@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qM-00016Q-CQ
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:43 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qN-00016V-5B
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qJ-0005pr-HX
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:38 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40143)
+	(envelope-from <cota@braap.org>) id 1dY1qJ-0005qv-R7
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:39 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40131)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005od-7f
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005pO-Jl
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:08:59 -0400
-Message-Id: <1500520169-23367-14-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:06 -0400
+Message-Id: <1500520169-23367-21-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 13/43] target/arm: check CF_PARALLEL instead
- of parallel_cpus
+Subject: [Qemu-devel] [PATCH v3 20/43] tcg: check CF_PARALLEL instead of
+ parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,203 +30,93 @@ Cc: Richard Henderson <rth@twiddle.net>
 Thereby decoupling the resulting translated code from the current state
 of the system.
 
+The tb->cflags field is not passed to tcg generation functions. So
+we add a bit to TCGContext, storing there whether CF_PARALLEL is set
+before translating every TB.
+
+Most architectures have <= 32 registers, which results in a 4-byte hole
+in TCGContext. Use this hole for the bit we need, which we store in a bool.
+
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/arm/helper-a64.h    |  4 ++++
- target/arm/helper-a64.c    | 38 ++++++++++++++++++++++++++++++++------
- target/arm/op_helper.c     |  7 -------
- target/arm/translate-a64.c | 31 +++++++++++++++++++++++++------
- target/arm/translate.c     |  9 +++++++--
- 5 files changed, 68 insertions(+), 21 deletions(-)
+ tcg/tcg.h                 |  1 +
+ accel/tcg/translate-all.c |  1 +
+ tcg/tcg-op.c              | 10 +++++-----
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 6f9eaba..85d8674 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -43,4 +43,8 @@ DEF_HELPER_FLAGS_2(fcvtx_f64_to_f32, TCG_CALL_NO_RWG, f32, f64, env)
- DEF_HELPER_FLAGS_3(crc32_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
- DEF_HELPER_FLAGS_3(crc32c_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
- DEF_HELPER_FLAGS_4(paired_cmpxchg64_le, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_4(paired_cmpxchg64_le_parallel, TCG_CALL_NO_WG,
-+                   i64, env, i64, i64, i64)
- DEF_HELPER_FLAGS_4(paired_cmpxchg64_be, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_4(paired_cmpxchg64_be_parallel, TCG_CALL_NO_WG,
-+                   i64, env, i64, i64, i64)
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index d9df82c..d0e435c 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -430,8 +430,9 @@ uint64_t HELPER(crc32c_64)(uint64_t acc, uint64_t val, uint32_t bytes)
- }
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 96872f8..9b6dade 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -656,6 +656,7 @@ struct TCGContext {
+     uintptr_t *tb_jmp_target_addr; /* tb->jmp_target_addr if !USE_DIRECT_JUMP */
  
- /* Returns 0 on success; 1 otherwise.  */
--uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
--                                     uint64_t new_lo, uint64_t new_hi)
-+static uint64_t do_paired_cmpxchg64_le(CPUARMState *env, uint64_t addr,
-+                                       uint64_t new_lo, uint64_t new_hi,
-+                                       bool parallel)
+     TCGRegSet reserved_regs;
++    bool cf_parallel; /* whether CF_PARALLEL is set in tb->cflags */
+     intptr_t current_frame_offset;
+     intptr_t frame_start;
+     intptr_t frame_end;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 600c0a1..645bc70 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1271,6 +1271,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     tb->flags = flags;
+     tb->cflags = cflags;
+     tb->trace_vcpu_dstate = *cpu->trace_dstate;
++    tcg_ctx.cf_parallel = !!(cflags & CF_PARALLEL);
+ 
+ #ifdef CONFIG_PROFILER
+     tcg_ctx.tb_count1++; /* includes aborted translations because of
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 205d07f..ef420d4 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -150,7 +150,7 @@ void tcg_gen_op6(TCGContext *ctx, TCGOpcode opc, TCGArg a1, TCGArg a2,
+ 
+ void tcg_gen_mb(TCGBar mb_type)
  {
-     uintptr_t ra = GETPC();
-     Int128 oldv, cmpv, newv;
-@@ -440,7 +441,7 @@ uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
-     cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
-     newv = int128_make128(new_lo, new_hi);
- 
 -    if (parallel_cpus) {
-+    if (parallel) {
- #ifndef CONFIG_ATOMIC128
-         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
- #else
-@@ -484,8 +485,21 @@ uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
-     return !success;
++    if (tcg_ctx.cf_parallel) {
+         tcg_gen_op1(&tcg_ctx, INDEX_op_mb, mb_type);
+     }
  }
- 
--uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
--                                     uint64_t new_lo, uint64_t new_hi)
-+uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
-+                                              uint64_t new_lo, uint64_t new_hi)
-+{
-+    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, false);
-+}
-+
-+uint64_t HELPER(paired_cmpxchg64_le_parallel)(CPUARMState *env, uint64_t addr,
-+                                              uint64_t new_lo, uint64_t new_hi)
-+{
-+    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, true);
-+}
-+
-+static uint64_t do_paired_cmpxchg64_be(CPUARMState *env, uint64_t addr,
-+                                       uint64_t new_lo, uint64_t new_hi,
-+                                       bool parallel)
+@@ -2794,7 +2794,7 @@ void tcg_gen_atomic_cmpxchg_i32(TCGv_i32 retv, TCGv addr, TCGv_i32 cmpv,
  {
-     uintptr_t ra = GETPC();
-     Int128 oldv, cmpv, newv;
-@@ -494,7 +508,7 @@ uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
-     cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
-     newv = int128_make128(new_lo, new_hi);
+     memop = tcg_canonicalize_memop(memop, 0, 0);
  
--    if (parallel_cpus) {
-+    if (parallel) {
- #ifndef CONFIG_ATOMIC128
-         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
- #else
-@@ -537,3 +551,15 @@ uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
+-    if (!parallel_cpus) {
++    if (!tcg_ctx.cf_parallel) {
+         TCGv_i32 t1 = tcg_temp_new_i32();
+         TCGv_i32 t2 = tcg_temp_new_i32();
  
-     return !success;
- }
-+
-+uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
-+                                     uint64_t new_lo, uint64_t new_hi)
-+{
-+    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, false);
-+}
-+
-+uint64_t HELPER(paired_cmpxchg64_be_parallel)(CPUARMState *env, uint64_t addr,
-+                                     uint64_t new_lo, uint64_t new_hi)
-+{
-+    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true);
-+}
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 2a85666..a28f254 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -450,13 +450,6 @@ void HELPER(yield)(CPUARMState *env)
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
- 
--    /* When running in MTTCG we don't generate jumps to the yield and
--     * WFE helpers as it won't affect the scheduling of other vCPUs.
--     * If we wanted to more completely model WFE/SEV so we don't busy
--     * spin unnecessarily we would need to do something more involved.
--     */
--    g_assert(!parallel_cpus);
--
-     /* This is a non-trappable hint instruction that generally indicates
-      * that the guest is currently busy-looping. Yield control back to the
-      * top level loop so that a more deserving VCPU has a chance to run.
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 685f1b0..5e775bd 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1334,13 +1334,18 @@ static void handle_hint(DisasContext *s, uint32_t insn,
-     case 3: /* WFI */
-         s->is_jmp = DISAS_WFI;
-         return;
-+        /* When running in MTTCG we don't generate jumps to the yield and
-+         * WFE helpers as it won't affect the scheduling of other vCPUs.
-+         * If we wanted to more completely model WFE/SEV so we don't busy
-+         * spin unnecessarily we would need to do something more involved.
-+         */
-     case 1: /* YIELD */
--        if (!parallel_cpus) {
-+        if (!(tb_cflags(s->tb) & CF_PARALLEL)) {
-             s->is_jmp = DISAS_YIELD;
-         }
-         return;
-     case 2: /* WFE */
--        if (!parallel_cpus) {
-+        if (!(tb_cflags(s->tb) & CF_PARALLEL)) {
-             s->is_jmp = DISAS_WFE;
-         }
-         return;
-@@ -1918,11 +1923,25 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
-             tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
-             tcg_temp_free_i64(val);
-         } else if (s->be_data == MO_LE) {
--            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
--                                           cpu_reg(s, rt2));
-+            if (tb_cflags(s->tb) & CF_PARALLEL) {
-+                gen_helper_paired_cmpxchg64_le_parallel(tmp, cpu_env, addr,
-+                                                        cpu_reg(s, rt),
-+                                                        cpu_reg(s, rt2));
-+            } else {
-+                gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr,
-+                                               cpu_reg(s, rt),
-+                                               cpu_reg(s, rt2));
-+            }
-         } else {
--            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, addr, cpu_reg(s, rt),
--                                           cpu_reg(s, rt2));
-+            if (tb_cflags(s->tb) & CF_PARALLEL) {
-+                gen_helper_paired_cmpxchg64_be_parallel(tmp, cpu_env, addr,
-+                                                        cpu_reg(s, rt),
-+                                                        cpu_reg(s, rt2));
-+            } else {
-+                gen_helper_paired_cmpxchg64_be(tmp, cpu_env, addr,
-+                                               cpu_reg(s, rt),
-+                                               cpu_reg(s, rt2));
-+            }
-         }
-     } else {
-         TCGv_i64 val = cpu_reg(s, rt);
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ccfb428..bd0ef58 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4497,8 +4497,13 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
- static void gen_nop_hint(DisasContext *s, int val)
+@@ -2838,7 +2838,7 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
  {
-     switch (val) {
-+        /* When running in MTTCG we don't generate jumps to the yield and
-+         * WFE helpers as it won't affect the scheduling of other vCPUs.
-+         * If we wanted to more completely model WFE/SEV so we don't busy
-+         * spin unnecessarily we would need to do something more involved.
-+         */
-     case 1: /* yield */
--        if (!parallel_cpus) {
-+        if (!(tb_cflags(s->tb) & CF_PARALLEL)) {
-             gen_set_pc_im(s, s->pc);
-             s->is_jmp = DISAS_YIELD;
-         }
-@@ -4508,7 +4513,7 @@ static void gen_nop_hint(DisasContext *s, int val)
-         s->is_jmp = DISAS_WFI;
-         break;
-     case 2: /* wfe */
--        if (!parallel_cpus) {
-+        if (!(tb_cflags(s->tb) & CF_PARALLEL)) {
-             gen_set_pc_im(s, s->pc);
-             s->is_jmp = DISAS_WFE;
-         }
+     memop = tcg_canonicalize_memop(memop, 1, 0);
+ 
+-    if (!parallel_cpus) {
++    if (!tcg_ctx.cf_parallel) {
+         TCGv_i64 t1 = tcg_temp_new_i64();
+         TCGv_i64 t2 = tcg_temp_new_i64();
+ 
+@@ -3015,7 +3015,7 @@ static void * const table_##NAME[16] = {                                \
+ void tcg_gen_atomic_##NAME##_i32                                        \
+     (TCGv_i32 ret, TCGv addr, TCGv_i32 val, TCGArg idx, TCGMemOp memop) \
+ {                                                                       \
+-    if (parallel_cpus) {                                                \
++    if (tcg_ctx.cf_parallel) {                                          \
+         do_atomic_op_i32(ret, addr, val, idx, memop, table_##NAME);     \
+     } else {                                                            \
+         do_nonatomic_op_i32(ret, addr, val, idx, memop, NEW,            \
+@@ -3025,7 +3025,7 @@ void tcg_gen_atomic_##NAME##_i32                                        \
+ void tcg_gen_atomic_##NAME##_i64                                        \
+     (TCGv_i64 ret, TCGv addr, TCGv_i64 val, TCGArg idx, TCGMemOp memop) \
+ {                                                                       \
+-    if (parallel_cpus) {                                                \
++    if (tcg_ctx.cf_parallel) {                                          \
+         do_atomic_op_i64(ret, addr, val, idx, memop, table_##NAME);     \
+     } else {                                                            \
+         do_nonatomic_op_i64(ret, addr, val, idx, memop, NEW,            \
 -- 
 2.7.4
