@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dY6FK-0002SM-2M
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:51:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1dY6HR-0003ia-QN
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dY6FG-000569-Uc
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:51:42 -0400
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:37559)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dY6FG-00054l-Pz
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:51:38 -0400
-Received: by mail-qk0-x22a.google.com with SMTP id y126so10545584qke.4
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 00:51:38 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1500520169-23367-1-git-send-email-cota@braap.org>
-	<1500520169-23367-41-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <8e3deffa-1e36-4d1a-2f2d-30d8f07f7093@twiddle.net>
-Date: Wed, 19 Jul 2017 21:51:32 -1000
-MIME-Version: 1.0
-In-Reply-To: <1500520169-23367-41-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 40/43] translate-all: use
- qemu_protect_rwx/none helpers
+	(envelope-from <armbru@redhat.com>) id 1dY6HQ-00037S-7K
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 20 Jul 2017 09:53:41 +0200
+Message-Id: <1500537221-20556-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1500537221-20556-1-git-send-email-armbru@redhat.com>
+References: <1500537221-20556-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 10/10] migration: Use JSON null instead of
+ "" to reset parameter to default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +20,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-On 07/19/2017 05:09 PM, Emilio G. Cota wrote:
-> The helpers require the address and size to be page-aligned, so
-> do that before calling them.
-> 
-> Signed-off-by: Emilio G. Cota<cota@braap.org>
-> ---
->   accel/tcg/translate-all.c | 61 ++++++++++-------------------------------------
->   1 file changed, 13 insertions(+), 48 deletions(-)
+migrate-set-parameters sets migration parameters according to is
+arguments like this:
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+* Present means "set the parameter to this value"
 
+* Absent means "leave the parameter unchanged"
 
-r~
+* Except for parameters tls_creds and tls_hostname, "" means "reset
+  the parameter to its default value
+
+The first two are perfectly normal: presence of the parameter makes
+the command do something.
+
+The third one overloads the parameter with a second meaning.  The
+overloading is *implicit*, i.e. it's not visible in the types.  Works
+here, because "" is neither a valid TLS credentials ID, nor a valid
+host name.
+
+Pressing argument values the schema accepts, but are semantically
+invalid, into service to mean "reset to default" is not general, as
+suitable invalid values need not exist.  I also find it ugly.
+
+To clean this up, we could add a separate flag argument to ask for
+"reset to default", or add a distinct value to @tls_creds and
+@tls_hostname.  This commit implements the latter: add JSON null to
+the values of @tls_creds and @tls_hostname, deprecate "".
+
+Because we're so close to the 2.10 freeze, implement it in the
+stupidest way possible: have qmp_migrate_set_parameters() rewrite null
+to "" before anything else can see the null.  The proper way to do it
+would be rewriting "" to null, but that requires fixing up code to
+work with null.  Add TODO comments for that.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ hmp.c                 |  8 ++++++--
+ migration/migration.c | 27 +++++++++++++++++++++++----
+ qapi-schema.json      | 20 ++++++++++++++++++--
+ 3 files changed, 47 insertions(+), 8 deletions(-)
+
+diff --git a/hmp.c b/hmp.c
+index 4b6b114..fd80dce 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1586,11 +1586,15 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+                 break;
+             case MIGRATION_PARAMETER_TLS_CREDS:
+                 p->has_tls_creds = true;
+-                visit_type_str(v, param, &p->tls_creds, &err);
++                p->tls_creds = g_new0(StrOrNull, 1);
++                p->tls_creds->type = QTYPE_QSTRING;
++                visit_type_str(v, param, &p->tls_creds->u.s, &err);
+                 break;
+             case MIGRATION_PARAMETER_TLS_HOSTNAME:
+                 p->has_tls_hostname = true;
+-                visit_type_str(v, param, &p->tls_hostname, &err);
++                p->tls_hostname = g_new0(StrOrNull, 1);
++                p->tls_hostname->type = QTYPE_QSTRING;
++                visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+                 break;
+             case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+                 p->has_max_bandwidth = true;
+diff --git a/migration/migration.c b/migration/migration.c
+index 205b801..085c32c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -770,11 +770,13 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     }
+ 
+     if (params->has_tls_creds) {
+-        dest->tls_creds = g_strdup(params->tls_creds);
++        assert(params->tls_creds->type == QTYPE_QSTRING);
++        dest->tls_creds = g_strdup(params->tls_creds->u.s);
+     }
+ 
+     if (params->has_tls_hostname) {
+-        dest->tls_hostname = g_strdup(params->tls_hostname);
++        assert(params->tls_hostname->type == QTYPE_QSTRING);
++        dest->tls_hostname = g_strdup(params->tls_hostname->u.s);
+     }
+ 
+     if (params->has_max_bandwidth) {
+@@ -822,12 +824,14 @@ static void migrate_params_apply(MigrateSetParameters *params)
+ 
+     if (params->has_tls_creds) {
+         g_free(s->parameters.tls_creds);
+-        s->parameters.tls_creds = g_strdup(params->tls_creds);
++        assert(params->tls_creds->type == QTYPE_QSTRING);
++        s->parameters.tls_creds = g_strdup(params->tls_creds->u.s);
+     }
+ 
+     if (params->has_tls_hostname) {
+         g_free(s->parameters.tls_hostname);
+-        s->parameters.tls_hostname = g_strdup(params->tls_hostname);
++        assert(params->tls_hostname->type == QTYPE_QSTRING);
++        s->parameters.tls_hostname = g_strdup(params->tls_hostname->u.s);
+     }
+ 
+     if (params->has_max_bandwidth) {
+@@ -858,6 +862,21 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+ {
+     MigrationParameters tmp;
+ 
++    /* TODO Rewrite "" to null instead */
++    if (params->has_tls_creds
++        && params->tls_creds->type == QTYPE_QNULL) {
++        QDECREF(params->tls_creds->u.n);
++        params->tls_creds->type = QTYPE_QSTRING;
++        params->tls_creds->u.s = strdup("");
++    }
++    /* TODO Rewrite "" to null instead */
++    if (params->has_tls_hostname
++        && params->tls_hostname->type == QTYPE_QNULL) {
++        QDECREF(params->tls_hostname->u.n);
++        params->tls_hostname->type = QTYPE_QSTRING;
++        params->tls_hostname->u.s = strdup("");
++    }
++
+     migrate_params_test_apply(params, &tmp);
+ 
+     if (!migrate_params_check(&tmp, errp)) {
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 9ea45d2..df0a568 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -116,6 +116,22 @@
+ { 'command': 'qmp_capabilities' }
+ 
+ ##
++# @StrOrNull:
++#
++# This is a string value or the explicit lack of a string (null
++# pointer in C).  Intended for cases when 'optional absent' already
++# has a different meaning.
++#
++# @s: the string value
++# @n: no string value
++#
++# Since: 2.10
++##
++{ 'alternate': 'StrOrNull',
++  'data': { 's': 'str',
++            'n': 'null' } }
++
++##
+ # @LostTickPolicy:
+ #
+ # Policy for handling lost ticks in timer devices.
+@@ -1098,8 +1114,8 @@
+             '*decompress-threads': 'int',
+             '*cpu-throttle-initial': 'int',
+             '*cpu-throttle-increment': 'int',
+-            '*tls-creds': 'str',
+-            '*tls-hostname': 'str',
++            '*tls-creds': 'StrOrNull',
++            '*tls-hostname': 'StrOrNull',
+             '*max-bandwidth': 'int',
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
+-- 
+2.7.5
