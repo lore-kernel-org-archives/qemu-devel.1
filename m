@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYB1A-0008DY-HH
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:57:25 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dYB2a-0000Y1-0t
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYB17-0002Yz-9r
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:57:24 -0400
-Received: from mail-io0-f180.google.com ([209.85.223.180]:36418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dYB17-0002Uo-44
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:57:21 -0400
-Received: by mail-io0-f180.google.com with SMTP id q2so11179762ioe.3
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 05:57:17 -0700 (PDT)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dYB2W-0004Ja-Mf
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:58:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46259)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dYB2W-0004IG-Bn
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:58:48 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6KCwesN091369
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:58:46 -0400
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bts1muggt-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:58:45 -0400
+Received: from localhost
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 20 Jul 2017 09:58:43 -0300
+References: <1500523879-23860-1-git-send-email-bharata@linux.vnet.ibm.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu, 20 Jul 2017 09:58:35 -0300
 MIME-Version: 1.0
-In-Reply-To: <87inin1g78.fsf@dusky.pond.sub.org>
-References: <20170720091902.22476-1-apahim@redhat.com>
-	<20170720091902.22476-2-apahim@redhat.com>
-	<87inin1g78.fsf@dusky.pond.sub.org>
-From: Amador Pahim <apahim@redhat.com>
-Date: Thu, 20 Jul 2017 14:57:15 +0200
-Message-ID: <CALAZnb1uWT__Pnd-zeP3_L+t+JDtK42+KHV9qo_r6qXWs4P64w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] qemu.py: fix is_running()
+In-Reply-To: <1500523879-23860-1-git-send-email-bharata@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <1af11c1a-7917-6616-9d03-39efcfd2001c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [FIX PATCH v1] spapr: Fix QEMU abort
+ during memory unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +42,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, ehabkost@redhat.com, mreitz@redhat.com, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Thu, Jul 20, 2017 at 1:49 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> Amador Pahim <apahim@redhat.com> writes:
+
+
+On 07/20/2017 01:11 AM, Bharata B Rao wrote:
+> Commit 0cffce56 (hw/ppc/spapr.c: adding pending_dimm_unplugs to
+> sPAPRMachineState) introduced a new way to track pending LMBs of DIMM
+> device that is marked for removal. Since this commit we can hit the
+> assert in spapr_pending_dimm_unplugs_add() in the following situation:
 >
->> Current implementation is broken. It does not really test if the child
->> process is running.
+> - DIMM device removal fails as the guest doesn't allow the removal.
+> - Subsequent attempt to remove the same DIMM would hit the assert
+>    as the corresponding sPAPRDIMMState is still part of the
+>    pending_dimm_unplugs list.
 >
-> What usage exactly is broken by this?  Got a reproducer for me?
-
-Problem is that 'returncode' is not set without a calling
-poll()/wait()/communicate(), so it's only useful to test if the
-process is running after such calls. But if we use 'poll()' instead,
-it will, according to the docs, "Check if child process has
-terminated. Set and return returncode attribute."
-
-Reproducer is:
-
- >>> import subprocess
- >>> devnull = open('/dev/null', 'rb')
- >>> p = subprocess.Popen(['qemu-system-x86_64', '-broken'],
-stdin=devnull, stdout=devnull, stderr=devnull, shell=False)
- >>> print p.returncode
- None
- >>> print p.poll()
- 1
- >>> print p.returncode
- 1
-
-
+> Fix this by removing the assert and conditionally adding the
+> sPAPRDIMMState to pending_dimm_unplugs list only when it is not
+> already present.
 >
->> The Popen.returncode will only be set after by a poll(), wait() or
->> communicate(). If the Popen fails to launch a VM, the Popen.returncode
->> will not turn to None by itself.
+> Fixes: 0cffce56ae3501c5783d779f97993ce478acf856
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> ---
+> Changes in v1:
+> - Added comment (David Gibson)
+> - Ensured we free sPAPRDIMMState when corresonding entry already
+>    exists (Daniel Henrique Barboza)
 >
-> Hmm.  What is the value of .returncode then?
+> Daniel had shown another alternative, we can switch over to that
+> if preferred.
 
-returncode starts with None and becomes the process exit code when the
-process is over and one of that three methods is called (poll(),
-wait() or communicate()).
-
-There's an error in my description though. The correct would be: "The
-Popen.returncode will only be set after a call to poll(), wait() or
-communicate(). If the Popen fails to launch a VM, the Popen.returncode
-will not turn from None to the actual return code by itself."
-
+Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 
 >
->> Instead of using Popen.returncode, let's use Popen.poll(), which
->> actually checks if child process has terminated.
->>
->> Signed-off-by: Amador Pahim <apahim@redhat.com>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> Reviewed-by: Fam Zheng <famz@redhat.com>
->> ---
->>  scripts/qemu.py | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/scripts/qemu.py b/scripts/qemu.py
->> index 880e3e8219..f0fade32bd 100644
->> --- a/scripts/qemu.py
->> +++ b/scripts/qemu.py
->> @@ -86,7 +86,7 @@ class QEMUMachine(object):
->>              raise
->>
->>      def is_running(self):
->> -        return self._popen and (self._popen.returncode is None)
->> +        return self._popen and (self._popen.poll() is None)
->>
->>      def exitcode(self):
->>          if self._popen is None:
->                return None
->            return self._popen.returncode
+>   hw/ppc/spapr.c | 13 +++++++++++--
+>   1 file changed, 11 insertions(+), 2 deletions(-)
 >
-> Why is this one safe?
-
-Here it's used just to retrieve the value from the Popen.returncode.
-It's not being used to check whether the process is running or not.
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1cb09e7..c6091e2 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2853,8 +2853,17 @@ static sPAPRDIMMState *spapr_pending_dimm_unplugs_find(sPAPRMachineState *s,
+>   static void spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
+>                                              sPAPRDIMMState *dimm_state)
+>   {
+> -    g_assert(!spapr_pending_dimm_unplugs_find(spapr, dimm_state->dimm));
+> -    QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, dimm_state, next);
+> +    /*
+> +     * If this request is for a DIMM whose removal had failed earlier
+> +     * (due to guest's refusal to remove the LMBs), we would have this
+> +     * dimm_state already in the pending_dimm_unplugs list. In that
+> +     * case don't add again.
+> +     */
+> +    if (!spapr_pending_dimm_unplugs_find(spapr, dimm_state->dimm)) {
+> +        QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, dimm_state, next);
+> +    } else {
+> +        g_free(dimm_state);
+> +    }
+>   }
+>
+>   static void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
