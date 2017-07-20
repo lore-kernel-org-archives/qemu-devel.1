@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dY6ml-000684-8p
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:26:16 -0400
+	(envelope-from <sf@sfritsch.de>) id 1dY6mm-00068b-6C
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dY6mk-0004on-8Z
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:26:15 -0400
-Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:36919)
+	(envelope-from <sf@sfritsch.de>) id 1dY6ml-0004p3-B0
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:26:16 -0400
+Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:36922)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dY6mk-0004oj-1Y
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:26:14 -0400
+	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dY6ml-0004ot-4t
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:26:15 -0400
 From: Stefan Fritsch <sf@sfritsch.de>
-Date: Thu, 20 Jul 2017 10:25:16 +0200
-Message-Id: <1500539123-23884-2-git-send-email-sf@sfritsch.de>
+Date: Thu, 20 Jul 2017 10:25:17 +0200
+Message-Id: <1500539123-23884-3-git-send-email-sf@sfritsch.de>
 In-Reply-To: <1500539123-23884-1-git-send-email-sf@sfritsch.de>
 References: <1500539123-23884-1-git-send-email-sf@sfritsch.de>
-Subject: [Qemu-devel] [PATCH 1/8] usb-ccid: Add support to dump all USB
- packets
+Subject: [Qemu-devel] [PATCH 2/8] usb-ccid: Fix USB packet generation for
+ 64-Bytes sized packets.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +29,40 @@ Cc: Stefan Fritsch <stefan_fritsch@genua.de>
 
 From: Stefan Fritsch <stefan_fritsch@genua.de>
 
-The dump can be activated by the debug command line option for the
-device like this "qemu ... -dev usb,ccid,debug=5"
+An USB transfer must be terminated by a packet that is shorter than
+the maximum USB packet size (usually 64Byte) reported by the device
+in its descriptor(s). Thus if the last packet of a transfer is exactly
+64-Bytes long,  we must send an additional zero length packet.
+Fix this for bulk in transfers.
 
-While there move the short read debug message to a higher debug level.
-It triggers very often and makes debug output unreadable.
+For bulk out transfers this is already ok, for interrupt transfers
+this is not a problem as the pipe has a maximum packet size of 8
+and transfers are only two bytes long.
 
 Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
 Signed-off-by: Christian Ehrhardt <christian_ehrhardt@genua.de>
 ---
- hw/usb/dev-smartcard-reader.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ hw/usb/dev-smartcard-reader.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index bef1f03c42..624dc2c447 100644
+index 624dc2c447..49791492ea 100644
 --- a/hw/usb/dev-smartcard-reader.c
 +++ b/hw/usb/dev-smartcard-reader.c
-@@ -54,9 +54,25 @@ do { \
- #define D_INFO 2
- #define D_MORE_INFO 3
- #define D_VERBOSE 4
-+#define D_TRACE 5
-+#define D_REMOTEIO 10
- 
- #define CCID_DEV_NAME "usb-ccid"
- #define USB_CCID_DEV(obj) OBJECT_CHECK(USBCCIDState, (obj), CCID_DEV_NAME)
-+
-+static void usb_packet_dump(int lvl, const char *dir, uint8_t *buf, size_t len)
-+{
-+    int i;
-+    if (lvl < D_TRACE) {
-+        return;
-+    }
-+    printf("usb-ccid: usb packet(%s/%zd):", dir, len);
-+    for (i = 0; i < len; ++i) {
-+        printf(" %02x", buf[i]);
-+    }
-+    printf("\n");
-+}
-+
- /*
-  * The two options for variable sized buffers:
-  * make them constant size, for large enough constant,
-@@ -1007,6 +1023,8 @@ static void ccid_handle_bulk_out(USBCCIDState *s, USBPacket *p)
-         goto err;
-     }
-     usb_packet_copy(p, s->bulk_out_data + s->bulk_out_pos, p->iov.size);
-+    usb_packet_dump(s->debug, "out", s->bulk_out_data + s->bulk_out_pos,
-+                    p->iov.size);
-     s->bulk_out_pos += p->iov.size;
-     if (s->bulk_out_pos < 10) {
-         DPRINTF(s, 1, "%s: header incomplete\n", __func__);
-@@ -1102,6 +1120,9 @@ static void ccid_bulk_in_copy_to_guest(USBCCIDState *s, USBPacket *p)
-                   p->iov.size);
-         usb_packet_copy(p, s->current_bulk_in->data +
-                         s->current_bulk_in->pos, len);
-+        usb_packet_dump(s->debug, " in",
-+                        s->current_bulk_in->data + s->current_bulk_in->pos,
-+                        len);
+@@ -1124,7 +1124,13 @@ static void ccid_bulk_in_copy_to_guest(USBCCIDState *s, USBPacket *p)
+                         s->current_bulk_in->data + s->current_bulk_in->pos,
+                         len);
          s->current_bulk_in->pos += len;
-         if (s->current_bulk_in->pos == s->current_bulk_in->len) {
+-        if (s->current_bulk_in->pos == s->current_bulk_in->len) {
++        /*
++         * The caller assumes that the packet continues if we fill the
++         * entire iov and the iov length matches the max packet size.
++         * Add an empty USB packet in this case.
++         */
++        if (s->current_bulk_in->pos == s->current_bulk_in->len
++            && (len < p->iov.size || p->iov.size < CCID_MAX_PACKET_SIZE)) {
              ccid_bulk_in_release(s);
-@@ -1116,7 +1137,7 @@ static void ccid_bulk_in_copy_to_guest(USBCCIDState *s, USBPacket *p)
-                 __func__, p->iov.size, len);
-     }
-     if (len < p->iov.size) {
--        DPRINTF(s, 1,
-+        DPRINTF(s, D_REMOTEIO,
-                 "%s: returning short (EREMOTEIO) %d < %zd\n",
-                 __func__, len, p->iov.size);
-     }
-@@ -1143,6 +1164,7 @@ static void ccid_handle_data(USBDevice *dev, USBPacket *p)
-                 buf[0] = CCID_MESSAGE_TYPE_RDR_to_PC_NotifySlotChange;
-                 buf[1] = s->bmSlotICCState;
-                 usb_packet_copy(p, buf, 2);
-+                usb_packet_dump(s->debug, "irq", buf, 2);
-                 s->notify_slot_change = false;
-                 s->bmSlotICCState &= ~SLOT_0_CHANGED_MASK;
-                 DPRINTF(s, D_INFO,
+         }
+     } else {
 -- 
 2.11.0
