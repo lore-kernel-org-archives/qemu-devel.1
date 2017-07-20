@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54298)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYEk7-0008Ml-FW
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:56:04 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54648)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1dYElK-0000gO-JZ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYEk3-00017t-AT
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:56:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYEk3-000175-4d
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:55:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA86072D09
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:55:57 +0000 (UTC)
-Date: Thu, 20 Jul 2017 17:55:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170720165547.GF2456@work-vm>
-References: <20170720163536.26183-1-dgilbert@redhat.com>
-	<20170720164410.GO21566@redhat.com>
+	(envelope-from <n54@gmx.com>) id 1dYElF-0001al-KU
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:57:18 -0400
+Received: from mout.gmx.net ([212.227.15.15]:55211)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dYElF-0001aL-9V
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:57:13 -0400
+References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
+	<87zibz2w4c.fsf@dusky.pond.sub.org>
+	<CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <8d6cb93a-ffa9-9d92-b733-134390fc4723@gmx.com>
+Date: Thu, 20 Jul 2017 18:59:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170720164410.GO21566@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/bios-tables-test: Compiler warning
- fix
+In-Reply-To: <CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
+ tools)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com, marcel@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Thu, Jul 20, 2017 at 05:35:36PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > gcc 7.1.1 in fedora 26 moans about the:
-> >    tables = g_new0(uint32_t, tables_nr)
-> > 
-> > because it can't convince itself that tables_nr is positive.
-> > This is fallout from g_assert_cmpint no longer necessarily being
-> > no-return;  replace it with a plain g_assert.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  tests/bios-tables-test.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> > index 63da978f0b..564da45f65 100644
-> > --- a/tests/bios-tables-test.c
-> > +++ b/tests/bios-tables-test.c
-> > @@ -108,7 +108,7 @@ static void test_acpi_rsdt_table(test_data *data)
-> >      /* compute the table entries in rsdt */
-> >      tables_nr = (rsdt_table->length - sizeof(AcpiRsdtDescriptorRev1)) /
-> >                  sizeof(uint32_t);
-> > -    g_assert_cmpint(tables_nr, >, 0);
-> > +    g_assert(tables_nr > 0);
-> 
-> IMHO your original patch was better - rsdt_table->length is an
-> uint32_t, and sizeof() evaluates to size_t, but we're assigning
-> to a local  tables_nr that is a signed int. So tables_nr would
-> be better declared as size_t.  That would mean the assert can
-> just be removed entirely, or replaced by an assert that
-> rsdt_table->length > sizeof(AcpiRsdtDescriptorRev1) if we're
-> concerned about that
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "patches@linaro.org" <patches@linaro.org>
+Message-ID: <8d6cb93a-ffa9-9d92-b733-134390fc4723@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
+ tools)
+References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
+ <87zibz2w4c.fsf@dusky.pond.sub.org>
+ <CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Given that assert was there I'd assumed Marcel was explicitly checking
-for that case, so my original hack of just making it a uint or size_t
-didn't seem safe.
+On 20.07.2017 17:35, Peter Maydell wrote:
+> On 20 July 2017 at 12:20, Markus Armbruster <armbru@redhat.com> wrote:
+>> Regardless of my inability to find CONFIG_IVSHMEM confusing (see PATCH=
 
-Checking that rsdt_table->length > sizeof(AcpiRsdtDescriptorRev1)
-probably is safer; although this is only a sanity assert in a test
-case, not dealing with user data, so I just made the minimal change.
+>> 1), series
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>=20
+> Thanks; patchset applied to master.
+>=20
+> -- PMM
+>=20
 
-Dave
+Thank you for this!
 
-> 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZcOFyAAoJEEuzCOmwLnZs97cP/0JxG/zTVc3C9Qrlltd9YLwA
+KEcNxwp/zDalRQRNDU2GQ5M3B5aqjQJuatx3YEGr0jTgfQ9f5vQK8zMv8pXgVEhj
+oKfmIiM0dEmfnvQ+kt0N13/TcRScm6/h69vUv5laIkBBKbU1GjxdFPa4ZX6YXMTQ
+GGoq2IS9UMRDbl+JPphoc8tLzx8YVqOwCAc3vIzEOJRioksnDQuDq34hSLIRplpJ
+7qTqbFdj1LFjBnSDVd3z2egSFt84jNwnmDLmcFnBK2tLUicT1KVgAauiuJ/tr+Nm
+MDZ+lk1TXVOECOMLdtI7khmOuTHLxFY5lSYrFUk3KSE/V/onoKYWjAbdvXS5g8GF
+KW6jhGe+Zt/YHTin0guzSCgCtRtyS5ikLCns9P93nAzHmBCT5JSHKGhMOsjjL/8Q
+ajv3vbzR3PRLUE5r+Akh2favSZ/g6yOlUzWrQAUXOOk2Eqhb8aTqpvlDOZwvjPWz
+FefPn0oEVwyoxt4VbvxEncxtMQuch/S6ZeDj5PwMRbR6sigq8lsdFZOGiUqP3Lw9
+IPs2cnZqkhd8FSQEkjCEiX/R1AMOsxJY5Y9nZq2Aoy5rPWUCRBPtpgAb5alb/wQE
+MYGcGgfWbZETA+hK4OkXYfWaV6ZQsO/9hiAV3fT08PhVobePhHjotbbjc33wdrtn
+04YH46QxFnksNQ/rH/MO
+=yhzc
+-----END PGP SIGNATURE-----
+
+--bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S--
