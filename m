@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dY6xB-0005AT-UV
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:37:06 -0400
+	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dY6xY-0005Hi-Hz
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dY6x6-0000eD-Tm
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:37:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45872)
+	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dY6xT-0000lJ-LQ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:37:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dY6x6-0000dm-OC
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:36:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dY6x4-0007vs-OM
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:36:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ABF512E8075
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:36:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <liujbjl@linux.vnet.ibm.com>)
+	id 1dY6xT-0000kR-Bq
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 04:37:19 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6K8XYGZ036332
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 04:37:17 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2btma8jf20-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 04:37:16 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <liujbjl@linux.vnet.ibm.com>;
+	Thu, 20 Jul 2017 02:37:15 -0600
+References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+	<96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
+	<ac3a06a2-bc47-92bb-50e2-0b8174c2b515@redhat.com>
+From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Date: Thu, 20 Jul 2017 16:37:29 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <ac3a06a2-bc47-92bb-50e2-0b8174c2b515@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <7f47afb9-fef3-3ca3-185f-d6844589798c@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Jul 2017 08:21:32 -0000
-From: Thomas Huth <1333216@bugs.launchpad.net>
-Reply-To: Bug 1333216 <1333216@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140623113621.6929.85009.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150053889230.24716.15513993833147934672.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1333216] Re: Xen 4.4 with qemu 1.6.2 VGA passthru
- NVIDIA
+Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +42,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Lukas Doktor <ldoktor@redhat.com>, Amador Segundo <asegundo@redhat.com>
 
-Thanks for the answer! So I'm closing this bug ticket now...
+Hi Cleber Rosa,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Invalid
 
--- =
+On 2017/7/19 =E4=B8=8A=E5=8D=885:22, Cleber Rosa wrote:
+>
+> On 07/18/2017 02:07 PM, John Snow wrote:
+>>
+>> On 07/17/2017 11:01 PM, Jing Liu wrote:
+>>
+[...]
+> I see issues here:
+>
+> 1) The qemu-iotests "runner", that is, "./check", understands that a
+> file number is a test.  No further granularity is (currently?)
+> achievable here.
+>
+> The easy solution would be to split tests which depend on optional
+> features to separate test files.  In the 087 test given as example,
+> the "=3D=3D=3D aio=3Dnative without O_DIRECT =3D=3D=3D" block would bec=
+ome, say, 190.
+>
+> 2) Skip tests based on features more easily.  There's already support
+> for skipping tests on various situations.  From 087:
+>
+> ...
+> _supported_fmt qcow2
+> _supported_proto file
+> _supported_os Linux
+> ...
+>
+> It's trivial to also have access to other compile time settings.  I did
+> a quick experiment that would add a "_required_feature" function to
+> "common.rc".
+This seems a good way to solve this problem.
+I failed for 087 just because there is no CONFIG_NETTLE_KDF.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1333216
+I wonder how can common.rc detect if there's CONFIG_XXX in config-host.ma=
+k ?
 
-Title:
-  Xen 4.4 with qemu 1.6.2 VGA passthru NVIDIA
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Hi!
-
-  Please, give me an advice.
-
-  I try use VGA passthough NVidia k40 on SuperMicro Server, but server is h=
-aving error.
-  My Xen is using qemu (a9e8aeb3755bccb7b51174adcf4a3fc427e0d147)2.0.0
-
-  My VirtualMachine is have config:
-  device_model_version =3D "qemu-xen"
-  device_model_override =3D "/opt/sources/qemu-a9e8aeb/x86_64-softmmu/qemu-=
-system-x86_64"
-
-  When I start VM:
-  dmesg
-  [    0.906181] pci 0000:00:05.0: BAR 1: can't assign mem pref (size 0x100=
-000000)
-  [    0.906187] pci 0000:00:05.0: BAR 1: trying firmware assignment [mem 0=
-x100000000-0x1ffffffff 64bit pref]
-  [    0.906193] pci 0000:00:05.0: BAR 1: assigned [mem 0x100000000-0x1ffff=
-ffff 64bit pref]
-  and lspci -s 00:05.0 -vvv
-          Region 0: Memory at 85000000 (32-bit, non-prefetchable) [size=3D1=
-6M]
-          Region 1: Memory at 100000000 (64-bit, prefetchable) [size=3D4G]
-          Region 3: Memory at 82000000 (64-bit, prefetchable) [size=3D32M]
-
-  Why?
-
-  This is message in DOM0:
-  lspci -s 03:00.0 -vvv
-  ....
-  Region 0: Memory at de000000 (32-bit, non-prefetchable) [size=3D16M]
-  Region 1: Memory at 5800000000 (64-bit, prefetchable) [size=3D16G]
-  Region 3: Memory at 5c00000000 (64-bit, prefetchable) [size=3D32M]
-
-  =
-
-  Why Qemu don`t mapping BAR1?
-  Thanks!
-  Regards!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1333216/+subscriptions
+Thanks.
+Jing
+>   For 087 (or 190?) it would look like:
+>
+> ...
+> _supported_fmt qcow2
+> _supported_proto file
+> _supported_os Linux
+> _required_feature CONFIG_LINUX_AIO
+> ...
+>
+> Does it make sense?  Would a patch series along those lines would be
+> welcomed by reviews?
+>
+> Thanks!
+>
