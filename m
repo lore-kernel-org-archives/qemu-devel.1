@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYBHr-0002Us-2V
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:14:44 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dYBSK-0005Ka-3A
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYBHk-0006R6-UX
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:14:39 -0400
-Received: from mail-io0-f173.google.com ([209.85.223.173]:34699)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dYBHk-0006PR-Nv
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:14:32 -0400
-Received: by mail-io0-f173.google.com with SMTP id l7so11558392iof.1
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 06:14:30 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dYBSG-0006Tc-08
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:25:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dYBSF-0006Ro-QJ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:25:23 -0400
+Date: Thu, 20 Jul 2017 15:25:15 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170720152515.36524879@gondolin>
+In-Reply-To: <1500550051-7821-2-git-send-email-borntraeger@de.ibm.com>
+References: <1500550051-7821-1-git-send-email-borntraeger@de.ibm.com>
+	<1500550051-7821-2-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <87d18v1frq.fsf@dusky.pond.sub.org>
-References: <20170720091902.22476-1-apahim@redhat.com>
-	<20170720091902.22476-3-apahim@redhat.com>
-	<87d18v1frq.fsf@dusky.pond.sub.org>
-From: Amador Pahim <apahim@redhat.com>
-Date: Thu, 20 Jul 2017 15:14:28 +0200
-Message-ID: <CALAZnb0pu7Q6BmLgggigThx0Xdy0NcO3EpRo3FY9Q6mSYY88Og@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: include debug information
- on launch error
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390/cpumodel: remove KSS from the
+ default model of z14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, ehabkost@redhat.com, mreitz@redhat.com, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Thu, Jul 20, 2017 at 1:58 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> Amador Pahim <apahim@redhat.com> writes:
->
->> When launching a VM, if an exception happens and the VM is not
->> initiated, it is useful to see the qemu command line that was executed
->> and the output of that command.
->>
->> Before the patch:
->>
->>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
->>     >>> VM.launch()
->>     Traceback (most recent call last):
->>       File "<stdin>", line 1, in <module>
->>       File "qemu.py", line 137, in launch
->>         self._post_launch()
->>       File "qemu.py", line 121, in _post_launch
->>         self._qmp.accept()
->>       File "qmp/qmp.py", line 145, in accept
->>         self.__sock, _ = self.__sock.accept()
->>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>         sock, addr = self._sock.accept()
->>     socket.timeout: timed out
->>
->> After the patch:
->>
->>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
->>     >>> VM.launch()
->>     Traceback (most recent call last):
->>       File "<stdin>", line 1, in <module>
->>       File "qemu.py", line 156, in launch
->>         raise RuntimeError(msg)
->>     RuntimeError: Error launching VM.
->>     Original Exception:
->>     Traceback (most recent call last):
->>       File "qemu.py", line 138, in launch
->>         self._post_launch()
->>       File "qemu.py", line 122, in _post_launch
->>         self._qmp.accept()
->>       File "qmp/qmp.py", line 145, in accept
->>         self.__sock, _ = self.__sock.accept()
->>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>         sock, addr = self._sock.accept()
->>     timeout: timed out
->>     Command:
->>     /usr/bin/qemu-system-aarch64 -chardev socket,id=mon,
->>     path=/var/tmp/qemu-23958-monitor.sock -mon chardev=mon,mode=control
->>     -display none -vga none
->>     Output:
->>     qemu-system-aarch64: No machine specified, and there is no default
->>     Use -machine help to list supported machines
->>
->> Also, if the launch() faces an exception, the 'except' now will use args
->> to fill the debug information. So this patch assigns 'args' earlier,
->> assuring it will be available for the 'except'.
->>
->> Signed-off-by: Amador Pahim <apahim@redhat.com>
->> Reviewed-by: Fam Zheng <famz@redhat.com>
->> ---
->>  scripts/qemu.py | 18 ++++++++++++++++--
->>  1 file changed, 16 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/qemu.py b/scripts/qemu.py
->> index f0fade32bd..2707ae7f75 100644
->> --- a/scripts/qemu.py
->> +++ b/scripts/qemu.py
->> @@ -18,6 +18,7 @@ import os
->>  import sys
->>  import subprocess
->>  import qmp.qmp
->> +import traceback
->>
->>
->>  class QEMUMachine(object):
->> @@ -129,17 +130,30 @@ class QEMUMachine(object):
->>          '''Launch the VM and establish a QMP connection'''
->>          devnull = open('/dev/null', 'rb')
->>          qemulog = open(self._qemu_log_path, 'wb')
->> +        args = self._wrapper + [self._binary] + self._base_args() + self.args
->>          try:
->>              self._pre_launch()
->> -            args = self._wrapper + [self._binary] + self._base_args() + self._args
->>              self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
->>                                             stderr=subprocess.STDOUT, shell=False)
->>              self._post_launch()
->
-> Lifting the assignment out of the try makes sense, because exceptions
-> there are programming errors.
->
-> Why are ._pre_launch() and ._post_launch() inside the try?
+On Thu, 20 Jul 2017 13:27:31 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-The _pre_launch()/_post_launch() are probably the main source of
-exceptions here and I assume we want to handle the exceptions coming
-from them.
+> The SIE_KSS feature will allow a guest to use KSS for a nested guest.
+> To create a nested guest the SIE_F2 facility is still necessary.
+> Since SIE_F2 is not part of the default model it does not make
+> a lot of sense to provide the SIE_KSS feature in the default model.
+> Let's also create a dependency check.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> ---
+>  target/s390x/cpu_models.c   | 1 +
+>  target/s390x/gen-features.c | 1 -
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 
-The call to subprocess.Popen() is unlikely to raise exceptions. I
-mean, it's easy to trigger an 'OSError' exception providing a
-non-existent command to Popen, but once we provide something
-executable, we will not see an exception here if the command fails.
-The CalledProcessError is only raised by subprocess.check_call() or
-subprocess.check_output().
-
-
->
->>          except:
->
-> Why do we catch all exceptions, and not just
-> subprocess.CalledProcessError?
->
->> +            self._load_io_log()
->>              if self.is_running():
->
-> I suspect we can't get here only for "odd" exceptions, not for
-> subprocess.CalledProcessError.
->
->>                  self._popen.kill()
->>                  self._popen.wait()
->> -            self._load_io_log()
->> +            else:
->> +                exc_type, exc_value, exc_traceback = sys.exc_info()
->> +                msg = ('Error launching VM.\n'
->> +                       'Original Exception: \n%s'
->> +                       'Command:\n%s\n'
->> +                       'Output:\n%s\n' %
->> +                       (''.join(traceback.format_exception(exc_type,
->> +                                                           exc_value,
->> +                                                           exc_traceback)),
->> +                        ' '.join(args),
->> +                        self._iolog))
->> +                self._post_shutdown()
->> +                raise RuntimeError(msg)
->>              self._post_shutdown()
->>              raise
->
-> Why do we print a traceback when subprocess.CalledProcessError?
-
-subprocess.CalledProcessError will not happen with subprocess.Popen,
-even if the command fails. But if the virtual machine does not start,
-we will, for example, see a 'socket.timeout' exception coming from
-_post_launch() when it tries to connect to the qemu monitor.
+Thanks, queued to s390-next.
