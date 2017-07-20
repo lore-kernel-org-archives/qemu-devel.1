@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dYCew-0003Ca-Oa
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:42:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dYCoL-0007ea-N6
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dYCes-000180-Ph
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:42:34 -0400
-Received: from mga02.intel.com ([134.134.136.20]:59084)
+	(envelope-from <ehabkost@redhat.com>) id 1dYCoI-00085o-Et
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:52:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dYCes-00016q-78
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:42:30 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Thu, 20 Jul 2017 14:42:25 +0000
-Message-ID: <1500561863.29166.1.camel@intel.com>
-References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
-	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
-	<a15251e3-de79-dcf3-3db9-83dd4f5980bb@linux.vnet.ibm.com>
-In-Reply-To: <a15251e3-de79-dcf3-3db9-83dd4f5980bb@linux.vnet.ibm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D206872AC76C9442821B995DD5EDAAAD@intel.com>
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dYCoI-00083i-50
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:52:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AFAB67A17D
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 14:43:49 +0000 (UTC)
+Date: Thu, 20 Jul 2017 11:43:40 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170720144340.GP2757@localhost.localdomain>
+References: <20170720091902.22476-1-apahim@redhat.com>
+	<20170720091902.22476-3-apahim@redhat.com>
+	<87d18v1frq.fsf@dusky.pond.sub.org>
+	<CALAZnb0pu7Q6BmLgggigThx0Xdy0NcO3EpRo3FY9Q6mSYY88Og@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALAZnb0pu7Q6BmLgggigThx0Xdy0NcO3EpRo3FY9Q6mSYY88Og@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: include debug information
+ on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +36,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Amador Pahim <apahim@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, mreitz@redhat.com, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
 
-T24gVHVlLCAyMDE3LTA3LTE4IGF0IDEwOjM5IC0wNDAwLCBTdGVmYW4gQmVyZ2VyIHdyb3RlOg0K
-PiBPbiAwNy8xOC8yMDE3IDA0OjQ5IEFNLCBBbWFybmF0aCBWYWxsdXJpIHdyb3RlOg0KPiA+IA0K
-PiA+IGRpZmYgLS1naXQgYS9ody90cG0vTWFrZWZpbGUub2JqcyBiL2h3L3RwbS9NYWtlZmlsZS5v
-YmpzDQo+ID4gaW5kZXggNjRjZWNjMy4uNDFmMGI3YSAxMDA2NDQNCj4gPiAtLS0gYS9ody90cG0v
-TWFrZWZpbGUub2Jqcw0KPiA+ICsrKyBiL2h3L3RwbS9NYWtlZmlsZS5vYmpzDQo+ID4gQEAgLTEs
-MiArMSwzIEBADQo+ID4gwqAgY29tbW9uLW9iai0kKENPTkZJR19UUE1fVElTKSArPSB0cG1fdGlz
-Lm8NCj4gPiDCoCBjb21tb24tb2JqLSQoQ09ORklHX1RQTV9QQVNTVEhST1VHSCkgKz0gdHBtX3Bh
-c3N0aHJvdWdoLm8NCj4gPiB0cG1fdXRpbC5vDQo+ID4gK2NvbW1vbi1vYmotJChDT05GSUdfVFBN
-X0VNVUxBVE9SKSArPSB0cG1fZW11bGF0b3IubyB0cG1fdXRpbC5vDQo+ID4gZGlmZiAtLWdpdCBh
-L2h3L3RwbS90cG1fZW11bGF0b3IuYyBiL2h3L3RwbS90cG1fZW11bGF0b3IuYw0KPiA+IG5ldyBm
-aWxlIG1vZGUgMTAwNjQ0DQo+ID4gaW5kZXggMDAwMDAwMC4uYzkwOTE0Yw0KPiA+IC0tLSAvZGV2
-L251bGwNCj4gPiArKysgYi9ody90cG0vdHBtX2VtdWxhdG9yLmMNCj4gPiBAQCAtMCwwICsxLDk3
-MyBAQA0KPiA+ICsvKg0KPiA+ICsgKsKgwqBlbXVsYXRvciBUUE0gZHJpdmVyDQo+ID4gKyAqDQo+
-ID4gKyAqwqDCoENvcHlyaWdodCAoYykgMjAxNyBJbnRlbCBDb3Jwb3JhdGlvbg0KPiA+ICsgKsKg
-wqBBdXRob3I6IEFtYXJuYXRoIFZhbGx1cmkgPGFtYXJuYXRoLnZhbGx1cmlAaW50ZWwuY29tPg0K
-PiA+ICsgKg0KPiA+ICsgKsKgwqBDb3B5cmlnaHQgKGMpIDIwMTAgLSAyMDEzIElCTSBDb3Jwb3Jh
-dGlvbg0KPiA+ICsgKsKgwqBBdXRob3JzOg0KPiA+ICsgKsKgwqDCoMKgU3RlZmFuIEJlcmdlciA8
-c3RlZmFuYkB1cy5pYm0uY29tPg0KPiA+ICsgKg0KPiA+ICsgKsKgwqBDb3B5cmlnaHQgKEMpIDIw
-MTEgSUFJSywgR3JheiBVbml2ZXJzaXR5IG9mIFRlY2hub2xvZ3kNCj4gPiArICrCoMKgwqDCoEF1
-dGhvcjogQW5kcmVhcyBOaWVkZXJsDQo+ID4gKyAqDQo+ID4gKyAqIFRoaXMgbGlicmFyeSBpcyBm
-cmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3INCj4gPiArICogbW9k
-aWZ5IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIExlc3NlciBHZW5lcmFsIFB1YmxpYw0K
-PiA+ICsgKiBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0
-aW9uOyBlaXRoZXINCj4gPiArICogdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvciAoYXQgeW91
-ciBvcHRpb24pIGFueSBsYXRlcg0KPiA+IHZlcnNpb24uDQo+ID4gKyAqDQo+ID4gKyAqIFRoaXMg
-bGlicmFyeSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVs
-LA0KPiA+ICsgKiBidXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1w
-bGllZCB3YXJyYW50eSBvZg0KPiA+ICsgKiBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVTUyBGT1Ig
-QSBQQVJUSUNVTEFSIFBVUlBPU0UuwqDCoFNlZSB0aGUNCj4gPiBHTlUNCj4gPiArICogTGVzc2Vy
-IEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4NCj4gPiArICoNCj4gPiAr
-ICogWW91IHNob3VsZCBoYXZlIHJlY2VpdmVkIGEgY29weSBvZiB0aGUgR05VIExlc3NlciBHZW5l
-cmFsDQo+ID4gUHVibGljDQo+ID4gKyAqIExpY2Vuc2UgYWxvbmcgd2l0aCB0aGlzIGxpYnJhcnk7
-IGlmIG5vdCwgc2VlIDxodHRwOi8vd3d3LmdudS5vcg0KPiA+IGcvbGljZW5zZXMvPg0KPiA+ICsg
-Kg0KPiA+ICsgKi8NCj4gPiArDQo+ID4gKyNpbmNsdWRlICJxZW11L29zZGVwLmgiDQo+ID4gKyNp
-bmNsdWRlICJxZW11L2Vycm9yLXJlcG9ydC5oIg0KPiA+ICsjaW5jbHVkZSAicWVtdS9zb2NrZXRz
-LmgiDQo+ID4gKyNpbmNsdWRlICJpby9jaGFubmVsLXNvY2tldC5oIg0KPiA+ICsjaW5jbHVkZSAi
-c3lzZW11L3RwbV9iYWNrZW5kLmgiDQo+ID4gKyNpbmNsdWRlICJ0cG1faW50LmgiDQo+ID4gKyNp
-bmNsdWRlICJody9ody5oIg0KPiA+ICsjaW5jbHVkZSAiaHcvaTM4Ni9wYy5oIg0KPiA+ICsjaW5j
-bHVkZSAidHBtX3V0aWwuaCINCj4gPiArI2luY2x1ZGUgInRwbV9pb2N0bC5oIg0KPiA+ICsjaW5j
-bHVkZSAibWlncmF0aW9uL21pZ3JhdGlvbi5oIg0KPiBNaXNzaW5nOiBtaWdyYXRpb24vYmxvY2tl
-ci5oDQpPb3BzIHRoZXJlIHdhcyBzb21ldGhpbmcgd2VudCB3cm9uZyB3aGlsZSByZWJhc2luZywg
-aSB3aWxsIHJlc2VuZC4NCg0KLSBBbWFybmF0aA==
+On Thu, Jul 20, 2017 at 03:14:28PM +0200, Amador Pahim wrote:
+> On Thu, Jul 20, 2017 at 1:58 PM, Markus Armbruster <armbru@redhat.com> wrote:
+> > Amador Pahim <apahim@redhat.com> writes:
+> >
+> >> When launching a VM, if an exception happens and the VM is not
+> >> initiated, it is useful to see the qemu command line that was executed
+> >> and the output of that command.
+> >>
+> >> Before the patch:
+> >>
+> >>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
+> >>     >>> VM.launch()
+> >>     Traceback (most recent call last):
+> >>       File "<stdin>", line 1, in <module>
+> >>       File "qemu.py", line 137, in launch
+> >>         self._post_launch()
+> >>       File "qemu.py", line 121, in _post_launch
+> >>         self._qmp.accept()
+> >>       File "qmp/qmp.py", line 145, in accept
+> >>         self.__sock, _ = self.__sock.accept()
+> >>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+> >>         sock, addr = self._sock.accept()
+> >>     socket.timeout: timed out
+> >>
+> >> After the patch:
+> >>
+> >>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
+> >>     >>> VM.launch()
+> >>     Traceback (most recent call last):
+> >>       File "<stdin>", line 1, in <module>
+> >>       File "qemu.py", line 156, in launch
+> >>         raise RuntimeError(msg)
+> >>     RuntimeError: Error launching VM.
+> >>     Original Exception:
+> >>     Traceback (most recent call last):
+> >>       File "qemu.py", line 138, in launch
+> >>         self._post_launch()
+> >>       File "qemu.py", line 122, in _post_launch
+> >>         self._qmp.accept()
+> >>       File "qmp/qmp.py", line 145, in accept
+> >>         self.__sock, _ = self.__sock.accept()
+> >>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+> >>         sock, addr = self._sock.accept()
+> >>     timeout: timed out
+> >>     Command:
+> >>     /usr/bin/qemu-system-aarch64 -chardev socket,id=mon,
+> >>     path=/var/tmp/qemu-23958-monitor.sock -mon chardev=mon,mode=control
+> >>     -display none -vga none
+> >>     Output:
+> >>     qemu-system-aarch64: No machine specified, and there is no default
+> >>     Use -machine help to list supported machines
+> >>
+> >> Also, if the launch() faces an exception, the 'except' now will use args
+> >> to fill the debug information. So this patch assigns 'args' earlier,
+> >> assuring it will be available for the 'except'.
+> >>
+> >> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> >> Reviewed-by: Fam Zheng <famz@redhat.com>
+> >> ---
+> >>  scripts/qemu.py | 18 ++++++++++++++++--
+> >>  1 file changed, 16 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> >> index f0fade32bd..2707ae7f75 100644
+> >> --- a/scripts/qemu.py
+> >> +++ b/scripts/qemu.py
+> >> @@ -18,6 +18,7 @@ import os
+> >>  import sys
+> >>  import subprocess
+> >>  import qmp.qmp
+> >> +import traceback
+> >>
+> >>
+> >>  class QEMUMachine(object):
+> >> @@ -129,17 +130,30 @@ class QEMUMachine(object):
+> >>          '''Launch the VM and establish a QMP connection'''
+> >>          devnull = open('/dev/null', 'rb')
+> >>          qemulog = open(self._qemu_log_path, 'wb')
+> >> +        args = self._wrapper + [self._binary] + self._base_args() + self.args
+> >>          try:
+> >>              self._pre_launch()
+> >> -            args = self._wrapper + [self._binary] + self._base_args() + self._args
+> >>              self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+> >>                                             stderr=subprocess.STDOUT, shell=False)
+> >>              self._post_launch()
+> >
+> > Lifting the assignment out of the try makes sense, because exceptions
+> > there are programming errors.
+> >
+> > Why are ._pre_launch() and ._post_launch() inside the try?
+> 
+> The _pre_launch()/_post_launch() are probably the main source of
+> exceptions here and I assume we want to handle the exceptions coming
+> from them.
+> 
+> The call to subprocess.Popen() is unlikely to raise exceptions. I
+> mean, it's easy to trigger an 'OSError' exception providing a
+> non-existent command to Popen, but once we provide something
+> executable, we will not see an exception here if the command fails.
+> The CalledProcessError is only raised by subprocess.check_call() or
+> subprocess.check_output().
+> 
+> 
+
+That's correct.  QEMU exiting won't cause an exception, it
+doesn't matter the error code.  Failing to connect to QMP or
+qtest sockets on _post_launch() will.
+
+However, another purpose of the try/except block is to ensure we
+clean up the process and log file in case _any_ exception happens
+(programming error or not).  That's why everything after
+open(self._qemu_log_path) is inside the try block.  We should be
+careful to not break that.
+
+I think this code really needs to be cleaned up.  The existing
+try/except block has a huge number of responsibilities:
+1) Ensuring we kill the process in case _post_launch() raises an
+   exception.
+2) Ensuring we load the log file even if Popen() or _post_launch()
+   raise an exception.
+3) Ensuring we remove the monitor socket if anything after
+   _pre_launch() raises an exception (through _post_shutdown())
+4) Ensuring the log file is deleted if anything after
+   open(_qemu_log_path) raises an exception (through
+   _post_shutdown())
+5) Ensuring _post_shutdown() is called if anything after
+   _pre_launch() raises an exception (e.g. QEMUQTestMachine
+   deletes the socket created by _pre_launch() inside
+   _post_shutdown()
+6) (New, added by this patch) Generating a more useful exception
+   message if something (what exactly?) fails.
+
+Some of the cases above are just programming errors, but it's
+still nice to do proper cleanup in case of programming errors.
+e.g.: if _base_args() raise an exception, we can ensure we delete
+the log file anyway (this patch breaks that).
+
+If we don't clean this up, future cleanups (e.g. moving
+_pre_launch() outside the try block) would easily break one or
+more responsibilities above, and this would be very easy to miss
+on patch review.
+
+
+> >
+> >>          except:
+> >
+> > Why do we catch all exceptions, and not just
+> > subprocess.CalledProcessError?
+
+See above.
+
+> >
+> >> +            self._load_io_log()
+> >>              if self.is_running():
+> >
+> > I suspect we can't get here only for "odd" exceptions, not for
+> > subprocess.CalledProcessError.
+
+It depends on what you mean by "odd".
+
+> >
+> >>                  self._popen.kill()
+> >>                  self._popen.wait()
+> >> -            self._load_io_log()
+> >> +            else:
+> >> +                exc_type, exc_value, exc_traceback = sys.exc_info()
+> >> +                msg = ('Error launching VM.\n'
+> >> +                       'Original Exception: \n%s'
+> >> +                       'Command:\n%s\n'
+> >> +                       'Output:\n%s\n' %
+> >> +                       (''.join(traceback.format_exception(exc_type,
+> >> +                                                           exc_value,
+> >> +                                                           exc_traceback)),
+> >> +                        ' '.join(args),
+> >> +                        self._iolog))
+> >> +                self._post_shutdown()
+> >> +                raise RuntimeError(msg)
+> >>              self._post_shutdown()
+> >>              raise
+> >
+> > Why do we print a traceback when subprocess.CalledProcessError?
+> 
+> subprocess.CalledProcessError will not happen with subprocess.Popen,
+> even if the command fails. But if the virtual machine does not start,
+> we will, for example, see a 'socket.timeout' exception coming from
+> _post_launch() when it tries to connect to the qemu monitor.
+
+Exactly.
+
+-- 
+Eduardo
