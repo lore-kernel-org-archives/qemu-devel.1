@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYEby-0005Nt-O7
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:47:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYEh9-0006pE-AR
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYEbv-0005x6-Ih
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:47:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dYEbv-0005wu-AE
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:47:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40A4F155E4
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:47:34 +0000 (UTC)
-Date: Thu, 20 Jul 2017 17:47:30 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170720164730.GP21566@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170407143847.GM2138@work-vm> <20170720105004.GA26866@redhat.com>
-	<20170720161548.GC2456@work-vm>
+	(envelope-from <peter.maydell@linaro.org>) id 1dYEh8-00084v-Hy
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:52:59 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dYEh8-00083v-AI
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:52:58 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id y43so73138815wrd.3
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:52:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170720161548.GC2456@work-vm>
-Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+In-Reply-To: <20170720075526.7383-1-kraxel@redhat.com>
+References: <20170720075526.7383-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Jul 2017 17:52:36 +0100
+Message-ID: <CAFEAcA-7eCrg=bLXUESZ32fK=Q=L=R3RNzQtCnrHf-3JyMh3zw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Ui 20170720 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jul 20, 2017 at 05:15:49PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Fri, Apr 07, 2017 at 03:38:47PM +0100, Dr. David Alan Gilbert wrote:
-> > > Hi,
-> > >    Fedora 26 has gcc 7.0.1 which has the normal compliment
-> > > of new fussy warnings; so far I've posted :
-> > > 
-> > > tests/check-qdict: Fix missing brackets
-> > > slirp/smb: Replace constant strings by glib string
-> > > 
-> > > that fix one actual mistake and work around something it's being
-> > > fussy over.
-> > > 
-> > > But I've also got a pile of hacks, attached below that I'm
-> > > not too sure what I'll do with them yet, but they're attached
-> > > for anyone else trying to build.  Note they're smoke-only-tested.
-> > > 
-> > > I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80346
-> > > filed for what I reckon is a couple of overly pessimistic warnings.
-> > 
-> > 
-> > > diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-> > > index bd9fd55b0a..ebb0221140 100644
-> > > --- a/include/qemu/iov.h
-> > > +++ b/include/qemu/iov.h
-> > > @@ -46,7 +46,7 @@ static inline size_t
-> > >  iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
-> > >               size_t offset, const void *buf, size_t bytes)
-> > >  {
-> > > -    if (__builtin_constant_p(bytes) && iov_cnt &&
-> > > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
-> > >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
-> > >          memcpy(iov[0].iov_base + offset, buf, bytes);
-> > >          return bytes;
-> > > @@ -59,7 +59,7 @@ static inline size_t
-> > >  iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
-> > >             size_t offset, void *buf, size_t bytes)
-> > >  {
-> > > -    if (__builtin_constant_p(bytes) && iov_cnt &&
-> > > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
-> > >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
-> > >          memcpy(buf, iov[0].iov_base + offset, bytes);
-> > >          return bytes;
-> 
-> tbh I don't know what the right fix for this is;  the gcc discussion
-> confused me as to why it thinks it can be a valid case.
+On 20 July 2017 at 08:55, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit d4e59218ab80e86015753782fb5378767a51ccd0:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-07-18-2' into staging (2017-07-19 20:45:37 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20170720-pull-request
+>
+> for you to fetch changes up to b02cf99b9d998b3ec23dae8a4a8210e222b4294b:
+>
+>   keymaps: fr-ca: more fixups (2017-07-20 09:25:44 +0200)
+>
+> ----------------------------------------------------------------
+> ui fixes (vnc docs, keymaps) for 2.10
+>
+> ----------------------------------------------------------------
+>
+> Gerd Hoffmann (1):
+>   keymaps: fr-ca: more fixups
+>
+> Markus Armbruster (1):
+>   vnc: Clarify documentation of QMP command change
+>
+>  pc-bios/keymaps/fr-ca | 10 +++++++++-
+>  qapi-schema.json      |  3 +--
+>  2 files changed, 10 insertions(+), 3 deletions(-)
 
-Even if gcc is broken in issuing a warning here, we still need to
-make it quiet so people on F26 and similarly new distros can build
-without warnings.
+Applied, thanks.
 
-IMHO your patch is ok, or we could be alittle more explicit about
-catching just the case where you pass -1 for bytes, and have
-
-  && bytes != -1
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
