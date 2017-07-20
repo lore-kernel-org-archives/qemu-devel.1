@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY884-0005UM-35
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:52:21 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dY89Z-0006AJ-7F
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY880-00078w-3d
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:52:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46790)
+	(envelope-from <frederic.konrad@adacore.com>) id 1dY89Y-0007wk-FJ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:53:53 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:56704
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dY87z-00078Y-Qc
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:52:16 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170714190827.4083-1-eblake@redhat.com>
-	<20170714190827.4083-3-eblake@redhat.com>
-Date: Thu, 20 Jul 2017 11:52:11 +0200
-In-Reply-To: <20170714190827.4083-3-eblake@redhat.com> (Eric Blake's message
-	of "Fri, 14 Jul 2017 14:08:24 -0500")
-Message-ID: <87mv7zmo50.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dY89Y-0007vX-8B
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:53:52 -0400
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	<20170717185830.GD31820@work-vm>
+	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <ff0bfab3-c6a5-0799-f39b-376f78b5fd2b@adacore.com>
+Date: Thu, 20 Jul 2017 11:53:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/5] tests: Enhance qobject output to cover
- partial visit
+In-Reply-To: <CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
 
-> Add a test that proves (at least when run under valgrind) that
-> we are correctly handling allocated memory even when a visit
-> is aborted in the middle for whatever other reason.
->
-> See commit f24582d "qapi: fix double free in
-> qmp_output_visitor_cleanup()" for a fix that was lacking
-> testsuite exposure prior to this patch.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/test-qobject-output-visitor.c | 46 ++++++++++++++++++++++++++++++++++++-
->  1 file changed, 45 insertions(+), 1 deletion(-)
->
-> diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
-> index 749c540..1e9a5d1 100644
-> --- a/tests/test-qobject-output-visitor.c
-> +++ b/tests/test-qobject-output-visitor.c
-> @@ -1,7 +1,7 @@
->  /*
->   * QObject Output Visitor unit-tests.
->   *
-> - * Copyright (C) 2011-2016 Red Hat Inc.
-> + * Copyright (C) 2011-2017 Red Hat Inc.
->   *
->   * Authors:
->   *  Luiz Capitulino <lcapitulino@redhat.com>
-> @@ -251,6 +251,48 @@ static void test_visitor_out_struct_errors(TestOutputVisitorData *data,
->  }
->
->
-> +static void test_visitor_out_partial_visit(TestOutputVisitorData *data,
-> +                                           const void *unused)
-> +{
-> +    /* Various checks that a mid-visit abort doesn't leak or double-free. */
-> +    const char *str = "hi";
-> +    Error *err = NULL;
-> +    UserDefAlternate uda = {
-> +        .type = QTYPE_QDICT,
-> +        .u.udfu = { .integer = 1,
-> +                    .string = (char *) "bye",
-> +                    .enum1 = -1 } /* intentionally bad */
-> +    };
-> +    UserDefAlternate *obj = &uda;
-> +
-> +    /* Abort within a nested object with no data members */
-> +    visit_start_struct(data->ov, NULL, NULL, 0, &error_abort);
-> +    visit_start_struct(data->ov, "nested", NULL, 0, &error_abort);
-> +    visitor_reset(data);
-> +
-> +    /* Abort in the middle of a list of strings */
-> +    visit_start_list(data->ov, "list", NULL, 0, &error_abort);
-> +    visit_type_str(data->ov, NULL, (char **)&str, &error_abort);
-> +    visit_type_str(data->ov, NULL, (char **)&str, &error_abort);
-> +    visitor_reset(data);
-> +
-> +    /*
-> +     * Abort in the middle of an alternate. Alternates can't be
-> +     * virtually visited, so we get to inline the first half of
-> +     * visit_type_UserDefAlternate().
-> +     */
 
-Not exactly inline.  Perhaps:
+On 07/20/2017 11:42 AM, Peter Maydell wrote:
+> On 17 July 2017 at 19:58, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>> * Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
+>>> Is there a way we can prevent migration of the RAMBlock?
+>>
+>> Not yet, I think we'd have to:
+>>     a) Add a flag to the RAMBlock
+>>     b) Set it/clear it on registration
+>>     c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
+>>     d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
+>>     cases) with the RAMBLOCK_FOREACH_MIGRATABLE
+>>     e) Worry about the corner cases!
+>>
+>> I've got a few worries about what happens when the kernel tries to
+>> do dirty yncing - I'm not sure if we have to change anything on that
+>> interface to skip those RAMBlocks.
+> 
+> OK, so what should we do for 2.10 ?
+> 
+> We could:
+>   * implement the changes you suggest above, and mark only
+>     vmstate_register_ram'd blocks as migratable
+>     (would probably need to fix some places which buggily
+>     don't call vmstate_register_ram)
+>   * implement the changes above, but special case mmio-interface
+>     so only its ramblock is marked unmigratable
+>   * postpone the changes above until 2.11, and for 2.10 register
+>     a migration-blocker in mmio-interface so that we at least
+>     give the user a useful error rather than having it fail
+>     obscurely on vmload (and release note this)
+> 
+> (Or something else?)
+> 
+> I do think we definitely need to fix this for 2.11 at latest.
 
-       /*
-        * Abort in the middle of an alternate.  Since alternates don't
-        * support virtual visits, we perform a real one, similar to what
-        * visit_type_UserDefAlternate() would do.
-        */
+I think we take less risks with the second one.
+Maybe there is other problematic devices which don't call
+vmstate_register_ram'd? Which would be broken by the first?
 
-Hmm, what would visit_type_UserDefAlternate() do for @uda?  Could we
-simply call it here and be done?
+BTW the issue will show up only if ones execute code from the
+LQSPI so maybe a mix between (3) and (2) ?
 
-I've explored supporting virtual alternate visits, but my solution isn't
-quite ready, yet.
+Fred
 
-> +    visit_start_alternate(data->ov, NULL, (GenericAlternate **)&obj,
-> +                          sizeof(uda), &error_abort);
-> +    visit_start_struct(data->ov, NULL, NULL, 0, &error_abort);
-> +    visit_type_UserDefUnionBase_members(data->ov,
-> +                                        (UserDefUnionBase *)&uda.u.udfu,
-> +                                        &err);
-> +    /* error expected because of bad "enum1" discriminator value */
-> +    error_free_or_abort(&err);
-> +    visitor_reset(data);
-> +}
-> +
-> +
->  static void test_visitor_out_list(TestOutputVisitorData *data,
->                                    const void *unused)
->  {
-> @@ -815,6 +857,8 @@ int main(int argc, char **argv)
->                              &out_visitor_data, test_visitor_out_struct_nested);
->      output_visitor_test_add("/visitor/output/struct-errors",
->                              &out_visitor_data, test_visitor_out_struct_errors);
-> +    output_visitor_test_add("/visitor/output/partial-visit",
-> +                            &out_visitor_data, test_visitor_out_partial_visit);
->      output_visitor_test_add("/visitor/output/list",
->                              &out_visitor_data, test_visitor_out_list);
->      output_visitor_test_add("/visitor/output/any",
+> 
+> thanks
+> -- PMM
+> 
