@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYD88-0003FG-Al
+	(envelope-from <alex.bennee@linaro.org>) id 1dYD88-0003FH-Ao
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYD85-0004Lk-Tm
+	(envelope-from <alex.bennee@linaro.org>) id 1dYD83-0004Kn-IV
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:12:44 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:38154)
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33237)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dYD85-0004LS-No
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:12:41 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id f21so15629930wrf.5
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:12:41 -0700 (PDT)
+	id 1dYD83-0004KE-64
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:12:39 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id v105so41927509wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:12:39 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 20 Jul 2017 16:04:19 +0100
-Message-Id: <20170720150426.12393-17-alex.bennee@linaro.org>
+Date: Thu, 20 Jul 2017 16:04:23 +0100
+Message-Id: <20170720150426.12393-21-alex.bennee@linaro.org>
 In-Reply-To: <20170720150426.12393-1-alex.bennee@linaro.org>
 References: <20170720150426.12393-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH for 2.11 16/23] include/exec/helper-head.h:
- support f16 in helper calls
+Subject: [Qemu-devel] [RFC PATCH for 2.11 20/23] fpu/softfloat2a: add
+ half-precision expansions for MINMAX fns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +31,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: rth@twiddle.net, qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: rth@twiddle.net, qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This allows us to explicitly pass float16 to helpers rather than
-assuming uint32_t and dealing with the result. Of course they will be
-passed in i32 sized registers by default.
+As SoftFloat3c doesn't have helpers for min/max and we already
+implemented it in 2a lets just expand the current helpers to include
+half-precision functions. The includes having f16 version of the
+compare functions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/exec/helper-head.h | 3 +++
- 1 file changed, 3 insertions(+)
+ fpu/softfloat2a/softfloat.c         |  2 ++
+ include/fpu/softfloat2a/softfloat.h | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
-index 1cfc43b9ff..fdb82151d3 100644
---- a/include/exec/helper-head.h
-+++ b/include/exec/helper-head.h
-@@ -30,6 +30,7 @@
- #define dh_alias_int i32
- #define dh_alias_i64 i64
- #define dh_alias_s64 i64
-+#define dh_alias_f16 i32
- #define dh_alias_f32 i32
- #define dh_alias_f64 i64
- #define dh_alias_ptr ptr
-@@ -42,6 +43,7 @@
- #define dh_ctype_int int
- #define dh_ctype_i64 uint64_t
- #define dh_ctype_s64 int64_t
-+#define dh_ctype_f16 float16
- #define dh_ctype_f32 float32
- #define dh_ctype_f64 float64
- #define dh_ctype_ptr void *
-@@ -98,6 +100,7 @@
- #define dh_is_signed_s32 1
- #define dh_is_signed_i64 0
- #define dh_is_signed_s64 1
-+#define dh_is_signed_f16 0
- #define dh_is_signed_f32 0
- #define dh_is_signed_f64 0
- #define dh_is_signed_tl  0
+diff --git a/fpu/softfloat2a/softfloat.c b/fpu/softfloat2a/softfloat.c
+index 4f1abbe08f..67115298bd 100644
+--- a/fpu/softfloat2a/softfloat.c
++++ b/fpu/softfloat2a/softfloat.c
+@@ -7579,6 +7579,7 @@ int float ## s ## _compare_quiet(float ## s a, float ## s b,                 \
+     return float ## s ## _compare_internal(a, b, 1, status);                 \
+ }
+ 
++COMPARE(16, 0x1f)
+ COMPARE(32, 0xff)
+ COMPARE(64, 0x7ff)
+ 
+@@ -7779,6 +7780,7 @@ float ## s float ## s ## _maxnummag(float ## s a, float ## s b,         \
+     return float ## s ## _minmax(a, b, 0, 1, 1, status);                \
+ }
+ 
++MINMAX(16)
+ MINMAX(32)
+ MINMAX(64)
+ 
+diff --git a/include/fpu/softfloat2a/softfloat.h b/include/fpu/softfloat2a/softfloat.h
+index 3cb41977d8..dd1293d802 100644
+--- a/include/fpu/softfloat2a/softfloat.h
++++ b/include/fpu/softfloat2a/softfloat.h
+@@ -386,6 +386,17 @@ static inline float16 float16_abs(float16 a)
+      */
+     return make_float16(float16_val(a) & 0x7fff);
+ }
++
++/* Expanded by the MINMAX macro in softfloat.c */
++int float16_compare(float16, float16, float_status *status);
++int float16_compare_quiet(float16, float16, float_status *status);
++float16 float16_min(float16, float16, float_status *status);
++float16 float16_max(float16, float16, float_status *status);
++float16 float16_minnum(float16, float16, float_status *status);
++float16 float16_maxnum(float16, float16, float_status *status);
++float16 float16_minnummag(float16, float16, float_status *status);
++float16 float16_maxnummag(float16, float16, float_status *status);
++
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated half-precision NaN.
+ *----------------------------------------------------------------------------*/
 -- 
 2.13.0
