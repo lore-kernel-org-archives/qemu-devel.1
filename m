@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY6HR-0003if-SV
+	(envelope-from <armbru@redhat.com>) id 1dY6HR-0003iY-Pl
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY6HQ-00037L-5q
+	(envelope-from <armbru@redhat.com>) id 1dY6HQ-00037n-AJ
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:53 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 20 Jul 2017 09:53:32 +0200
-Message-Id: <1500537221-20556-2-git-send-email-armbru@redhat.com>
-In-Reply-To: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-References: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/10] qapi: Separate type QNull from QObject
+Date: Thu, 20 Jul 2017 09:53:31 +0200
+Message-Id: <1500537221-20556-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/10] Correct two minor QMP interface
+ design flaws
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,181 +21,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
----
- include/qapi/qmp/qobject.h    | 10 +++++++---
- qapi/qobject-output-visitor.c |  2 +-
- qobject/json-parser.c         |  2 +-
- qobject/qnull.c               |  8 +++++---
- target/i386/cpu.c             |  4 ++--
- tests/check-qjson.c           |  6 +++---
- tests/check-qnull.c           | 18 +++++++++---------
- 7 files changed, 28 insertions(+), 22 deletions(-)
+blockdev-add and migrate-set-parameters overload empty strings to mean
+something entirely different.  See my memo "qapi: Stop abusing
+"special" values for something entirely different" for details.
 
-diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index b8ddbca..3543b55 100644
---- a/include/qapi/qmp/qobject.h
-+++ b/include/qapi/qmp/qobject.h
-@@ -93,11 +93,15 @@ static inline QType qobject_type(const QObject *obj)
-     return obj->type;
- }
- 
--extern QObject qnull_;
-+typedef struct QNull {
-+    QObject base;
-+} QNull;
- 
--static inline QObject *qnull(void)
-+extern QNull qnull_;
-+
-+static inline QNull *qnull(void)
- {
--    qobject_incref(&qnull_);
-+    QINCREF(&qnull_);
-     return &qnull_;
- }
- 
-diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
-index 70be84c..398dcb5 100644
---- a/qapi/qobject-output-visitor.c
-+++ b/qapi/qobject-output-visitor.c
-@@ -190,7 +190,7 @@ static void qobject_output_type_any(Visitor *v, const char *name,
- static void qobject_output_type_null(Visitor *v, const char *name, Error **errp)
- {
-     QObjectOutputVisitor *qov = to_qov(v);
--    qobject_output_add_obj(qov, name, qnull());
-+    qobject_output_add(qov, name, qnull());
- }
- 
- /* Finish building, and return the root object.
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 7a417f2..724ca24 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -445,7 +445,7 @@ static QObject *parse_keyword(JSONParserContext *ctxt)
-     } else if (!strcmp(token->str, "false")) {
-         return QOBJECT(qbool_from_bool(false));
-     } else if (!strcmp(token->str, "null")) {
--        return qnull();
-+        return QOBJECT(qnull());
-     }
-     parse_error(ctxt, token, "invalid keyword '%s'", token->str);
-     return NULL;
-diff --git a/qobject/qnull.c b/qobject/qnull.c
-index c124d05..69a21d1 100644
---- a/qobject/qnull.c
-+++ b/qobject/qnull.c
-@@ -14,7 +14,9 @@
- #include "qemu-common.h"
- #include "qapi/qmp/qobject.h"
- 
--QObject qnull_ = {
--    .type = QTYPE_QNULL,
--    .refcnt = 1,
-+QNull qnull_ = {
-+    .base = {
-+        .type = QTYPE_QNULL,
-+        .refcnt = 1,
-+    },
- };
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 0bbda76..89f5fb7 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2442,7 +2442,7 @@ static QDict *x86_cpu_static_props(void)
- 
-     d = qdict_new();
-     for (i = 0; props[i]; i++) {
--        qdict_put_obj(d, props[i], qnull());
-+        qdict_put(d, props[i], qnull());
-     }
- 
-     for (w = 0; w < FEATURE_WORDS; w++) {
-@@ -2452,7 +2452,7 @@ static QDict *x86_cpu_static_props(void)
-             if (!fi->feat_names[bit]) {
-                 continue;
-             }
--            qdict_put_obj(d, fi->feat_names[bit], qnull());
-+            qdict_put(d, fi->feat_names[bit], qnull());
-         }
-     }
- 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 53f2275..a3a97b0 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1012,7 +1012,7 @@ static void keyword_literal(void)
- {
-     QObject *obj;
-     QBool *qbool;
--    QObject *null;
-+    QNull *null;
-     QString *str;
- 
-     obj = qobject_from_json("true", &error_abort);
-@@ -1053,10 +1053,10 @@ static void keyword_literal(void)
-     g_assert(qobject_type(obj) == QTYPE_QNULL);
- 
-     null = qnull();
--    g_assert(null == obj);
-+    g_assert(QOBJECT(null) == obj);
- 
-     qobject_decref(obj);
--    qobject_decref(null);
-+    QDECREF(null);
- }
- 
- typedef struct LiteralQDictEntry LiteralQDictEntry;
-diff --git a/tests/check-qnull.c b/tests/check-qnull.c
-index 8dd1c96..1ab7c98 100644
---- a/tests/check-qnull.c
-+++ b/tests/check-qnull.c
-@@ -24,14 +24,14 @@ static void qnull_ref_test(void)
- {
-     QObject *obj;
- 
--    g_assert(qnull_.refcnt == 1);
--    obj = qnull();
-+    g_assert(qnull_.base.refcnt == 1);
-+    obj = QOBJECT(qnull());
-     g_assert(obj);
--    g_assert(obj == &qnull_);
--    g_assert(qnull_.refcnt == 2);
-+    g_assert(obj == QOBJECT(&qnull_));
-+    g_assert(qnull_.base.refcnt == 2);
-     g_assert(qobject_type(obj) == QTYPE_QNULL);
-     qobject_decref(obj);
--    g_assert(qnull_.refcnt == 1);
-+    g_assert(qnull_.base.refcnt == 1);
- }
- 
- static void qnull_visit_test(void)
-@@ -45,8 +45,8 @@ static void qnull_visit_test(void)
-      * depend on layering violations to check qnull_ refcnt.
-      */
- 
--    g_assert(qnull_.refcnt == 1);
--    obj = qnull();
-+    g_assert(qnull_.base.refcnt == 1);
-+    obj = QOBJECT(qnull());
-     v = qobject_input_visitor_new(obj);
-     qobject_decref(obj);
-     visit_type_null(v, NULL, &error_abort);
-@@ -55,11 +55,11 @@ static void qnull_visit_test(void)
-     v = qobject_output_visitor_new(&obj);
-     visit_type_null(v, NULL, &error_abort);
-     visit_complete(v, &obj);
--    g_assert(obj == &qnull_);
-+    g_assert(obj == QOBJECT(&qnull_));
-     qobject_decref(obj);
-     visit_free(v);
- 
--    g_assert(qnull_.refcnt == 1);
-+    g_assert(qnull_.base.refcnt == 1);
- }
- 
- int main(int argc, char **argv)
+    Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
+    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
+
+This series deprecates these usages of "" in favour of JSON null.
+Because we're so close to the 2.10 freeze, the implementation is
+intentionally stupid: rewrite null to "" at first opportunity.  The
+proper way to do it would be rewriting "" to null, but that requires
+fixing up code to work with null.  There are TODO comments for that.
+I'm willing to take care of them in the next development cycle.
+
+v2, because my pull request clashed with Juan's:
+* Rebased, non-trivial conflicts in migration/migration.c
+* PATCH 02: Commit message typo [Eric]
+  	    Fix ppc [patchew]
+* PATCH 03: qapi-code-gen.txt update [Eric]
+* PATCH 09: Conflict resolution, somewhat ugly
+* PATCH 10: Doc improvement [Eric]
+  	    Conflict resolution
+
+Markus Armbruster (10):
+  qapi: Separate type QNull from QObject
+  qapi: Use QNull for a more regular visit_type_null()
+  qapi: Introduce a first class 'null' type
+  tests/test-qobject-input-visitor: Drop redundant test
+  block: Use JSON null instead of "" to disable backing file
+  hmp: Clean up and simplify hmp_migrate_set_parameter()
+  migration: Clean up around tls_creds, tls_hostname
+  migration: Add TODO comments on duplication of QAPI_CLONE()
+  migration: Unshare MigrationParameters struct for now
+  migration: Use JSON null instead of "" to reset parameter to default
+
+ blockdev.c                              |  14 +++++
+ docs/devel/qapi-code-gen.txt            |  10 +--
+ hmp.c                                   |  88 ++++++++++++--------------
+ hw/ppc/spapr_drc.c                      |   4 +-
+ include/qapi/qmp/qobject.h              |  10 ++-
+ include/qapi/visitor-impl.h             |   3 +-
+ include/qapi/visitor.h                  |   8 +--
+ include/qemu/typedefs.h                 |   1 +
+ migration/migration.c                   |  96 +++++++++++++++++++++++++---
+ qapi-schema.json                        | 108 ++++++++++++++++++++++++++++----
+ qapi/block-core.json                    |  29 ++++++---
+ qapi/qapi-clone-visitor.c               |   5 +-
+ qapi/qapi-dealloc-visitor.c             |   6 +-
+ qapi/qapi-visit-core.c                  |   7 ++-
+ qapi/qobject-input-visitor.c            |   6 +-
+ qapi/qobject-output-visitor.c           |   5 +-
+ qapi/string-input-visitor.c             |   8 ++-
+ qapi/string-output-visitor.c            |   3 +-
+ qapi/trace-events                       |   2 +-
+ qobject/json-parser.c                   |   2 +-
+ qobject/qnull.c                         |   8 ++-
+ scripts/qapi.py                         |   5 +-
+ target/i386/cpu.c                       |   4 +-
+ target/ppc/translate_init.c             |   5 +-
+ tests/check-qjson.c                     |   6 +-
+ tests/check-qnull.c                     |  27 ++++----
+ tests/qapi-schema/qapi-schema-test.json |   3 +-
+ tests/qapi-schema/qapi-schema-test.out  |   1 +
+ tests/qemu-iotests/085                  |   2 +-
+ tests/qemu-iotests/139                  |   2 +-
+ tests/test-qobject-input-visitor.c      |  24 ++++---
+ tests/test-qobject-output-visitor.c     |  13 +++-
+ 32 files changed, 378 insertions(+), 137 deletions(-)
+
 -- 
 2.7.5
