@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYEuX-0003zd-Ra
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:06:51 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dYF9m-0007x2-I4
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYEuU-0005Gs-1x
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:06:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2769)
+	(envelope-from <dgilbert@redhat.com>) id 1dYF9j-0003PV-9W
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:22:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dYEuT-0005G9-PK
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:06:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B374361E53
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 17:06:44 +0000 (UTC)
-Date: Thu, 20 Jul 2017 18:06:40 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170720170640.GQ21566@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170407143847.GM2138@work-vm> <20170720105004.GA26866@redhat.com>
-	<20170720161548.GC2456@work-vm> <20170720164730.GP21566@redhat.com>
-	<20170720170443.GG2456@work-vm>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYF9j-0003PL-06
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:22:31 -0400
+Date: Thu, 20 Jul 2017 18:22:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720172215.GH2456@work-vm>
+References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
+	<20170719114612.GC3500@work-vm>
+	<20170719152427.620b2a2a@nial.brq.redhat.com>
+	<20170719184748-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170720170443.GG2456@work-vm>
-Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+In-Reply-To: <20170719184748-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
+ vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-On Thu, Jul 20, 2017 at 06:04:44PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Thu, Jul 20, 2017 at 05:15:49PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > On Fri, Apr 07, 2017 at 03:38:47PM +0100, Dr. David Alan Gilbert wrote:
-> > > > > Hi,
-> > > > >    Fedora 26 has gcc 7.0.1 which has the normal compliment
-> > > > > of new fussy warnings; so far I've posted :
-> > > > > 
-> > > > > tests/check-qdict: Fix missing brackets
-> > > > > slirp/smb: Replace constant strings by glib string
-> > > > > 
-> > > > > that fix one actual mistake and work around something it's being
-> > > > > fussy over.
-> > > > > 
-> > > > > But I've also got a pile of hacks, attached below that I'm
-> > > > > not too sure what I'll do with them yet, but they're attached
-> > > > > for anyone else trying to build.  Note they're smoke-only-tested.
-> > > > > 
-> > > > > I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80346
-> > > > > filed for what I reckon is a couple of overly pessimistic warnings.
-> > > > 
-> > > > 
-> > > > > diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-> > > > > index bd9fd55b0a..ebb0221140 100644
-> > > > > --- a/include/qemu/iov.h
-> > > > > +++ b/include/qemu/iov.h
-> > > > > @@ -46,7 +46,7 @@ static inline size_t
-> > > > >  iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
-> > > > >               size_t offset, const void *buf, size_t bytes)
-> > > > >  {
-> > > > > -    if (__builtin_constant_p(bytes) && iov_cnt &&
-> > > > > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
-> > > > >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
-> > > > >          memcpy(iov[0].iov_base + offset, buf, bytes);
-> > > > >          return bytes;
-> > > > > @@ -59,7 +59,7 @@ static inline size_t
-> > > > >  iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
-> > > > >             size_t offset, void *buf, size_t bytes)
-> > > > >  {
-> > > > > -    if (__builtin_constant_p(bytes) && iov_cnt &&
-> > > > > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
-> > > > >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
-> > > > >          memcpy(buf, iov[0].iov_base + offset, bytes);
-> > > > >          return bytes;
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
+> > On Wed, 19 Jul 2017 12:46:13 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > 
+> > > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > > On Wed, 19 Jul 2017 23:17:32 +0800
+> > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > >   
+> > > > > When a guest that has several hotplugged dimms is migrated, in
+> > > > > destination host it will fail to resume. Because vhost regions of
+> > > > > several dimms in source host are merged and in the restore stage
+> > > > > in destination host it computes whether more than vhost slot limit
+> > > > > before merging vhost regions of several dimms.  
+> > > > could you provide a bit more detailed description of the problem
+> > > > including command line+used device_add commands on source and
+> > > > command line on destination?  
 > > > 
-> > > tbh I don't know what the right fix for this is;  the gcc discussion
-> > > confused me as to why it thinks it can be a valid case.
+> > > (ccing in Marc Andre and Maxime)
+> > > 
+> > > Hmm, I'd like to understade the situation where you get merging between
+> > > RAMBlocks; that complicates some stuff for postcopy.
+> > and probably inconsistent merging breaks vhost as well
 > > 
-> > Even if gcc is broken in issuing a warning here, we still need to
-> > make it quiet so people on F26 and similarly new distros can build
-> > without warnings.
-> 
-> I agree.
-> 
-> > IMHO your patch is ok, or we could be alittle more explicit about
-> > catching just the case where you pass -1 for bytes, and have
+> > merging might happen if regions are adjacent or overlap
+> > but for that to happen merged regions must have equal
+> > distance between their GPA:HVA pairs, so that following
+> > translation would work:
 > > 
-> >   && bytes != -1
+> > if gva in regionX[gva_start, len, hva_start]
+> >    hva = hva_start + gva - gva_start
+> > 
+> > while GVA of regions is under QEMU control and deterministic
+> > HVA is not, so in migration case merging might happen on source
+> > side but not on destination, resulting in different memory maps.
+> > 
+> > Maybe Michael might know details why migration works in vhost usecase,
+> > but I don't see vhost sending any vmstate data.
 > 
-> This seems bizarre to me since bytes is   size_t bytes   and size_t
-> is unsigned, so I'd have sympathy for a compiler that warned that
-> bytes != -1 was always true.
+> We aren't merging ramblocks at all.
+> When we are passing blocks A and B to vhost, if we see that
+> 
+> hvaB=hvaA + lenA
+> gpaB=gpaA + lenA
+> 
+> then we can improve performance a bit by passing a single
+> chunk to vhost: hvaA,gpaA,lena+lenB
 
-Could be paranoid and do    "&& bytes !=  (size_t)-1"
+OK, but that means that a region can incorporate multiple
+RAMBlocks though? Hmm that's not fun on postcopy.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> so it does not affect migration normally.
+
+Well, why? What's required - if the region sizes/lengths/orders
+are different on the source and destination does it matter - if
+it does then that means we have a problem, since that heuristic
+is non-deterministic.
+
+Dave
+
+> 
+> > 
+> > > 
+> > > > > 
+> > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > ---
+> > > > >  hw/mem/pc-dimm.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > 
+> > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > index ea67b46..bb0fa08 100644
+> > > > > --- a/hw/mem/pc-dimm.c
+> > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > > >          goto out;
+> > > > >      }
+> > > > >  
+> > > > > -    if (!vhost_has_free_slot()) {
+> > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
+> > > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > > >                                 " memory slots left");
+> > > > >          goto out;  
+> > > 
+> > > Even this produces the wrong error message in this case,
+> > > it also makes me think if the existing code should undo a lot of
+> > > the object_property_set's that happen.
+> > > 
+> > > Dave
+> > > > 
+> > > >   
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
