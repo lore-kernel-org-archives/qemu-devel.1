@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYDx5-0004N7-Qa
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:05:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1dYE6I-0001QW-Ig
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYDx4-0002In-Dy
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:05:23 -0400
-References: <1500560441-5670-1-git-send-email-pl@kamp.de>
-	<1500560441-5670-11-git-send-email-pl@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cc13b2a9-82be-e3d8-5a6b-4d29814c70e4@redhat.com>
-Date: Thu, 20 Jul 2017 11:05:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1dYE6D-0002KD-Iz
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:14:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44180)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYE6D-0002IY-C7
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:14:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52D31267C2
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:14:48 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170717180926.14924-1-ehabkost@redhat.com>
+Date: Thu, 20 Jul 2017 18:14:44 +0200
+In-Reply-To: <20170717180926.14924-1-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Mon, 17 Jul 2017 15:09:26 -0300")
+Message-ID: <877ez3rsp7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1500560441-5670-11-git-send-email-pl@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="avk5gNTNrkQEnKwsePAbOeI0pJp1FC3HP"
-Subject: Re: [Qemu-devel] [PATCH V4 10/10] block/qcow2: add compress info to
- image specific info
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on
+ alternate conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---avk5gNTNrkQEnKwsePAbOeI0pJp1FC3HP
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
- den@openvz.org, mreitz@redhat.com, berrange@redhat.com
-Message-ID: <cc13b2a9-82be-e3d8-5a6b-4d29814c70e4@redhat.com>
-Subject: Re: [PATCH V4 10/10] block/qcow2: add compress info to image specific
- info
-References: <1500560441-5670-1-git-send-email-pl@kamp.de>
- <1500560441-5670-11-git-send-email-pl@kamp.de>
-In-Reply-To: <1500560441-5670-11-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-On 07/20/2017 09:20 AM, Peter Lieven wrote:
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  block/qcow2.c        | 9 +++++++++
->  qapi/block-core.json | 6 +++++-
->  2 files changed, 14 insertions(+), 1 deletion(-)
->=20
+> The conflict check added by commit c0644771 ("qapi: Reject
+> alternates that can't work with keyval_parse()") doesn't work
+> with the following declaration:
+>
+>   { 'alternate': 'Alt',
+>     'data': { 'one': 'bool',
+>               'two': 'str' } }
+>
+> It crashes with:
+>
+>   Traceback (most recent call last):
+>     File "./scripts/qapi-types.py", line 295, in <module>
+>       schema = QAPISchema(input_file)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
+>       self.exprs = check_exprs(parser.exprs)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
+>       check_alternate(expr, info)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
+>       % (name, key, types_seen[qtype]))
+>   KeyError: 'QTYPE_QSTRING'
+>
+> This happens because the previously-seen conflicting member
+> ('one') can't be found at types_seen[qtype], but at
+> types_seen['QTYPE_BOOL'].
+>
+> Fix the bug by moving the error check to the same loop that adds
+> new items to types_seen, raising an exception if types_seen[qt]
+> is already set.
+>
+> Add two additional test cases that can detect the bug.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+[...]
+> diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
+> new file mode 100644
+> index 0000000..e69de29
+> diff --git a/tests/qapi-schema/alternate-multi-conflict.json b/tests/qapi-schema/alternate-multi-conflict.json
+> new file mode 100644
+> index 0000000..e69de29
 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 9eb76df..9310715 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -68,6 +68,9 @@
->  # @encrypt: details about encryption parameters; only set if image
->  #           is encrypted (since 2.10)
->  #
-> +# @compress: details about parameters for compressed clusters; only se=
-t if
-> +#            the compress format header extension is present (since 2.=
-10)
-
-Would it be possible/wise to ALWAYS output compression information, even
-if it is the older style zlib with small window and default level?  Made
-easier if you can represent all tunables of zlib (where you special-case
-writing the qcow2 header to omit the extension header when the user has
-requested the defaults).
-
-This is a new feature, and unfortunately we've missed soft freeze for
-2.10.  You'll want to update your series to uniformly state since 2.11.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---avk5gNTNrkQEnKwsePAbOeI0pJp1FC3HP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllw1LkACgkQp6FrSiUn
-Q2r1Nwf+ILZYVphQJZLIXxtHpWuesNby0MoJKpi5h+7z1k+xANxHLBbqHH390Nff
-r7e77CF9n0wm6JlZZl9zWgg4a0cxXA1WZQLkIH0gVqQzVaLKIxPWibh9l34tZ94C
-iOxHLOFj8OAUppJzDgZBfv36rb4dI1frlIGkJnMzNgWefzZYdbULVtsXTva+uAcl
-bpre8861gDOn/fOQfZuGSrCf3wVHxUQDnP3VpXQQytKbGZ8pdqPEPzeBt701K+rL
-EdH4IMlpGH99u06kBLqKHDqrmEpgKahDMji3zys9N/A8+X8dKSH19NPkv/ETb1iU
-mxeQnbiryuBno+XeKouK68kV9BFIwA==
-=nQ17
------END PGP SIGNATURE-----
-
---avk5gNTNrkQEnKwsePAbOeI0pJp1FC3HP--
+Accident?  Can drop on commit.
