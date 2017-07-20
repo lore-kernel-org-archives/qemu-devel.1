@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY9fx-0006oV-V3
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:31:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dY9tO-0001L6-JL
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:45:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY9fu-0003JG-O2
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:31:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60704)
+	(envelope-from <dgilbert@redhat.com>) id 1dY9tJ-0000u7-NG
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:45:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52094)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY9fu-0003Iv-EL
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:31:22 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY9tJ-0000t5-Ds
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:45:13 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 03D30C056827
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 11:31:21 +0000 (UTC)
-Date: Thu, 20 Jul 2017 12:31:14 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D01C61E51
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 11:45:12 +0000 (UTC)
+Date: Thu, 20 Jul 2017 12:45:08 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170720113113.GF2101@work-vm>
+Message-ID: <20170720114507.GG2101@work-vm>
 References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-17-quintela@redhat.com>
+	<20170717134238.1966-18-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-17-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 16/17] migration: Transfer pages over
- new channels
+In-Reply-To: <20170717134238.1966-18-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,200 +37,186 @@ To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
 * Juan Quintela (quintela@redhat.com) wrote:
-> We switch for sending the page number to send real pages.
+> Each time that we sync the bitmap, it is a possiblity that we receive
+> a page that is being processed by a different thread.  We fix this
+> problem just making sure that we wait for all receiving threads to
+> finish its work before we procedeed with the next stage.
+> 
+> We are low on page flags, so we use a combination that is not valid to
+> emit that message:  MULTIFD_PAGE and COMPRESSED.
+> 
+> I tried to make a migration command for it, but it don't work because
+> we sync the bitmap sometimes when we have already sent the beggining
+> of the section, so I just added a new page flag.
 > 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
-> Remove the HACK bit, now we have the function that calculates the size
-> of a page exported.
 > ---
->  migration/migration.c | 14 ++++++++----
->  migration/ram.c       | 59 +++++++++++++++++----------------------------------
->  2 files changed, 29 insertions(+), 44 deletions(-)
+>  migration/ram.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 56 insertions(+), 1 deletion(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index e122684..34a34b7 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1882,13 +1882,14 @@ static void *migration_thread(void *opaque)
->      /* Used by the bandwidth calcs, updated later */
->      int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> -    int64_t initial_bytes = 0;
->      /*
->       * The final stage happens when the remaining data is smaller than
->       * this threshold; it's calculated from the requested downtime and
->       * measured bandwidth
->       */
->      int64_t threshold_size = 0;
-> +    int64_t qemu_file_bytes = 0;
-> +    int64_t multifd_pages = 0;
-
-It feels like these changes to the transfer count should be in a
-separate patch.
-
->      int64_t start_time = initial_time;
->      int64_t end_time;
->      bool old_vm_running = false;
-> @@ -1976,9 +1977,13 @@ static void *migration_thread(void *opaque)
->          }
->          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->          if (current_time >= initial_time + BUFFER_DELAY) {
-> -            uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
-> -                                         initial_bytes;
->              uint64_t time_spent = current_time - initial_time;
-> +            uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
-> +            uint64_t multifd_pages_now = ram_counters.multifd;
-> +            uint64_t transferred_bytes =
-> +                (qemu_file_bytes_now - qemu_file_bytes) +
-> +                (multifd_pages_now - multifd_pages) *
-> +                qemu_target_page_size();
-
-If I've followed this right, then ram_counters.multifd is in the main
-thread not the individual threads, so we should be OK doing that.
-
->              double bandwidth = (double)transferred_bytes / time_spent;
->              threshold_size = bandwidth * s->parameters.downtime_limit;
->  
-> @@ -1996,7 +2001,8 @@ static void *migration_thread(void *opaque)
->  
->              qemu_file_reset_rate_limit(s->to_dst_file);
->              initial_time = current_time;
-> -            initial_bytes = qemu_ftell(s->to_dst_file);
-> +            qemu_file_bytes = qemu_file_bytes_now;
-> +            multifd_pages = multifd_pages_now;
->          }
->          if (qemu_file_rate_limit(s->to_dst_file)) {
->              /* usleep expects microseconds */
 > diff --git a/migration/ram.c b/migration/ram.c
-> index b55b243..c78b286 100644
+> index c78b286..bffe204 100644
 > --- a/migration/ram.c
 > +++ b/migration/ram.c
-> @@ -468,25 +468,21 @@ static void *multifd_send_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> -            int i;
->              int num;
+> @@ -71,6 +71,12 @@
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+>  #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
 >  
->              num = p->pages.num;
->              p->pages.num = 0;
->              qemu_mutex_unlock(&p->mutex);
->  
-> -            for (i = 0; i < num; i++) {
-> -                if (qio_channel_write(p->c,
-> -                                      (const char *)&p->pages.iov[i].iov_base,
-> -                                      sizeof(uint8_t *), &error_abort)
-> -                    != sizeof(uint8_t *)) {
-> -                    MigrationState *s = migrate_get_current();
-> +            if (qio_channel_writev_all(p->c, p->pages.iov,
-> +                                       num, &error_abort)
-> +                != num * TARGET_PAGE_SIZE) {
-> +                MigrationState *s = migrate_get_current();
-
-Same comments as previous patch; note we should find a way to get
-the error message logged; not easy since we're in a thread, but
-we need to find a way to log the errors.
-
->  
-> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> -                                      MIGRATION_STATUS_FAILED);
-> -                    terminate_multifd_send_threads();
-> -                    return NULL;
-> -                }
-> +                migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                  MIGRATION_STATUS_FAILED);
-> +                terminate_multifd_send_threads();
-> +                return NULL;
->              }
->              qemu_mutex_lock(&multifd_send_state->mutex);
->              p->done = true;
-> @@ -654,7 +650,6 @@ void multifd_load_cleanup(void)
->  static void *multifd_recv_thread(void *opaque)
+> +/* We are getting low on pages flags, so we start using combinations
+> +   When we need to flush a page, we sent it as
+> +   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_COMPRESS_PAGE
+> +   We don't allow that combination
+> +*/
+> +
+>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
 >  {
->      MultiFDRecvParams *p = opaque;
-> -    uint8_t *recv_address;
+>      return buffer_is_zero(p, size);
+> @@ -193,6 +199,9 @@ struct RAMState {
+>      uint64_t iterations_prev;
+>      /* Iterations since start */
+>      uint64_t iterations;
+> +    /* Indicates if we have synced the bitmap and we need to assure that
+> +       target has processeed all previous pages */
+> +    bool multifd_needs_flush;
+>      /* protects modification of the bitmap */
+>      uint64_t migration_dirty_pages;
+>      /* number of dirty bits in the bitmap */
+> @@ -363,7 +372,6 @@ static void compress_threads_save_setup(void)
 >  
->      qemu_sem_post(&p->ready);
->      while (true) {
-> @@ -664,38 +659,21 @@ static void *multifd_recv_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> -            int i;
->              int num;
+>  /* Multiple fd's */
 >  
->              num = p->pages.num;
->              p->pages.num = 0;
->  
-> -            for (i = 0; i < num; i++) {
-> -                if (qio_channel_read(p->c,
-> -                                     (char *)&recv_address,
-> -                                     sizeof(uint8_t *), &error_abort)
-> -                    != sizeof(uint8_t *)) {
-> -                    MigrationState *s = migrate_get_current();
-> +            if (qio_channel_readv_all(p->c, p->pages.iov,
-> +                                      num, &error_abort)
-> +                != num * TARGET_PAGE_SIZE) {
-> +                MigrationState *s = migrate_get_current();
->  
-> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> -                                      MIGRATION_STATUS_FAILED);
-> -                    terminate_multifd_recv_threads();
-> -                    return NULL;
-> -                }
-> -                if (recv_address != p->pages.iov[i].iov_base) {
-> -                    MigrationState *s = migrate_get_current();
 > -
-> -                    printf("We received %p what we were expecting %p (%d)\n",
-> -                           recv_address,
-> -                           p->pages.iov[i].iov_base, i);
-> -
-> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> -                                      MIGRATION_STATUS_FAILED);
-> -                    terminate_multifd_recv_threads();
-> -                    return NULL;
-> -                }
-> +                migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                  MIGRATION_STATUS_FAILED);
-> +                terminate_multifd_recv_threads();
-> +                return NULL;
+>  typedef struct {
+>      int num;
+>      int size;
+> @@ -595,9 +603,11 @@ struct MultiFDRecvParams {
+>      QIOChannel *c;
+>      QemuSemaphore ready;
+>      QemuSemaphore sem;
+> +    QemuCond cond_sync;
+>      QemuMutex mutex;
+>      /* proteced by param mutex */
+>      bool quit;
+> +    bool sync;
+>      multifd_pages_t pages;
+>      bool done;
+>  };
+> @@ -637,6 +647,7 @@ void multifd_load_cleanup(void)
+>          qemu_thread_join(&p->thread);
+>          qemu_mutex_destroy(&p->mutex);
+>          qemu_sem_destroy(&p->sem);
+> +        qemu_cond_destroy(&p->cond_sync);
+>          socket_recv_channel_destroy(p->c);
+>          g_free(p);
+>          multifd_recv_state->params[i] = NULL;
+> @@ -675,6 +686,10 @@ static void *multifd_recv_thread(void *opaque)
+>                  return NULL;
 >              }
-> -
 >              p->done = true;
+> +            if (p->sync) {
+> +                qemu_cond_signal(&p->cond_sync);
+> +                p->sync = false;
+> +            }
 >              qemu_mutex_unlock(&p->mutex);
 >              qemu_sem_post(&p->ready);
-> @@ -1262,8 +1240,10 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
->                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
->          fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
->          qemu_put_be16(rs->f, fd_num);
-> +        if (fd_num != UINT16_MAX) {
-> +            qemu_fflush(rs->f);
+>              continue;
+> @@ -724,9 +739,11 @@ gboolean multifd_new_channel(QIOChannel *ioc)
+>      qemu_mutex_init(&p->mutex);
+>      qemu_sem_init(&p->sem, 0);
+>      qemu_sem_init(&p->ready, 0);
+> +    qemu_cond_init(&p->cond_sync);
+>      p->quit = false;
+>      p->id = id;
+>      p->done = false;
+> +    p->sync = false;
+>      multifd_init_group(&p->pages);
+>      p->c = ioc;
+>      atomic_set(&multifd_recv_state->params[id], p);
+> @@ -792,6 +809,27 @@ static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+>      qemu_sem_post(&p->sem);
+>  }
+>  
+> +static int multifd_flush(void)
+> +{
+> +    int i, thread_count;
+> +
+> +    if (!migrate_use_multifd()) {
+> +        return 0;
+> +    }
+> +    thread_count = migrate_multifd_threads();
+> +    for (i = 0; i < thread_count; i++) {
+> +        MultiFDRecvParams *p = multifd_recv_state->params[i];
+> +
+> +        qemu_mutex_lock(&p->mutex);
+> +        while (!p->done) {
+> +            p->sync = true;
+> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
 > +        }
 
-Is that to make sure that the relatively small messages actually get
-transmitted on the main fd so that the destination starts receiving
-them?
+I don't think I understand how that works in the case where the
+recv_thread has already 'done' by the point you set sync=true; how does
+it get back to the check and do the signal?
 
-I do have a worry there that, since the addresses are going down a
-single fd we are open to deadlock by the send threads filling up
-buffers and blocking waiting for the receivers to receive.
-
->          ram_counters.transferred += 2; /* size of fd_num */
-> -        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
->          ram_counters.transferred += TARGET_PAGE_SIZE;
->          pages = 1;
->          ram_counters.normal++;
-> @@ -3126,7 +3106,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          case RAM_SAVE_FLAG_MULTIFD_PAGE:
->              fd_num = qemu_get_be16(f);
->              multifd_recv_page(host, fd_num);
-> -            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
->              break;
+> +        qemu_mutex_unlock(&p->mutex);
+> +    }
+> +    return 0;
+> +}
+> +
+>  /**
+>   * save_page_header: write page header to wire
+>   *
+> @@ -809,6 +847,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
+>  {
+>      size_t size, len;
 >  
->          case RAM_SAVE_FLAG_EOS:
+> +    if (rs->multifd_needs_flush &&
+> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+> +        offset |= RAM_SAVE_FLAG_ZERO;
+
+In the comment near the top you say RAM_SAVE_FLAG_COMPRESS_PAGE;  it's
+probably best to add an alias at the top to make it clear, e.g.
+  #define RAM_SAVE_FLAG_MULTIFD_SYNC RAM_SAVE_FLAG_ZERO
+
+  or maybe (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)
+
+> +        rs->multifd_needs_flush = false;
+> +    }
+> +
+>      if (block == rs->last_sent_block) {
+>          offset |= RAM_SAVE_FLAG_CONTINUE;
+>      }
+> @@ -2496,6 +2540,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+>  
+>      if (!migration_in_postcopy()) {
+>          migration_bitmap_sync(rs);
+> +        if (migrate_use_multifd()) {
+> +            rs->multifd_needs_flush = true;
+> +        }
+>      }
+>  
+>      ram_control_before_iterate(f, RAM_CONTROL_FINISH);
+> @@ -2538,6 +2585,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>          qemu_mutex_lock_iothread();
+>          rcu_read_lock();
+>          migration_bitmap_sync(rs);
+> +        if (migrate_use_multifd()) {
+> +            rs->multifd_needs_flush = true;
+> +        }
+>          rcu_read_unlock();
+>          qemu_mutex_unlock_iothread();
+>          remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
+> @@ -3012,6 +3062,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              break;
+>          }
+>  
+> +        if ((flags & (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO))
+> +                  == (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)) {
+> +            multifd_flush();
+> +            flags = flags & ~RAM_SAVE_FLAG_ZERO;
+> +        }
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
+>                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
 
 Dave
 
