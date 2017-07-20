@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYADH-0000XB-Tx
+	(envelope-from <bounces@canonical.com>) id 1dYADH-0000XD-V1
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYADE-0002XC-Le
+	(envelope-from <bounces@canonical.com>) id 1dYADG-0002YV-3o
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38192)
+Received: from indium.canonical.com ([91.189.90.7]:38212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYADE-0002Ul-Fr
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:48 -0400
+	id 1dYADF-0002Xv-UZ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYADD-0002hU-4f
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:47 +0000
+	id 1dYADF-0002hZ-3U
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EA7332E8019
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 154E52E8075
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Jul 2017 11:54:11 -0000
-From: Thomas Huth <1191326@bugs.launchpad.net>
-Reply-To: Bug 1191326 <1191326@bugs.launchpad.net>
+Date: Thu, 20 Jul 2017 11:53:36 -0000
+From: Thomas Huth <1182490@bugs.launchpad.net>
+Reply-To: Bug 1182490 <1182490@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130615151015.21597.4187.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150055165166.26860.4910709704520523715.malone@chaenomeles.canonical.com>
+References: <20130521141106.20288.51455.malonedeb@gac.canonical.com>
+Message-Id: <150055161725.6577.12832400070113086647.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1191326] Re: QNX 4 doesn't boot on qemu >= 1.3
+Subject: [Qemu-devel] [Bug 1182490] Re: [qemu-1.5] coroutine-win32.c broken
+ on NULL pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,9 +39,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU (currently v2.9.0)?
-
 ** Changed in: qemu
        Status: New =3D> Incomplete
 
@@ -48,34 +46,94 @@ the latest version of QEMU (currently v2.9.0)?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1191326
+https://bugs.launchpad.net/bugs/1182490
 
 Title:
-  QNX 4 doesn't boot on qemu >=3D 1.3
+  [qemu-1.5] coroutine-win32.c broken on NULL pointer
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  I am using virtual machine with QNX4 operating system installed on it.  I=
- updated my qemu from version
-  to newer and QNX4 doesn't start any more. All is ok on version 1.2 but wh=
-en I try to use any newer version
-  (1.3, 1.4, 1.5)  QNX4 doesn't boot.  I tried on windows and linux ubuntu =
-hosts - effects are the same.
+  Program received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 4340.0x163c]
+  qemu_coroutine_switch (action=3DCOROUTINE_TERMINATE, to_=3D0x0, from_=3D0=
+x3ba1c80)
+      at /home/cauchy/vcs/git/qemu/coroutine-win32.c:47
+  (gdb) bt
+  #0  qemu_coroutine_switch (action=3DCOROUTINE_TERMINATE, to_=3D0x0,
+      from_=3D0x3ba1c80) at /home/cauchy/vcs/git/qemu/coroutine-win32.c:47
+  #1  coroutine_trampoline (co_=3D0x3ba1c80)
+      at /home/cauchy/vcs/git/qemu/coroutine-win32.c:58
+  #2  0x0000000077098fed in ?? ()
+  #3  0x0000000000000000 in ?? ()
+  (gdb)
+  (gdb) info registers
+  rax            0x0      0
+  rbx            0x3ba1c80        62528640
+  rcx            0x0      0
+  rdx            0x0      0
+  rsi            0x770b28d0       1997220048
+  rdi            0x3ba1b38        62528312
+  rbp            0x0      0x0
+  rsp            0xc0bff60        0xc0bff60
+  r8             0x3184c0 3245248
+  r9             0x43e31a 4449050
+  r10            0x0      0
+  r11            0x206    518
+  r12            0x0      0
+  r13            0x0      0
+  r14            0x0      0
+  r15            0x0      0
+  rip            0x43e2cd 0x43e2cd <coroutine_trampoline+61>
+  eflags         0x10206  [ PF IF RF ]
+  cs             0x33     51
+  ss             0x2b     43
+  ds             0x0      0
+  es             0x0      0
+  fs             0x0      0
+  gs             0x0      0
+  (gdb) disassemble
+  Dump of assembler code for function coroutine_trampoline:
+     0x000000000043e290 <+0>:     push   %rdi
+     0x000000000043e291 <+1>:     push   %rsi
+     0x000000000043e292 <+2>:     push   %rbx
+     0x000000000043e293 <+3>:     sub    $0x30,%rsp
+     0x000000000043e297 <+7>:     mov    %rcx,%rbx
+     0x000000000043e29a <+10>:    lea    0x26dc1f(%rip),%rcx        #
+  0x6abec0 <__emutls_v.current>
+     0x000000000043e2a1 <+17>:    mov    0x6868dd68(%rip),%rax        # 0x6=
+8acc010
+     0x000000000043e2a8 <+24>:    mov    %rax,0x28(%rsp)
+     0x000000000043e2ad <+29>:    xor    %eax,%eax
+     0x000000000043e2af <+31>:    callq  0x695808 <__emutls_get_address>
+     0x000000000043e2b4 <+36>:    mov    0x9090d9(%rip),%rsi        #
+  0xd47394 <__imp_SwitchToFiber>
+     0x000000000043e2bb <+43>:    mov    %rax,%rdi
+     0x000000000043e2be <+46>:    xchg   %ax,%ax
+     0x000000000043e2c0 <+48>:    mov    0x8(%rbx),%rcx
+     0x000000000043e2c4 <+52>:    callq  *(%rbx)
+     0x000000000043e2c6 <+54>:    mov    0x10(%rbx),%rdx
+     0x000000000043e2ca <+58>:    mov    %rdx,(%rdi)
+  =3D> 0x000000000043e2cd <+61>:    movl   $0x2,0x38(%rdx)
+     0x000000000043e2d4 <+68>:    mov    0x30(%rdx),%rcx
+     0x000000000043e2d8 <+72>:    callq  *%rsi
+     0x000000000043e2da <+74>:    jmp    0x43e2c0 <coroutine_trampoline+48>
+  End of assembler dump.
+  (gdb)
 
-  When virtual machine boots qnx bootloader loads and starts operating syst=
-em. In the next step
-  qnx starts its ide driver, which detects qemu harddisk and cdrom. Problem=
- starts when operating system
-  tries mount partition - an error occur and qnx stop booting procedure:
+  =
 
-  mount -p "No bios signature in partition sector on /dev/hd0"
+  From:
 
-  I have tried install qnx from cdrom but it seems that there is the same p=
-roblem. QNX installer boot from
-  cdrom, detects hard disk and cdrom, but cdrom can't be mounted in the nex=
-t step of installation procedure.
+  qemu_coroutine_switch (action=3DCOROUTINE_TERMINATE, to_=3D0x0, from_=3D0=
+x3ba1c80)
+      at /home/cauchy/vcs/git/qemu/coroutine-win32.c:47
+
+  We can see qemu_coroutine_switch was call with to_=3DNULL, then crashed
+  at line 47:
+
+  to->action =3D action;
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1191326/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1182490/+subscriptions
