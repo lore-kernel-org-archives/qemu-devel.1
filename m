@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dYFcn-0006rQ-36
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:52:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYFi9-0000df-4d
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dYFck-0005ha-18
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:52:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dYFcj-0005hV-Qo
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:52:29 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B695467AFE
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 17:52:28 +0000 (UTC)
-Date: Thu, 20 Jul 2017 14:52:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170720175223.GR2757@localhost.localdomain>
-References: <20170717180926.14924-1-ehabkost@redhat.com>
-	<877ez3rsp7.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1dYFi6-0007ER-4J
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:58:05 -0400
+References: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2ba1a0e2-3e15-189c-b66f-2128dfb61bad@redhat.com>
+Date: Thu, 20 Jul 2017 12:57:52 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877ez3rsp7.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on
- alternate conflict
+In-Reply-To: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fttReTR1AOKOwKGEuFOXNi635VXj50GTX"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] Use qemu_tolower() and
+ qemu_toupper(), not tolower() and toupper()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jul 20, 2017 at 06:14:44PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > The conflict check added by commit c0644771 ("qapi: Reject
-> > alternates that can't work with keyval_parse()") doesn't work
-> > with the following declaration:
-> >
-> >   { 'alternate': 'Alt',
-> >     'data': { 'one': 'bool',
-> >               'two': 'str' } }
-> >
-> > It crashes with:
-> >
-> >   Traceback (most recent call last):
-> >     File "./scripts/qapi-types.py", line 295, in <module>
-> >       schema = QAPISchema(input_file)
-> >     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
-> >       self.exprs = check_exprs(parser.exprs)
-> >     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
-> >       check_alternate(expr, info)
-> >     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
-> >       % (name, key, types_seen[qtype]))
-> >   KeyError: 'QTYPE_QSTRING'
-> >
-> > This happens because the previously-seen conflicting member
-> > ('one') can't be found at types_seen[qtype], but at
-> > types_seen['QTYPE_BOOL'].
-> >
-> > Fix the bug by moving the error check to the same loop that adds
-> > new items to types_seen, raising an exception if types_seen[qt]
-> > is already set.
-> >
-> > Add two additional test cases that can detect the bug.
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> [...]
-> > diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
-> > new file mode 100644
-> > index 0000000..e69de29
-> > diff --git a/tests/qapi-schema/alternate-multi-conflict.json b/tests/qapi-schema/alternate-multi-conflict.json
-> > new file mode 100644
-> > index 0000000..e69de29
-> 
-> Accident?  Can drop on commit.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fttReTR1AOKOwKGEuFOXNi635VXj50GTX
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+Cc: patches@linaro.org, Cornelia Huck <cohuck@redhat.com>,
+ Alexander Graf <agraf@suse.de>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
+Message-ID: <2ba1a0e2-3e15-189c-b66f-2128dfb61bad@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] Use qemu_tolower() and
+ qemu_toupper(), not tolower() and toupper()
+References: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, sorry.  Thanks for spotting it.
+On 07/20/2017 11:31 AM, Peter Maydell wrote:
+> On NetBSD, where tolower() and toupper() are implemented using an
+> array lookup, the compiler warns if you pass a plain 'char'
+> to these functions:
+>=20
+> gdbstub.c:914:13: warning: array subscript has type 'char'
+>=20
+> This reflects the fact that toupper() and tolower() give
+> undefined behaviour if they are passed a value that isn't
+> a valid 'unsigned char' or EOF.
+>=20
+> We have qemu_tolower() and qemu_toupper() to avoid this problem;
+> use them.
+>=20
+> (The use in scsi-generic.c does not trigger the warning because
+> it passes a uint8_t; we switch it anyway, for consistency.)
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
 
--- 
-Eduardo
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--fttReTR1AOKOwKGEuFOXNi635VXj50GTX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllw7yAACgkQp6FrSiUn
+Q2oowgf/TqIbkjwW7kDuvJklojbmdlHqw3+CpZm0QPdatq7tlCSrh7H5e/QGbFUb
+aL5Dp9vFOjywUbIR6qCC5nK/+85lB+dW8LEJP0Jl7OY6YhenKPYO+z0RS2e/tx6Z
+ekeL+1KAgf5u0JVpvqh9MwyUh74JHb6ihK/gBfRRvVlOwnTSuq0keaCRO9N+DuP+
+xH+b/MdWSpO3joLR0fvharTv0+/jQIb33oasHSd34MT8wdZPiezUzW+ecZx7TOfz
+DcSCuxN6UhaZgyNejLWIrdKPLFZqMyCfNJr2QYN63NhVDoXHcU+6qHFrhsHlS9wy
+CwVX6GOb6Er0WWuUJikybaNwzS0BOg==
+=l3lX
+-----END PGP SIGNATURE-----
+
+--fttReTR1AOKOwKGEuFOXNi635VXj50GTX--
