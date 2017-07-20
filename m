@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYIPG-0002Yp-Fv
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:50:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYISR-000490-D8
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYIPD-0007LJ-7b
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:50:46 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45227)
+	(envelope-from <eblake@redhat.com>) id 1dYISO-0008JL-8V
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:54:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59926)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYIPC-0007JJ-P6
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:50:43 -0400
-Date: Thu, 20 Jul 2017 16:50:41 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170720205041.GA8754@flamenco>
-References: <1500520169-23367-1-git-send-email-cota@braap.org>
-	<1500520169-23367-43-git-send-email-cota@braap.org>
-	<8f18a24d-01f8-7b57-33ef-f89939acd3c6@twiddle.net>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYISN-0008JB-VW
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:54:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E891356D5
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 20:53:58 +0000 (UTC)
+References: <20170714190827.4083-1-eblake@redhat.com>
+	<20170714190827.4083-6-eblake@redhat.com>
+	<87zibzl8py.fsf@dusky.pond.sub.org>
+	<ff471aeb-51dc-1abd-f512-f1a93db3752c@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9674afa4-78b3-044b-4e5f-4014888ff03e@redhat.com>
+Date: Thu, 20 Jul 2017 15:53:56 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f18a24d-01f8-7b57-33ef-f89939acd3c6@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v3 42/43] tcg: introduce regions to split
- code_gen_buffer
+In-Reply-To: <ff471aeb-51dc-1abd-f512-f1a93db3752c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ma01dJb5CwaMGl0p6FLe6B1WVIScuG73C"
+Subject: Re: [Qemu-devel] [PATCH 5/5] qtest: Document calling conventions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,153 +36,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-On Wed, Jul 19, 2017 at 22:04:50 -1000, Richard Henderson wrote:
-> On 07/19/2017 05:09 PM, Emilio G. Cota wrote:
-> >+    /* We do not yet support multiple TCG contexts, so use one region for now */
-> >+    n_regions = 1;
-> >+
-> >+    /* start on a page-aligned address */
-> >+    buf = QEMU_ALIGN_PTR_UP(buf, qemu_real_host_page_size);
-> >+    g_assert(buf < tcg_init_ctx.code_gen_buffer + size);
-> >+
-> >+    /* discard that initial portion */
-> >+    size -= buf - tcg_init_ctx.code_gen_buffer;
-> 
-> It seems pointless wasting most of a page after the prologue when n_regions
-> == 1.  We don't really need to start on a page boundary in that case.
-> 
-> >+    /* make region_size a multiple of page_size */
-> >+    region_size = size / n_regions;
-> >+    region_size = QEMU_ALIGN_DOWN(region_size, qemu_real_host_page_size);
-> 
-> This division can result in a number of pages at the end of the region being
-> unused.  Is it worthwhile freeing them?  Or marking them mprotect_none along
-> with the last guard page?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ma01dJb5CwaMGl0p6FLe6B1WVIScuG73C
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <9674afa4-78b3-044b-4e5f-4014888ff03e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] qtest: Document calling conventions
+References: <20170714190827.4083-1-eblake@redhat.com>
+ <20170714190827.4083-6-eblake@redhat.com> <87zibzl8py.fsf@dusky.pond.sub.org>
+ <ff471aeb-51dc-1abd-f512-f1a93db3752c@redhat.com>
+In-Reply-To: <ff471aeb-51dc-1abd-f512-f1a93db3752c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Perhaps we should then enlarge both the first and last regions so that we
-fully use the buffer.
+On 07/20/2017 03:37 PM, Eric Blake wrote:
+>>> + * @fmt...: QMP message to send to qemu; only recognizes formats
+>>> + * understood by json-lexer.c
+>>>   *
+>>>   * Sends a QMP message to QEMU and consumes the response.
+>>>   */
+>>
+>> These formats are chosen so that gcc can help us check them.  Please a=
+dd
+>> GCC_FMT_ATTR().  Precedence: qobject_from_jsonf().
+>=20
+> Will do.  (This patch was originally part of my larger series trying to=
 
-What do you think of the below? It's a delta over the v3 patch.
+> get rid of qobject_from_jsonf() - I may still succeed at that, but
+> separating the easy stuff from the controversial means that the easy
+> stuff needs tweaking).
 
-		Emilio
+Bleargh.  It's not that simple.
 
----8<---
+With printf-style, hmp("literal") and hmp("%s", "literal") produce the
+same results.
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index a5c01be..8bf8bca 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -129,7 +129,8 @@ static unsigned int n_tcg_ctxs;
-  */
- struct tcg_region_state {
-     QemuMutex lock;
--    void *buf;      /* set at init time */
-+    void *start;    /* set at init time */
-+    void *end;      /* set at init time */
-     size_t n;       /* set at init time */
-     size_t size;    /* size of one region; set at init time */
-     size_t current; /* protected by the lock */
-@@ -277,13 +278,27 @@ TCGLabel *gen_new_label(void)
- 
- static void tcg_region_assign(TCGContext *s, size_t curr_region)
- {
-+    void *aligned = QEMU_ALIGN_PTR_UP(region.start, qemu_real_host_page_size);
-     void *buf;
-+    size_t size = region.size;
- 
--    buf = region.buf + curr_region * (region.size + qemu_real_host_page_size);
-+    /* The beginning of the first region might not be page-aligned */
-+    if (curr_region == 0) {
-+        buf = region.start;
-+        size += aligned - buf;
-+    } else {
-+        buf = aligned + curr_region * (region.size +  qemu_real_host_page_size);
-+    }
-+    /* the last region might be larger than region.size */
-+    if (curr_region == region.n - 1) {
-+        void *aligned_end = buf + size;
-+
-+        size += region.end - qemu_real_host_page_size - aligned_end;
-+    }
-     s->code_gen_buffer = buf;
-     s->code_gen_ptr = buf;
--    s->code_gen_buffer_size = region.size;
--    s->code_gen_highwater = buf + region.size - TCG_HIGHWATER;
-+    s->code_gen_buffer_size = size;
-+    s->code_gen_highwater = buf + size - TCG_HIGHWATER;
- }
- 
- static bool tcg_region_alloc__locked(TCGContext *s)
-@@ -409,44 +424,50 @@ static size_t tcg_n_regions(void)
- void tcg_region_init(void)
- {
-     void *buf = tcg_init_ctx.code_gen_buffer;
-+    void *aligned;
-     size_t size = tcg_init_ctx.code_gen_buffer_size;
-+    size_t page_size = qemu_real_host_page_size;
-     size_t region_size;
-     size_t n_regions;
-     size_t i;
-+    int rc;
- 
-     n_regions = tcg_n_regions();
- 
--    /* start on a page-aligned address */
--    buf = QEMU_ALIGN_PTR_UP(buf, qemu_real_host_page_size);
--    g_assert(buf < tcg_init_ctx.code_gen_buffer + size);
--
--    /* discard that initial portion */
--    size -= buf - tcg_init_ctx.code_gen_buffer;
--
--    /* make region_size a multiple of page_size */
--    region_size = size / n_regions;
--    region_size = QEMU_ALIGN_DOWN(region_size, qemu_real_host_page_size);
-+    /* The first region will be 'aligned - buf' bytes larger than the others */
-+    aligned = QEMU_ALIGN_PTR_UP(buf, page_size);
-+    g_assert(aligned < tcg_init_ctx.code_gen_buffer + size);
-+    /*
-+     * Make region_size a multiple of page_size, using aligned as the start.
-+     * As a result of this we might end up with a few extra pages at the end of
-+     * the buffer; we will assign those to the last region.
-+     */
-+    region_size = (size - (aligned - buf)) / n_regions;
-+    region_size = QEMU_ALIGN_DOWN(region_size, page_size);
- 
-     /* A region must have at least 2 pages; one code, one guard */
--    g_assert(region_size >= 2 * qemu_real_host_page_size);
-+    g_assert(region_size >= 2 * page_size);
- 
-     /* init the region struct */
-     qemu_mutex_init(&region.lock);
-     region.n = n_regions;
--    region.buf = buf;
-+    region.start = buf;
-+    /* page-align the end, since its last page will be a guard page */
-+    region.end = QEMU_ALIGN_PTR_DOWN(buf + size, page_size);
-     /* do not count the guard page in region.size */
--    region.size = region_size - qemu_real_host_page_size;
-+    region.size = region_size - page_size;
- 
--    /* set guard pages */
--    for (i = 0; i < region.n; i++) {
-+    /* set guard pages for the first n-1 regions */
-+    for (i = 0; i < region.n - 1; i++) {
-         void *guard;
--        int rc;
- 
--        guard = region.buf + region.size;
--        guard += i * (region.size + qemu_real_host_page_size);
--        rc = qemu_mprotect_none(guard, qemu_real_host_page_size);
-+        guard = aligned + region.size + i * (region.size + page_size);
-+        rc = qemu_mprotect_none(guard, page_size);
-         g_assert(!rc);
-     }
-+    /* the last region gets the rest of the buffer */
-+    rc = qemu_mprotect_none(region.end - page_size, page_size);
-+    g_assert(!rc);
- 
-     /* In user-mode we support only one ctx, so do the initial allocation now */
- #ifdef CONFIG_USER_ONLY
+But with json-lexer style, %s MODIFIES its input.
+The original qmp("{'execute':\"foo\"}") sends a JSON object
+ {'execute':"foo"}
+but counterpart qmp("%s", "{'execute':'foo'}") sends a JSON string with
+added \ escaping:
+ "{'execute':\"foo\"}"
+
+So adding the format immediately causes lots of warnings, such as:
+
+  CC      tests/vhost-user-test.o
+tests/vhost-user-test.c: In function =E2=80=98test_migrate=E2=80=99:
+tests/vhost-user-test.c:668:5: error: format not a string literal and no
+format arguments [-Werror=3Dformat-security]
+     rsp =3D qmp(cmd);
+     ^~~
+
+  CC      tests/boot-order-test.o
+tests/boot-order-test.c: In function =E2=80=98test_a_boot_order=E2=80=99:=
+
+tests/boot-order-test.c:46:26: error: zero-length gnu_printf format
+string [-Werror=3Dformat-zero-length]
+     qmp_discard_response("");   /* HACK: wait for event */
+                          ^~
+
+but we CAN'T rewrite those to qmp("%s", command).
+
+Now you can sort-of understand why my larger series wanted to get rid of
+qobject_from_jsonf(), since our use of GCC_FMT_ATTR() there is a lie?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ma01dJb5CwaMGl0p6FLe6B1WVIScuG73C
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllxGGQACgkQp6FrSiUn
+Q2qAiwf+OlwFCudYipdTxx8cqwaqzQ7brK4OHhAIGeB2iBCzyMbkqYnCPRfA2dPl
+w7GV86Qe49FAZesd8VFhGgjABnGZPWo47z1Zcvq9WR7Lr+6HjGVNBJmfLRyfjlt+
+6w5aEhKeJw2L+6UGNkVz5ZOrkh+rQl3s8slyw1QIbr7ihN1IGN2GP5ofBzP96KAI
+3eYFGuwCK86dkd5Ecx+I7ZRT6vRgys3oxd2+WIgbZRX/OLF47Keie9rUlUpccbIs
+AQncRpstR6/HMK9dPKW/VnerI3i0EDI4264GO9F+m6Q3nZEw4L1mC18eXtmc/880
+W2jOHq/n1Y2MfrUsH1m3KW9ghjZcKA==
+=JoEu
+-----END PGP SIGNATURE-----
+
+--ma01dJb5CwaMGl0p6FLe6B1WVIScuG73C--
