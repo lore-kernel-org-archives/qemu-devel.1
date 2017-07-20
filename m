@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dY9cN-0004t8-Qa
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:27:44 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dY9fx-0006oV-V3
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dY9cK-0001NC-JX
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:27:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50376
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dY9cK-0001M5-ER
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:27:40 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6KBOIDM045770
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 07:27:38 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2btpr84ybs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 07:27:37 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 20 Jul 2017 12:27:35 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 20 Jul 2017 13:27:31 +0200
-In-Reply-To: <1500550051-7821-1-git-send-email-borntraeger@de.ibm.com>
-References: <1500550051-7821-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500550051-7821-2-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] s390/cpumodel: remove KSS from the default
- model of z14
+	(envelope-from <dgilbert@redhat.com>) id 1dY9fu-0003JG-O2
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:31:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY9fu-0003Iv-EL
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:31:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 03D30C056827
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 11:31:21 +0000 (UTC)
+Date: Thu, 20 Jul 2017 12:31:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720113113.GF2101@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-17-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170717134238.1966-17-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 16/17] migration: Transfer pages over
+ new channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,46 +34,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-The SIE_KSS feature will allow a guest to use KSS for a nested guest.
-To create a nested guest the SIE_F2 facility is still necessary.
-Since SIE_F2 is not part of the default model it does not make
-a lot of sense to provide the SIE_KSS feature in the default model.
-Let's also create a dependency check.
+* Juan Quintela (quintela@redhat.com) wrote:
+> We switch for sending the page number to send real pages.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> Remove the HACK bit, now we have the function that calculates the size
+> of a page exported.
+> ---
+>  migration/migration.c | 14 ++++++++----
+>  migration/ram.c       | 59 +++++++++++++++++----------------------------------
+>  2 files changed, 29 insertions(+), 44 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e122684..34a34b7 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1882,13 +1882,14 @@ static void *migration_thread(void *opaque)
+>      /* Used by the bandwidth calcs, updated later */
+>      int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+> -    int64_t initial_bytes = 0;
+>      /*
+>       * The final stage happens when the remaining data is smaller than
+>       * this threshold; it's calculated from the requested downtime and
+>       * measured bandwidth
+>       */
+>      int64_t threshold_size = 0;
+> +    int64_t qemu_file_bytes = 0;
+> +    int64_t multifd_pages = 0;
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
----
- target/s390x/cpu_models.c   | 1 +
- target/s390x/gen-features.c | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+It feels like these changes to the transfer count should be in a
+separate patch.
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index f4e5bb6..d91b7b8 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -723,6 +723,7 @@ static void check_consistency(const S390CPUModel *model)
-         { S390_FEAT_KLMD_SHAKE_256, S390_FEAT_MSA },
-         { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
-         { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
-+        { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
-     };
-     int i;
- 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index cf69157..c8dc104 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -535,7 +535,6 @@ static uint16_t default_GEN14_GA1[] = {
-     S390_FEAT_GROUP_MSA_EXT_6,
-     S390_FEAT_GROUP_MSA_EXT_7,
-     S390_FEAT_GROUP_MSA_EXT_8,
--    S390_FEAT_SIE_KSS,
- };
- 
- /****** END FEATURE DEFS ******/
--- 
-2.7.4
+>      int64_t start_time = initial_time;
+>      int64_t end_time;
+>      bool old_vm_running = false;
+> @@ -1976,9 +1977,13 @@ static void *migration_thread(void *opaque)
+>          }
+>          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>          if (current_time >= initial_time + BUFFER_DELAY) {
+> -            uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
+> -                                         initial_bytes;
+>              uint64_t time_spent = current_time - initial_time;
+> +            uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
+> +            uint64_t multifd_pages_now = ram_counters.multifd;
+> +            uint64_t transferred_bytes =
+> +                (qemu_file_bytes_now - qemu_file_bytes) +
+> +                (multifd_pages_now - multifd_pages) *
+> +                qemu_target_page_size();
+
+If I've followed this right, then ram_counters.multifd is in the main
+thread not the individual threads, so we should be OK doing that.
+
+>              double bandwidth = (double)transferred_bytes / time_spent;
+>              threshold_size = bandwidth * s->parameters.downtime_limit;
+>  
+> @@ -1996,7 +2001,8 @@ static void *migration_thread(void *opaque)
+>  
+>              qemu_file_reset_rate_limit(s->to_dst_file);
+>              initial_time = current_time;
+> -            initial_bytes = qemu_ftell(s->to_dst_file);
+> +            qemu_file_bytes = qemu_file_bytes_now;
+> +            multifd_pages = multifd_pages_now;
+>          }
+>          if (qemu_file_rate_limit(s->to_dst_file)) {
+>              /* usleep expects microseconds */
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b55b243..c78b286 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -468,25 +468,21 @@ static void *multifd_send_thread(void *opaque)
+>              break;
+>          }
+>          if (p->pages.num) {
+> -            int i;
+>              int num;
+>  
+>              num = p->pages.num;
+>              p->pages.num = 0;
+>              qemu_mutex_unlock(&p->mutex);
+>  
+> -            for (i = 0; i < num; i++) {
+> -                if (qio_channel_write(p->c,
+> -                                      (const char *)&p->pages.iov[i].iov_base,
+> -                                      sizeof(uint8_t *), &error_abort)
+> -                    != sizeof(uint8_t *)) {
+> -                    MigrationState *s = migrate_get_current();
+> +            if (qio_channel_writev_all(p->c, p->pages.iov,
+> +                                       num, &error_abort)
+> +                != num * TARGET_PAGE_SIZE) {
+> +                MigrationState *s = migrate_get_current();
+
+Same comments as previous patch; note we should find a way to get
+the error message logged; not easy since we're in a thread, but
+we need to find a way to log the errors.
+
+>  
+> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+> -                                      MIGRATION_STATUS_FAILED);
+> -                    terminate_multifd_send_threads();
+> -                    return NULL;
+> -                }
+> +                migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+> +                                  MIGRATION_STATUS_FAILED);
+> +                terminate_multifd_send_threads();
+> +                return NULL;
+>              }
+>              qemu_mutex_lock(&multifd_send_state->mutex);
+>              p->done = true;
+> @@ -654,7 +650,6 @@ void multifd_load_cleanup(void)
+>  static void *multifd_recv_thread(void *opaque)
+>  {
+>      MultiFDRecvParams *p = opaque;
+> -    uint8_t *recv_address;
+>  
+>      qemu_sem_post(&p->ready);
+>      while (true) {
+> @@ -664,38 +659,21 @@ static void *multifd_recv_thread(void *opaque)
+>              break;
+>          }
+>          if (p->pages.num) {
+> -            int i;
+>              int num;
+>  
+>              num = p->pages.num;
+>              p->pages.num = 0;
+>  
+> -            for (i = 0; i < num; i++) {
+> -                if (qio_channel_read(p->c,
+> -                                     (char *)&recv_address,
+> -                                     sizeof(uint8_t *), &error_abort)
+> -                    != sizeof(uint8_t *)) {
+> -                    MigrationState *s = migrate_get_current();
+> +            if (qio_channel_readv_all(p->c, p->pages.iov,
+> +                                      num, &error_abort)
+> +                != num * TARGET_PAGE_SIZE) {
+> +                MigrationState *s = migrate_get_current();
+>  
+> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+> -                                      MIGRATION_STATUS_FAILED);
+> -                    terminate_multifd_recv_threads();
+> -                    return NULL;
+> -                }
+> -                if (recv_address != p->pages.iov[i].iov_base) {
+> -                    MigrationState *s = migrate_get_current();
+> -
+> -                    printf("We received %p what we were expecting %p (%d)\n",
+> -                           recv_address,
+> -                           p->pages.iov[i].iov_base, i);
+> -
+> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+> -                                      MIGRATION_STATUS_FAILED);
+> -                    terminate_multifd_recv_threads();
+> -                    return NULL;
+> -                }
+> +                migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+> +                                  MIGRATION_STATUS_FAILED);
+> +                terminate_multifd_recv_threads();
+> +                return NULL;
+>              }
+> -
+>              p->done = true;
+>              qemu_mutex_unlock(&p->mutex);
+>              qemu_sem_post(&p->ready);
+> @@ -1262,8 +1240,10 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+>                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>          fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
+>          qemu_put_be16(rs->f, fd_num);
+> +        if (fd_num != UINT16_MAX) {
+> +            qemu_fflush(rs->f);
+> +        }
+
+Is that to make sure that the relatively small messages actually get
+transmitted on the main fd so that the destination starts receiving
+them?
+
+I do have a worry there that, since the addresses are going down a
+single fd we are open to deadlock by the send threads filling up
+buffers and blocking waiting for the receivers to receive.
+
+>          ram_counters.transferred += 2; /* size of fd_num */
+> -        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+>          ram_counters.transferred += TARGET_PAGE_SIZE;
+>          pages = 1;
+>          ram_counters.normal++;
+> @@ -3126,7 +3106,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>          case RAM_SAVE_FLAG_MULTIFD_PAGE:
+>              fd_num = qemu_get_be16(f);
+>              multifd_recv_page(host, fd_num);
+> -            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+>              break;
+>  
+>          case RAM_SAVE_FLAG_EOS:
+
+Dave
+
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
