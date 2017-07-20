@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45245)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYE7I-00024e-Vx
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:15:58 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48024)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dYEI4-0006Ck-Mj
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:27:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYE7H-0004aN-KG
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:15:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58738)
+	(envelope-from <pl@kamp.de>) id 1dYEI0-00051i-MJ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:27:04 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:44175 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYE7H-0004Vf-Az
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:15:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E43876A00
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:15:52 +0000 (UTC)
-Date: Thu, 20 Jul 2017 17:15:49 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170720161548.GC2456@work-vm>
-References: <20170407143847.GM2138@work-vm> <20170720105004.GA26866@redhat.com>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dYEI0-000514-CP
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:27:00 -0400
+References: <1500560441-5670-1-git-send-email-pl@kamp.de>
+	<1500560441-5670-2-git-send-email-pl@kamp.de>
+	<72303744-31bc-1c28-2d34-5926975b0b2d@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <2177e9ee-73c6-cc7d-76a4-e56749be5815@kamp.de>
+Date: Thu, 20 Jul 2017 18:26:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170720105004.GA26866@redhat.com>
-Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+In-Reply-To: <72303744-31bc-1c28-2d34-5926975b0b2d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 01/10] specs/qcow2: add compress format
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Fri, Apr 07, 2017 at 03:38:47PM +0100, Dr. David Alan Gilbert wrote:
-> > Hi,
-> >    Fedora 26 has gcc 7.0.1 which has the normal compliment
-> > of new fussy warnings; so far I've posted :
-> > 
-> > tests/check-qdict: Fix missing brackets
-> > slirp/smb: Replace constant strings by glib string
-> > 
-> > that fix one actual mistake and work around something it's being
-> > fussy over.
-> > 
-> > But I've also got a pile of hacks, attached below that I'm
-> > not too sure what I'll do with them yet, but they're attached
-> > for anyone else trying to build.  Note they're smoke-only-tested.
-> > 
-> > I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80346
-> > filed for what I reckon is a couple of overly pessimistic warnings.
-> 
-> 
-> > diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-> > index bd9fd55b0a..ebb0221140 100644
-> > --- a/include/qemu/iov.h
-> > +++ b/include/qemu/iov.h
-> > @@ -46,7 +46,7 @@ static inline size_t
-> >  iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
-> >               size_t offset, const void *buf, size_t bytes)
-> >  {
-> > -    if (__builtin_constant_p(bytes) && iov_cnt &&
-> > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
-> >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
-> >          memcpy(iov[0].iov_base + offset, buf, bytes);
-> >          return bytes;
-> > @@ -59,7 +59,7 @@ static inline size_t
-> >  iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
-> >             size_t offset, void *buf, size_t bytes)
-> >  {
-> > -    if (__builtin_constant_p(bytes) && iov_cnt &&
-> > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
-> >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
-> >          memcpy(buf, iov[0].iov_base + offset, bytes);
-> >          return bytes;
+Am 20.07.2017 um 17:52 schrieb Eric Blake:
+> On 07/20/2017 09:20 AM, Peter Lieven wrote:
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>> ---
+>>  docs/interop/qcow2.txt | 43 ++++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 42 insertions(+), 1 deletion(-)
+>>
+>> +== Compress format extension ==
+>> +
+>> +The compress format extension is an optional header extension. It provides
+>> +the ability to specify the compress algorithm and compress parameters
+>> +that are used for compressed clusters. This new header MUST be present if
+>> +the incompatible-feature bit "compress format bit" is set and MUST be absent
+>> +otherwise.
+>> +
+>> +Note: Ommitting the incompatible "Compress format bit" results in the usage
+> s/Ommitting/Omitting/
+>
+>> +of zlib compression with default compression level (default before QEMU 2.10).
+>> +However, this old default has a smaller compression window size which results in
+>> +lower compression ratio and slightly worse compression speed compared to
+>> +explicity specifying zlib compression with default compression level in the
+> s/explicity/explicitly/
+>
+>> +compress format extension.
+> If window size affects decompression, then we absolutely must specify
+> what window size is in use, both for the old-style compression (bug that
+> we haven't mentioned window size in the past), and for the new-style.
+> That is, if you have to tell zlib at decompression time what size window
+> was used at compression, then our choices for window size should be
+> mentioned in this spec.  Furthermore, if window size matters, it sounds
+> like it should be a zlib-specific tunable.  I really would like to be
+> able to document that having the extension header present with
+> parameters XYZ is the same as omitting the extension header (but that is
+> only doable if window size is a tunable parameter).
+>
+> I haven't yet checked your code implementation to see where you are
+> setting window sizes, to know if window size is something that should be
+> a tunable in the file format.
+>
+You don't have to know the window size that was used. The docs of zlib
 
-tbh I don't know what the right fix for this is;  the gcc discussion
-confused me as to why it thinks it can be a valid case.
+just say, that the windowSize specified at inflate must be greater or equal
 
-> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> > index 88dbf97853..c55de4f65b 100644
-> > --- a/tests/bios-tables-test.c
-> > +++ b/tests/bios-tables-test.c
-> > @@ -98,7 +98,7 @@ static void test_acpi_rsdt_table(test_data *data)
-> >      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
-> >      uint32_t addr = data->rsdp_table.rsdt_physical_address;
-> >      uint32_t *tables;
-> > -    int tables_nr;
-> > +    unsigned int tables_nr;
-> >      uint8_t checksum;
-> >  
-> >      /* read the header */
+to the one used at deflate. So if we change the code to use 15 we can safely
 
-> Unless I've missed a patch somwhere, I think the problems that these two
-> chunks are fixing are still needed for current git master, to stop warnings
-> in the unit tests.
-> 
+decompress old clusters that where compressed with 12.
 
-The second one of those I can post a patch for; the trick is to change
-the g_assert_cmpint to a g_assert and then gcc realises the bad case
-can't happen.  I'll post that in a few mins.
 
-Dave
-> 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Peter
