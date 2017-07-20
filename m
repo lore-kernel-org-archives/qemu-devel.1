@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qO-00016d-Sj
+	(envelope-from <cota@braap.org>) id 1dY1qO-00016b-MI
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qK-0005rl-MR
+	(envelope-from <cota@braap.org>) id 1dY1qK-0005rV-F1
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:40 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53141)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40609)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qK-0005rN-Hv
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qK-0005rF-BI
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:36 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:09:11 -0400
-Message-Id: <1500520169-23367-26-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:10 -0400
+Message-Id: <1500520169-23367-25-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 25/43] translate-all: define and use
- DEBUG_TB_CHECK_GATE
+Subject: [Qemu-devel] [PATCH v3 24/43] translate-all: define and use
+ DEBUG_TB_INVALIDATE_GATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-This prevents bit rot by ensuring the debug code is compiled when
-building a user-mode target.
-
-Unfortunately the helpers are user-mode-only so we cannot fully
-get rid of the ifdef checks. Add a comment to explain this.
+This gets rid of an ifdef check while ensuring that the debug code
+is compiled, which prevents bit rot.
 
 Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ accel/tcg/translate-all.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 962e9b3..845585b 100644
+index c4c23f9..962e9b3 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -82,6 +82,12 @@
- #undef DEBUG_TB_CHECK
- #endif
+@@ -65,6 +65,12 @@
+ /* make various TB consistency checks */
+ /* #define DEBUG_TB_CHECK */
  
-+#ifdef DEBUG_TB_CHECK
-+#define DEBUG_TB_CHECK_GATE 1
++#ifdef DEBUG_TB_INVALIDATE
++#define DEBUG_TB_INVALIDATE_GATE 1
 +#else
-+#define DEBUG_TB_CHECK_GATE 0
++#define DEBUG_TB_INVALIDATE_GATE 0
 +#endif
 +
- /* Access to the various translations structures need to be serialised via locks
-  * for consistency. This is automatic for SoftMMU based system
-  * emulation due to its single threaded nature. In user-mode emulation
-@@ -950,7 +956,13 @@ void tb_flush(CPUState *cpu)
-     }
- }
- 
--#ifdef DEBUG_TB_CHECK
-+/*
-+ * Formerly ifdef DEBUG_TB_CHECK. These debug functions are user-mode-only,
-+ * so in order to prevent bit rot we compile them unconditionally in user-mode,
-+ * and let the optimizer get rid of them by wrapping their user-only callers
-+ * with if (DEBUG_TB_CHECK_GATE).
-+ */
-+#ifdef CONFIG_USER_ONLY
- 
- static void
- do_tb_invalidate_check(struct qht *ht, void *p, uint32_t hash, void *userp)
-@@ -994,7 +1006,7 @@ static void tb_page_check(void)
-     qht_iter(&tcg_ctx.tb_ctx.htable, do_tb_page_check, NULL);
- }
- 
+ #ifdef DEBUG_TB_FLUSH
+ #define DEBUG_TB_FLUSH_GATE 1
+ #else
+@@ -1193,9 +1199,9 @@ static inline void tb_alloc_page(TranslationBlock *tb,
+           }
+         mprotect(g2h(page_addr), qemu_host_page_size,
+                  (prot & PAGE_BITS) & ~PAGE_WRITE);
+-#ifdef DEBUG_TB_INVALIDATE
+-        printf("protecting code page: 0x" TB_PAGE_ADDR_FMT "\n", page_addr);
 -#endif
-+#endif /* CONFIG_USER_ONLY */
- 
- static inline void tb_page_remove(TranslationBlock **ptb, TranslationBlock *tb)
- {
-@@ -1238,8 +1250,10 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-                      tb->trace_vcpu_dstate);
-     qht_insert(&tcg_ctx.tb_ctx.htable, tb, h);
- 
--#ifdef DEBUG_TB_CHECK
--    tb_page_check();
-+#ifdef CONFIG_USER_ONLY
-+    if (DEBUG_TB_CHECK_GATE) {
-+        tb_page_check();
-+    }
- #endif
- }
- 
-@@ -2209,8 +2223,10 @@ int page_unprotect(target_ulong address, uintptr_t pc)
-             /* and since the content will be modified, we must invalidate
-                the corresponding translated code. */
-             current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
--#ifdef DEBUG_TB_CHECK
--            tb_invalidate_check(addr);
-+#ifdef CONFIG_USER_ONLY
-+            if (DEBUG_TB_CHECK_GATE) {
-+                tb_invalidate_check(addr);
-+            }
- #endif
-         }
-         mprotect((void *)g2h(host_start), qemu_host_page_size,
++        if (DEBUG_TB_INVALIDATE_GATE) {
++            printf("protecting code page: 0x" TB_PAGE_ADDR_FMT "\n", page_addr);
++        }
+     }
+ #else
+     /* if some code is already present, then the pages are already
 -- 
 2.7.4
