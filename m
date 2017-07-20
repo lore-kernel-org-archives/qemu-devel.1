@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYDf5-0001CB-F7
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:46:48 -0400
+	(envelope-from <asegundo@redhat.com>) id 1dYDj9-0002hK-Qt
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:51:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYDf2-0006xq-9j
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:46:47 -0400
-Received: from mail-it0-f45.google.com ([209.85.214.45]:33528)
+	(envelope-from <asegundo@redhat.com>) id 1dYDj6-0000wo-NZ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:50:59 -0400
+Received: from mail-io0-f171.google.com ([209.85.223.171]:35645)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dYDf2-0006xQ-4Z
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:46:44 -0400
-Received: by mail-it0-f45.google.com with SMTP id j81so367652ita.0
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:46:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dYDj6-0000wY-H1
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:50:56 -0400
+Received: by mail-io0-f171.google.com with SMTP id m88so4589809iod.2
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:50:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87vamnuovc.fsf@dusky.pond.sub.org>
+In-Reply-To: <87379rw3so.fsf@dusky.pond.sub.org>
 References: <20170720091902.22476-1-apahim@redhat.com>
-	<20170720091902.22476-2-apahim@redhat.com>
-	<87inin1g78.fsf@dusky.pond.sub.org>
-	<CALAZnb1uWT__Pnd-zeP3_L+t+JDtK42+KHV9qo_r6qXWs4P64w@mail.gmail.com>
-	<87vamnuovc.fsf@dusky.pond.sub.org>
+	<20170720091902.22476-3-apahim@redhat.com>
+	<87d18v1frq.fsf@dusky.pond.sub.org>
+	<CALAZnb0pu7Q6BmLgggigThx0Xdy0NcO3EpRo3FY9Q6mSYY88Og@mail.gmail.com>
+	<87379rw3so.fsf@dusky.pond.sub.org>
 From: Amador Pahim <apahim@redhat.com>
-Date: Thu, 20 Jul 2017 17:46:42 +0200
-Message-ID: <CALAZnb3d1U1iAviG7q1r5quuL7phpha76+PoYdMxQW-h6BXyRw@mail.gmail.com>
+Date: Thu, 20 Jul 2017 17:50:54 +0200
+Message-ID: <CALAZnb2QUguQnQbf+mKgJavBdY4or3NASbQ4oArzzbw=xoeUZg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] qemu.py: fix is_running()
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: include debug information
+ on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +35,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>
 Cc: kwolf@redhat.com, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, ehabkost@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Cleber Rosa <crosa@redhat.com>
 
-On Thu, Jul 20, 2017 at 5:09 PM, Markus Armbruster <armbru@redhat.com> wrote:
+On Thu, Jul 20, 2017 at 5:01 PM, Markus Armbruster <armbru@redhat.com> wrote:
 > Amador Pahim <apahim@redhat.com> writes:
 >
->> On Thu, Jul 20, 2017 at 1:49 PM, Markus Armbruster <armbru@redhat.com> wrote:
+>> On Thu, Jul 20, 2017 at 1:58 PM, Markus Armbruster <armbru@redhat.com> wrote:
 >>> Amador Pahim <apahim@redhat.com> writes:
 >>>
->>>> Current implementation is broken. It does not really test if the child
->>>> process is running.
->>>
->>> What usage exactly is broken by this?  Got a reproducer for me?
->>
->> Problem is that 'returncode' is not set without a calling
->> poll()/wait()/communicate(), so it's only useful to test if the
->> process is running after such calls. But if we use 'poll()' instead,
->> it will, according to the docs, "Check if child process has
->> terminated. Set and return returncode attribute."
->>
->> Reproducer is:
->>
->>  >>> import subprocess
->>  >>> devnull = open('/dev/null', 'rb')
->>  >>> p = subprocess.Popen(['qemu-system-x86_64', '-broken'],
->> stdin=devnull, stdout=devnull, stderr=devnull, shell=False)
->>  >>> print p.returncode
->>  None
->>  >>> print p.poll()
->>  1
->>  >>> print p.returncode
->>  1
->>
->>>> The Popen.returncode will only be set after by a poll(), wait() or
->>>> communicate(). If the Popen fails to launch a VM, the Popen.returncode
->>>> will not turn to None by itself.
->>>
->>> Hmm.  What is the value of .returncode then?
->>
->> returncode starts with None and becomes the process exit code when the
->> process is over and one of that three methods is called (poll(),
->> wait() or communicate()).
->>
->> There's an error in my description though. The correct would be: "The
->> Popen.returncode will only be set after a call to poll(), wait() or
->> communicate(). If the Popen fails to launch a VM, the Popen.returncode
->> will not turn from None to the actual return code by itself."
->
-> Suggest to add ", and is_running() continues to report True".
->
->>>> Instead of using Popen.returncode, let's use Popen.poll(), which
->>>> actually checks if child process has terminated.
+>>>> When launching a VM, if an exception happens and the VM is not
+>>>> initiated, it is useful to see the qemu command line that was executed
+>>>> and the output of that command.
+>>>>
+>>>> Before the patch:
+>>>>
+>>>>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
+>>>>     >>> VM.launch()
+>>>>     Traceback (most recent call last):
+>>>>       File "<stdin>", line 1, in <module>
+>>>>       File "qemu.py", line 137, in launch
+>>>>         self._post_launch()
+>>>>       File "qemu.py", line 121, in _post_launch
+>>>>         self._qmp.accept()
+>>>>       File "qmp/qmp.py", line 145, in accept
+>>>>         self.__sock, _ = self.__sock.accept()
+>>>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+>>>>         sock, addr = self._sock.accept()
+>>>>     socket.timeout: timed out
+>>>>
+>>>> After the patch:
+>>>>
+>>>>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
+>>>>     >>> VM.launch()
+>>>>     Traceback (most recent call last):
+>>>>       File "<stdin>", line 1, in <module>
+>>>>       File "qemu.py", line 156, in launch
+>>>>         raise RuntimeError(msg)
+>>>>     RuntimeError: Error launching VM.
+>>>>     Original Exception:
+>>>>     Traceback (most recent call last):
+>>>>       File "qemu.py", line 138, in launch
+>>>>         self._post_launch()
+>>>>       File "qemu.py", line 122, in _post_launch
+>>>>         self._qmp.accept()
+>>>>       File "qmp/qmp.py", line 145, in accept
+>>>>         self.__sock, _ = self.__sock.accept()
+>>>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+>>>>         sock, addr = self._sock.accept()
+>>>>     timeout: timed out
+>>>>     Command:
+>>>>     /usr/bin/qemu-system-aarch64 -chardev socket,id=mon,
+>>>>     path=/var/tmp/qemu-23958-monitor.sock -mon chardev=mon,mode=control
+>>>>     -display none -vga none
+>>>>     Output:
+>>>>     qemu-system-aarch64: No machine specified, and there is no default
+>>>>     Use -machine help to list supported machines
+>>>>
+>>>> Also, if the launch() faces an exception, the 'except' now will use args
+>>>> to fill the debug information. So this patch assigns 'args' earlier,
+>>>> assuring it will be available for the 'except'.
 >>>>
 >>>> Signed-off-by: Amador Pahim <apahim@redhat.com>
->>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 >>>> Reviewed-by: Fam Zheng <famz@redhat.com>
 >>>> ---
->>>>  scripts/qemu.py | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>  scripts/qemu.py | 18 ++++++++++++++++--
+>>>>  1 file changed, 16 insertions(+), 2 deletions(-)
 >>>>
 >>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>>> index 880e3e8219..f0fade32bd 100644
+>>>> index f0fade32bd..2707ae7f75 100644
 >>>> --- a/scripts/qemu.py
 >>>> +++ b/scripts/qemu.py
->>>> @@ -86,7 +86,7 @@ class QEMUMachine(object):
->>>>              raise
+>>>> @@ -18,6 +18,7 @@ import os
+>>>>  import sys
+>>>>  import subprocess
+>>>>  import qmp.qmp
+>>>> +import traceback
 >>>>
->>>>      def is_running(self):
->>>> -        return self._popen and (self._popen.returncode is None)
->>>> +        return self._popen and (self._popen.poll() is None)
 >>>>
->>>>      def exitcode(self):
->>>>          if self._popen is None:
->>>                return None
->>>            return self._popen.returncode
+>>>>  class QEMUMachine(object):
+>>>> @@ -129,17 +130,30 @@ class QEMUMachine(object):
+>>>>          '''Launch the VM and establish a QMP connection'''
+>>>>          devnull = open('/dev/null', 'rb')
+>>>>          qemulog = open(self._qemu_log_path, 'wb')
+>>>> +        args = self._wrapper + [self._binary] + self._base_args() + self.args
+>>>>          try:
+>>>>              self._pre_launch()
+>>>> -            args = self._wrapper + [self._binary] + self._base_args() + self._args
+>>>>              self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+>>>>                                             stderr=subprocess.STDOUT, shell=False)
+>>>>              self._post_launch()
 >>>
->>> Why is this one safe?
+>>> Lifting the assignment out of the try makes sense, because exceptions
+>>> there are programming errors.
+>>>
+>>> Why are ._pre_launch() and ._post_launch() inside the try?
 >>
->> Here it's used just to retrieve the value from the Popen.returncode.
->> It's not being used to check whether the process is running or not.
+>> The _pre_launch()/_post_launch() are probably the main source of
+>> exceptions here and I assume we want to handle the exceptions coming
+>> from them.
+>>
+>> The call to subprocess.Popen() is unlikely to raise exceptions. I
+>> mean, it's easy to trigger an 'OSError' exception providing a
+>> non-existent command to Popen, but once we provide something
+>> executable, we will not see an exception here if the command fails.
+>> The CalledProcessError is only raised by subprocess.check_call() or
+>> subprocess.check_output().
 >
-> If self._popen is not None, we return self._popen.returncode.  It's None
-> if .poll() etc. haven't been called.  Can this happen?  If not, why not?
-> If yes, why is returning None then okay?
+> Okay.
+>
+> Catching all exceptions is too sloppy for my taste.  But it's not your
+> patch's fault.
+>
+>>>>          except:
+>>>
+>>> Why do we catch all exceptions, and not just
+>>> subprocess.CalledProcessError?
+>>>
+>>>> +            self._load_io_log()
+>>>>              if self.is_running():
+>>>
+>>> I suspect we can't get here only for "odd" exceptions, not for
+>>> subprocess.CalledProcessError.
+>>>
+>>>>                  self._popen.kill()
+>>>>                  self._popen.wait()
+>>>> -            self._load_io_log()
+>>>> +            else:
+>>>> +                exc_type, exc_value, exc_traceback = sys.exc_info()
+>>>> +                msg = ('Error launching VM.\n'
+>>>> +                       'Original Exception: \n%s'
+>>>> +                       'Command:\n%s\n'
+>>>> +                       'Output:\n%s\n' %
+>>>> +                       (''.join(traceback.format_exception(exc_type,
+>>>> +                                                           exc_value,
+>>>> +                                                           exc_traceback)),
+>>>> +                        ' '.join(args),
+>>>> +                        self._iolog))
+>>>> +                self._post_shutdown()
+>>>> +                raise RuntimeError(msg)
+>>>>              self._post_shutdown()
+>>>>              raise
+>>>
+>>> Why do we print a traceback when subprocess.CalledProcessError?
+>>
+>> subprocess.CalledProcessError will not happen with subprocess.Popen,
+>> even if the command fails. But if the virtual machine does not start,
+>> we will, for example, see a 'socket.timeout' exception coming from
+>> _post_launch() when it tries to connect to the qemu monitor.
+>
+> A traceback is a inexcusably lazy way to report such errors.  You're
+> putting lipstick on a pig.
+>
+> When putting on lipstick is all we can do, it can be better than
+> nothing.  Is it all we can do?
 
-Yes, that can happen. This method is not returning an up-to-date
-returncode, it's serving just as a wrapper to the attribute, being the
-attribute updated or not.
-I lack the background on why it was coded that way, but considering
-the API-user perspective, I agree with you. We should return
-self._popen.poll() here indeed. Fixing that.
+Ok, so let me take this opportunity to cleanup this code at once.
