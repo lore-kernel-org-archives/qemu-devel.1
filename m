@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41061)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dYCK0-0008BY-Kn
+	id 1dYCK0-0008Bg-M0
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dYCJw-0007t8-8v
+	(envelope-from <pl@kamp.de>) id 1dYCJv-0007sk-M1
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:20:56 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34363 helo=mx01.kamp.de)
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34579 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dYCJv-0007rs-Vo
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:20:52 -0400
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dYCJv-0007rr-Bu
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:20:51 -0400
 From: Peter Lieven <pl@kamp.de>
-Date: Thu, 20 Jul 2017 16:20:32 +0200
-Message-Id: <1500560441-5670-2-git-send-email-pl@kamp.de>
-In-Reply-To: <1500560441-5670-1-git-send-email-pl@kamp.de>
-References: <1500560441-5670-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH V4 01/10] specs/qcow2: add compress format
- extension
+Date: Thu, 20 Jul 2017 16:20:31 +0200
+Message-Id: <1500560441-5670-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V4 00/10] add Qcow2 compress format extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +24,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
- docs/interop/qcow2.txt | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+this adds a create option for Qcow2 images to specify the compression format
+and level for compressed clusters. The series adds 2 algorithms to choose from:
+zlib and lzo. zlib is the current default, but with unoptimal settings.
+If no compress.format option is specified the old zlib with the old parameters
+is used and the created images are backwards compatible with older QEMU version.
+As soon as a compression format is specified a new compress format header extension
+is written and the Qcow2 images are incompatible with older QEMU versions.
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index d7fdb1f..ef5abb2 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -86,7 +86,12 @@ in the description of a field.
-                                 be written to (unless for regaining
-                                 consistency).
- 
--                    Bits 2-63:  Reserved (set to 0)
-+                    Bit 2:      Compress format bit.  If and only if this bit
-+                                is set then the compress format extension
-+                                MUST be present and MUST be parsed and checked
-+                                for compatibility.
-+
-+                    Bits 3-63:  Reserved (set to 0)
- 
-          80 -  87:  compatible_features
-                     Bitmask of compatible features. An implementation can
-@@ -137,6 +142,7 @@ be stored. Each extension has a structure like the following:
-                         0x6803f857 - Feature name table
-                         0x23852875 - Bitmaps extension
-                         0x0537be77 - Full disk encryption header pointer
-+                        0xC03183A3 - Compress format extension
-                         other      - Unknown header extension, can be safely
-                                      ignored
- 
-@@ -311,6 +317,41 @@ The algorithms used for encryption vary depending on the method
-    in the LUKS header, with the physical disk sector as the
-    input tweak.
- 
-+
-+== Compress format extension ==
-+
-+The compress format extension is an optional header extension. It provides
-+the ability to specify the compress algorithm and compress parameters
-+that are used for compressed clusters. This new header MUST be present if
-+the incompatible-feature bit "compress format bit" is set and MUST be absent
-+otherwise.
-+
-+Note: Ommitting the incompatible "Compress format bit" results in the usage
-+of zlib compression with default compression level (default before QEMU 2.10).
-+However, this old default has a smaller compression window size which results in
-+lower compression ratio and slightly worse compression speed compared to
-+explicity specifying zlib compression with default compression level in the
-+compress format extension.
-+
-+The fields of the compress format extension are:
-+
-+    Byte  0 - 14:  compress_format_name (padded with zeros, but not
-+                   necessarily null terminated if it has full length).
-+                   Valid compression format names currently are:
-+
-+                   zlib: Standard zlib deflate compression
-+
-+              15:  compress_level (uint8_t)
-+
-+                   0 = default compress level (valid for all formats, default)
-+
-+                   Additional valid compression levels for zlib compression:
-+
-+                   All values between 1 and 9. 1 gives best speed, 9 gives best
-+                   compression. The default compression level is defined by zlib
-+                   and currently defaults to 6.
-+
-+
- == Host cluster management ==
- 
- qcow2 manages the allocation of host clusters by maintaining a reference count
+Some numbers for an uncompressed Debian 9 QCOW2 image (size 1148MB):
+
+compress.format     compress time    compressed size   decompress time
+none                35.7s            339MB             3.4s
+zlib (default)      30.5s            320MB             3.2s
+zlib (level 1)      12.8s            348MB             3.2s
+lzo                  4.2s            429MB             1.6s
+
+Changes V3->V4:
+  - reduce the compress format name to 15 bytes [Eric]
+  - explain the default compression level for zlib [Eric]
+  - explain the difference between zlib with default compression
+    and the old default [Eric]
+  - added Patch 10
+
+Changes V2->V3:
+  - rebase to current master (qcow2 crypto extension)
+  - patch 1: explicitly list valid format names, list valid compression levels,
+             remove extra_data and extra_data_size for now [Kevin]
+  - patch 2: don't hook the compression options in the blockdev-add options [Kevin, Daniel]
+  - patch 3: parse compress settings from the qapi struct [Daniel]
+  - patch 4: mention valid values for zlib, mention incompatiblity for QEMU < 2.10 [Kevin]
+  - patch 5: use qapi to parse the compress format from header [Daniel]
+  - added patch 6
+
+Changes V1->V2:
+  - split the series into more patches
+  - added an qapi scheme for the compression settings
+  - renamed compression_algorithm to compress.format and added compress.level+
+  - updated the header extension to carry a variable extra payload and compress
+    level.
+  - removed extra reservations for header extensions
+  - added missing lzo_init and fixed compress overhead for lzo
+
+Peter Lieven (10):
+  specs/qcow2: add compress format extension
+  qapi/block-core: add Qcow2Compress parameters
+  block/qcow2: parse compress create options
+  qemu-img: add documentation for compress settings
+  block/qcow2: read and write the compress format extension
+  block/qcow2: simplify ret usage in qcow2_create
+  block/qcow2: optimize qcow2_co_pwritev_compressed
+  block/qcow2: start using the compress format extension
+  block/qcow2: add lzo compress format
+  block/qcow2: add compress info to image specific info
+
+ block/qcow2-cluster.c     |  73 +++++++++-----
+ block/qcow2.c             | 248 ++++++++++++++++++++++++++++++++++++++--------
+ block/qcow2.h             |  21 +++-
+ configure                 |   2 +-
+ docs/interop/qcow2.txt    |  43 +++++++-
+ include/block/block_int.h |   2 +
+ qapi/block-core.json      |  54 +++++++++-
+ qemu-img.texi             |  21 ++++
+ 8 files changed, 392 insertions(+), 72 deletions(-)
+
 -- 
 1.9.1
