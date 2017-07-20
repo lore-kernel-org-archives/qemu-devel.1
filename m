@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dYIqZ-0004aY-2A
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 17:19:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYIsR-0005x7-6U
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 17:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dYIqU-0000yy-HD
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 17:18:59 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:54008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dYIqT-0000vD-Fa
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 17:18:54 -0400
-Date: Fri, 21 Jul 2017 02:48:45 +0530 (IST)
-From: Ishani <chugh.ishani@research.iiit.ac.in>
-Message-ID: <741825315.292989.1500585525578.JavaMail.zimbra@research.iiit.ac.in>
-In-Reply-To: <8e003313-8651-1f92-3a0b-d465ab1d1cf7@redhat.com>
-References: <1500151401-30863-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<20170717071835.GD22872@lemon>
-	<1805860107.204084.1500320230836.JavaMail.zimbra@research.iiit.ac.in>
-	<8e003313-8651-1f92-3a0b-d465ab1d1cf7@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dYIsQ-0002UT-6y
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 17:20:55 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36485)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dYIsQ-0002UD-07
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 17:20:54 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id v76so6630384wmv.1
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 14:20:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] RFC on Backup tool
+In-Reply-To: <15cdd5e0-48f8-35be-8fa3-c57bc50828f6@redhat.com>
+References: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
+	<eec67af4-3f8e-bb85-0854-61f4d450f627@redhat.com>
+	<CAFEAcA9M0jeER9Ygg74_kQXv4CeW2_PMns7=t=Jw6sxkYhANpA@mail.gmail.com>
+	<15cdd5e0-48f8-35be-8fa3-c57bc50828f6@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Jul 2017 22:20:32 +0100
+Message-ID: <CAFEAcA9Wdw+nwnCo1MbDVzHmzRfbSz9ah5ZxZLGKErytoDz5JQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] util/oslib-posix.c: Avoid warning
+ on NetBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,485 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow <jsnow@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, stefanha <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, "patches@linaro.org" <patches@linaro.org>
 
+On 20 July 2017 at 22:10, Eric Blake <eblake@redhat.com> wrote:
+> On 07/20/2017 03:53 PM, Peter Maydell wrote:
+>> On 20 July 2017 at 19:26, Eric Blake <eblake@redhat.com> wrote:
+>>> On 07/20/2017 11:32 AM, Peter Maydell wrote:
+>>>> On NetBSD the compiler warns:
+>>>> util/oslib-posix.c: In function 'sigaction_invoke':
+>>>> util/oslib-posix.c:589:5: warning: missing braces around initializer [-Wmissing-braces]
+>>>>      siginfo_t si = { 0 };
+>>>>      ^
+>>>
+>>> Uggh. That is a broken compiler.  C99 declares that 'anything = {0}' is
+>>> supposed to be a valid way to zero-initialize anything.
+>>
+>> Looks like maybe it was https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+>
+> Would it be better to add a configure check for broken -Wmissing-braces
+> (where we would then add -Wno-missing-braces to the (outdated) NetBSD
+> compiler)?
 
+There's also a pointer to a clang bug which is not marked as fixed,
+and even in gcc it's down as not fixed in 4.8 or 4.9 if I'm reading
+the bug comments right.
 
------ On Jul 19, 2017, at 2:59 AM, jsnow jsnow@redhat.com wrote:
+> But then again, we already rely on gcc/clang's extension of foo={}
+> (which is valid for C++, what a shame that the two languages picked
+> different universal-zero initializers), so it's probably less churn to
+> just fix the few outliers to also rely on the extension than it is to
+> bloat configure just to permanently work around the broken compiler.
 
-> On 07/17/2017 03:37 PM, Ishani wrote:
->> ----- On Jul 17, 2017, at 12:48 PM, Fam Zheng famz@redhat.com wrote:
->>> On Sun, 07/16 02:13, Ishani Chugh wrote:
-> 
-> [...]
-> 
->>> Only full backup is implemented in this patch, is the plan to add incremental
->>> backup on top?  I'm curious because you have target file path set during drive
->>> add, but in the incremental case, it should be possible that each backup creates
->>> a new target file that chains up with earlier ones, so I think the target file
->>> should be an option for "backup" command as well.
->> 
->> Yes. Incremental backup is to be added. I am still in learning phase with
->> respect to incremental backups. I will modify the arguments and workflow
->> accordingly.
->> 
-> 
-> You may consider solidifying the backup target *pattern* during drive
-> add as an alternative, such as:
-> 
-> .../path/to/backup/%VM%/%DRIVE%/%yyyy%-%mm%-%dd%.qcow2
-> 
-> Or some such scheme. Simple numerals work well, too:
-> 
-> myvm/sda/incr.0.qcow2
-> myvm/sda/incr.1.qcow2
-> 
-> Simple numerals offer the benefit that it is easier to reconstruct the
-> chain if you lose your metadata in the python script.
-> 
-> Also consider that even for non-incremental backups, we want full
-> backups made subsequently to not, in general, overwrite the previous
-> full backup, so the TARGET is more of a "living entity" than a fixed
-> thing, even in the simple case.
+This is AFAICT the only instance that needs fixing, because the
+compiler only warns if the first element in the struct isn't
+a simple data type that can be initialized with '= 0'. If NetBSD
+had happened to use a similar definition to Linux (which happens
+to start with "int si_signo;") we wouldn't have had to change this
+initializer. (The fact that so many still-prevalent gcc versions
+behave like this is probably why the only case the NetBSD compile
+found is one that is an initializer of a system-header-defined
+struct where NetBSD has taken a somewhat odd approach.)
 
-Okay. Thats a great suggestion. But, it might not work when the entire chain
-of backups is not present at the same location. Can a case like this arise?
+(Personally if I were the C standards folks I'd fix it by
+blessing the gcc-extension that makes "{}" a valid zero
+initializer and bringing it into line with C++.)
 
->>>> It is intended as a
->>>> reference implementation for management stack and backup developers
->>>> to see QEMU's backup features in action. The tool writes details of
->>>> guest in a configuration file and the data is retrieved from the file
->>>> while creating a backup. The usage is as follows:
->>>> Add a guest
->>>> python qemu-backup.py guest add --guest <guest_name> --qmp <socket_path> [--tcp]
->>>>
->>>> Add a drive for backup in a specified guest
->>>> python qemu-backup.py drive add --guest <guest_name> --id <drive_id> [--target
->>>> <target_file_path>]
->>>>
->>>> Create backup of the added drives:
->>>> python qemu-backup.py backup --guest <guest_name>
->>>>
->>>> List all guest configs in configuration file:
->>>> python qemu-backup.py guest list
->>>
->>> Please put these examples into the help output of the command, this way users
->>> can read it as well.
->> 
->> I have created a manpage documentation for the tool.
->> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg05241.html
->> It is to be updated continuously as the development progresses.
->> 
-> 
-> You can include this (or a similar link) in future cover letters for the
-> benefit of reviewers.
-
-Okay. Will update in next revision.
-
->>>>
->>>> I will be obliged by any feedback.
->>>
->>> Thanks for doing this!
->>>
-> 
-> Yes, thank you :)
-> 
-
-Thanks for review. :)
-
->>>>
->>>> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
->>>> ---
->>>>  contrib/backup/qemu-backup.py | 244 ++++++++++++++++++++++++++++++++++++++++++
->>>>  1 file changed, 244 insertions(+)
->>>>  create mode 100644 contrib/backup/qemu-backup.py
->>>>
->>>> diff --git a/contrib/backup/qemu-backup.py b/contrib/backup/qemu-backup.py
->>>> new file mode 100644
->>>> index 0000000..9c3dc53
->>>> --- /dev/null
->>>> +++ b/contrib/backup/qemu-backup.py
->>>> @@ -0,0 +1,244 @@
->>>> +#!/usr/bin/python
->>>> +# -*- coding: utf-8 -*-
->>>
->>> You need a copyright header here (the default choice for QEMU is GPLv2 but there
->>> is no strict restrictions for scripts). See examples in other *.py files.
->> 
->> Thanks. Will update in next revision.
->>  
-> 
-> Yes, up to you. Files without a copyright default to GPLv2 in the QEMU
-> project, but if you feel strongly one way or another you can argue for
-> that license in upstream review.
-> 
-> (For instance, documentation and other non-code documents can sometimes
-> be better served by different licenses.)
-> 
-> We tend to avoid the implicit copyright when possible, so including an
-> explicit GPLv2 license is preferable to declare intent.
-> 
-> QEMU as a whole is GPLv2, so this is a good license to use if you don't
-> have any strong feelings on the matter, but please take a moment to read
-> the implications of the license as a new contributor to our project:
-> 
-> https://tldrlegal.com/license/gnu-general-public-license-v2
-> 
-> And the full, legal text:
-> 
-> https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
-> 
-
-I will go through the licenses and update in next revision. Thanks.
-
->>>> +"""
->>>> +This file is an implementation of backup tool
->>>> +"""
->>>> +from argparse import ArgumentParser
->>>> +import os
->>>> +import errno
->>>> +from socket import error as socket_error
->>>> +import configparser
->>>
->>> Python2 has ConfigParser while python3 has configparser. Please be specific
->>> about the python compatibility level of this script - my system (Fedora) has
->>> python2 as /usr/bin/python, so the shebang and your example command in the
->>> commit message don't really work. "six" module can handle python 2/3
->>> differentiations, or you can use '#!/usr/bin/env python2' to specify a python
->>> version explicitly.
->> 
->> The script is supposed to be both python2/3 compatible. I will take reference
->> from Stefan's review and fix it in next revision.
->> 
->>>> +import sys
->>>> +sys.path.append('../../scripts/qmp')
->>>
->>> This expects the script to be invoked from its local directory? It's better to
->>> use the __file__ trick to allow arbitrary workdir:
->>>
->>> $ git grep __file__
->>> scripts/device-crash-test:sys.path.append(os.path.join(os.path.dirname(__file__),
->>> '..', 'scripts'))
->>> scripts/qemu-gdb.py:sys.path.append(os.path.dirname(__file__))
->>> tests/migration/guestperf/engine.py:sys.path.append(os.path.join(os.path.dirname(__file__),
->>> '..', '..', '..', 'scripts'))
->>> tests/qemu-iotests/iotests.py:sys.path.append(os.path.join(os.path.dirname(__file__),
->>> '..', '..', 'scripts'))
->> 
->> Thanks. Will fix it in next revision.
->> 
-> 
-> Thanks for the hint, Fam!
-> 
->>>> +from qmp import QEMUMonitorProtocol
->>>> +
->>>> +
->>>> +class BackupTool(object):
->>>> +    """BackupTool Class"""
->>>> +    def __init__(self, config_file='backup.ini'):
->>>
->>> Is it better to put this in a more predictable place such as
->>> "$HOME/.qemu-backup.ini" and/or make it a command line option?
->> 
->> It is planned to be an optional command-line option, if not
->> provided, the default location suggested should be taken.
->> 
-> 
-> $HOME/.config/QEMU/backup.ini is my preference here.
-> 
-> Just a preference; but we may wind up needing more than one or two
-> secret files, and this would be a good place to keep them.
-
-If we require multiple files, then this is a good location. Is it okay that,
-at present, since we require only config file, I put the default location in 
-$HOME/.qemu-backup.ini ? 
-
->>>> +        self.config_file = config_file
->>>> +        self.config = configparser.ConfigParser()
->>>> +        self.config.read(self.config_file)
->>>> +
->>>> +    def write_config(self):
->>>> +        """
->>>> +        Writes configuration to ini file.
->>>> +        """
->>>> +        with open(self.config_file, 'w') as config_file:
->>>> +            self.config.write(config_file)
->>>> +
->>>> +    def get_socket_path(self, socket_path, tcp):
->>>> +        """
->>>> +        Return Socket address in form of string or tuple
->>>> +        """
->>>> +        if tcp is False:
->>>> +            return os.path.abspath(socket_path)
->>>> +        return (socket_path.split(':')[0], int(socket_path.split(':')[1]))
->>>> +
->>>> +    def __full_backup(self, guest_name):
->>>
->>> I think double underscore attributes are special:
->>>
->>> https://www.python.org/dev/peps/pep-0008/#id47
->>>
->>> If it's not intended, perhaps it's enough to just stick to one "_". The same
->>> applies to a few more below.
->> 
->> I used double underscores to stick with internal usage. However, single
->> underscores can be used as well for weak internal usage. Will fix in
->> next revision.
->>  
->>>> +        """
->>>> +        Performs full backup of guest
->>>> +        """
->>>> +        if guest_name not in self.config.sections():
->>>> +            print ("Cannot find specified guest")
->>>> +            return
->>>> +        if self.is_guest_running(guest_name, self.config[guest_name]['qmp'],
->>>> +                                 self.config[guest_name]['tcp']) is False:
->>>> +            return
->>>> +        connection = QEMUMonitorProtocol(
->>>> +                                         self.get_socket_path(
->>>> +                                             self.config[guest_name]['qmp'],
->>>> +                                             self.config[guest_name]['tcp']))
->>>> +        connection.connect()
->>>> +        cmd = {"execute": "transaction", "arguments": {"actions": []}}
->>>> +        for key in self.config[guest_name]:
->>>> +            if key.startswith("drive_"):
->>>> +                drive = key[key.index('_')+1:]
->>>> +                target = self.config[guest_name][key]
->>>> +                sub_cmd = {"type": "drive-backup", "data": {"device": drive,
->>>> +                                                            "target": target,
->>>> +                                                            "sync": "full"}}
->>>> +                cmd['arguments']['actions'].append(sub_cmd)
->>>> +        print (connection.cmd_obj(cmd))
->>>> +
->>>> +    def __drive_add(self, drive_id, guest_name, target=None):
->>>> +        """
->>>> +        Adds drive for backup
->>>> +        """
->>>> +        if target is None:
->>>> +            target = os.path.abspath(drive_id) + ".img"
->>>> +
->>>> +        if guest_name not in self.config.sections():
->>>> +            print ("Cannot find specified guest")
->>>
->>> Error messages should go to stderr.
->> 
->> Will update in next revision.
->> 
->>>
->>>> +            return
->>>> +
->>>> +        if "drive_"+drive_id in self.config[guest_name]:
->>>
->>> Whitespace around "+"?
->>>
->> 
->> I am not sure how I missed it. I ran the code through online
->> PEP8 checker. Will fix it.
->> 
->>>> +            print ("Drive already marked for backup")
->>>> +            return
->>>> +
->>>> +        if self.is_guest_running(guest_name, self.config[guest_name]['qmp'],
->>>> +                                 self.config[guest_name]['tcp']) is False:
->>>> +            return
->>>> +
->>>> +        connection = QEMUMonitorProtocol(
->>>> +                                         self.get_socket_path(
->>>> +                                             self.config[guest_name]['qmp'],
->>>> +                                             self.config[guest_name]['tcp']))
->>>> +        connection.connect()
->>>> +        cmd = {'execute': 'query-block'}
->>>> +        returned_json = connection.cmd_obj(cmd)
->>>> +        device_present = False
->>>> +        for device in returned_json['return']:
->>>> +            if device['device'] == drive_id:
->>>> +                device_present = True
->>>> +                break
->>>> +
->>>> +        if device_present is False:
->>>> +            print ("No such drive in guest")
->>>> +            return
->>>> +
->>>> +        drive_id = "drive_" + drive_id
->>>> +        for id in self.config[guest_name]:
->>>
->>> I think id is a python built-in function, please avoid using it as variable
->>> name.
->>>
->> 
->> Will fix in next revision.
->> 
->>>> +            if self.config[guest_name][id] == target:
->>>> +                print ("Please choose different target")
->>>> +                return
->>>> +        self.config.set(guest_name, drive_id, target)
->>>> +        self.write_config()
->>>> +        print("Successfully Added Drive")
->>>> +
->>>> +    def is_guest_running(self, guest_name, socket_path, tcp):
->>>> +        """
->>>> +        Checks whether specified guest is running or not
->>>> +        """
->>>> +        try:
->>>> +            connection = QEMUMonitorProtocol(
->>>> +                                             self.get_socket_path(
->>>> +                                                  socket_path, tcp))
->>>> +            connection.connect()
->>>> +        except socket_error:
->>>> +            if socket_error.errno != errno.ECONNREFUSED:
->>>> +                print ("Connection to guest refused")
->>>> +            return False
->>>> +        except:
->>>> +            print ("Unable to connect to guest")
->>>> +            return False
->>>> +        return True
->>>> +
->>>> +    def __guest_add(self, guest_name, socket_path, tcp):
->>>> +        """
->>>> +        Adds a guest to the config file
->>>> +        """
->>>> +        if self.is_guest_running(guest_name, socket_path, tcp) is False:
->>>> +            return
->>>> +
->>>> +        if guest_name in self.config.sections():
->>>> +            print ("ID already exists. Please choose a different guestname")
->>>
->>> "guest name".
->> 
->> Will fix in next revision. Thanks.
->> 
->>>> +            return
->>>> +
->>>> +        self.config[guest_name] = {'qmp': socket_path}
->>>> +        self.config.set(guest_name, 'tcp', str(tcp))
->>>> +        self.write_config()
->>>> +        print("Successfully Added Guest")
->>>> +
->>>> +    def __guest_remove(self, guest_name):
->>>> +        """
->>>> +        Removes a guest from config file
->>>> +        """
->>>> +        if guest_name not in self.config.sections():
->>>> +            print("Guest Not present")
->>>> +            return
->>>> +        self.config.remove_section(guest_name)
->>>> +        print("Guest successfully deleted")
->>>> +
->>>> +    def guest_remove_wrapper(self, args):
->>>> +        """
->>>> +        Wrapper for __guest_remove method.
->>>> +        """
->>>> +        guest_name = args.guest
->>>> +        self.__guest_remove(guest_name)
->>>> +        self.write_config()
->>>> +
->>>> +    def list(self, args):
->>>> +        """
->>>> +        Prints guests present in Config file
->>>> +        """
->>>> +        for guest_name in self.config.sections():
->>>> +            print(guest_name)
->>>> +
->>>> +    def guest_add_wrapper(self, args):
->>>> +        """
->>>> +        Wrapper for __quest_add method
->>>> +        """
->>>> +        if args.tcp is False:
->>>> +            self.__guest_add(args.guest, args.qmp, False)
->>>> +        else:
->>>> +            self.__guest_add(args.guest, args.qmp, True)
->>>> +
->>>> +    def drive_add_wrapper(self, args):
->>>> +        """
->>>> +        Wrapper for __drive_add method
->>>> +        """
->>>> +        self.__drive_add(args.id, args.guest, args.target)
->>>> +
->>>> +    def fullbackup_wrapper(self, args):
->>>> +        """
->>>> +        Wrapper for __full_backup method
->>>> +        """
->>>> +        self.__full_backup(args.guest)
->>>> +
->>>> +
->>>> +def main():
->>>> +    backup_tool = BackupTool()
->>>> +    parser = ArgumentParser()
->>>> +    subparsers = parser.add_subparsers(title='Subcommands',
->>>> +                                       description='Valid Subcommands',
->>>> +                                       help='Subcommand help')
->>>> +    guest_parser = subparsers.add_parser('guest', help='Adds or \
->>>> +                                                   removes and lists guest(s)')
->>>> +    guest_subparsers = guest_parser.add_subparsers(title='Guest Subparser')
->>>> +    guest_list_parser = guest_subparsers.add_parser('list',
->>>> +                                                    help='Lists all guests')
->>>> +    guest_list_parser.set_defaults(func=backup_tool.list)
->>>> +
->>>> +    guest_add_parser = guest_subparsers.add_parser('add', help='Adds a guest')
->>>> +    guest_add_parser.add_argument('--guest', action='store', type=str,
->>>> +                                  help='Name of the guest')
->>>> +    guest_add_parser.add_argument('--qmp', action='store', type=str,
->>>> +                                  help='Path of socket')
->>>> +    guest_add_parser.add_argument('--tcp', nargs='?', type=bool,
->>>> +                                  default=False,
->>>> +                                  help='Specify if socket is tcp')
->>>> +    guest_add_parser.set_defaults(func=backup_tool.guest_add_wrapper)
->>>> +
->>>> +    guest_remove_parser = guest_subparsers.add_parser('remove',
->>>> +                                                      help='removes a guest')
->>>> +    guest_remove_parser.add_argument('--guest', action='store', type=str,
->>>> +                                     help='Name of the guest')
->>>> +    guest_remove_parser.set_defaults(func=backup_tool.guest_remove_wrapper)
->>>> +
->>>> +    drive_parser = subparsers.add_parser('drive',
->>>> +                                         help='Adds drive(s) for backup')
->>>> +    drive_subparsers = drive_parser.add_subparsers(title='Add subparser',
->>>> +                                                   description='Drive \
->>>> +                                                                subparser')
->>>> +    drive_add_parser = drive_subparsers.add_parser('add',
->>>> +                                                   help='Adds new \
->>>> +                                                         drive for backup')
->>>> +    drive_add_parser.add_argument('--guest', action='store',
->>>> +                                  type=str, help='Name of the guest')
->>>> +    drive_add_parser.add_argument('--id', action='store',
->>>> +                                  type=str, help='Drive ID')
->>>> +    drive_add_parser.add_argument('--target', nargs='?',
->>>> +                                  default=None, help='Destination path')
->>>> +    drive_add_parser.set_defaults(func=backup_tool.drive_add_wrapper)
->>>> +
->>>> +    backup_parser = subparsers.add_parser('backup', help='Creates backup')
->>>> +    backup_parser.add_argument('--guest', action='store',
->>>> +                               type=str, help='Name of the guest')
->>>> +    backup_parser.set_defaults(func=backup_tool.fullbackup_wrapper)
->>>> +
->>>> +    args = parser.parse_args()
->>>> +    args.func(args)
->>>
->>> All exit points should report a status code (zero for success and non-zero for
->>> failures). This way the user or upper layer software know if backup has
->>> succeeded.
->> 
->> I agree. Will update in next revision. Thanks.
->> 
->>>> +
->>>> +if __name__ == '__main__':
->>>> +    main()
->>>> --
->>>
->>> Nice patch, thanks!
->> 
->> Thanks for a deep and detailed review.
->> 
-> 
-> Fam's the best! :)
-> 
->> Regards,
->> Ishani
->> 
-> 
-> Thank you both.
-
-Thanks for review.
-
-> --John
+thanks
+-- PMM
