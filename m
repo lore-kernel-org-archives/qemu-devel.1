@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qS-00019G-Gk
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:50 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qW-0001ET-RD
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qK-0005s5-Vp
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:44 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41703)
+	(envelope-from <cota@braap.org>) id 1dY1qO-0005xX-06
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:48 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:49951)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qK-0005rd-Rr
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:36 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qN-0005wk-Le
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:39 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:09:13 -0400
-Message-Id: <1500520169-23367-28-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:28 -0400
+Message-Id: <1500520169-23367-43-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 27/43] translate-all: use a binary search
- tree to track TBs in TBContext
+Subject: [Qemu-devel] [PATCH v3 42/43] tcg: introduce regions to split
+ code_gen_buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,429 +27,538 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-This is a prerequisite for supporting multiple TCG contexts, since
-we will have threads generating code in separate regions of
-code_gen_buffer.
+This is groundwork for supporting multiple TCG contexts.
 
-For this we need a new field (.size) in struct tb_tc to keep
-track of the size of the translated code. This field uses a size_t
-to avoid adding a hole to the struct, although really an unsigned
-int would have been enough.
+The naive solution here is to split code_gen_buffer statically
+among the TCG threads; this however results in poor utilization
+if translation needs are different across TCG threads.
 
-The comparison function we use is optimized for the common case:
-insertions. Profiling shows that upon booting debian-arm, 98%
-of comparisons are between existing tb's (i.e. a->size and b->size
-are both !0), which happens during insertions (and removals, but
-those are rare). The remaining cases are lookups. From reading the glib
-sources we see that the first key is always the lookup key. However,
-the code does not assume this to always be the case because this
-behaviour is not guaranteed in the glib docs. However, we embed
-this knowledge in the code as a branch hint for the compiler.
+What we do here is to add an extra layer of indirection, assigning
+regions that act just like pages do in virtual memory allocation.
+(BTW if you are wondering about the chosen naming, I did not want
+to use blocks or pages because those are already heavily used in QEMU).
 
-Note that tb_free does not free space in the code_gen_buffer anymore,
-since we cannot easily know whether the tb is the last one inserted
-in code_gen_buffer. The next patch in this series renames tb_free
-to tb_remove to reflect this.
+We use a global lock to serialize allocations as well as statistics
+reporting (we now export the size of the used code_gen_buffer with
+tcg_code_size()). Note that for the allocator we could just use
+a counter and atomic_inc; however, that would complicate the gathering
+of tcg_code_size()-like stats. So given that the region operations are
+not a fast path, a lock seems the most reasonable choice.
 
-Performance-wise, lookups in tb_find_pc are the same as before:
-O(log n). However, insertions are O(log n) instead of O(1), which
-results in a small slowdown when booting debian-arm:
+The effectiveness of this approach is clear after seeing some numbers.
+I used the bootup+shutdown of debian-arm with '-tb-size 80' as a benchmark.
+Note that I'm evaluating this after enabling per-thread TCG (which
+is done by a subsequent commit).
 
-Performance counter stats for 'build/arm-softmmu/qemu-system-arm \
-	-machine type=virt -nographic -smp 1 -m 4096 \
-	-netdev user,id=unet,hostfwd=tcp::2222-:22 \
-	-device virtio-net-device,netdev=unet \
-	-drive file=img/arm/jessie-arm32.qcow2,id=myblock,index=0,if=none \
-	-device virtio-blk-device,drive=myblock \
-	-kernel img/arm/aarch32-current-linux-kernel-only.img \
-	-append console=ttyAMA0 root=/dev/vda1 \
-	-name arm,debug-threads=on -smp 1' (10 runs):
+* -smp 1, 1 region (entire buffer):
+    qemu: flush code_size=83885014 nb_tbs=154739 avg_tb_size=357
+    qemu: flush code_size=83884902 nb_tbs=153136 avg_tb_size=363
+    qemu: flush code_size=83885014 nb_tbs=152777 avg_tb_size=364
+    qemu: flush code_size=83884950 nb_tbs=150057 avg_tb_size=373
+    qemu: flush code_size=83884998 nb_tbs=150234 avg_tb_size=373
+    qemu: flush code_size=83885014 nb_tbs=154009 avg_tb_size=360
+    qemu: flush code_size=83885014 nb_tbs=151007 avg_tb_size=370
+    qemu: flush code_size=83885014 nb_tbs=151816 avg_tb_size=367
 
-- Before:
+That is, 8 flushes.
 
-       8048.598422      task-clock (msec)         #    0.931 CPUs utilized            ( +-  0.28% )
-            16,974      context-switches          #    0.002 M/sec                    ( +-  0.12% )
-                 0      cpu-migrations            #    0.000 K/sec
-            10,125      page-faults               #    0.001 M/sec                    ( +-  1.23% )
-    35,144,901,879      cycles                    #    4.367 GHz                      ( +-  0.14% )
-   <not supported>      stalled-cycles-frontend
-   <not supported>      stalled-cycles-backend
-    65,758,252,643      instructions              #    1.87  insns per cycle          ( +-  0.33% )
-    10,871,298,668      branches                  # 1350.707 M/sec                    ( +-  0.41% )
-       192,322,212      branch-misses             #    1.77% of all branches          ( +-  0.32% )
+* -smp 8, 32 regions (80/32 MB per region) [i.e. this patch]:
 
-       8.640869419 seconds time elapsed                                          ( +-  0.57% )
+    qemu: flush code_size=76328008 nb_tbs=141040 avg_tb_size=356
+    qemu: flush code_size=75366534 nb_tbs=138000 avg_tb_size=361
+    qemu: flush code_size=76864546 nb_tbs=140653 avg_tb_size=361
+    qemu: flush code_size=76309084 nb_tbs=135945 avg_tb_size=375
+    qemu: flush code_size=74581856 nb_tbs=132909 avg_tb_size=375
+    qemu: flush code_size=73927256 nb_tbs=135616 avg_tb_size=360
+    qemu: flush code_size=78629426 nb_tbs=142896 avg_tb_size=365
+    qemu: flush code_size=76667052 nb_tbs=138508 avg_tb_size=368
 
-- After:
-       8146.242027      task-clock (msec)         #    0.923 CPUs utilized            ( +-  1.23% )
-            17,016      context-switches          #    0.002 M/sec                    ( +-  0.40% )
-                 0      cpu-migrations            #    0.000 K/sec
-            18,769      page-faults               #    0.002 M/sec                    ( +-  0.45% )
-    35,660,956,120      cycles                    #    4.378 GHz                      ( +-  1.22% )
-   <not supported>      stalled-cycles-frontend
-   <not supported>      stalled-cycles-backend
-    65,095,366,607      instructions              #    1.83  insns per cycle          ( +-  1.73% )
-    10,803,480,261      branches                  # 1326.192 M/sec                    ( +-  1.95% )
-       195,601,289      branch-misses             #    1.81% of all branches          ( +-  0.39% )
+Again, 8 flushes. Note how buffer utilization is not 100%, but it
+is close. Smaller region sizes would yield higher utilization,
+but we want region allocation to be rare (it acquires a lock), so
+we do not want to go too small.
 
-       8.828660235 seconds time elapsed                                          ( +-  0.38% )
+* -smp 8, static partitioning of 8 regions (10 MB per region):
+    qemu: flush code_size=21936504 nb_tbs=40570 avg_tb_size=354
+    qemu: flush code_size=11472174 nb_tbs=20633 avg_tb_size=370
+    qemu: flush code_size=11603976 nb_tbs=21059 avg_tb_size=365
+    qemu: flush code_size=23254872 nb_tbs=41243 avg_tb_size=377
+    qemu: flush code_size=28289496 nb_tbs=52057 avg_tb_size=358
+    qemu: flush code_size=43605160 nb_tbs=78896 avg_tb_size=367
+    qemu: flush code_size=45166552 nb_tbs=82158 avg_tb_size=364
+    qemu: flush code_size=63289640 nb_tbs=116494 avg_tb_size=358
+    qemu: flush code_size=51389960 nb_tbs=93937 avg_tb_size=362
+    qemu: flush code_size=59665928 nb_tbs=107063 avg_tb_size=372
+    qemu: flush code_size=38380824 nb_tbs=68597 avg_tb_size=374
+    qemu: flush code_size=44884568 nb_tbs=79901 avg_tb_size=376
+    qemu: flush code_size=50782632 nb_tbs=90681 avg_tb_size=374
+    qemu: flush code_size=39848888 nb_tbs=71433 avg_tb_size=372
+    qemu: flush code_size=64708840 nb_tbs=119052 avg_tb_size=359
+    qemu: flush code_size=49830008 nb_tbs=90992 avg_tb_size=362
+    qemu: flush code_size=68372408 nb_tbs=123442 avg_tb_size=368
+    qemu: flush code_size=33555560 nb_tbs=59514 avg_tb_size=378
+    qemu: flush code_size=44748344 nb_tbs=80974 avg_tb_size=367
+    qemu: flush code_size=37104248 nb_tbs=67609 avg_tb_size=364
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+That is, 20 flushes. Note how a static partitioning approach uses
+the code buffer poorly, leading to many unnecessary flushes.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/exec-all.h   |   5 ++
- include/exec/tb-context.h |   4 +-
- accel/tcg/translate-all.c | 217 ++++++++++++++++++++++++----------------------
- 3 files changed, 118 insertions(+), 108 deletions(-)
+ tcg/tcg.h                 |   6 ++
+ accel/tcg/translate-all.c |  63 +++++-----------
+ bsd-user/main.c           |   1 +
+ cpus.c                    |  12 +++
+ linux-user/main.c         |   1 +
+ tcg/tcg.c                 | 183 +++++++++++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 221 insertions(+), 45 deletions(-)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index bc4f41c..eb3eb7b 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -343,10 +343,15 @@ static inline void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 3611141..3365da8 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -760,6 +760,12 @@ void *tcg_malloc_internal(TCGContext *s, int size);
+ void tcg_pool_reset(TCGContext *s);
+ TranslationBlock *tcg_tb_alloc(TCGContext *s);
  
- /*
-  * Translation Cache-related fields of a TB.
-+ * This struct exists just for convenience; we keep track of TB's in a binary
-+ * search tree, and the only fields needed to compare TB's in the tree are
-+ * @ptr and @size. @search is brought here for consistency, since it is also
-+ * a TC-related field.
-  */
- struct tb_tc {
-     void *ptr;    /* pointer to the translated code */
-     uint8_t *search;  /* pointer to search data */
-+    size_t size;
- };
- 
- struct TranslationBlock {
-diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
-index 25c2afe..1fa8dcc 100644
---- a/include/exec/tb-context.h
-+++ b/include/exec/tb-context.h
-@@ -31,10 +31,8 @@ typedef struct TBContext TBContext;
- 
- struct TBContext {
- 
--    TranslationBlock **tbs;
-+    GTree *tb_tree;
-     struct qht htable;
--    size_t tbs_size;
--    int nb_tbs;
-     /* any access to the tbs or the page table must use this lock */
-     QemuMutex tb_lock;
- 
++void tcg_region_init(void);
++void tcg_region_reset_all(void);
++
++size_t tcg_code_size(void);
++size_t tcg_code_capacity(void);
++
+ /* Called with tb_lock held.  */
+ static inline void *tcg_malloc(int size)
+ {
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 0a2eb86..cb71aef 100644
+index e930bac..623b9e7 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -776,6 +776,48 @@ static inline void *alloc_code_gen_buffer(void)
- }
- #endif /* USE_STATIC_CODE_GEN_BUFFER, WIN32, POSIX */
- 
-+/* compare a pointer @ptr and a tb_tc @s */
-+static int ptr_cmp_tb_tc(const void *ptr, const struct tb_tc *s)
-+{
-+    if (ptr >= s->ptr + s->size) {
-+        return 1;
-+    } else if (ptr < s->ptr) {
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static gint tb_tc_cmp(gconstpointer ap, gconstpointer bp)
-+{
-+    const struct tb_tc *a = ap;
-+    const struct tb_tc *b = bp;
-+
-+    /*
-+     * When both sizes are set, we know this isn't a lookup and therefore
-+     * the two buffers are non-overlapping.
-+     * This is the most likely case: every TB must be inserted; lookups
-+     * are a lot less frequent.
-+     */
-+    if (likely(a->size && b->size)) {
-+        /* a->ptr == b->ptr would mean the buffers overlap */
-+        g_assert(a->ptr != b->ptr);
-+
-+        if (a->ptr > b->ptr) {
-+            return 1;
-+        }
-+        return -1;
-+    }
-+    /*
-+     * All lookups have either .size field set to 0.
-+     * From the glib sources we see that @ap is always the lookup key. However
-+     * the docs provide no guarantee, so we just mark this case as likely.
-+     */
-+    if (likely(a->size == 0)) {
-+        return ptr_cmp_tb_tc(a->ptr, b);
-+    }
-+    return ptr_cmp_tb_tc(b->ptr, a);
-+}
-+
- static inline void code_gen_alloc(size_t tb_size)
+@@ -608,15 +608,13 @@ static inline void *alloc_code_gen_buffer(void)
  {
-     tcg_ctx.code_gen_buffer_size = size_code_gen_buffer(tb_size);
-@@ -784,15 +826,7 @@ static inline void code_gen_alloc(size_t tb_size)
-         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
-         exit(1);
+     void *buf = static_code_gen_buffer;
+     void *end = static_code_gen_buffer + sizeof(static_code_gen_buffer);
+-    size_t full_size, size;
++    size_t size;
+ 
+     /* page-align the beginning and end of the buffer */
+     buf = QEMU_ALIGN_PTR_UP(buf, qemu_real_host_page_size);
+     end = QEMU_ALIGN_PTR_DOWN(end, qemu_real_host_page_size);
+ 
+-    /* Reserve a guard page.  */
+-    full_size = end - buf;
+-    size = full_size - qemu_real_host_page_size;
++    size = end - buf;
+ 
+     /* Honor a command-line option limiting the size of the buffer.  */
+     if (size > tcg_ctx->code_gen_buffer_size) {
+@@ -635,9 +633,6 @@ static inline void *alloc_code_gen_buffer(void)
+     if (qemu_mprotect_rwx(buf, size)) {
+         abort();
      }
--
--    /* size this conservatively -- realloc later if needed */
--    tcg_ctx.tb_ctx.tbs_size =
--        tcg_ctx.code_gen_buffer_size / CODE_GEN_AVG_BLOCK_SIZE / 8;
--    if (unlikely(!tcg_ctx.tb_ctx.tbs_size)) {
--        tcg_ctx.tb_ctx.tbs_size = 64 * 1024;
+-    if (qemu_mprotect_none(buf + size, qemu_real_host_page_size)) {
+-        abort();
 -    }
--    tcg_ctx.tb_ctx.tbs = g_new(TranslationBlock *, tcg_ctx.tb_ctx.tbs_size);
--
-+    tcg_ctx.tb_ctx.tb_tree = g_tree_new(tb_tc_cmp);
-     qemu_mutex_init(&tcg_ctx.tb_ctx.tb_lock);
- }
+     qemu_madvise(buf, size, QEMU_MADV_HUGEPAGE);
  
-@@ -829,7 +863,6 @@ void tcg_exec_init(unsigned long tb_size)
- static TranslationBlock *tb_alloc(target_ulong pc)
+     return buf;
+@@ -646,22 +641,16 @@ static inline void *alloc_code_gen_buffer(void)
+ static inline void *alloc_code_gen_buffer(void)
  {
-     TranslationBlock *tb;
--    TBContext *ctx;
+     size_t size = tcg_ctx->code_gen_buffer_size;
+-    void *buf1, *buf2;
+-
+-    /* Perform the allocation in two steps, so that the guard page
+-       is reserved but uncommitted.  */
+-    buf1 = VirtualAlloc(NULL, size + qemu_real_host_page_size,
+-                        MEM_RESERVE, PAGE_NOACCESS);
+-    if (buf1 != NULL) {
+-        buf2 = VirtualAlloc(buf1, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+-        assert(buf1 == buf2);
+-    }
++    void *buf;
  
-     assert_tb_locked();
+-    return buf1;
++    buf = VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT,
++                        PAGE_EXECUTE_READWRITE);
++    return buf;
+ }
+ #else
+ static inline void *alloc_code_gen_buffer(void)
+ {
++    int prot = PROT_WRITE | PROT_READ | PROT_EXEC;
+     int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+     uintptr_t start = 0;
+     size_t size = tcg_ctx->code_gen_buffer_size;
+@@ -695,8 +684,7 @@ static inline void *alloc_code_gen_buffer(void)
+ #  endif
+ # endif
  
-@@ -837,12 +870,6 @@ static TranslationBlock *tb_alloc(target_ulong pc)
-     if (unlikely(tb == NULL)) {
+-    buf = mmap((void *)start, size + qemu_real_host_page_size,
+-               PROT_NONE, flags, -1, 0);
++    buf = mmap((void *)start, size, prot, flags, -1, 0);
+     if (buf == MAP_FAILED) {
          return NULL;
      }
--    ctx = &tcg_ctx.tb_ctx;
--    if (unlikely(ctx->nb_tbs == ctx->tbs_size)) {
--        ctx->tbs_size *= 2;
--        ctx->tbs = g_renew(TranslationBlock *, ctx->tbs, ctx->tbs_size);
--    }
--    ctx->tbs[ctx->nb_tbs++] = tb;
-     return tb;
- }
- 
-@@ -851,16 +878,7 @@ void tb_free(TranslationBlock *tb)
- {
-     assert_tb_locked();
- 
--    /* In practice this is mostly used for single use temporary TB
--       Ignore the hard cases and just back up if this TB happens to
--       be the last one generated.  */
--    if (tcg_ctx.tb_ctx.nb_tbs > 0 &&
--            tb == tcg_ctx.tb_ctx.tbs[tcg_ctx.tb_ctx.nb_tbs - 1]) {
--        size_t struct_size = ROUND_UP(sizeof(*tb), qemu_icache_linesize);
--
--        tcg_ctx.code_gen_ptr = tb->tc.ptr - struct_size;
--        tcg_ctx.tb_ctx.nb_tbs--;
--    }
-+    g_tree_remove(tcg_ctx.tb_ctx.tb_tree, &tb->tc);
- }
- 
- static inline void invalidate_page_bitmap(PageDesc *p)
-@@ -918,11 +936,12 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+@@ -706,24 +694,23 @@ static inline void *alloc_code_gen_buffer(void)
+         /* Try again, with the original still mapped, to avoid re-acquiring
+            that 256mb crossing.  This time don't specify an address.  */
+         size_t size2;
+-        void *buf2 = mmap(NULL, size + qemu_real_host_page_size,
+-                          PROT_NONE, flags, -1, 0);
++        void *buf2 = mmap(NULL, size, prot, flags, -1, 0);
+         switch ((int)(buf2 != MAP_FAILED)) {
+         case 1:
+             if (!cross_256mb(buf2, size)) {
+                 /* Success!  Use the new buffer.  */
+-                munmap(buf, size + qemu_real_host_page_size);
++                munmap(buf, size);
+                 break;
+             }
+             /* Failure.  Work with what we had.  */
+-            munmap(buf2, size + qemu_real_host_page_size);
++            munmap(buf2, size);
+             /* fallthru */
+         default:
+             /* Split the original buffer.  Free the smaller half.  */
+             buf2 = split_cross_256mb(buf, size);
+             size2 = tcg_ctx->code_gen_buffer_size;
+             if (buf == buf2) {
+-                munmap(buf + size2 + qemu_real_host_page_size, size - size2);
++                munmap(buf + size2, size - size2);
+             } else {
+                 munmap(buf, size - size2);
+             }
+@@ -734,10 +721,6 @@ static inline void *alloc_code_gen_buffer(void)
      }
- 
-     if (DEBUG_TB_FLUSH_GATE) {
--        printf("qemu: flush code_size=%td nb_tbs=%d avg_tb_size=%td\n",
--               tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
--               tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
--               (tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer) /
--               tcg_ctx.tb_ctx.nb_tbs : 0);
-+        size_t nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
-+
-+        printf("qemu: flush code_size=%td nb_tbs=%zu avg_tb_size=%td\n",
-+               tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer, nb_tbs,
-+               nb_tbs > 0 ?
-+               (tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer) / nb_tbs : 0);
-     }
-     if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
-         > tcg_ctx.code_gen_buffer_size) {
-@@ -933,7 +952,10 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-         cpu_tb_jmp_cache_clear(cpu);
-     }
- 
--    tcg_ctx.tb_ctx.nb_tbs = 0;
-+    /* Increment the refcount first so that destroy acts as a reset */
-+    g_tree_ref(tcg_ctx.tb_ctx.tb_tree);
-+    g_tree_destroy(tcg_ctx.tb_ctx.tb_tree);
-+
-     qht_reset_size(&tcg_ctx.tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
-     page_flush_tb();
- 
-@@ -1343,6 +1365,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     if (unlikely(search_size < 0)) {
-         goto buffer_overflow;
-     }
-+    tb->tc.size = gen_code_size;
- 
- #ifdef CONFIG_PROFILER
-     tcg_ctx.code_time += profile_getclock() - ti;
-@@ -1393,6 +1416,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-      * through the physical hash table and physical page list.
-      */
-     tb_link_page(tb, phys_pc, phys_page2);
-+    g_tree_insert(tcg_ctx.tb_ctx.tb_tree, &tb->tc, tb);
-     return tb;
- }
- 
-@@ -1663,37 +1687,16 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
- }
  #endif
  
--/* find the TB 'tb' such that tb[0].tc_ptr <= tc_ptr <
--   tb[1].tc_ptr. Return NULL if not found */
+-    /* Make the final buffer accessible.  The guard page at the end
+-       will remain inaccessible with PROT_NONE.  */
+-    mprotect(buf, size, PROT_WRITE | PROT_READ | PROT_EXEC);
+-
+     /* Request large pages for the buffer.  */
+     qemu_madvise(buf, size, QEMU_MADV_HUGEPAGE);
+ 
+@@ -918,13 +901,8 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+         size_t host_size = 0;
+ 
+         g_tree_foreach(tb_ctx.tb_tree, tb_host_size_iter, &host_size);
+-        printf("qemu: flush code_size=%td nb_tbs=%zu avg_tb_size=%zu\n",
+-               tcg_ctx->code_gen_ptr - tcg_ctx->code_gen_buffer, nb_tbs,
+-               nb_tbs > 0 ? host_size / nb_tbs : 0);
+-    }
+-    if ((unsigned long)(tcg_ctx->code_gen_ptr - tcg_ctx->code_gen_buffer)
+-        > tcg_ctx->code_gen_buffer_size) {
+-        cpu_abort(cpu, "Internal error: code buffer overflow\n");
++        printf("qemu: flush code_size=%zu nb_tbs=%zu avg_tb_size=%zu\n",
++               tcg_code_size(), nb_tbs, nb_tbs > 0 ? host_size / nb_tbs : 0);
+     }
+ 
+     CPU_FOREACH(cpu) {
+@@ -938,7 +916,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
+     page_flush_tb();
+ 
+-    tcg_ctx->code_gen_ptr = tcg_ctx->code_gen_buffer;
++    tcg_region_reset_all();
+     /* XXX: flush processor icache at this point if cache flush is
+        expensive */
+     atomic_mb_set(&tb_ctx.tb_flush_count, tb_ctx.tb_flush_count + 1);
+@@ -1279,9 +1257,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         cflags |= CF_USE_ICOUNT;
+     }
+ 
++ buffer_overflow:
+     tb = tb_alloc(pc);
+     if (unlikely(!tb)) {
+- buffer_overflow:
+         /* flush must be done */
+         tb_flush(cpu);
+         mmap_unlock();
+@@ -1365,9 +1343,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     }
+ #endif
+ 
+-    tcg_ctx->code_gen_ptr = (void *)
++    atomic_set(&tcg_ctx->code_gen_ptr, (void *)
+         ROUND_UP((uintptr_t)gen_code_buf + gen_code_size + search_size,
+-                 CODE_GEN_ALIGN);
++                 CODE_GEN_ALIGN));
+ 
+     /* init jump list */
+     assert(((uintptr_t)tb & 3) == 0);
+@@ -1909,9 +1887,8 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+      * otherwise users might think "-tb-size" is not honoured.
+      * For avg host size we use the precise numbers from tb_tree_stats though.
+      */
+-    cpu_fprintf(f, "gen code size       %td/%zd\n",
+-                tcg_ctx->code_gen_ptr - tcg_ctx->code_gen_buffer,
+-                tcg_ctx->code_gen_highwater - tcg_ctx->code_gen_buffer);
++    cpu_fprintf(f, "gen code size       %zu/%zu\n",
++                tcg_code_size(), tcg_code_capacity());
+     cpu_fprintf(f, "TB count            %zu\n", nb_tbs);
+     cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
+                 nb_tbs ? tst.target_size / nb_tbs : 0,
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 7a8b29e..aa52c97 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -979,6 +979,7 @@ int main(int argc, char **argv)
+        generating the prologue until now so that the prologue can take
+        the real value of GUEST_BASE into account.  */
+     tcg_prologue_init(tcg_ctx);
++    tcg_region_init();
+ 
+     /* build Task State */
+     memset(ts, 0, sizeof(TaskState));
+diff --git a/cpus.c b/cpus.c
+index 9bed61e..6022d40 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1664,6 +1664,18 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+     static QemuCond *single_tcg_halt_cond;
+     static QemuThread *single_tcg_cpu_thread;
++    static int tcg_region_inited;
++
++    /*
++     * Initialize TCG regions--once. Now is a good time, because:
++     * (1) TCG's init context, prologue and target globals have been set up.
++     * (2) qemu_tcg_mttcg_enabled() works now (TCG init code runs before the
++     *     -accel flag is processed, so the check doesn't work then).
++     */
++    if (!tcg_region_inited) {
++        tcg_region_inited = 1;
++        tcg_region_init();
++    }
+ 
+     if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+         cpu->thread = g_malloc0(sizeof(QemuThread));
+diff --git a/linux-user/main.c b/linux-user/main.c
+index de7d948..aab4433 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4460,6 +4460,7 @@ int main(int argc, char **argv, char **envp)
+        generating the prologue until now so that the prologue can take
+        the real value of GUEST_BASE into account.  */
+     tcg_prologue_init(tcg_ctx);
++    tcg_region_init();
+ 
+ #if defined(TARGET_I386)
+     env->cr[0] = CR0_PG_MASK | CR0_WP_MASK | CR0_PE_MASK;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index cb4ecbd..22a949f 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -120,6 +120,23 @@ static bool tcg_out_tb_finalize(TCGContext *s);
+ static TCGContext **tcg_ctxs;
+ static unsigned int n_tcg_ctxs;
+ 
 +/*
-+ * Find the TB 'tb' such that
-+ * tb->tc.ptr <= tc_ptr < tb->tc.ptr + tb->tc.size
-+ * Return NULL if not found.
++ * We divide code_gen_buffer into equally-sized "regions" that TCG threads
++ * dynamically allocate from as demand dictates. Given appropriate region
++ * sizing, this minimizes flushes even when some TCG threads generate a lot
++ * more code than others.
 + */
- static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
- {
--    int m_min, m_max, m;
--    uintptr_t v;
--    TranslationBlock *tb;
-+    struct tb_tc s = { .ptr = (void *)tc_ptr };
- 
--    if (tcg_ctx.tb_ctx.nb_tbs <= 0) {
--        return NULL;
--    }
--    if (tc_ptr < (uintptr_t)tcg_ctx.code_gen_buffer ||
--        tc_ptr >= (uintptr_t)tcg_ctx.code_gen_ptr) {
--        return NULL;
--    }
--    /* binary search (cf Knuth) */
--    m_min = 0;
--    m_max = tcg_ctx.tb_ctx.nb_tbs - 1;
--    while (m_min <= m_max) {
--        m = (m_min + m_max) >> 1;
--        tb = tcg_ctx.tb_ctx.tbs[m];
--        v = (uintptr_t)tb->tc.ptr;
--        if (v == tc_ptr) {
--            return tb;
--        } else if (tc_ptr < v) {
--            m_max = m - 1;
--        } else {
--            m_min = m + 1;
--        }
--    }
--    return tcg_ctx.tb_ctx.tbs[m_max];
-+    return g_tree_lookup(tcg_ctx.tb_ctx.tb_tree, &s);
- }
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1879,63 +1882,67 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
-     g_free(hgram);
- }
- 
-+struct tb_tree_stats {
-+    size_t target_size;
-+    size_t max_target_size;
-+    size_t direct_jmp_count;
-+    size_t direct_jmp2_count;
-+    size_t cross_page;
++struct tcg_region_state {
++    QemuMutex lock;
++    void *buf;      /* set at init time */
++    size_t n;       /* set at init time */
++    size_t size;    /* size of one region; set at init time */
++    size_t current; /* protected by the lock */
++    size_t n_full;  /* protected by the lock */
 +};
 +
-+static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-+{
-+    const TranslationBlock *tb = value;
-+    struct tb_tree_stats *tst = data;
++static struct tcg_region_state region;
 +
-+    tst->target_size += tb->size;
-+    if (tb->size > tst->max_target_size) {
-+        tst->max_target_size = tb->size;
+ static TCGRegSet tcg_target_available_regs[2];
+ static TCGRegSet tcg_target_call_clobber_regs;
+ 
+@@ -257,6 +274,164 @@ TCGLabel *gen_new_label(void)
+ 
+ #include "tcg-target.inc.c"
+ 
++static void tcg_region_assign(TCGContext *s, size_t curr_region)
++{
++    void *buf;
++
++    buf = region.buf + curr_region * (region.size + qemu_real_host_page_size);
++    s->code_gen_buffer = buf;
++    s->code_gen_ptr = buf;
++    s->code_gen_buffer_size = region.size;
++    s->code_gen_highwater = buf + region.size - TCG_HIGHWATER;
++}
++
++static bool tcg_region_alloc__locked(TCGContext *s)
++{
++    if (region.current == region.n) {
++        return true;
 +    }
-+    if (tb->page_addr[1] != -1) {
-+        tst->cross_page++;
-+    }
-+    if (tb->jmp_reset_offset[0] != TB_JMP_RESET_OFFSET_INVALID) {
-+        tst->direct_jmp_count++;
-+        if (tb->jmp_reset_offset[1] != TB_JMP_RESET_OFFSET_INVALID) {
-+            tst->direct_jmp2_count++;
-+        }
-+    }
++    tcg_region_assign(s, region.current);
++    region.current++;
 +    return false;
 +}
 +
- void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
++/*
++ * Request a new region once the one in use has filled up.
++ * Returns true on error.
++ */
++static bool tcg_region_alloc(TCGContext *s)
++{
++    bool err;
++
++    qemu_mutex_lock(&region.lock);
++    err = tcg_region_alloc__locked(s);
++    if (!err) {
++        region.n_full++;
++    }
++    qemu_mutex_unlock(&region.lock);
++    return err;
++}
++
++/*
++ * Perform a context's first region allocation.
++ * This function does _not_ increment region.n_full.
++ */
++static inline bool tcg_region_initial_alloc__locked(TCGContext *s)
++{
++    return tcg_region_alloc__locked(s);
++}
++
++/* Call from a safe-work context */
++void tcg_region_reset_all(void)
++{
++    unsigned int i;
++
++    qemu_mutex_lock(&region.lock);
++    region.current = 0;
++    region.n_full = 0;
++
++    for (i = 0; i < n_tcg_ctxs; i++) {
++        bool err = tcg_region_initial_alloc__locked(tcg_ctxs[i]);
++
++        g_assert(!err);
++    }
++    qemu_mutex_unlock(&region.lock);
++}
++
++/*
++ * Initializes region partitioning.
++ *
++ * Called at init time from the parent thread (i.e. the one calling
++ * tcg_context_init), after the target's TCG globals have been set.
++ */
++void tcg_region_init(void)
++{
++    void *buf = tcg_init_ctx.code_gen_buffer;
++    size_t size = tcg_init_ctx.code_gen_buffer_size;
++    size_t region_size;
++    size_t n_regions;
++    size_t i;
++
++    /* We do not yet support multiple TCG contexts, so use one region for now */
++    n_regions = 1;
++
++    /* start on a page-aligned address */
++    buf = QEMU_ALIGN_PTR_UP(buf, qemu_real_host_page_size);
++    g_assert(buf < tcg_init_ctx.code_gen_buffer + size);
++
++    /* discard that initial portion */
++    size -= buf - tcg_init_ctx.code_gen_buffer;
++
++    /* make region_size a multiple of page_size */
++    region_size = size / n_regions;
++    region_size = QEMU_ALIGN_DOWN(region_size, qemu_real_host_page_size);
++
++    /* A region must have at least 2 pages; one code, one guard */
++    g_assert(region_size >= 2 * qemu_real_host_page_size);
++
++    /* init the region struct */
++    qemu_mutex_init(&region.lock);
++    region.n = n_regions;
++    region.buf = buf;
++    /* do not count the guard page in region.size */
++    region.size = region_size - qemu_real_host_page_size;
++
++    /* set guard pages */
++    for (i = 0; i < region.n; i++) {
++        void *guard;
++        int rc;
++
++        guard = region.buf + region.size;
++        guard += i * (region.size + qemu_real_host_page_size);
++        rc = qemu_mprotect_none(guard, qemu_real_host_page_size);
++        g_assert(!rc);
++    }
++
++    /* We do not yet support multiple TCG contexts so allocate the region now */
++    {
++        bool err = tcg_region_initial_alloc__locked(tcg_ctx);
++
++        g_assert(!err);
++    }
++}
++
++/*
++ * Returns the size (in bytes) of all translated code (i.e. from all regions)
++ * currently in the cache.
++ * See also: tcg_code_capacity()
++ * Do not confuse with tcg_current_code_size(); that one applies to a single
++ * TCG context.
++ */
++size_t tcg_code_size(void)
++{
++    unsigned int i;
++    size_t total;
++
++    qemu_mutex_lock(&region.lock);
++    total = region.n_full * (region.size - TCG_HIGHWATER);
++    for (i = 0; i < n_tcg_ctxs; i++) {
++        const TCGContext *s = tcg_ctxs[i];
++        size_t size;
++
++        size = atomic_read(&s->code_gen_ptr) - s->code_gen_buffer;
++        g_assert(size <= s->code_gen_buffer_size);
++        total += size;
++    }
++    qemu_mutex_unlock(&region.lock);
++    return total;
++}
++
++/*
++ * Returns the code capacity (in bytes) of the entire cache, i.e. including all
++ * regions.
++ * See also: tcg_code_size()
++ */
++size_t tcg_code_capacity(void)
++{
++    /* no need for synchronization; these variables are set at init time */
++    return region.n * (region.size - TCG_HIGHWATER);
++}
++
+ /* pool based memory allocation */
+ void *tcg_malloc_internal(TCGContext *s, int size)
  {
--    int i, target_code_size, max_target_code_size;
--    int direct_jmp_count, direct_jmp2_count, cross_page;
--    TranslationBlock *tb;
-+    struct tb_tree_stats tst = {};
-     struct qht_stats hst;
-+    size_t nb_tbs;
+@@ -400,13 +575,17 @@ TranslationBlock *tcg_tb_alloc(TCGContext *s)
+     TranslationBlock *tb;
+     void *next;
  
-     tb_lock();
++ retry:
+     tb = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, align);
+     next = (void *)ROUND_UP((uintptr_t)(tb + 1), align);
  
--    target_code_size = 0;
--    max_target_code_size = 0;
--    cross_page = 0;
--    direct_jmp_count = 0;
--    direct_jmp2_count = 0;
--    for (i = 0; i < tcg_ctx.tb_ctx.nb_tbs; i++) {
--        tb = tcg_ctx.tb_ctx.tbs[i];
--        target_code_size += tb->size;
--        if (tb->size > max_target_code_size) {
--            max_target_code_size = tb->size;
--        }
--        if (tb->page_addr[1] != -1) {
--            cross_page++;
--        }
--        if (tb->jmp_reset_offset[0] != TB_JMP_RESET_OFFSET_INVALID) {
--            direct_jmp_count++;
--            if (tb->jmp_reset_offset[1] != TB_JMP_RESET_OFFSET_INVALID) {
--                direct_jmp2_count++;
--            }
--        }
--    }
-+    nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
-+    g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
-     /* XXX: avoid using doubles ? */
-     cpu_fprintf(f, "Translation buffer state:\n");
-     cpu_fprintf(f, "gen code size       %td/%zd\n",
-                 tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
-                 tcg_ctx.code_gen_highwater - tcg_ctx.code_gen_buffer);
--    cpu_fprintf(f, "TB count            %d\n", tcg_ctx.tb_ctx.nb_tbs);
--    cpu_fprintf(f, "TB avg target size  %d max=%d bytes\n",
--            tcg_ctx.tb_ctx.nb_tbs ? target_code_size /
--                    tcg_ctx.tb_ctx.nb_tbs : 0,
--            max_target_code_size);
-+    cpu_fprintf(f, "TB count            %zu\n", nb_tbs);
-+    cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
-+                nb_tbs ? tst.target_size / nb_tbs : 0,
-+                tst.max_target_size);
-     cpu_fprintf(f, "TB avg host size    %td bytes (expansion ratio: %0.1f)\n",
--            tcg_ctx.tb_ctx.nb_tbs ? (tcg_ctx.code_gen_ptr -
--                                     tcg_ctx.code_gen_buffer) /
--                                     tcg_ctx.tb_ctx.nb_tbs : 0,
--                target_code_size ? (double) (tcg_ctx.code_gen_ptr -
--                                             tcg_ctx.code_gen_buffer) /
--                                             target_code_size : 0);
--    cpu_fprintf(f, "cross page TB count %d (%d%%)\n", cross_page,
--            tcg_ctx.tb_ctx.nb_tbs ? (cross_page * 100) /
--                                    tcg_ctx.tb_ctx.nb_tbs : 0);
--    cpu_fprintf(f, "direct jump count   %d (%d%%) (2 jumps=%d %d%%)\n",
--                direct_jmp_count,
--                tcg_ctx.tb_ctx.nb_tbs ? (direct_jmp_count * 100) /
--                        tcg_ctx.tb_ctx.nb_tbs : 0,
--                direct_jmp2_count,
--                tcg_ctx.tb_ctx.nb_tbs ? (direct_jmp2_count * 100) /
--                        tcg_ctx.tb_ctx.nb_tbs : 0);
-+                nb_tbs ? (tcg_ctx.code_gen_ptr -
-+                          tcg_ctx.code_gen_buffer) / nb_tbs : 0,
-+                tst.target_size ? (double) (tcg_ctx.code_gen_ptr -
-+                                            tcg_ctx.code_gen_buffer) /
-+                                            tst.target_size : 0);
-+    cpu_fprintf(f, "cross page TB count %zu (%zu%%)\n", tst.cross_page,
-+            nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-+    cpu_fprintf(f, "direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
-+                tst.direct_jmp_count,
-+                nb_tbs ? (tst.direct_jmp_count * 100) / nb_tbs : 0,
-+                tst.direct_jmp2_count,
-+                nb_tbs ? (tst.direct_jmp2_count * 100) / nb_tbs : 0);
+     if (unlikely(next > s->code_gen_highwater)) {
+-        return NULL;
++        if (tcg_region_alloc(s)) {
++            return NULL;
++        }
++        goto retry;
+     }
+-    s->code_gen_ptr = next;
++    atomic_set(&s->code_gen_ptr, next);
+     return tb;
+ }
  
-     qht_statistics_init(&tcg_ctx.tb_ctx.htable, &hst);
-     print_qht_statistics(f, cpu_fprintf, hst);
 -- 
 2.7.4
