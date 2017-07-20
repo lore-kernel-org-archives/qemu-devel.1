@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY8Dv-0007DZ-J8
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:58:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dY8Fr-0000G6-MH
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY8Dr-0002IN-NB
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:58:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY8Dr-0002Hr-DX
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:58:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F81DC058ECA
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:58:18 +0000 (UTC)
-Date: Thu, 20 Jul 2017 10:58:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170720095811.GB2101@work-vm>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-13-quintela@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dY8Fm-0003V4-Vn
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:00:23 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:37242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dY8Fm-0003S9-NX
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:00:18 -0400
+Received: by mail-wr0-x231.google.com with SMTP id 33so12045933wrz.4
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 03:00:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-13-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 12/17] migration: Send the fd number
- which we are going to use for this page
+In-Reply-To: <aadcb5f0-410a-94a5-ddd9-0933e32bd871@redhat.com>
+References: <20170628204452.41230-1-raj.khem@gmail.com>
+	<CAFEAcA-N3Ve8GmX6Yq+Kbng8vExe3CzDT_2_07JML8QC2xVwDA@mail.gmail.com>
+	<20170629131807.GD32167@redhat.com>
+	<aadcb5f0-410a-94a5-ddd9-0933e32bd871@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Jul 2017 10:59:55 +0100
+Message-ID: <CAFEAcA8ubNPPj+hLjxJ0EFxuB=ERhFfXMVERSOR+kpEs=DGg3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] replace struct ucontext with ucontext_t
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Khem Raj <raj.khem@gmail.com>, Kamil Rytarowski <kamil@netbsd.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We are still sending the page through the main channel, that would
-> change later in the series
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 90e1bcb..ac0742f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -568,7 +568,7 @@ static int multifd_send_page(uint8_t *address)
->      qemu_mutex_unlock(&p->mutex);
->      qemu_sem_post(&p->sem);
->  
-> -    return 0;
-> +    return i;
+On 19 July 2017 at 02:06, Eric Blake <eblake@redhat.com> wrote:
+> On 06/29/2017 08:18 AM, Daniel P. Berrange wrote:
+>> On Thu, Jun 29, 2017 at 10:05:13AM +0100, Peter Maydell wrote:
+>>> On 28 June 2017 at 21:44, Khem Raj <raj.khem@gmail.com> wrote:
+>>>> The ucontext_t type had a tag struct ucontext until now
+>>>> but newer glibc will drop it so we need to adjust and use
+>>>> the exposed type instead
+>>>
+>>> If true this seems like a bug in glibc to break
+>>> existing working programs, and it should be fixed there...
+>>
+>> The glib commit message indicates it is intentional change, in order
+>> to get POSIX compliance:
+>>
+>>   https://sourceware.org/git/?p=glibc.git;a=commit;h=251287734e89a52da3db682a8241eb6bccc050c9
+>>
+>> NB, other parts of QEMU like the coroutine code are already
+>> using the 'ucontext_t' typedef, so attaining consistency across
+>> files is good regardless of the glibc change.
+>
+> I agree. And since the issue has been reposted, I support the fix,
+> although Nathaniel's repost may have the better commit message.
+> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06005.html
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-is 'i' anything sane so far - I think this is currently a bogus value
-so perhaps it's best to keep it as 0 till later?
-Also, add a comment to multifd_send_page to say it'll return the fd
-to use.
+Thanks; applied to master with an upgraded commit message.
 
-
->  }
->  
->  struct MultiFDRecvParams {
-> @@ -1143,6 +1143,7 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
->                              bool last_stage)
->  {
->      int pages;
-> +    uint16_t fd_num;
->      uint8_t *p;
->      RAMBlock *block = pss->block;
->      ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
-> @@ -1154,8 +1155,10 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
->          ram_counters.transferred +=
->              save_page_header(rs, rs->f, block,
->                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
-> +        fd_num = multifd_send_page(p);
-> +        qemu_put_be16(rs->f, fd_num);
-
-Check for errors from multifd_send_page?
-(I'd have preferred to have made this one field in a new fixed size word
-which will get used for other things as well, but I'm OK with it this
-way).
-
-I think you've also got a 2^8 fd limit in some of the other configs
-as opposed to the 2^16 here.
-
-> +        ram_counters.transferred += 2; /* size of fd_num */
->          qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
-> -        multifd_send_page(p);
->          ram_counters.transferred += TARGET_PAGE_SIZE;
->          pages = 1;
->          ram_counters.normal++;
-> @@ -2905,6 +2908,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
->          ram_addr_t addr, total_ram_bytes;
->          void *host = NULL;
-> +        uint16_t fd_num;
->          uint8_t ch;
->  
->          addr = qemu_get_be64(f);
-> @@ -3015,6 +3019,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->              break;
->  
->          case RAM_SAVE_FLAG_MULTIFD_PAGE:
-> +            fd_num = qemu_get_be16(f);
-> +            if (fd_num != 0) {
-> +                /* this is yet an unused variable, changed later */
-> +                fd_num = fd_num;
-> +            }
->              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
->              break;
-
-Dave
-
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
