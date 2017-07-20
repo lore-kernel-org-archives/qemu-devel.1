@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYBFc-0008G0-Ap
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:12:21 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dYBGH-0000Qp-UA
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:13:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYBFZ-0004lT-9O
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:12:19 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:58036)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYBFZ-0004k4-31
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:12:17 -0400
-References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
-	<7caba6ac0e2f7dd2183f4febc529ceee55c699be.1500378931.git-series.james.hogan@imgtec.com>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <82394a73-fa6f-95eb-7807-93d5cf080389@imgtec.com>
-Date: Thu, 20 Jul 2017 14:12:13 +0100
+	(envelope-from <cohuck@redhat.com>) id 1dYBGD-0005B3-7M
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:13:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dYBGD-0005AR-0k
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:12:57 -0400
+Date: Thu, 20 Jul 2017 15:12:47 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170720151247.20f8f559@gondolin>
+In-Reply-To: <706a3c69-3558-940c-fd42-4f2a88277cdc@de.ibm.com>
+References: <1500550051-7821-1-git-send-email-borntraeger@de.ibm.com>
+	<1500550051-7821-2-git-send-email-borntraeger@de.ibm.com>
+	<20170720150537.1bf00f96@gondolin>
+	<706a3c69-3558-940c-fd42-4f2a88277cdc@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <7caba6ac0e2f7dd2183f4febc529ceee55c699be.1500378931.git-series.james.hogan@imgtec.com>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 14/14] target/mips: Enable CP0_EBase.WG on
- MIPS64 CPUs
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390/cpumodel: remove KSS from the
+ default model of z14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
+On Thu, 20 Jul 2017 15:10:35 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-
-On 18/07/2017 12:55, James Hogan wrote:
-> Enable the CP0_EBase.WG (write gate) on the I6400 and MIPS64R2-generic
-> CPUs. This allows 64-bit guests to run KVM itself, which uses
-> CP0_EBase.WG to point CP0_EBase at XKPhys.
+> On 07/20/2017 03:05 PM, Cornelia Huck wrote:
+> > On Thu, 20 Jul 2017 13:27:31 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> The SIE_KSS feature will allow a guest to use KSS for a nested guest.
+> >> To create a nested guest the SIE_F2 facility is still necessary.
+> >> Since SIE_F2 is not part of the default model it does not make
+> >> a lot of sense to provide the SIE_KSS feature in the default model.
+> >> Let's also create a dependency check.
+> >>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> >> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> >> ---
+> >>  target/s390x/cpu_models.c   | 1 +
+> >>  target/s390x/gen-features.c | 1 -
+> >>  2 files changed, 1 insertion(+), 1 deletion(-)  
+> > 
+> > I can either queue this; or, if you want to push this out as a fixup,
+> > feel free to add  
 > 
-> Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> ---
-> Changes in v2:
-> - New patch.
-> ---
->  target/mips/translate_init.c | 2 ++
->  1 file changed, 2 insertions(+), 0 deletions(-)
+> I want this in 2.10, but it can wait some days of course. I am on vacation
+> starting end of next week, so maybe its better if you do the next round
+> (and also take care of Davids and Thomas patches if those are appropriate
+> for 2.10)
 > 
-> diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
-> index 741b39023744..255d25bacd03 100644
-> --- a/target/mips/translate_init.c
-> +++ b/target/mips/translate_init.c
-> @@ -640,6 +640,7 @@ static const mips_def_t mips_defs[] =
->          .SYNCI_Step = 32,
->          .CCRes = 2,
->          .CP0_Status_rw_bitmask = 0x36FBFFFF,
-> +        .CP0_EBaseWG_rw_bitmask = (1 << CP0EBase_WG),
->          .CP1_fcr0 = (1 << FCR0_F64) | (1 << FCR0_3D) | (1 << FCR0_PS) |
->                      (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
->                      (1 << FCR0_S) | (0x00 << FCR0_PRID) | (0x0 << FCR0_REV),
-> @@ -723,6 +724,7 @@ static const mips_def_t mips_defs[] =
->          .CP0_PageGrain = (1 << CP0PG_IEC) | (1 << CP0PG_XIE) |
->                           (1U << CP0PG_RIE),
->          .CP0_PageGrain_rw_bitmask = (1 << CP0PG_ELPA),
-> +        .CP0_EBaseWG_rw_bitmask = (1 << CP0EBase_WG),
->          .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_HAS2008) | (1 << FCR0_F64) |
->                      (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
->                      (1 << FCR0_S) | (0x03 << FCR0_PRID) | (0x0 << FCR0_REV),
+> Thanks a lot
+
+OK, I'll deal with this next week. I've got the vfio-ccw patches as
+well, anyway.
+
+> > Acked-by: Cornelia Huck <cohuck@redhat.com>
+> >   
 > 
-
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
-
-Regards,
-Yongbok
