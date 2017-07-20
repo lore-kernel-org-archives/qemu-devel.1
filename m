@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qQ-00017h-Vf
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:47 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qQ-00016q-A1
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qK-0005rr-Rg
+	(envelope-from <cota@braap.org>) id 1dY1qJ-0005qy-SQ
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:42 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:37221)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:47257)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qK-0005rP-Mn
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:36 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005pN-LB
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:09:12 -0400
-Message-Id: <1500520169-23367-27-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:03 -0400
+Message-Id: <1500520169-23367-18-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 26/43] exec-all: extract tb->tc_* into a
- separate struct tc_tb
+Subject: [Qemu-devel] [PATCH v3 17/43] target/s390x: check CF_PARALLEL
+ instead of parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,218 +27,297 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-In preparation for adding tc.size to be able to keep track of
-TB's using the binary search tree implementation from glib.
+Thereby decoupling the resulting translated code from the current state
+of the system.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/exec-all.h   | 20 ++++++++++++++------
- accel/tcg/cpu-exec.c      |  6 +++---
- accel/tcg/translate-all.c | 20 ++++++++++----------
- tcg/tcg-runtime.c         |  4 ++--
- tcg/tcg.c                 |  4 ++--
- 5 files changed, 31 insertions(+), 23 deletions(-)
+ target/s390x/helper.h     |  4 +++
+ target/s390x/mem_helper.c | 80 +++++++++++++++++++++++++++++++++++++----------
+ target/s390x/translate.c  | 26 ++++++++++++---
+ 3 files changed, 88 insertions(+), 22 deletions(-)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 00f7da8..bc4f41c 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -341,6 +341,14 @@ static inline void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
- #define USE_DIRECT_JUMP
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 4b02907..84a4597 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -34,7 +34,9 @@ DEF_HELPER_3(celgb, i64, env, i64, i32)
+ DEF_HELPER_3(cdlgb, i64, env, i64, i32)
+ DEF_HELPER_3(cxlgb, i64, env, i64, i32)
+ DEF_HELPER_4(cdsg, void, env, i64, i32, i32)
++DEF_HELPER_4(cdsg_parallel, void, env, i64, i32, i32)
+ DEF_HELPER_4(csst, i32, env, i32, i64, i64)
++DEF_HELPER_4(csst_parallel, i32, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_3(aeb, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_3(adb, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_5(axb, TCG_CALL_NO_WG, i64, env, i64, i64, i64, i64)
+@@ -107,7 +109,9 @@ DEF_HELPER_FLAGS_1(popcnt, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_2(stfle, i32, env, i64)
+ DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
++DEF_HELPER_FLAGS_2(lpq_parallel, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_4(stpq, TCG_CALL_NO_WG, void, env, i64, i64, i64)
++DEF_HELPER_FLAGS_4(stpq_parallel, TCG_CALL_NO_WG, void, env, i64, i64, i64)
+ DEF_HELPER_4(mvcos, i32, env, i64, i64, i64)
+ DEF_HELPER_4(cu12, i32, env, i32, i32, i32)
+ DEF_HELPER_4(cu14, i32, env, i32, i32, i32)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index cdc78aa..74a2157 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1363,8 +1363,8 @@ uint32_t HELPER(trXX)(CPUS390XState *env, uint32_t r1, uint32_t r2,
+     return cc;
+ }
+ 
+-void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
+-                  uint32_t r1, uint32_t r3)
++static void do_cdsg(CPUS390XState *env, uint64_t addr,
++                    uint32_t r1, uint32_t r3, bool parallel)
+ {
+     uintptr_t ra = GETPC();
+     Int128 cmpv = int128_make128(env->regs[r1 + 1], env->regs[r1]);
+@@ -1372,7 +1372,7 @@ void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
+     Int128 oldv;
+     bool fail;
+ 
+-    if (parallel_cpus) {
++    if (parallel) {
+ #ifndef CONFIG_ATOMIC128
+         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+ #else
+@@ -1404,7 +1404,20 @@ void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
+     env->regs[r1 + 1] = int128_getlo(oldv);
+ }
+ 
+-uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
++void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
++                  uint32_t r1, uint32_t r3)
++{
++    do_cdsg(env, addr, r1, r3, false);
++}
++
++void HELPER(cdsg_parallel)(CPUS390XState *env, uint64_t addr,
++                           uint32_t r1, uint32_t r3)
++{
++    do_cdsg(env, addr, r1, r3, true);
++}
++
++static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
++                        uint64_t a2, bool parallel)
+ {
+ #if !defined(CONFIG_USER_ONLY) || defined(CONFIG_ATOMIC128)
+     uint32_t mem_idx = cpu_mmu_index(env, false);
+@@ -1440,7 +1453,7 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+        the complete operation is not.  Therefore we do not need to assert serial
+        context in order to implement this.  That said, restart early if we can't
+        support either operation that is supposed to be atomic.  */
+-    if (parallel_cpus) {
++    if (parallel) {
+         int mask = 0;
+ #if !defined(CONFIG_ATOMIC64)
+         mask = -8;
+@@ -1464,7 +1477,7 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+             uint32_t cv = env->regs[r3];
+             uint32_t ov;
+ 
+-            if (parallel_cpus) {
++            if (parallel) {
+ #ifdef CONFIG_USER_ONLY
+                 uint32_t *haddr = g2h(a1);
+                 ov = atomic_cmpxchg__nocheck(haddr, cv, nv);
+@@ -1487,7 +1500,7 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+             uint64_t cv = env->regs[r3];
+             uint64_t ov;
+ 
+-            if (parallel_cpus) {
++            if (parallel) {
+ #ifdef CONFIG_ATOMIC64
+ # ifdef CONFIG_USER_ONLY
+                 uint64_t *haddr = g2h(a1);
+@@ -1497,7 +1510,7 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+                 ov = helper_atomic_cmpxchgq_be_mmu(env, a1, cv, nv, oi, ra);
+ # endif
+ #else
+-                /* Note that we asserted !parallel_cpus above.  */
++                /* Note that we asserted !parallel above.  */
+                 g_assert_not_reached();
+ #endif
+             } else {
+@@ -1517,13 +1530,13 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+             Int128 cv = int128_make128(env->regs[r3 + 1], env->regs[r3]);
+             Int128 ov;
+ 
+-            if (parallel_cpus) {
++            if (parallel) {
+ #ifdef CONFIG_ATOMIC128
+                 TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+                 ov = helper_atomic_cmpxchgo_be_mmu(env, a1, cv, nv, oi, ra);
+                 cc = !int128_eq(ov, cv);
+ #else
+-                /* Note that we asserted !parallel_cpus above.  */
++                /* Note that we asserted !parallel above.  */
+                 g_assert_not_reached();
+ #endif
+             } else {
+@@ -1567,13 +1580,13 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+             cpu_stq_data_ra(env, a2, svh, ra);
+             break;
+         case 4:
+-            if (parallel_cpus) {
++            if (parallel) {
+ #ifdef CONFIG_ATOMIC128
+                 TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+                 Int128 sv = int128_make128(svl, svh);
+                 helper_atomic_sto_be_mmu(env, a2, sv, oi, ra);
+ #else
+-                /* Note that we asserted !parallel_cpus above.  */
++                /* Note that we asserted !parallel above.  */
+                 g_assert_not_reached();
+ #endif
+             } else {
+@@ -1593,6 +1606,17 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+     g_assert_not_reached();
+ }
+ 
++uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
++{
++    return do_csst(env, r3, a1, a2, false);
++}
++
++uint32_t HELPER(csst_parallel)(CPUS390XState *env, uint32_t r3, uint64_t a1,
++                               uint64_t a2)
++{
++    return do_csst(env, r3, a1, a2, true);
++}
++
+ #if !defined(CONFIG_USER_ONLY)
+ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+@@ -2035,12 +2059,12 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
  #endif
  
-+/*
-+ * Translation Cache-related fields of a TB.
-+ */
-+struct tb_tc {
-+    void *ptr;    /* pointer to the translated code */
-+    uint8_t *search;  /* pointer to search data */
-+};
-+
- struct TranslationBlock {
-     target_ulong pc;   /* simulated PC corresponding to this block (EIP + CS base) */
-     target_ulong cs_base; /* CS base for this block */
-@@ -362,8 +370,8 @@ struct TranslationBlock {
-     /* Per-vCPU dynamic tracing state used to generate this TB */
-     uint32_t trace_vcpu_dstate;
- 
--    void *tc_ptr;    /* pointer to the translated code */
--    uint8_t *tc_search;  /* pointer to search data */
-+    struct tb_tc tc;
-+
-     /* original tb when cflags has CF_NOCACHE */
-     struct TranslationBlock *orig_tb;
-     /* first and second physical page containing code. The lower bit
-@@ -462,7 +470,7 @@ static inline void tb_set_jmp_target(TranslationBlock *tb,
-                                      int n, uintptr_t addr)
+ /* load pair from quadword */
+-uint64_t HELPER(lpq)(CPUS390XState *env, uint64_t addr)
++static uint64_t do_lpq(CPUS390XState *env, uint64_t addr, bool parallel)
  {
-     uint16_t offset = tb->jmp_insn_offset[n];
--    tb_set_jmp_target1((uintptr_t)(tb->tc_ptr + offset), addr);
-+    tb_set_jmp_target1((uintptr_t)(tb->tc.ptr + offset), addr);
- }
+     uintptr_t ra = GETPC();
+     uint64_t hi, lo;
  
+-    if (parallel_cpus) {
++    if (parallel) {
+ #ifndef CONFIG_ATOMIC128
+         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
  #else
-@@ -489,11 +497,11 @@ static inline void tb_add_jump(TranslationBlock *tb, int n,
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, tb->pc,
-                            "Linking TBs %p [" TARGET_FMT_lx
-                            "] index %d -> %p [" TARGET_FMT_lx "]\n",
--                           tb->tc_ptr, tb->pc, n,
--                           tb_next->tc_ptr, tb_next->pc);
-+                           tb->tc.ptr, tb->pc, n,
-+                           tb_next->tc.ptr, tb_next->pc);
+@@ -2061,13 +2085,23 @@ uint64_t HELPER(lpq)(CPUS390XState *env, uint64_t addr)
+     return hi;
+ }
  
-     /* patch the native jump address */
--    tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc_ptr);
-+    tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc.ptr);
- 
-     /* add in TB jmp circular list */
-     tb->jmp_list_next[n] = tb_next->jmp_list_first;
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 526cab3..cb1e6d3 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -143,11 +143,11 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
-     uintptr_t ret;
-     TranslationBlock *last_tb;
-     int tb_exit;
--    uint8_t *tb_ptr = itb->tc_ptr;
-+    uint8_t *tb_ptr = itb->tc.ptr;
- 
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc,
-                            "Trace %p [%d: " TARGET_FMT_lx "] %s\n",
--                           itb->tc_ptr, cpu->cpu_index, itb->pc,
-+                           itb->tc.ptr, cpu->cpu_index, itb->pc,
-                            lookup_symbol(itb->pc));
- 
- #if defined(DEBUG_DISAS)
-@@ -179,7 +179,7 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
-         qemu_log_mask_and_addr(CPU_LOG_EXEC, last_tb->pc,
-                                "Stopped execution of TB chain before %p ["
-                                TARGET_FMT_lx "] %s\n",
--                               last_tb->tc_ptr, last_tb->pc,
-+                               last_tb->tc.ptr, last_tb->pc,
-                                lookup_symbol(last_tb->pc));
-         if (cc->synchronize_from_tb) {
-             cc->synchronize_from_tb(cpu, last_tb);
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 845585b..0a2eb86 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -260,7 +260,7 @@ static target_long decode_sleb128(uint8_t **pp)
-    which comes from the host pc of the end of the code implementing the insn.
- 
-    Each line of the table is encoded as sleb128 deltas from the previous
--   line.  The seed for the first line is { tb->pc, 0..., tb->tc_ptr }.
-+   line.  The seed for the first line is { tb->pc, 0..., tb->tc.ptr }.
-    That is, the first column is seeded with the guest pc, the last column
-    with the host pc, and the middle columns with zeros.  */
- 
-@@ -270,7 +270,7 @@ static int encode_search(TranslationBlock *tb, uint8_t *block)
-     uint8_t *p = block;
-     int i, j, n;
- 
--    tb->tc_search = block;
-+    tb->tc.search = block;
- 
-     for (i = 0, n = tb->icount; i < n; ++i) {
-         target_ulong prev;
-@@ -305,9 +305,9 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-                                      uintptr_t searched_pc)
++uint64_t HELPER(lpq)(CPUS390XState *env, uint64_t addr)
++{
++    return do_lpq(env, addr, false);
++}
++
++uint64_t HELPER(lpq_parallel)(CPUS390XState *env, uint64_t addr)
++{
++    return do_lpq(env, addr, true);
++}
++
+ /* store pair to quadword */
+-void HELPER(stpq)(CPUS390XState *env, uint64_t addr,
+-                  uint64_t low, uint64_t high)
++static void do_stpq(CPUS390XState *env, uint64_t addr,
++                    uint64_t low, uint64_t high, bool parallel)
  {
-     target_ulong data[TARGET_INSN_START_WORDS] = { tb->pc };
--    uintptr_t host_pc = (uintptr_t)tb->tc_ptr;
-+    uintptr_t host_pc = (uintptr_t)tb->tc.ptr;
-     CPUArchState *env = cpu->env_ptr;
--    uint8_t *p = tb->tc_search;
-+    uint8_t *p = tb->tc.search;
-     int i, j, num_insns = tb->icount;
- #ifdef CONFIG_PROFILER
-     int64_t ti = profile_getclock();
-@@ -858,7 +858,7 @@ void tb_free(TranslationBlock *tb)
-             tb == tcg_ctx.tb_ctx.tbs[tcg_ctx.tb_ctx.nb_tbs - 1]) {
-         size_t struct_size = ROUND_UP(sizeof(*tb), qemu_icache_linesize);
+     uintptr_t ra = GETPC();
  
--        tcg_ctx.code_gen_ptr = tb->tc_ptr - struct_size;
-+        tcg_ctx.code_gen_ptr = tb->tc.ptr - struct_size;
-         tcg_ctx.tb_ctx.nb_tbs--;
+-    if (parallel_cpus) {
++    if (parallel) {
+ #ifndef CONFIG_ATOMIC128
+         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+ #else
+@@ -2085,6 +2119,18 @@ void HELPER(stpq)(CPUS390XState *env, uint64_t addr,
      }
  }
-@@ -1059,7 +1059,7 @@ static inline void tb_remove_from_jmp_list(TranslationBlock *tb, int n)
-    another TB */
- static inline void tb_reset_jump(TranslationBlock *tb, int n)
+ 
++void HELPER(stpq)(CPUS390XState *env, uint64_t addr,
++                  uint64_t low, uint64_t high)
++{
++    do_stpq(env, addr, low, high, false);
++}
++
++void HELPER(stpq_parallel)(CPUS390XState *env, uint64_t addr,
++                           uint64_t low, uint64_t high)
++{
++    do_stpq(env, addr, low, high, true);
++}
++
+ /* Execute instruction.  This instruction executes an insn modified with
+    the contents of r1.  It does not change the executed instruction in memory;
+    it does not change the program counter.
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 0d5d623..ea8a90a 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2024,7 +2024,11 @@ static ExitStatus op_cdsg(DisasContext *s, DisasOps *o)
+     addr = get_address(s, 0, b2, d2);
+     t_r1 = tcg_const_i32(r1);
+     t_r3 = tcg_const_i32(r3);
+-    gen_helper_cdsg(cpu_env, addr, t_r1, t_r3);
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
++        gen_helper_cdsg_parallel(cpu_env, addr, t_r1, t_r3);
++    } else {
++        gen_helper_cdsg(cpu_env, addr, t_r1, t_r3);
++    }
+     tcg_temp_free_i64(addr);
+     tcg_temp_free_i32(t_r1);
+     tcg_temp_free_i32(t_r3);
+@@ -2038,7 +2042,11 @@ static ExitStatus op_csst(DisasContext *s, DisasOps *o)
+     int r3 = get_field(s->fields, r3);
+     TCGv_i32 t_r3 = tcg_const_i32(r3);
+ 
+-    gen_helper_csst(cc_op, cpu_env, t_r3, o->in1, o->in2);
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
++        gen_helper_csst_parallel(cc_op, cpu_env, t_r3, o->in1, o->in2);
++    } else {
++        gen_helper_csst(cc_op, cpu_env, t_r3, o->in1, o->in2);
++    }
+     tcg_temp_free_i32(t_r3);
+ 
+     set_cc_static(s);
+@@ -2943,7 +2951,7 @@ static ExitStatus op_lpd(DisasContext *s, DisasOps *o)
+     TCGMemOp mop = s->insn->data;
+ 
+     /* In a parallel context, stop the world and single step.  */
+-    if (parallel_cpus) {
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
+         potential_page_fault(s);
+         gen_exception(EXCP_ATOMIC);
+         return EXIT_NORETURN;
+@@ -2964,7 +2972,11 @@ static ExitStatus op_lpd(DisasContext *s, DisasOps *o)
+ 
+ static ExitStatus op_lpq(DisasContext *s, DisasOps *o)
  {
--    uintptr_t addr = (uintptr_t)(tb->tc_ptr + tb->jmp_reset_offset[n]);
-+    uintptr_t addr = (uintptr_t)(tb->tc.ptr + tb->jmp_reset_offset[n]);
-     tb_set_jmp_target(tb, n, addr);
+-    gen_helper_lpq(o->out, cpu_env, o->in2);
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
++        gen_helper_lpq_parallel(o->out, cpu_env, o->in2);
++    } else {
++        gen_helper_lpq(o->out, cpu_env, o->in2);
++    }
+     return_low128(o->out2);
+     return NO_EXIT;
  }
+@@ -4281,7 +4293,11 @@ static ExitStatus op_stmh(DisasContext *s, DisasOps *o)
  
-@@ -1290,7 +1290,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     }
- 
-     gen_code_buf = tcg_ctx.code_gen_ptr;
--    tb->tc_ptr = gen_code_buf;
-+    tb->tc.ptr = gen_code_buf;
-     tb->pc = pc;
-     tb->cs_base = cs_base;
-     tb->flags = flags;
-@@ -1310,7 +1310,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     gen_intermediate_code(env, tb);
-     tcg_ctx.cpu = NULL;
- 
--    trace_translate_block(tb, tb->pc, tb->tc_ptr);
-+    trace_translate_block(tb, tb->pc, tb->tc.ptr);
- 
-     /* generate machine code */
-     tb->jmp_reset_offset[0] = TB_JMP_RESET_OFFSET_INVALID;
-@@ -1356,7 +1356,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         qemu_log_in_addr_range(tb->pc)) {
-         qemu_log_lock();
-         qemu_log("OUT: [size=%d]\n", gen_code_size);
--        log_disas(tb->tc_ptr, gen_code_size);
-+        log_disas(tb->tc.ptr, gen_code_size);
-         qemu_log("\n");
-         qemu_log_flush();
-         qemu_log_unlock();
-@@ -1684,7 +1684,7 @@ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
-     while (m_min <= m_max) {
-         m = (m_min + m_max) >> 1;
-         tb = tcg_ctx.tb_ctx.tbs[m];
--        v = (uintptr_t)tb->tc_ptr;
-+        v = (uintptr_t)tb->tc.ptr;
-         if (v == tc_ptr) {
-             return tb;
-         } else if (tc_ptr < v) {
-diff --git a/tcg/tcg-runtime.c b/tcg/tcg-runtime.c
-index 4f873a9..9a87616 100644
---- a/tcg/tcg-runtime.c
-+++ b/tcg/tcg-runtime.c
-@@ -157,9 +157,9 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-     }
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, pc,
-                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
--                           tb->tc_ptr, cpu->cpu_index, pc,
-+                           tb->tc.ptr, cpu->cpu_index, pc,
-                            lookup_symbol(pc));
--    return tb->tc_ptr;
-+    return tb->tc.ptr;
+ static ExitStatus op_stpq(DisasContext *s, DisasOps *o)
+ {
+-    gen_helper_stpq(cpu_env, o->in2, o->out2, o->out);
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
++        gen_helper_stpq_parallel(cpu_env, o->in2, o->out2, o->out);
++    } else {
++        gen_helper_stpq(cpu_env, o->in2, o->out2, o->out);
++    }
+     return NO_EXIT;
  }
- 
- void HELPER(exit_atomic)(CPUArchState *env)
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 3559829..28c1b94 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -2616,8 +2616,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- 
-     tcg_reg_alloc_start(s);
- 
--    s->code_buf = tb->tc_ptr;
--    s->code_ptr = tb->tc_ptr;
-+    s->code_buf = tb->tc.ptr;
-+    s->code_ptr = tb->tc.ptr;
- 
-     tcg_out_tb_init(s);
  
 -- 
 2.7.4
