@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dY5Kd-0004MR-1x
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:53:08 -0400
+	(envelope-from <famz@redhat.com>) id 1dY5L3-0004l9-Rl
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dY5KZ-0005OP-Vf
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:53:07 -0400
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:25935)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dY5KZ-0005Jg-Mo
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:53:03 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout4.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OTD006X1N416A50@mailout4.w1.samsung.com> for
-	qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:52:49 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 20 Jul 2017 09:52:32 +0300
-Message-id: <1500533554-5779-2-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1500533554-5779-1-git-send-email-a.perevalov@samsung.com>
-References: <1500533554-5779-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170720065248eucas1p233be1718f190cd4415c0e58a23e2ef2a@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH v8 1/3] migration: postcopy_place_page
- factoring out
+	(envelope-from <famz@redhat.com>) id 1dY5L0-0005Y6-Pk
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:53:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55148)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dY5L0-0005Xs-Gd
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:53:30 -0400
+Date: Thu, 20 Jul 2017 14:53:24 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170720065324.GH11032@lemon>
+References: <DM2PR21MB0060B20A50AEEC8B6816154C9EA00@DM2PR21MB0060.namprd21.prod.outlook.com>
+	<1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
+	<edae6aa7-34ef-a3a8-94e0-175f05728345@redhat.com>
+	<DM2PR21MB0060A68EDF44A9FC4B018C909EA10@DM2PR21MB0060.namprd21.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM2PR21MB0060A68EDF44A9FC4B018C909EA10@DM2PR21MB0060.namprd21.prod.outlook.com>
+Subject: Re: [Qemu-devel] Disable image locking for snapshot drive?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, peterx@redhat.com, i.maximets@samsung.com, quintela@redhat.com, heetae82.ahn@samsung.com, dgilbert@redhat.com
+To: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Need to mark copied pages as closer as possible to the place where it
-tracks down. That will be necessary in futher patch.
+On Tue, 07/18 16:19, Andrew Baumann wrote:
+> > From: Eric Blake [mailto:eblake@redhat.com]
+> > Sent: Tuesday, 18 July 2017 8:07
+> > On 07/17/2017 07:33 PM, John Snow wrote:
+> > > On 07/17/2017 07:30 PM, Andrew Baumann via Qemu-devel wrote:
+> > >> I'm running a recent Linux build of qemu on Windows Subsystem for Linux
+> > (WSL) which doesn't appear to implement file locking:
+> > >>
+> > >> $ qemu-system-aarch64 ... -drive file=test.vhdx,if=none,id=hd0 -device
+> > virtio-blk-pci,drive=hd0
+> > >> qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to
+> > unlock byte 100
+> > 
+> > Does WSL implement fcntl(F_SETLK) but not fcntl(F_OFD_SETLK)?
+> 
+> Yes, this appears to be the case (there's also one report that it's broken):
+> https://github.com/Microsoft/BashOnWindows/issues/1927
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+What does fcntl(F_OFD_SETLK) return? If it is -ENOTSUP, we can probably detect
+that and disable locking. Can you try the patch pasted in the end?
+
+> 
+> > We
+> > already have code in place for compiling when F_OFD_SETLK is not
+> > supported (which makes lock=auto do nothing, and issues a warning that
+> > F_SETLK locks may be ineffective when locks are explicitly requested),
+> > do we need to just expand that code into a runtime test of whether
+> > F_OFD_SETLK appears to be unsupported?
+> 
+> That would be a nice fix, and it would avoid the need for yet another flag. On
+> the other hand, WSL is aiming for ABI compatibility, so they should get around
+> to implementing F_OFD_SETLK et al eventually.
+> 
+> Even if this were fixed in QEMU or implemented in WSL, shouldn't there to be a
+> way to turn snapshot file locking off on a per-drive basis?
+
+A snapshot file is temporary and unlinked immediately, so applying a lock or not
+doesn't matter that much to deserve an option for that.
+
 ---
- migration/postcopy-ram.c | 13 +++++++------
- migration/postcopy-ram.h |  4 ++--
- migration/ram.c          |  4 ++--
- 3 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 7e21e6f..996e64d 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -564,9 +564,10 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-  * returns 0 on success
-  */
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     struct uffdio_copy copy_struct;
-+    size_t pagesize = qemu_ram_pagesize(rb);
- 
-     copy_struct.dst = (uint64_t)(uintptr_t)host;
-     copy_struct.src = (uint64_t)(uintptr_t)from;
-@@ -595,11 +596,11 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-  * returns 0 on success
-  */
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                             size_t pagesize)
-+                             RAMBlock *rb)
- {
-     trace_postcopy_place_page_zero(host);
- 
--    if (pagesize == getpagesize()) {
-+    if (qemu_ram_pagesize(rb) == getpagesize()) {
-         struct uffdio_zeropage zero_struct;
-         zero_struct.range.start = (uint64_t)(uintptr_t)host;
-         zero_struct.range.len = getpagesize();
-@@ -629,7 +630,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-             memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
-         }
-         return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
--                                   pagesize);
-+                                   rb);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index cfbb236f6f..0be5bbbd53 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -493,6 +493,12 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
      }
+     s->fd = fd;
  
-     return 0;
-@@ -692,14 +693,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
- }
- 
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     assert(0);
-     return -1;
- }
- 
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     assert(0);
-     return -1;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 52d51e8..78a3591 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -72,14 +72,14 @@ void postcopy_discard_send_finish(MigrationState *ms,
-  * returns 0 on success
-  */
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize);
-+                        RAMBlock *rb);
- 
- /*
-  * Place a zero page at (host) atomically
-  * returns 0 on success
-  */
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                             size_t pagesize);
-+                             RAMBlock *rb);
- 
- /* The current postcopy state is read/set by postcopy_state_get/set
-  * which update it atomically.
-diff --git a/migration/ram.c b/migration/ram.c
-index 1b08296..9cc1b17 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2470,10 +2470,10 @@ static int ram_load_postcopy(QEMUFile *f)
- 
-             if (all_zero) {
-                 ret = postcopy_place_page_zero(mis, place_dest,
--                                               block->page_size);
-+                                               block);
-             } else {
-                 ret = postcopy_place_page(mis, place_dest,
--                                          place_source, block->page_size);
-+                                          place_source, block);
-             }
-         }
-         if (!ret) {
--- 
-1.9.1
++    if (s->use_lock) {
++        int ret0 = qemu_unlock_fd(fd, 0, 0);
++        if (ret0 == -ENOTSUP) {
++            s->use_lock = false;
++        }
++    }
+     s->lock_fd = -1;
+     if (s->use_lock) {
+         fd = qemu_open(filename, s->open_flags);
