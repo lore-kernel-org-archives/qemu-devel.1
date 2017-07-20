@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qT-0001Af-Ld
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:49 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qM-00016L-AJ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qN-0005wA-3S
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:45 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41411)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qM-0005ue-NF
+	(envelope-from <cota@braap.org>) id 1dY1qJ-0005pE-9d
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:38 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40689)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005oS-5o
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:09:23 -0400
-Message-Id: <1500520169-23367-38-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:08:56 -0400
+Message-Id: <1500520169-23367-11-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 37/43] tcg: distribute profiling counters
- across TCGContext's
+Subject: [Qemu-devel] [PATCH v3 10/43] exec-all: bring tb->invalid into
+ tb->cflags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,339 +27,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-This is groundwork for supporting multiple TCG contexts.
-
-To avoid scalability issues when profiling info is enabled, this patch
-makes the profiling info counters distributed via the following changes:
-
-1) Consolidate profile info into its own struct, TCGProfile, which
-   TCGContext also includes. Note that tcg_table_op_count is brought
-   into TCGProfile after dropping the tcg_ prefix.
-2) Iterate over the TCG contexts in the system to obtain the total counts.
-
-This change also requires updating the accessors to TCGProfile fields to
-use atomic_read/set whenever there may be conflicting accesses (as defined
-in C11) to them.
+This gets rid of a hole in struct TranslationBlock.
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/tcg.h                 |  38 +++++++++-------
- accel/tcg/translate-all.c |  23 +++++-----
- tcg/tcg.c                 | 110 ++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 126 insertions(+), 45 deletions(-)
+ include/exec/exec-all.h   | 3 +--
+ include/exec/tb-lookup.h  | 2 +-
+ accel/tcg/cpu-exec.c      | 4 ++--
+ accel/tcg/translate-all.c | 3 +--
+ 4 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index f83f9b0..3611141 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -641,6 +641,26 @@ QEMU_BUILD_BUG_ON(OPPARAM_BUF_SIZE > (1 << 14));
- /* Make sure that we don't overflow 64 bits without noticing.  */
- QEMU_BUILD_BUG_ON(sizeof(TCGOp) > 8);
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 69c1b36..256b9a6 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -352,12 +352,11 @@ struct TranslationBlock {
+ #define CF_NOCACHE     0x10000 /* To be freed after execution */
+ #define CF_USE_ICOUNT  0x20000
+ #define CF_IGNORE_ICOUNT 0x40000 /* Do not generate icount code */
++#define CF_INVALID     0x80000 /* TB is stale. Setters must acquire tb_lock */
  
-+typedef struct TCGProfile {
-+    int64_t tb_count1;
-+    int64_t tb_count;
-+    int64_t op_count; /* total insn count */
-+    int op_count_max; /* max insn per TB */
-+    int64_t temp_count;
-+    int temp_count_max;
-+    int64_t del_op_count;
-+    int64_t code_in_len;
-+    int64_t code_out_len;
-+    int64_t search_out_len;
-+    int64_t interm_time;
-+    int64_t code_time;
-+    int64_t la_time;
-+    int64_t opt_time;
-+    int64_t restore_count;
-+    int64_t restore_time;
-+    int64_t table_op_count[NB_OPS];
-+} TCGProfile;
-+
- struct TCGContext {
-     uint8_t *pool_cur, *pool_end;
-     TCGPool *pool_first, *pool_current, *pool_first_large;
-@@ -665,23 +685,7 @@ struct TCGContext {
-     tcg_insn_unit *code_ptr;
+     /* Per-vCPU dynamic tracing state used to generate this TB */
+     uint32_t trace_vcpu_dstate;
  
- #ifdef CONFIG_PROFILER
--    /* profiling info */
--    int64_t tb_count1;
--    int64_t tb_count;
--    int64_t op_count; /* total insn count */
--    int op_count_max; /* max insn per TB */
--    int64_t temp_count;
--    int temp_count_max;
--    int64_t del_op_count;
--    int64_t code_in_len;
--    int64_t code_out_len;
--    int64_t search_out_len;
--    int64_t interm_time;
--    int64_t code_time;
--    int64_t la_time;
--    int64_t opt_time;
--    int64_t restore_count;
--    int64_t restore_time;
-+    TCGProfile prof;
- #endif
- 
- #ifdef CONFIG_DEBUG_TCG
+-    uint16_t invalid;
+-
+     void *tc_ptr;    /* pointer to the translated code */
+     uint8_t *tc_search;  /* pointer to search data */
+     /* original tb when cflags has CF_NOCACHE */
+diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
+index 9d32cb0..436b6d5 100644
+--- a/include/exec/tb-lookup.h
++++ b/include/exec/tb-lookup.h
+@@ -35,7 +35,7 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
+                tb->cs_base == *cs_base &&
+                tb->flags == *flags &&
+                tb->trace_vcpu_dstate == *cpu->trace_dstate &&
+-               !atomic_read(&tb->invalid))) {
++               !(atomic_read(&tb->cflags) & CF_INVALID))) {
+         return tb;
+     }
+     tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags);
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 5d2ee5b..fae8c40 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -294,7 +294,7 @@ static bool tb_cmp(const void *p, const void *d)
+         tb->cs_base == desc->cs_base &&
+         tb->flags == desc->flags &&
+         tb->trace_vcpu_dstate == desc->trace_vcpu_dstate &&
+-        !atomic_read(&tb->invalid)) {
++        !(atomic_read(&tb->cflags) & CF_INVALID)) {
+         /* check next page if needed */
+         if (tb->page_addr[1] == -1) {
+             return true;
+@@ -377,7 +377,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+             tb_lock();
+             acquired_tb_lock = true;
+         }
+-        if (!tb->invalid) {
++        if (!(tb->cflags & CF_INVALID)) {
+             tb_add_jump(last_tb, tb_exit, tb);
+         }
+     }
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index e6ee4e3..36b17ac 100644
+index a124181..7ef4f19 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -312,6 +312,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-     uint8_t *p = tb->tc.search;
-     int i, j, num_insns = tb->icount;
- #ifdef CONFIG_PROFILER
-+    TCGProfile *prof = &tcg_ctx->prof;
-     int64_t ti = profile_getclock();
- #endif
+@@ -1073,7 +1073,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
  
-@@ -346,8 +347,9 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-     restore_state_to_opc(env, tb, data);
+     assert_tb_locked();
  
- #ifdef CONFIG_PROFILER
--    tcg_ctx->restore_time += profile_getclock() - ti;
--    tcg_ctx->restore_count++;
-+    atomic_set(&prof->restore_time,
-+                prof->restore_time + profile_getclock() - ti);
-+    atomic_set(&prof->restore_count, prof->restore_count + 1);
- #endif
-     return 0;
- }
-@@ -1302,6 +1304,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tcg_insn_unit *gen_code_buf;
-     int gen_code_size, search_size;
- #ifdef CONFIG_PROFILER
-+    TCGProfile *prof = &tcg_ctx->prof;
-     int64_t ti;
- #endif
-     assert_memory_lock();
-@@ -1332,8 +1335,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tcg_ctx->cf_parallel = !!(cflags & CF_PARALLEL);
+-    atomic_set(&tb->invalid, true);
++    atomic_set(&tb->cflags, tb->cflags | CF_INVALID);
+ 
+     /* remove the TB from the hash list */
+     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+@@ -1269,7 +1269,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     tb->flags = flags;
+     tb->cflags = cflags;
+     tb->trace_vcpu_dstate = *cpu->trace_dstate;
+-    tb->invalid = false;
  
  #ifdef CONFIG_PROFILER
--    tcg_ctx->tb_count1++; /* includes aborted translations because of
--                       exceptions */
-+    /* includes aborted translations because of exceptions */
-+    atomic_set(&prof->tb_count1, prof->tb_count1 + 1);
-     ti = profile_getclock();
- #endif
- 
-@@ -1358,8 +1361,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
- #endif
- 
- #ifdef CONFIG_PROFILER
--    tcg_ctx->tb_count++;
--    tcg_ctx->interm_time += profile_getclock() - ti;
-+    atomic_set(&prof->tb_count, prof->tb_count + 1);
-+    atomic_set(&prof->interm_time, prof->interm_time + profile_getclock() - ti);
-     ti = profile_getclock();
- #endif
- 
-@@ -1379,10 +1382,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tb->tc.size = gen_code_size;
- 
- #ifdef CONFIG_PROFILER
--    tcg_ctx->code_time += profile_getclock() - ti;
--    tcg_ctx->code_in_len += tb->size;
--    tcg_ctx->code_out_len += gen_code_size;
--    tcg_ctx->search_out_len += search_size;
-+    atomic_set(&prof->code_time, prof->code_time + profile_getclock() - ti);
-+    atomic_set(&prof->code_in_len, prof->code_in_len + tb->size);
-+    atomic_set(&prof->code_out_len, prof->code_out_len + gen_code_size);
-+    atomic_set(&prof->search_out_len, prof->search_out_len + search_size);
- #endif
- 
- #ifdef DEBUG_DISAS
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 2217314..0ddd0dc 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1344,7 +1344,7 @@ void tcg_op_remove(TCGContext *s, TCGOp *op)
-     memset(op, 0, sizeof(*op));
- 
- #ifdef CONFIG_PROFILER
--    s->del_op_count++;
-+    atomic_set(&s->prof.del_op_count, s->prof.del_op_count + 1);
- #endif
- }
- 
-@@ -2515,15 +2515,79 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
- 
- #ifdef CONFIG_PROFILER
- 
--static int64_t tcg_table_op_count[NB_OPS];
-+/* avoid copy/paste errors */
-+#define PROF_ADD(to, from, field)                       \
-+    do {                                                \
-+        (to)->field += atomic_read(&((from)->field));   \
-+    } while (0)
-+
-+#define PROF_MAX(to, from, field)                                       \
-+    do {                                                                \
-+        typeof((from)->field) val__ = atomic_read(&((from)->field));    \
-+        if (val__ > (to)->field) {                                      \
-+            (to)->field = val__;                                        \
-+        }                                                               \
-+    } while (0)
-+
-+/* Pass in a zero'ed @prof */
-+static inline
-+void tcg_profile_snapshot(TCGProfile *prof, bool counters, bool table)
-+{
-+    unsigned int i;
-+
-+    for (i = 0; i < n_tcg_ctxs; i++) {
-+        const TCGProfile *orig = &tcg_ctxs[i]->prof;
-+
-+        if (counters) {
-+            PROF_ADD(prof, orig, tb_count1);
-+            PROF_ADD(prof, orig, tb_count);
-+            PROF_ADD(prof, orig, op_count);
-+            PROF_MAX(prof, orig, op_count_max);
-+            PROF_ADD(prof, orig, temp_count);
-+            PROF_MAX(prof, orig, temp_count_max);
-+            PROF_ADD(prof, orig, del_op_count);
-+            PROF_ADD(prof, orig, code_in_len);
-+            PROF_ADD(prof, orig, code_out_len);
-+            PROF_ADD(prof, orig, search_out_len);
-+            PROF_ADD(prof, orig, interm_time);
-+            PROF_ADD(prof, orig, code_time);
-+            PROF_ADD(prof, orig, la_time);
-+            PROF_ADD(prof, orig, opt_time);
-+            PROF_ADD(prof, orig, restore_count);
-+            PROF_ADD(prof, orig, restore_time);
-+        }
-+        if (table) {
-+            int i;
-+
-+            for (i = 0; i < NB_OPS; i++) {
-+                PROF_ADD(prof, orig, table_op_count[i]);
-+            }
-+        }
-+    }
-+}
-+
-+#undef PROF_ADD
-+#undef PROF_MAX
-+
-+static void tcg_profile_snapshot_counters(TCGProfile *prof)
-+{
-+    tcg_profile_snapshot(prof, true, false);
-+}
-+
-+static void tcg_profile_snapshot_table(TCGProfile *prof)
-+{
-+    tcg_profile_snapshot(prof, false, true);
-+}
- 
- void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf)
- {
-+    TCGProfile prof = {};
-     int i;
- 
-+    tcg_profile_snapshot_table(&prof);
-     for (i = 0; i < NB_OPS; i++) {
-         cpu_fprintf(f, "%s %" PRId64 "\n", tcg_op_defs[i].name,
--                    tcg_table_op_count[i]);
-+                    prof.table_op_count[i]);
-     }
- }
- #else
-@@ -2536,6 +2600,9 @@ void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf)
- 
- int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- {
-+#ifdef CONFIG_PROFILER
-+    TCGProfile *prof = &s->prof;
-+#endif
-     int i, oi, oi_next, num_insns;
- 
- #ifdef CONFIG_PROFILER
-@@ -2543,15 +2610,15 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-         int n;
- 
-         n = s->gen_op_buf[0].prev + 1;
--        s->op_count += n;
--        if (n > s->op_count_max) {
--            s->op_count_max = n;
-+        atomic_set(&prof->op_count, prof->op_count + n);
-+        if (n > prof->op_count_max) {
-+            atomic_set(&prof->op_count_max, n);
-         }
- 
-         n = s->nb_temps;
--        s->temp_count += n;
--        if (n > s->temp_count_max) {
--            s->temp_count_max = n;
-+        atomic_set(&prof->temp_count, prof->temp_count + n);
-+        if (n > prof->temp_count_max) {
-+            atomic_set(&prof->temp_count_max, n);
-         }
-     }
- #endif
-@@ -2568,7 +2635,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #endif
- 
- #ifdef CONFIG_PROFILER
--    s->opt_time -= profile_getclock();
-+    atomic_set(&prof->opt_time, prof->opt_time - profile_getclock());
- #endif
- 
- #ifdef USE_TCG_OPTIMIZATIONS
-@@ -2576,8 +2643,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #endif
- 
- #ifdef CONFIG_PROFILER
--    s->opt_time += profile_getclock();
--    s->la_time -= profile_getclock();
-+    atomic_set(&prof->opt_time, prof->opt_time + profile_getclock());
-+    atomic_set(&prof->la_time, prof->la_time - profile_getclock());
- #endif
- 
-     {
-@@ -2605,7 +2672,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-     }
- 
- #ifdef CONFIG_PROFILER
--    s->la_time += profile_getclock();
-+    atomic_set(&prof->la_time, prof->la_time + profile_getclock());
- #endif
- 
- #ifdef DEBUG_DISAS
-@@ -2636,7 +2703,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- 
-         oi_next = op->next;
- #ifdef CONFIG_PROFILER
--        tcg_table_op_count[opc]++;
-+        atomic_set(&prof->table_op_count[opc], prof->table_op_count[opc] + 1);
- #endif
- 
-         switch (opc) {
-@@ -2712,10 +2779,17 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #ifdef CONFIG_PROFILER
- void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
- {
--    TCGContext *s = tcg_ctx;
--    int64_t tb_count = s->tb_count;
--    int64_t tb_div_count = tb_count ? tb_count : 1;
--    int64_t tot = s->interm_time + s->code_time;
-+    TCGProfile prof = {};
-+    const TCGProfile *s;
-+    int64_t tb_count;
-+    int64_t tb_div_count;
-+    int64_t tot;
-+
-+    tcg_profile_snapshot_counters(&prof);
-+    s = &prof;
-+    tb_count = s->tb_count;
-+    tb_div_count = tb_count ? tb_count : 1;
-+    tot = s->interm_time + s->code_time;
- 
-     cpu_fprintf(f, "JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
-                 tot, tot / 2.4e9);
+     tcg_ctx.tb_count1++; /* includes aborted translations because of
 -- 
 2.7.4
