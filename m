@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qO-00016X-0j
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:45 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qR-00018V-PX
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qJ-0005q2-Ig
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:39 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36545)
+	(envelope-from <cota@braap.org>) id 1dY1qM-0005vy-UP
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:43 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51671)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005p0-B0
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qM-0005u8-Mh
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:38 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:09:00 -0400
-Message-Id: <1500520169-23367-15-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:22 -0400
+Message-Id: <1500520169-23367-37-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 14/43] target/hppa: check CF_PARALLEL
- instead of parallel_cpus
+Subject: [Qemu-devel] [PATCH v3 36/43] tcg: introduce **tcg_ctxs to keep
+ track of all TCGContext's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Thereby decoupling the resulting translated code from the current state
-of the system.
+Groundwork for supporting multiple TCG contexts.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Note that having n_tcg_ctxs is unnecessary. However, it is
+convenient to have it, since it will simplify iterating over the
+array: we'll have just a for loop instead of having to iterate
+over a NULL-terminated array (which would require n+1 elems)
+or having to check with ifdef's for usermode/softmmu.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/hppa/helper.h    |  2 ++
- target/hppa/op_helper.c | 32 ++++++++++++++++++++++++++++----
- target/hppa/translate.c | 12 ++++++++++--
- 3 files changed, 40 insertions(+), 6 deletions(-)
+ tcg/tcg.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 789f07f..0a6b900 100644
---- a/target/hppa/helper.h
-+++ b/target/hppa/helper.h
-@@ -3,7 +3,9 @@ DEF_HELPER_FLAGS_2(tsv, TCG_CALL_NO_WG, void, env, tl)
- DEF_HELPER_FLAGS_2(tcond, TCG_CALL_NO_WG, void, env, tl)
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index f907c47..2217314 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -115,6 +115,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ static void tcg_out_tb_init(TCGContext *s);
+ static bool tcg_out_tb_finalize(TCGContext *s);
  
- DEF_HELPER_FLAGS_3(stby_b, TCG_CALL_NO_WG, void, env, tl, tl)
-+DEF_HELPER_FLAGS_3(stby_b_parallel, TCG_CALL_NO_WG, void, env, tl, tl)
- DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tl)
-+DEF_HELPER_FLAGS_3(stby_e_parallel, TCG_CALL_NO_WG, void, env, tl, tl)
++static TCGContext **tcg_ctxs;
++static unsigned int n_tcg_ctxs;
  
- DEF_HELPER_FLAGS_1(probe_r, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_FLAGS_1(probe_w, TCG_CALL_NO_RWG_SE, tl, tl)
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index c05c0d5..3104404 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -76,7 +76,8 @@ static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
- #endif
- }
- 
--void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-+static void do_stby_b(CPUHPPAState *env, target_ulong addr, target_ulong val,
-+                      bool parallel)
- {
-     uintptr_t ra = GETPC();
- 
-@@ -89,7 +90,7 @@ void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-         break;
-     case 1:
-         /* The 3 byte store must appear atomic.  */
--        if (parallel_cpus) {
-+        if (parallel) {
-             atomic_store_3(env, addr, val, 0x00ffffffu, ra);
-         } else {
-             cpu_stb_data_ra(env, addr, val >> 16, ra);
-@@ -102,14 +103,26 @@ void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-     }
- }
- 
--void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-+void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-+{
-+    do_stby_b(env, addr, val, false);
-+}
-+
-+void HELPER(stby_b_parallel)(CPUHPPAState *env, target_ulong addr,
-+                             target_ulong val)
-+{
-+    do_stby_b(env, addr, val, true);
-+}
-+
-+static void do_stby_e(CPUHPPAState *env, target_ulong addr, target_ulong val,
-+                      bool parallel)
- {
-     uintptr_t ra = GETPC();
- 
-     switch (addr & 3) {
-     case 3:
-         /* The 3 byte store must appear atomic.  */
--        if (parallel_cpus) {
-+        if (parallel) {
-             atomic_store_3(env, addr - 3, val, 0xffffff00u, ra);
-         } else {
-             cpu_stw_data_ra(env, addr - 3, val >> 16, ra);
-@@ -132,6 +145,17 @@ void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-     }
- }
- 
-+void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
-+{
-+    do_stby_e(env, addr, val, false);
-+}
-+
-+void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
-+                             target_ulong val)
-+{
-+    do_stby_e(env, addr, val, true);
-+}
-+
- target_ulong HELPER(probe_r)(target_ulong addr)
- {
-     return page_check_range(addr, 1, PAGE_READ);
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 1effe82..66aa11d 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -2309,9 +2309,17 @@ static ExitStatus trans_stby(DisasContext *ctx, uint32_t insn,
-     val = load_gpr(ctx, rt);
- 
-     if (a) {
--        gen_helper_stby_e(cpu_env, addr, val);
-+        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
-+            gen_helper_stby_e_parallel(cpu_env, addr, val);
-+        } else {
-+            gen_helper_stby_e(cpu_env, addr, val);
-+        }
-     } else {
--        gen_helper_stby_b(cpu_env, addr, val);
-+        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
-+            gen_helper_stby_b_parallel(cpu_env, addr, val);
-+        } else {
-+            gen_helper_stby_b(cpu_env, addr, val);
-+        }
+ static TCGRegSet tcg_target_available_regs[2];
+ static TCGRegSet tcg_target_call_clobber_regs;
+@@ -382,6 +384,8 @@ void tcg_context_init(TCGContext *s)
      }
  
-     if (m) {
+     tcg_ctx = s;
++    tcg_ctxs = &tcg_ctx;
++    n_tcg_ctxs = 1;
+ }
+ 
+ /*
 -- 
 2.7.4
