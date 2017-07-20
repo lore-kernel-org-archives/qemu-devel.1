@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dY7N9-0006Mq-Ot
+	(envelope-from <sf@sfritsch.de>) id 1dY7N9-0006Mt-Qq
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dY7N9-0004QN-4y
+	(envelope-from <sf@sfritsch.de>) id 1dY7N8-0004Q7-U2
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:51 -0400
-Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:37006)
+Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:37002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dY7N8-0004Pa-W4
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:51 -0400
+	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dY7N8-0004PT-PF
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:50 -0400
 From: Stefan Fritsch <sf@sfritsch.de>
-Date: Thu, 20 Jul 2017 11:02:50 +0200
-Message-Id: <1500541371-24788-8-git-send-email-sf@sfritsch.de>
+Date: Thu, 20 Jul 2017 11:02:48 +0200
+Message-Id: <1500541371-24788-6-git-send-email-sf@sfritsch.de>
 In-Reply-To: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
 References: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
-Subject: [Qemu-devel] [PATCH v2 7/8] usb-ccid: Increase ccid max APDU size
+Subject: [Qemu-devel] [PATCH v2 5/8] usb-ccid: Fix USB descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +27,41 @@ To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
 From: Stefan Fritsch <stefan_fritsch@genua.de>
 
-The emulated ccid smartcard reader has a fixed limit for APDUs from the
-card. Increase this to 1024. We have seen software that tries to use 768
-byte APDUs.
+- We want to support both T=0 and T=1. Additionally, note that all
+  fields in USB descriptors are little endian and the supported
+  protocols are in the lowest byte the of the 32-Bit dwProtocols field.
+- We want APDU level exchanges. This saves us from PPS exchanges and from
+  APDU reassembly from T=1 packets.
 
 Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
+Signed-off-by: Christian Ehrhardt <christian_ehrhardt@genua.de>
 ---
- hw/usb/dev-smartcard-reader.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/usb/dev-smartcard-reader.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index 709c65c384..72324e8313 100644
+index 769949144b..bc4dc35d3f 100644
 --- a/hw/usb/dev-smartcard-reader.c
 +++ b/hw/usb/dev-smartcard-reader.c
-@@ -82,7 +82,7 @@ static void usb_packet_dump(int lvl, const char *dir, uint8_t *buf, size_t len)
- #define BULK_OUT_DATA_SIZE 65536
- #define PENDING_ANSWERS_NUM 128
+@@ -353,8 +353,8 @@ static const uint8_t qemu_ccid_descriptor[] = {
+                      */
+         0x07,       /* u8  bVoltageSupport; 01h - 5.0v, 02h - 3.0, 03 - 1.8 */
  
--#define BULK_IN_BUF_SIZE 384
-+#define BULK_IN_BUF_SIZE 1024
- #define BULK_IN_PENDING_NUM 8
- 
- #define CCID_MAX_PACKET_SIZE                64
+-        0x00, 0x00, /* u32 dwProtocols; RRRR PPPP. RRRR = 0000h.*/
+-        0x01, 0x00, /* PPPP: 0001h = Protocol T=0, 0002h = Protocol T=1 */
++        0x03, 0x00, /* u32 dwProtocols; RRRR PPPP. RRRR = 0000h.*/
++        0x00, 0x00, /* PPPP: 0001h = Protocol T=0, 0002h = Protocol T=1 */
+                     /* u32 dwDefaultClock; in kHZ (0x0fa0 is 4 MHz) */
+         0xa0, 0x0f, 0x00, 0x00,
+                     /* u32 dwMaximumClock; */
+@@ -397,7 +397,7 @@ static const uint8_t qemu_ccid_descriptor[] = {
+                      * insertion and removal. Must set bit 5 in bmAttributes
+                      * in Configuration descriptor if 100000 is set.
+                      */
+-        0xfe, 0x04, 0x01, 0x00,
++        0xfe, 0x04, 0x04, 0x00,
+                     /*
+                      * u32 dwMaxCCIDMessageLength; For extended APDU in
+                      * [261 + 10 , 65544 + 10]. Otherwise the minimum is
 -- 
 2.11.0
