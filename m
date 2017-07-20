@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYADU-0000eq-EE
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:06:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYAG6-0002aa-Cp
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:08:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYADR-0002qv-5U
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:06:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50084)
+	(envelope-from <eblake@redhat.com>) id 1dYAG3-0004Ud-44
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:08:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYADQ-0002pV-St
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:06:01 -0400
-References: <1500543086-26588-1-git-send-email-sf@sfritsch.de>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYAG2-0004U7-Pl
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:08:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B75C8806D0
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:08:41 +0000 (UTC)
+References: <20170720100046.4424-1-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c98eec07-b269-ddb3-6e53-88ad4e34dbc5@redhat.com>
-Date: Thu, 20 Jul 2017 07:05:50 -0500
+Message-ID: <1749fce5-8f96-f0eb-6f55-40139bb4b6f7@redhat.com>
+Date: Thu, 20 Jul 2017 07:08:38 -0500
 MIME-Version: 1.0
-In-Reply-To: <1500543086-26588-1-git-send-email-sf@sfritsch.de>
+In-Reply-To: <20170720100046.4424-1-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3FlG9OO97g0GuKOkPGM5T4StpsdtAnwjH"
-Subject: Re: [Qemu-devel] [PATCH] acpi: Add emulated sleep button
+	boundary="U1QtMq2XfkAvVHAJDdS1thQuIlNhVV5af"
+Subject: Re: [Qemu-devel] [PATCH] char-fd: remove useless chr pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3FlG9OO97g0GuKOkPGM5T4StpsdtAnwjH
+--U1QtMq2XfkAvVHAJDdS1thQuIlNhVV5af
 From: Eric Blake <eblake@redhat.com>
-To: Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <c98eec07-b269-ddb3-6e53-88ad4e34dbc5@redhat.com>
-Subject: Re: [PATCH] acpi: Add emulated sleep button
-References: <1500543086-26588-1-git-send-email-sf@sfritsch.de>
-In-Reply-To: <1500543086-26588-1-git-send-email-sf@sfritsch.de>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1749fce5-8f96-f0eb-6f55-40139bb4b6f7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] char-fd: remove useless chr pointer
+References: <20170720100046.4424-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170720100046.4424-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/20/2017 04:31 AM, Stefan Fritsch wrote:
-> From: Stefan Fritsch <stefan_fritsch@genua.de>
+On 07/20/2017 05:00 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Apparently unused since it was introduced in commit
+> a29753f8aa79a34a324afebe340182a51a5aef11. Now, it can be trivially
+> accessed by CHARDEV() of self.
 >=20
-> Add an ACPI sleep button and QMP/HMP commands to trigger it.  A sleep
-> button is a so called "fixed hardware feature", which makes it more
-> suitable for putting the system to sleep than a laptop lid, for example=
-=2E
->=20
-> The sleep button is disabled by default (Bit 5 in the FACP flags
-> register set and no button "device" present in SSDT/DSDT). Clearing sai=
-d
-> bit enables it as a fixed feature device.
->=20
-> Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
+>  include/chardev/char-fd.h | 2 +-
+>  chardev/char-fd.c         | 1 -
+>  2 files changed, 1 insertion(+), 2 deletions(-)
 
-Just an interface review:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> +++ b/qapi-schema.json
-> @@ -2314,6 +2314,18 @@
->  { 'command': 'system_reset' }
-> =20
->  ##
-> +# @system_sleep:
-> +#
-> +# Requests that a guest perform a ACPI sleep transition by pushing a v=
-irtual
-
-s/a /an /
-
-> +# sleep button.
-> +#
-> +# Notes: A guest may or may not respond to this command.  This command=
-
-> +#        returning does not indicate that a guest has accepted the req=
-uest or
-> +#        that it has gone to sleep.
-
-Missing a 'Since: 2.11' line.
-
-> +##
-> +{ 'command': 'system_sleep' }
-
-Please name this 'system-sleep' (new QMP commands should favor '-' over
-'_').  Or at least document in the commit message that you are
-intentionally trying to match spelling of older existing system_*
-commands.  I wonder if it might be better to have a single system-acpi
-command that takes an enum of which action (sleep, powerdown, ...) to
-attempt, rather than a proliferation of commands per action..
+As it is a code cleanup and not a bug fix, it may be safer to defer to
+this to 2.11.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -101,7 +71,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---3FlG9OO97g0GuKOkPGM5T4StpsdtAnwjH
+--U1QtMq2XfkAvVHAJDdS1thQuIlNhVV5af
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -110,14 +80,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllwnJ4ACgkQp6FrSiUn
-Q2rRbAf/VKaoRTud4PP6WRYZoU7BLS4z9SlF/mHQr0fyMbZeJZn1LMC6n1kgRZjo
-IR+pvjUszK+gU8pxlFDuOaQdiEH75e/ncjN6uL/2N0m5Mw5nR1VLfk+EY8zk5JLz
-vYNOJuraiIvtGdNOhTItpr1c363SdCZAze+5z2K/vBmmFDyp65DOkjDXVgnjhCpM
-I1UZ2EaUAl1Nhkc8ptMAKQWPzd2NOTum8S/zyDU+8iESd8eTJFSTZTQwDk6WwrLV
-LOjps7C2cdnpFuSLoiLxbc+IFG2E4svMQjWjizEi/xbEbGUKqIUySjwCdy0D+eQz
-gIEkBiS9iQ2ADh4ham351tz2IGokog==
-=JrAf
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllwnUYACgkQp6FrSiUn
+Q2rUswgAnQgFBGLAdwpFwUWXmZC2/pvqrs488WxpzdH9ouhSEpbRYwxiXb3Yk3tg
+K+z384hmOX+RqpFoBoFRMJgIxAq2k/4tLtwSJfGUp6HyfTjbGNLHHDJm0JANkKvJ
+bt1IEi7gUhYipLu74A+ZbfjuWz4jDbOlWOeFTVNR9VbRoP3HrvA9sL3V3UiF3GEZ
+YNse+ybsvBJGehfMIT0oYZT+SWqguwJQO60zjtMI+zLy0A3dCiAHrH5FPgF9pqj9
+AVKpbXhsV+aEH6W/bs547R6242Ak41WSLQC4eesqUPD3MftXT1NlbH1J++PiGION
+2yBnhF5xASaSlA8U5JlTae+u5CCrGQ==
+=GSWF
 -----END PGP SIGNATURE-----
 
---3FlG9OO97g0GuKOkPGM5T4StpsdtAnwjH--
+--U1QtMq2XfkAvVHAJDdS1thQuIlNhVV5af--
