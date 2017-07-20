@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dY80F-000132-QT
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:16 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dY80G-000133-Nv
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dY80E-0002jK-U5
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:15 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dY80E-0002j5-Nc
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:14 -0400
-Received: by mail-wm0-x233.google.com with SMTP id k69so19496160wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 02:44:14 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dY80B-0002iY-QX
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY80B-0002iA-Gp
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:11 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 619517F407
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:44:10 +0000 (UTC)
+Date: Thu, 20 Jul 2017 10:44:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720094404.GA2101@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-12-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
-References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Jul 2017 10:43:52 +0100
-Message-ID: <CAFEAcA-9vJSoGu07fCudPhO4NVbrXN1N5T+LH4voQ97Yg1dBCA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
- tools)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170717134238.1966-12-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 11/17] migration: Really use multiple
+ pages at a time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +34,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Kamil Rytarowski <n54@gmx.com>, Markus Armbruster <armbru@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-Ping for review? It would be nice to get the NetBSD host into
-the build-test rotation...
+* Juan Quintela (quintela@redhat.com) wrote:
+> We now send several pages at a time each time that we wakeup a thread.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> Use iovec's insead of creating the equivalent.
+> ---
+>  migration/ram.c | 46 ++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 40 insertions(+), 6 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 2bf3fa7..90e1bcb 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -362,6 +362,13 @@ static void compress_threads_save_setup(void)
+>  
+>  /* Multiple fd's */
+>  
+> +
+> +typedef struct {
+> +    int num;
+> +    int size;
 
-thanks
--- PMM
+size_t ?
 
-On 14 July 2017 at 09:33, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This patchset fixes the build on NetBSD by making sure we only
-> build the ivshmem-client and ivshmem-server tools if the host OS
-> actually supports ivshmem. (Previously we were only gating building
-> of the within-QEMU ivshmem PCI device.)
->
-> Most of this patchset is the work of Kamil Rytarowski; I just
-> split it up into easily-reviewable patches and fixed a few bugs.
->
-> Tested on Linux, on NetBSD, and on Linux with a '--disable-linux-user
-> --disable-system' config (which was the one that was failing with
-> our previous attempt to fix this bug).
->
-> NB: we still have some things we need to fix to be able to put
-> NetBSD into the build-test set. The next issue is that 'make check'
-> fails with
->
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM % 255 + 1))} gtester -k --verbose -m=quick tests/check-qdict
-> sh: arith: syntax error: "RANDOM % 255 + 1"
->
-> likely because we're using a bashism there.
->
-> thanks
-> -- PMM
->
-> Kamil Rytarowski (2):
->   configure: Use an explicit CONFIG_IVSHMEM rather than CONFIG_EVENTFD
->   configure: Don't build ivshmem tools unless CONFIG_IVSHMEM is set
->
-> Peter Maydell (1):
->   configure: Rename CONFIG_IVSHMEM to CONFIG_IVSHMEM_DEVICE
->
->  configure               | 11 +++++++++++
->  Makefile                |  2 ++
->  Makefile.objs           |  4 ++--
->  hw/misc/Makefile.objs   |  2 +-
->  tests/Makefile.include  |  4 ++--
->  default-configs/pci.mak |  2 +-
->  6 files changed, 19 insertions(+), 6 deletions(-)
+> +    struct iovec *iov;
+> +} multifd_pages_t;
+> +
+>  struct MultiFDSendParams {
+>      /* not changed */
+>      uint8_t id;
+> @@ -371,7 +378,7 @@ struct MultiFDSendParams {
+>      QemuMutex mutex;
+>      /* protected by param mutex */
+>      bool quit;
+> -    uint8_t *address;
+> +    multifd_pages_t pages;
+>      /* protected by multifd mutex */
+>      bool done;
+>  };
+> @@ -459,8 +466,8 @@ static void *multifd_send_thread(void *opaque)
+>              qemu_mutex_unlock(&p->mutex);
+>              break;
+>          }
+> -        if (p->address) {
+> -            p->address = 0;
+> +        if (p->pages.num) {
+> +            p->pages.num = 0;
+>              qemu_mutex_unlock(&p->mutex);
+>              qemu_mutex_lock(&multifd_send_state->mutex);
+>              p->done = true;
+> @@ -475,6 +482,13 @@ static void *multifd_send_thread(void *opaque)
+>      return NULL;
+>  }
+>  
+> +static void multifd_init_group(multifd_pages_t *pages)
+> +{
+> +    pages->num = 0;
+> +    pages->size = migrate_multifd_group();
+> +    pages->iov = g_malloc0(pages->size * sizeof(struct iovec));
+
+Does that get freed anywhere?
+
+> +}
+> +
+>  int multifd_save_setup(void)
+>  {
+>      int thread_count;
+> @@ -498,7 +512,7 @@ int multifd_save_setup(void)
+>          p->quit = false;
+>          p->id = i;
+>          p->done = true;
+> -        p->address = 0;
+> +        multifd_init_group(&p->pages);
+>          p->c = socket_send_channel_create();
+>          if (!p->c) {
+>              error_report("Error creating a send channel");
+> @@ -515,8 +529,23 @@ int multifd_save_setup(void)
+>  
+>  static int multifd_send_page(uint8_t *address)
+>  {
+> -    int i;
+> +    int i, j;
+>      MultiFDSendParams *p = NULL; /* make happy gcc */
+> +    static multifd_pages_t pages;
+> +    static bool once;
+> +
+> +    if (!once) {
+> +        multifd_init_group(&pages);
+> +        once = true;
+> +    }
+> +
+> +    pages.iov[pages.num].iov_base = address;
+> +    pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
+> +    pages.num++;
+> +
+> +    if (pages.num < (pages.size - 1)) {
+> +        return UINT16_MAX;
+
+That's a very odd magic constant to return.
+What's your intention?
+
+> +    }
+>  
+>      qemu_sem_wait(&multifd_send_state->sem);
+>      qemu_mutex_lock(&multifd_send_state->mutex);
+> @@ -530,7 +559,12 @@ static int multifd_send_page(uint8_t *address)
+>      }
+>      qemu_mutex_unlock(&multifd_send_state->mutex);
+>      qemu_mutex_lock(&p->mutex);
+> -    p->address = address;
+> +    p->pages.num = pages.num;
+> +    for (j = 0; j < pages.size; j++) {
+> +        p->pages.iov[j].iov_base = pages.iov[j].iov_base;
+> +        p->pages.iov[j].iov_len = pages.iov[j].iov_len;
+> +    }
+
+It would seem more logical to update p->pages.num last
+
+This is also a little odd in that iov_len is never really used,
+it's always TARGET_PAGE_SIZE.
+
+> +    pages.num = 0;
+>      qemu_mutex_unlock(&p->mutex);
+>      qemu_sem_post(&p->sem);
+
+What makes sure that any final chunk of pages that was less
+than the group size is sent at the end?
+
+Dave
+
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
