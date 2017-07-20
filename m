@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dY3Hz-0004Dv-6L
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 00:42:16 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dY5KH-0004EH-QI
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dY3Hw-00038X-13
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 00:42:15 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:37591)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dY3Hu-00037D-Lt
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 00:42:11 -0400
-Date: Thu, 20 Jul 2017 12:41:57 +0800 (CST)
-Message-ID: <201707201241573748200@zte.com.cn>
-References: 201707191247531805742@zte.com.cn,
-	20170719194650.GL2757@localhost.localdomain
+	(envelope-from <kraxel@redhat.com>) id 1dY5KE-0005Ga-P5
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:52:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dY5KE-0005GH-Il
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 02:52:42 -0400
+Message-ID: <1500533554.6553.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 20 Jul 2017 08:52:34 +0200
+In-Reply-To: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
+References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-From: <wang.yi59@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_v2=5D_hmp=3A_allow_cpu_index_for?=
- =?utf-8?q?_=22info_lapic=22?=
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [SeaBIOS] [RFC PATCH 0/2] Allow RedHat PCI bridges
+ reserve more buses than necessary during init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +27,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
-Cc: dgilbert@redhat.com, eblake@redhat.com, berrange@redhat.com, liu.yunh@zte.com.cn, qemu-devel@nongnu.org, libvir-list@redhat.com, pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org
+Cc: marcel@redhat.com, qemu-devel@nongnu.org
 
-Pk9uIFdlZCwgSnVsIDE5LCAyMDE3IGF0IDA4OjE3OjQ5UE0gKzAxMDAsIERyLiBEYXZpZCBBbGFu
-IEdpbGJlcnQgd3JvdGU6DQoNCj4+ICogRWR1YXJkbyBIYWJrb3N0IChhZGRyZXNzQGhpZGRlbikg
-d3JvdGU6DQoNCj4+ID4gT24gV2VkLCBKdWwgMTksIDIwMTcgYXQgMTA6MTc6MzZBTSAtMDUwMCwg
-RXJpYyBCbGFrZSB3cm90ZToNCg0KPj4gPiA+IE9uIDA3LzE5LzIwMTcgMTA6MDcgQU0sIERhbmll
-bCBQLiBCZXJyYW5nZSB3cm90ZToNCg0KPj4gPiA+ID4+IEl0IGRvZXNuJ3QuICBQZXJoYXBzIHdl
-IHNob3VsZCBhZGQgdGhhdCBhcyBhIGZ1dHVyZSBsaWJ2aXJ0LXFlbXUuc28gQVBJDQoNCj4+ID4g
-PiA+PiBhZGRpdGlvbiwgYWx0aG91Z2ggaXQncyBwcm9iYWJseSBlYXNpZXIgdG8ganVzdCB1c2Ug
-UU1QIHRoYW4gSE1QIHdoZW4NCg0KPj4gPiA+ID4+IHVzaW5nICd2aXJzaCBxZW11LW1vbml0b3It
-Y29tbWFuZCcgaWYgSE1QIGRvZXNuJ3QgZG8gd2hhdCB5b3Ugd2FudC4NCg0KPj4gPiA+ID4gDQoN
-Cj4+ID4gPiA+IE9yIHNwZWNpYWwgY2FzZSB0aGUgImNwdSAxIiBjb21tYW5kIC0gaWUgbm90aWNl
-IHRoYXQgaXQgaXMgYmVpbmcNCg0KPj4gPiA+ID4gcmVxdWVzdGVkIGFuZCBkb24ndCBleGVjdXRl
-ICdodW1hbi1tb250b3ItY29tbWFuZCcuIEluc3RlYWQganVzdA0KDQo+PiA+ID4gPiByZWNvcmQg
-dGhlIENQVSBpbmRleCwgYW5kIHVzZSB0aGF0IGZvciBmdXR1cmUgImh1bWFuLW1vbml0b3ItY29t
-bWFuZCINCg0KPj4gPiA+ID4gaW52b2thdGlvbnMsIHNvIHdlIGdldCBmdWxsIGNvbXBhdCB3aXRo
-IHRoZSAoZHViaW91cykgc3RhdGVmdWwgSE1QDQoNCj4+ID4gPiA+IHNlbWFudGljcyB0aGF0IHRy
-YWRpdGlvbmFsbHkgZXhpc3RlZC4NCg0KPj4gPiA+IA0KDQo+PiA+ID4gSXMgJ2NwdScgKGFuZCB0
-aGUgZm9sbG93dXAgY29tbWFuZHMgYWZmZWN0ZWQgYnkgaXQpIHRoZSBvbmx5IHN0YXRlZnVsDQoN
-Cj4+ID4gPiBITVAgY29tbWFuZCBwYWlyaW5nPyAgSXMgdGhlcmUgYSB3YXkgdG8gc3BlY2lmeSBt
-dWx0aXBsZSBITVAgY29tbWFuZHMgaW4NCg0KPj4gPiA+IGEgc2luZ2xlIGh1bWFuLW1vbml0b3It
-Y29tbWFuZCBRTVAgY2FsbD8NCg0KPj4gPiA+IA0KDQo+PiA+ID4gSW5kZWVkLCB0d2Vha2luZyBx
-ZW11J3MgaHVtYW4tbW9uaXRvci1jb21tYW5kIGNhbGwgdG8gdHJhY2sgdGhlIHN0YXRlDQoNCj4+
-ID4gPiBtaWdodCBiZSBjbGVhbmVyIHRoYW4gaGF2aW5nIGxpYnZpcnQgaGF2ZSB0byB0d2VhayBB
-UEkgdG8gd29yayBhcm91bmQNCg0KPj4gPiA+IHRoaXMgd2FydCBvZiBITVAuDQoNCj4+ID4gDQoN
-Cj4+ID4gVGhlIENQVSBpbmRleCB3YXMgdGhlIG9ubHkgc3RhdGUga2VwdCBieSB0aGUgaHVtYW4g
-bW9uaXRvciwgYW5kIEkNCg0KPj4gPiB0aGluayBpdCdzIGJ5IGRlc2lnbiB0aGF0IGl0IHN0b3Bw
-ZWQgYmVpbmcgY29uc2lkZXJlZCAibW9uaXRvcg0KDQo+PiA+IHN0YXRlIiB0byBiZSB0cmFja2Vk
-LCBhbmQgYmVjYW1lIGp1c3QgYW4gYXJndW1lbnQgdG8NCg0KPj4gPiBodW1hbi1tb25pdG9yLWNv
-bW1hbmQuDQoNCj4+ID4gDQoNCj4+ID4gSXQncyB0cnVlIHRoYXQgaXQgYnJva2UgY29tcGF0aWJp
-bGl0eSBvZg0KDQo+PiA+ICAgInZpcnNoIHFlbXUtbW9uaXRvci1jb21tYW5kIDxkb21haW4+IC0t
-aG1wICdjcHUgPG4+JyIsDQoNCj4+ID4gd2hlbiB3ZSBtb3ZlZCB0byBRTVAsIGJ1dCB0aGlzIGhh
-cHBlbmVkIHllYXJzIGFnbywgYW5kIGl0IGxvb2tzDQoNCj4+ID4gbGlrZSBub2JvZHkgd2FzIHJl
-bHlpbmcgb24gaXQuICBJIGRvbid0IHNlZSB0aGUgcG9pbnQgb2YgdHJ5aW5nDQoNCj4+ID4gdG8g
-ZW11bGF0ZSB0aGUgcHJldmlvdXMgc3RhdGVmdWwgaW50ZXJmYWNlLg0KDQo+PiANCg0KPj4gSU1I
-TyBZaSdzIGZpeCAob25jZSByZXdvcmtlZCkgaXMgdGhlIHJpZ2h0IGZpeCAtIGl0IHJlbW92ZXMg
-dGhlDQoNCj4+IHVzZSBvZiB0aGF0IHBpZWNlIG9mIHN0YXRlLCB3aGVuIHRoZSBvcHRpb25hbCBw
-YXJhbWV0ZXIgaXMgdXNlZC4NCg0KPj4gKE9LLCBzbyBpdCBuZWVkcyByZXdvcmsgbm90IHRvIGNo
-YW5nZSB0aGF0IHN0YXRlIGFuZCB0bw0KDQo+PiBjb21lIHRvIHNvbWUgYWdyZWVtZW50IGFzIHRv
-IHdoYXQgdG8gdXNlIGluc3RlYWQgb2YgY3B1IGluZGV4IG51bWJlcg0KDQo+PiBldGMpLg0KDQo+
-DQoNCj5BZ3JlZWQsIGFzIGl0IGhlbHBzIHVzIHRvIGtlZXAgdGhlICJ2aXJzaCBxZW11LW1vbml0
-b3ItY29tbWFuZCINCg0KPmludGVyZmFjZSBzaW1wbGVyLiAgQnV0IHdlIGhhdmUgOCBjb21tYW5k
-cyB0aGF0IHVzZQ0KDQo+bW9uX2dldF9jcHUoKSwgd2Ugc2hvdWxkbid0IGZpeCBvbmx5ICJpbmZv
-IGxhcGljIi4NCg0KDQoNCg0KVGhhbmsgeW91IGFsbCENCg0KSSB3aWxsIHJld29yayB0aGlzIHBh
-dGNoIGluIHRoaXMgd2F5Og0KDQogIC0gZXh0ZW5kICdpbmZvIHJlZ2lzdGVycycgd2l0aCBhcGlj
-IGlkIHZhbHVlIGluc3RlYWQgb2YgY3VycmVudCwgbGlrZSB0aGlzOg0KDQogICAgICBDUFUjMSAo
-c29ja2V0LWlkOiBhLCBjb3JlLWlkOiBiLCB0aHJlYWQtaWQ6IGMsIGFwaWMtaWQ6IGQpDQoNCiAg
-LSBhZGQgcGFyYW1ldGVyICdhcGljIGlkJyBmb3IgJ2luZm8gbGFwaWMnDQoNCg0KDQoNCkFzIHRv
-IG90aGVyIGNvbW1hbmRzLCBJIHdhbnQgdG8gc2VuZCBzb21lIG90aGVyIHBhdGNoZXMgJ2NhdXNl
-IGluIG15IG9waW5pb24gbm90DQoNCmFsbCBjb21tYW5kcyBuZWVkICdhcGljLWlkJyBhcyBpbmRl
-eC4NCg0KDQoNCg0KLS0tDQoNCkJlc3Qgd2lzaGVzDQoNCllpIFdhbmc=
+On Wed, 2017-07-19 at 16:20 +0300, Aleksandr Bezzubikov wrote:
+> Now PCI bridges (and PCIE root port too) get a bus range number in
+> system init,
+> basing on currently plugged devices. That's why when one wants to
+> hotplug another bridge,
+> it needs his child bus, which the parent is unable to provide.
+> The suggested workaround is to have vendor-specific capability in
+> RedHat generic pcie-root-port
+> that contains number of additional bus to reserve on BIOS PCI init.
+
+Where is the qemu patch for this?
+
+What about window sizes?  IIRC there was a plan to provide allocation
+hints for them too ...
+
+cheers,
+  Gerd
