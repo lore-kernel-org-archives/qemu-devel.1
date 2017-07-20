@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYADH-0000XE-V6
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1dYADH-0000XB-Tx
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYADF-0002XX-1C
+	(envelope-from <bounces@canonical.com>) id 1dYADE-0002XC-Le
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38198)
+Received: from indium.canonical.com ([91.189.90.7]:38192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYADE-0002Ww-Rf
+	id 1dYADE-0002Ul-Fr
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 08:05:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYADE-0002hS-1j
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:48 +0000
+	id 1dYADD-0002hU-4f
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 06AFF2E807D
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id EA7332E8019
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:05:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Jul 2017 11:52:04 -0000
-From: Thomas Huth <1185395@bugs.launchpad.net>
-Reply-To: Bug 1185395 <1185395@bugs.launchpad.net>
+Date: Thu, 20 Jul 2017 11:54:11 -0000
+From: Thomas Huth <1191326@bugs.launchpad.net>
+Reply-To: Bug 1191326 <1191326@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130529115415.23233.51064.malonedeb@wampee.canonical.com>
-Message-Id: <150055152492.6757.2784805857295424199.malone@gac.canonical.com>
+References: <20130615151015.21597.4187.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150055165166.26860.4910709704520523715.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1185395] Re: qemu-1.5.0 savevm error -95 while
- writing vm with ceph-rbd as storage-backend
+Subject: [Qemu-devel] [Bug 1191326] Re: QNX 4 doesn't boot on qemu >= 1.3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,28 +48,34 @@ the latest version of QEMU (currently v2.9.0)?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1185395
+https://bugs.launchpad.net/bugs/1191326
 
 Title:
-  qemu-1.5.0 savevm error -95 while writing vm with ceph-rbd as storage-
-  backend
+  QNX 4 doesn't boot on qemu >=3D 1.3
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  With a running VM I encounter this strange behaviour, former qemu-version=
-s don't show up such an error.
-  Perhaps this comes from the rbd-backend in qemu-1.5.0 in combination with=
- ceph-0.56.6?
+  I am using virtual machine with QNX4 operating system installed on it.  I=
+ updated my qemu from version
+  to newer and QNX4 doesn't start any more. All is ok on version 1.2 but wh=
+en I try to use any newer version
+  (1.3, 1.4, 1.5)  QNX4 doesn't boot.  I tried on windows and linux ubuntu =
+hosts - effects are the same.
 
-  ( -95 might be a general "Operation not supported" error? )
+  When virtual machine boots qnx bootloader loads and starts operating syst=
+em. In the next step
+  qnx starts its ide driver, which detects qemu harddisk and cdrom. Problem=
+ starts when operating system
+  tries mount partition - an error occur and qnx stop booting procedure:
 
-  Up to 1.4.2 everything is OK with savevm, though.
+  mount -p "No bios signature in partition sector on /dev/hd0"
 
-  Any help welcome,
-
-  Oliver.
+  I have tried install qnx from cdrom but it seems that there is the same p=
+roblem. QNX installer boot from
+  cdrom, detects hard disk and cdrom, but cdrom can't be mounted in the nex=
+t step of installation procedure.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1185395/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1191326/+subscriptions
