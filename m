@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dYDIa-0005Et-FR
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:23:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dYDS4-0002m5-N5
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dYDIW-00029S-Df
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:23:32 -0400
-Resent-Message-Id: <E1dYDIW-00029S-Df@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dYDIW-000295-5Q
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:23:28 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150056419280.93.12335864653737844635@5d477a5b5989>
-In-Reply-To: <20170720145729.22141-1-otubo@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dYDS0-0007VA-MB
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:33:20 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35571)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dYDS0-0007UX-Cg
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 11:33:16 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id w126so27703976wme.0
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 08:33:16 -0700 (PDT)
+References: <20170718104513.23947-1-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 20 Jul 2017 16:33:13 +0100
+Message-ID: <87379r86o6.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 20 Jul 2017 08:23:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] configure: add -Wno-format-truncation to
- QEMU_CFLAGS
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] Fwd: [PULL 00/32] Final updates for Travis/Shippable
+ for soft-freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: otubo@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVzdCBvbiBGcmVlQlNEIGhvc3QuIFBsZWFz
-ZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTcw
-NzIwMTQ1NzI5LjIyMTQxLTEtb3R1Ym9AcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
-W1BBVENIXSBjb25maWd1cmU6IGFkZCAtV25vLWZvcm1hdC10cnVuY2F0aW9uIHRvIFFFTVVfQ0ZM
-QUdTCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9zaAojIFRlc3Rpbmcgc2NyaXB0
-IHdpbGwgYmUgaW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50
-aW5nIHRvIGEgY29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJi
-YXNlIgojIGJyYW5jaApzZXQgLWUKZWNobyAiPT09IEVOViA9PT0iCmVudgplY2hvICI9PT0gUEFD
-S0FHRVMgPT09Igpwa2cgaW5mbwplY2hvICI9PT0gVEVTVCBCRUdJTiA9PT0iCkNDPS91c3IvbG9j
-YWwvbGliZXhlYy9jY2FjaGUvY2MKSU5TVEFMTD0kUFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWls
-ZAplY2hvIC1uICJVc2luZyBDQzogIgpyZWFscGF0aCAkQ0MKbWtkaXIgLXAgJEJVSUxEICRJTlNU
-QUxMClNSQz0kUFdECmNkICRCVUlMRAokU1JDL2NvbmZpZ3VyZSAtLWNjPSRDQyAtLXByZWZpeD0k
-SU5TVEFMTCAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11CmdtYWtlIC1qNAojIFhYWDogd2Ug
-bmVlZCByZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQpnbWFrZSBpbnN0YWxs
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzA3MjAxNDU3Mjku
-MjIxNDEtMS1vdHVib0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzA3MjAxNDU3MjkuMjIxNDEt
-MS1vdHVib0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTM0NDM0
-ZjUwMiBjb25maWd1cmU6IGFkZCAtV25vLWZvcm1hdC10cnVuY2F0aW9uIHRvIFFFTVVfQ0ZMQUdT
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQo9PT0gRU5WID09PQpMT0dOQU1FPXBhdGNoZXctdGVzdGVy
-ClBBVEg9L3NiaW46L2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3Vzci9sb2NhbC9zYmluOi91c3Iv
-bG9jYWwvYmluClBXRD0vdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtc2pyeHhyNDcvc3JjCkhP
-TUU9L2hvbWUvcGF0Y2hldy10ZXN0ZXIKVVNFUj1wYXRjaGV3LXRlc3RlcgpTSEVMTD0vYmluL3No
-ClBBVENIRVc9L2hvbWUvcGF0Y2hldy10ZXN0ZXIvcGF0Y2hldy9wYXRjaGV3LWNsaSAtcyBodHRw
-Oi8vcGF0Y2hldy5vcmcgLS1ub2RlYnVnCj09PSBQQUNLQUdFUyA9PT0KYmFzaC00LjQuMTJfMiAg
-ICAgICAgICAgICAgICAgIEdOVSBQcm9qZWN0J3MgQm91cm5lIEFnYWluIFNIZWxsCmJpbnV0aWxz
-LTIuMjgsMSAgICAgICAgICAgICAgICBHTlUgYmluYXJ5IHRvb2xzCmJpc29uLTMuMC40LDEgICAg
-ICAgICAgICAgICAgICBQYXJzZXIgZ2VuZXJhdG9yIGZyb20gRlNGLCAobW9zdGx5KSBjb21wYXRp
-YmxlIHdpdGggWWFjYwpjYV9yb290X25zcy0zLjMwLjIgICAgICAgICAgICAgUm9vdCBjZXJ0aWZp
-Y2F0ZSBidW5kbGUgZnJvbSB0aGUgTW96aWxsYSBQcm9qZWN0CmNjYWNoZS0zLjMuNF8zICAgICAg
-ICAgICAgICAgICBUb29sIHRvIG1pbmltaXplIHRoZSBjb21waWxlIHRpbWUgb2YgQy9DKysgcHJv
-Z3JhbXMKY3VybC03LjU0LjAgICAgICAgICAgICAgICAgICAgIE5vbi1pbnRlcmFjdGl2ZSB0b29s
-IHRvIGdldCBmaWxlcyBmcm9tIEZUUCwgR09QSEVSLCBIVFRQKFMpIHNlcnZlcnMKY3ZzcHMtMi4x
-XzIgICAgICAgICAgICAgICAgICAgIENyZWF0ZSBwYXRjaHNldCBpbmZvcm1hdGlvbiBmcm9tIENW
-UwpkdGMtMS40LjJfMSAgICAgICAgICAgICAgICAgICAgRGV2aWNlIFRyZWUgQ29tcGlsZXIKZXhw
-YXQtMi4yLjBfMSAgICAgICAgICAgICAgICAgIFhNTCAxLjAgcGFyc2VyIHdyaXR0ZW4gaW4gQwpn
-Y2MtNS40LjAgICAgICAgICAgICAgICAgICAgICAgR05VIENvbXBpbGVyIENvbGxlY3Rpb24gNQpn
-Y2MtZWNqLTQuNSAgICAgICAgICAgICAgICAgICAgRWNsaXBzZSBKYXZhIENvbXBpbGVyIHVzZWQg
-dG8gYnVpbGQgR0NDIEphdmEKZ2V0dGV4dC1ydW50aW1lLTAuMTkuOC4xXzEgICAgIEdOVSBnZXR0
-ZXh0IHJ1bnRpbWUgbGlicmFyaWVzIGFuZCBwcm9ncmFtcwpnaXQtMi4xMy4wICAgICAgICAgICAg
-ICAgICAgICAgRGlzdHJpYnV0ZWQgc291cmNlIGNvZGUgbWFuYWdlbWVudCB0b29sCmdsaWItMi40
-Ni4yXzUgICAgICAgICAgICAgICAgICBTb21lIHVzZWZ1bCByb3V0aW5lcyBvZiBDIHByb2dyYW1t
-aW5nIChjdXJyZW50IHN0YWJsZSB2ZXJzaW9uKQpnbWFrZS00LjIuMV8xICAgICAgICAgICAgICAg
-ICAgR05VIHZlcnNpb24gb2YgJ21ha2UnIHV0aWxpdHkKZ21wLTYuMS4yICAgICAgICAgICAgICAg
-ICAgICAgIEZyZWUgbGlicmFyeSBmb3IgYXJiaXRyYXJ5IHByZWNpc2lvbiBhcml0aG1ldGljCmlu
-ZGV4aW5mby0wLjIuNiAgICAgICAgICAgICAgICBVdGlsaXR5IHRvIHJlZ2VuZXJhdGUgdGhlIEdO
-VSBpbmZvIHBhZ2UgaW5kZXgKbGliZmZpLTMuMi4xICAgICAgICAgICAgICAgICAgIEZvcmVpZ24g
-RnVuY3Rpb24gSW50ZXJmYWNlCmxpYmljb252LTEuMTRfMTAgICAgICAgICAgICAgICBDaGFyYWN0
-ZXIgc2V0IGNvbnZlcnNpb24gbGlicmFyeQpsaWJuZ2h0dHAyLTEuMjEuMCAgICAgICAgICAgICAg
-SFRUUC8yLjAgQyBMaWJyYXJ5Cm00LTEuNC4xOCwxICAgICAgICAgICAgICAgICAgICBHTlUgTTQK
-bXBjLTEuMC4zICAgICAgICAgICAgICAgICAgICAgIExpYnJhcnkgb2YgY29tcGxleCBudW1iZXJz
-IHdpdGggYXJiaXRyYXJpbHkgaGlnaCBwcmVjaXNpb24KbXBmci0zLjEuNV8xICAgICAgICAgICAg
-ICAgICAgIExpYnJhcnkgZm9yIG11bHRpcGxlLXByZWNpc2lvbiBmbG9hdGluZy1wb2ludCBjb21w
-dXRhdGlvbnMKcDUtQXV0aGVuLVNBU0wtMi4xNl8xICAgICAgICAgIFBlcmw1IG1vZHVsZSBmb3Ig
-U0FTTCBhdXRoZW50aWNhdGlvbgpwNS1EaWdlc3QtSE1BQy0xLjAzXzEgICAgICAgICAgUGVybDUg
-aW50ZXJmYWNlIHRvIEhNQUMgTWVzc2FnZS1EaWdlc3QgQWxnb3JpdGhtcwpwNS1FcnJvci0wLjE3
-MDI0ICAgICAgICAgICAgICAgRXJyb3IvZXhjZXB0aW9uIGhhbmRsaW5nIGluIG9iamVjdC1vcmll
-bnRlZCBwcm9ncmFtbWluZyBzdHlsZQpwNS1HU1NBUEktMC4yOF8xICAgICAgICAgICAgICAgUGVy
-bCBleHRlbnNpb24gcHJvdmlkaW5nIGFjY2VzcyB0byB0aGUgR1NTQVBJdjIgbGlicmFyeQpwY3Jl
-LTguNDAgICAgICAgICAgICAgICAgICAgICAgUGVybCBDb21wYXRpYmxlIFJlZ3VsYXIgRXhwcmVz
-c2lvbnMgbGlicmFyeQpwZXJsNS01LjI0LjEgICAgICAgICAgICAgICAgICAgUHJhY3RpY2FsIEV4
-dHJhY3Rpb24gYW5kIFJlcG9ydCBMYW5ndWFnZQpwaXhtYW4tMC4zNC4wICAgICAgICAgICAgICAg
-ICAgTG93LWxldmVsIHBpeGVsIG1hbmlwdWxhdGlvbiBsaWJyYXJ5CnBrZy0xLjEwLjEgICAgICAg
-ICAgICAgICAgICAgICBQYWNrYWdlIG1hbmFnZXIKcGtnY29uZi0xLjMuMCwxICAgICAgICAgICAg
-ICAgIFV0aWxpdHkgdG8gaGVscCB0byBjb25maWd1cmUgY29tcGlsZXIgYW5kIGxpbmtlciBmbGFn
-cwpweXRob24tMi43XzMsMiAgICAgICAgICAgICAgICAgIm1ldGEtcG9ydCIgZm9yIHRoZSBkZWZh
-dWx0IHZlcnNpb24gb2YgUHl0aG9uIGludGVycHJldGVyCnB5dGhvbjItMl8zICAgICAgICAgICAg
-ICAgICAgICBUaGUgIm1ldGEtcG9ydCIgZm9yIHZlcnNpb24gMiBvZiB0aGUgUHl0aG9uIGludGVy
-cHJldGVyCnB5dGhvbjI3LTIuNy4xM18zICAgICAgICAgICAgICBJbnRlcnByZXRlZCBvYmplY3Qt
-b3JpZW50ZWQgcHJvZ3JhbW1pbmcgbGFuZ3VhZ2UKcHl0aG9uMy0zXzMgICAgICAgICAgICAgICAg
-ICAgIFRoZSAibWV0YS1wb3J0IiBmb3IgdmVyc2lvbiAzIG9mIHRoZSBQeXRob24gaW50ZXJwcmV0
-ZXIKcHl0aG9uMzUtMy41LjNfMSAgICAgICAgICAgICAgIEludGVycHJldGVkIG9iamVjdC1vcmll
-bnRlZCBwcm9ncmFtbWluZyBsYW5ndWFnZQpyZWFkbGluZS02LjMuOCAgICAgICAgICAgICAgICAg
-TGlicmFyeSBmb3IgZWRpdGluZyBjb21tYW5kIGxpbmVzIGFzIHRoZXkgYXJlIHR5cGVkCnN1ZG8t
-MS44LjIwcDEgICAgICAgICAgICAgICAgICBBbGxvdyBvdGhlcnMgdG8gcnVuIGNvbW1hbmRzIGFz
-IHJvb3QKPT09IFRFU1QgQkVHSU4gPT09ClVzaW5nIENDOiAvdXNyL2xvY2FsL2Jpbi9jY2FjaGUK
-CkVSUk9SOiBZb3VyIGNvbXBpbGVyIGRvZXMgbm90IHN1cHBvcnQgdGhlIF9fdGhyZWFkIHNwZWNp
-ZmllciBmb3IgCiAgICAgICBUaHJlYWQtTG9jYWwgU3RvcmFnZSAoVExTKS4gUGxlYXNlIHVwZ3Jh
-ZGUgdG8gYSB2ZXJzaW9uIHRoYXQgZG9lcy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+Alex Bennée <alex.bennee@linaro.org> writes:
+
+Hmm it looked like the cover letter never made it to the list.
+
+> The following changes since commit 5a477a78060638b8433e9fb96a3ada100b1ab8e9:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2017-07-17 18:39:32 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-ci-updates-for-softfreeze-180717-2
+>
+> for you to fetch changes up to 118d1becc0e6332145bb9d6aee8ed232eed770e8:
+>
+>   docker: install clang since Shippable setup_ve() verify it is available (2017-07-18 10:58:36 +0100)
+>
+> ----------------------------------------------------------------
+> Final CI updates for soft-freeze
+>
+> Tweaks from Paolo for J=x Travis compiles
+> Bunch of updated cross-compile targets from Philippe
+> Additional debug tools in travis image from Me
+>
+> ----------------------------------------------------------------
+> Alex Bennée (3):
+>       docker: include python-yaml in travis.docker
+>       docker: add debug tools to travis.docker
+>       docker: add debian/powerpc based on Jessie
+>
+> Paolo Bonzini (2):
+>       docker: allow customizing Travis global_env variables
+>       travis: move make -j flag out of script
+>
+> Philippe Mathieu-Daudé (27):
+>       docker: rename debian stable -> 9 (Stretch)
+>       docker: add common packages to debian base
+>       docker: debian/s390x no more in unstable, now available in Stretch
+>       docker: remove packages now dependent of qemu in Stretch
+>       docker: optimize debian9 base image
+>       docker: add debian/armel based on Stretch
+>       docker: add debian/ppc64el based on Stretch
+>       docker: add debian/amd64 based on Stretch
+>       docker: enable virgl to extend code coverage on amd64
+>       docker: enable netmap to extend code coverage on amd64
+>       docker: enable gcrypt to extend code coverage on amd64
+>       docker: enable nettle to extend code coverage on arm64
+>       shippable: add armel targets
+>       shippable: add ppc64el targets
+>       shippable: add x86_64 targets
+>       docker: add qemu:debian-jessie based on outdated jessie release
+>       docker: add 'apt-fake' script which generate fake debian packages
+>       shippable: add powerpc target
+>       docker: add debian/mips[eb] images
+>       shippable: use debian/mips[eb] targets
+>       docker: add debian/mips64el image
+>       shippable: add mips64el targets
+>       docker: add MXE (M cross environment) base image for MinGW-w64
+>       shippable: add win32/64 targets
+>       docker: add debian Ports base image
+>       docker: warn users to use newer debian8/debian9 base image
+>       docker: install clang since Shippable setup_ve() verify it is available
+>
+>  .shippable.yml                                     | 19 +++++++--
+>  .travis.yml                                        |  3 +-
+>  tests/docker/Makefile.include                      | 18 +++++++--
+>  tests/docker/dockerfiles/debian-amd64.docker       | 39 ++++++++++++++++++
+>  tests/docker/dockerfiles/debian-apt-fake.sh        | 46 ++++++++++++++++++++++
+>  tests/docker/dockerfiles/debian-arm64-cross.docker | 10 ++---
+>  tests/docker/dockerfiles/debian-armel-cross.docker | 24 +++++++++++
+>  tests/docker/dockerfiles/debian-armhf-cross.docker |  7 +---
+>  tests/docker/dockerfiles/debian-mips-cross.docker  | 29 ++++++++++++++
+>  .../dockerfiles/debian-mips64el-cross.docker       | 30 ++++++++++++++
+>  .../docker/dockerfiles/debian-mipsel-cross.docker  | 16 ++++----
+>  tests/docker/dockerfiles/debian-ports.docker       | 35 ++++++++++++++++
+>  .../docker/dockerfiles/debian-powerpc-cross.docker | 40 +++++++++++++++++++
+>  .../docker/dockerfiles/debian-ppc64el-cross.docker | 25 ++++++++++++
+>  tests/docker/dockerfiles/debian-s390x-cross.docker | 23 +++++------
+>  tests/docker/dockerfiles/debian-win32-cross.docker | 32 +++++++++++++++
+>  tests/docker/dockerfiles/debian-win64-cross.docker | 32 +++++++++++++++
+>  tests/docker/dockerfiles/debian.docker             | 27 +++++--------
+>  tests/docker/dockerfiles/debian8-mxe.docker        | 18 +++++++++
+>  tests/docker/dockerfiles/debian8.docker            | 36 +++++++++++++++++
+>  tests/docker/dockerfiles/debian9.docker            | 30 ++++++++++++++
+>  tests/docker/dockerfiles/travis.docker             |  2 +-
+>  tests/docker/travis.py                             |  6 +--
+>  23 files changed, 488 insertions(+), 59 deletions(-)
+>  create mode 100644 tests/docker/dockerfiles/debian-amd64.docker
+>  create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+>  create mode 100644 tests/docker/dockerfiles/debian-armel-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-mips-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-mips64el-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-ports.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-powerpc-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-ppc64el-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-win32-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-win64-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian8-mxe.docker
+>  create mode 100644 tests/docker/dockerfiles/debian8.docker
+>  create mode 100644 tests/docker/dockerfiles/debian9.docker
+
+
+--
+Alex Bennée
