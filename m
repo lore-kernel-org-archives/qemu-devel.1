@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXyW1-000078-02
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:36:28 -0400
+	(envelope-from <ray.kinsella@intel.com>) id 1dXzaC-0003SD-Ar
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 20:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXyVy-00074r-Ly
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:36:24 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35040)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXyVy-00074b-F6
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:36:22 -0400
-Received: by mail-qk0-x243.google.com with SMTP id t186so1003232qkf.2
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 16:36:22 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 19 Jul 2017 13:34:55 -1000
-Message-Id: <20170719233455.8740-15-rth@twiddle.net>
-In-Reply-To: <20170719233455.8740-1-rth@twiddle.net>
-References: <20170719233455.8740-1-rth@twiddle.net>
+	(envelope-from <ray.kinsella@intel.com>) id 1dXza9-00068y-8v
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 20:44:48 -0400
+Received: from mga14.intel.com ([192.55.52.115]:18572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ray.kinsella@intel.com>)
+	id 1dXza8-00065Z-HL
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 20:44:45 -0400
+References: <767EFADFF809234DB6CAABD6D2F93847C5D31539@IRSMSX107.ger.corp.intel.com>
+	<3319b641-b7f3-0ee8-e5ed-9c378e723eb4@redhat.com>
+From: "Kinsella, Ray" <ray.kinsella@intel.com>
+Message-ID: <bc619876-bca3-15c8-0ef0-0fc5f833bab3@intel.com>
+Date: Wed, 19 Jul 2017 17:44:39 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 14/14] tcg: Pass generic CPUState to
- gen_intermediate_code()
+In-Reply-To: <3319b641-b7f3-0ee8-e5ed-9c378e723eb4@redhat.com>
+Content-Type: multipart/mixed; boundary="------------4B4503C6F5F3344A99B0D83F"
+Subject: Re: [Qemu-devel] >256 Virtio-net-pci hotplug Devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,473 +27,468 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-From: Lluís Vilanova <vilanova@ac.upc.edu>
+This is a multi-part message in MIME format.
+--------------4B4503C6F5F3344A99B0D83F
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Needed to implement a target-agnostic gen_intermediate_code()
-in the future.
+Hi Marcel,
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Benneé <alex.benee@linaro.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-Message-Id: <150002025498.22386.18051908483085660588.stgit@frigg.lan>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- include/exec/exec-all.h       | 2 +-
- target/arm/translate.h        | 4 ++--
- accel/tcg/translate-all.c     | 2 +-
- target/alpha/translate.c      | 5 ++---
- target/arm/translate-a64.c    | 6 +++---
- target/arm/translate.c        | 6 +++---
- target/cris/translate.c       | 7 +++----
- target/hppa/translate.c       | 5 ++---
- target/i386/translate.c       | 5 ++---
- target/lm32/translate.c       | 4 ++--
- target/m68k/translate.c       | 5 ++---
- target/microblaze/translate.c | 4 ++--
- target/mips/translate.c       | 5 ++---
- target/moxie/translate.c      | 4 ++--
- target/nios2/translate.c      | 5 ++---
- target/openrisc/translate.c   | 4 ++--
- target/ppc/translate.c        | 5 ++---
- target/s390x/translate.c      | 5 ++---
- target/sh4/translate.c        | 5 ++---
- target/sparc/translate.c      | 5 ++---
- target/tilegx/translate.c     | 5 ++---
- target/tricore/translate.c    | 5 ++---
- target/unicore32/translate.c  | 5 ++---
- target/xtensa/translate.c     | 5 ++---
- 24 files changed, 49 insertions(+), 64 deletions(-)
+> You can use multi-function PCIe Root Ports, this will give you 8 ports
+> per slot, if you have 16 empty slots (I think we have more) you reach
+> 128 root ports.
+> Then you can use multi-function  virtio-net-pci devices, this will
+> give you 8 functions per port, so you reach the target of 1024 devices.
+>
+> You loose hot-plug granularity since you can hot-plug 8-functions group,
+> but maybe is OK, depending on your scenario.
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 87b1b74e3b..440fc31b37 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -66,7 +66,7 @@ typedef ram_addr_t tb_page_addr_t;
- 
- #include "qemu/log.h"
- 
--void gen_intermediate_code(CPUArchState *env, struct TranslationBlock *tb);
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb);
- void restore_state_to_opc(CPUArchState *env, struct TranslationBlock *tb,
-                           target_ulong *data);
- 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 12fd79ba8e..2fe144baa9 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -149,7 +149,7 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
- 
- #ifdef TARGET_AARCH64
- void a64_translate_init(void);
--void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb);
-+void gen_intermediate_code_a64(CPUState *cpu, TranslationBlock *tb);
- void gen_a64_set_pc_im(uint64_t val);
- void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-                             fprintf_function cpu_fprintf, int flags);
-@@ -158,7 +158,7 @@ static inline void a64_translate_init(void)
- {
- }
- 
--static inline void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
-+static inline void gen_intermediate_code_a64(CPUState *cpu, TranslationBlock *tb)
- {
- }
- 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 090ebad0a7..37ecafa931 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1280,7 +1280,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tcg_func_start(&tcg_ctx);
- 
-     tcg_ctx.cpu = ENV_GET_CPU(env);
--    gen_intermediate_code(env, tb);
-+    gen_intermediate_code(cpu, tb);
-     tcg_ctx.cpu = NULL;
- 
-     trace_translate_block(tb, tb->pc, tb->tc_ptr);
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 744d8bbf12..f465752208 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -2952,10 +2952,9 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-     return ret;
- }
- 
--void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    AlphaCPU *cpu = alpha_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUAlphaState *env = cs->env_ptr;
-     DisasContext ctx, *ctxp = &ctx;
-     target_ulong pc_start;
-     target_ulong pc_mask;
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 5bb0f8ef22..883e9df0c2 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11179,10 +11179,10 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
-     free_tmp_a64(s);
- }
- 
--void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
-+void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
- {
--    CPUState *cs = CPU(cpu);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cs->env_ptr;
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-     DisasContext dc1, *dc = &dc1;
-     target_ulong pc_start;
-     target_ulong next_page_start;
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d3003ae0d8..d1a5f56998 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11795,10 +11795,10 @@ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
-+    CPUARMState *env = cs->env_ptr;
-     ARMCPU *cpu = arm_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     DisasContext dc1, *dc = &dc1;
-     target_ulong pc_start;
-     target_ulong next_page_start;
-@@ -11812,7 +11812,7 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-      * the A32/T32 complexity to do with conditional execution/IT blocks/etc.
-      */
-     if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
--        gen_intermediate_code_a64(cpu, tb);
-+        gen_intermediate_code_a64(cs, tb);
-         return;
-     }
- 
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 0ee05ca02d..12b96eb68f 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -3080,10 +3080,9 @@ static unsigned int crisv32_decoder(CPUCRISState *env, DisasContext *dc)
-  */
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUCRISState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    CRISCPU *cpu = cris_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUCRISState *env = cs->env_ptr;
-     uint32_t pc_start;
-     unsigned int insn_len;
-     struct DisasContext ctx;
-@@ -3105,7 +3104,7 @@ void gen_intermediate_code(CPUCRISState *env, struct TranslationBlock *tb)
-      * delayslot, like in real hw.
-      */
-     pc_start = tb->pc & ~1;
--    dc->cpu = cpu;
-+    dc->cpu = cris_env_get_cpu(env);
-     dc->tb = tb;
- 
-     dc->is_jmp = DISAS_NEXT;
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index e10abc5e04..900870cd5a 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -3740,10 +3740,9 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-     return gen_illegal(ctx);
- }
- 
--void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    HPPACPU *cpu = hppa_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUHPPAState *env = cs->env_ptr;
-     DisasContext ctx;
-     ExitStatus ret;
-     int num_insns, max_insns, i;
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index ed3b896db4..cab9e32f91 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8378,10 +8378,9 @@ void tcg_x86_init(void)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUX86State *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUX86State *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     target_ulong pc_ptr;
-     uint32_t flags;
-diff --git a/target/lm32/translate.c b/target/lm32/translate.c
-index 692882f447..f68f372f15 100644
---- a/target/lm32/translate.c
-+++ b/target/lm32/translate.c
-@@ -1044,10 +1044,10 @@ static inline void decode(DisasContext *dc, uint32_t ir)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPULM32State *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
-+    CPULM32State *env = cs->env_ptr;
-     LM32CPU *cpu = lm32_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     struct DisasContext ctx, *dc = &ctx;
-     uint32_t pc_start;
-     uint32_t next_page_start;
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index e709e6cde2..ada2a91b64 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5518,10 +5518,9 @@ static void disas_m68k_insn(CPUM68KState * env, DisasContext *s)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUM68KState *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUM68KState *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     target_ulong pc_start;
-     int pc_offset;
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index cb65d1e129..a24373c0be 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1625,10 +1625,10 @@ static inline void decode(DisasContext *dc, uint32_t ir)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUMBState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
-+    CPUMBState *env = cs->env_ptr;
-     MicroBlazeCPU *cpu = mb_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     uint32_t pc_start;
-     struct DisasContext ctx;
-     struct DisasContext *dc = &ctx;
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index fe44f2f807..1fd18e9d2a 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -19888,10 +19888,9 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-     }
- }
- 
--void gen_intermediate_code(CPUMIPSState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUMIPSState *env = cs->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
-     target_ulong next_page_start;
-diff --git a/target/moxie/translate.c b/target/moxie/translate.c
-index 0660b44c08..3cfd232558 100644
---- a/target/moxie/translate.c
-+++ b/target/moxie/translate.c
-@@ -822,10 +822,10 @@ static int decode_opc(MoxieCPU *cpu, DisasContext *ctx)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUMoxieState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
-+    CPUMoxieState *env = cs->env_ptr;
-     MoxieCPU *cpu = moxie_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     DisasContext ctx;
-     target_ulong pc_start;
-     int num_insns, max_insns;
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index 2f3c2e5dfb..8b97d6585f 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -799,10 +799,9 @@ static void gen_exception(DisasContext *dc, uint32_t excp)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUNios2State *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUNios2State *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     int num_insns;
-     int max_insns;
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index e49518e893..a01413113b 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1518,10 +1518,10 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
-     }
- }
- 
--void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
-+    CPUOpenRISCState *env = cs->env_ptr;
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     struct DisasContext ctx, *dc = &ctx;
-     uint32_t pc_start;
-     uint32_t next_page_start;
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index de271af52b..01233e8b6d 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7196,10 +7196,9 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
- }
- 
- /*****************************************************************************/
--void gen_intermediate_code(CPUPPCState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUPPCState *env = cs->env_ptr;
-     DisasContext ctx, *ctxp = &ctx;
-     opc_handler_t **table, *handler;
-     target_ulong pc_start;
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 1dffcee884..48b71f9604 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -5853,10 +5853,9 @@ static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
-     return ret;
- }
- 
--void gen_intermediate_code(CPUS390XState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUS390XState *env = cs->env_ptr;
-     DisasContext dc;
-     target_ulong pc_start;
-     uint64_t next_page_start;
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 498bb99dc1..10191073b2 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2230,10 +2230,9 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
- }
- #endif
- 
--void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    SuperHCPU *cpu = sh_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUSH4State *env = cs->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
-     int num_insns;
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index d13173275f..3bde47be83 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5739,10 +5739,9 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-     }
- }
- 
--void gen_intermediate_code(CPUSPARCState * env, TranslationBlock * tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
- {
--    SPARCCPU *cpu = sparc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUSPARCState *env = cs->env_ptr;
-     target_ulong pc_start, last_pc;
-     DisasContext dc1, *dc = &dc1;
-     int num_insns;
-diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
-index ff2ef7b63d..ace2830a84 100644
---- a/target/tilegx/translate.c
-+++ b/target/tilegx/translate.c
-@@ -2370,12 +2370,11 @@ static void translate_one_bundle(DisasContext *dc, uint64_t bundle)
-     }
- }
- 
--void gen_intermediate_code(CPUTLGState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    TileGXCPU *cpu = tilegx_env_get_cpu(env);
-+    CPUTLGState *env = cs->env_ptr;
-     DisasContext ctx;
-     DisasContext *dc = &ctx;
--    CPUState *cs = CPU(cpu);
-     uint64_t pc_start = tb->pc;
-     uint64_t next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-     int num_insns = 0;
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index ddd2dd07dd..4e4198e887 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8782,10 +8782,9 @@ static void decode_opc(CPUTriCoreState *env, DisasContext *ctx, int *is_branch)
-     }
- }
- 
--void gen_intermediate_code(CPUTriCoreState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- {
--    TriCoreCPU *cpu = tricore_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUTriCoreState *env = cs->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
-     int num_insns, max_insns;
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index 666a2016a8..8f30cff932 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -1869,10 +1869,9 @@ static void disas_uc32_insn(CPUUniCore32State *env, DisasContext *s)
- }
- 
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUUniCore32State *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUUniCore32State *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
-     target_ulong pc_start;
-     uint32_t next_page_start;
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 263002486c..f3f0ff589c 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -3117,10 +3117,9 @@ static void gen_ibreak_check(CPUXtensaState *env, DisasContext *dc)
-     }
- }
- 
--void gen_intermediate_code(CPUXtensaState *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
--    XtensaCPU *cpu = xtensa_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUXtensaState *env = cs->env_ptr;
-     DisasContext dc;
-     int insn_count = 0;
-     int max_insns = tb->cflags & CF_COUNT_MASK;
--- 
-2.13.3
+Thanks for the advice losing the hotplug granularity is something I 
+think I can live with. It would mean, I would have to track how many 
+ports are allocated to a VM, and create 8 new ports when 1 is required, 
+caching the other 7 for when they are needed.
+
+> Even so, you can use one cold-plugged pxb-pcie if you don't
+> have enough empty slots on pcie.0, in order to reach the maximum
+> number of PCIe Root Ports (256) which is the maximum for a single
+> PCI domain.
+
+Took your advice see the attached cfg, it works exactly as you 
+indicated. If you are interested, you can use it from your VM adding 
+-readconfig to your qemu cmd line. I can currently only manage to start 
+a VM with around 50 coldplugged virtio devices before something breaks. 
+Not sure what yet, I will try scaling it with hotplugging tomorrow.
+
+>
+> If you need granularity per single device (1000+ hot-pluggable),
+> you could enhance the pxb-pcie to support multiple pci domains.
+
+Do think there would be much work in this?
+
+Thanks,
+
+Ray K
+
+--------------4B4503C6F5F3344A99B0D83F
+Content-Type: application/gzip;
+ name="test.cfg.gz"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="test.cfg.gz"
+
+H4sICPX5b1kAA3Rlc3QuY2ZnAM3dXa9kzXHd+Xt+CoH3tHdEZGRmXPiCr19iMBhQ4iOLGJsU
+SEqwv/1UnZbVVXnW6VoRwATrwrAo7b374f8A0vqxuzN/9n/94ad//+M//fQPP//X//WPP/+/
+f/aHv/zx33/6yz/8t49//Yt//ac//vTzn/3jv/31479x+xf/5fr4l//Pnz4euf7Xvv3rn/3n
+J/745+vpE3/887/Y0Nsj//Pf/sff/vjP//anf/rbH//8p/v/5M9/+vnPfv+HP3z7yv2j//Qv
+v//rX//48etc33/F2z/S7fO3/9lfbr/EP/z83//lz3/92/2X+Mff/9P/+9Of/nB/5q9/vv2X
+f/v5z/7193/7l/u//q9/+5//+l///V9v/+/+8C/+7a8//eX6L/eHfv6z23/5H/9gf/7nf75/
++E8//e3ju9/+//uH//a///Wn+wPfX/74R/v45f/bf/4DPPxb/vc//uVv57/tb/+9X9y+eg/4
+85/9xy/z377/Qv/n3+D9TRznD3/86+//8X/89Iv/+ec//PSXP/3nP/P/+W//j5/+++//6X//
+n4f/1y/++N//9Oe//PSL/+jyi3/+6fd/+7e//PRXmPoMKumgwgUVMqh8DiqpoPIc9P+vdvK5
+nabbKddOyXb6uZ2m2mlPO/3cztLtjGtnZDv73M5S7aynnX1uN9LtBtdukO3G53Yj1W70tBuf
+23m6nXPtnGznn9t5qp33tPPP7Wa63eTaTbLd/NxuptrNnnbzc7uVbre4dotstz63W6l2q6fd
+et6Ugjfl0/9dfpiP8uP5uNM/hc39FDb5U9iffwo79VPYDz8F+fvPx0gHDS5okEHjc9BIBY3n
+oI3zUfKYEVIzwnJGgGckBxq5egqCESkFvbB8of2CAJMUjPQUBFNS8oYREjHCKkYAYyTnGNGe
+gmBQSl4yQlJGWMsIwIzkNCPWUxDMSsl7RkjQCCsaAaSRnGlk9BQE41LyqhGSNcK6RgBsJCcb
+8Z6Cx8TUVxNTnyam/nhiSl5JQjJJWCcJgJLkpCSPVNK//9CUPKCEFJSwhBJgKMkhStZz1s65
+mcePkPoRlj8C/CM5AMnuKYjmZl47QnJHWO8IAI/kxCPRUxDMTc2TR0nyKEseBeTRHHn06ikI
+5qbmyaMkeZQljwLyaI48Kj0FwdzUwm/bsL9vQ//GDfqdm+Rv3WhPQTA3NU8eJcmjLHkUkEdz
+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
+dpVEk3UXGLVZRm2aURsxaicZtVdXyU+T9cWVWL85D2t9uDLmi8laQNlmUbZplG2Esp1E2X5C
+mbzDlVi7ILXNSm3TUttIajsptR1n3s7JGgVbBWuroG0VyFaRtFVcXSXRZI0Co4JlVNCMCsSo
+SDIqpKskmqxRYFSwjAqaUYEYFUlGhXaVRJM1CowKllFBMyoQoyLJqLCukmiyRoFRwTIqaEYF
+YlQkGRWjqySarFFgVLCMCppRgRgVSUaFd5X8NFm/uBLrh4e1/vY8rPXhwj68Y6MgtWClFrTU
+AkktklKLZ6m9wz1ZUeBbsHwLmm+B+BZJvsU687bu2AK4ggVX0OAKBK5Igit2V0m4Ywu2CtZW
+QdsqkK0iaauIrpJgx8aVt9XtHa7kt48zJe9Pfir57XW+5MdHekqCHRtX3la3d9iSrK3uT4KS
+OVvFJV0lwY6NK2+r2ztsSdZW9ydByZyt4tKukmDHxpW31e0dtiRrq/uToGTOVnFZV8lPO/bF
+PVm/PQ9rfbgZGU7WuPJSu73D/lxYqd2fBD+XnNTiepbaG9yTFVeeb7d32Lws3+5Pgrw5vsXl
+Z97GyRpX3la3d9iSrK3uT4KSOVvFNbtKgskaV55Rt3fYkiyj7k+CkjlGxbW6SsLJmmfU7R22
+JMuo+5OgZI5Rce2uknCy5hl1e4ctyTLq/iQomWNUXNFVEk1WKTBKWEYJzShBjJIko+TqKokm
+qxQYJSyjhGaUIEZJklEiXSU/TdYv7sn6PlmPw1rlxZVYIQWUCYsyoVEmCGWSRJk8o+wNrsQK
+KUhNWKkJLTVBUpOk1MTOvJ2TVQq2EtZWQttKkK0kaSsZXSXRZJUCo4RllNCMEsQoSTJKvKsk
+mqxSYJSwjBKaUYIYJUlGyewqiSarFBglLKOEZpQgRkmSUbK6SsLJWmCUsIwSmlGCGCVJRsnu
+Kgkna4FRwjJKaEYJYpQkGSXRVfLTZH1xJdZvz8NaH/5XOp6sWkCZsihTGmWKUKZJlOkzyt7g
+SqzQgtSUlZrSUlMkNU1KTeXM2zlZtWArZW2ltK0U2UqTtlLtKokmqxYYpSyjlGaUIkZpklFq
+XSXRZNUCo5RllNKMUsQoTTJKR1dJNFm1wChlGaU0oxQxSpOMUu8qiSarFhilLKOUZpQiRmmS
+UTq7SqLJqgVGKcsopRmliFGaZJSurpKfJuuLK7F+ex7W+mDnLyZrAWXKokxplClCmSZRps8o
+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
+--------------4B4503C6F5F3344A99B0D83F--
