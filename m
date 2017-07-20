@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41213)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dYCKB-0008Ms-OJ
+	id 1dYCKC-0008NG-1w
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dYCK7-0007yh-4K
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:21:07 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:53092 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1dYCKA-0007zu-TY
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:21:08 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:38380 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dYCK6-0007xg-Ql
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:21:03 -0400
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dYCKA-0007zG-Kj
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 10:21:06 -0400
 From: Peter Lieven <pl@kamp.de>
-Date: Thu, 20 Jul 2017 16:20:36 +0200
-Message-Id: <1500560441-5670-6-git-send-email-pl@kamp.de>
+Date: Thu, 20 Jul 2017 16:20:34 +0200
+Message-Id: <1500560441-5670-4-git-send-email-pl@kamp.de>
 In-Reply-To: <1500560441-5670-1-git-send-email-pl@kamp.de>
 References: <1500560441-5670-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH V4 05/10] block/qcow2: read and write the
- compress format extension
+Subject: [Qemu-devel] [PATCH V4 03/10] block/qcow2: parse compress create
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,216 +27,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>
 
-we now read the extension on open and write it on update, but
-do not yet use it.
+this adds parsing and validation for the compress create
+options. They are only validated but not yet used.
 
 Signed-off-by: Peter Lieven <pl@kamp.de>
 ---
- block/qcow2.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- block/qcow2.h | 21 +++++++++----
- 2 files changed, 105 insertions(+), 10 deletions(-)
+ block/qcow2.c             | 53 +++++++++++++++++++++++++++++++++++++++++++++--
+ include/block/block_int.h |  2 ++
+ 2 files changed, 53 insertions(+), 2 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 073d50f..1dff87e 100644
+index d5790af..073d50f 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -70,6 +70,7 @@ typedef struct {
- #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
- #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
- #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
-+#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
- 
- static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+@@ -31,6 +31,8 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/util.h"
++#include "qapi-visit.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "qapi/qmp/types.h"
+ #include "qapi-event.h"
+ #include "trace.h"
+@@ -2706,7 +2708,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+                          const char *backing_file, const char *backing_format,
+                          int flags, size_t cluster_size, PreallocMode prealloc,
+                          QemuOpts *opts, int version, int refcount_order,
+-                         const char *encryptfmt, Error **errp)
++                         const char *encryptfmt, Qcow2Compress *compress,
++                         Error **errp)
  {
-@@ -164,6 +165,17 @@ static ssize_t qcow2_crypto_hdr_write_func(QCryptoBlock *block, size_t offset,
- }
+     QDict *options;
  
+@@ -2898,6 +2901,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     char *backing_file = NULL;
+     char *backing_fmt = NULL;
+     char *buf = NULL;
++    Qcow2Compress compress, *compress_ptr = NULL;
+     uint64_t size = 0;
+     int flags = 0;
+     size_t cluster_size = DEFAULT_CLUSTER_SIZE;
+@@ -2975,9 +2979,43 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
  
-+static void qcow2_compress_level_supported(int format, uint8_t level,
-+                                           Error **errp)
-+{
-+    if (format == QCOW2_COMPRESS_FORMAT_ZLIB && level > 9) {
-+        error_setg(errp, "ERROR: compress level %" PRIu8 " is not"
-+                         " supported for format '%s'", level,
-+                         Qcow2CompressFormat_lookup[format]);
-+    }
-+}
-+
-+
- /* 
-  * read qcow2 extension and fill bs
-  * start reading from start_offset
-@@ -241,6 +253,48 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
- #endif
-             break;
+     refcount_order = ctz32(refcount_bits);
  
-+        case QCOW2_EXT_MAGIC_COMPRESS_FORMAT:
-+        {
-+            Qcow2CompressFormatExt compress_ext;
-+            Error *local_err = NULL;
-+            if (ext.len != sizeof(compress_ext)) {
-+                error_setg(errp, "ERROR: ext_compress_format: len=%"
-+                           PRIu32 " invalid (!=%zu)", ext.len,
-+                           sizeof(compress_ext));
-+                return 2;
-+            }
-+            ret = bdrv_pread(bs->file, offset, &compress_ext,
-+                             ext.len);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "ERROR: ext_compress_fromat:"
-+                                 " Could not read extension");
-+                return 3;
-+            }
-+
-+            s->compress_format =
-+                qapi_enum_parse(Qcow2CompressFormat_lookup,
-+                                compress_ext.name, QCOW2_COMPRESS_FORMAT__MAX,
-+                                -1, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return 4;
-+            }
-+
-+            qcow2_compress_level_supported(s->compress_format,
-+                                           compress_ext.level, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return 5;
-+            }
-+            s->compress_level = compress_ext.level;
-+
-+#ifdef DEBUG_EXT
-+            printf("Qcow2: Got compress format %s with compress level %"
-+                   PRIu8 "\n", Qcow2CompressFormat_lookup[s->compress_format],
-+                   s->compress_level);
-+#endif
-+            break;
-+        }
-         case QCOW2_EXT_MAGIC_FEATURE_TABLE:
-             if (p_feature_table != NULL) {
-                 void* feature_table = g_malloc0(ext.len + 2 * sizeof(Qcow2Feature));
-@@ -1374,6 +1428,7 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     s->cluster_cache_offset = -1;
-     s->flags = flags;
-+    s->compress_format = -1;
- 
-     ret = qcow2_refcount_init(bs);
-     if (ret != 0) {
-@@ -2292,6 +2347,25 @@ int qcow2_update_header(BlockDriverState *bs)
-         buflen -= ret;
-     }
- 
-+    /* Compress Format header extension */
-+    if (s->compress_format >= 0) {
-+        Qcow2CompressFormatExt ext;
-+        assert(s->compress_format < QCOW2_COMPRESS_FORMAT__MAX);
-+        strncpy((char *) &ext.name,
-+                Qcow2CompressFormat_lookup[s->compress_format],
-+                sizeof(ext.name));
-+        ext.level = s->compress_level;
-+        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_COMPRESS_FORMAT,
-+                             &ext, sizeof(ext),
-+                             buflen);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+        buf += ret;
-+        buflen -= ret;
-+        header->incompatible_features |= cpu_to_be64(QCOW2_INCOMPAT_COMPRESS);
-+    }
-+
-     /* Feature table */
-     if (s->qcow_version >= 3) {
-         Qcow2Feature features[] = {
-@@ -2306,6 +2380,11 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .name = "corrupt bit",
-             },
-             {
-+                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
-+                .bit  = QCOW2_INCOMPAT_COMPRESS_BITNR,
-+                .name = "compress format bit",
-+            },
-+            {
-                 .type = QCOW2_FEAT_TYPE_COMPATIBLE,
-                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-                 .name = "lazy refcounts",
-@@ -2827,6 +2906,12 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-         abort();
-     }
- 
-+    if (compress) {
-+        BDRVQcow2State *s = blk_bs(blk)->opaque;
-+        s->compress_format = compress->format;
-+        s->compress_level = compress->level;
-+    }
-+
-     /* Create a full header (including things like feature table) */
-     ret = qcow2_update_header(blk_bs(blk));
-     if (ret < 0) {
-@@ -3002,11 +3087,10 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-         visit_free(v);
-         QDECREF(compressopts);
-         QDECREF(options);
--        if (compress.format == QCOW2_COMPRESS_FORMAT_ZLIB &&
--            compress.level > 9) {
--            error_setg(errp, "Compress level %" PRIu8 " is not supported for"
--                       " format '%s'", compress.level,
--                       Qcow2CompressFormat_lookup[compress.format]);
-+        qcow2_compress_level_supported(compress.format, compress.level,
-+                                       &local_err);
++    if (qemu_opt_get(opts, BLOCK_OPT_COMPRESS_FORMAT) ||
++        qemu_opt_get(opts, BLOCK_OPT_COMPRESS_LEVEL)) {
++        QDict *options, *compressopts = NULL;
++        Visitor *v;
++        options = qemu_opts_to_qdict(opts, NULL);
++        qdict_extract_subqdict(options, &compressopts, "compress.");
++        v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
++        visit_start_struct(v, NULL, NULL, 0, &local_err);
 +        if (local_err) {
 +            error_propagate(errp, local_err);
-             ret = -EINVAL;
-             goto finish;
-         }
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 96a8d43..9a564d4 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -188,13 +188,16 @@ enum {
++            ret = -EINVAL;
++            goto finish;
++        }
++        visit_type_Qcow2Compress_members(v, &compress, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            ret = -EINVAL;
++            goto finish;
++        }
++        visit_end_struct(v, NULL);
++        visit_free(v);
++        QDECREF(compressopts);
++        QDECREF(options);
++        if (compress.format == QCOW2_COMPRESS_FORMAT_ZLIB &&
++            compress.level > 9) {
++            error_setg(errp, "Compress level %" PRIu8 " is not supported for"
++                       " format '%s'", compress.level,
++                       Qcow2CompressFormat_lookup[compress.format]);
++            ret = -EINVAL;
++            goto finish;
++        }
++        compress_ptr = &compress;
++    }
++
+     ret = qcow2_create2(filename, size, backing_file, backing_fmt, flags,
+                         cluster_size, prealloc, opts, version, refcount_order,
+-                        encryptfmt, &local_err);
++                        encryptfmt, compress_ptr, &local_err);
+     error_propagate(errp, local_err);
  
- /* Incompatible feature bits */
- enum {
--    QCOW2_INCOMPAT_DIRTY_BITNR   = 0,
--    QCOW2_INCOMPAT_CORRUPT_BITNR = 1,
--    QCOW2_INCOMPAT_DIRTY         = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
--    QCOW2_INCOMPAT_CORRUPT       = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
-+    QCOW2_INCOMPAT_DIRTY_BITNR    = 0,
-+    QCOW2_INCOMPAT_CORRUPT_BITNR  = 1,
-+    QCOW2_INCOMPAT_COMPRESS_BITNR = 2,
-+    QCOW2_INCOMPAT_DIRTY          = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
-+    QCOW2_INCOMPAT_CORRUPT        = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
-+    QCOW2_INCOMPAT_COMPRESS       = 1 << QCOW2_INCOMPAT_COMPRESS_BITNR,
- 
-     QCOW2_INCOMPAT_MASK          = QCOW2_INCOMPAT_DIRTY
--                                 | QCOW2_INCOMPAT_CORRUPT,
-+                                 | QCOW2_INCOMPAT_CORRUPT
-+                                 | QCOW2_INCOMPAT_COMPRESS,
+ finish:
+@@ -4287,6 +4325,17 @@ static QemuOptsList qcow2_create_opts = {
+             .help = "Width of a reference count entry in bits",
+             .def_value_str = "16"
+         },
++        {
++            .name = BLOCK_OPT_COMPRESS_FORMAT,
++            .type = QEMU_OPT_STRING,
++            .help = "Compress format used for compressed clusters (zlib)",
++        },
++        {
++            .name = BLOCK_OPT_COMPRESS_LEVEL,
++            .type = QEMU_OPT_NUMBER,
++            .help = "Compress level used for compressed clusters (0 = default,"
++                    " 1=fastest, x=best; x varies depending on compress.format)",
++        },
+         { /* end of list */ }
+     }
  };
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 5c6b761..8245963 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -57,6 +57,8 @@
+ #define BLOCK_OPT_NOCOW             "nocow"
+ #define BLOCK_OPT_OBJECT_SIZE       "object_size"
+ #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
++#define BLOCK_OPT_COMPRESS_FORMAT   "compress.format"
++#define BLOCK_OPT_COMPRESS_LEVEL    "compress.level"
  
- /* Compatible feature bits */
-@@ -228,6 +231,11 @@ typedef struct Qcow2Feature {
-     char    name[46];
- } QEMU_PACKED Qcow2Feature;
- 
-+typedef struct Qcow2CompressFormatExt {
-+    char name[15];
-+    uint8_t level;
-+} QEMU_PACKED Qcow2CompressFormatExt;
-+
- typedef struct Qcow2DiscardRegion {
-     BlockDriverState *bs;
-     uint64_t offset;
-@@ -304,6 +312,9 @@ typedef struct BDRVQcow2State {
-     int refcount_bits;
-     uint64_t refcount_max;
- 
-+    int compress_format;
-+    uint8_t compress_level;
-+
-     Qcow2GetRefcountFunc *get_refcount;
-     Qcow2SetRefcountFunc *set_refcount;
+ #define BLOCK_PROBE_BUF_SIZE        512
  
 -- 
 1.9.1
