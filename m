@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dY7N9-0006Ml-MT
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1dY7P9-0008So-9l
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dY7N8-0004Q1-Qm
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:51 -0400
-Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:37000)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dY7N8-0004PP-Le
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:50 -0400
-From: Stefan Fritsch <sf@sfritsch.de>
-Date: Thu, 20 Jul 2017 11:02:47 +0200
-Message-Id: <1500541371-24788-5-git-send-email-sf@sfritsch.de>
-In-Reply-To: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
-References: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
-Subject: [Qemu-devel] [PATCH v2 4/8] usb-ccid: Fix ATR parsing
+	(envelope-from <armbru@redhat.com>) id 1dY7P6-0005qX-3S
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:05:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dY7P5-0005qB-QZ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:05:52 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170714190827.4083-1-eblake@redhat.com>
+	<20170714190827.4083-2-eblake@redhat.com>
+Date: Thu, 20 Jul 2017 11:05:48 +0200
+In-Reply-To: <20170714190827.4083-2-eblake@redhat.com> (Eric Blake's message
+	of "Fri, 14 Jul 2017 14:08:23 -0500")
+Message-ID: <87vamnmqab.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/5] qapi: Further enhance visitor virtual
+ walk doc example
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-From: Stefan Fritsch <stefan_fritsch@genua.de>
+Eric Blake <eblake@redhat.com> writes:
 
-- The number of parameter set TA_i...TD_i is unlimited. The list ends
-  if TD_i is not present or the high nibble is zero.
-- If at least one protocol in any of the TD bytes is non-zero, the
-  ATR must have a checksum.
-- Add a missing length check before accessing TD.
-- Fixup a wrong checksum but accept the ATR.
+> Markus pointed out that the example given for virtual walks did
+> not discuss how to do a virtual walk of an alternate type.  It
+> turns out that for output, we don't need to visit an alternate
+> (just directly visit the type that we want); and for input,
+> visit_start_alternate() is not currently wired up for alternates
+> (it requires a QAPI type, rather than permitting NULL for a
+> virtual walk).  Also, the example was never updated in commit
+> 3b098d5 about where visit_complete() would fit in.  Improve the
+> description and example to give more details along these lines.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
-Signed-off-by: Christian Ehrhardt <christian_ehrhardt@genua.de>
----
- hw/usb/ccid-card-passthru.c | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
+This clashes with some unfinished work I have on alternates.  If I can
+finish it quickly, we can compare and decide whether we still need this.
 
-diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-index 45d96b03c6..e2e94ac1ba 100644
---- a/hw/usb/ccid-card-passthru.c
-+++ b/hw/usb/ccid-card-passthru.c
-@@ -146,8 +146,7 @@ static void ccid_card_vscard_handle_init(
- 
- static int check_atr(PassthruState *card, uint8_t *data, int len)
- {
--    int historical_length, opt_bytes;
--    int td_count = 0;
-+    int historical_length, opt_bytes, tck = 0;
-     int td;
- 
-     if (len < 2) {
-@@ -160,10 +159,8 @@ static int check_atr(PassthruState *card, uint8_t *data, int len)
-                 data[0]);
-         return 0;
-     }
--    td_count = 0;
-     td = data[1] >> 4;
--    while (td && td_count < 2 && opt_bytes + historical_length + 2 < len) {
--        td_count++;
-+    while (td && opt_bytes + historical_length + 2 < len) {
-         if (td & 0x1) {
-             opt_bytes++;
-         }
-@@ -175,16 +172,37 @@ static int check_atr(PassthruState *card, uint8_t *data, int len)
-         }
-         if (td & 0x8) {
-             opt_bytes++;
--            td = data[opt_bytes + 2] >> 4;
-+            if (opt_bytes + 1 >= len) {
-+                break;
-+            }
-+            /* Checksum byte must be present if T!=0 */
-+            if (data[opt_bytes + 1] & 0xf) {
-+                tck = 1;
-+            }
-+            td = data[opt_bytes + 1] >> 4;
-+        } else {
-+            td = 0;
-         }
-     }
--    if (len < 2 + historical_length + opt_bytes) {
-+    if (len < 2 + historical_length + opt_bytes + tck) {
-         DPRINTF(card, D_WARN,
-             "atr too short: len %d, but historical_len %d, T1 0x%X\n",
-             len, historical_length, data[1]);
-         return 0;
-     }
--    if (len > 2 + historical_length + opt_bytes) {
-+    if (tck) {
-+        int i;
-+        uint8_t cksum = 0;
-+        for (i = 1; i < 2 + historical_length + opt_bytes; ++i) {
-+            cksum ^= data[i];
-+        }
-+        if (cksum != data[i]) {
-+            DPRINTF(card, D_WARN, "atr has bad checksum: "
-+                "real=0x%x should be 0x%x (FIXED)\n", cksum, data[i]);
-+            data[i] = cksum;
-+        }
-+    }
-+    if (len > 2 + historical_length + opt_bytes + tck) {
-         DPRINTF(card, D_WARN,
-             "atr too long: len %d, but hist/opt %d/%d, T1 0x%X\n",
-             len, historical_length, opt_bytes, data[1]);
--- 
-2.11.0
+> ---
+>  include/qapi/visitor.h | 41 ++++++++++++++++++++++++++++-------------
+>  1 file changed, 28 insertions(+), 13 deletions(-)
+>
+> diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+> index 74768aa..b0a048f 100644
+> --- a/include/qapi/visitor.h
+> +++ b/include/qapi/visitor.h
+> @@ -183,19 +183,25 @@
+>   *
+>   * It is also possible to use the visitors to do a virtual walk, where
+>   * no actual QAPI struct is present.  In this situation, decisions
+> - * about what needs to be walked are made by the calling code, and
+> - * structured visits are split between pairs of start and end methods
+> - * (where the end method must be called if the start function
+> - * succeeded, even if an intermediate visit encounters an error).
+> - * Thus, a virtual walk corresponding to '{ "list": [1, 2] }' looks
+> - * like:
+> + * about what needs to be walked are made by the calling code (that
+> + * is, there is no use for QAPI alternate types in a virtual walk,
+> + * because the code can just directly visit the appropriate type
+> + * within the alternate), and structured visits are split between
+
+The parenthesis makes a long sentence even longer.
+
+> + * pairs of start and end methods (where the end method must be called
+> + * if the start function succeeded, even if an intermediate visit
+> + * encounters an error).  Thus, a virtual output walk of an object
+> + * containing a list of alternates between an integer or nested
+> + * object, corresponding to '{ "list": [1, { "value": "2" } ] }',
+> + * would look like:
+
+Covering alternates as well makes the example rather complicated.  In
+the unfinished work I mentioned above, I explain them separately.
+
+>   *
+>   * <example>
+>   *  Visitor *v;
+>   *  Error *err = NULL;
+> - *  int value;
+> + *  int i = 1;
+> + *  const char *s = "2";
+> + *  FOO output;
+>   *
+> - *  v = FOO_visitor_new(...);
+> + *  v = FOO_visitor_new(..., &output);
+>   *  visit_start_struct(v, NULL, NULL, 0, &err);
+>   *  if (err) {
+>   *      goto out;
+> @@ -204,16 +210,21 @@
+>   *  if (err) {
+>   *      goto outobj;
+>   *  }
+> - *  value = 1;
+> - *  visit_type_int(v, NULL, &value, &err);
+> + *  visit_type_int(v, NULL, &i, &err);
+>   *  if (err) {
+>   *      goto outlist;
+>   *  }
+> - *  value = 2;
+> - *  visit_type_int(v, NULL, &value, &err);
+> + *  visit_type_start(v, NULL, NULL, 0, &err);
+>   *  if (err) {
+> - *      goto outlist;
+> + *      goto outnest;
+> + *  }
+> + *  visit_type_str(v, "value", (char **)&s, &err);
+> + *  if (err) {
+> + *      goto outnest;
+>   *  }
+> + *  visit_check_struct(v, &err);
+> + * outnest:
+> + *  visit_end_struct(v, NULL);
+>   * outlist:
+>   *  visit_end_list(v, NULL);
+>   *  if (!err) {
+> @@ -221,6 +232,10 @@
+>   *  }
+>   * outobj:
+>   *  visit_end_struct(v, NULL);
+> + *  if (!err) {
+> + *      visit_complete(v, &output);
+> + *      ...use output...
+> + *  }
+>   * out:
+>   *  error_propagate(errp, err);
+>   *  visit_free(v);
