@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54648)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dYElK-0000gO-JZ
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:57:21 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56559)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dgilbert@redhat.com>) id 1dYEse-0002nu-UE
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dYElF-0001al-KU
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:57:18 -0400
-Received: from mout.gmx.net ([212.227.15.15]:55211)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dYElF-0001aL-9V
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:57:13 -0400
-References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
-	<87zibz2w4c.fsf@dusky.pond.sub.org>
-	<CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <8d6cb93a-ffa9-9d92-b733-134390fc4723@gmx.com>
-Date: Thu, 20 Jul 2017 18:59:24 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dYEsb-0004MH-4X
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:04:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYEsa-0004Lx-RY
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 13:04:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A9A6D2F86D3
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 17:04:47 +0000 (UTC)
+Date: Thu, 20 Jul 2017 18:04:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720170443.GG2456@work-vm>
+References: <20170407143847.GM2138@work-vm> <20170720105004.GA26866@redhat.com>
+	<20170720161548.GC2456@work-vm> <20170720164730.GP21566@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S"
-Subject: Re: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
- tools)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170720164730.GP21566@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +33,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S
-From: Kamil Rytarowski <n54@gmx.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- "patches@linaro.org" <patches@linaro.org>
-Message-ID: <8d6cb93a-ffa9-9d92-b733-134390fc4723@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
- tools)
-References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
- <87zibz2w4c.fsf@dusky.pond.sub.org>
- <CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
-In-Reply-To: <CAFEAcA-QEpAuh-CTrC-XvHHAWwhCT85M9Pwn3fAngpXDK8F7Fw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Thu, Jul 20, 2017 at 05:15:49PM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > On Fri, Apr 07, 2017 at 03:38:47PM +0100, Dr. David Alan Gilbert wrote:
+> > > > Hi,
+> > > >    Fedora 26 has gcc 7.0.1 which has the normal compliment
+> > > > of new fussy warnings; so far I've posted :
+> > > > 
+> > > > tests/check-qdict: Fix missing brackets
+> > > > slirp/smb: Replace constant strings by glib string
+> > > > 
+> > > > that fix one actual mistake and work around something it's being
+> > > > fussy over.
+> > > > 
+> > > > But I've also got a pile of hacks, attached below that I'm
+> > > > not too sure what I'll do with them yet, but they're attached
+> > > > for anyone else trying to build.  Note they're smoke-only-tested.
+> > > > 
+> > > > I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80346
+> > > > filed for what I reckon is a couple of overly pessimistic warnings.
+> > > 
+> > > 
+> > > > diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+> > > > index bd9fd55b0a..ebb0221140 100644
+> > > > --- a/include/qemu/iov.h
+> > > > +++ b/include/qemu/iov.h
+> > > > @@ -46,7 +46,7 @@ static inline size_t
+> > > >  iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
+> > > >               size_t offset, const void *buf, size_t bytes)
+> > > >  {
+> > > > -    if (__builtin_constant_p(bytes) && iov_cnt &&
+> > > > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
+> > > >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
+> > > >          memcpy(iov[0].iov_base + offset, buf, bytes);
+> > > >          return bytes;
+> > > > @@ -59,7 +59,7 @@ static inline size_t
+> > > >  iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
+> > > >             size_t offset, void *buf, size_t bytes)
+> > > >  {
+> > > > -    if (__builtin_constant_p(bytes) && iov_cnt &&
+> > > > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
+> > > >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
+> > > >          memcpy(buf, iov[0].iov_base + offset, bytes);
+> > > >          return bytes;
+> > 
+> > tbh I don't know what the right fix for this is;  the gcc discussion
+> > confused me as to why it thinks it can be a valid case.
+> 
+> Even if gcc is broken in issuing a warning here, we still need to
+> make it quiet so people on F26 and similarly new distros can build
+> without warnings.
 
-On 20.07.2017 17:35, Peter Maydell wrote:
-> On 20 July 2017 at 12:20, Markus Armbruster <armbru@redhat.com> wrote:
->> Regardless of my inability to find CONFIG_IVSHMEM confusing (see PATCH=
+I agree.
 
->> 1), series
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->=20
-> Thanks; patchset applied to master.
->=20
-> -- PMM
->=20
+> IMHO your patch is ok, or we could be alittle more explicit about
+> catching just the case where you pass -1 for bytes, and have
+> 
+>   && bytes != -1
 
-Thank you for this!
+This seems bizarre to me since bytes is   size_t bytes   and size_t
+is unsigned, so I'd have sympathy for a compiler that warned that
+bytes != -1 was always true.
 
+Dave
 
---bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZcOFyAAoJEEuzCOmwLnZs97cP/0JxG/zTVc3C9Qrlltd9YLwA
-KEcNxwp/zDalRQRNDU2GQ5M3B5aqjQJuatx3YEGr0jTgfQ9f5vQK8zMv8pXgVEhj
-oKfmIiM0dEmfnvQ+kt0N13/TcRScm6/h69vUv5laIkBBKbU1GjxdFPa4ZX6YXMTQ
-GGoq2IS9UMRDbl+JPphoc8tLzx8YVqOwCAc3vIzEOJRioksnDQuDq34hSLIRplpJ
-7qTqbFdj1LFjBnSDVd3z2egSFt84jNwnmDLmcFnBK2tLUicT1KVgAauiuJ/tr+Nm
-MDZ+lk1TXVOECOMLdtI7khmOuTHLxFY5lSYrFUk3KSE/V/onoKYWjAbdvXS5g8GF
-KW6jhGe+Zt/YHTin0guzSCgCtRtyS5ikLCns9P93nAzHmBCT5JSHKGhMOsjjL/8Q
-ajv3vbzR3PRLUE5r+Akh2favSZ/g6yOlUzWrQAUXOOk2Eqhb8aTqpvlDOZwvjPWz
-FefPn0oEVwyoxt4VbvxEncxtMQuch/S6ZeDj5PwMRbR6sigq8lsdFZOGiUqP3Lw9
-IPs2cnZqkhd8FSQEkjCEiX/R1AMOsxJY5Y9nZq2Aoy5rPWUCRBPtpgAb5alb/wQE
-MYGcGgfWbZETA+hK4OkXYfWaV6ZQsO/9hiAV3fT08PhVobePhHjotbbjc33wdrtn
-04YH46QxFnksNQ/rH/MO
-=yhzc
------END PGP SIGNATURE-----
-
---bnHFmvghUwEqGc7HEQbDX3OhNP58ve38S--
+> 
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
