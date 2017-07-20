@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49165)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dYELb-0007cP-D4
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:30:44 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49533)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1dYEMq-000095-Vy
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dYELS-0006q0-VF
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:30:38 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:52680 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dYELS-0006pP-MA
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:30:34 -0400
-References: <1500560441-5670-1-git-send-email-pl@kamp.de>
-	<1500560441-5670-10-git-send-email-pl@kamp.de>
-	<00d382b3-2dfa-b213-37c9-957a89c6c9dd@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <3afbbbec-a2dc-ce52-4cc6-aa84749a2e59@kamp.de>
-Date: Thu, 20 Jul 2017 18:30:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <00d382b3-2dfa-b213-37c9-957a89c6c9dd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 09/10] block/qcow2: add lzo compress
- format
+	(envelope-from <pm215@archaic.org.uk>) id 1dYEMp-0007RO-R2
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:32:00 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Jul 2017 17:31:30 +0100
+Message-Id: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.10] Use qemu_tolower() and qemu_toupper(),
+ not tolower() and toupper()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +18,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org
 
-Am 20.07.2017 um 18:03 schrieb Eric Blake:
-> On 07/20/2017 09:20 AM, Peter Lieven wrote:
->> Signed-off-by: Peter Lieven <pl@kamp.de>
->> ---
->>  block/qcow2-cluster.c | 15 +++++++++++++++
->>  block/qcow2.c         | 42 +++++++++++++++++++++++++++++++++++-------
->>  configure             |  2 +-
->>  qapi/block-core.json  | 14 ++++++++++++--
->>  qemu-img.texi         |  1 +
->>  5 files changed, 64 insertions(+), 10 deletions(-)
-> Where is the change to docs/ for updating the qcow2 spec to document the
-> new format?
->
+On NetBSD, where tolower() and toupper() are implemented using an
+array lookup, the compiler warns if you pass a plain 'char'
+to these functions:
 
-was lost during rebase. Will fix this.
+gdbstub.c:914:13: warning: array subscript has type 'char'
+
+This reflects the fact that toupper() and tolower() give
+undefined behaviour if they are passed a value that isn't
+a valid 'unsigned char' or EOF.
+
+We have qemu_tolower() and qemu_toupper() to avoid this problem;
+use them.
+
+(The use in scsi-generic.c does not trigger the warning because
+it passes a uint8_t; we switch it anyway, for consistency.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ gdbstub.c                  | 2 +-
+ hw/s390x/s390-virtio-ccw.c | 2 +-
+ hw/scsi/scsi-generic.c     | 2 +-
+ target/ppc/monitor.c       | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index f936ddd..2a94030 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -911,7 +911,7 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
+ 
+         cur_action = *p++;
+         if (cur_action == 'C' || cur_action == 'S') {
+-            cur_action = tolower(cur_action);
++            cur_action = qemu_tolower(cur_action);
+             res = qemu_strtoul(p + 1, &p, 16, &tmp);
+             if (res) {
+                 goto out;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index ce3921e..1c7af39 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -318,7 +318,7 @@ static void machine_set_loadparm(Object *obj, const char *val, Error **errp)
+     int i;
+ 
+     for (i = 0; i < sizeof(ms->loadparm) && val[i]; i++) {
+-        uint8_t c = toupper(val[i]); /* mimic HMC */
++        uint8_t c = qemu_toupper(val[i]); /* mimic HMC */
+ 
+         if (('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || (c == '.') ||
+             (c == ' ')) {
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index a55ff87..7e1cbab 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -406,7 +406,7 @@ static int read_naa_id(const uint8_t *p, uint64_t *p_wwn)
+         }
+         *p_wwn = 0;
+         for (i = 8; i < 24; i++) {
+-            char c = toupper(p[i]);
++            char c = qemu_toupper(p[i]);
+             c -= (c >= '0' && c <= '9' ? '0' : 'A' - 10);
+             *p_wwn = (*p_wwn << 4) | c;
+         }
+diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+index b8f30e9..1491511 100644
+--- a/target/ppc/monitor.c
++++ b/target/ppc/monitor.c
+@@ -115,14 +115,14 @@ int target_get_monitor_def(CPUState *cs, const char *name, uint64_t *pval)
+     CPUPPCState *env = &cpu->env;
+ 
+     /* General purpose registers */
+-    if ((tolower(name[0]) == 'r') &&
++    if ((qemu_tolower(name[0]) == 'r') &&
+         ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->gpr), &regnum)) {
+         *pval = env->gpr[regnum];
+         return 0;
+     }
+ 
+     /* Floating point registers */
+-    if ((tolower(name[0]) == 'f') &&
++    if ((qemu_tolower(name[0]) == 'f') &&
+         ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->fpr), &regnum)) {
+         *pval = env->fpr[regnum];
+         return 0;
+-- 
+2.7.4
