@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dY8eF-0001je-1U
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:25:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dY8iU-0003Yt-Fh
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dY8eA-0000gW-F2
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:25:35 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:56585)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dY8e9-0000e7-AY
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:25:30 -0400
-Date: Thu, 20 Jul 2017 18:25:03 +0800 (CST)
-Message-ID: <201707201825034905299@zte.com.cn>
-References: 1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn,
-	20170719184748-mutt-send-email-mst@kernel.org,
-	201707201029023745671@zte.com.cn
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH=5D_vhost=3A_fix_a_migration_fail?=
- =?utf-8?q?ed_because_ofvhost_region_merge?=
+	(envelope-from <dgilbert@redhat.com>) id 1dY8iP-0004mF-Is
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:29:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY8iP-0004kn-9U
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:29:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E4E3FC058EDE
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 10:29:51 +0000 (UTC)
+Date: Thu, 20 Jul 2017 11:29:46 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720102945.GC2101@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-14-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170717134238.1966-14-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 13/17] migration: Create thread
+ infrastructure for multifd recv side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +34,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: imammedo@redhat.com, dgilbert@redhat.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-5Y+R5Lu25Lq677yaIDxtc3RAcmVkaGF0LmNvbT4NCuaUtuS7tuS6uu+8miA8aW1hbW1lZG9AcmVk
-aGF0LmNvbT4NCuaKhOmAgeS6uu+8miA8ZGdpbGJlcnRAcmVkaGF0LmNvbT4gPG1hcmNhbmRyZS5s
-dXJlYXVAcmVkaGF0LmNvbT4gPG1heGltZS5jb3F1ZWxpbkByZWRoYXQuY29tPuW9rea1qTEwMDk2
-NzQy546L5Lia6LaFMTAxNTQ0MjUgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCuaXpSDmnJ8g77ya
-MjAxN+W5tDA35pyIMTnml6UgMjM6NTMNCuS4uyDpopgg77yaUmU6IFtRZW11LWRldmVsXSBbUEFU
-Q0hdIHZob3N0OiBmaXggYSBtaWdyYXRpb24gZmFpbGVkIGJlY2F1c2Ugb2Z2aG9zdCByZWdpb24g
-bWVyZ2UNCg0KDQoNCg0KDQpPbiBXZWQsIEp1bCAxOSwgMjAxNyBhdCAwMzoyNDoyN1BNICswMjAw
-LCBJZ29yIE1hbW1lZG92IHdyb3RlOg0KPiBPbiBXZWQsIDE5IEp1bCAyMDE3IDEyOjQ2OjEzICsw
-MTAwDQo+ICJEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IiA8ZGdpbGJlcnRAcmVkaGF0LmNvbT4gd3Jv
-dGU6DQo+IA0KPiA+ICogSWdvciBNYW1tZWRvdiAoaW1hbW1lZG9AcmVkaGF0LmNvbSkgd3JvdGU6
-DQo+ID4gPiBPbiBXZWQsIDE5IEp1bCAyMDE3IDIzOjE3OjMyICswODAwDQo+ID4gPiBQZW5nIEhh
-byA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdyb3RlOg0KPiA+ID4gICANCj4gPiA+ID4gV2hlbiBh
-IGd1ZXN0IHRoYXQgaGFzIHNldmVyYWwgaG90cGx1Z2dlZCBkaW1tcyBpcyBtaWdyYXRlZCwgaW4N
-Cj4gPiA+ID4gZGVzdGluYXRpb24gaG9zdCBpdCB3aWxsIGZhaWwgdG8gcmVzdW1lLiBCZWNhdXNl
-IHZob3N0IHJlZ2lvbnMgb2YNCj4gPiA+ID4gc2V2ZXJhbCBkaW1tcyBpbiBzb3VyY2UgaG9zdCBh
-cmUgbWVyZ2VkIGFuZCBpbiB0aGUgcmVzdG9yZSBzdGFnZQ0KPiA+ID4gPiBpbiBkZXN0aW5hdGlv
-biBob3N0IGl0IGNvbXB1dGVzIHdoZXRoZXIgbW9yZSB0aGFuIHZob3N0IHNsb3QgbGltaXQNCj4g
-PiA+ID4gYmVmb3JlIG1lcmdpbmcgdmhvc3QgcmVnaW9ucyBvZiBzZXZlcmFsIGRpbW1zLiAgDQo+
-ID4gPiBjb3VsZCB5b3UgcHJvdmlkZSBhIGJpdCBtb3JlIGRldGFpbGVkIGRlc2NyaXB0aW9uIG9m
-IHRoZSBwcm9ibGVtDQo+ID4gPiBpbmNsdWRpbmcgY29tbWFuZCBsaW5lK3VzZWQgZGV2aWNlX2Fk
-ZCBjb21tYW5kcyBvbiBzb3VyY2UgYW5kDQo+ID4gPiBjb21tYW5kIGxpbmUgb24gZGVzdGluYXRp
-b24/ICANCj4gPiANCj4gPiAoY2NpbmcgaW4gTWFyYyBBbmRyZSBhbmQgTWF4aW1lKQ0KPiA+IA0K
-PiA+IEhtbSwgSSdkIGxpa2UgdG8gdW5kZXJzdGFkZSB0aGUgc2l0dWF0aW9uIHdoZXJlIHlvdSBn
-ZXQgbWVyZ2luZyBiZXR3ZWVuDQo+ID4gUkFNQmxvY2tzIHRoYXQgY29tcGxpY2F0ZXMgc29tZSBz
-dHVmZiBmb3IgcG9zdGNvcHkuDQo+IGFuZCBwcm9iYWJseSBpbmNvbnNpc3RlbnQgbWVyZ2luZyBi
-cmVha3Mgdmhvc3QgYXMgd2VsbA0KPiANCj4gbWVyZ2luZyBtaWdodCBoYXBwZW4gaWYgcmVnaW9u
-cyBhcmUgYWRqYWNlbnQgb3Igb3ZlcmxhcA0KPiBidXQgZm9yIHRoYXQgdG8gaGFwcGVuIG1lcmdl
-ZCByZWdpb25zIG11c3QgaGF2ZSBlcXVhbA0KPiBkaXN0YW5jZSBiZXR3ZWVuIHRoZWlyIEdQQTpI
-VkEgcGFpcnMsIHNvIHRoYXQgZm9sbG93aW5nDQo+IHRyYW5zbGF0aW9uIHdvdWxkIHdvcms6DQo+
-IA0KPiBpZiBndmEgaW4gcmVnaW9uWFtndmFfc3RhcnQsIGxlbiwgaHZhX3N0YXJ0XQ0KPiAgICBo
-dmEgPSBodmFfc3RhcnQgKyBndmEgLSBndmFfc3RhcnQNCj4gDQo+IHdoaWxlIEdWQSBvZiByZWdp
-b25zIGlzIHVuZGVyIFFFTVUgY29udHJvbCBhbmQgZGV0ZXJtaW5pc3RpYw0KPiBIVkEgaXMgbm90
-LCBzbyBpbiBtaWdyYXRpb24gY2FzZSBtZXJnaW5nIG1pZ2h0IGhhcHBlbiBvbiBzb3VyY2UNCj4g
-c2lkZSBidXQgbm90IG9uIGRlc3RpbmF0aW9uLCByZXN1bHRpbmcgaW4gZGlmZmVyZW50IG1lbW9y
-eSBtYXBzLg0KPiANCj4gTWF5YmUgTWljaGFlbCBtaWdodCBrbm93IGRldGFpbHMgd2h5IG1pZ3Jh
-dGlvbiB3b3JrcyBpbiB2aG9zdCB1c2VjYXNlLA0KPiBidXQgSSBkb24ndCBzZWUgdmhvc3Qgc2Vu
-ZGluZyBhbnkgdm1zdGF0ZSBkYXRhLg0KDQo+V2UgYXJlbid0IG1lcmdpbmcgcmFtYmxvY2tzIGF0
-IGFsbC4NCj5XaGVuIHdlIGFyZSBwYXNzaW5nIGJsb2NrcyBBIGFuZCBCIHRvIHZob3N0LCBpZiB3
-ZSBzZWUgdGhhdA0KDQo+IGh2YUI9aHZhQSArIGxlbkENCj4gZ3BhQj1ncGFBICsgbGVuQQ0KDQo+
-IHRoZW4gd2UgY2FuIGltcHJvdmUgcGVyZm9ybWFuY2UgYSBiaXQgYnkgcGFzc2luZyBhIHNpbmds
-ZQ0KPiBjaHVuayB0byB2aG9zdDogaHZhQSxncGFBLGxlbmErbGVuQg0KDQo+IHNvIGl0IGRvZXMg
-bm90IGFmZmVjdCBtaWdyYXRpb24gbm9ybWFsbHkuDQoNCg0KDQoNCiBJIHRoaW5rIGl0IGlzIGxp
-a2UgdGhpczoNCg0KaW4gc291cmNlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgaW4gZGVzdGluYXRpb246KHJlc3RvcmUpDQoNCnJlYWxpemUgZGV2aWNlIDEgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICByZWFsaXplIGRldmljZSAxDQoNCnJlYWxpemUgZGV2aWNlIDIg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZWFsaXplIGRpbW0gMA0KDQogICAgIC4uLiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVhbGl6ZSBkaW1t
-MQ0KDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgLi4uLg0KDQpyZWFsaXplIGRldmljZSBuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-cmVhbGl6ZSBkaW1teA0KDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgcmVhbGl6ZSAgZGV2aWNlIG0NCg0KcmVhbGl6ZSBkaW1tMCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4uLg0KDQpyZWFsaXplIGRpbW0xICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIC4uLi4uDQoNCi4uLi4uLiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4uLi4NCg0KcmVhbGl6ZSBkaW1teCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVhbGl6ZSBkZXZpY2Ugbg0KDQoNCg0KDQpJ
-biByZXN0b3JlIHN0YWdlICx0aGUgc29ydCBvZiByZWFsaXppbmcgZGV2aWNlICBpcyBkaWZmZXJl
-bnQgZnJvbSBzdGFydGluZyB2bSBiZWNhdXNlIG9mIGFkZGluZyBkaW1tcy4NCg0KU28gaXQgbWF5
-IGluIHNvbWUgc3RhZ2UgZHVyaW5nIHJlc3RvcmluZyBjYW4ndCBtZXJnZSB2aG9zdCByZWdpb25z
-Lg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCj4gDQo+ID4gDQo+ID4gPiA+IA0KPiA+ID4g
-PiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+DQo+ID4gPiA+
-IFNpZ25lZC1vZmYtYnk6IFdhbmcgWWVjaGFvIDx3YW5nLnllY2hhbzI1NUB6dGUuY29tLmNuPg0K
-PiA+ID4gPiAtLS0NCj4gPiA+ID4gIGh3L21lbS9wYy1kaW1tLmMgfCAyICstDQo+ID4gPiA+ICAx
-IGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gPiA+ID4gDQo+
-ID4gPiA+IGRpZmYgLS1naXQgYS9ody9tZW0vcGMtZGltbS5jIGIvaHcvbWVtL3BjLWRpbW0uYw0K
-PiA+ID4gPiBpbmRleCBlYTY3YjQ2Li5iYjBmYTA4IDEwMDY0NA0KPiA+ID4gPiAtLS0gYS9ody9t
-ZW0vcGMtZGltbS5jDQo+ID4gPiA+ICsrKyBiL2h3L21lbS9wYy1kaW1tLmMNCj4gPiA+ID4gQEAg
-LTEwMSw3ICsxMDEsNyBAQCB2b2lkIHBjX2RpbW1fbWVtb3J5X3BsdWcoRGV2aWNlU3RhdGUgKmRl
-diwgTWVtb3J5SG90cGx1Z1N0YXRlICpocG1zLA0KPiA+ID4gPiAgICAgICAgICBnb3RvIG91dA0K
-PiA+ID4gPiAgICAgIH0NCj4gPiA+ID4gIA0KPiA+ID4gPiAtICAgIGlmICghdmhvc3RfaGFzX2Zy
-ZWVfc2xvdCgpKSB7DQo+ID4gPiA+ICsgICAgaWYgKCF2aG9zdF9oYXNfZnJlZV9zbG90KCkgJiYg
-cnVuc3RhdGVfaXNfcnVubmluZygpKSB7DQo+ID4gPiA+ICAgICAgICAgIGVycm9yX3NldGcoJmxv
-Y2FsX2VyciwgImEgdXNlZCB2aG9zdCBiYWNrZW5kIGhhcyBubyBmcmVlIg0KPiA+ID4gPiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICIgbWVtb3J5IHNsb3RzIGxlZnQiKQ0KPiA+ID4g
-PiAgICAgICAgICBnb3RvIG91dCAgDQo+ID4gDQo+ID4gRXZlbiB0aGlzIHByb2R1Y2VzIHRoZSB3
-cm9uZyBlcnJvciBtZXNzYWdlIGluIHRoaXMgY2FzZSwNCj4gPiBpdCBhbHNvIG1ha2VzIG1lIHRo
-aW5rIGlmIHRoZSBleGlzdGluZyBjb2RlIHNob3VsZCB1bmRvIGEgbG90IG9mDQo+ID4gdGhlIG9i
-amVjdF9wcm9wZXJ0eV9zZXQncyB0aGF0IGhhcHBlbi4NCj4gPiANCj4gPiBEYXZlDQo+ID4gPiAN
-Cj4gPiA+ICAgDQo+ID4gLS0NCj4gPiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRA
-cmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVL
+* Juan Quintela (quintela@redhat.com) wrote:
+> We make the locking and the transfer of information specific, even if we
+> are still receiving things through the main thread.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 60 insertions(+), 8 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index ac0742f..49c4880 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -49,6 +49,7 @@
+>  #include "migration/colo.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/uuid.h"
+> +#include "qemu/iov.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> @@ -527,7 +528,7 @@ int multifd_save_setup(void)
+>      return 0;
+>  }
+>  
+> -static int multifd_send_page(uint8_t *address)
+> +static uint16_t multifd_send_page(uint8_t *address, bool last_page)
+>  {
+>      int i, j;
+>      MultiFDSendParams *p = NULL; /* make happy gcc */
+> @@ -543,8 +544,10 @@ static int multifd_send_page(uint8_t *address)
+>      pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
+>      pages.num++;
+>  
+> -    if (pages.num < (pages.size - 1)) {
+> -        return UINT16_MAX;
+> +    if (!last_page) {
+> +        if (pages.num < (pages.size - 1)) {
+> +            return UINT16_MAX;
+> +        }
+>      }
+
+This doesn't feel like it should be in a recv patch.
+
+>      qemu_sem_wait(&multifd_send_state->sem);
+> @@ -572,12 +575,17 @@ static int multifd_send_page(uint8_t *address)
+>  }
+>  
+>  struct MultiFDRecvParams {
+> +    /* not changed */
+>      uint8_t id;
+>      QemuThread thread;
+>      QIOChannel *c;
+> +    QemuSemaphore ready;
+>      QemuSemaphore sem;
+>      QemuMutex mutex;
+> +    /* proteced by param mutex */
+>      bool quit;
+> +    multifd_pages_t pages;
+> +    bool done;
+>  };
+>  typedef struct MultiFDRecvParams MultiFDRecvParams;
+
+The params between Send and Recv keep looking very similar; I wonder
+if we can share them.
+
+> @@ -629,12 +637,20 @@ static void *multifd_recv_thread(void *opaque)
+>  {
+>      MultiFDRecvParams *p = opaque;
+>  
+> +    qemu_sem_post(&p->ready);
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+>          if (p->quit) {
+>              qemu_mutex_unlock(&p->mutex);
+>              break;
+>          }
+> +        if (p->pages.num) {
+> +            p->pages.num = 0;
+> +            p->done = true;
+> +            qemu_mutex_unlock(&p->mutex);
+> +            qemu_sem_post(&p->ready);
+> +            continue;
+> +        }
+>          qemu_mutex_unlock(&p->mutex);
+>          qemu_sem_wait(&p->sem);
+>      }
+> @@ -679,8 +695,11 @@ gboolean multifd_new_channel(QIOChannel *ioc)
+>      }
+>      qemu_mutex_init(&p->mutex);
+>      qemu_sem_init(&p->sem, 0);
+> +    qemu_sem_init(&p->ready, 0);
+>      p->quit = false;
+>      p->id = id;
+> +    p->done = false;
+> +    multifd_init_group(&p->pages);
+>      p->c = ioc;
+>      atomic_set(&multifd_recv_state->params[id], p);
+>      qemu_thread_create(&p->thread, "multifd_recv", multifd_recv_thread, p,
+> @@ -709,6 +728,42 @@ int multifd_load_setup(void)
+>      return 0;
+>  }
+>  
+> +static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+> +{
+> +    int thread_count;
+> +    MultiFDRecvParams *p;
+> +    static multifd_pages_t pages;
+> +    static bool once;
+> +
+> +    if (!once) {
+> +        multifd_init_group(&pages);
+> +        once = true;
+> +    }
+> +
+> +    pages.iov[pages.num].iov_base = address;
+> +    pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
+> +    pages.num++;
+> +
+> +    if (fd_num == UINT16_MAX) {
+> +        return;
+> +    }
+> +
+> +    thread_count = migrate_multifd_threads();
+> +    assert(fd_num < thread_count);
+> +    p = multifd_recv_state->params[fd_num];
+> +
+> +    qemu_sem_wait(&p->ready);
+> +
+> +    qemu_mutex_lock(&p->mutex);
+> +    p->done = false;
+> +    iov_copy(p->pages.iov, pages.num, pages.iov, pages.num, 0,
+> +             iov_size(pages.iov, pages.num));
+> +    p->pages.num = pages.num;
+> +    pages.num = 0;
+> +    qemu_mutex_unlock(&p->mutex);
+> +    qemu_sem_post(&p->sem);
+> +}
+> +
+>  /**
+>   * save_page_header: write page header to wire
+>   *
+> @@ -1155,7 +1210,7 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+>          ram_counters.transferred +=
+>              save_page_header(rs, rs->f, block,
+>                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> -        fd_num = multifd_send_page(p);
+> +        fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
+
+I think that belongs in the previous patch and probably answers one of
+my questions.
+
+>          qemu_put_be16(rs->f, fd_num);
+>          ram_counters.transferred += 2; /* size of fd_num */
+>          qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+> @@ -3020,10 +3075,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  
+>          case RAM_SAVE_FLAG_MULTIFD_PAGE:
+>              fd_num = qemu_get_be16(f);
+> -            if (fd_num != 0) {
+> -                /* this is yet an unused variable, changed later */
+> -                fd_num = fd_num;
+> -            }
+> +            multifd_recv_page(host, fd_num);
+>              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+>              break;
+>  
+> -- 
+> 2.9.4
+> 
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
