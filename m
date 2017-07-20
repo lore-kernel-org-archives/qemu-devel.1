@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY98D-0002bl-Ey
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:56:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dY9Fg-0004fR-5v
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY98A-0002NZ-Bd
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:56:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY98A-0002NR-5l
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:56:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B655280082
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 10:56:28 +0000 (UTC)
-Date: Thu, 20 Jul 2017 11:56:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170720105622.GD2101@work-vm>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-15-quintela@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dY9Ff-0005eK-A7
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:04:16 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:32843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dY9Ff-0005e2-2v
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:04:15 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id v105so39100405wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 04:04:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-15-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 14/17] migration: Delay the start of
- reception on main channel
+In-Reply-To: <20170719233455.8740-1-rth@twiddle.net>
+References: <20170719233455.8740-1-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Jul 2017 12:03:53 +0100
+Message-ID: <CAFEAcA-ZQPV89sqJxnqTUTjR+R_miPC=SESyzyggqEF4A5Lq6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/14] tcg-next patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> When we start multifd, we will want to delay the main channel until
-> the others are created.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index d9d5415..e122684 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -358,14 +358,11 @@ static void process_incoming_migration_co(void *opaque)
->  
->  static void migration_incoming_setup(QEMUFile *f)
->  {
-> -    MigrationIncomingState *mis = migration_incoming_get_current();
-> -
->      if (multifd_load_setup() != 0) {
->          /* We haven't been able to create multifd threads
->             nothing better to do */
->          exit(EXIT_FAILURE);
->      }
-> -    mis->from_src_file = f;
->      qemu_file_set_blocking(f, false);
->  }
->  
-> @@ -384,18 +381,26 @@ void migration_fd_process_incoming(QEMUFile *f)
->  gboolean migration_ioc_process_incoming(QIOChannel *ioc)
->  {
->      MigrationIncomingState *mis = migration_incoming_get_current();
-> +    gboolean result = FALSE;
+On 20 July 2017 at 00:34, Richard Henderson <rth@twiddle.net> wrote:
+> This edition is a real mix:
+>   * Code gen improvement for mips64 host (Jiang)
+>   * Build fix for ppc-linux (Philippe)
+>   * Runtime fix for tci (Philippe)
+>   * Fix atomic helper names in debugging dumps (rth)
+>
+>   * Cross-target tcg code gen improvements (Philippe)
+>     This one had no obvious tree through which it should go,
+>     so I went ahead and took them all.
+>
+>   * Cherry-picked the first patch from Lluis' generic translate loop,
+>     wherein the interface to gen_intermediate_code changes trivially.
+>     It's the only patch from that series that touches all targets,
+>     and I see little point carrying it around further.
+>
+> V2: Fixed typo in the sparc mulscc deposit patch.
+>
+>
+> r~
+>
+>
+> The following changes since commit d4e59218ab80e86015753782fb5378767a51ccd0:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-07-18-2' into staging (2017-07-19 20:45:37 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-tcg-20170719
+>
+> for you to fetch changes up to 9c489ea6bed134fecfd556b439c68bba48fbe102:
+>
+>   tcg: Pass generic CPUState to gen_intermediate_code() (2017-07-19 14:45:16 -0700)
+>
+> ----------------------------------------------------------------
+> Queued tcg and tcg code gen related cleanups
 
-I wonder if we need some state somewhere so that we can see that the
-incoming migration is partially connected - since the main incoming
-coroutine hasn't started yet, we've not got much of mis setup.
+Applied, thanks.
 
-Dave
-
->      if (!mis->from_src_file) {
->          QEMUFile *f = qemu_fopen_channel_input(ioc);
->          mis->from_src_file = f;
-> -        migration_fd_process_incoming(f);
-> -        if (!migrate_use_multifd()) {
-> -            return FALSE;
-> -        } else {
-> -            return TRUE;
-> +        migration_incoming_setup(f);
-> +        if (migrate_use_multifd()) {
-> +            result = TRUE;
->          }
-> +    } else {
-> +        /* we can only arrive here if multifd is on
-> +           and this is a new channel */
-> +        result = multifd_new_channel(ioc);
->      }
-> -    return multifd_new_channel(ioc);
-> +    if (result == FALSE) {
-> +        /* called when !multifd and for last multifd channel */
-> +        migration_incoming_process();
-> +    }
-> +
-> +    return result;
->  }
->  
->  /*
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
