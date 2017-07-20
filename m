@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dYEMq-000095-Vy
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:32:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dYENE-0000Nu-9l
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dYEMp-0007RO-R2
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:32:00 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dYEND-0007gH-E7
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:32:24 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Jul 2017 17:31:30 +0100
-Message-Id: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.10] Use qemu_tolower() and qemu_toupper(),
- not tolower() and toupper()
+Date: Thu, 20 Jul 2017 17:32:21 +0100
+Message-Id: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.10] util/oslib-posix.c: Avoid warning on
+ NetBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,91 +19,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org
+Cc: patches@linaro.org, Kamil Rytarowski <kamil@netbsd.org>
 
-On NetBSD, where tolower() and toupper() are implemented using an
-array lookup, the compiler warns if you pass a plain 'char'
-to these functions:
+On NetBSD the compiler warns:
+util/oslib-posix.c: In function 'sigaction_invoke':
+util/oslib-posix.c:589:5: warning: missing braces around initializer [-Wmissing-braces]
+     siginfo_t si = { 0 };
+     ^
+util/oslib-posix.c:589:5: warning: (near initialization for 'si.si_pad') [-Wmissing-braces]
 
-gdbstub.c:914:13: warning: array subscript has type 'char'
+because on this platform siginfo_t is defined as
+  typedef union siginfo {
+          char    si_pad[128];    /* Total size; for future expansion */
+          struct _ksiginfo _info;
+  } siginfo_t;
 
-This reflects the fact that toupper() and tolower() give
-undefined behaviour if they are passed a value that isn't
-a valid 'unsigned char' or EOF.
-
-We have qemu_tolower() and qemu_toupper() to avoid this problem;
-use them.
-
-(The use in scsi-generic.c does not trigger the warning because
-it passes a uint8_t; we switch it anyway, for consistency.)
+Avoid this warning by initializing the struct with {} instead;
+this is a GCC extension but we use it all over the codebase already.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- gdbstub.c                  | 2 +-
- hw/s390x/s390-virtio-ccw.c | 2 +-
- hw/scsi/scsi-generic.c     | 2 +-
- target/ppc/monitor.c       | 4 ++--
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ util/oslib-posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index f936ddd..2a94030 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -911,7 +911,7 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
- 
-         cur_action = *p++;
-         if (cur_action == 'C' || cur_action == 'S') {
--            cur_action = tolower(cur_action);
-+            cur_action = qemu_tolower(cur_action);
-             res = qemu_strtoul(p + 1, &p, 16, &tmp);
-             if (res) {
-                 goto out;
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index ce3921e..1c7af39 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -318,7 +318,7 @@ static void machine_set_loadparm(Object *obj, const char *val, Error **errp)
-     int i;
- 
-     for (i = 0; i < sizeof(ms->loadparm) && val[i]; i++) {
--        uint8_t c = toupper(val[i]); /* mimic HMC */
-+        uint8_t c = qemu_toupper(val[i]); /* mimic HMC */
- 
-         if (('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || (c == '.') ||
-             (c == ' ')) {
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index a55ff87..7e1cbab 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -406,7 +406,7 @@ static int read_naa_id(const uint8_t *p, uint64_t *p_wwn)
-         }
-         *p_wwn = 0;
-         for (i = 8; i < 24; i++) {
--            char c = toupper(p[i]);
-+            char c = qemu_toupper(p[i]);
-             c -= (c >= '0' && c <= '9' ? '0' : 'A' - 10);
-             *p_wwn = (*p_wwn << 4) | c;
-         }
-diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
-index b8f30e9..1491511 100644
---- a/target/ppc/monitor.c
-+++ b/target/ppc/monitor.c
-@@ -115,14 +115,14 @@ int target_get_monitor_def(CPUState *cs, const char *name, uint64_t *pval)
-     CPUPPCState *env = &cpu->env;
- 
-     /* General purpose registers */
--    if ((tolower(name[0]) == 'r') &&
-+    if ((qemu_tolower(name[0]) == 'r') &&
-         ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->gpr), &regnum)) {
-         *pval = env->gpr[regnum];
-         return 0;
-     }
- 
-     /* Floating point registers */
--    if ((tolower(name[0]) == 'f') &&
-+    if ((qemu_tolower(name[0]) == 'f') &&
-         ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->fpr), &regnum)) {
-         *pval = env->fpr[regnum];
-         return 0;
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index b2dea48..cacf0ef 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -586,7 +586,7 @@ void qemu_free_stack(void *stack, size_t sz)
+ void sigaction_invoke(struct sigaction *action,
+                       struct qemu_signalfd_siginfo *info)
+ {
+-    siginfo_t si = { 0 };
++    siginfo_t si = {};
+     si.si_signo = info->ssi_signo;
+     si.si_errno = info->ssi_errno;
+     si.si_code = info->ssi_code;
 -- 
 2.7.4
