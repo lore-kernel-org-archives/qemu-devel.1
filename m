@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYYWu-0008FR-9t
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:03:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYYXb-0000Le-Ap
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYYWt-0004GD-6C
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:03:44 -0400
-Date: Fri, 21 Jul 2017 15:03:29 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170721140329.GR17693@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170721135047.25005-1-eblake@redhat.com>
-	<20170721135047.25005-2-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dYYXZ-0004mg-NJ
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:04:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYYXZ-0004m2-EY
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:04:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A9AB883C8
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:04:24 +0000 (UTC)
+References: <20170720214008.28494-1-eblake@redhat.com>
+	<20170720214008.28494-4-eblake@redhat.com>
+	<87shhpj3uo.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f3b66d5f-4dad-4d46-a5f8-6709a40aabf4@redhat.com>
+Date: Fri, 21 Jul 2017 09:04:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170721135047.25005-2-eblake@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-nbd: Update version string
+In-Reply-To: <87shhpj3uo.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="juRPwKsUS8BUjaQ3nXc01AgUeMvdwretV"
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] qtest: Avoid passing raw strings
+ through hmp()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jul 21, 2017 at 08:50:46AM -0500, Eric Blake wrote:
-> qemu-io and qemu-img already mirror the qemu version string,
-> time to make qemu-nbd do the same.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--juRPwKsUS8BUjaQ3nXc01AgUeMvdwretV
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <f3b66d5f-4dad-4d46-a5f8-6709a40aabf4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] qtest: Avoid passing raw strings
+ through hmp()
+References: <20170720214008.28494-1-eblake@redhat.com>
+ <20170720214008.28494-4-eblake@redhat.com>
+ <87shhpj3uo.fsf@dusky.pond.sub.org>
+In-Reply-To: <87shhpj3uo.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/21/2017 08:50 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 >=20
-> Reported-by: =E9=99=B3=E5=9F=B9=E6=B3=93 <pahome.chen@mirlab.org>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  qemu-nbd.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>> The next patch will add __attribute__((__format__)) to hmp(), which
 >=20
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index 78d05bea2d..1086934a95 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -36,6 +36,7 @@
->  #include "io/channel-socket.h"
->  #include "crypto/init.h"
->  #include "trace/control.h"
-> +#include "qemu-version.h"
->=20
->  #include <getopt.h>
->  #include <libgen.h>
-> @@ -129,10 +130,10 @@ static void usage(const char *name)
->  static void version(const char *name)
->  {
->      printf(
-> -"%s version 0.0.1\n"
-> +"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
+> It did in v1, but no more.  Intentional?
 
-wow, suprised that bogus version has existed for so long :-)
+Oh shoot.  I got so busy deleting the attribute for qmp() and friends
+that I also deleted it for hmp().  I'm not having a very good run at
+this, am I?
 
->  "Written by Anthony Liguori.\n"
->  "\n"
-> -"Copyright (C) 2006 Anthony Liguori <anthony@codemonkey.ws>.\n"
-> +QEMU_COPYRIGHT "\n"
->  "This is free software; see the source for copying conditions.  There =
-is NO\n"
->  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PU=
-RPOSE.\n"
->      , name);
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--juRPwKsUS8BUjaQ3nXc01AgUeMvdwretV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyCeYACgkQp6FrSiUn
+Q2pdQAgArM/6H/FwmMVL6RNK/5iXkdT1EKjYNZGiJlRT+5aT6NTg2+wfT65V898+
+adtbFldocpZp5Whv7FCnSFcQeJhJhrr8a217ocPUh2zxYCSvhrSvPHs6aQ3d1cSg
+rCvKYQ8v/pJoZiUb2sCofZ1u93OLsPFPjvMzGlzO6EnzbMirkagqai6lXr7Xbo1U
+wNI/JYF7XHrptfFhOYlWf5vtAoKD1FGvR/LvigJTkL06gci2Lk6BV79YsdMeO+5a
+B73tTguY/+Jf5tlkGmxeEJzglkPKbOXgHMEFpsd7seeow5ixpvS8as7SJCvELYy7
+sTqAYTj0YbVydaPQV8lAQ0yxZOH5sA==
+=bsJJ
+-----END PGP SIGNATURE-----
+
+--juRPwKsUS8BUjaQ3nXc01AgUeMvdwretV--
