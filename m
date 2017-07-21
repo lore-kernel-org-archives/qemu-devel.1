@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYU0J-0000W8-OG
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:13:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYU2I-0001N8-Av
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYU0G-00064f-Iz
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:13:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYU0G-00063n-9D
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:13:44 -0400
-Date: Fri, 21 Jul 2017 10:13:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170721091337.GA2133@work-vm>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-	<20170717185830.GD31820@work-vm>
-	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
-	<20170720100232.GA2456@work-vm>
-	<408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dYU2H-0006hO-7Y
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:15:50 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38696)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dYU2G-0006h6-SO
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:15:49 -0400
+Received: by mail-wm0-x232.google.com with SMTP id w191so8622900wmw.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:15:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+In-Reply-To: <20170721041053.GQ11032@lemon>
+References: <CAB3eZfs8E0xsBAFH_4U=M4LsVpRs73aPdFk5qy_ZUKqMom9P8g@mail.gmail.com>
+	<20170721041053.GQ11032@lemon>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Jul 2017 10:15:27 +0100
+Message-ID: <CAFEAcA-bDWpXsn9HyaLSX_Kqa7+5-6icks-zu4jZ0a0M4h41FQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] unrecognized option --object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-* KONRAD Frederic (frederic.konrad@adacore.com) wrote:
-> 
-> 
-> On 07/20/2017 12:02 PM, Dr. David Alan Gilbert wrote:
-> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> > > On 17 July 2017 at 19:58, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > > > * Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
-> > > > > Is there a way we can prevent migration of the RAMBlock?
-> > > > 
-> > > > Not yet, I think we'd have to:
-> > > >     a) Add a flag to the RAMBlock
-> > > >     b) Set it/clear it on registration
-> > > >     c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
-> > > >     d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
-> > > >     cases) with the RAMBLOCK_FOREACH_MIGRATABLE
-> > > >     e) Worry about the corner cases!
-> > > > 
-> > > > I've got a few worries about what happens when the kernel tries to
-> > > > do dirty yncing - I'm not sure if we have to change anything on that
-> > > > interface to skip those RAMBlocks.
-> > > 
-> > > OK, so what should we do for 2.10 ?
-> > > 
-> > > We could:
-> > >   * implement the changes you suggest above, and mark only
-> > >     vmstate_register_ram'd blocks as migratable
-> > >     (would probably need to fix some places which buggily
-> > >     don't call vmstate_register_ram)
-> > >   * implement the changes above, but special case mmio-interface
-> > >     so only its ramblock is marked unmigratable
-> > 
-> > I think either of these is too late for 2.10 - I don't fancy prodding
-> > about in all of the migration RAM loops at this stage.
-> > 
-> > >   * postpone the changes above until 2.11, and for 2.10 register
-> > >     a migration-blocker in mmio-interface so that we at least
-> > >     give the user a useful error rather than having it fail
-> > >     obscurely on vmload (and release note this)
-> > 
-> > I think that's best, especially because I've just thought of another nasty.
-> > If I understand the way mmio-interface is working, you're dynamically
-> > changing the RAMBlock list while the guest is running.
-> > And while we are using QLIST_FOREACH_RCU I'm not convinced we're
-> > actually safe against dynamic modification of that list.
-> 
-> Hi Dave,
-> 
-> Hmmm I'm not totally convinced..
-> 
-> Let's imagine somebody (eg: u-boot guest) wants to execute code
-> from the LQSPI area.
-> 
-> memory_region_request_mmio_ptr is called (the guest is not
-> running yet) it will create a mmio-interface which create the
-> ram memory region with a pointer provided by the device.
-> Then the guest can execute code from that and this somehow is
-> breaking migration because this ram memory region is migrated.
-> 
-> Now something is writing to the device.. The cache is no longer
-> valid, we have to drop this mmio-interface. This is done in an
-> async_safe work so cpu are stopped at this moment. So I think we
-> are safe for that.
+On 21 July 2017 at 05:10, Fam Zheng <famz@redhat.com> wrote:
+> On Thu, 07/20 19:06, =E9=99=B3=E5=9F=B9=E6=B3=93 wrote:
+>> I build qemu from the https://github.com/qemu/qemu, and it didn't show a=
+ny
+>> errors.
+>>
+>> I tried qemu-nbd --object secret,id=3Dsec0...
+>> but it shows unrecognized option '--object '
+>>
+>> how to solve it?
+>
+> -object it is. Thanks.
 
-I don't fully understand the way memory_region_do_invalidate_mmio_ptr
-works; I see it dropping the memory region; if that's also dropping
-the RAMBlock then it will upset migration.   Even if the CPU is stopped
-I dont think that stops the migration thread walking through the list of
-RAMBlocks.
-Even then, the problem is migration keeps a 'dirty_pages' count which is
-calculated at the start of migration and updated as we dirty and send
-pages; if we add/remove a RAMBlock then that dirty_pages count is wrong
-and we either never finish migration (since dirty_pages never reaches
-zero) or finish early with some unsent data.
-And then there's the 'received' bitmap currently being added for
-postcopy which tracks each page that's been received (that's not in yet
-though).
+Hmm? For me the help message says '--object' and the implementation
+agrees that it wants two hyphens:
 
-Dave
+$ ./build/x86/qemu-nbd -object foo
+Invalid offset `bject'
+[ie interpreting it as -o plus an argument]
+$ ./build/x86/qemu-nbd --object foo
+Invalid number of arguments
+Try `./build/x86/qemu-nbd --help' for more information.
+[ie it recognized the option]
 
-> > 
-> > > (Or something else?)
-> > > 
-> > > I do think we definitely need to fix this for 2.11 at latest.
-> > 
-> > OK, I can do a-e OK, I'm more worried now about that dynamic
-> > modification I just thought of.
-> > 
-> 
-> What's an a-e?
-> 
-> BTW sorry for this pain :( I didn't figure out that the
-> ram MemoryRegion would be migrated..
-> 
-> Thanks,
-> Fred
-> 
-> > Dave
-> > 
-> > > thanks
-> > > -- PMM
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+My guesses for why the original poster is getting
+'unrecognized option' are either:
+ (1) if the error message really has a space after
+"t" and before the closing "'" then they're probably invoking
+qemu-nbd via a script whose quoting is wrong and is passing
+the literal string "--object " with a trailing space by mistake
+ (2) otherwise, accidentally running the system qemu-nbd
+(which is presumably an old version without this option)
+rather than the one they've just built from git ?
+
+thanks
+-- PMM
