@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYgwp-000225-8b
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:03:04 -0400
+	(envelope-from <cota@braap.org>) id 1dYh7W-00040T-30
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:14:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYgwm-0007hx-0c
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:03:03 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50737)
+	(envelope-from <cota@braap.org>) id 1dYh7R-0004Ke-47
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:14:06 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:46939)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYgwl-0007hm-Sl
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:02:59 -0400
-Date: Fri, 21 Jul 2017 19:02:58 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYh7Q-0004KR-Vp
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:14:01 -0400
+Date: Fri, 21 Jul 2017 19:14:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170721230258.GN10809@flamenco>
+Message-ID: <20170721231400.GO10809@flamenco>
 References: <20170715094243.28371-1-rth@twiddle.net>
-	<20170715094243.28371-31-rth@twiddle.net>
+	<20170715094243.28371-32-rth@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170715094243.28371-31-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v14 30/34] target/arm: [tcg] Port to
- generic translation framework
+In-Reply-To: <20170715094243.28371-32-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v14 31/34] target/arm: [a64] Move page and
+ ss checks to init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +31,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
 
-On Fri, Jul 14, 2017 at 23:42:39 -1000, Richard Henderson wrote:
-> From: Lluís Vilanova <vilanova@ac.upc.edu>
+On Fri, Jul 14, 2017 at 23:42:40 -1000, Richard Henderson wrote:
+> Since AArch64 uses a fixed-width ISA, we can pre-compute the number of
+> insns remaining on the page.  Also, we can check for single-step once.
 > 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> Message-Id: <150002631325.22386.10348327185029496649.stgit@frigg.lan>
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/arm/translate.h     |   8 +---
->  target/arm/translate-a64.c | 107 ++++++++-----------------------------------
->  target/arm/translate.c     | 110 ++++++++++-----------------------------------
->  3 files changed, 42 insertions(+), 183 deletions(-)
-
-(snip)
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 4ea5f70..4b1230b 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -11897,7 +11897,9 @@ static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
->          TCGv_i32 tmp = tcg_temp_new_i32();
->          tcg_gen_movi_i32(tmp, 0);
->          store_cpu_field(tmp, condexec_bits);
-> +        tcg_temp_free_i32(tmp);
-
-This seems unrelated to the patch. Perhaps a better place to add
-this fix would be patch 20, with a mention to it in the commit log.
-Or just keep it here, but mention it in the commit log.
-
-Otherwise,
 
 Reviewed-by: Emilio G. Cota <cota@braap.org>
+
+Pity, if it wasn't for thumb, we could get rid of dc->next_page_start.
+
+		E.
