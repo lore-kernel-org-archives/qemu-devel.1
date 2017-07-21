@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYYKa-0005yk-Mn
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:01 -0400
+	(envelope-from <prvs=3683a44df=anthony.perard@citrix.com>)
+	id 1dYYKe-00061q-NM
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYYKZ-0002XY-VB
+	(envelope-from <prvs=3683a44df=anthony.perard@citrix.com>)
+	id 1dYYKa-0002Y3-Pr
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:04 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:8350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=3683a44df=anthony.perard@citrix.com>)
+	id 1dYYKa-0002X2-JQ
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYYKZ-0002W6-PG
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:50:59 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3498E46213
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 13:50:57 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170720214008.28494-1-eblake@redhat.com>
-	<20170720214008.28494-4-eblake@redhat.com>
-Date: Fri, 21 Jul 2017 15:50:55 +0200
-In-Reply-To: <20170720214008.28494-4-eblake@redhat.com> (Eric Blake's message
-	of "Thu, 20 Jul 2017 16:40:07 -0500")
-Message-ID: <87shhpj3uo.fsf@dusky.pond.sub.org>
+Date: Fri, 21 Jul 2017 14:50:57 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170721135057.GJ1587@perard.uk.xensource.com>
+References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
+	<1500416562-27337-1-git-send-email-sstabellini@kernel.org>
+	<1500416562-27337-6-git-send-email-sstabellini@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] qtest: Avoid passing raw strings
- through hmp()
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1500416562-27337-6-git-send-email-sstabellini@kernel.org>
+Subject: Re: [Qemu-devel] [PULL for-2.10 6/7] xen/mapcache: introduce
+ xen_replace_cache_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +32,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Igor Druzhinin <igor.druzhinin@citrix.com>
 
-Eric Blake <eblake@redhat.com> writes:
+On Tue, Jul 18, 2017 at 03:22:41PM -0700, Stefano Stabellini wrote:
+> From: Igor Druzhinin <igor.druzhinin@citrix.com>
 
-> The next patch will add __attribute__((__format__)) to hmp(), which
+...
 
-It did in v1, but no more.  Intentional?
+> +static uint8_t *xen_replace_cache_entry_unlocked(hwaddr old_phys_addr,
+> +                                                 hwaddr new_phys_addr,
+> +                                                 hwaddr size)
+> +{
+> +    MapCacheEntry *entry;
+> +    hwaddr address_index, address_offset;
+> +    hwaddr test_bit_size, cache_size = size;
+> +
+> +    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
+> +    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
+> +
+> +    assert(size);
+> +    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
+> +    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
+> +    if (test_bit_size % XC_PAGE_SIZE) {
+> +        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
+> +    }
+> +    cache_size = size + address_offset;
+> +    if (cache_size % MCACHE_BUCKET_SIZE) {
+> +        cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
+> +    }
+> +
+> +    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
+> +    while (entry && !(entry->paddr_index == address_index &&
+> +                      entry->size == cache_size)) {
+> +        entry = entry->next;
+> +    }
+> +    if (!entry) {
+> +        DPRINTF("Trying to update an entry for %lx " \
+> +                "that is not in the mapcache!\n", old_phys_addr);
+> +        return NULL;
+> +    }
+> +
+> +    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
+> +    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
+> +
+> +    fprintf(stderr, "Replacing a dummy mapcache entry for %lx with %lx\n",
+> +            old_phys_addr, new_phys_addr);
 
-> in turn causes gcc to warn about non-literal format strings.  Rather
-> than risk an arbitrary string containing % being mis-handled, always
-> pass variable strings along with a %s format.  It also makes it
-> easier to prove correctness locally, rather than auditing all the
-> source strings.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/test-hmp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index d77b3c8710..0af066487c 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -80,7 +80,7 @@ static void test_commands(void)
->          if (verbose) {
->              fprintf(stderr, "\t%s\n", hmp_cmds[i]);
->          }
-> -        response = hmp(hmp_cmds[i]);
-> +        response = hmp("%s", hmp_cmds[i]);
->          g_free(response);
->      }
->
-> @@ -103,7 +103,7 @@ static void test_info_commands(void)
->          if (verbose) {
->              fprintf(stderr, "\t%s\n", info);
->          }
-> -        resp = hmp(info);
-> +        resp = hmp("%s", info);
->          g_free(resp);
->          /* And move forward to the next line */
->          info = strchr(endp + 1, '\n');
+Looks likes this does not build on 32bits.
+in: http://logs.test-lab.xenproject.org/osstest/logs/112041/build-i386/6.ts-xen-build.log
+
+/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c: In function 'xen_replace_cache_entry_unlocked':
+/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:539:13: error: format '%lx' expects argument of type 'long unsigned int', but argument 3 has type 'hwaddr' [-Werror=format=]
+             old_phys_addr, new_phys_addr);
+             ^
+/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:539:13: error: format '%lx' expects argument of type 'long unsigned int', but argument 4 has type 'hwaddr' [-Werror=format=]
+cc1: all warnings being treated as errors
+  CC      i386-softmmu/target/i386/gdbstub.o
+/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/rules.mak:66: recipe for target 'hw/i386/xen/xen-mapcache.o' failed
+
+> +
+> +    xen_remap_bucket(entry, entry->vaddr_base,
+> +                     cache_size, address_index, false);
+> +    if (!test_bits(address_offset >> XC_PAGE_SHIFT,
+> +                test_bit_size >> XC_PAGE_SHIFT,
+> +                entry->valid_mapping)) {
+> +        DPRINTF("Unable to update a mapcache entry for %lx!\n", old_phys_addr);
+> +        return NULL;
+> +    }
+> +
+> +    return entry->vaddr_base + address_offset;
+> +}
+> +
+
+-- 
+Anthony PERARD
