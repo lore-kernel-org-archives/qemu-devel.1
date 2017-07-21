@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYZoR-0008Lf-Fy
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:25:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYZor-000099-3f
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:26:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYZoQ-0000UP-J7
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:25:55 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:32832)
+	(envelope-from <peter.maydell@linaro.org>) id 1dYZoq-0000do-9Y
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:26:21 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37355)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dYZoQ-0000Th-CD
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:25:54 -0400
-Received: by mail-wm0-x230.google.com with SMTP id v139so4409153wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 08:25:54 -0700 (PDT)
+	id 1dYZoq-0000dB-3Q
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:26:20 -0400
+Received: by mail-wm0-x236.google.com with SMTP id e131so17047140wme.0
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 08:26:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <dabe4865-05a0-eb85-f9db-8948db3e14bf@redhat.com>
-References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
-	<1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
-	<b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
-	<CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
-	<dabe4865-05a0-eb85-f9db-8948db3e14bf@redhat.com>
+In-Reply-To: <1500625265-23844-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1500625265-23844-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Jul 2017 16:25:32 +0100
-Message-ID: <CAFEAcA_T1CNZY+rnryt_r-kaffk838Q4jZOw9GogfQB7t-jFtA@mail.gmail.com>
+Date: Fri, 21 Jul 2017 16:25:58 +0100
+Message-ID: <CAFEAcA8BoxaBao7NbgmXFyr-rTX_VwNCyxYzxTgu2L+gPFw90A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
- variable warning
+Subject: Re: [Qemu-devel] [PATCH] block/vpc: fix uninitialised variable
+ compiler warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 21 July 2017 at 13:23, Eric Blake <eblake@redhat.com> wrote:
-> On 07/19/2017 03:19 AM, Peter Maydell wrote:
->> On 18 July 2017 at 23:01, Eric Blake <eblake@redhat.com> wrote:
->>> On 07/18/2017 11:26 AM, Peter Maydell wrote:
->>>> On OpenBSD the compiler warns:
->>>> bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wunused-but-set-variable]
->>>>
->>>> This is because a lot of the signal delivery code is #if-0'd
->>>> out as unused. Reshuffle #ifdefs a bit to silence the warning.
->>>
->>> Why not just nuke the #if 0 code instead (we can always 'git revert' it
->>> later as a starting point for someone that wants to implement it).
->>
->> I went for the minimal change, especially given we know
->> that the freebsd folks have a big patchset on top of
->> us fixing a lot of bsd-user code and it didn't seem worth
->> giving them a more awkward rebase task.
+On 21 July 2017 at 09:21, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> Since commit cfc87e00 "block/vpc.c: Handle write failures in
+> get_image_offset()" older versions of gcc (in this case 4.7) incorrectly
+> warn that "ret" can be used uninitialised in vpc_co_pwritev().
 >
-> Perhaps worth mentioning in the commit message that keeping the #if 0 is
-> intentional, then. At any rate,
+> Setting ret to 0 at the start of vpc_co_pwritev() prevents the warning
+> in gcc 4.7 and enables compilation with -Werror to succeed.
 >
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  block/vpc.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/vpc.c b/block/vpc.c
+> index 10e6519..574879b 100644
+> --- a/block/vpc.c
+> +++ b/block/vpc.c
+> @@ -649,7 +649,7 @@ vpc_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+>      int64_t image_offset;
+>      int64_t n_bytes;
+>      int64_t bytes_done = 0;
+> -    int ret;
+> +    int ret = 0;
+>      VHDFooter *footer =  (VHDFooter *) s->footer_buf;
+>      QEMUIOVector local_qiov;
+>
 
-Thanks; applied to master with an updated commit message.
-
+Thanks; applied to master as a buildfix.
 
 -- PMM
