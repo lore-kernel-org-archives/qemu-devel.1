@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYXHZ-0007g5-Q2
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:43:50 -0400
+	(envelope-from <otubo@redhat.com>) id 1dYXQ9-0000qB-Dn
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYXHW-0003Km-NC
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:43:49 -0400
-Date: Fri, 21 Jul 2017 13:43:43 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170721124343.GD18014@stefanha-x1.localdomain>
-References: <CAOE=1Z0yXiscZWibFpUjaqZj7vK06nrWcnaWvga4B2Kw+Eta+g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="lc9FT7cWel8HagAv"
-Content-Disposition: inline
-In-Reply-To: <CAOE=1Z0yXiscZWibFpUjaqZj7vK06nrWcnaWvga4B2Kw+Eta+g@mail.gmail.com>
-Subject: Re: [Qemu-devel] Why "trace event does not exist"?
+	(envelope-from <otubo@redhat.com>) id 1dYXQ6-0000a8-Bp
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:52:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dYXQ6-0000Zf-63
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:52:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B6BF34E33A
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 12:52:36 +0000 (UTC)
+Received: from vader.redhat.com (ovpn-116-236.ams2.redhat.com [10.36.116.236])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1FFA38B316
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 12:52:35 +0000 (UTC)
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Fri, 21 Jul 2017 14:52:29 +0200
+Message-Id: <20170721125235.11939-1-otubo@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/6] seccomp: feature refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: qemu-devel@nongnu.org
 
+v3:
+    * Style problems fixed
 
---lc9FT7cWel8HagAv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v2:
+    * The semantics of the options "allow/deny" instead of booleans "on/off" remains. 
+    * Added option 'children' to elevateprivileges
+    * Added documentation to docs/
 
-On Thu, Jul 20, 2017 at 10:38:07AM +0800, Sam wrote:
-> Hi all,
->=20
-> I want to add new trace-event and log it, so I add into $QEMU/trace-event
-> like this:
->=20
-> io_mem_init(void) ""
-> >
->=20
-> and after configure, $QEMU/build/trace-events-all also have this.
-> then I add code like this into $QEMU/exec.c
->=20
-> trace_io_mem_init();
-> >
->=20
-> then I `make` and `make install`.
->=20
-> But when I run `qemu-system-x86_64 -D /qemu.log -trace events=3D/qemu-eve=
-nts
-> ...`
-> it warn me that:
->=20
-> qemu-system-x86_64:/qemu-events:1: WARNING: trace event 'io_mem_init' does
-> > not exist
->=20
->=20
-> and no io_mem_init log output. Why and what should I do to add this log?
+v1:
+    * First version based on the discussion
+      https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03348.html
 
-Are you sure you're running the binary you compiled?  Please check that
-"which qemu-system-x86_64" is really the QEMU binary you built and
-installed.
+Eduardo Otubo (6):
+  seccomp: changing from whitelist to blacklist
+  seccomp: add obsolete argument to command line
+  seccomp: add elevateprivileges argument to command line
+  seccomp: add spawn argument to command line
+  seccomp: add resourcecontrol argument to command line
+  seccomp: adding documentation to new seccomp model
 
---lc9FT7cWel8HagAv
-Content-Type: application/pgp-signature; name="signature.asc"
+ docs/seccomp.txt         |  31 ++++
+ include/sysemu/seccomp.h |   7 +-
+ qemu-options.hx          |  19 ++-
+ qemu-seccomp.c           | 364 ++++++++++++++++++-----------------------------
+ vl.c                     |  61 +++++++-
+ 5 files changed, 248 insertions(+), 234 deletions(-)
+ create mode 100644 docs/seccomp.txt
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZcfb/AAoJEJykq7OBq3PIL2kIAK+6wvTVpqNSt9Uq3wxSzVt+
-m3Hku8g8h2bOgKUHLvcBFxh61+oYMjMdEW8rB90EfLxEbqR2Uh4tPvUbMcOu49Rf
-aUd70VtYkIuKb1H9g35/GkRmQSF9MyushoyW6qhkmuZHDJDPsmBQKspHg6qmxNF3
-36hEFGmhgEv+uSCRm8oU1fFFJ8SYAB6FllxRiya+pmRE65O+fcKUdxpPdX2pPa89
-c71WdknfRN5LiOP7l3Ab3fw9QQU50T4hXbjKULXJBd15d05Hzo7/tDyA1hyfnhKz
-EZIAAK4FWWlsa+BxMXovkndzpgFGlsPppTTHl6qbqJdot7ix15RpCNbJ98B44wA=
-=WfwL
------END PGP SIGNATURE-----
-
---lc9FT7cWel8HagAv--
+-- 
+2.13.3
