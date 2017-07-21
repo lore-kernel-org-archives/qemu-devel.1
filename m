@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYQhc-0007Sq-Co
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:42:17 -0400
+	(envelope-from <cota@braap.org>) id 1dYQyM-0002RM-9v
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYQhY-00006t-De
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:42:16 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:47121)
+	(envelope-from <cota@braap.org>) id 1dYQyJ-0001pf-3U
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:34 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:49387)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYQhY-00006X-2t
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:42:12 -0400
-Date: Fri, 21 Jul 2017 01:42:10 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYQyI-0001pI-SR
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:31 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170721054210.GA16334@flamenco>
-References: <20170719233455.8740-1-rth@twiddle.net>
-	<20170719233455.8740-7-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170719233455.8740-7-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH] target/arm: fix TCG temp leak in aarch64 rev16
+Date: Fri, 21 Jul 2017 01:59:20 -0400
+Message-Id: <1500616763-26560-3-git-send-email-cota@braap.org>
+In-Reply-To: <1500616763-26560-1-git-send-email-cota@braap.org>
+References: <1500616763-26560-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v4 20/43] tcg: check CF_PARALLEL instead of
+ parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On Wed, Jul 19, 2017 at 13:34:47 -1000, Richard Henderson wrote:
-> It is much shorter to reverse all 4 half-words in parallel
-> than extract, reverse, and deposit each in turn.
-> 
-> Suggested-by: Aurelien Jarno <aurelien@aurel32.net>
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/arm/translate-a64.c | 24 ++++++------------------
->  1 file changed, 6 insertions(+), 18 deletions(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 3fa39023ca..5bb0f8ef22 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -4043,25 +4043,13 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
->      TCGv_i64 tcg_rd = cpu_reg(s, rd);
->      TCGv_i64 tcg_tmp = tcg_temp_new_i64();
->      TCGv_i64 tcg_rn = read_cpu_reg(s, rn, sf);
-> +    TCGv_i64 mask = tcg_const_i64(sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff);
->  
-> -    tcg_gen_andi_i64(tcg_tmp, tcg_rn, 0xffff);
-> -    tcg_gen_bswap16_i64(tcg_rd, tcg_tmp);
-> -
-> -    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 16);
-> -    tcg_gen_andi_i64(tcg_tmp, tcg_tmp, 0xffff);
-> -    tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
-> -    tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 16, 16);
-> -
-> -    if (sf) {
-> -        tcg_gen_shri_i64(tcg_tmp, tcg_rn, 32);
-> -        tcg_gen_andi_i64(tcg_tmp, tcg_tmp, 0xffff);
-> -        tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
-> -        tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 32, 16);
-> -
-> -        tcg_gen_shri_i64(tcg_tmp, tcg_rn, 48);
-> -        tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
-> -        tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 48, 16);
-> -    }
-> +    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
-> +    tcg_gen_and_i64(tcg_rd, tcg_rn, mask);
-> +    tcg_gen_and_i64(tcg_tmp, tcg_tmp, mask);
-> +    tcg_gen_shli_i64(tcg_rd, tcg_rd, 8);
-> +    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_tmp);
->  
->      tcg_temp_free_i64(tcg_tmp);
+Thereby decoupling the resulting translated code from the current state
+of the system.
 
-const leak! patch below -- cut with `git am --scissors'.
+The tb->cflags field is not passed to tcg generation functions. So
+we add a field to TCGContext, storing there a copy of tb->cflags.
 
-		Emilio
+Most architectures have <= 32 registers, which results in a 4-byte hole
+in TCGContext. Use this hole for the new field.
 
----8<---
-
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/arm/translate-a64.c | 1 +
- 1 file changed, 1 insertion(+)
+ tcg/tcg.h                 |  1 +
+ accel/tcg/translate-all.c |  1 +
+ tcg/tcg-op.c              | 10 +++++-----
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 883e9df..58ed4c6 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -4044,20 +4044,21 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
-     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
-     TCGv_i64 tcg_rn = read_cpu_reg(s, rn, sf);
-     TCGv_i64 mask = tcg_const_i64(sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff);
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 96872f8..ef1760a 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -656,6 +656,7 @@ struct TCGContext {
+     uintptr_t *tb_jmp_target_addr; /* tb->jmp_target_addr if !USE_DIRECT_JUMP */
  
-     tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
-     tcg_gen_and_i64(tcg_rd, tcg_rn, mask);
-     tcg_gen_and_i64(tcg_tmp, tcg_tmp, mask);
-     tcg_gen_shli_i64(tcg_rd, tcg_rd, 8);
-     tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_tmp);
+     TCGRegSet reserved_regs;
++    uint32_t tb_cflags; /* cflags of the current TB */
+     intptr_t current_frame_offset;
+     intptr_t frame_start;
+     intptr_t frame_end;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index c1ce38f..227b566 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1271,6 +1271,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     tb->flags = flags;
+     tb->cflags = cflags;
+     tb->trace_vcpu_dstate = *cpu->trace_dstate;
++    tcg_ctx.tb_cflags = cflags;
  
-+    tcg_temp_free_i64(mask);
-     tcg_temp_free_i64(tcg_tmp);
+ #ifdef CONFIG_PROFILER
+     tcg_ctx.tb_count1++; /* includes aborted translations because of
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 205d07f..5580789 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -150,7 +150,7 @@ void tcg_gen_op6(TCGContext *ctx, TCGOpcode opc, TCGArg a1, TCGArg a2,
+ 
+ void tcg_gen_mb(TCGBar mb_type)
+ {
+-    if (parallel_cpus) {
++    if (tcg_ctx.tb_cflags & CF_PARALLEL) {
+         tcg_gen_op1(&tcg_ctx, INDEX_op_mb, mb_type);
+     }
  }
+@@ -2794,7 +2794,7 @@ void tcg_gen_atomic_cmpxchg_i32(TCGv_i32 retv, TCGv addr, TCGv_i32 cmpv,
+ {
+     memop = tcg_canonicalize_memop(memop, 0, 0);
  
- /* C3.5.7 Data-processing (1 source)
-  *   31  30  29  28             21 20     16 15    10 9    5 4    0
-  * +----+---+---+-----------------+---------+--------+------+------+
-  * | sf | 1 | S | 1 1 0 1 0 1 1 0 | opcode2 | opcode |  Rn  |  Rd  |
-  * +----+---+---+-----------------+---------+--------+------+------+
-  */
- static void disas_data_proc_1src(DisasContext *s, uint32_t insn)
+-    if (!parallel_cpus) {
++    if (!(tcg_ctx.tb_cflags & CF_PARALLEL)) {
+         TCGv_i32 t1 = tcg_temp_new_i32();
+         TCGv_i32 t2 = tcg_temp_new_i32();
+ 
+@@ -2838,7 +2838,7 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
+ {
+     memop = tcg_canonicalize_memop(memop, 1, 0);
+ 
+-    if (!parallel_cpus) {
++    if (!(tcg_ctx.tb_cflags & CF_PARALLEL)) {
+         TCGv_i64 t1 = tcg_temp_new_i64();
+         TCGv_i64 t2 = tcg_temp_new_i64();
+ 
+@@ -3015,7 +3015,7 @@ static void * const table_##NAME[16] = {                                \
+ void tcg_gen_atomic_##NAME##_i32                                        \
+     (TCGv_i32 ret, TCGv addr, TCGv_i32 val, TCGArg idx, TCGMemOp memop) \
+ {                                                                       \
+-    if (parallel_cpus) {                                                \
++    if (tcg_ctx.tb_cflags & CF_PARALLEL) {                              \
+         do_atomic_op_i32(ret, addr, val, idx, memop, table_##NAME);     \
+     } else {                                                            \
+         do_nonatomic_op_i32(ret, addr, val, idx, memop, NEW,            \
+@@ -3025,7 +3025,7 @@ void tcg_gen_atomic_##NAME##_i32                                        \
+ void tcg_gen_atomic_##NAME##_i64                                        \
+     (TCGv_i64 ret, TCGv addr, TCGv_i64 val, TCGArg idx, TCGMemOp memop) \
+ {                                                                       \
+-    if (parallel_cpus) {                                                \
++    if (tcg_ctx.tb_cflags & CF_PARALLEL) {                              \
+         do_atomic_op_i64(ret, addr, val, idx, memop, table_##NAME);     \
+     } else {                                                            \
+         do_nonatomic_op_i64(ret, addr, val, idx, memop, NEW,            \
 -- 
 2.7.4
