@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1dYbjQ-0006SI-Aw
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:28:53 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1dYbo5-0008E6-U4
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:33:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1dYbjL-0001cw-9g
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:28:52 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1dYbjL-0001c4-35
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:28:47 -0400
-Received: by mail-qt0-x243.google.com with SMTP id p25so6896040qtp.2
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 10:28:45 -0700 (PDT)
-Date: Fri, 21 Jul 2017 13:28:43 -0400
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20170721172843.GA6606@morn.lan>
-References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
-	<1500533554.6553.1.camel@redhat.com>
-	<3e0f92ea-58ce-abfb-1aed-4d56c1fa68b2@redhat.com>
-	<1500631461.12926.5.camel@redhat.com>
-	<eeba9fcf-4b52-2c24-af03-d88333cd2dc6@redhat.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1dYbo0-0004Nd-U8
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:33:41 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Fri, 21 Jul 2017 17:23:24 +0000
+Message-ID: <DM2PR21MB0060502DD5939A4A46FB527D9EA40@DM2PR21MB0060.namprd21.prod.outlook.com>
+References: <20170721102059.14663-1-famz@redhat.com>
+	<20170721102059.14663-3-famz@redhat.com>
+In-Reply-To: <20170721102059.14663-3-famz@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eeba9fcf-4b52-2c24-af03-d88333cd2dc6@redhat.com>
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC PATCH 0/2] Allow RedHat PCI bridges
- reserve more buses than necessary during init
+Subject: Re: [Qemu-devel] [PATCH 2/2] file-posix: Do runtime check for ofd
+ lock API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>
 
-On Fri, Jul 21, 2017 at 03:15:46PM +0300, Marcel Apfelbaum wrote:
-> On 21/07/2017 13:04, Gerd Hoffmann wrote:
-> > I'd prefer to have a single vendor capability for all resource
-> > allocation hints provided by qemu.
-> Sure, the capability looking something like:
-> 
->    [flags: reserve-buses|reserve-IO|reserve-MEM|...]
->    [extra-buses][IO-size][MEM-size]
-> 
->    if reserve-buses -> use 'extra-buses' value and so on
+> From: Fam Zheng [mailto:famz@redhat.com]
+> Sent: Friday, 21 July 2017 3:21
+>=20
+> It is reported that on Windows Subsystem for Linux, ofd operations fail
+> with -EINVAL. In other words, QEMU binary built with system headers that
+> exports F_OFD_SETLK doesn't necessarily run in an environment that
+> actually supports it:
+>=20
+> $ qemu-system-aarch64 ... -drive file=3Dtest.vhdx,if=3Dnone,id=3Dhd0 \
+>     -device virtio-blk-pci,drive=3Dhd0
+> qemu-system-aarch64: -drive file=3Dtest.vhdx,if=3Dnone,id=3Dhd0: Failed t=
+o unlock
+> byte 100
+> qemu-system-aarch64: -drive file=3Dtest.vhdx,if=3Dnone,id=3Dhd0: Failed t=
+o unlock
+> byte 100
+> qemu-system-aarch64: -drive file=3Dtest.vhdx,if=3Dnone,id=3Dhd0: Failed t=
+o lock
+> byte 100
+>=20
+> Let's do a runtime check to cope with that.
+>=20
+> Reported-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 19 ++++++++-----------
+>  1 file changed, 8 insertions(+), 11 deletions(-)
 
-I don't have any objection to using a PCI capability, but I do wonder
-if fw_cfg would be a better fit.  This information is purely qemu ->
-firmware, right?
+If it helps:
+Tested-By: Andrew Baumann <andrew.baumann@microsoft.com>
 
--Kevin
+Thanks!
+Andrew
