@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYYgR-0005a1-Nm
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:13:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYYlJ-0006Nr-87
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:18:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYYgM-0003X3-Mh
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:13:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37906)
+	(envelope-from <eblake@redhat.com>) id 1dYYlE-0006hi-Uy
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:18:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYYgM-0003WI-DR
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:13:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 405A781F01
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:13:29 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170714190827.4083-1-eblake@redhat.com>
-	<20170714190827.4083-6-eblake@redhat.com>
-	<87zibzl8py.fsf@dusky.pond.sub.org>
-	<ff471aeb-51dc-1abd-f512-f1a93db3752c@redhat.com>
-	<9674afa4-78b3-044b-4e5f-4014888ff03e@redhat.com>
-	<87379ql28s.fsf@dusky.pond.sub.org>
-	<ac668b9d-3ee4-7e63-efed-4d092b2adb78@redhat.com>
-Date: Fri, 21 Jul 2017 16:13:27 +0200
-In-Reply-To: <ac668b9d-3ee4-7e63-efed-4d092b2adb78@redhat.com> (Eric Blake's
-	message of "Fri, 21 Jul 2017 07:08:57 -0500")
-Message-ID: <87bmodho8o.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYYlE-0006gs-LH
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:18:32 -0400
+References: <20170720085958.GC21566@redhat.com>
+	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+	<20170720091224.GD21566@redhat.com>
+	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+	<20170721083816.GC17693@redhat.com>
+	<CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+	<20170721093433.GG17693@redhat.com>
+	<CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+	<9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
+	<18c3027a-d30b-98df-9693-826751f80ea9@redhat.com>
+	<20170721140631.GS17693@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <81f2f144-896a-d16e-83da-1fae313ccfff@redhat.com>
+Date: Fri, 21 Jul 2017 09:18:29 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/5] qtest: Document calling conventions
+In-Reply-To: <20170721140631.GS17693@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5swPvef9471RWsfAi3Xc1Jnt9Id4cUwRI"
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,117 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5swPvef9471RWsfAi3Xc1Jnt9Id4cUwRI
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <81f2f144-896a-d16e-83da-1fae313ccfff@redhat.com>
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
+References: <20170720085958.GC21566@redhat.com>
+ <CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+ <20170720091224.GD21566@redhat.com>
+ <CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+ <20170721083816.GC17693@redhat.com>
+ <CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+ <20170721093433.GG17693@redhat.com>
+ <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+ <9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
+ <18c3027a-d30b-98df-9693-826751f80ea9@redhat.com>
+ <20170721140631.GS17693@redhat.com>
+In-Reply-To: <20170721140631.GS17693@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 07/21/2017 01:42 AM, Markus Armbruster wrote:
->>> But with json-lexer style, %s MODIFIES its input.
->>=20
->> Your assertion "MODIFIES its input" confused me briefly, because I read
->> it as "side effect on the argument string".  That would be bonkers.
->> What you mean is it doesn't emit the argument string unmodified.
->
-> Yes. I'm not sure how I could have worded that better; maybe "does not
-> do a straight passthrough of its input"
->
->>> So adding the format immediately causes lots of warnings, such as:
->>>
->>>   CC      tests/vhost-user-test.o
->>> tests/vhost-user-test.c: In function =E2=80=98test_migrate=E2=80=99:
->>> tests/vhost-user-test.c:668:5: error: format not a string literal and no
->>> format arguments [-Werror=3Dformat-security]
->>>      rsp =3D qmp(cmd);
->>>      ^~~
->>=20
->>     cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
->>                           "'arguments': { 'uri': '%s' } }",
->>                           uri);
->>     rsp =3D qmp(cmd);
->>     g_free(cmd);
->>     g_assert(qdict_haskey(rsp, "return"));
->>     QDECREF(rsp);
->>=20
->> For this to work, @uri must not contain funny characters.
->>=20
->> Shouldn't we simply use the built-in quoting here?
->
-> We can - but there are a lot of tests that have to be updated.
+On 07/21/2017 09:06 AM, Daniel P. Berrange wrote:
+>> Oops, looks like 'git send-email' doesn't know how to auto-cc
+>> 'Reported-by:' tags.
+>=20
+> That's something that's bugged me too - someone should write a patch fo=
+r
+> git :-)
 
-Not that many, see "[PATCH 0/9] tests: Clean up around qmp() and hmp()".
-Its PATCH 4/9 makes the case for built-in quoting:
+Attempted:
+http://marc.info/?l=3Dgit&m=3D150064653516706&w=3D2
 
-    When you build QMP input manually like this
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-        cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
-                              "'arguments': { 'uri': '%s' } }",
-                              uri);
-        rsp =3D qmp(cmd);
-        g_free(cmd);
 
-    you're responsible for escaping the interpolated values for JSON.  Not
-    done here, and therefore works only for sufficiently nice @uri.  For
-    instance, if @uri contained a single "'", qobject_from_jsonv() would
-    fail, qmp_fd_sendv() would misinterpret the failure as empty input and
-    do nothing, and the test would hang waiting for a response that never
-    comes.
+--5swPvef9471RWsfAi3Xc1Jnt9Id4cUwRI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-    Leaving interpolation into JSON to qmp() is more robust:
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-        rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }",=
- uri);
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyDTUACgkQp6FrSiUn
+Q2o0RQf/ftZfrd6JPHUdwdgvqDiylGMmeNlG2Q+fKL1RdEEbgOCBuZalpPtc7XRN
+fjDJV/RLtcCNtDrPsbPU0ElUqdpOnbVjMqmNu3qLSl+XOUGFhrfVNdeFRHMzMKMm
+thwFWzOrpfyN9wvnBD2ynEEWsy1RDKkMJGhZEIkPntD0xh4M1xil4L/ZyZe8pklZ
+e/Ja1Jv21oQNfBkAq9O5k6bNk2YWYfSZpQgXc4+aOySyFgsBPzxy4GE/IAODgdQ1
+/qx8AdUGgos7oEiVj0YRMCqQkdetvdFpk3x2z96aR+hjvFOpsUHLxU9r9eivLkG+
+aePRV1GZEihcIj1JhKBciuw4F1as/A==
+=ITX4
+-----END PGP SIGNATURE-----
 
-    It's also more concise.
-
-In short, using printf() & similar to format JSON is a JSON injection
-vulnerability waiting to happen.  Special case: g_strdup_printf() to
-format input for qobject_from_jsonf() & friends.  Leaving the job to
-qobject_from_jsonf() is more robust.
-
->>=20
->>     rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }", =
-uri);
->>     g_assert(qdict_haskey(rsp, "return"));
->>     QDECREF(rsp);
->>=20
->>>
->>>   CC      tests/boot-order-test.o
->>> tests/boot-order-test.c: In function =E2=80=98test_a_boot_order=E2=80=
-=99:
->>> tests/boot-order-test.c:46:26: error: zero-length gnu_printf format
->>> string [-Werror=3Dformat-zero-length]
->>>      qmp_discard_response("");   /* HACK: wait for event */
->>>                           ^~
->>=20
->> Should use qmp_eventwait().  Doesn't because it predates it.
->
-> We can - but there are a lot of tests that have to be updated.
-
-Also not that many, see same series.
-
->>> but we CAN'T rewrite those to qmp("%s", command).
->>=20
->> Got more troublemakers?
->
-> When I worked on getting rid of qobject_from_jsonf(), I was able to
-> reduce the tests down to JUST using %s, which I then handled locally in
-> qmp() rather than relying on qobject_from_jsonf().  Going the opposite
-> direction and more fully relying on qobject_from_jsonf() by fixing
-> multiple tests that were using older idioms is also an approach (in the
-> opposite direction I originally took) - but the more work it is, the
-> less likely that this patch is 2.10 material.
-
-No need to worry about 2.10, I think.
-
->>> Now you can sort-of understand why my larger series wanted to get rid of
->>> qobject_from_jsonf(), since our use of GCC_FMT_ATTR() there is a lie?
->>=20
->> I don't think it's a lie.  qobject_from_jsonf() satisfies the attribute
->> format(printf, ...) contract: it fetches varargs exactly like printf().
->> What it does with them is of no concern to this attribute.
->
-> I still find it odd that you can't safely turn foo(var) into foo("%s", va=
-r).
-
-For me, the protection against JSON injection bugs is well worth it.
+--5swPvef9471RWsfAi3Xc1Jnt9Id4cUwRI--
