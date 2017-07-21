@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMda-0004dY-FX
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:21:51 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdz-0004oE-Tx
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdV-0001b6-Ld
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:21:50 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:50317)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdv-0001o3-2J
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:22:15 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:58796)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdU-0001Xc-R7
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:21:45 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdu-0001jH-7g
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:22:11 -0400
 From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Date: Fri, 21 Jul 2017 09:20:16 +0800
-Message-Id: <1500600016-5906-1-git-send-email-lu.zhipeng@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] qga: Add support network interface statistics
- in guest-network-get-interfaces command
+Date: Fri, 21 Jul 2017 09:20:49 +0800
+Message-Id: <1500600049-5954-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH v7] qga: Add support network interface
+ statistics in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
