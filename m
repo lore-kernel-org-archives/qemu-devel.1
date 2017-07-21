@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYXYx-0008Ii-2n
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:01:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYXgA-0004dT-7M
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYXYs-0004Fo-Md
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:01:47 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:32869)
+	(envelope-from <peter.maydell@linaro.org>) id 1dYXg9-0001QH-20
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:09:14 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:37006)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYXYs-0004F2-H7
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:01:42 -0400
-Received: by mail-wm0-x241.google.com with SMTP id 65so6939729wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 06:01:42 -0700 (PDT)
-Date: Fri, 21 Jul 2017 14:01:38 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170721130138.GG18014@stefanha-x1.localdomain>
-References: <20170717101547.22295-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dYXg8-0001Pz-RW
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:09:12 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id 33so25742214wrz.4
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 06:09:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4ndw/alBWmZEhfcZ"
-Content-Disposition: inline
-In-Reply-To: <20170717101547.22295-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] add editorconfig
+In-Reply-To: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
+References: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Jul 2017 14:08:51 +0100
+Message-ID: <CAFEAcA-rOyqHWFYMitBy20mJRsB_4k0zM13Yx67Mb0N9CJAwKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/14] target-mips queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 21 July 2017 at 03:37, Yongbok Kim <yongbok.kim@imgtec.com> wrote:
+> The following changes since commit 25d0233c1ac6cd14a15fcc834f1de3b179037b1d:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20170720-pull-request' into staging (2017-07-20 16:40:01 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/yongbok/upstream-qemu.git tags/mips-20170721
+>
+> for you to fetch changes up to bad63a8008a0aaefcd00542c89bee01623d7c9de:
+>
+>   target/mips: Enable CP0_EBase.WG on MIPS64 CPUs (2017-07-21 03:23:44 +0100)
+>
+> ----------------------------------------------------------------
+> MIPS patches 2017-07-21
+>
+> Changes:
+> * Add Enhanced Virtual Addressing (EVA) support
+>
+> ----------------------------------------------------------------
+>
+>
+> James Hogan (14):
+>   target/mips: Fix MIPS64 MFC0 UserLocal on BE host
+>   target/mips: Fix TLBWI shadow flush for EHINV,XI,RI
+>   target/mips: Weaken TLB flush on UX,SX,KX,ASID changes
+>   target/mips: Add CP0_Ebase.WG (write gate) support
+>   target/mips: Prepare loads/stores for EVA
+>   target/mips: Decode MIPS32 EVA load & store instructions
+>   target/mips: Decode microMIPS EVA load & store instructions
+>   target/mips: Check memory permissions with mem_idx
+>   target/mips: Abstract mmu_idx from hflags
+>   target/mips: Add an MMU mode for ERL
+>   target/mips: Add segmentation control registers
+>   target/mips: Implement segmentation control
+>   target/mips: Add EVA support to P5600
+>   target/mips: Enable CP0_EBase.WG on MIPS64 CPUs
+>
 
---4ndw/alBWmZEhfcZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Applied, thanks.
 
-On Mon, Jul 17, 2017 at 12:15:47PM +0200, Gerd Hoffmann wrote:
-> Add a .editorconfig file for qemu.  Specifies the indent and tab style
-> for various files (C code and Makefiles for starters).  Most popular
-> editors support this either natively or via plugin.
->=20
-> Check http://editorconfig.org/ for details.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  .editorconfig | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->  create mode 100644 .editorconfig
->=20
-> diff --git a/.editorconfig b/.editorconfig
-> new file mode 100644
-> index 0000000000..b2022e391a
-> --- /dev/null
-> +++ b/.editorconfig
-> @@ -0,0 +1,15 @@
-> +# http://editorconfig.org
-> +root =3D true
-> +
-> +[*]
-> +end_of_line =3D lf
-> +insert_final_newline =3D true
-> +charset =3D utf-8
-> +
-> +[Makefile*]
-> +indent_style =3D tab
-> +indent_size =3D 8
-> +
-> +[*.{c,h}]
-> +indent_style =3D space
-> +indent_size =3D 4
-
-Missing .cpp and .cc (hard to choose one, we use both!).
-
-Stefan
-
---4ndw/alBWmZEhfcZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZcfsyAAoJEJykq7OBq3PIX7cIALJRmZ+XygPpNNlkigCfibRB
-XgK9JCbsf0oeUF0KsrLFcYe8tX5YJ1y4SRJnr1IOe8QNjuNBqnNSFHPQKS8XCgxd
-k8Incj3u0TPiHlx/KLr81x9ThRRj0pWQahTtmOhzDzcvpD2HaLaZZlM0N/4+BjuB
-mqnWg5fxMCvzeO3MDfob1OpdEzqbDS+HROxCNG8cp6ZHse6cV+h+zlkS+wcQY8H7
-CWiFmbinUa23KPQjNNp2b3SfFOB1RvgPda2HbM2BlcY6Gr9fuGLls0DvLX2Syyc1
-/jxqZSMqgvTyahpiAI8nqd6F8dm3OQFSqoSns1+Relh9c+/N0w4BtVEL2bp/EQU=
-=LlcF
------END PGP SIGNATURE-----
-
---4ndw/alBWmZEhfcZ--
+-- PMM
