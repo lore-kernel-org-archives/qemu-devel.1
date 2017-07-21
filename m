@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYVDN-0002f7-83
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:31:22 -0400
+	(envelope-from <lists@philjordan.eu>) id 1dYVLX-0004BC-BY
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYVDJ-00053c-7J
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:31:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYVDI-00053M-U6
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:31:17 -0400
-Date: Fri, 21 Jul 2017 11:31:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170721103110.GD2133@work-vm>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-	<20170717185830.GD31820@work-vm>
-	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
-	<20170720100232.GA2456@work-vm>
-	<408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
-	<20170721091337.GA2133@work-vm>
-	<CAFEAcA9Odi+ZtT1FmDoD8pjk=cgHS54BOVwopqXRi+TTf4PA8g@mail.gmail.com>
+	(envelope-from <lists@philjordan.eu>) id 1dYVLV-000870-Nr
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:39:47 -0400
+Received: from mail-ua0-x233.google.com ([2607:f8b0:400c:c08::233]:34448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lists@philjordan.eu>) id 1dYVLV-00086f-HP
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:39:45 -0400
+Received: by mail-ua0-x233.google.com with SMTP id q25so23691599uah.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 03:39:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9Odi+ZtT1FmDoD8pjk=cgHS54BOVwopqXRi+TTf4PA8g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+In-Reply-To: <20170721114623.57b3be1d@nial.brq.redhat.com>
+References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+	<20170721092026.GD17693@redhat.com>
+	<20170721114623.57b3be1d@nial.brq.redhat.com>
+From: Phil Dennis-Jordan <lists@philjordan.eu>
+Date: Fri, 21 Jul 2017 12:39:24 +0200
+Message-ID: <CAGCz3vvFyOEqbnEScZvmgOts+LNQ=vob5LwhSGURZMfPWZJf1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +32,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 21 July 2017 at 10:13, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > I don't fully understand the way memory_region_do_invalidate_mmio_ptr
-> > works; I see it dropping the memory region; if that's also dropping
-> > the RAMBlock then it will upset migration.   Even if the CPU is stopped
-> > I dont think that stops the migration thread walking through the list of
-> > RAMBlocks.
-> 
-> memory_region_do_invalidate_mmio_ptr() calls memory_region_unref(),
-> which will eventually result in memory_region_finalize() being
-> called, which will call the MR destructor, which in this case is
-> memory_region_destructor_ram(), which calls qemu_ram_free() on
-> the RAMBlock, which removes the RAMBlock from the list (after
-> taking the ramlist lock).
+On Fri, Jul 21, 2017 at 11:46 AM, Igor Mammedov <imammedo@redhat.com> wrote=
+:
+> On Fri, 21 Jul 2017 10:20:26 +0100
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>
+>> On Thu, Jul 20, 2017 at 09:29:33PM +0200, Phil Dennis-Jordan wrote:
+>> > On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
+>> > <programmingkidx@gmail.com> wrote:
+>> > > I noticed that Windows 2000 does not boot up in QEMU recently. After=
+ bisecting the issue I found the offending commit:
+>> >
+>> > Ouch. I reckon we have 2 options for fixing this:
+>> >
+>> > 1. Export two FADTs, one ACPI 1.0, one ACPI 2.0. The latter would need
+>> > to be pointed to by an XSDT, which Qemu currently doesn't implement at
+>> > all as far as I'm aware. Any ideas on how SeaBIOS or OVMF would handle
+>> > this? Any likely other OS regressions?
+>> >
+>> > 2. Select FADT version with an option. This one is definitely safe,
+>> > but adds yet another option.
+>> >
+>> > Thoughts?
+>>
+>> The original comit below claims the change does not impact guest ABI
+>> compatibility, so do we understand why Windows broke ?
+> Author made a reasonable effort to test with variety of guest OSes upto
+> vanilla WinXP, we can't blame ourselves for not testing OS that's is not
+> available.
+>
+> Well we don't know why w2k breaks, only that it bisects to this commit.
 
-OK
+Short of having access to Win2K source or reverse engineering, we can
+only guess - but it's almost certainly got to be one or more of these:
 
-> > Even then, the problem is migration keeps a 'dirty_pages' count which is
-> > calculated at the start of migration and updated as we dirty and send
-> > pages; if we add/remove a RAMBlock then that dirty_pages count is wrong
-> > and we either never finish migration (since dirty_pages never reaches
-> > zero) or finish early with some unsent data.
-> > And then there's the 'received' bitmap currently being added for
-> > postcopy which tracks each page that's been received (that's not in yet
-> > though).
-> 
-> It sounds like we really need to make migration robust against
-> RAMBlock changes -- in the hotplug case it's certainly possible
-> for RAMBlocks to be newly created or destroyed while migration
-> is in progress.
+1. It can't handle FADT revision !=3D 1 (as opposed to later systems
+which evidently test for >=3D 1)
+2. It can't handle if FADT length !=3D sizeof(ACPI 1.0 FADT) (again, as
+opposed to testing for >=3D)
+3. It only computes the checksum over the hardcoded ACPI 1.0 FADT
+length, not over the number of bytes in the length field.
 
-Juan recently added a patch that disables hotplug/unplug during
-migration (b06424de) - although we did figure out later that it's
-not quite enough because it stops the request to hotunplug, but
-one of those might already be in flight.
+There isn't a way to reconcile these with a valid ACPI 2.0 FADT.
 
-Adding a RAMBlock isn't too bad a problem, removing one is much hairier.
+I've found these presentation slides from Intel's IDF 2001:
+http://www.acpi.info/presentations/S01USMOBS169_OS%20new.ppt
+On slide 10, "ACPI 2.0 System Description Tables (Windows 2000
+Compatibility)" it indicates that two FADTs are required for Win2k,
+with the RSDT pointing to an ACPI 1.0 FADT, and the XSDT pointing to a
+2.0 one. (This is my "option 1")
 
-  a) Somehow it has to be coordinated with the destination - my
-  suggestion for this is to send a QMP command down the migration stream
-  to do the hot-add.
+Presumably this is how shipping Win2K-compatible hardware implemented
+it, so I'd expect FOSS operating systems to be able to deal with this
+kind of setup too. Moreover, the ACPI 2.0 spec says (5.2.7) "An ACPI
+2.0-compatible OS must use the XSDT if present." which also suggests
+that the RSDT should be ignored if the OS can handle the XSDT. Whether
+ALL proprietary OSes can deal with it in practice is another question.
 
-  b) Migration traverses RAMBlock lists over quite a long time; we can't
-  hold an RCU lock for the whole period we're doing migration,
-  so the FOREACH_RCU isn't really protecting us from much.
-  (We probably should hold ram_list.mutex or the whole migration at
-  the moment)
-
-  c) RAMBlocks themselves aren't reference counted
-
-  d) We've got 2ndary structures such as that counter, a queue of
-  requests, bitmaps etc - that are all either based off RAMBlock list
-  data or actually contain pointers to RAMBlocks
-
-  e) Then the RAMBlocks are registered with the kernel for dirty
-  tracking.
-
-None of those feel easily fixable.
-
-Dave
-
-
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> If the commit message was inaccurate, and *does* in fact change ABI,
+>> then we should have added an option to toggle FADT version, and used
+>> machine type versioning to ensure we didn't regress existing machine
+>> types. IOW option 2.
+>>
+>> That would still, however, leave Windows 2k broken on new machine
+>> types which is pretty poor experiance, but is probably all that
+>> we have time for in the current freeze period.
+>>
+>> If we can do option 1 in the 2.11 release that would potentially
+>> give better user experiance by not being broken out of the box
+>> with the latest machine type.
+> option 1 might confuse/break OVMF.
+>
+> I've just posted patch to unconditionally force rev1 for pc-i440fx-2.9
+> and older machines, while q35 and newer pc would use rev3.
+>
+>>
+>>
+>> > > commit 77af8a2b95b79699de650965d5228772743efe84
+>> > > Author: Phil Dennis-Jordan <phil@philjordan.eu>
+>> > > Date:   Wed Mar 15 19:20:26 2017 +1300
+>> > >
+>> > >     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve gue=
+st OS support.
+>> > >
+>> > >     This updates the FADT generated for x86/64 machine types from Re=
+vision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is=
+ to expose the reset register information to guest operating systems which =
+require it, specifically OS X/macOS. Revision 1 FADTs do not contain the fi=
+elds relating to the reset register.
+>> > >
+>> > >     The new layout and contents remains backwards-compatible with op=
+erating systems which only support ACPI 1.0, as the existing fields are not=
+ modified by this change, as the 64-bit and 32-bit variants are allowed to =
+co-exist according to the ACPI 2.0 standard. No regressions became apparent=
+ in tests with a range of Windows (XP-10) and Linux versions.
+>> > >
+>> > >     The BIOS tables test suite's FADT checksum test has also been up=
+dated to reflect the new FADT layout and content.
+>> > >
+>> > >     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+>> > >     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.e=
+u>
+>> > >     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> > >
+>> > > :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 6d2a94150cf1=
+eafb16f0ccf6325281415fef64a6 M      hw
+>> > > :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d 68f9368d8d78=
+fd3267f609b603f97e8a74bdf528 M      include
+>> > > :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff 8ed08cef10fd=
+dee7814e38ad62be11371592a75a M      tests
+>> > >
+>> > >
+>> >
+>>
+>> Regards,
+>> Daniel
+>
