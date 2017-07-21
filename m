@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYfRz-0002z4-6U
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:27:10 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dYfTl-0004C8-1c
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYfRy-0005pu-Bl
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:27:07 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48679)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYfRy-0005po-7G
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:27:06 -0400
-Date: Fri, 21 Jul 2017 17:27:05 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170721212705.GD10809@flamenco>
-References: <20170715094243.28371-1-rth@twiddle.net>
-	<20170715094243.28371-7-rth@twiddle.net>
+	(envelope-from <rth7680@gmail.com>) id 1dYfTh-0006GI-V1
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:28:57 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:38696)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dYfTh-0006FP-MV
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:28:53 -0400
+Received: by mail-pf0-x242.google.com with SMTP id c23so5604757pfe.5
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:28:53 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1500616763-26560-1-git-send-email-cota@braap.org>
+	<1500616763-26560-2-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <98208c73-d3fe-e484-657f-d1b648a8e0f3@twiddle.net>
+Date: Fri, 21 Jul 2017 11:28:41 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170715094243.28371-7-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v14 06/34] target/arm: Delay check for
- magic kernel page
+In-Reply-To: <1500616763-26560-2-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use
+ it for TB hashing along with CF_COUNT_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
-On Fri, Jul 14, 2017 at 23:42:15 -1000, Richard Henderson wrote:
-> There's nothing magic about the exception that we generate in order
-> to execute the magic kernel page.  We can and should allow gdb to
-> set a breakpoint at this location.
+On 07/20/2017 07:59 PM, Emilio G. Cota wrote:
+> This will enable us to decouple code translation from the value
+> of parallel_cpus at any given time. It will also help us minimize
+> TB flushes when generating code via EXCP_ATOMIC.
 > 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> Note that the declaration of parallel_cpus is brought to exec-all.h
+> to be able to define there the "curr_cflags" inline.
+> 
+> Signed-off-by: Emilio G. Cota<cota@braap.org>
+> ---
+>   include/exec/exec-all.h   | 20 +++++++++++++++++++-
+>   include/exec/tb-hash-xx.h |  9 ++++++---
+>   include/exec/tb-hash.h    |  4 ++--
+>   include/exec/tb-lookup.h  |  6 +++---
+>   tcg/tcg.h                 |  1 -
+>   accel/tcg/cpu-exec.c      | 45 +++++++++++++++++++++++----------------------
+>   accel/tcg/translate-all.c | 13 +++++++++----
+>   exec.c                    |  2 +-
+>   tcg/tcg-runtime.c         |  2 +-
+>   tests/qht-bench.c         |  2 +-
+>   10 files changed, 65 insertions(+), 39 deletions(-)
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-		E.
+
+r~
