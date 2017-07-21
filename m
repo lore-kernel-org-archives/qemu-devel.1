@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYZvt-0003V5-NW
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:33:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYZxL-00048Q-20
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYZvq-0002pN-JQ
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:33:37 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35254)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYZvq-0002p9-BG
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:33:34 -0400
-Received: by mail-wm0-x231.google.com with SMTP id w126so15715022wme.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 08:33:34 -0700 (PDT)
-Date: Fri, 21 Jul 2017 16:33:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170721153331.GL18014@stefanha-x1.localdomain>
-References: <87o9so1hl7.fsf@dusky.pond.sub.org>
-	<20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1dYZxK-0003Ix-6G
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:35:07 -0400
+References: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5bd70af1-1f4d-9e73-86e6-b8b546c12dc9@redhat.com>
+Date: Fri, 21 Jul 2017 10:34:59 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bPg9NdpM9EETxvqt"
-Content-Disposition: inline
-In-Reply-To: <8760epr9vw.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+In-Reply-To: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk"
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Avoid unnecessary sleeps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-
---bPg9NdpM9EETxvqt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <5bd70af1-1f4d-9e73-86e6-b8b546c12dc9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Avoid unnecessary sleeps
+References: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 18, 2017 at 06:24:19PM +0200, Markus Armbruster wrote:
-> Stefan Hajnoczi <stefanha@gmail.com> writes:
+On 07/21/2017 10:10 AM, Kevin Wolf wrote:
+> Test cases 030, 041 and 055 used to sleep for a second after calling
+> block-job-pause to make sure that the block job had time to actually
+> get into paused state. We can instead poll its status and use that one
+> second only as a timeout.
 >=20
-> > On Thu, Jul 13, 2017 at 05:28:52PM +0200, Markus Armbruster wrote:
-> >> What can we do to improve QMP testing?  Sadly, I don't have the master
-> >> plan ready.  I can tell people their new code needs to come with tests,
-> >> but that won't help much unless subsystem maintainers pick up the habi=
-t,
-> >> too.  There are a few obvious tests to write for old code, such as a
-> >> generic test of query-like commands without arguments and without side
-> >> effects, similar to what test-hmp.c does for HMP command info (I hope =
-to
-> >> get around to that one).  But for much of the old code, we don't even
-> >> know where the test coverage holes are.
-> >>=20
-> >> Ideas anyone?
-> >
-> > It makes sense for maintainers to ask that new QMP commands come with
-> > comprehensive tests.
-> >
-> > For me the main question is how to begin?  What is the easiest and
-> > preferred way to write QMP command test cases?
-> >
-> > Today the most common approach is a qtest test case that sends commands
-> > and verifies that the expected response is returned.  This approach
-> > works but we could benefit from a discussion about the alternatives
-> > (e.g.  qemu-iotests style shell scripts with output diffing).
+> The tests also slept a second for checking that the block jobs don't
+> make progress while being paused. Half a second is more than enough for=
+
+> this.
 >=20
-> Output testing style delegates checking ouput to diff.  I rather like it
-> when text output is readily available.  It is when testing QMP.  A
-> non-trivial example using this style could be useful, as discussing
-> ideas tends to be more productive when they come with patches.
+> These changes reduce the total time for the three tests by 25 seconds o=
+n
+> my laptop (from 155 seconds to 130).
 
-Yes, I was considering how many of the Python iotests could be rewritten
-comfortably in shell.  It is nice when the test simply executes commands
-and the output file shows the entire history of what happened.  Great
-for debugging.
+Nice!
 
-Stefan
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
 
---bPg9NdpM9EETxvqt
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZch7LAAoJEJykq7OBq3PIbH8H/A9QCh5YnBF9YoVQipPCk19q
-kmYfCQLbg8pk675Xz3pN1R0eKJR1PrskYPs6NlwJudhbQjdjiuk9y8jmniDl+ctP
-m/uFN1GqOGZ+Q5go24GbSGAJr9rclJNsqFpjGfg1l3Q2S6dBDsDeVMBuZxRcf8vm
-gx7TQt3I9yXGZTC4LbGtuT5Qt3I9BhWAEyqUqWaeuuveaQgeyps8IXKxo6+tniF9
-YwHhEBd5TAwI4IgTjqwx2qnhraEIT7Oy2fjqQ2UHJMVvbXJD7xyJeHk+H++3ofNn
-df+qWuK+P2jp7Wrjbis+Id97VxyrONwbkosyuA2bxx7hlYmfLTTVl0g9INE42zw=
-=SAYB
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyHyMACgkQp6FrSiUn
+Q2qXqwgAil5bT5pyIFNMZuSILCrlgwaQFBwAA96fGql4vMbar4D9CX55+zUPDRov
+PREr1T+WTCx6R5bz/wDTyy89gCsjaAByp6bCicsOs+sjPSMuHX0GhTALdZD3BuOz
+8g+cCuBmThckJrYtEg8omJ3fpC9pSomeUyoZGu0Nx4nmvuW5Qn0A4WViEPKtvu4x
+O8wwdp9gu4C07cnt6vi4l1wDeHJBJLtc25W3EAGDsuZzXyAZPzrpvS43cCx8ARg5
+DhMC0Tty8puBNv8IoE15JeNSwP46yRyRfYE6Mlu0armIRzLN3c4kZF7OVmArqIqd
+jkF8Vu8YKFqgptxP0gbbkv8m8BBAIQ==
+=pwXi
 -----END PGP SIGNATURE-----
 
---bPg9NdpM9EETxvqt--
+--dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk--
