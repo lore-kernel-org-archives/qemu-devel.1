@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdz-0004oE-Tx
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:22:17 -0400
+	(envelope-from <pahome.chen@mirlab.org>) id 1dYMzc-0001r6-Da
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdv-0001o3-2J
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:22:15 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:58796)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdu-0001jH-7g
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:22:11 -0400
-From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Date: Fri, 21 Jul 2017 09:20:49 +0800
-Message-Id: <1500600049-5954-1-git-send-email-lu.zhipeng@zte.com.cn>
-Subject: [Qemu-devel] [PATCH v7] qga: Add support network interface
- statistics in guest-network-get-interfaces command
+	(envelope-from <pahome.chen@mirlab.org>) id 1dYMzb-0007PQ-0v
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:44:36 -0400
+Received: from mail-ua0-x233.google.com ([2607:f8b0:400c:c08::233]:37557)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
+	id 1dYMza-0007P8-OR
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:44:34 -0400
+Received: by mail-ua0-x233.google.com with SMTP id f9so35785586uaf.4
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 18:44:34 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170720091224.GD21566@redhat.com>
+References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
+	<20170720085958.GC21566@redhat.com>
+	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+	<20170720091224.GD21566@redhat.com>
+From: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>
+Date: Fri, 21 Jul 2017 09:44:33 +0800
+Message-ID: <CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,257 +32,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-we can get the network interface statistics inside a virtual machine by
-guest-network-get-interfaces command. it is very useful for us to monitor
-and analyze network traffic.
+I re-build qemu from the https://github.com/qemu/qemu, and it didn't show
+any errors.
 
-Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+I tried the cmd you suggested below:
 
-v1->v2:
- - correct some spelling mistake and add the stats data to the
-   guest-network-get-interfaces command instead of adding a new command.
-v2-v3:
- - optimize function implementation
-v3->v4:
- - modify compile error
-v4->v5:
- - rename some temporary variables and add str_trim_off function for
-   calculating the space num in front of the string in guest_get_network_stats
-v5->v6:
- - use g_strchug instead of str_trim_off implemented by myself
-v6->v7:
- - add implementation for windows
----
- qga/commands-posix.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- qga/commands-win32.c | 47 ++++++++++++++++++++++++++++++++++
- qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
- 3 files changed, 155 insertions(+), 2 deletions(-)
+> qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+>            -c /dev/nbd0 \
+>            --image-opts driver=3Dqcow2,file.filename=3D
+> demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index d8e4122..b65dd8e 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -1639,6 +1639,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
-     return head;
- }
- 
-+static int guest_get_network_stats(const char *name,
-+                       GuestNetworkInterfaceStat *stats)
-+{
-+    int name_len;
-+    char const *devinfo = "/proc/net/dev";
-+    FILE *fp;
-+    char *line = NULL, *colon;
-+    size_t n;
-+    fp = fopen(devinfo, "r");
-+    if (!fp) {
-+        return -1;
-+    }
-+    name_len = strlen(name);
-+    while (getline(&line, &n, fp) != -1) {
-+        long long dummy;
-+        long long rx_bytes;
-+        long long rx_packets;
-+        long long rx_errs;
-+        long long rx_dropped;
-+        long long tx_bytes;
-+        long long tx_packets;
-+        long long tx_errs;
-+        long long tx_dropped;
-+        char *trim_line;
-+        trim_line = g_strchug(line);
-+        if (trim_line[0] == '\0') {
-+            continue;
-+        }
-+        colon = strchr(trim_line, ':');
-+        if (!colon) {
-+            continue;
-+        }
-+        if (colon - name_len  == trim_line &&
-+           strncmp(trim_line, name, name_len) == 0) {
-+            if (sscanf(colon + 1,
-+                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
-+                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
-+                  &dummy, &dummy, &dummy, &dummy,
-+                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
-+                  &dummy, &dummy, &dummy, &dummy) != 16) {
-+                continue;
-+            }
-+            stats->rx_bytes = rx_bytes;
-+            stats->rx_packets = rx_packets;
-+            stats->rx_errs = rx_errs;
-+            stats->rx_dropped = rx_dropped;
-+            stats->tx_bytes = tx_bytes;
-+            stats->tx_packets = tx_packets;
-+            stats->tx_errs = tx_errs;
-+            stats->tx_dropped = tx_dropped;
-+            fclose(fp);
-+            return 0;
-+        }
-+    }
-+    fclose(fp);
-+    g_debug("/proc/net/dev: Interface not found");
-+    return -1;
-+}
-+
- /*
-  * Build information about guest interfaces
-  */
-@@ -1655,6 +1714,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
-     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
-         GuestNetworkInterfaceList *info;
-         GuestIpAddressList **address_list = NULL, *address_item = NULL;
-+        GuestNetworkInterfaceStat  *interface_stat = NULL;
-         char addr4[INET_ADDRSTRLEN];
-         char addr6[INET6_ADDRSTRLEN];
-         int sock;
-@@ -1774,7 +1834,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
- 
-         info->value->has_ip_addresses = true;
- 
--
-+        if (!info->value->has_statistics) {
-+            interface_stat = g_malloc0(sizeof(*interface_stat));
-+            if (guest_get_network_stats(info->value->name,
-+                interface_stat) == -1) {
-+                info->value->has_statistics = false;
-+                g_free(interface_stat);
-+            } else {
-+                info->value->statistics = interface_stat;
-+                info->value->has_statistics = true;
-+            }
-+        }
-     }
- 
-     freeifaddrs(ifap);
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 6f16457..433453d 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -1152,6 +1152,42 @@ out:
- }
- #endif
- 
-+static DWORD get_interface_index(const char *guid)
-+{
-+    ULONG index;
-+    DWORD status;
-+    wchar_t wbuf[512];
-+    snwprintf(wbuf, sizeof(wbuf), L"\\device\\tcpip_%s", guid);
-+    wbuf[sizeof(wbuf) - 1] = 0;
-+    status = GetAdapterIndex (wbuf, &index);
-+    if (status != NO_ERROR) {
-+        return (DWORD)~0;
-+    } else {
-+        return index;
-+    }
-+}
-+static int guest_get_network_stats(const char *name,
-+                       GuestNetworkInterfaceStat *stats)
-+{
-+    DWORD IfIndex = 0;
-+    MIB_IFROW aMib_ifrow;
-+    memset(&aMib_ifrow, 0, sizeof(aMib_ifrow));
-+    IfIndex = get_interface_index(name);
-+    aMib_ifrow.dwIndex = IfIndex;
-+    if (NO_ERROR == GetIfEntry(&aMib_ifrow)) {
-+        stats->rx_bytes = aMib_ifrow.dwInOctets;
-+        stats->rx_packets = aMib_ifrow.dwInUcastPkts;
-+        stats->rx_errs = aMib_ifrow.dwInErrors;
-+        stats->rx_dropped = aMib_ifrow.dwInDiscards;
-+        stats->tx_bytes = aMib_ifrow.dwOutOctets;
-+        stats->tx_packets = aMib_ifrow.dwOutUcastPkts;
-+        stats->tx_errs = aMib_ifrow.dwOutErrors;
-+        stats->tx_dropped = aMib_ifrow.dwOutDiscards;
-+        return 0;
-+    }
-+    return -1;
-+}
-+
- GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
- {
-     IP_ADAPTER_ADDRESSES *adptr_addrs, *addr;
-@@ -1238,6 +1274,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
-             info->value->has_ip_addresses = true;
-             info->value->ip_addresses = head_addr;
-         }
-+        if (!info->value->has_statistics) {
-+            interface_stat = g_malloc0(sizeof(*interface_stat));
-+            if (guest_get_network_stats(add->AdapterName,
-+                interface_stat) == -1) {
-+                info->value->has_statistics = false;
-+                g_free(interface_stat);
-+            } else {
-+                info->value->statistics = interface_stat;
-+                info->value->has_statistics = true;
-+            }
-+        }
-     }
-     WSACleanup();
- out:
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 03743ab..4ad5c57 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -643,6 +643,38 @@
-            'prefix': 'int'} }
- 
- ##
-+# @GuestNetworkInterfaceStat:
-+#
-+# @rx-bytes: total bytes received
-+#
-+# @rx-packets: total packets received
-+#
-+# @rx-errs: bad packets received
-+#
-+# @rx-dropped: receiver dropped packets
-+#
-+# @tx-bytes: total bytes transmitted
-+#
-+# @tx-packets: total packets transmitted
-+#
-+# @tx-errs: packet transmit problems
-+#
-+# @tx-dropped: dropped packets transmitted
-+#
-+# Since: 2.11
-+##
-+{ 'struct': 'GuestNetworkInterfaceStat',
-+  'data': {'rx-bytes': 'uint64',
-+            'rx-packets': 'uint64',
-+            'rx-errs': 'uint64',
-+            'rx-dropped': 'uint64',
-+            'tx-bytes': 'uint64',
-+            'tx-packets': 'uint64',
-+            'tx-errs': 'uint64',
-+            'tx-dropped': 'uint64'
-+           } }
-+
-+##
- # @GuestNetworkInterface:
- #
- # @name: The name of interface for which info are being delivered
-@@ -651,12 +683,16 @@
- #
- # @ip-addresses: List of addresses assigned to @name
- #
-+# @statistics: various statistic counters related to @name
-+# (since 2.11)
-+#
- # Since: 1.1
- ##
- { 'struct': 'GuestNetworkInterface',
-   'data': {'name': 'str',
-            '*hardware-address': 'str',
--           '*ip-addresses': ['GuestIpAddress'] } }
-+           '*ip-addresses': ['GuestIpAddress'],
-+           '*statistics': 'GuestNetworkInterfaceStat' } }
- 
- ##
- # @guest-network-get-interfaces:
--- 
-1.8.3.1
+but it shows unrecognized option '--object '
+why?I missed to install something?
+
+2017-07-20 17:12 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
+
+> On Thu, Jul 20, 2017 at 05:07:49PM +0800, =E9=99=B3=E5=9F=B9=E6=B3=93 wro=
+te:
+> > oh~ I don't know can expose the LUKS encryption. I'm sure the older(AES=
+)
+> > can't be mounted by qemu-nbd.
+>
+> It can be mounted, with current git master (all the commands I show
+> below are for git master btw).
+>
+> You should, however, *never* use the old AES format any more. It is
+> broken by design and not considered secure.
+>
+> > If I encrypt by the command you recommended:
+> >
+> > > qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+> > >              --image-opts driver=3Dqcow2,file.filename=3D
+> > > demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
+>
+> This *is* exposing the encrypted file -  not creating it. If you
+> want to connect to a host nbd device then you use the command
+> above, with the -c arg
+>
+> $ qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+>            -c /dev/nbd0 \
+>            --image-opts driver=3Dqcow2,file.filename=3D
+> demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
+>
+>
+> If you have a legacy AES qcow2 file the syntax is very similar
+>
+> $ qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+>            -c /dev/nbd0 \
+>            --image-opts driver=3Dqcow2,file.filename=3D
+> demo.qcow2,encrypt.format=3Daes,encrypt.key-secret=3Dsec0
+>
+> Note we just changed the encrypt.format parameter there.
+>
+>
+> To actually create an encrypted file in the first place you need the
+> qemu-img command
+>
+> $ qemu-img create --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Dra=
+w \
+>            -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
+>            demo.qcow2 1G
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
