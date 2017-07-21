@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYYN3-0007gW-B7
+	(envelope-from <armbru@redhat.com>) id 1dYYN2-0007fv-TJ
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYYN1-00046T-NH
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:53:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38136)
+	(envelope-from <armbru@redhat.com>) id 1dYYMz-00044q-UI
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:53:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYYN1-00045W-F1
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:53:31 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYYMz-000448-LA
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:53:29 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59476C07046F
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 13:53:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 766E1A0CD8
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 13:53:28 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 21 Jul 2017 15:53:24 +0200
-Message-Id: <1500645206-13559-8-git-send-email-armbru@redhat.com>
+Date: Fri, 21 Jul 2017 15:53:19 +0200
+Message-Id: <1500645206-13559-3-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500645206-13559-1-git-send-email-armbru@redhat.com>
 References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/9] tests: Clean up wait for event
+Subject: [Qemu-devel] [PATCH 2/9] qtest: Document calling conventions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,189 +31,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We still use hacks like qmp("") to wait for an event, even though we
-have qmp_eventwait() since commit 8fe941f, and qmp_eventwait_ref()
-since commit 7ffe312.  Both commits neglected to convert all the
-existing hacks.  Make up what they missed.
+From: Eric Blake <eblake@redhat.com>
 
-Bonus: gets rid of empty format strings.  A step towards compile-time
-format string checking without triggering -Wformat-zero-length.
+We have two flavors of vararg usage in qtest; make it clear that
+qmp() has different semantics than hmp(), and let the compiler
+enforce that hmp() is used correctly. However, qmp() (and friends)
+only accept a subset of printf flags look-alikes (namely, those
+that our JSON parser understands), and what is worse, qmp("true")
+(the JSON keyword 'true') is different from qmp("%s", "true")
+(the JSON string '"true"'), so marking those as printf-like would
+produce more harm from bogus warnings than it helps (we may have
+made a mistake in previously marking qobject_from_jsonf(), but
+this patch is not addressing that).
 
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20170720214008.28494-5-eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/boot-order-test.c   |  2 +-
- tests/libqos/pci-pc.c     |  6 +-----
- tests/tco-test.c          |  3 +--
- tests/usb-hcd-uhci-test.c |  6 +-----
- tests/usb-hcd-xhci-test.c | 12 ++----------
- tests/wdt_ib700-test.c    | 35 ++++++++++-------------------------
- 6 files changed, 16 insertions(+), 48 deletions(-)
+ tests/libqtest.h | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
-index fc1e794..9d51683 100644
---- a/tests/boot-order-test.c
-+++ b/tests/boot-order-test.c
-@@ -43,7 +43,7 @@ static void test_a_boot_order(const char *machine,
-      * system_reset only requests reset.  We get a RESET event after
-      * the actual reset completes.  Need to wait for that.
-      */
--    qmp_discard_response("");   /* HACK: wait for event */
-+    qmp_eventwait("RESET");
-     actual = read_boot_order();
-     g_assert_cmphex(actual, ==, expected_reboot);
-     qtest_quit(global_qtest);
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index d40aa9d..e4be809 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -168,9 +168,5 @@ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 38bc1e9..ae57282 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -50,7 +50,8 @@ void qtest_quit(QTestState *s);
+ /**
+  * qtest_qmp_discard_response:
+  * @s: #QTestState instance to operate on.
+- * @fmt...: QMP message to send to qemu
++ * @fmt...: QMP message to send to qemu; formats arguments through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Sends a QMP message to QEMU and consumes the response.
+  */
+@@ -59,7 +60,8 @@ void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
+ /**
+  * qtest_qmp:
+  * @s: #QTestState instance to operate on.
+- * @fmt...: QMP message to send to qemu
++ * @fmt...: QMP message to send to qemu; formats arguments through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Sends a QMP message to QEMU and returns the response.
+  */
+@@ -68,7 +70,8 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
+ /**
+  * qtest_async_qmp:
+  * @s: #QTestState instance to operate on.
+- * @fmt...: QMP message to send to qemu
++ * @fmt...: QMP message to send to qemu; formats arguments through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Sends a QMP message to QEMU and leaves the response in the stream.
+  */
+@@ -134,7 +137,7 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+ /**
+  * qtest_hmp:
+  * @s: #QTestState instance to operate on.
+- * @fmt...: HMP command to send to QEMU
++ * @fmt...: HMP command to send to QEMU, formats arguments like vsprintf().
+  *
+  * Send HMP command to QEMU via QMP's human-monitor-command.
+  * QMP events are discarded.
+@@ -535,7 +538,8 @@ static inline void qtest_end(void)
  
-     outb(ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
+ /**
+  * qmp:
+- * @fmt...: QMP message to send to qemu
++ * @fmt...: QMP message to send to qemu; formats arguments through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Sends a QMP message to QEMU and returns the response.
+  */
+@@ -543,7 +547,8 @@ QDict *qmp(const char *fmt, ...);
  
--    response = qmp("");
--    g_assert(response);
--    g_assert(qdict_haskey(response, "event"));
--    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
--    QDECREF(response);
-+    qmp_eventwait("DEVICE_DELETED");
- }
-diff --git a/tests/tco-test.c b/tests/tco-test.c
-index c4c264e..f2ed6ed 100644
---- a/tests/tco-test.c
-+++ b/tests/tco-test.c
-@@ -237,9 +237,8 @@ static void test_tco_max_timeout(void)
+ /**
+  * qmp_async:
+- * @fmt...: QMP message to send to qemu
++ * @fmt...: QMP message to send to qemu; formats arguments through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Sends a QMP message to QEMU and leaves the response in the stream.
+  */
+@@ -551,7 +556,8 @@ void qmp_async(const char *fmt, ...);
  
- static QDict *get_watchdog_action(void)
- {
--    QDict *ev = qmp("");
-+    QDict *ev = qmp_eventwait_ref("WATCHDOG");
-     QDict *data;
--    g_assert(!strcmp(qdict_get_str(ev, "event"), "WATCHDOG"));
+ /**
+  * qmp_discard_response:
+- * @fmt...: QMP message to send to qemu
++ * @fmt...: QMP message to send to qemu; formats arguments through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Sends a QMP message to QEMU and consumes the response.
+  */
+@@ -592,7 +598,7 @@ static inline QDict *qmp_eventwait_ref(const char *event)
  
-     data = qdict_get_qdict(ev, "data");
-     QINCREF(data);
-diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
-index 5b500fe..0fb7f8d 100644
---- a/tests/usb-hcd-uhci-test.c
-+++ b/tests/usb-hcd-uhci-test.c
-@@ -68,11 +68,7 @@ static void test_usb_storage_hotplug(void)
-     g_assert(!qdict_haskey(response, "error"));
-     QDECREF(response);
- 
--    response = qmp("");
--    g_assert(response);
--    g_assert(qdict_haskey(response, "event"));
--    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
--    QDECREF(response);
-+    qmp_eventwait("DEVICE_DELETED");
- }
- 
- int main(int argc, char **argv)
-diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
-index 031764d..c05a339 100644
---- a/tests/usb-hcd-xhci-test.c
-+++ b/tests/usb-hcd-xhci-test.c
-@@ -57,11 +57,7 @@ static void test_usb_uas_hotplug(void)
-     g_assert(!qdict_haskey(response, "error"));
-     QDECREF(response);
- 
--    response = qmp("");
--    g_assert(qdict_haskey(response, "event"));
--    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
--    QDECREF(response);
--
-+    qmp_eventwait("DEVICE_DELETED");
- 
-     response = qmp("{'execute': 'device_del',"
-                            " 'arguments': {"
-@@ -71,11 +67,7 @@ static void test_usb_uas_hotplug(void)
-     g_assert(!qdict_haskey(response, "error"));
-     QDECREF(response);
- 
--    response = qmp("");
--    g_assert(response);
--    g_assert(qdict_haskey(response, "event"));
--    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
--    QDECREF(response);
-+    qmp_eventwait("DEVICE_DELETED");
- }
- 
- int main(int argc, char **argv)
-diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
-index 49f4f0c..4fc8eea 100644
---- a/tests/wdt_ib700-test.c
-+++ b/tests/wdt_ib700-test.c
-@@ -18,26 +18,10 @@ static void qmp_check_no_event(void)
-     QDECREF(resp);
- }
- 
--static QDict *qmp_get_event(const char *name)
--{
--    QDict *event = qmp("");
--    QDict *data;
--    g_assert(qdict_haskey(event, "event"));
--    g_assert(!strcmp(qdict_get_str(event, "event"), name));
--
--    if (qdict_haskey(event, "data")) {
--        data = qdict_get_qdict(event, "data");
--        QINCREF(data);
--    } else {
--        data = NULL;
--    }
--
--    QDECREF(event);
--    return data;
--}
--
- static QDict *ib700_program_and_wait(QTestState *s)
- {
-+    QDict *event, *data;
-+
-     clock_step(NANOSECONDS_PER_SECOND * 40);
-     qmp_check_no_event();
- 
-@@ -61,7 +45,11 @@ static QDict *ib700_program_and_wait(QTestState *s)
-     clock_step(3 * NANOSECONDS_PER_SECOND);
-     qmp_check_no_event();
-     clock_step(2 * NANOSECONDS_PER_SECOND);
--    return qmp_get_event("WATCHDOG");
-+    event = qmp_eventwait_ref("WATCHDOG");
-+    data = qdict_get_qdict(event, "data");
-+    QINCREF(data);
-+    QDECREF(event);
-+    return data;
- }
- 
- 
-@@ -73,8 +61,7 @@ static void ib700_pause(void)
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "pause"));
-     QDECREF(d);
--    d = qmp_get_event("STOP");
--    QDECREF(d);
-+    qmp_eventwait("STOP");
-     qtest_end();
- }
- 
-@@ -86,8 +73,7 @@ static void ib700_reset(void)
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
-     QDECREF(d);
--    d = qmp_get_event("RESET");
--    QDECREF(d);
-+    qmp_eventwait("RESET");
-     qtest_end();
- }
- 
-@@ -99,8 +85,7 @@ static void ib700_shutdown(void)
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
-     QDECREF(d);
--    d = qmp_get_event("SHUTDOWN");
--    QDECREF(d);
-+    qmp_eventwait("SHUTDOWN");
-     qtest_end();
- }
- 
+ /**
+  * hmp:
+- * @fmt...: HMP command to send to QEMU
++ * @fmt...: HMP command to send to QEMU, formats arguments like vsprintf().
+  *
+  * Send HMP command to QEMU via QMP's human-monitor-command.
+  *
 -- 
 2.7.5
