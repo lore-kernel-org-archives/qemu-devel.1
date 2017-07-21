@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYUIq-0000zT-A8
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:32:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1dYUKe-0002QG-9P
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYUIm-0007GT-40
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:32:56 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:38682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dYUIl-0007G3-U2
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:32:52 -0400
-Received: by mail-wr0-x232.google.com with SMTP id f21so23668579wrf.5
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:32:51 -0700 (PDT)
-References: <20170720150426.12393-1-alex.bennee@linaro.org>
-	<20170720150426.12393-6-alex.bennee@linaro.org>
-	<71a11f23-39e7-d89a-36d5-2870ed76d940@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <71a11f23-39e7-d89a-36d5-2870ed76d940@twiddle.net>
-Date: Fri, 21 Jul 2017 10:32:49 +0100
-Message-ID: <87y3ri6sou.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1dYUKa-0008Bc-Ar
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dYUKa-0008Ai-4n
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:44 -0400
+Date: Fri, 21 Jul 2017 10:34:33 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170721093433.GG17693@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
+	<20170720085958.GC21566@redhat.com>
+	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+	<20170720091224.GD21566@redhat.com>
+	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+	<20170721083816.GC17693@redhat.com>
+	<CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.11 05/23] softfloat3c: initial
- build machinery
+Content-Disposition: inline
+In-Reply-To: <CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: =?utf-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>
+Cc: qemu-devel@nongnu.org
+
+On Fri, Jul 21, 2017 at 05:31:04PM +0800, =E9=99=B3=E5=9F=B9=E6=B3=93 wro=
+te:
+> It works after I replace the /usr/bin/qemu-nbd with binary I built.
+>=20
+> My cmd is :
+>=20
+> > qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+> >              --image-opts driver=3Dqcow2,file.filename=3D
+> > demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
+>=20
+>=20
+> But I got other message:
+>=20
+> > Block format 'qcow2' does not support the option 'encrypt.format'
+>=20
+>=20
+> Maybe it doen't support yet?
+
+It is supported. I think you're git checkout is not fully updated.
 
 
-Richard Henderson <rth@twiddle.net> writes:
-
-> On 07/20/2017 05:04 AM, Alex Bennée wrote:
->> +# so they can still be linked when needed. We build these files surpressing so of the normal CFLAGS.
->
-> "surpressing so" -> "suppressing some"
->
-> Do we gain any confidence for our still supported but less tested
-> 32-bit hosts (all of which do support a 64-bit type) by dropping the
-> FAST_INT64 distinction?
-
-I guess so. Certainly I can cross-compile aarch64-softmmu on armhf
-defining all the:
-
-  softfloat3_fastint64="yes"
-  softfloat3_fastdiv32to16="yes"
-  softfloat3_fastdiv64to32="yes"
-
-without any issue. I guess it might mean our 32 bit guests might run
-slightly slower but none of our FP is fast anyway.
-
-There is also a slight intermingling in the build setup between the
-FASTINT64 and the specialisation even though there are for different
-things.
-
-The 8086 code basically makes NaN propagation match old x86 whereas SSE
-is the more recent and more IEEE like SSE behaviour. See section 5 of:
-
-  http://www.jhauser.us/arithmetic/SoftFloat-3c/doc/SoftFloat-source.html
-
-I suspect what we should have here are specialisation for each of our
-guests. We do something similar in the softfloat2a code in it's
-specialise header. Maybe we should rename 8086-SSE to default and then
-create a specialisation for each guest that needs it?
-
->
->> -#ifdef __GNUC_STDC_INLINE__
->> -#define INLINE inline
->> -#else
->> -#define INLINE extern inline
->
-> Why are you removing this?
-
-I was having compile issues I think because it was defaulting to extern
-inline which was breaking given all the inline functions are defined in
-the header. Having re-read the docs for __GNUC_STDC_INLINE__ though it
-must have been for one of the more esoteric compile targets as that
-should be defined for our default C99 compile?
-
---
-Alex Bennée
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
