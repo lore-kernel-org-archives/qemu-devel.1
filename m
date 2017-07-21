@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dYMJ5-000093-KK
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:00:41 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMda-0004dY-FX
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dYMJ2-0006kS-Es
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:00:39 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:50472)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdV-0001b6-Ld
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:21:50 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:50317)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dYMJ0-0006gN-W2
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:00:36 -0400
-Date: Fri, 21 Jul 2017 09:00:18 +0800 (CST)
-Message-ID: <201707210900188603103@zte.com.cn>
-References: 1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn,
-	20170720172215.GH2456@work-vm
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gdmhvc3Q6IGZp?=
- =?utf-8?q?x_a_migration_failed_because_ofvhost_region_merge?=
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dYMdU-0001Xc-R7
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:21:45 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Fri, 21 Jul 2017 09:20:16 +0800
+Message-Id: <1500600016-5906-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] qga: Add support network interface statistics
+ in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +22,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: mst@redhat.com, imammedo@redhat.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
-KiBNaWNoYWVsIFMuIFRzaXJraW4gKG1zdEByZWRoYXQuY29tKSB3cm90ZToNCg0KDQoNCg0KDQo+
-PiBPbiBXZWQsIEp1bCAxOSwgMjAxNyBhdCAwMzoyNDoyN1BNICswMjAwLCBJZ29yIE1hbW1lZG92
-IHdyb3RlOg0KPiA+ID4gT24gV2VkLCAxOSBKdWwgMjAxNyAxMjo0NjoxMyArMDEwMA0KPiA+ID4g
-IkRyLiBEYXZpZCBBbGFuIEdpbGJlcnQiIDxkZ2lsYmVydEByZWRoYXQuY29tPiB3cm90ZToNCj4g
-PiA+IA0KPiA+ID4gPiAqIElnb3IgTWFtbWVkb3YgKGltYW1tZWRvQHJlZGhhdC5jb20pIHdyb3Rl
-Og0KPiA+ID4gPiA+IE9uIFdlZCwgMTkgSnVsIDIwMTcgMjM6MTc6MzIgKzA4MDANCj4gPiA+ID4g
-PiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdyb3RlOg0KPiA+ID4gPiA+ICAgDQo+
-ID4gPiA+ID4gPiBXaGVuIGEgZ3Vlc3QgdGhhdCBoYXMgc2V2ZXJhbCBob3RwbHVnZ2VkIGRpbW1z
-IGlzIG1pZ3JhdGVkLCBpbg0KPiA+ID4gPiA+ID4gZGVzdGluYXRpb24gaG9zdCBpdCB3aWxsIGZh
-aWwgdG8gcmVzdW1lLiBCZWNhdXNlIHZob3N0IHJlZ2lvbnMgb2YNCj4gPiA+ID4gPiA+IHNldmVy
-YWwgZGltbXMgaW4gc291cmNlIGhvc3QgYXJlIG1lcmdlZCBhbmQgaW4gdGhlIHJlc3RvcmUgc3Rh
-Z2UNCj4gPiA+ID4gPiA+IGluIGRlc3RpbmF0aW9uIGhvc3QgaXQgY29tcHV0ZXMgd2hldGhlciBt
-b3JlIHRoYW4gdmhvc3Qgc2xvdCBsaW1pdA0KPiA+ID4gPiA+ID4gYmVmb3JlIG1lcmdpbmcgdmhv
-c3QgcmVnaW9ucyBvZiBzZXZlcmFsIGRpbW1zLiAgDQo+ID4gPiA+ID4gY291bGQgeW91IHByb3Zp
-ZGUgYSBiaXQgbW9yZSBkZXRhaWxlZCBkZXNjcmlwdGlvbiBvZiB0aGUgcHJvYmxlbQ0KPiA+ID4g
-PiA+IGluY2x1ZGluZyBjb21tYW5kIGxpbmUrdXNlZCBkZXZpY2VfYWRkIGNvbW1hbmRzIG9uIHNv
-dXJjZSBhbmQNCj4gPiA+ID4gPiBjb21tYW5kIGxpbmUgb24gZGVzdGluYXRpb24/ICANCj4gPiA+
-ID4gDQo+ID4gPiA+IChjY2luZyBpbiBNYXJjIEFuZHJlIGFuZCBNYXhpbWUpDQo+ID4gPiA+IA0K
-PiA+ID4gPiBIbW0sIEknZCBsaWtlIHRvIHVuZGVyc3RhZGUgdGhlIHNpdHVhdGlvbiB3aGVyZSB5
-b3UgZ2V0IG1lcmdpbmcgYmV0d2Vlbg0KPiA+ID4gPiBSQU1CbG9ja3MgdGhhdCBjb21wbGljYXRl
-cyBzb21lIHN0dWZmIGZvciBwb3N0Y29weS4NCj4gPiA+IGFuZCBwcm9iYWJseSBpbmNvbnNpc3Rl
-bnQgbWVyZ2luZyBicmVha3Mgdmhvc3QgYXMgd2VsbA0KPiA+ID4gDQo+ID4gPiBtZXJnaW5nIG1p
-Z2h0IGhhcHBlbiBpZiByZWdpb25zIGFyZSBhZGphY2VudCBvciBvdmVybGFwDQo+ID4gPiBidXQg
-Zm9yIHRoYXQgdG8gaGFwcGVuIG1lcmdlZCByZWdpb25zIG11c3QgaGF2ZSBlcXVhbA0KPiA+ID4g
-ZGlzdGFuY2UgYmV0d2VlbiB0aGVpciBHUEE6SFZBIHBhaXJzLCBzbyB0aGF0IGZvbGxvd2luZw0K
-PiA+ID4gdHJhbnNsYXRpb24gd291bGQgd29yazoNCj4gPiA+IA0KPiA+ID4gaWYgZ3ZhIGluIHJl
-Z2lvblhbZ3ZhX3N0YXJ0LCBsZW4sIGh2YV9zdGFydF0NCj4gPiA+ICAgIGh2YSA9IGh2YV9zdGFy
-dCArIGd2YSAtIGd2YV9zdGFydA0KPiA+ID4gDQo+ID4gPiB3aGlsZSBHVkEgb2YgcmVnaW9ucyBp
-cyB1bmRlciBRRU1VIGNvbnRyb2wgYW5kIGRldGVybWluaXN0aWMNCj4gPiA+IEhWQSBpcyBub3Qs
-IHNvIGluIG1pZ3JhdGlvbiBjYXNlIG1lcmdpbmcgbWlnaHQgaGFwcGVuIG9uIHNvdXJjZQ0KPiA+
-ID4gc2lkZSBidXQgbm90IG9uIGRlc3RpbmF0aW9uLCByZXN1bHRpbmcgaW4gZGlmZmVyZW50IG1l
-bW9yeSBtYXBzLg0KPiA+ID4gDQo+ID4gPiBNYXliZSBNaWNoYWVsIG1pZ2h0IGtub3cgZGV0YWls
-cyB3aHkgbWlncmF0aW9uIHdvcmtzIGluIHZob3N0IHVzZWNhc2UsDQo+ID4gPiBidXQgSSBkb24n
-dCBzZWUgdmhvc3Qgc2VuZGluZyBhbnkgdm1zdGF0ZSBkYXRhLg0KPiA+IA0KPj4gV2UgYXJlbid0
-IG1lcmdpbmcgcmFtYmxvY2tzIGF0IGFsbC4NCj4+IFdoZW4gd2UgYXJlIHBhc3NpbmcgYmxvY2tz
-IEEgYW5kIEIgdG8gdmhvc3QsIGlmIHdlIHNlZSB0aGF0DQo+PiANCj4+IGh2YUI9aHZhQSArIGxl
-bkENCj4+IGdwYUI9Z3BhQSArIGxlbkENCj4+IA0KPj4gdGhlbiB3ZSBjYW4gaW1wcm92ZSBwZXJm
-b3JtYW5jZSBhIGJpdCBieSBwYXNzaW5nIGEgc2luZ2xlDQo+PiBjaHVuayB0byB2aG9zdDogaHZh
-QSxncGFBLGxlbmErbGVuQg0KDQo+T0ssIGJ1dCB0aGF0IG1lYW5zIHRoYXQgYSByZWdpb24gY2Fu
-IGluY29ycG9yYXRlIG11bHRpcGxlDQo+UkFNQmxvY2tzIHRob3VnaD8gSG1tIHRoYXQncyBub3Qg
-ZnVuIG9uIHBvc3Rjb3B5Lg0KDQo+PiBzbyBpdCBkb2VzIG5vdCBhZmZlY3QgbWlncmF0aW9uIG5v
-cm1hbGx5Lg0KDQo+V2VsbCwgd2h5PyBXaGF0J3MgcmVxdWlyZWQgLSBpZiB0aGUgcmVnaW9uIHNp
-emVzL2xlbmd0aHMvb3JkZXJzDQo+YXJlIGRpZmZlcmVudCBvbiB0aGUgc291cmNlIGFuZCBkZXN0
-aW5hdGlvbiBkb2VzIGl0IG1hdHRlciAtIGlmDQo+aXQgZG9lcyB0aGVuIHRoYXQgbWVhbnMgd2Ug
-aGF2ZSBhIHByb2JsZW0sIHNpbmNlIHRoYXQgaGV1cmlzdGljDQo+aXMgbm9uLWRldGVybWluaXN0
-aWMuDQpZZXMsSSBlbmNvdW50ZXIgdGhlIGRpZmZlcmVudCAgcmVnaW9uIGNyZWF0aW9uIG9yZGVy
-cyAgb24gdGhlIHNvdXJjZSBhbmQgZGVzdGluYXRpb24NCg0KaWYgeW91IGFkZCBkaW1tcyBvbiB0
-aGUgc291cmNlIGJlZm9yZSBtaWdyYXRpb24uIHNvIEkganVzdCBkaXN0aW5ndWlzaCBhY2NvcmRp
-bmcgdG8gDQoNCnZtIHN0YXRlLg0KDQo+RGF2ZQ0KDQoNCj4gDQo+ID4gDQo+ID4gPiANCj4gPiA+
-ID4gPiANCj4gPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5j
-b20uY24+DQo+ID4gPiA+ID4gU2lnbmVkLW9mZi1ieTogV2FuZyBZZWNoYW8gPHdhbmcueWVjaGFv
-MjU1QHp0ZS5jb20uY24+DQo+ID4gPiA+ID4gLS0tDQo+ID4gPiA+ID4gIGh3L21lbS9wYy1kaW1t
-LmMgfCAyICstDQo+ID4gPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBk
-ZWxldGlvbigtKQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IGRpZmYgLS1naXQgYS9ody9tZW0vcGMt
-ZGltbS5jIGIvaHcvbWVtL3BjLWRpbW0uYw0KPiA+ID4gPiA+IGluZGV4IGVhNjdiNDYuLmJiMGZh
-MDggMTAwNjQ0DQo+ID4gPiA+ID4gLS0tIGEvaHcvbWVtL3BjLWRpbW0uYw0KPiA+ID4gPiA+ICsr
-KyBiL2h3L21lbS9wYy1kaW1tLmMNCj4gPiA+ID4gPiBAQCAtMTAxLDcgKzEwMSw3IEBAIHZvaWQg
-cGNfZGltbV9tZW1vcnlfcGx1ZyhEZXZpY2VTdGF0ZSAqZGV2LCBNZW1vcnlIb3RwbHVnU3RhdGUg
-KmhwbXMsDQo+ID4gPiA+ID4gICAgICAgICAgZ290byBvdXQNCj4gPiA+ID4gPiAgICAgIH0NCj4g
-PiA+ID4gPiAgDQo+ID4gPiA+ID4gLSAgICBpZiAoIXZob3N0X2hhc19mcmVlX3Nsb3QoKSkgew0K
-PiA+ID4gPiA+ICsgICAgaWYgKCF2aG9zdF9oYXNfZnJlZV9zbG90KCkgJiYgcnVuc3RhdGVfaXNf
-cnVubmluZygpKSB7DQo+ID4gPiA+ID4gICAgICAgICAgZXJyb3Jfc2V0ZygmbG9jYWxfZXJyLCAi
-YSB1c2VkIHZob3N0IGJhY2tlbmQgaGFzIG5vIGZyZWUiDQo+ID4gPiA+ID4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAiIG1lbW9yeSBzbG90cyBsZWZ0IikNCj4gPiA+ID4gPiAgICAg
-ICAgICBnb3RvIG91dCAgDQo+ID4gPiANCj4gPiA+IEV2ZW4gdGhpcyBwcm9kdWNlcyB0aGUgd3Jv
-bmcgZXJyb3IgbWVzc2FnZSBpbiB0aGlzIGNhc2UsDQo+ID4gPiBpdCBhbHNvIG1ha2VzIG1lIHRo
-aW5rIGlmIHRoZSBleGlzdGluZyBjb2RlIHNob3VsZCB1bmRvIGEgbG90IG9mDQo+ID4gPiB0aGUg
-b2JqZWN0X3Byb3BlcnR5X3NldCdzIHRoYXQgaGFwcGVuLg0KPiA+ID4gDQo+ID4gPiBEYXZlDQo+
-ID4gPiA+IA0KPiA+ID4gPiAgIA0KPiA+ID4gLS0NCj4gPiA+IERyLiBEYXZpZCBBbGFuIEdpbGJl
-cnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFuY2hlc3RlciwgVUsNCi0tDQpEci4gRGF2aWQg
-QWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRAcmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVL
+we can get the network interface statistics inside a virtual machine by
+guest-network-get-interfaces command. it is very useful for us to monitor
+and analyze network traffic.
+
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+
+v1->v2:
+ - correct some spelling mistake and add the stats data to the
+   guest-network-get-interfaces command instead of adding a new command.
+v2-v3:
+ - optimize function implementation
+v3->v4:
+ - modify compile error
+v4->v5:
+ - rename some temporary variables and add str_trim_off function for
+   calculating the space num in front of the string in guest_get_network_stats
+v5->v6:
+ - use g_strchug instead of str_trim_off implemented by myself
+v6->v7:
+ - add implementation for windows
+---
+ qga/commands-posix.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qga/commands-win32.c | 47 ++++++++++++++++++++++++++++++++++
+ qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
+ 3 files changed, 155 insertions(+), 2 deletions(-)
+
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index d8e4122..b65dd8e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1639,6 +1639,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
+     return head;
+ }
+ 
++static int guest_get_network_stats(const char *name,
++                       GuestNetworkInterfaceStat *stats)
++{
++    int name_len;
++    char const *devinfo = "/proc/net/dev";
++    FILE *fp;
++    char *line = NULL, *colon;
++    size_t n;
++    fp = fopen(devinfo, "r");
++    if (!fp) {
++        return -1;
++    }
++    name_len = strlen(name);
++    while (getline(&line, &n, fp) != -1) {
++        long long dummy;
++        long long rx_bytes;
++        long long rx_packets;
++        long long rx_errs;
++        long long rx_dropped;
++        long long tx_bytes;
++        long long tx_packets;
++        long long tx_errs;
++        long long tx_dropped;
++        char *trim_line;
++        trim_line = g_strchug(line);
++        if (trim_line[0] == '\0') {
++            continue;
++        }
++        colon = strchr(trim_line, ':');
++        if (!colon) {
++            continue;
++        }
++        if (colon - name_len  == trim_line &&
++           strncmp(trim_line, name, name_len) == 0) {
++            if (sscanf(colon + 1,
++                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
++                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
++                  &dummy, &dummy, &dummy, &dummy,
++                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
++                  &dummy, &dummy, &dummy, &dummy) != 16) {
++                continue;
++            }
++            stats->rx_bytes = rx_bytes;
++            stats->rx_packets = rx_packets;
++            stats->rx_errs = rx_errs;
++            stats->rx_dropped = rx_dropped;
++            stats->tx_bytes = tx_bytes;
++            stats->tx_packets = tx_packets;
++            stats->tx_errs = tx_errs;
++            stats->tx_dropped = tx_dropped;
++            fclose(fp);
++            return 0;
++        }
++    }
++    fclose(fp);
++    g_debug("/proc/net/dev: Interface not found");
++    return -1;
++}
++
+ /*
+  * Build information about guest interfaces
+  */
+@@ -1655,6 +1714,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+         GuestNetworkInterfaceList *info;
+         GuestIpAddressList **address_list = NULL, *address_item = NULL;
++        GuestNetworkInterfaceStat  *interface_stat = NULL;
+         char addr4[INET_ADDRSTRLEN];
+         char addr6[INET6_ADDRSTRLEN];
+         int sock;
+@@ -1774,7 +1834,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+ 
+         info->value->has_ip_addresses = true;
+ 
+-
++        if (!info->value->has_statistics) {
++            interface_stat = g_malloc0(sizeof(*interface_stat));
++            if (guest_get_network_stats(info->value->name,
++                interface_stat) == -1) {
++                info->value->has_statistics = false;
++                g_free(interface_stat);
++            } else {
++                info->value->statistics = interface_stat;
++                info->value->has_statistics = true;
++            }
++        }
+     }
+ 
+     freeifaddrs(ifap);
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 6f16457..433453d 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -1152,6 +1152,42 @@ out:
+ }
+ #endif
+ 
++static DWORD get_interface_index(const char *guid)
++{
++    ULONG index;
++    DWORD status;
++    wchar_t wbuf[512];
++    snwprintf(wbuf, sizeof(wbuf), L"\\device\\tcpip_%s", guid);
++    wbuf[sizeof(wbuf) - 1] = 0;
++    status = GetAdapterIndex (wbuf, &index);
++    if (status != NO_ERROR) {
++        return (DWORD)~0;
++    } else {
++        return index;
++    }
++}
++static int guest_get_network_stats(const char *name,
++                       GuestNetworkInterfaceStat *stats)
++{
++    DWORD IfIndex = 0;
++    MIB_IFROW aMib_ifrow;
++    memset(&aMib_ifrow, 0, sizeof(aMib_ifrow));
++    IfIndex = get_interface_index(name);
++    aMib_ifrow.dwIndex = IfIndex;
++    if (NO_ERROR == GetIfEntry(&aMib_ifrow)) {
++        stats->rx_bytes = aMib_ifrow.dwInOctets;
++        stats->rx_packets = aMib_ifrow.dwInUcastPkts;
++        stats->rx_errs = aMib_ifrow.dwInErrors;
++        stats->rx_dropped = aMib_ifrow.dwInDiscards;
++        stats->tx_bytes = aMib_ifrow.dwOutOctets;
++        stats->tx_packets = aMib_ifrow.dwOutUcastPkts;
++        stats->tx_errs = aMib_ifrow.dwOutErrors;
++        stats->tx_dropped = aMib_ifrow.dwOutDiscards;
++        return 0;
++    }
++    return -1;
++}
++
+ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+ {
+     IP_ADAPTER_ADDRESSES *adptr_addrs, *addr;
+@@ -1238,6 +1274,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+             info->value->has_ip_addresses = true;
+             info->value->ip_addresses = head_addr;
+         }
++        if (!info->value->has_statistics) {
++            interface_stat = g_malloc0(sizeof(*interface_stat));
++            if (guest_get_network_stats(add->AdapterName,
++                interface_stat) == -1) {
++                info->value->has_statistics = false;
++                g_free(interface_stat);
++            } else {
++                info->value->statistics = interface_stat;
++                info->value->has_statistics = true;
++            }
++        }
+     }
+     WSACleanup();
+ out:
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 03743ab..4ad5c57 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -643,6 +643,38 @@
+            'prefix': 'int'} }
+ 
+ ##
++# @GuestNetworkInterfaceStat:
++#
++# @rx-bytes: total bytes received
++#
++# @rx-packets: total packets received
++#
++# @rx-errs: bad packets received
++#
++# @rx-dropped: receiver dropped packets
++#
++# @tx-bytes: total bytes transmitted
++#
++# @tx-packets: total packets transmitted
++#
++# @tx-errs: packet transmit problems
++#
++# @tx-dropped: dropped packets transmitted
++#
++# Since: 2.11
++##
++{ 'struct': 'GuestNetworkInterfaceStat',
++  'data': {'rx-bytes': 'uint64',
++            'rx-packets': 'uint64',
++            'rx-errs': 'uint64',
++            'rx-dropped': 'uint64',
++            'tx-bytes': 'uint64',
++            'tx-packets': 'uint64',
++            'tx-errs': 'uint64',
++            'tx-dropped': 'uint64'
++           } }
++
++##
+ # @GuestNetworkInterface:
+ #
+ # @name: The name of interface for which info are being delivered
+@@ -651,12 +683,16 @@
+ #
+ # @ip-addresses: List of addresses assigned to @name
+ #
++# @statistics: various statistic counters related to @name
++# (since 2.11)
++#
+ # Since: 1.1
+ ##
+ { 'struct': 'GuestNetworkInterface',
+   'data': {'name': 'str',
+            '*hardware-address': 'str',
+-           '*ip-addresses': ['GuestIpAddress'] } }
++           '*ip-addresses': ['GuestIpAddress'],
++           '*statistics': 'GuestNetworkInterfaceStat' } }
+ 
+ ##
+ # @guest-network-get-interfaces:
+-- 
+1.8.3.1
