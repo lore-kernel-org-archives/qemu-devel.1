@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dYdnH-0007K6-7i
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:41:00 -0400
+	(envelope-from <mst@redhat.com>) id 1dYe4K-0001FX-Mz
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:58:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dYdnE-0006RQ-42
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:40:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56628)
+	(envelope-from <mst@redhat.com>) id 1dYe4G-0004so-0A
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:58:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dYdnD-0006RC-Rb
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:40:56 -0400
-Date: Fri, 21 Jul 2017 16:40:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170721194051.GF2757@localhost.localdomain>
-References: <1500622736-20865-1-git-send-email-wang.yi59@zte.com.cn>
-	<1500622736-20865-3-git-send-email-wang.yi59@zte.com.cn>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dYe4F-0004sL-MX
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:58:31 -0400
+Date: Fri, 21 Jul 2017 22:49:29 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170721224259-mutt-send-email-mst@kernel.org>
+References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
+	<20170719114612.GC3500@work-vm>
+	<20170719152427.620b2a2a@nial.brq.redhat.com>
+	<20170719184748-mutt-send-email-mst@kernel.org>
+	<20170720172215.GH2456@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1500622736-20865-3-git-send-email-wang.yi59@zte.com.cn>
-Subject: Re: [Qemu-devel] [PATCH 2/2] [PATCH] hmp: allow apic-id for "info
- lapic"
+In-Reply-To: <20170720172215.GH2456@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
+ vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,164 +32,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Wang <wang.yi59@zte.com.cn>
-Cc: dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-On Fri, Jul 21, 2017 at 03:38:56AM -0400, Yi Wang wrote:
-> Add [apic-id] support for hmp command "info lapic", which is
-> useful when debugging ipi and so on. Current behavior is not
-> changed when the parameter isn't specified.
+On Thu, Jul 20, 2017 at 06:22:15PM +0100, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
+> > > On Wed, 19 Jul 2017 12:46:13 +0100
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > 
+> > > > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > > > On Wed, 19 Jul 2017 23:17:32 +0800
+> > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > > >   
+> > > > > > When a guest that has several hotplugged dimms is migrated, in
+> > > > > > destination host it will fail to resume. Because vhost regions of
+> > > > > > several dimms in source host are merged and in the restore stage
+> > > > > > in destination host it computes whether more than vhost slot limit
+> > > > > > before merging vhost regions of several dimms.  
+> > > > > could you provide a bit more detailed description of the problem
+> > > > > including command line+used device_add commands on source and
+> > > > > command line on destination?  
+> > > > 
+> > > > (ccing in Marc Andre and Maxime)
+> > > > 
+> > > > Hmm, I'd like to understade the situation where you get merging between
+> > > > RAMBlocks; that complicates some stuff for postcopy.
+> > > and probably inconsistent merging breaks vhost as well
+> > > 
+> > > merging might happen if regions are adjacent or overlap
+> > > but for that to happen merged regions must have equal
+> > > distance between their GPA:HVA pairs, so that following
+> > > translation would work:
+> > > 
+> > > if gva in regionX[gva_start, len, hva_start]
+> > >    hva = hva_start + gva - gva_start
+> > > 
+> > > while GVA of regions is under QEMU control and deterministic
+> > > HVA is not, so in migration case merging might happen on source
+> > > side but not on destination, resulting in different memory maps.
+> > > 
+> > > Maybe Michael might know details why migration works in vhost usecase,
+> > > but I don't see vhost sending any vmstate data.
+> > 
+> > We aren't merging ramblocks at all.
+> > When we are passing blocks A and B to vhost, if we see that
+> > 
+> > hvaB=hvaA + lenA
+> > gpaB=gpaA + lenA
+> > 
+> > then we can improve performance a bit by passing a single
+> > chunk to vhost: hvaA,gpaA,lena+lenB
 > 
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
-> ---
->  hmp-commands-info.hx  |  6 +++---
->  target/i386/cpu.h     | 10 ++++++++++
->  target/i386/helper.c  | 16 ++++++++++++++++
->  target/i386/monitor.c |  9 ++++++++-
->  4 files changed, 37 insertions(+), 4 deletions(-)
+> OK, but that means that a region can incorporate multiple
+> RAMBlocks though? Hmm that's not fun on postcopy.
 > 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index d9df238..00623df 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -115,9 +115,9 @@ ETEXI
->  #if defined(TARGET_I386)
->      {
->          .name       = "lapic",
-> -        .args_type  = "",
-> -        .params     = "",
-> -        .help       = "show local apic state",
-> +        .args_type  = "apic-id:i?",
-> +        .params     = "[apic-id]",
-> +        .help       = "show local apic state (apic-id: local apic to read, default is 0)",
-
-Default isn't 0: it's the APIC of the current CPU (the one
-selected with the "cpu" command).
-
->          .cmd        = hmp_info_local_apic,
->      },
->  #endif
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 31ad681..4da2ca2 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1712,6 +1712,16 @@ void enable_compat_apic_id_mode(void);
->  #define APIC_DEFAULT_ADDRESS 0xfee00000
->  #define APIC_SPACE_SIZE      0x100000
->  
-> +/**
-> + * x86_get_cpu_by_apic:
-> + * @id: The apic-id of the specified CPU to obtain.
-> + *
-> + * Gets a CPU on which @id given of apic.
-> + *
-> + * Returns: The CPU or %NULL if there is no matching CPU.
-> + */
-> +CPUState *x86_get_cpu_by_apic(int id);
-> +
->  void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
->                                     fprintf_function cpu_fprintf, int flags);
->  
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index fd4f1af..6972833 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -398,6 +398,22 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
->      }
->      cpu_fprintf(f, " PPR 0x%02x\n", apic_get_ppr(s));
->  }
-> +
-> +CPUState *x86_get_cpu_by_apic(int id)
-> +{
-> +    CPUState *cs;
-> +
-> +    CPU_FOREACH(cs) {
-> +        X86CPU *cpu = X86_CPU(cs);
-> +        APICCommonState *s = APIC_COMMON(cpu->apic_state);
-> +        if (id == s->id) {
-> +            return cs;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-
-Similar logic already exists in qom/cpu.c:cpu_exists().
-
-I suggest the following:
-
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 4f38db0..e6210d5 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -34,7 +34,7 @@
- 
- CPUInterruptHandler cpu_interrupt_handler;
- 
--bool cpu_exists(int64_t id)
-+CPUState *cpu_by_arch_id(int64_t id)
- {
-     CPUState *cpu;
- 
-@@ -42,10 +42,15 @@ bool cpu_exists(int64_t id)
-         CPUClass *cc = CPU_GET_CLASS(cpu);
- 
-         if (cc->get_arch_id(cpu) == id) {
--            return true;
-+            return cpu;
-         }
-     }
--    return false;
-+    return NULL;
-+}
-+
-+bool cpu_exists(int64_t id)
-+{
-+    return !!cpu_by_arch_id(id);
- }
- 
- CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
-
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-
-> +
->  #else
->  void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
->                                     fprintf_function cpu_fprintf, int flags)
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 77ead60..e911a57 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -632,7 +632,14 @@ const MonitorDef *target_monitor_defs(void)
->  
->  void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
->  {
-> -    CPUState *cs = mon_get_cpu();
-> +    CPUState *cs;
-> +
-> +    if (qdict_haskey(qdict, "apic-id")) {
-> +        int id = qdict_get_try_int(qdict, "apic-id", 0);
-
-On which cases do you want qdict_get_try_int() to return
-def_value (0), here?  The qdict_haskey() check will ensure the
-key is present, and  monitor_parse_arguments() will ensure it
-will be an integer.  Just qdict_get_int() seems safe here.
-
-
-> +        cs = x86_get_cpu_by_apic(id);
-> +    } else {
-> +        cs = mon_get_cpu();
-> +    }
->  
->      if (!cs) {
->          monitor_printf(mon, "No CPU available\n");
-> -- 
-> 1.8.3.1
+> > so it does not affect migration normally.
 > 
+> Well, why? What's required - if the region sizes/lengths/orders
+> are different on the source and destination does it matter - if
+> it does then that means we have a problem, since that heuristic
+> is non-deterministic.
 > 
+> Dave
 
--- 
-Eduardo
+It doesn't matter normally. But there's a limit
+on number of regions that vhost can support.
+pc_dimm_memory_plug tries to guess this number early
+because it wants to fail hotplug requests gracefully.
+
+See
+commit 3fad87881e55aaff659408dcf25fa204f89a7896
+Author: Igor Mammedov <imammedo@redhat.com>
+Date:   Tue Oct 6 10:37:28 2015 +0200
+
+    pc-dimm: add vhost slots limit check before commiting to hotplug
+
+It might make sense to limit this to hotplug, though
+runstate check seems like a wrong way to do this -
+VM could be stopped e.g. through QMP at the time.
+
+> > 
+> > > 
+> > > > 
+> > > > > > 
+> > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > > ---
+> > > > > >  hw/mem/pc-dimm.c | 2 +-
+> > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > 
+> > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > > index ea67b46..bb0fa08 100644
+> > > > > > --- a/hw/mem/pc-dimm.c
+> > > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > > > >          goto out;
+> > > > > >      }
+> > > > > >  
+> > > > > > -    if (!vhost_has_free_slot()) {
+> > > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
+> > > > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > > > >                                 " memory slots left");
+> > > > > >          goto out;  
+> > > > 
+> > > > Even this produces the wrong error message in this case,
+> > > > it also makes me think if the existing code should undo a lot of
+> > > > the object_property_set's that happen.
+> > > > 
+> > > > Dave
+> > > > > 
+> > > > >   
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
