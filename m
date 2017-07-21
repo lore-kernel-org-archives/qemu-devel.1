@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYX5J-0002Pu-Fy
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:31:10 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dYX7d-0003IY-Bq
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYX5I-0004E8-Bm
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:31:09 -0400
-References: <20170721102059.14663-1-famz@redhat.com>
-	<20170721102059.14663-2-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d0569b90-8e46-aac1-4ceb-70c10260b1e5@redhat.com>
-Date: Fri, 21 Jul 2017 07:30:56 -0500
+	(envelope-from <stefanha@gmail.com>) id 1dYX7Z-00056R-E9
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:33:33 -0400
+Date: Fri, 21 Jul 2017 13:33:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170721123325.GC18014@stefanha-x1.localdomain>
+References: <20170721034730.25612-1-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170721102059.14663-2-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR"
-Subject: Re: [Qemu-devel] [PATCH 1/2] osdep: Add runtime OFD lock detection
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="m51xatjYGsM+13rf"
+Content-Disposition: inline
+In-Reply-To: <20170721034730.25612-1-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, jsnow@redhat.com,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <d0569b90-8e46-aac1-4ceb-70c10260b1e5@redhat.com>
-Subject: Re: [PATCH 1/2] osdep: Add runtime OFD lock detection
-References: <20170721102059.14663-1-famz@redhat.com>
- <20170721102059.14663-2-famz@redhat.com>
-In-Reply-To: <20170721102059.14663-2-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--m51xatjYGsM+13rf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/21/2017 05:20 AM, Fam Zheng wrote:
-> Build time check of OFD lock is not sufficient and can cause image open=
-
-> errors when the runtime environment doesn't support it.
+On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+> This is a follow up to a previous discussion about reported failures when
+> running some qemu-iotests.  Turns out the failures were due to missing
+> libraries, which in turn, reflected on the host build configuration.
 >=20
-> Add a helper function to probe it at runtime, additionally. Also provid=
-e
-> a qemu_has_ofd_lock() for callers to check the status.
+> This series introduces a tool that can check both host and target level
+> build configurations.  On top of that, it adds a function to to be used
+> on qemu-iotests.  Finally, as an example, it sets a test to be skipped
+> if the required feature is not enable on the host build configuration.
 >=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  include/qemu/osdep.h |  1 +
->  util/osdep.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++=
-+-------
->  2 files changed, 64 insertions(+), 9 deletions(-)
+> Cleber Rosa (3):
+>   scripts: introduce buildconf.py
+>   qemu-iotests: add _require_feature() function
+>   qemu-iotests: require CONFIG_LINUX_AIO for test 087
+>=20
+>  scripts/buildconf.py         | 278 +++++++++++++++++++++++++++++++++++++=
+++++++
+>  tests/qemu-iotests/087       |   1 +
+>  tests/qemu-iotests/check     |   2 +
+>  tests/qemu-iotests/common.rc |   7 ++
+>  4 files changed, 288 insertions(+)
+>=20
 
-> =20
-> +static void qemu_probe_lock_ops(void)
-> +{
-> +    if (fcntl_op_setlk =3D=3D -1) {
-> +#ifdef F_OFD_SETLK
-> +        int fd;
-> +        int ret;
-> +        const char *tmpdir;
-> +        char *filename;
-> +        struct flock fl =3D {
-> +            .l_whence =3D SEEK_SET,
-> +            .l_start  =3D 0,
-> +            .l_len    =3D 0,
-> +            .l_type   =3D F_WRLCK,
+It should be possible to run iotests against any
+qemu/qemu-img/qemu-io/qemu-nbd binaries - even if no build root is
+available.
 
-Do we actually need to grab a lock over the entire file,...
+How about invoking qemu-img and tools to determine their capabilities?
 
-> +        };
-> +
-> +        tmpdir =3D getenv("TMPDIR");
-> +        if (!tmpdir) {
-> +            tmpdir =3D "/var/tmp";
-> +        }
-> +        filename =3D g_strdup_printf("%s/qemu_lock_probe.XXXXXX", tmpd=
-ir);
-> +        fd =3D mkstemp(filename);
+At the beginning of ./check, query the qemu/qemu-img/qemu-io/qemu-nbd
+binaries for specific features.  This produces a set of available
+features and tests can say:
 
-Can we skip the temporary file, and just open("/dev/null", O_RDWR), for
-slightly less work?
+  _supported_feature aio_native
 
-> +        if (fd < 0) {
-> +            fprintf(stderr, "Failed to create temporary file '%s': %s\=
-n",
-> +                    filename, strerror(errno));
-> +            fcntl_op_setlk =3D F_SETLK;
-> +            fcntl_op_getlk =3D F_GETLK;
-> +            goto out;
-> +        }
-> +        ret =3D fcntl(fd, F_OFD_SETLK, &fl);
+This feature can be checked by opening an image file:
 
-=2E..or should we change this to the much-weaker F_OFD_GETLK?  I guess it=
+  qemu-io --format raw --nocache --native-aio --cmd quit test.img
 
-doesn't matter if we use a temporary file, but does if we are trying to
-simplify by using /dev/null.
-
-At any rate, the rest of the patch looks sane.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR
+--m51xatjYGsM+13rf
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllx9AAACgkQp6FrSiUn
-Q2o9Igf/TDXNfa7GpnGhd9VlxzkztlzPsaJD14JtLx6o6WBIVHzJ57Wvmc7oc6Ww
-myqWAz43DyJ8EkzU4hFWIDcnFvjXV+K3j6AWqYq+3cSOngubHaecdzKwkHVgXKwu
-noQLVPSDxMfb0T/qX22FuRuMZMJbWcqf5PFNOnF0ti3BdDjI2HwQZfY/x+DXon96
-5d92aCKz49+4a3kmFDQUaDmE0EJ8OnI5yek1cY27pju8pcJcFcGdKo9bolro6reG
-nvDHkIfPEsTkA2pYPpMf9NdWWUMs+YVHmvMhlkrvs+Geemq1Kgd0Rz6fpQkvYTC8
-+wjCaPkLQQhcxmOyLTFBbuN1OAIcOQ==
-=qvVT
+iQEcBAEBAgAGBQJZcfSVAAoJEJykq7OBq3PIYNIIALFqx8PI2I6CZU09gQaW+FfB
+6mlK4l2jE21+43gwu4/Wn9DeSU28xOBvthwhdnhSdXWxpT0mPRs94X+9E1AHy9RQ
+iz/qNpXvC0OPbTfYcd8dJ2mddn/G30B9Mt6c/Wiklau/Udj6WSZL9nSscqeEfZMR
+p3z9c19LNwGZtxJlCNHnyYA4YRDxxPkzitu5+/uhZYSo2ChLsyTGoW2VP2ge7aNE
+GKNIfdD4muJQ+Z1uVPEcw576zV7Ae2z5J3M/URR8cu0wpP37IM736ZFlmaBxPdVY
+Vb3qn9x07KLygY16U29ZArNoa3x6qbpaX0BmTkEVnPRegNzMVO3FOMvOvdVPmPU=
+=uk2v
 -----END PGP SIGNATURE-----
 
---qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR--
+--m51xatjYGsM+13rf--
