@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYUgE-0004Zc-2k
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:07 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dYUgJ-0004e9-3s
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYUgB-0001HW-0E
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:06 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:32997)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dYUgA-0001H0-Ps
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:02 -0400
-Received: by mail-wm0-x230.google.com with SMTP id v139so2494565wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:57:02 -0700 (PDT)
-References: <20170720150426.12393-1-alex.bennee@linaro.org>
-	<20170720150426.12393-3-alex.bennee@linaro.org>
-	<98e1b6a7-7af5-7b8b-23c8-159572c83eb4@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <98e1b6a7-7af5-7b8b-23c8-159572c83eb4@redhat.com>
-Date: Fri, 21 Jul 2017 10:57:00 +0100
-Message-ID: <87shhq6rkj.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.11 02/23] fpu: import SoftFloat3c
+	(envelope-from <jfreimann@redhat.com>) id 1dYUgH-0001M8-Va
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1dYUgH-0001LM-Lk
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:09 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B13E2C154A
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 09:57:08 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
+Date: Fri, 21 Jul 2017 11:55:53 +0200
+Message-Id: <20170721095553.10717-5-jfreimann@redhat.com>
+In-Reply-To: <20170721095553.10717-1-jfreimann@redhat.com>
+References: <20170721095553.10717-1-jfreimann@redhat.com>
+Subject: [Qemu-devel] [PATCH 4/4] tests/pxe-test: add testcase using
+ vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com
 
+From: Jens Freimann <jfreiman@redhat.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+Add a PXE testcase tunneling traffic through vhost-user-bridge process.
+Create a vhost-user-bridge  process and connect it to qemu via a socket.
 
-> On 20.07.2017 17:04, Alex Bennée wrote:
->> SoftFloat3c is a re-write of the BSD softfloat library which includes
->> a number of new features. It has been written with libraries in mind
->> and has a new API so hopefully we can use both side-by-side as we
->> migrate.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  fpu/softfloat3c/8086-SSE/extF80M_isSignalingNaN.c |   57 +
->
-> I'd maybe rather name the folder "softfloat3" instead of "softfloat3c"
-> ... otherwise it does not match anymore if we ever want to update to
-> version 3d (which is likely just a minor release with some few bug
-> fixes, so we likely don't want to maintain that in a separate folder)
+Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+---
+ tests/Makefile.include |   4 +-
+ tests/pxe-test.c       | 140 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 142 insertions(+), 2 deletions(-)
 
-Good point, will do.
-
---
-Alex Bennée
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 7af278d..e40550c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -705,7 +705,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
+ tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
+ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+ 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+-tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
++tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
++    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
+ tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+ tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
+ tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+@@ -834,6 +835,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+ 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+ 		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
++		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
+ 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+ 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
+ 	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
+diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+index 34282d3..d6379a8 100644
+--- a/tests/pxe-test.c
++++ b/tests/pxe-test.c
+@@ -5,7 +5,8 @@
+  *
+  * Authors:
+  *  Michael S. Tsirkin <mst@redhat.com>,
+- *  Victor Kaplansky <victork@redhat.com>
++ *  Victor Kaplansky <victork@redhat.com>,
++ *  Jens Freimann <jfreiman@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+@@ -13,14 +14,150 @@
+ 
+ #include "qemu/osdep.h"
+ #include <glib/gstdio.h>
++#include <glib.h>
+ #include "qemu-common.h"
+ #include "libqtest.h"
+ #include "boot-sector.h"
++#include <sys/vfs.h>
+ 
++#define LPORT 5555
++#define RPORT 4444
+ #define NETNAME "net0"
++#define QEMU_CMD_MEM    "--enable-kvm -m %d "\
++                        "-object memory-backend-file,id=mem,size=%dM,"\
++                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
++#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
++#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
++                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
++                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
++                        " -netdev socket,id=n1,fd=%d"
++#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
++                        " -device virtio-net-pci,netdev=n1 "
++
++#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
++                        QEMU_CMD_NETDEV QEMU_CMD_NET
++
++#define HUGETLBFS_MAGIC       0x958458f6
++#define VUBR_SOCK "vubr.sock"
++#define MEMSZ 1024
+ 
+ static char disk[] = "tests/pxe-test-disk-XXXXXX";
+ 
++static const char *init_hugepagefs(const char *path)
++{
++    struct statfs fs;
++    int ret;
++
++    if (access(path, R_OK | W_OK | X_OK)) {
++        g_test_message("access on path (%s): %s\n", path, strerror(errno));
++        return NULL;
++    }
++
++    do {
++        ret = statfs(path, &fs);
++    } while (ret != 0 && errno == EINTR);
++
++    if (ret != 0) {
++        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
++        return NULL;
++    }
++
++    if (fs.f_type != HUGETLBFS_MAGIC) {
++        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
++        return NULL;
++    }
++
++    return path;
++}
++
++static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
++{
++    int sock;
++
++    if (inet_aton("127.0.0.1", (struct in_addr *) &si_remote->sin_addr.s_addr)
++            == 0) {
++        g_test_message("inet_aton failed\n");
++        return -1;
++    }
++    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
++    if (sock == -1) {
++        g_test_message("socket creation failed\n");
++        return -1;
++    }
++    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
++        g_test_message("connect failed: %s", strerror(errno));
++        return -1;
++    }
++
++    return sock;
++}
++
++static void test_pxe_vhost_user(void)
++{
++    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
++    char template2[] = "/tmp/hugepages-XXXXXX";
++    gchar * vubr_args[] = {NULL, NULL, NULL, NULL};
++    struct sockaddr_in si_remote = {
++        .sin_family = AF_INET,
++        .sin_port = htons(RPORT),
++    };
++    const char *hugefs = NULL;
++    const char *tmpfs2 = NULL;
++    const char *tmpfs = NULL;
++    const char *root = NULL;
++    GError *error = NULL;
++    char *vubr_binary;
++    char *qemu_args;
++    GPid vubr_pid;
++    int sock = -1;
++
++    tmpfs = mkdtemp(template);
++    if (!tmpfs) {
++        g_test_message("mkdtemp on path(%s): %s\n",
++                       template, strerror(errno));
++    }
++    vubr_binary = getenv("QTEST_VUBR_BINARY");
++    g_assert(vubr_binary);
++    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
++    vubr_args[1] = g_strdup_printf("-u");
++    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
++    g_spawn_async(NULL, vubr_args, NULL,
++                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
++                  G_SPAWN_SEARCH_PATH,
++                  NULL, NULL, &vubr_pid, &error);
++    g_assert_no_error(error);
++
++    hugefs = getenv("QTEST_HUGETLBFS_PATH");
++    if (hugefs) {
++        root = init_hugepagefs(hugefs);
++        g_assert(root);
++    } else {
++        tmpfs2 = mkdtemp(template2);
++        g_assert(tmpfs2);
++        root = tmpfs2;
++    }
++
++    sock = vubr_create_socket(&si_remote, RPORT);
++    g_assert_cmpint(sock, !=, -1);
++
++    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
++                                "char0", vubr_args[2], "char0",
++                                disk, sock);
++    qtest_start(qemu_args);
++    boot_sector_test();
++    qtest_quit(global_qtest);
++    g_free(qemu_args);
++    g_free(vubr_args[0]);
++    g_free(vubr_args[1]);
++    g_free(vubr_args[2]);
++    g_assert_cmpint(g_remove(g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK)),
++                    ==, 0);
++    if (tmpfs2) {
++        g_assert_cmpint(rmdir(tmpfs2), ==, 0);
++    }
++    g_assert_cmpint(g_rmdir(tmpfs), ==, 0);
++}
++
+ static void test_pxe_one(const char *params, bool ipv6)
+ {
+     char *args;
+@@ -65,6 +202,7 @@ int main(int argc, char *argv[])
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qtest_add_func("pxe/e1000", test_pxe_e1000);
+         qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
++        qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
+     } else if (strcmp(arch, "ppc64") == 0) {
+         qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
+         qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
+-- 
+2.9.4
