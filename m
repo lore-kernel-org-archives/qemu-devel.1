@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYabK-0008I9-JO
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 12:16:27 -0400
+	(envelope-from <crosa@redhat.com>) id 1dYabk-0008RF-4H
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 12:16:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dYabH-00039x-Da
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 12:16:26 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34883)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dYabH-00039P-2x
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 12:16:23 -0400
-Received: by mail-wm0-x235.google.com with SMTP id w126so16612810wme.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 09:16:22 -0700 (PDT)
-References: <1500151401-30863-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<20170717071835.GD22872@lemon>
-	<1805860107.204084.1500320230836.JavaMail.zimbra@research.iiit.ac.in>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1805860107.204084.1500320230836.JavaMail.zimbra@research.iiit.ac.in>
-Date: Fri, 21 Jul 2017 17:16:19 +0100
-Message-ID: <87lgnh7oks.fsf@linaro.org>
+	(envelope-from <crosa@redhat.com>) id 1dYabg-0003Lk-VT
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 12:16:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dYabg-0003KF-LF
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 12:16:48 -0400
+References: <87o9so1hl7.fsf@dusky.pond.sub.org>
+	<20170717103308.GI7163@stefanha-x1.localdomain>
+	<8760epr9vw.fsf@dusky.pond.sub.org>
+	<20170721153331.GL18014@stefanha-x1.localdomain>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
+Date: Fri, 21 Jul 2017 12:16:30 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC] RFC on Backup tool
+In-Reply-To: <20170721153331.GL18014@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Q1m8eXVr8AXtpXqXeBIi8lJ0FQkec75lV"
+Subject: Re: [Qemu-devel] Improving QMP test coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +30,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani <chugh.ishani@research.iiit.ac.in>
-Cc: Fam Zheng <famz@redhat.com>, jsnow <jsnow@redhat.com>, qemu-devel@nongnu.org, stefanha <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Q1m8eXVr8AXtpXqXeBIi8lJ0FQkec75lV
+From: Cleber Rosa <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org,
+ Cleber Rosa <cleber@redhat.com>
+Message-ID: <026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
+Subject: Re: [Qemu-devel] Improving QMP test coverage
+References: <87o9so1hl7.fsf@dusky.pond.sub.org>
+ <20170717103308.GI7163@stefanha-x1.localdomain>
+ <8760epr9vw.fsf@dusky.pond.sub.org>
+ <20170721153331.GL18014@stefanha-x1.localdomain>
+In-Reply-To: <20170721153331.GL18014@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
 
-Ishani <chugh.ishani@research.iiit.ac.in> writes:
+On 07/21/2017 11:33 AM, Stefan Hajnoczi wrote:
+>> Output testing style delegates checking ouput to diff.  I rather like =
+it
+>> when text output is readily available.  It is when testing QMP.  A
+>> non-trivial example using this style could be useful, as discussing
+>> ideas tends to be more productive when they come with patches.
+>=20
+> Yes, I was considering how many of the Python iotests could be rewritte=
+n
+> comfortably in shell.  It is nice when the test simply executes command=
+s
+> and the output file shows the entire history of what happened.  Great
+> for debugging.
+>=20
+> Stefan
+>=20
+I'd like to have a better understanding of the major pain points here.
 
-> Thanks for the review.
->
-> ----- On Jul 17, 2017, at 12:48 PM, Fam Zheng famz@redhat.com wrote:
->
->> On Sun, 07/16 02:13, Ishani Chugh wrote:
->>> This is a Request For Comments patch for qemu backup tool. As an
->>> Outreachy intern, I am assigned to the project for creating a backup
->>> tool. qemu-backup will be a command-line tool for performing full and
->>> incremental disk backups on running VMs.
->>
->> Only full backup is implemented in this patch, is the plan to add incremental
->> backup on top?  I'm curious because you have target file path set during drive
->> add, but in the incremental case, it should be possible that each backup creates
->> a new target file that chains up with earlier ones, so I think the target file
->> should be an option for "backup" command as well.
->
-> Yes. Incremental backup is to be added. I am still in learning phase with
-> respect to incremental backups. I will modify the arguments and workflow accordingly.
->
->>> It is intended as a
->>> reference implementation for management stack and backup developers
->>> to see QEMU's backup features in action. The tool writes details of
->>> guest in a configuration file and the data is retrieved from the file
->>> while creating a backup. The usage is as follows:
->>> Add a guest
->>> python qemu-backup.py guest add --guest <guest_name> --qmp <socket_path> [--tcp]
->>>
->>> Add a drive for backup in a specified guest
->>> python qemu-backup.py drive add --guest <guest_name> --id <drive_id> [--target
->>> <target_file_path>]
->>>
->>> Create backup of the added drives:
->>> python qemu-backup.py backup --guest <guest_name>
->>>
->>> List all guest configs in configuration file:
->>> python qemu-backup.py guest list
->>
->> Please put these examples into the help output of the command, this way users
->> can read it as well.
->
-> I have created a manpage documentation for the tool.
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg05241.html
-> It is to be updated continuously as the development progresses.
->
->>>
->>> I will be obliged by any feedback.
->>
->> Thanks for doing this!
->>
->>>
->>> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
->>> ---
->>>  contrib/backup/qemu-backup.py | 244 ++++++++++++++++++++++++++++++++++++++++++
->>>  1 file changed, 244 insertions(+)
->>>  create mode 100644 contrib/backup/qemu-backup.py
->>>
->>> diff --git a/contrib/backup/qemu-backup.py b/contrib/backup/qemu-backup.py
->>> new file mode 100644
->>> index 0000000..9c3dc53
->>> --- /dev/null
->>> +++ b/contrib/backup/qemu-backup.py
->>> @@ -0,0 +1,244 @@
->>> +#!/usr/bin/python
->>> +# -*- coding: utf-8 -*-
->>
->> You need a copyright header here (the default choice for QEMU is GPLv2 but there
->> is no strict restrictions for scripts). See examples in other *.py files.
->
-> Thanks. Will update in next revision.
->
->>> +"""
->>> +This file is an implementation of backup tool
->>> +"""
->>> +from argparse import ArgumentParser
->>> +import os
->>> +import errno
->>> +from socket import error as socket_error
->>> +import configparser
->>
->> Python2 has ConfigParser while python3 has configparser. Please be specific
->> about the python compatibility level of this script - my system (Fedora) has
->> python2 as /usr/bin/python, so the shebang and your example command in the
->> commit message don't really work. "six" module can handle python 2/3
->> differentiations, or you can use '#!/usr/bin/env python2' to specify a python
->> version explicitly.
->
-> The script is supposed to be both python2/3 compatible. I will take reference
-> from Stefan's review and fix it in next revision.
->
->>> +import sys
->>> +sys.path.append('../../scripts/qmp')
->>
->> This expects the script to be invoked from its local directory? It's better to
->> use the __file__ trick to allow arbitrary workdir:
->>
->> $ git grep __file__
->> scripts/device-crash-test:sys.path.append(os.path.join(os.path.dirname(__file__),
->> '..', 'scripts'))
->> scripts/qemu-gdb.py:sys.path.append(os.path.dirname(__file__))
->> tests/migration/guestperf/engine.py:sys.path.append(os.path.join(os.path.dirname(__file__),
->> '..', '..', '..', 'scripts'))
->> tests/qemu-iotests/iotests.py:sys.path.append(os.path.join(os.path.dirname(__file__),
->> '..', '..', 'scripts'))
->
-> Thanks. Will fix it in next revision.
->
->>> +from qmp import QEMUMonitorProtocol
->>> +
->>> +
->>> +class BackupTool(object):
->>> +    """BackupTool Class"""
->>> +    def __init__(self, config_file='backup.ini'):
->>
->> Is it better to put this in a more predictable place such as
->> "$HOME/.qemu-backup.ini" and/or make it a command line option?
->
-> It is planned to be an optional command-line option, if not
-> provided, the default location suggested should be taken.
+Although this can be seen as a matter of taste, style preferences and
+even religion, I guess it's safe to say that Python can scale better
+than shell.  The upside of shell based tests is the "automatic" and
+complete logging, right?  Running "bash -x /path/to/test.sh" will give
+much more *useful* information than "python -v /path/to/test.py" will, fa=
+ct.
 
-Can it be $HOME/.config/qemu/backup.ini please as per:
+I believe this has to do with how *generic* Python code is written, and
+how builtin functions and most of the standard Python libraries work as
+they do.  Now, when writing code aimed at testing, making use of testing
+oriented libraries and tools, one would expect much more useful and
+readily available debug information.
 
-  https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+I'm biased, for sure, but that's what you get when you write basic tests
+using the Avocado libraries.  For instance, when using process.run()[1]
+within a test, you can choose to see its command output quite easily
+with a command such as "avocado --show=3Davocado.test.stdout run test.py"=
+=2E
 
-Cheers,
+Using other custom logging channels is also trivial (for instance for
+specific QMP communication)[2][3].
 
---
-Alex Bennée
+I wonder if such logging capabilities fill in the gap of what you
+describe as "[when the] output file shows the entire history of what
+happened".
+
+BTW, I'll defer the discussion of using an external tool to check the
+output and determine test success/failure, because it is IMO a
+complementary topic, and I believe I understand its use cases.
+
+Regards,
+- Cleber.
+
+[1] -
+http://avocado-framework.readthedocs.io/en/52.0/api/utils/avocado.utils.h=
+tml#avocado.utils.process.run
+[2] -
+http://avocado-framework.readthedocs.io/en/52.0/WritingTests.html#advance=
+d-logging-capabilities
+[3] - https://www.youtube.com/watch?v=3DhtUbOsh8MZI
+
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+
+
+--Q1m8eXVr8AXtpXqXeBIi8lJ0FQkec75lV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZcijeAAoJEGV+jTOl8gnzZ9cP/2PGoJvdO8z7/A4TiD9kEqur
+rRecfEw8cB8op1iW2Vb531IwswwdoFviuXtNfcmj+Ml5DxG7mAEirtlZAlOYViw3
+7BSGakVz2g+nTkVE+5ChWzMb2IOVsyeJlhY3gz1J7YkkR1oDG/6+1yL4caIonWcO
+MC6AzdzNx9cWvQTuIa3DAZmsCy5X3FQ+LwpAW9NXE2MBSqI2kncqmIxaVoj32Ayh
+hjKUCD8/l9u6JuwKBXHUs6dCJ/WfCOMYPMmUzZ9TXp6+v496aQubvokWsi8peGeP
+NYyYHktGx/BnZj6jIwPnrS2h2ucKuECsFK5XXbFjlWgbvjE4QdlfPBWjH3oFYYwl
+yGjq62QAR5ERsnTe9VX4Qq++1znKweQmmRbXkWsa24esgItF2FKJ+kF/fIFUZv69
+JGYJl50YqVjEDyAcwxrDOycNxuWg3/g1Islqt3yrwsfYXgRYCB9UUFvMyr54VH5m
+szVBf+NmKYrY/9jTV75XwGRxSWuArFOkysNai4TqQNsUzsJS7Jc7dN3lbKPlzZAA
+xumqqfNmtlILUcOipS75BAFjP/vrPVD7Ivr4/vsr1Iup4PgQevkbU1Kl+ZdixxqZ
+ZJ6S9Q6gaMSWJfCVGcGM86GK70mebYrdxe9oLUbbRHjwMtgUZGmQxoLSBbwHov/4
+JRlrieyxRIqiOF5LZIvC
+=CPxq
+-----END PGP SIGNATURE-----
+
+--Q1m8eXVr8AXtpXqXeBIi8lJ0FQkec75lV--
