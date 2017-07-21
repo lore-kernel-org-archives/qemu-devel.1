@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dYRkJ-0006ng-V6
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:49:09 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dYRlg-0007UU-AN
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:50:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dYRkI-00073s-VN
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:49:08 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170721041952.45950-1-aik@ozlabs.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b3ed544c-a576-7a74-b7b0-8067873cf11e@amsat.org>
-Date: Fri, 21 Jul 2017 03:48:56 -0300
+	(envelope-from <ldoktor@redhat.com>) id 1dYRld-0000FF-9e
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:50:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56164)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dYRlc-0000EV-Vv
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:50:29 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CA7118E685
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 06:50:27 +0000 (UTC)
+References: <20170720162815.19802-1-ldoktor@redhat.com>
+	<20170720162815.19802-8-ldoktor@redhat.com>
+	<20170720183522.GW2757@localhost.localdomain>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <79c348d8-fb6c-7b08-e143-eab8572b5468@redhat.com>
+Date: Fri, 21 Jul 2017 08:50:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170721041952.45950-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] Revert "elf-loader: warn about
- invalid endianness"
+In-Reply-To: <20170720183522.GW2757@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9pc8691OwtEJPRKlaphLOrQ6Bc6C7Hc4T"
+Subject: Re: [Qemu-devel] [PATCH 07/11] qmp.py: Use object-based class for
+ QEMUMonitorProtocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +36,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Paul Burton <paul.burton@imgtec.com>, Alistair Francis <alistair.francis@xilinx.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-Hi Alexey,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9pc8691OwtEJPRKlaphLOrQ6Bc6C7Hc4T
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com
+Message-ID: <79c348d8-fb6c-7b08-e143-eab8572b5468@redhat.com>
+Subject: Re: [PATCH 07/11] qmp.py: Use object-based class for
+ QEMUMonitorProtocol
+References: <20170720162815.19802-1-ldoktor@redhat.com>
+ <20170720162815.19802-8-ldoktor@redhat.com>
+ <20170720183522.GW2757@localhost.localdomain>
+In-Reply-To: <20170720183522.GW2757@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 07/21/2017 01:19 AM, Alexey Kardashevskiy wrote:
-> This reverts c8e1158cf611 "elf-loader: warn about invalid endianness"
-> as it produces a useless message every time an LE kernel image is
-> passed via -kernel on a ppc64-pseries machine. The pseries machine
-> already checks for ELF_LOAD_WRONG_ENDIAN and tries with big_endian=0.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->   hw/core/loader.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index c17ace0a2e..e5e8cbb638 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -480,7 +480,6 @@ int load_elf_ram(const char *filename,
->       }
->   
->       if (target_data_order != e_ident[EI_DATA]) {
-> -        fprintf(stderr, "%s: wrong endianness\n", filename);
->           ret = ELF_LOAD_WRONG_ENDIAN;
->           goto fail;
->       }
-> 
+Dne 20.7.2017 v 20:35 Eduardo Habkost napsal(a):
+> On Thu, Jul 20, 2017 at 06:28:11PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:=
 
-I submitted this patch because I spent some time debugging while QEMU 
-was failing silently using a MIPS kernel image which used to work, after 
-realizing I was in an incorrect build_dir using qemu-system-mipsel to 
-load a big endian image and felt stupid [1]. This dumb error can happen 
-to other people so I added this warning here.
-I was not aware of the ELF_LOAD_WRONG_ENDIAN related code, and at least 
-the MIPS arch is not using it.
-As I can see in MAINTAINERS, sPAPR is "Supported" meaning "Someone is 
-actually paid to look after this", while there is no such paid person 
-for the MIPS part.
-It seems each arch had a different way to load images and 
-hw/core/loader.c was an effort to merge common code but mostly 
-"Supported" arch are using it.
-While your revert does fixes your sPAPR warning issue, looking at the 
-problem roots I think the correct fix is to improve the MIPS port and 
-eventually the less loved archs to unify the loader.c calls and avoid 
-such problems.
-I don't object reverting this patch for 2.10 and improve the loader.c 
-usage during 2.11 cycle, I only wonder if this is another 
-corporate/hobbyist conflict of interest with corporate crushing on 
-hobbyist instead of helping, motivating contribution improving common 
-code usage.
+>> There is no need to define QEMUMonitorProtocol as old-style class.
+>>
+>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+>> ---
+>>  scripts/qmp/qmp.py | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+>> index bb4d614..68f3420 100644
+>> --- a/scripts/qmp/qmp.py
+>> +++ b/scripts/qmp/qmp.py
+>> @@ -30,7 +30,7 @@ class QMPTimeoutError(QMPError):
+>>      pass
+>> =20
+>> =20
+>> -class QEMUMonitorProtocol:
+>> +class QEMUMonitorProtocol(object):
+>=20
+> I don't fully understand the consequences of changing to
+> new-style classes when using old-style SuperClass.__init__()
+> calls in the __init__().  Should we change QMPShell.__init__() to
+> use super()?
+>=20
+The consequence is it becomes a proper object with full object model and =
+less workarounds. It also consumes a bit more memory but are the only ava=
+ilable mode in py3.
 
-Cc'ed MIPS and loader.c maintainers (both "Maintained" and not "Supported").
+As for the old-style superclass, it works, but the correct approach is to=
+ replace it with `super` call. I'll address that in the v2 (I only checke=
+d for `.py` files but there are many python sources in qemu tree without =
+the proper extension. I still need to get used to this.).
 
-Phil.
+Luk=C3=A1=C5=A1
 
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05926.html
+>=20
+>> =20
+>>      #: Socket's error class
+>>      error =3D socket.error
+>> --=20
+>> 2.9.4
+>>
+>=20
+
+
+
+--9pc8691OwtEJPRKlaphLOrQ6Bc6C7Hc4T
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZcaQuExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsFt
+JAf/SDS6/kZaza7RBkYLzcsk9VYUldJ2Ft7MrjLCYQehVSqNaBz/uW0Tvnep66bg
+r5/ym5rIOzHNuTFmcEM8vzjLQ3kQGLA/XYzSNUbM2I5E37BzRCNkr6DZOttuMS1A
+s55GXcNOUqyDRJ8i1TfI0XmUuh2GopdaVBQXXFzJqmNp6gmsL6J5O236AVWL8N6x
+U/vJ0k0qX5Lfd4pgFJvjCjMAFQU4vVdfANtrviFowqTARcqoCKouWr4y1bav9min
+QC62r6RkrxZ6BEMTDH8p9cDXqBq78BoZerLjm7zQtjV1jPOw3ngxAUIUh3mNXphU
+DoYJwhqWLJBW2mIuSWngT+Dx6Q==
+=zGH+
+-----END PGP SIGNATURE-----
+
+--9pc8691OwtEJPRKlaphLOrQ6Bc6C7Hc4T--
