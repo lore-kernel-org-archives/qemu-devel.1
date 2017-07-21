@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lists@philjordan.eu>) id 1dYWOh-0004gB-1U
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:47:08 -0400
+	(envelope-from <mike.caraman@nxp.com>) id 1dYWOp-0004je-Rc
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:47:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lists@philjordan.eu>) id 1dYWOf-0006SL-Vh
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:47:07 -0400
-Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:32768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lists@philjordan.eu>) id 1dYWOf-0006S6-Pb
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:47:05 -0400
-Received: by mail-ua0-x235.google.com with SMTP id 80so43527519uas.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 04:47:05 -0700 (PDT)
+	(envelope-from <mike.caraman@nxp.com>) id 1dYWOm-0006Ut-M2
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:47:15 -0400
+From: Mike Caraman <mike.caraman@nxp.com>
+Date: Fri, 21 Jul 2017 11:47:06 +0000
+Message-ID: <AM2PR04MB0804660DF51B39B3E88B0D3484A40@AM2PR04MB0804.eurprd04.prod.outlook.com>
+References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>,
+	<CAFEAcA_Zd1kFdv11Pbh9=_Hu2uBvULxPHbk15ot-uKGpzw4s3A@mail.gmail.com>
+In-Reply-To: <CAFEAcA_Zd1kFdv11Pbh9=_Hu2uBvULxPHbk15ot-uKGpzw4s3A@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1707211235480.66319@zero.eik.bme.hu>
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721092026.GD17693@redhat.com>
-	<20170721114623.57b3be1d@nial.brq.redhat.com>
-	<alpine.BSF.2.21.1707211235480.66319@zero.eik.bme.hu>
-From: Phil Dennis-Jordan <lists@philjordan.eu>
-Date: Fri, 21 Jul 2017 13:46:44 +0200
-Message-ID: <CAGCz3vu7qdNQKp7aHU35Hj7GxsT_WqGEJbb6XNyaAn=wmHYiZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +24,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, Diana Madalina Craciun <diana.craciun@nxp.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, Laurentiu Tudor <laurentiu.tudor@nxp.com>
 
-On Fri, Jul 21, 2017 at 12:50 PM, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> On Fri, 21 Jul 2017, Igor Mammedov wrote:
->>
->> On Fri, 21 Jul 2017 10:20:26 +0100
->> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->>>
->>> On Thu, Jul 20, 2017 at 09:29:33PM +0200, Phil Dennis-Jordan wrote:
->>>>
->>>> On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
->>>> <programmingkidx@gmail.com> wrote:
->>>>>
->>>>> I noticed that Windows 2000 does not boot up in QEMU recently. After
->>>>> bisecting the issue I found the offending commit:
->>>>
->>>>
->>>> Ouch. I reckon we have 2 options for fixing this:
->>>>
->>>> 1. Export two FADTs, one ACPI 1.0, one ACPI 2.0. The latter would need
->>>> to be pointed to by an XSDT, which Qemu currently doesn't implement at
->>>> all as far as I'm aware. Any ideas on how SeaBIOS or OVMF would handle
->>>> this? Any likely other OS regressions?
->>>>
->>>> 2. Select FADT version with an option. This one is definitely safe,
->>>> but adds yet another option.
->>>>
->>>> Thoughts?
->>>
->>>
->>> The original comit below claims the change does not impact guest ABI
->>> compatibility, so do we understand why Windows broke ?
->>
->> Author made a reasonable effort to test with variety of guest OSes upto
->> vanilla WinXP, we can't blame ourselves for not testing OS that's is not
->> available.
->>
->> Well we don't know why w2k breaks, only that it bisects to this commit.
->
->
-> I don't know if this helps but I've found that this same commit also broke
-> booting OS X on q35 with OVMF and Clover (some old versions I had and worked
-> before this commit). See here:
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg04306.html
->
-> Maybe it's simpler to debug as these are open source but it's still not very
-> clear why they fail because it starts to boot OS X but hangs during kernel
-> init (and maybe Win2K fails to boot because of something else). I think I've
-> seen this with OVMF 58f025afd and Clover 3354 (or around that, not
-> completely sure about these versions).
+Peter, thanks for feedback. Diana will return from vacation next week,
+I am trying clarify some of the questions.
 
-OVMF had 2 bugs that totally mucked up the ACPI tables if Qemu didn't
-supply its loader commands "just so", and modified ACPI 2.0-5.0 FADTs
-in such a way that they were no longer valid. These are fixed in
-198a46d and 072060a, which are about a year newer than 58f025afd, so
-it's no surprise this combination doesn't work. I have no idea if
-Clover on top makes any difference.
+>From: Peter Maydell <peter.maydell@linaro.org>
+>Sent: Monday, July 10, 2017 8:10 PM
+>To: Diana Madalina Craciun
+>Cc: QEMU Developers; Michael S. Tsirkin; Eric Auger; Mike Caraman; qemu-ar=
+m; Marcel Apfelbaum; Bharat Bhushan; Christoffer Dall; Laurentiu Tudor
+>Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt mach=
+ine
+>
+>On 23 May 2017 at 12:12, Diana Craciun <diana.craciun@nxp.com> wrote:
+>> The NXP DPAA2 is a hardware architecture designed for high-speeed networ=
+k
+>> packet processing. The DPAA2 hardware components are managed by a hardwa=
+re
+>> component called the Management Complex (or MC) which provides an
+>> object-base abstraction for software drivers to use the DPAA2 hardware.
+>> For more details you can see:
+>> https://emea01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgit=
+.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git%2Ftre=
+e%2Fdrivers%2Fstaging%2Ffsl-mc%2FREADME.txt%3Fh%3Dv4.10&data=3D01%7C01%7Cmi=
+ke.caraman%40nxp.com%7Ccdb80ed25c4a4a71d86708d4c7b68cd8%7C686ea1d3bc2b4c6fa=
+92cd99c5c301635%7C0&sdata=3DJfYha1w2rZ12URBU3LHgo7OwtEPEDqcGWjdAUiRCP4k%3D&=
+reserved=3D0
+>>
+>> The interrupts generated by the DPAA2 hardware components are MSIs. We w=
+ill add
+>> support for direct assigning these DPAA2 components/objects to a virtual
+>> machine. However, this will add the need to expand the MSI usage in QEMU=
+.
+>>
+>> Currently the MSIs in QEMU are pretty much tied to PCI. For ARM the
+>> GIC ITS is using a device ID for interrupt translation. Currently, for
+>> PCI, the requester ID is used as device ID. This will not work when
+>> we add another entity that needs also a device ID which is supposed to
+>> be unique across the system.
+>>
+>> My proposal is to add a static allocation in the virt machine. I conside=
+red
+>> that this allocation is specific to each machine/platform. Currently onl=
+y
+>> virt machine has it, but other implementations may use the same mechanis=
+m
+>> as well.
+>> So, I used a static allocation with this formula:
+>>
+>> DeviceID =3D zero_extend( RequesterID[15:0] ) + 0x10000 * Constant
+>>
+>> This formula was taken from SBSA spec (Appendix I: DeviceID generation a=
+nd
+>> ITS groups). In case of QEMU the constant will be different for each ent=
+ity.
+>> In this way a unique DeviceID will be generated and the device ID will b=
+e
+>> derived from a requesterID (in case of PCI) or other means in case of ot=
+her
+>> entities.
+>>
+>> The implementation is generic as there might be in the future other non-=
+pci devices
+>> that are using MSIs or IOMMU. Any architecture can use it, though curren=
+tly
+>> only the ARM architecture is using the function that retrieves the strea=
+m ID. I
+>> did not change all the replacements of the pci_requester_id (with pci_st=
+ream_id)
+>> in the code (although if the constant is 0, the stream_id is equal with =
+requester_id).
+>> The other architectures (e.g. intel iommu code) assume that the ID is th=
+e
+>> requester ID.
+>>
+>> Tested on NXP LS2080 platform.
+>
+>So I'm still a bit confused about what this is for and what the
+>relationship is with how the equivalent task would be performed
+>in real hardware. Can you explain how that works, please?
+>Would there be a system MMU involved somewhere that would be
+>allocating these IDs somehow?
+
+This is the first step to accommodate device pass-though with MSI support,
+required for non-PCI/heterogeneous buses on ARM64 platforms with GIC-ITS.
+We reached the point where our mc-bus infrastructure got the ack and
+it is ready to get out of staging:
+https://lkml.org/lkml/2017/7/18/708
+
+The problem we want to address is related to guest DeviceIDs allocation
+for GIC-ITS emulation. On real hardware the boot loader, in our case u-boot=
+,
+allocates the DeviceIDs and populates the PCI msi-map device tree binding.
+We have a similar binding mechanism for MC devices:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Doc=
+umentation/devicetree/bindings/pci/pci-msi.txt
+http://git.denx.de/?p=3Du-boot.git;a=3Dblob;f=3Ddrivers/pci/pcie_layerscape=
+_fixup.c;h=3D9e6c2f5dfcf62e8b06935aa9ae3c40a734f9571d;hb=3DHEAD#l118
+
+Qemu does not populate yet the msi-map and the DeviceIDs for PCI devices
+defaults to bdf at run-time:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
+vers/of/irq.c#n599
+http://elixir.free-electrons.com/linux/latest/source/drivers/pci/msi.c#L148=
+8
+
+The proposal is to allocate the DeviceIDs as described in SBSA and to popul=
+ate the
+device tree, as oppose of generating them at runtime, in order to stick to =
+device
+binding definitions and to avoid clashes.
+
+>The patchset also seems to be introducing a fair amount of
+>mechanism without also implementing the actual use for it -- yes,
+>if we had two PCI controllers in the virt board we would need to
+>sort something out I guess, but we don't, we only have one.
+>Evaluating whether the mechanism makes sense without its major
+>user is always trickier.
+>
+>Essentially, I know very little about this use case, but my
+>default position is that if in doubt we should aim to match
+>how real hardware handles something. Virtualization-specific
+>code, and especially something specific to a niche use case like
+>this, is something I'd really prefer to avoid. The ideal is to
+>have something like PCI device passthrough, where the guest can
+>automatically probe for things and QEMU doesn't need to get
+>involved.
+>
+>I was hoping Eric would review this, since he's more up to speed
+>on direct hardware passthrough than I am, but I think he's just
+>gone off on holiday...
+>
+>thanks
+>-- PMM
+>
+
+Regards,
+Mike
