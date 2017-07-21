@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYV6I-0007MD-BL
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:24:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYVA6-0001UT-9j
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYV6H-0000xz-Gv
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:24:02 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37195)
+	(envelope-from <peter.maydell@linaro.org>) id 1dYVA5-0003nn-GP
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:27:58 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34023)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dYV6H-0000vw-BG
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:24:01 -0400
-Received: by mail-wm0-x232.google.com with SMTP id e131so10103824wme.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 03:24:01 -0700 (PDT)
+	id 1dYVA5-0003mi-AM
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:27:57 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id 12so80790962wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 03:27:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
-References: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
+References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Jul 2017 11:23:39 +0100
-Message-ID: <CAFEAcA8zVjRNtvu7HiBy_8u+7NTXjWh3aT6Fx=+D4OSNSe9KPg@mail.gmail.com>
+Date: Fri, 21 Jul 2017 11:27:35 +0100
+Message-ID: <CAFEAcA_uaB3kJcqDNR9Gg=BS1Ae0iBTs3t3S524ikKkPfx59ZA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] Use qemu_tolower() and
- qemu_toupper(), not tolower() and toupper()
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/4] bsd-user: silence warnings on
+ OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +30,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Kamil Rytarowski <kamil@netbsd.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+Cc: "patches@linaro.org" <patches@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>
 
-On 20 July 2017 at 17:31, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On NetBSD, where tolower() and toupper() are implemented using an
-> array lookup, the compiler warns if you pass a plain 'char'
-> to these functions:
+On 18 July 2017 at 17:26, Peter Maydell <peter.maydell@linaro.org> wrote:
+> I've just managed to get an OpenBSD VM into my test set for processing
+> pull requests. There are a handful of minor compiler warnings in
+> bsd-user, which this patchset fixes, just to reduce the noise
+> in my logs.
 >
-> gdbstub.c:914:13: warning: array subscript has type 'char'
+> thanks
+> -- PMM
 >
-> This reflects the fact that toupper() and tolower() give
-> undefined behaviour if they are passed a value that isn't
-> a valid 'unsigned char' or EOF.
->
-> We have qemu_tolower() and qemu_toupper() to avoid this problem;
-> use them.
->
-> (The use in scsi-generic.c does not trigger the warning because
-> it passes a uint8_t; we switch it anyway, for consistency.)
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Peter Maydell (4):
+>   bsd-user/mmap.c: Move __thread attribute to right place
+>   bsd-user/elfload.c: Fix set-but-not-used warnings
+>   bsd-user/bsdload.c: Remove write-only id_change variable
+>   bsd-user/main.c: Fix unused variable warning
 
-Applied to master; thanks all for fast reviews/acks.
+I've applied patches 1 and 2 to master; patch 3 still awaiting
+review and 4 review/reply to my response-to-review...
 
+thanks
 -- PMM
