@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYrV-0001x1-M5
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:25:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYYtT-00034Y-NC
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:27:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYrS-0005dH-HM
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:25:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYYrS-0005d4-BS
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:24:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYYrR-0004TU-DO
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:24:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3A6CB2E8080
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:24:57 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dYYtQ-0006nS-JI
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:27:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYYtQ-0006n1-AP
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:27:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 50EE2491
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:26:59 +0000 (UTC)
+References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
+	<1500645206-13559-4-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c974c7c1-5c0e-19fc-4c3d-babe406d5eac@redhat.com>
+Date: Fri, 21 Jul 2017 09:26:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Jul 2017 14:13:06 -0000
-From: Thomas Huth <1578192@bugs.launchpad.net>
-Reply-To: Bug 1578192 <1578192@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160504123823.5625.5258.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150064638808.26587.564186319598917695.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1578192] Re: GTK+ interface doesn't translate
- keycodes properly with Wayland backend
+In-Reply-To: <1500645206-13559-4-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FLpepTPB0tPlruVJdDa4UuApjwfRAbgEx"
+Subject: Re: [Qemu-devel] [PATCH 3/9] tests: Pass literal format strings
+ directly to qmp_FOO()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,103 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FLpepTPB0tPlruVJdDa4UuApjwfRAbgEx
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <c974c7c1-5c0e-19fc-4c3d-babe406d5eac@redhat.com>
+Subject: Re: [PATCH 3/9] tests: Pass literal format strings directly to
+ qmp_FOO()
+References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
+ <1500645206-13559-4-git-send-email-armbru@redhat.com>
+In-Reply-To: <1500645206-13559-4-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 07/21/2017 08:53 AM, Markus Armbruster wrote:
+> The qmp_FOO() take a printf-like format string.  In a few places, we
+> assign a string literal to a variable and pass that instead of simply
+> passing the literal.  Clean that up.
+>=20
+> Bonus: gets rid of non-literal format strings.  A step towards
+> compile-time format string checking without triggering
+> -Wformat-nonliteral.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/ahci-test.c | 4 +---
+>  tests/ide-test.c  | 4 +---
+>  2 files changed, 2 insertions(+), 6 deletions(-)
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1578192
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Title:
-  GTK+ interface doesn't translate keycodes properly with Wayland
-  backend
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Status in QEMU:
-  Fix Released
 
-Bug description:
-  I already posted this on the mailing list
-  (https://lists.nongnu.org/archive/html/qemu-
-  devel/2016-05/msg00119.html) but I decided to do a formal bug report
-  so it can be tracked and doesn't get lost.
+--FLpepTPB0tPlruVJdDa4UuApjwfRAbgEx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  ... I'm no expert, but it looks like GTK+ key events come in at the
-  ui/gtk.c:gd_key_event callback function, which calls
-  ui/gtk.c:gd_map_keycode to translate the GTK+ keycode into the Qemu
-  keycode before sending it on using qemu_input_event_send_key_number.
-  The problem is that gd_map_keycode is incomplete when GTK+ is running
-  on a backend other than X11.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_ke=
-ycode)
-  {
-      int qemu_keycode;
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyDzEACgkQp6FrSiUn
+Q2rwRwf+IhWpLv83p7t3wp7QYlzhqulyCS43MtDMeLV4XjwHqHDCLkpmGZCjjiQ7
+wXPW1qjMbg25o08F+BEdHmxXbq1i8wgxitg5MTc2Q1p3MQoxox012LMtiQ2reRIp
+Aa6iCDtZP1xdtSKd7Dj1JsiWoAwqa4RwfFrYj4pJoakIKhVXHWCKjUGFC4xXW9uz
+iwGZeqdpEj71jkhLDem7JtEVDzF4gTvXRJC86P2LwZGaXFtk8i7MeTpzWGoZjFYt
+tgXieeAvoeOM9Y5lG3r/jr9iQ4KZ9u22KiDGK5BS7qp9wkJaBU7Mh1/wO+21MO0Z
+nzrx4xl0E0a38dT/UTpNs1/qpHs/Cg==
+=Me/o
+-----END PGP SIGNATURE-----
 
-  #ifdef GDK_WINDOWING_WIN32
-      if (GDK_IS_WIN32_DISPLAY(dpy)) {
-          qemu_keycode =3D MapVirtualKey(gdk_keycode, MAPVK_VK_TO_VSC);
-          switch (qemu_keycode) {
-          case 103:   /* alt gr */
-              qemu_keycode =3D 56 | SCANCODE_GREY;
-              break;
-          }
-          return qemu_keycode;
-      }
-  #endif
-
-      if (gdk_keycode < 9) {
-          qemu_keycode =3D 0;
-      } else if (gdk_keycode < 97) {
-          qemu_keycode =3D gdk_keycode - 8;
-  #ifdef GDK_WINDOWING_X11
-      } else if (GDK_IS_X11_DISPLAY(dpy) && gdk_keycode < 158) {
-          if (s->has_evdev) {
-              qemu_keycode =3D translate_evdev_keycode(gdk_keycode - 97);
-          } else {
-              qemu_keycode =3D translate_xfree86_keycode(gdk_keycode - 97);
-          }
-  #endif
-      } else if (gdk_keycode =3D=3D 208) { /* Hiragana_Katakana */
-          qemu_keycode =3D 0x70;
-      } else if (gdk_keycode =3D=3D 211) { /* backslash */
-          qemu_keycode =3D 0x73;
-      } else {
-          qemu_keycode =3D 0;
-      }
-
-      return qemu_keycode;
-  }
-
-  In my case, I'm using GTK+'s Wayland backend, so keycodes 97 through
-  157 (this includes KEY_HOME(102), KEY_PAGEUP(104), KEY_PAGEDOWN(109),
-  KEY_END(107), etc.) are never translated into a qemu_keycode, and the
-  final 'else' block is hit, causing gd_map_keycode to return 0, which
-  is an invalid keycode and thus cannot be handled by xen-kbdfront. At
-  least that's my best guess as to what is happening.
-
-  The solution that comes to mind is provide an alternative to
-  translate_{evdev,xfree86}_keycode that is compatable with
-  Wayland/libinput, but I don't know exactly which API would provide
-  this functionality, much less do I have a patch. Intuition tells me
-  that translate_evdev_keycode would probably work under Wayland because
-  Weston uses libinput which uses evdev as its backend, but I don't know
-  this for a fact, and I don't know if it would be the Right Way (i.e.
-  Wayland or libinput might provide an API for this purpose, but I don't
-  know).
-
-  I may try to do some testing with translate_evdev_keycode on Wayland
-  and also look into any possible APIs for keycode translation, but I
-  just wanted to put it out there and get some feedback awhile.
-
-  Qemu 2.2.1 from Xen 4.6.1 (relevant code appears unchanged in Qemu master)
-  GTK+ 3.18.7
-  Wayland 1.9.0
-  Weston 1.9.0
-  libinput 1.2.3
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1578192/+subscriptions
+--FLpepTPB0tPlruVJdDa4UuApjwfRAbgEx--
