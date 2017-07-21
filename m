@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dYbxI-0002qQ-4J
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:43:12 -0400
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dYc4b-0005L4-7c
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dYbxH-0004X5-7f
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:43:12 -0400
-Date: Fri, 21 Jul 2017 19:43:03 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170721174303.bhzslryhi53uevfp@aurel32.net>
-References: <20170720150426.12393-1-alex.bennee@linaro.org>
-	<20170720150426.12393-13-alex.bennee@linaro.org>
-	<4d6ac494-d606-ebaf-6498-7c526467ac62@twiddle.net>
-	<87tw266rm3.fsf@linaro.org>
-	<20170721132140.xy2uqronprhzjiga@aurel32.net>
-	<87mv7x7vbq.fsf@linaro.org>
-	<CAFEAcA9kEa2PCjEKn1A=-bM7jjFhZc8pjef2J_c9qL8p4bLdaQ@mail.gmail.com>
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dYc4X-000083-4G
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:50:45 -0400
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:42744
+	helo=www.kot-begemot.co.uk)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
+	id 1dYc4W-00007i-QT
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 13:50:40 -0400
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-2-anton.ivanov@cambridgegreys.com>
+	<1236f136-c211-32a1-11b1-1e86fad422c4@redhat.com>
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Message-ID: <c6bd0b81-0b9c-89fd-31e0-00662115cad8@cambridgegreys.com>
+Date: Fri, 21 Jul 2017 18:50:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAFEAcA9kEa2PCjEKn1A=-bM7jjFhZc8pjef2J_c9qL8p4bLdaQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.11 12/23]
- target/arm/translate-a64.c: add FP16 FAGCT to AdvSIMD 3 Same
+In-Reply-To: <1236f136-c211-32a1-11b1-1e86fad422c4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] Unified Datagram Socket Transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alex =?iso-8859-15?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-On 2017-07-21 14:58, Peter Maydell wrote:
-> On 21 July 2017 at 14:50, Alex Benn=E9e <alex.bennee@linaro.org> wrote:
-> > Aurelien Jarno <aurelien@aurel32.net> writes:
-> >> As said in another email, some architectures actually use more than one
-> >> float_status. We therefore need to implement a solution like the one
-> >> proposed by Richard.
-> >
-> > Ahh you mean more than one float_status for a given vCPU context?
->=20
-> Yep. ARM's cpu state struct has
->         float_status fp_status;
->         float_status standard_fp_status;
->=20
-> which we use to handle (1) operations which use the state
-> controlled by the FPSCR value and (2) operations which
-> ignore the FPSCR and use the "Standard FPSCR Value" (generally
-> Neon ops). More info in the comment in cpu.h...
+[snip]
 
-Indeed. This is also the case on:
-- i386: one float_status for the x87 FPU, one for MMX and one for SSE.
-- mips: one for the FPU and one for the MSA FP (SIMD operations).
-- ppc: one for the FPU instructions and one for the VEC instructions.
+>> +    NetUnifiedState *s = (NetUnifiedState *) us;
+>> +    L2TPV3TunnelParams *p = (L2TPV3TunnelParams *) s->params;
+>
+> How about embedding NetUnifiedState into this structure and keep using 
+> NetL2TPV3State? Then:
+>
+> -  's' could be kept and lots of lines of changes could be saved here 
+> and l2tpv3_verify_header()
+> -  each transport could have their own type instead of using 
+> NET_CLIENT_DRIVER_L2TPV3
 
-Aurelien
+That means each of them having their own read/write functions in each 
+transport, destroy functions, etc.
 
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+I am trying to achieve exactly the opposite which across all transports 
+should save more code. There should be nothing in a transport which 
+leverages the common datagram processing backend except:
+
+1. Init and parse arguments
+2. Form Header
+3. Verify Header
+
+All the rest can be common for a large family of datagram based 
+transports - L2TPv3, GRE, RAW (both full interface and just pulling a 
+specific vlan out of it), etc.
+
+It is trivial to do that for fixed size headers (as in the current 
+patchset family). It is a bit more difficult to that for variable 
+headers, but still datagram (GUE, Geneve, etc).
+
+These may also add 4 - I/O to control plane, but it remains to be seen 
+if that is needed.
+
+This also makes any improvements to the backend - f.e. switching from 
+send() to sendmmsg() automatically available for all transports.
+
+What cannot be done is to shoehorn into this stream based. I believe we 
+have only one of those - the original socket.c in tcp mode and we can 
+leave it to stay that way and switch only the datagram mode to a better 
+backend.
+
+I am going through the other comments in the meantime to see if I missed 
+something else and fixing the omissions.
+
+A.
+
+[snip]
+
+-- 
+Anton R. Ivanov
+
+Cambridge Greys Limited, England and Wales company No 10273661
+http://www.cambridgegreys.com/
