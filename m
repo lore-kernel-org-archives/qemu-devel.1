@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dYNrf-0006Lr-Cf
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:40:28 -0400
+	(envelope-from <famz@redhat.com>) id 1dYO8W-000673-AO
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:57:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dYNrc-00014X-9i
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:40:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28409)
+	(envelope-from <famz@redhat.com>) id 1dYO8R-0003Uq-JV
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:57:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51070)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dYNrb-00013u-WA
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:40:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC6818553D
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:40:22 +0000 (UTC)
-Date: Fri, 21 Jul 2017 10:40:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170721024018.GB878@pxdev.xzpeter.org>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-18-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dYO8R-0003UH-9P
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:57:47 -0400
+Date: Fri, 21 Jul 2017 10:57:39 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170721025739.GM11032@lemon>
+References: <1500600049-5954-1-git-send-email-lu.zhipeng@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-18-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
+In-Reply-To: <1500600049-5954-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH v7] qga: Add support network interface
+ statistics in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,208 +27,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-On Mon, Jul 17, 2017 at 03:42:38PM +0200, Juan Quintela wrote:
-> Each time that we sync the bitmap, it is a possiblity that we receive
-> a page that is being processed by a different thread.  We fix this
-> problem just making sure that we wait for all receiving threads to
-> finish its work before we procedeed with the next stage.
+On Fri, 07/21 09:20, ZhiPeng Lu wrote:
+> we can get the network interface statistics inside a virtual machine by
+> guest-network-get-interfaces command. it is very useful for us to monitor
+> and analyze network traffic.
 > 
-> We are low on page flags, so we use a combination that is not valid to
-> emit that message:  MULTIFD_PAGE and COMPRESSED.
+> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+
+In the future, please add a '---' line between commit message and revision
+history:
+
+---
+
+So that the latter won't get into the git history when maintainers apply it.
+
+Fam
+
 > 
-> I tried to make a migration command for it, but it don't work because
-> we sync the bitmap sometimes when we have already sent the beggining
-> of the section, so I just added a new page flag.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> v1->v2:
+>  - correct some spelling mistake and add the stats data to the
+>    guest-network-get-interfaces command instead of adding a new command.
+> v2-v3:
+>  - optimize function implementation
+> v3->v4:
+>  - modify compile error
+> v4->v5:
+>  - rename some temporary variables and add str_trim_off function for
+>    calculating the space num in front of the string in guest_get_network_stats
+> v5->v6:
+>  - use g_strchug instead of str_trim_off implemented by myself
+> v6->v7:
+>  - add implementation for windows
 > ---
->  migration/ram.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 56 insertions(+), 1 deletion(-)
+>  qga/commands-posix.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  qga/commands-win32.c | 47 ++++++++++++++++++++++++++++++++++
+>  qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
+>  3 files changed, 155 insertions(+), 2 deletions(-)
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index c78b286..bffe204 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -71,6 +71,12 @@
->  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
->  #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
->  
-> +/* We are getting low on pages flags, so we start using combinations
-> +   When we need to flush a page, we sent it as
-> +   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_COMPRESS_PAGE
-> +   We don't allow that combination
-> +*/
-> +
->  static inline bool is_zero_range(uint8_t *p, uint64_t size)
->  {
->      return buffer_is_zero(p, size);
-> @@ -193,6 +199,9 @@ struct RAMState {
->      uint64_t iterations_prev;
->      /* Iterations since start */
->      uint64_t iterations;
-> +    /* Indicates if we have synced the bitmap and we need to assure that
-> +       target has processeed all previous pages */
-> +    bool multifd_needs_flush;
->      /* protects modification of the bitmap */
->      uint64_t migration_dirty_pages;
->      /* number of dirty bits in the bitmap */
-> @@ -363,7 +372,6 @@ static void compress_threads_save_setup(void)
->  
->  /* Multiple fd's */
->  
-> -
->  typedef struct {
->      int num;
->      int size;
-> @@ -595,9 +603,11 @@ struct MultiFDRecvParams {
->      QIOChannel *c;
->      QemuSemaphore ready;
->      QemuSemaphore sem;
-> +    QemuCond cond_sync;
->      QemuMutex mutex;
->      /* proteced by param mutex */
->      bool quit;
-> +    bool sync;
->      multifd_pages_t pages;
->      bool done;
->  };
-> @@ -637,6 +647,7 @@ void multifd_load_cleanup(void)
->          qemu_thread_join(&p->thread);
->          qemu_mutex_destroy(&p->mutex);
->          qemu_sem_destroy(&p->sem);
-> +        qemu_cond_destroy(&p->cond_sync);
->          socket_recv_channel_destroy(p->c);
->          g_free(p);
->          multifd_recv_state->params[i] = NULL;
-> @@ -675,6 +686,10 @@ static void *multifd_recv_thread(void *opaque)
->                  return NULL;
->              }
->              p->done = true;
-> +            if (p->sync) {
-> +                qemu_cond_signal(&p->cond_sync);
-> +                p->sync = false;
-> +            }
-
-Could we use the same p->ready for this purpose? They looks similar:
-all we want to do is to let the main thread know "worker thread has
-finished receiving the last piece and becomes idle again", right?
-
->              qemu_mutex_unlock(&p->mutex);
->              qemu_sem_post(&p->ready);
->              continue;
-> @@ -724,9 +739,11 @@ gboolean multifd_new_channel(QIOChannel *ioc)
->      qemu_mutex_init(&p->mutex);
->      qemu_sem_init(&p->sem, 0);
->      qemu_sem_init(&p->ready, 0);
-> +    qemu_cond_init(&p->cond_sync);
->      p->quit = false;
->      p->id = id;
->      p->done = false;
-> +    p->sync = false;
->      multifd_init_group(&p->pages);
->      p->c = ioc;
->      atomic_set(&multifd_recv_state->params[id], p);
-> @@ -792,6 +809,27 @@ static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
->      qemu_sem_post(&p->sem);
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index d8e4122..b65dd8e 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -1639,6 +1639,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
+>      return head;
 >  }
 >  
-> +static int multifd_flush(void)
+> +static int guest_get_network_stats(const char *name,
+> +                       GuestNetworkInterfaceStat *stats)
 > +{
-> +    int i, thread_count;
-> +
-> +    if (!migrate_use_multifd()) {
-> +        return 0;
+> +    int name_len;
+> +    char const *devinfo = "/proc/net/dev";
+> +    FILE *fp;
+> +    char *line = NULL, *colon;
+> +    size_t n;
+> +    fp = fopen(devinfo, "r");
+> +    if (!fp) {
+> +        return -1;
 > +    }
-> +    thread_count = migrate_multifd_threads();
-> +    for (i = 0; i < thread_count; i++) {
-> +        MultiFDRecvParams *p = multifd_recv_state->params[i];
-> +
-> +        qemu_mutex_lock(&p->mutex);
-> +        while (!p->done) {
-> +            p->sync = true;
-> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
-
-(similar comment like above)
-
+> +    name_len = strlen(name);
+> +    while (getline(&line, &n, fp) != -1) {
+> +        long long dummy;
+> +        long long rx_bytes;
+> +        long long rx_packets;
+> +        long long rx_errs;
+> +        long long rx_dropped;
+> +        long long tx_bytes;
+> +        long long tx_packets;
+> +        long long tx_errs;
+> +        long long tx_dropped;
+> +        char *trim_line;
+> +        trim_line = g_strchug(line);
+> +        if (trim_line[0] == '\0') {
+> +            continue;
 > +        }
-> +        qemu_mutex_unlock(&p->mutex);
+> +        colon = strchr(trim_line, ':');
+> +        if (!colon) {
+> +            continue;
+> +        }
+> +        if (colon - name_len  == trim_line &&
+> +           strncmp(trim_line, name, name_len) == 0) {
+> +            if (sscanf(colon + 1,
+> +                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
+> +                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
+> +                  &dummy, &dummy, &dummy, &dummy,
+> +                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
+> +                  &dummy, &dummy, &dummy, &dummy) != 16) {
+> +                continue;
+> +            }
+> +            stats->rx_bytes = rx_bytes;
+> +            stats->rx_packets = rx_packets;
+> +            stats->rx_errs = rx_errs;
+> +            stats->rx_dropped = rx_dropped;
+> +            stats->tx_bytes = tx_bytes;
+> +            stats->tx_packets = tx_packets;
+> +            stats->tx_errs = tx_errs;
+> +            stats->tx_dropped = tx_dropped;
+> +            fclose(fp);
+> +            return 0;
+> +        }
 > +    }
-> +    return 0;
+> +    fclose(fp);
+> +    g_debug("/proc/net/dev: Interface not found");
+> +    return -1;
 > +}
 > +
->  /**
->   * save_page_header: write page header to wire
->   *
-> @@ -809,6 +847,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
->  {
->      size_t size, len;
+>  /*
+>   * Build information about guest interfaces
+>   */
+> @@ -1655,6 +1714,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+>      for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+>          GuestNetworkInterfaceList *info;
+>          GuestIpAddressList **address_list = NULL, *address_item = NULL;
+> +        GuestNetworkInterfaceStat  *interface_stat = NULL;
+>          char addr4[INET_ADDRSTRLEN];
+>          char addr6[INET6_ADDRSTRLEN];
+>          int sock;
+> @@ -1774,7 +1834,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
 >  
-> +    if (rs->multifd_needs_flush &&
-> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-
-If multifd_needs_flush is only for multifd, then we may skip this
-check, but it looks more like an assertion:
-
-    if (rs->multifd_needs_flush) {
-        assert(offset & RAM_SAVE_FLAG_MULTIFD_PAGE);
-        offset |= RAM_SAVE_FLAG_ZERO;
-    }
-
-(Dave mentioned about unaligned flag used in commit message and here:
- ZERO is used, but COMPRESS is mentioned)
-
-> +        offset |= RAM_SAVE_FLAG_ZERO;
-> +        rs->multifd_needs_flush = false;
+>          info->value->has_ip_addresses = true;
+>  
+> -
+> +        if (!info->value->has_statistics) {
+> +            interface_stat = g_malloc0(sizeof(*interface_stat));
+> +            if (guest_get_network_stats(info->value->name,
+> +                interface_stat) == -1) {
+> +                info->value->has_statistics = false;
+> +                g_free(interface_stat);
+> +            } else {
+> +                info->value->statistics = interface_stat;
+> +                info->value->has_statistics = true;
+> +            }
+> +        }
+>      }
+>  
+>      freeifaddrs(ifap);
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 6f16457..433453d 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -1152,6 +1152,42 @@ out:
+>  }
+>  #endif
+>  
+> +static DWORD get_interface_index(const char *guid)
+> +{
+> +    ULONG index;
+> +    DWORD status;
+> +    wchar_t wbuf[512];
+> +    snwprintf(wbuf, sizeof(wbuf), L"\\device\\tcpip_%s", guid);
+> +    wbuf[sizeof(wbuf) - 1] = 0;
+> +    status = GetAdapterIndex (wbuf, &index);
+> +    if (status != NO_ERROR) {
+> +        return (DWORD)~0;
+> +    } else {
+> +        return index;
 > +    }
+> +}
+> +static int guest_get_network_stats(const char *name,
+> +                       GuestNetworkInterfaceStat *stats)
+> +{
+> +    DWORD IfIndex = 0;
+> +    MIB_IFROW aMib_ifrow;
+> +    memset(&aMib_ifrow, 0, sizeof(aMib_ifrow));
+> +    IfIndex = get_interface_index(name);
+> +    aMib_ifrow.dwIndex = IfIndex;
+> +    if (NO_ERROR == GetIfEntry(&aMib_ifrow)) {
+> +        stats->rx_bytes = aMib_ifrow.dwInOctets;
+> +        stats->rx_packets = aMib_ifrow.dwInUcastPkts;
+> +        stats->rx_errs = aMib_ifrow.dwInErrors;
+> +        stats->rx_dropped = aMib_ifrow.dwInDiscards;
+> +        stats->tx_bytes = aMib_ifrow.dwOutOctets;
+> +        stats->tx_packets = aMib_ifrow.dwOutUcastPkts;
+> +        stats->tx_errs = aMib_ifrow.dwOutErrors;
+> +        stats->tx_dropped = aMib_ifrow.dwOutDiscards;
+> +        return 0;
+> +    }
+> +    return -1;
+> +}
 > +
->      if (block == rs->last_sent_block) {
->          offset |= RAM_SAVE_FLAG_CONTINUE;
->      }
-> @@ -2496,6 +2540,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
->  
->      if (!migration_in_postcopy()) {
->          migration_bitmap_sync(rs);
-> +        if (migrate_use_multifd()) {
-> +            rs->multifd_needs_flush = true;
-> +        }
-
-Would it be good to move this block into entry of
-migration_bitmap_sync(), instead of setting it up at the callers of
-migration_bitmap_sync()?
-
->      }
->  
->      ram_control_before_iterate(f, RAM_CONTROL_FINISH);
-> @@ -2538,6 +2585,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
->          qemu_mutex_lock_iothread();
->          rcu_read_lock();
->          migration_bitmap_sync(rs);
-> +        if (migrate_use_multifd()) {
-> +            rs->multifd_needs_flush = true;
-> +        }
->          rcu_read_unlock();
->          qemu_mutex_unlock_iothread();
->          remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
-> @@ -3012,6 +3062,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->              break;
+>  GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+>  {
+>      IP_ADAPTER_ADDRESSES *adptr_addrs, *addr;
+> @@ -1238,6 +1274,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+>              info->value->has_ip_addresses = true;
+>              info->value->ip_addresses = head_addr;
 >          }
->  
-> +        if ((flags & (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO))
-> +                  == (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)) {
-> +            multifd_flush();
-> +            flags = flags & ~RAM_SAVE_FLAG_ZERO;
+> +        if (!info->value->has_statistics) {
+> +            interface_stat = g_malloc0(sizeof(*interface_stat));
+> +            if (guest_get_network_stats(add->AdapterName,
+> +                interface_stat) == -1) {
+> +                info->value->has_statistics = false;
+> +                g_free(interface_stat);
+> +            } else {
+> +                info->value->statistics = interface_stat;
+> +                info->value->has_statistics = true;
+> +            }
 > +        }
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
->                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+>      }
+>      WSACleanup();
+>  out:
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index 03743ab..4ad5c57 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -643,6 +643,38 @@
+>             'prefix': 'int'} }
+>  
+>  ##
+> +# @GuestNetworkInterfaceStat:
+> +#
+> +# @rx-bytes: total bytes received
+> +#
+> +# @rx-packets: total packets received
+> +#
+> +# @rx-errs: bad packets received
+> +#
+> +# @rx-dropped: receiver dropped packets
+> +#
+> +# @tx-bytes: total bytes transmitted
+> +#
+> +# @tx-packets: total packets transmitted
+> +#
+> +# @tx-errs: packet transmit problems
+> +#
+> +# @tx-dropped: dropped packets transmitted
+> +#
+> +# Since: 2.11
+> +##
+> +{ 'struct': 'GuestNetworkInterfaceStat',
+> +  'data': {'rx-bytes': 'uint64',
+> +            'rx-packets': 'uint64',
+> +            'rx-errs': 'uint64',
+> +            'rx-dropped': 'uint64',
+> +            'tx-bytes': 'uint64',
+> +            'tx-packets': 'uint64',
+> +            'tx-errs': 'uint64',
+> +            'tx-dropped': 'uint64'
+> +           } }
+> +
+> +##
+>  # @GuestNetworkInterface:
+>  #
+>  # @name: The name of interface for which info are being delivered
+> @@ -651,12 +683,16 @@
+>  #
+>  # @ip-addresses: List of addresses assigned to @name
+>  #
+> +# @statistics: various statistic counters related to @name
+> +# (since 2.11)
+> +#
+>  # Since: 1.1
+>  ##
+>  { 'struct': 'GuestNetworkInterface',
+>    'data': {'name': 'str',
+>             '*hardware-address': 'str',
+> -           '*ip-addresses': ['GuestIpAddress'] } }
+> +           '*ip-addresses': ['GuestIpAddress'],
+> +           '*statistics': 'GuestNetworkInterfaceStat' } }
+>  
+>  ##
+>  # @guest-network-get-interfaces:
 > -- 
-> 2.9.4
+> 1.8.3.1
 > 
-
-Thanks,
-
--- 
-Peter Xu
+> 
+> 
