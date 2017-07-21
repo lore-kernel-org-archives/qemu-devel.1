@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYReF-0005Sc-04
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:42:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dYRkJ-0006ng-V6
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYReB-0002uj-Qj
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:42:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYReB-0002tz-HW
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:42:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE5B57F772
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 06:42:45 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170714190827.4083-1-eblake@redhat.com>
-	<20170714190827.4083-6-eblake@redhat.com>
-	<87zibzl8py.fsf@dusky.pond.sub.org>
-	<ff471aeb-51dc-1abd-f512-f1a93db3752c@redhat.com>
-	<9674afa4-78b3-044b-4e5f-4014888ff03e@redhat.com>
-Date: Fri, 21 Jul 2017 08:42:43 +0200
-In-Reply-To: <9674afa4-78b3-044b-4e5f-4014888ff03e@redhat.com> (Eric Blake's
-	message of "Thu, 20 Jul 2017 15:53:56 -0500")
-Message-ID: <87379ql28s.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dYRkI-00073s-VN
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 02:49:08 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170721041952.45950-1-aik@ozlabs.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b3ed544c-a576-7a74-b7b0-8067873cf11e@amsat.org>
+Date: Fri, 21 Jul 2017 03:48:56 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/5] qtest: Document calling conventions
+In-Reply-To: <20170721041952.45950-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] Revert "elf-loader: warn about
+ invalid endianness"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Paul Burton <paul.burton@imgtec.com>, Alistair Francis <alistair.francis@xilinx.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-Eric Blake <eblake@redhat.com> writes:
+Hi Alexey,
 
-> On 07/20/2017 03:37 PM, Eric Blake wrote:
->>>> + * @fmt...: QMP message to send to qemu; only recognizes formats
->>>> + * understood by json-lexer.c
->>>>   *
->>>>   * Sends a QMP message to QEMU and consumes the response.
->>>>   */
->>>
->>> These formats are chosen so that gcc can help us check them.  Please add
->>> GCC_FMT_ATTR().  Precedence: qobject_from_jsonf().
->>=20
->> Will do.  (This patch was originally part of my larger series trying to
->> get rid of qobject_from_jsonf() - I may still succeed at that, but
->> separating the easy stuff from the controversial means that the easy
->> stuff needs tweaking).
->
-> Bleargh.  It's not that simple.
->
-> With printf-style, hmp("literal") and hmp("%s", "literal") produce the
-> same results.
->
-> But with json-lexer style, %s MODIFIES its input.
+On 07/21/2017 01:19 AM, Alexey Kardashevskiy wrote:
+> This reverts c8e1158cf611 "elf-loader: warn about invalid endianness"
+> as it produces a useless message every time an LE kernel image is
+> passed via -kernel on a ppc64-pseries machine. The pseries machine
+> already checks for ELF_LOAD_WRONG_ENDIAN and tries with big_endian=0.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>   hw/core/loader.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index c17ace0a2e..e5e8cbb638 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -480,7 +480,6 @@ int load_elf_ram(const char *filename,
+>       }
+>   
+>       if (target_data_order != e_ident[EI_DATA]) {
+> -        fprintf(stderr, "%s: wrong endianness\n", filename);
+>           ret = ELF_LOAD_WRONG_ENDIAN;
+>           goto fail;
+>       }
+> 
 
-Your assertion "MODIFIES its input" confused me briefly, because I read
-it as "side effect on the argument string".  That would be bonkers.
-What you mean is it doesn't emit the argument string unmodified.
+I submitted this patch because I spent some time debugging while QEMU 
+was failing silently using a MIPS kernel image which used to work, after 
+realizing I was in an incorrect build_dir using qemu-system-mipsel to 
+load a big endian image and felt stupid [1]. This dumb error can happen 
+to other people so I added this warning here.
+I was not aware of the ELF_LOAD_WRONG_ENDIAN related code, and at least 
+the MIPS arch is not using it.
+As I can see in MAINTAINERS, sPAPR is "Supported" meaning "Someone is 
+actually paid to look after this", while there is no such paid person 
+for the MIPS part.
+It seems each arch had a different way to load images and 
+hw/core/loader.c was an effort to merge common code but mostly 
+"Supported" arch are using it.
+While your revert does fixes your sPAPR warning issue, looking at the 
+problem roots I think the correct fix is to improve the MIPS port and 
+eventually the less loved archs to unify the loader.c calls and avoid 
+such problems.
+I don't object reverting this patch for 2.10 and improve the loader.c 
+usage during 2.11 cycle, I only wonder if this is another 
+corporate/hobbyist conflict of interest with corporate crushing on 
+hobbyist instead of helping, motivating contribution improving common 
+code usage.
 
-> The original qmp("{'execute':\"foo\"}") sends a JSON object
->  {'execute':"foo"}
-> but counterpart qmp("%s", "{'execute':'foo'}") sends a JSON string with
-> added \ escaping:
->  "{'execute':\"foo\"}"
->
-> So adding the format immediately causes lots of warnings, such as:
->
->   CC      tests/vhost-user-test.o
-> tests/vhost-user-test.c: In function =E2=80=98test_migrate=E2=80=99:
-> tests/vhost-user-test.c:668:5: error: format not a string literal and no
-> format arguments [-Werror=3Dformat-security]
->      rsp =3D qmp(cmd);
->      ^~~
+Cc'ed MIPS and loader.c maintainers (both "Maintained" and not "Supported").
 
-    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
-                          "'arguments': { 'uri': '%s' } }",
-                          uri);
-    rsp =3D qmp(cmd);
-    g_free(cmd);
-    g_assert(qdict_haskey(rsp, "return"));
-    QDECREF(rsp);
+Phil.
 
-For this to work, @uri must not contain funny characters.
-
-Shouldn't we simply use the built-in quoting here?
-
-    rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }", uri=
-);
-    g_assert(qdict_haskey(rsp, "return"));
-    QDECREF(rsp);
-
->
->   CC      tests/boot-order-test.o
-> tests/boot-order-test.c: In function =E2=80=98test_a_boot_order=E2=80=99:
-> tests/boot-order-test.c:46:26: error: zero-length gnu_printf format
-> string [-Werror=3Dformat-zero-length]
->      qmp_discard_response("");   /* HACK: wait for event */
->                           ^~
-
-Should use qmp_eventwait().  Doesn't because it predates it.
-
-> but we CAN'T rewrite those to qmp("%s", command).
-
-Got more troublemakers?
-
-> Now you can sort-of understand why my larger series wanted to get rid of
-> qobject_from_jsonf(), since our use of GCC_FMT_ATTR() there is a lie?
-
-I don't think it's a lie.  qobject_from_jsonf() satisfies the attribute
-format(printf, ...) contract: it fetches varargs exactly like printf().
-What it does with them is of no concern to this attribute.
+[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05926.html
