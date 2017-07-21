@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cdall@linaro.org>) id 1dYVuo-0004gK-Eg
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:16:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1dYVxK-0005VF-To
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cdall@linaro.org>) id 1dYVul-0007Fx-AN
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:16:14 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:38850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cdall@linaro.org>) id 1dYVul-0007Eb-38
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:16:11 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id w191so11175978wmw.1
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 04:16:09 -0700 (PDT)
-Date: Fri, 21 Jul 2017 13:16:07 +0200
-From: Christoffer Dall <cdall@linaro.org>
-Message-ID: <20170721111607.GA16350@cbox>
-References: <1500471597-2517-1-git-send-email-drjones@redhat.com>
-	<1500471597-2517-2-git-send-email-drjones@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dYVxH-0008AD-QU
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:18:50 -0400
+References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
+	<1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
+	<b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
+	<CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0ed4e0fb-3699-f633-ee6f-ccd4b6494563@redhat.com>
+Date: Fri, 21 Jul 2017 13:18:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1500471597-2517-2-git-send-email-drjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hw/arm/virt: add pmu interrupt state
+In-Reply-To: <CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
+ variable warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, agraf@suse.de
+To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Wed, Jul 19, 2017 at 09:39:54AM -0400, Andrew Jones wrote:
-> Mimicking gicv3-maintenance-interrupt, add the PMU's interrupt to
-> CPU state.
+On 19.07.2017 10:19, Peter Maydell wrote:
+> On 18 July 2017 at 23:01, Eric Blake <eblake@redhat.com> wrote:
+>> On 07/18/2017 11:26 AM, Peter Maydell wrote:
+>>> On OpenBSD the compiler warns:
+>>> bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wunused-but-set-variable]
+>>>
+>>> This is because a lot of the signal delivery code is #if-0'd
+>>> out as unused. Reshuffle #ifdefs a bit to silence the warning.
+>>
+>> Why not just nuke the #if 0 code instead (we can always 'git revert' it
+>> later as a starting point for someone that wants to implement it).
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/virt.c    | 3 +++
->  target/arm/cpu.c | 2 ++
->  target/arm/cpu.h | 2 ++
->  3 files changed, 7 insertions(+)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 31739d75a3e0..ea26f0c473c2 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -610,6 +610,9 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->          qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt", 0,
->                                      qdev_get_gpio_in(gicdev, ppibase
->                                                       + ARCH_GICV3_MAINT_IRQ));
-> +        qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
-> +                                    qdev_get_gpio_in(gicdev, ppibase
-> +                                                     + VIRTUAL_PMU_IRQ));
+> I went for the minimal change, especially given we know
+> that the freebsd folks have a big patchset on top of
+> us fixing a lot of bsd-user code and it didn't seem worth
+> giving them a more awkward rebase task.
 
-I know Peter reviewed this, but isn't it a bit strange to create the
-pmu-interrupt when creating the gic (as this isn't an output from the
-GIC like the maintenance interrupt is) ?
+That's fair. So FWIW:
 
-Thanks,
--Christoffer
-
->  
->          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
->          sysbus_connect_irq(gicbusdev, i + smp_cpus,
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 96d1f840301f..fd82c7944840 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -499,6 +499,8 @@ static void arm_cpu_initfn(Object *obj)
->  
->      qdev_init_gpio_out_named(DEVICE(cpu), &cpu->gicv3_maintenance_interrupt,
->                               "gicv3-maintenance-interrupt", 1);
-> +    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt,
-> +                             "pmu-interrupt", 1);
->  #endif
->  
->      /* DTB consumers generally don't in fact care what the 'compatible'
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 102c58afac52..8d91166eb97b 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -584,6 +584,8 @@ struct ARMCPU {
->      qemu_irq gt_timer_outputs[NUM_GTIMERS];
->      /* GPIO output for GICv3 maintenance interrupt signal */
->      qemu_irq gicv3_maintenance_interrupt;
-> +    /* GPIO output for the PMU interrupt */
-> +    qemu_irq pmu_interrupt;
->  
->      /* MemoryRegion to use for secure physical accesses */
->      MemoryRegion *secure_memory;
-> -- 
-> 1.8.3.1
-> 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
