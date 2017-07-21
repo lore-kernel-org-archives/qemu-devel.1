@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dYV3Z-00054M-27
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:14 -0400
+	(envelope-from <famz@redhat.com>) id 1dYV3b-00057F-8V
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dYV3Y-0006xr-1V
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:13 -0400
+	(envelope-from <famz@redhat.com>) id 1dYV3a-00070D-90
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:15 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Jul 2017 18:20:58 +0800
-Message-Id: <20170721102059.14663-2-famz@redhat.com>
+Date: Fri, 21 Jul 2017 18:20:59 +0800
+Message-Id: <20170721102059.14663-3-famz@redhat.com>
 In-Reply-To: <20170721102059.14663-1-famz@redhat.com>
 References: <20170721102059.14663-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] osdep: Add runtime OFD lock detection
+Subject: [Qemu-devel] [PATCH 2/2] file-posix: Do runtime check for ofd lock
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,133 +23,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>, eblake@redhat.com
 
-Build time check of OFD lock is not sufficient and can cause image open
-errors when the runtime environment doesn't support it.
+It is reported that on Windows Subsystem for Linux, ofd operations fail
+with -EINVAL. In other words, QEMU binary built with system headers that
+exports F_OFD_SETLK doesn't necessarily run in an environment that
+actually supports it:
 
-Add a helper function to probe it at runtime, additionally. Also provide
-a qemu_has_ofd_lock() for callers to check the status.
+$ qemu-system-aarch64 ... -drive file=test.vhdx,if=none,id=hd0 \
+    -device virtio-blk-pci,drive=hd0
+qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to unlock byte 100
+qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to unlock byte 100
+qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to lock byte 100
 
+Let's do a runtime check to cope with that.
+
+Reported-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- include/qemu/osdep.h |  1 +
- util/osdep.c         | 72 +++++++++++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 64 insertions(+), 9 deletions(-)
+ block/file-posix.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 3b74f6fcb2..6855b94bbf 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -357,6 +357,7 @@ int qemu_dup(int fd);
- int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
- int qemu_unlock_fd(int fd, int64_t start, int64_t len);
- int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-+bool qemu_has_ofd_lock(void);
- 
- #if defined(__HAIKU__) && defined(__i386__)
- #define FMT_pid "%ld"
-diff --git a/util/osdep.c b/util/osdep.c
-index a2863c8e53..b275c6579a 100644
---- a/util/osdep.c
-+++ b/util/osdep.c
-@@ -38,13 +38,8 @@ extern int madvise(caddr_t, size_t, int);
- #include "qemu/error-report.h"
- #include "monitor/monitor.h"
- 
--#ifdef F_OFD_SETLK
--#define QEMU_SETLK F_OFD_SETLK
--#define QEMU_GETLK F_OFD_GETLK
--#else
--#define QEMU_SETLK F_SETLK
--#define QEMU_GETLK F_GETLK
+diff --git a/block/file-posix.c b/block/file-posix.c
+index cfbb236f6f..5ddf2729eb 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -457,22 +457,19 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     switch (locking) {
+     case ON_OFF_AUTO_ON:
+         s->use_lock = true;
+-#ifndef F_OFD_SETLK
+-        fprintf(stderr,
+-                "File lock requested but OFD locking syscall is unavailable, "
+-                "falling back to POSIX file locks.\n"
+-                "Due to the implementation, locks can be lost unexpectedly.\n");
 -#endif
-+static int fcntl_op_setlk = -1;
-+static int fcntl_op_getlk = -1;
- 
- static bool fips_enabled = false;
- 
-@@ -149,6 +144,63 @@ static int qemu_parse_fdset(const char *param)
-     return qemu_parse_fd(param);
- }
- 
-+static void qemu_probe_lock_ops(void)
-+{
-+    if (fcntl_op_setlk == -1) {
-+#ifdef F_OFD_SETLK
-+        int fd;
-+        int ret;
-+        const char *tmpdir;
-+        char *filename;
-+        struct flock fl = {
-+            .l_whence = SEEK_SET,
-+            .l_start  = 0,
-+            .l_len    = 0,
-+            .l_type   = F_WRLCK,
-+        };
-+
-+        tmpdir = getenv("TMPDIR");
-+        if (!tmpdir) {
-+            tmpdir = "/var/tmp";
++        if (!qemu_has_ofd_lock()) {
++            fprintf(stderr,
++                    "File lock requested but OFD locking syscall is "
++                    "unavailable, falling back to POSIX file locks.\n"
++                    "Due to the implementation, locks can be lost "
++                    "unexpectedly.\n");
 +        }
-+        filename = g_strdup_printf("%s/qemu_lock_probe.XXXXXX", tmpdir);
-+        fd = mkstemp(filename);
-+        if (fd < 0) {
-+            fprintf(stderr, "Failed to create temporary file '%s': %s\n",
-+                    filename, strerror(errno));
-+            fcntl_op_setlk = F_SETLK;
-+            fcntl_op_getlk = F_GETLK;
-+            goto out;
-+        }
-+        ret = fcntl(fd, F_OFD_SETLK, &fl);
-+        close(fd);
-+        unlink(filename);
-+        if (!ret) {
-+            fcntl_op_setlk = F_OFD_SETLK;
-+            fcntl_op_getlk = F_OFD_GETLK;
-+        } else {
-+            fcntl_op_setlk = F_SETLK;
-+            fcntl_op_getlk = F_GETLK;
-+        }
-+out:
-+        g_free(filename);
-+#else
-+        fcntl_op_setlk = F_SETLK;
-+        fcntl_op_getlk = F_GETLK;
-+#endif
-+    }
-+}
-+
-+bool qemu_has_ofd_lock(void)
-+{
-+    qemu_probe_lock_ops();
-+#ifdef F_OFD_SETLK
-+    return fcntl_op_setlk == F_OFD_SETLK;
-+#else
-+    return false;
-+#endif
-+}
-+
- static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
- {
-     int ret;
-@@ -158,7 +210,8 @@ static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
-         .l_len    = len,
-         .l_type   = fl_type,
-     };
--    ret = fcntl(fd, QEMU_SETLK, &fl);
-+    qemu_probe_lock_ops();
-+    ret = fcntl(fd, fcntl_op_setlk, &fl);
-     return ret == -1 ? -errno : 0;
- }
- 
-@@ -181,7 +234,8 @@ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
-         .l_len    = len,
-         .l_type   = exclusive ? F_WRLCK : F_RDLCK,
-     };
--    ret = fcntl(fd, QEMU_GETLK, &fl);
-+    qemu_probe_lock_ops();
-+    ret = fcntl(fd, fcntl_op_getlk, &fl);
-     if (ret == -1) {
-         return -errno;
-     } else {
+         break;
+     case ON_OFF_AUTO_OFF:
+         s->use_lock = false;
+         break;
+     case ON_OFF_AUTO_AUTO:
+-#ifdef F_OFD_SETLK
+-        s->use_lock = true;
+-#else
+-        s->use_lock = false;
+-#endif
++        s->use_lock = qemu_has_ofd_lock();
+         break;
+     default:
+         abort();
 -- 
 2.13.3
