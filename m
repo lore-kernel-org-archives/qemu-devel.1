@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYWtO-0006Us-Lq
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:18:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYWxm-0007lN-WA
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYWtK-0003Ww-1o
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:18:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYWtJ-0003WY-Oo
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:18:45 -0400
-References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
-	<20170720085958.GC21566@redhat.com>
-	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
-	<20170720091224.GD21566@redhat.com>
-	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
-	<20170721083816.GC17693@redhat.com>
-	<CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
-	<20170721093433.GG17693@redhat.com>
-	<CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1dYWxj-0000qe-0e
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:23:22 -0400
+References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
+	<1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
+	<b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
+	<CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
-Date: Fri, 21 Jul 2017 07:18:43 -0500
+Message-ID: <dabe4865-05a0-eb85-f9db-8948db3e14bf@redhat.com>
+Date: Fri, 21 Jul 2017 07:23:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S"
-Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
+	boundary="4X6gfLNI5Ubw6XR5RQI7IBswIsFgokxjR"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
+ variable warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S
+--4X6gfLNI5Ubw6XR5RQI7IBswIsFgokxjR
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>,
- "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
-Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
-References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
- <20170720085958.GC21566@redhat.com>
- <CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
- <20170720091224.GD21566@redhat.com>
- <CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
- <20170721083816.GC17693@redhat.com>
- <CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
- <20170721093433.GG17693@redhat.com>
- <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
-In-Reply-To: <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ "patches@linaro.org" <patches@linaro.org>
+Message-ID: <dabe4865-05a0-eb85-f9db-8948db3e14bf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
+ variable warning
+References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
+ <1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
+ <b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
+ <CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-[please don't top-post on technical lists]
+On 07/19/2017 03:19 AM, Peter Maydell wrote:
+> On 18 July 2017 at 23:01, Eric Blake <eblake@redhat.com> wrote:
+>> On 07/18/2017 11:26 AM, Peter Maydell wrote:
+>>> On OpenBSD the compiler warns:
+>>> bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wu=
+nused-but-set-variable]
+>>>
+>>> This is because a lot of the signal delivery code is #if-0'd
+>>> out as unused. Reshuffle #ifdefs a bit to silence the warning.
+>>
+>> Why not just nuke the #if 0 code instead (we can always 'git revert' i=
+t
+>> later as a starting point for someone that wants to implement it).
+>=20
+> I went for the minimal change, especially given we know
+> that the freebsd folks have a big patchset on top of
+> us fixing a lot of bsd-user code and it didn't seem worth
+> giving them a more awkward rebase task.
 
-On 07/21/2017 04:41 AM, =E9=99=B3=E5=9F=B9=E6=B3=93 wrote:
-> oh Maybe the version is something wrong?
->=20
-> qemu-img -V
->=20
->> qemu-img version 2.9.0
->=20
->=20
-> qemu-nbd -V
->=20
->> qemu-nbd version 0.0.1
->=20
->=20
-> They're not correspondent?
+Perhaps worth mentioning in the commit message that keeping the #if 0 is
+intentional, then. At any rate,
 
-Not currently, although patches are welcome (qemu-img and qemu-io share
-versions, so qemu-nbd is the only oddball)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -85,7 +78,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S
+--4X6gfLNI5Ubw6XR5RQI7IBswIsFgokxjR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -94,14 +87,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllx8SMACgkQp6FrSiUn
-Q2o0Nwf/fg2X9LDh5JXwGQieTd0gZj9pU1r1S0ShxPNzSOqtTMQLfZhRTNGKb2hw
-AFr7uiky28r1/niuXHqDJ0YghHKJm3gOeGZUbgdToWbi38V1w4/QFSRbrGxkKhTt
-OlsnlLnB4wH74CNxmWWL0AJv4RxGJX/LdBvNuONpfRsXXhJsRrXfEdDeR7ZbO8lS
-nWHkn9Z2v3ijpofiq4y3D97mzEufALvRdAT0dnCXng9caitzUNL8srE55YTjFVWa
-rZkkqlb5S4giA1wKxIU6VsYLJ+IaRDNfUCClIBhQXIzNfkJQbX6QuN1fXePwRL/X
-9bErd7lB6pYMJEd5srOb2b4NyfVDtg==
-=e4Xa
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllx8jQACgkQp6FrSiUn
+Q2pn1gf/eDSlDieGM6x0aZfLbzw/FBk3Dc6pDothmIG+46rKJ2s1bQL1s9agTjyC
+a1pxqzX3guJhH1gPoJJS8DHxrQkl13WdbXBucVUIzfN7laH6fRtHZs49Wx/5xB7p
+HjBqzKM6S/V5Kz6E98xPK6txYGGfmPwQ9Gq0kaqVYK3T1en8Cx8EFl1/M3qEfuId
+24fAjT8ojZSomDlMQhb5YFcWDbzTOsgs7aSQ17Z1qhi6uzVwCsZfKslAe7UtxBVM
+Hf76+/FGkZr7ol25yviqwZtCPoixWEqc2LOXigozzDiA4EyCwx8D+ci9XYIZh3Pg
+Ho+aJBauctMAiY6vveiSk4pcNBOAUA==
+=f0Em
 -----END PGP SIGNATURE-----
 
---Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S--
+--4X6gfLNI5Ubw6XR5RQI7IBswIsFgokxjR--
