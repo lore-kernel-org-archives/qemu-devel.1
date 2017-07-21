@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNos-0003xK-6Y
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNos-0003xJ-4i
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoq-0007Zd-To
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNop-0007Ys-2u
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:34 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:8539)
+Received: from mailapp01.imgtec.com ([195.59.15.196]:55088)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoq-0007ZQ-NA
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:32 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoo-0007Yd-RK
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:31 -0400
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Fri, 21 Jul 2017 03:37:14 +0100
-Message-ID: <1500604635-15027-14-git-send-email-yongbok.kim@imgtec.com>
+Date: Fri, 21 Jul 2017 03:37:11 +0100
+Message-ID: <1500604635-15027-11-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 13/14] target/mips: Add EVA support to P5600
+Subject: [Qemu-devel] [PULL 10/14] target/mips: Add an MMU mode for ERL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +30,125 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <james.hogan@imgtec.co
 
 From: James Hogan <james.hogan@imgtec.com>
 
-Add the Enhanced Virtual Addressing (EVA) feature to the P5600 core
-configuration, along with the related Segmentation Control (SC) feature
-and writable CP0_EBase.WG bit.
+The segmentation control feature allows a legacy memory segment to
+become unmapped uncached at error level (according to CP0_Status.ERL),
+and in fact the user segment is already treated in this way by QEMU.
 
-This allows it to run Malta EVA kernels.
+Add a new MMU mode for this state so that QEMU's mappings don't persist
+between ERL=0 and ERL=1.
 
 Signed-off-by: James Hogan <james.hogan@imgtec.com>
 Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: Aurelien Jarno <aurelien@aurel32.net>
+[yongbok.kim@imgtec.com:
+  cosmetic changes]
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- target/mips/translate_init.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ target/mips/cpu.h       | 17 +++++++++++++----
+ target/mips/op_helper.c | 10 ++++++++++
+ 2 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
-index 8f8196e..741b390 100644
---- a/target/mips/translate_init.c
-+++ b/target/mips/translate_init.c
-@@ -421,9 +421,9 @@ static const mips_def_t mips_defs[] =
-     },
-     {
-         /* FIXME:
--         * Config3: CMGCR, SC, PW, VZ, CTXTC, CDMM, TL
-+         * Config3: CMGCR, PW, VZ, CTXTC, CDMM, TL
-          * Config4: MMUExtDef
--         * Config5: EVA, MRP
-+         * Config5: MRP
-          * FIR(FCR0): Has2008
-          * */
-         .name = "P5600",
-@@ -436,13 +436,14 @@ static const mips_def_t mips_defs[] =
-                        (1 << CP0C1_PC) | (1 << CP0C1_FP),
-         .CP0_Config2 = MIPS_CONFIG2,
-         .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
--                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
--                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
-+                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_SC) |
-+                       (1 << CP0C3_ULRI) | (1 << CP0C3_RXI) | (1 << CP0C3_LPA) |
-+                       (1 << CP0C3_VInt),
-         .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
-                        (0x1c << CP0C4_KScrExist),
-         .CP0_Config4_rw_bitmask = 0,
--        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_MVH) | (1 << CP0C5_LLB) |
--                       (1 << CP0C5_MRP),
-+        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_EVA) | (1 << CP0C5_MVH) |
-+                       (1 << CP0C5_LLB) | (1 << CP0C5_MRP),
-         .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
-                                   (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
-                                   (1 << CP0C5_FRE) | (1 << CP0C5_UFR),
-@@ -453,6 +454,7 @@ static const mips_def_t mips_defs[] =
-         .CP0_Status_rw_bitmask = 0x3C68FF1F,
-         .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
-                     (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
-+        .CP0_EBaseWG_rw_bitmask = (1 << CP0EBase_WG),
-         .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_UFRP) | (1 << FCR0_HAS2008) |
-                     (1 << FCR0_F64) | (1 << FCR0_L) | (1 << FCR0_W) |
-                     (1 << FCR0_D) | (1 << FCR0_S) | (0x03 << FCR0_PRID),
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 3cf1676..c24b1f6 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -134,7 +134,7 @@ struct CPUMIPSFPUContext {
+ #define FP_UNIMPLEMENTED  32
+ };
+ 
+-#define NB_MMU_MODES 3
++#define NB_MMU_MODES 4
+ #define TARGET_INSN_START_EXTRA_WORDS 2
+ 
+ typedef struct CPUMIPSMVPContext CPUMIPSMVPContext;
+@@ -551,7 +551,7 @@ struct CPUMIPSState {
+ #define EXCP_INST_NOTAVAIL 0x2 /* No valid instruction word for BadInstr */
+     uint32_t hflags;    /* CPU State */
+     /* TMASK defines different execution modes */
+-#define MIPS_HFLAG_TMASK  0xF5807FF
++#define MIPS_HFLAG_TMASK  0x1F5807FF
+ #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
+     /* The KSU flags must be the lowest bits in hflags. The flag order
+        must be the same as defined for CP0 Status. This allows to use
+@@ -601,6 +601,7 @@ struct CPUMIPSState {
+ #define MIPS_HFLAG_FRE   0x2000000 /* FRE enabled */
+ #define MIPS_HFLAG_ELPA  0x4000000
+ #define MIPS_HFLAG_ITC_CACHE  0x8000000 /* CACHE instr. operates on ITC tag */
++#define MIPS_HFLAG_ERL   0x10000000 /* error level flag */
+     target_ulong btarget;        /* Jump / branch target               */
+     target_ulong bcond;          /* Branch condition (if needed)       */
+ 
+@@ -698,11 +699,16 @@ extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
+ #define MMU_MODE0_SUFFIX _kernel
+ #define MMU_MODE1_SUFFIX _super
+ #define MMU_MODE2_SUFFIX _user
++#define MMU_MODE3_SUFFIX _error
+ #define MMU_USER_IDX 2
+ 
+ static inline int hflags_mmu_index(uint32_t hflags)
+ {
+-    return hflags & MIPS_HFLAG_KSU;
++    if (hflags & MIPS_HFLAG_ERL) {
++        return 3; /* ERL */
++    } else {
++        return hflags & MIPS_HFLAG_KSU;
++    }
+ }
+ 
+ static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
+@@ -971,7 +977,10 @@ static inline void compute_hflags(CPUMIPSState *env)
+                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
+                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
+                      MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
+-                     MIPS_HFLAG_ELPA);
++                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
++    if (env->CP0_Status & (1 << CP0St_ERL)) {
++        env->hflags |= MIPS_HFLAG_ERL;
++    }
+     if (!(env->CP0_Status & (1 << CP0St_EXL)) &&
+         !(env->CP0_Status & (1 << CP0St_ERL)) &&
+         !(env->hflags & MIPS_HFLAG_DM)) {
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index da1817e..c52a407 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -67,6 +67,7 @@ static inline type do_##name(CPUMIPSState *env, target_ulong addr,      \
+     case 1: return (type) cpu_##insn##_super_ra(env, addr, retaddr);    \
+     default:                                                            \
+     case 2: return (type) cpu_##insn##_user_ra(env, addr, retaddr);     \
++    case 3: return (type) cpu_##insn##_error_ra(env, addr, retaddr);    \
+     }                                                                   \
+ }
+ #endif
+@@ -94,6 +95,9 @@ static inline void do_##name(CPUMIPSState *env, target_ulong addr,      \
+     case 1: cpu_##insn##_super_ra(env, addr, val, retaddr); break;      \
+     default:                                                            \
+     case 2: cpu_##insn##_user_ra(env, addr, val, retaddr); break;       \
++    case 3:                                                             \
++        cpu_##insn##_error_ra(env, addr, val, retaddr);                 \
++        break;                                                          \
+     }                                                                   \
+ }
+ #endif
+@@ -1451,6 +1455,9 @@ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
+                 val, val & env->CP0_Cause & CP0Ca_IP_mask,
+                 env->CP0_Cause);
+         switch (cpu_mmu_index(env, false)) {
++        case 3:
++            qemu_log(", ERL\n");
++            break;
+         case MIPS_HFLAG_UM: qemu_log(", UM\n"); break;
+         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
+         case MIPS_HFLAG_KM: qemu_log("\n"); break;
+@@ -2245,6 +2252,9 @@ static void debug_post_eret(CPUMIPSState *env)
+         if (env->hflags & MIPS_HFLAG_DM)
+             qemu_log(" DEPC " TARGET_FMT_lx, env->CP0_DEPC);
+         switch (cpu_mmu_index(env, false)) {
++        case 3:
++            qemu_log(", ERL\n");
++            break;
+         case MIPS_HFLAG_UM: qemu_log(", UM\n"); break;
+         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
+         case MIPS_HFLAG_KM: qemu_log("\n"); break;
 -- 
 2.7.4
