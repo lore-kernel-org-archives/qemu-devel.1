@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1dYV48-0005U9-Q9
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dYV5f-0006nN-B0
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1dYV43-0007MY-VU
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1dYV43-0007Kq-Lh
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:21:43 -0400
-Date: Fri, 21 Jul 2017 06:21:39 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <813318776.33377694.1500632499830.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170721095131.ule4owoayuqwh6d3@hz-desktop>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
-	<20170721095131.ule4owoayuqwh6d3@hz-desktop>
+	(envelope-from <peter.maydell@linaro.org>) id 1dYV5e-0000CL-Fu
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:23:23 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dYV5e-00008t-8R
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:23:22 -0400
+Received: by mail-wr0-x231.google.com with SMTP id k71so27142862wrc.2
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 03:23:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <eec67af4-3f8e-bb85-0854-61f4d450f627@redhat.com>
+References: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
+	<eec67af4-3f8e-bb85-0854-61f4d450f627@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Jul 2017 11:22:59 +0100
+Message-ID: <CAFEAcA_mOeR2jTGuik6Jig972vMW5JTqQFaoZzt5_9oaG7D+aA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] util/oslib-posix.c: Avoid warning
+ on NetBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, Rik van Riel <riel@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, "patches@linaro.org" <patches@linaro.org>
 
+On 20 July 2017 at 19:26, Eric Blake <eblake@redhat.com> wrote:
+> On 07/20/2017 11:32 AM, Peter Maydell wrote:
+>> On NetBSD the compiler warns:
+>> util/oslib-posix.c: In function 'sigaction_invoke':
+>> util/oslib-posix.c:589:5: warning: missing braces around initializer [-Wmissing-braces]
+>>      siginfo_t si = { 0 };
+>>      ^
+>
+> Uggh. That is a broken compiler.  C99 declares that 'anything = {0}' is
+> supposed to be a valid way to zero-initialize anything.
+>
+>> util/oslib-posix.c:589:5: warning: (near initialization for 'si.si_pad') [-Wmissing-braces]
+>>
+>> because on this platform siginfo_t is defined as
+>>   typedef union siginfo {
+>>           char    si_pad[128];    /* Total size; for future expansion */
+>>           struct _ksiginfo _info;
+>>   } siginfo_t;
+>>
+>> Avoid this warning by initializing the struct with {} instead;
+>> this is a GCC extension but we use it all over the codebase already.
+>
+> Well, I'm glad that works to shut up the broken compiler.
+>
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  util/oslib-posix.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> > 
-> > Hello,
-> > 
-> > We shared a proposal for 'KVM fake DAX flushing interface'.
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02478.html
-> >
-> 
-> In above link,
->   "Overall goal of project
->    is to increase the number of virtual machines that can be
->    run on a physical machine, in order to *increase the density*
->    of customer virtual machines"
-> 
-> Is the fake persistent memory used as normal RAM in guest? If no, how
-> is it expected to be used in guest?
+Thanks; applied to master.
 
-Yes, guest will have a nvdimm DAX device and not use page cache for most 
-of the operations. Host will manage memory requirement of all the guests.
-  
-> 
-> > We did initial POC in which we used 'virtio-blk' device to perform
-> > a device flush on pmem fsync on ext4 filesystem. They are few hacks
-> > to make things work. We need suggestions on below points before we
-> > start actual implementation.
-> >
-> > A] Problems to solve:
-> > ------------------
-> > 
-> > 1] We are considering two approaches for 'fake DAX flushing interface'.
-> >     
-> >  1.1] fake dax with NVDIMM flush hints & KVM async page fault
-> > 
-> >      - Existing interface.
-> > 
-> >      - The approach to use flush hint address is already nacked upstream.
-> > 
-> >      - Flush hint not queued interface for flushing. Applications might
-> >        avoid to use it.
-> > 
-> >      - Flush hint address traps from guest to host and do an entire fsync
-> >        on backing file which itself is costly.
-> > 
-> >      - Can be used to flush specific pages on host backing disk. We can
-> >        send data(pages information) equal to cache-line size(limitation)
-> >        and tell host to sync corresponding pages instead of entire disk
-> >        sync.
-> > 
-> >      - This will be an asynchronous operation and vCPU control is returned
-> >        quickly.
-> > 
-> > 
-> >  1.2] Using additional para virt device in addition to pmem device(fake dax
-> >  with device flush)
-> > 
-> >      - New interface
-> > 
-> >      - Guest maintains information of DAX dirty pages as exceptional
-> >      entries in
-> >        radix tree.
-> > 
-> >      - If we want to flush specific pages from guest to host, we need to
-> >      send
-> >        list of the dirty pages corresponding to file on which we are doing
-> >        fsync.
-> > 
-> >      - This will require implementation of new interface, a new paravirt
-> >      device
-> >        for sending flush requests.
-> > 
-> >      - Host side will perform fsync/fdatasync on list of dirty pages or
-> >      entire
-> >        block device backed file.
-> > 
-> > 2] Questions:
-> > -----------
-> > 
-> >  2.1] Not sure why WPQ flush is not a queued interface? We can force
-> >  applications
-> >       to call this? device DAX neither calls fsync/msync?
-> > 
-> >  2.2] Depending upon interface we decide, we need optimal solution to sync
-> >       range of pages?
-> > 
-> >      - Send range of pages from guest to host to sync asynchronously
-> >      instead
-> >        of syncing entire block device?
-> 
-> e.g. a new virtio device to deliver sync requests to host?
-> 
-> > 
-> >      - Other option is to sync entire disk backing file to make sure all
-> >      the
-> >        writes are persistent. In our case, backing file is a regular file
-> >        on
-> >        non NVDIMM device so host page cache has list of dirty pages which
-> >        can be used either with fsync or similar interface.
-> 
-> As the amount of dirty pages can be variant, the latency of each host
-> fsync is likely to vary in a large range.
-> 
-> > 
-> >  2.3] If we do host fsync on entire disk we will be flushing all the dirty
-> >  data
-> >       to backend file. Just thinking what would be better approach,
-> >       flushing
-> >       pages on corresponding guest file fsync or entire block device?
-> > 
-> >  2.4] If we decide to choose one of the above approaches, we need to
-> >  consider
-> >       all DAX supporting filesystems(ext4/xfs). Would hooking code to
-> >       corresponding
-> >       fsync code of fs seems reasonable? Just thinking for flush hint
-> >       address use-case?
-> >       Or how flush hint addresses would be invoked with fsync or similar
-> >       api?
-> > 
-> >  2.5] Also with filesystem journalling and other mount options like
-> >  barriers,
-> >       ordered etc, how we decide to use page flush hint or regular fsync on
-> >       file?
-> >  
-> >  2.6] If at guest side we have PFN of all the dirty pages in radixtree? and
-> >  we send
-> >       these to to host? At host side would we able to find corresponding
-> >       page and flush
-> >       them all?
-> 
-> That may require the host file system provides API to flush specified
-> blocks/extents and their meta data in the file system. I'm not
-> familiar with this part and don't know whether such API exists.
-> 
-> Haozhong
-> 
+-- PMM
