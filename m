@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dYXU1-00041A-74
+	(envelope-from <david@redhat.com>) id 1dYXU1-000419-71
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dYXTw-0002P5-9X
+	(envelope-from <david@redhat.com>) id 1dYXTz-0002QC-0j
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41448)
+Received: from mx1.redhat.com ([209.132.183.28]:41654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dYXTw-0002Oo-3I
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:36 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dYXTy-0002Pf-R0
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:38 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 21 Jul 2017 14:56:06 +0200
-Message-Id: <20170721125609.11117-4-david@redhat.com>
+Date: Fri, 21 Jul 2017 14:56:07 +0200
+Message-Id: <20170721125609.11117-5-david@redhat.com>
 In-Reply-To: <20170721125609.11117-1-david@redhat.com>
 References: <20170721125609.11117-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 3/6] target/s390x: implement spm (SET
- PROGRAM MASK)
+Subject: [Qemu-devel] [PATCH v1 4/6] target/s390x: move wrap_address to cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +28,59 @@ Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, co
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h         |  2 ++
- target/s390x/insn-data.def |  2 ++
- target/s390x/translate.c   | 16 ++++++++++++++++
- 3 files changed, 20 insertions(+)
+ target/s390x/cpu.h        | 14 ++++++++++++++
+ target/s390x/mem_helper.c | 14 --------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 7732d01..4f7c6b7 100644
+index 4f7c6b7..13df41c 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -308,6 +308,7 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
- #undef PSW_SHIFT_ASC
- #undef PSW_MASK_CC
- #undef PSW_MASK_PM
-+#undef PSW_SHIFT_MASK_PM
- #undef PSW_MASK_64
- #undef PSW_MASK_32
- #undef PSW_MASK_ESA_ADDR
-@@ -325,6 +326,7 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
- #define PSW_SHIFT_ASC           46
- #define PSW_MASK_CC             0x0000300000000000ULL
- #define PSW_MASK_PM             0x00000F0000000000ULL
-+#define PSW_SHIFT_MASK_PM       40
- #define PSW_MASK_64             0x0000000100000000ULL
- #define PSW_MASK_32             0x0000000080000000ULL
- #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index ad84c74..84233a4 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -755,6 +755,8 @@
-     C(0xb2b8, SRNMB,   S,     FPE, 0, 0, 0, 0, srnm, 0)
- /* SET DFP ROUNDING MODE */
-     C(0xb2b9, SRNMT,   S,     DFPR, 0, 0, 0, 0, srnm, 0)
-+/* SET PROGRAM MASK */
-+    C(0x0400, SPM,     RR_a,  Z,   r1, 0, 0, 0, spm, 0)
- 
- /* SHIFT LEFT SINGLE */
-     D(0x8b00, SLA,     RS_a,  Z,   r1, sh32, new, r1_32, sla, 0, 31)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 1dffcee..7fc07a4 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3854,6 +3854,22 @@ static ExitStatus op_srnm(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
+@@ -409,6 +409,20 @@ static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
+     }
  }
  
-+static ExitStatus op_spm(DisasContext *s, DisasOps *o)
++static inline uint64_t wrap_address(CPUS390XState *env, uint64_t a)
 +{
-+    TCGv_i32 cc = tcg_temp_new_i32();
-+
-+    tcg_gen_extrl_i64_i32(cc, o->in1);
-+    tcg_gen_shri_i32(cc, cc, 28);
-+    tcg_gen_andi_i32(cc, cc, 0x3ul);
-+    tcg_gen_mov_i32(cc_op, cc);
-+    tcg_temp_free_i32(cc);
-+    set_cc_static(s);
-+
-+    tcg_gen_shri_i64(o->in1, o->in1, 24);
-+    tcg_gen_deposit_i64(psw_mask, psw_mask, o->in1, PSW_SHIFT_MASK_PM, 4);
-+    return NO_EXIT;
++    if (!(env->psw.mask & PSW_MASK_64)) {
++        if (!(env->psw.mask & PSW_MASK_32)) {
++            /* 24-Bit mode */
++            a &= 0x00ffffff;
++        } else {
++            /* 31-Bit mode */
++            a &= 0x7fffffff;
++        }
++    }
++    return a;
 +}
 +
- #ifndef CONFIG_USER_ONLY
- static ExitStatus op_spka(DisasContext *s, DisasOps *o)
+ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
+                                         target_ulong *cs_base, uint32_t *flags)
+ {
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index cdc78aa..369d291 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -110,20 +110,6 @@ static inline void cpu_stsize_data_ra(CPUS390XState *env, uint64_t addr,
+     }
+ }
+ 
+-static inline uint64_t wrap_address(CPUS390XState *env, uint64_t a)
+-{
+-    if (!(env->psw.mask & PSW_MASK_64)) {
+-        if (!(env->psw.mask & PSW_MASK_32)) {
+-            /* 24-Bit mode */
+-            a &= 0x00ffffff;
+-        } else {
+-            /* 31-Bit mode */
+-            a &= 0x7fffffff;
+-        }
+-    }
+-    return a;
+-}
+-
+ static void fast_memset(CPUS390XState *env, uint64_t dest, uint8_t byte,
+                         uint32_t l, uintptr_t ra)
  {
 -- 
 2.9.4
