@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoo-0003uV-NB
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoo-0003uT-5R
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNon-0007X9-Gb
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNom-0007Wh-PH
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:30 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:14892)
+Received: from mailapp01.imgtec.com ([195.59.15.196]:44231)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNon-0007Wy-Ac
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:29 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNom-0007WI-Gu
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:28 -0400
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Fri, 21 Jul 2017 03:37:09 +0100
-Message-ID: <1500604635-15027-9-git-send-email-yongbok.kim@imgtec.com>
+Date: Fri, 21 Jul 2017 03:37:07 +0100
+Message-ID: <1500604635-15027-7-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 08/14] target/mips: Check memory permissions
- with mem_idx
+Subject: [Qemu-devel] [PULL 06/14] target/mips: Decode MIPS32 EVA load &
+ store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +31,241 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <james.hogan@imgtec.co
 
 From: James Hogan <james.hogan@imgtec.com>
 
-When performing virtual to physical address translation, check the
-required privilege level based on the mem_idx rather than the mode in
-the hflags. This will allow EVA loads & stores to operate safely only on
-user memory from kernel mode.
+Implement decoding of MIPS32 EVA loads and stores. These access the user
+address space from kernel mode when implemented, so for each instruction
+we need to check that EVA is available from Config5.EVA & check for
+sufficient COP0 privilege (with the new check_eva()), and then override
+the mem_idx used for the operation.
 
-For the cases where the mmu_idx doesn't need to be overridden
-(mips_cpu_get_phys_page_debug() and cpu_mips_translate_address()), we
-calculate the required mmu_idx using cpu_mmu_index(). Note that this
-only tests the MIPS_HFLAG_KSU bits rather than MIPS_HFLAG_MODE, so we
-don't test the debug mode hflag MIPS_HFLAG_DM any longer. This should be
-fine as get_physical_address() only compares against MIPS_HFLAG_UM and
-MIPS_HFLAG_SM, neither of which should get set by compute_hflags() when
-MIPS_HFLAG_DM is set.
+Unfortunately some Loongson 2E instructions use overlapping encodings,
+so we must be careful not to prevent those from being decoded when EVA
+is absent.
 
 Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: Aurelien Jarno <aurelien@aurel32.net>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- target/mips/helper.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ target/mips/translate.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 5b765cd..7805e5c 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -109,11 +109,11 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 38887a1..93fb8f3 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -427,6 +427,24 @@ enum {
+     OPC_EXTR_W_DSP     = 0x38 | OPC_SPECIAL3,
+     OPC_DEXTR_W_DSP    = 0x3C | OPC_SPECIAL3,
  
- static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-                                 int *prot, target_ulong real_address,
--                                int rw, int access_type)
-+                                int rw, int access_type, int mmu_idx)
++    /* EVA */
++    OPC_LWLE           = 0x19 | OPC_SPECIAL3,
++    OPC_LWRE           = 0x1A | OPC_SPECIAL3,
++    OPC_CACHEE         = 0x1B | OPC_SPECIAL3,
++    OPC_SBE            = 0x1C | OPC_SPECIAL3,
++    OPC_SHE            = 0x1D | OPC_SPECIAL3,
++    OPC_SCE            = 0x1E | OPC_SPECIAL3,
++    OPC_SWE            = 0x1F | OPC_SPECIAL3,
++    OPC_SWLE           = 0x21 | OPC_SPECIAL3,
++    OPC_SWRE           = 0x22 | OPC_SPECIAL3,
++    OPC_PREFE          = 0x23 | OPC_SPECIAL3,
++    OPC_LBUE           = 0x28 | OPC_SPECIAL3,
++    OPC_LHUE           = 0x29 | OPC_SPECIAL3,
++    OPC_LBE            = 0x2C | OPC_SPECIAL3,
++    OPC_LHE            = 0x2D | OPC_SPECIAL3,
++    OPC_LLE            = 0x2E | OPC_SPECIAL3,
++    OPC_LWE            = 0x2F | OPC_SPECIAL3,
++
+     /* R6 */
+     R6_OPC_PREF        = 0x35 | OPC_SPECIAL3,
+     R6_OPC_CACHE       = 0x25 | OPC_SPECIAL3,
+@@ -1431,6 +1449,7 @@ typedef struct DisasContext {
+     bool bp;
+     uint64_t PAMask;
+     bool mvh;
++    bool eva;
+     int CP0_LLAddr_shift;
+     bool ps;
+     bool vp;
+@@ -2216,29 +2235,47 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
+         tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TESL);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LWE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LW:
+         tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TESL |
+                            ctx->default_tcg_memop_mask);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LHE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LH:
+         tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TESW |
+                            ctx->default_tcg_memop_mask);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LHUE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LHU:
+         tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEUW |
+                            ctx->default_tcg_memop_mask);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LBE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LB:
+         tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_SB);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LBUE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LBU:
+         tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_UB);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LWLE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LWL:
+         t1 = tcg_temp_new();
+         /* Do a byte access to possibly trigger a page
+@@ -2262,6 +2299,9 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
+         tcg_gen_ext32s_tl(t0, t0);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LWRE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LWR:
+         t1 = tcg_temp_new();
+         /* Do a byte access to possibly trigger a page
+@@ -2286,6 +2326,9 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
+         tcg_gen_ext32s_tl(t0, t0);
+         gen_store_gpr(t0, rt);
+         break;
++    case OPC_LLE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_LL:
+     case R6_OPC_LL:
+         op_ld_ll(t0, t0, mem_idx, ctx);
+@@ -2318,20 +2361,35 @@ static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
+         gen_helper_0e2i(sdr, t1, t0, mem_idx);
+         break;
+ #endif
++    case OPC_SWE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_SW:
+         tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_TEUL |
+                            ctx->default_tcg_memop_mask);
+         break;
++    case OPC_SHE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_SH:
+         tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_TEUW |
+                            ctx->default_tcg_memop_mask);
+         break;
++    case OPC_SBE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_SB:
+         tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_8);
+         break;
++    case OPC_SWLE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_SWL:
+         gen_helper_0e2i(swl, t1, t0, mem_idx);
+         break;
++    case OPC_SWRE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_SWR:
+         gen_helper_0e2i(swr, t1, t0, mem_idx);
+         break;
+@@ -2364,6 +2422,9 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
+         op_st_scd(t1, t0, rt, mem_idx, ctx);
+         break;
+ #endif
++    case OPC_SCE:
++        mem_idx = MIPS_HFLAG_UM;
++        /* fall through */
+     case OPC_SC:
+     case R6_OPC_SC:
+         op_st_sc(t1, t0, rt, mem_idx, ctx);
+@@ -18020,13 +18081,57 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
  {
-     /* User mode can only access useg/xuseg */
--    int user_mode = (env->hflags & MIPS_HFLAG_MODE) == MIPS_HFLAG_UM;
--    int supervisor_mode = (env->hflags & MIPS_HFLAG_MODE) == MIPS_HFLAG_SM;
-+    int user_mode = mmu_idx == MIPS_HFLAG_UM;
-+    int supervisor_mode = mmu_idx == MIPS_HFLAG_SM;
-     int kernel_mode = !user_mode && !supervisor_mode;
- #if defined(TARGET_MIPS64)
-     int UX = (env->CP0_Status & (1 << CP0St_UX)) != 0;
-@@ -413,11 +413,12 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
- hwaddr mips_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- {
-     MIPSCPU *cpu = MIPS_CPU(cs);
-+    CPUMIPSState *env = &cpu->env;
-     hwaddr phys_addr;
-     int prot;
+     int rs, rt, rd, sa;
+     uint32_t op1, op2;
++    int16_t imm;
  
--    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0,
--                             ACCESS_INT) != 0) {
-+    if (get_physical_address(env, &phys_addr, &prot, addr, 0, ACCESS_INT,
-+                             cpu_mmu_index(env, false)) != 0) {
-         return -1;
-     }
-     return phys_addr;
-@@ -449,7 +450,7 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw,
-        correctly */
-     access_type = ACCESS_INT;
-     ret = get_physical_address(env, &physical, &prot,
--                               address, rw, access_type);
-+                               address, rw, access_type, mmu_idx);
-     switch (ret) {
-     case TLBRET_MATCH:
-         qemu_log_mask(CPU_LOG_MMU,
-@@ -487,8 +488,8 @@ hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int r
+     rs = (ctx->opcode >> 21) & 0x1f;
+     rt = (ctx->opcode >> 16) & 0x1f;
+     rd = (ctx->opcode >> 11) & 0x1f;
+     sa = (ctx->opcode >> 6) & 0x1f;
++    imm = sextract32(ctx->opcode, 7, 9);
  
-     /* data access */
-     access_type = ACCESS_INT;
--    ret = get_physical_address(env, &physical, &prot,
--                               address, rw, access_type);
-+    ret = get_physical_address(env, &physical, &prot, address, rw, access_type,
-+                               cpu_mmu_index(env, false));
-     if (ret != TLBRET_MATCH) {
-         raise_mmu_exception(env, address, rw, ret);
-         return -1LL;
+     op1 = MASK_SPECIAL3(ctx->opcode);
++
++    /*
++     * EVA loads and stores overlap Loongson 2E instructions decoded by
++     * decode_opc_special3_legacy(), so be careful to allow their decoding when
++     * EVA is absent.
++     */
++    if (ctx->eva) {
++        switch (op1) {
++        case OPC_LWLE ... OPC_LWRE:
++            check_insn_opc_removed(ctx, ISA_MIPS32R6);
++            /* fall through */
++        case OPC_LBUE ... OPC_LHUE:
++        case OPC_LBE ... OPC_LWE:
++            check_cp0_enabled(ctx);
++            gen_ld(ctx, op1, rt, rs, imm);
++            return;
++        case OPC_SWLE ... OPC_SWRE:
++            check_insn_opc_removed(ctx, ISA_MIPS32R6);
++            /* fall through */
++        case OPC_SBE ... OPC_SHE:
++        case OPC_SWE:
++            check_cp0_enabled(ctx);
++            gen_st(ctx, op1, rt, rs, imm);
++            return;
++        case OPC_SCE:
++            check_cp0_enabled(ctx);
++            gen_st_cond(ctx, op1, rt, rs, imm);
++            return;
++        case OPC_CACHEE:
++            check_cp0_enabled(ctx);
++            if (ctx->hflags & MIPS_HFLAG_ITC_CACHE) {
++                gen_cache_operation(ctx, rt, rs, imm);
++            }
++            /* Treat as NOP. */
++            return;
++        case OPC_PREFE:
++            check_cp0_enabled(ctx);
++            /* Treat as NOP. */
++            return;
++        }
++    }
++
+     switch (op1) {
+     case OPC_EXT:
+     case OPC_INS:
+@@ -19925,6 +20030,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     ctx.bp = (env->CP0_Config3 >> CP0C3_BP) & 1;
+     ctx.PAMask = env->PAMask;
+     ctx.mvh = (env->CP0_Config5 >> CP0C5_MVH) & 1;
++    ctx.eva = (env->CP0_Config5 >> CP0C5_EVA) & 1;
+     ctx.CP0_LLAddr_shift = env->CP0_LLAddr_shift;
+     ctx.cmgcr = (env->CP0_Config3 >> CP0C3_CMGCR) & 1;
+     /* Restore delay slot state from the tb context.  */
 -- 
 2.7.4
