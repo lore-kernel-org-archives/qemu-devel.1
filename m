@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYZxL-00048Q-20
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:35:07 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dYa9B-0007MP-SV
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:47:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYZxK-0003Ix-6G
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:35:07 -0400
-References: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5bd70af1-1f4d-9e73-86e6-b8b546c12dc9@redhat.com>
-Date: Fri, 21 Jul 2017 10:34:59 -0500
+	(envelope-from <stefanha@gmail.com>) id 1dYa96-0000IC-OY
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:47:21 -0400
+Date: Fri, 21 Jul 2017 16:47:12 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170721154712.GM18014@stefanha-x1.localdomain>
+References: <20170711170821.24669-1-ppandit@redhat.com>
+	<29e5dd08-80e7-ae0d-7179-73f5d34c3485@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Avoid unnecessary sleeps
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Kc9HNjpzOXVc7FFU"
+Content-Disposition: inline
+In-Reply-To: <29e5dd08-80e7-ae0d-7179-73f5d34c3485@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: check BlockDriverState
+ object before dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Kieron Shorrock <kshorrock@paloaltonetworks.com>, Prasad J Pandit <pjp@fedoraproject.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <5bd70af1-1f4d-9e73-86e6-b8b546c12dc9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Avoid unnecessary sleeps
-References: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--Kc9HNjpzOXVc7FFU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/21/2017 10:10 AM, Kevin Wolf wrote:
-> Test cases 030, 041 and 055 used to sleep for a second after calling
-> block-job-pause to make sure that the block job had time to actually
-> get into paused state. We can instead poll its status and use that one
-> second only as a timeout.
+On Mon, Jul 17, 2017 at 11:56:48AM -0400, John Snow wrote:
+> On 07/11/2017 01:08 PM, P J P wrote:
+> > From: Prasad J Pandit <pjp@fedoraproject.org>
+> >=20
+> > When processing ATA_CACHE_FLUSH ide controller command,
+> > BlockDriverState object could be null. Add check to avoid
+> > null pointer dereference.
+> >=20
 >=20
-> The tests also slept a second for checking that the block jobs don't
-> make progress while being paused. Half a second is more than enough for=
-
-> this.
+> This happens through 0xE7, what QEMU calls WIN_CACHE_FLUSH and described
+> in ATA8 ACS3 as "FLUSH CACHE"
 >=20
-> These changes reduce the total time for the three tests by 25 seconds o=
-n
-> my laptop (from 155 seconds to 130).
-
-Nice!
-
+> The core of the matter here is that any ATA device associated with a
+> BlockBackend that has no media inserted will accept the command and call
+> blk_aio_flush, which will later fail because blk_aio_prwv assumes that
+> the BlockBackend it was given definitely has a BlockDriverState attached.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
+> The associated bdrv_inc_in_flight causes the null pointer dereference.
+>=20
+> It's not immediately clear to me what the right fix is here:
+>=20
+> (1) Should blk_ functions not assume they will have a BlockDriverState?
+> (i.e. should an attempted blk_flush on an empty blk just succeed
+> quietly, or is that inherently an error?)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Hmm...BlockDriverState still has bdrv_is_inserted() even though
+BlockBackend->root can be NULL?  CCing Markus in case he has thoughts on
+the BB/BDS split.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I find it weird that block-backend.c calls bdrv_inc_in_flight() and then
+bdrv_co_flush() will call it again.  Perhaps we need to do this so that
+blk_drain() works correctly but it's odd that they share the same
+counter variable.
 
-
---dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk
+--Kc9HNjpzOXVc7FFU
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyHyMACgkQp6FrSiUn
-Q2qXqwgAil5bT5pyIFNMZuSILCrlgwaQFBwAA96fGql4vMbar4D9CX55+zUPDRov
-PREr1T+WTCx6R5bz/wDTyy89gCsjaAByp6bCicsOs+sjPSMuHX0GhTALdZD3BuOz
-8g+cCuBmThckJrYtEg8omJ3fpC9pSomeUyoZGu0Nx4nmvuW5Qn0A4WViEPKtvu4x
-O8wwdp9gu4C07cnt6vi4l1wDeHJBJLtc25W3EAGDsuZzXyAZPzrpvS43cCx8ARg5
-DhMC0Tty8puBNv8IoE15JeNSwP46yRyRfYE6Mlu0armIRzLN3c4kZF7OVmArqIqd
-jkF8Vu8YKFqgptxP0gbbkv8m8BBAIQ==
-=pwXi
+iQEcBAEBAgAGBQJZciIAAAoJEJykq7OBq3PIXuQH/1r6tWxHlVBYvpjrfiMOqEKu
+hNuDLjl7nCHRkGbFdJNmWFR3la0bDplCgSdEherUA9jR8U5o8FwSoonfuBferH1+
+igQIbjmLqVaQhjUl/x/JCTQ0kTE5zQntbKY7u+G6JKum+8IstTwgnY4GEj6UfTBN
+6bNxlg2ZhVSz6oxeGAdWtLXbJFMG/HZfLV8ECXosVAA+J2barbgOk5utVkyqv94G
+ju185VkwU181mmN0w6b87TPZt+cdjdxld7ibSZyilJ8yikEOgn3N+QMqFGqYGy62
+l878vQUWJEQRRNdPOGU7LnOZQxMrblDbKhlnDYoow0GwTNV9uxnxyX3wBnr7zXI=
+=3wYK
 -----END PGP SIGNATURE-----
 
---dmcKPqSMxHO58c8g8jxj0L4kwxABSIJmk--
+--Kc9HNjpzOXVc7FFU--
