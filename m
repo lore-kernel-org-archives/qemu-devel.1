@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dYhXS-0001sm-D4
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:40:56 -0400
+	(envelope-from <mst@redhat.com>) id 1dYhh8-0004Xq-V1
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:50:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dYhXN-0001bx-E0
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:40:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60426)
+	(envelope-from <mst@redhat.com>) id 1dYhh4-0000T4-CN
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:50:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dYhXN-0001bU-1X
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:40:49 -0400
-Date: Sat, 22 Jul 2017 02:40:46 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dYhh4-0000SY-0J
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:50:50 -0400
+Date: Sat, 22 Jul 2017 02:50:39 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170722023020-mutt-send-email-mst@kernel.org>
-References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
-	<20170721094955.GH17693@redhat.com>
-	<20170721121048.44d617ea@nial.brq.redhat.com>
+Message-ID: <20170722024929-mutt-send-email-mst@kernel.org>
+References: <201707201057577907414@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170721121048.44d617ea@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
- machine types
+In-Reply-To: <201707201057577907414@zte.com.cn>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gdmhvc3Q6IGZp?=
+ =?utf-8?q?x_a_migration_failed_because_ofvhost_region_merge?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,193 +29,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>, Phil Dennis-Jordan <lists@philjordan.eu>
+To: peng.hao2@zte.com.cn
+Cc: imammedo@redhat.com, dgilbert@redhat.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
 
-On Fri, Jul 21, 2017 at 12:10:48PM +0200, Igor Mammedov wrote:
-> On Fri, 21 Jul 2017 10:49:55 +0100
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> 
-> > On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:
-> > > w2k used to boot on QEMU until we bumped revision of FADT to rev3
-> > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
-> > > 
-> > > Considering that w2k is ancient and long time EOLed, leave default
-> > > rev3 but make pc-i440fx-2.9 and older machine types to force rev1
-> > > so old setups won't break (w2k could boot).  
-> > 
-> > There needs to be a machine type property added to control this
-> > feature. When provisioning new VMs, management apps need to be
-> > able to set the property explicitly - having them rely on picking
-> > particular machine type name+versions is not viable, because
-> > downstream vendors replace the machine types with their own
-> > names + versions.
-> having property doesn't really help here and we don't do it for every
-> compat tweak /ex: save_tsc_khz, linuxboot_dma_enabled/.
-> 
-> Management would not benefit much from having property vs machine version
-> as it would have to encode somewhere that for w2k it should set
-> some machine property or pick a particular machine type.
+On Thu, Jul 20, 2017 at 10:57:57AM +0800, peng.hao2@zte.com.cn wrote:
+> =E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6
+> =E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A <mst@redhat.com>;
+> =E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A <imammedo@redhat.com>;
+> =E6=8A=84=E9=80=81=E4=BA=BA=EF=BC=9A <dgilbert@redhat.com>; <marcandre.=
+lureau@redhat.com>;
+> <maxime.coquelin@redhat.com>;=E5=BD=AD=E6=B5=A910096742;=E7=8E=8B=E4=B8=
+=9A=E8=B6=8510154425;
+> <qemu-devel@nongnu.org>;
+> =E6=97=A5=E6=9C=9F=EF=BC=9A2017=E5=B9=B407=E6=9C=8819=E6=97=A5 23:53
+> =E4=B8=BB=E9=A2=98=EF=BC=9ARe: [Qemu-devel] [PATCH] vhost: fix a migrat=
+ion failed because ofvhost
+> region merge
+>=20
+>=20
+> On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
+> > On Wed, 19 Jul 2017 12:46:13 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >=20
+> > > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > > On Wed, 19 Jul 2017 23:17:32 +0800
+> > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > >  =20
+> > > > > When a guest that has several hotplugged dimms is migrated, in
+> > > > > destination host it will fail to resume. Because vhost regions =
+of
+> > > > > several dimms in source host are merged and in the restore stag=
+e
+> > > > > in destination host it computes whether more than vhost slot li=
+mit
+> > > > > before merging vhost regions of several dimms. =20
+> > > > could you provide a bit more detailed description of the problem
+> > > > including command line+used device_add commands on source and
+> > > > command line on destination? =20
+> > >=20
+> > > (ccing in Marc Andre and Maxime)
+> > >=20
+> > > Hmm, I'd like to understade the situation where you get merging bet=
+ween
+> > > RAMBlocks; that complicates some stuff for postcopy.
+> > and probably inconsistent merging breaks vhost as well
+> >=20
+> > merging might happen if regions are adjacent or overlap
+> > but for that to happen merged regions must have equal
+> > distance between their GPA:HVA pairs, so that following
+> > translation would work:
+> >=20
+> > if gva in regionX[gva_start, len, hva_start]
+> >    hva =3D hva_start + gva - gva_start
+> >=20
+> > while GVA of regions is under QEMU control and deterministic
+> > HVA is not, so in migration case merging might happen on source
+> > side but not on destination, resulting in different memory maps.
+> >=20
+> > Maybe Michael might know details why migration works in vhost usecase=
+,
+> > but I don't see vhost sending any vmstate data.
+>=20
+> We aren't merging ramblocks at all.
+> When we are passing blocks A and B to vhost, if we see that
+>=20
+> hvaB=3DhvaA + lenA
+> gpaB=3DgpaA + lenA
+>=20
+> then we can improve performance a bit by passing a single
+> chunk to vhost: hvaA,gpaA,lena+lenB
+>=20
+>=20
+> so it does not affect migration normally.
+>=20
+> ----- I think it is like this:
+>=20
+> in source;                                       in destination:(restor=
+e)
+>=20
+> realize device 1                              realize device 1
+>=20
+> realize device 2                              realize dimm 0
+>=20
+>      ...                                               realize dimm1
+>=20
+>                                                        ....
+>=20
+> realize device n                              realize dimmx
+>=20
+>                                                        realize  device =
+m
+>=20
+> realize dimm0                                  .....
+>=20
+> realize dimm1                                  .....
+>=20
+> ......                                                  .....
+>=20
+> realize dimmx                                realize device n
+>=20
+>=20
+> In restore stage ,the sort of realizing device  is different from start=
+ing vm
+> because of adding dimms.
+>=20
+> So it may in some stage during restoring can't merge vhost regions.
 
-I think I'd disagree with that. If
-users might need this for compatibility with some guests,
-then it should be a property not just a machine type.
-
-But see below - I think we rushed it for the PC anyway.
-
-> Probably no one would worry about fixing virt-install or something
-> else for the sake of w2k and if they are going to fix it
-> it doesn't matter if they map machine type vs property.
-> 
-> Also with new machine type deprecation policy we would be able
-> easily to phase out rev1 support along with 2.9 machine,
-> but if you expose property then removing it would break
-> CLI not only for 2.9 but possible later machines if it's set there.
-> 
-> So I'm against adding properties/CLI options for unless we have to in this case,
-> and I'm not convinced that w2k deserves it.
-
-If I have to choose, I'd say Mac OSX is way less interesting than old
-windows versions. Lots of people have software that will only run on old
-windows and there's probably good money to be had running it on new
-hardware in VMs. And PC machine is all about compatibility - we have Q35
-for new stuff.  Besides OSX uses q35 anyway I think.
-
-So maybe the right thing to do is to
-- switch default for PC back to rev 1
-- keep default for Q35 at rev 3
-
-No machinetype hacks.
-
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > > CC: Programmingkid <programmingkidx@gmail.com>
-> > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> > > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > > 
-> > > Only compile test since I don't have w2k to test with
-> > > 
-> > > ---
-> > >  include/hw/i386/pc.h |  1 +
-> > >  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
-> > >  hw/i386/pc_piix.c    |  2 ++
-> > >  3 files changed, 22 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > index d80859b..d6f65dd 100644
-> > > --- a/include/hw/i386/pc.h
-> > > +++ b/include/hw/i386/pc.h
-> > > @@ -122,6 +122,7 @@ struct PCMachineClass {
-> > >      bool rsdp_in_ram;
-> > >      int legacy_acpi_table_size;
-> > >      unsigned acpi_data_size;
-> > > +    bool force_rev1_fadt;
-> > >  
-> > >      /* SMBIOS compat: */
-> > >      bool smbios_defaults;
-> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > index 6b7bade..227f9ad 100644
-> > > --- a/hw/i386/acpi-build.c
-> > > +++ b/hw/i386/acpi-build.c
-> > > @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
-> > >  }
-> > >  
-> > >  /* Load chipset information in FADT */
-> > > -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > > +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, bool rev1)
-> > >  {
-> > >      fadt->model = 1;
-> > >      fadt->reserved1 = 0;
-> > > @@ -304,6 +304,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-> > >      }
-> > >      fadt->century = RTC_CENTURY;
-> > > +    if (rev1) {
-> > > +        return;
-> > > +    }
-> > >  
-> > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-> > >      fadt->reset_value = 0xf;
-> > > @@ -335,6 +338,7 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > >  /* FADT */
-> > >  static void
-> > >  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > +           MachineState *machine,
-> > >             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
-> > >             const char *oem_id, const char *oem_table_id)
-> > >  {
-> > > @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-> > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-> > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> > > +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
-> > > +    int fadt_size = sizeof(*fadt);
-> > > +    int rev = 3;
-> > >  
-> > >      /* FACS address to be filled by Guest linker */
-> > >      bios_linker_loader_add_pointer(linker,
-> > > @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > >          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
-> > >  
-> > >      /* DSDT address to be filled by Guest linker */
-> > > -    fadt_setup(fadt, pm);
-> > > +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
-> > >      bios_linker_loader_add_pointer(linker,
-> > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > -    bios_linker_loader_add_pointer(linker,
-> > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > +    if (pcmc->force_rev1_fadt) {
-> > > +        rev = 1;
-> > > +        fadt_size = offsetof(typeof(*fadt), reset_register);
-> > > +    } else {
-> > > +        bios_linker_loader_add_pointer(linker,
-> > > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > +    }
-> > >  
-> > >      build_header(linker, table_data,
-> > > -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
-> > > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
-> > >  }
-> > >  
-> > >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-> > > @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-> > >      /* ACPI tables pointed to by RSDT */
-> > >      fadt = tables_blob->len;
-> > >      acpi_add_table(table_offsets, tables_blob);
-> > > -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
-> > > +    build_fadt(tables_blob, tables->linker, &pm, machine, facs, dsdt,
-> > >                 slic_oem.id, slic_oem.table_id);
-> > >      aml_len += tables_blob->len - fadt;
-> > >  
-> > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > > index 11b4336..bc61332 100644
-> > > --- a/hw/i386/pc_piix.c
-> > > +++ b/hw/i386/pc_piix.c
-> > > @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
-> > >  
-> > >  static void pc_i440fx_2_9_machine_options(MachineClass *m)
-> > >  {
-> > > +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> > >      pc_i440fx_2_10_machine_options(m);
-> > >      m->is_default = 0;
-> > >      m->alias = NULL;
-> > > +    pcmc->force_rev1_fadt = true;
-> > >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
-
-whatever switch we use for this option, I think it makes
-sense to add comments to document why we keep this around.
+If you run over the number of regions supported by vhost on destination
+then you won't be able to start a VM there until you disable vhost.
 
 
-> > >  }
-> > >  
-> > > -- 
-> > > 2.7.4
-> > > 
-> > >   
-> > 
-> > Regards,
-> > Daniel
+
+>=20
+>=20
+>=20
+>=20
+>=20
+> >=20
+> > >=20
+> > > > >=20
+> > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > ---
+> > > > >  hw/mem/pc-dimm.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >=20
+> > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > index ea67b46..bb0fa08 100644
+> > > > > --- a/hw/mem/pc-dimm.c
+> > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug
+> (DeviceState *dev, MemoryHotplugState *hpms,
+> > > > >          goto out;
+> > > > >      }
+> > > > > =20
+> > > > > -    if (!vhost_has_free_slot()) {
+> > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
+> > > > >          error_setg(&local_err, "a used vhost backend has no fr=
+ee"
+> > > > >                                 " memory slots left");
+> > > > >          goto out; =20
+> > >=20
+> > > Even this produces the wrong error message in this case,
+> > > it also makes me think if the existing code should undo a lot of
+> > > the object_property_set's that happen.
+> > >=20
+> > > Dave
+> > > >=20
+> > > >  =20
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+>=20
+>=20
