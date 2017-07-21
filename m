@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYnp-0007Oz-1k
+	(envelope-from <bounces@canonical.com>) id 1dYYnp-0007Oy-1X
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYnk-0002rh-8M
+	(envelope-from <bounces@canonical.com>) id 1dYYnj-0002rD-WF
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47700)
+Received: from indium.canonical.com ([91.189.90.7]:47686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYYnk-0002qT-28
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:08 -0400
+	id 1dYYnj-0002pw-Q6
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:07 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYYni-0003Ky-8a
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:21:06 +0000
+	id 1dYYnh-0003L4-35
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:21:05 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EED122E8241
+	by loganberry.canonical.com (Postfix) with ESMTP id 06F602E8238
 	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:20:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Jul 2017 14:15:24 -0000
-From: Thomas Huth <1643619@bugs.launchpad.net>
-Reply-To: Bug 1643619 <1643619@bugs.launchpad.net>
+Date: Fri, 21 Jul 2017 14:14:40 -0000
+From: Thomas Huth <1670170@bugs.launchpad.net>
+Reply-To: Bug 1670170 <1670170@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20161121164013.8062.14361.malonedeb@soybean.canonical.com>
-Message-Id: <150064652544.6148.9007806314791846839.launchpad@gac.canonical.com>
+References: <20170305181803.7371.53021.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150064648095.5906.788239738290308892.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1643619] Re: netlink broken on big-endian mips
+Subject: [Qemu-devel] [Bug 1670170] Re: `qemu-system-sparc64 -M Niagara`
+ Aborted (core dumped)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,58 +46,65 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1643619
+https://bugs.launchpad.net/bugs/1670170
 
 Title:
-  netlink broken on big-endian mips
+  `qemu-system-sparc64 -M Niagara` Aborted (core dumped)
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Debian QEMU version 2.7.0, but the bug also appears in current git
-  master (commit c36ed06e9159)
+  > qemu-system-sparc64 -M Niagara
+  qemu: fatal: Trap 0x0064 while trap level (6) >=3D MAXTL (6), Error state
+  pc: 0000000000004c80  npc: 0000000000004c84
+  %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %o0-3: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
+0 =
 
-  As the summary says, netlink is completely broken on big-endian mips
-  running qemu-user.
+  %o4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
+0 =
 
-  Running 'ip route' from within a Debian chroot with QEMU simply hangs.
-  Running amd64 strace on qemu-mips-static shows that it's waiting for a
-  netlink response from the kernel which never comes.
+  %l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 000000000000000=
+0 =
 
-  [...]
-  [pid 11249] socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) =3D 3
-  [pid 11249] setsockopt(3, SOL_SOCKET, SO_SNDBUF, [32768], 4) =3D 0
-  [pid 11249] setsockopt(3, SOL_SOCKET, SO_RCVBUF, [1048576], 4) =3D 0
-  [pid 11249] bind(3, {sa_family=3DAF_NETLINK, nl_pid=3D0, nl_groups=3D0000=
-0000}, 12) =3D 0
-  [pid 11249] getsockname(3, {sa_family=3DAF_NETLINK, nl_pid=3D11249, nl_gr=
-oups=3D00000000}, [12]) =3D 0
-  [pid 11249] time([1479745823])          =3D 1479745823
-  [pid 11249] sendto(3, {{len=3D671088640, type=3D0x1a00 /* NLMSG_??? */, f=
-lags=3DNLM_F_REQUEST|NLM_F_MULTI|0x100, seq=3D539046744, pid=3D0}, "\2\0\0\=
-0\0\0\0\0\0\0\0\0\0\0\0\0\0\10\0\35\0\0\0\1"}, 40, 0, NULL, 0) =3D 40
-  [pid 11249] recvmsg(3,
+  %l4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
+0 =
 
-  Notice the len in the buffer passed to the kernel is 0x28000000 which
-  looks byteswapped.
+  %i0-3: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
+0 =
 
-  Removing the call to fd_trans_unregister in the NR_socket syscall in
-  do_syscall fixes this for me, but I don't understand why the fd
-  translation was immediately unregistered after being registered just
-  before in do_socket - presumably it was added for a reason.
+  %i4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
+0 =
 
-  --- a/linux-user/syscall.c
-  +++ b/linux-user/syscall.c
-  @@ -9331,7 +9331,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
-   #ifdef TARGET_NR_socket
-       case TARGET_NR_socket:
-           ret =3D do_socket(arg1, arg2, arg3);
-  -        fd_trans_unregister(ret);
-           break;
-   #endif
-   #ifdef TARGET_NR_socketpair
+  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  %f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+  pstate: 00000414 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0
+  cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
+  fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
+
+  Aborted (core dumped)
+
+  > qemu-system-sparc64 -M help
+  Supported machines are:
+  Niagara              Sun4v platform, Niagara
+  none                 empty machine
+  sun4u                Sun4u platform (default)
+  sun4v                Sun4v platform
+
+  > qemu-system-sparc64 -version
+  QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
+
+  from
+  https://build.opensuse.org/package/show/Virtualization:Staging/qemu on
+  openSUSE Leap 42.2.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1643619/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1670170/+subscriptions
