@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dYUbg-0002UW-RF
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:52:26 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dYUdf-0003DW-Rv
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:54:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dYUbc-0002yb-K5
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:52:24 -0400
-Received: from mga05.intel.com ([192.55.52.43]:59316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dYUbc-0002vg-8X
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:52:20 -0400
-Date: Fri, 21 Jul 2017 17:51:31 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170721095131.ule4owoayuqwh6d3@hz-desktop>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
+	(envelope-from <lprosek@redhat.com>) id 1dYUdc-00075p-Oy
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:54:27 -0400
+Received: from mail-ua0-f178.google.com ([209.85.217.178]:37600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dYUdc-00072I-KO
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:54:24 -0400
+Received: by mail-ua0-f178.google.com with SMTP id f9so41850575uaf.4
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:54:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri, 21 Jul 2017 11:54:20 +0200
+Message-ID: <CABdb736GdDK_Kxa4u_eCt=1qiV0Hn69NfrvofJTFgaXJzx1gow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, Rik van Riel <riel@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, ross.zwisler@linux.intel.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong.eric@gmail.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
 
-On 07/21/17 02:56 -0400, Pankaj Gupta wrote:
-> 
-> Hello,
-> 
-> We shared a proposal for 'KVM fake DAX flushing interface'.
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02478.html
+On Fri, Jul 21, 2017 at 11:32 AM, Igor Mammedov <imammedo@redhat.com> wrote:
+> w2k used to boot on QEMU until we bumped revision of FADT to rev3
+> (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
 >
-
-In above link,
-  "Overall goal of project 
-   is to increase the number of virtual machines that can be 
-   run on a physical machine, in order to *increase the density*
-   of customer virtual machines"
-
-Is the fake persistent memory used as normal RAM in guest? If no, how
-is it expected to be used in guest?
-
-> We did initial POC in which we used 'virtio-blk' device to perform 
-> a device flush on pmem fsync on ext4 filesystem. They are few hacks 
-> to make things work. We need suggestions on below points before we 
-> start actual implementation.
+> Considering that w2k is ancient and long time EOLed, leave default
+> rev3 but make pc-i440fx-2.9 and older machine types to force rev1
+> so old setups won't break (w2k could boot).
 >
-> A] Problems to solve:
-> ------------------
-> 
-> 1] We are considering two approaches for 'fake DAX flushing interface'.
->     
->  1.1] fake dax with NVDIMM flush hints & KVM async page fault
-> 
->      - Existing interface.
-> 
->      - The approach to use flush hint address is already nacked upstream.
-> 
->      - Flush hint not queued interface for flushing. Applications might 
->        avoid to use it.
-> 
->      - Flush hint address traps from guest to host and do an entire fsync 
->        on backing file which itself is costly.
-> 
->      - Can be used to flush specific pages on host backing disk. We can 
->        send data(pages information) equal to cache-line size(limitation) 
->        and tell host to sync corresponding pages instead of entire disk sync.
-> 
->      - This will be an asynchronous operation and vCPU control is returned 
->        quickly.
-> 
-> 
->  1.2] Using additional para virt device in addition to pmem device(fake dax with device flush)
-> 
->      - New interface
-> 
->      - Guest maintains information of DAX dirty pages as exceptional entries in 
->        radix tree.
-> 
->      - If we want to flush specific pages from guest to host, we need to send 
->        list of the dirty pages corresponding to file on which we are doing fsync.
-> 
->      - This will require implementation of new interface, a new paravirt device 
->        for sending flush requests.
-> 
->      - Host side will perform fsync/fdatasync on list of dirty pages or entire 
->        block device backed file.
-> 
-> 2] Questions:
-> -----------
-> 
->  2.1] Not sure why WPQ flush is not a queued interface? We can force applications 
->       to call this? device DAX neither calls fsync/msync?
-> 
->  2.2] Depending upon interface we decide, we need optimal solution to sync 
->       range of pages?
-> 
->      - Send range of pages from guest to host to sync asynchronously instead 
->        of syncing entire block device?
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: Programmingkid <programmingkidx@gmail.com>
+> CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+>
+> Only compile test since I don't have w2k to test with
 
-e.g. a new virtio device to deliver sync requests to host?
+Confirming that Windows 2000 boots with this patch and -machine pc-i440fx-2.9.
 
-> 
->      - Other option is to sync entire disk backing file to make sure all the 
->        writes are persistent. In our case, backing file is a regular file on 
->        non NVDIMM device so host page cache has list of dirty pages which
->        can be used either with fsync or similar interface.
-
-As the amount of dirty pages can be variant, the latency of each host
-fsync is likely to vary in a large range.
-
-> 
->  2.3] If we do host fsync on entire disk we will be flushing all the dirty data
->       to backend file. Just thinking what would be better approach, flushing 
->       pages on corresponding guest file fsync or entire block device?
-> 
->  2.4] If we decide to choose one of the above approaches, we need to consider 
->       all DAX supporting filesystems(ext4/xfs). Would hooking code to corresponding
->       fsync code of fs seems reasonable? Just thinking for flush hint address use-case?
->       Or how flush hint addresses would be invoked with fsync or similar api?
-> 
->  2.5] Also with filesystem journalling and other mount options like barriers, 
->       ordered etc, how we decide to use page flush hint or regular fsync on file?
->  
->  2.6] If at guest side we have PFN of all the dirty pages in radixtree? and we send 
->       these to to host? At host side would we able to find corresponding page and flush 
->       them all?
-
-That may require the host file system provides API to flush specified
-blocks/extents and their meta data in the file system. I'm not
-familiar with this part and don't know whether such API exists.
-
-Haozhong
+Tested-by: Ladi Prosek <lprosek@redhat.com>
