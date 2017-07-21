@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dYUVz-0000BZ-Qu
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:46:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dYUZF-0001JN-K6
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:49:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dYUVv-0006Wn-UJ
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:46:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60472)
+	(envelope-from <dgilbert@redhat.com>) id 1dYUZB-0000RN-J6
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:49:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dYUVv-0006Vx-Ks
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:46:27 -0400
-Date: Fri, 21 Jul 2017 11:46:23 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170721114623.57b3be1d@nial.brq.redhat.com>
-In-Reply-To: <20170721092026.GD17693@redhat.com>
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721092026.GD17693@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYUZB-0000Pl-9N
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:49:49 -0400
+Date: Fri, 21 Jul 2017 10:49:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170721094943.GC2133@work-vm>
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Phil Dennis-Jordan <lists@philjordan.eu>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org
-	qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com
 
-On Fri, 21 Jul 2017 10:20:26 +0100
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
+* Jay Zhou (jianjay.zhou@huawei.com) wrote:
+> Qemu_savevm_state_cleanup() takes about 300ms in my ram migration tests
+> with a 8U24G vm(20G is really occupied), the main cost comes from
+> KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
+> kvm_set_user_memory_region(). In kmod, the main cost is
+> kvm_zap_obsolete_pages(), which traverses the active_mmu_pages list to
+> zap the unsync sptes.
 
-> On Thu, Jul 20, 2017 at 09:29:33PM +0200, Phil Dennis-Jordan wrote:
-> > On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
-> > <programmingkidx@gmail.com> wrote:  
-> > > I noticed that Windows 2000 does not boot up in QEMU recently. After bisecting the issue I found the offending commit:  
-> > 
-> > Ouch. I reckon we have 2 options for fixing this:
-> > 
-> > 1. Export two FADTs, one ACPI 1.0, one ACPI 2.0. The latter would need
-> > to be pointed to by an XSDT, which Qemu currently doesn't implement at
-> > all as far as I'm aware. Any ideas on how SeaBIOS or OVMF would handle
-> > this? Any likely other OS regressions?
-> > 
-> > 2. Select FADT version with an option. This one is definitely safe,
-> > but adds yet another option.
-> > 
-> > Thoughts?  
-> 
-> The original comit below claims the change does not impact guest ABI
-> compatibility, so do we understand why Windows broke ?
-Author made a reasonable effort to test with variety of guest OSes upto
-vanilla WinXP, we can't blame ourselves for not testing OS that's is not
-available.
+Hi Jay,
+  Is this actually increasing the real downtime when the guest isn't
+running, or is it just the reported time? I see that the s->downtime
+value is calculated right after where we currently call
+qemu_savevm_state_cleanup.
 
-Well we don't know why w2k breaks, only that it bisects to this commit.
- 
+  I guess the biggest problem is that 300ms happens before we restart
+the guest on the source if a migration fails.
 
-> 
-> If the commit message was inaccurate, and *does* in fact change ABI,
-> then we should have added an option to toggle FADT version, and used
-> machine type versioning to ensure we didn't regress existing machine
-> types. IOW option 2.
-> 
-> That would still, however, leave Windows 2k broken on new machine
-> types which is pretty poor experiance, but is probably all that
-> we have time for in the current freeze period.
-> 
-> If we can do option 1 in the 2.11 release that would potentially
-> give better user experiance by not being broken out of the box
-> with the latest machine type.
-option 1 might confuse/break OVMF.
+> I think it can be optimized:
+> (1) source vm will be destroyed if the migration is successfully done,
+>     so the resources will be cleanuped automatically by the system
+> (2) delay the cleanup if the migration failed
 
-I've just posted patch to unconditionally force rev1 for pc-i440fx-2.9
-and older machines, while q35 and newer pc would use rev3.
+I don't like putting it in qmp_cont; that shouldn't have migration magic
+in it.
+I guess we could put it in migrate_fd_cleanup perhaps? It gets called on
+a bh near the end -  or could we just move it closer to the end of 
+migration_thread?
 
+However, we would need to be a bit careful of anything that needs
+cleaning up before the source restarts on failure; I'm not sure of
+the semantics of all the current things wired into save_cleanup.
+
+Dave
+
+
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> ---
+>  migration/migration.c | 16 +++++++++-------
+>  qmp.c                 | 10 ++++++++++
+>  2 files changed, 19 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index a0db40d..72832be 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1877,6 +1877,15 @@ static void *migration_thread(void *opaque)
+>          if (qemu_file_get_error(s->to_dst_file)) {
+>              migrate_set_state(&s->state, current_active_state,
+>                                MIGRATION_STATUS_FAILED);
+> +            /*
+> +             * The resource has been allocated by migration will be reused in
+> +             * COLO process, so don't release them.
+> +             */
+> +            if (!enable_colo) {
+> +                qemu_mutex_lock_iothread();
+> +                qemu_savevm_state_cleanup();
+> +                qemu_mutex_unlock_iothread();
+> +            }
+>              trace_migration_thread_file_err();
+>              break;
+>          }
+> @@ -1916,13 +1925,6 @@ static void *migration_thread(void *opaque)
+>      end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>  
+>      qemu_mutex_lock_iothread();
+> -    /*
+> -     * The resource has been allocated by migration will be reused in COLO
+> -     * process, so don't release them.
+> -     */
+> -    if (!enable_colo) {
+> -        qemu_savevm_state_cleanup();
+> -    }
+>      if (s->state == MIGRATION_STATUS_COMPLETED) {
+>          uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
+>          s->total_time = end_time - s->total_time;
+> diff --git a/qmp.c b/qmp.c
+> index b86201e..0e68eaa 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -37,6 +37,8 @@
+>  #include "qom/object_interfaces.h"
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/acpi/acpi_dev_interface.h"
+> +#include "migration/migration.h"
+> +#include "migration/savevm.h"
+>  
+>  NameInfo *qmp_query_name(Error **errp)
+>  {
+> @@ -200,6 +202,14 @@ void qmp_cont(Error **errp)
+>      if (runstate_check(RUN_STATE_INMIGRATE)) {
+>          autostart = 1;
+>      } else {
+> +        /*
+> +         * Delay the cleanup to reduce the downtime of migration.
+> +         * The resource has been allocated by migration will be reused
+> +         * in COLO process, so don't release them.
+> +         */
+> +        if (runstate_check(RUN_STATE_POSTMIGRATE) && !migrate_colo_enabled()) {
+> +            qemu_savevm_state_cleanup();
+> +        }
+>          vm_start();
+>      }
+>  }
+> -- 
+> 1.8.3.1
 > 
 > 
-> > > commit 77af8a2b95b79699de650965d5228772743efe84
-> > > Author: Phil Dennis-Jordan <phil@philjordan.eu>
-> > > Date:   Wed Mar 15 19:20:26 2017 +1300
-> > >
-> > >     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.
-> > >
-> > >     This updates the FADT generated for x86/64 machine types from Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is to expose the reset register information to guest operating systems which require it, specifically OS X/macOS. Revision 1 FADTs do not contain the fields relating to the reset register.
-> > >
-> > >     The new layout and contents remains backwards-compatible with operating systems which only support ACPI 1.0, as the existing fields are not modified by this change, as the 64-bit and 32-bit variants are allowed to co-exist according to the ACPI 2.0 standard. No regressions became apparent in tests with a range of Windows (XP-10) and Linux versions.
-> > >
-> > >     The BIOS tables test suite's FADT checksum test has also been updated to reflect the new FADT layout and content.
-> > >
-> > >     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
-> > >     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
-> > >     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > >
-> > > :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 6d2a94150cf1eafb16f0ccf6325281415fef64a6 M      hw
-> > > :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d 68f9368d8d78fd3267f609b603f97e8a74bdf528 M      include
-> > > :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff 8ed08cef10fddee7814e38ad62be11371592a75a M      tests
-> > >
-> > >  
-> >   
-> 
-> Regards,
-> Daniel
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
