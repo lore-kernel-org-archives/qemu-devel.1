@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dYe4K-0001FX-Mz
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:58:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYeDh-0003jA-CV
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 16:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dYe4G-0004so-0A
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:58:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40354)
+	(envelope-from <eblake@redhat.com>) id 1dYeDc-000893-ML
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 16:08:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dYe4F-0004sL-MX
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 15:58:31 -0400
-Date: Fri, 21 Jul 2017 22:49:29 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170721224259-mutt-send-email-mst@kernel.org>
-References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
-	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
-	<20170719114612.GC3500@work-vm>
-	<20170719152427.620b2a2a@nial.brq.redhat.com>
-	<20170719184748-mutt-send-email-mst@kernel.org>
-	<20170720172215.GH2456@work-vm>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYeDc-00087X-CV
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 16:08:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2C8A13513A
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 20:08:10 +0000 (UTC)
+References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
+	<1500645206-13559-5-git-send-email-armbru@redhat.com>
+	<295a3dcc-5165-cc23-26a2-ffb4d8ccb144@redhat.com>
+	<87tw25ag8p.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <500db1a0-e7f5-0413-950a-4c9bfbceba06@redhat.com>
+Date: Fri, 21 Jul 2017 15:08:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170720172215.GH2456@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
- vhost region merge
+In-Reply-To: <87tw25ag8p.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Sp6BN90mwF3XNCa8vRq0ScQWoQBlihCbJ"
+Subject: Re: [Qemu-devel] [PATCH 4/9] tests: Clean up string interpolation
+ into QMP input (simple cases)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,118 +37,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Jul 20, 2017 at 06:22:15PM +0100, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
-> > > On Wed, 19 Jul 2017 12:46:13 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > 
-> > > > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > > > On Wed, 19 Jul 2017 23:17:32 +0800
-> > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
-> > > > >   
-> > > > > > When a guest that has several hotplugged dimms is migrated, in
-> > > > > > destination host it will fail to resume. Because vhost regions of
-> > > > > > several dimms in source host are merged and in the restore stage
-> > > > > > in destination host it computes whether more than vhost slot limit
-> > > > > > before merging vhost regions of several dimms.  
-> > > > > could you provide a bit more detailed description of the problem
-> > > > > including command line+used device_add commands on source and
-> > > > > command line on destination?  
-> > > > 
-> > > > (ccing in Marc Andre and Maxime)
-> > > > 
-> > > > Hmm, I'd like to understade the situation where you get merging between
-> > > > RAMBlocks; that complicates some stuff for postcopy.
-> > > and probably inconsistent merging breaks vhost as well
-> > > 
-> > > merging might happen if regions are adjacent or overlap
-> > > but for that to happen merged regions must have equal
-> > > distance between their GPA:HVA pairs, so that following
-> > > translation would work:
-> > > 
-> > > if gva in regionX[gva_start, len, hva_start]
-> > >    hva = hva_start + gva - gva_start
-> > > 
-> > > while GVA of regions is under QEMU control and deterministic
-> > > HVA is not, so in migration case merging might happen on source
-> > > side but not on destination, resulting in different memory maps.
-> > > 
-> > > Maybe Michael might know details why migration works in vhost usecase,
-> > > but I don't see vhost sending any vmstate data.
-> > 
-> > We aren't merging ramblocks at all.
-> > When we are passing blocks A and B to vhost, if we see that
-> > 
-> > hvaB=hvaA + lenA
-> > gpaB=gpaA + lenA
-> > 
-> > then we can improve performance a bit by passing a single
-> > chunk to vhost: hvaA,gpaA,lena+lenB
-> 
-> OK, but that means that a region can incorporate multiple
-> RAMBlocks though? Hmm that's not fun on postcopy.
-> 
-> > so it does not affect migration normally.
-> 
-> Well, why? What's required - if the region sizes/lengths/orders
-> are different on the source and destination does it matter - if
-> it does then that means we have a problem, since that heuristic
-> is non-deterministic.
-> 
-> Dave
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Sp6BN90mwF3XNCa8vRq0ScQWoQBlihCbJ
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <500db1a0-e7f5-0413-950a-4c9bfbceba06@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] tests: Clean up string interpolation
+ into QMP input (simple cases)
+References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
+ <1500645206-13559-5-git-send-email-armbru@redhat.com>
+ <295a3dcc-5165-cc23-26a2-ffb4d8ccb144@redhat.com>
+ <87tw25ag8p.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tw25ag8p.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It doesn't matter normally. But there's a limit
-on number of regions that vhost can support.
-pc_dimm_memory_plug tries to guess this number early
-because it wants to fail hotplug requests gracefully.
+On 07/21/2017 11:48 AM, Markus Armbruster wrote:
+> I forgot that PRId64 expands into non-standard crap on some systems.
+>=20
+> Options:
+>=20
+> 1. Outlaw use of PRI macros, limit integer length modifiers for
+>    conversion specifiers "d" and "u" to "l" and "ll".  When PRI macros
+>    creep in, the build breaks on hosts where they expand to anything
+>    else (hopefully, our CI will catch that).  Interpolating int64_t
+>    values become a bit awkward.
+>=20
+>    Required work: fix my patches not to use PRId64, drop support for
+>    length modifier "I64" from parse_escape().
 
-See
-commit 3fad87881e55aaff659408dcf25fa204f89a7896
-Author: Igor Mammedov <imammedo@redhat.com>
-Date:   Tue Oct 6 10:37:28 2015 +0200
+Yuck.  (But motivation for my earlier series to nuke qobject_from_jsonf()=
+)
 
-    pc-dimm: add vhost slots limit check before commiting to hotplug
+>=20
+> 2. Support PRId64 and PRIu64, whatever their actual value may be.
+>=20
+>    a. Support all possible values.  This is what we've tried before.
+>       Nasty: fails only at run-time on hosts with sufficiently creative=
 
-It might make sense to limit this to hotplug, though
-runstate check seems like a wrong way to do this -
-VM could be stopped e.g. through QMP at the time.
+>       values.
+>=20
+>       Required work: add support for length modifier "q", to unbreak
+>       MacOS.
+>=20
+>       Optional work: try to turn the run-time failure into a compile-
+>       time failure, ideally in configure.
 
-> > 
-> > > 
-> > > > 
-> > > > > > 
-> > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> > > > > > ---
-> > > > > >  hw/mem/pc-dimm.c | 2 +-
-> > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > > 
-> > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > > > index ea67b46..bb0fa08 100644
-> > > > > > --- a/hw/mem/pc-dimm.c
-> > > > > > +++ b/hw/mem/pc-dimm.c
-> > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > > > >          goto out;
-> > > > > >      }
-> > > > > >  
-> > > > > > -    if (!vhost_has_free_slot()) {
-> > > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
-> > > > > >          error_setg(&local_err, "a used vhost backend has no free"
-> > > > > >                                 " memory slots left");
-> > > > > >          goto out;  
-> > > > 
-> > > > Even this produces the wrong error message in this case,
-> > > > it also makes me think if the existing code should undo a lot of
-> > > > the object_property_set's that happen.
-> > > > 
-> > > > Dave
-> > > > > 
-> > > > >   
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Accepts garbage (although -Wformat detection will help avoid the worst
+of it).  You can't check string equality in the preprocessor, and you
+can't do things like "case PRId64[0]: case 'l':" to force compilation
+errors due to duplicate labels, but we CAN limit ourselves to the
+preprocessor and grep that output to see what PRId64 expands to.  I'll
+see if I can come up with a configure check.  Still, it may be easier to
+just fail configure and tell people to report the bug on their odd libc,
+at which point we update json-lexer.c and configure, than it is to try
+and reuse configure results in json-lexer.c (since the PRId64 string is
+not a constant width, it gets hard to code an exact value into our lexer
+state machine, but easier to code every reported value).
+
+>=20
+>    b. Support exactly the host's PRId64 and PRIu64 values.
+>=20
+>       Work required: replace support of "I64d" and "I64u" by support of=
+
+>       PRId64 and PRIu64.  Easy enough in parse_escape(), but not in
+>       json-lexer.c.  We could perhaps have the lexer accept the shortes=
+t
+>       string that's followed by a conversion specifier as length
+>       modifier, then reject invalid length modifiers in a semantic
+>       action.
+
+Interesting idea. I'm playing with it...
+
+>=20
+>    Optional work: try to simplify code that currently works around
+>    unavailability of PRId64 and PRIu64.
+>=20
+> Preferences?
+>=20
+> I like 2b, but I'm not sure I'll like the code implementing it.  One wa=
+y
+> to find out...
+
+In the lexer, widen the state machine to accept up to three unknown
+characters between % and d.  Hmm, there's also the possibility of
+int64_t being mapped to %jd, in addition to our known culprits of %ld,
+%lld, %I64d, and %qd.
+
+>=20
+>> Overall, I like the patch, but we need to fix the problems for the nex=
+t
+>> round of this series.
+>=20
+> Yes. =20
+
+At this point, I think I'll spin the next round. But it's not longer a
+2.10 priority, so it may be a few days.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Sp6BN90mwF3XNCa8vRq0ScQWoQBlihCbJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyXykACgkQp6FrSiUn
+Q2q+1ggAh9YWPO+xb27/iLFD+OV1gBAwbBcLnVcsbuX9UDxPda5zYa259puzsw6G
+MXn0UuXFlYwBzAvVrOnsIhA35V7uNv9JuLuHtFNQdUfo7SMoMFgem69gD/ieIzm5
+WFzq/yCC8udVixw9tDUZg8/XfF62zTkJzdAnkZgsdRy+ourWv5ODgV9PI1hMxlxe
+loI93HoV2MXTZ6ssGIoTr8c9+TMekwFfBABJbgbd4VpGXDweXstqulWVMYdgXsjU
+VHyTY4Vp3Gb/lznsqCIZ7Yf4eSoKrOlm2K3riGdF35cxjTs8YBzNr8wtnYZ8Tua5
+QAQzd1Gf32IyUc1/C9DTxljmtjkxmQ==
+=jtbn
+-----END PGP SIGNATURE-----
+
+--Sp6BN90mwF3XNCa8vRq0ScQWoQBlihCbJ--
