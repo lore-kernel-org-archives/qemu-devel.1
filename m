@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNon-0003uR-WE
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:32 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNot-0003yP-9c
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNom-0007W7-5c
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:30 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:44646)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNor-0007a3-GP
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:35 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:18293)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNol-0007Vp-T3
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:28 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNor-0007Zn-7B
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:33 -0400
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Fri, 21 Jul 2017 03:37:06 +0100
-Message-ID: <1500604635-15027-6-git-send-email-yongbok.kim@imgtec.com>
+Date: Fri, 21 Jul 2017 03:37:13 +0100
+Message-ID: <1500604635-15027-13-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 05/14] target/mips: Prepare loads/stores for EVA
+Subject: [Qemu-devel] [PULL 12/14] target/mips: Implement segmentation
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,296 +31,287 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <james.hogan@imgtec.co
 
 From: James Hogan <james.hogan@imgtec.com>
 
-EVA load and store instructions access the user mode address map, so
-they need to use mem_idx of MIPS_HFLAG_UM. Update the various utility
-functions to allow mem_idx to be more easily overridden from the
-decoding logic.
+Implement the optional segmentation control feature in the virtual to
+physical address translation code.
 
-Specifically we add a mem_idx argument to the op_ld/st_* helpers used
-for atomics, and a mem_idx local variable to gen_ld(), gen_st(), and
-gen_st_cond().
+The fixed legacy segment and xkphys handling is replaced with a dynamic
+layout based on the segmentation control registers (which should be set
+up even when the feature is not exposed to the guest).
 
 Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: Aurelien Jarno <aurelien@aurel32.net>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+[yongbok.kim@imgtec.com:
+  cosmetic changes]
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- target/mips/translate.c | 77 +++++++++++++++++++++++++++----------------------
- 1 file changed, 42 insertions(+), 35 deletions(-)
+ target/mips/helper.c | 191 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 152 insertions(+), 39 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 76dcc5e..38887a1 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -2029,7 +2029,8 @@ FOP_CONDNS(s, FMT_S, 32, gen_store_fpr32(ctx, fp0, fd))
- /* load/store instructions. */
- #ifdef CONFIG_USER_ONLY
- #define OP_LD_ATOMIC(insn,fname)                                           \
--static inline void op_ld_##insn(TCGv ret, TCGv arg1, DisasContext *ctx)    \
-+static inline void op_ld_##insn(TCGv ret, TCGv arg1, int mem_idx,          \
-+                                DisasContext *ctx)                         \
- {                                                                          \
-     TCGv t0 = tcg_temp_new();                                              \
-     tcg_gen_mov_tl(t0, arg1);                                              \
-@@ -2040,9 +2041,10 @@ static inline void op_ld_##insn(TCGv ret, TCGv arg1, DisasContext *ctx)    \
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 7805e5c..a2b79e8 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -107,15 +107,107 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+     return TLBRET_NOMATCH;
  }
- #else
- #define OP_LD_ATOMIC(insn,fname)                                           \
--static inline void op_ld_##insn(TCGv ret, TCGv arg1, DisasContext *ctx)    \
-+static inline void op_ld_##insn(TCGv ret, TCGv arg1, int mem_idx,          \
-+                                DisasContext *ctx)                         \
- {                                                                          \
--    gen_helper_1e1i(insn, ret, arg1, ctx->mem_idx);                        \
-+    gen_helper_1e1i(insn, ret, arg1, mem_idx);                             \
- }
- #endif
- OP_LD_ATOMIC(ll,ld32s);
-@@ -2053,7 +2055,8 @@ OP_LD_ATOMIC(lld,ld64);
  
- #ifdef CONFIG_USER_ONLY
- #define OP_ST_ATOMIC(insn,fname,ldname,almask)                               \
--static inline void op_st_##insn(TCGv arg1, TCGv arg2, int rt, DisasContext *ctx) \
-+static inline void op_st_##insn(TCGv arg1, TCGv arg2, int rt, int mem_idx,   \
-+                                DisasContext *ctx)                           \
- {                                                                            \
-     TCGv t0 = tcg_temp_new();                                                \
-     TCGLabel *l1 = gen_new_label();                                          \
-@@ -2077,10 +2080,11 @@ static inline void op_st_##insn(TCGv arg1, TCGv arg2, int rt, DisasContext *ctx)
- }
- #else
- #define OP_ST_ATOMIC(insn,fname,ldname,almask)                               \
--static inline void op_st_##insn(TCGv arg1, TCGv arg2, int rt, DisasContext *ctx) \
-+static inline void op_st_##insn(TCGv arg1, TCGv arg2, int rt, int mem_idx,   \
-+                                DisasContext *ctx)                           \
- {                                                                            \
-     TCGv t0 = tcg_temp_new();                                                \
--    gen_helper_1e2i(insn, t0, arg1, arg2, ctx->mem_idx);                     \
-+    gen_helper_1e2i(insn, t0, arg1, arg2, mem_idx);                          \
-     gen_store_gpr(t0, rt);                                                   \
-     tcg_temp_free(t0);                                                       \
- }
-@@ -2123,6 +2127,7 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-                    int rt, int base, int16_t offset)
++static int is_seg_am_mapped(unsigned int am, bool eu, int mmu_idx)
++{
++    /*
++     * Interpret access control mode and mmu_idx.
++     *           AdE?     TLB?
++     *      AM  K S U E  K S U E
++     * UK    0  0 1 1 0  0 - - 0
++     * MK    1  0 1 1 0  1 - - !eu
++     * MSK   2  0 0 1 0  1 1 - !eu
++     * MUSK  3  0 0 0 0  1 1 1 !eu
++     * MUSUK 4  0 0 0 0  0 1 1 0
++     * USK   5  0 0 1 0  0 0 - 0
++     * -     6  - - - -  - - - -
++     * UUSK  7  0 0 0 0  0 0 0 0
++     */
++    int32_t adetlb_mask;
++
++    switch (mmu_idx) {
++    case 3 /* ERL */:
++        /* If EU is set, always unmapped */
++        if (eu) {
++            return 0;
++        }
++        /* fall through */
++    case MIPS_HFLAG_KM:
++        /* Never AdE, TLB mapped if AM={1,2,3} */
++        adetlb_mask = 0x70000000;
++        goto check_tlb;
++
++    case MIPS_HFLAG_SM:
++        /* AdE if AM={0,1}, TLB mapped if AM={2,3,4} */
++        adetlb_mask = 0xc0380000;
++        goto check_ade;
++
++    case MIPS_HFLAG_UM:
++        /* AdE if AM={0,1,2,5}, TLB mapped if AM={3,4} */
++        adetlb_mask = 0xe4180000;
++        /* fall through */
++    check_ade:
++        /* does this AM cause AdE in current execution mode */
++        if ((adetlb_mask << am) < 0) {
++            return TLBRET_BADADDR;
++        }
++        adetlb_mask <<= 8;
++        /* fall through */
++    check_tlb:
++        /* is this AM mapped in current execution mode */
++        return ((adetlb_mask << am) < 0);
++    default:
++        assert(0);
++        return TLBRET_BADADDR;
++    };
++}
++
++static int get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
++                                    int *prot, target_ulong real_address,
++                                    int rw, int access_type, int mmu_idx,
++                                    unsigned int am, bool eu,
++                                    target_ulong segmask,
++                                    hwaddr physical_base)
++{
++    int mapped = is_seg_am_mapped(am, eu, mmu_idx);
++
++    if (mapped < 0) {
++        /* is_seg_am_mapped can report TLBRET_BADADDR */
++        return mapped;
++    } else if (mapped) {
++        /* The segment is TLB mapped */
++        return env->tlb->map_address(env, physical, prot, real_address, rw,
++                                     access_type);
++    } else {
++        /* The segment is unmapped */
++        *physical = physical_base | (real_address & segmask);
++        *prot = PAGE_READ | PAGE_WRITE;
++        return TLBRET_MATCH;
++    }
++}
++
++static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
++                                       int *prot, target_ulong real_address,
++                                       int rw, int access_type, int mmu_idx,
++                                       uint16_t segctl, target_ulong segmask)
++{
++    unsigned int am = (segctl & CP0SC_AM_MASK) >> CP0SC_AM;
++    bool eu = (segctl >> CP0SC_EU) & 1;
++    hwaddr pa = ((hwaddr)segctl & CP0SC_PA_MASK) << 20;
++
++    return get_seg_physical_address(env, physical, prot, real_address, rw,
++                                    access_type, mmu_idx, am, eu, segmask,
++                                    pa & ~(hwaddr)segmask);
++}
++
+ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+                                 int *prot, target_ulong real_address,
+                                 int rw, int access_type, int mmu_idx)
  {
-     TCGv t0, t1, t2;
-+    int mem_idx = ctx->mem_idx;
+     /* User mode can only access useg/xuseg */
++#if defined(TARGET_MIPS64)
+     int user_mode = mmu_idx == MIPS_HFLAG_UM;
+     int supervisor_mode = mmu_idx == MIPS_HFLAG_SM;
+     int kernel_mode = !user_mode && !supervisor_mode;
+-#if defined(TARGET_MIPS64)
+     int UX = (env->CP0_Status & (1 << CP0St_UX)) != 0;
+     int SX = (env->CP0_Status & (1 << CP0St_SX)) != 0;
+     int KX = (env->CP0_Status & (1 << CP0St_KX)) != 0;
+@@ -148,12 +240,16 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
  
-     if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F)) {
-         /* Loongson CPU uses a load to zero register for prefetch.
-@@ -2137,32 +2142,32 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-     switch (opc) {
+     if (address <= USEG_LIMIT) {
+         /* useg */
+-        if (env->CP0_Status & (1 << CP0St_ERL)) {
+-            *physical = address & 0xFFFFFFFF;
+-            *prot = PAGE_READ | PAGE_WRITE;
++        uint16_t segctl;
++
++        if (address >= 0x40000000UL) {
++            segctl = env->CP0_SegCtl2;
+         } else {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
++            segctl = env->CP0_SegCtl2 >> 16;
+         }
++        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
++                                          access_type, mmu_idx, segctl,
++                                          0x3FFFFFFF);
  #if defined(TARGET_MIPS64)
-     case OPC_LWU:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL |
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEUL |
-                            ctx->default_tcg_memop_mask);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LD:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEQ |
-                            ctx->default_tcg_memop_mask);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LLD:
-     case R6_OPC_LLD:
--        op_ld_lld(t0, t0, ctx);
-+        op_ld_lld(t0, t0, mem_idx, ctx);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LDL:
-         t1 = tcg_temp_new();
-         /* Do a byte access to possibly trigger a page
-            fault with the unaligned address.  */
--        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_qemu_ld_tl(t1, t0, mem_idx, MO_UB);
-         tcg_gen_andi_tl(t1, t0, 7);
- #ifndef TARGET_WORDS_BIGENDIAN
-         tcg_gen_xori_tl(t1, t1, 7);
+     } else if (address < 0x4000000000000000ULL) {
+         /* xuseg */
+@@ -172,10 +268,33 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+         }
+     } else if (address < 0xC000000000000000ULL) {
+         /* xkphys */
+-        if (kernel_mode && KX &&
+-            (address & 0x07FFFFFFFFFFFFFFULL) <= env->PAMask) {
+-            *physical = address & env->PAMask;
+-            *prot = PAGE_READ | PAGE_WRITE;
++        if ((address & 0x07FFFFFFFFFFFFFFULL) <= env->PAMask) {
++            /* KX/SX/UX bit to check for each xkphys EVA access mode */
++            static const uint8_t am_ksux[8] = {
++                [CP0SC_AM_UK]    = (1u << CP0St_KX),
++                [CP0SC_AM_MK]    = (1u << CP0St_KX),
++                [CP0SC_AM_MSK]   = (1u << CP0St_SX),
++                [CP0SC_AM_MUSK]  = (1u << CP0St_UX),
++                [CP0SC_AM_MUSUK] = (1u << CP0St_UX),
++                [CP0SC_AM_USK]   = (1u << CP0St_SX),
++                [6]              = (1u << CP0St_KX),
++                [CP0SC_AM_UUSK]  = (1u << CP0St_UX),
++            };
++            unsigned int am = CP0SC_AM_UK;
++            unsigned int xr = (env->CP0_SegCtl2 & CP0SC2_XR_MASK) >> CP0SC2_XR;
++
++            if (xr & (1 << ((address >> 59) & 0x7))) {
++                am = (env->CP0_SegCtl1 & CP0SC1_XAM_MASK) >> CP0SC1_XAM;
++            }
++            /* Does CP0_Status.KX/SX/UX permit the access mode (am) */
++            if (env->CP0_Status & am_ksux[am]) {
++                ret = get_seg_physical_address(env, physical, prot,
++                                               real_address, rw, access_type,
++                                               mmu_idx, am, false, env->PAMask,
++                                               0);
++            } else {
++                ret = TLBRET_BADADDR;
++            }
+         } else {
+             ret = TLBRET_BADADDR;
+         }
+@@ -190,35 +309,25 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
  #endif
-         tcg_gen_shli_tl(t1, t1, 3);
-         tcg_gen_andi_tl(t0, t0, ~7);
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEQ);
-         tcg_gen_shl_tl(t0, t0, t1);
-         t2 = tcg_const_tl(-1);
-         tcg_gen_shl_tl(t2, t2, t1);
-@@ -2177,14 +2182,14 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-         t1 = tcg_temp_new();
-         /* Do a byte access to possibly trigger a page
-            fault with the unaligned address.  */
--        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_qemu_ld_tl(t1, t0, mem_idx, MO_UB);
-         tcg_gen_andi_tl(t1, t0, 7);
- #ifdef TARGET_WORDS_BIGENDIAN
-         tcg_gen_xori_tl(t1, t1, 7);
- #endif
-         tcg_gen_shli_tl(t1, t1, 3);
-         tcg_gen_andi_tl(t0, t0, ~7);
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEQ);
-         tcg_gen_shr_tl(t0, t0, t1);
-         tcg_gen_xori_tl(t1, t1, 63);
-         t2 = tcg_const_tl(0xfffffffffffffffeull);
-@@ -2200,7 +2205,7 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-         t1 = tcg_const_tl(pc_relative_pc(ctx));
-         gen_op_addr_add(ctx, t0, t0, t1);
-         tcg_temp_free(t1);
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEQ);
-         gen_store_gpr(t0, rt);
-         break;
- #endif
-@@ -2208,44 +2213,44 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-         t1 = tcg_const_tl(pc_relative_pc(ctx));
-         gen_op_addr_add(ctx, t0, t0, t1);
-         tcg_temp_free(t1);
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESL);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TESL);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LW:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESL |
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TESL |
-                            ctx->default_tcg_memop_mask);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LH:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESW |
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TESW |
-                            ctx->default_tcg_memop_mask);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LHU:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUW |
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEUW |
-                            ctx->default_tcg_memop_mask);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LB:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_SB);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_SB);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LBU:
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_UB);
-         gen_store_gpr(t0, rt);
-         break;
-     case OPC_LWL:
-         t1 = tcg_temp_new();
-         /* Do a byte access to possibly trigger a page
-            fault with the unaligned address.  */
--        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_qemu_ld_tl(t1, t0, mem_idx, MO_UB);
-         tcg_gen_andi_tl(t1, t0, 3);
- #ifndef TARGET_WORDS_BIGENDIAN
-         tcg_gen_xori_tl(t1, t1, 3);
- #endif
-         tcg_gen_shli_tl(t1, t1, 3);
-         tcg_gen_andi_tl(t0, t0, ~3);
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEUL);
-         tcg_gen_shl_tl(t0, t0, t1);
-         t2 = tcg_const_tl(-1);
-         tcg_gen_shl_tl(t2, t2, t1);
-@@ -2261,14 +2266,14 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-         t1 = tcg_temp_new();
-         /* Do a byte access to possibly trigger a page
-            fault with the unaligned address.  */
--        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-+        tcg_gen_qemu_ld_tl(t1, t0, mem_idx, MO_UB);
-         tcg_gen_andi_tl(t1, t0, 3);
- #ifdef TARGET_WORDS_BIGENDIAN
-         tcg_gen_xori_tl(t1, t1, 3);
- #endif
-         tcg_gen_shli_tl(t1, t1, 3);
-         tcg_gen_andi_tl(t0, t0, ~3);
--        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL);
-+        tcg_gen_qemu_ld_tl(t0, t0, mem_idx, MO_TEUL);
-         tcg_gen_shr_tl(t0, t0, t1);
-         tcg_gen_xori_tl(t1, t1, 31);
-         t2 = tcg_const_tl(0xfffffffeull);
-@@ -2283,7 +2288,7 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-         break;
-     case OPC_LL:
-     case R6_OPC_LL:
--        op_ld_ll(t0, t0, ctx);
-+        op_ld_ll(t0, t0, mem_idx, ctx);
-         gen_store_gpr(t0, rt);
-         break;
+     } else if (address < (int32_t)KSEG1_BASE) {
+         /* kseg0 */
+-        if (kernel_mode) {
+-            *physical = address - (int32_t)KSEG0_BASE;
+-            *prot = PAGE_READ | PAGE_WRITE;
+-        } else {
+-            ret = TLBRET_BADADDR;
+-        }
++        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
++                                          access_type, mmu_idx,
++                                          env->CP0_SegCtl1 >> 16, 0x1FFFFFFF);
+     } else if (address < (int32_t)KSEG2_BASE) {
+         /* kseg1 */
+-        if (kernel_mode) {
+-            *physical = address - (int32_t)KSEG1_BASE;
+-            *prot = PAGE_READ | PAGE_WRITE;
+-        } else {
+-            ret = TLBRET_BADADDR;
+-        }
++        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
++                                          access_type, mmu_idx,
++                                          env->CP0_SegCtl1, 0x1FFFFFFF);
+     } else if (address < (int32_t)KSEG3_BASE) {
+         /* sseg (kseg2) */
+-        if (supervisor_mode || kernel_mode) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
+-        } else {
+-            ret = TLBRET_BADADDR;
+-        }
++        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
++                                          access_type, mmu_idx,
++                                          env->CP0_SegCtl0 >> 16, 0x1FFFFFFF);
+     } else {
+         /* kseg3 */
+         /* XXX: debug segment is not emulated */
+-        if (kernel_mode) {
+-            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
+-        } else {
+-            ret = TLBRET_BADADDR;
+-        }
++        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
++                                          access_type, mmu_idx,
++                                          env->CP0_SegCtl0, 0x1FFFFFFF);
      }
-@@ -2296,38 +2301,39 @@ static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
- {
-     TCGv t0 = tcg_temp_new();
-     TCGv t1 = tcg_temp_new();
-+    int mem_idx = ctx->mem_idx;
+     return ret;
+ }
+@@ -722,15 +831,17 @@ void mips_cpu_do_interrupt(CPUState *cs)
+ #if defined(TARGET_MIPS64)
+             int R = env->CP0_BadVAddr >> 62;
+             int UX = (env->CP0_Status & (1 << CP0St_UX)) != 0;
+-            int SX = (env->CP0_Status & (1 << CP0St_SX)) != 0;
+             int KX = (env->CP0_Status & (1 << CP0St_KX)) != 0;
  
-     gen_base_offset_addr(ctx, t0, base, offset);
-     gen_load_gpr(t1, rt);
-     switch (opc) {
- #if defined(TARGET_MIPS64)
-     case OPC_SD:
--        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEQ |
-+        tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_TEQ |
-                            ctx->default_tcg_memop_mask);
-         break;
-     case OPC_SDL:
--        gen_helper_0e2i(sdl, t1, t0, ctx->mem_idx);
-+        gen_helper_0e2i(sdl, t1, t0, mem_idx);
-         break;
-     case OPC_SDR:
--        gen_helper_0e2i(sdr, t1, t0, ctx->mem_idx);
-+        gen_helper_0e2i(sdr, t1, t0, mem_idx);
-         break;
+-            if (((R == 0 && UX) || (R == 1 && SX) || (R == 3 && KX)) &&
+-                (!(env->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F))))
++            if ((R != 0 || UX) && (R != 3 || KX) &&
++                (!(env->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F)))) {
+                 offset = 0x080;
+-            else
++            } else {
  #endif
-     case OPC_SW:
--        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL |
-+        tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_TEUL |
-                            ctx->default_tcg_memop_mask);
-         break;
-     case OPC_SH:
--        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUW |
-+        tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_TEUW |
-                            ctx->default_tcg_memop_mask);
-         break;
-     case OPC_SB:
--        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_8);
-+        tcg_gen_qemu_st_tl(t1, t0, mem_idx, MO_8);
-         break;
-     case OPC_SWL:
--        gen_helper_0e2i(swl, t1, t0, ctx->mem_idx);
-+        gen_helper_0e2i(swl, t1, t0, mem_idx);
-         break;
-     case OPC_SWR:
--        gen_helper_0e2i(swr, t1, t0, ctx->mem_idx);
-+        gen_helper_0e2i(swr, t1, t0, mem_idx);
-         break;
-     }
-     tcg_temp_free(t0);
-@@ -2340,6 +2346,7 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
-                          int base, int16_t offset)
- {
-     TCGv t0, t1;
-+    int mem_idx = ctx->mem_idx;
+                 offset = 0x000;
++#if defined(TARGET_MIPS64)
++            }
++#endif
+         }
+         goto set_EPC;
+     case EXCP_TLBS:
+@@ -741,15 +852,17 @@ void mips_cpu_do_interrupt(CPUState *cs)
+ #if defined(TARGET_MIPS64)
+             int R = env->CP0_BadVAddr >> 62;
+             int UX = (env->CP0_Status & (1 << CP0St_UX)) != 0;
+-            int SX = (env->CP0_Status & (1 << CP0St_SX)) != 0;
+             int KX = (env->CP0_Status & (1 << CP0St_KX)) != 0;
  
- #ifdef CONFIG_USER_ONLY
-     t0 = tcg_temp_local_new();
-@@ -2354,12 +2361,12 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
- #if defined(TARGET_MIPS64)
-     case OPC_SCD:
-     case R6_OPC_SCD:
--        op_st_scd(t1, t0, rt, ctx);
-+        op_st_scd(t1, t0, rt, mem_idx, ctx);
-         break;
+-            if (((R == 0 && UX) || (R == 1 && SX) || (R == 3 && KX)) &&
+-                (!(env->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F))))
++            if ((R != 0 || UX) && (R != 3 || KX) &&
++                (!(env->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F)))) {
+                 offset = 0x080;
+-            else
++            } else {
  #endif
-     case OPC_SC:
-     case R6_OPC_SC:
--        op_st_sc(t1, t0, rt, ctx);
-+        op_st_sc(t1, t0, rt, mem_idx, ctx);
-         break;
-     }
-     tcg_temp_free(t1);
+                 offset = 0x000;
++#if defined(TARGET_MIPS64)
++            }
++#endif
+         }
+         goto set_EPC;
+     case EXCP_AdEL:
 -- 
 2.7.4
