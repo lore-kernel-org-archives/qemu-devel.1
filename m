@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYWrR-0005nH-Lw
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:16:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYWtO-0006Us-Lq
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYWrQ-0001vH-J0
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:16:49 -0400
-References: <20170721093416.17816-1-stefanha@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dYWtK-0003Ww-1o
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:18:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60570)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYWtJ-0003WY-Oo
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:18:45 -0400
+References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
+	<20170720085958.GC21566@redhat.com>
+	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+	<20170720091224.GD21566@redhat.com>
+	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+	<20170721083816.GC17693@redhat.com>
+	<CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+	<20170721093433.GG17693@redhat.com>
+	<CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <fb720b66-8b5f-bd84-2cb6-aa7d7d14b2db@redhat.com>
-Date: Fri, 21 Jul 2017 07:16:34 -0500
+Message-ID: <9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
+Date: Fri, 21 Jul 2017 07:18:43 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170721093416.17816-1-stefanha@redhat.com>
+In-Reply-To: <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="1OWhWCji0BjPLXxWWcr8kdapTTl7EqesM"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
+	boundary="Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S"
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-block@nongnu.org
+To: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1OWhWCji0BjPLXxWWcr8kdapTTl7EqesM
+--Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S
 From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-block@nongnu.org
-Message-ID: <fb720b66-8b5f-bd84-2cb6-aa7d7d14b2db@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
-References: <20170721093416.17816-1-stefanha@redhat.com>
-In-Reply-To: <20170721093416.17816-1-stefanha@redhat.com>
+To: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
+References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
+ <20170720085958.GC21566@redhat.com>
+ <CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+ <20170720091224.GD21566@redhat.com>
+ <CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+ <20170721083816.GC17693@redhat.com>
+ <CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+ <20170721093433.GG17693@redhat.com>
+ <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+In-Reply-To: <CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/21/2017 04:34 AM, Stefan Hajnoczi wrote:
-> There is not much getting started documentation for qemu-iotests.  This=
+[please don't top-post on technical lists]
 
-> patch explains how to create a new test and covers the overall testing
-> approach.
+On 07/21/2017 04:41 AM, =E9=99=B3=E5=9F=B9=E6=B3=93 wrote:
+> oh Maybe the version is something wrong?
 >=20
-> Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
+> qemu-img -V
+>=20
+>> qemu-img version 2.9.0
+>=20
+>=20
+> qemu-nbd -V
+>=20
+>> qemu-nbd version 0.0.1
+>=20
+>=20
+> They're not correspondent?
 
-> +3. Assign groups to the test
-> +
-> +Add your test to the ./group file.  This file is the index of tests an=
-d assigns
-> +them to functional groups like "rw" for read-write tests.  Most tests =
-belong to
-> +the "rw" and "auto" groups.  "auto" means the test runs when ./check i=
-s invoked
-> +without a -g argument.
-> +
-> +Consider adding your test to the "quick" group if it executes quickly =
-(<1s).
-
-We have several tests going up to 5s (and I have a patch pending to
-remove two tests that took longer) - I think 1s is a bit on the short
-end for still classifying a test as quick.
-
-> +This group is run by "make check-block" and is often included as part =
-of build
-> +tests in continuous integration systems.
-
-It would still be nice to have 'make check' run 'make check-block'...
-but that's independent of this patch.
-
-> +Once you are happy with the test output it can be used as the golden m=
-aster
-> +with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to =
-verify
-> +that it passes.
-> +
-> +Congratulations, you've created a new test!
-
-Maybe a reminder to 'git add' the new files, then submit the patch?
-
-Better than what we have, so whether or not you make further tweaks
-according to my suggestions,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Not currently, although patches are welcome (qemu-img and qemu-io share
+versions, so qemu-nbd is the only oddball)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -93,7 +85,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---1OWhWCji0BjPLXxWWcr8kdapTTl7EqesM
+--Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -102,14 +94,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllx8KIACgkQp6FrSiUn
-Q2qSUQf9FkQG63Y5ScJ5zf150GMHZxrGf3dtEvYEZSXBRiJzMr7sqqfi29LaayLG
-CCpH8z8tdDh642/KbcWUi/HtNdcCnA+FHzPXqQzQup4Wm+vh2lHI3yEgwisYguvI
-L/vqN3qtJUIaykYy6KO+tac5VA+Ar8jqa6WW5R0SjhqC3Q0PlyLJ0rt+UutA9+ci
-DGsEPJwhDDXeJfgXcwvH/nuEHTX+bWY7gV/6rIhOtTvgdbE/i+SIV8hto1RUgRWs
-CnPOGPxi5AjK9fkY8ygzrXGpQElNvVdQ/XqaQ+g/o/mQRxlxQKOaOAm40gJI1tIS
-xqpJIz7mhXZvd18obKoP/hOtcBPURg==
-=rsI1
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllx8SMACgkQp6FrSiUn
+Q2o0Nwf/fg2X9LDh5JXwGQieTd0gZj9pU1r1S0ShxPNzSOqtTMQLfZhRTNGKb2hw
+AFr7uiky28r1/niuXHqDJ0YghHKJm3gOeGZUbgdToWbi38V1w4/QFSRbrGxkKhTt
+OlsnlLnB4wH74CNxmWWL0AJv4RxGJX/LdBvNuONpfRsXXhJsRrXfEdDeR7ZbO8lS
+nWHkn9Z2v3ijpofiq4y3D97mzEufALvRdAT0dnCXng9caitzUNL8srE55YTjFVWa
+rZkkqlb5S4giA1wKxIU6VsYLJ+IaRDNfUCClIBhQXIzNfkJQbX6QuN1fXePwRL/X
+9bErd7lB6pYMJEd5srOb2b4NyfVDtg==
+=e4Xa
 -----END PGP SIGNATURE-----
 
---1OWhWCji0BjPLXxWWcr8kdapTTl7EqesM--
+--Tb8ApiF2NeOQLVDWBSbM2g2uUAKX4ov5S--
