@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYnU-0007ER-LB
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:20:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1dYYnp-0007Oz-1k
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYnP-0002Be-JH
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:20:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47185)
+	(envelope-from <bounces@canonical.com>) id 1dYYnk-0002rh-8M
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47700)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYYnP-00029W-9j
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:20:47 -0400
+	id 1dYYnk-0002qT-28
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:21:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYYnM-0003L0-GS
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:20:44 +0000
+	id 1dYYni-0003Ky-8a
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:21:06 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7A2082E806B
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:20:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id EED122E8241
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:20:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Jul 2017 14:09:51 -0000
-From: hbagdi <1705717@bugs.launchpad.net>
-Reply-To: Bug 1705717 <1705717@bugs.launchpad.net>
+Date: Fri, 21 Jul 2017 14:15:24 -0000
+From: Thomas Huth <1643619@bugs.launchpad.net>
+Reply-To: Bug 1643619 <1643619@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <150064619170.15700.7661736805405042031.malonedeb@wampee.canonical.com>
+References: <20161121164013.8062.14361.malonedeb@soybean.canonical.com>
+Message-Id: <150064652544.6148.9007806314791846839.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1705717] [NEW] Live migration fails with 'host'
- cpu when KVM is inserted with nested=1
+Subject: [Qemu-devel] [Bug 1643619] Re: netlink broken on big-endian mips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,145 +38,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
-
-Qemu v2.9.0
-Linux kernel 4.9.34
-
-Live migration(pre-copy) being done from one physical host to another:
-
-Source Qemu:
-sudo qemu-system-x86_64 -drive file=3D${IMAGE_DIR}/${IMAGE_NAME},if=3Dvirti=
-o -m 2048 -smp 1 -net nic,model=3Dvirtio,macaddr=3D${MAC} -net tap,ifname=
-=3Dqtap0,script=3Dno,downscript=3Dno -vnc :1 --enable-kvm -cpu kvm64 -qmp t=
-cp:*:4242,server,nowait
-
-And KVM is inserted with nested=3D1 on both source and destination
-machine.
-
-Migration fails with a nested specific assertion failure on destination
-at target/i386/kvm.c +1629
-
-Migration is successful in the following cases-
-
-A) cpu model is 'host' and kvm is inserted without nested=3D1 parameter
-B) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D1)
-C) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D0)
-D) Between an L0 and a guest Hypervisor L1, with 'kvm64' as CPU type (and n=
-ested=3D1 for L0 KVM)
-
-Physical host(s)-
-$ lscpu
-Architecture:          x86_64
-CPU op-mode(s):        32-bit, 64-bit
-Byte Order:            Little Endian
-CPU(s):                12
-On-line CPU(s) list:   0-11
-Thread(s) per core:    1
-Core(s) per socket:    6
-Socket(s):             2
-NUMA node(s):          2
-Vendor ID:             GenuineIntel
-CPU family:            6
-Model:                 62
-Model name:            Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz
-Stepping:              4
-CPU MHz:               1200.091
-CPU max MHz:           2600.0000
-CPU min MHz:           1200.0000
-BogoMIPS:              4203.28
-Virtualization:        VT-x
-L1d cache:             32K
-L1i cache:             32K
-L2 cache:              256K
-L3 cache:              15360K
-NUMA node0 CPU(s):     0-5
-NUMA node1 CPU(s):     6-11
-Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge=
- mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall=
- nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtop=
-ology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl v=
-mx smx est tm2 ssse3 cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt ts=
-c_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi flex=
-priority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1705717
+https://bugs.launchpad.net/bugs/1643619
 
 Title:
-  Live migration fails with 'host' cpu when KVM is inserted with
-  nested=3D1
+  netlink broken on big-endian mips
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  Qemu v2.9.0
-  Linux kernel 4.9.34
+  Debian QEMU version 2.7.0, but the bug also appears in current git
+  master (commit c36ed06e9159)
 
-  Live migration(pre-copy) being done from one physical host to another:
+  As the summary says, netlink is completely broken on big-endian mips
+  running qemu-user.
 
-  Source Qemu:
-  sudo qemu-system-x86_64 -drive file=3D${IMAGE_DIR}/${IMAGE_NAME},if=3Dvir=
-tio -m 2048 -smp 1 -net nic,model=3Dvirtio,macaddr=3D${MAC} -net tap,ifname=
-=3Dqtap0,script=3Dno,downscript=3Dno -vnc :1 --enable-kvm -cpu kvm64 -qmp t=
-cp:*:4242,server,nowait
+  Running 'ip route' from within a Debian chroot with QEMU simply hangs.
+  Running amd64 strace on qemu-mips-static shows that it's waiting for a
+  netlink response from the kernel which never comes.
 
-  And KVM is inserted with nested=3D1 on both source and destination
-  machine.
+  [...]
+  [pid 11249] socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) =3D 3
+  [pid 11249] setsockopt(3, SOL_SOCKET, SO_SNDBUF, [32768], 4) =3D 0
+  [pid 11249] setsockopt(3, SOL_SOCKET, SO_RCVBUF, [1048576], 4) =3D 0
+  [pid 11249] bind(3, {sa_family=3DAF_NETLINK, nl_pid=3D0, nl_groups=3D0000=
+0000}, 12) =3D 0
+  [pid 11249] getsockname(3, {sa_family=3DAF_NETLINK, nl_pid=3D11249, nl_gr=
+oups=3D00000000}, [12]) =3D 0
+  [pid 11249] time([1479745823])          =3D 1479745823
+  [pid 11249] sendto(3, {{len=3D671088640, type=3D0x1a00 /* NLMSG_??? */, f=
+lags=3DNLM_F_REQUEST|NLM_F_MULTI|0x100, seq=3D539046744, pid=3D0}, "\2\0\0\=
+0\0\0\0\0\0\0\0\0\0\0\0\0\0\10\0\35\0\0\0\1"}, 40, 0, NULL, 0) =3D 40
+  [pid 11249] recvmsg(3,
 
-  Migration fails with a nested specific assertion failure on
-  destination at target/i386/kvm.c +1629
+  Notice the len in the buffer passed to the kernel is 0x28000000 which
+  looks byteswapped.
 
-  Migration is successful in the following cases-
+  Removing the call to fd_trans_unregister in the NR_socket syscall in
+  do_syscall fixes this for me, but I don't understand why the fd
+  translation was immediately unregistered after being registered just
+  before in do_socket - presumably it was added for a reason.
 
-  A) cpu model is 'host' and kvm is inserted without nested=3D1 parameter
-  B) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D1)
-  C) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D0)
-  D) Between an L0 and a guest Hypervisor L1, with 'kvm64' as CPU type (and=
- nested=3D1 for L0 KVM)
-
-  Physical host(s)-
-  $ lscpu
-  Architecture:          x86_64
-  CPU op-mode(s):        32-bit, 64-bit
-  Byte Order:            Little Endian
-  CPU(s):                12
-  On-line CPU(s) list:   0-11
-  Thread(s) per core:    1
-  Core(s) per socket:    6
-  Socket(s):             2
-  NUMA node(s):          2
-  Vendor ID:             GenuineIntel
-  CPU family:            6
-  Model:                 62
-  Model name:            Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz
-  Stepping:              4
-  CPU MHz:               1200.091
-  CPU max MHz:           2600.0000
-  CPU min MHz:           1200.0000
-  BogoMIPS:              4203.28
-  Virtualization:        VT-x
-  L1d cache:             32K
-  L1i cache:             32K
-  L2 cache:              256K
-  L3 cache:              15360K
-  NUMA node0 CPU(s):     0-5
-  NUMA node1 CPU(s):     6-11
-  Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr p=
-ge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe sysca=
-ll nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xt=
-opology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl=
- vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt =
-tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi fl=
-expriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+  --- a/linux-user/syscall.c
+  +++ b/linux-user/syscall.c
+  @@ -9331,7 +9331,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
+g arg1,
+   #ifdef TARGET_NR_socket
+       case TARGET_NR_socket:
+           ret =3D do_socket(arg1, arg2, arg3);
+  -        fd_trans_unregister(ret);
+           break;
+   #endif
+   #ifdef TARGET_NR_socketpair
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1705717/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1643619/+subscriptions
