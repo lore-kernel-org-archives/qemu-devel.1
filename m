@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dYLc1-0007rX-Vm
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 20:16:11 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dYMJ5-000093-KK
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dYLc0-0005lx-JK
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 20:16:09 -0400
-Date: Fri, 21 Jul 2017 09:58:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170720235822.GA3717@umbus.fritz.box>
-References: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
-Content-Disposition: inline
-In-Reply-To: <1500568290-7966-1-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] Use qemu_tolower() and
- qemu_toupper(), not tolower() and toupper()
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dYMJ2-0006kS-Es
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:00:39 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:50472)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dYMJ0-0006gN-W2
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 21:00:36 -0400
+Date: Fri, 21 Jul 2017 09:00:18 +0800 (CST)
+Message-ID: <201707210900188603103@zte.com.cn>
+References: 1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn,
+	20170720172215.GH2456@work-vm
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gdmhvc3Q6IGZp?=
+ =?utf-8?q?x_a_migration_failed_because_ofvhost_region_merge?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,135 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org
+To: dgilbert@redhat.com
+Cc: mst@redhat.com, imammedo@redhat.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
 
-
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jul 20, 2017 at 05:31:30PM +0100, Peter Maydell wrote:
-> On NetBSD, where tolower() and toupper() are implemented using an
-> array lookup, the compiler warns if you pass a plain 'char'
-> to these functions:
->=20
-> gdbstub.c:914:13: warning: array subscript has type 'char'
->=20
-> This reflects the fact that toupper() and tolower() give
-> undefined behaviour if they are passed a value that isn't
-> a valid 'unsigned char' or EOF.
->=20
-> We have qemu_tolower() and qemu_toupper() to avoid this problem;
-> use them.
->=20
-> (The use in scsi-generic.c does not trigger the warning because
-> it passes a uint8_t; we switch it anyway, for consistency.)
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-ppc parts
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  gdbstub.c                  | 2 +-
->  hw/s390x/s390-virtio-ccw.c | 2 +-
->  hw/scsi/scsi-generic.c     | 2 +-
->  target/ppc/monitor.c       | 4 ++--
->  4 files changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index f936ddd..2a94030 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -911,7 +911,7 @@ static int gdb_handle_vcont(GDBState *s, const char *=
-p)
-> =20
->          cur_action =3D *p++;
->          if (cur_action =3D=3D 'C' || cur_action =3D=3D 'S') {
-> -            cur_action =3D tolower(cur_action);
-> +            cur_action =3D qemu_tolower(cur_action);
->              res =3D qemu_strtoul(p + 1, &p, 16, &tmp);
->              if (res) {
->                  goto out;
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index ce3921e..1c7af39 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -318,7 +318,7 @@ static void machine_set_loadparm(Object *obj, const c=
-har *val, Error **errp)
->      int i;
-> =20
->      for (i =3D 0; i < sizeof(ms->loadparm) && val[i]; i++) {
-> -        uint8_t c =3D toupper(val[i]); /* mimic HMC */
-> +        uint8_t c =3D qemu_toupper(val[i]); /* mimic HMC */
-> =20
->          if (('A' <=3D c && c <=3D 'Z') || ('0' <=3D c && c <=3D '9') || =
-(c =3D=3D '.') ||
->              (c =3D=3D ' ')) {
-> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-> index a55ff87..7e1cbab 100644
-> --- a/hw/scsi/scsi-generic.c
-> +++ b/hw/scsi/scsi-generic.c
-> @@ -406,7 +406,7 @@ static int read_naa_id(const uint8_t *p, uint64_t *p_=
-wwn)
->          }
->          *p_wwn =3D 0;
->          for (i =3D 8; i < 24; i++) {
-> -            char c =3D toupper(p[i]);
-> +            char c =3D qemu_toupper(p[i]);
->              c -=3D (c >=3D '0' && c <=3D '9' ? '0' : 'A' - 10);
->              *p_wwn =3D (*p_wwn << 4) | c;
->          }
-> diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
-> index b8f30e9..1491511 100644
-> --- a/target/ppc/monitor.c
-> +++ b/target/ppc/monitor.c
-> @@ -115,14 +115,14 @@ int target_get_monitor_def(CPUState *cs, const char=
- *name, uint64_t *pval)
->      CPUPPCState *env =3D &cpu->env;
-> =20
->      /* General purpose registers */
-> -    if ((tolower(name[0]) =3D=3D 'r') &&
-> +    if ((qemu_tolower(name[0]) =3D=3D 'r') &&
->          ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->gpr), &regnum)) {
->          *pval =3D env->gpr[regnum];
->          return 0;
->      }
-> =20
->      /* Floating point registers */
-> -    if ((tolower(name[0]) =3D=3D 'f') &&
-> +    if ((qemu_tolower(name[0]) =3D=3D 'f') &&
->          ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->fpr), &regnum)) {
->          *pval =3D env->fpr[regnum];
->          return 0;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllxQ5kACgkQbDjKyiDZ
-s5J0bhAA0IUgocl/2Nsh/DVbVZfXVn7BLFMC5r8jH3/laFW/0WKWBRulbNeYtX1W
-nTVpVHV05VKthu/YzhNGPoXiRq0oMznLy8QnAF9rYc+aslGr2GJoSRlE7EmHkVYg
-tWjhN3lNVCXNpHuejEgAINZIJpeybQoPUO7EnA9Fc1umBrpdxwh6iTpu9t2cfom1
-jf4/JslJ5s9hjHmQ0G0uRHOUEZxQLEskH9W80HpgVSJw2ttTWRrEEOtSCIAi8ob2
-+wvRrzh/n3VseVm3Ncu0ZErmJ35sYs92ygpDB7Jh990dfoF4FHrCjmWTruuteK1g
-2oonE7xGC3Nrx/cnBnex09bTsS+D8TW2ERdPc3PhYkd2eEtipaC1gI3U9wOcDWmX
-9XOC6alVONeUCzm+aI+RO6mUGciHW8KY8I8kpceVp5eOPr3DICNawjZspFCd7akA
-z9mYq/ibc6STMQZx47KePd3kY3758scWIehIue08wYpLnyUYhQn7d77RWkCaTAic
-hywoVFgJWCGYoXaoC/yBL+vM7573aUWxdPFxijORkWGIvtxGmBl48T0khkJDu7hJ
-lmwqIKh22pkCGiaHCJtL0GPTQs3G56nMoVSzvKWLa9mJK8IghaPk+obljT+BEci3
-q4CvEs1fLtABa+ZluYm3Hl1KNkYJZMbECnJfPkVTb5Pw8p+dehg=
-=sZb8
------END PGP SIGNATURE-----
-
---5vNYLRcllDrimb99--
+KiBNaWNoYWVsIFMuIFRzaXJraW4gKG1zdEByZWRoYXQuY29tKSB3cm90ZToNCg0KDQoNCg0KDQo+
+PiBPbiBXZWQsIEp1bCAxOSwgMjAxNyBhdCAwMzoyNDoyN1BNICswMjAwLCBJZ29yIE1hbW1lZG92
+IHdyb3RlOg0KPiA+ID4gT24gV2VkLCAxOSBKdWwgMjAxNyAxMjo0NjoxMyArMDEwMA0KPiA+ID4g
+IkRyLiBEYXZpZCBBbGFuIEdpbGJlcnQiIDxkZ2lsYmVydEByZWRoYXQuY29tPiB3cm90ZToNCj4g
+PiA+IA0KPiA+ID4gPiAqIElnb3IgTWFtbWVkb3YgKGltYW1tZWRvQHJlZGhhdC5jb20pIHdyb3Rl
+Og0KPiA+ID4gPiA+IE9uIFdlZCwgMTkgSnVsIDIwMTcgMjM6MTc6MzIgKzA4MDANCj4gPiA+ID4g
+PiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdyb3RlOg0KPiA+ID4gPiA+ICAgDQo+
+ID4gPiA+ID4gPiBXaGVuIGEgZ3Vlc3QgdGhhdCBoYXMgc2V2ZXJhbCBob3RwbHVnZ2VkIGRpbW1z
+IGlzIG1pZ3JhdGVkLCBpbg0KPiA+ID4gPiA+ID4gZGVzdGluYXRpb24gaG9zdCBpdCB3aWxsIGZh
+aWwgdG8gcmVzdW1lLiBCZWNhdXNlIHZob3N0IHJlZ2lvbnMgb2YNCj4gPiA+ID4gPiA+IHNldmVy
+YWwgZGltbXMgaW4gc291cmNlIGhvc3QgYXJlIG1lcmdlZCBhbmQgaW4gdGhlIHJlc3RvcmUgc3Rh
+Z2UNCj4gPiA+ID4gPiA+IGluIGRlc3RpbmF0aW9uIGhvc3QgaXQgY29tcHV0ZXMgd2hldGhlciBt
+b3JlIHRoYW4gdmhvc3Qgc2xvdCBsaW1pdA0KPiA+ID4gPiA+ID4gYmVmb3JlIG1lcmdpbmcgdmhv
+c3QgcmVnaW9ucyBvZiBzZXZlcmFsIGRpbW1zLiAgDQo+ID4gPiA+ID4gY291bGQgeW91IHByb3Zp
+ZGUgYSBiaXQgbW9yZSBkZXRhaWxlZCBkZXNjcmlwdGlvbiBvZiB0aGUgcHJvYmxlbQ0KPiA+ID4g
+PiA+IGluY2x1ZGluZyBjb21tYW5kIGxpbmUrdXNlZCBkZXZpY2VfYWRkIGNvbW1hbmRzIG9uIHNv
+dXJjZSBhbmQNCj4gPiA+ID4gPiBjb21tYW5kIGxpbmUgb24gZGVzdGluYXRpb24/ICANCj4gPiA+
+ID4gDQo+ID4gPiA+IChjY2luZyBpbiBNYXJjIEFuZHJlIGFuZCBNYXhpbWUpDQo+ID4gPiA+IA0K
+PiA+ID4gPiBIbW0sIEknZCBsaWtlIHRvIHVuZGVyc3RhZGUgdGhlIHNpdHVhdGlvbiB3aGVyZSB5
+b3UgZ2V0IG1lcmdpbmcgYmV0d2Vlbg0KPiA+ID4gPiBSQU1CbG9ja3MgdGhhdCBjb21wbGljYXRl
+cyBzb21lIHN0dWZmIGZvciBwb3N0Y29weS4NCj4gPiA+IGFuZCBwcm9iYWJseSBpbmNvbnNpc3Rl
+bnQgbWVyZ2luZyBicmVha3Mgdmhvc3QgYXMgd2VsbA0KPiA+ID4gDQo+ID4gPiBtZXJnaW5nIG1p
+Z2h0IGhhcHBlbiBpZiByZWdpb25zIGFyZSBhZGphY2VudCBvciBvdmVybGFwDQo+ID4gPiBidXQg
+Zm9yIHRoYXQgdG8gaGFwcGVuIG1lcmdlZCByZWdpb25zIG11c3QgaGF2ZSBlcXVhbA0KPiA+ID4g
+ZGlzdGFuY2UgYmV0d2VlbiB0aGVpciBHUEE6SFZBIHBhaXJzLCBzbyB0aGF0IGZvbGxvd2luZw0K
+PiA+ID4gdHJhbnNsYXRpb24gd291bGQgd29yazoNCj4gPiA+IA0KPiA+ID4gaWYgZ3ZhIGluIHJl
+Z2lvblhbZ3ZhX3N0YXJ0LCBsZW4sIGh2YV9zdGFydF0NCj4gPiA+ICAgIGh2YSA9IGh2YV9zdGFy
+dCArIGd2YSAtIGd2YV9zdGFydA0KPiA+ID4gDQo+ID4gPiB3aGlsZSBHVkEgb2YgcmVnaW9ucyBp
+cyB1bmRlciBRRU1VIGNvbnRyb2wgYW5kIGRldGVybWluaXN0aWMNCj4gPiA+IEhWQSBpcyBub3Qs
+IHNvIGluIG1pZ3JhdGlvbiBjYXNlIG1lcmdpbmcgbWlnaHQgaGFwcGVuIG9uIHNvdXJjZQ0KPiA+
+ID4gc2lkZSBidXQgbm90IG9uIGRlc3RpbmF0aW9uLCByZXN1bHRpbmcgaW4gZGlmZmVyZW50IG1l
+bW9yeSBtYXBzLg0KPiA+ID4gDQo+ID4gPiBNYXliZSBNaWNoYWVsIG1pZ2h0IGtub3cgZGV0YWls
+cyB3aHkgbWlncmF0aW9uIHdvcmtzIGluIHZob3N0IHVzZWNhc2UsDQo+ID4gPiBidXQgSSBkb24n
+dCBzZWUgdmhvc3Qgc2VuZGluZyBhbnkgdm1zdGF0ZSBkYXRhLg0KPiA+IA0KPj4gV2UgYXJlbid0
+IG1lcmdpbmcgcmFtYmxvY2tzIGF0IGFsbC4NCj4+IFdoZW4gd2UgYXJlIHBhc3NpbmcgYmxvY2tz
+IEEgYW5kIEIgdG8gdmhvc3QsIGlmIHdlIHNlZSB0aGF0DQo+PiANCj4+IGh2YUI9aHZhQSArIGxl
+bkENCj4+IGdwYUI9Z3BhQSArIGxlbkENCj4+IA0KPj4gdGhlbiB3ZSBjYW4gaW1wcm92ZSBwZXJm
+b3JtYW5jZSBhIGJpdCBieSBwYXNzaW5nIGEgc2luZ2xlDQo+PiBjaHVuayB0byB2aG9zdDogaHZh
+QSxncGFBLGxlbmErbGVuQg0KDQo+T0ssIGJ1dCB0aGF0IG1lYW5zIHRoYXQgYSByZWdpb24gY2Fu
+IGluY29ycG9yYXRlIG11bHRpcGxlDQo+UkFNQmxvY2tzIHRob3VnaD8gSG1tIHRoYXQncyBub3Qg
+ZnVuIG9uIHBvc3Rjb3B5Lg0KDQo+PiBzbyBpdCBkb2VzIG5vdCBhZmZlY3QgbWlncmF0aW9uIG5v
+cm1hbGx5Lg0KDQo+V2VsbCwgd2h5PyBXaGF0J3MgcmVxdWlyZWQgLSBpZiB0aGUgcmVnaW9uIHNp
+emVzL2xlbmd0aHMvb3JkZXJzDQo+YXJlIGRpZmZlcmVudCBvbiB0aGUgc291cmNlIGFuZCBkZXN0
+aW5hdGlvbiBkb2VzIGl0IG1hdHRlciAtIGlmDQo+aXQgZG9lcyB0aGVuIHRoYXQgbWVhbnMgd2Ug
+aGF2ZSBhIHByb2JsZW0sIHNpbmNlIHRoYXQgaGV1cmlzdGljDQo+aXMgbm9uLWRldGVybWluaXN0
+aWMuDQpZZXMsSSBlbmNvdW50ZXIgdGhlIGRpZmZlcmVudCAgcmVnaW9uIGNyZWF0aW9uIG9yZGVy
+cyAgb24gdGhlIHNvdXJjZSBhbmQgZGVzdGluYXRpb24NCg0KaWYgeW91IGFkZCBkaW1tcyBvbiB0
+aGUgc291cmNlIGJlZm9yZSBtaWdyYXRpb24uIHNvIEkganVzdCBkaXN0aW5ndWlzaCBhY2NvcmRp
+bmcgdG8gDQoNCnZtIHN0YXRlLg0KDQo+RGF2ZQ0KDQoNCj4gDQo+ID4gDQo+ID4gPiANCj4gPiA+
+ID4gPiANCj4gPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5j
+b20uY24+DQo+ID4gPiA+ID4gU2lnbmVkLW9mZi1ieTogV2FuZyBZZWNoYW8gPHdhbmcueWVjaGFv
+MjU1QHp0ZS5jb20uY24+DQo+ID4gPiA+ID4gLS0tDQo+ID4gPiA+ID4gIGh3L21lbS9wYy1kaW1t
+LmMgfCAyICstDQo+ID4gPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBk
+ZWxldGlvbigtKQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IGRpZmYgLS1naXQgYS9ody9tZW0vcGMt
+ZGltbS5jIGIvaHcvbWVtL3BjLWRpbW0uYw0KPiA+ID4gPiA+IGluZGV4IGVhNjdiNDYuLmJiMGZh
+MDggMTAwNjQ0DQo+ID4gPiA+ID4gLS0tIGEvaHcvbWVtL3BjLWRpbW0uYw0KPiA+ID4gPiA+ICsr
+KyBiL2h3L21lbS9wYy1kaW1tLmMNCj4gPiA+ID4gPiBAQCAtMTAxLDcgKzEwMSw3IEBAIHZvaWQg
+cGNfZGltbV9tZW1vcnlfcGx1ZyhEZXZpY2VTdGF0ZSAqZGV2LCBNZW1vcnlIb3RwbHVnU3RhdGUg
+KmhwbXMsDQo+ID4gPiA+ID4gICAgICAgICAgZ290byBvdXQNCj4gPiA+ID4gPiAgICAgIH0NCj4g
+PiA+ID4gPiAgDQo+ID4gPiA+ID4gLSAgICBpZiAoIXZob3N0X2hhc19mcmVlX3Nsb3QoKSkgew0K
+PiA+ID4gPiA+ICsgICAgaWYgKCF2aG9zdF9oYXNfZnJlZV9zbG90KCkgJiYgcnVuc3RhdGVfaXNf
+cnVubmluZygpKSB7DQo+ID4gPiA+ID4gICAgICAgICAgZXJyb3Jfc2V0ZygmbG9jYWxfZXJyLCAi
+YSB1c2VkIHZob3N0IGJhY2tlbmQgaGFzIG5vIGZyZWUiDQo+ID4gPiA+ID4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAiIG1lbW9yeSBzbG90cyBsZWZ0IikNCj4gPiA+ID4gPiAgICAg
+ICAgICBnb3RvIG91dCAgDQo+ID4gPiANCj4gPiA+IEV2ZW4gdGhpcyBwcm9kdWNlcyB0aGUgd3Jv
+bmcgZXJyb3IgbWVzc2FnZSBpbiB0aGlzIGNhc2UsDQo+ID4gPiBpdCBhbHNvIG1ha2VzIG1lIHRo
+aW5rIGlmIHRoZSBleGlzdGluZyBjb2RlIHNob3VsZCB1bmRvIGEgbG90IG9mDQo+ID4gPiB0aGUg
+b2JqZWN0X3Byb3BlcnR5X3NldCdzIHRoYXQgaGFwcGVuLg0KPiA+ID4gDQo+ID4gPiBEYXZlDQo+
+ID4gPiA+IA0KPiA+ID4gPiAgIA0KPiA+ID4gLS0NCj4gPiA+IERyLiBEYXZpZCBBbGFuIEdpbGJl
+cnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFuY2hlc3RlciwgVUsNCi0tDQpEci4gRGF2aWQg
+QWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRAcmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVL
