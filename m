@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=3683a44df=anthony.perard@citrix.com>)
-	id 1dYYKe-00061q-NM
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYYKr-00069W-Kd
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=3683a44df=anthony.perard@citrix.com>)
-	id 1dYYKa-0002Y3-Pr
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:04 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:8350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=3683a44df=anthony.perard@citrix.com>)
-	id 1dYYKa-0002X2-JQ
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:00 -0400
-Date: Fri, 21 Jul 2017 14:50:57 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170721135057.GJ1587@perard.uk.xensource.com>
-References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
-	<1500416562-27337-1-git-send-email-sstabellini@kernel.org>
-	<1500416562-27337-6-git-send-email-sstabellini@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1500416562-27337-6-git-send-email-sstabellini@kernel.org>
-Subject: Re: [Qemu-devel] [PULL for-2.10 6/7] xen/mapcache: introduce
- xen_replace_cache_entry()
+	(envelope-from <eblake@redhat.com>) id 1dYYKq-0002kr-RG
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:51:17 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 21 Jul 2017 08:50:47 -0500
+Message-Id: <20170721135047.25005-3-eblake@redhat.com>
+In-Reply-To: <20170721135047.25005-1-eblake@redhat.com>
+References: <20170721135047.25005-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] maint: Reorder include directives for
+ qemu-{nbd, io}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +20,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Igor Druzhinin <igor.druzhinin@citrix.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On Tue, Jul 18, 2017 at 03:22:41PM -0700, Stefano Stabellini wrote:
-> From: Igor Druzhinin <igor.druzhinin@citrix.com>
+HACKING recommends listing system includes right after osdep.h,
+and before any other in-project headers.
 
-...
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-img.c | 3 ++-
+ qemu-nbd.c | 8 ++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-> +static uint8_t *xen_replace_cache_entry_unlocked(hwaddr old_phys_addr,
-> +                                                 hwaddr new_phys_addr,
-> +                                                 hwaddr size)
-> +{
-> +    MapCacheEntry *entry;
-> +    hwaddr address_index, address_offset;
-> +    hwaddr test_bit_size, cache_size = size;
-> +
-> +    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
-> +    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
-> +
-> +    assert(size);
-> +    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
-> +    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
-> +    if (test_bit_size % XC_PAGE_SIZE) {
-> +        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
-> +    }
-> +    cache_size = size + address_offset;
-> +    if (cache_size % MCACHE_BUCKET_SIZE) {
-> +        cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
-> +    }
-> +
-> +    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
-> +    while (entry && !(entry->paddr_index == address_index &&
-> +                      entry->size == cache_size)) {
-> +        entry = entry->next;
-> +    }
-> +    if (!entry) {
-> +        DPRINTF("Trying to update an entry for %lx " \
-> +                "that is not in the mapcache!\n", old_phys_addr);
-> +        return NULL;
-> +    }
-> +
-> +    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
-> +    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
-> +
-> +    fprintf(stderr, "Replacing a dummy mapcache entry for %lx with %lx\n",
-> +            old_phys_addr, new_phys_addr);
+diff --git a/qemu-img.c b/qemu-img.c
+index eb32b93e90..f4d5f0d77d 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -22,6 +22,8 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include <getopt.h>
++
+ #include "qemu-version.h"
+ #include "qapi/error.h"
+ #include "qapi/util.h"
+@@ -43,7 +45,6 @@
+ #include "block/qapi.h"
+ #include "crypto/init.h"
+ #include "trace/control.h"
+-#include <getopt.h>
 
-Looks likes this does not build on 32bits.
-in: http://logs.test-lab.xenproject.org/osstest/logs/112041/build-i386/6.ts-xen-build.log
+ #define QEMU_IMG_VERSION "qemu-img version " QEMU_VERSION QEMU_PKGVERSION \
+                           "\n" QEMU_COPYRIGHT "\n"
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 1086934a95..b8666bb575 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -17,6 +17,10 @@
+  */
 
-/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c: In function 'xen_replace_cache_entry_unlocked':
-/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:539:13: error: format '%lx' expects argument of type 'long unsigned int', but argument 3 has type 'hwaddr' [-Werror=format=]
-             old_phys_addr, new_phys_addr);
-             ^
-/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:539:13: error: format '%lx' expects argument of type 'long unsigned int', but argument 4 has type 'hwaddr' [-Werror=format=]
-cc1: all warnings being treated as errors
-  CC      i386-softmmu/target/i386/gdbstub.o
-/home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/rules.mak:66: recipe for target 'hw/i386/xen/xen-mapcache.o' failed
+ #include "qemu/osdep.h"
++#include <getopt.h>
++#include <libgen.h>
++#include <pthread.h>
++
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+@@ -38,10 +42,6 @@
+ #include "trace/control.h"
+ #include "qemu-version.h"
 
-> +
-> +    xen_remap_bucket(entry, entry->vaddr_base,
-> +                     cache_size, address_index, false);
-> +    if (!test_bits(address_offset >> XC_PAGE_SHIFT,
-> +                test_bit_size >> XC_PAGE_SHIFT,
-> +                entry->valid_mapping)) {
-> +        DPRINTF("Unable to update a mapcache entry for %lx!\n", old_phys_addr);
-> +        return NULL;
-> +    }
-> +
-> +    return entry->vaddr_base + address_offset;
-> +}
-> +
-
+-#include <getopt.h>
+-#include <libgen.h>
+-#include <pthread.h>
+-
+ #define SOCKET_PATH                "/var/lock/qemu-nbd-%s"
+ #define QEMU_NBD_OPT_CACHE         256
+ #define QEMU_NBD_OPT_AIO           257
 -- 
-Anthony PERARD
+2.13.3
