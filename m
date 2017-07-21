@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dYO8W-000673-AO
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:57:53 -0400
+	(envelope-from <famz@redhat.com>) id 1dYOYP-0001Z2-Cx
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 23:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dYO8R-0003Uq-JV
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:57:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51070)
+	(envelope-from <famz@redhat.com>) id 1dYOYM-0001KI-Ao
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 23:24:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dYO8R-0003UH-9P
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:57:47 -0400
-Date: Fri, 21 Jul 2017 10:57:39 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dYOYM-0001Jg-4G
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 23:24:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 16D9F6CB4C
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 03:24:33 +0000 (UTC)
+Date: Fri, 21 Jul 2017 11:24:30 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170721025739.GM11032@lemon>
-References: <1500600049-5954-1-git-send-email-lu.zhipeng@zte.com.cn>
+Message-ID: <20170721032430.GP11032@lemon>
+References: <20170717063521.GA7393@lemon>
+ <20170717100206.GF3640@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1500600049-5954-1-git-send-email-lu.zhipeng@zte.com.cn>
-Subject: Re: [Qemu-devel] [PATCH v7] qga: Add support network interface
- statistics in guest-network-get-interfaces command
+In-Reply-To: <20170717100206.GF3640@redhat.com>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,271 +33,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 07/21 09:20, ZhiPeng Lu wrote:
-> we can get the network interface statistics inside a virtual machine by
-> guest-network-get-interfaces command. it is very useful for us to monitor
-> and analyze network traffic.
-> 
-> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+On Mon, 07/17 11:02, Daniel P. Berrange wrote:
+> I'd like to see a web page that provides a list of all mail threads that
+> the test system has queued, with status of which jobs and running, and
+> once completed, provides the full logs.
 
-In the future, please add a '---' line between commit message and revision
-history:
+The index page already exists (no running jobs information, though):
 
----
-
-So that the latter won't get into the git history when maintainers apply it.
+http://patchew.org/QEMU/
 
 Fam
-
-> 
-> v1->v2:
->  - correct some spelling mistake and add the stats data to the
->    guest-network-get-interfaces command instead of adding a new command.
-> v2-v3:
->  - optimize function implementation
-> v3->v4:
->  - modify compile error
-> v4->v5:
->  - rename some temporary variables and add str_trim_off function for
->    calculating the space num in front of the string in guest_get_network_stats
-> v5->v6:
->  - use g_strchug instead of str_trim_off implemented by myself
-> v6->v7:
->  - add implementation for windows
-> ---
->  qga/commands-posix.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  qga/commands-win32.c | 47 ++++++++++++++++++++++++++++++++++
->  qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
->  3 files changed, 155 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index d8e4122..b65dd8e 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -1639,6 +1639,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
->      return head;
->  }
->  
-> +static int guest_get_network_stats(const char *name,
-> +                       GuestNetworkInterfaceStat *stats)
-> +{
-> +    int name_len;
-> +    char const *devinfo = "/proc/net/dev";
-> +    FILE *fp;
-> +    char *line = NULL, *colon;
-> +    size_t n;
-> +    fp = fopen(devinfo, "r");
-> +    if (!fp) {
-> +        return -1;
-> +    }
-> +    name_len = strlen(name);
-> +    while (getline(&line, &n, fp) != -1) {
-> +        long long dummy;
-> +        long long rx_bytes;
-> +        long long rx_packets;
-> +        long long rx_errs;
-> +        long long rx_dropped;
-> +        long long tx_bytes;
-> +        long long tx_packets;
-> +        long long tx_errs;
-> +        long long tx_dropped;
-> +        char *trim_line;
-> +        trim_line = g_strchug(line);
-> +        if (trim_line[0] == '\0') {
-> +            continue;
-> +        }
-> +        colon = strchr(trim_line, ':');
-> +        if (!colon) {
-> +            continue;
-> +        }
-> +        if (colon - name_len  == trim_line &&
-> +           strncmp(trim_line, name, name_len) == 0) {
-> +            if (sscanf(colon + 1,
-> +                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
-> +                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
-> +                  &dummy, &dummy, &dummy, &dummy,
-> +                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
-> +                  &dummy, &dummy, &dummy, &dummy) != 16) {
-> +                continue;
-> +            }
-> +            stats->rx_bytes = rx_bytes;
-> +            stats->rx_packets = rx_packets;
-> +            stats->rx_errs = rx_errs;
-> +            stats->rx_dropped = rx_dropped;
-> +            stats->tx_bytes = tx_bytes;
-> +            stats->tx_packets = tx_packets;
-> +            stats->tx_errs = tx_errs;
-> +            stats->tx_dropped = tx_dropped;
-> +            fclose(fp);
-> +            return 0;
-> +        }
-> +    }
-> +    fclose(fp);
-> +    g_debug("/proc/net/dev: Interface not found");
-> +    return -1;
-> +}
-> +
->  /*
->   * Build information about guest interfaces
->   */
-> @@ -1655,6 +1714,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
->      for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
->          GuestNetworkInterfaceList *info;
->          GuestIpAddressList **address_list = NULL, *address_item = NULL;
-> +        GuestNetworkInterfaceStat  *interface_stat = NULL;
->          char addr4[INET_ADDRSTRLEN];
->          char addr6[INET6_ADDRSTRLEN];
->          int sock;
-> @@ -1774,7 +1834,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
->  
->          info->value->has_ip_addresses = true;
->  
-> -
-> +        if (!info->value->has_statistics) {
-> +            interface_stat = g_malloc0(sizeof(*interface_stat));
-> +            if (guest_get_network_stats(info->value->name,
-> +                interface_stat) == -1) {
-> +                info->value->has_statistics = false;
-> +                g_free(interface_stat);
-> +            } else {
-> +                info->value->statistics = interface_stat;
-> +                info->value->has_statistics = true;
-> +            }
-> +        }
->      }
->  
->      freeifaddrs(ifap);
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 6f16457..433453d 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -1152,6 +1152,42 @@ out:
->  }
->  #endif
->  
-> +static DWORD get_interface_index(const char *guid)
-> +{
-> +    ULONG index;
-> +    DWORD status;
-> +    wchar_t wbuf[512];
-> +    snwprintf(wbuf, sizeof(wbuf), L"\\device\\tcpip_%s", guid);
-> +    wbuf[sizeof(wbuf) - 1] = 0;
-> +    status = GetAdapterIndex (wbuf, &index);
-> +    if (status != NO_ERROR) {
-> +        return (DWORD)~0;
-> +    } else {
-> +        return index;
-> +    }
-> +}
-> +static int guest_get_network_stats(const char *name,
-> +                       GuestNetworkInterfaceStat *stats)
-> +{
-> +    DWORD IfIndex = 0;
-> +    MIB_IFROW aMib_ifrow;
-> +    memset(&aMib_ifrow, 0, sizeof(aMib_ifrow));
-> +    IfIndex = get_interface_index(name);
-> +    aMib_ifrow.dwIndex = IfIndex;
-> +    if (NO_ERROR == GetIfEntry(&aMib_ifrow)) {
-> +        stats->rx_bytes = aMib_ifrow.dwInOctets;
-> +        stats->rx_packets = aMib_ifrow.dwInUcastPkts;
-> +        stats->rx_errs = aMib_ifrow.dwInErrors;
-> +        stats->rx_dropped = aMib_ifrow.dwInDiscards;
-> +        stats->tx_bytes = aMib_ifrow.dwOutOctets;
-> +        stats->tx_packets = aMib_ifrow.dwOutUcastPkts;
-> +        stats->tx_errs = aMib_ifrow.dwOutErrors;
-> +        stats->tx_dropped = aMib_ifrow.dwOutDiscards;
-> +        return 0;
-> +    }
-> +    return -1;
-> +}
-> +
->  GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
->  {
->      IP_ADAPTER_ADDRESSES *adptr_addrs, *addr;
-> @@ -1238,6 +1274,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
->              info->value->has_ip_addresses = true;
->              info->value->ip_addresses = head_addr;
->          }
-> +        if (!info->value->has_statistics) {
-> +            interface_stat = g_malloc0(sizeof(*interface_stat));
-> +            if (guest_get_network_stats(add->AdapterName,
-> +                interface_stat) == -1) {
-> +                info->value->has_statistics = false;
-> +                g_free(interface_stat);
-> +            } else {
-> +                info->value->statistics = interface_stat;
-> +                info->value->has_statistics = true;
-> +            }
-> +        }
->      }
->      WSACleanup();
->  out:
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index 03743ab..4ad5c57 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -643,6 +643,38 @@
->             'prefix': 'int'} }
->  
->  ##
-> +# @GuestNetworkInterfaceStat:
-> +#
-> +# @rx-bytes: total bytes received
-> +#
-> +# @rx-packets: total packets received
-> +#
-> +# @rx-errs: bad packets received
-> +#
-> +# @rx-dropped: receiver dropped packets
-> +#
-> +# @tx-bytes: total bytes transmitted
-> +#
-> +# @tx-packets: total packets transmitted
-> +#
-> +# @tx-errs: packet transmit problems
-> +#
-> +# @tx-dropped: dropped packets transmitted
-> +#
-> +# Since: 2.11
-> +##
-> +{ 'struct': 'GuestNetworkInterfaceStat',
-> +  'data': {'rx-bytes': 'uint64',
-> +            'rx-packets': 'uint64',
-> +            'rx-errs': 'uint64',
-> +            'rx-dropped': 'uint64',
-> +            'tx-bytes': 'uint64',
-> +            'tx-packets': 'uint64',
-> +            'tx-errs': 'uint64',
-> +            'tx-dropped': 'uint64'
-> +           } }
-> +
-> +##
->  # @GuestNetworkInterface:
->  #
->  # @name: The name of interface for which info are being delivered
-> @@ -651,12 +683,16 @@
->  #
->  # @ip-addresses: List of addresses assigned to @name
->  #
-> +# @statistics: various statistic counters related to @name
-> +# (since 2.11)
-> +#
->  # Since: 1.1
->  ##
->  { 'struct': 'GuestNetworkInterface',
->    'data': {'name': 'str',
->             '*hardware-address': 'str',
-> -           '*ip-addresses': ['GuestIpAddress'] } }
-> +           '*ip-addresses': ['GuestIpAddress'],
-> +           '*statistics': 'GuestNetworkInterfaceStat' } }
->  
->  ##
->  # @guest-network-get-interfaces:
-> -- 
-> 1.8.3.1
-> 
-> 
-> 
