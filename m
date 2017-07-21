@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYZU0-0008Sb-Ad
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:04:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dYZZa-0001kS-VF
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYZTw-0004p3-Aw
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:04:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57188)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYZTw-0004nu-1q
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:04:44 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CB1FC073D77
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 15:04:43 +0000 (UTC)
-References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
-	<1500645206-13559-10-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c7a634ae-bdd9-3690-c87e-349888736ffc@redhat.com>
-Date: Fri, 21 Jul 2017 10:04:42 -0500
-MIME-Version: 1.0
-In-Reply-To: <1500645206-13559-10-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CGmaIv6e4aicTFB0dtuMP8wDnMf2Xujnk"
-Subject: Re: [Qemu-devel] [PATCH 9/9] tests/libqtest: Enable compile-time
- format string checking
+	(envelope-from <kwolf@redhat.com>) id 1dYZZZ-0007AG-JD
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:10:34 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 21 Jul 2017 17:10:20 +0200
+Message-Id: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests: Avoid unnecessary sleeps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +17,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CGmaIv6e4aicTFB0dtuMP8wDnMf2Xujnk
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <c7a634ae-bdd9-3690-c87e-349888736ffc@redhat.com>
-Subject: Re: [PATCH 9/9] tests/libqtest: Enable compile-time format string
- checking
-References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
- <1500645206-13559-10-git-send-email-armbru@redhat.com>
-In-Reply-To: <1500645206-13559-10-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Test cases 030, 041 and 055 used to sleep for a second after calling
+block-job-pause to make sure that the block job had time to actually
+get into paused state. We can instead poll its status and use that one
+second only as a timeout.
 
-On 07/21/2017 08:53 AM, Markus Armbruster wrote:
-> qtest_qmp() & friends pass their format string and variable arguments
-> to qobject_from_jsonv().  Unlike qobject_from_jsonv(), they aren't
-> decorated with GCC_FMT_ATTR().  Fix that to get compile-time format
-> string checking.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/libqtest.h | 40 ++++++++++++++++++++++++----------------
->  1 file changed, 24 insertions(+), 16 deletions(-)
+The tests also slept a second for checking that the block jobs don't
+make progress while being paused. Half a second is more than enough for
+this.
 
-Don't know how much of this to merge with my fixed version of 2/9.  But
-matches what I had locally after my version 1, before I ripped it all
-back out again prior to posting my v2 when dealing with gcc fallout,
-that you've now corrected.
+These changes reduce the total time for the three tests by 25 seconds on
+my laptop (from 155 seconds to 130).
 
-> @@ -65,7 +66,8 @@ void qtest_qmp_discard_response(QTestState *s, const =
-char *fmt, ...);
->   *
->   * Sends a QMP message to QEMU and returns the response.
->   */
-> -QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
-> +QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
-> +    GCC_FMT_ATTR(2, 3);
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/030        |  7 ++++---
+ tests/qemu-iotests/041        | 12 ++++--------
+ tests/qemu-iotests/055        | 15 +++++++++------
+ tests/qemu-iotests/iotests.py | 27 +++++++++++++++++++++++++++
+ 4 files changed, 44 insertions(+), 17 deletions(-)
 
-This would fit on one line; any reason we need the line wrap?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---CGmaIv6e4aicTFB0dtuMP8wDnMf2Xujnk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyGAoACgkQp6FrSiUn
-Q2qHIAgAmz8P5qZ2k8a88D0SpFXQXRz5Mm7r3Ws2mOL+DVUZMwaN2K4AEPhVg+L3
-TcUMeIgTCOesi49hP2TYWbAsA8Ctxe+Zl8Jj+HyP55dmqyXTaOsaLeRjLIyO4ejJ
-SAHr6uEavewbhCzA5Kr+OYljoYLRNQIPciH8i/oRq/gRzdW1ufDfpWfgLgNEfENx
-sxBFNUABdwfsFeIHexESL0fzIKHtfhWb0DaZCgrL0vAHDXBVhVbW7pXRaksCXzN3
-dsPfgTOVD6sZ0qIKrATqQ6djkRhArlMfSf8bcluDKgxzLod7siU2lCu+7+RR45UW
-eOyD6GWXBGDoR8IiyRdvXsOU43TjmQ==
-=w3UU
------END PGP SIGNATURE-----
-
---CGmaIv6e4aicTFB0dtuMP8wDnMf2Xujnk--
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index feee861..d745cb4 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -89,18 +89,19 @@ class TestSingleDrive(iotests.QMPTestCase):
+         result = self.vm.qmp('block-job-pause', device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+-        time.sleep(1)
++        self.vm.resume_drive('drive0')
++        self.pause_job('drive0')
++
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+ 
+-        time.sleep(1)
++        time.sleep(0.5)
+         result = self.vm.qmp('query-block-jobs')
+         self.assert_qmp(result, 'return[0]/offset', offset)
+ 
+         result = self.vm.qmp('block-job-resume', device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+-        self.vm.resume_drive('drive0')
+         self.wait_until_completed()
+ 
+         self.assert_no_active_block_jobs()
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index 60f09cc..4cda540 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -103,14 +103,12 @@ class TestSingleDrive(iotests.QMPTestCase):
+                              target=self.qmp_target)
+         self.assert_qmp(result, 'return', {})
+ 
+-        result = self.vm.qmp('block-job-pause', device='drive0')
+-        self.assert_qmp(result, 'return', {})
++        self.pause_job('drive0')
+ 
+-        time.sleep(1)
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+ 
+-        time.sleep(1)
++        time.sleep(0.5)
+         result = self.vm.qmp('query-block-jobs')
+         self.assert_qmp(result, 'return[0]/offset', offset)
+ 
+@@ -896,14 +894,12 @@ class TestRepairQuorum(iotests.QMPTestCase):
+                              target=quorum_repair_img, format=iotests.imgfmt)
+         self.assert_qmp(result, 'return', {})
+ 
+-        result = self.vm.qmp('block-job-pause', device='job0')
+-        self.assert_qmp(result, 'return', {})
++        self.pause_job('job0')
+ 
+-        time.sleep(1)
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+ 
+-        time.sleep(1)
++        time.sleep(0.5)
+         result = self.vm.qmp('query-block-jobs')
+         self.assert_qmp(result, 'return[0]/offset', offset)
+ 
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index ba4da65..e1206ca 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -89,11 +89,12 @@ class TestSingleDrive(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return', {})
+ 
+         self.vm.resume_drive('drive0')
+-        time.sleep(1)
++        self.pause_job('drive0')
++
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+ 
+-        time.sleep(1)
++        time.sleep(0.5)
+         result = self.vm.qmp('query-block-jobs')
+         self.assert_qmp(result, 'return[0]/offset', offset)
+ 
+@@ -302,11 +303,12 @@ class TestSingleTransaction(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return', {})
+ 
+         self.vm.resume_drive('drive0')
+-        time.sleep(1)
++        self.pause_job('drive0')
++
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+ 
+-        time.sleep(1)
++        time.sleep(0.5)
+         result = self.vm.qmp('query-block-jobs')
+         self.assert_qmp(result, 'return[0]/offset', offset)
+ 
+@@ -529,11 +531,12 @@ class TestDriveCompression(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return', {})
+ 
+         self.vm.resume_drive('drive0')
+-        time.sleep(1)
++        self.pause_job('drive0')
++
+         result = self.vm.qmp('query-block-jobs')
+         offset = self.dictpath(result, 'return[0]/offset')
+ 
+-        time.sleep(1)
++        time.sleep(0.5)
+         result = self.vm.qmp('query-block-jobs')
+         self.assert_qmp(result, 'return[0]/offset', offset)
+ 
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index abcf3c1..22439c4 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -27,6 +27,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
+ import qtest
+ import struct
+ import json
++import signal
+ 
+ 
+ # This will not work if arguments contain spaces but is necessary if we
+@@ -137,6 +138,20 @@ def log(msg, filters=[]):
+         msg = flt(msg)
+     print msg
+ 
++class Timeout:
++    def __init__(self, seconds, errmsg = "Timeout"):
++        self.seconds = seconds
++        self.errmsg = errmsg
++    def __enter__(self):
++        signal.signal(signal.SIGALRM, self.timeout)
++        signal.setitimer(signal.ITIMER_REAL, self.seconds)
++        return self
++    def __exit__(self, type, value, traceback):
++        signal.setitimer(signal.ITIMER_REAL, 0)
++        return False
++    def timeout(self, signum, frame):
++        raise Exception(self.errmsg)
++
+ class VM(qtest.QEMUQtestMachine):
+     '''A QEMU VM'''
+ 
+@@ -346,6 +361,18 @@ class QMPTestCase(unittest.TestCase):
+         event = self.wait_until_completed(drive=drive)
+         self.assert_qmp(event, 'data/type', 'mirror')
+ 
++    def pause_job(self, job_id='job0'):
++        result = self.vm.qmp('block-job-pause', device=job_id)
++        self.assert_qmp(result, 'return', {})
++
++        with Timeout(1, "Timeout waiting for job to pause"):
++            while True:
++                result = self.vm.qmp('query-block-jobs')
++                for job in result['return']:
++                    if job['device'] == job_id and job['paused'] == True and job['busy'] == False:
++                        return job
++
++
+ def notrun(reason):
+     '''Skip this test suite'''
+     # Each test in qemu-iotests has a number ("seq")
+-- 
+1.8.3.1
