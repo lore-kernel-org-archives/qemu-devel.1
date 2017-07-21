@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYXRt-0002Mv-Hb
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:54:30 -0400
+	(envelope-from <david@redhat.com>) id 1dYXTg-0003mF-O0
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYXRo-0001Vh-MZ
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:54:29 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYXRo-0001VK-Eb
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:54:24 -0400
-Received: by mail-wm0-x236.google.com with SMTP id w126so12091601wme.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 05:54:24 -0700 (PDT)
-Date: Fri, 21 Jul 2017 13:54:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170721125420.GE18014@stefanha-x1.localdomain>
-References: <CAC0nwATQ-YKmYHyvOQeEmA8u=BvVrC8q20=Ogmr+TFaWRiRUfw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0H629O+sVkh21xTi"
-Content-Disposition: inline
-In-Reply-To: <CAC0nwATQ-YKmYHyvOQeEmA8u=BvVrC8q20=Ogmr+TFaWRiRUfw@mail.gmail.com>
-Subject: Re: [Qemu-devel] ask a question
+	(envelope-from <david@redhat.com>) id 1dYXTf-0002Jy-Mc
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dYXTf-0002J3-Go
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:19 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 21 Jul 2017 14:56:03 +0200
+Message-Id: <20170721125609.11117-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/6] target/s390x: tcg improvments + MSA
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +22,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?55qu5pm6?= <pizhi0616@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com
 
+Based on series:
+    "[PATCH v2 0/5] target/s390x: cpu model cleanups + improvements"
 
---0H629O+sVkh21xTi
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+1. smaller pgm irq instruction length fixes
+2. implement IPM, which is often used in context of MSA instructions
+3. implement all basic MSA (cpacf/crypto) instructions <= z13. Only provide
+   the query subfunction (to query available subfunctions), no actual
+   de/encryption yet
+4. add a couple of alignment checks, that e.g. make some kvm-unit-tests
+   pass now.
 
-On Tue, Jul 18, 2017 at 03:39:15PM +0800, =E7=9A=AE=E6=99=BA wrote:
-> hi qemu-devel=EF=BC=8CI want to know why should add the migration blocker=
-s to
-> prevent live migration in peer mode=EF=BC=8Cif I drop the patch=EF=BC=8CW=
-hat other
-> disadvantages will it bring=EF=BC=9F
+I have written kvm-unit-tests for MSA functions and for SPM/IPM. Will
+send them out soon. I use the following cpu model to test with an upstream
+kernel compiled for z10:
 
-Peer mode means ivshmem-server is used.  It doesn't support live
-migration.  For example, how should peers be migrated and what happens
-to peer IDs?
+... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+              eimm=on,stckf=on,csst=on,csst2=on,ginste=on,\
+              exrl=on,msa-base=on,msa3-base=on,msa4-base=on,msa5-base=on ...
 
-I don't know whether it's possible to add live migration support, but it
-would definitely require code changes.  Just removing the migration
-blocker will not make migration work correctly in peer mode.
+David Hildenbrand (6):
+  target/s390x: fix pgm irq ilen for stsi
+  target/s390x: fix pgm irq ilen in translate_pages()
+  target/s390x: implement spm (SET PROGRAM MASK)
+  target/s390x: move wrap_address to cpu.h
+  target/s390x: add basic MSA features
+  target/s390x: various alignment check
 
---0H629O+sVkh21xTi
-Content-Type: application/pgp-signature; name="signature.asc"
+ target/s390x/Makefile.objs   |  2 +-
+ target/s390x/cpu.h           | 16 +++++++++
+ target/s390x/cpu_models.c    |  4 +++
+ target/s390x/crypto_helper.c | 65 ++++++++++++++++++++++++++++++++++++
+ target/s390x/helper.h        |  1 +
+ target/s390x/insn-data.def   | 29 ++++++++++++----
+ target/s390x/mem_helper.c    | 49 +++++++++++++++++++--------
+ target/s390x/misc_helper.c   | 10 ++++--
+ target/s390x/mmu_helper.c    |  2 +-
+ target/s390x/translate.c     | 79 ++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 232 insertions(+), 25 deletions(-)
+ create mode 100644 target/s390x/crypto_helper.c
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZcfl8AAoJEJykq7OBq3PIA4IIAKU+AgtJH7TMz+4hQmEP+BSr
-pXDF6DeMG6rNy8fgK4wtWDOCF+mm1oGz6sblA6+eBtTNOl/uhJ+A3zCL+H7prEls
-cG1GdhIiagv4lUYQ4QjJZfyLoVMjbXnZJyeFOQqoX9E9fG3uhzlddUhakdUOQxeW
-nCGkaSsuu/hPM2UrDDBnm+5oUAY48D6pgfXTSTyJEK40ZKLiHC9SU9pACcy3nqPz
-9/j6yqy6YUsxmMlB/cLYjcnJJCZZX3qCuSsdvzZRvVmwbOKVCosl+IorlgvXMv6w
-UBDrkq0pHX2EcgYuJ6Oz9LXvXc/PlnEXUQosoeH01v20nXW+O8BleM1nc+VyxxQ=
-=G0js
------END PGP SIGNATURE-----
-
---0H629O+sVkh21xTi--
+-- 
+2.9.4
