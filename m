@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYWnb-0003Vb-4o
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:12:52 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dYWoK-0003u2-Fj
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYWnW-0008Tc-1g
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:12:51 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37966)
+	(envelope-from <stefanha@gmail.com>) id 1dYWoF-0000Jf-IZ
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:13:36 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYWnV-0008Ro-Qv
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:12:45 -0400
-Received: by mail-wm0-x234.google.com with SMTP id w191so12359217wmw.1
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 05:12:44 -0700 (PDT)
-Date: Fri, 21 Jul 2017 13:12:41 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYWoF-0000Iq-Ba
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:13:31 -0400
+Received: by mail-wm0-x229.google.com with SMTP id e131so12393660wme.0
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 05:13:31 -0700 (PDT)
+Date: Fri, 21 Jul 2017 13:13:28 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170721121241.GA18014@stefanha-x1.localdomain>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
+Message-ID: <20170721121328.GB18014@stefanha-x1.localdomain>
+References: <1500625265-23844-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
+	protocol="application/pgp-signature"; boundary="O5XBE6gyVG5Rl6Rj"
 Content-Disposition: inline
-In-Reply-To: <945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <1500625265-23844-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH] block/vpc: fix uninitialised variable
+ compiler warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, Rik van Riel <riel@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, ross.zwisler@linux.intel.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong.eric@gmail.com, Haozhong Zhang <haozhong.zhang@intel.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
---YZ5djTAD1cGYuMQK
+--O5XBE6gyVG5Rl6Rj
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 21, 2017 at 02:56:34AM -0400, Pankaj Gupta wrote:
-> A] Problems to solve:
-> ------------------
+On Fri, Jul 21, 2017 at 09:21:05AM +0100, Mark Cave-Ayland wrote:
+> Since commit cfc87e00 "block/vpc.c: Handle write failures in
+> get_image_offset()" older versions of gcc (in this case 4.7) incorrectly
+> warn that "ret" can be used uninitialised in vpc_co_pwritev().
 >=20
-> 1] We are considering two approaches for 'fake DAX flushing interface'.
->    =20
->  1.1] fake dax with NVDIMM flush hints & KVM async page fault
+> Setting ret to 0 at the start of vpc_co_pwritev() prevents the warning
+> in gcc 4.7 and enables compilation with -Werror to succeed.
 >=20
->      - Existing interface.
->=20
->      - The approach to use flush hint address is already nacked upstream.
->
->      - Flush hint not queued interface for flushing. Applications might=
-=20
->        avoid to use it.
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  block/vpc.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This doesn't contradicts the last point about async operation and vcpu
-control.  KVM async page faults turn the Address Flush Hints write into
-an async operation so the guest can get other work done while waiting
-for completion.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->=20
->      - Flush hint address traps from guest to host and do an entire fsync=
-=20
->        on backing file which itself is costly.
->=20
->      - Can be used to flush specific pages on host backing disk. We can=
-=20
->        send data(pages information) equal to cache-line size(limitation)=
-=20
->        and tell host to sync corresponding pages instead of entire disk s=
-ync.
-
-Are you sure?  Your previous point says only the entire device can be
-synced.  The NVDIMM Adress Flush Hints interface does not involve
-address range information.
-
->=20
->      - This will be an asynchronous operation and vCPU control is returne=
-d=20
->        quickly.
->=20
->=20
->  1.2] Using additional para virt device in addition to pmem device(fake d=
-ax with device flush)
-
-Perhaps this can be exposed via ACPI as part of the NVDIMM standards
-instead of a separate KVM-only paravirt device.
-
---YZ5djTAD1cGYuMQK
+--O5XBE6gyVG5Rl6Rj
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZce+5AAoJEJykq7OBq3PIFbAH/jSdCCHJDmBAoM15NhcbFhz3
-VQyBg2oHvp0Rh70raY2tKnvixRRxxT36to+NqOioNrTPEN3kNBmO8Sgks551ov4Q
-dsqKSHThnRmf4G8jdv/Dst7dArF56XrCiAfVLtokYf1fkE3HVDiY8VcoFmi825Q5
-w5HxTHRYSH/4KhEyv1y2FYWKWWnP7GLT2NxDywiGg1amWEThkhgUjwFwQOeQayr5
-IoprsZAP64AcLLxw3qABB9FgMeIhnDIrA6GL9tLEz5YRt9ztRvWkb35FChdV8Jps
-XqPhUzC2l7XSRVmt7JeEwDuMWgrUpSGuJ1XT5WtVQxtMwHC2TqWp+T3yYERdqT8=
-=suLS
+iQEcBAEBAgAGBQJZce/oAAoJEJykq7OBq3PIg7AH/i0CNV5rbzxL9D+qHrj6j2MN
+bbw8xUvatlfbeit5E20SBAvAAffV9V4LXL4jqvy94uNRhRNc9EZi0+NGEvHYD3rV
+YFp/giEMGAhQFmU4OA8nE/djcHHByTFRM4s9F6aUVxvLOvZt4la9qBYNPo4VrVeL
+VeuUxf1nCuPRWp0MaYa58U3cE3DN4DAx+jrkwrfyw3YBurIAc3RBhkzrz+GOX9He
+kUffjnBm7z8/yLdakUc2bJDfNAV4lj/HsrTk7cChjUyP3Xh0lLGnv5WwyzQkSXoP
+7DXaXe8U0b5TqH/bHuTKMv6ISiQhWrA0Y7cP2oOUYHba//rwVPpdS+wRRHa1vS0=
+=bPcW
 -----END PGP SIGNATURE-----
 
---YZ5djTAD1cGYuMQK--
+--O5XBE6gyVG5Rl6Rj--
