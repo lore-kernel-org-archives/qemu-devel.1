@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYUKe-0002QG-9P
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:49 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYUKa-0008Bc-Ar
+	(envelope-from <frederic.konrad@adacore.com>) id 1dYUKc-0002PM-WF
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49774)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <frederic.konrad@adacore.com>) id 1dYUKY-00089O-U9
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:47 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:40424
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dYUKa-0008Ai-4n
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:44 -0400
-Date: Fri, 21 Jul 2017 10:34:33 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170721093433.GG17693@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
-	<20170720085958.GC21566@redhat.com>
-	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
-	<20170720091224.GD21566@redhat.com>
-	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
-	<20170721083816.GC17693@redhat.com>
-	<CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dYUKY-00088p-KW
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:42 -0400
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	<20170717185830.GD31820@work-vm>
+	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
+	<20170720100232.GA2456@work-vm>
+	<408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
+	<20170721092705.GB2133@work-vm>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <7879f510-5a59-ba17-1727-5ea47bf781f2@adacore.com>
+Date: Fri, 21 Jul 2017 11:34:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
+In-Reply-To: <20170721092705.GB2133@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +36,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>
-Cc: qemu-devel@nongnu.org
-
-On Fri, Jul 21, 2017 at 05:31:04PM +0800, =E9=99=B3=E5=9F=B9=E6=B3=93 wro=
-te:
-> It works after I replace the /usr/bin/qemu-nbd with binary I built.
->=20
-> My cmd is :
->=20
-> > qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
-> >              --image-opts driver=3Dqcow2,file.filename=3D
-> > demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
->=20
->=20
-> But I got other message:
->=20
-> > Block format 'qcow2' does not support the option 'encrypt.format'
->=20
->=20
-> Maybe it doen't support yet?
-
-It is supported. I think you're git checkout is not fully updated.
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+On 07/21/2017 11:27 AM, Dr. David Alan Gilbert wrote:
+> * KONRAD Frederic (frederic.konrad@adacore.com) wrote:
+>>
+>>
+>> On 07/20/2017 12:02 PM, Dr. David Alan Gilbert wrote:
+>>> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>>> On 17 July 2017 at 19:58, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>>>>> * Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
+>>>>>> Is there a way we can prevent migration of the RAMBlock?
+>>>>>
+>>>>> Not yet, I think we'd have to:
+>>>>>      a) Add a flag to the RAMBlock
+>>>>>      b) Set it/clear it on registration
+>>>>>      c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
+>>>>>      d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
+>>>>>      cases) with the RAMBLOCK_FOREACH_MIGRATABLE
+>>>>>      e) Worry about the corner cases!
+>>>>>
+>>>>> I've got a few worries about what happens when the kernel tries to
+>>>>> do dirty yncing - I'm not sure if we have to change anything on that
+>>>>> interface to skip those RAMBlocks.
+>>>>
+>>>> OK, so what should we do for 2.10 ?
+>>>>
+>>>> We could:
+>>>>    * implement the changes you suggest above, and mark only
+>>>>      vmstate_register_ram'd blocks as migratable
+>>>>      (would probably need to fix some places which buggily
+>>>>      don't call vmstate_register_ram)
+>>>>    * implement the changes above, but special case mmio-interface
+>>>>      so only its ramblock is marked unmigratable
+>>>
+>>> I think either of these is too late for 2.10 - I don't fancy prodding
+>>> about in all of the migration RAM loops at this stage.
+>>>
+>>>>    * postpone the changes above until 2.11, and for 2.10 register
+>>>>      a migration-blocker in mmio-interface so that we at least
+>>>>      give the user a useful error rather than having it fail
+>>>>      obscurely on vmload (and release note this)
+>>>
+>>> I think that's best, especially because I've just thought of another nasty.
+>>> If I understand the way mmio-interface is working, you're dynamically
+>>> changing the RAMBlock list while the guest is running.
+>>> And while we are using QLIST_FOREACH_RCU I'm not convinced we're
+>>> actually safe against dynamic modification of that list.
+>>
+>> Hi Dave,
+>>
+>> Hmmm I'm not totally convinced..
+>>
+>> Let's imagine somebody (eg: u-boot guest) wants to execute code
+>> from the LQSPI area.
+>>
+>> memory_region_request_mmio_ptr is called (the guest is not
+>> running yet) it will create a mmio-interface which create the
+>> ram memory region with a pointer provided by the device.
+>> Then the guest can execute code from that and this somehow is
+>> breaking migration because this ram memory region is migrated.
+>>
+>> Now something is writing to the device.. The cache is no longer
+>> valid, we have to drop this mmio-interface. This is done in an
+>> async_safe work so cpu are stopped at this moment. So I think we
+>> are safe for that.
+>>
+>>>
+>>>> (Or something else?)
+>>>>
+>>>> I do think we definitely need to fix this for 2.11 at latest.
+>>>
+>>> OK, I can do a-e OK, I'm more worried now about that dynamic
+>>> modification I just thought of.
+>>>
+>>
+>> What's an a-e?
+> 
+> Oh sorry, didn't answer that bit - it's the items a..e in the list
+> I posted above.
+> 
+>> BTW sorry for this pain :( I didn't figure out that the
+>> ram MemoryRegion would be migrated..
+> 
+> It's OK, these things happen.
+> 
+> Dave
+
+Ok thanks!
+
+Fred
+
+> 
+>> Thanks,
+>> Fred
+>>
+>>> Dave
+>>>
+>>>> thanks
+>>>> -- PMM
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
