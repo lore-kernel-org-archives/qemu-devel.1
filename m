@@ -1,33 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dYUKc-0002PM-WF
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:48 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dYUKj-0002Ut-Tb
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dYUKY-00089O-U9
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:47 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:40424
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dYUKY-00088p-KW
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:42 -0400
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-	<20170717185830.GD31820@work-vm>
-	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
-	<20170720100232.GA2456@work-vm>
-	<408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
-	<20170721092705.GB2133@work-vm>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <7879f510-5a59-ba17-1727-5ea47bf781f2@adacore.com>
-Date: Fri, 21 Jul 2017 11:34:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170721092705.GB2133@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+	(envelope-from <stefanha@redhat.com>) id 1dYUKi-0008Et-Pm
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:34:53 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri, 21 Jul 2017 10:34:16 +0100
+Message-Id: <20170721093416.17816-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,111 +17,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
+There is not much getting started documentation for qemu-iotests.  This
+patch explains how to create a new test and covers the overall testing
+approach.
 
+Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qemu-iotests/README | 83 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
-On 07/21/2017 11:27 AM, Dr. David Alan Gilbert wrote:
-> * KONRAD Frederic (frederic.konrad@adacore.com) wrote:
->>
->>
->> On 07/20/2017 12:02 PM, Dr. David Alan Gilbert wrote:
->>> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>>> On 17 July 2017 at 19:58, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>>>> * Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
->>>>>> Is there a way we can prevent migration of the RAMBlock?
->>>>>
->>>>> Not yet, I think we'd have to:
->>>>>      a) Add a flag to the RAMBlock
->>>>>      b) Set it/clear it on registration
->>>>>      c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
->>>>>      d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
->>>>>      cases) with the RAMBLOCK_FOREACH_MIGRATABLE
->>>>>      e) Worry about the corner cases!
->>>>>
->>>>> I've got a few worries about what happens when the kernel tries to
->>>>> do dirty yncing - I'm not sure if we have to change anything on that
->>>>> interface to skip those RAMBlocks.
->>>>
->>>> OK, so what should we do for 2.10 ?
->>>>
->>>> We could:
->>>>    * implement the changes you suggest above, and mark only
->>>>      vmstate_register_ram'd blocks as migratable
->>>>      (would probably need to fix some places which buggily
->>>>      don't call vmstate_register_ram)
->>>>    * implement the changes above, but special case mmio-interface
->>>>      so only its ramblock is marked unmigratable
->>>
->>> I think either of these is too late for 2.10 - I don't fancy prodding
->>> about in all of the migration RAM loops at this stage.
->>>
->>>>    * postpone the changes above until 2.11, and for 2.10 register
->>>>      a migration-blocker in mmio-interface so that we at least
->>>>      give the user a useful error rather than having it fail
->>>>      obscurely on vmload (and release note this)
->>>
->>> I think that's best, especially because I've just thought of another nasty.
->>> If I understand the way mmio-interface is working, you're dynamically
->>> changing the RAMBlock list while the guest is running.
->>> And while we are using QLIST_FOREACH_RCU I'm not convinced we're
->>> actually safe against dynamic modification of that list.
->>
->> Hi Dave,
->>
->> Hmmm I'm not totally convinced..
->>
->> Let's imagine somebody (eg: u-boot guest) wants to execute code
->> from the LQSPI area.
->>
->> memory_region_request_mmio_ptr is called (the guest is not
->> running yet) it will create a mmio-interface which create the
->> ram memory region with a pointer provided by the device.
->> Then the guest can execute code from that and this somehow is
->> breaking migration because this ram memory region is migrated.
->>
->> Now something is writing to the device.. The cache is no longer
->> valid, we have to drop this mmio-interface. This is done in an
->> async_safe work so cpu are stopped at this moment. So I think we
->> are safe for that.
->>
->>>
->>>> (Or something else?)
->>>>
->>>> I do think we definitely need to fix this for 2.11 at latest.
->>>
->>> OK, I can do a-e OK, I'm more worried now about that dynamic
->>> modification I just thought of.
->>>
->>
->> What's an a-e?
-> 
-> Oh sorry, didn't answer that bit - it's the items a..e in the list
-> I posted above.
-> 
->> BTW sorry for this pain :( I didn't figure out that the
->> ram MemoryRegion would be migrated..
-> 
-> It's OK, these things happen.
-> 
-> Dave
-
-Ok thanks!
-
-Fred
-
-> 
->> Thanks,
->> Fred
->>
->>> Dave
->>>
->>>> thanks
->>>> -- PMM
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
+index 6079b40..8259b9f 100644
+--- a/tests/qemu-iotests/README
++++ b/tests/qemu-iotests/README
+@@ -14,8 +14,91 @@ Just run ./check to run all tests for the raw image format, or ./check
+ -qcow2 to test the qcow2 image format.  The output of ./check -h explains
+ additional options to test further image formats or I/O methods.
+ 
++* Testing approach
++
++Each test is an executable file (usually a bash script) that is run by the
++./check test harness.  Standard out and standard error are captured to an
++output file.  If the output file differs from the "golden master" output file
++for the test then it fails.
++
++Tests are simply a sequence of commands that produce output and the test itself
++does not judge whether it passed or failed.  If you find yourself writing
++checks to determine success or failure then you should rethink the test and
++rely on output diffing instead.
++
++** Filtering volatile output
++
++When output contains absolute file paths, timestamps, process IDs, hostnames,
++or other volatile strings, the diff against golden master output will fail.
++Such output must be filtered to replace volatile strings with fixed
++placeholders.
++
++For example, the path to the temporary working directory changes between test
++runs so it must be filtered:
++
++  sed -e "s#$TEST_DIR/#TEST_DIR/#g"
++
++Commonly needed filters are available in ./common.filter.
++
++** Python tests
++
++Most tests are implemented in bash but it is difficult to interact with the QMP
++monitor.  A Python module called 'iotests' is available for tests that require
++JSON and interacting with QEMU.
++
++* How to create a test
++
++1. Choose an unused test number
++
++Tests are identified by a unique number.  Look for the highest test case number
++by looking at the test files.  Then search the qemu-devel@nongnu.org mailing
++list to check if anyone has already sent patches using the next available
++number.  You may need to increment the number a few times to reach an unused
++number.
++
++2. Create the test file
++
++Copy an existing test (one that most closely resembles what you wish to test)
++to the new test number:
++
++  cp 001 <test-number>
++
++3. Assign groups to the test
++
++Add your test to the ./group file.  This file is the index of tests and assigns
++them to functional groups like "rw" for read-write tests.  Most tests belong to
++the "rw" and "auto" groups.  "auto" means the test runs when ./check is invoked
++without a -g argument.
++
++Consider adding your test to the "quick" group if it executes quickly (<1s).
++This group is run by "make check-block" and is often included as part of build
++tests in continuous integration systems.
++
++4. Write the test
++
++Edit the test script.  Look at existing tests for examples.
++
++5. Generate the golden master file
++
++Run your test with "./check <test-number>".  You may need to pass additional
++options to use an image format or protocol.
++
++The test will fail because there is no golden master yet.  Inspect the output
++that your test generated with "cat <test-number>.out.bad".
++
++Verify that the output is as expected and contains no volatile strings like
++timestamps.  You may need to add filters to your test to remove volatile
++strings.
++
++Once you are happy with the test output it can be used as the golden master
++with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to verify
++that it passes.
++
++Congratulations, you've created a new test!
++
+ * Feedback and patches
+ 
+ Please send improvements to the test suite, general feedback or just
+ reports of failing tests cases to qemu-devel@nongnu.org with a CC:
+ to qemu-block@nongnu.org.
++
+-- 
+2.9.4
