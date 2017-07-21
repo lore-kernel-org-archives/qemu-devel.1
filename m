@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dYPVr-0003n2-KL
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:26:04 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dYPif-0005rC-3I
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:39:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dYPVn-0002SF-Jz
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:26:03 -0400
-Received: from ivanoab5.miniserver.com ([78.31.111.25]:42667
-	helo=www.kot-begemot.co.uk)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
-	id 1dYPVn-0002RT-Dc
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:25:59 -0400
-References: <20170720191228.12342-1-anton.ivanov@cambridgegreys.com>
-	<6d89f581-fc89-3455-60c8-439702d7bba6@redhat.com>
-From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Message-ID: <1fe9110c-ae57-41e3-b479-66daa6d6cb3c@cambridgegreys.com>
-Date: Fri, 21 Jul 2017 05:25:37 +0100
+	(envelope-from <no-reply@patchew.org>) id 1dYPib-0004Iq-TT
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:39:17 -0400
+Resent-Message-Id: <E1dYPib-0004Iq-TT@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150061193945.99.11260015619329347277@5d477a5b5989>
+In-Reply-To: <20170721034730.25612-1-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6d89f581-fc89-3455-60c8-439702d7bba6@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Unified Datagram Socket Transport
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 20 Jul 2017 21:39:00 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: crosa@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, liujbjl@linux.vnet.ibm.com, mreitz@redhat.com, jsnow@redhat.com
 
-
-
-On 21/07/17 04:55, Jason Wang wrote:
->
->
-> On 2017年07月21日 03:12, anton.ivanov@cambridgegreys.com wrote:
->> Hi all,
->>
->> This addresses comments so far except Eric's suggestion to use
->> InetSocketAddressBase. If I understand correctly its intended use,
->> it will not be of help for protocols which have no port (raw
->> sockets - GRE, L2TPv3, etc).
->>
->> It also includes a port of the original socket.c transport to
->> the new UDST backend. The relevant code is ifdef-ed so there
->> should be no effect on other systems.
->
-> This looks sub-optimal. If you want to do this, I would rather suggest 
-> you just extend the socket dgram backend like what udst did now.
-
-Apologies, do you mean extend it further to handle the tcp form?
-
-That does not work at present. Sure, you can receive tcp using recvmmsg, 
-but you cannot use it to handle a tcp based variable length encaps where 
-frame lengths are set in a header. That can be done only be sequential 
-read() or recv() to read the frame length first, then the frame.
-
-I can in theory add that to a unified socket backend, but this is 
-completely different tx and rx logic - so it will become suboptimal (and 
-quite ugly). It will need different tx and rx functions and appropriate 
-initialization to select them. I'd rather keep it to datagram only - 
-what says on the tin.
-
->
->>
->> I think that this is would be the appropriate place to stop in this
->> iteration. I would prefer to have this polished, before I start
->> looking at sendmmsg and bulk send or some of the more unpleasant
->> encapsulations like geneve.
->
-> Pay attention we're softfreeze now. So the feature is for 2.11, if it 
-> looks good, I can only queue it for 2.11.
-
-OK. Understood.
-
->
-> Btw, looks like not all comments of v1 were addressed.
-
-I will go through the comments one more time. I realized I may have 
-missed converting malloc to a g_memdup in a couple places.
-
->
-> Thanks
-
-Best Regards,
-
-A.
-
->
->>
->> A.
->>
->>
->
->
-
--- 
-Anton R. Ivanov
-
-Cambridge Greys Limited, England and Wales company No 10273661
-http://www.cambridgegreys.com/
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBidWlsZCBjb25maWd1cmF0aW9uIHF1ZXJ5
+IHRvb2wgYW5kIGNvbmRpdGlvbmFsIChxZW11LWlvKXRlc3Qgc2tpcApNZXNzYWdlLWlkOiAyMDE3
+MDcyMTAzNDczMC4yNTYxMi0xLWNyb3NhQHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGlu
+ZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0i
+JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
+dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
+IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
+fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
+ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
+ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
+MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
+Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNzIxMDQxOTUyLjQ1OTUw
+LTEtYWlrQG96bGFicy5ydSAtPiBwYXRjaGV3LzIwMTcwNzIxMDQxOTUyLjQ1OTUwLTEtYWlrQG96
+bGFicy5ydQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhlMTcxNWQgcWVtdS1pb3Rl
+c3RzOiByZXF1aXJlIENPTkZJR19MSU5VWF9BSU8gZm9yIHRlc3QgMDg3CjJiYTJkOTEgcWVtdS1p
+b3Rlc3RzOiBhZGQgX3JlcXVpcmVfZmVhdHVyZSgpIGZ1bmN0aW9uCjkwNDE0OTAgc2NyaXB0czog
+aW50cm9kdWNlIGJ1aWxkY29uZi5weQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
+Q0ggMS8zOiBzY3JpcHRzOiBpbnRyb2R1Y2UgYnVpbGRjb25mLnB5Li4uCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEwNzogRklMRTogc2NyaXB0cy9idWlsZGNvbmYu
+cHk6NTk6CiteSUBlY2hvICQoe2NvbmZ9KSQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiMyNzc6IEZJTEU6IHNjcmlwdHMvYnVpbGRjb25mLnB5OjIyOToKKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAnc2V0IHRvICJ5Ii4gIFRoaXMgY2F1c2VzIHRoaXMgdG9vbCB0
+byBiZSBzaWxlbnQgJwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3ODogRklM
+RTogc2NyaXB0cy9idWlsZGNvbmYucHk6MjMwOgorICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICdhbmQgcmV0dXJuIG9ubHkgYSBzdGF0dXMgY29kZSBvZiBlaXRoZXIgMCAoaWYgJwoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3OTogRklMRTogc2NyaXB0cy9idWls
+ZGNvbmYucHk6MjMxOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICdjb25maWd1
+cmF0aW9uIGlzIHNldCkgb3Igbm9uLXplcm8gb3RoZXJ3aXNlLicpKQoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzI4MTogRklMRTogc2NyaXB0cy9idWlsZGNvbmYucHk6MjMzOgor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhlbHA9KCdEbyBub3QgYXR0ZW1wdCB0byB1c2Ug
+YSBkZWZhdWx0IHRhcmdldCBpZiBvbmUgJwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzI4MjogRklMRTogc2NyaXB0cy9idWlsZGNvbmYucHk6MjM0OgorICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICd3YXMgbm90IGV4cGxpY2l0bHkgZ2l2ZW4gaW4gdGhlIGNvbW1h
+bmQgbGluZScpKQoKdG90YWw6IDEgZXJyb3JzLCA1IHdhcm5pbmdzLCAyNzggbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+Mi8zOiBxZW11LWlvdGVzdHM6IGFkZCBfcmVxdWlyZV9mZWF0dXJlKCkgZnVuY3Rpb24uLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMy8zOiBxZW11LWlvdGVzdHM6IHJlcXVpcmUgQ09ORklHX0xJTlVYX0FJTyBm
+b3IgdGVzdCAwODcuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
