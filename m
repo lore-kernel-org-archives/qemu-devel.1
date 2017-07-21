@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYUZF-0001JN-K6
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:49:54 -0400
+	(envelope-from <berrange@redhat.com>) id 1dYUZT-0001RK-3y
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:50:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dYUZB-0000RN-J6
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:49:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34932)
+	(envelope-from <berrange@redhat.com>) id 1dYUZP-0000ic-8l
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:50:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYUZB-0000Pl-9N
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:49:49 -0400
-Date: Fri, 21 Jul 2017 10:49:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170721094943.GC2133@work-vm>
-References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dYUZO-0000i8-VW
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:50:03 -0400
+Date: Fri, 21 Jul 2017 10:49:55 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170721094955.GH17693@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
+In-Reply-To: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,115 +28,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
 
-* Jay Zhou (jianjay.zhou@huawei.com) wrote:
-> Qemu_savevm_state_cleanup() takes about 300ms in my ram migration tests
-> with a 8U24G vm(20G is really occupied), the main cost comes from
-> KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
-> kvm_set_user_memory_region(). In kmod, the main cost is
-> kvm_zap_obsolete_pages(), which traverses the active_mmu_pages list to
-> zap the unsync sptes.
+On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:
+> w2k used to boot on QEMU until we bumped revision of FADT to rev3
+> (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+> 
+> Considering that w2k is ancient and long time EOLed, leave default
+> rev3 but make pc-i440fx-2.9 and older machine types to force rev1
+> so old setups won't break (w2k could boot).
 
-Hi Jay,
-  Is this actually increasing the real downtime when the guest isn't
-running, or is it just the reported time? I see that the s->downtime
-value is calculated right after where we currently call
-qemu_savevm_state_cleanup.
+There needs to be a machine type property added to control this
+feature. When provisioning new VMs, management apps need to be
+able to set the property explicitly - having them rely on picking
+particular machine type name+versions is not viable, because
+downstream vendors replace the machine types with their own
+names + versions.
 
-  I guess the biggest problem is that 300ms happens before we restart
-the guest on the source if a migration fails.
-
-> I think it can be optimized:
-> (1) source vm will be destroyed if the migration is successfully done,
->     so the resources will be cleanuped automatically by the system
-> (2) delay the cleanup if the migration failed
-
-I don't like putting it in qmp_cont; that shouldn't have migration magic
-in it.
-I guess we could put it in migrate_fd_cleanup perhaps? It gets called on
-a bh near the end -  or could we just move it closer to the end of 
-migration_thread?
-
-However, we would need to be a bit careful of anything that needs
-cleaning up before the source restarts on failure; I'm not sure of
-the semantics of all the current things wired into save_cleanup.
-
-Dave
-
-
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  migration/migration.c | 16 +++++++++-------
->  qmp.c                 | 10 ++++++++++
->  2 files changed, 19 insertions(+), 7 deletions(-)
+> CC: Programmingkid <programmingkidx@gmail.com>
+> CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index a0db40d..72832be 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1877,6 +1877,15 @@ static void *migration_thread(void *opaque)
->          if (qemu_file_get_error(s->to_dst_file)) {
->              migrate_set_state(&s->state, current_active_state,
->                                MIGRATION_STATUS_FAILED);
-> +            /*
-> +             * The resource has been allocated by migration will be reused in
-> +             * COLO process, so don't release them.
-> +             */
-> +            if (!enable_colo) {
-> +                qemu_mutex_lock_iothread();
-> +                qemu_savevm_state_cleanup();
-> +                qemu_mutex_unlock_iothread();
-> +            }
->              trace_migration_thread_file_err();
->              break;
->          }
-> @@ -1916,13 +1925,6 @@ static void *migration_thread(void *opaque)
->      end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> Only compile test since I don't have w2k to test with
+> 
+> ---
+>  include/hw/i386/pc.h |  1 +
+>  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
+>  hw/i386/pc_piix.c    |  2 ++
+>  3 files changed, 22 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d80859b..d6f65dd 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -122,6 +122,7 @@ struct PCMachineClass {
+>      bool rsdp_in_ram;
+>      int legacy_acpi_table_size;
+>      unsigned acpi_data_size;
+> +    bool force_rev1_fadt;
 >  
->      qemu_mutex_lock_iothread();
-> -    /*
-> -     * The resource has been allocated by migration will be reused in COLO
-> -     * process, so don't release them.
-> -     */
-> -    if (!enable_colo) {
-> -        qemu_savevm_state_cleanup();
-> -    }
->      if (s->state == MIGRATION_STATUS_COMPLETED) {
->          uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
->          s->total_time = end_time - s->total_time;
-> diff --git a/qmp.c b/qmp.c
-> index b86201e..0e68eaa 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -37,6 +37,8 @@
->  #include "qom/object_interfaces.h"
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/acpi/acpi_dev_interface.h"
-> +#include "migration/migration.h"
-> +#include "migration/savevm.h"
->  
->  NameInfo *qmp_query_name(Error **errp)
->  {
-> @@ -200,6 +202,14 @@ void qmp_cont(Error **errp)
->      if (runstate_check(RUN_STATE_INMIGRATE)) {
->          autostart = 1;
->      } else {
-> +        /*
-> +         * Delay the cleanup to reduce the downtime of migration.
-> +         * The resource has been allocated by migration will be reused
-> +         * in COLO process, so don't release them.
-> +         */
-> +        if (runstate_check(RUN_STATE_POSTMIGRATE) && !migrate_colo_enabled()) {
-> +            qemu_savevm_state_cleanup();
-> +        }
->          vm_start();
->      }
+>      /* SMBIOS compat: */
+>      bool smbios_defaults;
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 6b7bade..227f9ad 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
 >  }
+>  
+>  /* Load chipset information in FADT */
+> -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, bool rev1)
+>  {
+>      fadt->model = 1;
+>      fadt->reserved1 = 0;
+> @@ -304,6 +304,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+>          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+>      }
+>      fadt->century = RTC_CENTURY;
+> +    if (rev1) {
+> +        return;
+> +    }
+>  
+>      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+>      fadt->reset_value = 0xf;
+> @@ -335,6 +338,7 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+>  /* FADT */
+>  static void
+>  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> +           MachineState *machine,
+>             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
+>             const char *oem_id, const char *oem_table_id)
+>  {
+> @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+>      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+>      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+>      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
+> +    int fadt_size = sizeof(*fadt);
+> +    int rev = 3;
+>  
+>      /* FACS address to be filled by Guest linker */
+>      bios_linker_loader_add_pointer(linker,
+> @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+>          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
+>  
+>      /* DSDT address to be filled by Guest linker */
+> -    fadt_setup(fadt, pm);
+> +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
+>      bios_linker_loader_add_pointer(linker,
+>          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> -    bios_linker_loader_add_pointer(linker,
+> -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> +    if (pcmc->force_rev1_fadt) {
+> +        rev = 1;
+> +        fadt_size = offsetof(typeof(*fadt), reset_register);
+> +    } else {
+> +        bios_linker_loader_add_pointer(linker,
+> +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> +    }
+>  
+>      build_header(linker, table_data,
+> -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
+> +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
+>  }
+>  
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>      /* ACPI tables pointed to by RSDT */
+>      fadt = tables_blob->len;
+>      acpi_add_table(table_offsets, tables_blob);
+> -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
+> +    build_fadt(tables_blob, tables->linker, &pm, machine, facs, dsdt,
+>                 slic_oem.id, slic_oem.table_id);
+>      aml_len += tables_blob->len - fadt;
+>  
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 11b4336..bc61332 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+>  
+>  static void pc_i440fx_2_9_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_i440fx_2_10_machine_options(m);
+>      m->is_default = 0;
+>      m->alias = NULL;
+> +    pcmc->force_rev1_fadt = true;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
+>  }
+>  
 > -- 
-> 1.8.3.1
+> 2.7.4
 > 
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
