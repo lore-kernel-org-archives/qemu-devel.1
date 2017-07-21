@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dYSG6-0005TV-P1
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 03:21:59 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dYSOs-0007fD-BT
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 03:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dYSG2-0001nb-15
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 03:21:58 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:55662)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dYSG1-0001mO-Bx
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 03:21:53 -0400
-From: Yi Wang <wang.yi59@zte.com.cn>
-Date: Fri, 21 Jul 2017 03:38:56 -0400
-Message-Id: <1500622736-20865-3-git-send-email-wang.yi59@zte.com.cn>
-In-Reply-To: <1500622736-20865-1-git-send-email-wang.yi59@zte.com.cn>
-References: <1500622736-20865-1-git-send-email-wang.yi59@zte.com.cn>
-Subject: [Qemu-devel] [PATCH 2/2] [PATCH] hmp: allow apic-id for "info lapic"
+	(envelope-from <aik@ozlabs.ru>) id 1dYSOo-0008N7-DM
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 03:31:02 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34837)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dYSOo-0008LE-4H
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 03:30:58 -0400
+Received: by mail-it0-x243.google.com with SMTP id v127so3305343itd.2
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 00:30:56 -0700 (PDT)
+References: <20170721041952.45950-1-aik@ozlabs.ru>
+	<b3ed544c-a576-7a74-b7b0-8067873cf11e@amsat.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <c7cc6429-fe77-2b47-d08b-f4266524407e@ozlabs.ru>
+Date: Fri, 21 Jul 2017 17:30:49 +1000
+MIME-Version: 1.0
+In-Reply-To: <b3ed544c-a576-7a74-b7b0-8067873cf11e@amsat.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH qemu] Revert "elf-loader: warn about
+ invalid endianness"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,106 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org
-Cc: wang.yi59@zte.com.cn, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Paul Burton <paul.burton@imgtec.com>, Alistair Francis <alistair.francis@xilinx.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-Add [apic-id] support for hmp command "info lapic", which is
-useful when debugging ipi and so on. Current behavior is not
-changed when the parameter isn't specified.
+On 21/07/17 16:48, Philippe Mathieu-Daudé wrote:
+> Hi Alexey,
+> 
+> On 07/21/2017 01:19 AM, Alexey Kardashevskiy wrote:
+>> This reverts c8e1158cf611 "elf-loader: warn about invalid endianness"
+>> as it produces a useless message every time an LE kernel image is
+>> passed via -kernel on a ppc64-pseries machine. The pseries machine
+>> already checks for ELF_LOAD_WRONG_ENDIAN and tries with big_endian=0.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>   hw/core/loader.c | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/hw/core/loader.c b/hw/core/loader.c
+>> index c17ace0a2e..e5e8cbb638 100644
+>> --- a/hw/core/loader.c
+>> +++ b/hw/core/loader.c
+>> @@ -480,7 +480,6 @@ int load_elf_ram(const char *filename,
+>>       }
+>>         if (target_data_order != e_ident[EI_DATA]) {
+>> -        fprintf(stderr, "%s: wrong endianness\n", filename);
+>>           ret = ELF_LOAD_WRONG_ENDIAN;
+>>           goto fail;
+>>       }
+>>
+> 
+> I submitted this patch because I spent some time debugging while QEMU was
+> failing silently using a MIPS kernel image which used to work, after
+> realizing I was in an incorrect build_dir using qemu-system-mipsel to load
+> a big endian image and felt stupid [1]. This dumb error can happen to other
+> people so I added this warning here.
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
----
- hmp-commands-info.hx  |  6 +++---
- target/i386/cpu.h     | 10 ++++++++++
- target/i386/helper.c  | 16 ++++++++++++++++
- target/i386/monitor.c |  9 ++++++++-
- 4 files changed, 37 insertions(+), 4 deletions(-)
+Been there too. This is why we try loading images twice in pseries.
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index d9df238..00623df 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -115,9 +115,9 @@ ETEXI
- #if defined(TARGET_I386)
-     {
-         .name       = "lapic",
--        .args_type  = "",
--        .params     = "",
--        .help       = "show local apic state",
-+        .args_type  = "apic-id:i?",
-+        .params     = "[apic-id]",
-+        .help       = "show local apic state (apic-id: local apic to read, default is 0)",
-         .cmd        = hmp_info_local_apic,
-     },
- #endif
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 31ad681..4da2ca2 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1712,6 +1712,16 @@ void enable_compat_apic_id_mode(void);
- #define APIC_DEFAULT_ADDRESS 0xfee00000
- #define APIC_SPACE_SIZE      0x100000
- 
-+/**
-+ * x86_get_cpu_by_apic:
-+ * @id: The apic-id of the specified CPU to obtain.
-+ *
-+ * Gets a CPU on which @id given of apic.
-+ *
-+ * Returns: The CPU or %NULL if there is no matching CPU.
-+ */
-+CPUState *x86_get_cpu_by_apic(int id);
-+
- void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-                                    fprintf_function cpu_fprintf, int flags);
- 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index fd4f1af..6972833 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -398,6 +398,22 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-     }
-     cpu_fprintf(f, " PPR 0x%02x\n", apic_get_ppr(s));
- }
-+
-+CPUState *x86_get_cpu_by_apic(int id)
-+{
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        X86CPU *cpu = X86_CPU(cs);
-+        APICCommonState *s = APIC_COMMON(cpu->apic_state);
-+        if (id == s->id) {
-+            return cs;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
- #else
- void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-                                    fprintf_function cpu_fprintf, int flags)
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 77ead60..e911a57 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -632,7 +632,14 @@ const MonitorDef *target_monitor_defs(void)
- 
- void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
- {
--    CPUState *cs = mon_get_cpu();
-+    CPUState *cs;
-+
-+    if (qdict_haskey(qdict, "apic-id")) {
-+        int id = qdict_get_try_int(qdict, "apic-id", 0);
-+        cs = x86_get_cpu_by_apic(id);
-+    } else {
-+        cs = mon_get_cpu();
-+    }
- 
-     if (!cs) {
-         monitor_printf(mon, "No CPU available\n");
+> I was not aware of the ELF_LOAD_WRONG_ENDIAN related code, and at least the
+> MIPS arch is not using it.
+> As I can see in MAINTAINERS, sPAPR is "Supported" meaning "Someone is
+> actually paid to look after this", while there is no such paid person for
+> the MIPS part.
+> It seems each arch had a different way to load images and hw/core/loader.c
+> was an effort to merge common code but mostly "Supported" arch are using it.
+
+afaict MIPS calls load_elf() in 4 places, each checks for the return value
+and already prints the message, how come that that message is not enough?
+What would probably make sense here is if MIPS also printed the return code
+from load_elf() but in any case it is easily visible from gdb.
+
+
+> While your revert does fixes your sPAPR warning issue, looking at the
+> problem roots I think the correct fix is to improve the MIPS port and
+> eventually the less loved archs to unify the loader.c calls and avoid such
+> problems.
+> I don't object reverting this patch for 2.10 and improve the loader.c usage
+> during 2.11 cycle, I only wonder if this is another corporate/hobbyist> conflict of interest with corporate crushing on hobbyist instead of
+
+Come on mate...
+
+
+> helping, motivating contribution improving common code usage.
+> 
+> Cc'ed MIPS and loader.c maintainers (both "Maintained" and not "Supported").
+> 
+> Phil.
+> 
+> [1] http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05926.html
+
+
 -- 
-1.8.3.1
+Alexey
