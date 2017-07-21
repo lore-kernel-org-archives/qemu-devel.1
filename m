@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYUZT-0001RK-3y
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:50:08 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1dYUbg-0002UW-RF
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dYUZP-0000ic-8l
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:50:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48634)
+	(envelope-from <haozhong.zhang@intel.com>) id 1dYUbc-0002yb-K5
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:52:24 -0400
+Received: from mga05.intel.com ([192.55.52.43]:59316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dYUZO-0000i8-VW
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:50:03 -0400
-Date: Fri, 21 Jul 2017 10:49:55 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170721094955.GH17693@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1dYUbc-0002vg-8X
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:52:20 -0400
+Date: Fri, 21 Jul 2017 17:51:31 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20170721095131.ule4owoayuqwh6d3@hz-desktop>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
- machine types
+In-Reply-To: <945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +28,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, Rik van Riel <riel@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, ross.zwisler@linux.intel.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong.eric@gmail.com
 
-On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:
-> w2k used to boot on QEMU until we bumped revision of FADT to rev3
-> (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+On 07/21/17 02:56 -0400, Pankaj Gupta wrote:
 > 
-> Considering that w2k is ancient and long time EOLed, leave default
-> rev3 but make pc-i440fx-2.9 and older machine types to force rev1
-> so old setups won't break (w2k could boot).
+> Hello,
+> 
+> We shared a proposal for 'KVM fake DAX flushing interface'.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02478.html
+>
 
-There needs to be a machine type property added to control this
-feature. When provisioning new VMs, management apps need to be
-able to set the property explicitly - having them rely on picking
-particular machine type name+versions is not viable, because
-downstream vendors replace the machine types with their own
-names + versions.
+In above link,
+  "Overall goal of project 
+   is to increase the number of virtual machines that can be 
+   run on a physical machine, in order to *increase the density*
+   of customer virtual machines"
+
+Is the fake persistent memory used as normal RAM in guest? If no, how
+is it expected to be used in guest?
+
+> We did initial POC in which we used 'virtio-blk' device to perform 
+> a device flush on pmem fsync on ext4 filesystem. They are few hacks 
+> to make things work. We need suggestions on below points before we 
+> start actual implementation.
+>
+> A] Problems to solve:
+> ------------------
+> 
+> 1] We are considering two approaches for 'fake DAX flushing interface'.
+>     
+>  1.1] fake dax with NVDIMM flush hints & KVM async page fault
+> 
+>      - Existing interface.
+> 
+>      - The approach to use flush hint address is already nacked upstream.
+> 
+>      - Flush hint not queued interface for flushing. Applications might 
+>        avoid to use it.
+> 
+>      - Flush hint address traps from guest to host and do an entire fsync 
+>        on backing file which itself is costly.
+> 
+>      - Can be used to flush specific pages on host backing disk. We can 
+>        send data(pages information) equal to cache-line size(limitation) 
+>        and tell host to sync corresponding pages instead of entire disk sync.
+> 
+>      - This will be an asynchronous operation and vCPU control is returned 
+>        quickly.
+> 
+> 
+>  1.2] Using additional para virt device in addition to pmem device(fake dax with device flush)
+> 
+>      - New interface
+> 
+>      - Guest maintains information of DAX dirty pages as exceptional entries in 
+>        radix tree.
+> 
+>      - If we want to flush specific pages from guest to host, we need to send 
+>        list of the dirty pages corresponding to file on which we are doing fsync.
+> 
+>      - This will require implementation of new interface, a new paravirt device 
+>        for sending flush requests.
+> 
+>      - Host side will perform fsync/fdatasync on list of dirty pages or entire 
+>        block device backed file.
+> 
+> 2] Questions:
+> -----------
+> 
+>  2.1] Not sure why WPQ flush is not a queued interface? We can force applications 
+>       to call this? device DAX neither calls fsync/msync?
+> 
+>  2.2] Depending upon interface we decide, we need optimal solution to sync 
+>       range of pages?
+> 
+>      - Send range of pages from guest to host to sync asynchronously instead 
+>        of syncing entire block device?
+
+e.g. a new virtio device to deliver sync requests to host?
 
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: Programmingkid <programmingkidx@gmail.com>
-> CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> CC: "Michael S. Tsirkin" <mst@redhat.com>
-> 
-> Only compile test since I don't have w2k to test with
-> 
-> ---
->  include/hw/i386/pc.h |  1 +
->  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
->  hw/i386/pc_piix.c    |  2 ++
->  3 files changed, 22 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index d80859b..d6f65dd 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -122,6 +122,7 @@ struct PCMachineClass {
->      bool rsdp_in_ram;
->      int legacy_acpi_table_size;
->      unsigned acpi_data_size;
-> +    bool force_rev1_fadt;
->  
->      /* SMBIOS compat: */
->      bool smbios_defaults;
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 6b7bade..227f9ad 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
->  }
->  
->  /* Load chipset information in FADT */
-> -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, bool rev1)
->  {
->      fadt->model = 1;
->      fadt->reserved1 = 0;
-> @@ -304,6 +304,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
->          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
->      }
->      fadt->century = RTC_CENTURY;
-> +    if (rev1) {
-> +        return;
-> +    }
->  
->      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
->      fadt->reset_value = 0xf;
-> @@ -335,6 +338,7 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
->  /* FADT */
->  static void
->  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> +           MachineState *machine,
->             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
->             const char *oem_id, const char *oem_table_id)
->  {
-> @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
->      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
->      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
->      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
-> +    int fadt_size = sizeof(*fadt);
-> +    int rev = 3;
->  
->      /* FACS address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
-> @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
->          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
->  
->      /* DSDT address to be filled by Guest linker */
-> -    fadt_setup(fadt, pm);
-> +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
->          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> -    bios_linker_loader_add_pointer(linker,
-> -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> +    if (pcmc->force_rev1_fadt) {
-> +        rev = 1;
-> +        fadt_size = offsetof(typeof(*fadt), reset_register);
-> +    } else {
-> +        bios_linker_loader_add_pointer(linker,
-> +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> +    }
->  
->      build_header(linker, table_data,
-> -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
-> +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
->  }
->  
->  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-> @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->      /* ACPI tables pointed to by RSDT */
->      fadt = tables_blob->len;
->      acpi_add_table(table_offsets, tables_blob);
-> -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
-> +    build_fadt(tables_blob, tables->linker, &pm, machine, facs, dsdt,
->                 slic_oem.id, slic_oem.table_id);
->      aml_len += tables_blob->len - fadt;
->  
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 11b4336..bc61332 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
->  
->  static void pc_i440fx_2_9_machine_options(MachineClass *m)
->  {
-> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
->      pc_i440fx_2_10_machine_options(m);
->      m->is_default = 0;
->      m->alias = NULL;
-> +    pcmc->force_rev1_fadt = true;
->      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
->  }
->  
-> -- 
-> 2.7.4
-> 
-> 
+>      - Other option is to sync entire disk backing file to make sure all the 
+>        writes are persistent. In our case, backing file is a regular file on 
+>        non NVDIMM device so host page cache has list of dirty pages which
+>        can be used either with fsync or similar interface.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+As the amount of dirty pages can be variant, the latency of each host
+fsync is likely to vary in a large range.
+
+> 
+>  2.3] If we do host fsync on entire disk we will be flushing all the dirty data
+>       to backend file. Just thinking what would be better approach, flushing 
+>       pages on corresponding guest file fsync or entire block device?
+> 
+>  2.4] If we decide to choose one of the above approaches, we need to consider 
+>       all DAX supporting filesystems(ext4/xfs). Would hooking code to corresponding
+>       fsync code of fs seems reasonable? Just thinking for flush hint address use-case?
+>       Or how flush hint addresses would be invoked with fsync or similar api?
+> 
+>  2.5] Also with filesystem journalling and other mount options like barriers, 
+>       ordered etc, how we decide to use page flush hint or regular fsync on file?
+>  
+>  2.6] If at guest side we have PFN of all the dirty pages in radixtree? and we send 
+>       these to to host? At host side would we able to find corresponding page and flush 
+>       them all?
+
+That may require the host file system provides API to flush specified
+blocks/extents and their meta data in the file system. I'm not
+familiar with this part and don't know whether such API exists.
+
+Haozhong
