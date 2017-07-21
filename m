@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYhV0-0000xl-L5
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:38:23 -0400
+	(envelope-from <mst@redhat.com>) id 1dYhXS-0001sm-D4
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYhUx-0000Hj-DG
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:38:22 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36319)
+	(envelope-from <mst@redhat.com>) id 1dYhXN-0001bx-E0
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:40:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYhUx-0000HU-8s
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:38:19 -0400
-Date: Fri, 21 Jul 2017 19:38:18 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170721233818.GT10809@flamenco>
-References: <20170715094243.28371-1-rth@twiddle.net>
-	<20170715094243.28371-9-rth@twiddle.net>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dYhXN-0001bU-1X
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 19:40:49 -0400
+Date: Sat, 22 Jul 2017 02:40:46 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170722023020-mutt-send-email-mst@kernel.org>
+References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+	<20170721094955.GH17693@redhat.com>
+	<20170721121048.44d617ea@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170715094243.28371-9-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v14 08/34] tcg: Add generic translation
- framework
+In-Reply-To: <20170721121048.44d617ea@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +29,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>, Phil Dennis-Jordan <lists@philjordan.eu>
 
-On Fri, Jul 14, 2017 at 23:42:17 -1000, Richard Henderson wrote:
-> From: Lluís Vilanova <vilanova@ac.upc.edu>
+On Fri, Jul 21, 2017 at 12:10:48PM +0200, Igor Mammedov wrote:
+> On Fri, 21 Jul 2017 10:49:55 +0100
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
 > 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> Message-Id: <150002073981.22386.9870422422367410100.stgit@frigg.lan>
-> [rth: Moved max_insns adjustment from tb_start to init_disas_context.
-> Removed pc_next return from translate_insn.
-> Removed tcg_check_temp_count from generic loop.
-> Moved gen_io_end to exactly match gen_io_start.
-> Use qemu_log instead of error_report for temporary leaks.
-> Moved TB size/icount assignments before disas_log.]
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-(snip)
-> +void translator_loop_temp_check(DisasContextBase *db)
-> +{
-> +    if (tcg_check_temp_count()) {
-> +        qemu_log("warning: TCG temporary leaks before "
-> +                 TARGET_FMT_lx "\n", db->pc_next);
-> +    }
-> +}
+> > On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:
+> > > w2k used to boot on QEMU until we bumped revision of FADT to rev3
+> > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+> > > 
+> > > Considering that w2k is ancient and long time EOLed, leave default
+> > > rev3 but make pc-i440fx-2.9 and older machine types to force rev1
+> > > so old setups won't break (w2k could boot).  
+> > 
+> > There needs to be a machine type property added to control this
+> > feature. When provisioning new VMs, management apps need to be
+> > able to set the property explicitly - having them rely on picking
+> > particular machine type name+versions is not viable, because
+> > downstream vendors replace the machine types with their own
+> > names + versions.
+> having property doesn't really help here and we don't do it for every
+> compat tweak /ex: save_tsc_khz, linuxboot_dma_enabled/.
+> 
+> Management would not benefit much from having property vs machine version
+> as it would have to encode somewhere that for w2k it should set
+> some machine property or pick a particular machine type.
 
-I dislike that we have target code calling tcg_clear_temp_count()
-and then calling translator_loop_temp_check().
+I think I'd disagree with that. If
+users might need this for compatibility with some guests,
+then it should be a property not just a machine type.
 
-I suggest we either:
-- Add an inline wrapping tcg_clear_temp_count(), calling it something
-  like translator_loop_clear_temp_count()
-- Just add a comment to this function, e.g.
-  '/* pairs with tcg_clear_temp_count() */'
+But see below - I think we rushed it for the PC anyway.
 
-Ignoring that and the update needed to the docs that Lluis mentioned,
+> Probably no one would worry about fixing virt-install or something
+> else for the sake of w2k and if they are going to fix it
+> it doesn't matter if they map machine type vs property.
+> 
+> Also with new machine type deprecation policy we would be able
+> easily to phase out rev1 support along with 2.9 machine,
+> but if you expose property then removing it would break
+> CLI not only for 2.9 but possible later machines if it's set there.
+> 
+> So I'm against adding properties/CLI options for unless we have to in this case,
+> and I'm not convinced that w2k deserves it.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+If I have to choose, I'd say Mac OSX is way less interesting than old
+windows versions. Lots of people have software that will only run on old
+windows and there's probably good money to be had running it on new
+hardware in VMs. And PC machine is all about compatibility - we have Q35
+for new stuff.  Besides OSX uses q35 anyway I think.
 
-		E.
+So maybe the right thing to do is to
+- switch default for PC back to rev 1
+- keep default for Q35 at rev 3
+
+No machinetype hacks.
+
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > CC: Programmingkid <programmingkidx@gmail.com>
+> > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> > > CC: "Michael S. Tsirkin" <mst@redhat.com>
+> > > 
+> > > Only compile test since I don't have w2k to test with
+> > > 
+> > > ---
+> > >  include/hw/i386/pc.h |  1 +
+> > >  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
+> > >  hw/i386/pc_piix.c    |  2 ++
+> > >  3 files changed, 22 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > index d80859b..d6f65dd 100644
+> > > --- a/include/hw/i386/pc.h
+> > > +++ b/include/hw/i386/pc.h
+> > > @@ -122,6 +122,7 @@ struct PCMachineClass {
+> > >      bool rsdp_in_ram;
+> > >      int legacy_acpi_table_size;
+> > >      unsigned acpi_data_size;
+> > > +    bool force_rev1_fadt;
+> > >  
+> > >      /* SMBIOS compat: */
+> > >      bool smbios_defaults;
+> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > index 6b7bade..227f9ad 100644
+> > > --- a/hw/i386/acpi-build.c
+> > > +++ b/hw/i386/acpi-build.c
+> > > @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
+> > >  }
+> > >  
+> > >  /* Load chipset information in FADT */
+> > > -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > > +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, bool rev1)
+> > >  {
+> > >      fadt->model = 1;
+> > >      fadt->reserved1 = 0;
+> > > @@ -304,6 +304,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+> > >      }
+> > >      fadt->century = RTC_CENTURY;
+> > > +    if (rev1) {
+> > > +        return;
+> > > +    }
+> > >  
+> > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+> > >      fadt->reset_value = 0xf;
+> > > @@ -335,6 +338,7 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > >  /* FADT */
+> > >  static void
+> > >  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > > +           MachineState *machine,
+> > >             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
+> > >             const char *oem_id, const char *oem_table_id)
+> > >  {
+> > > @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+> > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+> > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> > > +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
+> > > +    int fadt_size = sizeof(*fadt);
+> > > +    int rev = 3;
+> > >  
+> > >      /* FACS address to be filled by Guest linker */
+> > >      bios_linker_loader_add_pointer(linker,
+> > > @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > >          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
+> > >  
+> > >      /* DSDT address to be filled by Guest linker */
+> > > -    fadt_setup(fadt, pm);
+> > > +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
+> > >      bios_linker_loader_add_pointer(linker,
+> > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+> > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > -    bios_linker_loader_add_pointer(linker,
+> > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > +    if (pcmc->force_rev1_fadt) {
+> > > +        rev = 1;
+> > > +        fadt_size = offsetof(typeof(*fadt), reset_register);
+> > > +    } else {
+> > > +        bios_linker_loader_add_pointer(linker,
+> > > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > +    }
+> > >  
+> > >      build_header(linker, table_data,
+> > > -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
+> > > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
+> > >  }
+> > >  
+> > >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> > > @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> > >      /* ACPI tables pointed to by RSDT */
+> > >      fadt = tables_blob->len;
+> > >      acpi_add_table(table_offsets, tables_blob);
+> > > -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
+> > > +    build_fadt(tables_blob, tables->linker, &pm, machine, facs, dsdt,
+> > >                 slic_oem.id, slic_oem.table_id);
+> > >      aml_len += tables_blob->len - fadt;
+> > >  
+> > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> > > index 11b4336..bc61332 100644
+> > > --- a/hw/i386/pc_piix.c
+> > > +++ b/hw/i386/pc_piix.c
+> > > @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+> > >  
+> > >  static void pc_i440fx_2_9_machine_options(MachineClass *m)
+> > >  {
+> > > +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+> > >      pc_i440fx_2_10_machine_options(m);
+> > >      m->is_default = 0;
+> > >      m->alias = NULL;
+> > > +    pcmc->force_rev1_fadt = true;
+> > >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
+
+whatever switch we use for this option, I think it makes
+sense to add comments to document why we keep this around.
+
+
+> > >  }
+> > >  
+> > > -- 
+> > > 2.7.4
+> > > 
+> > >   
+> > 
+> > Regards,
+> > Daniel
