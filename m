@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dYUfq-0004EA-4m
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:56:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dYUgE-0004Zc-2k
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dYUfn-0000vW-2V
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:56:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1dYUfm-0000v5-SJ
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:56:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BCAB02C1552
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 09:56:37 +0000 (UTC)
-From: Jens Freimann <jfreimann@redhat.com>
-Date: Fri, 21 Jul 2017 11:55:52 +0200
-Message-Id: <20170721095553.10717-4-jfreimann@redhat.com>
-In-Reply-To: <20170721095553.10717-1-jfreimann@redhat.com>
-References: <20170721095553.10717-1-jfreimann@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] libvhost-user: quit when no more data
- received
+	(envelope-from <alex.bennee@linaro.org>) id 1dYUgB-0001HW-0E
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:06 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:32997)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dYUgA-0001H0-Ps
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:57:02 -0400
+Received: by mail-wm0-x230.google.com with SMTP id v139so2494565wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:57:02 -0700 (PDT)
+References: <20170720150426.12393-1-alex.bennee@linaro.org>
+	<20170720150426.12393-3-alex.bennee@linaro.org>
+	<98e1b6a7-7af5-7b8b-23c8-159572c83eb4@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <98e1b6a7-7af5-7b8b-23c8-159572c83eb4@redhat.com>
+Date: Fri, 21 Jul 2017 10:57:00 +0100
+Message-ID: <87shhq6rkj.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH for 2.11 02/23] fpu: import SoftFloat3c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
 
-From: Jens Freimann <jfreiman@redhat.com>
 
-End processing of messages when VHOST_USER_NO_MESSAGE
-is received.
+Thomas Huth <thuth@redhat.com> writes:
 
-Without this we run into a vubr_panic() call and get
-"PANIC: Unhandled request: 0"
+> On 20.07.2017 17:04, Alex Bennée wrote:
+>> SoftFloat3c is a re-write of the BSD softfloat library which includes
+>> a number of new features. It has been written with libraries in mind
+>> and has a new API so hopefully we can use both side-by-side as we
+>> migrate.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  fpu/softfloat3c/8086-SSE/extF80M_isSignalingNaN.c |   57 +
+>
+> I'd maybe rather name the folder "softfloat3" instead of "softfloat3c"
+> ... otherwise it does not match anymore if we ever want to update to
+> version 3d (which is likely just a minor release with some few bug
+> fixes, so we likely don't want to maintain that in a separate folder)
 
-Signed-off-by: Jens Freimann <jfreiman@redhat.com>
----
- contrib/libvhost-user/libvhost-user.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Good point, will do.
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index 9efb9da..85523ca 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -161,7 +161,7 @@ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
-         rc = recvmsg(conn_fd, &msg, 0);
-     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
- 
--    if (rc <= 0) {
-+    if (rc < 0) {
-         vu_panic(dev, "Error while recvmsg: %s", strerror(errno));
-         return false;
-     }
-@@ -806,6 +806,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_get_queue_num_exec(dev, vmsg);
-     case VHOST_USER_SET_VRING_ENABLE:
-         return vu_set_vring_enable_exec(dev, vmsg);
-+    case VHOST_USER_NONE:
-+        return true;
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
--- 
-2.9.4
+--
+Alex Bennée
