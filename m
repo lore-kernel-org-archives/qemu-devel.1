@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNos-0003xb-FV
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1dYNrf-0006Lr-Cf
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:40:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoq-0007ZW-RK
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:34 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:50397)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dYNoq-0007ZL-J5
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:37:32 -0400
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Fri, 21 Jul 2017 03:37:12 +0100
-Message-ID: <1500604635-15027-12-git-send-email-yongbok.kim@imgtec.com>
-In-Reply-To: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
-References: <1500604635-15027-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <peterx@redhat.com>) id 1dYNrc-00014X-9i
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:40:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28409)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dYNrb-00013u-WA
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 22:40:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC6818553D
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:40:22 +0000 (UTC)
+Date: Fri, 21 Jul 2017 10:40:18 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170721024018.GB878@pxdev.xzpeter.org>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-18-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 11/14] target/mips: Add segmentation control
- registers
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170717134238.1966-18-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,288 +33,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
 
-From: James Hogan <james.hogan@imgtec.com>
+On Mon, Jul 17, 2017 at 03:42:38PM +0200, Juan Quintela wrote:
+> Each time that we sync the bitmap, it is a possiblity that we receive
+> a page that is being processed by a different thread.  We fix this
+> problem just making sure that we wait for all receiving threads to
+> finish its work before we procedeed with the next stage.
+> 
+> We are low on page flags, so we use a combination that is not valid to
+> emit that message:  MULTIFD_PAGE and COMPRESSED.
+> 
+> I tried to make a migration command for it, but it don't work because
+> we sync the bitmap sometimes when we have already sent the beggining
+> of the section, so I just added a new page flag.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 56 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index c78b286..bffe204 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -71,6 +71,12 @@
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+>  #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
+>  
+> +/* We are getting low on pages flags, so we start using combinations
+> +   When we need to flush a page, we sent it as
+> +   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_COMPRESS_PAGE
+> +   We don't allow that combination
+> +*/
+> +
+>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
+>  {
+>      return buffer_is_zero(p, size);
+> @@ -193,6 +199,9 @@ struct RAMState {
+>      uint64_t iterations_prev;
+>      /* Iterations since start */
+>      uint64_t iterations;
+> +    /* Indicates if we have synced the bitmap and we need to assure that
+> +       target has processeed all previous pages */
+> +    bool multifd_needs_flush;
+>      /* protects modification of the bitmap */
+>      uint64_t migration_dirty_pages;
+>      /* number of dirty bits in the bitmap */
+> @@ -363,7 +372,6 @@ static void compress_threads_save_setup(void)
+>  
+>  /* Multiple fd's */
+>  
+> -
+>  typedef struct {
+>      int num;
+>      int size;
+> @@ -595,9 +603,11 @@ struct MultiFDRecvParams {
+>      QIOChannel *c;
+>      QemuSemaphore ready;
+>      QemuSemaphore sem;
+> +    QemuCond cond_sync;
+>      QemuMutex mutex;
+>      /* proteced by param mutex */
+>      bool quit;
+> +    bool sync;
+>      multifd_pages_t pages;
+>      bool done;
+>  };
+> @@ -637,6 +647,7 @@ void multifd_load_cleanup(void)
+>          qemu_thread_join(&p->thread);
+>          qemu_mutex_destroy(&p->mutex);
+>          qemu_sem_destroy(&p->sem);
+> +        qemu_cond_destroy(&p->cond_sync);
+>          socket_recv_channel_destroy(p->c);
+>          g_free(p);
+>          multifd_recv_state->params[i] = NULL;
+> @@ -675,6 +686,10 @@ static void *multifd_recv_thread(void *opaque)
+>                  return NULL;
+>              }
+>              p->done = true;
+> +            if (p->sync) {
+> +                qemu_cond_signal(&p->cond_sync);
+> +                p->sync = false;
+> +            }
 
-The optional segmentation control registers CP0_SegCtl0, CP0_SegCtl1 &
-CP0_SegCtl2 control the behaviour and required privilege of the legacy
-virtual memory segments.
+Could we use the same p->ready for this purpose? They looks similar:
+all we want to do is to let the main thread know "worker thread has
+finished receiving the last piece and becomes idle again", right?
 
-Add them to the CP0 interface so they can be read and written when
-CP0_Config3.SC=1, and initialise them to describe the standard legacy
-layout so they can be used in future patches regardless of whether they
-are exposed to the guest.
+>              qemu_mutex_unlock(&p->mutex);
+>              qemu_sem_post(&p->ready);
+>              continue;
+> @@ -724,9 +739,11 @@ gboolean multifd_new_channel(QIOChannel *ioc)
+>      qemu_mutex_init(&p->mutex);
+>      qemu_sem_init(&p->sem, 0);
+>      qemu_sem_init(&p->ready, 0);
+> +    qemu_cond_init(&p->cond_sync);
+>      p->quit = false;
+>      p->id = id;
+>      p->done = false;
+> +    p->sync = false;
+>      multifd_init_group(&p->pages);
+>      p->c = ioc;
+>      atomic_set(&multifd_recv_state->params[id], p);
+> @@ -792,6 +809,27 @@ static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+>      qemu_sem_post(&p->sem);
+>  }
+>  
+> +static int multifd_flush(void)
+> +{
+> +    int i, thread_count;
+> +
+> +    if (!migrate_use_multifd()) {
+> +        return 0;
+> +    }
+> +    thread_count = migrate_multifd_threads();
+> +    for (i = 0; i < thread_count; i++) {
+> +        MultiFDRecvParams *p = multifd_recv_state->params[i];
+> +
+> +        qemu_mutex_lock(&p->mutex);
+> +        while (!p->done) {
+> +            p->sync = true;
+> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- target/mips/cpu.h       | 30 +++++++++++++++++
- target/mips/helper.h    |  3 ++
- target/mips/machine.c   |  7 ++--
- target/mips/op_helper.c | 24 ++++++++++++++
- target/mips/translate.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 150 insertions(+), 2 deletions(-)
+(similar comment like above)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index c24b1f6..74f6a5b 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -306,6 +306,36 @@ struct CPUMIPSState {
- #define CP0PG_XIE 30
- #define CP0PG_ELPA 29
- #define CP0PG_IEC 27
-+    target_ulong CP0_SegCtl0;
-+    target_ulong CP0_SegCtl1;
-+    target_ulong CP0_SegCtl2;
-+#define CP0SC_PA        9
-+#define CP0SC_PA_MASK   (0x7FULL << CP0SC_PA)
-+#define CP0SC_PA_1GMASK (0x7EULL << CP0SC_PA)
-+#define CP0SC_AM        4
-+#define CP0SC_AM_MASK   (0x7ULL << CP0SC_AM)
-+#define CP0SC_AM_UK     0ULL
-+#define CP0SC_AM_MK     1ULL
-+#define CP0SC_AM_MSK    2ULL
-+#define CP0SC_AM_MUSK   3ULL
-+#define CP0SC_AM_MUSUK  4ULL
-+#define CP0SC_AM_USK    5ULL
-+#define CP0SC_AM_UUSK   7ULL
-+#define CP0SC_EU        3
-+#define CP0SC_EU_MASK   (1ULL << CP0SC_EU)
-+#define CP0SC_C         0
-+#define CP0SC_C_MASK    (0x7ULL << CP0SC_C)
-+#define CP0SC_MASK      (CP0SC_C_MASK | CP0SC_EU_MASK | CP0SC_AM_MASK | \
-+                         CP0SC_PA_MASK)
-+#define CP0SC_1GMASK    (CP0SC_C_MASK | CP0SC_EU_MASK | CP0SC_AM_MASK | \
-+                         CP0SC_PA_1GMASK)
-+#define CP0SC0_MASK     (CP0SC_MASK | (CP0SC_MASK << 16))
-+#define CP0SC1_XAM      59
-+#define CP0SC1_XAM_MASK (0x7ULL << CP0SC1_XAM)
-+#define CP0SC1_MASK     (CP0SC_MASK | (CP0SC_MASK << 16) | CP0SC1_XAM_MASK)
-+#define CP0SC2_XR       56
-+#define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
-+#define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
-     int32_t CP0_Wired;
-     int32_t CP0_SRSConf0_rw_bitmask;
-     int32_t CP0_SRSConf0;
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 60efa01..5f49234 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -115,6 +115,9 @@ DEF_HELPER_2(mtc0_entrylo1, void, env, tl)
- DEF_HELPER_2(mtc0_context, void, env, tl)
- DEF_HELPER_2(mtc0_pagemask, void, env, tl)
- DEF_HELPER_2(mtc0_pagegrain, void, env, tl)
-+DEF_HELPER_2(mtc0_segctl0, void, env, tl)
-+DEF_HELPER_2(mtc0_segctl1, void, env, tl)
-+DEF_HELPER_2(mtc0_segctl2, void, env, tl)
- DEF_HELPER_2(mtc0_wired, void, env, tl)
- DEF_HELPER_2(mtc0_srsconf0, void, env, tl)
- DEF_HELPER_2(mtc0_srsconf1, void, env, tl)
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 91e31a7..898825d 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -211,8 +211,8 @@ const VMStateDescription vmstate_tlb = {
- 
- const VMStateDescription vmstate_mips_cpu = {
-     .name = "cpu",
--    .version_id = 9,
--    .minimum_version_id = 9,
-+    .version_id = 10,
-+    .minimum_version_id = 10,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         /* Active TC */
-@@ -252,6 +252,9 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_UINTTL(env.CP0_Context, MIPSCPU),
-         VMSTATE_INT32(env.CP0_PageMask, MIPSCPU),
-         VMSTATE_INT32(env.CP0_PageGrain, MIPSCPU),
-+        VMSTATE_UINTTL(env.CP0_SegCtl0, MIPSCPU),
-+        VMSTATE_UINTTL(env.CP0_SegCtl1, MIPSCPU),
-+        VMSTATE_UINTTL(env.CP0_SegCtl2, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Wired, MIPSCPU),
-         VMSTATE_INT32(env.CP0_SRSConf0, MIPSCPU),
-         VMSTATE_INT32(env.CP0_SRSConf1, MIPSCPU),
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index c52a407..526f8e4 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -1322,6 +1322,30 @@ void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
-     restore_pamask(env);
- }
- 
-+void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
-+{
-+    CPUState *cs = CPU(mips_env_get_cpu(env));
-+
-+    env->CP0_SegCtl0 = arg1 & CP0SC0_MASK;
-+    tlb_flush(cs);
-+}
-+
-+void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
-+{
-+    CPUState *cs = CPU(mips_env_get_cpu(env));
-+
-+    env->CP0_SegCtl1 = arg1 & CP0SC1_MASK;
-+    tlb_flush(cs);
-+}
-+
-+void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
-+{
-+    CPUState *cs = CPU(mips_env_get_cpu(env));
-+
-+    env->CP0_SegCtl2 = arg1 & CP0SC2_MASK;
-+    tlb_flush(cs);
-+}
-+
- void helper_mtc0_wired(CPUMIPSState *env, target_ulong arg1)
- {
-     if (env->insn_flags & ISA_MIPS32R6) {
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4fb8217..51626ae 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1450,6 +1450,7 @@ typedef struct DisasContext {
-     uint64_t PAMask;
-     bool mvh;
-     bool eva;
-+    bool sc;
-     int CP0_LLAddr_shift;
-     bool ps;
-     bool vp;
-@@ -5232,6 +5233,24 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageGrain));
-             rn = "PageGrain";
-             break;
-+        case 2:
-+            CP0_CHECK(ctx->sc);
-+            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl0));
-+            tcg_gen_ext32s_tl(arg, arg);
-+            rn = "SegCtl0";
-+            break;
-+        case 3:
-+            CP0_CHECK(ctx->sc);
-+            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl1));
-+            tcg_gen_ext32s_tl(arg, arg);
-+            rn = "SegCtl1";
-+            break;
-+        case 4:
-+            CP0_CHECK(ctx->sc);
-+            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
-+            tcg_gen_ext32s_tl(arg, arg);
-+            rn = "SegCtl2";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -5886,6 +5905,21 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             rn = "PageGrain";
-             ctx->bstate = BS_STOP;
-             break;
-+        case 2:
-+            CP0_CHECK(ctx->sc);
-+            gen_helper_mtc0_segctl0(cpu_env, arg);
-+            rn = "SegCtl0";
-+            break;
-+        case 3:
-+            CP0_CHECK(ctx->sc);
-+            gen_helper_mtc0_segctl1(cpu_env, arg);
-+            rn = "SegCtl1";
-+            break;
-+        case 4:
-+            CP0_CHECK(ctx->sc);
-+            gen_helper_mtc0_segctl2(cpu_env, arg);
-+            rn = "SegCtl2";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -6547,6 +6581,21 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageGrain));
-             rn = "PageGrain";
-             break;
-+        case 2:
-+            CP0_CHECK(ctx->sc);
-+            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl0));
-+            rn = "SegCtl0";
-+            break;
-+        case 3:
-+            CP0_CHECK(ctx->sc);
-+            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl1));
-+            rn = "SegCtl1";
-+            break;
-+        case 4:
-+            CP0_CHECK(ctx->sc);
-+            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
-+            rn = "SegCtl2";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7183,6 +7232,21 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_helper_mtc0_pagegrain(cpu_env, arg);
-             rn = "PageGrain";
-             break;
-+        case 2:
-+            CP0_CHECK(ctx->sc);
-+            gen_helper_mtc0_segctl0(cpu_env, arg);
-+            rn = "SegCtl0";
-+            break;
-+        case 3:
-+            CP0_CHECK(ctx->sc);
-+            gen_helper_mtc0_segctl1(cpu_env, arg);
-+            rn = "SegCtl1";
-+            break;
-+        case 4:
-+            CP0_CHECK(ctx->sc);
-+            gen_helper_mtc0_segctl2(cpu_env, arg);
-+            rn = "SegCtl2";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -20142,6 +20206,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     ctx.PAMask = env->PAMask;
-     ctx.mvh = (env->CP0_Config5 >> CP0C5_MVH) & 1;
-     ctx.eva = (env->CP0_Config5 >> CP0C5_EVA) & 1;
-+    ctx.sc = (env->CP0_Config3 >> CP0C3_SC) & 1;
-     ctx.CP0_LLAddr_shift = env->CP0_LLAddr_shift;
-     ctx.cmgcr = (env->CP0_Config3 >> CP0C3_CMGCR) & 1;
-     /* Restore delay slot state from the tb context.  */
-@@ -20628,6 +20693,29 @@ void cpu_state_reset(CPUMIPSState *env)
-             env->tcs[0].CP0_TCStatus = (1 << CP0TCSt_A);
-         }
-     }
-+
-+    /*
-+     * Configure default legacy segmentation control. We use this regardless of
-+     * whether segmentation control is presented to the guest.
-+     */
-+    /* KSeg3 (seg0 0xE0000000..0xFFFFFFFF) */
-+    env->CP0_SegCtl0 =   (CP0SC_AM_MK << CP0SC_AM);
-+    /* KSeg2 (seg1 0xC0000000..0xDFFFFFFF) */
-+    env->CP0_SegCtl0 |= ((CP0SC_AM_MSK << CP0SC_AM)) << 16;
-+    /* KSeg1 (seg2 0xA0000000..0x9FFFFFFF) */
-+    env->CP0_SegCtl1 =   (0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) |
-+                         (2 << CP0SC_C);
-+    /* KSeg0 (seg3 0x80000000..0x9FFFFFFF) */
-+    env->CP0_SegCtl1 |= ((0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) |
-+                         (3 << CP0SC_C)) << 16;
-+    /* USeg (seg4 0x40000000..0x7FFFFFFF) */
-+    env->CP0_SegCtl2 =   (2 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
-+                         (1 << CP0SC_EU) | (2 << CP0SC_C);
-+    /* USeg (seg5 0x00000000..0x3FFFFFFF) */
-+    env->CP0_SegCtl2 |= ((0 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
-+                         (1 << CP0SC_EU) | (2 << CP0SC_C)) << 16;
-+    /* XKPhys (note, SegCtl2.XR = 0, so XAM won't be used) */
-+    env->CP0_SegCtl1 |= (CP0SC_AM_UK << CP0SC1_XAM);
- #endif
-     if ((env->insn_flags & ISA_MIPS32R6) &&
-         (env->active_fpu.fcr0 & (1 << FCR0_F64))) {
+> +        }
+> +        qemu_mutex_unlock(&p->mutex);
+> +    }
+> +    return 0;
+> +}
+> +
+>  /**
+>   * save_page_header: write page header to wire
+>   *
+> @@ -809,6 +847,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
+>  {
+>      size_t size, len;
+>  
+> +    if (rs->multifd_needs_flush &&
+> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+
+If multifd_needs_flush is only for multifd, then we may skip this
+check, but it looks more like an assertion:
+
+    if (rs->multifd_needs_flush) {
+        assert(offset & RAM_SAVE_FLAG_MULTIFD_PAGE);
+        offset |= RAM_SAVE_FLAG_ZERO;
+    }
+
+(Dave mentioned about unaligned flag used in commit message and here:
+ ZERO is used, but COMPRESS is mentioned)
+
+> +        offset |= RAM_SAVE_FLAG_ZERO;
+> +        rs->multifd_needs_flush = false;
+> +    }
+> +
+>      if (block == rs->last_sent_block) {
+>          offset |= RAM_SAVE_FLAG_CONTINUE;
+>      }
+> @@ -2496,6 +2540,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+>  
+>      if (!migration_in_postcopy()) {
+>          migration_bitmap_sync(rs);
+> +        if (migrate_use_multifd()) {
+> +            rs->multifd_needs_flush = true;
+> +        }
+
+Would it be good to move this block into entry of
+migration_bitmap_sync(), instead of setting it up at the callers of
+migration_bitmap_sync()?
+
+>      }
+>  
+>      ram_control_before_iterate(f, RAM_CONTROL_FINISH);
+> @@ -2538,6 +2585,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+>          qemu_mutex_lock_iothread();
+>          rcu_read_lock();
+>          migration_bitmap_sync(rs);
+> +        if (migrate_use_multifd()) {
+> +            rs->multifd_needs_flush = true;
+> +        }
+>          rcu_read_unlock();
+>          qemu_mutex_unlock_iothread();
+>          remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
+> @@ -3012,6 +3062,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              break;
+>          }
+>  
+> +        if ((flags & (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO))
+> +                  == (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)) {
+> +            multifd_flush();
+> +            flags = flags & ~RAM_SAVE_FLAG_ZERO;
+> +        }
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
+>                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+> -- 
+> 2.9.4
+> 
+
+Thanks,
+
 -- 
-2.7.4
+Peter Xu
