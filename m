@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYQyM-0002RM-9v
+	(envelope-from <cota@braap.org>) id 1dYQyM-0002RL-AR
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYQyJ-0001pf-3U
+	(envelope-from <cota@braap.org>) id 1dYQyJ-0001pm-4L
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:34 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:49387)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:38709)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYQyI-0001pI-SR
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYQyI-0001p7-S9
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:31 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 21 Jul 2017 01:59:20 -0400
-Message-Id: <1500616763-26560-3-git-send-email-cota@braap.org>
-In-Reply-To: <1500616763-26560-1-git-send-email-cota@braap.org>
-References: <1500616763-26560-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v4 20/43] tcg: check CF_PARALLEL instead of
- parallel_cpus
+Date: Fri, 21 Jul 2017 01:59:18 -0400
+Message-Id: <1500616763-26560-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v4 00/43] tcg: support for multiple TCG contexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +24,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Thereby decoupling the resulting translated code from the current state
-of the system.
+v3:
+  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06353.html
 
-The tb->cflags field is not passed to tcg generation functions. So
-we add a field to TCGContext, storing there a copy of tb->cflags.
+To ease review/testing, you can pull this series from:
+  https://github.com/cota/qemu/tree/multi-tcg-v4
+  [ head commit: 1d50a9f24e ]
 
-Most architectures have <= 32 registers, which results in a 4-byte hole
-in TCGContext. Use this hole for the new field.
+In this iteration I'm sending only the few patches that contain changes
+from v3; they are highlighted in the change list below.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- tcg/tcg.h                 |  1 +
- accel/tcg/translate-all.c |  1 +
- tcg/tcg-op.c              | 10 +++++-----
- 3 files changed, 7 insertions(+), 5 deletions(-)
+Changes from v3:
+- Add R-b tags
+- Rebase on top of current master (25d0233c1)
+- [PATCH 11] tb->cflags hashing: add CF_COUNT_MASK to CF_HASH_MASK
+  - [PATCH 20] tcg_ctx.cf_parallel: convert to tcg_ctx.tb_cflags (Richard:
+    kept your R-b)
+- [PATCH 35] TCG optimizer: allocate using tcg_malloc (Richard: dropped
+  your R-b)
+- [PATCH 42] TCG regions:
+  - expand first and last regions to fully use the buffer
+    - use tcg_region_bounds as suggested by Richard
+    - substitute regions.n_full with region.agg_full_size since now
+      not all regions are of the same size
+  - add region.stride and .start_aligned fields
+    - Only use qemu_real_host_page_size once in the file; guard size
+      is derived as 'region.stride - region.size'
+- [PATCH 43] TCG __thread: (Richard: kept your R-b)
+  - do not assume CONFIG_SOFTMMU == !CONFIG_USER_ONLY
+  - use atomic_read/set on tcg_ctxs[] as well
+  - Remove unnecessary clearing of tcg_ctx->prof in tcg_register_thread()
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 96872f8..ef1760a 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -656,6 +656,7 @@ struct TCGContext {
-     uintptr_t *tb_jmp_target_addr; /* tb->jmp_target_addr if !USE_DIRECT_JUMP */
- 
-     TCGRegSet reserved_regs;
-+    uint32_t tb_cflags; /* cflags of the current TB */
-     intptr_t current_frame_offset;
-     intptr_t frame_start;
-     intptr_t frame_end;
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index c1ce38f..227b566 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1271,6 +1271,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tb->flags = flags;
-     tb->cflags = cflags;
-     tb->trace_vcpu_dstate = *cpu->trace_dstate;
-+    tcg_ctx.tb_cflags = cflags;
- 
- #ifdef CONFIG_PROFILER
-     tcg_ctx.tb_count1++; /* includes aborted translations because of
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 205d07f..5580789 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -150,7 +150,7 @@ void tcg_gen_op6(TCGContext *ctx, TCGOpcode opc, TCGArg a1, TCGArg a2,
- 
- void tcg_gen_mb(TCGBar mb_type)
- {
--    if (parallel_cpus) {
-+    if (tcg_ctx.tb_cflags & CF_PARALLEL) {
-         tcg_gen_op1(&tcg_ctx, INDEX_op_mb, mb_type);
-     }
- }
-@@ -2794,7 +2794,7 @@ void tcg_gen_atomic_cmpxchg_i32(TCGv_i32 retv, TCGv addr, TCGv_i32 cmpv,
- {
-     memop = tcg_canonicalize_memop(memop, 0, 0);
- 
--    if (!parallel_cpus) {
-+    if (!(tcg_ctx.tb_cflags & CF_PARALLEL)) {
-         TCGv_i32 t1 = tcg_temp_new_i32();
-         TCGv_i32 t2 = tcg_temp_new_i32();
- 
-@@ -2838,7 +2838,7 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
- {
-     memop = tcg_canonicalize_memop(memop, 1, 0);
- 
--    if (!parallel_cpus) {
-+    if (!(tcg_ctx.tb_cflags & CF_PARALLEL)) {
-         TCGv_i64 t1 = tcg_temp_new_i64();
-         TCGv_i64 t2 = tcg_temp_new_i64();
- 
-@@ -3015,7 +3015,7 @@ static void * const table_##NAME[16] = {                                \
- void tcg_gen_atomic_##NAME##_i32                                        \
-     (TCGv_i32 ret, TCGv addr, TCGv_i32 val, TCGArg idx, TCGMemOp memop) \
- {                                                                       \
--    if (parallel_cpus) {                                                \
-+    if (tcg_ctx.tb_cflags & CF_PARALLEL) {                              \
-         do_atomic_op_i32(ret, addr, val, idx, memop, table_##NAME);     \
-     } else {                                                            \
-         do_nonatomic_op_i32(ret, addr, val, idx, memop, NEW,            \
-@@ -3025,7 +3025,7 @@ void tcg_gen_atomic_##NAME##_i32                                        \
- void tcg_gen_atomic_##NAME##_i64                                        \
-     (TCGv_i64 ret, TCGv addr, TCGv_i64 val, TCGArg idx, TCGMemOp memop) \
- {                                                                       \
--    if (parallel_cpus) {                                                \
-+    if (tcg_ctx.tb_cflags & CF_PARALLEL) {                              \
-         do_atomic_op_i64(ret, addr, val, idx, memop, table_##NAME);     \
-     } else {                                                            \
-         do_nonatomic_op_i64(ret, addr, val, idx, memop, NEW,            \
--- 
-2.7.4
+To be done after this series:
+- Get rid of tb_lock, or at least push it down so that we take advantage of
+  multiple TCG contexts in MTTCG. (I'm doing this in my testing, but doing
+  it well will require another patch series.)
+
+Improvements that were suggested during this series' development:
+- Perhaps look at arranging fields such that all the fields that are
+  "shared" between the contexts are up front, and use the qemu standard
+  'memcpy(new, old, offsetof(TCGContext, end_common_fields));' trick, and
+  zero the rest.
+- Order tb->[*] comparisons by likelihood of mismatch.
+- Get rid of parallel_cpus from from cpu_exec_step_atomic -- I'm not sure
+  whether just removing it is safe, since we call curr_cflags from several
+  places.
+- Add CF_NOCHAIN flag, that tcg-op can check via tcg_ctx->tb_cflags.
+- Expand CF_HASH_MASK to compare all bits in cflags. Would require cleaning
+  CF_IGNORE_ICOUNT up.
+- Perhaps parse -accel=tcg command-line arguments before TCG is initialized,
+  so that those arguments can be used during TCG initialization.
+
+Thanks,
+
+		Emilio
