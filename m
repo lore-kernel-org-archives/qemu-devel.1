@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dYXU8-00047b-5W
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:53 -0400
+	(envelope-from <david@redhat.com>) id 1dYXUD-0004CQ-C9
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dYXU6-0002Xt-8Q
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37212)
+	(envelope-from <david@redhat.com>) id 1dYXU8-0002aC-Nj
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dYXU5-0002Wv-Ts
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:46 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dYXU8-0002ZC-Di
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:56:48 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 21 Jul 2017 14:56:08 +0200
-Message-Id: <20170721125609.11117-6-david@redhat.com>
+Date: Fri, 21 Jul 2017 14:56:09 +0200
+Message-Id: <20170721125609.11117-7-david@redhat.com>
 In-Reply-To: <20170721125609.11117-1-david@redhat.com>
 References: <20170721125609.11117-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 5/6] target/s390x: add basic MSA features
+Subject: [Qemu-devel] [PATCH v1 6/6] target/s390x: various alignment check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,244 +26,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com
 
-The STFLE bits for the MSA (extension) facilities simply indicate that
-the respective instructions can be executed. The QUERY subfunction can then
-be used to identify which features exactly are available.
-
-Availability of subfunctions can also vary on real hardware. For now, we
-simply implement a CPU model without any available subfunctions except
-QUERY (which is always around).
-
-As all MSA functions behave quite similarly, we can use one translation
-handler for now. Prepare the code for implementation of actual subfunctions.
-
-At least MSA is helpful for now, as older Linux kernels require this
-facility when compiled for a z9 model. Allow to enable the facilities
-for the qemu cpu model.
+Let's add proper alignment checks for a handful of instructions that
+require a SPECIFICATION exception in case alignment is violated.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/Makefile.objs   |  2 +-
- target/s390x/cpu_models.c    |  4 +++
- target/s390x/crypto_helper.c | 65 ++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/helper.h        |  1 +
- target/s390x/insn-data.def   | 13 +++++++++
- target/s390x/translate.c     | 56 ++++++++++++++++++++++++++++++++++++++
- 6 files changed, 140 insertions(+), 1 deletion(-)
- create mode 100644 target/s390x/crypto_helper.c
+ target/s390x/insn-data.def | 14 +++++++-------
+ target/s390x/mem_helper.c  | 35 +++++++++++++++++++++++++++++++++++
+ target/s390x/misc_helper.c |  8 +++++++-
+ target/s390x/translate.c   |  7 +++++++
+ 4 files changed, 56 insertions(+), 8 deletions(-)
 
-diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
-index 46f6a8c..9d261ed 100644
---- a/target/s390x/Makefile.objs
-+++ b/target/s390x/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += translate.o helper.o cpu.o interrupt.o
-+obj-y += translate.o helper.o cpu.o interrupt.o crypto_helper.o
- obj-y += int_helper.o fpu_helper.o cc_helper.o mem_helper.o misc_helper.o
- obj-y += gdbstub.o cpu_models.o cpu_features.o
- obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 92120f4..45bd920 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -792,6 +792,7 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
-         S390_FEAT_STFLE,
-         S390_FEAT_EXTENDED_IMMEDIATE,
-         S390_FEAT_EXTENDED_TRANSLATION_2,
-+        S390_FEAT_MSA,
-         S390_FEAT_EXTENDED_TRANSLATION_3,
-         S390_FEAT_LONG_DISPLACEMENT,
-         S390_FEAT_LONG_DISPLACEMENT_FAST,
-@@ -808,6 +809,9 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
-         S390_FEAT_STFLE_49,
-         S390_FEAT_LOCAL_TLB_CLEARING,
-         S390_FEAT_STFLE_53,
-+        S390_FEAT_MSA_EXT_5,
-+        S390_FEAT_MSA_EXT_3,
-+        S390_FEAT_MSA_EXT_4,
-     };
-     int i;
- 
-diff --git a/target/s390x/crypto_helper.c b/target/s390x/crypto_helper.c
-new file mode 100644
-index 0000000..125bd9b
---- /dev/null
-+++ b/target/s390x/crypto_helper.c
-@@ -0,0 +1,65 @@
-+/*
-+ *  s390x crypto helpers
-+ *
-+ *  Copyright (c) 2017 Red Hat Inc
-+ *
-+ *  Authors:
-+ *   David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
-+#include "cpu.h"
-+#include "exec/helper-proto.h"
-+#include "exec/exec-all.h"
-+#include "exec/cpu_ldst.h"
-+
-+uint32_t HELPER(msa)(CPUS390XState *env, uint32_t r1, uint32_t r2, uint32_t r3,
-+                     uint32_t type)
-+{
-+    const uintptr_t ra = GETPC();
-+    const uint8_t mod = env->regs[0] & 0x80ULL;
-+    const uint8_t fc = env->regs[0] & 0x7fULL;
-+    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    uint8_t subfunc[16] = { 0 };
-+    uint64_t param_addr;
-+    int i;
-+
-+    switch (type) {
-+    case S390_FEAT_TYPE_KMAC:
-+    case S390_FEAT_TYPE_KIMD:
-+    case S390_FEAT_TYPE_KLMD:
-+    case S390_FEAT_TYPE_PCKMO:
-+    case S390_FEAT_TYPE_PCC:
-+        if (mod) {
-+            cpu_restore_state(cs, ra);
-+            program_interrupt(env, PGM_SPECIFICATION, 4);
-+            return 0;
-+        }
-+        break;
-+    }
-+
-+    s390_get_feat_block(type, subfunc);
-+    if (fc >= 128 || !test_be_bit(fc, subfunc)) {
-+        cpu_restore_state(cs, ra);
-+        program_interrupt(env, PGM_SPECIFICATION, 4);
-+        return 0;
-+    }
-+
-+    switch (fc) {
-+    case 0:
-+        for (i = 0; i < 16; i++) {
-+            param_addr = wrap_address(env, env->regs[1] + i);
-+            cpu_stb_data_ra(env, param_addr, subfunc[i], ra);
-+        }
-+        break;
-+    default:
-+        /* we don't implement any other subfunction yet */
-+        g_assert_not_reached();
-+    }
-+
-+    return 0;
-+}
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 4b02907..75ba04f 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -115,6 +115,7 @@ DEF_HELPER_4(cu21, i32, env, i32, i32, i32)
- DEF_HELPER_4(cu24, i32, env, i32, i32, i32)
- DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
- DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
-+DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
- 
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 84233a4..d09f2ed 100644
+index d09f2ed..7ba7304 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -941,6 +941,19 @@
- /* UNPACK UNICODE */
-     C(0xe200, UNPKU,   SS_a,  E2,  la1, a2, 0, 0, unpku, 0)
+@@ -998,11 +998,11 @@
+     /* ??? Not implemented - is it necessary? */
+     C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
+ /* SET CLOCK COMPARATOR */
+-    C(0xb206, SCKC,    S,     Z,   0, m2_64, 0, 0, sckc, 0)
++    C(0xb206, SCKC,    S,     Z,   0, a2, 0, 0, sckc, 0)
+ /* SET CPU TIMER */
+-    C(0xb208, SPT,     S,     Z,   0, m2_64, 0, 0, spt, 0)
++    C(0xb208, SPT,     S,     Z,   0, a2, 0, 0, spt, 0)
+ /* SET PREFIX */
+-    C(0xb210, SPX,     S,     Z,   0, m2_32u, 0, 0, spx, 0)
++    C(0xb210, SPX,     S,     Z,   0, a2, 0, 0, spx, 0)
+ /* SET PSW KEY FROM ADDRESS */
+     C(0xb20a, SPKA,    S,     Z,   0, a2, 0, 0, spka, 0)
+ /* SET STORAGE KEY EXTENDED */
+@@ -1017,20 +1017,20 @@
+ /* STORE CLOCK EXTENDED */
+     C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
+ /* STORE CLOCK COMPARATOR */
+-    C(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64, stckc, 0)
++    C(0xb207, STCKC,   S,     Z,   la2, 0, new, 0, stckc, 0)
+ /* STORE CONTROL */
+     C(0xb600, STCTL,   RS_a,  Z,   0, a2, 0, 0, stctl, 0)
+     C(0xeb25, STCTG,   RSY_a, Z,   0, a2, 0, 0, stctg, 0)
+ /* STORE CPU ADDRESS */
+-    C(0xb212, STAP,    S,     Z,   la2, 0, new, m1_16, stap, 0)
++    C(0xb212, STAP,    S,     Z,   la2, 0, new, 0, stap, 0)
+ /* STORE CPU ID */
+     C(0xb202, STIDP,   S,     Z,   la2, 0, new, 0, stidp, 0)
+ /* STORE CPU TIMER */
+-    C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
++    C(0xb209, STPT,    S,     Z,   la2, 0, new, 0, stpt, 0)
+ /* STORE FACILITY LIST */
+     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
+ /* STORE PREFIX */
+-    C(0xb211, STPX,    S,     Z,   la2, 0, new, m1_32, stpx, 0)
++    C(0xb211, STPX,    S,     Z,   la2, 0, new, 0, stpx, 0)
+ /* STORE SYSTEM INFORMATION */
+     C(0xb27d, STSI,    S,     Z,   0, a2, 0, 0, stsi, 0)
+ /* STORE THEN AND SYSTEM MASK */
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 369d291..87bdbba 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -683,8 +683,15 @@ uint64_t HELPER(mvst)(CPUS390XState *env, uint64_t c, uint64_t d, uint64_t s)
+ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+     uintptr_t ra = GETPC();
++    CPUState *cs = CPU(s390_env_get_cpu(env));
+     int i;
  
-+/* MSA Instructions */
-+    D(0xb91e, KMAC,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMAC)
-+    D(0xb928, PCKMO,   RRE,   MSA3, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_PCKMO)
-+    D(0xb92a, KMF,     RRE,   MSA4, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMF)
-+    D(0xb92b, KMO,     RRE,   MSA4, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMO)
-+    D(0xb92c, PCC,     RRE,   MSA4, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_PCC)
-+    D(0xb92d, KMCTR,   RRF_b, MSA4, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMCTR)
-+    D(0xb92e, KM,      RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KM)
-+    D(0xb92f, KMC,     RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KMC)
-+    D(0xb93c, PPNO,    RRE,   MSA5, 0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_PPNO)
-+    D(0xb93e, KIMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KIMD)
-+    D(0xb93f, KLMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_KLMD)
++    if (a2 & 0x3) {
++        /* we can come here either by lam or lamy, which have different size */
++        cpu_restore_state(cs, ra);
++        program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO);
++    }
 +
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-     D(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL)
+     for (i = r1;; i = (i + 1) % 16) {
+         env->aregs[i] = cpu_ldl_data_ra(env, a2, ra);
+         a2 += 4;
+@@ -699,8 +706,14 @@ void HELPER(lam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+     uintptr_t ra = GETPC();
++    CPUState *cs = CPU(s390_env_get_cpu(env));
+     int i;
+ 
++    if (a2 & 0x3) {
++        cpu_restore_state(cs, ra);
++        program_interrupt(env, PGM_SPECIFICATION, 4);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stl_data_ra(env, a2, env->aregs[i], ra);
+         a2 += 4;
+@@ -1588,6 +1601,11 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t src = a2;
+     uint32_t i;
+ 
++    if (src & 0x7) {
++        cpu_restore_state(CPU(cpu), ra);
++        program_interrupt(env, PGM_SPECIFICATION, 6);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         uint64_t val = cpu_ldq_data_ra(env, src, ra);
+         if (env->cregs[i] != val && i >= 9 && i <= 11) {
+@@ -1618,6 +1636,11 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     uint64_t src = a2;
+     uint32_t i;
+ 
++    if (src & 0x3) {
++        cpu_restore_state(CPU(cpu), ra);
++        program_interrupt(env, PGM_SPECIFICATION, 4);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         uint32_t val = cpu_ldl_data_ra(env, src, ra);
+         if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
+@@ -1642,9 +1665,15 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+     uintptr_t ra = GETPC();
++    CPUState *cs = CPU(s390_env_get_cpu(env));
+     uint64_t dest = a2;
+     uint32_t i;
+ 
++    if (dest & 0x7) {
++        cpu_restore_state(cs, ra);
++        program_interrupt(env, PGM_SPECIFICATION, 6);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stq_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint64_t);
+@@ -1658,9 +1687,15 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+     uintptr_t ra = GETPC();
++    CPUState *cs = CPU(s390_env_get_cpu(env));
+     uint64_t dest = a2;
+     uint32_t i;
+ 
++    if (dest & 0x3) {
++        cpu_restore_state(cs, ra);
++        program_interrupt(env, PGM_SPECIFICATION, 4);
++    }
++
+     for (i = r1;; i = (i + 1) % 16) {
+         cpu_stl_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint32_t);
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 2ec49c9..a8694da 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -391,7 +391,9 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0,
+     sel1 = r0 & STSI_R0_SEL1_MASK;
+     sel2 = r1 & STSI_R1_SEL2_MASK;
+ 
+-    /* XXX: spec exception if sysib is not 4k-aligned */
++    if (a0 & 0xfff) {
++        program_interrupt(env, PGM_SPECIFICATION, 4);
++    }
+ 
+     switch (r0 & STSI_LEVEL_MASK) {
+     case STSI_LEVEL_1:
+@@ -728,6 +730,10 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
+     unsigned max_m1 = do_stfle(env, words);
+     unsigned i;
+ 
++    if (addr & 0x7) {
++        program_interrupt(env, PGM_SPECIFICATION, 4);
++    }
++
+     for (i = 0; i <= count_m1; ++i) {
+         cpu_stq_data(env, addr + 8 * i, words[i]);
+     }
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 7fc07a4..2d975b4 100644
+index 2d975b4..36d13a6 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -2480,6 +2480,58 @@ static ExitStatus op_iske(DisasContext *s, DisasOps *o)
+@@ -3953,6 +3953,7 @@ static ExitStatus op_stap(DisasContext *s, DisasOps *o)
+        version of this stored more than the required half-word, so it
+        is unlikely this has ever been tested.  */
+     tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, cpu_num));
++    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUW | MO_ALIGN);
+     return NO_EXIT;
  }
- #endif
  
-+static ExitStatus op_msa(DisasContext *s, DisasOps *o)
-+{
-+    int r1 = have_field(s->fields, r1) ? get_field(s->fields, r1) : 0;
-+    int r2 = have_field(s->fields, r2) ? get_field(s->fields, r2) : 0;
-+    int r3 = have_field(s->fields, r3) ? get_field(s->fields, r3) : 0;
-+    TCGv_i32 t_r1, t_r2, t_r3, type;
-+
-+    switch (s->insn->data) {
-+    case S390_FEAT_TYPE_KMCTR:
-+        if (r3 & 1 || !r3) {
-+            gen_program_exception(s, PGM_SPECIFICATION);
-+            return EXIT_NORETURN;
-+        }
-+        /* FALL THROUGH */
-+    case S390_FEAT_TYPE_PPNO:
-+    case S390_FEAT_TYPE_KMF:
-+    case S390_FEAT_TYPE_KMC:
-+    case S390_FEAT_TYPE_KMO:
-+    case S390_FEAT_TYPE_KM:
-+        if (r1 & 1 || !r1) {
-+            gen_program_exception(s, PGM_SPECIFICATION);
-+            return EXIT_NORETURN;
-+        }
-+        /* FALL THROUGH */
-+    case S390_FEAT_TYPE_KMAC:
-+    case S390_FEAT_TYPE_KIMD:
-+    case S390_FEAT_TYPE_KLMD:
-+        if (r2 & 1 || !r2) {
-+            gen_program_exception(s, PGM_SPECIFICATION);
-+            return EXIT_NORETURN;
-+        }
-+        /* FALL THROUGH */
-+    case S390_FEAT_TYPE_PCKMO:
-+    case S390_FEAT_TYPE_PCC:
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    };
-+
-+    t_r1 = tcg_const_i32(r1);
-+    t_r2 = tcg_const_i32(r2);
-+    t_r3 = tcg_const_i32(r3);
-+    type = tcg_const_i32(s->insn->data);
-+    gen_helper_msa(cc_op, cpu_env, t_r1, t_r2, t_r3, type);
-+    set_cc_static(s);
-+    tcg_temp_free_i32(t_r1);
-+    tcg_temp_free_i32(t_r2);
-+    tcg_temp_free_i32(t_r3);
-+    tcg_temp_free_i32(type);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_keb(DisasContext *s, DisasOps *o)
+@@ -3989,6 +3990,7 @@ static ExitStatus op_stcke(DisasContext *s, DisasOps *o)
+ static ExitStatus op_sckc(DisasContext *s, DisasOps *o)
  {
-     gen_helper_keb(cc_op, cpu_env, o->in1, o->in2);
-@@ -5571,6 +5623,10 @@ enum DisasInsnEnum {
- #define FAC_PPA         S390_FEAT_STFLE_49 /* processor-assist */
- #define FAC_LZRB        S390_FEAT_STFLE_53 /* load-and-zero-rightmost-byte */
- #define FAC_ETF3        S390_FEAT_EXTENDED_TRANSLATION_3
-+#define FAC_MSA         S390_FEAT_MSA /* message-security-assist facility */
-+#define FAC_MSA3        S390_FEAT_MSA_EXT_3 /* msa-extension-3 facility */
-+#define FAC_MSA4        S390_FEAT_MSA_EXT_4 /* msa-extension-4 facility */
-+#define FAC_MSA5        S390_FEAT_MSA_EXT_5 /* msa-extension-5 facility */
+     check_privileged(s);
++    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
+     gen_helper_sckc(cpu_env, o->in2);
+     return NO_EXIT;
+ }
+@@ -3997,6 +3999,7 @@ static ExitStatus op_stckc(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
+     gen_helper_stckc(o->out, cpu_env);
++    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
+     return NO_EXIT;
+ }
  
- static const DisasInsn insn_info[] = {
- #include "insn-data.def"
+@@ -4033,6 +4036,7 @@ static ExitStatus op_stidp(DisasContext *s, DisasOps *o)
+ static ExitStatus op_spt(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
++    tcg_gen_qemu_ld_i64(o->in2, o->in2, get_mem_index(s), MO_TEQ | MO_ALIGN);
+     gen_helper_spt(cpu_env, o->in2);
+     return NO_EXIT;
+ }
+@@ -4048,6 +4052,7 @@ static ExitStatus op_stpt(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
+     gen_helper_stpt(o->out, cpu_env);
++    tcg_gen_qemu_st_i64(o->out, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
+     return NO_EXIT;
+ }
+ 
+@@ -4063,6 +4068,7 @@ static ExitStatus op_stsi(DisasContext *s, DisasOps *o)
+ static ExitStatus op_spx(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
++    tcg_gen_qemu_ld_tl(o->in2, o->in2, get_mem_index(s), MO_TEUL | MO_ALIGN);
+     gen_helper_spx(cpu_env, o->in2);
+     return NO_EXIT;
+ }
+@@ -4162,6 +4168,7 @@ static ExitStatus op_stpx(DisasContext *s, DisasOps *o)
+     check_privileged(s);
+     tcg_gen_ld_i64(o->out, cpu_env, offsetof(CPUS390XState, psa));
+     tcg_gen_andi_i64(o->out, o->out, 0x7fffe000);
++    tcg_gen_qemu_st_tl(o->out, o->addr1, get_mem_index(s), MO_TEUL | MO_ALIGN);
+     return NO_EXIT;
+ }
+ 
 -- 
 2.9.4
