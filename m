@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYYRp-0003b2-Gn
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:58:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYYTu-0005qd-JI
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYYRn-0000V5-FW
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:58:28 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dYYRn-0000TC-6q
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 09:58:27 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id v105so52636294wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 06:58:24 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dYYTt-0002oM-NM
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:00:38 -0400
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721034730.25612-2-crosa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cce2586b-eafd-27cc-edc7-ea2d3d2275e0@redhat.com>
+Date: Fri, 21 Jul 2017 09:00:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <87mv7x7vbq.fsf@linaro.org>
-References: <20170720150426.12393-1-alex.bennee@linaro.org>
-	<20170720150426.12393-13-alex.bennee@linaro.org>
-	<4d6ac494-d606-ebaf-6498-7c526467ac62@twiddle.net>
-	<87tw266rm3.fsf@linaro.org>
-	<20170721132140.xy2uqronprhzjiga@aurel32.net>
-	<87mv7x7vbq.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Jul 2017 14:58:02 +0100
-Message-ID: <CAFEAcA9kEa2PCjEKn1A=-bM7jjFhZc8pjef2J_c9qL8p4bLdaQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.11 12/23]
- target/arm/translate-a64.c: add FP16 FAGCT to AdvSIMD 3 Same
+In-Reply-To: <20170721034730.25612-2-crosa@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NOpldbqgnXBowJeaBiSkB66rNivL1m7s4"
+Subject: Re: [Qemu-devel] [PATCH 1/3] scripts: introduce buildconf.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>
 
-On 21 July 2017 at 14:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Aurelien Jarno <aurelien@aurel32.net> writes:
->> As said in another email, some architectures actually use more than one
->> float_status. We therefore need to implement a solution like the one
->> proposed by Richard.
->
-> Ahh you mean more than one float_status for a given vCPU context?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NOpldbqgnXBowJeaBiSkB66rNivL1m7s4
+From: Eric Blake <eblake@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Jing Liu <liujbjl@linux.vnet.ibm.com>
+Message-ID: <cce2586b-eafd-27cc-edc7-ea2d3d2275e0@redhat.com>
+Subject: Re: [PATCH 1/3] scripts: introduce buildconf.py
+References: <20170721034730.25612-1-crosa@redhat.com>
+ <20170721034730.25612-2-crosa@redhat.com>
+In-Reply-To: <20170721034730.25612-2-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yep. ARM's cpu state struct has
-        float_status fp_status;
-        float_status standard_fp_status;
+On 07/20/2017 10:47 PM, Cleber Rosa wrote:
+> scripts/buildconf.py is a command line utility (but also can be used
+> as a Python module) that introspects the build configuration.
+>=20
+> It uses the generated host level config-host.mak to obtain the general
+> build configuration, and optionally, also target specific
+> config-target.mak and config-devices.mak.  It does not attempt to
+> implement a Makefile parser, but instead relies on "make" itself to
+> parse those files and output the queried variable.
+>=20
+> It requires a build tree that has been both configured and built.  By
+> default, for convenience, it will selected a default target, which can
+> be displayed and overriden.  A few examples follow.
 
-which we use to handle (1) operations which use the state
-controlled by the FPSCR value and (2) operations which
-ignore the FPSCR and use the "Standard FPSCR Value" (generally
-Neon ops). More info in the comment in cpu.h...
+s/overriden/overridden/
 
-thanks
--- PMM
+
+>=20
+> And for checking a target different than the default one:
+>=20
+>  $ ./scripts/buildconf.py -c CONFIG_PARALLEL arm-softmmu; echo $?
+>  255
+
+Gross.  exit status greater than 128 typically mean death due to signal,
+meanwhile, 255 is special-cased by find to kill processing immediately;
+it is very rare that someone intentionally returns a status of 255, and
+more often, it is evidence that someone mistakenly used exit(-1).
+
+>=20
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  scripts/buildconf.py | 278 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 278 insertions(+)
+>  create mode 100755 scripts/buildconf.py
+>=20
+
+I don't feel comfortable reviewing the script in depth, but I will reques=
+t:
+
+
+> +                else:
+> +                    sys.exit(-1)
+> +            else:
+> +                conf =3D get_build_conf(config, self.target)
+> +                if conf:
+> +                    print(conf)
+> +                    sys.exit(0)
+> +                else:
+> +                    sys.exit(-1)
+
+Please use sys.exit(1), not -1.
+
+Overall, the idea is cool.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--NOpldbqgnXBowJeaBiSkB66rNivL1m7s4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllyCPYACgkQp6FrSiUn
+Q2qSWgf+N+ze4eLnxpEIxLlPRsTyB1J/L7xkvr/XKsGK7aWrs8F1I+ObWzH4V9sM
+XKnf8qUXLuVdnx8inswQOTxlQy3TlPeZF5mBPLysa57Jem7SaRaHA5W1mXMjXkmN
+5znAeDk8+BqbHeBpx2nUi0IdxeZO525K/NzgKWe74d9Kv/RjI+QQ5EdjbBl9IwmL
+7/1MJcBoWxve3e2ENrqb2/TtetGVBdw2MOGICQh+Aabn35EjeTc1Zc43RzrT0vvy
+HBqiANfAqkfTEJUlR/oGy95mupHeGmUQ9qxq7cweWigx80xC/zxKD0qkMFBkBDI0
+nRaokCrJfFjP2cVIfkhsNXkunWmgcA==
+=GBtP
+-----END PGP SIGNATURE-----
+
+--NOpldbqgnXBowJeaBiSkB66rNivL1m7s4--
