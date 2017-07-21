@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYUFb-0007Q2-VT
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:29:44 -0400
+	(envelope-from <pahome.chen@mirlab.org>) id 1dYUH6-0008QR-GZ
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:31:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYUFY-0005yI-0A
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:29:35 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:38098)
+	(envelope-from <pahome.chen@mirlab.org>) id 1dYUH5-0006fW-9Z
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:31:08 -0400
+Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:37902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dYUFX-0005xc-R2
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:29:31 -0400
-Received: by mail-wr0-x230.google.com with SMTP id f21so23633490wrf.5
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:29:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
+	id 1dYUH5-0006f3-2l
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 05:31:07 -0400
+Received: by mail-ua0-x22d.google.com with SMTP id w45so41391985uac.5
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 02:31:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170721091337.GA2133@work-vm>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-	<20170717185830.GD31820@work-vm>
-	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
-	<20170720100232.GA2456@work-vm>
-	<408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
-	<20170721091337.GA2133@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Jul 2017 10:29:10 +0100
-Message-ID: <CAFEAcA9Odi+ZtT1FmDoD8pjk=cgHS54BOVwopqXRi+TTf4PA8g@mail.gmail.com>
+In-Reply-To: <20170721083816.GC17693@redhat.com>
+References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
+	<20170720085958.GC21566@redhat.com>
+	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+	<20170720091224.GD21566@redhat.com>
+	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+	<20170721083816.GC17693@redhat.com>
+From: =?UTF-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>
+Date: Fri, 21 Jul 2017 17:31:04 +0800
+Message-ID: <CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 21 July 2017 at 10:13, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> I don't fully understand the way memory_region_do_invalidate_mmio_ptr
-> works; I see it dropping the memory region; if that's also dropping
-> the RAMBlock then it will upset migration.   Even if the CPU is stopped
-> I dont think that stops the migration thread walking through the list of
-> RAMBlocks.
+It works after I replace the /usr/bin/qemu-nbd with binary I built.
 
-memory_region_do_invalidate_mmio_ptr() calls memory_region_unref(),
-which will eventually result in memory_region_finalize() being
-called, which will call the MR destructor, which in this case is
-memory_region_destructor_ram(), which calls qemu_ram_free() on
-the RAMBlock, which removes the RAMBlock from the list (after
-taking the ramlist lock).
+My cmd is :
 
-> Even then, the problem is migration keeps a 'dirty_pages' count which is
-> calculated at the start of migration and updated as we dirty and send
-> pages; if we add/remove a RAMBlock then that dirty_pages count is wrong
-> and we either never finish migration (since dirty_pages never reaches
-> zero) or finish early with some unsent data.
-> And then there's the 'received' bitmap currently being added for
-> postcopy which tracks each page that's been received (that's not in yet
-> though).
+> qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+>              --image-opts driver=3Dqcow2,file.filename=3D
+> demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
 
-It sounds like we really need to make migration robust against
-RAMBlock changes -- in the hotplug case it's certainly possible
-for RAMBlocks to be newly created or destroyed while migration
-is in progress.
 
-thanks
--- PMM
+But I got other message:
+
+> Block format 'qcow2' does not support the option 'encrypt.format'
+
+
+Maybe it doen't support yet?
+
+2017-07-21 16:38 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
+
+> On Fri, Jul 21, 2017 at 09:44:33AM +0800, =E9=99=B3=E5=9F=B9=E6=B3=93 wro=
+te:
+> > I re-build qemu from the https://github.com/qemu/qemu, and it didn't
+> show
+> > any errors.
+> >
+> > I tried the cmd you suggested below:
+> >
+> > > qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+> > >            -c /dev/nbd0 \
+> > >            --image-opts driver=3Dqcow2,file.filename=3D
+> > > demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
+> >
+> > but it shows unrecognized option '--object '
+> > why?I missed to install something?
+>
+> Sounds like you're not running the binaries you just built
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
