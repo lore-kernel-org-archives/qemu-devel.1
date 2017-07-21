@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYxP-0005gD-4o
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:31:08 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dYYyF-00066M-8u
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:32:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYYxM-000106-12
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:31:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYYxL-0000zo-R0
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:31:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYYxJ-0004wl-Oq
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:31:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 121292E80AD
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:31:00 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Jul 2017 14:22:52 -0000
-From: Thomas Huth <1645355@bugs.launchpad.net>
-Reply-To: Bug 1645355 <1645355@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161128150552.28561.31457.malonedeb@soybean.canonical.com>
-Message-Id: <150064697245.6509.9199456498195194659.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1645355] Re: x86: singlestepping through SYSCALL
- instruction causes exception in kernelspace
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dYYyC-0001Zm-Tu
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:31:59 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:34750 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dYYyC-0001W1-Gg
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 10:31:56 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 21 Jul 2017 17:31:48 +0300
+Message-Id: <20170721143149.43721-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 1/2] trace: do not calculate arguments for
+ disabled trace-points
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,76 +26,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, dgilbert@redhat.com, armbru@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-The two patches mentioned in comment #1 have been released with v2.9.0,
-so setting status to "Fix released" now.
+Do not calculate arguments if trace-point is disabled. For this:
+ - move to macro do { ... } while (0) scheme
+ - use additional macro-layer to handle calls of trace-points where
+   a macro generates parameter list
+   (like trace_e1000e_mac_set_permanent(MAC_ARG(macaddr)))
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+This is needed to allow some additional logic in trace-point parameter
+calculation, which will not be executed if this trace-point is
+disabled.
 
--- =
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ scripts/tracetool/format/h.py | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1645355
-
-Title:
-  x86: singlestepping through SYSCALL instruction causes exception in
-  kernelspace
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Hi,
-
-  The bug was originally reported [1] and [2] here. There is a problem
-  inside QEMU with singlestepping from userspace until SYSCALL
-  instruction is reached. The OS has in FMASK TF bit set, therefore
-  there should be no singlestepping exception when transitioning to
-  kernelmode. But, inside QEMU there is (TF is clear seems FMASK is
-  applied). See below for further details.
-
-  The reproducer is available at [2].
-
-  Here is the original text with some minor clarifications:
-
-  It seems that there is something wrong with QEMU with respect to
-  handle the singlestepping and AMD64 syscall instruction.
-
-  The AMD "syscall" instruction will clear defined flag in the FMASK
-  MSR. Normally the TF flag is set there, so the first instruction when
-  kernel is entered after syscall won't cause single step exception in
-  the kernel.
-
-  The observed scenario is a unhandled singlestep fault in the kernel or
-  host reboot or QEMU crash.
-
-  The possible way how to reproduce it is to single step through any
-  function (in userspace) which does "syscall" instruction. After
-  syscall is entered QEMU will trigger singlestepping exception in the
-  kernel despite that the TF is set in FMASK MSR. Real HW behaves
-  correctly and does not trigger this exception.
-
-  =
-
-  What is interesting is that I was not able to trigger it if I just enable=
-d TF and did the syscall instruction, perhaps for this bug is somewhat impo=
-rtant to have TF set for previous few instruction.
-
-  =
-
-  I have stumbled to this problem while working with our custom OS. However=
- after some googling I found out that the NetBSD guys (CCed) are having ver=
-y similar problem and I asked them to prepare a ISO image where the problem=
- ends with QEMU SIGSEGV or host reboot. =
-
-
-  Thanks
-  Rudolf
-
-  [1] https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg02289.html
-  [2] http://gnats.netbsd.org/49603
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1645355/+subscriptions
+diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.py
+index aecf249d66..d0baccc453 100644
+--- a/scripts/tracetool/format/h.py
++++ b/scripts/tracetool/format/h.py
+@@ -73,12 +73,13 @@ def generate(events, backend, group):
+             cond = "true"
+ 
+         out('',
+-            'static inline void %(api)s(%(args)s)',
+-            '{',
+-            '    if (%(cond)s) {',
+-            '        %(api_nocheck)s(%(names)s);',
+-            '    }',
+-            '}',
++            '#define %(api)s(...)  _do_%(api)s(__VA_ARGS__)',
++            '#define _do_%(api)s(%(names)s) \\',
++            'do { \\',
++            '    if (%(cond)s) { \\',
++            '        %(api_nocheck)s(%(names)s); \\',
++            '    } \\',
++            '} while (0)',
+             api=e.api(),
+             api_nocheck=e.api(e.QEMU_TRACE_NOCHECK),
+             args=e.args,
+-- 
+2.11.1
