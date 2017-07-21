@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dYOvI-00048j-Pa
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 23:48:18 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dYPAO-000804-Nz
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:03:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dYOvG-0002Zm-Sv
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 23:48:16 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 20 Jul 2017 23:47:28 -0400
-Message-Id: <20170721034730.25612-2-crosa@redhat.com>
-In-Reply-To: <20170721034730.25612-1-crosa@redhat.com>
-References: <20170721034730.25612-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] scripts: introduce buildconf.py
+	(envelope-from <jasowang@redhat.com>) id 1dYPAL-0002Vs-Kp
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:03:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dYPAL-0002TQ-Ex
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 00:03:49 -0400
+References: <20170720191228.12342-1-anton.ivanov@cambridgegreys.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <6d89f581-fc89-3455-60c8-439702d7bba6@redhat.com>
+Date: Fri, 21 Jul 2017 11:55:06 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170720191228.12342-1-anton.ivanov@cambridgegreys.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Unified Datagram Socket Transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,332 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: anton.ivanov@cambridgegreys.com, qemu-devel@nongnu.org
 
-scripts/buildconf.py is a command line utility (but also can be used
-as a Python module) that introspects the build configuration.
 
-It uses the generated host level config-host.mak to obtain the general
-build configuration, and optionally, also target specific
-config-target.mak and config-devices.mak.  It does not attempt to
-implement a Makefile parser, but instead relies on "make" itself to
-parse those files and output the queried variable.
 
-It requires a build tree that has been both configured and built.  By
-default, for convenience, it will selected a default target, which can
-be displayed and overriden.  A few examples follow.
+On 2017=E5=B9=B407=E6=9C=8821=E6=97=A5 03:12, anton.ivanov@cambridgegreys=
+.com wrote:
+> Hi all,
+>
+> This addresses comments so far except Eric's suggestion to use
+> InetSocketAddressBase. If I understand correctly its intended use,
+> it will not be of help for protocols which have no port (raw
+> sockets - GRE, L2TPv3, etc).
+>
+> It also includes a port of the original socket.c transport to
+> the new UDST backend. The relevant code is ifdef-ed so there
+> should be no effect on other systems.
 
-To get the TLS priority (a host level configuration), one would run:
+This looks sub-optimal. If you want to do this, I would rather suggest=20
+you just extend the socket dgram backend like what udst did now.
 
- $ ./scripts/buildconf.py CONFIG_TLS_PRIORITY
- NORMAL
+>
+> I think that this is would be the appropriate place to stop in this
+> iteration. I would prefer to have this polished, before I start
+> looking at sendmmsg and bulk send or some of the more unpleasant
+> encapsulations like geneve.
 
-To get a configuration from the default target devices:
+Pay attention we're softfreeze now. So the feature is for 2.11, if it=20
+looks good, I can only queue it for 2.11.
 
- $ ./scripts/buildconf.py CONFIG_PARALLEL
- y
+Btw, looks like not all comments of v1 were addressed.
 
-If one is not interested in the actual value, but whether a given
-feature is enabled, the '-c|--check' option can be used:
+Thanks
 
- $ ./scripts/buildconf.py -c CONFIG_PARALLEL; echo $?
- 0
-
-And for checking a target different than the default one:
-
- $ ./scripts/buildconf.py -c CONFIG_PARALLEL arm-softmmu; echo $?
- 255
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- scripts/buildconf.py | 278 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 278 insertions(+)
- create mode 100755 scripts/buildconf.py
-
-diff --git a/scripts/buildconf.py b/scripts/buildconf.py
-new file mode 100755
-index 0000000..0eee6d7
---- /dev/null
-+++ b/scripts/buildconf.py
-@@ -0,0 +1,278 @@
-+#!/usr/bin/env python
-+#
-+# QEMU build configuration introspection utilty
-+#
-+# Copyright (C) 2017 Red Hat Inc.
-+#
-+# This library is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU Lesser General Public
-+# License as published by the Free Software Foundation; either
-+# version 2 of the License, or (at your option) any later version.
-+#
-+# This library is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+# Lesser General Public License for more details.
-+#
-+# You should have received a copy of the GNU Lesser General Public
-+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+#
-+# Authors:
-+#  Cleber Rosa <crosa@redhat.com>
-+
-+"""
-+QEMU's build configuration is recorded in both config-host.mak and
-+config-host.h, as is specific target configuration expressed in
-+<target>/config-{target,devices}.{mak,h}.
-+
-+This module relies on the .mak files, as they contain a bit more
-+information than the .h files.
-+
-+While it would be possible to write a simple Makefile parser capable to
-+handle the variable assignments, this would impose limitations on this
-+script and introduce breakages if the build scripts start using
-+functionality not expected here.
-+
-+The approach chosen was one that is definitely slower at runtime but
-+is more reliable.  Temporary Makefiles that include config-host.mak,
-+and optionally the target specific config-target.mak and
-+config-devices.mak files, and print the desired configuration to
-+stdout.  As long as the basic premises of a global config-host.mak,
-+and target specific config-target.mak and config-devices.mak is kept,
-+this tool should be able to keep up with any style or feature chances.
-+"""
-+
-+from __future__ import print_function
-+
-+import optparse
-+import os
-+import subprocess
-+import sys
-+import tempfile
-+
-+
-+TEMPLATE = """
-+include {build_prefix}/config-host.mak
-+{target_specific}
-+
-+all:
-+	@echo $({conf})
-+"""
-+
-+TARGET_TEMPLATE = """
-+include {build_prefix}/{target}/config-target.mak
-+include {build_prefix}/{target}/config-devices.mak
-+"""
-+
-+
-+class InvalidTarget(Exception):
-+    """
-+    Target chosen is not present in the current build tree configuration
-+    """
-+
-+
-+def get_build_root():
-+    """
-+    Returns the absolute location of the root of the build tree
-+
-+    This has been tested from build(only) trees, and works fine when
-+    it's executed as a command line tool.
-+
-+    If this is used as a Python module, it will really depend on how
-+    the module is imported.  If the build tree "scripts" directory is
-+    added to the import path, this will work properly.  If the current
-+    working directory is the "scripts" directory itself, and no
-+    explicit import path is added, it will only work when building
-+    from the source tree, and will *not* work when the build tree is
-+    different from the source tree.
-+
-+    A longer explanation on this caveat: the Python import
-+    implementation will look for a matching module in the current
-+    working directory.  Python's current working directory,
-+    os.getcwd(), is really like getcwd(3), and not like
-+    os.getenv("PWD").  Because the scripts directory is linked to the
-+    source tree, os.getcwd() returns the source tree location instead.
-+    """
-+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-+
-+
-+def is_build_root_configured():
-+    """
-+    Checks if the build root has been configured
-+
-+    In theory, this only makes sense for in-tree builds, because the
-+    out-of-tree build directory, including the link to the scripts
-+    directory containing this script, will only exist after a
-+    successful "./configure" execution.
-+
-+    Either way, the check is still valid for the main source of
-+    build configuration, that is, the existence of 'config-host.mak'
-+    """
-+    return os.path.isfile(os.path.join(get_build_root(), 'config-host.mak'))
-+
-+
-+def get_default_target():
-+    """
-+    Returns the default target on the current build tree
-+
-+    The approach used here is to look for a "-softmmu" target that
-+    matches "ARCH".  If found, that is the best choice for a default
-+    target.
-+
-+    If not found, the first "-softmmu" target found is considered the
-+    next best choice for a default target.
-+
-+    As a fallback if no "-softmmu" target exists, the first entry on
-+    the target list is returned.
-+
-+    :returns: a target name or None if no target is configured
-+    """
-+    targets = get_targets()
-+    if not targets:
-+        return None
-+    arch = get_build_conf("ARCH", None)
-+    first_choice = "%s-softmmu" % arch
-+    if first_choice in targets:
-+        return first_choice
-+    else:
-+        softmmu_targets = [t for t in targets if t.endswith("-softmmu")]
-+        if softmmu_targets:
-+            return softmmu_targets[0]
-+        else:
-+            return targets[0]
-+
-+
-+def get_build_conf(conf, target=None):
-+    """
-+    Returns the value of a given Makefile variable
-+
-+    :param conf: the configuration name, which really must be a
-+                 Makefile variable in either the host or target .mak
-+                 files
-+    :param target: the name of a valid target in the current build tree.
-+                   it must match the name of a target dir, such as
-+                   'x86_64-softmmu' or 'i386-linux-user'.
-+    :returns: the raw output or None
-+    :rtype: str or None
-+    """
-+    build_prefix = get_build_root()
-+
-+    if target is None:
-+        target_specific = ''
-+    else:
-+        if target not in get_targets():
-+            raise InvalidTarget
-+        target_specific = TARGET_TEMPLATE.format(build_prefix=build_prefix,
-+                                                 target=target)
-+
-+    mak_fd, mak_path = tempfile.mkstemp()
-+    os.write(mak_fd, TEMPLATE.format(build_prefix=build_prefix,
-+                                     target_specific=target_specific,
-+                                     conf=conf))
-+    proc = subprocess.Popen(['make', '-f', mak_path],
-+                            stdout=subprocess.PIPE,
-+                            stderr=subprocess.PIPE)
-+    ret = proc.wait()
-+    os.unlink(mak_path)
-+    if (ret == 0):
-+        return proc.stdout.read().strip()
-+
-+
-+def is_enabled(conf, target=None):
-+    """
-+    Checks wether a given feature is enabled in the build configuration
-+
-+    The Makefile variables default to using 'y' when they are enabled,
-+    and are just missing (instead of set no 'n') when they're not enabled.
-+    Even if a given variable is set, for instance in the case of TARGET_DIRS,
-+    it will not be considered enabled by this function unless its content is
-+    'y'.  For variables that are known to not contain 'y', please resort to
-+    using get_build_conf() and parsing its output for meaningful value.
-+
-+    :param conf: the configuration name, which really must be a
-+                 Makefile variable in either the host or target .mak
-+                 files
-+    :param target: the name of a valid target in the current build tree.
-+                   it must match the name of a target dir, such as
-+                   'x86_64-softmmu' or 'i386-linux-user'.
-+    :returns: the raw output or None
-+    :rtype: str or None
-+    """
-+    build_conf = get_build_conf(conf, target=target)
-+    if build_conf == 'y':
-+        return True
-+    return False
-+
-+
-+def get_targets():
-+    """
-+    Returns the list of targets currently configured
-+
-+    :rtype: list
-+    """
-+    targets = get_build_conf('TARGET_DIRS', None)
-+    if targets is not None:
-+        return targets.split()
-+
-+
-+if __name__ == '__main__':
-+    class Parser(optparse.OptionParser):
-+
-+        def __init__(self):
-+            optparse.OptionParser.__init__(
-+                self,
-+                usage=('%prog [options] CONFIG [TARGET]\n\n'
-+                       'CONFIG is the build configuration variable name\n'
-+                       'TARGET is auto selected if not explicitly set'))
-+            self.add_option('-c', '--check', action='store_true',
-+                            help=('Checks if the build configuration option is '
-+                                  'set to "y".  This causes this tool to be silent '
-+                                  'and return only a status code of either 0 (if '
-+                                  'configuration is set) or non-zero otherwise.'))
-+            self.add_option('-n', '--no-default-target', action='store_true',
-+                            help=('Do not attempt to use a default target if one '
-+                                  'was not explicitly given in the command line'))
-+            self.add_option('--print-target', action='store_true',
-+                            help=('Also prints the selected target'))
-+
-+
-+    class App(object):
-+
-+        def __init__(self):
-+            self.target = None
-+            self.parser = Parser()
-+            self._parse()
-+
-+        def _parse(self):
-+            self.opts, self.args = self.parser.parse_args()
-+            args_len = len(self.args)
-+            if (args_len < 1 or args_len > 2):
-+                self.parser.print_help()
-+                sys.exit(0)
-+            elif args_len == 2:
-+                self.target = self.args[1]
-+            else:
-+                if not self.opts.no_default_target:
-+                    self.target = get_default_target()
-+
-+        def run(self):
-+            if self.opts.print_target:
-+                print("TARGET:", self.target)
-+            config = self.args[0]
-+            if self.opts.check:
-+                result = is_enabled(config, self.target)
-+                if result:
-+                    sys.exit(0)
-+                else:
-+                    sys.exit(-1)
-+            else:
-+                conf = get_build_conf(config, self.target)
-+                if conf:
-+                    print(conf)
-+                    sys.exit(0)
-+                else:
-+                    sys.exit(-1)
-+
-+
-+    app = App()
-+    app.run()
--- 
-2.9.4
+>
+> A.
+>
+>
