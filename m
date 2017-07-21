@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dYfWW-0006O3-UV
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:31:50 -0400
+	(envelope-from <cota@braap.org>) id 1dYfcK-0000M1-3c
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dYfWT-00080W-RB
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:31:48 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dYfWT-0007yt-LD
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:31:45 -0400
-Received: by mail-pg0-x242.google.com with SMTP id s4so6235963pgr.5
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 14:31:45 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1500616763-26560-1-git-send-email-cota@braap.org>
-	<1500616763-26560-4-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <46195c32-3583-38c0-0e63-f3ce707a3412@twiddle.net>
-Date: Fri, 21 Jul 2017 11:31:37 -1000
+	(envelope-from <cota@braap.org>) id 1dYfcH-0002UU-1F
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:37:48 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36343)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYfcG-0002U9-KH
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 17:37:44 -0400
+Date: Fri, 21 Jul 2017 17:37:43 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170721213743.GE10809@flamenco>
+References: <20170715094243.28371-1-rth@twiddle.net>
+	<20170715094243.28371-8-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1500616763-26560-4-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 35/43] tcg: allocate optimizer temps
- with tcg_malloc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170715094243.28371-8-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v14 07/34] target/arm: Set is_jmp properly
+ after single-stepping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
 
-On 07/20/2017 07:59 PM, Emilio G. Cota wrote:
-> Groundwork for supporting multiple TCG contexts.
+On Fri, Jul 14, 2017 at 23:42:16 -1000, Richard Henderson wrote:
+> We have generated an exception, so use DISAS_NORETURN.
 > 
-> While at it, also allocate temps_used directly as a bitmap of the
-> required size, instead of using a bitmap of TCG_MAX_TEMPS via
-> TCGTempSet.
-> 
-> Performance-wise we lose about 1.12% in a translation-heavy workload
-> such as booting+shutting down debian-arm:
-> 
-> Performance counter stats for 'taskset -c 0 arm-softmmu/qemu-system-arm \
-> 	-machine type=virt -nographic -smp 1 -m 4096 \
-> 	-netdev user,id=unet,hostfwd=tcp::2222-:22 \
-> 	-device virtio-net-device,netdev=unet \
-> 	-drive file=die-on-boot.qcow2,id=myblock,index=0,if=none \
-> 	-device virtio-blk-device,drive=myblock \
-> 	-kernel kernel.img -append console=ttyAMA0 root=/dev/vda1 \
-> 	-name arm,debug-threads=on -smp 1' (10 runs):
-> 
->               exec time (s)  Relative slowdown wrt original (%)
-> ---------------------------------------------------------------
->   original     20.213321616                                  0.
->   tcg_malloc   20.441130078                           1.1270214
->   TCGContext   20.477846517                           1.3086662
->   g_malloc     20.780527895                           2.8061013
-> 
-> The other two alternatives shown in the table are:
-> - TCGContext: embed temps[TCG_MAX_TEMPS] and TCGTempSet used_temps
->    in TCGContext. This is simple enough but it isn't faster than using
->    tcg_malloc; moreover, it wastes memory.
-> - g_malloc: allocate/deallocate both temps and used_temps every time
->    tcg_optimize is executed.
-> 
-> Suggested-by: Richard Henderson<rth@twiddle.net>
-> Signed-off-by: Emilio G. Cota<cota@braap.org>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
->   tcg/optimize.c | 306 ++++++++++++++++++++++++++++++---------------------------
->   1 file changed, 161 insertions(+), 145 deletions(-)
+>  target/arm/translate-a64.c | 1 +
+>  target/arm/translate.c     | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 342ff7c..657684b 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -11285,6 +11285,7 @@ void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
+>                          dc->is_jmp = DISAS_UPDATE;
+>                      } else {
+>                          gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
+> +                        dc->is_jmp = DISAS_NORETURN;
+>                          /* The address covered by the breakpoint must be
+>                             included in [tb->pc, tb->pc + tb->size) in order
+>                             to for it to be properly cleared -- thus we
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 2ae68ce..83e5491 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -11942,6 +11942,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>                          dc->is_jmp = DISAS_UPDATE;
+>                      } else {
+>                          gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
+> +                        dc->is_jmp = DISAS_NORETURN;
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+gen_exception_internal_insn already sets dc->is_jmp to DISAS_NORETURN,
+as per patch 04/34:
+@@ -304,7 +304,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
+ {
+     gen_a64_set_pc_im(s->pc - offset);
+     gen_exception_internal(excp);
+-    s->is_jmp = DISAS_EXC;
++    s->is_jmp = DISAS_NORETURN;
+ }
 
-r~
+This applies to both arm and a64.
+
+Why do we need to set is_jmp again, then?
+
+		E.
