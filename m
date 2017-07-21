@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYQyM-0002RN-AV
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:36 -0400
+	(envelope-from <cota@braap.org>) id 1dYQyM-0002RK-9W
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dYQyJ-0001qp-Gi
+	(envelope-from <cota@braap.org>) id 1dYQyJ-0001ps-4b
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:34 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48647)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:37291)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYQyJ-0001q3-Bo
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dYQyI-0001pE-SL
 	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 01:59:31 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 21 Jul 2017 01:59:23 -0400
-Message-Id: <1500616763-26560-6-git-send-email-cota@braap.org>
+Date: Fri, 21 Jul 2017 01:59:19 -0400
+Message-Id: <1500616763-26560-2-git-send-email-cota@braap.org>
 In-Reply-To: <1500616763-26560-1-git-send-email-cota@braap.org>
 References: <1500616763-26560-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v4 43/43] tcg: enable multiple TCG contexts in
- softmmu
+Subject: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use it
+ for TB hashing along with CF_COUNT_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,373 +27,369 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-This enables parallel TCG code generation. However, we do not take
-advantage of it yet since tb_lock is still held during tb_gen_code.
+This will enable us to decouple code translation from the value
+of parallel_cpus at any given time. It will also help us minimize
+TB flushes when generating code via EXCP_ATOMIC.
 
-In user-mode we use a single TCG context; see the documentation
-added to tcg_region_init for the rationale.
+Note that the declaration of parallel_cpus is brought to exec-all.h
+to be able to define there the "curr_cflags" inline.
 
-Note that targets do not need any conversion: targets initialize a
-TCGContext (e.g. defining TCG globals), and after this initialization
-has finished, the context is cloned by the vCPU threads, each of
-them keeping a separate copy.
-
-TCG threads claim one entry in tcg_ctxs[] by atomically increasing
-n_tcg_ctxs. Do not be too annoyed by the subsequent atomic_read's
-of that variable and tcg_ctxs; they are there just to play nice with
-analysis tools such as thread sanitizer.
-
-Note that we do not allocate an array of contexts (we allocate
-an array of pointers instead) because when tcg_context_init
-is called, we do not know yet how many contexts we'll use since
-the bool behind qemu_tcg_mttcg_enabled() isn't set yet.
-
-Previous patches folded some TCG globals into TCGContext. The non-const
-globals remaining are only set at init time, i.e. before the TCG
-threads are spawned. Here is a list of these set-at-init-time globals
-under tcg/:
-
-Only written by tcg_context_init:
-- indirect_reg_alloc_order
-- tcg_op_defs
-Only written by tcg_target_init (called from tcg_context_init):
-- tcg_target_available_regs
-- tcg_target_call_clobber_regs
-- arm: arm_arch, use_idiv_instructions
-- i386: have_cmov, have_bmi1, have_bmi2, have_lzcnt,
-        have_movbe, have_popcnt
-- mips: use_movnz_instructions, use_mips32_instructions,
-        use_mips32r2_instructions, got_sigill (tcg_target_detect_isa)
-- ppc: have_isa_2_06, have_isa_3_00, tb_ret_addr
-- s390: tb_ret_addr, s390_facilities
-- sparc: qemu_ld_trampoline, qemu_st_trampoline (build_trampolines),
-         use_vis3_instructions
-
-Only written by tcg_prologue_init:
-- 'struct jit_code_entry one_entry'
-- aarch64: tb_ret_addr
-- arm: tb_ret_addr
-- i386: tb_ret_addr, guest_base_flags
-- ia64: tb_ret_addr
-- mips: tb_ret_addr, bswap32_addr, bswap32u_addr, bswap64_addr
-
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/tcg.h                 |   7 ++-
- accel/tcg/translate-all.c |   2 +-
- cpus.c                    |   2 +
- linux-user/syscall.c      |   1 +
- tcg/tcg.c                 | 137 +++++++++++++++++++++++++++++++++++++++++++---
- 5 files changed, 136 insertions(+), 13 deletions(-)
+ include/exec/exec-all.h   | 20 +++++++++++++++++++-
+ include/exec/tb-hash-xx.h |  9 ++++++---
+ include/exec/tb-hash.h    |  4 ++--
+ include/exec/tb-lookup.h  |  6 +++---
+ tcg/tcg.h                 |  1 -
+ accel/tcg/cpu-exec.c      | 45 +++++++++++++++++++++++----------------------
+ accel/tcg/translate-all.c | 13 +++++++++----
+ exec.c                    |  2 +-
+ tcg/tcg-runtime.c         |  2 +-
+ tests/qht-bench.c         |  2 +-
+ 10 files changed, 65 insertions(+), 39 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 7413aa0..aaf447e 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -733,7 +733,7 @@ struct TCGContext {
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 8cbd90b..f6a928d 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -353,6 +353,9 @@ struct TranslationBlock {
+ #define CF_USE_ICOUNT  0x20000
+ #define CF_IGNORE_ICOUNT 0x40000 /* Do not generate icount code */
+ #define CF_INVALID     0x80000 /* TB is stale. Setters must acquire tb_lock */
++#define CF_PARALLEL    0x100000 /* Generate code for a parallel context */
++/* cflags' mask for hashing/comparison */
++#define CF_HASH_MASK (CF_COUNT_MASK | CF_PARALLEL)
+ 
+     /* Per-vCPU dynamic tracing state used to generate this TB */
+     uint32_t trace_vcpu_dstate;
+@@ -396,11 +399,26 @@ struct TranslationBlock {
+     uintptr_t jmp_list_first;
  };
  
- extern TCGContext tcg_init_ctx;
--extern TCGContext *tcg_ctx;
-+extern __thread TCGContext *tcg_ctx;
++extern bool parallel_cpus;
++
++/* Hide the atomic_read to make code a little easier on the eyes */
++static inline uint32_t tb_cflags(const TranslationBlock *tb)
++{
++    return atomic_read(&tb->cflags);
++}
++
++/* current cflags for hashing/comparison */
++static inline uint32_t curr_cflags(void)
++{
++    return parallel_cpus ? CF_PARALLEL : 0;
++}
++
+ void tb_free(TranslationBlock *tb);
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+-                                   target_ulong cs_base, uint32_t flags);
++                                   target_ulong cs_base, uint32_t flags,
++                                   uint32_t cf_mask);
+ 
+ #if defined(USE_DIRECT_JUMP)
+ 
+diff --git a/include/exec/tb-hash-xx.h b/include/exec/tb-hash-xx.h
+index 6cd3022..747a9a6 100644
+--- a/include/exec/tb-hash-xx.h
++++ b/include/exec/tb-hash-xx.h
+@@ -48,8 +48,8 @@
+  * xxhash32, customized for input variables that are not guaranteed to be
+  * contiguous in memory.
+  */
+-static inline
+-uint32_t tb_hash_func6(uint64_t a0, uint64_t b0, uint32_t e, uint32_t f)
++static inline uint32_t
++tb_hash_func7(uint64_t a0, uint64_t b0, uint32_t e, uint32_t f, uint32_t g)
+ {
+     uint32_t v1 = TB_HASH_XX_SEED + PRIME32_1 + PRIME32_2;
+     uint32_t v2 = TB_HASH_XX_SEED + PRIME32_2;
+@@ -78,7 +78,7 @@ uint32_t tb_hash_func6(uint64_t a0, uint64_t b0, uint32_t e, uint32_t f)
+     v4 *= PRIME32_1;
+ 
+     h32 = rol32(v1, 1) + rol32(v2, 7) + rol32(v3, 12) + rol32(v4, 18);
+-    h32 += 24;
++    h32 += 28;
+ 
+     h32 += e * PRIME32_3;
+     h32  = rol32(h32, 17) * PRIME32_4;
+@@ -86,6 +86,9 @@ uint32_t tb_hash_func6(uint64_t a0, uint64_t b0, uint32_t e, uint32_t f)
+     h32 += f * PRIME32_3;
+     h32  = rol32(h32, 17) * PRIME32_4;
+ 
++    h32 += g * PRIME32_3;
++    h32  = rol32(h32, 17) * PRIME32_4;
++
+     h32 ^= h32 >> 15;
+     h32 *= PRIME32_2;
+     h32 ^= h32 >> 13;
+diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
+index 17b5ee0..0526c4f 100644
+--- a/include/exec/tb-hash.h
++++ b/include/exec/tb-hash.h
+@@ -59,9 +59,9 @@ static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
+ 
+ static inline
+ uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc, uint32_t flags,
+-                      uint32_t trace_vcpu_dstate)
++                      uint32_t cf_mask, uint32_t trace_vcpu_dstate)
+ {
+-    return tb_hash_func6(phys_pc, pc, flags, trace_vcpu_dstate);
++    return tb_hash_func7(phys_pc, pc, flags, cf_mask, trace_vcpu_dstate);
+ }
+ 
+ #endif
+diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
+index 436b6d5..2961385 100644
+--- a/include/exec/tb-lookup.h
++++ b/include/exec/tb-lookup.h
+@@ -21,7 +21,7 @@
+ /* Might cause an exception, so have a longjmp destination ready */
+ static inline TranslationBlock *
+ tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
+-                     uint32_t *flags)
++                     uint32_t *flags, uint32_t cf_mask)
+ {
+     CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+     TranslationBlock *tb;
+@@ -35,10 +35,10 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
+                tb->cs_base == *cs_base &&
+                tb->flags == *flags &&
+                tb->trace_vcpu_dstate == *cpu->trace_dstate &&
+-               !(atomic_read(&tb->cflags) & CF_INVALID))) {
++               (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == cf_mask)) {
+         return tb;
+     }
+-    tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags);
++    tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags, cf_mask);
+     if (tb == NULL) {
+         return NULL;
+     }
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index da78721..96872f8 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -730,7 +730,6 @@ struct TCGContext {
+ };
+ 
+ extern TCGContext tcg_ctx;
+-extern bool parallel_cpus;
  
  static inline void tcg_set_insn_param(int op_idx, int arg, TCGArg v)
  {
-@@ -755,7 +755,7 @@ static inline bool tcg_op_buf_full(void)
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index fae8c40..b71e015 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -207,7 +207,8 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+     tb_lock();
+     tb = tb_gen_code(cpu, orig_tb->pc, orig_tb->cs_base, orig_tb->flags,
+                      max_cycles | CF_NOCACHE
+-                         | (ignore_icount ? CF_IGNORE_ICOUNT : 0));
++                         | (ignore_icount ? CF_IGNORE_ICOUNT : 0)
++                         | curr_cflags());
+     tb->orig_tb = orig_tb;
+     tb_unlock();
  
- /* pool based memory allocation */
- 
--/* tb_lock must be held for tcg_malloc_internal. */
-+/* user-mode: tb_lock must be held for tcg_malloc_internal. */
- void *tcg_malloc_internal(TCGContext *s, int size);
- void tcg_pool_reset(TCGContext *s);
- TranslationBlock *tcg_tb_alloc(TCGContext *s);
-@@ -766,7 +766,7 @@ void tcg_region_reset_all(void);
- size_t tcg_code_size(void);
- size_t tcg_code_capacity(void);
- 
--/* Called with tb_lock held.  */
-+/* user-mode: Called with tb_lock held.  */
- static inline void *tcg_malloc(int size)
+@@ -225,31 +226,27 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+ static void cpu_exec_step(CPUState *cpu)
  {
-     TCGContext *s = tcg_ctx;
-@@ -783,6 +783,7 @@ static inline void *tcg_malloc(int size)
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+-    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+     TranslationBlock *tb;
+     target_ulong cs_base, pc;
+     uint32_t flags;
++    uint32_t cflags = 1 | CF_IGNORE_ICOUNT;
+ 
+-    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+     if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+-        mmap_lock();
+-        tb_lock();
+-        tb = tb_gen_code(cpu, pc, cs_base, flags,
+-                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+-        tb->orig_tb = NULL;
+-        tb_unlock();
+-        mmap_unlock();
++        tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags,
++                                  cflags & CF_HASH_MASK);
++        if (tb == NULL) {
++            mmap_lock();
++            tb_lock();
++            tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
++            tb_unlock();
++            mmap_unlock();
++        }
+ 
+         cc->cpu_exec_enter(cpu);
+         /* execute the generated code */
+-        trace_exec_tb_nocache(tb, pc);
++        trace_exec_tb(tb, pc);
+         cpu_tb_exec(cpu, tb);
+         cc->cpu_exec_exit(cpu);
+-
+-        tb_lock();
+-        tb_phys_invalidate(tb, -1);
+-        tb_free(tb);
+-        tb_unlock();
+     } else {
+         /* We may have exited due to another problem here, so we need
+          * to reset any tb_locks we may have taken but didn't release.
+@@ -281,6 +278,7 @@ struct tb_desc {
+     CPUArchState *env;
+     tb_page_addr_t phys_page1;
+     uint32_t flags;
++    uint32_t cf_mask;
+     uint32_t trace_vcpu_dstate;
+ };
+ 
+@@ -294,7 +292,7 @@ static bool tb_cmp(const void *p, const void *d)
+         tb->cs_base == desc->cs_base &&
+         tb->flags == desc->flags &&
+         tb->trace_vcpu_dstate == desc->trace_vcpu_dstate &&
+-        !(atomic_read(&tb->cflags) & CF_INVALID)) {
++        (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == desc->cf_mask) {
+         /* check next page if needed */
+         if (tb->page_addr[1] == -1) {
+             return true;
+@@ -313,7 +311,8 @@ static bool tb_cmp(const void *p, const void *d)
  }
  
- void tcg_context_init(TCGContext *s);
-+void tcg_register_thread(void);
- void tcg_prologue_init(TCGContext *s);
- void tcg_func_start(TCGContext *s);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+-                                   target_ulong cs_base, uint32_t flags)
++                                   target_ulong cs_base, uint32_t flags,
++                                   uint32_t cf_mask)
+ {
+     tb_page_addr_t phys_pc;
+     struct tb_desc desc;
+@@ -322,11 +321,12 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+     desc.env = (CPUArchState *)cpu->env_ptr;
+     desc.cs_base = cs_base;
+     desc.flags = flags;
++    desc.cf_mask = cf_mask;
+     desc.trace_vcpu_dstate = *cpu->trace_dstate;
+     desc.pc = pc;
+     phys_pc = get_page_addr_code(desc.env, pc);
+     desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+-    h = tb_hash_func(phys_pc, pc, flags, *cpu->trace_dstate);
++    h = tb_hash_func(phys_pc, pc, flags, cf_mask, *cpu->trace_dstate);
+     return qht_lookup(&tcg_ctx.tb_ctx.htable, tb_cmp, &desc, h);
+ }
  
+@@ -338,8 +338,9 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+     target_ulong cs_base, pc;
+     uint32_t flags;
+     bool acquired_tb_lock = false;
++    uint32_t cf_mask = curr_cflags();
+ 
+-    tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags);
++    tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, cf_mask);
+     if (tb == NULL) {
+         /* mmap_lock is needed by tb_gen_code, and mmap_lock must be
+          * taken outside tb_lock. As system emulation is currently
+@@ -352,10 +353,10 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+         /* There's a chance that our desired tb has been translated while
+          * taking the locks so we check again inside the lock.
+          */
+-        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
++        tb = tb_htable_lookup(cpu, pc, cs_base, flags, cf_mask);
+         if (likely(tb == NULL)) {
+             /* if no translated code available, then translate it now */
+-            tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
++            tb = tb_gen_code(cpu, pc, cs_base, flags, cf_mask);
+         }
+ 
+         mmap_unlock();
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 9be584b..db3d42c 100644
+index c8abef0..c1ce38f 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -154,7 +154,7 @@ static void *l1_map[V_L1_MAX_SIZE];
+@@ -1077,7 +1077,8 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
  
- /* code generation context */
- TCGContext tcg_init_ctx;
--TCGContext *tcg_ctx;
-+__thread TCGContext *tcg_ctx;
- TBContext tb_ctx;
- bool parallel_cpus;
+     /* remove the TB from the hash list */
+     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+-    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
++    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
++                     tb->trace_vcpu_dstate);
+     qht_remove(&tcg_ctx.tb_ctx.htable, tb, h);
  
-diff --git a/cpus.c b/cpus.c
-index 6022d40..74ddd49 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1307,6 +1307,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-     CPUState *cpu = arg;
+     /* remove the TB from the page list */
+@@ -1222,7 +1223,8 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+     }
  
-     rcu_register_thread();
-+    tcg_register_thread();
+     /* add in the hash table */
+-    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
++    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
++                     tb->trace_vcpu_dstate);
+     qht_insert(&tcg_ctx.tb_ctx.htable, tb, h);
  
-     qemu_mutex_lock_iothread();
-     qemu_thread_get_self(cpu->thread);
-@@ -1454,6 +1455,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-     g_assert(!use_icount);
+ #ifdef DEBUG_TB_CHECK
+@@ -1503,7 +1505,8 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+         /* we generate a block containing just the instruction
+            modifying the memory. It will ensure that it cannot modify
+            itself */
+-        tb_gen_code(cpu, current_pc, current_cs_base, current_flags, 1);
++        tb_gen_code(cpu, current_pc, current_cs_base, current_flags,
++                    1 | curr_cflags());
+         cpu_loop_exit_noexc(cpu);
+     }
+ #endif
+@@ -1621,7 +1624,8 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+         /* we generate a block containing just the instruction
+            modifying the memory. It will ensure that it cannot modify
+            itself */
+-        tb_gen_code(cpu, current_pc, current_cs_base, current_flags, 1);
++        tb_gen_code(cpu, current_pc, current_cs_base, current_flags,
++                    1 | curr_cflags());
+         /* tb_lock will be reset after cpu_loop_exit_noexc longjmps
+          * back into the cpu_exec loop. */
+         return true;
+@@ -1765,6 +1769,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+     }
  
-     rcu_register_thread();
-+    tcg_register_thread();
+     cflags = n | CF_LAST_IO;
++    cflags |= curr_cflags();
+     pc = tb->pc;
+     cs_base = tb->cs_base;
+     flags = tb->flags;
+diff --git a/exec.c b/exec.c
+index 01ac21e..94b0f3e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2433,7 +2433,7 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+                     cpu_loop_exit(cpu);
+                 } else {
+                     cpu_get_tb_cpu_state(env, &pc, &cs_base, &cpu_flags);
+-                    tb_gen_code(cpu, pc, cs_base, cpu_flags, 1);
++                    tb_gen_code(cpu, pc, cs_base, cpu_flags, 1 | curr_cflags());
+                     cpu_loop_exit_noexc(cpu);
+                 }
+             }
+diff --git a/tcg/tcg-runtime.c b/tcg/tcg-runtime.c
+index 7100339..4f873a9 100644
+--- a/tcg/tcg-runtime.c
++++ b/tcg/tcg-runtime.c
+@@ -151,7 +151,7 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
+     target_ulong cs_base, pc;
+     uint32_t flags;
  
-     qemu_mutex_lock_iothread();
-     qemu_thread_get_self(cpu->thread);
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 003943b..bbf7913 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6214,6 +6214,7 @@ static void *clone_func(void *arg)
-     TaskState *ts;
+-    tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags);
++    tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, curr_cflags());
+     if (tb == NULL) {
+         return tcg_ctx.code_gen_epilogue;
+     }
+diff --git a/tests/qht-bench.c b/tests/qht-bench.c
+index 11c1cec..4cabdfd 100644
+--- a/tests/qht-bench.c
++++ b/tests/qht-bench.c
+@@ -103,7 +103,7 @@ static bool is_equal(const void *obj, const void *userp)
  
-     rcu_register_thread();
-+    tcg_register_thread();
-     env = info->env;
-     cpu = ENV_GET_CPU(env);
-     thread_cpu = cpu;
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index c77654f..9a0ed00 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -58,6 +58,7 @@
- 
- #include "elf.h"
- #include "exec/log.h"
-+#include "sysemu/sysemu.h"
- 
- /* Forward declarations for functions declared in tcg-target.inc.c and
-    used here. */
-@@ -352,25 +353,87 @@ static inline bool tcg_region_initial_alloc__locked(TCGContext *s)
- /* Call from a safe-work context */
- void tcg_region_reset_all(void)
+ static inline uint32_t h(unsigned long v)
  {
-+    unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
-     unsigned int i;
- 
-     qemu_mutex_lock(&region.lock);
-     region.current = 0;
-     region.agg_size_full = 0;
- 
--    for (i = 0; i < n_tcg_ctxs; i++) {
--        bool err = tcg_region_initial_alloc__locked(tcg_ctxs[i]);
-+    for (i = 0; i < n_ctxs; i++) {
-+        TCGContext *s = atomic_read(&tcg_ctxs[i]);
-+        bool err = tcg_region_initial_alloc__locked(s);
- 
-         g_assert(!err);
-     }
-     qemu_mutex_unlock(&region.lock);
- }
- 
-+#ifdef CONFIG_USER_ONLY
-+static size_t tcg_n_regions(void)
-+{
-+    return 1;
-+}
-+#else
-+/*
-+ * It is likely that some vCPUs will translate more code than others, so we
-+ * first try to set more regions than smp_cpus, with those regions being of
-+ * reasonable size. If that's not possible we make do by evenly dividing
-+ * the code_gen_buffer among the vCPUs.
-+ */
-+static size_t tcg_n_regions(void)
-+{
-+    size_t i;
-+
-+    /* Use a single region if all we have is one vCPU thread */
-+    if (smp_cpus == 1 || !qemu_tcg_mttcg_enabled()) {
-+        return 1;
-+    }
-+
-+    /* Try to have more regions than smp_cpus, with each region being >= 2 MB */
-+    for (i = 8; i > 0; i--) {
-+        size_t regions_per_thread = i;
-+        size_t region_size;
-+
-+        region_size = tcg_init_ctx.code_gen_buffer_size;
-+        region_size /= smp_cpus * regions_per_thread;
-+
-+        if (region_size >= 2 * 1024u * 1024) {
-+            return smp_cpus * regions_per_thread;
-+        }
-+    }
-+    /* If we can't, then just allocate one region per vCPU thread */
-+    return smp_cpus;
-+}
-+#endif
-+
- /*
-  * Initializes region partitioning.
-  *
-  * Called at init time from the parent thread (i.e. the one calling
-  * tcg_context_init), after the target's TCG globals have been set.
-+ *
-+ * Region partitioning works by splitting code_gen_buffer into separate regions,
-+ * and then assigning regions to TCG threads so that the threads can translate
-+ * code in parallel without synchronization.
-+ *
-+ * In softmmu the number of TCG threads is bounded by smp_cpus, so we use at
-+ * least smp_cpus regions in MTTCG. In !MTTCG we use a single region.
-+ * Note that the TCG options from the command-line (i.e. -accel accel=tcg,[...])
-+ * must have been parsed before calling this function, since it calls
-+ * qemu_tcg_mttcg_enabled().
-+ *
-+ * In user-mode we use a single region.  Having multiple regions in user-mode
-+ * is not supported, because the number of vCPU threads (recall that each thread
-+ * spawned by the guest corresponds to a vCPU thread) is only bounded by the
-+ * OS, and usually this number is huge (tens of thousands is not uncommon).
-+ * Thus, given this large bound on the number of vCPU threads and the fact
-+ * that code_gen_buffer is allocated at compile-time, we cannot guarantee
-+ * that the availability of at least one region per vCPU thread.
-+ *
-+ * However, this user-mode limitation is unlikely to be a significant problem
-+ * in practice. Multi-threaded guests share most if not all of their translated
-+ * code, which makes parallel code generation less appealing than in softmmu.
-  */
- void tcg_region_init(void)
- {
-@@ -382,8 +445,7 @@ void tcg_region_init(void)
-     size_t n_regions;
-     size_t i;
- 
--    /* We do not yet support multiple TCG contexts, so use one region for now */
--    n_regions = 1;
-+    n_regions = tcg_n_regions();
- 
-     /* The first region will be 'aligned - buf' bytes larger than the others */
-     aligned = QEMU_ALIGN_PTR_UP(buf, page_size);
-@@ -421,15 +483,59 @@ void tcg_region_init(void)
-         g_assert(!rc);
-     }
- 
--    /* We do not yet support multiple TCG contexts so allocate the region now */
-+    /* In user-mode we support only one ctx, so do the initial allocation now */
-+#ifdef CONFIG_USER_ONLY
-     {
-         bool err = tcg_region_initial_alloc__locked(tcg_ctx);
- 
-         g_assert(!err);
-     }
-+#endif
+-    return tb_hash_func6(v, 0, 0, 0);
++    return tb_hash_func7(v, 0, 0, 0, 0);
  }
  
  /*
-+ * All TCG threads except the parent (i.e. the one that called tcg_context_init
-+ * and registered the target's TCG globals) must register with this function
-+ * before initiating translation.
-+ *
-+ * In user-mode we just point tcg_ctx to tcg_init_ctx. See the documentation
-+ * of tcg_region_init() for the reasoning behind this.
-+ *
-+ * In softmmu each caller registers its context in tcg_ctxs[]. Note that in
-+ * softmmu tcg_ctxs[] does not track tcg_ctx_init, since the initial context
-+ * is not used anymore for translation once this function is called.
-+ *
-+ * Not tracking tcg_init_ctx in tcg_ctxs[] in softmmu keeps code that iterates
-+ * over the array (e.g. tcg_code_size() the same for both softmmu and user-mode.
-+ */
-+#ifdef CONFIG_USER_ONLY
-+void tcg_register_thread(void)
-+{
-+    tcg_ctx = &tcg_init_ctx;
-+}
-+#else
-+void tcg_register_thread(void)
-+{
-+    TCGContext *s = g_malloc(sizeof(*s));
-+    unsigned int n;
-+    bool err;
-+
-+    memcpy(s, &tcg_init_ctx, sizeof(*s));
-+
-+    /* claim an entry in tcg_ctxs */
-+    n = atomic_fetch_inc(&n_tcg_ctxs);
-+    g_assert(n < smp_cpus);
-+    atomic_set(&tcg_ctxs[n], s);
-+
-+    tcg_ctx = s;
-+    qemu_mutex_lock(&region.lock);
-+    err = tcg_region_initial_alloc__locked(tcg_ctx);
-+    g_assert(!err);
-+    qemu_mutex_unlock(&region.lock);
-+}
-+#endif /* !CONFIG_USER_ONLY */
-+
-+/*
-  * Returns the size (in bytes) of all translated code (i.e. from all regions)
-  * currently in the cache.
-  * See also: tcg_code_capacity()
-@@ -438,13 +544,14 @@ void tcg_region_init(void)
-  */
- size_t tcg_code_size(void)
- {
-+    unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
-     unsigned int i;
-     size_t total;
- 
-     qemu_mutex_lock(&region.lock);
-     total = region.agg_size_full;
--    for (i = 0; i < n_tcg_ctxs; i++) {
--        const TCGContext *s = tcg_ctxs[i];
-+    for (i = 0; i < n_ctxs; i++) {
-+        const TCGContext *s = atomic_read(&tcg_ctxs[i]);
-         size_t size;
- 
-         size = atomic_read(&s->code_gen_ptr) - s->code_gen_buffer;
-@@ -600,8 +707,18 @@ void tcg_context_init(TCGContext *s)
-     }
- 
-     tcg_ctx = s;
-+    /*
-+     * In user-mode we simply share the init context among threads, since we
-+     * use a single region. See the documentation tcg_region_init() for the
-+     * reasoning behind this.
-+     * In softmmu we will have at most smp_cpus TCG threads.
-+     */
-+#ifdef CONFIG_USER_ONLY
-     tcg_ctxs = &tcg_ctx;
-     n_tcg_ctxs = 1;
-+#else
-+    tcg_ctxs = g_new(TCGContext *, smp_cpus);
-+#endif
- }
- 
- /*
-@@ -2753,10 +2870,12 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
- static inline
- void tcg_profile_snapshot(TCGProfile *prof, bool counters, bool table)
- {
-+    unsigned int n_ctxs = atomic_read(&n_tcg_ctxs);
-     unsigned int i;
- 
--    for (i = 0; i < n_tcg_ctxs; i++) {
--        const TCGProfile *orig = &tcg_ctxs[i]->prof;
-+    for (i = 0; i < n_ctxs; i++) {
-+        TCGContext *s = atomic_read(&tcg_ctxs[i]);
-+        const TCGProfile *orig = &s->prof;
- 
-         if (counters) {
-             PROF_ADD(prof, orig, tb_count1);
 -- 
 2.7.4
