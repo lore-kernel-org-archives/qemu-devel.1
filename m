@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYZgA-00055h-HV
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:17:23 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dYZj9-00067V-Pq
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dYZg7-0002BJ-An
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:17:22 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36065)
+	(envelope-from <stefanha@gmail.com>) id 1dYZj2-00055V-2g
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:20:23 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34023)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYZg7-00029y-1P
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:17:19 -0400
-Received: by mail-wm0-x232.google.com with SMTP id w191so11031248wmw.1
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 08:17:18 -0700 (PDT)
-Date: Fri, 21 Jul 2017 16:17:14 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dYZj1-000546-Sc
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 11:20:19 -0400
+Received: by mail-wm0-x242.google.com with SMTP id p204so7351430wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 08:20:19 -0700 (PDT)
+Date: Fri, 21 Jul 2017 16:20:16 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170721151714.GH18014@stefanha-x1.localdomain>
+Message-ID: <20170721152016.GI18014@stefanha-x1.localdomain>
 References: <20170717081152.17153-1-lprosek@redhat.com>
-	<20170717081152.17153-10-lprosek@redhat.com>
+	<20170717081152.17153-9-lprosek@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="aF3LVLvitz/VQU3c"
+	protocol="application/pgp-signature"; boundary="k9xkV0rc9XGsukaG"
 Content-Disposition: inline
-In-Reply-To: <20170717081152.17153-10-lprosek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 9/9] checkpatch: add virtio_error and
- virtqueue_error to error funcs
+In-Reply-To: <20170717081152.17153-9-lprosek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 8/9] virtio-crypto: use virtqueue_error
+ for errors with queue context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +35,37 @@ To: Ladi Prosek <lprosek@redhat.com>
 Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
 
---aF3LVLvitz/VQU3c
+--k9xkV0rc9XGsukaG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 17, 2017 at 10:11:52AM +0200, Ladi Prosek wrote:
-> Two more error functions that should not contain newlines.
+On Mon, Jul 17, 2017 at 10:11:51AM +0200, Ladi Prosek wrote:
+> virtqueue_error includes the queue index in the error output and is prefe=
+rred
+> for errors that pertain to a virtqueue rather than to the device as a who=
+le.
 >=20
-> Suggested-by: Greg Kurz <groug@kaod.org>
 > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 > ---
->  scripts/checkpatch.pl | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  hw/virtio/virtio-crypto.c | 49 ++++++++++++++++++++++++-----------------=
+------
+>  1 file changed, 25 insertions(+), 24 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---aF3LVLvitz/VQU3c
+--k9xkV0rc9XGsukaG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZchr6AAoJEJykq7OBq3PIj1IIAKyW9DMo12wFQBL7N6wpCSsH
-yLoIeOJvctcHXLr0IktQaIWGFowXAvHGIEPFQhJdUx+FqHWjy1NJF7ScxPM0Y6AQ
-JXZWfSTzJSrDge9IRMi9HaaB10zsqwfXxWy5qCozCfccN3YBdmjJ7h6b6vUVHs3D
-ZceM/e9rPrivvxwiwNxgpmY+XBqC8gRJ8A1ycRDiyzWzAwilTjYQuPj3R2Mz1lst
-r33PV3xcUXXo9emhnIWx/XFFDB9zDHP2Yknhc3XMXT9b2znqx9yhq+kju67fQNVq
-RYox/rA7YKiSGedW3BvBLofSdZqeSMgUjEsMotR5W8vbOywm8PgWEfgVOSfbdbo=
-=J+id
+iQEcBAEBAgAGBQJZchuwAAoJEJykq7OBq3PIxlYH/R3pnca7yIi0d6BRVmhm96uf
+a6inpQSDoA1uSkvvnAlOk34Ejl1nX5XBenvfvk+fyXp0vqZBtcumPrRlyoK6LAm5
+wmwBfCy79PMBiC7G7TG52EnUYfQeOGHViAPCKIv3tf6H5w5xnc8gkRX1QL5Etkqm
+d6q/ralltwdi2aG7JuNKEYITtkesDTeV5AKi9Y6HNzyLClDWHwbE75igv1t4aQ3L
+nU6/yq2O/edYD4sRGm879QhLKv+Sj1J9kHpjm8uDRAL2qCAxu0PqgAB2RlnD0Je4
+Qm6WiQZz1srMGbP06tEBXAZTE7rNF9SH7g/rklhqpIXyQflgHh/nVAlMjytX5/U=
+=YNTz
 -----END PGP SIGNATURE-----
 
---aF3LVLvitz/VQU3c--
+--k9xkV0rc9XGsukaG--
