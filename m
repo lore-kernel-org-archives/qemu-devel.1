@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYX2s-0001YK-3b
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:28:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYX5J-0002Pu-Fy
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYX2r-0002ze-6u
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:28:38 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:37028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dYX2q-0002zN-W3
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:28:37 -0400
-Received: by mail-wr0-x235.google.com with SMTP id 33so25320503wrz.4
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 05:28:36 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dYX5I-0004E8-Bm
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 08:31:09 -0400
+References: <20170721102059.14663-1-famz@redhat.com>
+	<20170721102059.14663-2-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d0569b90-8e46-aac1-4ceb-70c10260b1e5@redhat.com>
+Date: Fri, 21 Jul 2017 07:30:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <87379r86o6.fsf@linaro.org>
-References: <20170718104513.23947-1-alex.bennee@linaro.org>
-	<87379r86o6.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Jul 2017 13:28:15 +0100
-Message-ID: <CAFEAcA_Y8hMteukH-L6J_RHR05oxVBBf9TB+ZPYyPNY-uPHjmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/32] Final updates for Travis/Shippable
- for soft-freeze
+In-Reply-To: <20170721102059.14663-2-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR"
+Subject: Re: [Qemu-devel] [PATCH 1/2] osdep: Add runtime OFD lock detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On 20 July 2017 at 16:33, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
-> Hmm it looked like the cover letter never made it to the list.
->
->> The following changes since commit 5a477a78060638b8433e9fb96a3ada100b1ab=
-8e9:
->>
->>   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reque=
-st' into staging (2017-07-17 18:39:32 +0100)
->>
->> are available in the git repository at:
->>
->>   https://github.com/stsquad/qemu.git tags/pull-ci-updates-for-softfreez=
-e-180717-2
->>
->> for you to fetch changes up to 118d1becc0e6332145bb9d6aee8ed232eed770e8:
->>
->>   docker: install clang since Shippable setup_ve() verify it is availabl=
-e (2017-07-18 10:58:36 +0100)
->>
->> ----------------------------------------------------------------
->> Final CI updates for soft-freeze
->>
->> Tweaks from Paolo for J=3Dx Travis compiles
->> Bunch of updated cross-compile targets from Philippe
->> Additional debug tools in travis image from Me
->>
->> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, jsnow@redhat.com,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <d0569b90-8e46-aac1-4ceb-70c10260b1e5@redhat.com>
+Subject: Re: [PATCH 1/2] osdep: Add runtime OFD lock detection
+References: <20170721102059.14663-1-famz@redhat.com>
+ <20170721102059.14663-2-famz@redhat.com>
+In-Reply-To: <20170721102059.14663-2-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 07/21/2017 05:20 AM, Fam Zheng wrote:
+> Build time check of OFD lock is not sufficient and can cause image open=
 
--- PMM
+> errors when the runtime environment doesn't support it.
+>=20
+> Add a helper function to probe it at runtime, additionally. Also provid=
+e
+> a qemu_has_ofd_lock() for callers to check the status.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  include/qemu/osdep.h |  1 +
+>  util/osdep.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++=
++-------
+>  2 files changed, 64 insertions(+), 9 deletions(-)
+
+> =20
+> +static void qemu_probe_lock_ops(void)
+> +{
+> +    if (fcntl_op_setlk =3D=3D -1) {
+> +#ifdef F_OFD_SETLK
+> +        int fd;
+> +        int ret;
+> +        const char *tmpdir;
+> +        char *filename;
+> +        struct flock fl =3D {
+> +            .l_whence =3D SEEK_SET,
+> +            .l_start  =3D 0,
+> +            .l_len    =3D 0,
+> +            .l_type   =3D F_WRLCK,
+
+Do we actually need to grab a lock over the entire file,...
+
+> +        };
+> +
+> +        tmpdir =3D getenv("TMPDIR");
+> +        if (!tmpdir) {
+> +            tmpdir =3D "/var/tmp";
+> +        }
+> +        filename =3D g_strdup_printf("%s/qemu_lock_probe.XXXXXX", tmpd=
+ir);
+> +        fd =3D mkstemp(filename);
+
+Can we skip the temporary file, and just open("/dev/null", O_RDWR), for
+slightly less work?
+
+> +        if (fd < 0) {
+> +            fprintf(stderr, "Failed to create temporary file '%s': %s\=
+n",
+> +                    filename, strerror(errno));
+> +            fcntl_op_setlk =3D F_SETLK;
+> +            fcntl_op_getlk =3D F_GETLK;
+> +            goto out;
+> +        }
+> +        ret =3D fcntl(fd, F_OFD_SETLK, &fl);
+
+=2E..or should we change this to the much-weaker F_OFD_GETLK?  I guess it=
+
+doesn't matter if we use a temporary file, but does if we are trying to
+simplify by using /dev/null.
+
+At any rate, the rest of the patch looks sane.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllx9AAACgkQp6FrSiUn
+Q2o9Igf/TDXNfa7GpnGhd9VlxzkztlzPsaJD14JtLx6o6WBIVHzJ57Wvmc7oc6Ww
+myqWAz43DyJ8EkzU4hFWIDcnFvjXV+K3j6AWqYq+3cSOngubHaecdzKwkHVgXKwu
+noQLVPSDxMfb0T/qX22FuRuMZMJbWcqf5PFNOnF0ti3BdDjI2HwQZfY/x+DXon96
+5d92aCKz49+4a3kmFDQUaDmE0EJ8OnI5yek1cY27pju8pcJcFcGdKo9bolro6reG
+nvDHkIfPEsTkA2pYPpMf9NdWWUMs+YVHmvMhlkrvs+Geemq1Kgd0Rz6fpQkvYTC8
++wjCaPkLQQhcxmOyLTFBbuN1OAIcOQ==
+=qvVT
+-----END PGP SIGNATURE-----
+
+--qSEL17FGUsxVrGBfUXG5fO6WPJpR1smhR--
