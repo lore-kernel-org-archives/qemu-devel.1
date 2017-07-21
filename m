@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dYVek-0000Af-D0
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:59:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dYViA-0001Ol-03
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:03:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dYVej-0000yo-DT
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:59:38 -0400
-Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:34483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dYVej-0000x9-0X
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 06:59:37 -0400
-Received: by mail-lf0-x230.google.com with SMTP id g25so18175075lfh.1
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 03:59:35 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dYVi5-0003Ht-4H
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:03:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49530)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dYVi4-0003HU-UR
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 07:03:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7D35883A5
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 10:53:49 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170721060338.GA1595@pxdev.xzpeter.org> (Peter Xu's message of
+	"Fri, 21 Jul 2017 14:03:38 +0800")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-18-quintela@redhat.com>
+	<20170721060338.GA1595@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Fri, 21 Jul 2017 12:53:47 +0200
+Message-ID: <87inimhxhg.fsf@secure.mitica>
 MIME-Version: 1.0
-References: <20170721095553.10717-1-jfreimann@redhat.com>
-	<20170721095553.10717-4-jfreimann@redhat.com>
-In-Reply-To: <20170721095553.10717-4-jfreimann@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 21 Jul 2017 10:59:23 +0000
-Message-ID: <CAJ+F1CJsCQWVeaGNwVz5ZNjv0b=mGR=ttOJQn9w5K3mUu4VLeQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] libvhost-user: quit when no more data
- received
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
-Cc: maxime.coquelin@redhat.com, victork@redhat.com, stefanha@redhat.com, mst@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
 
-On Fri, Jul 21, 2017 at 11:58 AM Jens Freimann <jfreimann@redhat.com> wrote=
-:
+Peter Xu <peterx@redhat.com> wrote:
+> On Mon, Jul 17, 2017 at 03:42:38PM +0200, Juan Quintela wrote:
+>> Each time that we sync the bitmap, it is a possiblity that we receive
+>> a page that is being processed by a different thread.  We fix this
+>> problem just making sure that we wait for all receiving threads to
+>> finish its work before we procedeed with the next stage.
+>> 
+>> We are low on page flags, so we use a combination that is not valid to
+>> emit that message:  MULTIFD_PAGE and COMPRESSED.
+>
+> Btw, would it be possible that we introduce a new QEMU_VM_COMMAND for
+> this flush operation?  Like: MIG_CMD_MULTIFD_FLUSH?
 
-> From: Jens Freimann <jfreiman@redhat.com>
->
-> End processing of messages when VHOST_USER_NO_MESSAGE
-> is received.
->
->
-What is VHOST_USER_NO_MESSAGE?
+>From the commit message:
 
+> I tried to make a migration command for it, but it don't work because
+> we sync the bitmap sometimes when we have already sent the beggining
+> of the section, so I just added a new page flag.
 
-> Without this we run into a vubr_panic() call and get
-> "PANIC: Unhandled request: 0"
->
-> Signed-off-by: Jens Freimann <jfreiman@redhat.com>
->
+Yeap, I found that much better dessign, but without further surgery, it
+is not trivial.  There are two places where we can sync the bitmap, and
+in one of them, we have already sent the beggining of the section, so
+too late to send a command.
 
----
->  contrib/libvhost-user/libvhost-user.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c
-> b/contrib/libvhost-user/libvhost-user.c
-> index 9efb9da..85523ca 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -161,7 +161,7 @@ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg
-> *vmsg)
->          rc =3D recvmsg(conn_fd, &msg, 0);
->      } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
->
-> -    if (rc <=3D 0) {
-> +    if (rc < 0) {
->
-
-that's looks fine
-
-
->          vu_panic(dev, "Error while recvmsg: %s", strerror(errno));
->          return false;
->      }
-> @@ -806,6 +806,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
->          return vu_get_queue_num_exec(dev, vmsg);
->      case VHOST_USER_SET_VRING_ENABLE:
->          return vu_set_vring_enable_exec(dev, vmsg);
-> +    case VHOST_USER_NONE:
-> +        return true;
->
-
-return true means 'reply_requested', is that what you want so
-vu_message_write() is called? If so, please explain in commit message.
-
-
->      default:
->          vmsg_close_fds(vmsg);
->          vu_panic(dev, "Unhandled request: %d", vmsg->request);
-> --
-> 2.9.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Later, Juan.
