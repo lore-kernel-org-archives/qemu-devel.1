@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dYqOO-0001i2-83
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:08:09 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dYqeQ-0006bW-6d
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:24:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dYqOJ-0003v1-5R
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:08:06 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:40458 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dYqOI-0003uh-Pd
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:08:03 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <20170715094243.28371-1-rth@twiddle.net>
-	<20170715094243.28371-33-rth@twiddle.net>
-Date: Sat, 22 Jul 2017 12:07:47 +0300
-In-Reply-To: <20170715094243.28371-33-rth@twiddle.net> (Richard Henderson's
-	message of "Fri, 14 Jul 2017 23:42:41 -1000")
-Message-ID: <87r2x8g7q4.fsf@frigg.lan>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dYqeO-0002PE-Jp
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:24:42 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:38502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dYqeO-0002Nk-6h
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:24:40 -0400
+Received: by mail-lf0-x244.google.com with SMTP id y15so659258lfd.5
+	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 02:24:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <1500614191-13392-1-git-send-email-wangyunjian@huawei.com>
+	<CAJ+F1CJ2FWZdY3xN2NOgQxZKYPOE4ykLXhcke+hFt6YDKuYiSw@mail.gmail.com>
+	<20170722033348-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170722033348-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 22 Jul 2017 09:24:27 +0000
+Message-ID: <CAJ+F1CJCwH==79Sxp_=XegqJMoMnRN=+7gvS3RihZqgnXbKxZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v14 32/34] target/arm: Move ss check to
- init_disas_context
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix watcher need be removed
+ when vhost-user hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +32,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, cota@braap.org, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: w00273186 <wangyunjian@huawei.com>, qemu-devel@nongnu.org, jasowang@redhat.com, caihe@huawei.com
 
-Richard Henderson writes:
+On Sat, Jul 22, 2017 at 2:35 AM Michael S. Tsirkin <mst@redhat.com> wrote:
 
-> We can check for single-step just once.
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> On Fri, Jul 21, 2017 at 11:19:04AM +0000, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Fri, Jul 21, 2017 at 7:18 AM w00273186 <wangyunjian@huawei.com>
+> wrote:
+> >
+> >     From: Yunjian Wang <wangyunjian@huawei.com>
+> >
+> >     "nc" is freed after hotplug vhost-user, but the watcher don't be
+> removed.
+> >     The QEMU crash when the watcher access the "nc" on socket disconnec=
+t.
+> >
+> >
+> >
+> > This is actually your 3rd iteration on the patch
+> >
+> > Could your describe your changes since:
+> > "[PATCH v2] vhost-user: fix watcher need be removed when vhost-user
+> hotplug"
+> >
+> > Thanks
+>
+> Yes but it's a 3-liner. That's way below the limit where you need
+> detailed change history. Does the patch make sense to you?
+>
+>
+That's not all, the fact that he didn't come up with the same solution in
+the first place, and I didn't notice a problem either with the previous
+approach is enough to ask from some clarification on which approach is
+best, and I bet there is something to say.
 
-Reviewed-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Furthermore, we would really benefit from having repeatable cases for this
+kind of fixes.
 
 
-> ---
->  target/arm/translate.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 4b1230b..ebe1c1a 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -11845,6 +11845,11 @@ static int arm_tr_init_disas_context(DisasContex=
-tBase *dcbase,
-dc-> next_page_start =3D
->          (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-=20
-> +    /* If architectural single step active, limit to 1.  */
-> +    if (is_singlestepping(dc)) {
-> +        max_insns =3D 1;
-> +    }
-> +
->      cpu_F0s =3D tcg_temp_new_i32();
->      cpu_F1s =3D tcg_temp_new_i32();
->      cpu_F0d =3D tcg_temp_new_i64();
-> @@ -12000,11 +12005,9 @@ static void arm_tr_translate_insn(DisasContextBa=
-se *dcbase, CPUState *cpu)
->           * Also stop translation when a page boundary is reached.  This
->           * ensures prefetch aborts occur at the right place.  */
-=20
-> -        if (is_singlestepping(dc)) {
-> -            dc->base.is_jmp =3D DISAS_TOO_MANY;
-> -        } else if ((dc->pc >=3D dc->next_page_start) ||
-> -                   ((dc->pc >=3D dc->next_page_start - 3) &&
-> -                    insn_crosses_page(env, dc))) {
-> +        if (dc->pc >=3D dc->next_page_start ||
-> +            (dc->pc >=3D dc->next_page_start - 3 &&
-> +             insn_crosses_page(env, dc))) {
->              /* We want to stop the TB if the next insn starts in a new p=
-age,
->               * or if it spans between this page and the next. This means=
- that
->               * if we're looking at the last halfword in the page we need=
- to
-> --=20
-> 2.9.4
+> >
+> >         Program received signal SIGSEGV, Segmentation fault.
+> >         #0  object_get_class (obj=3Dobj@entry=3D0x2) at qom/object.c:75=
+0
+> >         #1  0x00007f9bb4180da1 in qemu_chr_fe_disconnect (be=3D<optimiz=
+ed
+> out>)
+> >     at chardev/char-fe.c:372
+> >         #2  0x00007f9bb40d1100 in net_vhost_user_watch (chan=3D<optimiz=
+ed
+> out>,
+> >     cond=3D<optimized out>, opaque=3D<optimized out>) at net/vhost-user=
+.c:188
+> >         #3  0x00007f9baf97f99a in g_main_context_dispatch () from
+> /usr/lib64/
+> >     libglib-2.0.so.0
+> >         #4  0x00007f9bb41d7ebc in glib_pollfds_poll () at
+> util/main-loop.c:213
+> >         #5  os_host_main_loop_wait (timeout=3D<optimized out>) at util/
+> >     main-loop.c:261
+> >         #6  main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at uti=
+l/
+> >     main-loop.c:515
+> >         #7  0x00007f9bb3e266a7 in main_loop () at vl.c:1917
+> >         #8  main (argc=3D<optimized out>, argv=3D<optimized out>,
+> envp=3D<optimized
+> >     out>) at vl.c:4786
+> >
+> >     Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> >     ---
+> >      net/vhost-user.c | 4 ++++
+> >      1 file changed, 4 insertions(+)
+> >
+> >     diff --git a/net/vhost-user.c b/net/vhost-user.c
+> >     index 36f32a2..c23927c 100644
+> >     --- a/net/vhost-user.c
+> >     +++ b/net/vhost-user.c
+> >     @@ -151,6 +151,10 @@ static void vhost_user_cleanup(NetClientState
+> *nc)
+> >              s->vhost_net =3D NULL;
+> >          }
+> >          if (nc->queue_index =3D=3D 0) {
+> >     +        if (s->watch) {
+> >     +            g_source_remove(s->watch);
+> >     +            s->watch =3D 0;
+> >     +        }
+> >              qemu_chr_fe_deinit(&s->chr, true);
+> >          }
+> >
+> >     --
+> >     1.8.3.1
+> >
+> >
+> >
+> >
+> > --
+> > Marc-Andr=C3=A9 Lureau
+>
+--=20
+Marc-Andr=C3=A9 Lureau
