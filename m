@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dYiHM-0002Q6-Ao
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 20:28:21 -0400
+	(envelope-from <mst@redhat.com>) id 1dYiNt-0004AS-PB
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 20:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dYiHJ-0002s3-6a
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 20:28:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52094)
+	(envelope-from <mst@redhat.com>) id 1dYiNq-0000HO-Eb
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 20:35:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dYiHI-0002qG-Uu
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 20:28:17 -0400
-Date: Fri, 21 Jul 2017 17:28:12 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <c5ef20f3-a5c5-5245-77e3-19111c7e4488@citrix.com>
-Message-ID: <alpine.DEB.2.10.1707211727540.22381@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
-	<1500416562-27337-1-git-send-email-sstabellini@kernel.org>
-	<1500416562-27337-6-git-send-email-sstabellini@kernel.org>
-	<20170721135057.GJ1587@perard.uk.xensource.com>
-	<c5ef20f3-a5c5-5245-77e3-19111c7e4488@citrix.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dYiNq-0000GP-4i
+	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 20:35:02 -0400
+Date: Sat, 22 Jul 2017 03:34:58 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170722033348-mutt-send-email-mst@kernel.org>
+References: <1500614191-13392-1-git-send-email-wangyunjian@huawei.com>
+	<CAJ+F1CJ2FWZdY3xN2NOgQxZKYPOE4ykLXhcke+hFt6YDKuYiSw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PULL for-2.10 6/7] xen/mapcache: introduce
- xen_replace_cache_entry()
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJ2FWZdY3xN2NOgQxZKYPOE4ykLXhcke+hFt6YDKuYiSw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix watcher need be removed
+ when vhost-user hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Druzhinin <igor.druzhinin@citrix.com>
-Cc: Anthony PERARD <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: w00273186 <wangyunjian@huawei.com>, qemu-devel@nongnu.org, jasowang@redhat.com, caihe@huawei.com
 
-On Fri, 21 Jul 2017, Igor Druzhinin wrote:
-> On 21/07/17 14:50, Anthony PERARD wrote:
-> > On Tue, Jul 18, 2017 at 03:22:41PM -0700, Stefano Stabellini wrote:
-> > > From: Igor Druzhinin <igor.druzhinin@citrix.com>
-> > 
-> > ...
-> > 
-> > > +static uint8_t *xen_replace_cache_entry_unlocked(hwaddr old_phys_addr,
-> > > +                                                 hwaddr new_phys_addr,
-> > > +                                                 hwaddr size)
-> > > +{
-> > > +    MapCacheEntry *entry;
-> > > +    hwaddr address_index, address_offset;
-> > > +    hwaddr test_bit_size, cache_size = size;
-> > > +
-> > > +    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
-> > > +    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
-> > > +
-> > > +    assert(size);
-> > > +    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
-> > > +    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
-> > > +    if (test_bit_size % XC_PAGE_SIZE) {
-> > > +        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
-> > > +    }
-> > > +    cache_size = size + address_offset;
-> > > +    if (cache_size % MCACHE_BUCKET_SIZE) {
-> > > +        cache_size += MCACHE_BUCKET_SIZE - (cache_size %
-> > > MCACHE_BUCKET_SIZE);
-> > > +    }
-> > > +
-> > > +    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
-> > > +    while (entry && !(entry->paddr_index == address_index &&
-> > > +                      entry->size == cache_size)) {
-> > > +        entry = entry->next;
-> > > +    }
-> > > +    if (!entry) {
-> > > +        DPRINTF("Trying to update an entry for %lx " \
-> > > +                "that is not in the mapcache!\n", old_phys_addr);
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
-> > > +    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
-> > > +
-> > > +    fprintf(stderr, "Replacing a dummy mapcache entry for %lx with
-> > > %lx\n",
-> > > +            old_phys_addr, new_phys_addr);
-> > 
-> > Looks likes this does not build on 32bits.
-> > in:
-> > http://logs.test-lab.xenproject.org/osstest/logs/112041/build-i386/6.ts-xen-build.log
-> > 
-> > /home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:
-> > In function 'xen_replace_cache_entry_unlocked':
-> > /home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:539:13:
-> > error: format '%lx' expects argument of type 'long unsigned int', but
-> > argument 3 has type 'hwaddr' [-Werror=format=]
-> >               old_phys_addr, new_phys_addr);
-> >               ^
-> > /home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/hw/i386/xen/xen-mapcache.c:539:13:
-> > error: format '%lx' expects argument of type 'long unsigned int', but
-> > argument 4 has type 'hwaddr' [-Werror=format=]
-> > cc1: all warnings being treated as errors
-> >    CC      i386-softmmu/target/i386/gdbstub.o
-> > /home/osstest/build.112041.build-i386/xen/tools/qemu-xen-dir/rules.mak:66:
-> > recipe for target 'hw/i386/xen/xen-mapcache.o' failed
-> > 
-> > > +
-> > > +    xen_remap_bucket(entry, entry->vaddr_base,
-> > > +                     cache_size, address_index, false);
-> > > +    if (!test_bits(address_offset >> XC_PAGE_SHIFT,
-> > > +                test_bit_size >> XC_PAGE_SHIFT,
-> > > +                entry->valid_mapping)) {
-> > > +        DPRINTF("Unable to update a mapcache entry for %lx!\n",
-> > > old_phys_addr);
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    return entry->vaddr_base + address_offset;
-> > > +}
-> > > +
-> > 
-> 
-> Please, accept the attached patch to fix the issue.
+On Fri, Jul 21, 2017 at 11:19:04AM +0000, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Fri, Jul 21, 2017 at 7:18 AM w00273186 <wangyunjian@huawei.com> wrot=
+e:
+>=20
+>     From: Yunjian Wang <wangyunjian@huawei.com>
+>=20
+>     "nc" is freed after hotplug vhost-user, but the watcher don't be re=
+moved.
+>     The QEMU crash when the watcher access the "nc" on socket disconnec=
+t.
+>=20
+>=20
+>=20
+> This is actually your 3rd iteration on the patch
+>=20
+> Could your describe your changes since:
+> "[PATCH v2] vhost-user: fix watcher need be removed when vhost-user hot=
+plug"
+>=20
+> Thanks
 
-The patch looks good to me. I'll send it upstream.
+Yes but it's a 3-liner. That's way below the limit where you need
+detailed change history. Does the patch make sense to you?
+
+>=20
+>     =A0 =A0 Program received signal SIGSEGV, Segmentation fault.
+>     =A0 =A0 #0=A0 object_get_class (obj=3Dobj@entry=3D0x2) at qom/objec=
+t.c:750
+>     =A0 =A0 #1=A0 0x00007f9bb4180da1 in qemu_chr_fe_disconnect (be=3D<o=
+ptimized out>)
+>     at chardev/char-fe.c:372
+>     =A0 =A0 #2=A0 0x00007f9bb40d1100 in net_vhost_user_watch (chan=3D<o=
+ptimized out>,
+>     cond=3D<optimized out>, opaque=3D<optimized out>) at net/vhost-user=
+.c:188
+>     =A0 =A0 #3=A0 0x00007f9baf97f99a in g_main_context_dispatch () from=
+ /usr/lib64/
+>     libglib-2.0.so.0
+>     =A0 =A0 #4=A0 0x00007f9bb41d7ebc in glib_pollfds_poll () at util/ma=
+in-loop.c:213
+>     =A0 =A0 #5=A0 os_host_main_loop_wait (timeout=3D<optimized out>) at=
+ util/
+>     main-loop.c:261
+>     =A0 =A0 #6=A0 main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) =
+at util/
+>     main-loop.c:515
+>     =A0 =A0 #7=A0 0x00007f9bb3e266a7 in main_loop () at vl.c:1917
+>     =A0 =A0 #8=A0 main (argc=3D<optimized out>, argv=3D<optimized out>,=
+ envp=3D<optimized
+>     out>) at vl.c:4786
+>=20
+>     Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+>     ---
+>     =A0net/vhost-user.c | 4 ++++
+>     =A01 file changed, 4 insertions(+)
+>=20
+>     diff --git a/net/vhost-user.c b/net/vhost-user.c
+>     index 36f32a2..c23927c 100644
+>     --- a/net/vhost-user.c
+>     +++ b/net/vhost-user.c
+>     @@ -151,6 +151,10 @@ static void vhost_user_cleanup(NetClientState =
+*nc)
+>     =A0 =A0 =A0 =A0 =A0s->vhost_net =3D NULL;
+>     =A0 =A0 =A0}
+>     =A0 =A0 =A0if (nc->queue_index =3D=3D 0) {
+>     +=A0 =A0 =A0 =A0 if (s->watch) {
+>     +=A0 =A0 =A0 =A0 =A0 =A0 g_source_remove(s->watch);
+>     +=A0 =A0 =A0 =A0 =A0 =A0 s->watch =3D 0;
+>     +=A0 =A0 =A0 =A0 }
+>     =A0 =A0 =A0 =A0 =A0qemu_chr_fe_deinit(&s->chr, true);
+>     =A0 =A0 =A0}
+>=20
+>     --
+>     1.8.3.1
+>=20
+>=20
+>=20
+>=20
+> --
+> Marc-Andr=E9 Lureau
