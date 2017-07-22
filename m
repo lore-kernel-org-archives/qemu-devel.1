@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dYjQu-00011i-Va
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 21:42:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1dYlks-0001OB-1a
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dYjQr-0001gZ-Sk
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 21:42:17 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:38911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dYjQr-0001gK-Ly
-	for qemu-devel@nongnu.org; Fri, 21 Jul 2017 21:42:13 -0400
-Received: by mail-io0-x242.google.com with SMTP id l7so4461553iof.5
-	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 18:42:13 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20170722023020-mutt-send-email-mst@kernel.org>
-Date: Fri, 21 Jul 2017 21:42:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1dYlko-0002Uo-SH
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:11:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dYlko-0002UQ-MA
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:10:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dYlkn-0003Aq-JI
+	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 04:10:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 90E5F2E806D
+	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 04:10:57 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <EFA75B9E-8237-450A-A4F5-515D03622AC7@gmail.com>
-References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
-	<20170721094955.GH17693@redhat.com>
-	<20170721121048.44d617ea@nial.brq.redhat.com>
-	<20170722023020-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
- machine types
+Date: Sat, 22 Jul 2017 04:02:28 -0000
+From: Imatimba <1703506@bugs.launchpad.net>
+Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
+Message-Id: <150069614873.24827.18322908405819029392.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
+ Ryzen CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
+To: qemu-devel@nongnu.org
 
+I tried disabling the CmpLegacy bit directly on /target/i386/cpu.c deleting=
+ the If statement on "case 0x80000001:" or changing "*ecx |=3D 1 << 1;" to =
+"*ecx |=3D 0 << 1;"
+But it didn't work, the VM still sees 8 physical cores.
+I believe the HTT bit should be enabled by default
+I tried changing it to "*edx |=3D 1 << 28;" in the If statement of "case 1:=
+" just in case but it didn't matter.
+Anything else that I could try to hard-code for testing?
 
-> On Jul 21, 2017, at 7:40 PM, Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->=20
-> On Fri, Jul 21, 2017 at 12:10:48PM +0200, Igor Mammedov wrote:
->> On Fri, 21 Jul 2017 10:49:55 +0100
->> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->>=20
->>> On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:
->>>> w2k used to boot on QEMU until we bumped revision of FADT to rev3
->>>> (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 =
-to improve guest OS support.)
->>>>=20
->>>> Considering that w2k is ancient and long time EOLed, leave default
->>>> rev3 but make pc-i440fx-2.9 and older machine types to force rev1
->>>> so old setups won't break (w2k could boot). =20
->>>=20
->>> There needs to be a machine type property added to control this
->>> feature. When provisioning new VMs, management apps need to be
->>> able to set the property explicitly - having them rely on picking
->>> particular machine type name+versions is not viable, because
->>> downstream vendors replace the machine types with their own
->>> names + versions.
->> having property doesn't really help here and we don't do it for every
->> compat tweak /ex: save_tsc_khz, linuxboot_dma_enabled/.
->>=20
->> Management would not benefit much from having property vs machine =
-version
->> as it would have to encode somewhere that for w2k it should set
->> some machine property or pick a particular machine type.
->=20
-> I think I'd disagree with that. If
-> users might need this for compatibility with some guests,
-> then it should be a property not just a machine type.
->=20
-> But see below - I think we rushed it for the PC anyway.
->=20
->> Probably no one would worry about fixing virt-install or something
->> else for the sake of w2k and if they are going to fix it
->> it doesn't matter if they map machine type vs property.
->>=20
->> Also with new machine type deprecation policy we would be able
->> easily to phase out rev1 support along with 2.9 machine,
->> but if you expose property then removing it would break
->> CLI not only for 2.9 but possible later machines if it's set there.
->>=20
->> So I'm against adding properties/CLI options for unless we have to in =
-this case,
->> and I'm not convinced that w2k deserves it.
->=20
-> If I have to choose, I'd say Mac OSX is way less interesting than old
-> windows versions. Lots of people have software that will only run on =
-old
-> windows and there's probably good money to be had running it on new
-> hardware in VMs. And PC machine is all about compatibility - we have =
-Q35
-> for new stuff.  Besides OSX uses q35 anyway I think.
->=20
-> So maybe the right thing to do is to
-> - switch default for PC back to rev 1
-> - keep default for Q35 at rev 3
->=20
-> No machinetype hacks.
+-- =
 
-I agree with your ideas.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703506
+
+Title:
+  SMT not supported by QEMU on AMD Ryzen CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+  message when setting the topology to threads=3D2:
+
+  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+  configure -smp options properly.
+
+  Checking in a Windows 10 guest reveals that SMT is not enabled, and
+  from what I understand, QEMU converts the topology from threads to
+  cores internally on AMD CPUs. This appears to cause performance
+  problems in the guest perhaps because programs are assuming that these
+  threads are actual cores.
+
+  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+  guest
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
