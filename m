@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dYroh-0004kG-SK
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 06:39:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dYs9U-0000WB-2J
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 07:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dYroe-0001JG-Pe
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 06:39:23 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37080)
+	(envelope-from <rth7680@gmail.com>) id 1dYs9O-00050G-LZ
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 07:00:52 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dYroe-0001J2-H3
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 06:39:20 -0400
-Received: by mail-pf0-x243.google.com with SMTP id d18so6641135pfe.4
-	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 03:39:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dYs9O-0004ze-Gq
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 07:00:46 -0400
+Received: by mail-pg0-x241.google.com with SMTP id s4so7384762pgr.5
+	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 04:00:46 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170715094243.28371-1-rth@twiddle.net>
-	<20170715094243.28371-8-rth@twiddle.net>
-	<20170721213743.GE10809@flamenco>
+	<20170715094243.28371-34-rth@twiddle.net>
+	<20170722003531.GB9909@flamenco>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <cccb194c-b885-25f2-3eb4-e56bf4b78f5a@twiddle.net>
-Date: Sat, 22 Jul 2017 00:39:13 -1000
+Message-ID: <78a94eac-6743-0ed9-2927-2bcaff11720e@twiddle.net>
+Date: Sat, 22 Jul 2017 01:00:37 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170721213743.GE10809@flamenco>
+In-Reply-To: <20170722003531.GB9909@flamenco>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v14 07/34] target/arm: Set is_jmp properly
- after single-stepping
+Subject: Re: [Qemu-devel] [PATCH v14 33/34] target/arm: Split out
+ thumb_tr_translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +36,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Emilio G. Cota" <cota@braap.org>
 Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
 
-On 07/21/2017 11:37 AM, Emilio G. Cota wrote:
->>                           gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
->> +                        dc->is_jmp = DISAS_NORETURN;
-> 
-> gen_exception_internal_insn already sets dc->is_jmp to DISAS_NORETURN,
-> as per patch 04/34:
-> @@ -304,7 +304,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
+On 07/21/2017 02:35 PM, Emilio G. Cota wrote:
+>   static void arm_post_translate_insn(CPUARMState *env, DisasContext *dc)
 >   {
->       gen_a64_set_pc_im(s->pc - offset);
->       gen_exception_internal(excp);
-> -    s->is_jmp = DISAS_EXC;
-> +    s->is_jmp = DISAS_NORETURN;
->   }
-> 
-> This applies to both arm and a64.
-> 
-> Why do we need to set is_jmp again, then?
+> +    if (dc->condjmp && !dc->base.is_jmp) {
+> +        gen_set_label(dc->condlabel);
+> +        dc->condjmp = 0;
+> +    }
+> +
 
-Because I confused gen_exception_internal, which does not.
-I have dropped this patch.
+Thanks for the catch.
+
+I have merged the !dc->base.is_jmp check with the
+following dc->base.is_jmp == DISAS_NEXT.
+
+I hope that's clearer.
 
 
 r~
