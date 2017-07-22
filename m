@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dZ2gs-0003I8-NE
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 18:16:05 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dZ2gy-0003LC-Fv
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 18:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dZ2gr-0008Fj-74
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 18:16:02 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:33044)
+	(envelope-from <zuban32s@gmail.com>) id 1dZ2gx-0008Lz-Hv
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 18:16:08 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33835)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZ2gq-0008Ei-Rd
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 18:16:01 -0400
-Received: by mail-lf0-x243.google.com with SMTP id k82so4722814lfg.0
-	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 15:16:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZ2gx-0008LG-A5
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 18:16:07 -0400
+Received: by mail-lf0-x244.google.com with SMTP id p11so5151612lfd.1
+	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 15:16:07 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Sun, 23 Jul 2017 01:15:38 +0300
-Message-Id: <1500761743-1669-2-git-send-email-zuban32s@gmail.com>
+Date: Sun, 23 Jul 2017 01:15:42 +0300
+Message-Id: <1500761743-1669-6-git-send-email-zuban32s@gmail.com>
 In-Reply-To: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
 References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH v2 1/6] hw/pci: introduce pcie-pci-bridge
- device
+Subject: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve property to
+ pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +29,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kraxel@redhat.com, seabios@seabios.org, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
+To enable hotplugging of a newly created pcie-pci-bridge,
+we need to tell firmware (SeaBIOS in this case) to reserve
+additional buses for pcie-root-port, that allows us to 
+hotplug pcie-pci-bridge into this root port.
+The number of buses to reserve is provided to the device via a corresponding
+property, and to the firmware via new PCI capability (next patch).
+The property's default value is 1 as we want to hotplug at least 1 bridge.
+
 Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
 ---
- hw/pci-bridge/Makefile.objs     |   2 +-
- hw/pci-bridge/pcie_pci_bridge.c | 151 ++++++++++++++++++++++++++++++++++++++++
- include/hw/pci/pci.h            |   1 +
- 3 files changed, 153 insertions(+), 1 deletion(-)
- create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
+ hw/pci-bridge/pcie_root_port.c | 1 +
+ include/hw/pci/pcie_port.h     | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-index c4683cf..666db37 100644
---- a/hw/pci-bridge/Makefile.objs
-+++ b/hw/pci-bridge/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += pci_bridge_dev.o
-+common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
- common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
- common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
- common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-new file mode 100644
-index 0000000..0991a7b
---- /dev/null
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -0,0 +1,151 @@
-+/*
-+ * QEMU Generic PCIE-PCI Bridge
-+ *
-+ * Copyright (c) 2017 Aleksandr Bezzubikov
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pci_bridge.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/slotid_cap.h"
-+
-+typedef struct PCIEPCIBridge {
-+    /*< private >*/
-+    PCIBridge parent_obj;
-+    uint32_t flags;
-+
-+    /*< public >*/
-+} PCIEPCIBridge;
-+
-+#define TYPE_PCIE_PCI_BRIDGE_DEV      "pcie-pci-bridge"
-+#define PCIE_PCI_BRIDGE_DEV(obj) \
-+        OBJECT_CHECK(PCIEPCIBridge, (obj), TYPE_PCIE_PCI_BRIDGE_DEV)
-+
-+static void pciepci_bridge_realize(PCIDevice *d, Error **errp)
-+{
-+    int rc, pos;
-+    Error *local_err = NULL;
-+
-+    pci_bridge_initfn(d, TYPE_PCI_BUS);
-+
-+    rc = pcie_cap_init(d, 0, PCI_EXP_TYPE_PCI_BRIDGE, 0, &local_err);
-+    if (rc < 0) {
-+        error_propagate(errp, local_err);
-+        goto error;
-+    }
-+
-+    pos = pci_add_capability(d, PCI_CAP_ID_PM, 0, PCI_PM_SIZEOF, &local_err);
-+    if (pos < 0) {
-+        error_propagate(errp, local_err);
-+        goto error;
-+    }
-+    d->exp.pm_cap = pos;
-+    pci_set_word(d->config + pos + PCI_PM_PMC, 0x3);
-+
-+    pcie_cap_arifwd_init(d);
-+    pcie_cap_deverr_init(d);
-+
-+    rc = pcie_aer_init(d, PCI_ERR_VER, 0x100, PCI_ERR_SIZEOF, &local_err);
-+    if (rc < 0) {
-+        error_propagate(errp, local_err);
-+        goto error;
-+    }
-+
-+    rc = msi_init(d, 0, 1, true, true, &local_err);
-+    if (rc < 0) {
-+        error_propagate(errp, local_err);
-+        goto error;
-+    }
-+
-+    return;
-+
-+    error:
-+    pci_bridge_exitfn(d);
-+}
-+
-+static void pciepci_bridge_exit(PCIDevice *d)
-+{
-+    pcie_cap_exit(d);
-+    pci_bridge_exitfn(d);
-+}
-+
-+static void pciepci_bridge_reset(DeviceState *qdev)
-+{
-+    PCIDevice *d = PCI_DEVICE(qdev);
-+    pci_bridge_reset(qdev);
-+    msi_reset(d);
-+}
-+
-+static void pcie_pci_bridge_write_config(PCIDevice *d,
-+        uint32_t address, uint32_t val, int len)
-+{
-+    pci_bridge_write_config(d, address, val, len);
-+    msi_write_config(d, address, val, len);
-+}
-+
-+
-+static Property pcie_pci_bridge_dev_properties[] = {
-+        DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static const VMStateDescription pciepci_bridge_dev_vmstate = {
-+        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
-+        .fields = (VMStateField[]) {
-+            VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
-+            VMSTATE_END_OF_LIST()
-+        }
-+};
-+
-+static void pciepci_bridge_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    k->is_express = 1;
-+    k->is_bridge = 1;
-+    k->vendor_id = PCI_VENDOR_ID_REDHAT;
-+    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
-+    k->realize = pciepci_bridge_realize;
-+    k->exit = pciepci_bridge_exit;
-+    k->config_write = pcie_pci_bridge_write_config;
-+    dc->vmsd = &pciepci_bridge_dev_vmstate;
-+    dc->props = pcie_pci_bridge_dev_properties;
-+    dc->vmsd = &pciepci_bridge_dev_vmstate;
-+    dc->reset = &pciepci_bridge_reset;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+}
-+
-+static const TypeInfo pciepci_bridge_info = {
-+        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
-+        .parent = TYPE_PCI_BRIDGE,
-+        .instance_size = sizeof(PCIEPCIBridge),
-+        .class_init = pciepci_bridge_class_init
-+};
-+
-+static void pciepci_register(void)
-+{
-+    type_register_static(&pciepci_bridge_info);
-+}
-+
-+type_init(pciepci_register);
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e598b09..b33a34f 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -98,6 +98,7 @@
- #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
- #define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
- #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
-+#define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
- #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index 4d588cb..b0e49e1 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+ static Property rp_props[] = {
+     DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+                     QEMU_PCIE_SLTCAP_PCP_BITNR, true),
++    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+     DEFINE_PROP_END_OF_LIST()
+ };
  
- #define FMT_PCIBUS                      PRIx64
+diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+index 1333266..1b2dd1f 100644
+--- a/include/hw/pci/pcie_port.h
++++ b/include/hw/pci/pcie_port.h
+@@ -34,6 +34,9 @@ struct PCIEPort {
+ 
+     /* pci express switch port */
+     uint8_t     port;
++
++    /* additional buses to reserve on firmware init */
++    uint8_t     bus_reserve;
+ };
+ 
+ void pcie_port_init_reg(PCIDevice *d);
 -- 
 2.7.4
