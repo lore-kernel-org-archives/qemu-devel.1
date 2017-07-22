@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYm8h-0005pH-Ah
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:35:40 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dYmKV-0007hi-1X
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYm8e-0000Ez-4p
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:35:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38211)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYm8d-0000EF-Tc
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:35:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYm8b-0005gI-5n
-	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 04:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 87AA22E80AD
-	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 04:35:32 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dYmKR-000063-WA
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:47:51 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dYmKR-00005k-QU
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:47:47 -0400
+Received: by mail-qt0-x243.google.com with SMTP id o3so4158217qto.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Jul 2017 21:47:47 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1499438577-7674-1-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <86339fc5-002a-5f20-272b-b0c76006e63f@amsat.org>
+Date: Sat, 22 Jul 2017 01:47:43 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Jul 2017 04:17:30 -0000
-From: Launchpad Bug Tracker <1300021@bugs.launchpad.net>
-Reply-To: Bug 1300021 <1300021@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140331055853.6092.52126.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150069705078.16349.8657541459193371630.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1300021] Re: after loadvm the system clock isn't
- current time
+In-Reply-To: <1499438577-7674-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/11] Make memory_region_init_ram() and
+ friends handle migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,29 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Hi Peter,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+On 07/07/2017 11:42 AM, Peter Maydell wrote:
+> This patchset changes the memory region functions
+>   - memory_region_init_ram()
+>   - memory_region_init_rom()
+>   - memory_region_init_rom_device()
+> to all automatically register the backing memory they allocate
+> for migration using vmstate_register_ram(). Renamed functions
+>   - memory_region_init_ram_nomigrate()
+>   - memory_region_init_rom_nomigrate()
+>   - memory_region_init_rom_device_nomigrate()
+> are provided which only do the MR init, for the oddball
+> cases which want to manage migration of the backing memory
+> themselves (and to avoid behavioural changes for callers
+> which weren't managing correctly migration themselves...)
+[...]
 
--- =
+I'm seeing memleaks using the malta machine, they come from the 
+smbus_eeprom_init() in hw/i2c/smbus_eeprom.c which does:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1300021
+     uint8_t *eeprom_buf = g_malloc0(8 * 256); /* XXX: make this 
+persistent */
 
-Title:
-  after loadvm the system clock isn't current time
+Question for 2.11: is this device a candidate to use one of the function 
+you enumerated? My guess is memory_region_init_rom_device()
 
-Status in QEMU:
-  Expired
+Question for 2.10: does that mean than the malta machine is not migratable?
 
-Bug description:
-  hi,
-  when i load a  snapshot of month ago using "loadvm  name"command, the vm =
-system time is past time,not recover current time.
+Thanks!
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1300021/+subscriptions
+Phil.
