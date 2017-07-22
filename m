@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dYnII-00078p-QG
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 01:49:40 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dYpAh-0004we-DE
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dYnIF-0008NY-Jz
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 01:49:38 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:56625)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dYnIE-0008Mq-5b
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 01:49:35 -0400
-Date: Sat, 22 Jul 2017 13:49:20 +0800 (CST)
-Message-ID: <201707221349209626503@zte.com.cn>
-References: 201707201057577907414@zte.com.cn,
-	20170722024929-mutt-send-email-mst@kernel.org
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTog562U5aSNOiBSZTogIFtQQVRD?=
- =?utf-8?q?H=5D_vhost=3A_fix_a_migration_failedbecause_ofvhost_region_merg?=
- =?utf-8?q?e?=
+	(envelope-from <knut.omang@oracle.com>) id 1dYpAe-0001oM-AG
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:55 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:17904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1dYpAe-0001o2-0L
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:52 -0400
+From: Knut Omang <knut.omang@oracle.com>
+Date: Sat, 22 Jul 2017 09:49:31 +0200
+Message-Id: <ee5cd7796873b061804bf6f8546759109473000b.1500709594.git-series.knut.omang@oracle.com>
+In-Reply-To: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+Subject: [Qemu-devel] [PATCH v5 2/4] sockets: factor out
+ create_fast_reuse_socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: imammedo@redhat.com, dgilbert@redhat.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
+To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
 
-PiA+IE9uIFdlZCwgSnVsIDE5LCAyMDE3IGF0IDAzOjI0OjI3UE0gKzAyMDAsIElnb3IgTWFtbWVk
-b3Ygd3JvdGU6DQoNCg0KDQoNCg0KPiA+ID4gT24gV2VkLCAxOSBKdWwgMjAxNyAxMjo0NjoxMyAr
-MDEwMA0KPiA+ID4gIkRyLiBEYXZpZCBBbGFuIEdpbGJlcnQiIDxkZ2lsYmVydEByZWRoYXQuY29t
-PiB3cm90ZToNCj4gPiA+IA0KPiA+ID4gPiAqIElnb3IgTWFtbWVkb3YgKGltYW1tZWRvQHJlZGhh
-dC5jb20pIHdyb3RlOg0KPiA+ID4gPiA+IE9uIFdlZCwgMTkgSnVsIDIwMTcgMjM6MTc6MzIgKzA4
-MDANCj4gPiA+ID4gPiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdyb3RlOg0KPiA+
-ID4gPiA+ICAgDQo+ID4gPiA+ID4gPiBXaGVuIGEgZ3Vlc3QgdGhhdCBoYXMgc2V2ZXJhbCBob3Rw
-bHVnZ2VkIGRpbW1zIGlzIG1pZ3JhdGVkLCBpbg0KPiA+ID4gPiA+ID4gZGVzdGluYXRpb24gaG9z
-dCBpdCB3aWxsIGZhaWwgdG8gcmVzdW1lLiBCZWNhdXNlIHZob3N0IHJlZ2lvbnMgb2YNCj4gPiA+
-ID4gPiA+IHNldmVyYWwgZGltbXMgaW4gc291cmNlIGhvc3QgYXJlIG1lcmdlZCBhbmQgaW4gdGhl
-IHJlc3RvcmUgc3RhZ2UNCj4gPiA+ID4gPiA+IGluIGRlc3RpbmF0aW9uIGhvc3QgaXQgY29tcHV0
-ZXMgd2hldGhlciBtb3JlIHRoYW4gdmhvc3Qgc2xvdCBsaW1pdA0KPiA+ID4gPiA+ID4gYmVmb3Jl
-IG1lcmdpbmcgdmhvc3QgcmVnaW9ucyBvZiBzZXZlcmFsIGRpbW1zLiAgDQo+ID4gPiA+ID4gY291
-bGQgeW91IHByb3ZpZGUgYSBiaXQgbW9yZSBkZXRhaWxlZCBkZXNjcmlwdGlvbiBvZiB0aGUgcHJv
-YmxlbQ0KPiA+ID4gPiA+IGluY2x1ZGluZyBjb21tYW5kIGxpbmUrdXNlZCBkZXZpY2VfYWRkIGNv
-bW1hbmRzIG9uIHNvdXJjZSBhbmQNCj4gPiA+ID4gPiBjb21tYW5kIGxpbmUgb24gZGVzdGluYXRp
-b24/ICANCj4gPiA+ID4gDQo+ID4gPiA+IChjY2luZyBpbiBNYXJjIEFuZHJlIGFuZCBNYXhpbWUp
-DQo+ID4gPiA+IA0KPiA+ID4gPiBIbW0sIEknZCBsaWtlIHRvIHVuZGVyc3RhZGUgdGhlIHNpdHVh
-dGlvbiB3aGVyZSB5b3UgZ2V0IG1lcmdpbmcgYmV0d2Vlbg0KPiA+ID4gPiBSQU1CbG9ja3MgdGhh
-dCBjb21wbGljYXRlcyBzb21lIHN0dWZmIGZvciBwb3N0Y29weS4NCj4gPiA+IGFuZCBwcm9iYWJs
-eSBpbmNvbnNpc3RlbnQgbWVyZ2luZyBicmVha3Mgdmhvc3QgYXMgd2VsbA0KPiA+ID4gDQo+ID4g
-PiBtZXJnaW5nIG1pZ2h0IGhhcHBlbiBpZiByZWdpb25zIGFyZSBhZGphY2VudCBvciBvdmVybGFw
-DQo+ID4gPiBidXQgZm9yIHRoYXQgdG8gaGFwcGVuIG1lcmdlZCByZWdpb25zIG11c3QgaGF2ZSBl
-cXVhbA0KPiA+ID4gZGlzdGFuY2UgYmV0d2VlbiB0aGVpciBHUEE6SFZBIHBhaXJzLCBzbyB0aGF0
-IGZvbGxvd2luZw0KPiA+ID4gdHJhbnNsYXRpb24gd291bGQgd29yazoNCj4gPiA+IA0KPiA+ID4g
-aWYgZ3ZhIGluIHJlZ2lvblhbZ3ZhX3N0YXJ0LCBsZW4sIGh2YV9zdGFydF0NCj4gPiA+ICAgIGh2
-YSA9IGh2YV9zdGFydCArIGd2YSAtIGd2YV9zdGFydA0KPiA+ID4gDQo+ID4gPiB3aGlsZSBHVkEg
-b2YgcmVnaW9ucyBpcyB1bmRlciBRRU1VIGNvbnRyb2wgYW5kIGRldGVybWluaXN0aWMNCj4gPiA+
-IEhWQSBpcyBub3QsIHNvIGluIG1pZ3JhdGlvbiBjYXNlIG1lcmdpbmcgbWlnaHQgaGFwcGVuIG9u
-IHNvdXJjZQ0KPiA+ID4gc2lkZSBidXQgbm90IG9uIGRlc3RpbmF0aW9uLCByZXN1bHRpbmcgaW4g
-ZGlmZmVyZW50IG1lbW9yeSBtYXBzLg0KPiA+ID4gDQo+ID4gPiBNYXliZSBNaWNoYWVsIG1pZ2h0
-IGtub3cgZGV0YWlscyB3aHkgbWlncmF0aW9uIHdvcmtzIGluIHZob3N0IHVzZWNhc2UsDQo+ID4g
-PiBidXQgSSBkb24ndCBzZWUgdmhvc3Qgc2VuZGluZyBhbnkgdm1zdGF0ZSBkYXRhLg0KPiA+IA0K
-PiA+IFdlIGFyZW4ndCBtZXJnaW5nIHJhbWJsb2NrcyBhdCBhbGwuDQo+ID4gV2hlbiB3ZSBhcmUg
-cGFzc2luZyBibG9ja3MgQSBhbmQgQiB0byB2aG9zdCwgaWYgd2Ugc2VlIHRoYXQNCj4gPiANCj4g
-PiBodmFCPWh2YUEgKyBsZW5BDQo+ID4gZ3BhQj1ncGFBICsgbGVuQQ0KPiA+IA0KPiA+IHRoZW4g
-d2UgY2FuIGltcHJvdmUgcGVyZm9ybWFuY2UgYSBiaXQgYnkgcGFzc2luZyBhIHNpbmdsZQ0KPiA+
-IGNodW5rIHRvIHZob3N0OiBodmFBLGdwYUEsbGVuYStsZW5CDQo+ID4gDQo+ID4gDQo+ID4gc28g
-aXQgZG9lcyBub3QgYWZmZWN0IG1pZ3JhdGlvbiBub3JtYWxseS4NCj4gPiANCj4gPiAtLS0tLSBJ
-IHRoaW5rIGl0IGlzIGxpa2UgdGhpczoNCj4gPiANCj4gPiBpbiBzb3VyY2UgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBpbiBkZXN0aW5hdGlvbjoocmVzdG9yZSkNCj4gPiAN
-Cj4gPiByZWFsaXplIGRldmljZSAxICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVhbGl6
-ZSBkZXZpY2UgMQ0KPiA+IA0KPiA+IHJlYWxpemUgZGV2aWNlIDIgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICByZWFsaXplIGRpbW0gMA0KPiA+IA0KPiA+ICAgICAgLi4uICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZWFsaXplIGRpbW0xDQo+ID4gDQo+
-ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IC4uLi4NCj4gPiANCj4gPiByZWFsaXplIGRldmljZSBuICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgcmVhbGl6ZSBkaW1teA0KPiA+IA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZWFsaXplICBkZXZpY2UgbQ0KPiA+IA0KPiA+
-IHJlYWxpemUgZGltbTAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4uLi4NCj4g
-PiANCj4gPiByZWFsaXplIGRpbW0xICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC4u
-Li4uDQo+ID4gDQo+ID4gLi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAuLi4uLg0KPiA+IA0KPiA+IHJlYWxpemUgZGltbXggICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHJlYWxpemUgZGV2aWNlIG4NCj4gPiANCj4gPiANCj4gPiBJbiBy
-ZXN0b3JlIHN0YWdlICx0aGUgc29ydCBvZiByZWFsaXppbmcgZGV2aWNlICBpcyBkaWZmZXJlbnQg
-ZnJvbSBzdGFydGluZyB2bQ0KPiA+IGJlY2F1c2Ugb2YgYWRkaW5nIGRpbW1zLg0KPiA+IA0KPiA+
-IFNvIGl0IG1heSBpbiBzb21lIHN0YWdlIGR1cmluZyByZXN0b3JpbmcgY2FuJ3QgbWVyZ2Ugdmhv
-c3QgcmVnaW9ucy4NCg0KPiBJZiB5b3UgcnVuIG92ZXIgdGhlIG51bWJlciBvZiByZWdpb25zIHN1
-cHBvcnRlZCBieSB2aG9zdCBvbiBkZXN0aW5hdGlvbg0KPiB0aGVuIHlvdSB3b24ndCBiZSBhYmxl
-IHRvIHN0YXJ0IGEgVk0gdGhlcmUgdW50aWwgeW91IGRpc2FibGUgdmhvc3QuDQoNCnNvbWUgcmVn
-aW9ucyBjYW4gbm90IG1lcmdlIHdoZW4ganVzdCBwYXJ0IG9mIGRldmljZXMgaGF2ZSByZWFsaXpl
-ZC4NCg0Kd2hlbiBhbGwgZGV2aWNlcyBhcmUgcmVhbGl6ZWQgb24gZGVzdGluYXRpb24sIHRoZXNl
-IHJlZ2lvbnMgIGNhbiBiZSBtZXJnZWQgIGFnYWluIA0KDQogYW5kIHRoZSB1c2VkIHNsb3RzIGNh
-biBzYXRpc2Z5IHRoZSB2aG9zdCBzbG90IGxpbWl0IGFzIG9uIHNvdXJjZS4NCg0KaW4gdGhlIHJl
-c3RvcmUgc3RhZ2UgdGhlIHZtIGlzIG5vdCBpbiBydW5uaW5nIHN0YXRlLCBzbyBkb24ndCBjb21w
-dXRlIGlmIG1vcmUgdGhhbiANCg0Kdmhvc3Qgc2xvdCBsaW1pdCB3aGVuIHZtIGlzIG5vdCBydW5u
-aW5nLiB3aGVuIGEgbGFzdCBkZXZpY2UgaXMgcmVhbGl6ZWQsDQoNCmFsbCByZWdpb25zIGFyZSBt
-ZXJnZWQgdG8gdGhlIHNsb3QgbnVtYmVyIGFzIG9uIHNvdXJjZS4gdGhlbiB0aGUgc3RhdGUgb2Yg
-dm0gDQoNCmNoYW5nZXMgdG8gcnVubmluZy4NCg0KIGl0IHNhdGlzZmllcyB0aGUgdmhvc3Qgc2xv
-dCBsaW1pdCBvbiBzb3VyY2UsIHNvIGl0IHNob3VsZCBzYXRpZnkgb24gZGVzdGluYXRpb24uDQoN
-Cg0KDQoNCj4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gU2lnbmVkLW9mZi1ieTogUGVuZyBIYW8g
-PHBlbmcuaGFvMkB6dGUuY29tLmNuPg0KPiA+ID4gPiA+ID4gU2lnbmVkLW9mZi1ieTogV2FuZyBZ
-ZWNoYW8gPHdhbmcueWVjaGFvMjU1QHp0ZS5jb20uY24+DQo+ID4gPiA+ID4gPiAtLS0NCj4gPiA+
-ID4gPiA+ICBody9tZW0vcGMtZGltbS5jIHwgMiArLQ0KPiA+ID4gPiA+ID4gIDEgZmlsZSBjaGFu
-Z2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiA+ID4gPiA+ID4gDQo+ID4gPiA+
-ID4gPiBkaWZmIC0tZ2l0IGEvaHcvbWVtL3BjLWRpbW0uYyBiL2h3L21lbS9wYy1kaW1tLmMNCj4g
-PiA+ID4gPiA+IGluZGV4IGVhNjdiNDYuLmJiMGZhMDggMTAwNjQ0DQo+ID4gPiA+ID4gPiAtLS0g
-YS9ody9tZW0vcGMtZGltbS5jDQo+ID4gPiA+ID4gPiArKysgYi9ody9tZW0vcGMtZGltbS5jDQo+
-ID4gPiA+ID4gPiBAQCAtMTAxLDcgKzEwMSw3IEBAIHZvaWQgcGNfZGltbV9tZW1vcnlfcGx1Zw0K
-PiA+IChEZXZpY2VTdGF0ZSAqZGV2LCBNZW1vcnlIb3RwbHVnU3RhdGUgKmhwbXMsDQo+ID4gPiA+
-ID4gPiAgICAgICAgICBnb3RvIG91dA0KPiA+ID4gPiA+ID4gICAgICB9DQo+ID4gPiA+ID4gPiAg
-DQo+ID4gPiA+ID4gPiAtICAgIGlmICghdmhvc3RfaGFzX2ZyZWVfc2xvdCgpKSB7DQo+ID4gPiA+
-ID4gPiArICAgIGlmICghdmhvc3RfaGFzX2ZyZWVfc2xvdCgpICYmIHJ1bnN0YXRlX2lzX3J1bm5p
-bmcoKSkgew0KPiA+ID4gPiA+ID4gICAgICAgICAgZXJyb3Jfc2V0ZygmbG9jYWxfZXJyLCAiYSB1
-c2VkIHZob3N0IGJhY2tlbmQgaGFzIG5vIGZyZWUiDQo+ID4gPiA+ID4gPiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICIgbWVtb3J5IHNsb3RzIGxlZnQiKQ0KPiA+ID4gPiA+ID4gICAg
-ICAgICAgZ290byBvdXQgIA0KPiA+ID4gPiANCj4gPiA+ID4gRXZlbiB0aGlzIHByb2R1Y2VzIHRo
-ZSB3cm9uZyBlcnJvciBtZXNzYWdlIGluIHRoaXMgY2FzZSwNCj4gPiA+ID4gaXQgYWxzbyBtYWtl
-cyBtZSB0aGluayBpZiB0aGUgZXhpc3RpbmcgY29kZSBzaG91bGQgdW5kbyBhIGxvdCBvZg0KPiA+
-ID4gPiB0aGUgb2JqZWN0X3Byb3BlcnR5X3NldCdzIHRoYXQgaGFwcGVuLg0KPiA+ID4gPiANCj4g
-PiA+ID4gRGF2ZQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+ICAgDQo+ID4gPiA+IC0tDQo+ID4gPiA+
-IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFuY2hlc3Rl
-ciwgVUs=
+First refactoring step to prepare for fixing the problem
+exposed with the test-listen test in the previous commit
+
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+---
+ util/qemu-sockets.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 1358c81..578f25b 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -149,6 +149,20 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
+     return PF_UNSPEC;
+ }
+ 
++static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
++{
++    int slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
++    if (slisten < 0) {
++        if (!e->ai_next) {
++            error_setg_errno(errp, errno, "Failed to create socket");
++        }
++        return -1;
++    }
++
++    socket_set_fast_reuse(slisten);
++    return slisten;
++}
++
+ static int inet_listen_saddr(InetSocketAddress *saddr,
+                              int port_offset,
+                              bool update_addr,
+@@ -210,21 +224,17 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+         return -1;
+     }
+ 
+-    /* create socket + bind */
++    /* create socket + bind/listen */
+     for (e = res; e != NULL; e = e->ai_next) {
+         getnameinfo((struct sockaddr*)e->ai_addr,e->ai_addrlen,
+ 		        uaddr,INET6_ADDRSTRLEN,uport,32,
+ 		        NI_NUMERICHOST | NI_NUMERICSERV);
+-        slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
++
++        slisten = create_fast_reuse_socket(e, &err);
+         if (slisten < 0) {
+-            if (!e->ai_next) {
+-                error_setg_errno(errp, errno, "Failed to create socket");
+-            }
+             continue;
+         }
+ 
+-        socket_set_fast_reuse(slisten);
+-
+         port_min = inet_getport(e);
+         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p = port_min; p <= port_max; p++) {
+-- 
+git-series 0.9.1
