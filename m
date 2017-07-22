@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dYmLN-00083t-HW
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:48:48 -0400
+	(envelope-from <wang.yi59@zte.com.cn>) id 1dYmdw-0002JS-5P
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 01:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dYmLK-0000lv-G3
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:48:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:24006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dYmLK-0000kZ-68
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 00:48:42 -0400
-Message-ID: <1500699121.4962.54.camel@intel.com>
-From: Amarnath Valluri <amarnath.valluri@intel.com>
-Reply-To: amarnath.valluri@intel.com
-Date: Sat, 22 Jul 2017 07:52:01 +0300
-In-Reply-To: <CAJ+F1C+MYV+GLpGD0RZJ9gWXchfcbjrbDHQ5OsxuZ6W=chzBEw@mail.gmail.com>
-References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
-	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1C+MYV+GLpGD0RZJ9gWXchfcbjrbDHQ5OsxuZ6W=chzBEw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <wang.yi59@zte.com.cn>) id 1dYmds-0003OL-QP
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 01:07:56 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:55923)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yi59@zte.com.cn>) id 1dYmdr-0003No-CQ
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 01:07:52 -0400
+Date: Sat, 22 Jul 2017 13:07:45 +0800 (CST)
+Message-ID: <201707221307459622030@zte.com.cn>
+References: 1500622736-20865-1-git-send-email-wang.yi59@zte.com.cn,
+	20170721152405.73701263@nial.brq.redhat.com
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
+From: <wang.yi59@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_1/2=5D_=5BPATCH=5D_hmp=3A_dump_i?=
+ =?utf-8?q?ds_includingsocket-id=2C_core-id_and_so_on_for_=27info_register?=
+ =?utf-8?q?s=27?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: imammedo@redhat.com
+Cc: dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org, liu.yunh@zte.com.cn, Liu.Jianjun3@zte.com.cn
 
-On Tue, 2017-07-18 at 05:08 -0700, Marc-André Lureau wrote:
-> Hi
-> 
-> On Tue, Jul 18, 2017 at 1:49 AM, Amarnath Valluri
-> <amarnath.valluri@intel.com> wrote:
-> > This change introduces a new TPM backend driver that can communicate with
-> > swtpm(software TPM emulator) using unix domain socket interface.
-> >
-> > Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
-> > for out-of-band control messages.
-> >
-> > The swtpm and associated tools can be found here:
-> >     https://github.com/stefanberger/swtpm
-> >
-> > The swtpm's control channel protocol specification can be found here:
-> >     https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specification
-> 
-> I am afraid this isn't enough yet.
-> 
-> > Usage:
-> >     # setup TPM state directory
-> >     mkdir /tmp/mytpm
-> >     chown -R tss:root /tmp/mytpm
-> >     /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
-> >
-> >     # Ask qemu to use TPM emulator with given tpm state directory
-> >     qemu-system-x86_64 \
-> >         [...] \
-> >         -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
-> 
-> We should rather follow the vhost-user pattern: do not deal with
-> spawning the external swtpm/backend, just use chardev to connect to
-> it. At least you don't have to deal with process argument details,
-> management etc that may change version to version.
-I made the spawning completely optional and it is useful in some
-environments, especially makes life easier when multiple QEMU instances
-on a system.
-
-One can configure QEMU to connect to already running software emulator
-using Unix domain socket paths:
-  -tpmdev emulator,id=tpm0,data-path=/path/,ctrl-path=/path
-
-- Amarnath
+Pk9uIEZyaSwgMjIgSnVsIDIwMTcgMDM6Mzg6NTUgLTA0MDANCg0KPllpIFdhbmcgPHdhbmcueWk1
+OUB6dGUuY29tLmNuPiB3cm90ZToNCg0KPg0KDQo+PiBUaGlzIHBhdGNoIGFkZCBvdXRwdXQgb2Yg
+Q1BVcycgc29ja2V0LWlkLCBjb3JlLWlkLCB0aHJlYWQtaWQgYW5kDQoNCj4+IGFwaWMtaWQgZm9y
+ICdpbmZvIHJlZ2lzdGVycycsIHdoaWNoIGNhbiBiZSB1c2VkIGZvciBxdWVyeWluZyBvdGhlcg0K
+DQo+PiBobXAgY29tbWFuZHMuDQoNCj4+IA0KDQo+PiBTaWduZWQtb2ZmLWJ5OiBZaSBXYW5nIDx3
+YW5nLnlpNTlAenRlLmNvbS5jbj4NCg0KPj4gU2lnbmVkLW9mZi1ieTogWXVuIExpdSA8bGl1Lnl1
+bmhAenRlLmNvbS5jbj4NCg0KPj4gLS0tDQoNCj4+ICBpbmNsdWRlL3FvbS9jcHUuaCAgICB8IDEy
+ICsrKysrKysrKysrKw0KDQo+PiAgbW9uaXRvci5jICAgICAgICAgICAgfCAgMSArDQoNCj4+ICBx
+b20vY3B1LmMgICAgICAgICAgICB8IDEwICsrKysrKysrKysNCg0KPj4gIHRhcmdldC9pMzg2L2Nw
+dS5jICAgIHwgIDEgKw0KDQo+PiAgdGFyZ2V0L2kzODYvY3B1LmggICAgfCAgMSArDQoNCj4+ICB0
+YXJnZXQvaTM4Ni9oZWxwZXIuYyB8IDEzICsrKysrKysrKysrKysNCg0KPj4gIDYgZmlsZXMgY2hh
+bmdlZCwgMzggaW5zZXJ0aW9ucygrKQ0KDQo+PiANCg0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
+cW9tL2NwdS5oIGIvaW5jbHVkZS9xb20vY3B1LmgNCg0KPj4gaW5kZXggMjVlZWZlYS4uNDcxN2Jk
+NyAxMDA2NDQNCg0KPj4gLS0tIGEvaW5jbHVkZS9xb20vY3B1LmgNCg0KPj4gKysrIGIvaW5jbHVk
+ZS9xb20vY3B1LmgNCg0KPj4gQEAgLTkyLDYgKzkyLDcgQEAgc3RydWN0IFRyYW5zbGF0aW9uQmxv
+Y2sNCg0KPj4gICAqIENQVXMgY2FuIHVzZSB0aGUgZGVmYXVsdCBpbXBsZW1lbnRhdGlvbiBvZiB0
+aGlzIG1ldGhvZC4gVGhpcyBtZXRob2Qgc2hvdWxkDQoNCj4+ICAgKiBub3QgYmUgdXNlZCBieSBh
+bnkgY2FsbGVycyBvdGhlciB0aGFuIHRoZSBwcmUtMS4wIHZpcnRpbyBkZXZpY2VzLg0KDQo+PiAg
+ICogQG1lbW9yeV9yd19kZWJ1ZzogQ2FsbGJhY2sgZm9yIEdEQiBtZW1vcnkgYWNjZXNzLg0KDQo+
+PiArICogQGR1bXBfaWRzOiBDYWxsYmFjayBmb3IgZHVtcGluZyBpZHMuDQoNCj4+ICAgKiBAZHVt
+cF9zdGF0ZTogQ2FsbGJhY2sgZm9yIGR1bXBpbmcgc3RhdGUuDQoNCj4+ICAgKiBAZHVtcF9zdGF0
+aXN0aWNzOiBDYWxsYmFjayBmb3IgZHVtcGluZyBzdGF0aXN0aWNzLg0KDQo+PiAgICogQGdldF9h
+cmNoX2lkOiBDYWxsYmFjayBmb3IgZ2V0dGluZyBhcmNoaXRlY3R1cmUtZGVwZW5kZW50IENQVSBJ
+RC4NCg0KPj4gQEAgLTE1Niw2ICsxNTcsNyBAQCB0eXBlZGVmIHN0cnVjdCBDUFVDbGFzcyB7DQoN
+Cj4+ICAgICAgYm9vbCAoKnZpcnRpb19pc19iaWdfZW5kaWFuKShDUFVTdGF0ZSAqY3B1KQ0KDQo+
+PiAgICAgIGludCAoKm1lbW9yeV9yd19kZWJ1ZykoQ1BVU3RhdGUgKmNwdSwgdmFkZHIgYWRkciwN
+Cg0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ4X3QgKmJ1ZiwgaW50IGxlbiwg
+Ym9vbCBpc193cml0ZSkNCg0KPj4gKyAgICB2b2lkICgqZHVtcF9pZHMpKENQVVN0YXRlICpjcHUs
+IEZJTEUgKmYsIGZwcmludGZfZnVuY3Rpb24gY3B1X2ZwcmludGYpDQoNCj4+ICAgICAgdm9pZCAo
+KmR1bXBfc3RhdGUpKENQVVN0YXRlICpjcHUsIEZJTEUgKmYsIGZwcmludGZfZnVuY3Rpb24gY3B1
+X2ZwcmludGYsDQoNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIGludCBmbGFncykNCg0KPj4g
+ICAgICBHdWVzdFBhbmljSW5mb3JtYXRpb24qICgqZ2V0X2NyYXNoX2luZm8pKENQVVN0YXRlICpj
+cHUpDQoNCj4+IEBAIC01MTgsNiArNTIwLDE2IEBAIGVudW0gQ1BVRHVtcEZsYWdzIHsNCg0KPj4g
+IH0NCg0KPj4gIA0KDQo+PiAgLyoqDQoNCj4+ICsgKiBjcHVfZHVtcF9pZHM6DQoNCj4+ICsgKiBA
+Y3B1OiBUaGUgQ1BVIHdob3NlIHN0YXRlIGlzIHRvIGJlIGR1bXBlZC4NCg0KPj4gKyAqIEBmOiBG
+aWxlIHRvIGR1bXAgdG8uDQoNCj4+ICsgKiBAY3B1X2ZwcmludGY6IEZ1bmN0aW9uIHRvIGR1bXAg
+d2l0aC4NCg0KPj4gKyAqDQoNCj4+ICsgKiBEdW1wcyBDUFUgc29ja2V0LWlkLCBjb3JlLWlkLCB0
+aHJlYWQtaWQgYW5kIGFwaWMtaWQuDQoNCj4+ICsgKi8NCg0KPj4gK3ZvaWQgY3B1X2R1bXBfaWRz
+KENQVVN0YXRlICpjcHUsIEZJTEUgKmYsIGZwcmludGZfZnVuY3Rpb24gY3B1X2ZwcmludGYpDQoN
+Cj4+ICsNCg0KPj4gKy8qKg0KDQo+PiAgICogY3B1X2R1bXBfc3RhdGU6DQoNCj4+ICAgKiBAY3B1
+OiBUaGUgQ1BVIHdob3NlIHN0YXRlIGlzIHRvIGJlIGR1bXBlZC4NCg0KPj4gICAqIEBmOiBGaWxl
+IHRvIGR1bXAgdG8uDQoNCj4+IGRpZmYgLS1naXQgYS9tb25pdG9yLmMgYi9tb25pdG9yLmMNCg0K
+Pj4gaW5kZXggNmQwNDBlNi4uMzBmODk4YyAxMDA2NDQNCg0KPj4gLS0tIGEvbW9uaXRvci5jDQoN
+Cj4+ICsrKyBiL21vbml0b3IuYw0KDQo+PiBAQCAtMTA4NSw2ICsxMDg1LDcgQEAgc3RhdGljIHZv
+aWQgaG1wX2luZm9fcmVnaXN0ZXJzKE1vbml0b3IgKm1vbiwgY29uc3QgUURpY3QgKnFkaWN0KQ0K
+DQo+PiAgICAgIGlmIChhbGxfY3B1cykgew0KDQo+PiAgICAgICAgICBDUFVfRk9SRUFDSChjcykg
+ew0KDQo+PiAgICAgICAgICAgICAgbW9uaXRvcl9wcmludGYobW9uLCAiXG5DUFUjJWRcbiIsIGNz
+LT5jcHVfaW5kZXgpDQoNCj4+ICsgICAgICAgICAgICBjcHVfZHVtcF9pZHMoY3MsIChGSUxFICop
+bW9uLCBtb25pdG9yX2ZwcmludGYpDQoNCj4+ICAgICAgICAgICAgICBjcHVfZHVtcF9zdGF0ZShj
+cywgKEZJTEUgKiltb24sIG1vbml0b3JfZnByaW50ZiwgQ1BVX0RVTVBfRlBVKQ0KDQo+PiAgICAg
+ICAgICB9DQoNCj4+ICAgICAgfSBlbHNlIHsNCg0KPj4gZGlmZiAtLWdpdCBhL3FvbS9jcHUuYyBi
+L3FvbS9jcHUuYw0KDQo+PiBpbmRleCA0ZjM4ZGIwLi5hOWRmNjYxIDEwMDY0NA0KDQo+PiAtLS0g
+YS9xb20vY3B1LmMNCg0KPj4gKysrIGIvcW9tL2NwdS5jDQoNCj4+IEBAIC0yNDIsNiArMjQyLDE2
+IEBAIEd1ZXN0UGFuaWNJbmZvcm1hdGlvbiAqY3B1X2dldF9jcmFzaF9pbmZvKENQVVN0YXRlICpj
+cHUpDQoNCj4+ICAgICAgcmV0dXJuIHJlcw0KDQo+PiAgfQ0KDQo+PiAgDQoNCj4+ICt2b2lkIGNw
+dV9kdW1wX2lkcyhDUFVTdGF0ZSAqY3B1LCBGSUxFICpmLCBmcHJpbnRmX2Z1bmN0aW9uIGNwdV9m
+cHJpbnRmKQ0KDQo+PiArew0KDQo+PiArICAgIENQVUNsYXNzICpjYyA9IENQVV9HRVRfQ0xBU1Mo
+Y3B1KQ0KDQo+PiArDQoNCj4+ICsgICAgaWYgKGNjLT5kdW1wX2lkcykgew0KDQo+PiArICAgICAg
+ICBjcHVfc3luY2hyb25pemVfc3RhdGUoY3B1KQ0KDQo+PiArICAgICAgICBjYy0+ZHVtcF9pZHMo
+Y3B1LCBmLCBjcHVfZnByaW50ZikNCg0KPj4gKyAgICB9DQoNCj4+ICt9DQoNCj4+ICsNCg0KPj4g
+IHZvaWQgY3B1X2R1bXBfc3RhdGUoQ1BVU3RhdGUgKmNwdSwgRklMRSAqZiwgZnByaW50Zl9mdW5j
+dGlvbiBjcHVfZnByaW50ZiwNCg0KPj4gICAgICAgICAgICAgICAgICAgICAgaW50IGZsYWdzKQ0K
+DQo+PiAgew0KDQo+PiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvY3B1LmMgYi90YXJnZXQvaTM4
+Ni9jcHUuYw0KDQo+PiBpbmRleCAwYmJkYTc2Li4wYWE0ODhmIDEwMDY0NA0KDQo+PiAtLS0gYS90
+YXJnZXQvaTM4Ni9jcHUuYw0KDQo+PiArKysgYi90YXJnZXQvaTM4Ni9jcHUuYw0KDQo+PiBAQCAt
+NDEyMCw2ICs0MTIwLDcgQEAgc3RhdGljIHZvaWQgeDg2X2NwdV9jb21tb25fY2xhc3NfaW5pdChP
+YmplY3RDbGFzcyAqb2MsIHZvaWQgKmRhdGEpDQoNCj4+ICAgICAgY2MtPmRvX2ludGVycnVwdCA9
+IHg4Nl9jcHVfZG9faW50ZXJydXB0DQoNCj4+ICAgICAgY2MtPmNwdV9leGVjX2ludGVycnVwdCA9
+IHg4Nl9jcHVfZXhlY19pbnRlcnJ1cHQNCg0KPj4gICNlbmRpZg0KDQo+PiArICAgIGNjLT5kdW1w
+X2lkcyA9IHg4Nl9jcHVfZHVtcF9pZHMNCg0KPj4gICAgICBjYy0+ZHVtcF9zdGF0ZSA9IHg4Nl9j
+cHVfZHVtcF9zdGF0ZQ0KDQo+PiAgICAgIGNjLT5nZXRfY3Jhc2hfaW5mbyA9IHg4Nl9jcHVfZ2V0
+X2NyYXNoX2luZm8NCg0KPj4gICAgICBjYy0+c2V0X3BjID0geDg2X2NwdV9zZXRfcGMNCg0KPj4g
+ZGlmZiAtLWdpdCBhL3RhcmdldC9pMzg2L2NwdS5oIGIvdGFyZ2V0L2kzODYvY3B1LmgNCg0KPj4g
+aW5kZXggMDUxODY3My4uMzFhZDY4MSAxMDA2NDQNCg0KPj4gLS0tIGEvdGFyZ2V0L2kzODYvY3B1
+LmgNCg0KPj4gKysrIGIvdGFyZ2V0L2kzODYvY3B1LmgNCg0KPj4gQEAgLTEzMTYsNiArMTMxNiw3
+IEBAIGludCB4ODZfY3B1X3dyaXRlX2VsZjMyX3FlbXVub3RlKFdyaXRlQ29yZUR1bXBGdW5jdGlv
+biBmLCBDUFVTdGF0ZSAqY3B1LA0KDQo+PiAgdm9pZCB4ODZfY3B1X2dldF9tZW1vcnlfbWFwcGlu
+ZyhDUFVTdGF0ZSAqY3B1LCBNZW1vcnlNYXBwaW5nTGlzdCAqbGlzdCwNCg0KPj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KDQo+PiAgDQoNCj4+ICt2b2lk
+IHg4Nl9jcHVfZHVtcF9pZHMoQ1BVU3RhdGUgKmNzLCBGSUxFICpmLCBmcHJpbnRmX2Z1bmN0aW9u
+IGNwdV9mcHJpbnRmKQ0KDQo+PiAgdm9pZCB4ODZfY3B1X2R1bXBfc3RhdGUoQ1BVU3RhdGUgKmNz
+LCBGSUxFICpmLCBmcHJpbnRmX2Z1bmN0aW9uIGNwdV9mcHJpbnRmLA0KDQo+PiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgaW50IGZsYWdzKQ0KDQo+PiAgDQoNCj4+IGRpZmYgLS1naXQgYS90YXJn
+ZXQvaTM4Ni9oZWxwZXIuYyBiL3RhcmdldC9pMzg2L2hlbHBlci5jDQoNCj4+IGluZGV4IGY2M2Vi
+M2QuLmZkNGYxYWYgMTAwNjQ0DQoNCj4+IC0tLSBhL3RhcmdldC9pMzg2L2hlbHBlci5jDQoNCj4+
+ICsrKyBiL3RhcmdldC9pMzg2L2hlbHBlci5jDQoNCj4+IEBAIC00MDgsNiArNDA4LDE5IEBAIHZv
+aWQgeDg2X2NwdV9kdW1wX2xvY2FsX2FwaWNfc3RhdGUoQ1BVU3RhdGUgKmNzLCBGSUxFICpmLA0K
+DQo+PiAgI2RlZmluZSBEVU1QX0NPREVfQllURVNfVE9UQUwgICAgNTANCg0KPj4gICNkZWZpbmUg
+RFVNUF9DT0RFX0JZVEVTX0JBQ0tXQVJEIDIwDQoNCj4+ICANCg0KPj4gK3ZvaWQgeDg2X2NwdV9k
+dW1wX2lkcyhDUFVTdGF0ZSAqY3MsIEZJTEUgKmYsIGZwcmludGZfZnVuY3Rpb24gY3B1X2Zwcmlu
+dGYpDQoNCj4+ICt7DQoNCj4NCg0KPg0KDQo+PiArICAgIFg4NkNQVSAqY3B1ID0gWDg2X0NQVShj
+cykNCg0KPj4gKyAgICBBUElDQ29tbW9uU3RhdGUgKnMgPSBBUElDX0NPTU1PTihjcHUtPmFwaWNf
+c3RhdGUpDQoNCj4+ICsgICAgaWYgKCFzKSB7DQoNCj4+ICsgICAgICAgIGNwdV9mcHJpbnRmKGYs
+ICJsb2NhbCBhcGljIHN0YXRlIG5vdCBhdmFpbGFibGVcbiIpDQoNCj4+ICsgICAgICAgIHJldHVy
+bg0KDQo+PiArICAgIH0NCg0KPj4gKw0KDQo+PiArICAgIGNwdV9mcHJpbnRmKGYsICIoc29ja2V0
+LWlkOiVkIGNvcmUtaWQ6JWQgdGhyZWFkLWlkOiVkIGFwaWMtaWQ6JWQpXG4iLA0KDQo+PiArICAg
+ICAgICAgICAgY3B1LT5zb2NrZXRfaWQsIGNwdS0+Y29yZV9pZCwgY3B1LT50aHJlYWRfaWQsIHMt
+PmlkKQ0KDQo+DQoNCj5JJ2QgbW92ZSB0aGlzIGh1bmsgaW50byB4ODZfY3B1X2R1bXBfc3RhdGUo
+KSBhbmQgZHJvcCB0aGUgcmVzdCBvZiB0aGUgcGF0Y2guDQoNCj4NCg0KPklmIHdlJ2QgbmVlZCB0
+byBnZW5lcmFsaXplIGl0IGZvciBvdGhlciB0YXJnZXRzLCB3ZSBjb3VsZCBkbyBpdCBsYXRlci4N
+Cg0KDQoNCg0KVGhhbmtzLCBJZ29yLg0KDQpTaG91bGQgSSByZXdvcmsgdGhpcyBwYXRjaCBhcyB5
+b3Ugc2FpZCBhYm92ZSBhbmQgc2VuZCBpdCB3aXRoIHRoZSBvdGhlciBbUEFUQ0ggMi8yXQ0KDQph
+cyBhIGVudGlyZSBzZXJpZXMgdGhlbj8gSWYgbm8sIEkgd2lsbCByZXNlbmQgdGhlIG5ldyB2ZXJz
+aW9uIG9mIFtQQVRDSCAyLzJdIG9ubHkgOikNCg0KDQoNCg0KDQoNCg0KDQotLS0NCg0KQmVzdCB3
+aXNoZXMNCg0KWWkgV2FuZw==
