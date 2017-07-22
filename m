@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dYpAj-0004ws-7h
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:58 -0400
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dYpDh-0006e7-2l
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:53:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dYpAg-0001of-59
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:57 -0400
-Received: from aserp1040.oracle.com ([141.146.126.69]:39416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dYpAf-0001oW-Qt
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:54 -0400
-From: Knut Omang <knut.omang@oracle.com>
-Date: Sat, 22 Jul 2017 09:49:32 +0200
-Message-Id: <f65fafa6dbfe151b16cc1b2528ddb7ab7e9fbfcf.1500709594.git-series.knut.omang@oracle.com>
-In-Reply-To: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 3/4] sockets: factor out a new try_bind()
- function
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dYpDe-0002yI-01
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:53:01 -0400
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:42780
+	helo=www.kot-begemot.co.uk)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
+	id 1dYpDd-0002y8-Pz
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:52:57 -0400
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-3-anton.ivanov@cambridgegreys.com>
+	<03702920-f5b1-6579-0c59-a0d46274a6d9@redhat.com>
+	<7c19329b-f3dc-1f54-9fac-8ecf43123a8b@cambridgegreys.com>
+	<33fada87-93c3-2914-68d9-86092856b37f@redhat.com>
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Message-ID: <c43cb967-f117-a4d0-ba1d-08c7de5f3d79@cambridgegreys.com>
+Date: Sat, 22 Jul 2017 08:52:50 +0100
+MIME-Version: 1.0
+In-Reply-To: <33fada87-93c3-2914-68d9-86092856b37f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] Unified Datagram Socket Transport -
+ GRE support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com
 
-Another refactoring step to prepare for the problem
-exposed by the test-listen test.
 
-This time simplify and reorganize the IPv6 specific extra
-measures and move it out of the for loop to increase
-code readability. No semantic changes.
 
-Signed-off-by: Knut Omang <knut.omang@oracle.com>
----
- util/qemu-sockets.c | 69 ++++++++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 30 deletions(-)
+>> ##
+>>
+>> If I read this right port is mandatory, correct?
+> Okay, so it sounds like reusing InetSocket directly may not be possible.
+>   But there's still the interface question of whether we want dual 'ipv4'
+> and 'ipv6' switches to allow finer-grain control over which (or both)
+> families to be used.
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 578f25b..39f207c 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -163,6 +163,44 @@ static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
-     return slisten;
- }
- 
-+static int try_bind(int socket, InetSocketAddress *saddr, struct addrinfo *e)
-+{
-+#ifndef IPV6_V6ONLY
-+    return bind(socket, e->ai_addr, e->ai_addrlen);
-+#else
-+    /*
-+     * Deals with first & last cases in matrix in comment
-+     * for inet_ai_family_from_address().
-+     */
-+    int v6only =
-+        ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
-+         (saddr->has_ipv4 && saddr->ipv4 &&
-+          saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
-+    int stat;
-+
-+ rebind:
-+    if (e->ai_family == PF_INET6) {
-+        qemu_setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
-+                        sizeof(v6only));
-+    }
-+
-+    stat = bind(socket, e->ai_addr, e->ai_addrlen);
-+    if (!stat) {
-+        return 0;
-+    }
-+
-+    /* If we got EADDRINUSE from an IPv6 bind & v6only is unset,
-+     * it could be that the IPv4 port is already claimed, so retry
-+     * with v6only set
-+     */
-+    if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
-+        v6only = 1;
-+        goto rebind;
-+    }
-+    return stat;
-+#endif
-+}
-+
- static int inet_listen_saddr(InetSocketAddress *saddr,
-                              int port_offset,
-                              bool update_addr,
-@@ -238,39 +276,10 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-         port_min = inet_getport(e);
-         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
-         for (p = port_min; p <= port_max; p++) {
--#ifdef IPV6_V6ONLY
--            /*
--             * Deals with first & last cases in matrix in comment
--             * for inet_ai_family_from_address().
--             */
--            int v6only =
--                ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
--                 (saddr->has_ipv4 && saddr->ipv4 &&
--                  saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
--#endif
-             inet_setport(e, p);
--#ifdef IPV6_V6ONLY
--        rebind:
--            if (e->ai_family == PF_INET6) {
--                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
--                                sizeof(v6only));
--            }
--#endif
--            if (bind(slisten, e->ai_addr, e->ai_addrlen) == 0) {
-+            if (try_bind(slisten, saddr, e) >= 0) {
-                 goto listen;
-             }
--
--#ifdef IPV6_V6ONLY
--            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
--             * it could be that the IPv4 port is already claimed, so retry
--             * with V6ONLY set
--             */
--            if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
--                v6only = 1;
--                goto rebind;
--            }
--#endif
--
-             if (p == port_max) {
-                 if (!e->ai_next) {
-                     error_setg_errno(errp, errno, "Failed to bind socket");
+I have that in the new version ready for submission. Behavior is 
+identical with other arguments which have a v4 and v6 switch.
+
+>
+>> We may be able to do it if the port portion if InetSocketAddress becomes
+>> optional. There is no such thing as port for the protocols which use the
+>> raw families.
+> We can always create a new QAPI type that expresses only the fields we
+> need; I don't think InetSocketAddress should be changed to have an
+> optional port just for your code additions.
+>
+Concur - there are places where people rely that it has the port 
+mandatory. Changing it to optional will break too much unrelated code.
+
 -- 
-git-series 0.9.1
+Anton R. Ivanov
+
+Cambridge Greys Limited, England and Wales company No 10273661
+http://www.cambridgegreys.com/
