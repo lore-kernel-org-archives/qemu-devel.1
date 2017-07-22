@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dYpAg-0004wc-Sx
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:55 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dYpAj-0004ws-7h
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dYpAd-0001oE-R0
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:54 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:17899)
+	(envelope-from <knut.omang@oracle.com>) id 1dYpAg-0001of-59
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:57 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:39416)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dYpAd-0001nk-Gu
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:51 -0400
+	id 1dYpAf-0001oW-Qt
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:54 -0400
 From: Knut Omang <knut.omang@oracle.com>
-Date: Sat, 22 Jul 2017 09:49:29 +0200
-Message-Id: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 0/4] Unit test+fix for problem with QEMU
- handling of multiple bind()s to the same port
+Date: Sat, 22 Jul 2017 09:49:32 +0200
+Message-Id: <f65fafa6dbfe151b16cc1b2528ddb7ab7e9fbfcf.1500709594.git-series.knut.omang@oracle.com>
+In-Reply-To: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+Subject: [Qemu-devel] [PATCH v5 3/4] sockets: factor out a new try_bind()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +28,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
 
-This series contains:
-* a unit test that exposes a race condition which causes QEMU to fail
-  to find a port even when there is plenty of available ports.
-* a refactor of the qemu-sockets inet_listen_saddr() function
-  to better handle this situation.
+Another refactoring step to prepare for the problem
+exposed by the test-listen test.
 
-Changes from v4:
-* Move the complexity of recreating a socket and setting the error pointer
-  into the main for loop, eliminating the try_bind_listen() function
-  again. Cleaning up and improving error handling in the process.
+This time simplify and reorganize the IPv6 specific extra
+measures and move it out of the for loop to increase
+code readability. No semantic changes.
 
-Changes from v3:
-* Test changes: Add missing license
-  Add subtests for ipv4, ipv6 and both
-  Various g_* usage improvements
-* Split patch into 3 patches with two refactoring patches ahead
-  of the actual fix.
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+---
+ util/qemu-sockets.c | 69 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 39 insertions(+), 30 deletions(-)
 
-Changes from v2:
-* Non-trivial rebase + further abstraction
-  on top of 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
-  'tests: add functional test validating ipv4/ipv6 address flag handling'
-
-Changes from v1:
-* Fix potential uninitialized variable only detected by optimize.
-* Improve unexpected error detection in test-listen to give more
-  details about why the test fails unexpectedly.
-* Fix some line length style issues.
-
-Thanks,
-Knut
-
-Knut Omang (4):
-  tests: Add test-listen - a stress test for QEMU socket listen
-  sockets: factor out create_fast_reuse_socket
-  sockets: factor out a new try_bind() function
-  sockets: Handle race condition between binds to the same port
-
- tests/Makefile.include |   2 +-
- tests/test-listen.c    | 253 ++++++++++++++++++++++++++++++++++++++++++-
- util/qemu-sockets.c    | 142 +++++++++++++++---------
- 3 files changed, 348 insertions(+), 49 deletions(-)
- create mode 100644 tests/test-listen.c
-
-base-commit: 91939262ffcd3c85ea6a4793d3029326eea1d649
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 578f25b..39f207c 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -163,6 +163,44 @@ static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
+     return slisten;
+ }
+ 
++static int try_bind(int socket, InetSocketAddress *saddr, struct addrinfo *e)
++{
++#ifndef IPV6_V6ONLY
++    return bind(socket, e->ai_addr, e->ai_addrlen);
++#else
++    /*
++     * Deals with first & last cases in matrix in comment
++     * for inet_ai_family_from_address().
++     */
++    int v6only =
++        ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
++         (saddr->has_ipv4 && saddr->ipv4 &&
++          saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
++    int stat;
++
++ rebind:
++    if (e->ai_family == PF_INET6) {
++        qemu_setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
++                        sizeof(v6only));
++    }
++
++    stat = bind(socket, e->ai_addr, e->ai_addrlen);
++    if (!stat) {
++        return 0;
++    }
++
++    /* If we got EADDRINUSE from an IPv6 bind & v6only is unset,
++     * it could be that the IPv4 port is already claimed, so retry
++     * with v6only set
++     */
++    if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
++        v6only = 1;
++        goto rebind;
++    }
++    return stat;
++#endif
++}
++
+ static int inet_listen_saddr(InetSocketAddress *saddr,
+                              int port_offset,
+                              bool update_addr,
+@@ -238,39 +276,10 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+         port_min = inet_getport(e);
+         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p = port_min; p <= port_max; p++) {
+-#ifdef IPV6_V6ONLY
+-            /*
+-             * Deals with first & last cases in matrix in comment
+-             * for inet_ai_family_from_address().
+-             */
+-            int v6only =
+-                ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
+-                 (saddr->has_ipv4 && saddr->ipv4 &&
+-                  saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
+-#endif
+             inet_setport(e, p);
+-#ifdef IPV6_V6ONLY
+-        rebind:
+-            if (e->ai_family == PF_INET6) {
+-                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
+-                                sizeof(v6only));
+-            }
+-#endif
+-            if (bind(slisten, e->ai_addr, e->ai_addrlen) == 0) {
++            if (try_bind(slisten, saddr, e) >= 0) {
+                 goto listen;
+             }
+-
+-#ifdef IPV6_V6ONLY
+-            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
+-             * it could be that the IPv4 port is already claimed, so retry
+-             * with V6ONLY set
+-             */
+-            if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
+-                v6only = 1;
+-                goto rebind;
+-            }
+-#endif
+-
+             if (p == port_max) {
+                 if (!e->ai_next) {
+                     error_setg_errno(errp, errno, "Failed to bind socket");
 -- 
 git-series 0.9.1
