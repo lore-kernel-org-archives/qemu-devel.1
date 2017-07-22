@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dYpAh-0004we-DE
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:56 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dYpAe-0001oM-AG
+	(envelope-from <knut.omang@oracle.com>) id 1dYpAg-0004wc-Sx
 	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:55 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:17904)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <knut.omang@oracle.com>) id 1dYpAd-0001oE-R0
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:54 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:17899)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dYpAe-0001o2-0L
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:52 -0400
+	id 1dYpAd-0001nk-Gu
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 03:49:51 -0400
 From: Knut Omang <knut.omang@oracle.com>
-Date: Sat, 22 Jul 2017 09:49:31 +0200
-Message-Id: <ee5cd7796873b061804bf6f8546759109473000b.1500709594.git-series.knut.omang@oracle.com>
-In-Reply-To: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 2/4] sockets: factor out
- create_fast_reuse_socket
+Date: Sat, 22 Jul 2017 09:49:29 +0200
+Message-Id: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] Unit test+fix for problem with QEMU
+ handling of multiple bind()s to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
 
-First refactoring step to prepare for fixing the problem
-exposed with the test-listen test in the previous commit
+This series contains:
+* a unit test that exposes a race condition which causes QEMU to fail
+  to find a port even when there is plenty of available ports.
+* a refactor of the qemu-sockets inet_listen_saddr() function
+  to better handle this situation.
 
-Signed-off-by: Knut Omang <knut.omang@oracle.com>
----
- util/qemu-sockets.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+Changes from v4:
+* Move the complexity of recreating a socket and setting the error pointer
+  into the main for loop, eliminating the try_bind_listen() function
+  again. Cleaning up and improving error handling in the process.
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 1358c81..578f25b 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -149,6 +149,20 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
-     return PF_UNSPEC;
- }
- 
-+static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
-+{
-+    int slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
-+    if (slisten < 0) {
-+        if (!e->ai_next) {
-+            error_setg_errno(errp, errno, "Failed to create socket");
-+        }
-+        return -1;
-+    }
-+
-+    socket_set_fast_reuse(slisten);
-+    return slisten;
-+}
-+
- static int inet_listen_saddr(InetSocketAddress *saddr,
-                              int port_offset,
-                              bool update_addr,
-@@ -210,21 +224,17 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-         return -1;
-     }
- 
--    /* create socket + bind */
-+    /* create socket + bind/listen */
-     for (e = res; e != NULL; e = e->ai_next) {
-         getnameinfo((struct sockaddr*)e->ai_addr,e->ai_addrlen,
- 		        uaddr,INET6_ADDRSTRLEN,uport,32,
- 		        NI_NUMERICHOST | NI_NUMERICSERV);
--        slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
-+
-+        slisten = create_fast_reuse_socket(e, &err);
-         if (slisten < 0) {
--            if (!e->ai_next) {
--                error_setg_errno(errp, errno, "Failed to create socket");
--            }
-             continue;
-         }
- 
--        socket_set_fast_reuse(slisten);
--
-         port_min = inet_getport(e);
-         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
-         for (p = port_min; p <= port_max; p++) {
+Changes from v3:
+* Test changes: Add missing license
+  Add subtests for ipv4, ipv6 and both
+  Various g_* usage improvements
+* Split patch into 3 patches with two refactoring patches ahead
+  of the actual fix.
+
+Changes from v2:
+* Non-trivial rebase + further abstraction
+  on top of 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
+  'tests: add functional test validating ipv4/ipv6 address flag handling'
+
+Changes from v1:
+* Fix potential uninitialized variable only detected by optimize.
+* Improve unexpected error detection in test-listen to give more
+  details about why the test fails unexpectedly.
+* Fix some line length style issues.
+
+Thanks,
+Knut
+
+Knut Omang (4):
+  tests: Add test-listen - a stress test for QEMU socket listen
+  sockets: factor out create_fast_reuse_socket
+  sockets: factor out a new try_bind() function
+  sockets: Handle race condition between binds to the same port
+
+ tests/Makefile.include |   2 +-
+ tests/test-listen.c    | 253 ++++++++++++++++++++++++++++++++++++++++++-
+ util/qemu-sockets.c    | 142 +++++++++++++++---------
+ 3 files changed, 348 insertions(+), 49 deletions(-)
+ create mode 100644 tests/test-listen.c
+
+base-commit: 91939262ffcd3c85ea6a4793d3029326eea1d649
 -- 
 git-series 0.9.1
