@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dYqeQ-0006bW-6d
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:24:43 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dYqlv-00083o-9q
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dYqeO-0002PE-Jp
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:24:42 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:38502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dYqeO-0002Nk-6h
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:24:40 -0400
-Received: by mail-lf0-x244.google.com with SMTP id y15so659258lfd.5
-	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 02:24:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <1500614191-13392-1-git-send-email-wangyunjian@huawei.com>
-	<CAJ+F1CJ2FWZdY3xN2NOgQxZKYPOE4ykLXhcke+hFt6YDKuYiSw@mail.gmail.com>
-	<20170722033348-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170722033348-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 22 Jul 2017 09:24:27 +0000
-Message-ID: <CAJ+F1CJCwH==79Sxp_=XegqJMoMnRN=+7gvS3RihZqgnXbKxZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix watcher need be removed
- when vhost-user hotplug
+	(envelope-from <knut.omang@oracle.com>) id 1dYqls-0005Uk-2T
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:32:27 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:42807)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1dYqlr-0005Ug-OY
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 05:32:24 -0400
+From: Knut Omang <knut.omang@oracle.com>
+Date: Sat, 22 Jul 2017 09:49:33 +0200
+Message-Id: <ec9baca1bcdf385ea4b3e27fdbe2d35b6b0f687d.1500709594.git-series.knut.omang@oracle.com>
+In-Reply-To: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+Subject: [Qemu-devel] [PATCH v5 4/4] sockets: Handle race condition between
+ binds to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,105 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: w00273186 <wangyunjian@huawei.com>, qemu-devel@nongnu.org, jasowang@redhat.com, caihe@huawei.com
+To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
 
-On Sat, Jul 22, 2017 at 2:35 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+If an offset of ports is specified to the inet_listen_saddr function(),
+and two or more processes tries to bind from these ports at the same time,
+occasionally more than one process may be able to bind to the same
+port. The condition is detected by listen() but too late to avoid a failure.
 
-> On Fri, Jul 21, 2017 at 11:19:04AM +0000, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Fri, Jul 21, 2017 at 7:18 AM w00273186 <wangyunjian@huawei.com>
-> wrote:
-> >
-> >     From: Yunjian Wang <wangyunjian@huawei.com>
-> >
-> >     "nc" is freed after hotplug vhost-user, but the watcher don't be
-> removed.
-> >     The QEMU crash when the watcher access the "nc" on socket disconnec=
-t.
-> >
-> >
-> >
-> > This is actually your 3rd iteration on the patch
-> >
-> > Could your describe your changes since:
-> > "[PATCH v2] vhost-user: fix watcher need be removed when vhost-user
-> hotplug"
-> >
-> > Thanks
->
-> Yes but it's a 3-liner. That's way below the limit where you need
-> detailed change history. Does the patch make sense to you?
->
->
-That's not all, the fact that he didn't come up with the same solution in
-the first place, and I didn't notice a problem either with the previous
-approach is enough to ask from some clarification on which approach is
-best, and I bet there is something to say.
+This function is called by socket_listen() and used
+by all socket listening code in QEMU, so all cases where any form of dynamic
+port selection is used should be subject to this issue.
 
-Furthermore, we would really benefit from having repeatable cases for this
-kind of fixes.
+Add code to close and re-establish the socket when this
+condition is observed, hiding the race condition from the user.
 
+Also clean up some issues with error handling to allow more
+accurate reporting of the cause of an error.
 
+This has been developed and tested by means of the
+test-listen unit test in the previous commit.
+Enable the test for make check now that it passes.
 
-> >
-> >         Program received signal SIGSEGV, Segmentation fault.
-> >         #0  object_get_class (obj=3Dobj@entry=3D0x2) at qom/object.c:75=
-0
-> >         #1  0x00007f9bb4180da1 in qemu_chr_fe_disconnect (be=3D<optimiz=
-ed
-> out>)
-> >     at chardev/char-fe.c:372
-> >         #2  0x00007f9bb40d1100 in net_vhost_user_watch (chan=3D<optimiz=
-ed
-> out>,
-> >     cond=3D<optimized out>, opaque=3D<optimized out>) at net/vhost-user=
-.c:188
-> >         #3  0x00007f9baf97f99a in g_main_context_dispatch () from
-> /usr/lib64/
-> >     libglib-2.0.so.0
-> >         #4  0x00007f9bb41d7ebc in glib_pollfds_poll () at
-> util/main-loop.c:213
-> >         #5  os_host_main_loop_wait (timeout=3D<optimized out>) at util/
-> >     main-loop.c:261
-> >         #6  main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at uti=
-l/
-> >     main-loop.c:515
-> >         #7  0x00007f9bb3e266a7 in main_loop () at vl.c:1917
-> >         #8  main (argc=3D<optimized out>, argv=3D<optimized out>,
-> envp=3D<optimized
-> >     out>) at vl.c:4786
-> >
-> >     Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> >     ---
-> >      net/vhost-user.c | 4 ++++
-> >      1 file changed, 4 insertions(+)
-> >
-> >     diff --git a/net/vhost-user.c b/net/vhost-user.c
-> >     index 36f32a2..c23927c 100644
-> >     --- a/net/vhost-user.c
-> >     +++ b/net/vhost-user.c
-> >     @@ -151,6 +151,10 @@ static void vhost_user_cleanup(NetClientState
-> *nc)
-> >              s->vhost_net =3D NULL;
-> >          }
-> >          if (nc->queue_index =3D=3D 0) {
-> >     +        if (s->watch) {
-> >     +            g_source_remove(s->watch);
-> >     +            s->watch =3D 0;
-> >     +        }
-> >              qemu_chr_fe_deinit(&s->chr, true);
-> >          }
-> >
-> >     --
-> >     1.8.3.1
-> >
-> >
-> >
-> >
-> > --
-> > Marc-Andr=C3=A9 Lureau
->
---=20
-Marc-Andr=C3=A9 Lureau
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+---
+ tests/Makefile.include |  2 +-
+ util/qemu-sockets.c    | 51 ++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 39 insertions(+), 14 deletions(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b37c0c8..9d2131d 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -128,7 +128,7 @@ check-unit-y += tests/test-bufferiszero$(EXESUF)
+ gcov-files-check-bufferiszero-y = util/bufferiszero.c
+ check-unit-y += tests/test-uuid$(EXESUF)
+ check-unit-y += tests/ptimer-test$(EXESUF)
+-#check-unit-y += tests/test-listen$(EXESUF)
++check-unit-y += tests/test-listen$(EXESUF)
+ gcov-files-ptimer-test-y = hw/core/ptimer.c
+ check-unit-y += tests/test-qapi-util$(EXESUF)
+ gcov-files-test-qapi-util-y = qapi/qapi-util.c
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 39f207c..8ca3ba6 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -210,7 +210,9 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+     char port[33];
+     char uaddr[INET6_ADDRSTRLEN+1];
+     char uport[33];
+-    int slisten, rc, port_min, port_max, p;
++    int rc, port_min, port_max, p;
++    int slisten = 0;
++    int saved_errno = 0;
+     Error *err = NULL;
+ 
+     memset(&ai,0, sizeof(ai));
+@@ -277,27 +279,50 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p = port_min; p <= port_max; p++) {
+             inet_setport(e, p);
+-            if (try_bind(slisten, saddr, e) >= 0) {
+-                goto listen;
+-            }
+-            if (p == port_max) {
+-                if (!e->ai_next) {
++            rc = try_bind(slisten, saddr, e);
++            if (rc) {
++                if (errno == EADDRINUSE) {
++                    continue;
++                } else {
+                     error_setg_errno(errp, errno, "Failed to bind socket");
++                    goto listen_failed;
++                }
++            }
++            rc = listen(slisten, 1);
++            if (!rc) {
++                goto listen_ok;
++            } else if (errno == EADDRINUSE) {
++                /* Someone else managed to bind to the same port and beat us
++                 * to listen on it! Socket semantics does not allow us to
++                 * recover from this situation, so we need to recreate the
++                 * socket to allow bind attempts for subsequent ports:
++                 */
++                closesocket(slisten);
++                slisten = create_fast_reuse_socket(e, errp);
++                if (slisten >= 0) {
++                    continue;
+                 }
+             }
++            error_setg_errno(errp, errno, "Failed to listen on socket");
++            goto listen_failed;
+         }
++    }
++    if (err) {
++        error_propagate(errp, err);
++    } else {
++        error_setg_errno(errp, errno, "Failed to find an available port");
++    }
++
++listen_failed:
++    saved_errno = errno;
++    if (slisten >= 0) {
+         closesocket(slisten);
+     }
+     freeaddrinfo(res);
++    errno = saved_errno;
+     return -1;
+ 
+-listen:
+-    if (listen(slisten,1) != 0) {
+-        error_setg_errno(errp, errno, "Failed to listen on socket");
+-        closesocket(slisten);
+-        freeaddrinfo(res);
+-        return -1;
+-    }
++listen_ok:
+     if (update_addr) {
+         g_free(saddr->host);
+         saddr->host = g_strdup(uaddr);
+-- 
+git-series 0.9.1
