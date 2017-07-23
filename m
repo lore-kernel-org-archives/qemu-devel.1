@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZIEx-0001w6-4u
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:52:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1dZIpG-0006rD-8X
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 11:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZIEu-0005ib-38
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:52:15 -0400
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-20-f4bug@amsat.org>
-	<CAJ+F1CJL8krrmFwCgqx6qZepkNZbcvTJrkOEVcsWiHurCBcUZw@mail.gmail.com>
-	<3b25ec9f-5711-de4c-eade-eecef96b6379@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a49428cc-88e9-dbd8-3d2f-207acbef68f9@redhat.com>
-Date: Sun, 23 Jul 2017 16:52:05 +0200
+	(envelope-from <bounces@canonical.com>) id 1dZIpD-0004GL-3e
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 11:29:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49901)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dZIpC-0004G7-Ul
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 11:29:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dZIpA-0005SD-Ab
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 15:29:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 44E7B2E8025
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 15:29:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <3b25ec9f-5711-de4c-eade-eecef96b6379@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 19/29] disas: use QEMU_IS_ALIGNED macro
+Date: Sun, 23 Jul 2017 15:16:01 -0000
+From: Blake Lee <1295587@bugs.launchpad.net>
+Reply-To: Bug 1295587 <1295587@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140321093246.9788.71300.malonedeb@soybean.canonical.com>
+Message-Id: <150082296112.15111.10271770780588419351.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1295587] Re: Temporal freeze and slowdown while
+ using emulated sb16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu trival <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 18/07/2017 16:43, Thomas Huth wrote:
-> On 18.07.2017 13:07, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
->>
->> On Mon, Jul 17, 2017 at 11:09 PM, Philippe Mathieu-Daud=C3=A9
->> <f4bug@amsat.org> wrote:
->>> Applied using the Coccinelle semantic patch scripts/coccinelle/use_os=
-dep.cocci
-> [...]
->>> diff --git a/disas.c b/disas.c
->>> index d335c55bbf..8b59448286 100644
->>> --- a/disas.c
->>> +++ b/disas.c
->>> @@ -151,7 +151,7 @@ static int print_insn_objdump(bfd_vma pc, disasse=
-mble_info *info,
->>>      info->read_memory_func(pc, buf, n, info);
->>>
->>>      for (i =3D 0; i < n; ++i) {
->>> -        if (i % 32 =3D=3D 0) {
->>> +        if (QEMU_IS_ALIGNED(i, 32)) {
->>>              info->fprintf_func(info->stream, "\n%s: ", prefix);
->>>          }
->>>          info->fprintf_func(info->stream, "%02x", buf[i]);
->=20
-> This looks wrong to me. QEMU_IS_ALIGNED should be used for addresses an=
-d
-> similar things. This part here is about pretty printing a hex dump.
->=20
-> The code should likely be converted to use qemu_hexdump() instead, I gu=
-ess.
+Is there any fix or workaround for this bug? Some old games won't use
+the AC97 and require SB16.
 
-qemu_hexdump only works with FILE*.
+-- =
 
-But I agree that QEMU_IS_ALIGNED looks weird here.  I think it should
-mostly be used when the argument is a pointer, to hide the cast.  Uses
-for non-pointer arguments should be decided on a one-by-one basis; "is
-the first argument an address" is definitely a good thing to consider.
-Another might be "is the second argument a variable", because "i % n =3D=3D
-0" is less efficient than "(i & (n - 1)) =3D=3D 0".
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1295587
 
-Paolo
+Title:
+  Temporal freeze and slowdown while using emulated sb16
 
+Status in QEMU:
+  New
 
-Paolo
+Bug description:
+  I have been carrying around this bug since previous versions and on
+  different machines: When I use the -soundhw sb16 option, while playing
+  any sound on the virtual machine it temporally freezes the emulated
+  machine and loops the last bit of such sound effect for 1-2 minutes,
+  then goes back to normal speed (until a new sound is played).
+
+  Console shows:
+
+  =C2=A0sb16: warning: command 0xf9,1 is not truly understood yet
+  =C2=A0sb16: warning: command 0xf9,1 is not truly understood yet
+  (...)
+  main-loop: WARNING: I/O thread spun for 1000 iterations
+
+  -One of my emulated machines is Windows 3.11: I managed to overrun
+  this bug by switching from the local 1.5 version of the sound blaster
+  driver to the 1.0, although since I updated qemu it freezes that
+  machine, so I can't test if it still works.
+
+  I am using the 1.7.90 version, but I suffered this bug for over one
+  year (confirmed in version 2.0.0-rc0 too)
+
+  this bug happens anytime I use the -soundhw sb16 switch, but the full
+  command I am using in this specific case is:
+
+  qemu-system-i386 -localtime -cpu pentium -m 32 -display sdl -vga
+  cirrus -hda c.img -cdrom win95stuff.iso -net nic,model=3Dne2k_pci -net
+  user -soundhw sb16
+
+  This bug appears on all my machines: Pentium III running Slackware
+  13.0 and freeBSD 10; Dual core T2400, both in Arch, Gentoo and
+  Slackware 14.1 (all 32 bits), and a Dual core T4400 64 bits with
+  Gentoo and Slackware. Same problem in all of those systems after
+  compiling instead of using the distro packages....
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1295587/+subscriptions
