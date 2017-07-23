@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1dZJmB-0004dS-5g
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:30:40 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dZJyy-0006RM-IF
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1dZJm8-0001dc-1h
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:30:39 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34508)
+	(envelope-from <zuban32s@gmail.com>) id 1dZJyx-0002IO-Eh
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:43:52 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33094)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1dZJm7-0001dH-SS
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:30:35 -0400
-Received: by mail-qk0-x241.google.com with SMTP id q66so8126723qki.1
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 09:30:35 -0700 (PDT)
-Date: Sun, 23 Jul 2017 12:30:33 -0400
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20170723163033.GB28883@morn.lan>
-References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
-	<1500761510-1556-4-git-send-email-zuban32s@gmail.com>
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZJyx-0002I5-5e
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:43:51 -0400
+Received: by mail-pg0-x241.google.com with SMTP id z1so9643163pgs.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 09:43:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1500761510-1556-4-git-send-email-zuban32s@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 3/4] pci: add QEMU-specific PCI
- capability structure
+In-Reply-To: <20170723054445-mutt-send-email-mst@kernel.org>
+References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+	<1500761510-1556-5-git-send-email-zuban32s@gmail.com>
+	<20170723054445-mutt-send-email-mst@kernel.org>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Sun, 23 Jul 2017 19:43:49 +0300
+Message-ID: <CAKSfGUAHPHwgLa=jNUGpW-saHK6rGK5epBY2ixizeuCwvE77wA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] pci: enable RedHat PCI bridges
+ to reserve additional buses on PCI init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: seabios@seabios.org, marcel@redhat.com, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, konrad.wilk@oracle.com, mst@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: seabios@seabios.org, Marcel Apfelbaum <marcel@redhat.com>, kraxel@redhat.com, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 
-On Sun, Jul 23, 2017 at 01:11:49AM +0300, Aleksandr Bezzubikov wrote:
-> On PCI init PCI bridge devices may need some
-> extra info about bus number to reserve, IO, memory and
-> prefetchable memory limits. QEMU can provide this
-> with special vendor-specific PCI capability.
-> 
-> This capability is intended to be used only
-> for Red Hat PCI bridges, i.e. QEMU cooperation.
-> 
-> Sizes of limits match ones from 
-> PCI Type 1 Configuration Space Header,
-> number of buses to reserve occupies only 1 byte 
-> since it is the size of Subordinate Bus Number register.
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->  src/hw/pci_cap.h | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
->  create mode 100644 src/hw/pci_cap.h
-> 
-> diff --git a/src/hw/pci_cap.h b/src/hw/pci_cap.h
-> new file mode 100644
-> index 0000000..1382b0b
-> --- /dev/null
-> +++ b/src/hw/pci_cap.h
-> @@ -0,0 +1,23 @@
-> +#ifndef _PCI_CAP_H
-> +#define _PCI_CAP_H
-> +
-> +#include "types.h"
-> +
-> +struct vendor_pci_cap {
-> +    u8 id;
-> +    u8 next;
-> +    u8 len;
-> +};
+2017-07-23 5:49 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
 
-Thanks.  If you respin this series, please add this header to the
-src/fw/ directory instead of src/hw/.  Also, I'd prefer to avoid a
-"pci_" prefix on the header as it makes it seem similar to the
-existing pci_regs.h and pci_ids.h headers which are a bit different -
-how about src/fw/dev-pci.h instead?
+> On Sun, Jul 23, 2017 at 01:11:50AM +0300, Aleksandr Bezzubikov wrote:
+> > In case of Red Hat PCI bridges reserve additional buses, which number is
+> provided
+> > in a vendor-specific capability.
+> >
+> > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > ---
+> >  src/fw/pciinit.c | 14 ++++++++++++--
+> >  1 file changed, 12 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
+> > index 864954f..f05a8b9 100644
+> > --- a/src/fw/pciinit.c
+> > +++ b/src/fw/pciinit.c
+> > @@ -15,6 +15,7 @@
+> >  #include "hw/pcidevice.h" // pci_probe_devices
+> >  #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
+> >  #include "hw/pci_regs.h" // PCI_COMMAND
+> > +#include "hw/pci_cap.h" // qemu_pci_cap
+> >  #include "list.h" // struct hlist_node
+> >  #include "malloc.h" // free
+> >  #include "output.h" // dprintf
+> > @@ -578,9 +579,18 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
+> >          pci_bios_init_bus_rec(secbus, pci_bus);
+> >
+> >          if (subbus != *pci_bus) {
+> > +            u8 res_bus = 0;
+> > +            if (pci_config_readw(bdf, PCI_VENDOR_ID) ==
+> PCI_VENDOR_ID_REDHAT) {
+>
+> Check device ID as well.
 
--Kevin
+Not sure what ID/IDs we want to see here exactly. Now it can be
+only pcie-root-port (0xC then), but
+
+
+>
+> > +                u8 cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
+>
+> There could be multiple vendor capabilities. You want to scan them all.
+>
+>
+> > +                if (cap) {
+> > +                    res_bus = pci_config_readb(bdf,
+> > +                            cap + offsetof(struct redhat_pci_bridge_cap,
+> > +                                           bus_res));
+>
+>
+> You might want to add sanity checks e.g. overflow, and capability
+> length.
+>
+> Also, if all you use is offsetof, don't bother with a struct, just
+> add some defines.
+>
+OK, will move this to defines.
+
+
+>
+> > +                }
+> > +            }
+> >              dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
+> > -                    subbus, *pci_bus);
+> > -            subbus = *pci_bus;
+> > +                    subbus, *pci_bus + res_bus);
+> > +            subbus = *pci_bus + res_bus;
+>
+> So you take all present devices and add reserved ones - is that it?
+> If so it looks like this will steal extra buses each time you
+> add a child bus and reboot.
+>
+
+You're right, such problem persists. Will think on what can be done here.
+
+
+>
+>
+> >          } else {
+> >              dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
+> >          }
+> > --
+> > 2.7.4
+>
+
+
+
+-- 
+Alexander Bezzubikov
