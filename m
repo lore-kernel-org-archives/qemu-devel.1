@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZHdP-0002oa-Pg
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:13:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZHim-0003lP-FA
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZHdM-0001wg-Jz
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:13:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dZHdM-0001uE-An
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:13:24 -0400
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
-	<20170723055006-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
-Date: Sun, 23 Jul 2017 17:13:11 +0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZHil-0006YF-CI
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:19:00 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170721093416.17816-1-stefanha@redhat.com>
+	<fb720b66-8b5f-bd84-2cb6-aa7d7d14b2db@redhat.com>
+	<20170721155146.GN18014@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0fd1f1b7-12e8-fc0b-96ce-4b3eee5b08af@amsat.org>
+Date: Sun, 23 Jul 2017 11:18:50 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170723055006-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170721155146.GN18014@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
- property to pcie-root-port
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, seabios@seabios.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 23/07/2017 15:22, Michael S. Tsirkin wrote:
-> On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
->> To enable hotplugging of a newly created pcie-pci-bridge,
->> we need to tell firmware (SeaBIOS in this case)
-> 
-
-Hi Michael,
-
-> Presumably, EFI would need to support this too?
-> 
-
-Sure, Eduardo added to CC, but he is in PTO now.
-
->> to reserve
->> additional buses for pcie-root-port, that allows us to
->> hotplug pcie-pci-bridge into this root port.
->> The number of buses to reserve is provided to the device via a corresponding
->> property, and to the firmware via new PCI capability (next patch).
->> The property's default value is 1 as we want to hotplug at least 1 bridge.
-> 
-> If so you should just teach firmware to allocate one bus #
-> unconditionally.
-> 
-
-That would be a problem for the PCIe machines, since each PCIe
-devices is plugged in a different bus and we are already
-limited to 256 PCIe devices. Allocating an extra-bus always
-would really limit the PCIe devices we can use.
-
-> But why would that be so? What's wrong with a device
-> directly in the root port?
-> 
-
-First, plugging a legacy PCI device into a PCIe Root Port
-looks strange at least, and it can;t be done on real HW anyway.
-(incompatible slots)
-
-Second (and more important), if we want 2 or more PCI
-devices we would loose both IO ports space and bus numbers.
-
-> 
+On 07/21/2017 12:51 PM, Stefan Hajnoczi wrote:
+> On Fri, Jul 21, 2017 at 07:16:34AM -0500, Eric Blake wrote:
+>> On 07/21/2017 04:34 AM, Stefan Hajnoczi wrote:
+>>> There is not much getting started documentation for qemu-iotests.  This
+>>> patch explains how to create a new test and covers the overall testing
+>>> approach.
+>>>
+>>> Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> ---
 >>
->> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> ---
->>   hw/pci-bridge/pcie_root_port.c | 1 +
->>   include/hw/pci/pcie_port.h     | 3 +++
->>   2 files changed, 4 insertions(+)
+>>> +3. Assign groups to the test
+>>> +
+>>> +Add your test to the ./group file.  This file is the index of tests and assigns
+>>> +them to functional groups like "rw" for read-write tests.  Most tests belong to
+>>> +the "rw" and "auto" groups.  "auto" means the test runs when ./check is invoked
+>>> +without a -g argument.
+>>> +
+>>> +Consider adding your test to the "quick" group if it executes quickly (<1s).
 >>
->> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
->> index 4d588cb..b0e49e1 100644
->> --- a/hw/pci-bridge/pcie_root_port.c
->> +++ b/hw/pci-bridge/pcie_root_port.c
->> @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
->>   static Property rp_props[] = {
->>       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
->>                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
->> +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
->>       DEFINE_PROP_END_OF_LIST()
->>   };
->>   
->> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
->> index 1333266..1b2dd1f 100644
->> --- a/include/hw/pci/pcie_port.h
->> +++ b/include/hw/pci/pcie_port.h
->> @@ -34,6 +34,9 @@ struct PCIEPort {
->>   
->>       /* pci express switch port */
->>       uint8_t     port;
->> +
->> +    /* additional buses to reserve on firmware init */
->> +    uint8_t     bus_reserve;
->>   };
->>   
->>   void pcie_port_init_reg(PCIDevice *d);
+>> We have several tests going up to 5s (and I have a patch pending to
+>> remove two tests that took longer) - I think 1s is a bit on the short
+>> end for still classifying a test as quick.
 > 
-> So here is a property and it does not do anything.
-> It makes it easier to work on series maybe, but review
-> is harder since we do not see what it does at all.
-> Please do not split up patches like this - you can maintain
-> it split up in your branch if you like and merge before sending.
->
+> I'm happy to accept any number blessed by Kevin.  I do think that 1
+> second is a safe maximum and no one should get in trouble for adding a
+> test that takes 1 second to the "quick" group.
+> 
+>>> +This group is run by "make check-block" and is often included as part of build
+>>> +tests in continuous integration systems.
+>>
+>> It would still be nice to have 'make check' run 'make check-block'...
+>> but that's independent of this patch.
+> 
+> Yes, there is a separate discussion about that on the list right now.
+> Hopefully it will be added back.
+> 
+>>> +Once you are happy with the test output it can be used as the golden master
+>>> +with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to verify
+>>> +that it passes.
+>>> +
+>>> +Congratulations, you've created a new test!
+>>
+>> Maybe a reminder to 'git add' the new files, then submit the patch?
+> 
+> I thought about this too but decided not to get into the git and patch
+> submission business.  I carefully worded it to be about "creating" tests
+> rather than "adding" them to qemu.git because I wanted to limit the
+> scope of this README :).
 
-Agreed, Alexandr please merge patches 4-5-6 for your next submission.
+Maybe something tiny like:
 
-Thanks,
-Marcel
+   Congratulations, you've created a new test!
 
+   To share your test to upstream QEMU (highly recommended!) just follow
+   these recommendations: http://wiki.qemu.org/Contribute/SubmitAPatch
 
->> -- 
->> 2.7.4
+> 
+> Stefan
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
