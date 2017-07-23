@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dZK3z-00081F-6u
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:49:04 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dZKB8-0000fw-5I
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dZK3y-0004vT-BM
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:49:03 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33325)
+	(envelope-from <rth7680@gmail.com>) id 1dZKB5-0000Rp-4y
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:56:26 -0400
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:37426)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZK3y-0004uL-4z
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:49:02 -0400
-Received: by mail-pg0-x244.google.com with SMTP id z1so9649544pgs.0
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 09:49:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZKB4-0000QJ-VQ
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:56:23 -0400
+Received: by mail-pg0-x236.google.com with SMTP id y129so47408796pgy.4
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 09:56:21 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1500648359-25931-1-git-send-email-thuth@redhat.com>
+	<1500648359-25931-4-git-send-email-thuth@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <c5ea5507-9b06-ae1b-cf86-d27c11ec20ef@twiddle.net>
+Date: Sun, 23 Jul 2017 06:56:16 -1000
 MIME-Version: 1.0
-In-Reply-To: <64a3e4dd-3021-c033-0a55-2408a6c07fae@redhat.com>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-3-git-send-email-zuban32s@gmail.com>
-	<64a3e4dd-3021-c033-0a55-2408a6c07fae@redhat.com>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Sun, 23 Jul 2017 19:49:00 +0300
-Message-ID: <CAKSfGUD-jZH2sgS2SkURdhL1f1PiWHVEER2KUx=DV-0rFw9bRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v2 2/6] hw/i386: allow SHPC for Q35
- machine
+In-Reply-To: <1500648359-25931-4-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] target/s390x: Rework
+ program_interrupt() and related functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, seabios@seabios.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-2017-07-23 18:59 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+On 07/21/2017 04:45 AM, Thomas Huth wrote:
+> +static void tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+> +                                       int ilen)
+> +{
+> +    trigger_pgm_exception(env, code, ilen);
+> +#ifdef CONFIG_TCG
+> +    cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+> +#endif
+> +}
+> +
 
-> On 23/07/2017 1:15, Aleksandr Bezzubikov wrote:
->
->> Unmask previously masked SHPC feature in _OSC method.
->>
->> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> ---
->>   hw/i386/acpi-build.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 6b7bade..0d99585 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -1850,7 +1850,7 @@ static Aml *build_q35_osc_method(void)
->>        * Always allow native PME, AER (no dependencies)
->>        * Never allow SHPC (no SHPC controller in this system)
->>
->
-> Seems the above comment is not longer correct :)
->
-Just missed it, will fix in v3.
+How about the whole body as g_assert_not_reached ifndef.
+
+Otherwise,
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
 
->
-> Thanks,
-> Marcel
->
->
->        */
->> -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1D), a_ctrl));
->> +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
->>         if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
->>       /* Unknown revision */
->>
->>
->
-
-
--- 
-Alexander Bezzubikov
+r~
