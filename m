@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <huayanghao@gmail.com>) id 1dZNx2-0001E6-RJ
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 16:58:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZO4N-0003ex-0b
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 17:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <huayanghao@gmail.com>) id 1dZNx2-0004Zj-2p
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 16:58:08 -0400
-Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:34964)
+	(envelope-from <peter.maydell@linaro.org>) id 1dZO4M-0007AA-4h
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 17:05:42 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37777)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <huayanghao@gmail.com>)
-	id 1dZNx1-0004ZO-T9
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 16:58:08 -0400
-Received: by mail-yb0-x241.google.com with SMTP id f135so2966414yba.2
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 13:58:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZO4L-00079V-QH
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 17:05:42 -0400
+Received: by mail-wm0-x233.google.com with SMTP id c184so17598801wmd.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 14:05:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TYFbv9EeafV8FZ=HEXx=kArVb2OYiC3mGQiP7_N1-UA@mail.gmail.com>
+In-Reply-To: <CAPTzt1ACBuwkY0YSjhMLrv+1OJyCLEM7xQZqTGKbxxsLfqVN=g@mail.gmail.com>
 References: <CAPTzt1Ai9x4OiHMH4HrDzj=vNbqhNnkmdDQ7wBLxYTJ-kcNM_w@mail.gmail.com>
 	<CAFEAcA_TYFbv9EeafV8FZ=HEXx=kArVb2OYiC3mGQiP7_N1-UA@mail.gmail.com>
-From: Hua Yanghao <huayanghao@gmail.com>
-Date: Sun, 23 Jul 2017 22:58:06 +0200
-Message-ID: <CAPTzt1ACBuwkY0YSjhMLrv+1OJyCLEM7xQZqTGKbxxsLfqVN=g@mail.gmail.com>
+	<CAPTzt1ACBuwkY0YSjhMLrv+1OJyCLEM7xQZqTGKbxxsLfqVN=g@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 23 Jul 2017 22:05:20 +0100
+Message-ID: <CAFEAcA9TUxr0ZfpNBuSc+jaz2e6mHtQwdo-s-DK=HjJe7bAFXA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH] hw/core/loader: do not check for regions
  overlap
@@ -30,55 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Hua Yanghao <huayanghao@gmail.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-> (I'm not sure why you end up with overlapping
-> program segments here since the bss segment ought
-> to be marked NOLOAD and ignored by QEMU. But I've
-> definitely seen overlapping segments myself where
-> the segments overlapping both are marked as LOAD.)
-Looks like qemu is not ignoring NOLOAD seciton check and used its VMA
-as if it is LMA ...
-If I remove the NOLOAD then .bss consumesthe LMA addresss and
-everything is working fine.
+On 23 July 2017 at 21:58, Hua Yanghao <huayanghao@gmail.com> wrote:
+>> (1) does this change give the right behaviour for
+>> which of the two overlapping segment is honoured?
+>> (I *think* the correct answer is that the second
+>> segment in the program header table should be
+>> loaded second, ie its definition of the memory
+>> contents is used, not that of the first segment)
+> I am not sure if I understood this point. linker will check for
+> section overlaps and if linker
+> did not complain why should qemu complain. qemu should simply follow
+> the LMA for each
+> section and ignore NOLOAD section for me this is the sane behavior.
 
-> Oddly enough, I just ran into this scenario with an
-> ELF file myself the other day, and worked around it
-> with pretty much the same kind of local hack as this.
-> I agree that since this kind of ELF file with overlapping
-> segments seems to be quite common we should load it,
-> rather than complaining.
-Good to know I am not the only one who hit this issue ;-)
+Suppose we have these two segments:
+ SEGMENT 1: start 0x1000, end 0x2fff, data all 0xff
+ SEGMENT 2: start 0x2000, end 0x3fff, data all 0x00
 
-> But...
->
-> (1) does this change give the right behaviour for
-> which of the two overlapping segment is honoured?
-> (I *think* the correct answer is that the second
-> segment in the program header table should be
-> loaded second, ie its definition of the memory
-> contents is used, not that of the first segment)
-I am not sure if I understood this point. linker will check for
-section overlaps and if linker
-did not complain why should qemu complain. qemu should simply follow
-the LMA for each
-section and ignore NOLOAD section for me this is the sane behavior.
+Clearly for the memory 0x1000..0x1fff we want the 0xff
+data, and for 0x3000..0x3fff we want 0x00.
+But for the memory 0x2000..0x2fff which is in
+both segment 1 and segment 2, should QEMU load
+0xff or 0x00 bytes ?
 
-> (2) should we allow the overlap only for ELF files but
-> retain the complain for overlapping ROMs of other types?
-> (eg by having the elf loader create "rom"s which
-> don't overlap by trimming the overlap itself)
-I think this should only apply for ELF files. (this is the only thing
-I care or understood so far,
-so not touching other types of input binaries ... however I am not
-sure if I am capable to provide
-a right patch to handle the ROM files properly, I only looked into
-qemu code starting today ...)
+We shouldn't pick randomly or just do whatever our
+implementation "happens to do" -- we need to look
+at what the ELF spec says must happen and do that.
 
-> Does anybody know (a) what the ELF spec mandates
-> for overlapping segments and (b) what the history
-> and rationale for QEMU's overlapping-roms check is?
->
-> thanks
-> -- PMM
+>> (2) should we allow the overlap only for ELF files but
+>> retain the complain for overlapping ROMs of other types?
+>> (eg by having the elf loader create "rom"s which
+>> don't overlap by trimming the overlap itself)
+> I think this should only apply for ELF files. (this is the only thing
+> I care or understood so far,
+> so not touching other types of input binaries ... however I am not
+> sure if I am capable to provide
+> a right patch to handle the ROM files properly, I only looked into
+> qemu code starting today ...)
+
+The patch you have here will affect QEMU's handling
+of ROMs of all types, because the loader.c code
+handles all the registered ROM images, not just those
+that the ELF loader creates from ELF files.
+
+(PS: these questions are partly aimed at the other
+QEMU developers who I cc'd, not just you.)
+
+thanks
+-- PMM
