@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZEAD-00050i-Q4
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 06:31:07 -0400
+	(envelope-from <mst@redhat.com>) id 1dZFtx-0002kk-Fu
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 08:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZEAA-0005R6-Mm
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 06:31:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dZEAA-0005QU-Cn
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 06:31:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dZEA6-0005sS-No
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 10:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 170892E80CE
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 10:30:58 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1dZFto-0007bt-QO
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 08:22:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZFto-0007bQ-Jp
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 08:22:16 -0400
+Date: Sun, 23 Jul 2017 15:22:08 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170723055006-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 23 Jul 2017 10:24:36 -0000
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-	<20170208084952.6259.59626.malone@wampee.canonical.com>
-	<CAJs94EZcKKb6i1ApTRVXnHvOiFBGNk-j6j5vcEK2TX0YQzDXvg@mail.gmail.com>
-Message-Id: <CAJs94EYaHCXy7w+-8sEXmqR7CMrjv2me-HW5fpgYigdnXpMXgQ@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
- cpu->kvm_msr_buf->nmsrs' failed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1500761743-1669-6-git-send-email-zuban32s@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
+ property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,205 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kraxel@redhat.com, seabios@seabios.org
 
-2017-07-23 12:54 GMT+03:00 Matwey V. Kornilov <matwey.kornilov@gmail.com>:
-> 2017-02-08 11:49 GMT+03:00 Paolo Bonzini <bonzini@gnu.org>:
->>> Does qemu follow recommendations from section 4.3?
->>
->> All that QEMU does is initialize MSR values and QEMU is talking to KVM,
->> not to the processor; KVM in turn talks to the host kernel's perf
->> subsystem.
->>
->> It's the host kernel's perf subsystem that needs to follow Intel's
->> recommendation.  In particular, QEMU is setting CPUID to the values
->> retrieved by
->>
->>     perf_get_x86_pmu_capability(&cap);
->
-> I can not find this function mentioned in qemu master sources.
->
+On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
+> To enable hotplugging of a newly created pcie-pci-bridge,
+> we need to tell firmware (SeaBIOS in this case)
 
-Ok, I found this place in kvm kernel module. But it doesn't do what
-you expect it to do. It just reassembles 0xA EAX from previously
-parsed data.
-IA32_MISC_ENABLE is not accessed anywhere here.
+Presumably, EFI would need to support this too?
 
-> The only thing I see is that has_msr_architectural_pmu is set to be
-> true in kvm_arch_init_vcpu() if 0xA EAX has non-zero version. This is
-> not enough according to the Intel specs.
->
->>
->> so perhaps it's perf_get_x86_pmu_capability that misreads the
->> performance monitoring capabilities provided by ESX.  Please attach
->> dmesg logs from starting the host with loglevel=3D9, as well as "x86info
->> -a" output from the host, to see if perf misses some problematic
->> CPUID/MSR combination.
->>
->> --
->> You received this bug notification because you are subscribed to the bug
->> report.
->> https://bugs.launchpad.net/bugs/1661386
->>
->> Title:
->>   Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
->>
->> Status in QEMU:
->>   New
->>
->> Bug description:
->>   Hello,
->>
->>
->>   I see the following when try to run qemu from master as the following:
->>
->>   # ./x86_64-softmmu/qemu-system-x86_64 --version
->>   QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
->>   Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
->>   # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
->>   -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
->>   -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3Dtty=
-S0
->>   loglevel=3D7' -m 1024 -serial stdio
->>   qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
->>   kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
->>
->>   First broken commit has been bisected:
->>
->>   commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
->>   Author: Paolo Bonzini <pbonzini@redhat.com>
->>   Date:   Wed Mar 30 22:55:29 2016 +0200
->>
->>       target-i386: assert that KVM_GET/SET_MSRS can set all requested MS=
-Rs
->>
->>       This would have caught the bug in the previous patch.
->>
->>       Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->>   My cpuinfo is the following:
->>
->>   processor       : 0
->>   vendor_id       : GenuineIntel
->>   cpu family      : 6
->>   model           : 44
->>   model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
->>   stepping        : 2
->>   microcode       : 0x14
->>   cpu MHz         : 3066.775
->>   cache size      : 12288 KB
->>   physical id     : 0
->>   siblings        : 2
->>   core id         : 0
->>   cpu cores       : 2
->>   apicid          : 0
->>   initial apicid  : 0
->>   fpu             : yes
->>   fpu_exception   : yes
->>   cpuid level     : 11
->>   wp              : yes
->>   flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge=
- mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp l=
-m constant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_ts=
-c aperfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervis=
-or lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
->>   bugs            :
->>   bogomips        : 6133.55
->>   clflush size    : 64
->>   cache_alignment : 64
->>   address sizes   : 40 bits physical, 48 bits virtual
->>   power management:
->>
->> To manage notifications about this bug go to:
->> https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
->
->
->
-> --
-> With best regards,
-> Matwey V. Kornilov
+> to reserve
+> additional buses for pcie-root-port, that allows us to 
+> hotplug pcie-pci-bridge into this root port.
+> The number of buses to reserve is provided to the device via a corresponding
+> property, and to the firmware via new PCI capability (next patch).
+> The property's default value is 1 as we want to hotplug at least 1 bridge.
+
+If so you should just teach firmware to allocate one bus #
+unconditionally.
+
+But why would that be so? What's wrong with a device
+directly in the root port?
 
 
--- =
+> 
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>  hw/pci-bridge/pcie_root_port.c | 1 +
+>  include/hw/pci/pcie_port.h     | 3 +++
+>  2 files changed, 4 insertions(+)
+> 
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 4d588cb..b0e49e1 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+>  static Property rp_props[] = {
+>      DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+>                      QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> index 1333266..1b2dd1f 100644
+> --- a/include/hw/pci/pcie_port.h
+> +++ b/include/hw/pci/pcie_port.h
+> @@ -34,6 +34,9 @@ struct PCIEPort {
+>  
+>      /* pci express switch port */
+>      uint8_t     port;
+> +
+> +    /* additional buses to reserve on firmware init */
+> +    uint8_t     bus_reserve;
+>  };
+>  
+>  void pcie_port_init_reg(PCIDevice *d);
 
-With best regards,
-Matwey V. Kornilov
+So here is a property and it does not do anything.
+It makes it easier to work on series maybe, but review
+is harder since we do not see what it does at all.
+Please do not split up patches like this - you can maintain
+it split up in your branch if you like and merge before sending.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661386
-
-Title:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  =
-
-  I see the following when try to run qemu from master as the following:
-
-  # ./x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
-  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
-  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
-  loglevel=3D7' -m 1024 -serial stdio
-  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
-  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  First broken commit has been bisected:
-
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  My cpuinfo is the following:
-
-  processor       : 0
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 44
-  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
-  stepping        : 2
-  microcode       : 0x14
-  cpu MHz         : 3066.775
-  cache size      : 12288 KB
-  physical id     : 0
-  siblings        : 2
-  core id         : 0
-  cpu cores       : 2
-  apicid          : 0
-  initial apicid  : 0
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 11
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
-onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
-perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
-lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
-  bugs            :
-  bogomips        : 6133.55
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 40 bits physical, 48 bits virtual
-  power management:
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
+> -- 
+> 2.7.4
