@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZ6xT-0001NL-KZ
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 22:49:28 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZ7zT-0000oa-Ay
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 23:55:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZ6xQ-00025T-H4
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 22:49:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZ6xQ-00025B-AB
-	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 22:49:24 -0400
-Date: Sun, 23 Jul 2017 05:49:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170723054445-mutt-send-email-mst@kernel.org>
-References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
-	<1500761510-1556-5-git-send-email-zuban32s@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1500761510-1556-5-git-send-email-zuban32s@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] pci: enable RedHat PCI bridges
- to reserve additional buses on PCI init
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZ7zQ-0006Ce-6u
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 23:55:35 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:30710)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZ7zP-00068O-AW
+	for qemu-devel@nongnu.org; Sat, 22 Jul 2017 23:55:32 -0400
+Date: Sun, 23 Jul 2017 11:54:59 +0800 (CST)
+Message-ID: <201707231154592281234@zte.com.cn>
+References: 201707221349209626503@zte.com.cn,
+	20170723044845-mutt-send-email-mst@kernel.org
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH=5D_vhost=3A_fix_amigration_faile?=
+ =?utf-8?q?dbecause_ofvhost_region_merge?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: seabios@seabios.org, marcel@redhat.com, kraxel@redhat.com, kevin@koconnor.net, lersek@redhat.com, qemu-devel@nongnu.org, konrad.wilk@oracle.com
+To: mst@redhat.com
+Cc: imammedo@redhat.com, dgilbert@redhat.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
 
-On Sun, Jul 23, 2017 at 01:11:50AM +0300, Aleksandr Bezzubikov wrote:
-> In case of Red Hat PCI bridges reserve additional buses, which number is provided
-> in a vendor-specific capability. 
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->  src/fw/pciinit.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
-> index 864954f..f05a8b9 100644
-> --- a/src/fw/pciinit.c
-> +++ b/src/fw/pciinit.c
-> @@ -15,6 +15,7 @@
->  #include "hw/pcidevice.h" // pci_probe_devices
->  #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
->  #include "hw/pci_regs.h" // PCI_COMMAND
-> +#include "hw/pci_cap.h" // qemu_pci_cap
->  #include "list.h" // struct hlist_node
->  #include "malloc.h" // free
->  #include "output.h" // dprintf
-> @@ -578,9 +579,18 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
->          pci_bios_init_bus_rec(secbus, pci_bus);
->  
->          if (subbus != *pci_bus) {
-> +            u8 res_bus = 0;
-> +            if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT) {
-
-Check device ID as well.
-
-> +                u8 cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
-
-There could be multiple vendor capabilities. You want to scan them all.
-
-
-> +                if (cap) {
-> +                    res_bus = pci_config_readb(bdf,
-> +                            cap + offsetof(struct redhat_pci_bridge_cap,
-> +                                           bus_res));
-
-
-You might want to add sanity checks e.g. overflow, and capability
-length.
-
-Also, if all you use is offsetof, don't bother with a struct, just
-add some defines.
-
-> +                }
-> +            }
->              dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
-> -                    subbus, *pci_bus);
-> -            subbus = *pci_bus;
-> +                    subbus, *pci_bus + res_bus);
-> +            subbus = *pci_bus + res_bus;
-
-So you take all present devices and add reserved ones - is that it?
-If so it looks like this will steal extra buses each time you
-add a child bus and reboot.
-
-
->          } else {
->              dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
->          }
-> -- 
-> 2.7.4
+PiBPbiBTYXQsIEp1bCAyMiwgMjAxNyBhdCAwMTo0OToyMFBNICswODAwLCBwZW5nLmhhbzJAenRl
+LmNvbS5jbiB3cm90ZToNCg0KDQoNCj4gPiBzb21lIHJlZ2lvbnMgY2FuIG5vdCBtZXJnZSB3aGVu
+IGp1c3QgcGFydCBvZiBkZXZpY2VzIGhhdmUgcmVhbGl6ZWQuDQo+ID4gDQo+ID4gd2hlbiBhbGwg
+ZGV2aWNlcyBhcmUgcmVhbGl6ZWQgb24gZGVzdGluYXRpb24sIHRoZXNlIHJlZ2lvbnMgIGNhbiBi
+ZSBtZXJnZWQNCj4gPiAgYWdhaW4gDQo+ID4gDQo+ID4gIGFuZCB0aGUgdXNlZCBzbG90cyBjYW4g
+c2F0aXNmeSB0aGUgdmhvc3Qgc2xvdCBsaW1pdCBhcyBvbiBzb3VyY2UuDQo+ID4gDQo+ID4gaW4g
+dGhlIHJlc3RvcmUgc3RhZ2UgdGhlIHZtIGlzIG5vdCBpbiBydW5uaW5nIHN0YXRlLCBzbyBkb24n
+dCBjb21wdXRlIGlmIG1vcmUNCj4gPiB0aGFuIA0KPiA+IA0KPiA+IHZob3N0IHNsb3QgbGltaXQg
+d2hlbiB2bSBpcyBub3QgcnVubmluZy4gd2hlbiBhIGxhc3QgZGV2aWNlIGlzIHJlYWxpemVkLA0K
+PiA+IA0KPiA+IGFsbCByZWdpb25zIGFyZSBtZXJnZWQgdG8gdGhlIHNsb3QgbnVtYmVyIGFzIG9u
+IHNvdXJjZS4gdGhlbiB0aGUgc3RhdGUgb2Ygdm0gDQo+ID4gDQo+ID4gY2hhbmdlcyB0byBydW5u
+aW5nLg0KPiA+IA0KPiA+ICBpdCBzYXRpc2ZpZXMgdGhlIHZob3N0IHNsb3QgbGltaXQgb24gc291
+cmNlLCBzbyBpdCBzaG91bGQgc2F0aWZ5IG9uDQo+ID4gZGVzdGluYXRpb24uDQoNCj4gT0sgYnV0
+IHRoZSBWTSBub3QgcnVubmluZyBjaGVjayBpcyB0b28gaGFja3kuIEUuZy4gaXQgd29uJ3QNCj4g
+dHJpZ2dlciB3aXRoIG1lbW9yeSBob3RwbHVnIGlmIHNvbWVvbmUgc3RvcHMgVk0gYmVmb3JlDQo+
+IGRvaW5nIGhvdHBsdWcuDQoNCj4gTG9va3MgbGlrZSB5b3Ugd2FudCB0byBjaGVjayBtYWNoaW5l
+X2luaXRfZG9uZSBvciBzb21ldGhpbmcNCj4gbGlrZSB0aGlzLg0KWWVhaCwgaXQgc291bmRzIGJl
+dHRlci5JIHdpbGwgbWFrZSBhbnRoZXIgcGF0Y2guDQotLSANCj4gTVNU
