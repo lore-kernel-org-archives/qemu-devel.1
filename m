@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZ8ZR-0004ba-0c
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 00:32:45 -0400
+	(envelope-from <sameeh@daynix.com>) id 1dZALO-0008Fi-FG
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 02:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZ8ZM-0002hs-Uf
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 00:32:44 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:34307)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZ8ZM-0002fU-B5
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 00:32:40 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sun, 23 Jul 2017 20:46:11 +0800
-Message-Id: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because of
- vhost region merge
+	(envelope-from <sameeh@daynix.com>) id 1dZALL-0004Ie-AM
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 02:26:22 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:36990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dZALL-0004Hn-1o
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 02:26:19 -0400
+Received: by mail-io0-x242.google.com with SMTP id p5so2413195ioo.4
+	for <qemu-devel@nongnu.org>; Sat, 22 Jul 2017 23:26:16 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170705075411.6556-1-sameeh@daynix.com>
+References: <20170705075411.6556-1-sameeh@daynix.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Sun, 23 Jul 2017 09:26:15 +0300
+Message-ID: <CAKPgXcF1GDQeKo+yf5V8C80r1CPWpTp+mN9X-Ufi1mbMRRj33g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/5] Fix qemu-ga's behaviour on Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,64 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, imammedo@redhat.com
-Cc: qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>
+To: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-When a guest that has several hotplugged dimms is migrated, on
-destination it will fail to resume. Because regions on source
-are merged and on destination the order of realizing devices
-is different from on source with dimms, so when part of devices
-are realizd some region can not be merged.That may be more than
-vhost slot limit.
+Ping.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
----
- hw/mem/pc-dimm.c        | 2 +-
- include/sysemu/sysemu.h | 1 +
- vl.c                    | 5 +++++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+On Wed, Jul 5, 2017 at 10:54 AM, Sameeh Jubran <sameeh@daynix.com> wrote:
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index ea67b46..13f3db5 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-         goto out;
-     }
- 
--    if (!vhost_has_free_slot()) {
-+    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
-         error_setg(&local_err, "a used vhost backend has no free"
-                                " memory slots left");
-         goto out;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index b213696..48228ad 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
- void qemu_add_exit_notifier(Notifier *notify);
- void qemu_remove_exit_notifier(Notifier *notify);
- 
-+bool qemu_is_machine_init_done(void);
- void qemu_add_machine_init_done_notifier(Notifier *notify);
- void qemu_remove_machine_init_done_notifier(Notifier *notify);
- 
-diff --git a/vl.c b/vl.c
-index fb6b2ef..43aee22 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
- 
- static bool machine_init_done;
- 
-+bool qemu_is_machine_init_done(void)
-+{
-+    return machine_init_done;
-+}
-+
- void qemu_add_machine_init_done_notifier(Notifier *notify)
- {
-     notifier_list_add(&machine_init_done_notifiers, notify);
+> From: Sameeh Jubran <sjubran@redhat.com>
+>
+> This patch series fixes qemu-ga's main service behaviour on Windows
+> by listening to the virtio-serial device's events.
+>
+> For more info on why this series is needed checkout the commit message
+> of the third patch and the following bugzilla:
+> https://bugzilla.redhat.com/show_bug.cgi?id=990629.
+>
+> Sameeh Jubran (5):
+>   Makefile: clean: Clean exe files
+>   qga-win: service-win32: Add start_service and stop_service functions
+>   qga-win: Add serial listener service
+>   qga-win: Add qga-serial-listener to msi installer
+>   qga-win: service-win32: Use get_service function
+>
+>  Makefile                            |  12 ++-
+>  Makefile.objs                       |   1 +
+>  qga/Makefile.objs                   |   2 +
+>  qga/channel.h                       |   9 ++
+>  qga/installer/qemu-ga.wxs           |  24 +++++
+>  qga/main.c                          |  23 +++--
+>  qga/serial-listener-service-win32.c | 181 ++++++++++++++++++++++++++++++
+> ++++++
+>  qga/serial-listener-service-win32.h |  29 ++++++
+>  qga/service-win32.c                 | 142 +++++++++++++++++++++++-----
+>  qga/service-win32.h                 |   5 +
+>  10 files changed, 395 insertions(+), 33 deletions(-)
+>  create mode 100644 qga/serial-listener-service-win32.c
+>  create mode 100644 qga/serial-listener-service-win32.h
+>
+> --
+> 2.9.4
+>
+>
+
+
 -- 
-1.8.3.1
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
