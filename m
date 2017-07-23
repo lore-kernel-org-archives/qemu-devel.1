@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZGfT-000233-F7
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 09:11:32 -0400
+	(envelope-from <riel@redhat.com>) id 1dZHV8-0000q0-16
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZGfQ-0006ol-9a
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 09:11:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41903)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dZGfQ-0006nx-3o
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 09:11:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dZGfO-0002AG-8n
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 13:11:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3FCB82E8041
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 13:11:26 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 23 Jul 2017 12:57:10 -0000
-From: Rida Shamasneh <1089005@bugs.launchpad.net>
-Reply-To: Bug 1089005 <1089005@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121211164752.19821.67677.malonedeb@wampee.canonical.com>
-Message-Id: <150081463042.6148.12661349802501600772.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1089005] Re: Qemu does not shutdown with vnc
- enabled on OS X
+	(envelope-from <riel@redhat.com>) id 1dZHV4-00035H-T9
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:04:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1dZHV4-00032e-Mo
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 10:04:50 -0400
+Message-ID: <1500818683.4073.31.camel@redhat.com>
+From: Rik van Riel <riel@redhat.com>
+Date: Sun, 23 Jul 2017 10:04:43 -0400
+In-Reply-To: <CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<945864462.33340808.1500620194836.JavaMail.zimbra@redhat.com>
+	<20170721121241.GA18014@stefanha-x1.localdomain>
+	<46101617.33460557.1500643755247.JavaMail.zimbra@redhat.com>
+	<20170721155848.GO18014@stefanha-x1.localdomain>
+	<CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-the issue is still there
-i am using 2.9.50
-i want to stop a running process when i press ctrl-c and not stop the whole=
- qemu
+On Sat, 2017-07-22 at 12:34 -0700, Dan Williams wrote:
+> On Fri, Jul 21, 2017 at 8:58 AM, Stefan Hajnoczi <stefanha@redhat.com
+> > wrote:
+> >
+> > Maybe the NVDIMM folks can comment on this idea.
+> 
+> I think it's unworkable to use the flush hints as a guest-to-host
+> fsync mechanism. That mechanism was designed to flush small memory
+> controller buffers, not large swaths of dirty memory. What about
+> running the guests in a writethrough cache mode to avoid needing
+> dirty
+> cache management altogether? Either way I think you need to use
+> device-dax on the host, or one of the two work-in-progress filesystem
+> mechanisms (synchronous-faults or S_IOMAP_FROZEN) to avoid need any
+> metadata coordination between guests and the host.
 
--- =
+The thing Pankaj is looking at is to use the DAX mechanisms
+inside the guest (disk image as memory mapped nvdimm area),
+with that disk image backed by a regular storage device on
+the host.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1089005
+The goal is to increase density of guests, by moving page
+cache into the host (where it can be easily reclaimed).
 
-Title:
-  Qemu does not shutdown with vnc enabled on OS X
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  I am running OS X 10.8.2 and Qemu 1.3.50 from your git repository.
-
-  Running
-
-      qemu-system-i386 <image>
-
-  works fine. I can quit the process using ctrl-c.
-
-  When I try to use
-
-       qemu-system-i386 -vnc :<port> <image>
-
-  ctrl-c does nothing and I have to kill the process trough the activity mo=
-nitor.
-  Furthermore terminating the process from my java program does not work ei=
-ther. =
-
-  I have also posted a question on Stackoverflow: http://stackoverflow.com/=
-questions/13798367/qemu-does-not-shutdown-with-vnc-enabled-on-os-x
-
-  Thanks
-  Leander
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1089005/+subscriptions
+If we assume the guests will be backed by relatively fast
+SSDs, a "whole device flush" from filesystem journaling
+code (issued where the filesystem issues a barrier or
+disk cache flush today) may be just what we need to make
+that work.
