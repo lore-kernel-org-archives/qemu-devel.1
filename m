@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dZMnQ-0002Bk-9q
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 15:44:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZN1j-0004Ov-LJ
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 15:58:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dZMnO-00052f-Sx
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 15:44:08 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35661)
+	(envelope-from <peter.maydell@linaro.org>) id 1dZN1i-0004Oo-Hy
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 15:58:55 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35688)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZMnO-000527-JW
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 15:44:06 -0400
-Received: by mail-pg0-x242.google.com with SMTP id d193so9839759pgc.2
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 12:44:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZN1i-0004MS-8m
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 15:58:54 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id k71so45242981wrc.2
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 12:58:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUAHPHwgLa=jNUGpW-saHK6rGK5epBY2ixizeuCwvE77wA@mail.gmail.com>
-References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
-	<1500761510-1556-5-git-send-email-zuban32s@gmail.com>
-	<20170723054445-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAHPHwgLa=jNUGpW-saHK6rGK5epBY2ixizeuCwvE77wA@mail.gmail.com>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Sun, 23 Jul 2017 22:44:04 +0300
-Message-ID: <CAKSfGUDbW8psdPGOXUQDWBV6OJL8z_hxp5NL-=Pg+OHu5ZGfvA@mail.gmail.com>
+In-Reply-To: <86339fc5-002a-5f20-272b-b0c76006e63f@amsat.org>
+References: <1499438577-7674-1-git-send-email-peter.maydell@linaro.org>
+	<86339fc5-002a-5f20-272b-b0c76006e63f@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 23 Jul 2017 20:58:30 +0100
+Message-ID: <CAFEAcA-z997nAPX256-H0Byr5USOupW9+gdqSAUZk-94vsv=xA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] pci: enable RedHat PCI bridges
- to reserve additional buses on PCI init
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/11] Make memory_region_init_ram() and
+ friends handle migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: seabios@seabios.org, Marcel Apfelbaum <marcel@redhat.com>, kraxel@redhat.com, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-By the way, any ideas on how to avoid 'bus overstealing' would
-be greatly appreciated.
-Static BIOS variable isn't applicable since its value isn't saved across
-reboots.
+On 22 July 2017 at 05:47, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> I'm seeing memleaks using the malta machine, they come from the
+> smbus_eeprom_init() in hw/i2c/smbus_eeprom.c which does:
+>
+>     uint8_t *eeprom_buf =3D g_malloc0(8 * 256); /* XXX: make this persist=
+ent
+> */
 
-2017-07-23 19:43 GMT+03:00 Alexander Bezzubikov <zuban32s@gmail.com>:
+(This isn't actually a leak because the eeprom device
+can't be hotplugged/unplugged, so once created it will
+live for the life of the simulation.)
 
-> 2017-07-23 5:49 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
->
->> On Sun, Jul 23, 2017 at 01:11:50AM +0300, Aleksandr Bezzubikov wrote:
->> > In case of Red Hat PCI bridges reserve additional buses, which number
->> is provided
->> > in a vendor-specific capability.
->> >
->> > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> > ---
->> >  src/fw/pciinit.c | 14 ++++++++++++--
->> >  1 file changed, 12 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
->> > index 864954f..f05a8b9 100644
->> > --- a/src/fw/pciinit.c
->> > +++ b/src/fw/pciinit.c
->> > @@ -15,6 +15,7 @@
->> >  #include "hw/pcidevice.h" // pci_probe_devices
->> >  #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
->> >  #include "hw/pci_regs.h" // PCI_COMMAND
->> > +#include "hw/pci_cap.h" // qemu_pci_cap
->> >  #include "list.h" // struct hlist_node
->> >  #include "malloc.h" // free
->> >  #include "output.h" // dprintf
->> > @@ -578,9 +579,18 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
->> >          pci_bios_init_bus_rec(secbus, pci_bus);
->> >
->> >          if (subbus != *pci_bus) {
->> > +            u8 res_bus = 0;
->> > +            if (pci_config_readw(bdf, PCI_VENDOR_ID) ==
->> PCI_VENDOR_ID_REDHAT) {
->>
->> Check device ID as well.
->
-> Not sure what ID/IDs we want to see here exactly. Now it can be
-> only pcie-root-port (0xC then), but
->
->
->>
->> > +                u8 cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
->>
->> There could be multiple vendor capabilities. You want to scan them all.
->>
->>
->> > +                if (cap) {
->> > +                    res_bus = pci_config_readb(bdf,
->> > +                            cap + offsetof(struct
->> redhat_pci_bridge_cap,
->> > +                                           bus_res));
->>
->>
->> You might want to add sanity checks e.g. overflow, and capability
->> length.
->>
->> Also, if all you use is offsetof, don't bother with a struct, just
->> add some defines.
->>
-> OK, will move this to defines.
->
->
->>
->> > +                }
->> > +            }
->> >              dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
->> > -                    subbus, *pci_bus);
->> > -            subbus = *pci_bus;
->> > +                    subbus, *pci_bus + res_bus);
->> > +            subbus = *pci_bus + res_bus;
->>
->> So you take all present devices and add reserved ones - is that it?
->> If so it looks like this will steal extra buses each time you
->> add a child bus and reboot.
->>
->
-> You're right, such problem persists. Will think on what can be done here.
->
->
->>
->>
->> >          } else {
->> >              dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
->> >          }
->> > --
->> > 2.7.4
->>
->
->
->
-> --
-> Alexander Bezzubikov
->
+> Question for 2.11: is this device a candidate to use one of the function =
+you
+> enumerated? My guess is memory_region_init_rom_device()
 
+A quick look at that device suggests that it's doing some
+pretty weird stuff which probably should be being
+cleaned up to use a memory region to handle the backing
+store for the EEPROM (although there are other ways to do it;
+since there's only 2K of data there it could also be
+handled by a byte-array in the device migrated via
+VMState).
 
+Do you know what the intention is of the code which
+passes the device an offset into the eeprom_buf buffer
+rather than just passing the start of the buffer ?
 
--- 
-Alexander Bezzubikov
+> Question for 2.10: does that mean than the malta machine is not migratabl=
+e?
+
+Depends whether the guest is actually writing to the EEPROM :-)
+The smbus_eeprom device doesn't have any support for migration
+at all -- it is neither migrating the data, nor the internal
+state (the offset). But if the guest doesn't ever write to
+the EEPROM and it doesn't happen to be relying on the offset
+having a particular value at the point of migration, you
+won't notice.
+
+In particular, the pc_piix and pc_q35 machines both create
+one of these devices, so this is an issue for the pc
+machine migration too... (and any fix we make to
+smbus_eeprom needs to handle migration compat as a result)
+
+thanks
+-- PMM
