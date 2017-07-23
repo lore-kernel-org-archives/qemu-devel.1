@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZJgM-0002G3-6o
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:24:39 -0400
+	(envelope-from <kevin@koconnor.net>) id 1dZJgc-0002Nw-8j
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZJgI-0007f4-QD
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:24:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dZJgI-0007eb-H2
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:24:34 -0400
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-	<8bf34bb0-bede-f1e4-2245-1a9572e73272@redhat.com>
-	<CAKSfGUDWf+0DTk=9VuGAvMfa76vjpudYGN5QNinLb4_Q3ViOjA@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <05d15825-c1c4-44a8-e208-d0116a45b333@redhat.com>
-Date: Sun, 23 Jul 2017 19:24:22 +0300
+	(envelope-from <kevin@koconnor.net>) id 1dZJgZ-0007kt-6B
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:24:54 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1dZJgY-0007kb-Vt
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:24:51 -0400
+Received: by mail-qt0-x241.google.com with SMTP id l55so10327530qtl.3
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 09:24:49 -0700 (PDT)
+Date: Sun, 23 Jul 2017 12:24:47 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+Message-ID: <20170723162447.GA28883@morn.lan>
+References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+	<1500761510-1556-2-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUDWf+0DTk=9VuGAvMfa76vjpudYGN5QNinLb4_Q3ViOjA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/6] hw/pci: introduce bridge-only
- vendor-specific capability to provide some hints to firmware
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1500761510-1556-2-git-send-email-zuban32s@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/4] pci: refactor
+ pci_find_capapibilty to get bdf as the first argument instead of the whole
+ pci_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,161 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Bezzubikov <zuban32s@gmail.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, seabios@seabios.org
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: seabios@seabios.org, marcel@redhat.com, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, konrad.wilk@oracle.com, mst@redhat.com
 
-On 23/07/2017 19:19, Alexander Bezzubikov wrote:
-> 2017-07-23 18:57 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com 
-> <mailto:marcel@redhat.com>>:
+On Sun, Jul 23, 2017 at 01:11:47AM +0300, Aleksandr Bezzubikov wrote:
+> Refactor pci_find_capability function to get bdf instead of
+> a whole pci_device* as the only necessary field for this function 
+> is still bdf.
+> It greatly helps when we have bdf but not pci_device.
 > 
->     On 23/07/2017 1:15, Aleksandr Bezzubikov wrote:
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>  src/fw/pciinit.c    |  4 ++--
+>  src/hw/pcidevice.c  | 12 ++++++------
+>  src/hw/pcidevice.h  |  2 +-
+>  src/hw/virtio-pci.c |  4 ++--
+>  4 files changed, 11 insertions(+), 11 deletions(-)
 > 
->         On PCI init PCI bridges may need some
->         extra info about bus number to reserve, IO, memory and
->         prefetchable memory limits. QEMU can provide this
->         with special vendor-specific PCI capability.
-> 
->         Sizes of limits match ones from
->         PCI Type 1 Configuration Space Header,
->         number of buses to reserve occupies only 1 byte
->         since it is the size of Subordinate Bus Number register.
-> 
-> 
->     Hi Alexandr,
-> 
->         Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com
->         <mailto:zuban32s@gmail.com>>
->         ---
->            hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
->            include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
->            2 files changed, 45 insertions(+)
-> 
->         diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->         index 720119b..8ec6c2c 100644
->         --- a/hw/pci/pci_bridge.c
->         +++ b/hw/pci/pci_bridge.c
->         @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br,
->         const char* bus_name,
->                br->bus_name = bus_name;
->            }
->            +
->         +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
-> 
-> 
->     Can you please rename to something like
->     'pci_bridge_qemu_cap_init' to be more specific?
-> 
->         +                              uint8_t bus_reserve, uint32_t
->         io_limit,
->         +                              uint16_t mem_limit, uint64_t
->         pref_limit,
-> 
-> 
-> 
->     I am not sure regarding "limit" suffix, this
->     is a reservation, not a limitation.
-> 
-> 
-> I'd like this fields names to match actual registers which
-> are going to get the values.
-> 
+> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
+> index 08221e6..864954f 100644
+> --- a/src/fw/pciinit.c
+> +++ b/src/fw/pciinit.c
+> @@ -762,7 +762,7 @@ static int pci_bus_hotplug_support(struct pci_bus *bus, u8 pcie_cap)
+>          return downstream_port && slot_implemented;
+>      }
+>  
+> -    shpc_cap = pci_find_capability(bus->bus_dev, PCI_CAP_ID_SHPC, 0);
+> +    shpc_cap = pci_find_capability(bus->bus_dev->bdf, PCI_CAP_ID_SHPC, 0);
+>      return !!shpc_cap;
+>  }
+>  
+> @@ -844,7 +844,7 @@ static int pci_bios_check_devices(struct pci_bus *busses)
+>               */
+>              parent = &busses[0];
+>          int type;
+> -        u8 pcie_cap = pci_find_capability(s->bus_dev, PCI_CAP_ID_EXP, 0);
+> +        u8 pcie_cap = pci_find_capability(s->bus_dev->bdf, PCI_CAP_ID_EXP, 0);
+>          int hotplug_support = pci_bus_hotplug_support(s, pcie_cap);
+>          for (type = 0; type < PCI_REGION_TYPE_COUNT; type++) {
+>              u64 align = (type == PCI_REGION_TYPE_IO) ?
+> diff --git a/src/hw/pcidevice.c b/src/hw/pcidevice.c
+> index cfebf66..d01e27b 100644
+> --- a/src/hw/pcidevice.c
+> +++ b/src/hw/pcidevice.c
+> @@ -134,25 +134,25 @@ pci_find_init_device(const struct pci_device_id *ids, void *arg)
+>      return NULL;
+>  }
+>  
+> -u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap)
+> +u8 pci_find_capability(u16 bdf, u8 cap_id, u8 cap)
 
-For this case I think is better to have io_res..., to describe
-the parameter rather than match the registers.
+Thanks.  If you respin this series, please also move
+pci_find_capability() function from pcidevice.c to pci.c.  (If the
+function no longer takes a pci_device, it should be moved out of
+pcidevice.c.)
 
-> 
-> 
->         +                              Error **errp)
->         +{
->         +    size_t cap_len = sizeof(PCIBridgeQemuCap);
->         +    PCIBridgeQemuCap cap;
->         +
->         +    cap.len = cap_len;
->         +    cap.bus_res = bus_reserve;
->         +    cap.io_lim = io_limit & 0xFF;
->         +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
->         +    cap.mem_lim = mem_limit;
->         +    cap.pref_lim = pref_limit & 0xFFFF;
->         +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
->         +
->         +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
->         +                                    cap_offset, cap_len, errp);
->         +    if (offset < 0) {
->         +        return offset;
->         +    }
->         +
->         +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len
->         - 2);
->         +    return 0;
->         +}
->         +
->            static const TypeInfo pci_bridge_type_info = {
->                .name = TYPE_PCI_BRIDGE,
->                .parent = TYPE_PCI_DEVICE,
->         diff --git a/include/hw/pci/pci_bridge.h
->         b/include/hw/pci/pci_bridge.h
->         index ff7cbaa..c9f642c 100644
->         --- a/include/hw/pci/pci_bridge.h
->         +++ b/include/hw/pci/pci_bridge.h
->         @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const
->         char* bus_name,
->            #define  PCI_BRIDGE_CTL_DISCARD_STATUS        0x400   /*
->         Discard timer status */
->            #define  PCI_BRIDGE_CTL_DISCARD_SERR  0x800   /* Discard
->         timer SERR# enable */
->            +typedef struct PCIBridgeQemuCap {
->         +    uint8_t id;     /* Standard PCI capability header field */
->         +    uint8_t next;   /* Standard PCI capability header field */
->         +    uint8_t len;    /* Standard PCI vendor-specific capability
->         header field */
->         +    uint8_t bus_res;
->         +    uint32_t pref_lim_upper;
->         +    uint16_t pref_lim;
->         +    uint16_t mem_lim;
-> 
-> 
->     This 32bit IOMEM, right?
-> 
->         +    uint16_t io_lim_upper;
->         +    uint8_t io_lim;
-> 
-> 
->     Why do we need io_lim and io_lim_upper?
-> 
-> 
-> The idea was to be able to directly move the capability fields values
-> to the registers when actually using it (in firmware) code.
-> Secondly, it saves a little space by avoding usage 32-bit types
-> when 24-bit ones are desired. And the same thing with prefetchable (48->64).
-> But if it's more convenient no to split this value, I can do that.
-
-With a clear explanation (Mimic of the <PCI config space field>)
-I personally don't mind keeping it like that.
-
-Thanks,
-Marcel
-
-> 
-> 
->     Thanks,
->     Marcel
-> 
-> 
->         +    uint8_t padding;
->         +} PCIBridgeQemuCap;
->         +
->         +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
->         +                              uint8_t bus_reserve, uint32_t
->         io_limit,
->         +                              uint16_t mem_limit, uint64_t
->         pref_limit,
->         +                              Error **errp);
->         +
->            #endif /* QEMU_PCI_BRIDGE_H */
-> 
-> 
-> 
-> 
-> 
-> -- 
-> Alexander Bezzubikov
+-Kevin
