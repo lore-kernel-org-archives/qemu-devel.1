@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZJOM-0006dL-Cm
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:06:03 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dZJUA-0007mn-Pi
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZJOL-0000Ql-87
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:06:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dZJOL-0000QP-0t
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:06:01 -0400
-References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
-	<1500761510-1556-3-git-send-email-zuban32s@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b66aaeea-aeb5-cfba-2478-7ea7a5addd9d@redhat.com>
-Date: Sun, 23 Jul 2017 19:05:50 +0300
+	(envelope-from <zuban32s@gmail.com>) id 1dZJU9-0002fd-Ov
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:12:02 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34802)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZJU9-0002fU-H4
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 12:12:01 -0400
+Received: by mail-pf0-x241.google.com with SMTP id o88so8640278pfk.1
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 09:12:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1500761510-1556-3-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 2/4] pci: add RedHat vendor ID
+In-Reply-To: <20170723054322-mutt-send-email-mst@kernel.org>
+References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+	<1500761510-1556-4-git-send-email-zuban32s@gmail.com>
+	<20170723054322-mutt-send-email-mst@kernel.org>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Sun, 23 Jul 2017 19:12:00 +0300
+Message-ID: <CAKSfGUAffh8WdR+HAZNi2YdshnsG0KLLTeAMWiLCxYeoSi3xeg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 3/4] pci: add QEMU-specific PCI
+ capability structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org
-Cc: kraxel@redhat.com, kevin@koconnor.net, lersek@redhat.com, qemu-devel@nongnu.org, konrad.wilk@oracle.com, mst@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: seabios@seabios.org, Marcel Apfelbaum <marcel@redhat.com>, kraxel@redhat.com, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 
-On 23/07/2017 1:11, Aleksandr Bezzubikov wrote:
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->   src/hw/pci_ids.h | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/src/hw/pci_ids.h b/src/hw/pci_ids.h
-> index 4ac73b4..db2e694 100644
-> --- a/src/hw/pci_ids.h
-> +++ b/src/hw/pci_ids.h
-> @@ -2263,6 +2263,8 @@
->   #define PCI_DEVICE_ID_KORENIX_JETCARDF0	0x1600
->   #define PCI_DEVICE_ID_KORENIX_JETCARDF1	0x16ff
->   
-> +#define PCI_VENDOR_ID_REDHAT 		0x1b36
-> +
->   #define PCI_VENDOR_ID_TEKRAM		0x1de1
->   #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
->   
-> 
+2017-07-23 5:44 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
 
-I suggest to merge this patch with patch 4
-that uses it.
+> On Sun, Jul 23, 2017 at 01:11:49AM +0300, Aleksandr Bezzubikov wrote:
+> > On PCI init PCI bridge devices may need some
+> > extra info about bus number to reserve, IO, memory and
+> > prefetchable memory limits. QEMU can provide this
+> > with special vendor-specific PCI capability.
+> >
+> > This capability is intended to be used only
+> > for Red Hat PCI bridges, i.e. QEMU cooperation.
+> >
+> > Sizes of limits match ones from
+> > PCI Type 1 Configuration Space Header,
+> > number of buses to reserve occupies only 1 byte
+> > since it is the size of Subordinate Bus Number register.
+> >
+> > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > ---
+> >  src/hw/pci_cap.h | 23 +++++++++++++++++++++++
+> >  1 file changed, 23 insertions(+)
+> >  create mode 100644 src/hw/pci_cap.h
+> >
+> > diff --git a/src/hw/pci_cap.h b/src/hw/pci_cap.h
+> > new file mode 100644
+> > index 0000000..1382b0b
+> > --- /dev/null
+> > +++ b/src/hw/pci_cap.h
+> > @@ -0,0 +1,23 @@
+> > +#ifndef _PCI_CAP_H
+> > +#define _PCI_CAP_H
+> > +
+> > +#include "types.h"
+> > +
+> > +struct vendor_pci_cap {
+> > +    u8 id;
+> > +    u8 next;
+> > +    u8 len;
+> > +};
+> > +
+> > +struct redhat_pci_bridge_cap {
+> > +    struct vendor_pci_cap hdr;
+>
+> Hi Michael,
+Thanks for the quick reply.
 
 
-Thanks,
-Marcel
+> You want to add some kind of identifier here after
+> the header, such that more capabilities can be added
+> in future without breaking this one.
+>
+
+You mean to distinguish different vendor-specific capabilities?
+Agreed if so, will add it in the next version.
+
+
+>
+> > +    u8 bus_res;
+> > +    u32 pref_lim_upper;
+> > +    u16 pref_lim;
+> > +    u16 mem_lim;
+> > +    u16 io_lim_upper;
+> > +    u8 io_lim;
+> > +    u8 padd;
+>
+> Please add documentation.
+>
+>
+> > +};
+> > +
+> > +#endif /* _PCI_CAP_H */
+> > --
+> > 2.7.4
+>
+
+
+
+-- 
+Alexander Bezzubikov
