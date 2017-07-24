@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjyJ-0003of-RW
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:29:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dZk7u-0003Hr-Qv
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjyI-0001yZ-GA
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:55 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33479)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjyI-0001yJ-AO
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:54 -0400
-Received: by mail-qk0-x244.google.com with SMTP id d145so8411914qkc.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:54 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 24 Jul 2017 13:27:27 -0700
-Message-Id: <20170724202728.25960-32-rth@twiddle.net>
-In-Reply-To: <20170724202728.25960-1-rth@twiddle.net>
-References: <20170724202728.25960-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v15 31/32] target/arm: Split out
- thumb_tr_translate_insn
+	(envelope-from <pbonzini@redhat.com>) id 1dZk7q-0001iG-Tt
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:38:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZk7q-0001gY-NQ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:38:46 -0400
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
+	<20170724153521.GD2127@work-vm>
+	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
+	<20170724190331.GH2127@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
+Date: Mon, 24 Jul 2017 22:38:38 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170724190331.GH2127@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,190 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org, vilanova@ac.upc.edu
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-We need not check for ARM vs Thumb state in order to dispatch
-disassembly of every instruction.
+On 24/07/2017 21:03, Dr. David Alan Gilbert wrote:
+>> I don't like having such a long-lived mutex (it seems like a recipe fo=
+r
+>> deadlocks with the BQL), plus memory_region_transaction_commit (the
+>> expensive part of memory_global_dirty_log_stop) needs to be under the
+>> BQL itself because it calls MemoryListeners.
+>>
+>> Maybe memory_global_dirty_log_stop can delay itself to the next vm_sta=
+rt
+>> if it's called while runstate_running() returns false (which should be
+>> always the case)?
+>>
+>> It could even be entirely enclosed within memory.c if you do it with a
+>> VMChangeStateHandler.
+> This still causes the BQL to be held for quite a while; albeit at a les=
+s
+> critical point.
+>=20
+> In this and the existing case we don't actually need efficiency - what =
+we need is just
+> not to be holding onto the BQL for so long;  could we do a less
+> efficient commit here, removing one region at a time, yielding the lock
+> and retaking it?
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate.c | 121 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 80 insertions(+), 41 deletions(-)
+I'm worried that if you release the lock and retake it you open a window
+where someone else could start a commit, and
+memory_global_dirty_log_stop's commit would use outdated information.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index cdf2917cef..554b05816b 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11951,11 +11951,8 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-     return true;
- }
- 
--static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-+static bool arm_pre_translate_insn(DisasContext *dc)
- {
--    DisasContext *dc = container_of(dcbase, DisasContext, base);
--    CPUARMState *env = cpu->env_ptr;
--
- #ifdef CONFIG_USER_ONLY
-     /* Intercept jump to the magic kernel page.  */
-     if (dc->pc >= 0xffff0000) {
-@@ -11963,7 +11960,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-            conditional execution block.  */
-         gen_exception_internal(EXCP_KERNEL_TRAP);
-         dc->base.is_jmp = DISAS_NORETURN;
--        return;
-+        return true;
-     }
- #endif
- 
-@@ -11982,56 +11979,85 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
-                       default_exception_el(dc));
-         dc->base.is_jmp = DISAS_NORETURN;
--        return;
-+        return true;
-     }
- 
--    if (dc->thumb) {
--        disas_thumb_insn(env, dc);
--        if (dc->condexec_mask) {
--            dc->condexec_cond = (dc->condexec_cond & 0xe)
--                | ((dc->condexec_mask >> 4) & 1);
--            dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
--            if (dc->condexec_mask == 0) {
--                dc->condexec_cond = 0;
--            }
--        }
--    } else {
--        unsigned int insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
--        dc->pc += 4;
--        disas_arm_insn(dc, insn);
--    }
-+    return false;
-+}
- 
-+static void arm_post_translate_insn(CPUARMState *env, DisasContext *dc)
-+{
-     if (dc->condjmp && !dc->base.is_jmp) {
-         gen_set_label(dc->condlabel);
-         dc->condjmp = 0;
-     }
- 
--    if (dc->base.is_jmp == DISAS_NEXT) {
--        /* Translation stops when a conditional branch is encountered.
--         * Otherwise the subsequent code could get translated several times.
--         * Also stop translation when a page boundary is reached.  This
--         * ensures prefetch aborts occur at the right place.  */
--
--        if (dc->pc >= dc->next_page_start ||
--            (dc->pc >= dc->next_page_start - 3 &&
--             insn_crosses_page(env, dc))) {
--            /* We want to stop the TB if the next insn starts in a new page,
--             * or if it spans between this page and the next. This means that
--             * if we're looking at the last halfword in the page we need to
--             * see if it's a 16-bit Thumb insn (which will fit in this TB)
--             * or a 32-bit Thumb insn (which won't).
--             * This is to avoid generating a silly TB with a single 16-bit insn
--             * in it at the end of this page (which would execute correctly
--             * but isn't very efficient).
--             */
--            dc->base.is_jmp = DISAS_TOO_MANY;
--        }
-+    /* Translation stops when a conditional branch is encountered.
-+     * Otherwise the subsequent code could get translated several times.
-+     * Also stop translation when a page boundary is reached.  This
-+     * ensures prefetch aborts occur at the right place.
-+     *
-+     * We want to stop the TB if the next insn starts in a new page,
-+     * or if it spans between this page and the next. This means that
-+     * if we're looking at the last halfword in the page we need to
-+     * see if it's a 16-bit Thumb insn (which will fit in this TB)
-+     * or a 32-bit Thumb insn (which won't).
-+     * This is to avoid generating a silly TB with a single 16-bit insn
-+     * in it at the end of this page (which would execute correctly
-+     * but isn't very efficient).
-+     */
-+    if (dc->base.is_jmp == DISAS_NEXT
-+        && (dc->pc >= dc->next_page_start
-+            || (dc->pc >= dc->next_page_start - 3
-+                && insn_crosses_page(env, dc)))) {
-+        dc->base.is_jmp = DISAS_TOO_MANY;
-     }
- 
-     dc->base.pc_next = dc->pc;
-     translator_loop_temp_check(&dc->base);
- }
- 
-+static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUARMState *env = cpu->env_ptr;
-+    unsigned int insn;
-+
-+    if (arm_pre_translate_insn(dc)) {
-+        return;
-+    }
-+
-+    insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
-+    dc->pc += 4;
-+    disas_arm_insn(dc, insn);
-+
-+    arm_post_translate_insn(env, dc);
-+}
-+
-+static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-+{
-+    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUARMState *env = cpu->env_ptr;
-+
-+    if (arm_pre_translate_insn(dc)) {
-+        return;
-+    }
-+
-+    disas_thumb_insn(env, dc);
-+
-+    /* Advance the Thumb condexec condition.  */
-+    if (dc->condexec_mask) {
-+        dc->condexec_cond = ((dc->condexec_cond & 0xe) |
-+                             ((dc->condexec_mask >> 4) & 1));
-+        dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
-+        if (dc->condexec_mask == 0) {
-+            dc->condexec_cond = 0;
-+        }
-+    }
-+
-+    arm_post_translate_insn(env, dc);
-+}
-+
- static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-@@ -12168,12 +12194,25 @@ static const TranslatorOps arm_translator_ops = {
-     .disas_log          = arm_tr_disas_log,
- };
- 
-+static const TranslatorOps thumb_translator_ops = {
-+    .init_disas_context = arm_tr_init_disas_context,
-+    .tb_start           = arm_tr_tb_start,
-+    .insn_start         = arm_tr_insn_start,
-+    .breakpoint_check   = arm_tr_breakpoint_check,
-+    .translate_insn     = thumb_tr_translate_insn,
-+    .tb_stop            = arm_tr_tb_stop,
-+    .disas_log          = arm_tr_disas_log,
-+};
-+
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
-     DisasContext dc;
-     const TranslatorOps *ops = &arm_translator_ops;
- 
-+    if (ARM_TBFLAG_THUMB(tb->flags)) {
-+        ops = &thumb_translator_ops;
-+    }
- #ifdef TARGET_AARCH64
-     if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
-         ops = &aarch64_translator_ops;
--- 
-2.13.3
+The problem is that a coarse lock, such as the BQL, is very hard to
+break into another lock with long critical sections (a "memory map
+commit lock" in this case).  It's obviously very easy to say "the new
+lock nests inside the BQL"... but then, because you created the lock to
+move things out of the BQL, any callback inside the new lock cannot take
+the memory map commit lock, and you need to make entire subsystems
+thread-safe.  If the new lock nests outside the BQL instead, it's
+simpler to avoid deadlocks, but you need to be careful about releasing
+the BQL and any reentrancy implications of doing that.
+
+One strategy that worked well so far has been to use two locks, one of
+them being the BQL, where you can take either lock for reads and both
+for writes.
+
+Paolo
