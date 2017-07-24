@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dZasW-0006ex-2V
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:46:21 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dZav2-0007ys-By
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dZasS-0000dP-R3
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:46:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZasS-0000cz-H7
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:46:16 -0400
-Date: Mon, 24 Jul 2017 12:46:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170724124603.19c8e81b@nial.brq.redhat.com>
-In-Reply-To: <20170724080633.GA2127@work-vm>
-References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
-	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
-	<20170719114612.GC3500@work-vm>
-	<20170719152427.620b2a2a@nial.brq.redhat.com>
-	<20170719184748-mutt-send-email-mst@kernel.org>
-	<20170720172215.GH2456@work-vm>
-	<20170721224259-mutt-send-email-mst@kernel.org>
-	<20170724080633.GA2127@work-vm>
+	(envelope-from <aik@ozlabs.ru>) id 1dZauz-0001Bg-8p
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:48:56 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:32925)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dZauz-0001BR-2N
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:48:53 -0400
+Received: by mail-it0-x241.google.com with SMTP id t6so7348558itb.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 03:48:52 -0700 (PDT)
+References: <20170720072231.35054-1-aik@ozlabs.ru>
+	<20170720072231.35054-2-aik@ozlabs.ru>
+	<20170724055316.GJ17228@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <81254aff-3d78-556e-71df-5ea71bf960d9@ozlabs.ru>
+Date: Mon, 24 Jul 2017 20:48:45 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
- vhost region merge
+In-Reply-To: <20170724055316.GJ17228@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="j5bDNOA18HFO4JV3DbTsCgkccKB2XjKeb"
+Subject: Re: [Qemu-devel] [PATCH qemu v4 1/3] spapr_iommu: Realloc guest
+ visible TCE table when hot(un)plugging vfio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,139 +32,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>, qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, Wang Yechao <wang.yechao255@zte.com.cn>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Mon, 24 Jul 2017 09:06:33 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--j5bDNOA18HFO4JV3DbTsCgkccKB2XjKeb
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <81254aff-3d78-556e-71df-5ea71bf960d9@ozlabs.ru>
+Subject: Re: [PATCH qemu v4 1/3] spapr_iommu: Realloc guest visible TCE table
+ when hot(un)plugging vfio-pci
+References: <20170720072231.35054-1-aik@ozlabs.ru>
+ <20170720072231.35054-2-aik@ozlabs.ru>
+ <20170724055316.GJ17228@umbus.fritz.box>
+In-Reply-To: <20170724055316.GJ17228@umbus.fritz.box>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: quoted-printable
 
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Thu, Jul 20, 2017 at 06:22:15PM +0100, Dr. David Alan Gilbert wrote:  
-> > > * Michael S. Tsirkin (mst@redhat.com) wrote:  
-> > > > On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:  
-> > > > > On Wed, 19 Jul 2017 12:46:13 +0100
-> > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > >   
-> > > > > > * Igor Mammedov (imammedo@redhat.com) wrote:  
-> > > > > > > On Wed, 19 Jul 2017 23:17:32 +0800
-> > > > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
-> > > > > > >     
-> > > > > > > > When a guest that has several hotplugged dimms is migrated, in
-> > > > > > > > destination host it will fail to resume. Because vhost regions of
-> > > > > > > > several dimms in source host are merged and in the restore stage
-> > > > > > > > in destination host it computes whether more than vhost slot limit
-> > > > > > > > before merging vhost regions of several dimms.    
-> > > > > > > could you provide a bit more detailed description of the problem
-> > > > > > > including command line+used device_add commands on source and
-> > > > > > > command line on destination?    
-> > > > > > 
-> > > > > > (ccing in Marc Andre and Maxime)
-> > > > > > 
-> > > > > > Hmm, I'd like to understade the situation where you get merging between
-> > > > > > RAMBlocks; that complicates some stuff for postcopy.  
-> > > > > and probably inconsistent merging breaks vhost as well
-> > > > > 
-> > > > > merging might happen if regions are adjacent or overlap
-> > > > > but for that to happen merged regions must have equal
-> > > > > distance between their GPA:HVA pairs, so that following
-> > > > > translation would work:
-> > > > > 
-> > > > > if gva in regionX[gva_start, len, hva_start]
-> > > > >    hva = hva_start + gva - gva_start
-> > > > > 
-> > > > > while GVA of regions is under QEMU control and deterministic
-> > > > > HVA is not, so in migration case merging might happen on source
-> > > > > side but not on destination, resulting in different memory maps.
-> > > > > 
-> > > > > Maybe Michael might know details why migration works in vhost usecase,
-> > > > > but I don't see vhost sending any vmstate data.  
-> > > > 
-> > > > We aren't merging ramblocks at all.
-> > > > When we are passing blocks A and B to vhost, if we see that
-> > > > 
-> > > > hvaB=hvaA + lenA
-> > > > gpaB=gpaA + lenA
-> > > > 
-> > > > then we can improve performance a bit by passing a single
-> > > > chunk to vhost: hvaA,gpaA,lena+lenB  
-> > > 
-> > > OK, but that means that a region can incorporate multiple
-> > > RAMBlocks though? Hmm that's not fun on postcopy.
-> > >   
-> > > > so it does not affect migration normally.  
-> > > 
-> > > Well, why? What's required - if the region sizes/lengths/orders
-> > > are different on the source and destination does it matter - if
-> > > it does then that means we have a problem, since that heuristic
-> > > is non-deterministic.
-> > > 
-> > > Dave  
-> > 
-> > It doesn't matter normally. But there's a limit
-> > on number of regions that vhost can support.
-> > pc_dimm_memory_plug tries to guess this number early
-> > because it wants to fail hotplug requests gracefully.  
-> 
-> Why doesn't it matter - can't this heuristic potentially trigger on a
-> source but not a destination even in the case of something like NUMA
-> without hotplug?
-it might if a memdev backend per node is used.
+On 24/07/17 15:53, David Gibson wrote:
+> On Thu, Jul 20, 2017 at 05:22:29PM +1000, Alexey Kardashevskiy wrote:
+>> This replaces g_malloc() with spapr_tce_alloc_table() as this is
+>> the standard way of allocating tables and this allows moving the table=
+
+>> back to KVM when unplugging a VFIO PCI device and VFIO TCE acceleratio=
+n
+>> support is not present in the KVM.
+>=20
+> So, I like the idea here, and I think it will work for now, but one
+> thing concerns me.
+>=20
+> AIUI, your future plans include allowing in-kernel accelerated TCE
+> tables even with VFIO devices.  When that happens, we might have an
+> in-kernel table both before and after a change in the "need_vfio"
+> state.
+
+The in-kernel table just stays there, mappings will be replayed but in th=
+e
+end of the replay only the hardware table will change.
+
+>=20
+> But you won't be able to have two in-kernel tables allocated at once,
+> whereas this code relies on having both the old and new tables at once
+> so it can copy the contents over.
+>=20
+> How do you intend to handle that?
+
+I intend to make this function no-op when cap_spapr_vfio is present.
 
 
-> 
-> > See
-> > commit 3fad87881e55aaff659408dcf25fa204f89a7896
-> > Author: Igor Mammedov <imammedo@redhat.com>
-> > Date:   Tue Oct 6 10:37:28 2015 +0200
-> > 
-> >     pc-dimm: add vhost slots limit check before commiting to hotplug
-> > 
-> > It might make sense to limit this to hotplug, though
-> > runstate check seems like a wrong way to do this -
-> > VM could be stopped e.g. through QMP at the time.  
-> 
-> My other problem is this optimisation makes it tricky for postcopy;
-> one-region -> one-ramblock is easy, but there's a potential for problems
-> if different RAMBlock's within the region have different
-> characteristics.
-> 
-> Dave
-> 
-> > > >   
-> > > > >   
-> > > > > >   
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> > > > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> > > > > > > > ---
-> > > > > > > >  hw/mem/pc-dimm.c | 2 +-
-> > > > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > > > > 
-> > > > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > > > > > index ea67b46..bb0fa08 100644
-> > > > > > > > --- a/hw/mem/pc-dimm.c
-> > > > > > > > +++ b/hw/mem/pc-dimm.c
-> > > > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > > > > > >          goto out;
-> > > > > > > >      }
-> > > > > > > >  
-> > > > > > > > -    if (!vhost_has_free_slot()) {
-> > > > > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
-> > > > > > > >          error_setg(&local_err, "a used vhost backend has no free"
-> > > > > > > >                                 " memory slots left");
-> > > > > > > >          goto out;    
-> > > > > > 
-> > > > > > Even this produces the wrong error message in this case,
-> > > > > > it also makes me think if the existing code should undo a lot of
-> > > > > > the object_property_set's that happen.
-> > > > > > 
-> > > > > > Dave  
-> > > > > > > 
-> > > > > > >     
-> > > > > > --
-> > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+>=20
+>> Although spapr_tce_alloc_table() is expected to fail with EBUSY
+>> if called when previous fd is not closed yet, in practice we will not
+>> see it because cap_spapr_vfio is false at the moment.
+>=20
+> I don't follow this.  How would cap_spapr_vfio be changing at any
+> point?
+
+It depends on the version of the host kernel.
+
+>=20
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>  hw/ppc/spapr_iommu.c | 35 ++++++++++++++---------------------
+>>  1 file changed, 14 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+>> index e614621a83..307dc3021e 100644
+>> --- a/hw/ppc/spapr_iommu.c
+>> +++ b/hw/ppc/spapr_iommu.c
+>> @@ -275,33 +275,26 @@ static int spapr_tce_table_realize(DeviceState *=
+dev)
+>>  void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bool need_vfio)
+>>  {
+>>      size_t table_size =3D tcet->nb_table * sizeof(uint64_t);
+>> -    void *newtable;
+>> +    uint64_t *oldtable;
+>> +    int newfd =3D -1;
+>> =20
+>> -    if (need_vfio =3D=3D tcet->need_vfio) {
+>> -        /* Nothing to do */
+>> -        return;
+>> -    }
+>> +    g_assert(need_vfio !=3D tcet->need_vfio);
+>> =20
+>> -    if (!need_vfio) {
+>> -        /* FIXME: We don't support transition back to KVM accelerated=
+
+>> -         * TCEs yet */
+>> -        return;
+>> -    }
+>> +    tcet->need_vfio =3D need_vfio;
+>> =20
+>> -    tcet->need_vfio =3D true;
+>> +    oldtable =3D tcet->table;
+>> =20
+>> -    if (tcet->fd < 0) {
+>> -        /* Table is already in userspace, nothing to be do */
+>> -        return;
+>> -    }
+>> +    tcet->table =3D spapr_tce_alloc_table(tcet->liobn,
+>> +                                        tcet->page_shift,
+>> +                                        tcet->bus_offset,
+>> +                                        tcet->nb_table,
+>> +                                        &newfd,
+>> +                                        need_vfio);
+>> +    memcpy(tcet->table, oldtable, table_size);
+>> =20
+>> -    newtable =3D g_malloc(table_size);
+>> -    memcpy(newtable, tcet->table, table_size);
+>> +    spapr_tce_free_table(oldtable, tcet->fd, tcet->nb_table);
+>> =20
+>> -    kvmppc_remove_spapr_tce(tcet->table, tcet->fd, tcet->nb_table);
+>> -
+>> -    tcet->fd =3D -1;
+>> -    tcet->table =3D newtable;
+>> +    tcet->fd =3D newfd;
+>>  }
+>> =20
+>>  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn=
+)
+>=20
+
+
+--=20
+Alexey
+
+
+--j5bDNOA18HFO4JV3DbTsCgkccKB2XjKeb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIrBAEBCAAVBQJZddCODhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5/QEP/2Nx
+hYG9Ow3L7QvjpdQVGsTi/jt4uJirta02hIVuMMq13PFCnU3xSkWORT8yTMldwjIp
+2YYwUf5psfx4TJgB4q4SPEgn/lijJdYHjg9ibSzguYGi02LGOSqhAtTv2B7i8Erb
+fIaSqMPq3QNMS+v6xqRz0HYD7MSjPY9+8udl+8m+GXkq15JqEKRysQ2+CgBdXEsv
+EoWOvtUM5HN17FYsGPBs0tmRX+yQrROsj2AyZ3ALItz1PQ5c9d9tuENthNYysqi6
+krSSdGZ8OqjUj3tPdBFgM5lF1ETKvzOmo2MF9tlrp/Af/ncsu/NLqYLMl+g6togU
+lzKRSlsUNy/5EmshlAu62PN3WN9jU2Otpr071tDqmVS3c774aYLyv2z4ENh0DEAa
+14naa5+FceWd/pU6JWWmCXcidYbfFFxUiVViEHC9ygFbR6sBS395ti4xaaWVRVkM
+D3zuWse+eNb1vGDs/HQNq8K+Sl8CeHXpaHbBvh7VFQdi8tEte9qI3ihSLvOk6IVq
+4dCU4DCqQTwrsb4P7gzvBxoxShWJ63f0A37us3pUt3lRiuRWxMfgWZFvY5XMqfDs
+1Dv5ZPiKXNeYhSBnaJmBdltNvWzTk6snJFLRTWSXfJO/YZsCHd2zem3kHQ3UAFHd
+td63E/9JOmPV9l3bDdWXGNNSHLkXc3xSApDtAwkB
+=ZZjb
+-----END PGP SIGNATURE-----
+
+--j5bDNOA18HFO4JV3DbTsCgkccKB2XjKeb--
