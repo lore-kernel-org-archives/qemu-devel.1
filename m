@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhG5-0006Bc-UD
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:35:06 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhJr-00006i-20
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhG2-0006yz-QT
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:35:05 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:55932)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhJn-0000gV-WB
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:38:59 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:38485)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhG2-0006xM-DP
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:35:02 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhJn-0000gF-JG
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:38:55 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Mon, 24 Jul 2017 20:34:43 +0300
-Message-Id: <150091768344.30739.12305583596427638085.stgit@frigg.lan>
+Date: Mon, 24 Jul 2017 20:38:45 +0300
+Message-Id: <150091792554.30739.5632278947752078528.stgit@frigg.lan>
 In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 08/13] instrument: [linux-user] Add command
- line library loader
+Subject: [Qemu-devel] [PATCH 09/13] instrument: [bsd-user] Add command line
+ library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +28,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- linux-user/main.c    |   20 ++++++++++++++++++++
- linux-user/syscall.c |    4 ++++
- 2 files changed, 24 insertions(+)
+ bsd-user/main.c    |   16 ++++++++++++++++
+ bsd-user/syscall.c |    5 +++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index ad03c9e8b2..fdb7ddb199 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -36,6 +36,8 @@
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index fa9c012c9f..37bf6a435c 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -33,6 +33,8 @@
  #include "exec/log.h"
  #include "trace/control.h"
  #include "glib-compat.h"
 +#include "instrument/cmdline.h"
 +#include "instrument/control.h"
 =20
- char *exec_path;
-=20
-@@ -4014,6 +4016,17 @@ static void handle_arg_trace(const char *arg)
-     trace_file =3D trace_opt_parse(arg);
- }
-=20
-+static char *instrument_path;
-+static int instrument_argc;
-+static const char **instrument_argv;
+ int singlestep;
+ unsigned long mmap_min_addr;
+@@ -666,6 +668,11 @@ static void usage(void)
+            "-B address        set guest_base address to address\n"
+            "-bsd type         select emulated BSD type FreeBSD/NetBSD/Op=
+enBSD (default)\n"
+            "\n"
 +#if defined(CONFIG_INSTRUMENT)
-+static void handle_arg_instrument(const char *arg)
-+{
-+    instr_opt_parse(arg, &instrument_path,
-+                    &instrument_argc, &instrument_argv);
-+}
++           "-instr [file=3D]<file>[,arg=3D<string>]\n"
++           "                  load an instrumentation library\n"
++           "\n"
 +#endif
-+
- struct qemu_argument {
-     const char *argv;
-     const char *env;
-@@ -4063,6 +4076,10 @@ static const struct qemu_argument arg_table[] =3D =
-{
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=3D]<pattern>][,events=3D<file>][,file=3D<fi=
-le>]"},
-+#if defined(CONFIG_INSTRUMENT)
-+    {"instr",      "QEMU_INSTR",       true,  handle_arg_instrument,
-+     "",           "[file=3D]<file>[,arg=3D<string>]"},
-+#endif
-     {"version",    "QEMU_VERSION",     false, handle_arg_version,
-      "",           "display version information and exit"},
-     {NULL, NULL, false, NULL, NULL, NULL}
-@@ -4252,6 +4269,7 @@ int main(int argc, char **argv, char **envp)
-     srand(time(NULL));
+            "Debug options:\n"
+            "-d item1[,...]    enable logging of specified items\n"
+            "                  (use '-d help' for a list of log items)\n"
+@@ -735,6 +742,9 @@ int main(int argc, char **argv)
+     envlist_t *envlist =3D NULL;
+     char *trace_file =3D NULL;
+     bsd_type =3D target_openbsd;
++    char *instrument_path =3D NULL;
++    int instrument_argc =3D 0;
++    const char **instrument_argv =3D NULL;
+=20
+     if (argc <=3D 1)
+         usage();
+@@ -753,6 +763,7 @@ int main(int argc, char **argv)
+     cpu_model =3D NULL;
 =20
      qemu_add_opts(&qemu_trace_opts);
 +    qemu_add_opts(&qemu_instr_opts);
 =20
-     optind =3D parse_args(argc, argv);
-=20
-@@ -4260,6 +4278,8 @@ int main(int argc, char **argv, char **envp)
+     optind =3D 1;
+     for (;;) {
+@@ -840,6 +851,9 @@ int main(int argc, char **argv)
+         } else if (!strcmp(r, "trace")) {
+             g_free(trace_file);
+             trace_file =3D trace_opt_parse(optarg);
++        } else if (!strcmp(r, "instr")) {
++            instr_opt_parse(optarg, &instrument_path,
++                            &instrument_argc, &instrument_argv);
+         } else {
+             usage();
+         }
+@@ -869,6 +883,8 @@ int main(int argc, char **argv)
      }
      trace_init_file(trace_file);
 =20
@@ -97,35 +99,43 @@ le>]"},
      /* Zero out regs */
      memset(regs, 0, sizeof(struct target_pt_regs));
 =20
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 003943b736..cf7071bd35 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -115,6 +115,8 @@ int __clone2(int (*fn)(void *), void *child_stack_bas=
-e,
- #include "uname.h"
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 66492aaf5d..3230f722f3 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -26,6 +26,8 @@
 =20
  #include "qemu.h"
+ #include "qemu-common.h"
 +#include "instrument/cmdline.h"
 +
 =20
- #ifndef CLONE_IO
- #define CLONE_IO                0x80000000      /* Clone io context */
-@@ -7765,6 +7767,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
+ //#define DEBUG
+=20
+@@ -332,6 +334,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
          _mcleanup();
  #endif
          gdb_exit(cpu_env, arg1);
 +        instr_fini();
+         /* XXX: should free thread stack and CPU env */
          _exit(arg1);
          ret =3D 0; /* avoid warning */
-         break;
-@@ -9821,6 +9824,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
+@@ -430,6 +433,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
+i_long arg1,
          _mcleanup();
  #endif
          gdb_exit(cpu_env, arg1);
 +        instr_fini();
-         ret =3D get_errno(exit_group(arg1));
-         break;
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
+@@ -505,6 +509,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+         _mcleanup();
  #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
