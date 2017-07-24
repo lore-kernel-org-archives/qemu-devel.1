@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dZUOs-0006i0-C6
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:51:19 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dZUR9-0007Ri-Iq
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dZUOp-0003RI-9G
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:51:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dZUOp-0003Qt-01
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:51:15 -0400
-References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
-	<20170718170819.28494-2-anton.ivanov@cambridgegreys.com>
-	<1236f136-c211-32a1-11b1-1e86fad422c4@redhat.com>
-	<c6bd0b81-0b9c-89fd-31e0-00662115cad8@cambridgegreys.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <20f8a99b-e05b-8371-461d-a6481d2fa68f@redhat.com>
-Date: Mon, 24 Jul 2017 11:51:07 +0800
+	(envelope-from <aik@ozlabs.ru>) id 1dZUR6-00045Z-JB
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:53:39 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dZUR6-000450-A2
+	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:53:36 -0400
+Received: by mail-pg0-x243.google.com with SMTP id d193so10541428pgc.2
+	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 20:53:34 -0700 (PDT)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-5-git-send-email-clg@kaod.org>
+	<20170719030849.GQ3140@umbus.fritz.box>
+	<1500436938.3350.11.camel@kernel.crashing.org>
+	<20170721075015.GE3717@umbus.fritz.box>
+	<1500625291.10674.22.camel@kernel.crashing.org>
+	<20170724032853.GB17228@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <efb76aaa-5dd6-ef8e-91b6-ce4a534f9cff@ozlabs.ru>
+Date: Mon, 24 Jul 2017 13:53:27 +1000
 MIME-Version: 1.0
-In-Reply-To: <c6bd0b81-0b9c-89fd-31e0-00662115cad8@cambridgegreys.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] Unified Datagram Socket Transport
+In-Reply-To: <20170724032853.GB17228@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C"
+Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
+ for the XIVE interrupt controller model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +36,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Ivanov <anton.ivanov@cambridgegreys.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Alexander Graf <agraf@suse.de>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Alexander Graf <agraf@suse.de>
+Message-ID: <efb76aaa-5dd6-ef8e-91b6-ce4a534f9cff@ozlabs.ru>
+Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton for
+ the XIVE interrupt controller model
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+ <1499274819-15607-5-git-send-email-clg@kaod.org>
+ <20170719030849.GQ3140@umbus.fritz.box>
+ <1500436938.3350.11.camel@kernel.crashing.org>
+ <20170721075015.GE3717@umbus.fritz.box>
+ <1500625291.10674.22.camel@kernel.crashing.org>
+ <20170724032853.GB17228@umbus.fritz.box>
+In-Reply-To: <20170724032853.GB17228@umbus.fritz.box>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: quoted-printable
 
+On 24/07/17 13:28, David Gibson wrote:
+> On Fri, Jul 21, 2017 at 06:21:31PM +1000, Benjamin Herrenschmidt wrote:=
 
-On 2017=E5=B9=B407=E6=9C=8822=E6=97=A5 01:50, Anton Ivanov wrote:
-> [snip]
->
->>> +    NetUnifiedState *s =3D (NetUnifiedState *) us;
->>> +    L2TPV3TunnelParams *p =3D (L2TPV3TunnelParams *) s->params;
+>> On Fri, 2017-07-21 at 17:50 +1000, David Gibson wrote:
+>>> On Wed, Jul 19, 2017 at 02:02:18PM +1000, Benjamin Herrenschmidt wrot=
+e:
+>>>> On Wed, 2017-07-19 at 13:08 +1000, David Gibson wrote:
+>>>>>
+>>>>> I'm somewhat uncomfortable with an irq allocater here in the intc
+>>>>> code.  As a rule, irq allocation is the responsibility of the machi=
+ne,
+>>>>> not any sub-component.  Furthermore, it should allocate in a way wh=
+ich
+>>>>> is repeatable, since they need to stay stable across reboots and
+>>>>> migrations.
+>>>>>
+>>>>> And, yes, we have an allocator of sorts in XICS - it has caused a
+>>>>> number of problems in the past.
+>>>>
+>>>> So....
+>>>>
+>>>> For a bare metal model (which we don't have yet) of XIVE, the IRQ
+>>>> numbering is entirely an artifact of how the HW is configured. There=
+
+>>>> should thus be no interrupt numbers visible to qemu.
+>>>
+>>> Uh.. I don't entirely follow.  Do you mean that during boot the guest=
+
+>>> programs the irq numbers into the various components?
 >>
->> How about embedding NetUnifiedState into this structure and keep=20
->> using NetL2TPV3State? Then:
+>> I said a "bare metal model" but yes. Pretty much.=20
+>=20
+> Right, by "guest" I meant the kernel running under qemu, even if its
+> running on a bare-metal equivalent platform.
+>=20
+>>> In that case this allocator stuff definitely doesn't belong on the
+>>> xive code.
+>>>
+>>>> For a PAPR model things are a bit different, but if we want to
+>>>> maximize code re-use between the two, we probably need to make sure
+>>>> the interrupts "allocated" by the machine for XIVE can be represente=
+d
+>>>> by the HW model.
+>>>>
+>>>> That means:
+>>>>
+>>>>  - Each chip has a range (high bits are the block ID, which maps to =
+a
+>>>> chip, low bits, around 512K to 1M interrupts is the per-chip space).=
+
+>>>>
+>>>>  - Interrupts 0...N of that range (N depends on how much backing
+>>>> memory and MMIO space is provisioned for each chip) are "generic IPI=
+s"
+>>>> which are somewhat generic interrupt source that can be triggered wi=
+th
+>>>> an MMIO store and routed to any target. Those are used in PAPR for
+>>>> things like IPIs and some type of accelerator interrupts.
+>>>>
+>>>>  - Portions of that range (which may or may not overlap the 0...N
+>>>> above, if they do they "shadow" the generic interrupts) can be
+>>>> configured to be the HW sources from the various PCIe bridges and
+>>>> the PSI controller.
+>>>
+>>> Err.. I'm confused how this not sure this relates to spapr.  There ar=
+e
+>>> no chips or PSI there, and the PCI bridges aren't really the same
+>>> thing.
 >>
->> -  's' could be kept and lots of lines of changes could be saved here=20
->> and l2tpv3_verify_header()
->> -  each transport could have their own type instead of using=20
->> NET_CLIENT_DRIVER_L2TPV3
->
-> That means each of them having their own read/write functions in each=20
-> transport, destroy functions, etc.
+>> The above is the HW model, sorry for the confusion. With a few comment=
+s
+>> about how they are used in PAPR.
+>>
+>> So yes, in PAPR there's an "allocator" because the hypervisor will
+>> create a guest "virtual" (or logical to use PAPR terminology) interrup=
+t
+>> number space, in order to represents the various interrupts into the
+>> guest.
+>=20
+> Ok, but are each of those logical irqs bound to a specific device/PHB
+> line/whatever, or can they be configured by the guest?
+>=20
+>> Those numbers however are just tokens, they don't have to represent an=
+y
+>> real HW concept. So they can be "allocated" in a rather fixed way, for=
 
-Looks not? Just something like
+>> example, you could have something like a fixed map where you put all
+>> the PCI interrupts at a certain number (a factor of the PHB# with room=
 
-typedef struct L2TPV3State {
-     NetUDSTState udst;
-     /* L2TPV3 specific data */
-     ....
-};
+>> or a fix number per PHB, maybe 16K or so, the HW does 4K max). Another=
 
-static NetClientInfo l2tpv3_info =3D {
-     /* we share this one for all types for now, wrong I know :) */
-     .type =3D NET_CLIENT_DRIVER_L2TPV3,
-     .size =3D sizeof(L2TPV3State),
-     .receive =3D net_udst_receive_dgram,
-     .receive_iov =3D net_udst_receive_dgram_iov,
-     .poll =3D udst_poll,
-     .cleanup =3D net_udst_cleanup,
-};
+>> based would have a chunk of "general purpose" IPIs (for use for actual=
 
-Thanks
+>> IPIs and for other things to come). And a range for the virtual device=
 
->
-> I am trying to achieve exactly the opposite which across all=20
-> transports should save more code. There should be nothing in a=20
-> transport which leverages the common datagram processing backend except=
-:
->
-> 1. Init and parse arguments
-> 2. Form Header
-> 3. Verify Header
->
-> All the rest can be common for a large family of datagram based=20
-> transports - L2TPv3, GRE, RAW (both full interface and just pulling a=20
-> specific vlan out of it), etc.
->
-> It is trivial to do that for fixed size headers (as in the current=20
-> patchset family). It is a bit more difficult to that for variable=20
-> headers, but still datagram (GUE, Geneve, etc).
->
-> These may also add 4 - I/O to control plane, but it remains to be seen=20
-> if that is needed.
->
-> This also makes any improvements to the backend - f.e. switching from=20
-> send() to sendmmsg() automatically available for all transports.
->
-> What cannot be done is to shoehorn into this stream based. I believe=20
-> we have only one of those - the original socket.c in tcp mode and we=20
-> can leave it to stay that way and switch only the datagram mode to a=20
-> better backend.
->
-> I am going through the other comments in the meantime to see if I=20
-> missed something else and fixing the omissions.
->
-> A.
->
-> [snip]
->
+>> interrupts for example. Or you can just use an allocator.
+>=20
+> Hm.  So what I'm meaning by an "allocator" is something at least
+> partially dynamic.  Something you say "give me an irq" and it gives
+> you the next available or similar.  As opposed to any mapping from
+> devices to (logical) irqs, which the machine will need to supply one
+> way or another.
+
+I am probably reading it wrong but the XIVE's allocator allocates IRQ
+ranges for interrupt source controls (which are CPU cores, PHBs, PSI - in=
+
+bare metal - so they allocate just once per machine creation). Individual=
+
+interrupts are still allocated via spapr_ics_alloc_block().
+
+
+
+>=20
+>> But it's fundamentally an allocator that sits in the hypervisor, so in=
+
+>> our case, I would say in the spapr "component" of XIVE, rather than th=
+e
+>> XIVE HW model itself.
+>=20
+> Maybe..
+>=20
+>> Now what Cedric did, because XIVE is very complex and we need somethin=
+g
+>> for PAPR quickly, is not a complete HW model, but a somewhat simplifie=
+d
+>> one that only handles what PAPR exposes. So in that case where the
+>> allocator sits is a bit of a TBD...
+>=20
+> Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
+> machine type level needs extreme caution, or the irqs may not be
+> stable which will generally break migration.
+>=20
+
+
+--=20
+Alexey
+
+
+--K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIrBAEBCAAVBQJZdW84DhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5I6EQALfO
+YC8Gg8+OOAN7rWPp91S08D/J++SBM/0KJ35UQT8FnoW3k2Qzlzclgp05vHdM7nyM
+pUxPUQXAfkjagXd3HwfCFozG4MADib/nFmfL4yeWyLRkCGLhKPKcawZlQZlMUjrm
+V5wgGnm3TXbN0VvR/A7HIFzVQdPypCpIsDKbV5cUcJdEtQpHOMC+dqHPHs+EkENR
+ysmbbGzWWpUC+A2wlh23TQpj3/ooAKtnE6F0la9uqyo8QYTLN0Eha50ZYp1jZSpR
+ekP/xWRw4nmK+YESSuKSBgdV+mHXG0hgfI4Eoz4x2kjLXdI7Q9l6ycYDjX+IB2h8
+ybyWhVkE4P7pe3BYDKFhSJwY0mflsurvYwk4m/3Wnw0UmeKHgOcwBkRsF3Y26DUq
+eWY6puj+948OsO+g+MRlE323iknmfLVfUG4yVPfxGDhlyA29oKpQjG6qy78NPgeG
+ZPzBkKhWrupvCbiwN/Qqe/s8v71xWUMxXZumgqgg7DApoig+uTaVLtDhjhav+bPS
+DyJaqpNgvIP8hSWocDA55snjqfn/CQPLEl3YL/Gj5DuYQj/vSTYX/ArUUKeEjDKu
+ztKvwpU873rxjaQam6XicVRh+imXe7u6YUi/LF8JcB2JhVpV9tv4Jij8hax8AJDc
+0+92ysHUF3RreZzDhvggNBApMQWR6cpvaRxlRb11
+=H/ro
+-----END PGP SIGNATURE-----
+
+--K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C--
