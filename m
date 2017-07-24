@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dZhtl-0004JG-9H
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:16:06 -0400
+	(envelope-from <mst@redhat.com>) id 1dZkCc-0007QU-QX
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dZhti-0008IV-4q
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:16:05 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:36455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dZhth-0008IA-UO
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:16:02 -0400
-Received: by mail-pf0-x231.google.com with SMTP id z129so10196594pfb.3
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:16:00 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dZkCY-0001N4-U2
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:43:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZkCY-00019j-Mu
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:43:38 -0400
+Date: Mon, 24 Jul 2017 23:43:26 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170724234138-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-7-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
-From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Date: Mon, 24 Jul 2017 11:15:44 -0700
-Message-Id: <20170724181544.20292-1-brandon.carpenter@cypherpath.com>
-Content-Type: text/plain; charset="US-ASCII"
-Subject: [Qemu-devel] [PATCH] io: Always remove an old channel watch before
- adding a new one.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1500761743-1669-7-git-send-email-zuban32s@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 6/6] hw/pci: add hint capabilty for
+ additional bus reservation to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, Brandon Carpenter <brandon.carpenter@cypherpath.com>
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kraxel@redhat.com, seabios@seabios.org
 
-Also set saved handle to zero when removing without adding a new watch.
+On Sun, Jul 23, 2017 at 01:15:43AM +0300, Aleksandr Bezzubikov wrote:
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>  hw/pci-bridge/pcie_root_port.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index b0e49e1..ca92d85 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -106,6 +106,11 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>      pcie_aer_root_init(d);
+>      rp_aer_vector_update(d);
+>  
+> +    rc = pci_bridge_help_cap_init(d, 0, p->bus_reserve, 0, 0, 0, errp);
+> +    if (rc < 0) {
+> +        goto err;
+> +    }
+> +
+>      return;
+>  
+>  err:
 
-Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
----
- ui/vnc-auth-vencrypt.c | 3 +++
- ui/vnc-ws.c            | 6 ++++++
- ui/vnc.c               | 4 ++++
- 3 files changed, 13 insertions(+)
+It looks like this will add the capability unconditionally to all
+pcie root ports. Two issues with it:
+1. you can't add vendor properties to devices where vendor is
+   not qemu as they might have their own concept of what it does.
+2. this will break compatibility with old machine types,
+   need to disable for these
 
-diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
-index ffaab57550..c3eece4fa7 100644
---- a/ui/vnc-auth-vencrypt.c
-+++ b/ui/vnc-auth-vencrypt.c
-@@ -77,6 +77,9 @@ static void vnc_tls_handshake_done(QIOTask *task,
-         vnc_client_error(vs);
-         error_free(err);
-     } else {
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
-+        }
-         vs->ioc_tag = qio_channel_add_watch(
-             vs->ioc, G_IO_IN | G_IO_OUT, vnc_client_io, vs, NULL);
-         start_auth_vencrypt_subauth(vs);
-diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
-index f530cd5474..eaf309553c 100644
---- a/ui/vnc-ws.c
-+++ b/ui/vnc-ws.c
-@@ -36,6 +36,9 @@ static void vncws_tls_handshake_done(QIOTask *task,
-         error_free(err);
-     } else {
-         VNC_DEBUG("TLS handshake complete, starting websocket handshake\n");
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
-+        }
-         vs->ioc_tag = qio_channel_add_watch(
-             QIO_CHANNEL(vs->ioc), G_IO_IN, vncws_handshake_io, vs, NULL);
-     }
-@@ -97,6 +100,9 @@ static void vncws_handshake_done(QIOTask *task,
-     } else {
-         VNC_DEBUG("Websock handshake complete, starting VNC protocol\n");
-         vnc_start_protocol(vs);
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
-+        }
-         vs->ioc_tag = qio_channel_add_watch(
-             vs->ioc, G_IO_IN, vnc_client_io, vs, NULL);
-     }
-diff --git a/ui/vnc.c b/ui/vnc.c
-index eb91559b6b..ec86d6ad97 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1121,6 +1121,7 @@ static void vnc_disconnect_start(VncState *vs)
-     vnc_set_share_mode(vs, VNC_SHARE_MODE_DISCONNECTED);
-     if (vs->ioc_tag) {
-         g_source_remove(vs->ioc_tag);
-+        vs->ioc_tag = 0;
-     }
-     qio_channel_close(vs->ioc, NULL);
-     vs->disconnecting = TRUE;
-@@ -2931,6 +2932,9 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
-     VNC_DEBUG("New client on socket %p\n", vs->sioc);
-     update_displaychangelistener(&vd->dcl, VNC_REFRESH_INTERVAL_BASE);
-     qio_channel_set_blocking(vs->ioc, false, NULL);
-+    if (vs->ioc_tag) {
-+        g_source_remove(vs->ioc_tag);
-+    }
-     if (websocket) {
-         vs->websocket = 1;
-         if (vd->tlscreds) {
--- 
-2.13.3
-
-
--- 
-
-
-CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
-for the sole use of the intended recipient(s) and may contain proprietary, 
-confidential or privileged information or otherwise be protected by law. 
-Any unauthorized review, use, disclosure or distribution is prohibited. If 
-you are not the intended recipient, please notify the sender and destroy 
-all copies and the original message.
+> -- 
+> 2.7.4
