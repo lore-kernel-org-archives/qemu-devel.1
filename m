@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dZeFf-0004nu-Br
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:22:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1dZeGt-0005Xt-RA
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dZeFb-0005u3-RT
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:22:27 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33740)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dZeFb-0005tL-L3
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:22:23 -0400
-Received: by mail-wr0-x233.google.com with SMTP id v105so76683011wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 07:22:23 -0700 (PDT)
-References: <20170720134716.13049-1-alex.bennee@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170720134716.13049-1-alex.bennee@linaro.org>
-Date: Mon, 24 Jul 2017 15:22:20 +0100
-Message-ID: <87wp6xdieb.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1dZeGq-0006pf-H4
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:23:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZeGq-0006p1-AP
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:23:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35846336F1F
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:23:39 +0000 (UTC)
+Date: Mon, 24 Jul 2017 15:23:32 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170724142332.GC11443@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170724140117.27651-1-kraxel@redhat.com>
+	<20170724141825.GB11443@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.10 0/3] some docker fixes
+Content-Disposition: inline
+In-Reply-To: <20170724141825.GB11443@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] Fix qemu keymaps, part one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
+
+On Mon, Jul 24, 2017 at 03:18:25PM +0100, Daniel P. Berrange wrote:
+> On Mon, Jul 24, 2017 at 04:01:14PM +0200, Gerd Hoffmann wrote:
+> > qemu carries a bunch of reverse keymaps in pc-bios/keymaps/, to map
+> > keysyms it receives from vnc clients back to keycodes.  These keymaps
+> > seem to be buggy and incomplete at times.  So, to tackle the issue once
+> > for all, I've written a tool to generate those maps from xkb keyboard
+> > layout data using libxkbcommon.
+> > 
+> > This patch series only adds the tool, it doesn't touch the maps in
+> > pc-bios/keymaps/ yet.  I want some testing feedback first ...
+> 
+> Hmm, we recently split out the keymap database and code for generating
+> lookup tables (that was duplicated across spice-gtk, gtk-vnc, and libvirt)
+> into a shared git sub-module
+> 
+>   https://gitlab.com/keycodemap/keycodemapdb/
+> 
+> some other VNC clients were also switching to its use.
+> 
+> I was coincidentally working on a patch to get QEMU to use this too,
+> so all projects are aligned on the same data maps and thus share fixes
+> in this area.
+> 
+> IMHO that'd be preferable than doing something custom in QEMU only.
+
+Oh actually ignore that - we're talking about different areas of
+keymapping. The stuff I was doing was primarily targetted as the
+SDL / GTK frontends in QEMU which must convert from X/GTK key
+maps to QEMU's XT keycodes, where as you were talking about the
+VNC keymaps when not using the QEMU scancode extension for VNC.
+So they're complementary, not mutually exclusive.
 
 
-Alex Bennée <alex.bennee@linaro.org> writes:
-
-> Hi,
->
-> I noticed some problems while running my local builds and while trying
-> to reproduce Travis failures. They apply on top of the currently in
-> flight pull-req pull-ci-updates-for-softfreeze-180717-2
->
-> Alex Bennée (3):
->   docker: ensure NOUSER for travis images
->   docker: fix dirty/stash detection  on some systems
->   docker: ignore submodules when checking diff
->
->  tests/docker/Makefile.include | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-
-Ping?
-
-Any more reviews? Happy for me to roll a pull-req?
-
---
-Alex Bennée
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
