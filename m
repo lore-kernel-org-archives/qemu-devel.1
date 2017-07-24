@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dZfLt-0004Xv-Qn
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:32:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dZfOQ-0005ng-0v
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dZfLo-0002jK-E2
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:32:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36698)
+	(envelope-from <dgilbert@redhat.com>) id 1dZfOL-0004Lo-9a
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:35:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dZfLo-0002iX-4b
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:32:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC3FC624BB
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 15:32:48 +0000 (UTC)
-Date: Mon, 24 Jul 2017 12:32:42 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170724153242.GH2757@localhost.localdomain>
-References: <20170720162815.19802-1-ldoktor@redhat.com>
-	<20170720162815.19802-6-ldoktor@redhat.com>
-	<20170720182753.GV2757@localhost.localdomain>
-	<6701dad4-40a5-7287-a4b8-a22e19b90ce2@redhat.com>
-	<20170721184227.GB2757@localhost.localdomain>
-	<1ec2f684-ddbc-de62-e13b-58f54d92e27d@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZfOL-0004Jr-08
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:35:29 -0400
+Date: Mon, 24 Jul 2017 16:35:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170724153521.GD2127@work-vm>
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1ec2f684-ddbc-de62-e13b-58f54d92e27d@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/11] qemu.py: Use custom exceptions
- rather than Exception
+In-Reply-To: <5971F246.5080000@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,76 +27,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Jay Zhou <jianjay.zhou@huawei.com>, pbonzini@redhat.com, rkrcmar@redhat.com
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com
 
-On Mon, Jul 24, 2017 at 02:13:09PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> Dne 21.7.2017 v 20:42 Eduardo Habkost napsal(a):
-> > On Fri, Jul 21, 2017 at 08:37:34AM +0200, Luk=C3=A1=C5=A1 Doktor wrot=
-e:
-> >> Dne 20.7.2017 v 20:27 Eduardo Habkost napsal(a):
-> >>> On Thu, Jul 20, 2017 at 06:28:09PM +0200, Luk=C3=A1=C5=A1 Doktor wr=
-ote:
-> >>>> The naked Exception should not be widely used. It makes sense to b=
-e a
-> >>>> bit more specific and use better-suited custom exceptions. As a be=
-nefit
-> >>>> we can store the full reply in the exception in case someone needs=
- it
-> >>>> when catching the exception.
-> >>>>
-> >>>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> >>>> ---
-> >>>>  scripts/qemu.py | 17 +++++++++++++++--
-> >>>>  1 file changed, 15 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> >>>> index 5948e19..2bd522f 100644
-> >>>> --- a/scripts/qemu.py
-> >>>> +++ b/scripts/qemu.py
-> >>>> @@ -19,6 +19,19 @@ import subprocess
-> >>>>  import qmp.qmp
-> >>>> =20
-> >>>> =20
-> >>>> +class MonitorResponseError(qmp.qmp.QMPError):
-> >>>> +    '''
-> >>>> +    Represents erroneous QMP monitor reply
-> >>>> +    '''
-> >>>> +    def __init__(self, reply):
-> >>>> +        try:
-> >>>> +            desc =3D reply["error"]["desc"]
-> >>>> +        except KeyError:
-> >>>> +            desc =3D reply
-> >>>> +        super(MonitorResponseError, self).__init__(desc)
-> >>>> +        self.reply =3D reply
-> >>>
-> >>> This would require every user of self.reply to first check if
-> >>> it's a string or dictionary.  All because of the "Monitor is
-> >>> closed" case below:
-> >>>
-> >> I haven't used it for the `Monitor is closed` exception, so
-> >> it's just to be able to store really broken reply safely.
-> >> Anyway people can check whether the reply is a dict, or I can
-> >> add `is_valid_reply` property which would check for
-> >> `[error][desc]` presence (which is a bit more precise than just
-> >> plain dict type checking).
-> >=20
-> >=20
-> > Oops, I wasn't paying enough attention, sorry.  self.reply is
-> > actually always set to the response from the monitor.
-> >=20
-> > If you are just trying a safe fallback for 'desc' if the response
-> > broken, what about using repr(reply) or json.dumps(reply) if
-> > reply['error']['desc'] isn't set?
-> >=20
-> I could use repr, but I'd prefer keeping it the way it is as
-> you could use `isinstance` to see whether it's dict and
-> interact with it (if needed, eg. on negative testing, which is
-> my motivation for storing the full response).
+* Jay Zhou (jianjay.zhou@huawei.com) wrote:
+> Hi Dave,
+> 
+> On 2017/7/21 17:49, Dr. David Alan Gilbert wrote:
+> > * Jay Zhou (jianjay.zhou@huawei.com) wrote:
+> > > Qemu_savevm_state_cleanup() takes about 300ms in my ram migration tests
+> > > with a 8U24G vm(20G is really occupied), the main cost comes from
+> > > KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
+> > > kvm_set_user_memory_region(). In kmod, the main cost is
+> > > kvm_zap_obsolete_pages(), which traverses the active_mmu_pages list to
+> > > zap the unsync sptes.
+> > 
+> > Hi Jay,
+> >    Is this actually increasing the real downtime when the guest isn't
+> > running, or is it just the reported time? I see that the s->downtime
+> > value is calculated right after where we currently call
+> > qemu_savevm_state_cleanup.
+> 
+> It actually increased the real downtime, I used the "ping" command to
+> test. Reason is that the source side libvirt sends qmp to qemu to query
+> the status of migration, which needs the BQL. qemu_savevm_state_cleanup
+> is done with BQL, qemu can not handle the qmp if qemu_savevm_state_cleanup
+> has not finished. And the source side libvirt delays about 300ms to notify
+> the destination side libvirt to send the "cont" command to start the vm.
+> 
+> I think the value of s->downtime is not accurate enough, maybe we could
+> move the calculation of end_time after qemu_savevm_state_cleanup has done.
 
-This makes sense for self.reply, but I'm thinking about the
-argument to Exception.__init__().  I'm worried that things might
-break if the argument is not a string.
+I'm copying in Paolo, Radim and Andrea- is there anyway we can make the
+teardown of KVMs dirty tracking not take so long? 300ms is a silly long time
+on only a small VM.
 
---=20
-Eduardo
+> >    I guess the biggest problem is that 300ms happens before we restart
+> > the guest on the source if a migration fails.
+> 
+> 300ms happens even if a migration succeeds.
+
+Hmm, OK, this needs fixing then - it does explain a result I saw a while
+ago where the downtime was much bigger with libvirt than it was with
+qemu on it's own.
+
+> > > I think it can be optimized:
+> > > (1) source vm will be destroyed if the migration is successfully done,
+> > >      so the resources will be cleanuped automatically by the system
+> > > (2) delay the cleanup if the migration failed
+> > 
+> > I don't like putting it in qmp_cont; that shouldn't have migration magic
+> > in it.
+> 
+> Yes, it is not a ideal place. :(
+> 
+> > I guess we could put it in migrate_fd_cleanup perhaps? It gets called on
+> > a bh near the end -  or could we just move it closer to the end of
+> > migration_thread?
+> 
+> I have tested putting it in migrate_fd_cleanup, but the downtime is not
+> optimized. So I think it is the same to move it closer to the end of
+> migration_thread if it holds the BQL.
+> Could we put it in migrate_init?
+
+Your explanation above hints as to why migrate_fd_cleanup doesn't help;
+it's because we're still going to be doing it with the BQL taken.
+
+Can you tell me which version of libvirt you're using?
+I thought the newer ones were supposed to use events so they did't
+have to poll qemu.
+
+ If we move qemu_savevm_state_cleanup is it still safe? Are there
+some things we're supposed to do at that point which are wrong if
+we don't.
+
+I wonder about something like;  take a mutex in
+memory_global_dirty_log_start, release it in
+memory_global_dirty_log_stop.  Then make ram_save_cleanup start
+a new thread that does the call to memory_global_dirty_log_stop.
+
+Dave
+
+> Thanks,
+> Jay
+> 
+> > However, we would need to be a bit careful of anything that needs
+> > cleaning up before the source restarts on failure; I'm not sure of
+> > the semantics of all the current things wired into save_cleanup.
+> > 
+> > Dave
+> > 
+> > 
+> > > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > > ---
+> > >   migration/migration.c | 16 +++++++++-------
+> > >   qmp.c                 | 10 ++++++++++
+> > >   2 files changed, 19 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index a0db40d..72832be 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -1877,6 +1877,15 @@ static void *migration_thread(void *opaque)
+> > >           if (qemu_file_get_error(s->to_dst_file)) {
+> > >               migrate_set_state(&s->state, current_active_state,
+> > >                                 MIGRATION_STATUS_FAILED);
+> > > +            /*
+> > > +             * The resource has been allocated by migration will be reused in
+> > > +             * COLO process, so don't release them.
+> > > +             */
+> > > +            if (!enable_colo) {
+> > > +                qemu_mutex_lock_iothread();
+> > > +                qemu_savevm_state_cleanup();
+> > > +                qemu_mutex_unlock_iothread();
+> > > +            }
+> > >               trace_migration_thread_file_err();
+> > >               break;
+> > >           }
+> > > @@ -1916,13 +1925,6 @@ static void *migration_thread(void *opaque)
+> > >       end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > 
+> > >       qemu_mutex_lock_iothread();
+> > > -    /*
+> > > -     * The resource has been allocated by migration will be reused in COLO
+> > > -     * process, so don't release them.
+> > > -     */
+> > > -    if (!enable_colo) {
+> > > -        qemu_savevm_state_cleanup();
+> > > -    }
+> > >       if (s->state == MIGRATION_STATUS_COMPLETED) {
+> > >           uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
+> > >           s->total_time = end_time - s->total_time;
+> > > diff --git a/qmp.c b/qmp.c
+> > > index b86201e..0e68eaa 100644
+> > > --- a/qmp.c
+> > > +++ b/qmp.c
+> > > @@ -37,6 +37,8 @@
+> > >   #include "qom/object_interfaces.h"
+> > >   #include "hw/mem/pc-dimm.h"
+> > >   #include "hw/acpi/acpi_dev_interface.h"
+> > > +#include "migration/migration.h"
+> > > +#include "migration/savevm.h"
+> > > 
+> > >   NameInfo *qmp_query_name(Error **errp)
+> > >   {
+> > > @@ -200,6 +202,14 @@ void qmp_cont(Error **errp)
+> > >       if (runstate_check(RUN_STATE_INMIGRATE)) {
+> > >           autostart = 1;
+> > >       } else {
+> > > +        /*
+> > > +         * Delay the cleanup to reduce the downtime of migration.
+> > > +         * The resource has been allocated by migration will be reused
+> > > +         * in COLO process, so don't release them.
+> > > +         */
+> > > +        if (runstate_check(RUN_STATE_POSTMIGRATE) && !migrate_colo_enabled()) {
+> > > +            qemu_savevm_state_cleanup();
+> > > +        }
+> > >           vm_start();
+> > >       }
+> > >   }
+> > > --
+> > > 1.8.3.1
+> > > 
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > .
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
