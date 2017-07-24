@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZeTb-0004wh-UU
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:36:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1dZeUB-0005Qu-Hn
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZeTb-00037t-3g
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:36:51 -0400
-Date: Mon, 24 Jul 2017 15:36:43 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170724143643.GG2784@stefanha-x1.localdomain>
-References: <20170714094521.4909-1-el13635@mail.ntua.gr>
-	<20170714094521.4909-2-el13635@mail.ntua.gr>
+	(envelope-from <thuth@redhat.com>) id 1dZeU8-0003fE-Sx
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:37:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dZeU8-0003eR-Mf
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:37:24 -0400
+References: <20170721125609.11117-1-david@redhat.com>
+	<20170721125609.11117-3-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1b898c34-3bda-c31d-b212-a2c090a01f62@redhat.com>
+Date: Mon, 24 Jul 2017 16:37:16 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="L1c6L/cjZjI9d0Eq"
-Content-Disposition: inline
-In-Reply-To: <20170714094521.4909-2-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH 1/7] block: move ThrottleGroup membership
- to ThrottleGroupMember
+In-Reply-To: <20170721125609.11117-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/6] target/s390x: fix pgm irq ilen in
+ translate_pages()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com
 
-
---L1c6L/cjZjI9d0Eq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jul 14, 2017 at 12:45:15PM +0300, Manos Pitsidianakis wrote:
-> This commit eliminates the 1:1 relationship between BlockBackend and
-> throttle group state.  Users will be able to create multiple throttle
-> nodes, each with its own throttle group state, in the future.  The
-> throttle group state cannot be per-BlockBackend anymore, it must be
-> per-throttle node. This is done by gathering ThrottleGroup membership
-> details from BlockBackendPublic into ThrottleGroupMember and refactoring
-> existing code to use the structure.
->=20
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+On 21.07.2017 14:56, David Hildenbrand wrote:
+> 0 is certainly wrong. Let's use ILEN_AUTO.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->=20
-> Notes:
->     Dropped R-b because I changed some of the comments (removed all Block=
-Backend
->         references in block/throttle-groups.c comments)
->=20
->  block/block-backend.c           |  66 +++++----
->  block/qapi.c                    |   8 +-
->  block/throttle-groups.c         | 288 ++++++++++++++++++++--------------=
-------
->  blockdev.c                      |   4 +-
->  include/block/throttle-groups.h |  39 +++++-
->  include/sysemu/block-backend.h  |  20 +--
->  tests/test-throttle.c           |  53 ++++----
->  7 files changed, 252 insertions(+), 226 deletions(-)
+>  target/s390x/mmu_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index a873dc4..1ad0158 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -440,7 +440,7 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+>          }
+>          if (!address_space_access_valid(&address_space_memory, pages[i],
+>                                          TARGET_PAGE_SIZE, is_write)) {
+> -            program_interrupt(env, PGM_ADDRESSING, 0);
+> +            program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO);
+>              return -EFAULT;
+>          }
+>          addr += TARGET_PAGE_SIZE;
+> 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+That makes more sense, indeed.
 
---L1c6L/cjZjI9d0Eq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZdgX7AAoJEJykq7OBq3PI9psH/R3VjKDRQW6EADfcaflT60BW
-zcNwRh45iZcSY5riKv6JMINgiNTLz5dvaiLmotttvKTp3bU0sLy9yq91ukDyKUR4
-VPY0Hi5+Q0F7SqBTmKQ8BXGmfLx9gmWySWzvpaYsEwAiKmUwgXEiU9kPQ42TmnJD
-JyPV0YdwrYLpIMOCiH3ktNcDLil+sAuKswWaoy0mOrywP6loPlJRvfreQet87tAc
-Q2yPj9jalL/eewVceqmxWcaEKjVmJ97kVNGZAA9ibRW3KCBY9JXOtxPD6lVCqmBc
-CtvUPh0iU1kge3RhhA3F27SsZtdJW2lVry2l/xMkEe0z5WrjqqeIJWyTIWQny0c=
-=HCJK
------END PGP SIGNATURE-----
-
---L1c6L/cjZjI9d0Eq--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
