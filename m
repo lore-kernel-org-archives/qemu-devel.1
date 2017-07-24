@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhJr-00006i-20
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:00 -0400
+	(envelope-from <david@redhat.com>) id 1dZhJy-0000A5-GK
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhJn-0000gV-WB
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:38:59 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:38485)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhJn-0000gF-JG
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:38:55 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Mon, 24 Jul 2017 20:38:45 +0300
-Message-Id: <150091792554.30739.5632278947752078528.stgit@frigg.lan>
-In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+	(envelope-from <david@redhat.com>) id 1dZhJv-0000nY-FV
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dZhJv-0000nI-8b
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:03 -0400
+References: <20170721125609.11117-1-david@redhat.com>
+	<20170721125609.11117-5-david@redhat.com>
+	<f1c1a29b-c249-0cb1-98a4-78c91147c405@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <41378209-643c-b76a-4f7d-c3843f3fb95e@redhat.com>
+Date: Mon, 24 Jul 2017 19:38:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/13] instrument: [bsd-user] Add command line
- library loader
+In-Reply-To: <f1c1a29b-c249-0cb1-98a4-78c91147c405@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/6] target/s390x: move wrap_address to
+ cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- bsd-user/main.c    |   16 ++++++++++++++++
- bsd-user/syscall.c |    5 +++++
- 2 files changed, 21 insertions(+)
+On 24.07.2017 06:40, Richard Henderson wrote:
+> On 07/21/2017 05:56 AM, David Hildenbrand wrote:
+>> Signed-off-by: David Hildenbrand<david@redhat.com>
+>> ---
+>>   target/s390x/cpu.h        | 14 ++++++++++++++
+>>   target/s390x/mem_helper.c | 14 --------------
+>>   2 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> 
+> Although another header, private to the helpers, might be better...
+> 
 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index fa9c012c9f..37bf6a435c 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -33,6 +33,8 @@
- #include "exec/log.h"
- #include "trace/control.h"
- #include "glib-compat.h"
-+#include "instrument/cmdline.h"
-+#include "instrument/control.h"
-=20
- int singlestep;
- unsigned long mmap_min_addr;
-@@ -666,6 +668,11 @@ static void usage(void)
-            "-B address        set guest_base address to address\n"
-            "-bsd type         select emulated BSD type FreeBSD/NetBSD/Op=
-enBSD (default)\n"
-            "\n"
-+#if defined(CONFIG_INSTRUMENT)
-+           "-instr [file=3D]<file>[,arg=3D<string>]\n"
-+           "                  load an instrumentation library\n"
-+           "\n"
-+#endif
-            "Debug options:\n"
-            "-d item1[,...]    enable logging of specified items\n"
-            "                  (use '-d help' for a list of log items)\n"
-@@ -735,6 +742,9 @@ int main(int argc, char **argv)
-     envlist_t *envlist =3D NULL;
-     char *trace_file =3D NULL;
-     bsd_type =3D target_openbsd;
-+    char *instrument_path =3D NULL;
-+    int instrument_argc =3D 0;
-+    const char **instrument_argv =3D NULL;
-=20
-     if (argc <=3D 1)
-         usage();
-@@ -753,6 +763,7 @@ int main(int argc, char **argv)
-     cpu_model =3D NULL;
-=20
-     qemu_add_opts(&qemu_trace_opts);
-+    qemu_add_opts(&qemu_instr_opts);
-=20
-     optind =3D 1;
-     for (;;) {
-@@ -840,6 +851,9 @@ int main(int argc, char **argv)
-         } else if (!strcmp(r, "trace")) {
-             g_free(trace_file);
-             trace_file =3D trace_opt_parse(optarg);
-+        } else if (!strcmp(r, "instr")) {
-+            instr_opt_parse(optarg, &instrument_path,
-+                            &instrument_argc, &instrument_argv);
-         } else {
-             usage();
-         }
-@@ -869,6 +883,8 @@ int main(int argc, char **argv)
-     }
-     trace_init_file(trace_file);
-=20
-+    instr_init(instrument_path, instrument_argc, instrument_argv);
-+
-     /* Zero out regs */
-     memset(regs, 0, sizeof(struct target_pt_regs));
-=20
-diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
-index 66492aaf5d..3230f722f3 100644
---- a/bsd-user/syscall.c
-+++ b/bsd-user/syscall.c
-@@ -26,6 +26,8 @@
-=20
- #include "qemu.h"
- #include "qemu-common.h"
-+#include "instrument/cmdline.h"
-+
-=20
- //#define DEBUG
-=20
-@@ -332,6 +334,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
-bi_long arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         /* XXX: should free thread stack and CPU env */
-         _exit(arg1);
-         ret =3D 0; /* avoid warning */
-@@ -430,6 +433,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
-i_long arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         /* XXX: should free thread stack and CPU env */
-         _exit(arg1);
-         ret =3D 0; /* avoid warning */
-@@ -505,6 +509,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
-bi_long arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         /* XXX: should free thread stack and CPU env */
-         _exit(arg1);
-         ret =3D 0; /* avoid warning */
+Question is if we should have a new header for stuff really only used
+locally in target/s390x - in contrast to say cpu.h, which is included
+from various other places. So not only a header for helpers, but also
+used for e.g. kvm.c.
+
+This header could e.g. be called cpu_helper.h and would not included in
+cpu.h
+
+Opinions?
+
+-- 
+
+Thanks,
+
+David
