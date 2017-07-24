@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZbYf-00016L-17
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:29:53 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dZbb9-0001ni-Kf
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZbYe-0003pH-7S
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:29:53 -0400
-Date: Mon, 24 Jul 2017 12:29:44 +0100
+	(envelope-from <stefanha@redhat.com>) id 1dZbb6-0004mC-Hm
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dZbb6-0004lw-9C
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:24 -0400
+Date: Mon, 24 Jul 2017 12:32:21 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170724112944.GA2784@stefanha-x1.localdomain>
-References: <20170721183243.22706-1-eblake@redhat.com>
+Message-ID: <20170724113221.GB2784@stefanha-x1.localdomain>
+References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+	<87a83xlo1a.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
+	protocol="application/pgp-signature"; boundary="Bn2rw/3z4jIqBvZU"
 Content-Disposition: inline
-In-Reply-To: <20170721183243.22706-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] Bug fixes from byte-based
- block status
+In-Reply-To: <87a83xlo1a.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, den@openvz.org, dgilbert@redhat.com, armbru@redhat.com
 
 
---sm4nu43k4a2Rpi4c
-Content-Type: text/plain; charset=us-ascii
+--Bn2rw/3z4jIqBvZU
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 21, 2017 at 01:32:41PM -0500, Eric Blake wrote:
-> Series 2-4 of my byte-based conversion missed soft freeze, so they
-> are now 2.11 material.  However, there are some bug fixes in those
-> series that we should fix now in 2.10 (patch 1 from series two
-> on dirty bitmaps, patch 2 extracted from "qcow2: Switch qcow2_measure()
-> to byte-based iteration" from series three on block status).
+On Fri, Jul 21, 2017 at 08:04:17PM +0300, Llu=EDs Vilanova wrote:
+> Vladimir Sementsov-Ogievskiy writes:
 >=20
-> I don't know if it is worth enhancing iotest 178 to probe the size
-> of a 2T image.  The test is simple, and fast when patched:
+> > Current trace system have a drawback: parameters of trace functions
+> > are calculated even if corresponding tracepoint is disabled. Also, it
+> > looks like trace function are not actually inlined by compiler (at
+> > least for me).
 >=20
-> $ qemu-img create -f qcow2 -o cluster_size=3D2M huge 2T
-> $ time ./qemu-img measure -O qcow2 -f qcow2 huge
-> required size: 335806464
-> fully allocated size: 2199359062016
+> > Here is a fix proposal: move from function call to macros. Patch 02
+> > is an example, of how to reduce extra calculations with help of
+> > patch 01.
 >=20
-> real	0m0.021s
-> user	0m0.017s
-> sys	0m0.004s
+> The tracing functions *were* inlined last time I checked, although things
+> changed quite a lot since then. Not sure that will make a lot of differen=
+ce in
+> terms of overall performance (needs measuring).
 >=20
-> but the inf-loop when unpatched is annoying; meanwhile, 'huge' only
-> occupies 6 megabytes on disk, so it's not that invasive.
->=20
-> Eric Blake (2):
->   dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented
->   qcow2: Fix sector calculation in qcow2_measure()
->=20
->  block/dirty-bitmap.c | 2 +-
->  block/qcow2.c        | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
->=20
-> --=20
-> 2.13.3
->=20
+> As for arguments, each trace event has a define TRACE_{NAME}_ENABLED that=
+ you
+> can use for that purpose. If this is not explained in tracing.txt, that i=
+s a
+> documentation bug.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+It is described in docs/devel/tracing.txt:
 
---sm4nu43k4a2Rpi4c
+In addition, there might be cases where relatively complex computations mus=
+t be
+performed to generate values that are only used as arguments for a trace
+function. In these cases you can use the macro 'TRACE_${EVENT_NAME}_ENABLED=
+' to
+guard such computations and avoid its compilation when the event is disable=
+d:
+
+    #include "trace.h"  /* needed for trace event prototype */
+   =20
+    void *qemu_vmalloc(size_t size)
+    {
+        void *ptr;
+        size_t align =3D QEMU_VMALLOC_ALIGN;
+   =20
+        if (size < align) {
+            align =3D getpagesize();
+        }
+        ptr =3D qemu_memalign(align, size);
+        if (TRACE_QEMU_VMALLOC_ENABLED) { /* preprocessor macro */
+            void *complex;
+            /* some complex computations to produce the 'complex' value */
+            trace_qemu_vmalloc(size, ptr, complex);
+        }
+        return ptr;
+    }
+
+--Bn2rw/3z4jIqBvZU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZddooAAoJEJykq7OBq3PIqJIH/RZGw69/RiyxPtEEW1UMkNCZ
-g6J13JXaXw/NjfgnqGYDpCH8g/cpNDcxR9CBzhk4Aszjmj40AgWmgVIZ0EPvvMHQ
-6k7s4epmpoZQE3ipjspIkYtV0pvB7+0yyOwSCaKWI0VB0MXqh/oebo/VcQUX2Whx
-KcMdJj6lgSUuI5Xum19+28O35oJoTqVg6Vv5upJq9sCATDDJ+ggRayUcLyNsBBTG
-nFeQjSytL0iYRnySLx5hcbZMDqBibY36zxmUCc/2wdHI5q6rHHiJMl332Rje5lC4
-Otoi7qkXuXM4n/nIdcQEtSlqWL6P0oZxg+Ho5ZHVQl4UGtkDNO2G9xSbfv4HcpA=
-=AAcc
+iQEcBAEBAgAGBQJZddrFAAoJEJykq7OBq3PIp2YIAJHOzK9pwfUdUsd8LBu370rr
+bFsdCVMQro2fxruzptw+bf0u97sur6Sc3RsltALTCDtkjtuvpWkDcc8FnT3hg0c8
+w1SN3AxAGsjrzxwvpVHP5BTNcazY+ZdsK+ZEA5LGT+RVKLQ3wBSByYWouAKgMmBI
+bRJeTcHcVBdFIaZawWlgE46m7KjJ2dJyINn7i5kWmmzGAOXnllsdRqNx665/f1X+
+mEN7sizeWvXe7emWN7hGdfM29fYYrHSrP3w+c+KXlxbuofWROsTYKSHiwyMIigwO
+J/UoqY+h0fLaJsV6GM4vHTxg5aG7nH1wwT21qnXnZYRap9hmEldAg6aLjD9Ci40=
+=jJnn
 -----END PGP SIGNATURE-----
 
---sm4nu43k4a2Rpi4c--
+--Bn2rw/3z4jIqBvZU--
