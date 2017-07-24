@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dZkSn-0003Of-GG
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:00:26 -0400
+	(envelope-from <cota@braap.org>) id 1dZkTt-0004HG-17
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dZkSk-0001XB-Et
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:00:25 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53387)
+	(envelope-from <cota@braap.org>) id 1dZkTp-0001wt-VV
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:01:33 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52099)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dZkSk-0001Wa-7s
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:00:22 -0400
-Date: Mon, 24 Jul 2017 17:00:19 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dZkTp-0001wk-S8
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:01:29 -0400
+Date: Mon, 24 Jul 2017 17:01:29 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170724210019.GA23091@flamenco>
+Message-ID: <20170724210129.GB23091@flamenco>
 References: <20170724202728.25960-1-rth@twiddle.net>
-	<20170724202728.25960-29-rth@twiddle.net>
+	<20170724202728.25960-32-rth@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170724202728.25960-29-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v15 28/32] target/arm: [tcg] Port to
- generic translation framework
+In-Reply-To: <20170724202728.25960-32-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v15 31/32] target/arm: Split out
+ thumb_tr_translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +31,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu
 
-On Mon, Jul 24, 2017 at 13:27:24 -0700, Richard Henderson wrote:
-> From: Lluís Vilanova <vilanova@ac.upc.edu>
+On Mon, Jul 24, 2017 at 13:27:27 -0700, Richard Henderson wrote:
+> We need not check for ARM vs Thumb state in order to dispatch
+> disassembly of every instruction.
 > 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> Message-Id: <150002631325.22386.10348327185029496649.stgit@frigg.lan>
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
->  target/arm/translate.h     |   8 +---
->  target/arm/translate-a64.c | 107 ++++++++------------------------------------
->  target/arm/translate.c     | 109 +++++++++------------------------------------
->  3 files changed, 41 insertions(+), 183 deletions(-)
+>  target/arm/translate.c | 121 ++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 80 insertions(+), 41 deletions(-)
 
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Tested-by: Emilio G. Cota <cota@braap.org>
