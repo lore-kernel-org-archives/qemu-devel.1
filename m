@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZkdn-0000qA-R6
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:11:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZkfe-00021G-E4
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZkdm-0007Zg-SP
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:11:47 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36009)
+	(envelope-from <peter.maydell@linaro.org>) id 1dZkfd-0008Ns-JI
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:13:42 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37764)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dZkdm-0007Z2-MN
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:11:46 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id t201so29696461wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:11:46 -0700 (PDT)
+	id 1dZkfd-0008NT-DS
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:13:41 -0400
+Received: by mail-wm0-x231.google.com with SMTP id c184so41581301wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:13:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170724182751.18261-23-f4bug@amsat.org>
+In-Reply-To: <20170724182751.18261-12-f4bug@amsat.org>
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-23-f4bug@amsat.org>
+	<20170724182751.18261-12-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Jul 2017 22:11:25 +0100
-Message-ID: <CAFEAcA9dciLWNYce7+4HjW1Cu4pEJ1V9gHQ2pokBECCj0mp1QA@mail.gmail.com>
+Date: Mon, 24 Jul 2017 22:13:19 +0100
+Message-ID: <CAFEAcA9nkfXfXn3fiZMS3dnrp7v8NVysqFS+pb-Ehf=+xOFfWQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 22/35] arm/vexpress: fix potential
- memory leak
+Subject: Re: [Qemu-devel] [PATCH for 2.10 11/35] i2c/exynos4210: correctly
+ check i2c_recv() return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +32,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
 On 24 July 2017 at 19:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
 te:
-> Reorder to only allocate if required.
+> i2c_recv() returns -1 on error, if the I2CCON_ACK_GEN bit was not set thi=
+s code
+> was setting i2cds =3D -1.
 >
-> hw/arm/vexpress.c:667:13: warning: Potential leak of memory pointed to by=
- 'flashalias'
+> i2c/exynos4210_i2c.c:117:20: warning: Loss of sign in implicit conversion
+>         s->i2cds =3D ret;
+>                    ^~~
 >
 > Reported-by: Clang Static Analyzer
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/arm/vexpress.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  hw/i2c/exynos4210_i2c.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-> index 528c65ddb6..76c4d84482 100644
-> --- a/hw/arm/vexpress.c
-> +++ b/hw/arm/vexpress.c
-> @@ -553,8 +553,6 @@ static void vexpress_common_init(MachineState *machin=
+> diff --git a/hw/i2c/exynos4210_i2c.c b/hw/i2c/exynos4210_i2c.c
+> index c96fa7d7be..4424dbd233 100644
+> --- a/hw/i2c/exynos4210_i2c.c
+> +++ b/hw/i2c/exynos4210_i2c.c
+> @@ -111,10 +111,12 @@ static void exynos4210_i2c_data_receive(void *opaqu=
 e)
->      MemoryRegion *sysmem =3D get_system_memory();
->      MemoryRegion *vram =3D g_new(MemoryRegion, 1);
->      MemoryRegion *sram =3D g_new(MemoryRegion, 1);
-> -    MemoryRegion *flashalias =3D g_new(MemoryRegion, 1);
-> -    MemoryRegion *flash0mem;
->      const hwaddr *map =3D daughterboard->motherboard_map;
->      int i;
->
-> @@ -657,6 +655,9 @@ static void vexpress_common_init(MachineState *machin=
-e)
+>      s->i2cstat &=3D ~I2CSTAT_LAST_BIT;
+>      s->scl_free =3D false;
+>      ret =3D i2c_recv(s->bus);
+> -    if (ret < 0 && (s->i2ccon & I2CCON_ACK_GEN)) {
+> -        s->i2cstat |=3D I2CSTAT_LAST_BIT;  /* Data is not acknowledged *=
+/
+> -    } else {
+> +    if (ret >=3D 0) {
+>          s->i2cds =3D ret;
+> +    } else {
+> +        if (s->i2ccon & I2CCON_ACK_GEN) {
+> +            s->i2cstat |=3D I2CSTAT_LAST_BIT;  /* Data is not acknowledg=
+ed */
+> +        }
 >      }
->
->      if (map[VE_NORFLASHALIAS] !=3D -1) {
-> +        MemoryRegion *flashalias =3D g_new(MemoryRegion, 1);
-> +        MemoryRegion *flash0mem;
-> +
->          /* Map flash 0 as an alias into low memory */
->          flash0mem =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(pflash0), 0)=
-;
->          memory_region_init_alias(flashalias, NULL, "vexpress.flashalias"=
-,
+>      exynos4210_i2c_raise_interrupt(s);
+>  }
 > --
-> 2.13.3
 
-flashalias is no different from any of the other MemoryRegion*
-variables we allocate here with g_new() -- they all
-leak, and it doesn't matter because the function
-runs once and we want the MemoryRegions to survive
-until the end of the simulation.
-
-These days we could in theory clean this up by
-switching from doing g_new() to having a set of
-MemoryRegion fields in the VexpressMachineState
-struct (compare hw/arm/mps2.c).
+Have you checked this change against the data sheet for
+the device?
 
 thanks
 -- PMM
