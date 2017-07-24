@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZcyY-0007c5-07
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:00:51 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dZczb-0008H7-Ft
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZcyT-0001Uc-G2
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:00:42 -0400
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:56740)
+	(envelope-from <imammedo@redhat.com>) id 1dZczY-0001xM-87
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:01:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZcyT-0001Ts-4F
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:00:37 -0400
-Received: from player732.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 5EC3E123BA2
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 15:00:35 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-5-git-send-email-clg@kaod.org>
-	<20170719030849.GQ3140@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5ead830d-760e-3486-9287-c1243acad3ea@kaod.org>
-Date: Mon, 24 Jul 2017 15:00:30 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZczY-0001vt-2H
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:01:44 -0400
+Date: Mon, 24 Jul 2017 15:01:28 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170724150128.17b59235@nial.brq.redhat.com>
+In-Reply-To: <20170721232134-mutt-send-email-mst@kernel.org>
+References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
+	<20170719114612.GC3500@work-vm>
+	<20170719152427.620b2a2a@nial.brq.redhat.com>
+	<20170719184748-mutt-send-email-mst@kernel.org>
+	<20170721164158.72fc3798@nial.brq.redhat.com>
+	<20170721232134-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170719030849.GQ3140@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
+ vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, Wang Yechao <wang.yechao255@zte.com.cn>
 
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qapi/error.h"
->> +#include "target/ppc/cpu.h"
->> +#include "sysemu/cpus.h"
->> +#include "sysemu/dma.h"
->> +#include "monitor/monitor.h"
->> +#include "hw/ppc/xive.h"
->> +
->> +#include "xive-internal.h"
->> +
->> +/*
->> + * Main XIVE object
-> 
-> As with XICs, does it really make sense for there to be a "main" XIVE
-> object, or should be an interface attached to the machine?
+Michael,
 
-yes. There are internal tables which are very specific to the controller 
-and I don't think they belong to the machine.
+You once advocated idea of using MAP_NORESERVE to reserve continuous
+HVA upto maxmmem in QEMU and then 'allocating' guest's RAM from that range
+so that translation map for vhost could consist only from
+that single pre-reserved HVA range and and if guest access
+page outside of actually present memory it would be ok
+to let guest misbehave.
 
-C.
+Reason we get so many fragments is holes pocked in
+initial RAM by device memory/MMIO ranges. Maybe we can reuse
+'would be ok to let guest misbehave' part in vhost_set_memory()
+which tracks flat memory map represented by sections.
+
+Idea here is that each section has reference to a MemoryRegion it belongs to,
+for vhost mem map we could reuse that MemoryRegion range instead
+of set of sections that belong to it. Well behaved guest will continue
+working as it uses accessible RAM pages and malicious guest will
+misbehave if it will ask for translation of the page outside of
+accessible RAM.
+This way vhost mem map will typically have 1/2 entries for
+low/high mem ranges + an entry per each dimm. This way we
+can keep the same or less number of entries in vhost map
+without merging (as in practice it works only for fragmented
+initial memory and by chanse may work for dimm device)
+and at the same time number of entries will be constant
+(number of RAM memory regions) depending on initial RAM amount
+and amount of used dimm devices regardless of the order they were created
+or the runtime point they are created at.
