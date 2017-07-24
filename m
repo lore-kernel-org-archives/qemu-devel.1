@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dZhF7-0005Xf-28
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:34:05 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhG5-0006Bc-UD
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dZhF4-0006IU-1G
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:34:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dZhF3-0006HQ-Qs
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:34:01 -0400
-References: <20170721125609.11117-1-david@redhat.com>
-	<20170721125609.11117-4-david@redhat.com>
-	<ac7c2032-deed-21b5-8252-d28797e05bf6@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <92ab558b-7de5-9d3a-d189-6e5a6a3b3d6f@redhat.com>
-Date: Mon, 24 Jul 2017 19:25:15 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhG2-0006yz-QT
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:35:05 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:55932)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhG2-0006xM-DP
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:35:02 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Mon, 24 Jul 2017 20:34:43 +0300
+Message-Id: <150091768344.30739.12305583596427638085.stgit@frigg.lan>
+In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <ac7c2032-deed-21b5-8252-d28797e05bf6@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] target/s390x: implement spm (SET
- PROGRAM MASK)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 08/13] instrument: [linux-user] Add command
+ line library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 24.07.2017 06:39, Richard Henderson wrote:
-> On 07/21/2017 05:56 AM, David Hildenbrand wrote:
->> +    tcg_gen_extrl_i64_i32(cc, o->in1);
->> +    tcg_gen_shri_i32(cc, cc, 28);
->> +    tcg_gen_andi_i32(cc, cc, 0x3ul);
->> +    tcg_gen_mov_i32(cc_op, cc);
->> +    tcg_temp_free_i32(cc);
->> +    set_cc_static(s);
-> 
->   tcg_gen_extrl_i64_i32(cc_op, o->in1);
->   tcg_gen_extract_i32(cc_op, cc_op, 28, 2);
-> 
-> 
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ linux-user/main.c    |   20 ++++++++++++++++++++
+ linux-user/syscall.c |    4 ++++
+ 2 files changed, 24 insertions(+)
 
-My tests still pass with the following suggested hunk.
-
-tcg_gen_extrl_i64_i32(cc_op, o->in1);
-tcg_gen_extract_i32(cc_op, cc_op, 28, 2);
-set_cc_static(s);
-
-Thanks!
-
-> Otherwise,
-> 
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> 
-> 
-> r~
-> 
-
-
--- 
-
-Thanks,
-
-David
+diff --git a/linux-user/main.c b/linux-user/main.c
+index ad03c9e8b2..fdb7ddb199 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -36,6 +36,8 @@
+ #include "exec/log.h"
+ #include "trace/control.h"
+ #include "glib-compat.h"
++#include "instrument/cmdline.h"
++#include "instrument/control.h"
+=20
+ char *exec_path;
+=20
+@@ -4014,6 +4016,17 @@ static void handle_arg_trace(const char *arg)
+     trace_file =3D trace_opt_parse(arg);
+ }
+=20
++static char *instrument_path;
++static int instrument_argc;
++static const char **instrument_argv;
++#if defined(CONFIG_INSTRUMENT)
++static void handle_arg_instrument(const char *arg)
++{
++    instr_opt_parse(arg, &instrument_path,
++                    &instrument_argc, &instrument_argv);
++}
++#endif
++
+ struct qemu_argument {
+     const char *argv;
+     const char *env;
+@@ -4063,6 +4076,10 @@ static const struct qemu_argument arg_table[] =3D =
+{
+      "",           "Seed for pseudo-random number generator"},
+     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
+      "",           "[[enable=3D]<pattern>][,events=3D<file>][,file=3D<fi=
+le>]"},
++#if defined(CONFIG_INSTRUMENT)
++    {"instr",      "QEMU_INSTR",       true,  handle_arg_instrument,
++     "",           "[file=3D]<file>[,arg=3D<string>]"},
++#endif
+     {"version",    "QEMU_VERSION",     false, handle_arg_version,
+      "",           "display version information and exit"},
+     {NULL, NULL, false, NULL, NULL, NULL}
+@@ -4252,6 +4269,7 @@ int main(int argc, char **argv, char **envp)
+     srand(time(NULL));
+=20
+     qemu_add_opts(&qemu_trace_opts);
++    qemu_add_opts(&qemu_instr_opts);
+=20
+     optind =3D parse_args(argc, argv);
+=20
+@@ -4260,6 +4278,8 @@ int main(int argc, char **argv, char **envp)
+     }
+     trace_init_file(trace_file);
+=20
++    instr_init(instrument_path, instrument_argc, instrument_argv);
++
+     /* Zero out regs */
+     memset(regs, 0, sizeof(struct target_pt_regs));
+=20
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 003943b736..cf7071bd35 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -115,6 +115,8 @@ int __clone2(int (*fn)(void *), void *child_stack_bas=
+e,
+ #include "uname.h"
+=20
+ #include "qemu.h"
++#include "instrument/cmdline.h"
++
+=20
+ #ifndef CLONE_IO
+ #define CLONE_IO                0x80000000      /* Clone io context */
+@@ -7765,6 +7767,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
+g arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
+         break;
+@@ -9821,6 +9824,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
+g arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         ret =3D get_errno(exit_group(arg1));
+         break;
+ #endif
