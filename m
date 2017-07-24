@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dZUR9-0007Ri-Iq
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:53:40 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dZUaR-0000Hk-ES
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dZUR6-00045Z-JB
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:53:39 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dZUR6-000450-A2
-	for qemu-devel@nongnu.org; Sun, 23 Jul 2017 23:53:36 -0400
-Received: by mail-pg0-x243.google.com with SMTP id d193so10541428pgc.2
-	for <qemu-devel@nongnu.org>; Sun, 23 Jul 2017 20:53:34 -0700 (PDT)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-5-git-send-email-clg@kaod.org>
-	<20170719030849.GQ3140@umbus.fritz.box>
-	<1500436938.3350.11.camel@kernel.crashing.org>
-	<20170721075015.GE3717@umbus.fritz.box>
-	<1500625291.10674.22.camel@kernel.crashing.org>
-	<20170724032853.GB17228@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <efb76aaa-5dd6-ef8e-91b6-ce4a534f9cff@ozlabs.ru>
-Date: Mon, 24 Jul 2017 13:53:27 +1000
+	(envelope-from <jasowang@redhat.com>) id 1dZUaO-0000EC-9c
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:03:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dZUaO-0000DW-0m
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:03:12 -0400
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-4-anton.ivanov@cambridgegreys.com>
+	<e31eb033-a770-e5fd-97b0-0b50f268c22c@redhat.com>
+	<b1194532-a97a-33d3-92d4-8531674d358d@cambridgegreys.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2c69da12-2b18-2272-6eff-c6223667aad0@redhat.com>
+Date: Mon, 24 Jul 2017 12:03:06 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170724032853.GB17228@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C"
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+In-Reply-To: <b1194532-a97a-33d3-92d4-8531674d358d@cambridgegreys.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] Unified Datagram Socket Transport -
+ raw support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,190 +31,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Alexander Graf <agraf@suse.de>
+To: Anton Ivanov <anton.ivanov@cambridgegreys.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Alexander Graf <agraf@suse.de>
-Message-ID: <efb76aaa-5dd6-ef8e-91b6-ce4a534f9cff@ozlabs.ru>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton for
- the XIVE interrupt controller model
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
- <1499274819-15607-5-git-send-email-clg@kaod.org>
- <20170719030849.GQ3140@umbus.fritz.box>
- <1500436938.3350.11.camel@kernel.crashing.org>
- <20170721075015.GE3717@umbus.fritz.box>
- <1500625291.10674.22.camel@kernel.crashing.org>
- <20170724032853.GB17228@umbus.fritz.box>
-In-Reply-To: <20170724032853.GB17228@umbus.fritz.box>
-Content-Type: text/plain; charset=koi8-r
-Content-Transfer-Encoding: quoted-printable
 
-On 24/07/17 13:28, David Gibson wrote:
-> On Fri, Jul 21, 2017 at 06:21:31PM +1000, Benjamin Herrenschmidt wrote:=
 
->> On Fri, 2017-07-21 at 17:50 +1000, David Gibson wrote:
->>> On Wed, Jul 19, 2017 at 02:02:18PM +1000, Benjamin Herrenschmidt wrot=
-e:
->>>> On Wed, 2017-07-19 at 13:08 +1000, David Gibson wrote:
->>>>>
->>>>> I'm somewhat uncomfortable with an irq allocater here in the intc
->>>>> code.  As a rule, irq allocation is the responsibility of the machi=
-ne,
->>>>> not any sub-component.  Furthermore, it should allocate in a way wh=
-ich
->>>>> is repeatable, since they need to stay stable across reboots and
->>>>> migrations.
->>>>>
->>>>> And, yes, we have an allocator of sorts in XICS - it has caused a
->>>>> number of problems in the past.
->>>>
->>>> So....
->>>>
->>>> For a bare metal model (which we don't have yet) of XIVE, the IRQ
->>>> numbering is entirely an artifact of how the HW is configured. There=
-
->>>> should thus be no interrupt numbers visible to qemu.
->>>
->>> Uh.. I don't entirely follow.  Do you mean that during boot the guest=
-
->>> programs the irq numbers into the various components?
+On 2017=E5=B9=B407=E6=9C=8822=E6=97=A5 02:50, Anton Ivanov wrote:
+>
+> [snip]
+>
+>>> +    "-netdev raw,id=3Dstr,ifname=3Difname\n"
+>>> +    "                configure a network backend with ID 'str'=20
+>>> connected to\n"
+>>> +    "                an Ethernet interface named ifname via raw=20
+>>> socket.\n"
+>>> +    "                This backend does not change the interface=20
+>>> settings.\n"
+>>> +    "                Most interfaces will require being set into=20
+>>> promisc mode,\n"
+>>> +    "                as well having most offloads (TSO, etc) turned=20
+>>> off.\n"
+>>> +    "                Some virtual interfaces like tap support only=20
+>>> RX.\n"
 >>
->> I said a "bare metal model" but yes. Pretty much.=20
->=20
-> Right, by "guest" I meant the kernel running under qemu, even if its
-> running on a bare-metal equivalent platform.
->=20
->>> In that case this allocator stuff definitely doesn't belong on the
->>> xive code.
->>>
->>>> For a PAPR model things are a bit different, but if we want to
->>>> maximize code re-use between the two, we probably need to make sure
->>>> the interrupts "allocated" by the machine for XIVE can be represente=
-d
->>>> by the HW model.
->>>>
->>>> That means:
->>>>
->>>>  - Each chip has a range (high bits are the block ID, which maps to =
-a
->>>> chip, low bits, around 512K to 1M interrupts is the per-chip space).=
+>> Pay attention that qemu supports vnet header. So any reason to turn=20
+>> off e.g TSO here?
+>
+> I am not aware of any means to get extra info like checksums, etc show=20
+> up on raw socket read.
+>
+> If you know a way to make them show up, this is worth investigating.
 
->>>>
->>>>  - Interrupts 0...N of that range (N depends on how much backing
->>>> memory and MMIO space is provisioned for each chip) are "generic IPI=
-s"
->>>> which are somewhat generic interrupt source that can be triggered wi=
-th
->>>> an MMIO store and routed to any target. Those are used in PAPR for
->>>> things like IPIs and some type of accelerator interrupts.
->>>>
->>>>  - Portions of that range (which may or may not overlap the 0...N
->>>> above, if they do they "shadow" the generic interrupts) can be
->>>> configured to be the HW sources from the various PCIe bridges and
->>>> the PSI controller.
->>>
->>> Err.. I'm confused how this not sure this relates to spapr.  There ar=
-e
->>> no chips or PSI there, and the PCI bridges aren't really the same
->>> thing.
+See packet_rcv_vnet(). But a known 'issue' for raw socket is that it=20
+forbids change vnet header length after creation, we may need some=20
+workaround in qemu.
+
+>
 >>
->> The above is the HW model, sorry for the confusion. With a few comment=
-s
->> about how they are used in PAPR.
+>>>   #endif
+>>>       "-netdev=20
+>>> socket,id=3Dstr[,fd=3Dh][,listen=3D[host]:port][,connect=3Dhost:port]=
+\n"
+>>>       "                configure a network backend to connect to=20
+>>> another network\n"
+>>> @@ -2463,6 +2470,32 @@ qemu-system-i386 linux.img -net nic -net=20
+>>> gre,src=3D4.2.3.1,dst=3D1.2.3.4
+>>>     @end example
+>>>   +@item -netdev raw,id=3D@var{id},ifname=3D@var{ifname}
+>>> +@itemx -net raw[,vlan=3D@var{n}][,name=3D@var{name}],ifname=3D@var{i=
+fname}
+>>> +Connect VLAN @var{n} directly to an Ethernet interface using raw=20
+>>> socket.
+>>> +
+>>> +This transport allows a VM to bypass most of the network stack=20
+>>> which is
+>>> +extremely useful for tapping.
+>>> +
+>>> +@item ifname=3D@var{ifname}
+>>> +    interface name (mandatory)
+>>> +
+>>> +@example
+>>> +# set up the interface - put it in promiscuous mode and turn off=20
+>>> offloads
+>>> +ifconfig eth0 up
+>>> +ifconfig eth0 promisc
+>>> +
+>>> +/sbin/ethtool -K eth0 gro off
+>>> +/sbin/ethtool -K eth0 tso off
+>>> +/sbin/ethtool -K eth0 gso off
+>>> +/sbin/ethtool -K eth0 tx off
 >>
->> So yes, in PAPR there's an "allocator" because the hypervisor will
->> create a guest "virtual" (or logical to use PAPR terminology) interrup=
-t
->> number space, in order to represents the various interrupts into the
->> guest.
->=20
-> Ok, but are each of those logical irqs bound to a specific device/PHB
-> line/whatever, or can they be configured by the guest?
->=20
->> Those numbers however are just tokens, they don't have to represent an=
-y
->> real HW concept. So they can be "allocated" in a rather fixed way, for=
+>> Any reason to turn off tx here?
+>
+> Yes - we already have it computed and we have written it as is as a=20
+> whole packet. You do not want it
+> re-computed as at least some adapters do silly things if you start=20
+> writing raw and the checksum already exists.
 
->> example, you could have something like a fixed map where you put all
->> the PCI interrupts at a certain number (a factor of the PHB# with room=
+This looks like a bug of the driver?
 
->> or a fix number per PHB, maybe 16K or so, the HW does 4K max). Another=
+For GRO it's easier to understand since guest may not handle big packets=20
+with partial checksum. But tso,gso,tx, this still looks questionable for=20
+the nic which may want to offload them to card (e.g virtio-net).
 
->> based would have a chunk of "general purpose" IPIs (for use for actual=
+>
+> Once again, this one of the pros/cons of using tpacket vs recv/send=20
+> (with or without mmsg) on a raw socket.
+>
+> recvm(m)sg/sendm(m)sg are brute force as far as offloads, but things=20
+> like scatter/gather work correctly so there are little copies.
+>
+> Compared to that, tpacket will allow you some access to checksumming=20
+> which you can map onto checksum offload in a vNIC. As a payback for=20
+> this you end up copying in more cases than for send/recvmmsg and you=20
+> pay penalty for timestamping if you do not have a hardware timestamp=20
+> source in the NIC.
+>
+> The other issue I always had with tpacket is that you "see" your own=20
+> packets so you have to manage a  RX side BPF filter which removes=20
+> those so you do not see your own packets.
 
->> IPIs and for other things to come). And a range for the virtual device=
+Don't get here, looks like I don't get this 'issue'. Anyway we can=20
+discuss this when I post the tpacket backend.
 
->> interrupts for example. Or you can just use an allocator.
->=20
-> Hm.  So what I'm meaning by an "allocator" is something at least
-> partially dynamic.  Something you say "give me an irq" and it gives
-> you the next available or similar.  As opposed to any mapping from
-> devices to (logical) irqs, which the machine will need to supply one
-> way or another.
+Thanks.
 
-I am probably reading it wrong but the XIVE's allocator allocates IRQ
-ranges for interrupt source controls (which are CPU cores, PHBs, PSI - in=
-
-bare metal - so they allocate just once per machine creation). Individual=
-
-interrupts are still allocated via spapr_ics_alloc_block().
-
-
-
->=20
->> But it's fundamentally an allocator that sits in the hypervisor, so in=
-
->> our case, I would say in the spapr "component" of XIVE, rather than th=
-e
->> XIVE HW model itself.
->=20
-> Maybe..
->=20
->> Now what Cedric did, because XIVE is very complex and we need somethin=
-g
->> for PAPR quickly, is not a complete HW model, but a somewhat simplifie=
-d
->> one that only handles what PAPR exposes. So in that case where the
->> allocator sits is a bit of a TBD...
->=20
-> Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
-> machine type level needs extreme caution, or the irqs may not be
-> stable which will generally break migration.
->=20
-
-
---=20
-Alexey
-
-
---K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIrBAEBCAAVBQJZdW84DhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5I6EQALfO
-YC8Gg8+OOAN7rWPp91S08D/J++SBM/0KJ35UQT8FnoW3k2Qzlzclgp05vHdM7nyM
-pUxPUQXAfkjagXd3HwfCFozG4MADib/nFmfL4yeWyLRkCGLhKPKcawZlQZlMUjrm
-V5wgGnm3TXbN0VvR/A7HIFzVQdPypCpIsDKbV5cUcJdEtQpHOMC+dqHPHs+EkENR
-ysmbbGzWWpUC+A2wlh23TQpj3/ooAKtnE6F0la9uqyo8QYTLN0Eha50ZYp1jZSpR
-ekP/xWRw4nmK+YESSuKSBgdV+mHXG0hgfI4Eoz4x2kjLXdI7Q9l6ycYDjX+IB2h8
-ybyWhVkE4P7pe3BYDKFhSJwY0mflsurvYwk4m/3Wnw0UmeKHgOcwBkRsF3Y26DUq
-eWY6puj+948OsO+g+MRlE323iknmfLVfUG4yVPfxGDhlyA29oKpQjG6qy78NPgeG
-ZPzBkKhWrupvCbiwN/Qqe/s8v71xWUMxXZumgqgg7DApoig+uTaVLtDhjhav+bPS
-DyJaqpNgvIP8hSWocDA55snjqfn/CQPLEl3YL/Gj5DuYQj/vSTYX/ArUUKeEjDKu
-ztKvwpU873rxjaQam6XicVRh+imXe7u6YUi/LF8JcB2JhVpV9tv4Jij8hax8AJDc
-0+92ysHUF3RreZzDhvggNBApMQWR6cpvaRxlRb11
-=H/ro
------END PGP SIGNATURE-----
-
---K8lIw8NsP7sWKc0lTX4sLEC53vcMoJw8C--
+> That can get quite interesting if you have a lot of MACs on a NIC=20
+> (f.e. when there are multicast apps). Not sure if this is still the=20
+> case - it definitely was in mid 3.x Linux kernels. If you use raw=20
+> sendm(m)sg there is no issue - the packets are not looped when writing=20
+> to physical interfaces.
+>
+>>
+>>> +
+>>> +# launch QEMU instance - if your network has reorder or is very=20
+>>> lossy add ,pincounter
+>>> +
+>>> +qemu-system-i386 linux.img -net nic -net raw,ifname=3Deth0
+>>
+>> Can we switch to use -netdev here?
+>
+> This is done in the new revisions.
+>
+>>
+>> Thanks
+>>
+>>> +
+>>> +@end example
+>>> +
+>>>   @item -netdev=20
+>>> vde,id=3D@var{id}[,sock=3D@var{socketpath}][,port=3D@var{n}][,group=3D=
+@var{groupname}][,mode=3D@var{octalmode}]
+>>>   @itemx -net=20
+>>> vde[,vlan=3D@var{n}][,name=3D@var{name}][,sock=3D@var{socketpath}]=20
+>>> [,port=3D@var{n}][,group=3D@var{groupname}][,mode=3D@var{octalmode}]
+>>>   Connect VLAN @var{n} to PORT @var{n} of a vde switch running on=20
+>>> host and
+>>
+>>
