@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZbyy-00014u-5r
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1dZbyy-000157-If
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZbyw-0006rr-MC
+	(envelope-from <armbru@redhat.com>) id 1dZbyw-0006rm-LI
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38680)
+Received: from mx1.redhat.com ([209.132.183.28]:34138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZbyw-0006rE-D6
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZbyw-0006rD-Bm
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41DB27DCF0
+	by mx1.redhat.com (Postfix) with ESMTPS id 47A22C0B772F
 	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:01 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-94.ams2.redhat.com
 	[10.36.116.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D70BB67CF4
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D15C170BB0
 	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:00 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Jul 2017 13:56:52 +0200
-Message-Id: <1500897419-15539-4-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Jul 2017 13:56:50 +0200
+Message-Id: <1500897419-15539-2-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500897419-15539-1-git-send-email-armbru@redhat.com>
 References: <1500897419-15539-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 03/10] qapi: Introduce a first class 'null'
- type
+Subject: [Qemu-devel] [PULL v2 01/10] qapi: Separate type QNull from QObject
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,172 +35,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I expect the 'null' type to be useful mostly for members of alternate
-types.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt            | 10 ++++++----
- include/qapi/qmp/qobject.h              |  4 ++--
- include/qemu/typedefs.h                 |  1 +
- scripts/qapi.py                         |  5 ++++-
- tests/qapi-schema/qapi-schema-test.json |  3 ++-
- tests/qapi-schema/qapi-schema-test.out  |  1 +
- tests/test-qobject-input-visitor.c      |  5 +++++
- tests/test-qobject-output-visitor.c     | 10 ++++++++++
- 8 files changed, 31 insertions(+), 8 deletions(-)
+ include/qapi/qmp/qobject.h    | 10 +++++++---
+ qapi/qobject-output-visitor.c |  2 +-
+ qobject/json-parser.c         |  2 +-
+ qobject/qnull.c               |  8 +++++---
+ target/i386/cpu.c             |  4 ++--
+ tests/check-qjson.c           |  6 +++---
+ tests/check-qnull.c           | 18 +++++++++---------
+ 7 files changed, 28 insertions(+), 22 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 52e3874..9903ac4 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -282,6 +282,7 @@ The following types are predefined, and map to C as follows:
-   size      uint64_t   like uint64_t, except StringInputVisitor
-                        accepts size suffixes
-   bool      bool       JSON true or false
-+  null      QNull *    JSON null
-   any       QObject *  any JSON value
-   QType     QType      JSON string matching enum QType values
- 
-@@ -536,10 +537,11 @@ can only express a choice between types represented differently in
- JSON.  If a branch is typed as the 'bool' built-in, the alternate
- accepts true and false; if it is typed as any of the various numeric
- built-ins, it accepts a JSON number; if it is typed as a 'str'
--built-in or named enum type, it accepts a JSON string; and if it is
--typed as a complex type (struct or union), it accepts a JSON object.
--Two different complex types, for instance, aren't permitted, because
--both are represented as a JSON object.
-+built-in or named enum type, it accepts a JSON string; if it is typed
-+as the 'null' built-in, it accepts JSON null; and if it is typed as a
-+complex type (struct or union), it accepts a JSON object.  Two
-+different complex types, for instance, aren't permitted, because both
-+are represented as a JSON object.
- 
- The example alternate declaration above allows using both of the
- following example objects:
 diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index 3543b55..eab29ed 100644
+index b8ddbca..3543b55 100644
 --- a/include/qapi/qmp/qobject.h
 +++ b/include/qapi/qmp/qobject.h
-@@ -93,9 +93,9 @@ static inline QType qobject_type(const QObject *obj)
+@@ -93,11 +93,15 @@ static inline QType qobject_type(const QObject *obj)
      return obj->type;
  }
  
--typedef struct QNull {
-+struct QNull {
-     QObject base;
--} QNull;
-+};
+-extern QObject qnull_;
++typedef struct QNull {
++    QObject base;
++} QNull;
  
- extern QNull qnull_;
- 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 7b0d4e7..39bc835 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -89,6 +89,7 @@ typedef struct QEMUSGList QEMUSGList;
- typedef struct QEMUTimer QEMUTimer;
- typedef struct QEMUTimerListGroup QEMUTimerListGroup;
- typedef struct QObject QObject;
-+typedef struct QNull QNull;
- typedef struct RAMBlock RAMBlock;
- typedef struct Range Range;
- typedef struct SerialState SerialState;
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 84e2eb4..8aa2775 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -20,6 +20,7 @@ import sys
- from ordereddict import OrderedDict
- 
- builtin_types = {
-+    'null':     'QTYPE_QNULL',
-     'str':      'QTYPE_QSTRING',
-     'int':      'QTYPE_QNUM',
-     'number':   'QTYPE_QNUM',
-@@ -1056,6 +1057,7 @@ class QAPISchemaType(QAPISchemaEntity):
- 
-     def alternate_qtype(self):
-         json2qtype = {
-+            'null':    'QTYPE_QNULL',
-             'string':  'QTYPE_QSTRING',
-             'number':  'QTYPE_QNUM',
-             'int':     'QTYPE_QNUM',
-@@ -1515,7 +1517,8 @@ class QAPISchema(object):
-                   ('uint64', 'int',     'uint64_t'),
-                   ('size',   'int',     'uint64_t'),
-                   ('bool',   'boolean', 'bool'),
--                  ('any',    'value',   'QObject' + pointer_suffix)]:
-+                  ('any',    'value',   'QObject' + pointer_suffix),
-+                  ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type = QAPISchemaObjectType(
-             'q_empty', None, None, None, [], None)
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index 91ffb26..c72dbd8 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -93,7 +93,8 @@
- { 'struct': 'WrapAlternate',
-   'data': { 'alt': 'UserDefAlternate' } }
- { 'alternate': 'UserDefAlternate',
--  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int' } }
-+  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int',
-+            'n': 'null' } }
- 
- { 'struct': 'UserDefC',
-   'data': { 'string1': 'str', 'string2': 'str' } }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index b88b8aa..3b1e908 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -64,6 +64,7 @@ alternate UserDefAlternate
-     case udfu: UserDefFlatUnion
-     case e: EnumOne
-     case i: int
-+    case n: null
- object UserDefB
-     member intb: int optional=False
-     member a-b: bool optional=True
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index f98caf9..f451844 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -583,6 +583,11 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
-     g_assert_cmpint(tmp->u.e, ==, ENUM_ONE_VALUE1);
-     qapi_free_UserDefAlternate(tmp);
- 
-+    v = visitor_input_test_init(data, "null");
-+    visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-+    g_assert_cmpint(tmp->type, ==, QTYPE_QNULL);
-+    qapi_free_UserDefAlternate(tmp);
+-static inline QObject *qnull(void)
++extern QNull qnull_;
 +
-     v = visitor_input_test_init(data, "{'integer':1, 'string':'str', "
-                                 "'enum1':'value1', 'boolean':true}");
-     visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
-index 8f1fcd4..7eb1620 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -424,6 +424,16 @@ static void test_visitor_out_alternate(TestOutputVisitorData *data,
++static inline QNull *qnull(void)
+ {
+-    qobject_incref(&qnull_);
++    QINCREF(&qnull_);
+     return &qnull_;
+ }
  
-     visitor_reset(data);
-     tmp = g_new0(UserDefAlternate, 1);
-+    tmp->type = QTYPE_QNULL;
-+    tmp->u.n = qnull();
-+
-+    visit_type_UserDefAlternate(data->ov, NULL, &tmp, &error_abort);
-+    g_assert_cmpint(qobject_type(visitor_get(data)), ==, QTYPE_QNULL);
-+
-+    qapi_free_UserDefAlternate(tmp);
-+
-+    visitor_reset(data);
-+    tmp = g_new0(UserDefAlternate, 1);
-     tmp->type = QTYPE_QDICT;
-     tmp->u.udfu.integer = 1;
-     tmp->u.udfu.string = g_strdup("str");
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
+index 70be84c..398dcb5 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -190,7 +190,7 @@ static void qobject_output_type_any(Visitor *v, const char *name,
+ static void qobject_output_type_null(Visitor *v, const char *name, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+-    qobject_output_add_obj(qov, name, qnull());
++    qobject_output_add(qov, name, qnull());
+ }
+ 
+ /* Finish building, and return the root object.
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 7a417f2..724ca24 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -445,7 +445,7 @@ static QObject *parse_keyword(JSONParserContext *ctxt)
+     } else if (!strcmp(token->str, "false")) {
+         return QOBJECT(qbool_from_bool(false));
+     } else if (!strcmp(token->str, "null")) {
+-        return qnull();
++        return QOBJECT(qnull());
+     }
+     parse_error(ctxt, token, "invalid keyword '%s'", token->str);
+     return NULL;
+diff --git a/qobject/qnull.c b/qobject/qnull.c
+index c124d05..69a21d1 100644
+--- a/qobject/qnull.c
++++ b/qobject/qnull.c
+@@ -14,7 +14,9 @@
+ #include "qemu-common.h"
+ #include "qapi/qmp/qobject.h"
+ 
+-QObject qnull_ = {
+-    .type = QTYPE_QNULL,
+-    .refcnt = 1,
++QNull qnull_ = {
++    .base = {
++        .type = QTYPE_QNULL,
++        .refcnt = 1,
++    },
+ };
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 0bbda76..89f5fb7 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2442,7 +2442,7 @@ static QDict *x86_cpu_static_props(void)
+ 
+     d = qdict_new();
+     for (i = 0; props[i]; i++) {
+-        qdict_put_obj(d, props[i], qnull());
++        qdict_put(d, props[i], qnull());
+     }
+ 
+     for (w = 0; w < FEATURE_WORDS; w++) {
+@@ -2452,7 +2452,7 @@ static QDict *x86_cpu_static_props(void)
+             if (!fi->feat_names[bit]) {
+                 continue;
+             }
+-            qdict_put_obj(d, fi->feat_names[bit], qnull());
++            qdict_put(d, fi->feat_names[bit], qnull());
+         }
+     }
+ 
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 53f2275..a3a97b0 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1012,7 +1012,7 @@ static void keyword_literal(void)
+ {
+     QObject *obj;
+     QBool *qbool;
+-    QObject *null;
++    QNull *null;
+     QString *str;
+ 
+     obj = qobject_from_json("true", &error_abort);
+@@ -1053,10 +1053,10 @@ static void keyword_literal(void)
+     g_assert(qobject_type(obj) == QTYPE_QNULL);
+ 
+     null = qnull();
+-    g_assert(null == obj);
++    g_assert(QOBJECT(null) == obj);
+ 
+     qobject_decref(obj);
+-    qobject_decref(null);
++    QDECREF(null);
+ }
+ 
+ typedef struct LiteralQDictEntry LiteralQDictEntry;
+diff --git a/tests/check-qnull.c b/tests/check-qnull.c
+index 8dd1c96..1ab7c98 100644
+--- a/tests/check-qnull.c
++++ b/tests/check-qnull.c
+@@ -24,14 +24,14 @@ static void qnull_ref_test(void)
+ {
+     QObject *obj;
+ 
+-    g_assert(qnull_.refcnt == 1);
+-    obj = qnull();
++    g_assert(qnull_.base.refcnt == 1);
++    obj = QOBJECT(qnull());
+     g_assert(obj);
+-    g_assert(obj == &qnull_);
+-    g_assert(qnull_.refcnt == 2);
++    g_assert(obj == QOBJECT(&qnull_));
++    g_assert(qnull_.base.refcnt == 2);
+     g_assert(qobject_type(obj) == QTYPE_QNULL);
+     qobject_decref(obj);
+-    g_assert(qnull_.refcnt == 1);
++    g_assert(qnull_.base.refcnt == 1);
+ }
+ 
+ static void qnull_visit_test(void)
+@@ -45,8 +45,8 @@ static void qnull_visit_test(void)
+      * depend on layering violations to check qnull_ refcnt.
+      */
+ 
+-    g_assert(qnull_.refcnt == 1);
+-    obj = qnull();
++    g_assert(qnull_.base.refcnt == 1);
++    obj = QOBJECT(qnull());
+     v = qobject_input_visitor_new(obj);
+     qobject_decref(obj);
+     visit_type_null(v, NULL, &error_abort);
+@@ -55,11 +55,11 @@ static void qnull_visit_test(void)
+     v = qobject_output_visitor_new(&obj);
+     visit_type_null(v, NULL, &error_abort);
+     visit_complete(v, &obj);
+-    g_assert(obj == &qnull_);
++    g_assert(obj == QOBJECT(&qnull_));
+     qobject_decref(obj);
+     visit_free(v);
+ 
+-    g_assert(qnull_.refcnt == 1);
++    g_assert(qnull_.base.refcnt == 1);
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 2.7.5
