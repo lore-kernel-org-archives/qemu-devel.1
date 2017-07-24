@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjxh-00035a-7c
+	(envelope-from <rth7680@gmail.com>) id 1dZjxh-00035Y-6q
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjxd-0000up-N1
+	(envelope-from <rth7680@gmail.com>) id 1dZjxf-0000vj-0t
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:17 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36992)
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33431)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjxd-0000ud-Iy
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:13 -0400
-Received: by mail-qk0-x244.google.com with SMTP id q130so10950556qka.4
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjxe-0000vS-T0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:14 -0400
+Received: by mail-qk0-x243.google.com with SMTP id d145so8410412qkc.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:14 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 24 Jul 2017 13:27:04 -0700
-Message-Id: <20170724202728.25960-9-rth@twiddle.net>
+Date: Mon, 24 Jul 2017 13:27:05 -0700
+Message-Id: <20170724202728.25960-10-rth@twiddle.net>
 In-Reply-To: <20170724202728.25960-1-rth@twiddle.net>
 References: <20170724202728.25960-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v15 08/32] target/i386: [tcg] Port to
- init_disas_context
+Subject: [Qemu-devel] [PATCH v15 09/32] target/i386: [tcg] Port to insn_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,122 +37,42 @@ From: Lluís Vilanova <vilanova@ac.upc.edu>
 Incrementally paves the way towards using the generic instruction translation
 loop.
 
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Alex Benneé <alex.benee@linaro.org>
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-Message-Id: <150002122448.22386.16854673576827449259.stgit@frigg.lan>
-[rth: Adjust for max_insns interface change.]
+Message-Id: <150002146647.22386.13380064201042141261.stgit@frigg.lan>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c | 46 +++++++++++++++++++++++++++-------------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
+ target/i386/translate.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 7825593111..651abcaf38 100644
+index 651abcaf38..6e1243a5b4 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -8376,20 +8376,13 @@ void tcg_x86_init(void)
-     }
+@@ -8448,6 +8448,13 @@ static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
+     return max_insns;
  }
  
--/* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
-+                                      int max_insns)
- {
--    CPUX86State *env = cs->env_ptr;
--    DisasContext dc1, *dc = &dc1;
--    uint32_t flags;
--    target_ulong cs_base;
--    int num_insns;
--    int max_insns;
--
--    /* generate intermediate code */
--    dc->base.pc_first = tb->pc;
--    cs_base = tb->cs_base;
--    flags = tb->flags;
++static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
++{
 +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUX86State *env = cpu->env_ptr;
-+    uint32_t flags = dc->base.tb->flags;
-+    target_ulong cs_base = dc->base.tb->cs_base;
- 
-     dc->pe = (flags >> HF_PE_SHIFT) & 1;
-     dc->code32 = (flags >> HF_CS32_SHIFT) & 1;
-@@ -8400,11 +8393,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     dc->cpl = (flags >> HF_CPL_SHIFT) & 3;
-     dc->iopl = (flags >> IOPL_SHIFT) & 3;
-     dc->tf = (flags >> TF_SHIFT) & 1;
--    dc->base.singlestep_enabled = cs->singlestep_enabled;
-     dc->cc_op = CC_OP_DYNAMIC;
-     dc->cc_op_dirty = false;
-     dc->cs_base = cs_base;
--    dc->base.tb = tb;
-     dc->popl_esp_hack = 0;
-     /* select memory access functions */
-     dc->mem_index = 0;
-@@ -8422,7 +8413,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     dc->code64 = (flags >> HF_CS64_SHIFT) & 1;
- #endif
-     dc->flags = flags;
--    dc->jmp_opt = !(dc->tf || cs->singlestep_enabled ||
-+    dc->jmp_opt = !(dc->tf || dc->base.singlestep_enabled ||
-                     (flags & HF_INHIBIT_IRQ_MASK));
-     /* Do not optimize repz jumps at all in icount mode, because
-        rep movsS instructions are execured with different paths
-@@ -8434,7 +8425,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-        record/replay modes and there will always be an
-        additional step for ecx=0 when icount is enabled.
-      */
--    dc->repz_opt = !dc->jmp_opt && !(tb->cflags & CF_USE_ICOUNT);
-+    dc->repz_opt = !dc->jmp_opt && !(dc->base.tb->cflags & CF_USE_ICOUNT);
- #if 0
-     /* check addseg logic */
-     if (!dc->addseg && (dc->vm86 || !dc->pe || !dc->code32))
-@@ -8454,9 +8445,24 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     cpu_ptr1 = tcg_temp_new_ptr();
-     cpu_cc_srcT = tcg_temp_local_new();
- 
-+    return max_insns;
++
++    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
 +}
 +
-+/* generate intermediate code for basic block 'tb'.  */
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+{
-+    CPUX86State *env = cs->env_ptr;
-+    DisasContext dc1, *dc = &dc1;
-+    int num_insns;
-+    int max_insns;
-+
-+    /* generate intermediate code */
-+    dc->base.singlestep_enabled = cs->singlestep_enabled;
-+    dc->base.tb = tb;
-     dc->base.is_jmp = DISAS_NEXT;
-+    dc->base.pc_first = tb->pc;
-     dc->base.pc_next = dc->base.pc_first;
--    num_insns = 0;
-+
-     max_insns = tb->cflags & CF_COUNT_MASK;
-     if (max_insns == 0) {
-         max_insns = CF_COUNT_MASK;
-@@ -8464,7 +8470,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     if (max_insns > TCG_MAX_INSNS) {
-         max_insns = TCG_MAX_INSNS;
-     }
-+    max_insns = i386_tr_init_disas_context(&dc->base, cs, max_insns);
- 
-+    num_insns = 0;
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ {
+@@ -8475,7 +8482,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+     num_insns = 0;
      gen_tb_start(tb);
      for(;;) {
-         tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
-@@ -8497,7 +8505,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-            the flag and abort the translation to give the irqs a
-            change to be happen */
-         if (dc->tf || dc->base.singlestep_enabled ||
--            (flags & HF_INHIBIT_IRQ_MASK)) {
-+            (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
-             gen_jmp_im(dc->base.pc_next - dc->cs_base);
-             gen_eob(dc);
-             break;
+-        tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
++        i386_tr_insn_start(&dc->base, cs);
+         num_insns++;
+ 
+         /* If RF is set, suppress an internally generated breakpoint.  */
 -- 
 2.13.3
