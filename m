@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZdq7-0001Am-If
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:56:07 -0400
+	(envelope-from <clg@kaod.org>) id 1dZdsy-0002Ly-5Z
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZdq4-0000fJ-VI
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:56:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39478)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dZdq4-0000eo-PD
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:56:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dZdq1-0003Py-UY
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:55:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7E7FB2E81DF
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:55:52 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1dZdsv-0002nU-JX
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:59:00 -0400
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:51129)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZdsv-0002lK-9O
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:58:57 -0400
+Received: from player732.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 7A2DF123F2E
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 15:58:55 +0200 (CEST)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-12-git-send-email-clg@kaod.org>
+	<20170724051334.GH17228@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6d7e80d4-5a8f-15e6-6395-72cb86ad4e5c@kaod.org>
+Date: Mon, 24 Jul 2017 15:58:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170724051334.GH17228@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Jul 2017 13:46:57 -0000
-From: Thomas Huth <1706058@bugs.launchpad.net>
-Reply-To: Bug 1706058 <1706058@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150089884536.6327.14466730634235428413.malonedeb@gac.canonical.com>
-Message-Id: <150090401778.6432.5567633677430653261.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706058] Re: Windows VM crashes when restoring
- from file if balloon stats polling is enabled
+Subject: Re: [Qemu-devel] [RFC PATCH 11/26] ppc/xics: introduce a
+ print_info() handler to the ICS and ICP objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Please make sure to use the right target for downstream bugs =3D=3D> Re-
-assigned this to qemu-ubuntu
+On 07/24/2017 07:13 AM, David Gibson wrote:
+> On Wed, Jul 05, 2017 at 07:13:24PM +0200, C=E9dric Le Goater wrote:
+>> This handler will be used to customize the ouput of the XIVE interrupt
+>> source and presenter objects.
+>=20
+> I'm not really happy with this without having a clear idea of where
+> this is heading - are you trying to share ICP and or ICS object
+> classes between XICS and XIVE, or will they eventually be separated
+> again?
 
-** Project changed: qemu =3D> qemu (Ubuntu)
+Because of the XICSFabric interface of the sPAPR machine, we need=20
+to use ICPState and ICSState objects.=20
 
--- =
+sPAPR is strongly tied to ICPState and it is complex to introduce=20
+a new ICPState class for the sPAPR machine. We did introduce a new=20
+class in the past but that was for a new machine : PowerNV.
+So I think we should just add a couple of attributes to ICPState
+to support XIVE. That is not what the patchset does but I have
+made progress since with hotplug and migration and came to that
+conclusion. The consequence is that the print_info() handler is=20
+now obsolete for ICPs and we will need to find another way to=20
+customize the output.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706058
+For the interrupt source, the constraints are less strong, adding=20
+a new ICSState class seems like a good option and so does the=20
+print_info() handler.
 
-Title:
-  Windows VM crashes when restoring from file if balloon stats polling
-  is enabled
+Thanks,
 
-Status in qemu package in Ubuntu:
-  New
+C.=20
 
-Bug description:
-  [Impact]
 
-  =C2=A0* Windows VMs BSOD when restoring from QEMUfile or during live migr=
-ation if the virtio balloon stats polling is enabled.
-   * Affected version: 1:2.5+dfsg-5ubuntu10.14 (xenial)
-
-  [Test Case]
-
-  =C2=A0* Install a Windows VM with virtio balloon drivers
-  =C2=A0* Start the VM and enable stats polling [1]
-  =C2=A0* Save the VM to savefile [2]
-  =C2=A0* Restore the VM [3]
-  =C2=A0* Enable stats polling [1] and VM will BSOD
-
-  QMP examples:
-  =C2=A0[1] {"execute":"qom-set","arguments":{"path":"//machine/i440fx/pci.=
-0/child[7]","property":"guest-stats-polling-interval","value":10}}
-  =C2=A0[2] {"execute": "migrate", "arguments": {"uri":"exec:gzip -c > /sto=
-rage/cases/VM/savefiles/testVM3save.gz"}}
-  =C2=A0[3] {"execute":"migrate-incoming","arguments":{"uri":"exec:gzip -c =
--d /storage/cases/VM/savefiles/testVM3save.gz"}}
-
-  [Other Info]
-
-  =C2=A0* This has been fixed upstream with commit
-  4a1e48becab81020adfb74b22c76a595f2d02a01
-
-  [Regression Potential]
-
-  =C2=A0*
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1706058/+subscriptions
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/xics.c        | 36 ++++++++++++++++++++++++------------
+>>  include/hw/ppc/xics.h |  2 ++
+>>  2 files changed, 26 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+>> index faa5c631f655..7837c2022b4a 100644
+>> --- a/hw/intc/xics.c
+>> +++ b/hw/intc/xics.c
+>> @@ -40,18 +40,26 @@
+>> =20
+>>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+>>  {
+>> +    ICPStateClass *k =3D ICP_GET_CLASS(icp);
+>>      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+>> =20
+>>      if (!icp->output) {
+>>          return;
+>>      }
+>> -    monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%02=
+x\n",
+>> -                   cpu_index, icp->xirr, icp->xirr_owner,
+>> -                   icp->pending_priority, icp->mfrr);
+>> +
+>> +    monitor_printf(mon, "CPU %d ", cpu_index);
+>> +    if (k->print_info) {
+>> +        k->print_info(icp, mon);
+>> +    } else {
+>> +        monitor_printf(mon, "XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%02x\n=
+",
+>> +                       icp->xirr, icp->xirr_owner,
+>> +                       icp->pending_priority, icp->mfrr);
+>> +    }
+>>  }
+>> =20
+>>  void ics_pic_print_info(ICSState *ics, Monitor *mon)
+>>  {
+>> +    ICSStateClass *k =3D ICS_BASE_GET_CLASS(ics);
+>>      uint32_t i;
+>> =20
+>>      monitor_printf(mon, "ICS %4x..%4x %p\n",
+>> @@ -61,17 +69,21 @@ void ics_pic_print_info(ICSState *ics, Monitor *mo=
+n)
+>>          return;
+>>      }
+>> =20
+>> -    for (i =3D 0; i < ics->nr_irqs; i++) {
+>> -        ICSIRQState *irq =3D ics->irqs + i;
+>> +    if (k->print_info) {
+>> +        k->print_info(ics, mon);
+>> +    } else {
+>> +        for (i =3D 0; i < ics->nr_irqs; i++) {
+>> +            ICSIRQState *irq =3D ics->irqs + i;
+>> =20
+>> -        if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+>> -            continue;
+>> +            if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+>> +                continue;
+>> +            }
+>> +            monitor_printf(mon, "  %4x %s %02x %02x\n",
+>> +                           ics->offset + i,
+>> +                           (irq->flags & XICS_FLAGS_IRQ_LSI) ?
+>> +                           "LSI" : "MSI",
+>> +                           irq->priority, irq->status);
+>>          }
+>> -        monitor_printf(mon, "  %4x %s %02x %02x\n",
+>> -                       ics->offset + i,
+>> -                       (irq->flags & XICS_FLAGS_IRQ_LSI) ?
+>> -                       "LSI" : "MSI",
+>> -                       irq->priority, irq->status);
+>>      }
+>>  }
+>> =20
+>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>> index 28d248abad61..902f3bfd0e33 100644
+>> --- a/include/hw/ppc/xics.h
+>> +++ b/include/hw/ppc/xics.h
+>> @@ -69,6 +69,7 @@ struct ICPStateClass {
+>>      void (*pre_save)(ICPState *icp);
+>>      int (*post_load)(ICPState *icp, int version_id);
+>>      void (*reset)(ICPState *icp);
+>> +    void (*print_info)(ICPState *icp, Monitor *mon);
+>>  };
+>> =20
+>>  struct ICPState {
+>> @@ -119,6 +120,7 @@ struct ICSStateClass {
+>>      void (*reject)(ICSState *s, uint32_t irq);
+>>      void (*resend)(ICSState *s);
+>>      void (*eoi)(ICSState *s, uint32_t irq);
+>> +    void (*print_info)(ICSState *s, Monitor *mon);
+>>  };
+>> =20
+>>  struct ICSState {
+>=20
