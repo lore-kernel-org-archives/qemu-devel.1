@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZc95-0001Kl-Mw
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:07:32 -0400
+	(envelope-from <dmitry@daynix.com>) id 1dZc9H-0001Sb-6M
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZc92-0003ey-IK
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:07:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dZc92-0003ei-9c
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:07:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 56BB2356DA
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 12:07:27 +0000 (UTC)
-Received: from [10.10.121.48] (ovpn-121-48.rdu2.redhat.com [10.10.121.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0F3B1702E1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 12:07:26 +0000 (UTC)
-References: <20170721135047.25005-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d410f903-f786-a112-8281-7d7162ec2569@redhat.com>
-Date: Mon, 24 Jul 2017 07:07:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170721135047.25005-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="P3gJ97cQ8G7nV2rfWF5nI8m32Gg5ODXGu"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] Update qemu-nbd version
+	(envelope-from <dmitry@daynix.com>) id 1dZc9E-0003iL-1l
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:07:43 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37005)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dZc9D-0003i2-R0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:07:39 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 12so9299237wrb.4
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 05:07:38 -0700 (PDT)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Date: Mon, 24 Jul 2017 15:07:29 +0300
+Message-Id: <20170724120729.24350-1-dmitry@daynix.com>
+Subject: [Qemu-devel] [PATCH] vfio/pci-quirks: Set non-zero GMS memory size
+ for IGD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +25,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---P3gJ97cQ8G7nV2rfWF5nI8m32Gg5ODXGu
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <d410f903-f786-a112-8281-7d7162ec2569@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] Update qemu-nbd version
-References: <20170721135047.25005-1-eblake@redhat.com>
-In-Reply-To: <20170721135047.25005-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+There is a claim that GMS memory is unused however
+Intel Windows 10 drivers starting from V.4534 (10/7/2016)
+allocate extra ~4G memory when GMS size set to 0.
 
-On 07/21/2017 08:50 AM, Eric Blake wrote:
-> =E9=99=B3=E5=9F=B9=E6=B3=93 reported that 'qemu-nbd -V' was stuck at 0.=
-0.1; fix that,
-> along with a nearby style issue noticed in the process.  Not
-> having a useful version number is a bug in my eyes, so I'm
-> proposing this series for 2.10.
->=20
-> Eric Blake (2):
->   qemu-nbd: Update version string
->   maint: Reorder include directives for qemu-{nbd,io}
+This patch fixes this issue by seting IGD GMS memory
+size to minimum by changing default value of x-igd-gms
+device parameter.
 
-Thanks; queued on my NBD branch:
-git://repo.or.cz/qemu/ericb.git nbd
+Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
+---
+ hw/vfio/pci-quirks.c | 13 +++++++++----
+ hw/vfio/pci.c        |  2 +-
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
->=20
->  qemu-img.c |  3 ++-
->  qemu-nbd.c | 13 +++++++------
->  2 files changed, 9 insertions(+), 7 deletions(-)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---P3gJ97cQ8G7nV2rfWF5nI8m32Gg5ODXGu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll14v4ACgkQp6FrSiUn
-Q2p2FAgAmA+iM8gs8Vysbxw2RqMI6zNntoG4V0w1OhZLOcgZmYo6nn1+YQLBeQkD
-kkHBr0lAiIGvL7EufJY2X908IDu92QgPMZtI95PvHR14mTxOy81lK+71KpHFm4lv
-7puNjSgPhZq2gJcsolbbz3Lmkacgz1nqcG39W7m7D3JvISIHn5QTM6XUQNX6NRMe
-gBM4Vkb9fSH2Z0OE1eDU3oEJI6tutScTZY6ZOElhOHYsoW4IcBE0dSQUK89om2GW
-+QmWzahVihYVCbbvTEmXFT5sFT6QvDWFFckRJ4A4sq6Rl3FDEF4XUFDFOfyKyuWq
-YJToF3dGz4wk7v8AxuV6qce3Iamypw==
-=E9h8
------END PGP SIGNATURE-----
-
---P3gJ97cQ8G7nV2rfWF5nI8m32Gg5ODXGu--
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index 349085e..197cb90 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1527,10 +1527,15 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     }
+ 
+     /*
+-     * Assume we have no GMS memory, but allow it to be overrided by device
+-     * option (experimental).  The spec doesn't actually allow zero GMS when
+-     * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
+-     * so let's not waste VM memory for it.
++     * There is a claim that GMS memory is unused and we want to waste for it
++     * as less VM memory as possible, however Intel Windows 10 drivers starting
++     * from V.4534 (10/7/2016) allocate extra ~4G memory when GMS size set to 0.
++     * The spec as well doesn't actually allow zero GMS when IVD
++     * (IGD VGA Disable) is clear.
++     *
++     * Therefore we set GMS memory size to minimal by default via device
++     * option x-igd-gms (experimental) and allow further tweaking of this
++     * parameter.
+      */
+     gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index d4051cb..bda07b7 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2982,7 +2982,7 @@ static Property vfio_pci_dev_properties[] = {
+                        sub_vendor_id, PCI_ANY_ID),
+     DEFINE_PROP_UINT32("x-pci-sub-device-id", VFIOPCIDevice,
+                        sub_device_id, PCI_ANY_ID),
+-    DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 0),
++    DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 1),
+     /*
+      * TODO - support passed fds... is this necessary?
+      * DEFINE_PROP_STRING("vfiofd", VFIOPCIDevice, vfiofd_name),
+-- 
+2.9.4
