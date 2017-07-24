@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZlM7-0002ep-0k
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:57:36 -0400
+	(envelope-from <mst@redhat.com>) id 1dZlMm-0002za-TZ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZlM6-0005x6-1P
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:57:35 -0400
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-22-f4bug@amsat.org>
-	<CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
-	<ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
-	<e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
-Date: Mon, 24 Jul 2017 16:57:18 -0500
+	(envelope-from <mst@redhat.com>) id 1dZlMj-0006cu-00
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:58:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36880)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZlMi-0006am-NE
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:58:12 -0400
+Date: Tue, 25 Jul 2017 00:58:07 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170725005027-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
+	<20170723055006-mutt-send-email-mst@kernel.org>
+	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+	<20170724234353-mutt-send-email-mst@kernel.org>
+	<CAKSfGUAs8Ru-wuuHXK-mHir0_Hj8NenoKxuXyDqVt1YXOZUHAw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b"
-Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
- pointer dereference
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKSfGUAs8Ru-wuuHXK-mHir0_Hj8NenoKxuXyDqVt1YXOZUHAw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
+ property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +32,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alexander Bezzubikov <zuban32s@gmail.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
- pointer dereference
-References: <20170724182751.18261-1-f4bug@amsat.org>
- <20170724182751.18261-22-f4bug@amsat.org>
- <CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
- <ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
- <e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
-In-Reply-To: <e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jul 25, 2017 at 12:41:12AM +0300, Alexander Bezzubikov wrote:
+> 2017-07-24 23:46 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> > On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
+> >> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
+> >> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
+> >> > > To enable hotplugging of a newly created pcie-pci-bridge,
+> >> > > we need to tell firmware (SeaBIOS in this case)
+> >> >
+> >>
+> >> Hi Michael,
+> >>
+> >> > Presumably, EFI would need to support this too?
+> >> >
+> >>
+> >> Sure, Eduardo added to CC, but he is in PTO now.
+> >>
+> >> > > to reserve
+> >> > > additional buses for pcie-root-port, that allows us to
+> >> > > hotplug pcie-pci-bridge into this root port.
+> >> > > The number of buses to reserve is provided to the device via a corresponding
+> >> > > property, and to the firmware via new PCI capability (next patch).
+> >> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
+> >> >
+> >> > If so you should just teach firmware to allocate one bus #
+> >> > unconditionally.
+> >> >
+> >>
+> >> That would be a problem for the PCIe machines, since each PCIe
+> >> devices is plugged in a different bus and we are already
+> >> limited to 256 PCIe devices. Allocating an extra-bus always
+> >> would really limit the PCIe devices we can use.
+> >
+> > But this is exactly what this patch does as the property is added to all
+> > buses and default to 1 (1 extra bus).
+> >
+> >> > But why would that be so? What's wrong with a device
+> >> > directly in the root port?
+> >> >
+> >>
+> >> First, plugging a legacy PCI device into a PCIe Root Port
+> >> looks strange at least, and it can;t be done on real HW anyway.
+> >> (incompatible slots)
+> >
+> > You can still plug in PCIe devices there.
+> >
+> >> Second (and more important), if we want 2 or more PCI
+> >> devices we would loose both IO ports space and bus numbers.
+> >
+> > What I am saying is maybe default should not be 1.
+> 
+> The only sensible variant left is 0.
+> But as we want pcie-pci-bridge to be used for every legacy PCI device
+> on q35 machine, every time one hotplugs the bridge into the root port,
+> he must be sure rp's prop value >0 (for Linux). I'm not sure
+> that it is a very convenient way to utilize the bridge - always remember
+> to set property.
 
-On 07/24/2017 04:52 PM, Eric Blake wrote:
-> On 07/24/2017 04:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 07/24/2017 06:09 PM, Peter Maydell wrote:
->>> On 24 July 2017 at 19:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->>>> Use error_report() + exit() instead of error_setg(&error_fatal).
->>>>
->>>> hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable
->>>> 'node_path') results in a null pointer dereference
->>>>      if (node_path[1]) {
->>>>          ^~~~~~~~~~~~
->>>
->>> I don't understand what this warning is trying to say.
->>> We can't get to this point with a NULL node_path,
->>> because of the previous conditional, which is using
->>> error_setg(&error_fatal).
->>
->> Ok I see, Clang is unaware than error_setg(&error_fatal) is a noreturn=
-=2E
->=20
-> Indeed, and that's because error_setg(&error_fatal) is not in preferred=
+That's what I'm saying then - if in your opinion default is >0 anyway,
+tweak firmware to do it by default.
 
-> form.
->=20
->>
->> Patch dropped.
->=20
-> That's a shame.  Rather, we should patch this file (and others) to avoi=
-d
-> all the inconsistent uses of error_setg(&error_*), to comply with the
-> error.h documentation.
+> Another way - we can set this to 0 by default, and to 1 for pcie-root-port,
+> and recommend to use it for hotplugging of the pcie-pci-bridge itself.
 
-In other words, switching to the preferred spelling in the following file=
-s:
-device_tree.c
-hw/arm/sysbus-fdt.c
-hw/block/fdc.c
-hw/ppc/spapr_drc.c
+I wonder about something: imagine hotplugging a hierarchy of bridges
+below a root port. It seems that nothing prevents guest from finding a
+free range of buses to cover this hierarchy and setting that as
+secondary/subordinate bus for this bridge.
 
-is desirable, and has the added benefit of also silencing a Coverity
-false positive.  But it should be done in terms of switching to the
-preferred spelling, as it touches more instances than just the one that
-shuts up Coverity.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This does need support on QEMU side to hotplug a hierarchy at once,
+and might need some fixes in Linux, on the plus side you can defer
+management decision on how many are needed until you are actually
+adding something, and you don't need vendor specific patches.
 
 
---UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll2bT4ACgkQp6FrSiUn
-Q2pokggAphLmlsdXFNxF//VMyJjkgoD1HN7lpy1rM+HYZclyEaasn1AUatSL7amx
-8JGC2XcmDKglkBEa4IRRWkI4G+xtWHEgdTDAfI98H07CpYPzneXAijivu+sBv/P7
-MNpHr8jjcHrvvAsIALinaCyFDdOWt5QnI6ZxN1g0MuBfiviPsN6yEHJdneiZ0YKl
-isZ/EN2xa50I9rmbM+LladwSIX3/v3yIp5S+/+nCzXSBScGpfUGKO1og9dgSBhgA
-YPtuE+js1Q+YGb/K+ojhIDibdJw54GjlhK7arHaBRO3+Lov3swu/aLGOqXVWpTet
-wzQKQ0vpl5ue007pIG7Qk7UlcmU5Og==
-=WF4E
------END PGP SIGNATURE-----
-
---UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b--
+> >
+> >> >
+> >> > >
+> >> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> >> > > ---
+> >> > >   hw/pci-bridge/pcie_root_port.c | 1 +
+> >> > >   include/hw/pci/pcie_port.h     | 3 +++
+> >> > >   2 files changed, 4 insertions(+)
+> >> > >
+> >> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> >> > > index 4d588cb..b0e49e1 100644
+> >> > > --- a/hw/pci-bridge/pcie_root_port.c
+> >> > > +++ b/hw/pci-bridge/pcie_root_port.c
+> >> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+> >> > >   static Property rp_props[] = {
+> >> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> >> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> >> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+> >> > >       DEFINE_PROP_END_OF_LIST()
+> >> > >   };
+> >> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> >> > > index 1333266..1b2dd1f 100644
+> >> > > --- a/include/hw/pci/pcie_port.h
+> >> > > +++ b/include/hw/pci/pcie_port.h
+> >> > > @@ -34,6 +34,9 @@ struct PCIEPort {
+> >> > >       /* pci express switch port */
+> >> > >       uint8_t     port;
+> >> > > +
+> >> > > +    /* additional buses to reserve on firmware init */
+> >> > > +    uint8_t     bus_reserve;
+> >> > >   };
+> >> > >   void pcie_port_init_reg(PCIDevice *d);
+> >> >
+> >> > So here is a property and it does not do anything.
+> >> > It makes it easier to work on series maybe, but review
+> >> > is harder since we do not see what it does at all.
+> >> > Please do not split up patches like this - you can maintain
+> >> > it split up in your branch if you like and merge before sending.
+> >> >
+> >>
+> >> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
+> >>
+> >> Thanks,
+> >> Marcel
+> >>
+> >>
+> >> > > --
+> >> > > 2.7.4
+> 
+> 
+> 
+> -- 
+> Alexander Bezzubikov
