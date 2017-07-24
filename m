@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZeam-0002qS-VI
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:44:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1dZeee-0005IO-Fi
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZeak-0000hg-86
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:44:17 -0400
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:40437)
+	(envelope-from <berrange@redhat.com>) id 1dZeea-0003kK-Fr
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:48:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZeaj-0000f3-U3
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:44:14 -0400
-Received: from player732.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6A20B124009
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 16:44:12 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-15-git-send-email-clg@kaod.org>
-	<20170724063534.GM17228@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
-Date: Mon, 24 Jul 2017 16:44:00 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZeea-0003jk-6f
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:48:12 -0400
+Date: Mon, 24 Jul 2017 15:47:59 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170724144759.GD11443@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170719100802.14094-1-berrange@redhat.com>
+	<20170719100802.14094-2-berrange@redhat.com>
+	<d659c0cb-0cb2-3af7-b97f-05ad15aa3550@redhat.com>
+	<ee0b3e06-7037-f2c9-18e9-1fb1dcb0784a@redhat.com>
+	<20170724141108.GA11443@redhat.com>
+	<d4f1f1c7-ca1f-904b-d23b-f9897b1ee29e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170724063534.GM17228@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 14/26] ppc/xive: add MMIO handlers to
- the XIVE interrupt presenter model
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d4f1f1c7-ca1f-904b-d23b-f9897b1ee29e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/2 (for 2.10)] docs: document support
+ lifetime for features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,274 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 07/24/2017 08:35 AM, David Gibson wrote:
-> On Wed, Jul 05, 2017 at 07:13:27PM +0200, C=E9dric Le Goater wrote:
->> The Thread Interrupt Management Area for the OS is mostly used to
->> acknowledge interrupts and set the CPPR of the CPU.
->>
->> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
->> used to retrieve the targeted interrupt presenter object.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> Am I right in thinking that this shoehorns the XIVE TIMA state into
-> the existing XICS ICP object.  That.. doesn't seem like a good idea.
+On Mon, Jul 24, 2017 at 04:26:24PM +0200, Paolo Bonzini wrote:
+> On 24/07/2017 16:11, Daniel P. Berrange wrote:
+> >>> +
+> >>> +The supported lifetime for versioned machine types is 12 releases,
+> >>> +which is equivalent to 4 years worth of previous QEMU releases.
+> >> I think there's still no consensus on this.
+> > 
+> > Indeed, which is exactly why I sent this patch - we need to come up
+> > with a sensible policy here, so we can stop repeating the same debate
+> > over & over & over each time some proposes a patch to kill off some
+> > random old machine type.
+> > 
+> > The 12 release / 4 year figure was a fairly arbitrary starting
+> > point to which I'd be hoping to see critical reviewer feedback
+> > on (with possible counterproposals) so we can try to get something
+> > documented, to put an end to the repeated debates in this area
+> > each time someone proposes a patch.
+> 
+> I agree.  At the moment, the status is "machine types never die".
+> 
+> We can change it, but I think that we should also make a decision on
+> whether removing machine types implies removing properties that only
+> exist for backwards-compatibility reasons.
+> 
+> 4 year seems like a long time, but it can actually be pretty taxing for
+> RHEL.  I'm pretty sure that around RHEL 8.4 (some time between
+> 2020-2022) we'll need a 1.5-ish machine type (2016).
 
-The TIMA memory region is under the XIVE object because it is=20
-unique for the system. The lookup of the ICP is simply done using=20
-'current_cpu'. The TIMA state is under the ICPState, yes, but this=20
-model does not seem incorrect to me as this state contains the=20
-interrupt information presented to a CPU.  =20
+QEMU 1.5 was 2013, so that's saying RHEL 8 will want support for QEMU
+machine types (and all their properties) that are ~10 years old from
+upstream QEMU POV.  Possibly longer, as RHEL lifetime seems to only
+ever increase
 
-Thanks,
+Generally I see the following choices:
 
-C.
+ 1. Upstream never removes machine types or properties they use
 
->> ---
->>  hw/intc/xive-internal.h |   4 ++
->>  hw/intc/xive.c          | 187 +++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  2 files changed, 191 insertions(+)
->>
->> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
->> index ba5e648a5258..5e8b78a1ea6a 100644
->> --- a/hw/intc/xive-internal.h
->> +++ b/hw/intc/xive-internal.h
->> @@ -200,6 +200,10 @@ struct XIVE {
->>      /* ESB and TIMA memory location */
->>      hwaddr       vc_base;
->>      MemoryRegion esb_iomem;
->> +
->> +    uint32_t     tm_shift;
->> +    hwaddr       tm_base;
->> +    MemoryRegion tm_iomem;
->>  };
->> =20
->>  void xive_reset(void *dev);
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index c08a4f8efb58..82b2f0dcda0b 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -26,6 +26,180 @@
->> =20
->>  #include "xive-internal.h"
->> =20
->> +static uint8_t priority_to_ipb(uint8_t priority)
->> +{
->> +    return priority < XIVE_EQ_PRIORITY_COUNT ? 1 << (7 - priority) : =
-0;
->> +}
->> +
->> +static uint64_t xive_icp_accept(XiveICPState *xicp)
->> +{
->> +    ICPState *icp =3D ICP(xicp);
->> +    uint8_t nsr =3D xicp->tima_os[TM_NSR];
->> +
->> +    qemu_irq_lower(icp->output);
->> +
->> +    if (xicp->tima_os[TM_NSR] & TM_QW1_NSR_EO) {
->> +        uint8_t cppr =3D xicp->tima_os[TM_PIPR];
->> +
->> +        xicp->tima_os[TM_CPPR] =3D cppr;
->> +
->> +        /* Reset the pending buffer bit */
->> +        xicp->tima_os[TM_IPB] &=3D ~priority_to_ipb(cppr);
->> +
->> +        /* Drop Exception bit for OS */
->> +        xicp->tima_os[TM_NSR] &=3D ~TM_QW1_NSR_EO;
->> +    }
->> +
->> +    return (nsr << 8) | xicp->tima_os[TM_CPPR];
->> +}
->> +
->> +static void xive_icp_set_cppr(XiveICPState *xicp, uint8_t cppr)
->> +{
->> +    if (cppr > XIVE_PRIORITY_MAX) {
->> +        cppr =3D 0xff;
->> +    }
->> +
->> +    xicp->tima_os[TM_CPPR] =3D cppr;
->> +}
->> +
->> +/*
->> + * Thread Interrupt Management Area MMIO
->> + */
->> +static uint64_t xive_tm_read_special(XiveICPState *icp, hwaddr offset=
-,
->> +                                     unsigned size)
->> +{
->> +    uint64_t ret =3D -1;
->> +
->> +    if (offset =3D=3D TM_SPC_ACK_OS_REG && size =3D=3D 2) {
->> +        ret =3D xive_icp_accept(icp);
->> +    } else {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA read @%"
->> +                      HWADDR_PRIx" size %d\n", offset, size);
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned si=
-ze)
->> +{
->> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
->> +    XiveICPState *icp =3D XIVE_ICP(cpu->intc);
->> +    uint64_t ret =3D -1;
->> +    int i;
->> +
->> +    if (offset >=3D TM_SPC_ACK_EBB) {
->> +        return xive_tm_read_special(icp, offset, size);
->> +    }
->> +
->> +    if (offset & TM_QW1_OS) {
->> +        switch (size) {
->> +        case 1:
->> +        case 2:
->> +        case 4:
->> +        case 8:
->> +            if (QEMU_IS_ALIGNED(offset, size)) {
->> +                ret =3D 0;
->> +                for (i =3D 0; i < size; i++) {
->> +                    ret |=3D icp->tima[offset + i] << (8 * i);
->> +                }
->> +            } else {
->> +                qemu_log_mask(LOG_GUEST_ERROR,
->> +                              "XIVE: invalid TIMA read alignment @%"
->> +                              HWADDR_PRIx" size %d\n", offset, size);
->> +            }
->> +            break;
->> +        default:
->> +            g_assert_not_reached();
->> +        }
->> +    } else {
->> +        qemu_log_mask(LOG_UNIMP, "XIVE: does handle non-OS TIMA ring =
-@%"
->> +                      HWADDR_PRIx"\n", offset);
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static bool xive_tm_is_readonly(uint8_t index)
->> +{
->> +    /* Let's be optimistic and prepare ground for HV mode support */
->> +    switch (index) {
->> +    case TM_QW1_OS + TM_CPPR:
->> +        return false;
->> +    default:
->> +        return true;
->> +    }
->> +}
->> +
->> +static void xive_tm_write_special(XiveICPState *xicp, hwaddr offset,
->> +                                  uint64_t value, unsigned size)
->> +{
->> +    if (offset =3D=3D TM_SPC_SET_OS_PENDING && size =3D=3D 1) {
->> +        xicp->tima_os[TM_IPB] |=3D priority_to_ipb(value & 0xff);
->> +    } else {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA write @%"
->> +                      HWADDR_PRIx" size %d\n", offset, size);
->> +    }
->> +
->> +    /* TODO: support TM_SPC_ACK_OS_EL */
->> +}
->> +
->> +static void xive_tm_write(void *opaque, hwaddr offset,
->> +                           uint64_t value, unsigned size)
->> +{
->> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
->> +    XiveICPState *icp =3D XIVE_ICP(cpu->intc);
->> +    int i;
->> +
->> +    if (offset >=3D TM_SPC_ACK_EBB) {
->> +        xive_tm_write_special(icp, offset, value, size);
->> +        return;
->> +    }
->> +
->> +    if (offset & TM_QW1_OS) {
->> +        switch (size) {
->> +        case 1:
->> +            if (offset =3D=3D TM_QW1_OS + TM_CPPR) {
->> +                xive_icp_set_cppr(icp, value & 0xff);
->> +            }
->> +            break;
->> +        case 4:
->> +        case 8:
->> +            if (QEMU_IS_ALIGNED(offset, size)) {
->> +                for (i =3D 0; i < size; i++) {
->> +                    if (!xive_tm_is_readonly(offset + i)) {
->> +                        icp->tima[offset + i] =3D (value >> (8 * i)) =
-& 0xff;
->> +                    }
->> +                }
->> +            } else {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA wr=
-ite @%"
->> +                              HWADDR_PRIx" size %d\n", offset, size);
->> +            }
->> +            break;
->> +        default:
->> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA write =
-@%"
->> +                          HWADDR_PRIx" size %d\n", offset, size);
->> +        }
->> +    } else {
->> +        qemu_log_mask(LOG_UNIMP, "XIVE: does handle non-OS TIMA ring =
-@%"
->> +                      HWADDR_PRIx"\n", offset);
->> +    }
->> +}
->> +
->> +
->> +static const MemoryRegionOps xive_tm_ops =3D {
->> +    .read =3D xive_tm_read,
->> +    .write =3D xive_tm_write,
->> +    .endianness =3D DEVICE_BIG_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 1,
->> +        .max_access_size =3D 8,
->> +    },
->> +    .impl =3D {
->> +        .min_access_size =3D 1,
->> +        .max_access_size =3D 8,
->> +    },
->> +};
->> +
->>  static void xive_icp_reset(ICPState *icp)
->>  {
->>      XiveICPState *xicp =3D XIVE_ICP(icp);
->> @@ -453,6 +627,11 @@ static const TypeInfo xive_ics_info =3D {
->>  #define P9_MMIO_BASE     0x006000000000000ull
->>  #define P9_CHIP_BASE(id) (P9_MMIO_BASE | (0x40000000000ull * (uint64_=
-t) (id)))
->> =20
->> +/* Thread Interrupt Management Area MMIO */
->> +#define TM_BAR_DEFAULT   0x30203180000ull
->> +#define TM_SHIFT         16
->> +#define TM_BAR_SIZE      (XIVE_TM_RING_COUNT * (1 << TM_SHIFT))
->> +
->>  static uint64_t xive_esb_default_read(void *p, hwaddr offset, unsigne=
-d size)
->>  {
->>      qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
->> @@ -541,6 +720,14 @@ static void xive_realize(DeviceState *dev, Error =
-**errp)
->>                            NULL, "xive.esb", VC_BAR_SIZE);
->>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->esb_iomem);
->> =20
->> +    /* TM BAR. Same address for each chip */
->> +    x->tm_base =3D (P9_MMIO_BASE | TM_BAR_DEFAULT);
->> +    x->tm_shift =3D TM_SHIFT;
->> +
->> +    memory_region_init_io(&x->tm_iomem, OBJECT(x), &xive_tm_ops, x,
->> +                          "xive.tm", TM_BAR_SIZE);
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->tm_iomem);
->> +
->>      qemu_register_reset(xive_reset, dev);
->>  }
->> =20
->=20
+ 2. Upstream removes machine types after N releases / Y years,
+    but keeps properties related to them forever
+
+ 3. Upstream removes machine types after N releases / Y years,
+    & removes some associated properties at same time.
+
+ 4. Upstream removes machine types after N releases / Y years,
+    & optionally marks associated properties as deprecated,
+    removing them in accordance with deprecation policy.
+
+Option 1 is current state of play, leaving burden on upstream
+forever, and letting machine list grow without bound.
+
+Option 2 stops the '-M ?' list growing without bound, but aside from
+that is the same as option 1. Not much difference from option 1, since
+supporting the properties is what adds the core maint burden, not the
+machine types themselves.
+
+Options 3/4 reduce burden on QEMU upstream, at cost of requiring the
+downstream vendor(s) to un-delete properties that upstream decides to
+remove and deal with any fallout that entails.  The work involved in
+undeleting stuff is larger than the work involved in keeping it alive
+in upstream, because downstream has to undelete it, resolve conflicts,
+and then do all the same work upstream would have been doing had it
+not delete it & deal with further merge conflicts.
+
+
+Downstreams may not care about difference betweeen option 1 & 2 if
+they define their own custom machine types (RHEL & Ubuntu both do)
+
+Effectively it comes down to who should have the maint burden,
+upstream or downstream.
+
+
+
+If it takes more work downstream to undelete & maintain machine
+types in the downstream fork, that means downstream maintainers
+less free time to improve QEMU upstream. From that POV, deleting
+machine types & props upstream is actually counterproductive to
+upstream on balance. The rational thing would thus be to stick
+with status quo, and explicitly cdeclare that upstream will *never*
+delete machine types, or make their lifetime long enough for the
+longest lived downstream (10 years min & by the time we get to
+10 years, it might even be 15 years). 
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
