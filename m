@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZlVI-0006js-Db
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:07:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dZlVx-000754-10
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:07:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZlVH-0002OL-1L
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:07:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZlVG-0002Mn-Nw
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:07:02 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 93B64461FE
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 22:07:01 +0000 (UTC)
-Date: Tue, 25 Jul 2017 01:06:51 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170725010503-mutt-send-email-mst@kernel.org>
-References: <20170721095553.10717-1-jfreimann@redhat.com>
-	<20170721095553.10717-5-jfreimann@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1dZlVv-0002dG-QZ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:07:45 -0400
+References: <7fb8c9ff25d183cf7c0f729a90ee4f59c0632d64.1497602554.git.maozy.fnst@cn.fujitsu.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <38f43362-e3a3-44ab-9c29-d04b4c825085@redhat.com>
+Date: Mon, 24 Jul 2017 18:07:26 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170721095553.10717-5-jfreimann@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] tests/pxe-test: add testcase using
- vhost-user-bridge
+In-Reply-To: <7fb8c9ff25d183cf7c0f729a90ee4f59c0632d64.1497602554.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] util: remove the obsolete
+ non-blocking connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,219 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, mitake.hitoshi@lab.ntt.co.jp, Cao jin <caoj.fnst@cn.fujitsu.com>, mreitz@redhat.com, sheepdog@lists.wpkg.org, kraxel@redhat.com, pbonzini@redhat.com, famz@redhat.com, namei.unix@gmail.com
 
-On Fri, Jul 21, 2017 at 11:55:53AM +0200, Jens Freimann wrote:
-> From: Jens Freimann <jfreiman@redhat.com>
+This was posted over a month ago with two R-Bs, did it get merged or 
+dropped?
+
+--js
+
+On 06/16/2017 04:54 AM, Mao Zhongyi wrote:
+> From: Cao jin <caoj.fnst@cn.fujitsu.com>
 > 
-> Add a PXE testcase tunneling traffic through vhost-user-bridge process.
-> Create a vhost-user-bridge  process and connect it to qemu via a socket.
+> The non-blocking connect mechanism is obsolete, and it doesn't
+> work well in inet connection, because it will call getaddrinfo
+> first and getaddrinfo will blocks on DNS lookups. Since commit
+> e65c67e4 & d984464e, the non-blocking connect of migration goes
+> through QIOChannel in a different manner(using a thread), and
+> nobody use this old non-blocking connect anymore.
 > 
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> Any newly written code which needs a non-blocking connect should
+> use the QIOChannel code, so we can drop NonBlockingConnectHandler
+> as a concept entirely.
+> 
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  tests/Makefile.include |   4 +-
->  tests/pxe-test.c       | 140 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 142 insertions(+), 2 deletions(-)
+> v3:
+> 1. fix the mistake that adds a unmodified file '--help' [Fam Zheng]
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 7af278d..e40550c 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -705,7 +705,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
->  tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
->  tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
->  	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
-> -tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
-> +tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
-> +    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
->  tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
->  tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
->  tests/m25p80-test$(EXESUF): tests/m25p80-test.o
-> @@ -834,6 +835,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
->  	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->  	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
->  		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-> +		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
->  		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
->  		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
->  	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
-> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-> index 34282d3..d6379a8 100644
-> --- a/tests/pxe-test.c
-> +++ b/tests/pxe-test.c
-> @@ -5,7 +5,8 @@
->   *
->   * Authors:
->   *  Michael S. Tsirkin <mst@redhat.com>,
-> - *  Victor Kaplansky <victork@redhat.com>
-> + *  Victor Kaplansky <victork@redhat.com>,
-> + *  Jens Freimann <jfreiman@redhat.com>
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or later.
->   * See the COPYING file in the top-level directory.
-> @@ -13,14 +14,150 @@
->  
->  #include "qemu/osdep.h"
->  #include <glib/gstdio.h>
-> +#include <glib.h>
->  #include "qemu-common.h"
->  #include "libqtest.h"
->  #include "boot-sector.h"
-> +#include <sys/vfs.h>
->  
-> +#define LPORT 5555
-> +#define RPORT 4444
->  #define NETNAME "net0"
-> +#define QEMU_CMD_MEM    "--enable-kvm -m %d "\
-> +                        "-object memory-backend-file,id=mem,size=%dM,"\
-> +                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
-> +#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
-> +#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
-> +                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
-> +                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
-> +                        " -netdev socket,id=n1,fd=%d"
-> +#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
-> +                        " -device virtio-net-pci,netdev=n1 "
-> +
-> +#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
-> +                        QEMU_CMD_NETDEV QEMU_CMD_NET
-> +
-> +#define HUGETLBFS_MAGIC       0x958458f6
-> +#define VUBR_SOCK "vubr.sock"
-> +#define MEMSZ 1024
->  
->  static char disk[] = "tests/pxe-test-disk-XXXXXX";
->  
-> +static const char *init_hugepagefs(const char *path)
-> +{
-> +    struct statfs fs;
-> +    int ret;
-> +
-> +    if (access(path, R_OK | W_OK | X_OK)) {
-> +        g_test_message("access on path (%s): %s\n", path, strerror(errno));
-> +        return NULL;
-> +    }
-> +
-> +    do {
-> +        ret = statfs(path, &fs);
-> +    } while (ret != 0 && errno == EINTR);
-> +
-> +    if (ret != 0) {
-> +        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
-> +        return NULL;
-> +    }
-> +
-> +    if (fs.f_type != HUGETLBFS_MAGIC) {
-> +        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
-> +        return NULL;
-> +    }
-> +
-> +    return path;
-> +}
+> v2:
+> 1. block/ssh.c is not compiled in v1 which leads to no error
+>     reported when I run make & make check, although I make a
+> 	mistake in block/ssh.c, because the package libssh2-devel
+> 	missed in my system. Now fixed it.
+> 2. Write the prototype in a single line. [Juan Quintela]
+> 
+> Because it's a minor change, so still add the r-b.
+> 
+> v1:
+> This patch was reviewed by Daniel about a years ago, but it has never
+> been merged just since socket_connect() called by net_socket_connect_init()
+> where NonBlockingConnectHandler was passed to socket_connect(). it's broken.
+> 
+> Now this problem was worked around by Daniel's patch(commit 6701e551 'Revert
+> "Change net/socket.c to use socket_*() functions" again'). Therefore, resend
+> it, of course, part of related code has changed over the years, so changed
+> the patch accordingly.
+> 
+> The reviewed patch listed on:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06373.html
+> 
+>   block/sheepdog.c       |   2 +-
+>   block/ssh.c            |   2 +-
+>   include/qemu/sockets.h |  12 +--
+>   io/channel-socket.c    |   2 +-
+>   util/qemu-sockets.c    | 205 ++++++-------------------------------------------
+>   5 files changed, 28 insertions(+), 195 deletions(-)
+> 
 
-Why bother?  Rest of the patchset works find on any filesystem.  User
-set this for some reason, let's just roll with it.
-
-> +
-> +static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
-> +{
-> +    int sock;
-> +
-> +    if (inet_aton("127.0.0.1", (struct in_addr *) &si_remote->sin_addr.s_addr)
-> +            == 0) {
-> +        g_test_message("inet_aton failed\n");
-> +        return -1;
-> +    }
-> +    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-> +    if (sock == -1) {
-> +        g_test_message("socket creation failed\n");
-> +        return -1;
-> +    }
-> +    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
-> +        g_test_message("connect failed: %s", strerror(errno));
-> +        return -1;
-> +    }
-> +
-> +    return sock;
-> +}
-> +
-> +static void test_pxe_vhost_user(void)
-> +{
-> +    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
-> +    char template2[] = "/tmp/hugepages-XXXXXX";
-> +    gchar * vubr_args[] = {NULL, NULL, NULL, NULL};
-> +    struct sockaddr_in si_remote = {
-> +        .sin_family = AF_INET,
-> +        .sin_port = htons(RPORT),
-> +    };
-> +    const char *hugefs = NULL;
-> +    const char *tmpfs2 = NULL;
-> +    const char *tmpfs = NULL;
-> +    const char *root = NULL;
-> +    GError *error = NULL;
-> +    char *vubr_binary;
-> +    char *qemu_args;
-> +    GPid vubr_pid;
-> +    int sock = -1;
-> +
-> +    tmpfs = mkdtemp(template);
-> +    if (!tmpfs) {
-> +        g_test_message("mkdtemp on path(%s): %s\n",
-> +                       template, strerror(errno));
-> +    }
-> +    vubr_binary = getenv("QTEST_VUBR_BINARY");
-> +    g_assert(vubr_binary);
-> +    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
-> +    vubr_args[1] = g_strdup_printf("-u");
-> +    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
-> +    g_spawn_async(NULL, vubr_args, NULL,
-> +                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
-> +                  G_SPAWN_SEARCH_PATH,
-> +                  NULL, NULL, &vubr_pid, &error);
-> +    g_assert_no_error(error);
-> +
-> +    hugefs = getenv("QTEST_HUGETLBFS_PATH");
-> +    if (hugefs) {
-> +        root = init_hugepagefs(hugefs);
-> +        g_assert(root);
-> +    } else {
-> +        tmpfs2 = mkdtemp(template2);
-> +        g_assert(tmpfs2);
-> +        root = tmpfs2;
-> +    }
-> +
-> +    sock = vubr_create_socket(&si_remote, RPORT);
-> +    g_assert_cmpint(sock, !=, -1);
-> +
-> +    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
-> +                                "char0", vubr_args[2], "char0",
-> +                                disk, sock);
-> +    qtest_start(qemu_args);
-> +    boot_sector_test();
-> +    qtest_quit(global_qtest);
-> +    g_free(qemu_args);
-> +    g_free(vubr_args[0]);
-> +    g_free(vubr_args[1]);
-> +    g_free(vubr_args[2]);
-> +    g_assert_cmpint(g_remove(g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK)),
-> +                    ==, 0);
-> +    if (tmpfs2) {
-> +        g_assert_cmpint(rmdir(tmpfs2), ==, 0);
-> +    }
-> +    g_assert_cmpint(g_rmdir(tmpfs), ==, 0);
-> +}
-> +
->  static void test_pxe_one(const char *params, bool ipv6)
->  {
->      char *args;
-> @@ -65,6 +202,7 @@ int main(int argc, char *argv[])
->      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->          qtest_add_func("pxe/e1000", test_pxe_e1000);
->          qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
-> +        qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
->      } else if (strcmp(arch, "ppc64") == 0) {
->          qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
->          qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
-> -- 
-> 2.9.4
+[snip]
