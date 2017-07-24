@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1dZXfY-00031p-RL
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:20:45 -0400
+	(envelope-from <clg@kaod.org>) id 1dZXn8-0004Ti-Sw
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:28:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1dZXfV-0006Gl-LV
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:20:44 -0400
-Message-ID: <1500880826.10674.66.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Mon, 24 Jul 2017 17:20:26 +1000
-In-Reply-To: <20170724053827.GI17228@umbus.fritz.box>
+	(envelope-from <clg@kaod.org>) id 1dZXn5-0001Uy-OR
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:28:34 -0400
+Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:45139)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZXn5-0001U0-HY
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:28:31 -0400
+Received: from player792.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 01CF470428
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 09:28:22 +0200 (CEST)
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-5-git-send-email-clg@kaod.org>
-	<20170719030849.GQ3140@umbus.fritz.box>
-	<1500436938.3350.11.camel@kernel.crashing.org>
-	<20170721075015.GE3717@umbus.fritz.box>
-	<1500625291.10674.22.camel@kernel.crashing.org>
-	<20170724032853.GB17228@umbus.fritz.box>
-	<1500872645.10674.52.camel@kernel.crashing.org>
-	<20170724053827.GI17228@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	<20170719030053.GP3140@umbus.fritz.box>
+	<1500436532.3350.8.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <89336f55-bcc1-c496-5277-66219149f17a@kaod.org>
+Date: Mon, 24 Jul 2017 09:28:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <1500436532.3350.8.camel@kernel.crashing.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+Subject: Re: [Qemu-devel] [RFC PATCH 00/26] guest exploitation of the XIVE
+ interrupt controller (POWER9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 2017-07-24 at 15:38 +1000, David Gibson wrote:
+On 07/19/2017 05:55 AM, Benjamin Herrenschmidt wrote:
+> On Wed, 2017-07-19 at 13:00 +1000, David Gibson wrote:
+>> So, this is probably obvious, but I'm not considering this a candidate
+>> for qemu 2.10 (seeing as the soft freeze was yesterday).  I'll still
+>> try to review and, once ready, queue for 2.11.
 > 
-> Can we assign our logical numbers sparsely, or will that cause other
-> problems?
+> Right. I need to review still and we need to make sure we have the
+> right plumbing for migration etc... and of course I need to do the
+> KVM bits. So it's definitely not 2.10 material.
 
-The main issue is that they probably needs to be the same between XICS
-and XIVE because by the time we get the CAS call to chose between XICS
-and XIVE, we have already handed out interrupts and constructed the DT,
-no ? Unless we do a real CAS reboot...
+yes. This is not for 2.10 clearly. This is just an RFC to get
+some feedback on the approach and on some ugly hacks I have 
+put in place.
 
-Otherwise, there's no reason they can't be sparse no.
+I have given KVM a quick look and it should be addressed before
+we start merging anything. I think PowerNV should wait a bit. 
 
-> Note that for PAPR we also have the question of finding logical
-> interrupts for legacy PAPR VIO devices.
+As for TCG, my branch supports reset, changing model XICS <-> XIVE, 
+migration and CPU hotplug. KVM+kernel_irqchip=off is supported
+also. Most of the issues have found a solution but now we need 
+to discuss.   
 
-We just make them another range ? With KVM legacy today, I just use the
-generic interrupt facility for those. So when you do the ioctl to
-"trigger" one, I just do an MMIO to the corresponding page and the
-interrupt magically shows up wherever the guest is running the target
-vcpu. In fact, I'd like to add a way to mmap that page into qemu so
-that qemu can triggers them without an ioctl.
+I was out last week. Catching up.
 
-The guest doesn't care, from the guest perspective they are interrupts
-coming from the DT, so they are like PCI etc...
+Thanks,
 
-> > We can fix the number of "generic" interrupts given to a guest. The
-> > only requirements from a PAPR perspective is that there should be at
-> > least as many as there are possible threads in the guest so they can be
-> > used as IPIs.
-> 
-> Ok.  If we can do things sparsely, allocating these well away from the
-> hw interrupts would make things easier.
-> 
-> > But we may need more for other things. We can make this a machine
-> > parameter with a default value of something like 4096. If we call N
-> > that number of extra generic interrupts, then the number of generic
-> > interrutps would be #possible-vcpu's + N, or something like that.
-> 
-> That seems reasonable.
-> 
-> > > > But it's fundamentally an allocator that sits in the hypervisor, so in
-> > > > our case, I would say in the spapr "component" of XIVE, rather than the
-> > > > XIVE HW model itself.
-> > > 
-> > > Maybe..
-> > 
-> > You are right in that a mapping is a better term than an allocator
-> > here.
-> > 
-> > > > Now what Cedric did, because XIVE is very complex and we need something
-> > > > for PAPR quickly, is not a complete HW model, but a somewhat simplified
-> > > > one that only handles what PAPR exposes. So in that case where the
-> > > > allocator sits is a bit of a TBD...
-> > > 
-> > > Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
-> > > machine type level needs extreme caution, or the irqs may not be
-> > > stable which will generally break migration.
-> > 
-> > Yes you are right. We should probably create a more "static" scheme.
-> 
-> Sounds like we're in violent agreement.
-
-Yup :)
-
-Cheers,
-Ben.
+C.
