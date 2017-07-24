@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZdjw-0007ld-V4
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:49:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dZdkj-0008E3-FJ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:50:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZdju-0004AR-7Q
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:49:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54402)
+	(envelope-from <imammedo@redhat.com>) id 1dZdkg-0004om-S0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:50:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZdju-00047u-0j
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:49:38 -0400
-References: <20170719100802.14094-1-berrange@redhat.com>
-	<20170719100802.14094-2-berrange@redhat.com>
-	<d659c0cb-0cb2-3af7-b97f-05ad15aa3550@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ee0b3e06-7037-f2c9-18e9-1fb1dcb0784a@redhat.com>
-Date: Mon, 24 Jul 2017 15:49:29 +0200
-MIME-Version: 1.0
-In-Reply-To: <d659c0cb-0cb2-3af7-b97f-05ad15aa3550@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/2 (for 2.10)] docs: document support
- lifetime for features
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZdkg-0004o2-IN
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 09:50:26 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 24 Jul 2017 15:50:20 +0200
+Message-Id: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx based
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +22,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Programmingkid <programmingkidx@gmail.com>, Phil Dennis-Jordan <lists@philjordan.eu>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 19/07/2017 13:56, Thomas Huth wrote:
-> +@node Machine types
-> +@section Machine types
-> +
-> +For architectures which aim to support live migration compatibility
-> +across releases, each release will introduce a new versioned machine
-> +type. For example, the 2.8.0 release introduced machine types
-> +``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
-> +
-> +To allow live migration of a guest running on a 2.8.0 release to a
-> +2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-> +``pc-q35-2.8''. To allow users live migrating VMs to skip multiple
-> +intermediate releases when upgrading, new releases of QEMU will
-> +support machine types from many previous versions.
-> +
-> +The supported lifetime for versioned machine types is 12 releases,
-> +which is equivalent to 4 years worth of previous QEMU releases.
+w2k used to boot on QEMU until revision of FADT has
+been bumped to rev3
+(commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
 
-I think there's still no consensus on this.  The first two paragraphs
-should be added to the documentation for -machine in qemu-options.hx,
-since "-machine [type=]foo" is currently not documented at all.
+Keep PC machine at rev1 to remain compatible and Q35
+at rev3 where w2k isn't supported anyway so OSX could
+run as well.
 
-Paolo
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+   - make pc rev1 and q35 rev3.
+       "Michael S. Tsirkin" <mst@redhat.com>
+
+PS:
+Only compile tested.
+
+
+CC: Programmingkid <programmingkidx@gmail.com>
+CC: Phil Dennis-Jordan <lists@philjordan.eu>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+
+---
+ hw/i386/acpi-build.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 6b7bade..b9c245c 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
+ } AcpiMcfgInfo;
+ 
+ typedef struct AcpiPmInfo {
++    bool force_rev1_fadt;
+     bool s3_disabled;
+     bool s4_disabled;
+     bool pcihp_bridge_en;
+@@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+     Object *obj = NULL;
+     QObject *o;
+ 
++    pm->force_rev1_fadt = false;
+     pm->cpu_hp_io_base = 0;
+     pm->pcihp_io_base = 0;
+     pm->pcihp_io_len = 0;
+     if (piix) {
++        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
++        pm->force_rev1_fadt = true;
+         obj = piix;
+         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+         pm->pcihp_io_base =
+@@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+         fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+     }
+     fadt->century = RTC_CENTURY;
++    if (pm->force_rev1_fadt) {
++        return;
++    }
+ 
+     fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+     fadt->reset_value = 0xf;
+@@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+     unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+     unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+     unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
++    int fadt_size = sizeof(*fadt);
++    int rev = 3;
+ 
+     /* FACS address to be filled by Guest linker */
+     bios_linker_loader_add_pointer(linker,
+@@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+     bios_linker_loader_add_pointer(linker,
+         ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+-    bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+-        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
++    if (pm->force_rev1_fadt) {
++        rev = 1;
++        fadt_size = offsetof(typeof(*fadt), reset_register);
++    } else {
++        bios_linker_loader_add_pointer(linker,
++            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
++            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
++    }
+ 
+     build_header(linker, table_data,
+-                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
++                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
+ }
+ 
+ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+-- 
+2.7.4
