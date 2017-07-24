@@ -1,18 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZZGE-0000Dn-Uo
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:02:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1dZZKQ-0001Yn-9V
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:07:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZZGB-0004hS-QX
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:02:43 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:51252)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZZGB-0004fg-4u
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:02:39 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Tue, 25 Jul 2017 01:15:40 +0800
-Message-Id: <1500916540-33510-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] rtc: fix a infinite loop in windows vm startup
+	(envelope-from <armbru@redhat.com>) id 1dZZKM-0006i0-OI
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:07:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZZKM-0006h6-FZ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:06:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 326D762647
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 09:06:57 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170721210707.21805-1-eblake@redhat.com>
+Date: Mon, 24 Jul 2017 11:06:53 +0200
+In-Reply-To: <20170721210707.21805-1-eblake@redhat.com> (Eric Blake's message
+	of "Fri, 21 Jul 2017 16:07:07 -0500")
+Message-ID: <87bmoatd8y.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qobject: Accept "%"PRId64 in
+ qobject_from_jsonf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,43 +33,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>, Liu Yi <liu.yi24@zte.com.cn>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-When a windows vm starts, periodic timer of rtc will stop several times.
-windows kernel will check whether REG_A_UIP is changed. REG_C's interrupt
-flags will not be cleared when periodic timer stops and the update timer
-will switch to alarm timer. So the expiration time of alarm timer is very
-long and REG_A_UIP will not vary.At last windows kernel will repeat to 
-check REG_A_UIP all the time.
+Eric Blake <eblake@redhat.com> writes:
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Signed-off-by: Liu Yi <liu.yi24@zte.com.cn>
----
- hw/timer/mc146818rtc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> Commit 1792d7d0 was written because PRId64 expands to non-portable
+> crap for some libc, and we had testsuite failures on Mac OS as a
+> result.  This in turn makes it difficult to rely on the obvious
+> conversions of 64-bit values into JSON, requiring things such as
+> casting int64_t to long long so we can use a reliable %lld and
+> still keep -Wformat happy.  So now it's time to fix that.
+>
+> We are already lexing %I64d (hello mingw); now expand the lexer
+> to parse %qd (hello Mac OS). In the process, we can drop one
+> state: IN_ESCAPE_I64 is redundant with IN_ESCAPE_LL.  And fix a
+> comment that mistakenly omitted %u as a supported escape.
+>
+> Next, tweak the parser to accept the exact spelling of PRId64
+> regardless of what it expands to (note that there are are now dead
+> branches in the 'if' chain for some platforms, like glibc; but all
+> branches are necessary on other platforms).  We are at least safe
+> in that we are parsing the correct size 32-bit or a 64-bit quantity
+> on whatever branch we end up in.  And of course, update the
+> testsuite for coverage of the feature.
+>
+> Finally, update configure to barf on any libc that uses yet
+> another form of PRId64 that we have not yet coded for, so that we
+> can once again update json-lexer.c to cater to those quirks (my
+> guess? we might see %jd next).  Yes, the only way I could find
+> to quickly do and still work when cross-compiling is to grep a
+> compiled binary; C does not make it easy to turn a string constant
+> into an integer constant, let along make preprocessor decisions;
+> and even parsing '$CC -E' output is fragile, since 64-bit glibc
+> pre-processes as "l" "d" rather than "ld".  I'm assuming that
+> 'strings' is portable enough during configure.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  configure             | 21 +++++++++++++++++++++
+>  qobject/json-lexer.c  | 11 +++--------
+>  qobject/json-parser.c | 10 ++++++----
+>  tests/check-qjson.c   |  7 +++++++
+>  4 files changed, 37 insertions(+), 12 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 6b52e19ee3..b810ff970d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3239,6 +3239,27 @@ for i in $glib_modules; do
+>      fi
+>  done
+>
+> +# Sanity check that we can parse PRId64 and friends in json-lexer.c
+> +# (Sadly, the "easiest" way to do this is to grep the compiled binary)
+> +cat > $TMPC <<EOF
+> +#include <inttypes.h>
+> +int main(void) {
+> +    static const char findme[] = "UnLiKeLyToClAsH_" PRId64;
+> +    return !findme[0];
+> +}
+> +EOF
+> +if ! compile_prog "$CFLAGS" "$LIBS" ; then
+> +    error_exit "can't determine value of PRId64"
+> +fi
+> +nl='
+> +'
+> +case $(strings $TMPE | grep ^UnLiKeLyToClAsH) in
+> +    '' | *"$nl"* ) error_exit "can't determine value of PRId64" ;;
+> +    *_ld | *_lld | *_I64d | *_qd) ;;
+> +    *) error_exit "unexepected value of PRId64, please add %$(strings $TMPE |
+> +       sed -n s/^UnLiKeLyToClAsH_//p) support to json-lexer.c" ;;
+> +esac
+> +
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 1b8d3d7..aa55fae 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -457,6 +457,8 @@ static void rtc_update_timer(void *opaque)
-     if ((new_irqs & s->cmos_data[RTC_REG_B]) != 0) {
-         s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
-         qemu_irq_raise(s->irq);
-+    } else if (s->cmos_data[RTC_REG_B] & REG_B_UIE == 0) {
-+        cmos_data[RTC_REG_C] &= ~REG_C_UF;
-     }
-     check_update_timer(s);
- }
-@@ -559,7 +561,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
-                 s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
-                 qemu_irq_raise(s->irq);
-             } else {
--                s->cmos_data[RTC_REG_C] &= ~REG_C_IRQF;
-+                s->cmos_data[RTC_REG_C] &= ~(REG_C_UF | REG_C_IRQF);
-                 qemu_irq_lower(s->irq);
-             }
-             s->cmos_data[RTC_REG_B] = data;
--- 
-1.8.3.1
+Why is this easier or more robust than examining output of the
+preprocessor?  Hmm, you explain it in the commit message.  I think you
+should also (briefly!) explain it in the "Sadly" comment.
+
+>  # Sanity check that the current size_t matches the
+>  # size that glib thinks it should be. This catches
+>  # problems on multi-arch where people try to build
+> diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+> index 980ba159d6..98b1ec8e35 100644
+> --- a/qobject/json-lexer.c
+> +++ b/qobject/json-lexer.c
+> @@ -31,7 +31,7 @@
+>   *
+>   * Extension for vararg handling in JSON construction:
+>   *
+> - * %((l|ll|I64)?d|[ipsf])
+> + * %(PRI[du]64|(l|ll)?[ud]|[ipsf])
+
+Confusing.  The lexer accepts more than that, but parse_escape() filters
+it out.  Need a comment explaining what, because the latter isn't
+locally obvious.
+
+>   *
+>   */
+>
+> @@ -63,7 +63,6 @@ enum json_lexer_state {
+>      IN_ESCAPE_LL,
+>      IN_ESCAPE_I,
+>      IN_ESCAPE_I6,
+> -    IN_ESCAPE_I64,
+>      IN_WHITESPACE,
+>      IN_START,
+>  };
+> @@ -236,13 +235,8 @@ static const uint8_t json_lexer[][256] =  {
+>          ['u'] = JSON_ESCAPE,
+>      },
+>
+> -    [IN_ESCAPE_I64] = {
+> -        ['d'] = JSON_ESCAPE,
+> -        ['u'] = JSON_ESCAPE,
+> -    },
+> -
+>      [IN_ESCAPE_I6] = {
+> -        ['4'] = IN_ESCAPE_I64,
+> +        ['4'] = IN_ESCAPE_LL,
+>      },
+>
+>      [IN_ESCAPE_I] = {
+> @@ -257,6 +251,7 @@ static const uint8_t json_lexer[][256] =  {
+>          ['u'] = JSON_ESCAPE,
+>          ['f'] = JSON_ESCAPE,
+>          ['l'] = IN_ESCAPE_L,
+> +        ['q'] = IN_ESCAPE_LL,
+>          ['I'] = IN_ESCAPE_I,
+>      },
+>
+
+IN_ESCAPE_LL becomes a bit of a misnomer.  IN_ESCAPE_DU?
+
+> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+> index 7a417f20cd..f01e97fc6b 100644
+> --- a/qobject/json-parser.c
+> +++ b/qobject/json-parser.c
+> @@ -470,15 +470,17 @@ static QObject *parse_escape(JSONParserContext *ctxt, va_list *ap)
+>          return QOBJECT(qnum_from_int(va_arg(*ap, int)));
+>      } else if (!strcmp(token->str, "%ld")) {
+>          return QOBJECT(qnum_from_int(va_arg(*ap, long)));
+> -    } else if (!strcmp(token->str, "%lld") ||
+> -               !strcmp(token->str, "%I64d")) {
+> +    } else if (!strcmp(token->str, "%" PRId64)) {
+> +        return QOBJECT(qnum_from_int(va_arg(*ap, int64_t)));
+> +    } else if (!strcmp(token->str, "%lld")) {
+>          return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
+
+Let's do "ll" before PRId64.
+
+>      } else if (!strcmp(token->str, "%u")) {
+>          return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned int)));
+>      } else if (!strcmp(token->str, "%lu")) {
+>          return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long)));
+> -    } else if (!strcmp(token->str, "%llu") ||
+> -               !strcmp(token->str, "%I64u")) {
+> +    } else if (!strcmp(token->str, "%" PRIu64)) {
+> +        return QOBJECT(qnum_from_uint(va_arg(*ap, uint64_t)));
+> +    } else if (!strcmp(token->str, "%llu")) {
+>          return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long long)));
+
+Likewise.
+
+>      } else if (!strcmp(token->str, "%s")) {
+>          return QOBJECT(qstring_from_str(va_arg(*ap, const char *)));
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index 53f2275b9b..d55d6d9ed1 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -990,8 +990,10 @@ static void vararg_number(void)
+>      QNum *qnum;
+>      int value = 0x2342;
+>      long long value_ll = 0x2342342343LL;
+> +    uint64_t value_u = UINT64_C(0x2342342343);
+
+Is UINT64_C() really necessary here?
+
+Call the variable value_u64?
+
+>      double valuef = 2.323423423;
+>      int64_t val;
+> +    uint64_t uval;
+>
+>      qnum = qobject_to_qnum(qobject_from_jsonf("%d", value));
+>      g_assert(qnum_get_try_int(qnum, &val));
+> @@ -1003,6 +1005,11 @@ static void vararg_number(void)
+>      g_assert_cmpint(val, ==, value_ll);
+>      QDECREF(qnum);
+>
+> +    qnum = qobject_to_qnum(qobject_from_jsonf("%" PRIu64, value_u));
+> +    g_assert(qnum_get_try_uint(qnum, &uval));
+> +    g_assert_cmpint(uval, ==, value_u);
+> +    QDECREF(qnum);
+> +
+>      qnum = qobject_to_qnum(qobject_from_jsonf("%f", valuef));
+>      g_assert(qnum_get_double(qnum) == valuef);
+>      QDECREF(qnum);
