@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjxr-0003Ew-EG
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:28 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dZjxs-0003Fk-79
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjxn-00016j-8J
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:27 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34981)
+	(envelope-from <rth7680@gmail.com>) id 1dZjxq-0001Bx-97
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:28 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjxn-000169-35
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:23 -0400
-Received: by mail-qk0-x244.google.com with SMTP id k2so3509978qkf.2
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjxq-0001BO-3J
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:26 -0400
+Received: by mail-qt0-x243.google.com with SMTP id n42so3407513qtn.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:26 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 24 Jul 2017 13:27:10 -0700
-Message-Id: <20170724202728.25960-15-rth@twiddle.net>
+Date: Mon, 24 Jul 2017 13:27:12 -0700
+Message-Id: <20170724202728.25960-17-rth@twiddle.net>
 In-Reply-To: <20170724202728.25960-1-rth@twiddle.net>
 References: <20170724202728.25960-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v15 14/32] target/i386: [tcg] Port to generic
- translation framework
+Subject: [Qemu-devel] [PATCH v15 16/32] target/arm: [tcg] Port to
+ init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,148 +35,155 @@ Cc: cota@braap.org, vilanova@ac.upc.edu
 
 From: Lluís Vilanova <vilanova@ac.upc.edu>
 
+Incrementally paves the way towards using the generic instruction translation
+loop.
+
 Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Tested-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <150002267714.22386.5095442346868988808.stgit@frigg.lan>
+Reviewed-by: Alex Benneé <alex.benee@linaro.org>
+Message-Id: <150002316201.22386.12115078843605656029.stgit@frigg.lan>
+[rth: Adjust for max_insns interface change.]
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c | 106 +++++++++---------------------------------------
- 1 file changed, 19 insertions(+), 87 deletions(-)
+ target/arm/translate.c | 88 ++++++++++++++++++++++++++++----------------------
+ 1 file changed, 50 insertions(+), 38 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 8e7212cf92..2bd667ec9a 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8449,6 +8449,10 @@ static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
-     return max_insns;
- }
- 
-+static void i386_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-+{
-+}
-+
- static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-@@ -8468,7 +8472,7 @@ static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-         /* The address covered by the breakpoint must be included in
-            [tb->pc, tb->pc + tb->size) in order to for it to be
-            properly cleared -- thus we increment the PC here so that
--           the logic setting tb->size below does the right thing.  */
-+           the generic logic setting tb->size later does the right thing.  */
-         dc->base.pc_next += 1;
-         return true;
-     } else {
-@@ -8532,94 +8536,22 @@ static void i386_tr_disas_log(const DisasContextBase *dcbase,
-     log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, disas_flags);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 55a2459a19..4e9e3c46b3 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11794,32 +11794,12 @@ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
+     return false;
  }
  
 -/* generate intermediate code for basic block 'tb'.  */
 -void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
--{
++static int arm_tr_init_disas_context(DisasContextBase *dcbase,
++                                     CPUState *cs, int max_insns)
+ {
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
+     CPUARMState *env = cs->env_ptr;
+     ARMCPU *cpu = arm_env_get_cpu(env);
 -    DisasContext dc1, *dc = &dc1;
--    int num_insns;
+-    target_ulong next_page_start;
 -    int max_insns;
+-    bool end_of_page;
 -
 -    /* generate intermediate code */
--    dc->base.singlestep_enabled = cs->singlestep_enabled;
+-
+-    /* The A64 decoder has its own top level loop, because it doesn't need
+-     * the A32/T32 complexity to do with conditional execution/IT blocks/etc.
+-     */
+-    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+-        gen_intermediate_code_a64(&dc->base, cs, tb);
+-        return;
+-    }
+-
 -    dc->base.tb = tb;
--    dc->base.is_jmp = DISAS_NEXT;
 -    dc->base.pc_first = tb->pc;
 -    dc->base.pc_next = dc->base.pc_first;
--
--    max_insns = tb->cflags & CF_COUNT_MASK;
--    if (max_insns == 0) {
--        max_insns = CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns = TCG_MAX_INSNS;
--    }
--    max_insns = i386_tr_init_disas_context(&dc->base, cs, max_insns);
--
--    num_insns = 0;
--    gen_tb_start(tb);
--    for(;;) {
--        i386_tr_insn_start(&dc->base, cs);
--        num_insns++;
--
--        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
--            CPUBreakpoint *bp;
--            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
--                if (bp->pc == dc->base.pc_next) {
--                    if (i386_tr_breakpoint_check(&dc->base, cs, bp)) {
--                        break;
--                    }
--                }
--            }
--
--            if (dc->base.is_jmp == DISAS_NORETURN) {
--                break;
--            }
--        }
--
--        if (num_insns == max_insns && (tb->cflags & CF_LAST_IO)) {
--            gen_io_start();
--        }
--
--        i386_tr_translate_insn(&dc->base, cs);
--        /* stop translation if indicated */
--        if (dc->base.is_jmp) {
--            break;
--        }
--        /* if single step mode, we generate only one instruction and
--           generate an exception */
--        if (dc->base.singlestep_enabled) {
--            dc->base.is_jmp = DISAS_TOO_MANY;
--            break;
--        }
--        /* if too long translation, stop generation too */
--        if (tcg_op_buf_full() ||
--            num_insns >= max_insns) {
--            dc->base.is_jmp = DISAS_TOO_MANY;
--            break;
--        }
--        if (singlestep) {
--            dc->base.is_jmp = DISAS_TOO_MANY;
--            break;
--        }
--    }
--    i386_tr_tb_stop(&dc->base, cs);
--    if (tb->cflags & CF_LAST_IO)
--        gen_io_end();
--    gen_tb_end(tb, num_insns);
-+static const TranslatorOps i386_tr_ops = {
-+    .init_disas_context = i386_tr_init_disas_context,
-+    .tb_start           = i386_tr_tb_start,
-+    .insn_start         = i386_tr_insn_start,
-+    .breakpoint_check   = i386_tr_breakpoint_check,
-+    .translate_insn     = i386_tr_translate_insn,
-+    .tb_stop            = i386_tr_tb_stop,
-+    .disas_log          = i386_tr_disas_log,
-+};
+-    dc->base.is_jmp = DISAS_NEXT;
+-    dc->base.num_insns = 0;
+-    dc->base.singlestep_enabled = cs->singlestep_enabled;
  
--    tb->size = dc->base.pc_next - dc->base.pc_first;
--    tb->icount = num_insns;
+     dc->pc = dc->base.pc_first;
+     dc->condjmp = 0;
+@@ -11830,23 +11810,23 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+      */
+     dc->secure_routed_to_el3 = arm_feature(env, ARM_FEATURE_EL3) &&
+                                !arm_el_is_aa64(env, 3);
+-    dc->thumb = ARM_TBFLAG_THUMB(tb->flags);
+-    dc->sctlr_b = ARM_TBFLAG_SCTLR_B(tb->flags);
+-    dc->be_data = ARM_TBFLAG_BE_DATA(tb->flags) ? MO_BE : MO_LE;
+-    dc->condexec_mask = (ARM_TBFLAG_CONDEXEC(tb->flags) & 0xf) << 1;
+-    dc->condexec_cond = ARM_TBFLAG_CONDEXEC(tb->flags) >> 4;
+-    dc->mmu_idx = core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(tb->flags));
++    dc->thumb = ARM_TBFLAG_THUMB(dc->base.tb->flags);
++    dc->sctlr_b = ARM_TBFLAG_SCTLR_B(dc->base.tb->flags);
++    dc->be_data = ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_LE;
++    dc->condexec_mask = (ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) & 0xf) << 1;
++    dc->condexec_cond = ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) >> 4;
++    dc->mmu_idx = core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.tb->flags));
+     dc->current_el = arm_mmu_idx_to_el(dc->mmu_idx);
+ #if !defined(CONFIG_USER_ONLY)
+     dc->user = (dc->current_el == 0);
+ #endif
+-    dc->ns = ARM_TBFLAG_NS(tb->flags);
+-    dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(tb->flags);
+-    dc->vfp_enabled = ARM_TBFLAG_VFPEN(tb->flags);
+-    dc->vec_len = ARM_TBFLAG_VECLEN(tb->flags);
+-    dc->vec_stride = ARM_TBFLAG_VECSTRIDE(tb->flags);
+-    dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(tb->flags);
+-    dc->v7m_handler_mode = ARM_TBFLAG_HANDLER(tb->flags);
++    dc->ns = ARM_TBFLAG_NS(dc->base.tb->flags);
++    dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
++    dc->vfp_enabled = ARM_TBFLAG_VFPEN(dc->base.tb->flags);
++    dc->vec_len = ARM_TBFLAG_VECLEN(dc->base.tb->flags);
++    dc->vec_stride = ARM_TBFLAG_VECSTRIDE(dc->base.tb->flags);
++    dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(dc->base.tb->flags);
++    dc->v7m_handler_mode = ARM_TBFLAG_HANDLER(dc->base.tb->flags);
+     dc->cp_regs = cpu->cp_regs;
+     dc->features = env->features;
+ 
+@@ -11865,11 +11845,12 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+      *   emit code to generate a software step exception
+      *   end the TB
+      */
+-    dc->ss_active = ARM_TBFLAG_SS_ACTIVE(tb->flags);
+-    dc->pstate_ss = ARM_TBFLAG_PSTATE_SS(tb->flags);
++    dc->ss_active = ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
++    dc->pstate_ss = ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
+     dc->is_ldex = false;
+     dc->ss_same_el = false; /* Can't be true since EL_d must be AArch64 */
+ 
++
+     cpu_F0s = tcg_temp_new_i32();
+     cpu_F1s = tcg_temp_new_i32();
+     cpu_F0d = tcg_temp_new_i64();
+@@ -11878,6 +11859,36 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+     cpu_V1 = cpu_F1d;
+     /* FIXME: cpu_M0 can probably be the same as cpu_V0.  */
+     cpu_M0 = tcg_temp_new_i64();
++
++    return max_insns;
++}
++
 +/* generate intermediate code for basic block 'tb'.  */
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
 +{
-+    DisasContext dc;
++    CPUARMState *env = cs->env_ptr;
++    DisasContext dc1, *dc = &dc1;
++    target_ulong next_page_start;
++    int max_insns;
++    bool end_of_page;
++
++    /* generate intermediate code */
++
++    /* The A64 decoder has its own top level loop, because it doesn't need
++     * the A32/T32 complexity to do with conditional execution/IT blocks/etc.
++     */
++    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
++        gen_intermediate_code_a64(&dc->base, cs, tb);
++        return;
++    }
++
++    dc->base.tb = tb;
++    dc->base.pc_first = dc->base.tb->pc;
++    dc->base.pc_next = dc->base.pc_first;
++    dc->base.is_jmp = DISAS_NEXT;
++    dc->base.num_insns = 0;
++    dc->base.singlestep_enabled = cs->singlestep_enabled;
++
+     next_page_start = (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+     max_insns = tb->cflags & CF_COUNT_MASK;
+     if (max_insns == 0) {
+@@ -11886,6 +11897,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+     if (max_insns > TCG_MAX_INSNS) {
+         max_insns = TCG_MAX_INSNS;
+     }
++    max_insns = arm_tr_init_disas_context(&dc->base, cs, max_insns);
  
--#ifdef DEBUG_DISAS
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(dc->base.pc_first)) {
--        qemu_log_lock();
--        qemu_log("----------------\n");
--        i386_tr_disas_log(&dc->base, cs);
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
--#endif
-+    translator_loop(&i386_tr_ops, &dc.base, cpu, tb);
- }
+     gen_tb_start(tb);
  
- void restore_state_to_opc(CPUX86State *env, TranslationBlock *tb,
 -- 
 2.13.3
