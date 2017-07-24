@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZlKK-0001wA-4c
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:55:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1dZlM7-0002ep-0k
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZlKG-0003yf-5o
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:55:44 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:32872)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZlKF-0003yI-Uh
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:55:40 -0400
-Received: by mail-qk0-x242.google.com with SMTP id d145so8600460qkc.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:55:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1dZlM6-0005x6-1P
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:57:35 -0400
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-34-f4bug@amsat.org>
-	<CAFEAcA-zk-PcOAeo_sshBi9iPc=zF9SD=38Zsx1hf1YwQJYT3w@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <28942e9b-13a6-ffd7-8b5f-abdf88ea8b99@amsat.org>
-Date: Mon, 24 Jul 2017 18:55:34 -0300
+	<20170724182751.18261-22-f4bug@amsat.org>
+	<CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
+	<ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
+	<e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
+Date: Mon, 24 Jul 2017 16:57:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-zk-PcOAeo_sshBi9iPc=zF9SD=38Zsx1hf1YwQJYT3w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.10 33/35] configure: clang does
- not support -Wexpansion-to-defined
+In-Reply-To: <e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b"
+Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
+ pointer dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +28,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 07/24/2017 06:22 PM, Peter Maydell wrote:
-> On 24 July 2017 at 19:27, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   configure | 6 +++++-
->>   1 file changed, 5 insertions(+), 1 deletion(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
+ pointer dereference
+References: <20170724182751.18261-1-f4bug@amsat.org>
+ <20170724182751.18261-22-f4bug@amsat.org>
+ <CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
+ <ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
+ <e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
+In-Reply-To: <e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/24/2017 04:52 PM, Eric Blake wrote:
+> On 07/24/2017 04:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 07/24/2017 06:09 PM, Peter Maydell wrote:
+>>> On 24 July 2017 at 19:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>>>> Use error_report() + exit() instead of error_setg(&error_fatal).
+>>>>
+>>>> hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable
+>>>> 'node_path') results in a null pointer dereference
+>>>>      if (node_path[1]) {
+>>>>          ^~~~~~~~~~~~
+>>>
+>>> I don't understand what this warning is trying to say.
+>>> We can't get to this point with a NULL node_path,
+>>> because of the previous conditional, which is using
+>>> error_setg(&error_fatal).
 >>
->> diff --git a/configure b/configure
->> index 6b52e19ee3..48295aa1e6 100755
->> --- a/configure
->> +++ b/configure
->> @@ -1582,8 +1582,12 @@ gcc_flags="-Wold-style-declaration -Wold-style-definition -Wtype-limits"
->>   gcc_flags="-Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers $gcc_flags"
->>   gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
->>   gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
->> -gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
->> +gcc_flags="-Wno-initializer-overrides $gcc_flags"
->>   gcc_flags="-Wno-string-plus-int $gcc_flags"
->> +# clang does not support -Wexpansion-to-defined
->> +if ! echo | $cc -dM -E - | grep __clang__ > /dev/null 2>&1 ; then
->> +    gcc_flags="-Wexpansion-to-defined $gcc_flags"
->> +fi
-> 
-> We already have a mechanism for testing that the warning
-> flags we pass here are actually supported by the compiler
-> (the cc_has_warning_flag() function, which we run on
-> every flag in $gcc_flags). Why does -Wexpansion-to-defined
-> need special casing?
+>> Ok I see, Clang is unaware than error_setg(&error_fatal) is a noreturn=
+=2E
+>=20
+> Indeed, and that's because error_setg(&error_fatal) is not in preferred=
 
-Yeah no idea, it works with clang 3.9 but not 5.0, I didn't investigate 
-further. I prefixed this patch 'RFC' to not consider it but provide it 
-if someone wanted to reproduce the analysis. Maybe I should prefix it 
-'XXX' next time or 'NOT FOR MERGE'.
+> form.
+>=20
+>>
+>> Patch dropped.
+>=20
+> That's a shame.  Rather, we should patch this file (and others) to avoi=
+d
+> all the inconsistent uses of error_setg(&error_*), to comply with the
+> error.h documentation.
 
-Regards,
+In other words, switching to the preferred spelling in the following file=
+s:
+device_tree.c
+hw/arm/sysbus-fdt.c
+hw/block/fdc.c
+hw/ppc/spapr_drc.c
 
-Phil.
+is desirable, and has the added benefit of also silencing a Coverity
+false positive.  But it should be done in terms of switching to the
+preferred spelling, as it touches more instances than just the one that
+shuts up Coverity.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll2bT4ACgkQp6FrSiUn
+Q2pokggAphLmlsdXFNxF//VMyJjkgoD1HN7lpy1rM+HYZclyEaasn1AUatSL7amx
+8JGC2XcmDKglkBEa4IRRWkI4G+xtWHEgdTDAfI98H07CpYPzneXAijivu+sBv/P7
+MNpHr8jjcHrvvAsIALinaCyFDdOWt5QnI6ZxN1g0MuBfiviPsN6yEHJdneiZ0YKl
+isZ/EN2xa50I9rmbM+LladwSIX3/v3yIp5S+/+nCzXSBScGpfUGKO1og9dgSBhgA
+YPtuE+js1Q+YGb/K+ojhIDibdJw54GjlhK7arHaBRO3+Lov3swu/aLGOqXVWpTet
+wzQKQ0vpl5ue007pIG7Qk7UlcmU5Og==
+=WF4E
+-----END PGP SIGNATURE-----
+
+--UuM0Tu06NIUC2HMBF20BUwnENd9njpm3b--
