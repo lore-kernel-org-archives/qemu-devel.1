@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZbb9-0001ni-Kf
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dZbbZ-0001z0-50
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZbb6-0004mC-Hm
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47738)
+	(envelope-from <cohuck@redhat.com>) id 1dZbbW-0004vp-0q
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dZbb6-0004lw-9C
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:24 -0400
-Date: Mon, 24 Jul 2017 12:32:21 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170724113221.GB2784@stefanha-x1.localdomain>
-References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
-	<87a83xlo1a.fsf@frigg.lan>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dZbbV-0004va-Qg
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:32:49 -0400
+Date: Mon, 24 Jul 2017 13:32:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170724133245.48649043@gondolin>
+In-Reply-To: <1500886370-14572-1-git-send-email-thuth@redhat.com>
+References: <1500886370-14572-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Bn2rw/3z4jIqBvZU"
-Content-Disposition: inline
-In-Reply-To: <87a83xlo1a.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] target/s390x: Fix broken build with
+ --disable-tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, den@openvz.org, dgilbert@redhat.com, armbru@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>
 
+On Mon, 24 Jul 2017 10:52:45 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
---Bn2rw/3z4jIqBvZU
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Our configure script was recently equipped with a new --disable-tcg
+> parameter, but this does unfortunately not work on s390x hosts yet. Fix
+> the build by moving some code around and by adding some few #ifdefs
+> in the right places.
+> 
+> v3:
+> - Fixed the problem when building the s390x-linux-user target
+> - Added a g_assert_not_reached() to tcg_s390_program_interrupt()
+>   according to Richard's suggestion
 
-On Fri, Jul 21, 2017 at 08:04:17PM +0300, Llu=EDs Vilanova wrote:
-> Vladimir Sementsov-Ogievskiy writes:
->=20
-> > Current trace system have a drawback: parameters of trace functions
-> > are calculated even if corresponding tracepoint is disabled. Also, it
-> > looks like trace function are not actually inlined by compiler (at
-> > least for me).
->=20
-> > Here is a fix proposal: move from function call to macros. Patch 02
-> > is an example, of how to reduce extra calculations with help of
-> > patch 01.
->=20
-> The tracing functions *were* inlined last time I checked, although things
-> changed quite a lot since then. Not sure that will make a lot of differen=
-ce in
-> terms of overall performance (needs measuring).
->=20
-> As for arguments, each trace event has a define TRACE_{NAME}_ENABLED that=
- you
-> can use for that purpose. If this is not explained in tracing.txt, that i=
-s a
-> documentation bug.
+If I get one more R-b by Richard for patch 3 before tomorrow, I'll
+merge that in.
 
-It is described in docs/devel/tracing.txt:
+> 
+> v2:
+> - Reworked the changes to program_interrupt() according to the
+>   suggestions by Richard
+> 
+> Thomas Huth (5):
+>   target/s390x: Move s390_cpu_dump_state() to helper.c
+>   target/s390x: Move diag helpers to a separate file
+>   target/s390x: Rework program_interrupt() and related functions
+>   target/s390x: Move exception-related functions to a new excp_helper.c
+>     file
+>   target/s390x: Add remaining switches to compile with --disable-tcg
+> 
+>  target/s390x/Makefile.objs |   8 +-
+>  target/s390x/cpu.c         |   4 +
+>  target/s390x/cpu.h         |  17 +-
+>  target/s390x/diag.c        | 179 +++++++++++++++
+>  target/s390x/excp_helper.c | 515 +++++++++++++++++++++++++++++++++++++++++++
+>  target/s390x/helper.c      | 528 +++++----------------------------------------
+>  target/s390x/interrupt.c   |  39 ++++
+>  target/s390x/kvm.c         |  16 +-
+>  target/s390x/misc_helper.c | 193 -----------------
+>  target/s390x/translate.c   |  60 ------
+>  10 files changed, 819 insertions(+), 740 deletions(-)
+>  create mode 100644 target/s390x/diag.c
+>  create mode 100644 target/s390x/excp_helper.c
+> 
 
-In addition, there might be cases where relatively complex computations mus=
-t be
-performed to generate values that are only used as arguments for a trace
-function. In these cases you can use the macro 'TRACE_${EVENT_NAME}_ENABLED=
-' to
-guard such computations and avoid its compilation when the event is disable=
-d:
-
-    #include "trace.h"  /* needed for trace event prototype */
-   =20
-    void *qemu_vmalloc(size_t size)
-    {
-        void *ptr;
-        size_t align =3D QEMU_VMALLOC_ALIGN;
-   =20
-        if (size < align) {
-            align =3D getpagesize();
-        }
-        ptr =3D qemu_memalign(align, size);
-        if (TRACE_QEMU_VMALLOC_ENABLED) { /* preprocessor macro */
-            void *complex;
-            /* some complex computations to produce the 'complex' value */
-            trace_qemu_vmalloc(size, ptr, complex);
-        }
-        return ptr;
-    }
-
---Bn2rw/3z4jIqBvZU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZddrFAAoJEJykq7OBq3PIp2YIAJHOzK9pwfUdUsd8LBu370rr
-bFsdCVMQro2fxruzptw+bf0u97sur6Sc3RsltALTCDtkjtuvpWkDcc8FnT3hg0c8
-w1SN3AxAGsjrzxwvpVHP5BTNcazY+ZdsK+ZEA5LGT+RVKLQ3wBSByYWouAKgMmBI
-bRJeTcHcVBdFIaZawWlgE46m7KjJ2dJyINn7i5kWmmzGAOXnllsdRqNx665/f1X+
-mEN7sizeWvXe7emWN7hGdfM29fYYrHSrP3w+c+KXlxbuofWROsTYKSHiwyMIigwO
-J/UoqY+h0fLaJsV6GM4vHTxg5aG7nH1wwT21qnXnZYRap9hmEldAg6aLjD9Ci40=
-=jJnn
------END PGP SIGNATURE-----
-
---Bn2rw/3z4jIqBvZU--
+Thanks, queued to s390-next.
