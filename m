@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZids-0004oZ-10
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:03:45 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1dZifk-0006V8-2h
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZidn-0007Hq-A8
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:03:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55740)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZidn-0007Ha-0I
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:03:39 -0400
-Date: Mon, 24 Jul 2017 20:03:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170724190331.GH2127@work-vm>
-References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
-	<20170724153521.GD2127@work-vm>
-	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1dZifg-0000Br-NZ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:05:40 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Mon, 24 Jul 2017 19:05:33 +0000
+Message-ID: <DM2PR21MB0060EFC1F6B9F0883A1792369EBB0@DM2PR21MB0060.namprd21.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
+Subject: [Qemu-devel] Torn read/write possible on aarch64/x86-64 MTTCG?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,184 +21,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: Andrey Shedel <ashedel@microsoft.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 24/07/2017 17:35, Dr. David Alan Gilbert wrote:
-> > * Jay Zhou (jianjay.zhou@huawei.com) wrote:
-> >> Hi Dave,
-> >>
-> >> On 2017/7/21 17:49, Dr. David Alan Gilbert wrote:
-> >>> * Jay Zhou (jianjay.zhou@huawei.com) wrote:
-> >>>> Qemu_savevm_state_cleanup() takes about 300ms in my ram migration tests
-> >>>> with a 8U24G vm(20G is really occupied), the main cost comes from
-> >>>> KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
-> >>>> kvm_set_user_memory_region(). In kmod, the main cost is
-> >>>> kvm_zap_obsolete_pages(), which traverses the active_mmu_pages list to
-> >>>> zap the unsync sptes.
-> >>>
-> >>> Hi Jay,
-> >>>    Is this actually increasing the real downtime when the guest isn't
-> >>> running, or is it just the reported time? I see that the s->downtime
-> >>> value is calculated right after where we currently call
-> >>> qemu_savevm_state_cleanup.
-> >>
-> >> It actually increased the real downtime, I used the "ping" command to
-> >> test. Reason is that the source side libvirt sends qmp to qemu to query
-> >> the status of migration, which needs the BQL. qemu_savevm_state_cleanup
-> >> is done with BQL, qemu can not handle the qmp if qemu_savevm_state_cleanup
-> >> has not finished. And the source side libvirt delays about 300ms to notify
-> >> the destination side libvirt to send the "cont" command to start the vm.
-> >>
-> >> I think the value of s->downtime is not accurate enough, maybe we could
-> >> move the calculation of end_time after qemu_savevm_state_cleanup has done.
-> > 
-> > I'm copying in Paolo, Radim and Andrea- is there anyway we can make the
-> > teardown of KVMs dirty tracking not take so long? 300ms is a silly long time
-> > on only a small VM.
-> 
-> Xiao Guangrong is working on something vaguely related (but different
-> and simpler because it's entirely contained within KVM), which is to
-> make log_sync faster.
-> 
-> The Intel folks working on clear containers also would like
-> MemoryListeners to have a better complexity, but that's again separate
-> from the "zapping" of SPTEs.
+Hi all,
 
-They do keep popping up; I remember they're a pain in COLO.
+I'm trying to track down what appears to be a translation bug in either the=
+ aarch64 target or x86_64 TCG (in multithreaded mode). The symptoms are ent=
+irely consistent with a torn read/write -- that is, a 64-bit load or store =
+that was translated to two 32-bit loads and stores -- but that's obviously =
+not what happens in the common path through the translation for this code, =
+so I'm wondering: are there any cases in which qemu will split a 64-bit mem=
+ory access into two 32-bit accesses?
 
-> > Can you tell me which version of libvirt you're using?
-> > I thought the newer ones were supposed to use events so they did't
-> > have to poll qemu.
-> > 
-> >  If we move qemu_savevm_state_cleanup is it still safe? Are there
-> > some things we're supposed to do at that point which are wrong if
-> > we don't.
-> > 
-> > I wonder about something like;  take a mutex in
-> > memory_global_dirty_log_start, release it in
-> > memory_global_dirty_log_stop.  Then make ram_save_cleanup start
-> > a new thread that does the call to memory_global_dirty_log_stop.
-> 
-> I don't like having such a long-lived mutex (it seems like a recipe for
-> deadlocks with the BQL), plus memory_region_transaction_commit (the
-> expensive part of memory_global_dirty_log_stop) needs to be under the
-> BQL itself because it calls MemoryListeners.
-> 
-> Maybe memory_global_dirty_log_stop can delay itself to the next vm_start
-> if it's called while runstate_running() returns false (which should be
-> always the case)?
-> 
-> It could even be entirely enclosed within memory.c if you do it with a
-> VMChangeStateHandler.
+The code:
+Guest CPU A writes a 64-bit value to an aligned memory location that was pr=
+eviously 0, using a regular store; e.g.:
+	f9000034 str         x20,[x1]
 
-This still causes the BQL to be held for quite a while; albeit at a less
-critical point.
+Guest CPU B (who is busy-waiting) reads a value from the same location:
+	f9400280 ldr         x0,[x20]
 
-In this and the existing case we don't actually need efficiency - what we need is just
-not to be holding onto the BQL for so long;  could we do a less
-efficient commit here, removing one region at a time, yielding the lock
-and retaking it?
+The symptom:
+CPU B loads a value that is neither NULL nor the value written. Instead, x0=
+ gets only the low 32-bits of the value written (high bits are all zero). B=
+y the time this value is dereferenced (a few instructions later) and the ex=
+ception handlers run, the memory location from which it was loaded has the =
+correct 64-bit value with a non-zero upper half.
 
+Obviously on a real ARM memory barriers are critical, and indeed the code h=
+as such barriers in it, but I'm assuming that any possible mistranslation o=
+f the barriers is irrelevant because for a 64-bit load and a 64-bit store y=
+ou should get all or nothing. Other clues that may be relevant: the code is=
+ _near_ a LDREX/STREX pair (the busy-waiting is used to resolve a race when=
+ updating another variable), and the busy-wait loop has a yield instruction=
+ in it (although those appear to be no-ops with MTTCG).
 
-> Thanks,
-> 
-> Paolo
-> 
-> > Dave
-> > 
-> >> Thanks,
-> >> Jay
-> >>
-> >>> However, we would need to be a bit careful of anything that needs
-> >>> cleaning up before the source restarts on failure; I'm not sure of
-> >>> the semantics of all the current things wired into save_cleanup.
-> >>>
-> >>> Dave
-> >>>
-> >>>
-> >>>> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> >>>> ---
-> >>>>   migration/migration.c | 16 +++++++++-------
-> >>>>   qmp.c                 | 10 ++++++++++
-> >>>>   2 files changed, 19 insertions(+), 7 deletions(-)
-> >>>>
-> >>>> diff --git a/migration/migration.c b/migration/migration.c
-> >>>> index a0db40d..72832be 100644
-> >>>> --- a/migration/migration.c
-> >>>> +++ b/migration/migration.c
-> >>>> @@ -1877,6 +1877,15 @@ static void *migration_thread(void *opaque)
-> >>>>           if (qemu_file_get_error(s->to_dst_file)) {
-> >>>>               migrate_set_state(&s->state, current_active_state,
-> >>>>                                 MIGRATION_STATUS_FAILED);
-> >>>> +            /*
-> >>>> +             * The resource has been allocated by migration will be reused in
-> >>>> +             * COLO process, so don't release them.
-> >>>> +             */
-> >>>> +            if (!enable_colo) {
-> >>>> +                qemu_mutex_lock_iothread();
-> >>>> +                qemu_savevm_state_cleanup();
-> >>>> +                qemu_mutex_unlock_iothread();
-> >>>> +            }
-> >>>>               trace_migration_thread_file_err();
-> >>>>               break;
-> >>>>           }
-> >>>> @@ -1916,13 +1925,6 @@ static void *migration_thread(void *opaque)
-> >>>>       end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> >>>>
-> >>>>       qemu_mutex_lock_iothread();
-> >>>> -    /*
-> >>>> -     * The resource has been allocated by migration will be reused in COLO
-> >>>> -     * process, so don't release them.
-> >>>> -     */
-> >>>> -    if (!enable_colo) {
-> >>>> -        qemu_savevm_state_cleanup();
-> >>>> -    }
-> >>>>       if (s->state == MIGRATION_STATUS_COMPLETED) {
-> >>>>           uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
-> >>>>           s->total_time = end_time - s->total_time;
-> >>>> diff --git a/qmp.c b/qmp.c
-> >>>> index b86201e..0e68eaa 100644
-> >>>> --- a/qmp.c
-> >>>> +++ b/qmp.c
-> >>>> @@ -37,6 +37,8 @@
-> >>>>   #include "qom/object_interfaces.h"
-> >>>>   #include "hw/mem/pc-dimm.h"
-> >>>>   #include "hw/acpi/acpi_dev_interface.h"
-> >>>> +#include "migration/migration.h"
-> >>>> +#include "migration/savevm.h"
-> >>>>
-> >>>>   NameInfo *qmp_query_name(Error **errp)
-> >>>>   {
-> >>>> @@ -200,6 +202,14 @@ void qmp_cont(Error **errp)
-> >>>>       if (runstate_check(RUN_STATE_INMIGRATE)) {
-> >>>>           autostart = 1;
-> >>>>       } else {
-> >>>> +        /*
-> >>>> +         * Delay the cleanup to reduce the downtime of migration.
-> >>>> +         * The resource has been allocated by migration will be reused
-> >>>> +         * in COLO process, so don't release them.
-> >>>> +         */
-> >>>> +        if (runstate_check(RUN_STATE_POSTMIGRATE) && !migrate_colo_enabled()) {
-> >>>> +            qemu_savevm_state_cleanup();
-> >>>> +        }
-> >>>>           vm_start();
-> >>>>       }
-> >>>>   }
-> >>>> --
-> >>>> 1.8.3.1
-> >>>>
-> >>>>
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>>
-> >>> .
-> >>>
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The bug repros more easily with more guest VCPUs, and more load on the host=
+ (i.e. more context switching to expose the race). It doesn't repro for the=
+ single-threaded TCG. Unfortunately it's hard to get detailed trace informa=
+tion, because the bug only repros roughly every one in 40 attempts, and it'=
+s a long way into the guest OS boot before it arises.
+
+I'm not yet 100% convinced this is a qemu bug -- the obvious path through t=
+he translator for those instructions does 64-bit memory accesses on the hos=
+t -- but at the same time, it has never been seen outside qemu, and after s=
+taring long and hard at the guest code, we're pretty sure it's correct. It'=
+s also extremely unlikely to be a wild write, given that it occurs on a wid=
+e variety of guest call-stacks, and the memory is later inconsistent with w=
+hat was loaded.
+
+Any clues or debugging suggestions appreciated!
+
+Thanks,
+Andrew
