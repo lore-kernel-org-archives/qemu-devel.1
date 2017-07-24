@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dZe50-0001BH-OL
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1dZe53-0001Ba-HA
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dZe4w-0005cz-Ot
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22564)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZe4w-0005aq-IX
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:22 -0400
-Date: Mon, 24 Jul 2017 15:11:08 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170724141108.GA11443@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170719100802.14094-1-berrange@redhat.com>
-	<20170719100802.14094-2-berrange@redhat.com>
-	<d659c0cb-0cb2-3af7-b97f-05ad15aa3550@redhat.com>
-	<ee0b3e06-7037-f2c9-18e9-1fb1dcb0784a@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1dZe4z-0005f1-C0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45132)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dZe4z-0005eC-5v
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:25 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dZe4x-0004IT-8i
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:11:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3B65F2E80CD
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:11:23 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ee0b3e06-7037-f2c9-18e9-1fb1dcb0784a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/2 (for 2.10)] docs: document support
- lifetime for features
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Jul 2017 13:58:28 -0000
+From: hbagdi <1705717@bugs.launchpad.net>
+Reply-To: Bug 1705717 <1705717@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150064619170.15700.7661736805405042031.malonedeb@wampee.canonical.com>
+Message-Id: <150090470849.6043.7099014266972880831.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1705717] Re: Live migration fails with 'host' cpu
+ when KVM is inserted with nested=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Jul 24, 2017 at 03:49:29PM +0200, Paolo Bonzini wrote:
-> On 19/07/2017 13:56, Thomas Huth wrote:
-> > +@node Machine types
-> > +@section Machine types
-> > +
-> > +For architectures which aim to support live migration compatibility
-> > +across releases, each release will introduce a new versioned machine
-> > +type. For example, the 2.8.0 release introduced machine types
-> > +``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
-> > +
-> > +To allow live migration of a guest running on a 2.8.0 release to a
-> > +2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-> > +``pc-q35-2.8''. To allow users live migrating VMs to skip multiple
-> > +intermediate releases when upgrading, new releases of QEMU will
-> > +support machine types from many previous versions.
-> > +
-> > +The supported lifetime for versioned machine types is 12 releases,
-> > +which is equivalent to 4 years worth of previous QEMU releases.
-> 
-> I think there's still no consensus on this.
+Hello,
+I could not replicate this behavior on another system.
+So, please close this bug.
+Apologies for the inconvenience.
 
-Indeed, which is exactly why I sent this patch - we need to come up
-with a sensible policy here, so we can stop repeating the same debate
-over & over & over each time some proposes a patch to kill off some
-random old machine type.
+-- =
 
-The 12 release / 4 year figure was a fairly arbitrary starting
-point to which I'd be hoping to see critical reviewer feedback
-on (with possible counterproposals) so we can try to get something
-documented, to put an end to the repeated debates in this area
-each time someone proposes a patch.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1705717
 
->                                              The first two paragraphs
-> should be added to the documentation for -machine in qemu-options.hx,
-> since "-machine [type=]foo" is currently not documented at all.
+Title:
+  Live migration fails with 'host' cpu when KVM is inserted with
+  nested=3D1
 
-I'll happily send a patch for the docs for qemu-options.hx.
+Status in QEMU:
+  New
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Bug description:
+  Qemu v2.9.0
+  Linux kernel 4.9.34
+
+  Live migration(pre-copy) being done from one physical host to another:
+
+  Source Qemu:
+  sudo qemu-system-x86_64 -drive file=3D${IMAGE_DIR}/${IMAGE_NAME},if=3Dvir=
+tio -m 2048 -smp 1 -net nic,model=3Dvirtio,macaddr=3D${MAC} -net tap,ifname=
+=3Dqtap0,script=3Dno,downscript=3Dno -vnc :1 --enable-kvm -cpu kvm64 -qmp t=
+cp:*:4242,server,nowait
+
+  And KVM is inserted with nested=3D1 on both source and destination
+  machine.
+
+  Migration fails with a nested specific assertion failure on
+  destination at target/i386/kvm.c +1629
+
+  Migration is successful in the following cases-
+
+  A) cpu model is 'host' and kvm is inserted without nested=3D1 parameter
+  B) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D1)
+  C) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D0)
+  D) Between an L0 and a guest Hypervisor L1, with 'kvm64' as CPU type (and=
+ nested=3D1 for L0 KVM)
+
+  Physical host(s)-
+  $ lscpu
+  Architecture:          x86_64
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Little Endian
+  CPU(s):                12
+  On-line CPU(s) list:   0-11
+  Thread(s) per core:    1
+  Core(s) per socket:    6
+  Socket(s):             2
+  NUMA node(s):          2
+  Vendor ID:             GenuineIntel
+  CPU family:            6
+  Model:                 62
+  Model name:            Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz
+  Stepping:              4
+  CPU MHz:               1200.091
+  CPU max MHz:           2600.0000
+  CPU min MHz:           1200.0000
+  BogoMIPS:              4203.28
+  Virtualization:        VT-x
+  L1d cache:             32K
+  L1i cache:             32K
+  L2 cache:              256K
+  L3 cache:              15360K
+  NUMA node0 CPU(s):     0-5
+  NUMA node1 CPU(s):     6-11
+  Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr p=
+ge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe sysca=
+ll nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xt=
+opology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl=
+ vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt =
+tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi fl=
+expriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1705717/+subscriptions
