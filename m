@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZkqr-0007Zq-Qq
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:25:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZks4-0008SM-O8
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZkqq-00049i-Q3
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:25:17 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38378)
+	(envelope-from <peter.maydell@linaro.org>) id 1dZks3-0004oo-Jp
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:26:32 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38617)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dZkqq-00049W-J0
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:25:16 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id m85so27568113wma.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:25:16 -0700 (PDT)
+	id 1dZks3-0004nw-DJ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:26:31 -0400
+Received: by mail-wm0-x231.google.com with SMTP id m85so27586052wma.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:26:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <08765e63-6712-f965-7ea3-ab356b083c60@amsat.org>
+In-Reply-To: <20170724182751.18261-28-f4bug@amsat.org>
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-22-f4bug@amsat.org>
-	<CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
-	<08765e63-6712-f965-7ea3-ab356b083c60@amsat.org>
+	<20170724182751.18261-28-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Jul 2017 22:24:55 +0100
-Message-ID: <CAFEAcA8eQLvAY9CozjNJ+zz0Lm99q=yEw0ap9MXJmsH-XuC4=g@mail.gmail.com>
+Date: Mon, 24 Jul 2017 22:26:09 +0100
+Message-ID: <CAFEAcA86cuTukJ4HXVKDjewpxy2myPU1Gdbn671zqxJq6d09Wg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
- pointer dereference
+Subject: Re: [Qemu-devel] [PATCH for 2.10 27/35] syscall: fix dereference of
+ undefined pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +32,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 24 July 2017 at 22:20, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+On 24 July 2017 at 19:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
 te:
-> On 07/24/2017 06:09 PM, Peter Maydell wrote:
->>
->> On 24 July 2017 at 19:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
+> Clang's scan-build-5.0 reports:
 >
-> ...
+> linux-user/syscall.c:5581:9: warning: Dereference of undefined pointer va=
+lue
+>     if (*host_rt_dev_ptr !=3D 0) {
+>         ^~~~~~~~~~~~~~~~
 >
->>> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
->>> index d68e3dcdbd..ad0cc49b19 100644
->>> --- a/hw/arm/sysbus-fdt.c
->>> +++ b/hw/arm/sysbus-fdt.c
->>> @@ -315,15 +315,14 @@ static int add_amd_xgbe_fdt_node(SysBusDevice
->>> *sbdev, void *opaque)
->>>       node_path =3D qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
->>>                                      &error_fatal);
->>>       if (!node_path || !node_path[0]) {
->>> -        error_setg(&error_fatal, "%s unable to retrieve node path for
->>> %s/%s",
->>> +        error_report("%s unable to retrieve node path for %s/%s",
->>>                      __func__, dt_name, vdev->compat);
->>> -    }
->>> -
->>> -    if (node_path[1]) {
->>> -        error_setg(&error_fatal, "%s more than one node matching
->>> %s/%s!",
->>> +        exit(1);
->>> +    } else if (node_path[1]) {
->>> +        error_report("%s more than one node matching %s/%s!",
->>>                      __func__, dt_name, vdev->compat);
->>> +        exit(1);
->>>       }
->>> -
->>>       g_free(dt_name);
->>
->>
->> This doesn't seem like an improvement. Now the
->> error handling in the function is an inconsistent
->> mix of error_report()+exit() and error_setg(&error_fatal).
+> Reported-by: Clang Static Analyzer
+> Suggested-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  linux-user/syscall.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index fcd20fa276..e79b5baec4 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -5524,7 +5524,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, u=
+int8_t *buf_temp,
+>      int target_size;
+>      void *argptr;
+>      abi_ulong *target_rt_dev_ptr;
+> -    unsigned long *host_rt_dev_ptr;
+> +    unsigned long *host_rt_dev_ptr =3D NULL;
+>      abi_long ret;
+>      int i;
 >
-> I got this from "qapi/error.h":
+> @@ -5570,6 +5570,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, u=
+int8_t *buf_temp,
+>      unlock_user(argptr, arg, 0);
 >
-> 156 * Please don't error_setg(&error_fatal, ...), use error_report() and
-> 157 * exit(), because that's more obvious.
-> 158 * Likewise, don't error_setg(&error_abort, ...), use assert().
->
-> Is this comment outdated?
+>      ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+> +    assert(host_rt_dev_ptr);
 
-Probably not, I expect this code predates it. However
-my point about inconsistency still stands.
+There's not much point in this assert because it doesn't
+tell us anything we're not about to find out immediately
+by dereferencing the pointer...
+
+>      if (*host_rt_dev_ptr !=3D 0) {
+>          unlock_user((void *)*host_rt_dev_ptr,
+>                      *target_rt_dev_ptr, 0);
+> --
+> 2.13.3
 
 thanks
 -- PMM
