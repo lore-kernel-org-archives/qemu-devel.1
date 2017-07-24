@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZeZp-00021O-Qb
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:43:18 -0400
+	(envelope-from <clg@kaod.org>) id 1dZeam-0002qS-VI
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZeZn-0008JT-4N
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:43:17 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:34883)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZeZm-0008IQ-Nf
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:43:15 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
-	<20170724113422.GC2784@stefanha-x1.localdomain>
-	<2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
-Date: Mon, 24 Jul 2017 17:43:05 +0300
-In-Reply-To: <2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org> (Denis
-	V. Lunev's message of "Mon, 24 Jul 2017 15:17:16 +0300")
-Message-ID: <87y3rdopza.fsf@frigg.lan>
+	(envelope-from <clg@kaod.org>) id 1dZeak-0000hg-86
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:44:17 -0400
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:40437)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZeaj-0000f3-U3
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:44:14 -0400
+Received: from player732.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6A20B124009
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 16:44:12 +0200 (CEST)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-15-git-send-email-clg@kaod.org>
+	<20170724063534.GM17228@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
+Date: Mon, 24 Jul 2017 16:44:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
+In-Reply-To: <20170724063534.GM17228@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 14/26] ppc/xive: add MMIO handlers to
+ the XIVE interrupt presenter model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +32,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, armbru@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Denis V Lunev writes:
+On 07/24/2017 08:35 AM, David Gibson wrote:
+> On Wed, Jul 05, 2017 at 07:13:27PM +0200, C=E9dric Le Goater wrote:
+>> The Thread Interrupt Management Area for the OS is mostly used to
+>> acknowledge interrupts and set the CPPR of the CPU.
+>>
+>> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
+>> used to retrieve the targeted interrupt presenter object.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> Am I right in thinking that this shoehorns the XIVE TIMA state into
+> the existing XICS ICP object.  That.. doesn't seem like a good idea.
 
-> On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
->> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->>> Current trace system have a drawback: parameters of trace functions
->>> are calculated even if corresponding tracepoint is disabled. Also, it
->>> looks like trace function are not actually inlined by compiler (at
->>> least for me).
->>> 
->>> Here is a fix proposal: move from function call to macros. Patch 02
->>> is an example, of how to reduce extra calculations with help of
->>> patch 01.
->>> 
->>> Vladimir Sementsov-Ogievskiy (2):
->>> trace: do not calculate arguments for disabled trace-points
->>> monitor: improve tracing in handle_qmp_command
->> Please use the TRACE_FOO_ENABLED macro instead of putting computation
->> inside the trace event arguments.  This makes the code cleaner and
->> easier to read.
-> At our opinion this ENABLED is compile time check while the option
-> could be tuned in runtime. Thus normally it would normally be
-> enabled while the trace is silent.
+The TIMA memory region is under the XIVE object because it is=20
+unique for the system. The lookup of the ICP is simply done using=20
+'current_cpu'. The TIMA state is under the ICPState, yes, but this=20
+model does not seem incorrect to me as this state contains the=20
+interrupt information presented to a CPU.  =20
 
-> So, under load, we will have extra allocation, copying the command buffer,
-> freeing memory without actual trace. In order to fix that we should
-> do something like
+Thanks,
 
-> if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
->    req_json = qobject_to_json(req);
->    trace_handle_qmp_command(mon, req_json);
->    QDECREF(req_json);
-> }
+C.
 
-> which is possible, but at our (me + Vova) opinion is ugly.
-> That is why we are proposing to switch to macro, which
-> will not require such tweaking.
-
-> Arguments will be only evaluated when necessary and we
-> will not have side-effects if the tracepoint is compile time
-> enabled and run-time disabled.
-
-> Though if the code above is acceptable, we can send the
-> patch with it. No problem.
-
-I completely get your point, but:
-
-* I'm not sure it will have much of a performance impact.
-* It is not obvious what's going to happen just by looking at the code of the
-  calling site.
-
-I prefer to minimize the use of macros, even if that makes a few trace event
-calls to be a bit more verbose, as in your example above. Also, I quite dislike
-the new style you propose:
-
-  trace_handle_qmp_command(mon,
-                           qstring_get_str(req_json = qobject_to_json(req)));
-  QDECREF(req_json);
-
-
-Cheers,
-  Lluis
+>> ---
+>>  hw/intc/xive-internal.h |   4 ++
+>>  hw/intc/xive.c          | 187 +++++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  2 files changed, 191 insertions(+)
+>>
+>> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
+>> index ba5e648a5258..5e8b78a1ea6a 100644
+>> --- a/hw/intc/xive-internal.h
+>> +++ b/hw/intc/xive-internal.h
+>> @@ -200,6 +200,10 @@ struct XIVE {
+>>      /* ESB and TIMA memory location */
+>>      hwaddr       vc_base;
+>>      MemoryRegion esb_iomem;
+>> +
+>> +    uint32_t     tm_shift;
+>> +    hwaddr       tm_base;
+>> +    MemoryRegion tm_iomem;
+>>  };
+>> =20
+>>  void xive_reset(void *dev);
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index c08a4f8efb58..82b2f0dcda0b 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -26,6 +26,180 @@
+>> =20
+>>  #include "xive-internal.h"
+>> =20
+>> +static uint8_t priority_to_ipb(uint8_t priority)
+>> +{
+>> +    return priority < XIVE_EQ_PRIORITY_COUNT ? 1 << (7 - priority) : =
+0;
+>> +}
+>> +
+>> +static uint64_t xive_icp_accept(XiveICPState *xicp)
+>> +{
+>> +    ICPState *icp =3D ICP(xicp);
+>> +    uint8_t nsr =3D xicp->tima_os[TM_NSR];
+>> +
+>> +    qemu_irq_lower(icp->output);
+>> +
+>> +    if (xicp->tima_os[TM_NSR] & TM_QW1_NSR_EO) {
+>> +        uint8_t cppr =3D xicp->tima_os[TM_PIPR];
+>> +
+>> +        xicp->tima_os[TM_CPPR] =3D cppr;
+>> +
+>> +        /* Reset the pending buffer bit */
+>> +        xicp->tima_os[TM_IPB] &=3D ~priority_to_ipb(cppr);
+>> +
+>> +        /* Drop Exception bit for OS */
+>> +        xicp->tima_os[TM_NSR] &=3D ~TM_QW1_NSR_EO;
+>> +    }
+>> +
+>> +    return (nsr << 8) | xicp->tima_os[TM_CPPR];
+>> +}
+>> +
+>> +static void xive_icp_set_cppr(XiveICPState *xicp, uint8_t cppr)
+>> +{
+>> +    if (cppr > XIVE_PRIORITY_MAX) {
+>> +        cppr =3D 0xff;
+>> +    }
+>> +
+>> +    xicp->tima_os[TM_CPPR] =3D cppr;
+>> +}
+>> +
+>> +/*
+>> + * Thread Interrupt Management Area MMIO
+>> + */
+>> +static uint64_t xive_tm_read_special(XiveICPState *icp, hwaddr offset=
+,
+>> +                                     unsigned size)
+>> +{
+>> +    uint64_t ret =3D -1;
+>> +
+>> +    if (offset =3D=3D TM_SPC_ACK_OS_REG && size =3D=3D 2) {
+>> +        ret =3D xive_icp_accept(icp);
+>> +    } else {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA read @%"
+>> +                      HWADDR_PRIx" size %d\n", offset, size);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned si=
+ze)
+>> +{
+>> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
+>> +    XiveICPState *icp =3D XIVE_ICP(cpu->intc);
+>> +    uint64_t ret =3D -1;
+>> +    int i;
+>> +
+>> +    if (offset >=3D TM_SPC_ACK_EBB) {
+>> +        return xive_tm_read_special(icp, offset, size);
+>> +    }
+>> +
+>> +    if (offset & TM_QW1_OS) {
+>> +        switch (size) {
+>> +        case 1:
+>> +        case 2:
+>> +        case 4:
+>> +        case 8:
+>> +            if (QEMU_IS_ALIGNED(offset, size)) {
+>> +                ret =3D 0;
+>> +                for (i =3D 0; i < size; i++) {
+>> +                    ret |=3D icp->tima[offset + i] << (8 * i);
+>> +                }
+>> +            } else {
+>> +                qemu_log_mask(LOG_GUEST_ERROR,
+>> +                              "XIVE: invalid TIMA read alignment @%"
+>> +                              HWADDR_PRIx" size %d\n", offset, size);
+>> +            }
+>> +            break;
+>> +        default:
+>> +            g_assert_not_reached();
+>> +        }
+>> +    } else {
+>> +        qemu_log_mask(LOG_UNIMP, "XIVE: does handle non-OS TIMA ring =
+@%"
+>> +                      HWADDR_PRIx"\n", offset);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static bool xive_tm_is_readonly(uint8_t index)
+>> +{
+>> +    /* Let's be optimistic and prepare ground for HV mode support */
+>> +    switch (index) {
+>> +    case TM_QW1_OS + TM_CPPR:
+>> +        return false;
+>> +    default:
+>> +        return true;
+>> +    }
+>> +}
+>> +
+>> +static void xive_tm_write_special(XiveICPState *xicp, hwaddr offset,
+>> +                                  uint64_t value, unsigned size)
+>> +{
+>> +    if (offset =3D=3D TM_SPC_SET_OS_PENDING && size =3D=3D 1) {
+>> +        xicp->tima_os[TM_IPB] |=3D priority_to_ipb(value & 0xff);
+>> +    } else {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA write @%"
+>> +                      HWADDR_PRIx" size %d\n", offset, size);
+>> +    }
+>> +
+>> +    /* TODO: support TM_SPC_ACK_OS_EL */
+>> +}
+>> +
+>> +static void xive_tm_write(void *opaque, hwaddr offset,
+>> +                           uint64_t value, unsigned size)
+>> +{
+>> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
+>> +    XiveICPState *icp =3D XIVE_ICP(cpu->intc);
+>> +    int i;
+>> +
+>> +    if (offset >=3D TM_SPC_ACK_EBB) {
+>> +        xive_tm_write_special(icp, offset, value, size);
+>> +        return;
+>> +    }
+>> +
+>> +    if (offset & TM_QW1_OS) {
+>> +        switch (size) {
+>> +        case 1:
+>> +            if (offset =3D=3D TM_QW1_OS + TM_CPPR) {
+>> +                xive_icp_set_cppr(icp, value & 0xff);
+>> +            }
+>> +            break;
+>> +        case 4:
+>> +        case 8:
+>> +            if (QEMU_IS_ALIGNED(offset, size)) {
+>> +                for (i =3D 0; i < size; i++) {
+>> +                    if (!xive_tm_is_readonly(offset + i)) {
+>> +                        icp->tima[offset + i] =3D (value >> (8 * i)) =
+& 0xff;
+>> +                    }
+>> +                }
+>> +            } else {
+>> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA wr=
+ite @%"
+>> +                              HWADDR_PRIx" size %d\n", offset, size);
+>> +            }
+>> +            break;
+>> +        default:
+>> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA write =
+@%"
+>> +                          HWADDR_PRIx" size %d\n", offset, size);
+>> +        }
+>> +    } else {
+>> +        qemu_log_mask(LOG_UNIMP, "XIVE: does handle non-OS TIMA ring =
+@%"
+>> +                      HWADDR_PRIx"\n", offset);
+>> +    }
+>> +}
+>> +
+>> +
+>> +static const MemoryRegionOps xive_tm_ops =3D {
+>> +    .read =3D xive_tm_read,
+>> +    .write =3D xive_tm_write,
+>> +    .endianness =3D DEVICE_BIG_ENDIAN,
+>> +    .valid =3D {
+>> +        .min_access_size =3D 1,
+>> +        .max_access_size =3D 8,
+>> +    },
+>> +    .impl =3D {
+>> +        .min_access_size =3D 1,
+>> +        .max_access_size =3D 8,
+>> +    },
+>> +};
+>> +
+>>  static void xive_icp_reset(ICPState *icp)
+>>  {
+>>      XiveICPState *xicp =3D XIVE_ICP(icp);
+>> @@ -453,6 +627,11 @@ static const TypeInfo xive_ics_info =3D {
+>>  #define P9_MMIO_BASE     0x006000000000000ull
+>>  #define P9_CHIP_BASE(id) (P9_MMIO_BASE | (0x40000000000ull * (uint64_=
+t) (id)))
+>> =20
+>> +/* Thread Interrupt Management Area MMIO */
+>> +#define TM_BAR_DEFAULT   0x30203180000ull
+>> +#define TM_SHIFT         16
+>> +#define TM_BAR_SIZE      (XIVE_TM_RING_COUNT * (1 << TM_SHIFT))
+>> +
+>>  static uint64_t xive_esb_default_read(void *p, hwaddr offset, unsigne=
+d size)
+>>  {
+>>      qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
+>> @@ -541,6 +720,14 @@ static void xive_realize(DeviceState *dev, Error =
+**errp)
+>>                            NULL, "xive.esb", VC_BAR_SIZE);
+>>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->esb_iomem);
+>> =20
+>> +    /* TM BAR. Same address for each chip */
+>> +    x->tm_base =3D (P9_MMIO_BASE | TM_BAR_DEFAULT);
+>> +    x->tm_shift =3D TM_SHIFT;
+>> +
+>> +    memory_region_init_io(&x->tm_iomem, OBJECT(x), &xive_tm_ops, x,
+>> +                          "xive.tm", TM_BAR_SIZE);
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->tm_iomem);
+>> +
+>>      qemu_register_reset(xive_reset, dev);
+>>  }
+>> =20
+>=20
