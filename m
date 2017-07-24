@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dZg4U-0006XB-EC
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:19:03 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZg9h-0007zn-9S
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dZg4T-0005pm-KP
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:19:02 -0400
-Received: from mail-yw0-x22e.google.com ([2607:f8b0:4002:c05::22e]:35659)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZg9c-0008M0-9x
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:24:25 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:38409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1dZg4T-0005pS-DD
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:19:01 -0400
-Received: by mail-yw0-x22e.google.com with SMTP id h189so26704969ywf.2
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 09:19:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZg9c-0008LF-4w
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:24:20 -0400
+Received: by mail-qk0-x241.google.com with SMTP id t2so10366862qkc.5
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 09:24:18 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+	<20170724113422.GC2784@stefanha-x1.localdomain>
+	<2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7b81efbc-f0ef-3637-1043-9bec4b4266b1@amsat.org>
+Date: Mon, 24 Jul 2017 13:24:07 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170724154849.GQ652@quack2.suse.cz>
-References: <20170721155848.GO18014@stefanha-x1.localdomain>
-	<CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
-	<1500818683.4073.31.camel@redhat.com>
-	<CAPcyv4h5O4D2kp6SJhWiz4V=dOLDa_Q3pk2B=u-x7hKKQqdXsQ@mail.gmail.com>
-	<1500833428.4073.36.camel@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<CAPcyv4g-X8S95=uQBo5MzxpwKfqdTbmBis3B56i59wqWiPnCBA@mail.gmail.com>
-	<20170724154849.GQ652@quack2.suse.cz>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Mon, 24 Jul 2017 09:19:00 -0700
-Message-ID: <CAPcyv4iLdcQhDJhi1sh8DT9yW5qSh5ruq-x=bsVTbgzO_NNT4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,23 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kara <jack@suse.cz>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Rik van Riel <riel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: armbru@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Mon, Jul 24, 2017 at 8:48 AM, Jan Kara <jack@suse.cz> wrote:
-> On Mon 24-07-17 08:10:05, Dan Williams wrote:
->> On Mon, Jul 24, 2017 at 5:37 AM, Jan Kara <jack@suse.cz> wrote:
-[..]
->> This approach would turn into a full fsync on the host. The question
->> in my mind is whether there is any optimization to be had by trapping
->> dax_flush() and calling msync() on host ranges, but Jan is right
->> trapping blkdev_issue_flush() and turning around and calling host
->> fsync() is the most straightforward approach that does not need driver
->> interface changes. The dax_flush() approach would need to modify it
->> into a async completion interface.
->
-> If the backing device on the host is actually a normal block device or an
-> image file, doing full fsync() is the most efficient implementation
-> anyway...
+On 07/24/2017 09:17 AM, Denis V. Lunev wrote:
+> On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
+>> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>>> Current trace system have a drawback: parameters of trace functions
+>>> are calculated even if corresponding tracepoint is disabled. Also, it
+>>> looks like trace function are not actually inlined by compiler (at
+>>> least for me).
+>>>
+>>> Here is a fix proposal: move from function call to macros. Patch 02
+>>> is an example, of how to reduce extra calculations with help of
+>>> patch 01.
+>>>
+>>> Vladimir Sementsov-Ogievskiy (2):
+>>>    trace: do not calculate arguments for disabled trace-points
+>>>    monitor: improve tracing in handle_qmp_command
+>> Please use the TRACE_FOO_ENABLED macro instead of putting computation
+>> inside the trace event arguments.  This makes the code cleaner and
+>> easier to read.
+> At our opinion this ENABLED is compile time check while the option
+> could be tuned in runtime. Thus normally it would normally be
+> enabled while the trace is silent.
+> 
+> So, under load, we will have extra allocation, copying the command buffer,
+> freeing memory without actual trace. In order to fix that we should
+> do something like
+> 
+> if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
+>     req_json = qobject_to_json(req);
+>     trace_handle_qmp_command(mon, req_json);
+>     QDECREF(req_json);
+> }
+> 
+> which is possible, but at our (me + Vova) opinion is ugly.
 
-Ah, ok, great. That was the gap in my understanding.
+It seems to me much cleaner/easier to read than your patch, I really 
+prefer this way. It is so nice/useful that it deserves to be starred as 
+an example in docs/devel/tracing.txt :)
+
+> That is why we are proposing to switch to macro, which
+> will not require such tweaking.
+> 
+> Arguments will be only evaluated when necessary and we
+> will not have side-effects if the tracepoint is compile time
+> enabled and run-time disabled.
+> 
+> Though if the code above is acceptable, we can send the
+> patch with it. No problem.
+> 
+> Den
