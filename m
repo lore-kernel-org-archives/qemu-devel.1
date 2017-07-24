@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dZUaR-0000Hk-ES
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:03:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dZUyW-0002tE-Cv
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dZUaO-0000EC-9c
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:03:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dZUaO-0000DW-0m
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:03:12 -0400
-References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
-	<20170718170819.28494-4-anton.ivanov@cambridgegreys.com>
-	<e31eb033-a770-e5fd-97b0-0b50f268c22c@redhat.com>
-	<b1194532-a97a-33d3-92d4-8531674d358d@cambridgegreys.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2c69da12-2b18-2272-6eff-c6223667aad0@redhat.com>
-Date: Mon, 24 Jul 2017 12:03:06 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dZUyT-0008R7-4v
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:28:08 -0400
+Date: Mon, 24 Jul 2017 14:02:20 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170724040220.GC17228@umbus.fritz.box>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-7-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <b1194532-a97a-33d3-92d4-8531674d358d@cambridgegreys.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] Unified Datagram Socket Transport -
- raw support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eHhjakXzOLJAF9wJ"
+Content-Disposition: inline
+In-Reply-To: <1499274819-15607-7-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 06/26] ppc/xive: introduce a XIVE
+ interrupt source model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,140 +25,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Ivanov <anton.ivanov@cambridgegreys.com>, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
+--eHhjakXzOLJAF9wJ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B407=E6=9C=8822=E6=97=A5 02:50, Anton Ivanov wrote:
->
-> [snip]
->
->>> +    "-netdev raw,id=3Dstr,ifname=3Difname\n"
->>> +    "                configure a network backend with ID 'str'=20
->>> connected to\n"
->>> +    "                an Ethernet interface named ifname via raw=20
->>> socket.\n"
->>> +    "                This backend does not change the interface=20
->>> settings.\n"
->>> +    "                Most interfaces will require being set into=20
->>> promisc mode,\n"
->>> +    "                as well having most offloads (TSO, etc) turned=20
->>> off.\n"
->>> +    "                Some virtual interfaces like tap support only=20
->>> RX.\n"
->>
->> Pay attention that qemu supports vnet header. So any reason to turn=20
->> off e.g TSO here?
->
-> I am not aware of any means to get extra info like checksums, etc show=20
-> up on raw socket read.
->
-> If you know a way to make them show up, this is worth investigating.
+On Wed, Jul 05, 2017 at 07:13:19PM +0200, C=E9dric Le Goater wrote:
+> This is very similar to the current ICS_SIMPLE model in XICS. We try
+> to reuse the ICS model because the sPAPR machine is tied to the
+> XICSFabric interface and should be using a common framework to switch
+> from one controller model to another: XICS <-> XIVE.
 
-See packet_rcv_vnet(). But a known 'issue' for raw socket is that it=20
-forbids change vnet header length after creation, we may need some=20
-workaround in qemu.
+Hm.  I'm not entirely concvinced re-using the xics ICSState class in
+this way is a good idea, though maybe it's a reasonable first step.
+With this patch alone some code is shared, but there are some real
+uglies around the edges.
 
->
->>
->>>   #endif
->>>       "-netdev=20
->>> socket,id=3Dstr[,fd=3Dh][,listen=3D[host]:port][,connect=3Dhost:port]=
-\n"
->>>       "                configure a network backend to connect to=20
->>> another network\n"
->>> @@ -2463,6 +2470,32 @@ qemu-system-i386 linux.img -net nic -net=20
->>> gre,src=3D4.2.3.1,dst=3D1.2.3.4
->>>     @end example
->>>   +@item -netdev raw,id=3D@var{id},ifname=3D@var{ifname}
->>> +@itemx -net raw[,vlan=3D@var{n}][,name=3D@var{name}],ifname=3D@var{i=
-fname}
->>> +Connect VLAN @var{n} directly to an Ethernet interface using raw=20
->>> socket.
->>> +
->>> +This transport allows a VM to bypass most of the network stack=20
->>> which is
->>> +extremely useful for tapping.
->>> +
->>> +@item ifname=3D@var{ifname}
->>> +    interface name (mandatory)
->>> +
->>> +@example
->>> +# set up the interface - put it in promiscuous mode and turn off=20
->>> offloads
->>> +ifconfig eth0 up
->>> +ifconfig eth0 promisc
->>> +
->>> +/sbin/ethtool -K eth0 gro off
->>> +/sbin/ethtool -K eth0 tso off
->>> +/sbin/ethtool -K eth0 gso off
->>> +/sbin/ethtool -K eth0 tx off
->>
->> Any reason to turn off tx here?
->
-> Yes - we already have it computed and we have written it as is as a=20
-> whole packet. You do not want it
-> re-computed as at least some adapters do silly things if you start=20
-> writing raw and the checksum already exists.
+Seems to me at least long term you need to either 1) make the XIVE ics
+separate, even if it has similarities to the XICS one or 2) truly
+unify them, with a common base type and methods to handle the
+differences.
 
-This looks like a bug of the driver?
 
-For GRO it's easier to understand since guest may not handle big packets=20
-with partial checksum. But tso,gso,tx, this still looks questionable for=20
-the nic which may want to offload them to card (e.g virtio-net).
+> The next patch will introduce the MMIO handlers to interact with XIVE
+> interrupt sources.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/intc/xive.c        | 110 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/ppc/xive.h |  12 ++++++
+>  2 files changed, 122 insertions(+)
+>=20
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 5b14d8155317..9ff14c0da595 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -26,6 +26,115 @@
+> =20
+>  #include "xive-internal.h"
+> =20
+> +static void xive_icp_irq(XiveICSState *xs, int lisn)
+> +{
+> +
+> +}
+> +
+> +/*
+> + * XIVE Interrupt Source
+> + */
+> +static void xive_ics_set_irq_msi(XiveICSState *xs, int srcno, int val)
+> +{
+> +    if (val) {
+> +        xive_icp_irq(xs, srcno + ICS_BASE(xs)->offset);
+> +    }
+> +}
+> +
+> +static void xive_ics_set_irq_lsi(XiveICSState *xs, int srcno, int val)
+> +{
+> +    ICSIRQState *irq =3D &ICS_BASE(xs)->irqs[srcno];
+> +
+> +    if (val) {
+> +        irq->status |=3D XICS_STATUS_ASSERTED;
+> +    } else {
+> +        irq->status &=3D ~XICS_STATUS_ASSERTED;
+> +    }
+> +
+> +    if (irq->status & XICS_STATUS_ASSERTED
+> +        && !(irq->status & XICS_STATUS_SENT)) {
+> +        irq->status |=3D XICS_STATUS_SENT;
+> +        xive_icp_irq(xs, srcno + ICS_BASE(xs)->offset);
+> +    }
+> +}
+> +
+> +static void xive_ics_set_irq(void *opaque, int srcno, int val)
+> +{
+> +    XiveICSState *xs =3D ICS_XIVE(opaque);
+> +    ICSIRQState *irq =3D &ICS_BASE(xs)->irqs[srcno];
+> +
+> +    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
+> +        xive_ics_set_irq_lsi(xs, srcno, val);
+> +    } else {
+> +        xive_ics_set_irq_msi(xs, srcno, val);
+> +    }
+> +}
 
->
-> Once again, this one of the pros/cons of using tpacket vs recv/send=20
-> (with or without mmsg) on a raw socket.
->
-> recvm(m)sg/sendm(m)sg are brute force as far as offloads, but things=20
-> like scatter/gather work correctly so there are little copies.
->
-> Compared to that, tpacket will allow you some access to checksumming=20
-> which you can map onto checksum offload in a vNIC. As a payback for=20
-> this you end up copying in more cases than for send/recvmmsg and you=20
-> pay penalty for timestamping if you do not have a hardware timestamp=20
-> source in the NIC.
->
-> The other issue I always had with tpacket is that you "see" your own=20
-> packets so you have to manage a  RX side BPF filter which removes=20
-> those so you do not see your own packets.
+e.g. you have some code re-use, but still need to more-or-less
+duplicate the set_irq code as above.
 
-Don't get here, looks like I don't get this 'issue'. Anyway we can=20
-discuss this when I post the tpacket backend.
+> +static void xive_ics_reset(void *dev)
+> +{
+> +    ICSState *ics =3D ICS_BASE(dev);
+> +    int i;
+> +    uint8_t flags[ics->nr_irqs];
+> +
+> +    for (i =3D 0; i < ics->nr_irqs; i++) {
+> +        flags[i] =3D ics->irqs[i].flags;
+> +    }
+> +
+> +    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
+> +
+> +    for (i =3D 0; i < ics->nr_irqs; i++) {
+> +        ics->irqs[i].flags =3D flags[i];
+> +    }
 
-Thanks.
+This save, clear, restore is also kind ugly.  I'm also not sure why
+this needs a reset method when I can't find one for the xics ICS.
 
-> That can get quite interesting if you have a lot of MACs on a NIC=20
-> (f.e. when there are multicast apps). Not sure if this is still the=20
-> case - it definitely was in mid 3.x Linux kernels. If you use raw=20
-> sendm(m)sg there is no issue - the packets are not looped when writing=20
-> to physical interfaces.
->
->>
->>> +
->>> +# launch QEMU instance - if your network has reorder or is very=20
->>> lossy add ,pincounter
->>> +
->>> +qemu-system-i386 linux.img -net nic -net raw,ifname=3Deth0
->>
->> Can we switch to use -netdev here?
->
-> This is done in the new revisions.
->
->>
->> Thanks
->>
->>> +
->>> +@end example
->>> +
->>>   @item -netdev=20
->>> vde,id=3D@var{id}[,sock=3D@var{socketpath}][,port=3D@var{n}][,group=3D=
-@var{groupname}][,mode=3D@var{octalmode}]
->>>   @itemx -net=20
->>> vde[,vlan=3D@var{n}][,name=3D@var{name}][,sock=3D@var{socketpath}]=20
->>> [,port=3D@var{n}][,group=3D@var{groupname}][,mode=3D@var{octalmode}]
->>>   Connect VLAN @var{n} to PORT @var{n} of a vde switch running on=20
->>> host and
->>
->>
+Does the xics irqstate structure really cover what you need for xive?
+I had the impression elsewhere that xive had a different priority
+model to xics.  And there's the xics pointer in the icsstate structure
+which is definitely redundant.
+
+> +}
+> +
+> +static void xive_ics_realize(ICSState *ics, Error **errp)
+> +{
+> +    XiveICSState *xs =3D ICS_XIVE(ics);
+> +    Object *obj;
+> +    Error *err =3D NULL;
+> +
+> +    obj =3D object_property_get_link(OBJECT(xs), "xive", &err);
+> +    if (!obj) {
+> +        error_setg(errp, "%s: required link 'xive' not found: %s",
+> +                   __func__, error_get_pretty(err));
+> +        return;
+> +    }
+> +    xs->xive =3D XIVE(obj);
+> +
+> +    if (!ics->nr_irqs) {
+> +        error_setg(errp, "Number of interrupts needs to be greater 0");
+> +        return;
+> +    }
+> +
+> +    ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+> +    ics->qirqs =3D qemu_allocate_irqs(xive_ics_set_irq, xs, ics->nr_irqs=
+);
+> +
+> +    qemu_register_reset(xive_ics_reset, xs);
+> +}
+> +
+> +static Property xive_ics_properties[] =3D {
+> +    DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+> +    DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void xive_ics_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
+> +
+> +    isc->realize =3D xive_ics_realize;
+> +
+> +    dc->props =3D xive_ics_properties;
+> +}
+> +
+> +static const TypeInfo xive_ics_info =3D {
+> +    .name =3D TYPE_ICS_XIVE,
+> +    .parent =3D TYPE_ICS_BASE,
+> +    .instance_size =3D sizeof(XiveICSState),
+> +    .class_init =3D xive_ics_class_init,
+> +};
+> +
+>  /*
+>   * Main XIVE object
+>   */
+> @@ -123,6 +232,7 @@ static const TypeInfo xive_info =3D {
+>  static void xive_register_types(void)
+>  {
+>      type_register_static(&xive_info);
+> +    type_register_static(&xive_ics_info);
+>  }
+> =20
+>  type_init(xive_register_types)
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 863f5a9c6b5f..544cc6e0c796 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -19,9 +19,21 @@
+>  #ifndef PPC_XIVE_H
+>  #define PPC_XIVE_H
+> =20
+> +#include "hw/ppc/xics.h"
+> +
+>  typedef struct XIVE XIVE;
+> +typedef struct XiveICSState XiveICSState;
+> =20
+>  #define TYPE_XIVE "xive"
+>  #define XIVE(obj) OBJECT_CHECK(XIVE, (obj), TYPE_XIVE)
+> =20
+> +#define TYPE_ICS_XIVE "xive-source"
+> +#define ICS_XIVE(obj) OBJECT_CHECK(XiveICSState, (obj), TYPE_ICS_XIVE)
+> +
+> +struct XiveICSState {
+> +    ICSState parent_obj;
+> +
+> +    XIVE         *xive;
+> +};
+
+>  #endif /* PPC_XIVE_H */
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--eHhjakXzOLJAF9wJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll1cUoACgkQbDjKyiDZ
+s5JXrBAAq2cXLhaqla96NNdl20parLJUQopPm4A1FISJZgJkpwkuQZ4bQYAKh48h
+sq9cuqByw5YrTZuJ8MaC3i0gnDGoKGFOPKcgLG7FUBn+Mbi4yUDduluKUCnBrcQj
+2CARX4OTp7Hne4mQOknopBtkkZXHypNHSPOkqt1QOahvXso7FzU51HPxrG2tJRyU
+aklVG2DkdNdvMLFiGekFw5trJ9uhEYHAxEd/7xWbE7VGI+RnvjK2pSh3g6Arwn2m
+tC/mgMIHfPgO8bM0UD9MyNRlGISV3+ZRIlLsI1H9nVjZy+DyyG1B6hk1kN5sZykK
+7Zur6KiWi/ZSr0O3J/PNUOW0Y2d74XsPnKStTFpB/BNSsAh1t2/91BEkEhoJ8c98
+SW3bDFmbOVSBArVEwS2PALyG0ZVho+vmmC/VZ+v1vqb/bkcTpVTgKubH4/t8zFeH
+fzv25LVHUIqtJkkp1p/ZsVik6e4PyrSLMoiEI3M+VL+7N6LBlFxo+gMHxay8giOF
+z9frlcSi0boL8bL3mKLMUEPoojhXuSZicCGD3NuSivRte9smEfNriQfN27ceq/Z9
+dkiAxGWn4Jk6OIzhR9MTw2SUMwbrVy1sZQIdJEpZdP9+pD2pvJwlRwqddorFZit/
+z51/LUv5zmSEONXRdX7uq1OyNpMu89s1kaEW6+U5V4awxwK7sfA=
+=N4K8
+-----END PGP SIGNATURE-----
+
+--eHhjakXzOLJAF9wJ--
