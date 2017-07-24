@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dZgSD-0006Wo-Q6
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:43:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dZgUu-0007Ue-Rm
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dZgS9-0007zp-SQ
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:43:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51600)
+	(envelope-from <berrange@redhat.com>) id 1dZgUq-0000YF-U4
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:46:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51776)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dZgS9-0007zO-LV
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:43:29 -0400
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <56c4d877-58e8-b8ac-cc7f-e6cde5ddfa16@redhat.com>
-Date: Mon, 24 Jul 2017 12:43:24 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZgUq-0000XI-OK
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:46:16 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 24 Jul 2017 17:46:01 +0100
+Message-Id: <20170724164601.21063-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170721110636.19412e6c@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for 2.10] ps2: fix sending of PAUSE/BREAK
+ scancodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
+The processing of the scancodes for PAUSE/BREAK  has been broken since
+the conversion to qcodes in:
 
+  commit 8c10e0baf0260b59a4e984744462a18016662e3e
+  Author: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+  Date:   Thu Sep 15 22:06:26 2016 +0200
 
-On 07/21/2017 05:06 AM, Igor Mammedov wrote:
-> On Thu, 20 Jul 2017 21:29:33 +0200
-> Phil Dennis-Jordan <lists@philjordan.eu> wrote:
-> 
->> On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
->> <programmingkidx@gmail.com> wrote:
->>> I noticed that Windows 2000 does not boot up in QEMU recently. After bisecting the issue I found the offending commit:
-> w2k is very ancient (and long time EOLed), I can't even download it from msdn to test
-> (oldest available is XP)
-> 
-> do we really care about it?
-> 
+    ps2: use QEMU qcodes instead of scancodes
 
-Red Hat: "No, not really."
-FOSS: "Yes, of course!"
+When using a VNC client, with the raw scancode extension, the client
+will send a scancode of 0xc6 for both PAUSE and BREAK. There is mistakenl=
+y
+no entry in the qcode_to_number table for this scancode, so
+ps2_keyboard_event() just generates a log message and discards the
+scancode
 
-Half the fun of QEMU (see also: QEMU Advent Calendar) is running old 
-software. Technology moves so fast that even software from just 17 years 
-ago is becoming impossible to run.
+When using a SPICE client, it will also send 0xc6 for BREAK, but
+will send 0xe1 0x1d 0x45 0xe1 0x9d 0xc5 for PAUSE. There is no
+entry in the qcode_to_number table for the scancode 0xe1 because
+it is a special XT keyboard prefix not mapping to any QKeyCode.
+Again ps2_keyboard_event() just generates a log message and discards
+the scancode. The following 0x1d, 0x45, 0x9d, 0xc5 scancodes get
+handled correctly. Fixing this just requires special casing 0xe1 so
+it is directly queued for sending to the guest, skipping any conversion
+to QKeyCode.
 
-For historical and archival purposes it is absolutely of interest to be 
-able to run one of Microsoft's most popular operating systems.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ hw/input/ps2.c    | 7 +++++++
+ ui/input-keymap.c | 1 +
+ 2 files changed, 8 insertions(+)
 
-Of course, it's not particularly high on anyone's list who is getting 
-paid to tend to QEMU, of course.
-
---js
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 3ba05efd06..a132d1ba72 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -607,6 +607,13 @@ static void ps2_keyboard_event(DeviceState *dev, Qem=
+uConsole *src,
+     assert(evt->type =3D=3D INPUT_EVENT_KIND_KEY);
+     qcode =3D qemu_input_key_value_to_qcode(key->key);
+=20
++    if (qcode =3D=3D 0 &&
++        key->key->type =3D=3D KEY_VALUE_KIND_NUMBER &&
++        key->key->u.number.data =3D=3D 0x61) {
++        ps2_put_keycode(s, 0xe1);
++        return;
++    }
++
+     if (s->scancode_set =3D=3D 1) {
+         if (qcode =3D=3D Q_KEY_CODE_PAUSE) {
+             if (key->down) {
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index 8a1476fc48..9211f835be 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -98,6 +98,7 @@ static const int qcode_to_number[] =3D {
+     [Q_KEY_CODE_KP_ENTER] =3D 0x9c,
+     [Q_KEY_CODE_KP_DECIMAL] =3D 0x53,
+     [Q_KEY_CODE_SYSRQ] =3D 0x54,
++    [Q_KEY_CODE_PAUSE] =3D 0xc6,
+=20
+     [Q_KEY_CODE_KP_0] =3D 0x52,
+     [Q_KEY_CODE_KP_1] =3D 0x4f,
+--=20
+2.13.3
