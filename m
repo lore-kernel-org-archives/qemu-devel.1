@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZic5-0003U2-6t
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:01:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dZids-0004oZ-10
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:03:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZic4-0006fZ-6J
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:01:53 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-24-f4bug@amsat.org>
-	<4de3bb09-6894-ee92-eb49-0f64efe1bad8@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0a7a2681-4702-5334-aaa8-e477aaa5c98a@twiddle.net>
-Date: Mon, 24 Jul 2017 12:01:41 -0700
+	(envelope-from <dgilbert@redhat.com>) id 1dZidn-0007Hq-A8
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:03:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZidn-0007Ha-0I
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:03:39 -0400
+Date: Mon, 24 Jul 2017 20:03:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170724190331.GH2127@work-vm>
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
+	<20170724153521.GD2127@work-vm>
+	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4de3bb09-6894-ee92-eb49-0f64efe1bad8@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 23/35] m68k/translate: fix
- incorrect copy/paste
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +29,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 07/24/2017 11:54 AM, Laurent Vivier wrote:
-> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
->> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
->> index ada2a91b64..1a2f421aab 100644
->> --- a/target/m68k/translate.c
->> +++ b/target/m68k/translate.c
->> @@ -1321,7 +1321,8 @@ static void gen_cc_cond(DisasCompare *c, DisasContext *s, int cond)
->>       case 5: /* CS (C) */
->>           /* Some cases fold C into X.  */
->>           if (op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL ||
->> -            op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL) {
->> +            op == CC_OP_SUBB || op == CC_OP_SUBW || op == CC_OP_SUBL ||
->> +            op == CC_OP_LOGIC) {
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 24/07/2017 17:35, Dr. David Alan Gilbert wrote:
+> > * Jay Zhou (jianjay.zhou@huawei.com) wrote:
+> >> Hi Dave,
+> >>
+> >> On 2017/7/21 17:49, Dr. David Alan Gilbert wrote:
+> >>> * Jay Zhou (jianjay.zhou@huawei.com) wrote:
+> >>>> Qemu_savevm_state_cleanup() takes about 300ms in my ram migration tests
+> >>>> with a 8U24G vm(20G is really occupied), the main cost comes from
+> >>>> KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
+> >>>> kvm_set_user_memory_region(). In kmod, the main cost is
+> >>>> kvm_zap_obsolete_pages(), which traverses the active_mmu_pages list to
+> >>>> zap the unsync sptes.
+> >>>
+> >>> Hi Jay,
+> >>>    Is this actually increasing the real downtime when the guest isn't
+> >>> running, or is it just the reported time? I see that the s->downtime
+> >>> value is calculated right after where we currently call
+> >>> qemu_savevm_state_cleanup.
+> >>
+> >> It actually increased the real downtime, I used the "ping" command to
+> >> test. Reason is that the source side libvirt sends qmp to qemu to query
+> >> the status of migration, which needs the BQL. qemu_savevm_state_cleanup
+> >> is done with BQL, qemu can not handle the qmp if qemu_savevm_state_cleanup
+> >> has not finished. And the source side libvirt delays about 300ms to notify
+> >> the destination side libvirt to send the "cont" command to start the vm.
+> >>
+> >> I think the value of s->downtime is not accurate enough, maybe we could
+> >> move the calculation of end_time after qemu_savevm_state_cleanup has done.
+> > 
+> > I'm copying in Paolo, Radim and Andrea- is there anyway we can make the
+> > teardown of KVMs dirty tracking not take so long? 300ms is a silly long time
+> > on only a small VM.
 > 
-> According to commit (db3d7945) introducing the incorrect copy/paste, I
-> don't think we need the CC_OP_LOGIC here. Logic operations never
-> generates X flags (whereas they can generate Z and and N).
+> Xiao Guangrong is working on something vaguely related (but different
+> and simpler because it's entirely contained within KVM), which is to
+> make log_sync faster.
+> 
+> The Intel folks working on clear containers also would like
+> MemoryListeners to have a better complexity, but that's again separate
+> from the "zapping" of SPTEs.
 
-Indeed, look at the comment below.  LOGIC is supposed to fall through to the 
-code that produces TCG_COND_NEVER.
+They do keep popping up; I remember they're a pain in COLO.
+
+> > Can you tell me which version of libvirt you're using?
+> > I thought the newer ones were supposed to use events so they did't
+> > have to poll qemu.
+> > 
+> >  If we move qemu_savevm_state_cleanup is it still safe? Are there
+> > some things we're supposed to do at that point which are wrong if
+> > we don't.
+> > 
+> > I wonder about something like;  take a mutex in
+> > memory_global_dirty_log_start, release it in
+> > memory_global_dirty_log_stop.  Then make ram_save_cleanup start
+> > a new thread that does the call to memory_global_dirty_log_stop.
+> 
+> I don't like having such a long-lived mutex (it seems like a recipe for
+> deadlocks with the BQL), plus memory_region_transaction_commit (the
+> expensive part of memory_global_dirty_log_stop) needs to be under the
+> BQL itself because it calls MemoryListeners.
+> 
+> Maybe memory_global_dirty_log_stop can delay itself to the next vm_start
+> if it's called while runstate_running() returns false (which should be
+> always the case)?
+> 
+> It could even be entirely enclosed within memory.c if you do it with a
+> VMChangeStateHandler.
+
+This still causes the BQL to be held for quite a while; albeit at a less
+critical point.
+
+In this and the existing case we don't actually need efficiency - what we need is just
+not to be holding onto the BQL for so long;  could we do a less
+efficient commit here, removing one region at a time, yielding the lock
+and retaking it?
 
 
-r~
+> Thanks,
+> 
+> Paolo
+> 
+> > Dave
+> > 
+> >> Thanks,
+> >> Jay
+> >>
+> >>> However, we would need to be a bit careful of anything that needs
+> >>> cleaning up before the source restarts on failure; I'm not sure of
+> >>> the semantics of all the current things wired into save_cleanup.
+> >>>
+> >>> Dave
+> >>>
+> >>>
+> >>>> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> >>>> ---
+> >>>>   migration/migration.c | 16 +++++++++-------
+> >>>>   qmp.c                 | 10 ++++++++++
+> >>>>   2 files changed, 19 insertions(+), 7 deletions(-)
+> >>>>
+> >>>> diff --git a/migration/migration.c b/migration/migration.c
+> >>>> index a0db40d..72832be 100644
+> >>>> --- a/migration/migration.c
+> >>>> +++ b/migration/migration.c
+> >>>> @@ -1877,6 +1877,15 @@ static void *migration_thread(void *opaque)
+> >>>>           if (qemu_file_get_error(s->to_dst_file)) {
+> >>>>               migrate_set_state(&s->state, current_active_state,
+> >>>>                                 MIGRATION_STATUS_FAILED);
+> >>>> +            /*
+> >>>> +             * The resource has been allocated by migration will be reused in
+> >>>> +             * COLO process, so don't release them.
+> >>>> +             */
+> >>>> +            if (!enable_colo) {
+> >>>> +                qemu_mutex_lock_iothread();
+> >>>> +                qemu_savevm_state_cleanup();
+> >>>> +                qemu_mutex_unlock_iothread();
+> >>>> +            }
+> >>>>               trace_migration_thread_file_err();
+> >>>>               break;
+> >>>>           }
+> >>>> @@ -1916,13 +1925,6 @@ static void *migration_thread(void *opaque)
+> >>>>       end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> >>>>
+> >>>>       qemu_mutex_lock_iothread();
+> >>>> -    /*
+> >>>> -     * The resource has been allocated by migration will be reused in COLO
+> >>>> -     * process, so don't release them.
+> >>>> -     */
+> >>>> -    if (!enable_colo) {
+> >>>> -        qemu_savevm_state_cleanup();
+> >>>> -    }
+> >>>>       if (s->state == MIGRATION_STATUS_COMPLETED) {
+> >>>>           uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
+> >>>>           s->total_time = end_time - s->total_time;
+> >>>> diff --git a/qmp.c b/qmp.c
+> >>>> index b86201e..0e68eaa 100644
+> >>>> --- a/qmp.c
+> >>>> +++ b/qmp.c
+> >>>> @@ -37,6 +37,8 @@
+> >>>>   #include "qom/object_interfaces.h"
+> >>>>   #include "hw/mem/pc-dimm.h"
+> >>>>   #include "hw/acpi/acpi_dev_interface.h"
+> >>>> +#include "migration/migration.h"
+> >>>> +#include "migration/savevm.h"
+> >>>>
+> >>>>   NameInfo *qmp_query_name(Error **errp)
+> >>>>   {
+> >>>> @@ -200,6 +202,14 @@ void qmp_cont(Error **errp)
+> >>>>       if (runstate_check(RUN_STATE_INMIGRATE)) {
+> >>>>           autostart = 1;
+> >>>>       } else {
+> >>>> +        /*
+> >>>> +         * Delay the cleanup to reduce the downtime of migration.
+> >>>> +         * The resource has been allocated by migration will be reused
+> >>>> +         * in COLO process, so don't release them.
+> >>>> +         */
+> >>>> +        if (runstate_check(RUN_STATE_POSTMIGRATE) && !migrate_colo_enabled()) {
+> >>>> +            qemu_savevm_state_cleanup();
+> >>>> +        }
+> >>>>           vm_start();
+> >>>>       }
+> >>>>   }
+> >>>> --
+> >>>> 1.8.3.1
+> >>>>
+> >>>>
+> >>> --
+> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>>
+> >>> .
+> >>>
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
