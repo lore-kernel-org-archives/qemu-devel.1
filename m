@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dZiVK-0005jR-Fv
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:54:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1dZiWL-0006jP-48
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dZiVG-0003cw-Jw
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:54:54 -0400
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-24-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4de3bb09-6894-ee92-eb49-0f64efe1bad8@vivier.eu>
-Date: Mon, 24 Jul 2017 20:54:34 +0200
+	(envelope-from <bounces@canonical.com>) id 1dZiWH-0004Jm-8L
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:55:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37752)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dZiWH-0004IZ-0z
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:55:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dZiWE-00014W-Of
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 18:55:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 675902E80D8
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 18:55:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170724182751.18261-24-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 23/35] m68k/translate: fix
- incorrect copy/paste
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Jul 2017 18:42:43 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1705717 <1705717@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150064619170.15700.7661736805405042031.malonedeb@wampee.canonical.com>
+Message-Id: <150092176407.15491.18391582918272527474.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1705717] Re: Live migration fails with 'host' cpu
+ when KVM is inserted with nested=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +37,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
 
-Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
-> db3d7945ae extended gen_cc_cond() for cond [6, 7, 9, 10] but misswrote [4, 5]
-> 
-> target/m68k/translate.c:1323:70: warning: identical expressions on both sides of logical operator
->         if (op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL ||
->             op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL) {
->             ~~~~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~ ^
-> 
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/m68k/translate.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index ada2a91b64..1a2f421aab 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -1321,7 +1321,8 @@ static void gen_cc_cond(DisasCompare *c, DisasContext *s, int cond)
->      case 5: /* CS (C) */
->          /* Some cases fold C into X.  */
->          if (op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL ||
-> -            op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL) {
-> +            op == CC_OP_SUBB || op == CC_OP_SUBW || op == CC_OP_SUBL ||
-> +            op == CC_OP_LOGIC) {
+Hmm OK; but if you do hit it again please just reopen this one and give
+the full assert and details
 
-According to commit (db3d7945) introducing the incorrect copy/paste, I
-don't think we need the CC_OP_LOGIC here. Logic operations never
-generates X flags (whereas they can generate Z and and N).
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Thanks,
-Laurent
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1705717
+
+Title:
+  Live migration fails with 'host' cpu when KVM is inserted with
+  nested=3D1
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Qemu v2.9.0
+  Linux kernel 4.9.34
+
+  Live migration(pre-copy) being done from one physical host to another:
+
+  Source Qemu:
+  sudo qemu-system-x86_64 -drive file=3D${IMAGE_DIR}/${IMAGE_NAME},if=3Dvir=
+tio -m 2048 -smp 1 -net nic,model=3Dvirtio,macaddr=3D${MAC} -net tap,ifname=
+=3Dqtap0,script=3Dno,downscript=3Dno -vnc :1 --enable-kvm -cpu kvm64 -qmp t=
+cp:*:4242,server,nowait
+
+  And KVM is inserted with nested=3D1 on both source and destination
+  machine.
+
+  Migration fails with a nested specific assertion failure on
+  destination at target/i386/kvm.c +1629
+
+  Migration is successful in the following cases-
+
+  A) cpu model is 'host' and kvm is inserted without nested=3D1 parameter
+  B) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D1)
+  C) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D0)
+  D) Between an L0 and a guest Hypervisor L1, with 'kvm64' as CPU type (and=
+ nested=3D1 for L0 KVM)
+
+  Physical host(s)-
+  $ lscpu
+  Architecture:          x86_64
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Little Endian
+  CPU(s):                12
+  On-line CPU(s) list:   0-11
+  Thread(s) per core:    1
+  Core(s) per socket:    6
+  Socket(s):             2
+  NUMA node(s):          2
+  Vendor ID:             GenuineIntel
+  CPU family:            6
+  Model:                 62
+  Model name:            Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz
+  Stepping:              4
+  CPU MHz:               1200.091
+  CPU max MHz:           2600.0000
+  CPU min MHz:           1200.0000
+  BogoMIPS:              4203.28
+  Virtualization:        VT-x
+  L1d cache:             32K
+  L1i cache:             32K
+  L2 cache:              256K
+  L3 cache:              15360K
+  NUMA node0 CPU(s):     0-5
+  NUMA node1 CPU(s):     6-11
+  Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr p=
+ge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe sysca=
+ll nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xt=
+opology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl=
+ vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt =
+tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi fl=
+expriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1705717/+subscriptions
