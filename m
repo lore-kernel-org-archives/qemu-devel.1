@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZYOA-0002on-Vl
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:06:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1dZYUk-0004Ce-EA
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZYO7-0007ya-Or
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:06:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59252)
+	(envelope-from <thuth@redhat.com>) id 1dZYUh-00029u-AP
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:13:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZYO7-0007xg-FX
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:06:47 -0400
-Date: Mon, 24 Jul 2017 09:06:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170724080633.GA2127@work-vm>
-References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
-	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
-	<20170719114612.GC3500@work-vm>
-	<20170719152427.620b2a2a@nial.brq.redhat.com>
-	<20170719184748-mutt-send-email-mst@kernel.org>
-	<20170720172215.GH2456@work-vm>
-	<20170721224259-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dZYUh-00029m-3z
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:13:35 -0400
+References: <150064965492.105.17172556674137846483@5d477a5b5989>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e31aa9be-a900-f901-3b2c-f96c54dcf0b4@redhat.com>
+Date: Mon, 24 Jul 2017 10:05:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170721224259-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
- vhost region merge
+In-Reply-To: <150064965492.105.17172556674137846483@5d477a5b5989>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/s390x: Fix broken build with
+ --disable-tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,132 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, no-reply@patchew.org
+Cc: famz@redhat.com, cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Thu, Jul 20, 2017 at 06:22:15PM +0100, Dr. David Alan Gilbert wrote:
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
-> > > > On Wed, 19 Jul 2017 12:46:13 +0100
-> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > 
-> > > > > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > > > > On Wed, 19 Jul 2017 23:17:32 +0800
-> > > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
-> > > > > >   
-> > > > > > > When a guest that has several hotplugged dimms is migrated, in
-> > > > > > > destination host it will fail to resume. Because vhost regions of
-> > > > > > > several dimms in source host are merged and in the restore stage
-> > > > > > > in destination host it computes whether more than vhost slot limit
-> > > > > > > before merging vhost regions of several dimms.  
-> > > > > > could you provide a bit more detailed description of the problem
-> > > > > > including command line+used device_add commands on source and
-> > > > > > command line on destination?  
-> > > > > 
-> > > > > (ccing in Marc Andre and Maxime)
-> > > > > 
-> > > > > Hmm, I'd like to understade the situation where you get merging between
-> > > > > RAMBlocks; that complicates some stuff for postcopy.
-> > > > and probably inconsistent merging breaks vhost as well
-> > > > 
-> > > > merging might happen if regions are adjacent or overlap
-> > > > but for that to happen merged regions must have equal
-> > > > distance between their GPA:HVA pairs, so that following
-> > > > translation would work:
-> > > > 
-> > > > if gva in regionX[gva_start, len, hva_start]
-> > > >    hva = hva_start + gva - gva_start
-> > > > 
-> > > > while GVA of regions is under QEMU control and deterministic
-> > > > HVA is not, so in migration case merging might happen on source
-> > > > side but not on destination, resulting in different memory maps.
-> > > > 
-> > > > Maybe Michael might know details why migration works in vhost usecase,
-> > > > but I don't see vhost sending any vmstate data.
-> > > 
-> > > We aren't merging ramblocks at all.
-> > > When we are passing blocks A and B to vhost, if we see that
-> > > 
-> > > hvaB=hvaA + lenA
-> > > gpaB=gpaA + lenA
-> > > 
-> > > then we can improve performance a bit by passing a single
-> > > chunk to vhost: hvaA,gpaA,lena+lenB
-> > 
-> > OK, but that means that a region can incorporate multiple
-> > RAMBlocks though? Hmm that's not fun on postcopy.
-> > 
-> > > so it does not affect migration normally.
-> > 
-> > Well, why? What's required - if the region sizes/lengths/orders
-> > are different on the source and destination does it matter - if
-> > it does then that means we have a problem, since that heuristic
-> > is non-deterministic.
-> > 
-> > Dave
-> 
-> It doesn't matter normally. But there's a limit
-> on number of regions that vhost can support.
-> pc_dimm_memory_plug tries to guess this number early
-> because it wants to fail hotplug requests gracefully.
+On 21.07.2017 17:07, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed build test on s390x host. Please find the details be=
+low.
+[...]
+>   CC      s390x-linux-user/target/s390x/interrupt.o
+>   CC      sh4eb-linux-user/linux-user/linuxload.o
+>   CC      sparc32plus-linux-user/accel/tcg/cpu-exec-common.o
+> /var/tmp/patchew-tester-tmp-_vbxifz5/src/target/s390x/interrupt.c: In f=
+unction =E2=80=98program_interrupt=E2=80=99:
+> /var/tmp/patchew-tester-tmp-_vbxifz5/src/target/s390x/interrupt.c:44:9:=
+ error: implicit declaration of function =E2=80=98kvm_s390_program_interr=
+upt=E2=80=99 [-Werror=3Dimplicit-function-declaration]
+>          kvm_s390_program_interrupt(cpu, code);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+> /var/tmp/patchew-tester-tmp-_vbxifz5/src/target/s390x/interrupt.c:44:9:=
+ error: nested extern declaration of =E2=80=98kvm_s390_program_interrupt=E2=
+=80=99 [-Werror=3Dnested-externs]
+> cc1: all warnings being treated as errors
+> /var/tmp/patchew-tester-tmp-_vbxifz5/src/rules.mak:66: recipe for targe=
+t 'target/s390x/interrupt.o' failed
+> make[1]: *** [target/s390x/interrupt.o] Error 1
+> Makefile:328: recipe for target 'subdir-s390x-linux-user' failed
+> make: *** [subdir-s390x-linux-user] Error 2
 
-Why doesn't it matter - can't this heuristic potentially trigger on a
-source but not a destination even in the case of something like NUMA
-without hotplug?
+*bummer* ... looks like I forgot to check target=3Ds390x-linux-user this
+time :-( Sorry, I'll fix it and send a v3 ...
 
-> See
-> commit 3fad87881e55aaff659408dcf25fa204f89a7896
-> Author: Igor Mammedov <imammedo@redhat.com>
-> Date:   Tue Oct 6 10:37:28 2015 +0200
-> 
->     pc-dimm: add vhost slots limit check before commiting to hotplug
-> 
-> It might make sense to limit this to hotplug, though
-> runstate check seems like a wrong way to do this -
-> VM could be stopped e.g. through QMP at the time.
-
-My other problem is this optimisation makes it tricky for postcopy;
-one-region -> one-ramblock is easy, but there's a potential for problems
-if different RAMBlock's within the region have different
-characteristics.
-
-Dave
-
-> > > 
-> > > > 
-> > > > > 
-> > > > > > > 
-> > > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> > > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> > > > > > > ---
-> > > > > > >  hw/mem/pc-dimm.c | 2 +-
-> > > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > > > 
-> > > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > > > > index ea67b46..bb0fa08 100644
-> > > > > > > --- a/hw/mem/pc-dimm.c
-> > > > > > > +++ b/hw/mem/pc-dimm.c
-> > > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > > > > >          goto out;
-> > > > > > >      }
-> > > > > > >  
-> > > > > > > -    if (!vhost_has_free_slot()) {
-> > > > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
-> > > > > > >          error_setg(&local_err, "a used vhost backend has no free"
-> > > > > > >                                 " memory slots left");
-> > > > > > >          goto out;  
-> > > > > 
-> > > > > Even this produces the wrong error message in this case,
-> > > > > it also makes me think if the existing code should undo a lot of
-> > > > > the object_property_set's that happen.
-> > > > > 
-> > > > > Dave
-> > > > > > 
-> > > > > >   
-> > > > > --
-> > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thomas
