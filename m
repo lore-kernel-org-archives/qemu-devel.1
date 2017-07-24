@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ray.kinsella@intel.com>) id 1dZVMu-0007Aq-Vj
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:53:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dZVWV-0000E9-Os
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 01:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ray.kinsella@intel.com>) id 1dZVMr-0000Kf-14
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:53:21 -0400
-Received: from mga09.intel.com ([134.134.136.24]:38380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ray.kinsella@intel.com>)
-	id 1dZVMq-0000KT-NT
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 00:53:16 -0400
-From: "Kinsella, Ray" <ray.kinsella@intel.com>
-Date: Mon, 24 Jul 2017 04:53:09 +0000
-Message-ID: <767EFADFF809234DB6CAABD6D2F93847C5D3A5BC@IRSMSX107.ger.corp.intel.com>
-References: <767EFADFF809234DB6CAABD6D2F93847C5D31539@IRSMSX107.ger.corp.intel.com>
-	<3319b641-b7f3-0ee8-e5ed-9c378e723eb4@redhat.com>
-	<bc619876-bca3-15c8-0ef0-0fc5f833bab3@intel.com>
-	<14b1b111-d2d6-6954-2d12-8e0ac791ae44@redhat.com>
-	<d06866b6-e089-0427-2d57-40c4648734da@intel.com>
-	<97068eca-2788-8396-0f8d-1990c651bdfc@redhat.com>
-	<20170723200440.GA3718@morn.lan>
-In-Reply-To: <20170723200440.GA3718@morn.lan>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgibson@ozlabs.org>) id 1dZVWU-0005Oj-MC
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 01:03:15 -0400
+Date: Mon, 24 Jul 2017 14:36:24 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170724043624.GE17228@umbus.fritz.box>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-9-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] >256 Virtio-net-pci hotplug Devices
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tVmo9FyGdCe4F4YN"
+Content-Disposition: inline
+In-Reply-To: <1499274819-15607-9-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 08/26] ppc/xive: add flags to the XIVE
+ interrupt source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "seabios@seabios.org" <seabios@seabios.org>, Gerd Hoffmann <kraxel@redhat.com>, Michael Tsirkin <mst@redhat.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
-So as it turns out at 512 devices, it is nothing to do SeaBIOS, it was the =
-Kernel again.
-It is taking quite a while to startup, a little over two hours (7489 second=
-s).
-The main culprits appear to be enumerating/initializing the PCI Express por=
-ts and enabling interrupts.=20
+--tVmo9FyGdCe4F4YN
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The PCI Express Root Ports are taking a long time to enumerate/ initializin=
-g.
-42 minutes in total=3D2579/60=3D64 ports in total, 40 seconds each.
+On Wed, Jul 05, 2017 at 07:13:21PM +0200, C=E9dric Le Goater wrote:
+> These flags define some characteristics of the source :
+>=20
+>  - XIVE_SRC_H_INT_ESB  the Event State Buffer are controlled with a
+>                        specific hcall H_INT_ESB
 
-[   50.612822] pci_bus 0000:80: root bus resource [bus 80-c1]
-[  172.345361] pci 0000:80:00.0: PCI bridge to [bus 81]
-...
-[ 2724.734240] pci 0000:80:08.0: PCI bridge to [bus c1]
-[ 2751.154702] ACPI: Enabled 2 GPEs in block 00 to 3F
+What's the other option?
 
-I assume the 1 hour (3827 seconds) below is being spent enabling interrupts=
-.
+>  - XIVE_SRC_LSI        LSI or MSI source
 
-[ 2899.394288] ACPI: PCI Interrupt Link [GSIG] enabled at IRQ 22
-[ 2899.531324] ACPI: PCI Interrupt Link [GSIH] enabled at IRQ 23
-[ 2899.534778] ACPI: PCI Interrupt Link [GSIE] enabled at IRQ 20
-[ 6726.914388] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
-[ 6726.937932] 00:04: ttyS0 at I/O 0x3f8 (irq =3D 4, base_baud =3D 115200) =
-is a 16550A
-[ 6726.964699] Linux agpgart interface v0.103
+Hrm.  This definitely duplicates info that is in the XICS per irq
+state which you're re-using (and which you're using in the xive code
+at this point).
 
-There finally there is another 20 minutes to find in the boot.
+>  - XIVE_SRC_TRIGGER    the full function page supports trigger
+>  - XIVE_SRC_STORE_EOI  EOI can with a store.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/intc/xive.c        | 1 +
+>  include/hw/ppc/xive.h | 9 +++++++++
+>  2 files changed, 10 insertions(+)
+>=20
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 816031b8ac81..8f8bb8b787bd 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -345,6 +345,7 @@ static Property xive_ics_properties[] =3D {
+>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+>      DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
+>      DEFINE_PROP_UINT32("shift", XiveICSState, esb_shift, 0),
+> +    DEFINE_PROP_UINT64("flags", XiveICSState, flags, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 5303d96f5f59..1178300c9df3 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -30,9 +30,18 @@ typedef struct XiveICSState XiveICSState;
+>  #define TYPE_ICS_XIVE "xive-source"
+>  #define ICS_XIVE(obj) OBJECT_CHECK(XiveICSState, (obj), TYPE_ICS_XIVE)
+> =20
+> +/*
+> + * XIVE Interrupt source flags
+> + */
+> +#define XIVE_SRC_H_INT_ESB     (1ull << (63 - 60))
+> +#define XIVE_SRC_LSI           (1ull << (63 - 61))
+> +#define XIVE_SRC_TRIGGER       (1ull << (63 - 62))
+> +#define XIVE_SRC_STORE_EOI     (1ull << (63 - 63))
+> +
+>  struct XiveICSState {
+>      ICSState parent_obj;
+> =20
+> +    uint64_t     flags;
+>      uint32_t     esb_shift;
+>      MemoryRegion esb_iomem;
+> =20
 
-[ 7489.202589] virtio_net virtio515 enp193s0f0: renamed from eth513
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Poky (Yocto Project Reference Distro) 2.3 qemux86-64 ttyS0
+--tVmo9FyGdCe4F4YN
+Content-Type: application/pgp-signature; name="signature.asc"
 
-qemux86-64 login: root
+-----BEGIN PGP SIGNATURE-----
 
-I will remove the virtio-net-pci devices and hotplug them instead.
-In theory it should improve boot time, at expense of incurring some of thes=
-e costs at runtime.=20
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll1eUgACgkQbDjKyiDZ
+s5Ko+g/6AxWh1FAakHDCbv4XhgLfS5lq/kVgTTHSJ2+rBAk7SGf9mYR8QQ2ZNbbU
+Lnau18/dWBeVHj6u0nzCGCtVy9igkr5GrC0fjdcgmDd1EU63yo2VIHdZsmtLbfpO
+yvWeO/l9Gfd6C37UrmGdZxCj51zO64NCAALsQLr8iOLjS5ivBbsVYMwZIVEyrRYg
+/K8bgyrIg36TVWtQ9BoOOiviLTbcE4JzLCvGNwDDA5uhkTjIh6ZS1RcgGW6gSU7v
+A04OQe/eJB1EUEYSO3XVPvkM5jVMESU7FzpoCkek9ovKZeMIlTv1pf+JAtzyzFfl
+MeWMUUUVmpYQSoPOHAJXy85COQ+lWGPp/wScCLXV1OHljfLR/bKzy38p5KOdGRYt
+twKfcMt703gYd/BbhEUm4owGLjqu1lIBs5kWQidw/8VTzvxApJfl3V/gEVmJRYkS
+w0kcCaea18l1HEHCG6ooSOj7BOaXs/6KjyqmxqvBNngVf5WTg6hx8QPZ2ISD2kAd
+txVCwu3o94Zncp1qesENePIA/bundjMNKy3RaHUd55Vfm6g+jRSryVbqQNdaqSX4
+mkD2JdxBQSaF4xb/Z3Su7J+GOvx3hMiEy6Me3PmldJAcjEUQbUyEsqgtt7yjXTEf
+EsOJKiJRC9/6jz5CM+o3rm5YH7gMjZVibJ8PRKNMeR85mQWnatg=
+=OgiY
+-----END PGP SIGNATURE-----
 
-Ray K
-
------Original Message-----
-From: Kevin O'Connor [mailto:kevin@koconnor.net]=20
-Sent: Sunday, July 23, 2017 1:05 PM
-To: Marcel Apfelbaum <marcel@redhat.com>; Kinsella, Ray <ray.kinsella@intel=
-.com>
-Cc: qemu-devel@nongnu.org; seabios@seabios.org; Gerd Hoffmann <kraxel@redha=
-t.com>; Michael Tsirkin <mst@redhat.com>
-Subject: Re: >256 Virtio-net-pci hotplug Devices
-
-On Sun, Jul 23, 2017 at 07:28:01PM +0300, Marcel Apfelbaum wrote:
-> On 22/07/2017 2:57, Kinsella, Ray wrote:
-> > When scaling up to 512 Virtio-net devices SeaBIOS appears to really=20
-> > slow down when configuring PCI Config space - haven't manage to get=20
-> > this to work yet.
-
-If there is a slowdown in SeaBIOS, it would help to produce a log with timi=
-ng information - see:
-https://www.seabios.org/Debugging#Timing_debug_messages
-
-It may also help to increase the debug level in SeaBIOS to get more fine gr=
-ained timing reports.
-
--Kevin
+--tVmo9FyGdCe4F4YN--
