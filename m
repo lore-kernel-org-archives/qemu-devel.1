@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dZiqz-0004b8-My
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:17:18 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZitO-0005Kw-EN
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:19:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dZiqw-0005iw-CY
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:17:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dZitL-0006VO-Ag
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 15:19:46 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-27-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <cc23ddee-ad10-74ef-874c-6ed1ef485d2e@vivier.eu>
-Date: Mon, 24 Jul 2017 21:16:57 +0200
+	<20170724182751.18261-24-f4bug@amsat.org>
+	<4de3bb09-6894-ee92-eb49-0f64efe1bad8@vivier.eu>
+	<0a7a2681-4702-5334-aaa8-e477aaa5c98a@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6c893f10-2772-8a2e-b247-388222589c83@amsat.org>
+Date: Mon, 24 Jul 2017 16:19:38 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170724182751.18261-27-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <0a7a2681-4702-5334-aaa8-e477aaa5c98a@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 26/35] linux-user: use is_error()
- to avoid warnings and make the code clearer
+Subject: Re: [Qemu-devel] [PATCH for 2.10 23/35] m68k/translate: fix
+ incorrect copy/paste
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
-> linux-user/flatload.c:740:9: warning: Loss of sign in implicit conversion
->     if (res > (unsigned long)-4096)
->         ^~~
+On 07/24/2017 04:01 PM, Richard Henderson wrote:
+> On 07/24/2017 11:54 AM, Laurent Vivier wrote:
+>> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
+>>> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+>>> index ada2a91b64..1a2f421aab 100644
+>>> --- a/target/m68k/translate.c
+>>> +++ b/target/m68k/translate.c
+>>> @@ -1321,7 +1321,8 @@ static void gen_cc_cond(DisasCompare *c, 
+>>> DisasContext *s, int cond)
+>>>       case 5: /* CS (C) */
+>>>           /* Some cases fold C into X.  */
+>>>           if (op == CC_OP_ADDB || op == CC_OP_ADDW || op == 
+>>> CC_OP_ADDL ||
+>>> -            op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL) {
+>>> +            op == CC_OP_SUBB || op == CC_OP_SUBW || op == CC_OP_SUBL ||
+>>> +            op == CC_OP_LOGIC) {
+>>
+>> According to commit (db3d7945) introducing the incorrect copy/paste, I
+>> don't think we need the CC_OP_LOGIC here. Logic operations never
+>> generates X flags (whereas they can generate Z and and N).
 > 
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Indeed, look at the comment below.  LOGIC is supposed to fall through to 
+> the code that produces TCG_COND_NEVER.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Indeed I also miss-copypasted :)
 
-> ---
->  linux-user/flatload.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
-> 
-> diff --git a/linux-user/flatload.c b/linux-user/flatload.c
-> index a35a560904..10c529910f 100644
-> --- a/linux-user/flatload.c
-> +++ b/linux-user/flatload.c
-> @@ -224,8 +224,9 @@ static int decompress_exec(
->  		ret = bprm->file->f_op->read(bprm->file, buf, LBUFSIZE, &fpos);
->  		if (ret <= 0)
->  			break;
-> -		if (ret >= (unsigned long) -4096)
-> +                if (is_error(ret)) {
->  			break;
-> +                }
->  		len -= ret;
->  
->  		strm.next_in = buf;
-> @@ -283,8 +284,7 @@ calc_reloc(abi_ulong r, struct lib_info *p, int curid, int internalp)
->                      "in same module (%d != %d)\n",
->                      (unsigned) r, curid, id);
->              goto failed;
-> -        } else if ( ! p[id].loaded &&
-> -                    load_flat_shared_library(id, p) > (unsigned long) -4096) {
-> +        } else if (!p[id].loaded && is_error(load_flat_shared_library(id, p))) {
->              fprintf(stderr, "BINFMT_FLAT: failed to load library %d\n", id);
->              goto failed;
->          }
-> @@ -523,9 +523,10 @@ static int load_flat_file(struct linux_binprm * bprm,
->                  fpos = 0;
->                  result = bprm->file->f_op->read(bprm->file,
->                                  (char *) textpos, text_len, &fpos);
-> -                if (result < (unsigned long) -4096)
-> +                if (!is_error(result)) {
->                          result = decompress_exec(bprm, text_len, (char *) datapos,
->                                           data_len + (relocs * sizeof(unsigned long)), 0);
-> +                }
->          }
->          else
->  #endif
-> @@ -693,8 +694,9 @@ static int load_flat_shared_library(int id, struct lib_info *libs)
->  
->  	res = prepare_binprm(&bprm);
->  
-> -	if (res <= (unsigned long)-4096)
-> +        if (!is_error(res)) {
->  		res = load_flat_file(&bprm, libs, id, NULL);
-> +        }
->  	if (bprm.file) {
->  		allow_write_access(bprm.file);
->  		fput(bprm.file);
-> @@ -737,8 +739,9 @@ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info)
->  
->  
->      res = load_flat_file(bprm, libinfo, 0, &stack_len);
-> -    if (res > (unsigned long)-4096)
-> +    if (is_error(res)) {
->              return res;
-> +    }
->  
->      /* Update data segment pointers for all libraries */
->      for (i=0; i<MAX_SHARED_LIBS; i++) {
-> 
+So the correct fix would be:?
+
+          if (op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL ||
+-            op == CC_OP_ADDB || op == CC_OP_ADDW || op == CC_OP_ADDL) {
++            op == CC_OP_SUBB || op == CC_OP_SUBW || op == CC_OP_SUBL) {
