@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZbz0-00016N-9N
+	(envelope-from <armbru@redhat.com>) id 1dZbyz-00015r-NH
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZbyy-0006ts-FM
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60998)
+	(envelope-from <armbru@redhat.com>) id 1dZbyy-0006t0-6p
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40454)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZbyy-0006sQ-7C
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZbyx-0006sD-TC
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:04 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F5A880E75
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CB152C025017
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:02 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-94.ams2.redhat.com
 	[10.36.116.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C4E9C60603
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6925660609
 	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:02 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Jul 2017 13:56:54 +0200
-Message-Id: <1500897419-15539-6-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Jul 2017 13:56:55 +0200
+Message-Id: <1500897419-15539-7-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500897419-15539-1-git-send-email-armbru@redhat.com>
 References: <1500897419-15539-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 05/10] block: Use JSON null instead of "" to
- disable backing file
+Subject: [Qemu-devel] [PULL v2 06/10] hmp: Clean up and simplify
+ hmp_migrate_set_parameter()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,169 +36,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-BlockdevRef is an alternate of BlockdevOptions (inline definition) and
-str (reference to an existing block device by name).  BlockdevRef
-value "" is special: "no block device should be referenced."  It's
-actually interpreted that way in just one place: optional member
-@backing of COW formats.  Semantics:
+The bulk of hmp_migrate_set_parameter()'s code sets one member of
+MigrationParameters according to the command's arguments.  It uses a
+string visitor for integer and boolean members, but not for string and
+size members.  It calls visit_type_bool() right away, but delays
+visit_type_int() some.  The delaying requires a flag variable and a
+bit of trickery: we set all integer members instead of just the one we
+want, and rely on the has_FOOs to mask the unwanted ones.
 
-* Present means "use this block device" as backing storage
+Clean this up as follows.  Don't delay calling visit_type_int().  Use
+the string visitor for strings, too.  This involves extra allocations
+and cleanup, but doing them is simpler and cleaner than avoiding them.
 
-* Absent means "default to the one stored in the image"
-
-* Except "" means "don't use backing storage at all"
-
-The first two are perfectly normal: when the parameter is absent, it
-defaults to an implied value, but the value's meaning is the same.
-
-The third one overloads the parameter with a second meaning.  The
-overloading is *implicit*, i.e. it's not visible in the types.  Works
-here, because "" is not a value block device ID.
-
-Pressing argument values the schema accepts, but are semantically
-invalid, into service to mean "do something else entirely" is not
-general, as suitable invalid values need not exist.  I also find it
-ugly.
-
-To clean this up, we could add a separate flag argument to suppress
-@backing, or add a distinct value to @backing.  This commit implements
-the latter: add JSON null to the values of @backing, deprecate "".
-
-Because we're so close to the 2.10 freeze, implement it in the
-stupidest way possible: have qmp_blockdev_add() rewrite null to ""
-before anything else can see the null.  Works, because BlockdevRef
-occurs only within arguments of blockdev-add.  The proper way to do it
-would be rewriting "" to null, preferably in a cleaner way, but that
-requires fixing up code to work with null.  Add a TODO comment for
+Sadly, using the string visitor for sizes isn't possible, because it
+defaults to Bytes rather than Mebibytes.  Add a comment explaining
 that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- blockdev.c             | 14 ++++++++++++++
- qapi/block-core.json   | 29 ++++++++++++++++++++++-------
- tests/qemu-iotests/085 |  2 +-
- tests/qemu-iotests/139 |  2 +-
- 4 files changed, 38 insertions(+), 9 deletions(-)
+ hmp.c | 78 ++++++++++++++++++++++++++++---------------------------------------
+ 1 file changed, 32 insertions(+), 46 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 6469f16..02cd69b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3887,6 +3887,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
-     QObject *obj;
-     Visitor *v = qobject_output_visitor_new(&obj);
-     QDict *qdict;
-+    const QDictEntry *ent;
-     Error *local_err = NULL;
+diff --git a/hmp.c b/hmp.c
+index bf1de74..dae4604 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1554,90 +1554,75 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     const char *param = qdict_get_str(qdict, "parameter");
+     const char *valuestr = qdict_get_str(qdict, "value");
+     Visitor *v = string_input_visitor_new(valuestr);
++    MigrationParameters *p = g_new0(MigrationParameters, 1);
+     uint64_t valuebw = 0;
+-    int64_t valueint = 0;
+-    bool valuebool = false;
+     Error *err = NULL;
+-    bool use_int_value = false;
+     int i, ret;
  
-     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-@@ -3900,6 +3901,19 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+     for (i = 0; i < MIGRATION_PARAMETER__MAX; i++) {
+         if (strcmp(param, MigrationParameter_lookup[i]) == 0) {
+-            MigrationParameters p = { 0 };
+             switch (i) {
+             case MIGRATION_PARAMETER_COMPRESS_LEVEL:
+-                p.has_compress_level = true;
+-                use_int_value = true;
++                p->has_compress_level = true;
++                visit_type_int(v, param, &p->compress_level, &err);
+                 break;
+             case MIGRATION_PARAMETER_COMPRESS_THREADS:
+-                p.has_compress_threads = true;
+-                use_int_value = true;
++                p->has_compress_threads = true;
++                visit_type_int(v, param, &p->compress_threads, &err);
+                 break;
+             case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
+-                p.has_decompress_threads = true;
+-                use_int_value = true;
++                p->has_decompress_threads = true;
++                visit_type_int(v, param, &p->decompress_threads, &err);
+                 break;
+             case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+-                p.has_cpu_throttle_initial = true;
+-                use_int_value = true;
++                p->has_cpu_throttle_initial = true;
++                visit_type_int(v, param, &p->cpu_throttle_initial, &err);
+                 break;
+             case MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT:
+-                p.has_cpu_throttle_increment = true;
+-                use_int_value = true;
++                p->has_cpu_throttle_increment = true;
++                visit_type_int(v, param, &p->cpu_throttle_increment, &err);
+                 break;
+             case MIGRATION_PARAMETER_TLS_CREDS:
+-                p.has_tls_creds = true;
+-                p.tls_creds = (char *) valuestr;
++                p->has_tls_creds = true;
++                visit_type_str(v, param, &p->tls_creds, &err);
+                 break;
+             case MIGRATION_PARAMETER_TLS_HOSTNAME:
+-                p.has_tls_hostname = true;
+-                p.tls_hostname = (char *) valuestr;
++                p->has_tls_hostname = true;
++                visit_type_str(v, param, &p->tls_hostname, &err);
+                 break;
+             case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+-                p.has_max_bandwidth = true;
++                p->has_max_bandwidth = true;
++                /*
++                 * Can't use visit_type_size() here, because it
++                 * defaults to Bytes rather than Mebibytes.
++                 */
+                 ret = qemu_strtosz_MiB(valuestr, NULL, &valuebw);
+                 if (ret < 0 || valuebw > INT64_MAX
+                     || (size_t)valuebw != valuebw) {
+                     error_setg(&err, "Invalid size %s", valuestr);
+-                    goto cleanup;
++                    break;
+                 }
+-                p.max_bandwidth = valuebw;
++                p->max_bandwidth = valuebw;
+                 break;
+             case MIGRATION_PARAMETER_DOWNTIME_LIMIT:
+-                p.has_downtime_limit = true;
+-                use_int_value = true;
++                p->has_downtime_limit = true;
++                visit_type_int(v, param, &p->downtime_limit, &err);
+                 break;
+             case MIGRATION_PARAMETER_X_CHECKPOINT_DELAY:
+-                p.has_x_checkpoint_delay = true;
+-                use_int_value = true;
++                p->has_x_checkpoint_delay = true;
++                visit_type_int(v, param, &p->x_checkpoint_delay, &err);
+                 break;
+             case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
+-                p.has_block_incremental = true;
+-                visit_type_bool(v, param, &valuebool, &err);
+-                if (err) {
+-                    goto cleanup;
+-                }
+-                p.block_incremental = valuebool;
++                p->has_block_incremental = true;
++                visit_type_bool(v, param, &p->block_incremental, &err);
+                 break;
+             }
  
-     qdict_flatten(qdict);
+-            if (use_int_value) {
+-                visit_type_int(v, param, &valueint, &err);
+-                if (err) {
+-                    goto cleanup;
+-                }
+-                /* Set all integers; only one has_FOO will be set, and
+-                 * the code ignores the remaining values */
+-                p.compress_level = valueint;
+-                p.compress_threads = valueint;
+-                p.decompress_threads = valueint;
+-                p.cpu_throttle_initial = valueint;
+-                p.cpu_throttle_increment = valueint;
+-                p.downtime_limit = valueint;
+-                p.x_checkpoint_delay = valueint;
++            if (err) {
++                goto cleanup;
+             }
  
-+    /*
-+     * Rewrite "backing": null to "backing": ""
-+     * TODO Rewrite "" to null instead, and perhaps not even here
-+     */
-+    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
-+        char *dot = strrchr(ent->key, '.');
-+
-+        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
-+            && qobject_type(ent->value) == QTYPE_QNULL) {
-+            qdict_put(qdict, ent->key, qstring_new());
-+        }
-+    }
-+
-     if (!qdict_get_try_str(qdict, "node-name")) {
-         error_setg(errp, "'node-name' must be specified for the root node");
-         goto fail;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ff8e2ba..6866ae8 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2273,15 +2273,14 @@
- # besides their data source and an optional backing file.
- #
- # @backing:     reference to or definition of the backing file block
--#               device (if missing, taken from the image file content). It is
--#               allowed to pass an empty string here in order to disable the
--#               default backing file.
-+#               device, null disables the backing file entirely.
-+#               Defaults to the backing file stored the image file.
- #
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsGenericCOWFormat',
-   'base': 'BlockdevOptionsGenericFormat',
--  'data': { '*backing': 'BlockdevRef' } }
-+  'data': { '*backing': 'BlockdevRefOrNull' } }
+-            qmp_migrate_set_parameters(&p, &err);
++            qmp_migrate_set_parameters(p, &err);
+             break;
+         }
+     }
+@@ -1647,6 +1632,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     }
  
- ##
- # @Qcow2OverlapCheckMode:
-@@ -3120,9 +3119,7 @@
- # Reference to a block device.
- #
- # @definition:      defines a new block device inline
--# @reference:       references the ID of an existing block device. An
--#                   empty string means that no block device should be
--#                   referenced.
-+# @reference:       references the ID of an existing block device
- #
- # Since: 2.9
- ##
-@@ -3131,6 +3128,24 @@
-             'reference': 'str' } }
- 
- ##
-+# @BlockdevRefOrNull:
-+#
-+# Reference to a block device.
-+#
-+# @definition:      defines a new block device inline
-+# @reference:       references the ID of an existing block device.
-+#                   An empty string means that no block device should
-+#                   be referenced.  Deprecated; use null instead.
-+# @null:            No block device should be referenced (since 2.10)
-+#
-+# Since: 2.9
-+##
-+{ 'alternate': 'BlockdevRefOrNull',
-+  'data': { 'definition': 'BlockdevOptions',
-+            'reference': 'str',
-+            'null': 'null' } }
-+
-+##
- # @blockdev-add:
- #
- # Creates a new block device. If the @id option is given at the top level, a
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index 71efe50..5c7668c 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -106,7 +106,7 @@ function add_snapshot_image()
-     snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
-     _make_test_img -u -b "${base_image}" "$size"
-     mv "${TEST_IMG}" "${snapshot_file}"
--    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
-+    do_blockdev_add "$1" "'backing': null, " "${snapshot_file}"
- }
- 
- # ${1}: unique identifier for the snapshot filename
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 9ff51d9..50cf40f 100644
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -69,7 +69,7 @@ class TestBlockdevDel(iotests.QMPTestCase):
-                          '-b', base_img, new_img, '1M')
-         opts = {'driver': iotests.imgfmt,
-                 'node-name': node,
--                'backing': '',
-+                'backing': None,
-                 'file': {'driver': 'file',
-                          'filename': new_img}}
-         result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
+  cleanup:
++    qapi_free_MigrationParameters(p);
+     visit_free(v);
+     if (err) {
+         error_report_err(err);
 -- 
 2.7.5
