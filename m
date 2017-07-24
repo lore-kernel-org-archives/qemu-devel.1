@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dZhJy-0000A5-GK
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:07 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhNl-0002E0-R5
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dZhJv-0000nY-FV
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33528)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dZhJv-0000nI-8b
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:39:03 -0400
-References: <20170721125609.11117-1-david@redhat.com>
-	<20170721125609.11117-5-david@redhat.com>
-	<f1c1a29b-c249-0cb1-98a4-78c91147c405@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <41378209-643c-b76a-4f7d-c3843f3fb95e@redhat.com>
-Date: Mon, 24 Jul 2017 19:38:59 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhNi-0002fY-Ke
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:43:01 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:38522)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhNi-0002eX-89
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:42:58 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Mon, 24 Jul 2017 20:42:48 +0300
+Message-Id: <150091816800.30739.7702589627052162702.stgit@frigg.lan>
+In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <f1c1a29b-c249-0cb1-98a4-78c91147c405@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/6] target/s390x: move wrap_address to
- cpu.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 10/13] instrument: [softmmu] Add command line
+ library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 24.07.2017 06:40, Richard Henderson wrote:
-> On 07/21/2017 05:56 AM, David Hildenbrand wrote:
->> Signed-off-by: David Hildenbrand<david@redhat.com>
->> ---
->>   target/s390x/cpu.h        | 14 ++++++++++++++
->>   target/s390x/mem_helper.c | 14 --------------
->>   2 files changed, 14 insertions(+), 14 deletions(-)
-> 
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> 
-> Although another header, private to the helpers, might be better...
-> 
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ qemu-options.hx |   17 +++++++++++++++++
+ vl.c            |   11 +++++++++++
+ 2 files changed, 28 insertions(+)
 
-Question is if we should have a new header for stuff really only used
-locally in target/s390x - in contrast to say cpu.h, which is included
-from various other places. So not only a header for helpers, but also
-used for e.g. kvm.c.
-
-This header could e.g. be called cpu_helper.h and would not included in
-cpu.h
-
-Opinions?
-
--- 
-
-Thanks,
-
-David
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9bd6bf0eee..aacd01cee7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4064,6 +4064,23 @@ HXCOMM HX does not support conditional compilation=
+ of text.
+ @findex -trace
+ @include qemu-option-trace.texi
+ ETEXI
++DEF("instr", HAS_ARG, QEMU_OPTION_instr,
++    "-instr [file=3D]<file>[,arg=3D<string>]\n"
++    "                load an instrumentation library\n",
++    QEMU_ARCH_ALL)
++STEXI
++@item -instr file=3D@var{file}[,arg=3D@var{string}]
++@findex -instr
++
++Load a dynamic trace instrumentation library.
++
++@table @option
++@item file=3D@var{file}
++Load the given dynamic trace instrumentation library.
++@item arg=3D@var{string}
++String argument passed as to the library's @code{qi_init} routine (can b=
+e given multiple times).
++@end table
++ETEXI
+=20
+ HXCOMM Internal use
+ DEF("qtest", HAS_ARG, QEMU_OPTION_qtest, "", QEMU_ARCH_ALL)
+diff --git a/vl.c b/vl.c
+index fb6b2efafa..1a24b34d47 100644
+--- a/vl.c
++++ b/vl.c
+@@ -118,6 +118,7 @@ int main(int argc, char **argv)
+=20
+ #include "trace-root.h"
+ #include "trace/control.h"
++#include "instrument/cmdline.h"
+ #include "qemu/queue.h"
+ #include "sysemu/arch_init.h"
+=20
+@@ -3031,6 +3032,9 @@ int main(int argc, char **argv, char **envp)
+     } BlockdevOptions_queue;
+     QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
+         =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
++    char *instrument_path =3D NULL;
++    int instrument_argc =3D 0;
++    const char **instrument_argv =3D NULL;
+=20
+     module_call_init(MODULE_INIT_TRACE);
+=20
+@@ -3058,6 +3062,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_add_opts(&qemu_global_opts);
+     qemu_add_opts(&qemu_mon_opts);
+     qemu_add_opts(&qemu_trace_opts);
++    qemu_add_opts(&qemu_instr_opts);
+     qemu_add_opts(&qemu_option_rom_opts);
+     qemu_add_opts(&qemu_machine_opts);
+     qemu_add_opts(&qemu_accel_opts);
+@@ -3999,6 +4004,10 @@ int main(int argc, char **argv, char **envp)
+                 g_free(trace_file);
+                 trace_file =3D trace_opt_parse(optarg);
+                 break;
++            case QEMU_OPTION_instr:
++                instr_opt_parse(optarg, &instrument_path,
++                                &instrument_argc, &instrument_argv);
++                break;
+             case QEMU_OPTION_readconfig:
+                 {
+                     int ret =3D qemu_read_config_file(optarg);
+@@ -4185,6 +4194,8 @@ int main(int argc, char **argv, char **envp)
+     }
+     trace_init_file(trace_file);
+=20
++    instr_init(instrument_path, instrument_argc, instrument_argv);
++
+     /* Open the logfile at this point and set the log mask if necessary.
+      */
+     if (log_file) {
