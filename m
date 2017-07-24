@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZf3T-0006ao-Cu
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:13:56 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZf56-0007xJ-53
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:15:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZf3O-0006qI-Uu
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:13:55 -0400
-Received: from 9.mo3.mail-out.ovh.net ([87.98.184.141]:54739)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZf3O-0006pv-Km
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:13:50 -0400
-Received: from player732.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 3F7CC123F62
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 17:13:49 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-7-git-send-email-clg@kaod.org>
-	<20170724040220.GC17228@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <bbea9495-c716-282f-2e71-2d099cea0929@kaod.org>
-Date: Mon, 24 Jul 2017 17:13:42 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170724040220.GC17228@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 06/26] ppc/xive: introduce a XIVE
- interrupt source model
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZf52-0008BQ-A7
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:15:36 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:58901)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZf50-000881-QX
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:15:32 -0400
+Date: Mon, 24 Jul 2017 23:15:12 +0800 (CST)
+Message-ID: <201707242315125988231@zte.com.cn>
+References: 201707241832350823841@zte.com.cn,
+	20170724135333.083d8934@nial.brq.redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V2=5D_vhost=3A_fix_a_migration_f?=
+ =?utf-8?q?ailedbecauseof_vhost_region_merge?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,233 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: imammedo@redhat.com
+Cc: wang.yechao255@zte.com.cn, qemu-devel@nongnu.org, mst@redhat.com
 
-On 07/24/2017 06:02 AM, David Gibson wrote:
-> On Wed, Jul 05, 2017 at 07:13:19PM +0200, C=E9dric Le Goater wrote:
->> This is very similar to the current ICS_SIMPLE model in XICS. We try
->> to reuse the ICS model because the sPAPR machine is tied to the
->> XICSFabric interface and should be using a common framework to switch
->> from one controller model to another: XICS <-> XIVE.
->=20
-> Hm.  I'm not entirely concvinced re-using the xics ICSState class in
-> this way is a good idea, though maybe it's a reasonable first step.
-> With this patch alone some code is shared, but there are some real
-> uglies around the edges.
-
-yes. I agree. The patchset is here to discuss these model issues.=20
-
-> Seems to me at least long term you need to either 1) make the XIVE ics
-> separate, even if it has similarities to the XICS one or 2) truly
-> unify them, with a common base type and methods to handle the
-> differences.
-
-OK. We should also discuss the IRQ number allocator. That's another=20
-email thread.
-
->> The next patch will introduce the MMIO handlers to interact with XIVE
->> interrupt sources.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/xive.c        | 110 +++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  include/hw/ppc/xive.h |  12 ++++++
->>  2 files changed, 122 insertions(+)
->>
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 5b14d8155317..9ff14c0da595 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -26,6 +26,115 @@
->> =20
->>  #include "xive-internal.h"
->> =20
->> +static void xive_icp_irq(XiveICSState *xs, int lisn)
->> +{
->> +
->> +}
->> +
->> +/*
->> + * XIVE Interrupt Source
->> + */
->> +static void xive_ics_set_irq_msi(XiveICSState *xs, int srcno, int val=
-)
->> +{
->> +    if (val) {
->> +        xive_icp_irq(xs, srcno + ICS_BASE(xs)->offset);
->> +    }
->> +}
->> +
->> +static void xive_ics_set_irq_lsi(XiveICSState *xs, int srcno, int val=
-)
->> +{
->> +    ICSIRQState *irq =3D &ICS_BASE(xs)->irqs[srcno];
->> +
->> +    if (val) {
->> +        irq->status |=3D XICS_STATUS_ASSERTED;
->> +    } else {
->> +        irq->status &=3D ~XICS_STATUS_ASSERTED;
->> +    }
->> +
->> +    if (irq->status & XICS_STATUS_ASSERTED
->> +        && !(irq->status & XICS_STATUS_SENT)) {
->> +        irq->status |=3D XICS_STATUS_SENT;
->> +        xive_icp_irq(xs, srcno + ICS_BASE(xs)->offset);
->> +    }
->> +}
->> +
->> +static void xive_ics_set_irq(void *opaque, int srcno, int val)
->> +{
->> +    XiveICSState *xs =3D ICS_XIVE(opaque);
->> +    ICSIRQState *irq =3D &ICS_BASE(xs)->irqs[srcno];
->> +
->> +    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
->> +        xive_ics_set_irq_lsi(xs, srcno, val);
->> +    } else {
->> +        xive_ics_set_irq_msi(xs, srcno, val);
->> +    }
->> +}
->=20
-> e.g. you have some code re-use, but still need to more-or-less
-> duplicate the set_irq code as above.
-
-yes. I am not sure how to do this though. We could use some property=20
-on the ICS to know in which interrupt mode we are running and branch,=20
-but wouldn't that pollute a lot the current code ?=20
-
->> +static void xive_ics_reset(void *dev)
->> +{
->> +    ICSState *ics =3D ICS_BASE(dev);
->> +    int i;
->> +    uint8_t flags[ics->nr_irqs];
->> +
->> +    for (i =3D 0; i < ics->nr_irqs; i++) {
->> +        flags[i] =3D ics->irqs[i].flags;
->> +    }
->> +
->> +    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
->> +
->> +    for (i =3D 0; i < ics->nr_irqs; i++) {
->> +        ics->irqs[i].flags =3D flags[i];
->> +    }
->=20
-> This save, clear, restore is also kind ugly.  I'm also not sure why
-> this needs a reset method when I can't find one for the xics ICS.
-
-Hmm, this is a copy paste of ics_simple_reset() but we can fix both.
-
-> Does the xics irqstate structure really cover what you need for xive?
-
-There is too much in it. We only need the flags to know if the IRQ is
-allocated and if it is a LSI. In fact, the ICSIRQState array is the
-only information we need to share to support resets between the XIVE=20
-and XICS modes. The allocator should be the same of course. But it
-is a bit of a hack for now.
-
-> I had the impression elsewhere that xive had a different priority
-> model to xics.  And there's the xics pointer in the icsstate structure
-> which is definitely redundant.
-
-In the hcalls, we need to do ICS lookups using IRQ numbers and this
-is when the ics_get() handler of the XICSFabric interface is used.
-I agree we could find some other ways but that is what we have put
-in place for sPAPR and PowerNV.
-
-Thanks,
-
-C.=20
-
->=20
->> +}
->> +
->> +static void xive_ics_realize(ICSState *ics, Error **errp)
->> +{
->> +    XiveICSState *xs =3D ICS_XIVE(ics);
->> +    Object *obj;
->> +    Error *err =3D NULL;
->> +
->> +    obj =3D object_property_get_link(OBJECT(xs), "xive", &err);
->> +    if (!obj) {
->> +        error_setg(errp, "%s: required link 'xive' not found: %s",
->> +                   __func__, error_get_pretty(err));
->> +        return;
->> +    }
->> +    xs->xive =3D XIVE(obj);
->> +
->> +    if (!ics->nr_irqs) {
->> +        error_setg(errp, "Number of interrupts needs to be greater 0"=
-);
->> +        return;
->> +    }
->> +
->> +    ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->> +    ics->qirqs =3D qemu_allocate_irqs(xive_ics_set_irq, xs, ics->nr_i=
-rqs);
->> +
->> +    qemu_register_reset(xive_ics_reset, xs);
->> +}
->> +
->> +static Property xive_ics_properties[] =3D {
->> +    DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
->> +    DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static void xive_ics_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
->> +
->> +    isc->realize =3D xive_ics_realize;
->> +
->> +    dc->props =3D xive_ics_properties;
->> +}
->> +
->> +static const TypeInfo xive_ics_info =3D {
->> +    .name =3D TYPE_ICS_XIVE,
->> +    .parent =3D TYPE_ICS_BASE,
->> +    .instance_size =3D sizeof(XiveICSState),
->> +    .class_init =3D xive_ics_class_init,
->> +};
->> +
->>  /*
->>   * Main XIVE object
->>   */
->> @@ -123,6 +232,7 @@ static const TypeInfo xive_info =3D {
->>  static void xive_register_types(void)
->>  {
->>      type_register_static(&xive_info);
->> +    type_register_static(&xive_ics_info);
->>  }
->> =20
->>  type_init(xive_register_types)
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 863f5a9c6b5f..544cc6e0c796 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -19,9 +19,21 @@
->>  #ifndef PPC_XIVE_H
->>  #define PPC_XIVE_H
->> =20
->> +#include "hw/ppc/xics.h"
->> +
->>  typedef struct XIVE XIVE;
->> +typedef struct XiveICSState XiveICSState;
->> =20
->>  #define TYPE_XIVE "xive"
->>  #define XIVE(obj) OBJECT_CHECK(XIVE, (obj), TYPE_XIVE)
->> =20
->> +#define TYPE_ICS_XIVE "xive-source"
->> +#define ICS_XIVE(obj) OBJECT_CHECK(XiveICSState, (obj), TYPE_ICS_XIVE=
-)
->> +
->> +struct XiveICSState {
->> +    ICSState parent_obj;
->> +
->> +    XIVE         *xive;
->> +};
->=20
->>  #endif /* PPC_XIVE_H */
->=20
+Pk9uIE1vbiwgMjQgSnVsIDIwMTcgMTg6MzI6MzUgKzA4MDAgKENTVCkNCg0KDQoNCg0KDQo+PHBl
+bmcuaGFvMkB6dGUuY29tLmNuPiB3cm90ZToNCg0KPj4gPiBPbiBTdW4sIDIzIEp1bCAyMDE3IDIw
+OjQ2OjExICswODAwICANCg0KPj4gPiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdy
+b3RlOiAgDQo+PiANCj4+ID4gPiBXaGVuIGEgZ3Vlc3QgdGhhdCBoYXMgc2V2ZXJhbCBob3RwbHVn
+Z2VkIGRpbW1zIGlzIG1pZ3JhdGVkLCBvbg0KPj4gPiA+IGRlc3RpbmF0aW9uIGl0IHdpbGwgZmFp
+bCB0byByZXN1bWUuIEJlY2F1c2UgcmVnaW9ucyBvbiBzb3VyY2UNCj4+ID4gPiBhcmUgbWVyZ2Vk
+IGFuZCBvbiBkZXN0aW5hdGlvbiB0aGUgb3JkZXIgb2YgcmVhbGl6aW5nIGRldmljZXMNCj4+ID4g
+PiBpcyBkaWZmZXJlbnQgZnJvbSBvbiBzb3VyY2Ugd2l0aCBkaW1tcywgc28gd2hlbiBwYXJ0IG9m
+IGRldmljZXMNCj4+ID4gPiBhcmUgcmVhbGl6ZCBzb21lIHJlZ2lvbiBjYW4gbm90IGJlIG1lcmdl
+ZC5UaGF0IG1heSBiZSBtb3JlIHRoYW4NCj4+ID4gPiB2aG9zdCBzbG90IGxpbWl0Lg0KPj4gPiA+
+IA0KPj4gPiA+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4N
+Cj4+ID4gPiBTaWduZWQtb2ZmLWJ5OiBXYW5nIFllY2hhbyA8d2FuZy55ZWNoYW8yNTVAenRlLmNv
+bS5jbj4NCj4+ID4gPiAtLS0NCj4+ID4gPiAgaHcvbWVtL3BjLWRpbW0uYyAgICAgICAgfCAyICst
+DQo+PiA+ID4gIGluY2x1ZGUvc3lzZW11L3N5c2VtdS5oIHwgMSArDQo+PiA+ID4gIHZsLmMgICAg
+ICAgICAgICAgICAgICAgIHwgNSArKysrKw0KPj4gPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDcgaW5z
+ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPj4gPiA+IA0KPj4gPiA+IGRpZmYgLS1naXQgYS9o
+dy9tZW0vcGMtZGltbS5jIGIvaHcvbWVtL3BjLWRpbW0uYw0KPj4gPiA+IGluZGV4IGVhNjdiNDYu
+LjEzZjNkYjUgMTAwNjQ0DQo+PiA+ID4gLS0tIGEvaHcvbWVtL3BjLWRpbW0uYw0KPj4gPiA+ICsr
+KyBiL2h3L21lbS9wYy1kaW1tLmMNCj4+ID4gPiBAQCAtMTAxLDcgKzEwMSw3IEBAIHZvaWQgcGNf
+ZGltbV9tZW1vcnlfcGx1ZyhEZXZpY2VTdGF0ZSAqZGV2LCBNZW1vcnlIb3RwbHVnU3RhdGUgKmhw
+bXMsDQo+PiA+ID4gICAgICAgICAgZ290byBvdXQNCj4+ID4gPiAgICAgIH0NCj4+ID4gPiAgDQo+
+PiA+ID4gLSAgICBpZiAoIXZob3N0X2hhc19mcmVlX3Nsb3QoKSkgew0KPj4gPiA+ICsgICAgaWYg
+KCF2aG9zdF9oYXNfZnJlZV9zbG90KCkgJiYgcWVtdV9pc19tYWNoaW5lX2luaXRfZG9uZSgpKSB7
+DQo+PiA+ID4gICAgICAgICAgZXJyb3Jfc2V0ZygmbG9jYWxfZXJyLCAiYSB1c2VkIHZob3N0IGJh
+Y2tlbmQgaGFzIG5vIGZyZWUiDQo+PiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAiIG1lbW9yeSBzbG90cyBsZWZ0IikgIA0KPj4gPiB0aGF0IGRvZXNuJ3QgZml4IGlzc3VlLA0K
+Pj4gPiAgICAxc3Q6IG51bWJlciBvZiB1c2VkIGVudHJpZXMgaXMgY2hhbmdpbmcgYWZ0ZXIgbWFj
+aGluZV9pbml0X2RvbmUoKSBpcyBjYWxsZWQNCj4+ID4gICAgICAgICBhcyByZWdpb25zIGNvbnRp
+bnVlIHRvIG1hcHBlZC91bm1hcHBlZCBkdXJpbmcgcnVudGltZQ0KPj4gPiAgICAybmQ6IGl0IGJy
+aW5ncyByZWdyZXNzaW9uIGFuZCBhbGxvd3MgdG8gc3RhcnQgUUVNVSB3aXRoIG51bWJlciBtZW1v
+cnkNCj4+ID4gICAgICAgICByZWdpb25zIG1vcmUgdGhhbiBzdXBwb3J0ZWQgYnkgYmFja2VuZCwg
+d2hpY2ggY29tYmluZWQgd2l0aCBtaXNzaW5nDQo+PiA+ICAgICAgICAgZXJyb3IgaGFuZGxpbmcg
+aW4gdmhvc3Qgd2lsbCBsZWFkIHRvIHFlbXUgY3Jhc2hlcyBvciBvYnNjdXJlIGJ1Z3MgaW4NCj4+
+ICA+ICAgICAgICBndWVzdCBicmVha2luZyB2aG9zdCBlbmFibGVkIGRyaXZlcnMuDQo+PiA+ICAg
+ICAgICAgaS5lLiBwYXRjaCB1bmRvZXMgd2hhdCB3ZXJlIGZpeGVkIGJ5DQo+PiA+ICAgICAgICAg
+aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTUtMTAvbXNn
+MDA3ODkuaHRtbCAgDQo+PiBJIGRvbid0IHRoaW5rIEkgdW5kbyB0aGUgcHJldmlvdXMgcGF0Y2gu
+IFRoZXJlIGFyZSB0b3cgc2NlbmFyaW9zIDoNCj4+IA0KPj4gaG90cGx1Z2dpbmcgbWVtb3J5IGhh
+cHBlbnMgYWZ0ZXIgbWFjaGluZV9pbml0X2RvbmUoKS4gc28gdGhlIG1vZGlmaWVkIGNvZGUgaXMg
+bm8gDQo+PiANCj4+IGluZmx1ZW5jZS4NCj4+IA0KPj4gaG90cGx1Z2dlZCBtZW1vcnkncyBWTSBp
+cyBqdXN0IG1pZ3JhdGVkIC4gb24gc291cmNlIGl0cyByZWdpb25zIGlzIGxlc3MgdGhhbiANCj4+
+IA0KPj4gc3VwcG9ydGVkIGJ5IGJhY2tlbmQgLHNvIG9uIGRlc3RpbmF0aW9uIGl0IHNob3VsZCBz
+YXRpc2Z5LiBEdXJpbmcgcmVzdG9yaW5nIFZNJ3MgcmVnaW9ucw0KPj4gDQo+PiBtYXkgYmUgbW9y
+ZSB0aGFuIHN1cHBvcnRlZCBieSBiYWNrZW5kIGJ1dCBhZnRlciBtYWNoaW5lX2luaXRfZG9uZSBW
+TSdzIHJlZ2lvbnMNCg0KPj4gY2FuIGJlIGxlc3MgdGhhbiAgc3VwcG9ydGVkIGJ5IGJhY2tlbmQu
+DQoNCj5oZXJlIGlzIHNpbXVsYXRpb24gd2l0aCB2aG9zdC1rZXJuZWwgd2hlcmUgL3N5cy9tb2R1
+bGUvdmhvc3QvcGFyYW1ldGVycy9tYXhfbWVtX3JlZ2lvbnMgc2V0IHRvIDgNCj5mb3IgbGltaXQg
+dG8gbG9vayBsaWtlIHZob3N0IHVzZXIuDQoNCj5xZW11LXN5c3RlbS14ODZfNjQgLS1lbmFibGUt
+a3ZtIC1tIDEyOCxzbG90cz0yNTYsbWF4bWVtPTFUICBcDQo+PiAtbmV0ZGV2IHR5cGU9dGFwLGlk
+PWd1ZXN0MCx2aG9zdD1vbixzY3JpcHQ9L2Jpbi90cnVlLHZob3N0Zm9yY2UgXA0KIC1kZXZpY2Ug
+dmlydGlvLW5ldC1wY2ksbmV0ZGV2PWd1ZXN0MCBcDQo+IGBpPTAgd2hpbGUgWyAkaSAtbHQgMTAg
+XSBkbyBlY2hvICItb2JqZWN0IG1lbW9yeS1iYWNrZW5kLXJhbSxpZD1tJGksc2l6ZT0xMjhNIC1k
+ZXZpY2UgcGMtZGltbSxpZD1kJGksbWVtZGV2PW0kaSIgaT0kKCgkaSArIDEpKSBkb25lYA0KDQo+
+IGl0IGVuZCB1cHMgd2l0aCAxMiB1c2VkX21lbXNsb3RzLCBhbmQgcHJpbnRzIGZvbGxvd2luZyBl
+cnJvciBtZXNzYWdlczoNCj4gcWVtdS1zeXN0ZW0teDg2XzY0OiB2aG9zdF9zZXRfbWVtX3RhYmxl
+IGZhaWxlZDogQXJndW1lbnQgbGlzdCB0b28gbG9uZyAoNykNCj4gcWVtdS1zeXN0ZW0teDg2XzY0
+OiB1bmFibGUgdG8gc3RhcnQgdmhvc3QgbmV0OiA3OiBmYWxsaW5nIGJhY2sgb24gdXNlcnNwYWNl
+IHZpcnRpbw0KDQo+IGFib3ZlIENMSSBzaG91bGQgZmFpbCB0byBzdGFydHVwIGFzIGl0J3MgYWJv
+dmUgc3VwcG9ydGVkIGxpbWl0IGV2ZW4gd2l0aCBtZXJnaW5nDQo+ICh3aXRoIG1lcmdpbmcgYXZh
+aWxhYmxlIHNsb3RzIGlzICdyYW5kb20nIG51bWJlciBhbmQgbWVyZ2luZyBjb3VsZCBoYXBwZW4g
+cmVnYXJkbGVzcw0KPiBvZiB0aGUgb3JkZXIgZGV2aWNlcyBhcmUgY3JlYXRlZCkuDQoNCg0KPiB2
+aG9zdF9kZXZfaW5pdCgpIGFsc28gaGFzIGNoZWNrcyB2aG9zdF9iYWNrZW5kX21lbXNsb3RzX2xp
+bWl0KCksDQo+IGFuZCBza2lwcGluZyBjaGVjayBpbiBwY19kaW1tX21lbW9yeV9wbHVnKCkgbWln
+aHQgbGVhZCB0byBmYWlsdXJlDQo+IGxhdGVyIGluIHZob3N0X2Rldl9pbml0KCkgLSBJJ20gbm90
+IHN1cmUgd2hlbiBpdCdzIGNhbGxlZCBhbmQgdG8gd2hhdA0KPiBjb25zZXF1ZW5jZXMgaXQgd291
+bGQgbGVhZC4NCg0KSSBkb24ndCB0aGluayB3ZSBkZXNjcmliZSB0aGUgc2FtZSAgc2NlbmFyaW8u
+SSBtZWFuIGhvdHBsdWdnZWQgbWVtIFZNIG9uIHNvdXJjZSBpcyBsZXNzIHRoYW4gbGltaXQsDQoN
+CmFuZCBhZnRlciBtaWdyYXRpb24gb24gZGVzdGluYXRpb24gVk0gc2hvdWxkIHNhdGlzZnkgdGhl
+IGxpbWl0Lg0KDQpiZWZvcmUgdmhvc3RfZGV2X2luaXQgICBhbGwgZGV2aWNlcyBpbml0aWFsaXph
+dGlvbiBkb24ndCBhZmZlY3Qgdmhvc3QgdXNlZF9tZW1zbG90cyBzdGF0aXN0aWNzDQoNCiAoYmVj
+YXVzZSBubyB2aG9zdCBkZXZpY2UpLiBzbyB3aGVuICB2aG9zdF9kZXZfaW5pdCAgaXMgY2FsbGVk
+LCB2aG9zdCB1c2VkX21lbXNsb3RzIHN0YXRpc3RpY3MgaXMgemVyby4NCg0KSSB0ZXN0IGluIG15
+IG1pZ3JhdGlvbiBzY2VuYXJpby4NCg0KYWZ0ZXIgbWlncmF0aW9uIG9uIGRlc3RpbmF0aW9uLCBw
+cmludCB1c2VkX21lbXNsb3RzICBpbiB2aG9zdF9zZXRfbWVtb3J5IGxpa2UgdGhpcyAod2l0aCBt
+eSBwYXRjaCkNCg0KDQoNCg0KIHVzZWRfbWVtc2xvdHMgOiAxDQoNCg0KIHVzZWRfbWVtc2xvdHMg
+OiAyDQoNCg0KdXNlZF9tZW1zbG90cyA6IDENCg0KIHVzZWRfbWVtc2xvdHMgOiAyDQoNCiB1c2Vk
+X21lbXNsb3RzIDogMw0KDQogdXNlZF9tZW1zbG90cyA6IDQNCg0KIHVzZWRfbWVtc2xvdHMgOiA1
+DQoNCiB1c2VkX21lbXNsb3RzIDogNg0KDQoNCiB1c2VkX21lbXNsb3RzIDogNw0KDQp1c2VkX21l
+bXNsb3RzIDogOA0KDQoNCiB1c2VkX21lbXNsb3RzIDogOQ0KDQogdXNlZF9tZW1zbG90cyA6IDEw
+DQoNCnVzZWRfbWVtc2xvdHMgOiA5DQoNCiB1c2VkX21lbXNsb3RzIDogMTANCg0KIHVzZWRfbWVt
+c2xvdHMgOiA5DQoNCg0KIHVzZWRfbWVtc2xvdHMgOiAxMA0KDQogdXNlZF9tZW1zbG90cyA6IDEx
+DQoNCiB1c2VkX21lbXNsb3RzIDogMTINCg0KIHVzZWRfbWVtc2xvdHMgOiAxMQ0KDQoNCiB1c2Vk
+X21lbXNsb3RzIDogMTANCg0KIHVzZWRfbWVtc2xvdHMgOiA5DQoNCiB1c2VkX21lbXNsb3RzIDog
+OQ0KDQogdXNlZF9tZW1zbG90cyA6IDkNCg0KIHVzZWRfbWVtc2xvdHMgOiA5DQoNCiB1c2VkX21l
+bXNsb3RzIDogOA0KDQoNCg0KDQoNCg0KDQoNCj4gPiAgICAgICAgICBnb3RvIG91dA0KPiA+IGRp
+ZmYgLS1naXQgYS9pbmNsdWRlL3N5c2VtdS9zeXNlbXUuaCBiL2luY2x1ZGUvc3lzZW11L3N5c2Vt
+dS5oDQo+ID4gaW5kZXggYjIxMzY5Ni4uNDgyMjhhZCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRl
+L3N5c2VtdS9zeXNlbXUuaA0KPiA+ICsrKyBiL2luY2x1ZGUvc3lzZW11L3N5c2VtdS5oDQo+ID4g
+QEAgLTg4LDYgKzg4LDcgQEAgdm9pZCBxZW11X3N5c3RlbV9ndWVzdF9wYW5pY2tlZChHdWVzdFBh
+bmljSW5mb3JtYXRpb24gKmluZm8pDQo+ID4gIHZvaWQgcWVtdV9hZGRfZXhpdF9ub3RpZmllcihO
+b3RpZmllciAqbm90aWZ5KQ0KPiA+ICB2b2lkIHFlbXVfcmVtb3ZlX2V4aXRfbm90aWZpZXIoTm90
+aWZpZXIgKm5vdGlmeSkNCj4gPiAgDQo+ID4gK2Jvb2wgcWVtdV9pc19tYWNoaW5lX2luaXRfZG9u
+ZSh2b2lkKQ0KPiA+ICB2b2lkIHFlbXVfYWRkX21hY2hpbmVfaW5pdF9kb25lX25vdGlmaWVyKE5v
+dGlmaWVyICpub3RpZnkpDQo+ID4gIHZvaWQgcWVtdV9yZW1vdmVfbWFjaGluZV9pbml0X2RvbmVf
+bm90aWZpZXIoTm90aWZpZXIgKm5vdGlmeSkNCj4gPiAgDQo+ID4gZGlmZiAtLWdpdCBhL3ZsLmMg
+Yi92bC5jDQo+ID4gaW5kZXggZmI2YjJlZi4uNDNhZWUyMiAxMDA2NDQNCj4gPiAtLS0gYS92bC5j
+DQo+ID4gKysrIGIvdmwuYw0KPiA+IEBAIC0yNjgxLDYgKzI2ODEsMTEgQEAgc3RhdGljIHZvaWQg
+cWVtdV9ydW5fZXhpdF9ub3RpZmllcnModm9pZCkNCj4gPiAgDQo+ID4gIHN0YXRpYyBib29sIG1h
+Y2hpbmVfaW5pdF9kb25lDQo+ID4gIA0KPiA+ICtib29sIHFlbXVfaXNfbWFjaGluZV9pbml0X2Rv
+bmUodm9pZCkNCj4gPiArew0KPiA+ICsgICAgcmV0dXJuIG1hY2hpbmVfaW5pdF9kb25lDQo+ID4g
+K30NCj4gPiArDQo+ID4gIHZvaWQgcWVtdV9hZGRfbWFjaGluZV9pbml0X2RvbmVfbm90aWZpZXIo
+Tm90aWZpZXIgKm5vdGlmeSkNCj4gPiAgew0KPiA+ICAgICAgbm90aWZpZXJfbGlzdF9hZGQoJm1h
+Y2hpbmVfaW5pdF9kb25lX25vdGlmaWVycywgbm90aWZ5
