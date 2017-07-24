@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dZkSI-0002zG-Ry
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:59:55 -0400
+	(envelope-from <cota@braap.org>) id 1dZkSn-0003Of-GG
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:00:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dZkSI-0001GZ-6d
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:59:54 -0400
+	(envelope-from <cota@braap.org>) id 1dZkSk-0001XB-Et
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:00:25 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53387)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dZkSk-0001Wa-7s
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:00:22 -0400
+Date: Mon, 24 Jul 2017 17:00:19 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170724210019.GA23091@flamenco>
+References: <20170724202728.25960-1-rth@twiddle.net>
+	<20170724202728.25960-29-rth@twiddle.net>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <12087bf6-7ff4-58f4-5a4a-1bdf1661abfb@redhat.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-3-f4bug@amsat.org>
-	<12087bf6-7ff4-58f4-5a4a-1bdf1661abfb@redhat.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 24 Jul 2017 13:59:18 -0700
-Message-ID: <CAKmqyKNo18_JGveUWZMjspRyTPY-g2q3JcOP3tt7s8q15Wogrg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 02/35] loader: check
- get_image_size() return value
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170724202728.25960-29-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v15 28/32] target/arm: [tcg] Port to
+ generic translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu
 
-On Mon, Jul 24, 2017 at 11:38 AM, Eric Blake <eblake@redhat.com> wrote:
-> On 07/24/2017 01:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> since a negative value means it errored.
->>
->> hw/core/loader.c:149:9: warning: Loss of sign in implicit conversion
->>     if (size > max_sz) {
->>         ^~~~
->> hw/core/loader.c:171:9: warning: Loss of sign in implicit conversion
->>     if (size > memory_region_size(mr)) {
->>         ^~~~
->>
->> Reported-by: Clang Static Analyzer
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  hw/core/loader.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+On Mon, Jul 24, 2017 at 13:27:24 -0700, Richard Henderson wrote:
+> From: Lluís Vilanova <vilanova@ac.upc.edu>
+> 
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> Message-Id: <150002631325.22386.10348327185029496649.stgit@frigg.lan>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/arm/translate.h     |   8 +---
+>  target/arm/translate-a64.c | 107 ++++++++------------------------------------
+>  target/arm/translate.c     | 109 +++++++++------------------------------------
+>  3 files changed, 41 insertions(+), 183 deletions(-)
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Tested-by: Emilio G. Cota <cota@braap.org>
 
-Thanks,
-Alistair
-
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->
+		E.
