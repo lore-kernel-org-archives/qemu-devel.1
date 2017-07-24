@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZXIe-0007sC-Pe
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 02:57:06 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1dZXMm-0000Mb-EL
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZXIa-00069Z-H1
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 02:57:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZXIa-00068A-8D
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 02:57:00 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <87o9so1hl7.fsf@dusky.pond.sub.org>
-	<20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
-	<20170721153331.GL18014@stefanha-x1.localdomain>
-	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
-Date: Mon, 24 Jul 2017 08:56:50 +0200
-In-Reply-To: <026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com> (Cleber Rosa's
-	message of "Fri, 21 Jul 2017 12:16:30 -0400")
-Message-ID: <8760eiuxu5.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+	(envelope-from <benh@kernel.crashing.org>) id 1dZXMj-0007Lx-D3
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:01:20 -0400
+Message-ID: <1500879657.10674.64.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Mon, 24 Jul 2017 17:00:57 +1000
+In-Reply-To: <20170724043624.GE17228@umbus.fritz.box>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-9-git-send-email-clg@kaod.org>
+	<20170724043624.GE17228@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 08/26] ppc/xive: add flags to the XIVE
+ interrupt source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Cleber Rosa <crosa@redhat.com> writes:
+On Mon, 2017-07-24 at 14:36 +1000, David Gibson wrote:
+> On Wed, Jul 05, 2017 at 07:13:21PM +0200, C=C3=A9dric Le Goater wrote:
+> > These flags define some characteristics of the source :
+> >=20
+> >  - XIVE_SRC_H_INT_ESB  the Event State Buffer are controlled with a
+> >                        specific hcall H_INT_ESB
+>=20
+> What's the other option?
 
-> On 07/21/2017 11:33 AM, Stefan Hajnoczi wrote:
->>> Output testing style delegates checking ouput to diff.  I rather like it
->>> when text output is readily available.  It is when testing QMP.  A
->>> non-trivial example using this style could be useful, as discussing
->>> ideas tends to be more productive when they come with patches.
->> 
->> Yes, I was considering how many of the Python iotests could be rewritten
->> comfortably in shell.  It is nice when the test simply executes commands
->> and the output file shows the entire history of what happened.  Great
->> for debugging.
->> 
->> Stefan
->> 
-> I'd like to have a better understanding of the major pain points here.
->
-> Although this can be seen as a matter of taste, style preferences and
-> even religion, I guess it's safe to say that Python can scale better
-> than shell.  The upside of shell based tests is the "automatic" and
-> complete logging, right?  Running "bash -x /path/to/test.sh" will give
-> much more *useful* information than "python -v /path/to/test.py" will, fact.
->
-> I believe this has to do with how *generic* Python code is written, and
-> how builtin functions and most of the standard Python libraries work as
-> they do.  Now, when writing code aimed at testing, making use of testing
-> oriented libraries and tools, one would expect much more useful and
-> readily available debug information.
->
-> I'm biased, for sure, but that's what you get when you write basic tests
-> using the Avocado libraries.  For instance, when using process.run()[1]
-> within a test, you can choose to see its command output quite easily
-> with a command such as "avocado --show=avocado.test.stdout run test.py".
->
-> Using other custom logging channels is also trivial (for instance for
-> specific QMP communication)[2][3].
->
-> I wonder if such logging capabilities fill in the gap of what you
-> describe as "[when the] output file shows the entire history of what
-> happened".
+Direct MMIO access. Normally all interrupts use normal MMIOs,
+each interrupts has an associated MMIO page with special MMIOs
+to control the source state (PQ bits). This is something I added
+to the PAPR spec (and the OPAL <-> Linux interface) to allow firmware
+to work around broken HW (which happens on some P9 versions).
 
-Test code language is orthogonal to verification method (with code
-vs. with diff).  Except verifying with shell code would be obviously
-nuts[*].
+> >  - XIVE_SRC_LSI        LSI or MSI source
+>=20
+> Hrm.  This definitely duplicates info that is in the XICS per irq
+> state which you're re-using (and which you're using in the xive code
+> at this point).
 
-The existing iotests written in Python verify with code, and the ones
-written in shell verify with diff.  Doesn't mean that we have to port
-from Python to shell to gain "verify with diff".
+I think all those flags correspond to the flags passed via the PAPR
+API, so it makes sense to have them there.
 
-I don't doubt that featureful test frameworks like Avocado provide
-adequate tools to debug tests.  The lure of the shell is its perceived
-simplicity: everybody knows (well, should know) how to write and debug
-simple shell scripts.  Of course, the simplicity evaporates when the
-scripts grow beyond "simple".  Scare quotes, because what's simple for
-Alice may not be so simple for Bob.
-
-> BTW, I'll defer the discussion of using an external tool to check the
-> output and determine test success/failure, because it is IMO a
-> complementary topic, and I believe I understand its use cases.
-
-Yes.  Regardless, I want to tell you *now* how tired of writing code to
-verify test output I am.  Even of reading it.  Output text is easier to
-read than code that tries to verify output text.  Diffs are easier to
-read than stack backtraces.
-
-> [1] -
-> http://avocado-framework.readthedocs.io/en/52.0/api/utils/avocado.utils.html#avocado.utils.process.run
-> [2] -
-> http://avocado-framework.readthedocs.io/en/52.0/WritingTests.html#advanced-logging-capabilities
-> [3] - https://www.youtube.com/watch?v=htUbOsh8MZI
-
-[*] Very many nutty things are more obviously nuts in shell.  It's an
-advantage of sorts ;)
+> >  - XIVE_SRC_TRIGGER    the full function page supports trigger
+> >  - XIVE_SRC_STORE_EOI  EOI can with a store.
+> >=20
+> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > ---
+> >  hw/intc/xive.c        | 1 +
+> >  include/hw/ppc/xive.h | 9 +++++++++
+> >  2 files changed, 10 insertions(+)
+> >=20
+> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > index 816031b8ac81..8f8bb8b787bd 100644
+> > --- a/hw/intc/xive.c
+> > +++ b/hw/intc/xive.c
+> > @@ -345,6 +345,7 @@ static Property xive_ics_properties[] =3D {
+> >      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+> >      DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
+> >      DEFINE_PROP_UINT32("shift", XiveICSState, esb_shift, 0),
+> > +    DEFINE_PROP_UINT64("flags", XiveICSState, flags, 0),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> > =20
+> > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> > index 5303d96f5f59..1178300c9df3 100644
+> > --- a/include/hw/ppc/xive.h
+> > +++ b/include/hw/ppc/xive.h
+> > @@ -30,9 +30,18 @@ typedef struct XiveICSState XiveICSState;
+> >  #define TYPE_ICS_XIVE "xive-source"
+> >  #define ICS_XIVE(obj) OBJECT_CHECK(XiveICSState, (obj), TYPE_ICS_XIV=
+E)
+> > =20
+> > +/*
+> > + * XIVE Interrupt source flags
+> > + */
+> > +#define XIVE_SRC_H_INT_ESB     (1ull << (63 - 60))
+> > +#define XIVE_SRC_LSI           (1ull << (63 - 61))
+> > +#define XIVE_SRC_TRIGGER       (1ull << (63 - 62))
+> > +#define XIVE_SRC_STORE_EOI     (1ull << (63 - 63))
+> > +
+> >  struct XiveICSState {
+> >      ICSState parent_obj;
+> > =20
+> > +    uint64_t     flags;
+> >      uint32_t     esb_shift;
+> >      MemoryRegion esb_iomem;
+> > =20
+>=20
+>=20
