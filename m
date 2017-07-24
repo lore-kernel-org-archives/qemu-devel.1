@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1dZeyM-0003ii-LC
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:08:40 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1dZezr-0004nS-VD
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:10:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1dZeyJ-0004fz-5i
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:08:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35362)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1dZeyI-0004f7-S5
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:08:35 -0400
-Date: Mon, 24 Jul 2017 17:02:13 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170724150213.slecgwbi7cjuxxog@kamzik.brq.redhat.com>
-References: <DB6PR07MB3157C27C077C91BE92846021F5A40@DB6PR07MB3157.eurprd07.prod.outlook.com>
+	(envelope-from <dan.j.williams@intel.com>) id 1dZezn-000584-DJ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:10:11 -0400
+Received: from mail-yw0-x230.google.com ([2607:f8b0:4002:c05::230]:33638)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1dZezn-00057F-7P
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:10:07 -0400
+Received: by mail-yw0-x230.google.com with SMTP id x125so50866485ywa.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 08:10:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DB6PR07MB3157C27C077C91BE92846021F5A40@DB6PR07MB3157.eurprd07.prod.outlook.com>
-Subject: Re: [Qemu-devel] virtio-net-pci possible limitation on AArch64
+In-Reply-To: <20170724123752.GN652@quack2.suse.cz>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<20170721155848.GO18014@stefanha-x1.localdomain>
+	<CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
+	<1500818683.4073.31.camel@redhat.com>
+	<CAPcyv4h5O4D2kp6SJhWiz4V=dOLDa_Q3pk2B=u-x7hKKQqdXsQ@mail.gmail.com>
+	<1500833428.4073.36.camel@redhat.com>
+	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
+	<20170724102330.GE652@quack2.suse.cz>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	<20170724123752.GN652@quack2.suse.cz>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Mon, 24 Jul 2017 08:10:05 -0700
+Message-ID: <CAPcyv4g-X8S95=uQBo5MzxpwKfqdTbmBis3B56i59wqWiPnCBA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,241 +37,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexandru Avadanii <Alexandru.Avadanii@enea.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, svc-armband <svc-armband@enea.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Rik van Riel <riel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-On Fri, Jul 21, 2017 at 06:37:26PM +0000, Alexandru Avadanii wrote:
-> Hi,
-> I ran into an interesting limitation (or possibly bug) while trying to attach more than 3 (three) virtio-net-pci NICs to an AArch64 guest.
-> I created 4 network with virsh (see below for xml defitions) - nothing fancy, only 2 of them use NAT.
-> 
-> Attaching a virtio-net-pci NIC for each network works well, VMs can be spawned, all devices are properly detected by the guest OS.
-> The first 3 guest interfaces work perfectly, however I can't get any traffic on the 4th one (in my case the public one).
-> 
-> QEMU version: 2.9.0
-> Libvirt: tested with both 1.3.4 and 3.5.0, although I don't think libvirt is to blame here
+On Mon, Jul 24, 2017 at 5:37 AM, Jan Kara <jack@suse.cz> wrote:
+> On Mon 24-07-17 08:06:07, Pankaj Gupta wrote:
+>>
+>> > On Sun 23-07-17 13:10:34, Dan Williams wrote:
+>> > > On Sun, Jul 23, 2017 at 11:10 AM, Rik van Riel <riel@redhat.com> wrote:
+>> > > > On Sun, 2017-07-23 at 09:01 -0700, Dan Williams wrote:
+>> > > >> [ adding Ross and Jan ]
+>> > > >>
+>> > > >> On Sun, Jul 23, 2017 at 7:04 AM, Rik van Riel <riel@redhat.com>
+>> > > >> wrote:
+>> > > >> >
+>> > > >> > The goal is to increase density of guests, by moving page
+>> > > >> > cache into the host (where it can be easily reclaimed).
+>> > > >> >
+>> > > >> > If we assume the guests will be backed by relatively fast
+>> > > >> > SSDs, a "whole device flush" from filesystem journaling
+>> > > >> > code (issued where the filesystem issues a barrier or
+>> > > >> > disk cache flush today) may be just what we need to make
+>> > > >> > that work.
+>> > > >>
+>> > > >> Ok, apologies, I indeed had some pieces of the proposal confused.
+>> > > >>
+>> > > >> However, it still seems like the storage interface is not capable of
+>> > > >> expressing what is needed, because the operation that is needed is a
+>> > > >> range flush. In the guest you want the DAX page dirty tracking to
+>> > > >> communicate range flush information to the host, but there's no
+>> > > >> readily available block i/o semantic that software running on top of
+>> > > >> the fake pmem device can use to communicate with the host. Instead
+>> > > >> you
+>> > > >> want to intercept the dax_flush() operation and turn it into a queued
+>> > > >> request on the host.
+>> > > >>
+>> > > >> In 4.13 we have turned this dax_flush() operation into an explicit
+>> > > >> driver call. That seems a better interface to modify than trying to
+>> > > >> map block-storage flush-cache / force-unit-access commands to this
+>> > > >> host request.
+>> > > >>
+>> > > >> The additional piece you would need to consider is whether to track
+>> > > >> all writes in addition to mmap writes in the guest as DAX-page-cache
+>> > > >> dirtying events, or arrange for every dax_copy_from_iter()
+>> > > >> operation()
+>> > > >> to also queue a sync on the host, but that essentially turns the host
+>> > > >> page cache into a pseudo write-through mode.
+>> > > >
+>> > > > I suspect initially it will be fine to not offer DAX
+>> > > > semantics to applications using these "fake DAX" devices
+>> > > > from a virtual machine, because the DAX APIs are designed
+>> > > > for a much higher performance device than these fake DAX
+>> > > > setups could ever give.
+>> > >
+>> > > Right, we don't need DAX, per se, in the guest.
+>> > >
+>> > > >
+>> > > > Having userspace call fsync/msync like done normally, and
+>> > > > having those coarser calls be turned into somewhat efficient
+>> > > > backend flushes would be perfectly acceptable.
+>> > > >
+>> > > > The big question is, what should that kind of interface look
+>> > > > like?
+>> > >
+>> > > To me, this looks much like the dirty cache tracking that is done in
+>> > > the address_space radix for the DAX case, but modified to coordinate
+>> > > queued / page-based flushing when the guest  wants to persist data.
+>> > > The similarity to DAX is not storing guest allocated pages in the
+>> > > radix but entries that track dirty guest physical addresses.
+>> >
+>> > Let me check whether I understand the problem correctly. So we want to
+>> > export a block device (essentially a page cache of this block device) to a
+>> > guest as PMEM and use DAX in the guest to save guest's page cache. The
+>>
+>> that's correct.
+>>
+>> > natural way to make the persistence work would be to make ->flush callback
+>> > of the PMEM device to do an upcall to the host which could then fdatasync()
+>> > appropriate image file range however the performance would suck in such
+>> > case since ->flush gets called for at most one page ranges from DAX.
+>>
+>> Discussion is : sync a range using paravirt device or flush hit addresses
+>> vs block device flush.
+>>
+>> >
+>> > So what you could do instead is to completely ignore ->flush calls for the
+>> > PMEM device and instead catch the bio with REQ_PREFLUSH flag set on the
+>> > PMEM device (generated by blkdev_issue_flush() or the journalling
+>> > machinery) and fdatasync() the whole image file at that moment - in fact
+>> > you must do that for metadata IO to hit persistent storage anyway in your
+>> > setting. This would very closely follow how exporting block devices with
+>> > volatile cache works with KVM these days AFAIU and the performance will be
+>> > the same.
+>>
+>> yes 'blkdev_issue_flush' does set 'REQ_OP_WRITE | REQ_PREFLUSH' flags.
+>> As per suggestions looks like block flushing device is way ahead.
+>>
+>> If we do an asynchronous block flush at guest side(put current task in
+>> wait queue till host side fdatasync completes) can solve the purpose? Or
+>> do we need another paravirt device for this?
+>
+> Well, even currently if you have PMEM device, you still have also a block
+> device and a request queue associated with it and metadata IO goes through
+> that path. So in your case you will have the same in the guest as a result
+> of exposing virtual PMEM device to the guest and you just need to make sure
+> this virtual block device behaves the same way as traditional virtualized
+> block devices in KVM in respose to 'REQ_OP_WRITE | REQ_PREFLUSH' requests.
 
-1.3.4 is way too old for AArch64 guests - 3.0.0 was the first release that
-contained basic support. The XML below doesn't show what I'd expect for
-the PCIe topology either (see [*]), and that's likely the problem. I
-suggest you try a fresh VM creation using latest libvirt and virt tools.
-If it still doesn't work, then confirm it's not a bridging issue by
-checking that it's always the forth network by changing their order.
-
-[*] QEMU doc: docs/config/mach-virt-graphical.cfg
-
-> Host OS: Ubuntu Xenial 16.04.2 LTS
-> Guest OS: Ubuntu Xenial Cloud Image (latest available)
-> Reproducibility rate: 100% with below config
-> 
-> VM is created with (also domain XML attached at the end of this mail):
-> $ virt-install --name cfg01 --ram 4096 --vcpus 6 --cpu host-passthrough --accelerate \
-> --network network:pxe,model=virtio-net-pci \
-> --network network:mgmt,model=virtio-net-pci \
-> --network network:internal,model=virtio-net-pci \
-> --network network:public,model=virtio-net-pci \
-> --console pty --autostart --noreboot --noautoconsole --video=vga --noautoconsole [...]
-> 
-> You might notice I had to disable legacy virtio in the domain XML, or the guest would complain about a missing F_... property and no guest network interfaces would be detected.
-
-You shouldn't need to do this disable-legacy stuff when using PCIe ports,
-as the virtio devices will automatically use virtio-1.0 ("modern").
-
-> 
-> For now, since we only need 4 guest interfaces, we switched one of them back to virtio-mmio, and everything is working as expected.
-> Unfortunately I can't investigate this myself right now, but I can provide additional details if needed for someone else to look into it.
-
-I just checked on my setup (RH qemu based on 2.9, RH libvirt based on
-3.2). I used Fedora 26's virt-manager from my x86 notebook, remotely
-connecting to my AArch64 host, in order to create four networks and
-a guest that has them all attached to four virtio nics. It worked
-without a hitch.
-
-Thanks,
-drew
-
-> 
-> BR,
-> Alex
-> 
-> ---
-> Network definitions:
-> ---
-> <network>
->   <name>pxe</name>
->   <forward mode='nat'/>
->   <bridge name='pxe' stp='on' delay='0'/>
->   <ip address='192.168.10.1' netmask='255.255.255.0'>
->     <dhcp>
->       <range start='192.168.10.100' end='192.168.10.254'/>
->     </dhcp>
->   </ip>
-> </network>
-> 
-> <network>
->   <name>mgmt</name>
->   <bridge name='mgmt' stp='on' delay='0'/>
->   <ip address='172.16.10.1' netmask='255.255.255.0'>
->   </ip>
-> </network>
-> 
-> <network>
->   <name>internal</name>
->   <bridge name='internal' stp='on' delay='0'/>
-> </network>
-> 
-> <network>
->   <name>public</name>
->   <forward mode='nat'/>
->   <bridge name='public' stp='on' delay='0'/>
->   <ip address='10.16.0.1' netmask='255.255.255.0'>
->   </ip>
-> </network>
-> 
-> ---
-> Domain XML:
-> ---
-> <domain type='kvm' id='28' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
->   <name>cfg01</name>
->   <uuid>3f8415d1-963a-46aa-8a63-1c6558775b92</uuid>
->   <memory unit='KiB'>4194304</memory>
->   <currentMemory unit='KiB'>4194304</currentMemory>
->   <vcpu placement='static'>6</vcpu>
->   <resource>
->     <partition>/machine</partition>
->   </resource>
->   <os>
->     <type arch='aarch64' machine='virt-2.9'>hvm</type>
->     <loader readonly='yes' type='pflash'>/usr/share/AAVMF/AAVMF_CODE.fd</loader>
->     <nvram>/var/lib/libvirt/qemu/nvram/cfg01_VARS.fd</nvram>
->     <boot dev='hd'/>
->   </os>
->   <features>
->     <acpi/>
->     <gic version='3'/>
->   </features>
->   <cpu mode='host-passthrough' check='none'/>
->   <clock offset='utc'/>
->   <on_poweroff>destroy</on_poweroff>
->   <on_reboot>restart</on_reboot>
->   <on_crash>restart</on_crash>
->   <devices>
->     <emulator>/usr/bin/kvm</emulator>
->     <disk type='file' device='disk'>
->       <driver name='qemu' type='qcow2' cache='none' io='native'/>
->       <source file='/home/jenkins/alav/armband/upstream/fuel/mcp/scripts/images/mcp_cfg01.qcow2'/>
->       <backingStore/>
->       <target dev='vda' bus='virtio'/>
->       <alias name='virtio-disk0'/>
->       <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
->     </disk>
->     <disk type='file' device='cdrom'>
->       <driver name='qemu' type='raw'/>
->       <source file='/home/jenkins/alav/armband/upstream/fuel/mcp/scripts/images/mcp_cfg01.iso'/>
->       <backingStore/>
->       <target dev='sda' bus='scsi'/>
->       <readonly/>
->       <alias name='scsi0-0-0-0'/>
->       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
->     </disk>
->     <controller type='scsi' index='0' model='virtio-scsi'>
->       <alias name='scsi0'/>
->       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
->     </controller>
->     <controller type='pci' index='0' model='pcie-root'>
->       <alias name='pcie.0'/>
->     </controller>
->     <controller type='pci' index='1' model='dmi-to-pci-bridge'>
->       <model name='i82801b11-bridge'/>
->       <alias name='pci.1'/>
->       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
->     </controller>
->     <controller type='pci' index='2' model='pci-bridge'>
->       <model name='pci-bridge'/>
->       <target chassisNr='2'/>
->       <alias name='pci.2'/>
->       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
->     </controller>
->     <controller type='pci' index='3' model='pcie-root-port'>
->       <model name='pcie-root-port'/>
->       <target chassis='3' port='0x10'/>
->       <alias name='pci.3'/>
->       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0' multifunction='on'/>
->     </controller>
->     <controller type='pci' index='4' model='pcie-root-port'>
->       <model name='pcie-root-port'/>
->       <target chassis='4' port='0x11'/>
->       <alias name='pci.4'/>
->       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x1'/>
->     </controller>
->     <controller type='pci' index='5' model='pcie-root-port'>
->       <model name='pcie-root-port'/>
->       <target chassis='5' port='0x12'/>
->       <alias name='pci.5'/>
->       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x2'/>
->     </controller>
->     <interface type='network'>
->       <mac address='52:54:00:ae:48:81'/>
->       <source network='pxe' bridge='pxe'/>
->       <target dev='vnet0'/>
->       <model type='virtio-net-pci'/>
->       <alias name='net0'/>
->       <address type='pci' domain='0x0000' bus='0x02' slot='0x01' function='0x0'/>
->     </interface>
->     <interface type='network'>
->       <mac address='52:54:00:36:2c:a9'/>
->       <source network='mgmt' bridge='mgmt'/>
->       <target dev='vnet1'/>
->       <model type='virtio-net-pci'/>
->       <alias name='net1'/>
->       <address type='pci' domain='0x0000' bus='0x02' slot='0x02' function='0x0'/>
->     </interface>
->     <interface type='network'>
->       <mac address='52:54:00:43:ce:03'/>
->       <source network='internal' bridge='internal'/>
->       <target dev='vnet2'/>
->       <model type='virtio-net-pci'/>
->       <alias name='net2'/>
->       <address type='pci' domain='0x0000' bus='0x02' slot='0x03' function='0x0'/>
->     </interface>
->     <interface type='network'>
->       <mac address='52:54:00:37:e6:0e'/>
->       <source network='public' bridge='public'/>
->       <target dev='vnet3'/>
->       <model type='virtio-net-pci'/>
->       <alias name='net3'/>
->       <address type='pci' domain='0x0000' bus='0x02' slot='0x04' function='0x0'/>
->     </interface>
->     <serial type='pty'>
->       <source path='/dev/pts/0'/>
->       <target port='0'/>
->       <alias name='serial0'/>
->     </serial>
->     <console type='pty' tty='/dev/pts/0'>
->       <source path='/dev/pts/0'/>
->       <target type='serial' port='0'/>
->       <alias name='serial0'/>
->     </console>
->     <graphics type='vnc' port='5900' autoport='yes' listen='127.0.0.1'>
->       <listen type='address' address='127.0.0.1'/>
->     </graphics>
->     <video>
->       <model type='vga' vram='16384' heads='1' primary='yes'/>
->       <alias name='video0'/>
->       <address type='pci' domain='0x0000' bus='0x02' slot='0x05' function='0x0'/>
->     </video>
->   </devices>
->   <seclabel type='dynamic' model='apparmor' relabel='yes'>
->     <label>libvirt-3f8415d1-963a-46aa-8a63-1c6558775b92</label>
->     <imagelabel>libvirt-3f8415d1-963a-46aa-8a63-1c6558775b92</imagelabel>
->   </seclabel>
->   <seclabel type='dynamic' model='dac' relabel='yes'>
->     <label>+113:+115</label>
->     <imagelabel>+113:+115</imagelabel>
->   </seclabel>
->   <qemu:commandline>
->     <qemu:arg value='-global'/>
->     <qemu:arg value='virtio-pci.disable-legacy=on'/>
->   </qemu:commandline>
-> </domain>
-> 
+This approach would turn into a full fsync on the host. The question
+in my mind is whether there is any optimization to be had by trapping
+dax_flush() and calling msync() on host ranges, but Jan is right
+trapping blkdev_issue_flush() and turning around and calling host
+fsync() is the most straightforward approach that does not need driver
+interface changes. The dax_flush() approach would need to modify it
+into a async completion interface.
