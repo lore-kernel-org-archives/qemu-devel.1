@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZXoz-0005mC-Gp
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:30:30 -0400
+	(envelope-from <a175818323@gmail.com>) id 1dZXpc-0006A0-Vo
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZXow-0002IR-CG
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:30:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZXow-0002I9-3E
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:30:26 -0400
-References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
-	<1499952476-3454-7-git-send-email-armbru@redhat.com>
-	<20170717101906.GC5301@noname.redhat.com>
-	<87a842b9yo.fsf@dusky.pond.sub.org>
-	<87bmoauz2s.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
-Date: Mon, 24 Jul 2017 09:30:06 +0200
+	(envelope-from <a175818323@gmail.com>) id 1dZXpb-0002WR-SK
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:31:08 -0400
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:37720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1dZXpb-0002WE-MG
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:31:07 -0400
+Received: by mail-io0-x235.google.com with SMTP id c74so39807163iod.4
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 00:31:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87bmoauz2s.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 6/9] Convert error_report() to warn_report()
+In-Reply-To: <CAMxP3BQ+2nPjoEcB4w3gb5=CykUQUuWsjzi8N5XHLgPphbm=wQ@mail.gmail.com>
+References: <CAMxP3BQ+2nPjoEcB4w3gb5=CykUQUuWsjzi8N5XHLgPphbm=wQ@mail.gmail.com>
+From: Bob Chen <a175818323@gmail.com>
+Date: Mon, 24 Jul 2017 15:31:06 +0800
+Message-ID: <CAMxP3BSDEwHFLrfXP72hpaVhSsLoVtZ9S_uSZYFd-pReeqyJYA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Device passthrough] Is there a way to passthrough
+ PCIE switch/bridge ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Jeff Cody <jcody@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On 24/07/2017 08:30, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
->> Kevin Wolf <kwolf@redhat.com> writes:
->>
->>> Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
->>>> From: Alistair Francis <alistair.francis@xilinx.com>
->>>>
->>>> Convert all uses of error_report("warning:"... to use warn_report()
->>>> instead. This helps standardise on a single method of printing warnings
->>>> to the user.
->>>>
->>>> All of the warnings were changed using these two commands:
->>>>     find ./* -type f -exec sed -i \
->>>>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
->>>>
->>>> Indentation fixed up manually afterwards.
->>>>
->>>> The test-qdev-global-props test case was manually updated to ensure that
->>>> this patch passes make check (as the test cases are case sensitive).
->>>
->>> This patch broke qemu-iotests 051 because it neglected to update the
->>> reference output. Not sure if a change of the message was even intended,
->>> but with a error location prefix, the order changes:
->>>
->>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
->>> +(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
->>>
->>> Personally, I would expect the error location or at least the program
->>> name to come first even for warnings.
->>
->> I'll fix it.
->>
->> While focusing on something other than block, I forget qemu-iotests
->> exist.  My fault, but it's a pretty common fault.  I reiterate my plea
->> to include (a sensible subset of) it in "make check".
-> 
-> Oh, 051 isn't run by "make check-block".  It could just as well not
-> exist then.
-> 
-> What's the recommended way to run all iotests a build of QEMU can run?
+Details attached...
 
-I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
+I was trying to passthrough multiple GPUs into a single VM, the topology
+looks like these below.
 
-There are two issues with check-block:
+Without the help of PCIE switches, data traversing between GPUs are
+extremely slow. (depends on memcopy by CPU)
 
-* tests that require QEMU are skipped (rationale: you might be building
-without the x86_64-softmmu target).
+So my question is can I passthrough all the switches and PCIE Root, in
+order to make the Nvidia p2p feature work?
 
-* it only runs the "quick" group, but I think we should reverse the
-direction and mark slow tests specifically (that would cut about 10
-minutes out of the 20).
 
-It's a pity that qemu-iotests doesn't parallelize.  Maybe the harness
-could be changed to something more standard.
 
-Paolo
+Host:
+[root@localhost ~]# nvidia-smi topo -m
+GPU0 GPU1 GPU2 GPU3 GPU4 GPU5 GPU6 GPU7 CPU Affinity
+GPU0 X PIX PHB PHB SOC SOC SOC SOC 0-9,20-29
+GPU1 PIX X PHB PHB SOC SOC SOC SOC 0-9,20-29
+GPU2 PHB PHB X PIX SOC SOC SOC SOC 0-9,20-29
+GPU3 PHB PHB PIX X SOC SOC SOC SOC 0-9,20-29
+GPU4 SOC SOC SOC SOC X PIX PHB PHB 10-19,30-39
+GPU5 SOC SOC SOC SOC PIX X PHB PHB 10-19,30-39
+GPU6 SOC SOC SOC SOC PHB PHB X PIX 10-19,30-39
+GPU7 SOC SOC SOC SOC PHB PHB PIX X 10-19,30-39
+
+
+VM:
+[root@titan-xp-chenbo-2 ~]# nvidia-smi topo -m
+GPU0 GPU1 GPU2 GPU3 GPU4 GPU5 GPU6 GPU7 CPU Affinity
+GPU0 X PHB PHB PHB PHB PHB PHB PHB 0-15
+GPU1 PHB X PHB PHB PHB PHB PHB PHB 0-15
+GPU2 PHB PHB X PHB PHB PHB PHB PHB 0-15
+GPU3 PHB PHB PHB X PHB PHB PHB PHB 0-15
+GPU4 PHB PHB PHB PHB X PHB PHB PHB 0-15
+GPU5 PHB PHB PHB PHB PHB X PHB PHB 0-15
+GPU6 PHB PHB PHB PHB PHB PHB X PHB 0-15
+GPU7 PHB PHB PHB PHB PHB PHB PHB X 0-15
+
+
+Legend:
+
+  X   = Self
+  SOC  = Connection traversing PCIe as well as the SMP link between CPU
+sockets(e.g. QPI)
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge
+(typically the CPU)
+  PXB  = Connection traversing multiple PCIe switches (without traversing
+the PCIe Host Bridge)
+  PIX  = Connection traversing a single PCIe switch
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+
+
+2017-07-24 14:03 GMT+08:00 Bob Chen <a175818323@gmail.com>:
+
+>
+> - Bob
+>
