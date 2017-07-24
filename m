@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhZW-0006N8-9z
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:55:11 -0400
+	(envelope-from <david@redhat.com>) id 1dZhdE-0007Wk-31
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhZR-0007VA-F6
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:55:10 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:54108)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZhZR-0007U6-3P
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:55:05 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Mon, 24 Jul 2017 20:54:54 +0300
-Message-Id: <150091889458.30739.16324719944323757435.stgit@frigg.lan>
-In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+	(envelope-from <david@redhat.com>) id 1dZhd9-0000Wl-9d
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:59:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49860)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dZhd9-0000WU-41
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:58:55 -0400
+References: <20170721125609.11117-1-david@redhat.com>
+	<4a89b217-6d7b-af98-ceb8-379605e161e5@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7b888011-23ce-6afd-0ff0-5004aeff1bef@redhat.com>
+Date: Mon, 24 Jul 2017 19:58:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 13/13] trace: Rename C++-specific names in
- event arguments
+In-Reply-To: <4a89b217-6d7b-af98-ceb8-379605e161e5@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/6] target/s390x: tcg improvments + MSA
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com
 
-Allows instrumentation clients in C++ to use the auto-generated headers.
+On 24.07.2017 05:16, Richard Henderson wrote:
+> On 07/21/2017 05:56 AM, David Hildenbrand wrote:
+>> 1. smaller pgm irq instruction length fixes
+> 
+> I think maybe we should add insn length data to the unwind data, so that we can 
+> have env->int_pgm_ilen set to the right value whenever cpu_restore_state is called.
+> 
+> 
+> r~
+> 
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- scripts/tracetool/__init__.py |   10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+You mean, passing a third argument to tcg_gen_insn_start():
+	tcg_gen_insn_start(dc.pc, dc.cc_op, dc.ilen);
 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
-y
-index 7c19dc8c94..be7f28d2be 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -42,6 +42,8 @@ def out(*lines, **kwargs):
-     sys.stdout.writelines("\n".join(lines) + "\n")
-=20
-=20
-+FORBIDDEN =3D ["new", "class"]
-+
- class Arguments:
-     """Event arguments description."""
-=20
-@@ -85,6 +87,9 @@ class Arguments:
-             else:
-                 arg_type, identifier =3D arg.rsplit(None, 1)
-=20
-+            if identifier in FORBIDDEN:
-+                identifier +=3D "_"
-+
-             res.append((arg_type, identifier))
-         return Arguments(res)
-=20
-@@ -230,7 +235,10 @@ class Event(object):
-         fmt_trans =3D groups["fmt_trans"]
-         if len(fmt_trans) > 0:
-             fmt =3D [fmt_trans, fmt]
--        args =3D Arguments.build(groups["args"])
-+        try:
-+            args =3D Arguments.build(groups["args"])
-+        except ForbiddenArgumentError as e:
-+            error("Error: event '%s' uses forbidden argument name '%s'" =
-% (name, e.name))
-=20
-         if "tcg-trans" in props:
-             raise ValueError("Invalid property 'tcg-trans'")
+by setting TARGET_INSN_START_EXTRA_WORDS=2 ?
+
+Then we would have to do instruction length detection before
+tcg_gen_insn_start() and therefore before translate_one().
+
+
+-- 
+
+Thanks,
+
+David
