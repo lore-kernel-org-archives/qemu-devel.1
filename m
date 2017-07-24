@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dZaHX-0003Op-Hu
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:08:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZaRM-0005pd-Fh
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dZaHS-0008Em-Kv
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:08:07 -0400
-Received: from mail-ua0-f178.google.com ([209.85.217.178]:33152)
+	(envelope-from <peter.maydell@linaro.org>) id 1dZaRL-0004Eu-FV
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:16 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38471)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dZaHS-0008EA-Gs
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:08:02 -0400
-Received: by mail-ua0-f178.google.com with SMTP id 80so74540213uas.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 03:08:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZaRL-0004Ed-81
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:15 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id m85so13195281wma.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 03:18:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170721121206.63bcbffd@nial.brq.redhat.com>
-References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
-	<CABdb736GdDK_Kxa4u_eCt=1qiV0Hn69NfrvofJTFgaXJzx1gow@mail.gmail.com>
-	<20170721121206.63bcbffd@nial.brq.redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 24 Jul 2017 12:07:59 +0200
-Message-ID: <CABdb734pB_DHeZ=NRp4DOP=fiXz-+wN=DX5fx2hUuo-u=4HJFA@mail.gmail.com>
+In-Reply-To: <alpine.DEB.2.10.1707211740220.22381@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1707211740220.22381@sstabellini-ThinkPad-X260>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Jul 2017 11:17:53 +0100
+Message-ID: <CAFEAcA8BdaJwtLbs+wWBbaicr=7fSD6K1ZFVNpV++_JyEEKe-A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
- machine types
+Subject: Re: [Qemu-devel] [PULL for-2.10 0/2] please pull xen-20170721-tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jul 21, 2017 at 12:12 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Fri, 21 Jul 2017 11:54:20 +0200
-> Ladi Prosek <lprosek@redhat.com> wrote:
+On 22 July 2017 at 01:45, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> The following changes since commit 91939262ffcd3c85ea6a4793d3029326eea1d649:
 >
->> On Fri, Jul 21, 2017 at 11:32 AM, Igor Mammedov <imammedo@redhat.com> wrote:
->> > w2k used to boot on QEMU until we bumped revision of FADT to rev3
->> > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
->> >
->> > Considering that w2k is ancient and long time EOLed, leave default
->> > rev3 but make pc-i440fx-2.9 and older machine types to force rev1
->> > so old setups won't break (w2k could boot).
->> >
->> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> > ---
->> > CC: Programmingkid <programmingkidx@gmail.com>
->> > CC: Phil Dennis-Jordan <lists@philjordan.eu>
->> > CC: "Michael S. Tsirkin" <mst@redhat.com>
->> >
->> > Only compile test since I don't have w2k to test with
->>
->> Confirming that Windows 2000 boots with this patch and -machine pc-i440fx-2.9.
-> Ladi,
+>   configure: Drop ancient Solaris 9 and earlier support (2017-07-21 15:04:05 +0100)
 >
-> Could you to try find out reason why w2k doesn't boot?
-
-The FADT table must be 134 bytes or less. The revision number does not
-matter and neither does the checksum.
-
-This is experimental data, I haven't been able to find the offending code.
-
->>
->> Tested-by: Ladi Prosek <lprosek@redhat.com>
+> are available in the git repository at:
 >
+>   git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170721-tag
+>
+> for you to fetch changes up to 7fb394ad8a7c4609cefa2136dec16cf65d028f40:
+>
+>   xen-mapcache: Fix the bug when overlapping emulated DMA operations may cause inconsistency in guest memory mappings (2017-07-21 17:37:06 -0700)
+>
+> ----------------------------------------------------------------
+> Xen 2017/07/21
+>
+> ----------------------------------------------------------------
+> Alexey G (1):
+>       xen-mapcache: Fix the bug when overlapping emulated DMA operations may cause inconsistency in guest memory mappings
+>
+> Igor Druzhinin (1):
+>       xen: fix compilation on 32-bit hosts
+>
+>  hw/i386/xen/xen-mapcache.c | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
+
+Applied, thanks.
+
+-- PMM
