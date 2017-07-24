@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZeM5-0008Lp-Sr
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:29:07 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dZeMv-0000Lt-N0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZeM4-0003Qf-TU
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:29:05 -0400
-References: <20170721093416.17816-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
-Date: Mon, 24 Jul 2017 09:28:53 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170721093416.17816-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="injkjEOtIlCrmLFF2j5LxS9ifE12aoOmr"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
+	(envelope-from <kraxel@redhat.com>) id 1dZeMs-00043T-DE
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:29:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dZeMs-00042n-7H
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:29:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35EE9C0BAA1B
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:29:53 +0000 (UTC)
+Message-ID: <1500906591.30644.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 24 Jul 2017 16:29:51 +0200
+In-Reply-To: <20170724141825.GB11443@redhat.com>
+References: <20170724140117.27651-1-kraxel@redhat.com>
+	<20170724141825.GB11443@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Fix qemu keymaps, part one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---injkjEOtIlCrmLFF2j5LxS9ifE12aoOmr
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-block@nongnu.org
-Message-ID: <5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
-References: <20170721093416.17816-1-stefanha@redhat.com>
-In-Reply-To: <20170721093416.17816-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/21/2017 04:34 AM, Stefan Hajnoczi wrote:
-> There is not much getting started documentation for qemu-iotests.  This=
-
-> patch explains how to create a new test and covers the overall testing
-> approach.
+On Mon, 2017-07-24 at 15:18 +0100, Daniel P. Berrange wrote:
+> On Mon, Jul 24, 2017 at 04:01:14PM +0200, Gerd Hoffmann wrote:
+> > qemu carries a bunch of reverse keymaps in pc-bios/keymaps/, to map
+> > keysyms it receives from vnc clients back to keycodes.=C2=A0=C2=A0The=
+se
+> > keymaps
+> > seem to be buggy and incomplete at times.=C2=A0=C2=A0So, to tackle th=
+e issue
+> > once
+> > for all, I've written a tool to generate those maps from xkb
+> > keyboard
+> > layout data using libxkbcommon.
+> >=20
+> > This patch series only adds the tool, it doesn't touch the maps in
+> > pc-bios/keymaps/ yet.=C2=A0=C2=A0I want some testing feedback first .=
+..
 >=20
-> +2. Create the test file
-> +
-> +Copy an existing test (one that most closely resembles what you wish t=
-o test)
-> +to the new test number:
-> +
-> +  cp 001 <test-number>
+> Hmm, we recently split out the keymap database and code for
+> generating
+> lookup tables (that was duplicated across spice-gtk, gtk-vnc, and
+> libvirt)
+> into a shared git sub-module
+>=20
+> =C2=A0 https://gitlab.com/keycodemap/keycodemapdb/
+>=20
+> some other VNC clients were also switching to its use.
+>=20
+> I was coincidentally working on a patch to get QEMU to use this too,
+> so all projects are aligned on the same data maps and thus share
+> fixes
+> in this area.
+>=20
+> IMHO that'd be preferable than doing something custom in QEMU only.
 
-And mark it executable (chmod a+x <test-number>)
+This is a different issue.  gtk-vnc & friends have to map keycodes from
+one system (ps/2, evdev, xorg, ...) to another.  qemu has to map
+keysyms back to keycodes, using a reverse keymap, in case the vnc
+client doesn't support VNC_ENCODING_EXT_KEY_EVENT.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---injkjEOtIlCrmLFF2j5LxS9ifE12aoOmr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll2BCUACgkQp6FrSiUn
-Q2qp6gf+NsEUMPJZGbvRYyIb6+nmW5aAds17YhxtCVN6S6R/m06S/4dn5ZU3eVtI
-kgkAkeZh0BxgbP7mRT08qpD9XT9lUvwdfe3jDS922TTysYv7vXihXaGU1XB8IMk6
-1O+CpU2CbLXSLEQUkMN/St8dQfaCYqBdQcuxn+5dxofA+UpBXQ14BhO/cmKKKn91
-b032QQ/9DlQx4lm9x40Az8kwsl/YAZFL0QBu012RLY1s702sSSvAOa2u+IvthOQs
-6lCcrlyIEPfiBJ4rIakVAfV5+Kp5cn4920xSNkGeo5P4SksareW33WzsW0mSSHQy
-8XtPvok/tGUpZ1/EGh+dRCJ5rpOI9Q==
-=7pra
------END PGP SIGNATURE-----
-
---injkjEOtIlCrmLFF2j5LxS9ifE12aoOmr--
+cheers,
+  Gerd
