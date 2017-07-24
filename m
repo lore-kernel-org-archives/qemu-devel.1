@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZaRM-0005pd-Fh
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1dZaRc-0005y2-LD
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZaRL-0004Eu-FV
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:16 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38471)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dZaRL-0004Ed-81
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:15 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id m85so13195281wma.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 03:18:15 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dZaRY-0004Io-NC
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1603)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dZaRY-0004HX-Gu
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:18:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 814467F408
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 10:18:24 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170720084755.GB21566@redhat.com> (Daniel P. Berrange's message
+	of "Thu, 20 Jul 2017 09:47:55 +0100")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-2-quintela@redhat.com>
+	<20170719150109.GN2103@work-vm>
+	<20170720070023.GA23385@pxdev.xzpeter.org>
+	<20170720084755.GB21566@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 24 Jul 2017 12:18:21 +0200
+Message-ID: <87bmoa87f6.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1707211740220.22381@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1707211740220.22381@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Jul 2017 11:17:53 +0100
-Message-ID: <CAFEAcA8BdaJwtLbs+wWBbaicr=7fSD6K1ZFVNpV++_JyEEKe-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-2.10 0/2] please pull xen-20170721-tag
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 01/17] migrate: Add gboolean return type
+ to migrate_channel_process_incoming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +38,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com
 
-On 22 July 2017 at 01:45, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> The following changes since commit 91939262ffcd3c85ea6a4793d3029326eea1d649:
->
->   configure: Drop ancient Solaris 9 and earlier support (2017-07-21 15:04:05 +0100)
->
-> are available in the git repository at:
->
->   git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170721-tag
->
-> for you to fetch changes up to 7fb394ad8a7c4609cefa2136dec16cf65d028f40:
->
->   xen-mapcache: Fix the bug when overlapping emulated DMA operations may cause inconsistency in guest memory mappings (2017-07-21 17:37:06 -0700)
->
-> ----------------------------------------------------------------
-> Xen 2017/07/21
->
-> ----------------------------------------------------------------
-> Alexey G (1):
->       xen-mapcache: Fix the bug when overlapping emulated DMA operations may cause inconsistency in guest memory mappings
->
-> Igor Druzhinin (1):
->       xen: fix compilation on 32-bit hosts
->
->  hw/i386/xen/xen-mapcache.c | 22 ++++++++++++++++------
->  1 file changed, 16 insertions(+), 6 deletions(-)
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Thu, Jul 20, 2017 at 03:00:23PM +0800, Peter Xu wrote:
+>> On Wed, Jul 19, 2017 at 04:01:10PM +0100, Dr. David Alan Gilbert wrote:
+>> > * Juan Quintela (quintela@redhat.com) wrote:
+>> > >  
+>> > > -void migration_channel_process_incoming(QIOChannel *ioc);
+>> > > +gboolean migration_channel_process_incoming(QIOChannel *ioc);
+>> > 
+>> > Can you add a comment here that says what the return value means.
 
-Applied, thanks.
+Added comment for the two functions (in the .c file through)
 
--- PMM
+>> 
+>> And, looks like we have G_SOURCE_CONTINUE and G_SOURCE_REMOVE:
+
+Used this ones, thanks.
+
+>> https://developer.gnome.org/glib/stable/glib-The-Main-Event-Loop.html#G-SOURCE-CONTINUE:CAPS
+>> 
+>> Maybe we can use them as well?
+>
+> Those are newer than our min required glib version, though we could
+> add compat defines for them
+
+Added the compatibility macros.
+
+Thanks to all of you, Juan.
