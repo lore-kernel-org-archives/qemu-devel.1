@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZkTv-0004Jx-Vv
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:01:37 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dZkVV-0005Sb-Vi
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZkTv-0001yf-50
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:01:36 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38510)
+	(envelope-from <bobby.prani@gmail.com>) id 1dZkVS-0002UD-Ri
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:03:13 -0400
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:37047)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dZkTu-0001xc-SU
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:01:35 -0400
-Received: by mail-wm0-x231.google.com with SMTP id m85so27192737wma.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:01:33 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170724182751.18261-33-f4bug@amsat.org>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-33-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Jul 2017 22:01:11 +0100
-Message-ID: <CAFEAcA9d5SE-+=YxJ_dwjvkpxs2R0QJszESExGoG2y+Bnyk2aA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 32/35] timer/pxa2xx: silent
- warning about out-of-bound memory access
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dZkVS-0002Tt-NQ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:03:10 -0400
+Received: by mail-yw0-x244.google.com with SMTP id h189so5752235ywf.4
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:03:09 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Mon, 24 Jul 2017 17:03:06 -0400
+Message-Id: <20170724210306.18428-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [RFC PATCH] tcg/softmmu: Increase size of TLB cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, pbonzini@redhat.com
 
-On 24 July 2017 at 19:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Unlikely to happen.
->
-> hw/timer/pxa2xx_timer.c:145:19: warning: Out of bound memory access (acce=
-ssed memory precedes memory block)
->         counter =3D counters[n];
->                   ^~~~~~~~~~~
->
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/timer/pxa2xx_timer.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
-> index 68ba5a70b3..d47f463636 100644
-> --- a/hw/timer/pxa2xx_timer.c
-> +++ b/hw/timer/pxa2xx_timer.c
-> @@ -139,7 +139,7 @@ static void pxa2xx_timer_update4(void *opaque, uint64=
-_t now_qemu, int n)
->      if (s->tm4[n].control & (1 << 7))
->          counter =3D n;
->      else
-> -        counter =3D counters[n];
-> +        counter =3D counters[n & 7];
->
->      if (!s->tm4[counter].freq) {
->          timer_del(s->tm4[n].tm.qtimer);
-> --
+This patch increases the number of entries we allow in the TLB. I went
+over a few architectures to see if increasing it is problematic. Only
+armv6 seems to have a limitation that only 8 bits can be used for
+indexing these entries. For other architectures, I increased the
+number of TLB entries to a 4K-sized cache.
 
-This looks rather odd, because we use a mask to guard
-the counters[] array index, but we do an access into
-another 8-element array with n both immediately
-above and immediately below that.
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ include/exec/cpu-defs.h  | 5 ++++-
+ tcg/aarch64/tcg-target.h | 1 +
+ tcg/i386/tcg-target.h    | 2 ++
+ tcg/mips/tcg-target.h    | 1 +
+ tcg/s390/tcg-target.h    | 1 +
+ tcg/sparc/tcg-target.h   | 1 +
+ 6 files changed, 10 insertions(+), 1 deletion(-)
 
-It's not actually possible to call this function
-with n not between 0 and 7 -- if the static
-analyser can't figure that out does adding an
-assert at the top of the function help it out?
-
-thanks
--- PMM
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index 29b3c2ada8..cb81232b83 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -64,6 +64,9 @@ typedef uint64_t target_ulong;
+ #define CPU_TLB_ENTRY_BITS 5
+ #endif
+ 
++#ifndef CPU_TLB_BITS_MAX
++# define CPU_TLB_BITS_MAX 8
++#endif
+ /* TCG_TARGET_TLB_DISPLACEMENT_BITS is used in CPU_TLB_BITS to ensure that
+  * the TLB is not unnecessarily small, but still small enough for the
+  * TLB lookup instruction sequence used by the TCG target.
+@@ -87,7 +90,7 @@ typedef uint64_t target_ulong;
+  * of tlb_table inside env (which is non-trivial but not huge).
+  */
+ #define CPU_TLB_BITS                                             \
+-    MIN(8,                                                       \
++    MIN(CPU_TLB_BITS_MAX,                                        \
+         TCG_TARGET_TLB_DISPLACEMENT_BITS - CPU_TLB_ENTRY_BITS -  \
+         (NB_MMU_MODES <= 1 ? 0 :                                 \
+          NB_MMU_MODES <= 2 ? 1 :                                 \
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index 55a46ac825..f428e09c98 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -15,6 +15,7 @@
+ 
+ #define TCG_TARGET_INSN_UNIT_SIZE  4
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 24
++#define CPU_TLB_BITS_MAX 12
+ #undef TCG_TARGET_STACK_GROWSUP
+ 
+ typedef enum {
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 73a15f7e80..35c27a977b 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -162,6 +162,8 @@ extern bool have_popcnt;
+ # define TCG_AREG0 TCG_REG_EBP
+ #endif
+ 
++#define CPU_TLB_BITS_MAX 12
++
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+ }
+diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+index d75cb63ed3..fd9046b7ad 100644
+--- a/tcg/mips/tcg-target.h
++++ b/tcg/mips/tcg-target.h
+@@ -37,6 +37,7 @@
+ 
+ #define TCG_TARGET_INSN_UNIT_SIZE 4
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
++#define CPU_TLB_BITS_MAX 12
+ #define TCG_TARGET_NB_REGS 32
+ 
+ typedef enum {
+diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
+index 957f0c0afe..218be322ad 100644
+--- a/tcg/s390/tcg-target.h
++++ b/tcg/s390/tcg-target.h
+@@ -27,6 +27,7 @@
+ 
+ #define TCG_TARGET_INSN_UNIT_SIZE 2
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 19
++#define CPU_TLB_BITS_MAX 12
+ 
+ typedef enum TCGReg {
+     TCG_REG_R0 = 0,
+diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
+index 854a0afd70..9fd59a64f2 100644
+--- a/tcg/sparc/tcg-target.h
++++ b/tcg/sparc/tcg-target.h
+@@ -29,6 +29,7 @@
+ 
+ #define TCG_TARGET_INSN_UNIT_SIZE 4
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 32
++#define CPU_TLB_BITS_MAX 12
+ #define TCG_TARGET_NB_REGS 32
+ 
+ typedef enum {
+-- 
+2.13.0
