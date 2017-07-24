@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dZZOw-0003Gl-1g
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:11:43 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dZZRc-0003xO-Ce
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:14:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dZZOu-0007wv-VM
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:11:41 -0400
-Date: Mon, 24 Jul 2017 11:11:28 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170724091128.GB4630@noname.str.redhat.com>
-References: <20170721093416.17816-1-stefanha@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1dZZRZ-0008V7-4k
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:14:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZZRY-0008Ut-SE
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:14:25 -0400
+Date: Mon, 24 Jul 2017 11:14:19 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170724111419.720aa168@nial.brq.redhat.com>
+In-Reply-To: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170721093416.17816-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
+ of vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,113 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: mst@redhat.com, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-Am 21.07.2017 um 11:34 hat Stefan Hajnoczi geschrieben:
-> There is not much getting started documentation for qemu-iotests.  This
-> patch explains how to create a new test and covers the overall testing
-> approach.
+On Sun, 23 Jul 2017 20:46:11 +0800
+Peng Hao <peng.hao2@zte.com.cn> wrote:
+
+> When a guest that has several hotplugged dimms is migrated, on
+> destination it will fail to resume. Because regions on source
+> are merged and on destination the order of realizing devices
+> is different from on source with dimms, so when part of devices
+> are realizd some region can not be merged.That may be more than
+> vhost slot limit.
 > 
-> Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
 > ---
->  tests/qemu-iotests/README | 83 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 83 insertions(+)
+>  hw/mem/pc-dimm.c        | 2 +-
+>  include/sysemu/sysemu.h | 1 +
+>  vl.c                    | 5 +++++
+>  3 files changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
-> index 6079b40..8259b9f 100644
-> --- a/tests/qemu-iotests/README
-> +++ b/tests/qemu-iotests/README
-> @@ -14,8 +14,91 @@ Just run ./check to run all tests for the raw image format, or ./check
->  -qcow2 to test the qcow2 image format.  The output of ./check -h explains
->  additional options to test further image formats or I/O methods.
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index ea67b46..13f3db5 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+>          goto out;
+>      }
 >  
-> +* Testing approach
-> +
-> +Each test is an executable file (usually a bash script) that is run by the
-> +./check test harness.  Standard out and standard error are captured to an
-> +output file.  If the output file differs from the "golden master" output file
-> +for the test then it fails.
-> +
-> +Tests are simply a sequence of commands that produce output and the test itself
-> +does not judge whether it passed or failed.  If you find yourself writing
-> +checks to determine success or failure then you should rethink the test and
-> +rely on output diffing instead.
-> +
-> +** Filtering volatile output
-> +
-> +When output contains absolute file paths, timestamps, process IDs, hostnames,
-> +or other volatile strings, the diff against golden master output will fail.
-> +Such output must be filtered to replace volatile strings with fixed
-> +placeholders.
-> +
-> +For example, the path to the temporary working directory changes between test
-> +runs so it must be filtered:
-> +
-> +  sed -e "s#$TEST_DIR/#TEST_DIR/#g"
-> +
-> +Commonly needed filters are available in ./common.filter.
-> +
-> +** Python tests
-> +
-> +Most tests are implemented in bash but it is difficult to interact with the QMP
-> +monitor.  A Python module called 'iotests' is available for tests that require
-> +JSON and interacting with QEMU.
-> +
-> +* How to create a test
-> +
-> +1. Choose an unused test number
-> +
-> +Tests are identified by a unique number.  Look for the highest test case number
-> +by looking at the test files.  Then search the qemu-devel@nongnu.org mailing
-> +list to check if anyone has already sent patches using the next available
-> +number.  You may need to increment the number a few times to reach an unused
-> +number.
-> +
-> +2. Create the test file
-> +
-> +Copy an existing test (one that most closely resembles what you wish to test)
-> +to the new test number:
-> +
-> +  cp 001 <test-number>
-> +
-> +3. Assign groups to the test
-> +
-> +Add your test to the ./group file.  This file is the index of tests and assigns
-> +them to functional groups like "rw" for read-write tests.  Most tests belong to
-> +the "rw" and "auto" groups.  "auto" means the test runs when ./check is invoked
-> +without a -g argument.
-> +
-> +Consider adding your test to the "quick" group if it executes quickly (<1s).
-> +This group is run by "make check-block" and is often included as part of build
-> +tests in continuous integration systems.
-> +
-> +4. Write the test
-> +
-> +Edit the test script.  Look at existing tests for examples.
-> +
-> +5. Generate the golden master file
-> +
-> +Run your test with "./check <test-number>".  You may need to pass additional
-> +options to use an image format or protocol.
+> -    if (!vhost_has_free_slot()) {
+> +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
+>          error_setg(&local_err, "a used vhost backend has no free"
+>                                 " memory slots left");
+that doesn't fix issue,
+   1st: number of used entries is changing after machine_init_done() is called
+        as regions continue to mapped/unmapped during runtime
+   2nd: it brings regression and allows to start QEMU with number memory
+        regions more than supported by backend, which combined with missing
+        error handling in vhost will lead to qemu crashes or obscure bugs in
+        guest breaking vhost enabled drivers.
+        i.e. patch undoes what were fixed by
+        https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html
 
-./check refuses to even run a test if the reference output is missing.
-So in practice you need a 'touch <test-number>.out' first.
 
-> +The test will fail because there is no golden master yet.  Inspect the output
-> +that your test generated with "cat <test-number>.out.bad".
+>          goto out;
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index b213696..48228ad 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+>  void qemu_add_exit_notifier(Notifier *notify);
+>  void qemu_remove_exit_notifier(Notifier *notify);
+>  
+> +bool qemu_is_machine_init_done(void);
+>  void qemu_add_machine_init_done_notifier(Notifier *notify);
+>  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+>  
+> diff --git a/vl.c b/vl.c
+> index fb6b2ef..43aee22 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
+>  
+>  static bool machine_init_done;
+>  
+> +bool qemu_is_machine_init_done(void)
+> +{
+> +    return machine_init_done;
+> +}
 > +
-> +Verify that the output is as expected and contains no volatile strings like
-> +timestamps.  You may need to add filters to your test to remove volatile
-> +strings.
-> +
-> +Once you are happy with the test output it can be used as the golden master
-> +with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to verify
-> +that it passes.
-> +
-> +Congratulations, you've created a new test!
-
-Looks good otherwise.
-
-Kevin
+>  void qemu_add_machine_init_done_notifier(Notifier *notify)
+>  {
+>      notifier_list_add(&machine_init_done_notifiers, notify);
