@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZgHl-0002Fo-Or
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:32:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dZgIQ-0002Y5-He
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZgHg-00047H-Qx
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:32:45 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:44878)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZgHg-00046b-Eq
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:32:40 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
-	<20170724113422.GC2784@stefanha-x1.localdomain>
-	<2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
-	<87y3rdopza.fsf@frigg.lan>
-	<d5c6df93-1610-cf55-71b9-940da91a355e@openvz.org>
-Date: Mon, 24 Jul 2017 19:32:29 +0300
-In-Reply-To: <d5c6df93-1610-cf55-71b9-940da91a355e@openvz.org> (Denis
-	V. Lunev's message of "Mon, 24 Jul 2017 17:55:11 +0300")
-Message-ID: <87zibtkd7m.fsf@frigg.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1dZgIM-0004Xe-IB
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:33:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZgIM-0004Vg-99
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 12:33:22 -0400
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
+	<20170724153521.GD2127@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
+Date: Mon, 24 Jul 2017 18:33:15 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170724153521.GD2127@work-vm>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +29,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, armbru@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Denis V Lunev writes:
+On 24/07/2017 17:35, Dr. David Alan Gilbert wrote:
+> * Jay Zhou (jianjay.zhou@huawei.com) wrote:
+>> Hi Dave,
+>>
+>> On 2017/7/21 17:49, Dr. David Alan Gilbert wrote:
+>>> * Jay Zhou (jianjay.zhou@huawei.com) wrote:
+>>>> Qemu_savevm_state_cleanup() takes about 300ms in my ram migration te=
+sts
+>>>> with a 8U24G vm(20G is really occupied), the main cost comes from
+>>>> KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size =3D 0 in
+>>>> kvm_set_user_memory_region(). In kmod, the main cost is
+>>>> kvm_zap_obsolete_pages(), which traverses the active_mmu_pages list =
+to
+>>>> zap the unsync sptes.
+>>>
+>>> Hi Jay,
+>>>    Is this actually increasing the real downtime when the guest isn't
+>>> running, or is it just the reported time? I see that the s->downtime
+>>> value is calculated right after where we currently call
+>>> qemu_savevm_state_cleanup.
+>>
+>> It actually increased the real downtime, I used the "ping" command to
+>> test. Reason is that the source side libvirt sends qmp to qemu to quer=
+y
+>> the status of migration, which needs the BQL. qemu_savevm_state_cleanu=
+p
+>> is done with BQL, qemu can not handle the qmp if qemu_savevm_state_cle=
+anup
+>> has not finished. And the source side libvirt delays about 300ms to no=
+tify
+>> the destination side libvirt to send the "cont" command to start the v=
+m.
+>>
+>> I think the value of s->downtime is not accurate enough, maybe we coul=
+d
+>> move the calculation of end_time after qemu_savevm_state_cleanup has d=
+one.
+>=20
+> I'm copying in Paolo, Radim and Andrea- is there anyway we can make the
+> teardown of KVMs dirty tracking not take so long? 300ms is a silly long=
+ time
+> on only a small VM.
 
-> On 07/24/2017 05:43 PM, Llu=C3=ADs Vilanova wrote:
->> Denis V Lunev writes:
->>=20
->>> On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
->>>> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievskiy=
- wrote:
->>>>> Current trace system have a drawback: parameters of trace functions
->>>>> are calculated even if corresponding tracepoint is disabled. Also, it
->>>>> looks like trace function are not actually inlined by compiler (at
->>>>> least for me).
->>>>>=20
->>>>> Here is a fix proposal: move from function call to macros. Patch 02
->>>>> is an example, of how to reduce extra calculations with help of
->>>>> patch 01.
->>>>>=20
->>>>> Vladimir Sementsov-Ogievskiy (2):
->>>>> trace: do not calculate arguments for disabled trace-points
->>>>> monitor: improve tracing in handle_qmp_command
->>>> Please use the TRACE_FOO_ENABLED macro instead of putting computation
->>>> inside the trace event arguments.  This makes the code cleaner and
->>>> easier to read.
->>> At our opinion this ENABLED is compile time check while the option
->>> could be tuned in runtime. Thus normally it would normally be
->>> enabled while the trace is silent.
->>> So, under load, we will have extra allocation, copying the command buff=
-er,
->>> freeing memory without actual trace. In order to fix that we should
->>> do something like
->>> if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
->>> req_json =3D qobject_to_json(req);
->>> trace_handle_qmp_command(mon, req_json);
->>> QDECREF(req_json);
->>> }
->>> which is possible, but at our (me + Vova) opinion is ugly.
->>> That is why we are proposing to switch to macro, which
->>> will not require such tweaking.
->>> Arguments will be only evaluated when necessary and we
->>> will not have side-effects if the tracepoint is compile time
->>> enabled and run-time disabled.
->>> Though if the code above is acceptable, we can send the
->>> patch with it. No problem.
->> I completely get your point, but:
->>=20
->> * I'm not sure it will have much of a performance impact.
->> * It is not obvious what's going to happen just by looking at the code o=
-f the
->> calling site.
->>=20
->> I prefer to minimize the use of macros, even if that makes a few trace e=
-vent
->> calls to be a bit more verbose, as in your example above. Also, I quite =
-dislike
->> the new style you propose:
->>=20
->> trace_handle_qmp_command(mon,
->> qstring_get_str(req_json =3D qobject_to_json(req)));
->> QDECREF(req_json);
->>=20
->>=20
->> Cheers,
->> Lluis
-> This is a matter of overall performance. For example I can have 500 VMs.
-> In order to manage them, f.e. tweak balloon I have to collect statistics.
-> This happens 1 time/10 sec/VM. Libvirt issues the following
+Xiao Guangrong is working on something vaguely related (but different
+and simpler because it's entirely contained within KVM), which is to
+make log_sync faster.
 
-> 494665@1486641285.213042:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name "=
-query-balloon"
-> 494665@1486641285.214181:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name "=
-qom-get"
-> 494665@1486641285.214792:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name "=
-query-hotpluggable-cpus"
-> 494665@1486641285.215283:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name "=
-query-cpus"
-> 494665@1486641285.216153:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name "=
-query-blockstats"
-> 494665@1486641285.216827:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name "=
-query-block"
+The Intel folks working on clear containers also would like
+MemoryListeners to have a better complexity, but that's again separate
+from the "zapping" of SPTEs.
 
-> We will have 300 commands in a second in all VMs. This is not that small
-> load. OK. I do think that I'll lost 2-3-5 percents of one host CPU due
-> to this allocation/free/copy. There are no measurements unfortunately.
-> At my opinion this matters.
+> Can you tell me which version of libvirt you're using?
+> I thought the newer ones were supposed to use events so they did't
+> have to poll qemu.
+>=20
+>  If we move qemu_savevm_state_cleanup is it still safe? Are there
+> some things we're supposed to do at that point which are wrong if
+> we don't.
+>=20
+> I wonder about something like;  take a mutex in
+> memory_global_dirty_log_start, release it in
+> memory_global_dirty_log_stop.  Then make ram_save_cleanup start
+> a new thread that does the call to memory_global_dirty_log_stop.
 
-Sorry for beating the point, but I just want to make sure we're on the same
-page. The example above (with the state check) and the one you propose in y=
-our
-patch have exactly the same performance.
+I don't like having such a long-lived mutex (it seems like a recipe for
+deadlocks with the BQL), plus memory_region_transaction_commit (the
+expensive part of memory_global_dirty_log_stop) needs to be under the
+BQL itself because it calls MemoryListeners.
 
-The change is then only in coding style, and I think the macros you propose=
- make
-the code harder to understand:
+Maybe memory_global_dirty_log_stop can delay itself to the next vm_start
+if it's called while runstate_running() returns false (which should be
+always the case)?
 
-  trace_handle_qmp_command(mon,
-                           qstring_get_str(req_json =3D qobject_to_json(req=
-)));
-  QDECREF(req_json);
+It could even be entirely enclosed within memory.c if you do it with a
+VMChangeStateHandler.
 
-If qobject_to_json() had any side-effect, it is not obvious why it would ha=
-ppen
-only when tracing of that event is dynaically enabled. IMO that's a recipe =
-for
-errors.
+Thanks,
 
+Paolo
 
-Cheers,
-  Lluis
+> Dave
+>=20
+>> Thanks,
+>> Jay
+>>
+>>> However, we would need to be a bit careful of anything that needs
+>>> cleaning up before the source restarts on failure; I'm not sure of
+>>> the semantics of all the current things wired into save_cleanup.
+>>>
+>>> Dave
+>>>
+>>>
+>>>> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+>>>> ---
+>>>>   migration/migration.c | 16 +++++++++-------
+>>>>   qmp.c                 | 10 ++++++++++
+>>>>   2 files changed, 19 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/migration/migration.c b/migration/migration.c
+>>>> index a0db40d..72832be 100644
+>>>> --- a/migration/migration.c
+>>>> +++ b/migration/migration.c
+>>>> @@ -1877,6 +1877,15 @@ static void *migration_thread(void *opaque)
+>>>>           if (qemu_file_get_error(s->to_dst_file)) {
+>>>>               migrate_set_state(&s->state, current_active_state,
+>>>>                                 MIGRATION_STATUS_FAILED);
+>>>> +            /*
+>>>> +             * The resource has been allocated by migration will be=
+ reused in
+>>>> +             * COLO process, so don't release them.
+>>>> +             */
+>>>> +            if (!enable_colo) {
+>>>> +                qemu_mutex_lock_iothread();
+>>>> +                qemu_savevm_state_cleanup();
+>>>> +                qemu_mutex_unlock_iothread();
+>>>> +            }
+>>>>               trace_migration_thread_file_err();
+>>>>               break;
+>>>>           }
+>>>> @@ -1916,13 +1925,6 @@ static void *migration_thread(void *opaque)
+>>>>       end_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>>>>
+>>>>       qemu_mutex_lock_iothread();
+>>>> -    /*
+>>>> -     * The resource has been allocated by migration will be reused =
+in COLO
+>>>> -     * process, so don't release them.
+>>>> -     */
+>>>> -    if (!enable_colo) {
+>>>> -        qemu_savevm_state_cleanup();
+>>>> -    }
+>>>>       if (s->state =3D=3D MIGRATION_STATUS_COMPLETED) {
+>>>>           uint64_t transferred_bytes =3D qemu_ftell(s->to_dst_file);
+>>>>           s->total_time =3D end_time - s->total_time;
+>>>> diff --git a/qmp.c b/qmp.c
+>>>> index b86201e..0e68eaa 100644
+>>>> --- a/qmp.c
+>>>> +++ b/qmp.c
+>>>> @@ -37,6 +37,8 @@
+>>>>   #include "qom/object_interfaces.h"
+>>>>   #include "hw/mem/pc-dimm.h"
+>>>>   #include "hw/acpi/acpi_dev_interface.h"
+>>>> +#include "migration/migration.h"
+>>>> +#include "migration/savevm.h"
+>>>>
+>>>>   NameInfo *qmp_query_name(Error **errp)
+>>>>   {
+>>>> @@ -200,6 +202,14 @@ void qmp_cont(Error **errp)
+>>>>       if (runstate_check(RUN_STATE_INMIGRATE)) {
+>>>>           autostart =3D 1;
+>>>>       } else {
+>>>> +        /*
+>>>> +         * Delay the cleanup to reduce the downtime of migration.
+>>>> +         * The resource has been allocated by migration will be reu=
+sed
+>>>> +         * in COLO process, so don't release them.
+>>>> +         */
+>>>> +        if (runstate_check(RUN_STATE_POSTMIGRATE) && !migrate_colo_=
+enabled()) {
+>>>> +            qemu_savevm_state_cleanup();
+>>>> +        }
+>>>>           vm_start();
+>>>>       }
+>>>>   }
+>>>> --
+>>>> 1.8.3.1
+>>>>
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+>>> .
+>>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
