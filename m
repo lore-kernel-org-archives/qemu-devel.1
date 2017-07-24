@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZfSk-0007fJ-DL
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:40:04 -0400
+	(envelope-from <jack@suse.cz>) id 1dZfbN-0002rq-JQ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZfSj-0006VO-6Q
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:40:02 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 24 Jul 2017 10:39:52 -0500
-Message-Id: <20170724153952.26510-3-eblake@redhat.com>
-In-Reply-To: <20170724153952.26510-1-eblake@redhat.com>
-References: <20170724153952.26510-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Add test of recent fix to
- 'qemu-img measure'
+	(envelope-from <jack@suse.cz>) id 1dZfbJ-0002VX-Kh
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:48:57 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36422 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1dZfbI-0002Us-Pw
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:48:53 -0400
+Date: Mon, 24 Jul 2017 17:48:49 +0200
+From: Jan Kara <jack@suse.cz>
+Message-ID: <20170724154849.GQ652@quack2.suse.cz>
+References: <20170721155848.GO18014@stefanha-x1.localdomain>
+	<CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
+	<1500818683.4073.31.camel@redhat.com>
+	<CAPcyv4h5O4D2kp6SJhWiz4V=dOLDa_Q3pk2B=u-x7hKKQqdXsQ@mail.gmail.com>
+	<1500833428.4073.36.camel@redhat.com>
+	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
+	<20170724102330.GE652@quack2.suse.cz>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	<20170724123752.GN652@quack2.suse.cz>
+	<CAPcyv4g-X8S95=uQBo5MzxpwKfqdTbmBis3B56i59wqWiPnCBA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4g-X8S95=uQBo5MzxpwKfqdTbmBis3B56i59wqWiPnCBA@mail.gmail.com>
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,113 +35,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Jan Kara <jack@suse.cz>, Pankaj Gupta <pagupta@redhat.com>, Rik van Riel <riel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-The new test 190 ensures we don't regress back to an infinite loop when
-measuring the size of a 2T+ qcow2 image.  I did not append to test 178,
-because that test is also designed to run with format 'raw'; also, this
-gives us some coverage of the measure command under the quick group.
+On Mon 24-07-17 08:10:05, Dan Williams wrote:
+> On Mon, Jul 24, 2017 at 5:37 AM, Jan Kara <jack@suse.cz> wrote:
+> > On Mon 24-07-17 08:06:07, Pankaj Gupta wrote:
+> >>
+> >> > On Sun 23-07-17 13:10:34, Dan Williams wrote:
+> >> > > On Sun, Jul 23, 2017 at 11:10 AM, Rik van Riel <riel@redhat.com> wrote:
+> >> > > > On Sun, 2017-07-23 at 09:01 -0700, Dan Williams wrote:
+> >> > > >> [ adding Ross and Jan ]
+> >> > > >>
+> >> > > >> On Sun, Jul 23, 2017 at 7:04 AM, Rik van Riel <riel@redhat.com>
+> >> > > >> wrote:
+> >> > > >> >
+> >> > > >> > The goal is to increase density of guests, by moving page
+> >> > > >> > cache into the host (where it can be easily reclaimed).
+> >> > > >> >
+> >> > > >> > If we assume the guests will be backed by relatively fast
+> >> > > >> > SSDs, a "whole device flush" from filesystem journaling
+> >> > > >> > code (issued where the filesystem issues a barrier or
+> >> > > >> > disk cache flush today) may be just what we need to make
+> >> > > >> > that work.
+> >> > > >>
+> >> > > >> Ok, apologies, I indeed had some pieces of the proposal confused.
+> >> > > >>
+> >> > > >> However, it still seems like the storage interface is not capable of
+> >> > > >> expressing what is needed, because the operation that is needed is a
+> >> > > >> range flush. In the guest you want the DAX page dirty tracking to
+> >> > > >> communicate range flush information to the host, but there's no
+> >> > > >> readily available block i/o semantic that software running on top of
+> >> > > >> the fake pmem device can use to communicate with the host. Instead
+> >> > > >> you
+> >> > > >> want to intercept the dax_flush() operation and turn it into a queued
+> >> > > >> request on the host.
+> >> > > >>
+> >> > > >> In 4.13 we have turned this dax_flush() operation into an explicit
+> >> > > >> driver call. That seems a better interface to modify than trying to
+> >> > > >> map block-storage flush-cache / force-unit-access commands to this
+> >> > > >> host request.
+> >> > > >>
+> >> > > >> The additional piece you would need to consider is whether to track
+> >> > > >> all writes in addition to mmap writes in the guest as DAX-page-cache
+> >> > > >> dirtying events, or arrange for every dax_copy_from_iter()
+> >> > > >> operation()
+> >> > > >> to also queue a sync on the host, but that essentially turns the host
+> >> > > >> page cache into a pseudo write-through mode.
+> >> > > >
+> >> > > > I suspect initially it will be fine to not offer DAX
+> >> > > > semantics to applications using these "fake DAX" devices
+> >> > > > from a virtual machine, because the DAX APIs are designed
+> >> > > > for a much higher performance device than these fake DAX
+> >> > > > setups could ever give.
+> >> > >
+> >> > > Right, we don't need DAX, per se, in the guest.
+> >> > >
+> >> > > >
+> >> > > > Having userspace call fsync/msync like done normally, and
+> >> > > > having those coarser calls be turned into somewhat efficient
+> >> > > > backend flushes would be perfectly acceptable.
+> >> > > >
+> >> > > > The big question is, what should that kind of interface look
+> >> > > > like?
+> >> > >
+> >> > > To me, this looks much like the dirty cache tracking that is done in
+> >> > > the address_space radix for the DAX case, but modified to coordinate
+> >> > > queued / page-based flushing when the guest  wants to persist data.
+> >> > > The similarity to DAX is not storing guest allocated pages in the
+> >> > > radix but entries that track dirty guest physical addresses.
+> >> >
+> >> > Let me check whether I understand the problem correctly. So we want to
+> >> > export a block device (essentially a page cache of this block device) to a
+> >> > guest as PMEM and use DAX in the guest to save guest's page cache. The
+> >>
+> >> that's correct.
+> >>
+> >> > natural way to make the persistence work would be to make ->flush callback
+> >> > of the PMEM device to do an upcall to the host which could then fdatasync()
+> >> > appropriate image file range however the performance would suck in such
+> >> > case since ->flush gets called for at most one page ranges from DAX.
+> >>
+> >> Discussion is : sync a range using paravirt device or flush hit addresses
+> >> vs block device flush.
+> >>
+> >> >
+> >> > So what you could do instead is to completely ignore ->flush calls for the
+> >> > PMEM device and instead catch the bio with REQ_PREFLUSH flag set on the
+> >> > PMEM device (generated by blkdev_issue_flush() or the journalling
+> >> > machinery) and fdatasync() the whole image file at that moment - in fact
+> >> > you must do that for metadata IO to hit persistent storage anyway in your
+> >> > setting. This would very closely follow how exporting block devices with
+> >> > volatile cache works with KVM these days AFAIU and the performance will be
+> >> > the same.
+> >>
+> >> yes 'blkdev_issue_flush' does set 'REQ_OP_WRITE | REQ_PREFLUSH' flags.
+> >> As per suggestions looks like block flushing device is way ahead.
+> >>
+> >> If we do an asynchronous block flush at guest side(put current task in
+> >> wait queue till host side fdatasync completes) can solve the purpose? Or
+> >> do we need another paravirt device for this?
+> >
+> > Well, even currently if you have PMEM device, you still have also a block
+> > device and a request queue associated with it and metadata IO goes through
+> > that path. So in your case you will have the same in the guest as a result
+> > of exposing virtual PMEM device to the guest and you just need to make sure
+> > this virtual block device behaves the same way as traditional virtualized
+> > block devices in KVM in respose to 'REQ_OP_WRITE | REQ_PREFLUSH' requests.
+> 
+> This approach would turn into a full fsync on the host. The question
+> in my mind is whether there is any optimization to be had by trapping
+> dax_flush() and calling msync() on host ranges, but Jan is right
+> trapping blkdev_issue_flush() and turning around and calling host
+> fsync() is the most straightforward approach that does not need driver
+> interface changes. The dax_flush() approach would need to modify it
+> into a async completion interface.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/190     | 59 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/190.out | 11 +++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 71 insertions(+)
- create mode 100755 tests/qemu-iotests/190
- create mode 100644 tests/qemu-iotests/190.out
+If the backing device on the host is actually a normal block device or an
+image file, doing full fsync() is the most efficient implementation
+anyway...
 
-diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-new file mode 100755
-index 0000000000..8f808fef5d
---- /dev/null
-+++ b/tests/qemu-iotests/190
-@@ -0,0 +1,59 @@
-+#!/bin/bash
-+#
-+# qemu-img measure sub-command tests on huge qcow2 files
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=eblake@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    rm -f "$TEST_IMG.converted"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.pattern
-+
-+# See 178 for more extensive tests across more formats
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+echo "== Huge file =="
-+echo
-+
-+IMGOPTS='cluster_size=2M' _make_test_img 2T
-+
-+$QEMU_IMG measure -O raw -f qcow2 "$TEST_IMG"
-+$QEMU_IMG measure -O qcow2 -o cluster_size=64k -f qcow2 "$TEST_IMG"
-+$QEMU_IMG measure -O qcow2 -o cluster_size=2M -f qcow2 "$TEST_IMG"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/190.out b/tests/qemu-iotests/190.out
-new file mode 100644
-index 0000000000..d001942002
---- /dev/null
-+++ b/tests/qemu-iotests/190.out
-@@ -0,0 +1,11 @@
-+QA output created by 190
-+== Huge file ==
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2199023255552
-+required size: 2199023255552
-+fully allocated size: 2199023255552
-+required size: 335806464
-+fully allocated size: 2199359062016
-+required size: 18874368
-+fully allocated size: 2199042129920
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 287f0ea27d..823811076d 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -184,3 +184,4 @@
- 186 rw auto
- 188 rw auto quick
- 189 rw auto
-+190 rw auto quick
+								Honza
 -- 
-2.13.3
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
