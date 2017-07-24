@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dZcbg-0006P3-Hz
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:37:05 -0400
+	(envelope-from <jack@suse.cz>) id 1dZccc-0006vs-BK
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dZcbc-000594-J2
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:37:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44885)
+	(envelope-from <jack@suse.cz>) id 1dZccY-0005dZ-Dc
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:38:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45254 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dZcbc-00058k-9X
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:37:00 -0400
-References: <20170720162815.19802-1-ldoktor@redhat.com>
-	<20170720162815.19802-7-ldoktor@redhat.com>
-	<989e2216-499c-3c22-3958-0c51ac342dd1@amsat.org>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Message-ID: <b772f95e-9a3a-0a72-e6c6-7390902f62d1@redhat.com>
-Date: Mon, 24 Jul 2017 14:36:52 +0200
+	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1dZccY-0005bd-3Z
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:37:58 -0400
+Date: Mon, 24 Jul 2017 14:37:52 +0200
+From: Jan Kara <jack@suse.cz>
+Message-ID: <20170724123752.GN652@quack2.suse.cz>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<20170721155848.GO18014@stefanha-x1.localdomain>
+	<CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
+	<1500818683.4073.31.camel@redhat.com>
+	<CAPcyv4h5O4D2kp6SJhWiz4V=dOLDa_Q3pk2B=u-x7hKKQqdXsQ@mail.gmail.com>
+	<1500833428.4073.36.camel@redhat.com>
+	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
+	<20170724102330.GE652@quack2.suse.cz>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <989e2216-499c-3c22-3958-0c51ac342dd1@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Tljh1clmOHrfECrOsGhvG3MBFVH8gqxXf"
-Subject: Re: [Qemu-devel] [PATCH 06/11] qmp.py: Couple of pylint/style fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,217 +34,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, ehabkost@redhat.com
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Jan Kara <jack@suse.cz>, Dan Williams <dan.j.williams@intel.com>, Rik van Riel <riel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Tljh1clmOHrfECrOsGhvG3MBFVH8gqxXf
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com,
- armbru@redhat.com, mreitz@redhat.com, ehabkost@redhat.com
-Message-ID: <b772f95e-9a3a-0a72-e6c6-7390902f62d1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/11] qmp.py: Couple of pylint/style fixes
-References: <20170720162815.19802-1-ldoktor@redhat.com>
- <20170720162815.19802-7-ldoktor@redhat.com>
- <989e2216-499c-3c22-3958-0c51ac342dd1@amsat.org>
-In-Reply-To: <989e2216-499c-3c22-3958-0c51ac342dd1@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon 24-07-17 08:06:07, Pankaj Gupta wrote:
+> 
+> > On Sun 23-07-17 13:10:34, Dan Williams wrote:
+> > > On Sun, Jul 23, 2017 at 11:10 AM, Rik van Riel <riel@redhat.com> wrote:
+> > > > On Sun, 2017-07-23 at 09:01 -0700, Dan Williams wrote:
+> > > >> [ adding Ross and Jan ]
+> > > >>
+> > > >> On Sun, Jul 23, 2017 at 7:04 AM, Rik van Riel <riel@redhat.com>
+> > > >> wrote:
+> > > >> >
+> > > >> > The goal is to increase density of guests, by moving page
+> > > >> > cache into the host (where it can be easily reclaimed).
+> > > >> >
+> > > >> > If we assume the guests will be backed by relatively fast
+> > > >> > SSDs, a "whole device flush" from filesystem journaling
+> > > >> > code (issued where the filesystem issues a barrier or
+> > > >> > disk cache flush today) may be just what we need to make
+> > > >> > that work.
+> > > >>
+> > > >> Ok, apologies, I indeed had some pieces of the proposal confused.
+> > > >>
+> > > >> However, it still seems like the storage interface is not capable of
+> > > >> expressing what is needed, because the operation that is needed is a
+> > > >> range flush. In the guest you want the DAX page dirty tracking to
+> > > >> communicate range flush information to the host, but there's no
+> > > >> readily available block i/o semantic that software running on top of
+> > > >> the fake pmem device can use to communicate with the host. Instead
+> > > >> you
+> > > >> want to intercept the dax_flush() operation and turn it into a queued
+> > > >> request on the host.
+> > > >>
+> > > >> In 4.13 we have turned this dax_flush() operation into an explicit
+> > > >> driver call. That seems a better interface to modify than trying to
+> > > >> map block-storage flush-cache / force-unit-access commands to this
+> > > >> host request.
+> > > >>
+> > > >> The additional piece you would need to consider is whether to track
+> > > >> all writes in addition to mmap writes in the guest as DAX-page-cache
+> > > >> dirtying events, or arrange for every dax_copy_from_iter()
+> > > >> operation()
+> > > >> to also queue a sync on the host, but that essentially turns the host
+> > > >> page cache into a pseudo write-through mode.
+> > > >
+> > > > I suspect initially it will be fine to not offer DAX
+> > > > semantics to applications using these "fake DAX" devices
+> > > > from a virtual machine, because the DAX APIs are designed
+> > > > for a much higher performance device than these fake DAX
+> > > > setups could ever give.
+> > > 
+> > > Right, we don't need DAX, per se, in the guest.
+> > > 
+> > > >
+> > > > Having userspace call fsync/msync like done normally, and
+> > > > having those coarser calls be turned into somewhat efficient
+> > > > backend flushes would be perfectly acceptable.
+> > > >
+> > > > The big question is, what should that kind of interface look
+> > > > like?
+> > > 
+> > > To me, this looks much like the dirty cache tracking that is done in
+> > > the address_space radix for the DAX case, but modified to coordinate
+> > > queued / page-based flushing when the guest  wants to persist data.
+> > > The similarity to DAX is not storing guest allocated pages in the
+> > > radix but entries that track dirty guest physical addresses.
+> > 
+> > Let me check whether I understand the problem correctly. So we want to
+> > export a block device (essentially a page cache of this block device) to a
+> > guest as PMEM and use DAX in the guest to save guest's page cache. The
+> 
+> that's correct.
+> 
+> > natural way to make the persistence work would be to make ->flush callback
+> > of the PMEM device to do an upcall to the host which could then fdatasync()
+> > appropriate image file range however the performance would suck in such
+> > case since ->flush gets called for at most one page ranges from DAX.
+> 
+> Discussion is : sync a range using paravirt device or flush hit addresses 
+> vs block device flush.
+> 
+> > 
+> > So what you could do instead is to completely ignore ->flush calls for the
+> > PMEM device and instead catch the bio with REQ_PREFLUSH flag set on the
+> > PMEM device (generated by blkdev_issue_flush() or the journalling
+> > machinery) and fdatasync() the whole image file at that moment - in fact
+> > you must do that for metadata IO to hit persistent storage anyway in your
+> > setting. This would very closely follow how exporting block devices with
+> > volatile cache works with KVM these days AFAIU and the performance will be
+> > the same.
+> 
+> yes 'blkdev_issue_flush' does set 'REQ_OP_WRITE | REQ_PREFLUSH' flags.
+> As per suggestions looks like block flushing device is way ahead. 
+> 
+> If we do an asynchronous block flush at guest side(put current task in
+> wait queue till host side fdatasync completes) can solve the purpose? Or
+> do we need another paravirt device for this?
 
-Dne 22.7.2017 v 03:30 Philippe Mathieu-Daud=C3=A9 napsal(a):
-> Hi Luk=C3=A1=C5=A1,
->=20
-> Since comment/indent fixes and code changes are not related I'd rather =
-see this split in at least 2 patches.
->=20
-Hello Philippe, thank you for the review, I'm wondering what code changes=
- you have in mind? This is commit should not bring any code changes, just=
- code reorganization (like including the self.* attributes on top of the =
-file)
+Well, even currently if you have PMEM device, you still have also a block
+device and a request queue associated with it and metadata IO goes through
+that path. So in your case you will have the same in the guest as a result
+of exposing virtual PMEM device to the guest and you just need to make sure
+this virtual block device behaves the same way as traditional virtualized
+block devices in KVM in respose to 'REQ_OP_WRITE | REQ_PREFLUSH' requests.
 
-> On 07/20/2017 01:28 PM, Luk=C3=A1=C5=A1 Doktor wrote:
->> No actual code changes, just a few pylint/style fixes and docstring
->> clarifications.
->>
->> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
->> ---
->>   scripts/qmp/qmp.py | 37 ++++++++++++++++++++++++-------------
->>   1 file changed, 24 insertions(+), 13 deletions(-)
->>
->> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
->> index 62d3651..bb4d614 100644
->> --- a/scripts/qmp/qmp.py
->> +++ b/scripts/qmp/qmp.py
->> @@ -13,19 +13,30 @@ import errno
->>   import socket
->>   import sys
->>   +
->>   class QMPError(Exception):
->>       pass
->>   +
->>   class QMPConnectError(QMPError):
->>       pass
->>   +
->>   class QMPCapabilitiesError(QMPError):
->>       pass
->>   +
->>   class QMPTimeoutError(QMPError):
->>       pass
->>   +
->>   class QEMUMonitorProtocol:
->> +
->> +    #: Socket's error class
->> +    error =3D socket.error
->> +    #: Socket's timeout
->> +    timeout =3D socket.timeout
->> +
->=20
-> ok
->=20
->>       def __init__(self, address, server=3DFalse, debug=3DFalse):
->>           """
->>           Create a QEMUMonitorProtocol class.
->> @@ -42,6 +53,7 @@ class QEMUMonitorProtocol:
->>           self.__address =3D address
->>           self._debug =3D debug
->>           self.__sock =3D self.__get_sock()
->> +        self.__sockfile =3D None
->>           if server:
->>               self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUS=
-EADDR, 1)
->>               self.__sock.bind(self.__address)
->> @@ -56,7 +68,7 @@ class QEMUMonitorProtocol:
->>         def __negotiate_capabilities(self):
->>           greeting =3D self.__json_read()
->> -        if greeting is None or not greeting.has_key('QMP'):
->> +        if greeting is None or "QMP" not in greeting:
->=20
-> ok
->=20
->>               raise QMPConnectError
->>           # Greeting seems ok, negotiate capabilities
->>           resp =3D self.cmd('qmp_capabilities')
->> @@ -78,8 +90,6 @@ class QEMUMonitorProtocol:
->>                       continue
->>               return resp
->>   -    error =3D socket.error
->> -
->>       def __get_events(self, wait=3DFalse):
->>           """
->>           Check for new events in the stream and cache them in __event=
-s.
->> @@ -89,8 +99,8 @@ class QEMUMonitorProtocol:
->>             @raise QMPTimeoutError: If a timeout float is provided and=
- the timeout
->>                                   period elapses.
->> -        @raise QMPConnectError: If wait is True but no events could b=
-e retrieved
->> -                                or if some other error occurred.
->> +        @raise QMPConnectError: If wait is True but no events could b=
-e
->> +                                retrieved or if some other error occu=
-rred.
->>           """
->>             # Check for new events regardless and pull them into the c=
-ache:
->> @@ -175,7 +185,7 @@ class QEMUMonitorProtocol:
->>           @param args: command arguments (dict)
->>           @param id: command id (dict, list, string or int)
->>           """
->> -        qmp_cmd =3D { 'execute': name }
->> +        qmp_cmd =3D {'execute': name}
->>           if args:
->>               qmp_cmd['arguments'] =3D args
->>           if id:
->> @@ -183,6 +193,9 @@ class QEMUMonitorProtocol:
->>           return self.cmd_obj(qmp_cmd)
->>         def command(self, cmd, **kwds):
->> +        """
->> +        Build and send a QMP command to the monitor, report errors wh=
-en any
->=20
-> I'm not native english speaker but I think "if any" sounds better.
->=20
-Yep, you are right.
-
->> +        """
->>           ret =3D self.cmd(cmd, kwds)
->>           if ret.has_key('error'):
->>               raise Exception(ret['error']['desc'])
->> @@ -190,15 +203,15 @@ class QEMUMonitorProtocol:
->>         def pull_event(self, wait=3DFalse):
->>           """
->> -        Get and delete the first available QMP event.
->> +        Get and pop the first available QMP event.
->=20
-> Both sentences seems unclear to me, regarding the function name... I wo=
-nder if removing this comment makes this function clearer.
->=20
-I was trying to avoid confusion with the delete. How about `Pulls/waits f=
-or a single event`? I'd like to keep the rest of the docstring as the det=
-ails might be useful.
-
-Luk=C3=A1=C5=A1
-
->>             @param wait (bool): block until an event is available.
->>           @param wait (float): If wait is a float, treat it as a timeo=
-ut value.
->>             @raise QMPTimeoutError: If a timeout float is provided and=
- the timeout
->>                                   period elapses.
->> -        @raise QMPConnectError: If wait is True but no events could b=
-e retrieved
->> -                                or if some other error occurred.
->> +        @raise QMPConnectError: If wait is True but no events could b=
-e
->> +                                retrieved or if some other error occu=
-rred.
->>             @return The first available QMP event, or None.
->>           """
->> @@ -217,8 +230,8 @@ class QEMUMonitorProtocol:
->>             @raise QMPTimeoutError: If a timeout float is provided and=
- the timeout
->>                                   period elapses.
->> -        @raise QMPConnectError: If wait is True but no events could b=
-e retrieved
->> -                                or if some other error occurred.
->> +        @raise QMPConnectError: If wait is True but no events could b=
-e
->> +                                retrieved or if some other error occu=
-rred.
->>             @return The list of available QMP events.
->>           """
->> @@ -235,8 +248,6 @@ class QEMUMonitorProtocol:
->>           self.__sock.close()
->>           self.__sockfile.close()
->>   -    timeout =3D socket.timeout
->> -
->>       def settimeout(self, timeout):
->>           self.__sock.settimeout(timeout)
->> =20
->=20
-> Regards,
->=20
-> Phil.
-
-
-
---Tljh1clmOHrfECrOsGhvG3MBFVH8gqxXf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEwBAEBCAAaBQJZdenkExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsHk
-DAf/aqChBxloi+QfiCM4R6mDyubWwPRyyqAcKsJ/CrbV3auBBdpRret7vJxiwTYe
-aJor41pr2MxBnmHtYaN8hNgzTlxDAsPiMO7elvYhscAT10+jz6B8v1okra37zUoX
-puWKEuvMnx3q9wPNxKxhb0x+rZbZbfNigMBUAnm3zWlEbX8uj6flK0g+Eo95grPa
-695ub5mJbLGflWGmU27Rv3AKgSnnj/rFKjiVj3NXKTq5Ycng8TpeVhvHkErVL0LO
-V1pyJEW/cMpKREOLED/gvf5aHIrd4ZrWbkCaqCOPN86pnDE+FbOmOFi/wTzl9NHP
-WDOYNFGXYy8jKdbwXkSzOqAvjw==
-=PCoK
------END PGP SIGNATURE-----
-
---Tljh1clmOHrfECrOsGhvG3MBFVH8gqxXf--
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
