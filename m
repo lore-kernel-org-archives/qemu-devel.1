@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZeXr-0000MY-8y
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:41:16 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZeZp-00021O-Qb
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZeXq-0006iO-Fp
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:41:15 -0400
-References: <20170721093416.17816-1-stefanha@redhat.com>
-	<5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
-	<CAFEAcA_njsLSkV1xvQ19j+89=prJGAbktkK9kNiaEQXTUtDkEQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <71566060-0670-6b23-372d-322ec64667c6@redhat.com>
-Date: Mon, 24 Jul 2017 09:41:04 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZeZn-0008JT-4N
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:43:17 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:34883)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZeZm-0008IQ-Nf
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:43:15 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+	<20170724113422.GC2784@stefanha-x1.localdomain>
+	<2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
+Date: Mon, 24 Jul 2017 17:43:05 +0300
+In-Reply-To: <2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org> (Denis
+	V. Lunev's message of "Mon, 24 Jul 2017 15:17:16 +0300")
+Message-ID: <87y3rdopza.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_njsLSkV1xvQ19j+89=prJGAbktkK9kNiaEQXTUtDkEQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="US3qDNSghKOUT4Sb4VNlbxOuCN8Q55acD"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, Qemu-block <qemu-block@nongnu.org>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, armbru@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---US3qDNSghKOUT4Sb4VNlbxOuCN8Q55acD
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Ishani Chugh <chugh.ishani@research.iiit.ac.in>,
- Qemu-block <qemu-block@nongnu.org>
-Message-ID: <71566060-0670-6b23-372d-322ec64667c6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
-References: <20170721093416.17816-1-stefanha@redhat.com>
- <5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
- <CAFEAcA_njsLSkV1xvQ19j+89=prJGAbktkK9kNiaEQXTUtDkEQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA_njsLSkV1xvQ19j+89=prJGAbktkK9kNiaEQXTUtDkEQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Denis V Lunev writes:
 
-On 07/24/2017 09:34 AM, Peter Maydell wrote:
-> On 24 July 2017 at 15:28, Eric Blake <eblake@redhat.com> wrote:
->> On 07/21/2017 04:34 AM, Stefan Hajnoczi wrote:
->>> There is not much getting started documentation for qemu-iotests.  Th=
-is
->>> patch explains how to create a new test and covers the overall testin=
-g
->>> approach.
->>>
->>> +2. Create the test file
->>> +
->>> +Copy an existing test (one that most closely resembles what you wish=
- to test)
->>> +to the new test number:
->>> +
->>> +  cp 001 <test-number>
->>
->> And mark it executable (chmod a+x <test-number>)
->=20
-> It should already be executable because the test file being
-> copied (001 in this case) is executable, shouldn't it?
+> On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
+>> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>>> Current trace system have a drawback: parameters of trace functions
+>>> are calculated even if corresponding tracepoint is disabled. Also, it
+>>> looks like trace function are not actually inlined by compiler (at
+>>> least for me).
+>>> 
+>>> Here is a fix proposal: move from function call to macros. Patch 02
+>>> is an example, of how to reduce extra calculations with help of
+>>> patch 01.
+>>> 
+>>> Vladimir Sementsov-Ogievskiy (2):
+>>> trace: do not calculate arguments for disabled trace-points
+>>> monitor: improve tracing in handle_qmp_command
+>> Please use the TRACE_FOO_ENABLED macro instead of putting computation
+>> inside the trace event arguments.  This makes the code cleaner and
+>> easier to read.
+> At our opinion this ENABLED is compile time check while the option
+> could be tuned in runtime. Thus normally it would normally be
+> enabled while the trace is silent.
 
-Oh, I see what happened.  Rather than dropping to shell 'cp', I copied
-via emacs' "ctrl-x ctrl-w" (write-file) and creating a new file name,
-and that does not preserve executable bit.
+> So, under load, we will have extra allocation, copying the command buffer,
+> freeing memory without actual trace. In order to fix that we should
+> do something like
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
+>    req_json = qobject_to_json(req);
+>    trace_handle_qmp_command(mon, req_json);
+>    QDECREF(req_json);
+> }
+
+> which is possible, but at our (me + Vova) opinion is ugly.
+> That is why we are proposing to switch to macro, which
+> will not require such tweaking.
+
+> Arguments will be only evaluated when necessary and we
+> will not have side-effects if the tracepoint is compile time
+> enabled and run-time disabled.
+
+> Though if the code above is acceptable, we can send the
+> patch with it. No problem.
+
+I completely get your point, but:
+
+* I'm not sure it will have much of a performance impact.
+* It is not obvious what's going to happen just by looking at the code of the
+  calling site.
+
+I prefer to minimize the use of macros, even if that makes a few trace event
+calls to be a bit more verbose, as in your example above. Also, I quite dislike
+the new style you propose:
+
+  trace_handle_qmp_command(mon,
+                           qstring_get_str(req_json = qobject_to_json(req)));
+  QDECREF(req_json);
 
 
---US3qDNSghKOUT4Sb4VNlbxOuCN8Q55acD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll2BwAACgkQp6FrSiUn
-Q2rmmwgAjomS9tXkt5HGggp6LAI5G37xIPkGinZyOwJGfYJYtX2Ur1OOUVvLlkyA
-SZN72ukc3IMkY6lg/t6bgSfuZGmxHaBbMSjiEE896eg5Z/GwLZNSgyCG1Y4MTX2W
-hc6zOBFFa0T8Uz608UcJV22K94X8Has0bB8soYP4UnR5MpgsT6noC9Eay53Wn/Bo
-dgPX+t46wEK3qQXEy3bdID0vOxGzzQMFL1NFgh3RebfTK27dBfUi2+Hu8btxyTN5
-mif8hnupwuESGRzSYTbnHcX7tC1wqb2OquDJfH6OVnRXeCiFKxAQ7mE9rAAfc40/
-dKYj4qagfjjtrh7CqKFEhELxhvBCQw==
-=q7Ea
------END PGP SIGNATURE-----
-
---US3qDNSghKOUT4Sb4VNlbxOuCN8Q55acD--
+Cheers,
+  Lluis
