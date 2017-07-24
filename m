@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dZfBh-0001vn-8B
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:22:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dZfLt-0004Xv-Qn
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dZfBe-0005Jf-2R
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35754)
+	(envelope-from <ehabkost@redhat.com>) id 1dZfLo-0002jK-E2
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:32:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dZfBd-0005JH-PV
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:22:22 -0400
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-15-dgilbert@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <726dd083-341b-aa13-37d2-b66479f6039a@redhat.com>
-Date: Mon, 24 Jul 2017 17:22:08 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dZfLo-0002iX-4b
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:32:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC3FC624BB
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 15:32:48 +0000 (UTC)
+Date: Mon, 24 Jul 2017 12:32:42 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170724153242.GH2757@localhost.localdomain>
+References: <20170720162815.19802-1-ldoktor@redhat.com>
+	<20170720162815.19802-6-ldoktor@redhat.com>
+	<20170720182753.GV2757@localhost.localdomain>
+	<6701dad4-40a5-7287-a4b8-a22e19b90ce2@redhat.com>
+	<20170721184227.GB2757@localhost.localdomain>
+	<1ec2f684-ddbc-de62-e13b-58f54d92e27d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170628190047.26159-15-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 14/29] vhost+postcopy: Register new regions
- with the ufd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1ec2f684-ddbc-de62-e13b-58f54d92e27d@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/11] qemu.py: Use custom exceptions
+ rather than Exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +39,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
+On Mon, Jul 24, 2017 at 02:13:09PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> Dne 21.7.2017 v 20:42 Eduardo Habkost napsal(a):
+> > On Fri, Jul 21, 2017 at 08:37:34AM +0200, Luk=C3=A1=C5=A1 Doktor wrot=
+e:
+> >> Dne 20.7.2017 v 20:27 Eduardo Habkost napsal(a):
+> >>> On Thu, Jul 20, 2017 at 06:28:09PM +0200, Luk=C3=A1=C5=A1 Doktor wr=
+ote:
+> >>>> The naked Exception should not be widely used. It makes sense to b=
+e a
+> >>>> bit more specific and use better-suited custom exceptions. As a be=
+nefit
+> >>>> we can store the full reply in the exception in case someone needs=
+ it
+> >>>> when catching the exception.
+> >>>>
+> >>>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> >>>> ---
+> >>>>  scripts/qemu.py | 17 +++++++++++++++--
+> >>>>  1 file changed, 15 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> >>>> index 5948e19..2bd522f 100644
+> >>>> --- a/scripts/qemu.py
+> >>>> +++ b/scripts/qemu.py
+> >>>> @@ -19,6 +19,19 @@ import subprocess
+> >>>>  import qmp.qmp
+> >>>> =20
+> >>>> =20
+> >>>> +class MonitorResponseError(qmp.qmp.QMPError):
+> >>>> +    '''
+> >>>> +    Represents erroneous QMP monitor reply
+> >>>> +    '''
+> >>>> +    def __init__(self, reply):
+> >>>> +        try:
+> >>>> +            desc =3D reply["error"]["desc"]
+> >>>> +        except KeyError:
+> >>>> +            desc =3D reply
+> >>>> +        super(MonitorResponseError, self).__init__(desc)
+> >>>> +        self.reply =3D reply
+> >>>
+> >>> This would require every user of self.reply to first check if
+> >>> it's a string or dictionary.  All because of the "Monitor is
+> >>> closed" case below:
+> >>>
+> >> I haven't used it for the `Monitor is closed` exception, so
+> >> it's just to be able to store really broken reply safely.
+> >> Anyway people can check whether the reply is a dict, or I can
+> >> add `is_valid_reply` property which would check for
+> >> `[error][desc]` presence (which is a bit more precise than just
+> >> plain dict type checking).
+> >=20
+> >=20
+> > Oops, I wasn't paying enough attention, sorry.  self.reply is
+> > actually always set to the response from the monitor.
+> >=20
+> > If you are just trying a safe fallback for 'desc' if the response
+> > broken, what about using repr(reply) or json.dumps(reply) if
+> > reply['error']['desc'] isn't set?
+> >=20
+> I could use repr, but I'd prefer keeping it the way it is as
+> you could use `isinstance` to see whether it's dict and
+> interact with it (if needed, eg. on negative testing, which is
+> my motivation for storing the full response).
 
+This makes sense for self.reply, but I'm thinking about the
+argument to Exception.__init__().  I'm worried that things might
+break if the argument is not a string.
 
-On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> When new regions are sent to the client using SET_MEM_TABLE, register
-> them with the userfaultfd.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   contrib/libvhost-user/libvhost-user.c | 33 +++++++++++++++++++++++++++++++++
->   1 file changed, 33 insertions(+)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index 6de339fb7a..be7470e3a9 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -450,6 +450,39 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
->                      dev_region->mmap_addr);
->           }
->   
-> +        if (dev->postcopy_listening) {
-> +            /* We should already have an open ufd need to mark each memory
-> +             * range as ufd.
-> +             * Note: Do we need any madvises? Well it's not been accessed
-> +             * yet, still probably need no THP to be safe, discard to be safe?
-> +             */
-> +            struct uffdio_register reg_struct;
-> +            /* Note: We might need to go back to using mmap_addr and
-> +             * len + mmap_offset for * huge pages, but then we do hope not to
-> +             * see accesses in that area below the offset
-> +             */
-> +            reg_struct.range.start = (uintptr_t)(dev_region->mmap_addr +
-> +                                                 dev_region->mmap_offset);
-> +            reg_struct.range.len = dev_region->size;
-> +            reg_struct.mode = UFFDIO_REGISTER_MODE_MISSING;
-> +
-> +            if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
-> +                vu_panic(dev, "%s: Failed to userfault region %d: (ufd=%d)%s\n",
-> +                         __func__, i, strerror(errno), dev->postcopy_ufd);
-Aren't the two last args swapped?
-
-> +                continue;
-> +            }
-> +            if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
-> +                vu_panic(dev, "%s Region (%d) doesn't support COPY",
-> +                         __func__, i);
-> +                continue;
-> +            }
-> +            DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
-> +                    __func__, i, reg_struct.range.start, reg_struct.range.len);
-> +            /* TODO: Stash 'zero' support flags somewhere */
-> +            /* TODO: Get address back to QEMU */
-> +
-> +        }
-> +
->           close(vmsg->fds[i]);
->       }
->   
-> 
+--=20
+Eduardo
