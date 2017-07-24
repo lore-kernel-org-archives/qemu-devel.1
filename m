@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZlMm-0002za-TZ
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:58:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dZlQq-0004Jp-4G
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZlMj-0006cu-00
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:58:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36880)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZlMi-0006am-NE
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 17:58:12 -0400
-Date: Tue, 25 Jul 2017 00:58:07 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170725005027-mutt-send-email-mst@kernel.org>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
-	<20170723055006-mutt-send-email-mst@kernel.org>
-	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
-	<20170724234353-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAs8Ru-wuuHXK-mHir0_Hj8NenoKxuXyDqVt1YXOZUHAw@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1dZlQp-0000rk-99
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 18:02:28 -0400
+References: <20170724153952.26510-1-eblake@redhat.com>
+	<20170724153952.26510-2-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <78846349-b145-a3a4-4e0f-8861b7423205@redhat.com>
+Date: Mon, 24 Jul 2017 18:02:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKSfGUAs8Ru-wuuHXK-mHir0_Hj8NenoKxuXyDqVt1YXOZUHAw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
- property to pcie-root-port
+In-Reply-To: <20170724153952.26510-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] iotests: Check dirty
+ bitmap statistics in 124
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,133 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Bezzubikov <zuban32s@gmail.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Tue, Jul 25, 2017 at 12:41:12AM +0300, Alexander Bezzubikov wrote:
-> 2017-07-24 23:46 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
-> > On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
-> >> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
-> >> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
-> >> > > To enable hotplugging of a newly created pcie-pci-bridge,
-> >> > > we need to tell firmware (SeaBIOS in this case)
-> >> >
-> >>
-> >> Hi Michael,
-> >>
-> >> > Presumably, EFI would need to support this too?
-> >> >
-> >>
-> >> Sure, Eduardo added to CC, but he is in PTO now.
-> >>
-> >> > > to reserve
-> >> > > additional buses for pcie-root-port, that allows us to
-> >> > > hotplug pcie-pci-bridge into this root port.
-> >> > > The number of buses to reserve is provided to the device via a corresponding
-> >> > > property, and to the firmware via new PCI capability (next patch).
-> >> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
-> >> >
-> >> > If so you should just teach firmware to allocate one bus #
-> >> > unconditionally.
-> >> >
-> >>
-> >> That would be a problem for the PCIe machines, since each PCIe
-> >> devices is plugged in a different bus and we are already
-> >> limited to 256 PCIe devices. Allocating an extra-bus always
-> >> would really limit the PCIe devices we can use.
-> >
-> > But this is exactly what this patch does as the property is added to all
-> > buses and default to 1 (1 extra bus).
-> >
-> >> > But why would that be so? What's wrong with a device
-> >> > directly in the root port?
-> >> >
-> >>
-> >> First, plugging a legacy PCI device into a PCIe Root Port
-> >> looks strange at least, and it can;t be done on real HW anyway.
-> >> (incompatible slots)
-> >
-> > You can still plug in PCIe devices there.
-> >
-> >> Second (and more important), if we want 2 or more PCI
-> >> devices we would loose both IO ports space and bus numbers.
-> >
-> > What I am saying is maybe default should not be 1.
+
+
+On 07/24/2017 11:39 AM, Eric Blake wrote:
+> We had a bug for multiple releases where dirty-bitmap count was
+> documented in bytes but reported in sectors; enhance the testsuite
+> to add coverage of DirtyBitmapInfo to ensure we do not regress again.
 > 
-> The only sensible variant left is 0.
-> But as we want pcie-pci-bridge to be used for every legacy PCI device
-> on q35 machine, every time one hotplugs the bridge into the root port,
-> he must be sure rp's prop value >0 (for Linux). I'm not sure
-> that it is a very convenient way to utilize the bridge - always remember
-> to set property.
-
-That's what I'm saying then - if in your opinion default is >0 anyway,
-tweak firmware to do it by default.
-
-> Another way - we can set this to 0 by default, and to 1 for pcie-root-port,
-> and recommend to use it for hotplugging of the pcie-pci-bridge itself.
-
-I wonder about something: imagine hotplugging a hierarchy of bridges
-below a root port. It seems that nothing prevents guest from finding a
-free range of buses to cover this hierarchy and setting that as
-secondary/subordinate bus for this bridge.
-
-This does need support on QEMU side to hotplug a hierarchy at once,
-and might need some fixes in Linux, on the plus side you can defer
-management decision on how many are needed until you are actually
-adding something, and you don't need vendor specific patches.
-
-
-> >
-> >> >
-> >> > >
-> >> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> >> > > ---
-> >> > >   hw/pci-bridge/pcie_root_port.c | 1 +
-> >> > >   include/hw/pci/pcie_port.h     | 3 +++
-> >> > >   2 files changed, 4 insertions(+)
-> >> > >
-> >> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> >> > > index 4d588cb..b0e49e1 100644
-> >> > > --- a/hw/pci-bridge/pcie_root_port.c
-> >> > > +++ b/hw/pci-bridge/pcie_root_port.c
-> >> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
-> >> > >   static Property rp_props[] = {
-> >> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
-> >> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
-> >> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
-> >> > >       DEFINE_PROP_END_OF_LIST()
-> >> > >   };
-> >> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> >> > > index 1333266..1b2dd1f 100644
-> >> > > --- a/include/hw/pci/pcie_port.h
-> >> > > +++ b/include/hw/pci/pcie_port.h
-> >> > > @@ -34,6 +34,9 @@ struct PCIEPort {
-> >> > >       /* pci express switch port */
-> >> > >       uint8_t     port;
-> >> > > +
-> >> > > +    /* additional buses to reserve on firmware init */
-> >> > > +    uint8_t     bus_reserve;
-> >> > >   };
-> >> > >   void pcie_port_init_reg(PCIDevice *d);
-> >> >
-> >> > So here is a property and it does not do anything.
-> >> > It makes it easier to work on series maybe, but review
-> >> > is harder since we do not see what it does at all.
-> >> > Please do not split up patches like this - you can maintain
-> >> > it split up in your branch if you like and merge before sending.
-> >> >
-> >>
-> >> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
-> >>
-> >> Thanks,
-> >> Marcel
-> >>
-> >>
-> >> > > --
-> >> > > 2.7.4
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>   tests/qemu-iotests/124 | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > 
+> diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+> index d0d2c2bfb0..8e76e62f93 100644
+> --- a/tests/qemu-iotests/124
+> +++ b/tests/qemu-iotests/124
+> @@ -336,7 +336,12 @@ class TestIncrementalBackup(TestIncrementalBackupBase):
+>                              (('0xab', 0, 512),
+>                               ('0xfe', '16M', '256k'),
+>                               ('0x64', '32736k', '64k')))
+> -
+> +        # Check the dirty bitmap stats
+> +        result = self.vm.qmp('query-block')
+> +        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/name', 'bitmap0')
+> +        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/count', 458752)
+> +        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/granularity', 65536)
+> +        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/status', 'active')
 > 
+>           # Prepare a cluster_size=128k backup target without a backing file.
+>           (target, _) = bitmap0.new_target()
 > 
-> -- 
-> Alexander Bezzubikov
+
+Good addition.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
