@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZe53-0001Ba-HA
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dZe84-0002eg-IP
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:14:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZe4z-0005f1-C0
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:29 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dZe4z-0005eC-5v
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:11:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dZe4x-0004IT-8i
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:11:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3B65F2E80CD
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 14:11:23 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1dZe80-0008Iv-Cr
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:14:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZe80-0008IO-3c
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:14:32 -0400
+Date: Mon, 24 Jul 2017 15:14:26 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170724141426.GB2127@work-vm>
+References: <20170724121409.8623-1-dgilbert@redhat.com>
+	<8c776e3a-a744-86e2-ba68-bf60e5234e20@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Jul 2017 13:58:28 -0000
-From: hbagdi <1705717@bugs.launchpad.net>
-Reply-To: Bug 1705717 <1705717@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150064619170.15700.7661736805405042031.malonedeb@wampee.canonical.com>
-Message-Id: <150090470849.6043.7099014266972880831.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1705717] Re: Live migration fails with 'host' cpu
- when KVM is inserted with nested=1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c776e3a-a744-86e2-ba68-bf60e5234e20@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hmp/(p)memsave: Allow >32bit file size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, admin@manateeshome.com, Markus Armbruster <armbru@redhat.com>
 
-Hello,
-I could not replicate this behavior on another system.
-So, please close this bug.
-Apologies for the inconvenience.
+* Thomas Huth (thuth@redhat.com) wrote:
+> On 24.07.2017 14:14, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > memsave and pmemsave only take 32bit size arguments in HMP at the
+> > moment; let them take 64bit values.
+> > 
+> > Reported-by: Pierre Kim <admin@manateeshome.com>
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hmp-commands.hx | 4 ++--
+> >  hmp.c           | 4 ++--
+> >  2 files changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hmp-commands.hx b/hmp-commands.hx
+> > index 1941e19932..ddf77ae7ac 100644
+> > --- a/hmp-commands.hx
+> > +++ b/hmp-commands.hx
+> > @@ -829,7 +829,7 @@ ETEXI
+> >  
+> >      {
+> >          .name       = "memsave",
+> > -        .args_type  = "val:l,size:i,filename:s",
+> > +        .args_type  = "val:l,size:l,filename:s",
+> >          .params     = "addr size file",
+> >          .help       = "save to disk virtual memory dump starting at 'addr' of size 'size'",
+> >          .cmd        = hmp_memsave,
+> > @@ -843,7 +843,7 @@ ETEXI
+> >  
+> >      {
+> >          .name       = "pmemsave",
+> > -        .args_type  = "val:l,size:i,filename:s",
+> > +        .args_type  = "val:l,size:l,filename:s",
+> >          .params     = "addr size file",
+> >          .help       = "save to disk physical memory dump starting at 'addr' of size 'size'",
+> >          .cmd        = hmp_pmemsave,
+> > diff --git a/hmp.c b/hmp.c
+> > index bf1de747d5..dfbd615380 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -1066,7 +1066,7 @@ void hmp_cpu(Monitor *mon, const QDict *qdict)
+> >  
+> >  void hmp_memsave(Monitor *mon, const QDict *qdict)
+> >  {
+> > -    uint32_t size = qdict_get_int(qdict, "size");
+> > +    uint64_t size = qdict_get_int(qdict, "size");
+> >      const char *filename = qdict_get_str(qdict, "filename");
+> >      uint64_t addr = qdict_get_int(qdict, "val");
+> >      Error *err = NULL;
+> > @@ -1083,7 +1083,7 @@ void hmp_memsave(Monitor *mon, const QDict *qdict)
+> >  
+> >  void hmp_pmemsave(Monitor *mon, const QDict *qdict)
+> >  {
+> > -    uint32_t size = qdict_get_int(qdict, "size");
+> > +    uint64_t size = qdict_get_int(qdict, "size");
+> >      const char *filename = qdict_get_str(qdict, "filename");
+> >      uint64_t addr = qdict_get_int(qdict, "val");
+> >      Error *err = NULL;
+> 
+> The "size" parameter of the qmp_memsave() and qmp_pmemsave() function is
+> a signed integer (int64_t) ... could we get into trouble here if the
+> integer is really big? E.g. should we make "size" here signed, too, and
+> then add a sanity check for "size >= 0" ?
 
--- =
+OK, yes, I'll fix that for the sizes;  qmp_pmemsave hangs with -ve sizes
+(which probably needs fixing another time).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1705717
+V.2 coming up.
 
-Title:
-  Live migration fails with 'host' cpu when KVM is inserted with
-  nested=3D1
+Dave
 
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu v2.9.0
-  Linux kernel 4.9.34
-
-  Live migration(pre-copy) being done from one physical host to another:
-
-  Source Qemu:
-  sudo qemu-system-x86_64 -drive file=3D${IMAGE_DIR}/${IMAGE_NAME},if=3Dvir=
-tio -m 2048 -smp 1 -net nic,model=3Dvirtio,macaddr=3D${MAC} -net tap,ifname=
-=3Dqtap0,script=3Dno,downscript=3Dno -vnc :1 --enable-kvm -cpu kvm64 -qmp t=
-cp:*:4242,server,nowait
-
-  And KVM is inserted with nested=3D1 on both source and destination
-  machine.
-
-  Migration fails with a nested specific assertion failure on
-  destination at target/i386/kvm.c +1629
-
-  Migration is successful in the following cases-
-
-  A) cpu model is 'host' and kvm is inserted without nested=3D1 parameter
-  B) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D1)
-  C) If instead of 'host' cpu model, 'kvm64' is used (KVM nested=3D0)
-  D) Between an L0 and a guest Hypervisor L1, with 'kvm64' as CPU type (and=
- nested=3D1 for L0 KVM)
-
-  Physical host(s)-
-  $ lscpu
-  Architecture:          x86_64
-  CPU op-mode(s):        32-bit, 64-bit
-  Byte Order:            Little Endian
-  CPU(s):                12
-  On-line CPU(s) list:   0-11
-  Thread(s) per core:    1
-  Core(s) per socket:    6
-  Socket(s):             2
-  NUMA node(s):          2
-  Vendor ID:             GenuineIntel
-  CPU family:            6
-  Model:                 62
-  Model name:            Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz
-  Stepping:              4
-  CPU MHz:               1200.091
-  CPU max MHz:           2600.0000
-  CPU min MHz:           1200.0000
-  BogoMIPS:              4203.28
-  Virtualization:        VT-x
-  L1d cache:             32K
-  L1i cache:             32K
-  L2 cache:              256K
-  L3 cache:              15360K
-  NUMA node0 CPU(s):     0-5
-  NUMA node1 CPU(s):     6-11
-  Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr p=
-ge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe sysca=
-ll nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xt=
-opology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl=
- vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt =
-tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi fl=
-expriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1705717/+subscriptions
+>  Thomas
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
