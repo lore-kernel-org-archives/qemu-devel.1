@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZh8m-0000u2-8w
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:27:33 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dZhBY-0002rn-G8
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:30:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZh8h-00016U-Fd
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:27:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZh8h-00015w-6h
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:27:27 -0400
-Date: Mon, 24 Jul 2017 18:27:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170724172717.GF2127@work-vm>
-References: <20170724165125.29887-1-dgilbert@redhat.com>
-	<a5e0101c-8288-683d-ad27-bd0d3eff6818@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <a5e0101c-8288-683d-ad27-bd0d3eff6818@redhat.com>
+	(envelope-from <programmingkidx@gmail.com>) id 1dZhBR-00045a-Lc
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:30:24 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:37385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dZhBR-000456-Ft
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:30:17 -0400
+Received: by mail-io0-x244.google.com with SMTP id p5so4443292ioo.4
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 10:30:17 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <56c4d877-58e8-b8ac-cc7f-e6cde5ddfa16@redhat.com>
+Date: Mon, 24 Jul 2017 13:30:14 -0400
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] cpu_physical_memory_sync_dirty_bitmap:
- Fix alignment check
+Message-Id: <69D48A72-93F1-4314-BD0E-E62CC03B4C08@gmail.com>
+References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+	<20170721110636.19412e6c@nial.brq.redhat.com>
+	<56c4d877-58e8-b8ac-cc7f-e6cde5ddfa16@redhat.com>
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, alex.bennee@linaro.org, haozhong.zhang@intel.com, peterx@redhat.com, lvivier@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 24/07/2017 18:51, Dr. David Alan Gilbert (git) wrote:
-> > From: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >=20
-> > This code has an optimised, word aligned version, and a boring
-> > unaligned version.  Recently 084140bd498909 fixed a missing offset
-> > addition from the core of both versions.  However, the offset isn't
-> > necessarily aligned and thus the choice between the two versions
-> > needs fixing up to also include the offset.
-> >=20
-> > Symptom:
-> >   A few stuck unsent pages during migration; not normally noticed
-> > unless under very low bandwidth in which case the migration may get
-> > stuck never ending and never performing a 2nd sync; noticed by
-> > a hanging postcopy-test on a very heavily loaded system.
-> >=20
-> > Fixes: 084140bd498909
-> >=20
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reported-by: Alex Benne=E9 <alex.benee@linaro.org>
-> > Tested-by: Alex Benne=E9 <alex.benee@linaro.org>
-> >=20
-> > --
-> > v2
-> >   Move 'page' inside the if (Comment from Paolo)
-> > ---
-> >  include/exec/ram_addr.h | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> > index c04f4f67f6..d017639f7e 100644
-> > --- a/include/exec/ram_addr.h
-> > +++ b/include/exec/ram_addr.h
-> > @@ -377,19 +377,20 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(=
-RAMBlock *rb,
-> >                                                 uint64_t *real_dirty_=
-pages)
-> >  {
-> >      ram_addr_t addr;
-> > -    unsigned long page =3D BIT_WORD(start >> TARGET_PAGE_BITS);
-> > +    unsigned long word =3D BIT_WORD((start + rb->offset) >> TARGET_P=
-AGE_BITS);
-> >      uint64_t num_dirty =3D 0;
-> >      unsigned long *dest =3D rb->bmap;
-> > =20
-> >      /* start address is aligned at the start of a word? */
-> > -    if (((page * BITS_PER_LONG) << TARGET_PAGE_BITS) =3D=3D start) {
-> > +    if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) =3D=3D
-> > +         (start + rb->offset)) {
-> >          int k;
-> >          int nr =3D BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
-> >          unsigned long * const *src;
-> > -        unsigned long word =3D BIT_WORD((start + rb->offset) >> TARG=
-ET_PAGE_BITS);
-> >          unsigned long idx =3D (word * BITS_PER_LONG) / DIRTY_MEMORY_=
-BLOCK_SIZE;
-> >          unsigned long offset =3D BIT_WORD((word * BITS_PER_LONG) %
-> >                                          DIRTY_MEMORY_BLOCK_SIZE);
-> > +        unsigned long page =3D BIT_WORD(start >> TARGET_PAGE_BITS);
-> > =20
-> >          rcu_read_lock();
-> > =20
-> >=20
+
+> On Jul 24, 2017, at 12:43 PM, John Snow <jsnow@redhat.com> wrote:
 >=20
 >=20
-> Thanks, do you want me to queue this patch?
+>=20
+> On 07/21/2017 05:06 AM, Igor Mammedov wrote:
+>> On Thu, 20 Jul 2017 21:29:33 +0200
+>> Phil Dennis-Jordan <lists@philjordan.eu> wrote:
+>>> On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
+>>> <programmingkidx@gmail.com> wrote:
+>>>> I noticed that Windows 2000 does not boot up in QEMU recently. =
+After bisecting the issue I found the offending commit:
+>> w2k is very ancient (and long time EOLed), I can't even download it =
+from msdn to test
+>> (oldest available is XP)
+>> do we really care about it?
+>=20
+> Red Hat: "No, not really."
+> FOSS: "Yes, of course!"
+>=20
+> Half the fun of QEMU (see also: QEMU Advent Calendar) is running old =
+software. Technology moves so fast that even software from just 17 years =
+ago is becoming impossible to run.
+>=20
+> For historical and archival purposes it is absolutely of interest to =
+be able to run one of Microsoft's most popular operating systems.
+>=20
+> Of course, it's not particularly high on anyone's list who is getting =
+paid to tend to QEMU, of course.
+>=20
+> =E2=80=94js
 
-Yes please.
-
-Dave
-
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Well said.
