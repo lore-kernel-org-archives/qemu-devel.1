@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZiIN-0002ir-27
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:41:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dZiK1-00047m-R1
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZiIM-0003yH-3x
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:41:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1dZiK0-0004uB-QT
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 14:43:13 -0400
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-6-f4bug@amsat.org>
+	<20170724182751.18261-7-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <31d7d85c-6410-c5ef-634d-c43523ad68cd@redhat.com>
-Date: Mon, 24 Jul 2017 13:41:16 -0500
+Message-ID: <35e2489f-9cd6-ae5e-39b6-297b6cf5d2ea@redhat.com>
+Date: Mon, 24 Jul 2017 13:42:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170724182751.18261-6-f4bug@amsat.org>
+In-Reply-To: <20170724182751.18261-7-f4bug@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="LjHdJXaFmTWkqanbhDGVk1XiK8lBxMs7s"
-Subject: Re: [Qemu-devel] [PATCH for 2.10 05/35] nbd: fix memory leak in
- nbd_opt_go()
+	boundary="g9xG711AHTVvGapTMPBLr7qWm4S3Pkg5K"
+Subject: Re: [Qemu-devel] [PATCH for 2.10 06/35] qcow2: remove inconsistent
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LjHdJXaFmTWkqanbhDGVk1XiK8lBxMs7s
+--g9xG711AHTVvGapTMPBLr7qWm4S3Pkg5K
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
-Message-ID: <31d7d85c-6410-c5ef-634d-c43523ad68cd@redhat.com>
-Subject: Re: [PATCH for 2.10 05/35] nbd: fix memory leak in nbd_opt_go()
+Message-ID: <35e2489f-9cd6-ae5e-39b6-297b6cf5d2ea@redhat.com>
+Subject: Re: [PATCH for 2.10 06/35] qcow2: remove inconsistent check
 References: <20170724182751.18261-1-f4bug@amsat.org>
- <20170724182751.18261-6-f4bug@amsat.org>
-In-Reply-To: <20170724182751.18261-6-f4bug@amsat.org>
+ <20170724182751.18261-7-f4bug@amsat.org>
+In-Reply-To: <20170724182751.18261-7-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 07/24/2017 01:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> nbd/client.c:385:12: warning: Potential leak of memory pointed to by 'b=
-uf'
+> This is equivalent to assert(russian roulette) so better remove it.
+>=20
+> block/qcow2-bitmap.c:259:29: warning: The left operand of '=3D=3D' is a=
+ garbage value
+>         assert(bitmap_table =3D=3D NULL);
+>                ~~~~~~~~~~~~ ^
 >=20
 > Reported-by: Clang Static Analyzer
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  nbd/client.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  block/qcow2-bitmap.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 3e8735a20d..fe72df5057 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -254,7 +254,6 @@ static int free_bitmap_clusters(BlockDriverState *b=
+s, Qcow2BitmapTable *tb)
+> =20
+>      ret =3D bitmap_table_load(bs, tb, &bitmap_table);
+>      if (ret < 0) {
+> -        assert(bitmap_table =3D=3D NULL);
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-I plan to take this through the NBD tree for 2.10, if no one else picks
-up the entire series first.
+Rather, we should fix bitmap_table_load() to ensure that bitmap_table is
+always assigned, even on error.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -64,7 +77,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---LjHdJXaFmTWkqanbhDGVk1XiK8lBxMs7s
+--g9xG711AHTVvGapTMPBLr7qWm4S3Pkg5K
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -73,14 +86,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll2P00ACgkQp6FrSiUn
-Q2pkWgf/aUDuTsUJH2iEl9EsTrNoo1CCxF/WEtB66UxEBZOO1eIxLGnh0YV4OidP
-y6teejM9FcIwTapI5KSmXTiApHwR8Sz7kHdSfBsR90K2h3olQnO0cUSkN0jfYp5h
-ugmV3VSTJCRldH6mLDO0hv7N6z0ixDb7eadXPao1kH/ol5PnazrsCIcjfhKD5khJ
-8cjLvK6iiljdsLd4ivyuGgt7AIYM8Ha/dzrElRiaZkUP5UyaIgSec/HlEQN7DN1M
-wmG5+BgL3++eJcHT9bqDweNEUQThteV/iI5zsJiTFFZr8eMKTlDGZp97cms6BU1t
-bvM14Oyt81TlnrehAtxVs3c+O68ClA==
-=TN43
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll2P7EACgkQp6FrSiUn
+Q2r1SAf/VqA4NbLXcKvUiH/rGqtgxVrCqyqpsE6dTzaNGFJ+gvUC723uXZesFju2
+2YntV/Dp3HEl3ua+clHeMphK5ihiUpIW+6zlmGYmDmA8HDAJZKV2AW/EeLA8bR4Y
+H4k0Qd1LQzzN9T/1X7v3+yYE8maxb49qblAGiddw6YjzKHAAnYUBy2SbAhmf3Ytc
+NA1qfBjOjgRoAduvTgJBbcbAfQ9iQJsCM6vALmt0HHjYqnKOiJ5jJfNAiRxGrFOm
+EbPsYnbXzasnN1mtYnSKNiMjlVHnVUpAEB/B2WifhzpIVSVKMAybqXshHdtbHBql
+uwSUrhhaTYDc6IZgVKqPhIbag/4bBw==
+=2dx2
 -----END PGP SIGNATURE-----
 
---LjHdJXaFmTWkqanbhDGVk1XiK8lBxMs7s--
+--g9xG711AHTVvGapTMPBLr7qWm4S3Pkg5K--
