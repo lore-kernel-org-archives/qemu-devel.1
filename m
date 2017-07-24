@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZh4G-00089T-LN
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:22:55 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZh8B-0000b9-Ru
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:26:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZh4B-0007Dn-Pf
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:22:52 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:41378 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZh86-0000nV-Ry
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:26:55 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:55462 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dZh4B-0007DH-4D
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:22:47 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZh86-0000nD-6F
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:26:50 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Mon, 24 Jul 2017 20:22:36 +0300
-Message-Id: <150091695652.30739.17868656744714699780.stgit@frigg.lan>
+Date: Mon, 24 Jul 2017 20:26:39 +0300
+Message-Id: <150091719881.30739.10096572040779058122.stgit@frigg.lan>
 In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/13] instrument: [dynamic] Add default public
- per-event functions
+Subject: [Qemu-devel] [PATCH 06/13] instrument: Add event control interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,162 +29,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-For each event, adds a set of public routines available to instrumentatio=
-n
-clients:
+Adds public and internal APIs to control event instrumentation.
 
-* qi_event_*_nop:
-  Do nothing (to disable an instrumentation event).
-
-* qi_event_*_trace
-  Trace event using QEMU's tracing system. Default for execution-time eve=
-nts.
-
-* qi_event_*_gen_exec
-  Generate TCG code to raise the event at execution time. Only available =
-for
-  translation-time events.
-
-* qi_event_*_trace_and_gen_exec
-  Combination of qi_event_*_trace and qi_event_*_gen_exec. Only available=
- for
-  translation-time events. Default for translation-time events.
-
-The functions are defined for all events, regardless of whether they are
-instrumented or disabled (used later).
+It also adds an event object (QI_EVENT_${NAME}) and define to know if it'=
+s staically enabled (QI_EVENT_${NAME}_ENABLED).
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- .gitignore                                  |    1=20
- Makefile                                    |   14 +++++
- configure                                   |    2 +
- instrument/Makefile.objs                    |   14 +++++
- instrument/qemu-instr/types.h               |   73 +++++++++++++++++++++=
-++
- instrument/qemu-instr/visibility-internal.h |   58 +++++++++++++++++++
- scripts/tracetool/__init__.py               |    4 +
- scripts/tracetool/backend/instr_dynamic.py  |   84 +++++++++++++++++++++=
+ Makefile                                   |    1=20
+ configure                                  |    4=20
+ instrument/Makefile.objs                   |    5=20
+ instrument/control.c                       |  316 ++++++++++++++++++++++=
 ++++++
- scripts/tracetool/backend/instr_none.py     |   18 ++++++
- scripts/tracetool/format/instr_api_h.py     |   65 +++++++++++++++++++++
- scripts/tracetool/format/instr_c.py         |    7 +-
- scripts/tracetool/format/instr_tcg_c.py     |    7 +-
- scripts/tracetool/format/tcg_helper_c.py    |    2 -
- scripts/tracetool/transform.py              |   13 ++++
- 14 files changed, 351 insertions(+), 11 deletions(-)
- create mode 100644 instrument/qemu-instr/types.h
- create mode 100644 instrument/qemu-instr/visibility-internal.h
- create mode 100644 scripts/tracetool/format/instr_api_h.py
+ instrument/control.h                       |   86 ++++++++
+ instrument/qemu-instr/control.h            |  128 +++++++++++
+ instrument/qemu-instr/types.h              |    8 +
+ scripts/tracetool/backend/instr_dynamic.py |   14 +
+ scripts/tracetool/format/c.py              |   37 +++
+ scripts/tracetool/format/instr_api_h.py    |   13 +
+ trace/event-internal.h                     |   10 +
+ 11 files changed, 615 insertions(+), 7 deletions(-)
+ create mode 100644 instrument/control.c
+ create mode 100644 instrument/control.h
+ create mode 100644 instrument/qemu-instr/control.h
 
-diff --git a/.gitignore b/.gitignore
-index ee2768cb05..d3aa8286b0 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -9,6 +9,7 @@
- /instrument-root.c
- /instrument/generated-tcg-tracers.h
- /instrument/generated-tcg-tracers.c
-+/instrument/qemu-instr/events.h
- /trace-events-all
- /trace/generated-events.h
- /trace/generated-events.c
 diff --git a/Makefile b/Makefile
-index fb226bf54b..c8be326790 100644
+index c8be326790..ee54b7e17a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -193,6 +193,9 @@ trace-dtrace-root.o: trace-dtrace-root.dtrace
-=20
- INSTRUMENT_HEADERS =3D instrument-root.h $(trace-events-subdirs:%=3D%/in=
-strument.h)
- INSTRUMENT_HEADERS +=3D instrument/generated-tcg-tracers.h
-+ifeq ($(TRACE_INSTRUMENT_BACKEND),instr-dynamic)
-+INSTRUMENT_HEADERS +=3D instrument/qemu-instr/events.h
-+endif
- INSTRUMENT_SOURCES =3D instrument-root.c $(trace-events-subdirs:%=3D%/in=
-strument.c)
- INSTRUMENT_SOURCES +=3D instrument/generated-tcg-tracers.c
-=20
-@@ -644,8 +647,13 @@ ifneq (,$(findstring qemu-ga,$(TOOLS)))
- endif
- endif
-=20
-+install-includedir:
-+	$(INSTALL_DIR) "$(DESTDIR)$(includedir)"
-=20
- install: all $(if $(BUILD_DOCS),install-doc) install-datadir install-loc=
-alstatedir
-+ifeq ($(TRACE_INSTRUMENT_BACKEND),instr-dynamic)
-+install: install-includedir
-+endif
- ifneq ($(TOOLS),)
- 	$(call install-prog,$(subst qemu-ga,qemu-ga$(EXESUF),$(TOOLS)),$(DESTDI=
-R)$(bindir))
- endif
-@@ -676,6 +684,12 @@ endif
- 	for d in $(TARGET_DIRS); do \
- 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=3D$$d/ -C $$d $@ || exit 1 ; \
-         done
-+ifeq ($(TRACE_INSTRUMENT_BACKEND),instr-dynamic)
-+	$(INSTALL_DIR) "$(DESTDIR)$(includedir)/qemu-instr"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/types.h "$(DESTDIR)$(=
+@@ -688,6 +688,7 @@ ifeq ($(TRACE_INSTRUMENT_BACKEND),instr-dynamic)
+ 	$(INSTALL_DIR) "$(DESTDIR)$(includedir)/qemu-instr"
+ 	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/types.h "$(DESTDIR)$(=
 includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/visibility-internal.h=
+ 	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/visibility-internal.h=
  "$(DESTDIR)$(includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(BUILD_DIR)/instrument/qemu-instr/events.h "$(DESTDIR)=
++	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/control.h "$(DESTDIR)=
 $(includedir)/qemu-instr/"
-+endif
+ 	$(INSTALL_DATA) $(BUILD_DIR)/instrument/qemu-instr/events.h "$(DESTDIR)=
+$(includedir)/qemu-instr/"
+ endif
 =20
- # various test targets
- test speed: all
 diff --git a/configure b/configure
-index 8ab2a36130..ca61665874 100755
+index ca61665874..320309e0c0 100755
 --- a/configure
 +++ b/configure
-@@ -489,6 +489,8 @@ QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissin=
-g-prototypes $QEMU_CFLAGS"
- QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
- QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURC=
-E $QEMU_CFLAGS"
- QEMU_INCLUDES=3D"-I. -I\$(SRC_PATH) -I\$(SRC_PATH)/accel/tcg -I\$(SRC_PA=
-TH)/include"
-+QEMU_INCLUDES=3D"$QEMU_INCLUDES -I\$(SRC_PATH)/instrument"
-+QEMU_INCLUDES=3D"$QEMU_INCLUDES -I\$(BUILD_DIR)/instrument"
- if test "$debug_info" =3D "yes"; then
-     CFLAGS=3D"-g $CFLAGS"
-     LDFLAGS=3D"-g $LDFLAGS"
+@@ -6019,10 +6019,14 @@ QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg $QEMU_INCLUDE=
+S"
+ echo "TRACE_INSTRUMENT_BACKEND=3Dinstr-$trace_instrument_backend" >> $co=
+nfig_host_mak
+ if test "$trace_instrument" =3D "yes"; then
+     echo "CONFIG_INSTRUMENT=3Dy" >> $config_host_mak
++    libs_qga=3D"-ldl $libs_qga"
++    LDFLAGS=3D"-rdynamic $LDFLAGS"
+ fi
+ if test -n "$instrument_events"; then
+     echo "CONFIG_INSTRUMENT_EVENTS=3D$instrument_events" >> $config_host=
+_mak
+ fi
++# code requiring it is always compiled-in
++LIBS=3D"-ldl $LIBS"
+ ##########################################
+=20
+ echo "TOOLS=3D$tools" >> $config_host_mak
 diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
-index c548bbdd8a..c2289aba85 100644
+index c2289aba85..244936aa8c 100644
 --- a/instrument/Makefile.objs
 +++ b/instrument/Makefile.objs
-@@ -24,3 +24,17 @@ $(obj)/generated-tcg-tracers.c-timestamp: $(SRC_PATH)/=
-trace-events $(BUILD_DIR)/
+@@ -38,3 +38,8 @@ $(obj)/qemu-instr/events.h-timestamp: $(BUILD_DIR)/trac=
+e-events-all $(BUILD_DIR)
+ 		--backend=3D$(TRACE_INSTRUMENT_BACKEND) \
+ 		$(TRACETOOL_INSTR_STATIC) \
  		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
-=20
- target-obj-$(CONFIG_INSTRUMENT) +=3D generated-tcg-tracers.o
 +
 +######################################################################
-+# User interface
++# Control code
 +
-+$(obj)/qemu-instr/events.h: $(obj)/qemu-instr/events.h-timestamp
-+	@cmp -s $< $@ || cp $< $@
-+$(obj)/qemu-instr/events.h-timestamp: $(BUILD_DIR)/trace-events-all $(BU=
-ILD_DIR)/config-host.mak $(tracetool-y)
-+	@mkdir -p $(dir $@)
-+	$(call quiet-command,$(TRACETOOL) \
-+		--group=3Droot \
-+		--format=3Dinstr-api-h \
-+		--backend=3D$(TRACE_INSTRUMENT_BACKEND) \
-+		$(TRACETOOL_INSTR_STATIC) \
-+		$< > $@,"GEN","$(patsubst %-timestamp,%,$@)")
-diff --git a/instrument/qemu-instr/types.h b/instrument/qemu-instr/types.=
-h
++target-obj-y +=3D control.o
+diff --git a/instrument/control.c b/instrument/control.c
 new file mode 100644
-index 0000000000..d3d26bbf73
+index 0000000000..309228f15d
 --- /dev/null
-+++ b/instrument/qemu-instr/types.h
-@@ -0,0 +1,73 @@
++++ b/instrument/control.c
+@@ -0,0 +1,316 @@
 +/*
-+ * QI-specific types for instrumentation clients.
++ * Interface for controlling dynamic trace instrumentation.
 + *
 + * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 + *
@@ -194,436 +121,777 @@ ter.
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef QI__TYPES_H
-+#define QI__TYPES_H
++#include "qemu/osdep.h"
++#include "qemu-common.h"
 +
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
++#include <dlfcn.h>
++#include "instrument/control.h"
++#include "qemu/thread.h"
++#include "qemu-instr/control.h"
++#include "qemu/error-report.h"
 +
-+/**
-+ * SECTION: types
-+ * @section_id: qi-types
-+ * @title: Common types
-+ *
-+ * Data of architecture-specific length is always passed as an #int64_t =
-to
-+ * provide binary compatibility between the instrumentation library and =
-QEMU,
-+ * regardless of the guest architecture being instrumented.
-+ */
 +
-+/**
-+ * QICPU:
-+ *
-+ * Opaque guest CPU pointer.
-+ */
-+typedef struct QICPU QICPU;
++typedef int64_t HandleID;
 +
-+/**
-+ * QITCGv_cpu:
-+ *
-+ * TCG register with QICPU.
-+ */
-+typedef struct QITCGv_cpu_d *QITCGv_cpu;
++typedef struct Handle
++{
++    HandleID id;
++    void *dlhandle;
++    void (*init)(int, const char **);
++    void (*fini)(void);
++    QSLIST_ENTRY(Handle) list;
++} Handle;
 +
-+/**
-+ * QITCGv:
-+ *
-+ * TCG register with data of architecture-specific length.
-+ */
-+typedef struct QITCGv_d *QITCGv;
++HandleID handle_last_id;
++QSLIST_HEAD(, Handle) handles =3D QSLIST_HEAD_INITIALIZER(handles);
++static QemuMutex instr_lock;
 +
-+/**
-+ * QITCGv_i32:
-+ *
-+ * TCG register with 32-bit data.
-+ */
-+typedef struct QITCGv_i32_d *QITCGv_i32;
 +
-+/**
-+ * QITCGv_i64:
-+ *
-+ * TCG register with 64-bit data.
-+ */
-+typedef struct QITCGv_i64_d *QITCGv_i64;
++static Handle *handle_get(void)
++{
++    Handle *res =3D g_malloc0(sizeof(Handle));
++    res->id =3D handle_last_id++;
++    QSLIST_INSERT_HEAD(&handles, res, list);
++    return res;
++}
 +
-+/**
-+ * QITCGv_ptr:
-+ *
-+ * TCG register with pointer of architecture-specific length.
-+ */
-+typedef struct QITCGv_ptr_d *QITCGv_ptr;
++static bool handle_put(HandleID id)
++{
++    Handle *prev =3D NULL;
++    Handle *handle;
++    QSLIST_FOREACH(handle, &handles, list) {
++        if (handle->id =3D=3D id) {
++            break;
++        }
++        prev =3D handle;
++    }
++    if (handle =3D=3D NULL) {
++        return false;
++    } else {
++        if (prev =3D=3D NULL) {
++            QSLIST_REMOVE_HEAD(&handles, list);
++        } else {
++            QSLIST_REMOVE_AFTER(prev, list);
++        }
++        g_free(handle);
++        return true;
++    }
++}
 +
-+#ifdef __cplusplus
++#if defined(CONFIG_INSTRUMENT)
++static Handle *handle_find(HandleID id)
++{
++    Handle *handle;
++    QSLIST_FOREACH(handle, &handles, list) {
++        if (handle->id =3D=3D id) {
++            return handle;
++        }
++    }
++    return NULL;
 +}
 +#endif
 +
-+#endif  /* QI__TYPES_H */
-diff --git a/instrument/qemu-instr/visibility-internal.h b/instrument/qem=
-u-instr/visibility-internal.h
++static bool instr_available(void)
++{
++#if defined(CONFIG_INSTRUMENT)
++    return true;
++#else
++    return false;
++#endif
++}
++
++InstrLoadError instr_load(const char * path, int argc, const char ** arg=
+v,
++                          int64_t *handle_id)
++{
++    InstrLoadError res;
++
++    qemu_rec_mutex_lock(&instr_lock);
++
++    *handle_id =3D -1;
++    if (!instr_available()) {
++        res =3D INSTR_LOAD_UNAVAILABLE;
++        goto out;
++    }
++
++    if (!QSLIST_EMPTY(&handles) > 0) {
++        /* XXX: This is in fact a hard-coded limit, but there's no reaso=
+n why a
++         *      real multi-library implementation should fail with somet=
+hing like
++         *      "too many open libraries".
++         */
++        res =3D INSTR_LOAD_UNAVAILABLE;
++        goto out;
++    }
++
++    Handle * handle =3D handle_get();
++    handle->dlhandle =3D dlopen(path, RTLD_NOW);
++    if (handle->dlhandle =3D=3D NULL) {
++        goto err;
++    }
++
++    handle->init =3D dlsym(handle->dlhandle, "qi_init");
++    if (handle->init =3D=3D NULL) {
++        goto err;
++    }
++    handle->fini =3D dlsym(handle->dlhandle, "qi_fini");
++    if (handle->fini =3D=3D NULL) {
++        goto err;
++    }
++
++    handle->init(argc, argv);
++
++    *handle_id =3D handle->id;
++    res =3D INSTR_LOAD_OK;
++    goto out;
++
++err:
++    handle_put(handle->id);
++    res =3D INSTR_LOAD_ERROR;
++out:
++    qemu_rec_mutex_unlock(&instr_lock);
++    return res;
++}
++
++static inline bool instr_event_is_instrument(TraceEvent *ev)
++{
++#if defined(CONFIG_INSTRUMENT)
++    return ev->is_instr;
++#else
++    return false;
++#endif
++}
++
++InstrUnloadError instr_unload(int64_t handle_id)
++{
++    InstrLoadError res;
++
++    qemu_rec_mutex_lock(&instr_lock);
++
++    if (!instr_available()) {
++        res =3D INSTR_UNLOAD_UNAVAILABLE;
++        goto out;
++    }
++
++#if defined(CONFIG_INSTRUMENT)
++    Handle *handle =3D handle_find(handle_id);
++    if (handle =3D=3D NULL) {
++        res =3D INSTR_UNLOAD_INVALID;
++        goto out;
++    }
++
++    handle->fini();
++
++    TraceEventIter iter;
++    TraceEvent *ev =3D NULL;
++    trace_event_iter_init(&iter, NULL);
++    while ((ev =3D trace_event_iter_next(&iter)) !=3D NULL) {
++        if (instr_event_is_instrument(ev)) {
++            *ev->instr_cb =3D ev->instr_cb_default;
++        }
++    }
++
++    /* this should never fail */
++    if (dlclose(handle->dlhandle) < 0) {
++        res =3D INSTR_UNLOAD_ERROR;
++    } else {
++        res =3D INSTR_UNLOAD_OK;
++    }
++    handle_put(handle->id);
++#endif
++
++out:
++    qemu_rec_mutex_unlock(&instr_lock);
++    return res;
++}
++
++InstrUnloadError instr_unload_all(void)
++{
++    InstrUnloadError res =3D INSTR_UNLOAD_OK;
++
++    qemu_rec_mutex_lock(&instr_lock);
++    while (true) {
++        Handle *handle =3D QSLIST_FIRST(&handles);
++        if (handle =3D=3D NULL) {
++            break;
++        } else {
++            res =3D instr_unload(handle->id);
++            if (res !=3D INSTR_UNLOAD_OK) {
++                break;
++            }
++        }
++    }
++    qemu_rec_mutex_unlock(&instr_lock);
++
++    return res;
++}
++
++void qi_ctrl_event_set(QIEvent *ev, void *cb)
++{
++    TraceEvent *tev =3D (TraceEvent *)ev;
++
++    if (unlikely(tev =3D=3D NULL)) {
++        error_report("qi_ctrl_event_set: event is NULL");
++        return;
++    }
++
++#if defined(CONFIG_INSTRUMENT)
++    if (unlikely(!tev->is_instr)) {
++        error_report("qi_ctrl_event_set: event is not instrumentable");
++        return;
++    }
++
++    if (cb =3D=3D NULL) {
++        *tev->instr_cb =3D tev->instr_cb_default;
++    } else {
++        *tev->instr_cb =3D cb;
++    }
++#else
++    assert(false);
++#endif  /* defined(CONFIG_INSTRUMENT) */
++}
++
++bool qi_trace_event_get_state_static(QIEvent *ev)
++{
++    if (unlikely(ev =3D=3D NULL)) {
++        error_report("qi_trace_event_get_state_static: event is NULL");
++        return false;
++    }
++    return trace_event_get_state_static((TraceEvent *)ev);
++}
++
++bool qi_trace_event_get_state_dynamic(QIEvent *ev)
++{
++    if (unlikely(ev =3D=3D NULL)) {
++        error_report("qi_trace_event_get_state_dynamic: event is NULL");
++        return false;
++    }
++    return trace_event_get_state_dynamic((TraceEvent *)ev);
++}
++
++bool qi_trace_event_get_vcpu_state_dynamic(QICPU *vcpu, QIEvent *ev)
++{
++    TraceEvent *tev =3D (TraceEvent *)ev;
++
++    if (unlikely(vcpu =3D=3D NULL)) {
++        error_report("qi_trace_event_get_vcpu_state_dynamic: vcpu is NUL=
+L");
++        return false;
++    }
++    if (unlikely(tev =3D=3D NULL)) {
++        error_report("qi_trace_event_get_vcpu_state_dynamic: event is NU=
+LL");
++        return false;
++    }
++    if (unlikely(!trace_event_is_vcpu(tev))) {
++        error_report("qi_trace_event_get_vcpu_state_dynamic: event does =
+not have 'vcpu' property");
++        return false;
++    }
++    return trace_event_get_vcpu_state_dynamic((CPUState *)vcpu, tev);
++}
++
++void qi_trace_event_set_state_dynamic(QIEvent *ev, bool state)
++{
++    TraceEvent *tev =3D (TraceEvent *)ev;
++
++    if (unlikely(tev =3D=3D NULL)) {
++        error_report("qi_trace_event_set_state_dynamic: event is NULL");
++        return;
++    }
++    if (unlikely(!trace_event_get_state_static(tev))) {
++        error_report("qi_trace_event_set_state_dynamic: event is statica=
+lly disabled");
++        return;
++    }
++    trace_event_set_state_dynamic(tev, state);
++}
++
++void qi_trace_event_set_vcpu_state_dynamic(QICPU *vcpu, QIEvent *ev, boo=
+l state)
++{
++    TraceEvent *tev =3D (TraceEvent *)ev;
++
++    if (unlikely(vcpu =3D=3D NULL)) {
++        error_report("qi_trace_event_set_vcpu_state_dynamic: vcpu is NUL=
+L");
++        return;
++    }
++    if (unlikely(tev =3D=3D NULL)) {
++        error_report("qi_trace_event_set_vcpu_state_dynamic: event is NU=
+LL");
++        return;
++    }
++    if (unlikely(!trace_event_is_vcpu(tev))) {
++        error_report("qi_trace_event_set_vcpu_state_dynamic: event does =
+not have 'vcpu' property");
++        return;
++    }
++    if (unlikely(!trace_event_get_state_static(tev))) {
++        error_report("qi_trace_event_set_vcpu_state_dynamic: event is st=
+atically disabled");
++        return;
++    }
++    trace_event_set_vcpu_state_dynamic((CPUState *)vcpu, tev, state);
++}
++
++static void __attribute__((constructor)) instr_lock_init(void)
++{
++    qemu_rec_mutex_init(&instr_lock);
++}
+diff --git a/instrument/control.h b/instrument/control.h
 new file mode 100644
-index 0000000000..3bbbdc34cd
+index 0000000000..a83a350faf
 --- /dev/null
-+++ b/instrument/qemu-instr/visibility-internal.h
-@@ -0,0 +1,58 @@
++++ b/instrument/control.h
+@@ -0,0 +1,86 @@
 +/*
-+ * Macros for symbol visibility.
++ * Interface for controlling dynamic trace instrumentation.
 + *
 + * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or la=
 ter.
-+ * See the COPYING file in the top-level directory of QEMU.
++ * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef QI__VISIBILITY_INTERNAL_H
-+#define QI__VISIBILITY_INTERNAL_H
++#ifndef INSTRUMENT__CONTROL_H
++#define INSTRUMENT__CONTROL_H
++
++#include <stdint.h>
++#include <stdbool.h>
++#include "qapi-types.h"
++#include "trace/control.h"
++
++
++/**
++ * InstrLoadError:
++ * @INSTR_LOAD_OK: Correctly loaded.
++ * @INSTR_LOAD_UNAVAILABLE: Service not available.
++ * @INSTR_LOAD_ERROR: Error with libdl (see dlerror).
++ *
++ * Error codes for instr_load().
++ *
++ * Warning: Keep in sync with #InstrLoadCode
++ */
++typedef enum {
++    INSTR_LOAD_OK,
++    INSTR_LOAD_UNAVAILABLE,
++    INSTR_LOAD_ERROR,
++} InstrLoadError;
++
++/**
++ * InstrUnloadError:
++ * @INSTR_UNLOAD_OK: Correctly unloaded.
++ * @INSTR_UNLOAD_UNAVAILABLE: Service not available.
++ * @INSTR_UNLOAD_INVALID: Invalid handle.
++ * @INSTR_UNLOAD_ERROR: Error with libdl (see dlerror).
++ *
++ * Error codes for instr_unload().
++ *
++ * Warning: Keep in sync with #InstrUnloadCode
++ */
++typedef enum {
++    INSTR_UNLOAD_OK,
++    INSTR_UNLOAD_UNAVAILABLE,
++    INSTR_UNLOAD_INVALID,
++    INSTR_UNLOAD_ERROR,
++} InstrUnloadError;
++
++/**
++ * instr_load:
++ * @path: Path to the shared library to load.
++ * @argc: Number of arguments passed to the initialization function of t=
+he library.
++ * @argv: Arguments passed to the initialization function of the library.
++ * @handle: Instrumentation library handle (undefined in case of error).
++ *
++ * Load a dynamic trace instrumentation library.
++ *
++ * Returns: Whether the library could be loaded.
++ */
++InstrLoadError instr_load(const char * path, int argc, const char ** arg=
+v,
++                          int64_t *handle);
++
++/**
++ * instr_unload:
++ * @handle: Instrumentation library handle returned by instr_load().
++ *
++ * Unload the given instrumentation library.
++ *
++ * Returns: Whether the library could be unloaded.
++ */
++InstrUnloadError instr_unload(int64_t handle);
++
++/**
++ * instr_unload_all:
++ *
++ * Unload all instrumentation libraries.
++ *
++ * Returns: Whether any library could not be unloaded.
++ */
++InstrUnloadError instr_unload_all(void);
++
++#endif  /* INSTRUMENT__CONTROL_H */
+diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
+rol.h
+new file mode 100644
+index 0000000000..83f20d42f2
+--- /dev/null
++++ b/instrument/qemu-instr/control.h
+@@ -0,0 +1,128 @@
++/*
++ * Interface for controlling the state of events.
++ *
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QI__CONTROL_H
++#define QI__CONTROL_H
 +
 +#ifdef __cplusplus
 +extern "C" {
 +#endif
 +
++#include <stdbool.h>
++#include <stddef.h>
++
++#include <qemu-instr/types.h>
++#include <qemu-instr/visibility-internal.h>
++
++
 +/**
-+ * SECTION:visibility
-+ * @section_id: qi-visibility
-+ * @title: Symbol visibility
-+ *
-+ * This code is taken from http://gcc.gnu.org/wiki/Visibility.
++ * SECTION:control
++ * @section_id: qi-control
++ * @title: Event control API for QEMU event instrumentation
 + */
 +
 +/**
-+ * QI_VPUBLIC:
++ * qi_ctrl_event_set:
++ * @ev: Event descriptor.
++ * @cb: Pointer to instrumentation callback.
 + *
-+ * Make an element public to user's instrumentation code.
++ * Set the instrumentation callback for the given event.
++ *
++ * @cb can also be set to #NULL to restore the default callback.
 + */
++QI_VPUBLIC void qi_ctrl_event_set(QIEvent *ev, void *cb);
 +
 +/**
-+ * QI_VLOCAL:
++ * qi_trace_event_get_state:
++ * @ev: Event identifier name.
 + *
-+ * Make an element not visible to user's instrumentation code.
++ * Get the tracing state of an event (both static and dynamic).
++ *
++ * If the event has the disabled property, the check will have no perfor=
+mance
++ * impact.
 + */
++#define qi_trace_event_get_state(ev)                                    =
+\
++    ((ev ##_ENABLED) && qi_trace_event_get_state_dynamic(ev))
 +
-+#if defined _WIN32 || defined __CYGWIN__
-+  #ifdef __GNUC__
-+    #define QI_VPUBLIC __attribute__ ((dllimport))
-+  #else
-+    #define QI_VPUBLIC __declspec(dllimport)
-+  #endif
-+  #define QI_VLOCAL
-+#else
-+  #if __GNUC__ >=3D 4
-+    #define QI_VPUBLIC __attribute__ ((visibility ("default")))
-+    #define QI_VLOCAL  __attribute__ ((visibility ("hidden")))
-+  #else
-+    #define QI_VPUBLIC
-+    #define QI_VLOCAL
-+  #endif
-+#endif
++/**
++ * qi_trace_event_get_vcpu_state:
++ * @vcpu: Target vCPU.
++ * @ev: Event identifier name.
++ *
++ * Get the tracing state of an event (both static and dynamic) for the g=
+iven
++ * vCPU.
++ *
++ * If the event has the disabled property, the check will have no perfor=
+mance
++ * impact.
++ */
++#define qi_trace_event_get_vcpu_state(vcpu, ev)                         =
+\
++    ((ev ##_ENABLED) &&                                                 =
+\
++     qi_trace_event_get_vcpu_state_dynamic(vcpu, ev))
++
++/**
++ * qi_trace_event_get_state_static:
++ * @ev: Event identifier.
++ *
++ * Get the static tracing state of an event.
++ *
++ * Use the define 'QI_EVENT_${EVENT}_ENABLED' for compile-time checks (i=
+t will
++ * be set to 1 or 0 according to the presence of the disabled property).
++ */
++QI_VPUBLIC bool qi_trace_event_get_state_static(QIEvent *ev);
++
++/**
++ * qi_trace_event_get_state_dynamic:
++ * @ev: Event identifier.
++ *
++ * Get the dynamic tracing state of an event.
++ */
++QI_VPUBLIC bool qi_trace_event_get_state_dynamic(QIEvent *ev);
++
++/**
++ * qi_trace_event_get_vcpu_state_dynamic:
++ * @vcpu: Target vCPU.
++ * @ev: Event identifier.
++ *
++ * Get the dynamic tracing state of an event for the given vCPU.
++ */
++QI_VPUBLIC bool qi_trace_event_get_vcpu_state_dynamic(QICPU *vcpu,
++                                                      QIEvent *ev);
++
++/**
++ * qi_trace_event_set_state_dynamic:
++ * @ev: Event identifier.
++ * @state: Target tracing state.
++ *
++ * Set the dynamic tracing state of an event.
++ *
++ * Pre-condition: qi_trace_event_get_state_static(ev) =3D=3D true
++ */
++QI_VPUBLIC void qi_trace_event_set_state_dynamic(QIEvent *ev, bool state=
+);
++
++/**
++ * qi_trace_event_set_vcpu_state_dynamic:
++ * @vcpu: Target vCPU.
++ * @ev: Event identifier.
++ * @state: Target tracing state.
++ *
++ * Set the dynamic tracing state of an event for the given vCPU.
++ *
++ * Pre-condition: qi_trace_event_get_state_static(ev) =3D=3D true
++ *
++ * Note: Changes for execution-time events with the 'tcg' property will =
+not be
++ *       propagated until the next TB is executed (iff executing in TCG =
+mode).
++ */
++QI_VPUBLIC void qi_trace_event_set_vcpu_state_dynamic(QICPU *vcpu,
++                                                      QIEvent *ev, bool =
+state);
 +
 +#ifdef __cplusplus
 +}
 +#endif
 +
-+#endif  /* QI__VISIBILITY_INTERNAL_H */
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
-y
-index b9ddf8fbf9..7c19dc8c94 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -277,6 +277,10 @@ class Event(object):
++#endif  /* QI__CONTROL_H */
+diff --git a/instrument/qemu-instr/types.h b/instrument/qemu-instr/types.=
+h
+index d3d26bbf73..58a84b6d01 100644
+--- a/instrument/qemu-instr/types.h
++++ b/instrument/qemu-instr/types.h
+@@ -25,6 +25,14 @@ extern "C" {
+  */
 =20
-     QI_TRACE_INSTRUMENT      =3D "qi_event_%(name)s"
-     QI_TRACE_INSTRUMENT_TCG  =3D QI_TRACE_INSTRUMENT + "_tcg"
-+    QI_TRACE_NOP             =3D QI_TRACE_INSTRUMENT + "_nop"
-+    QI_TRACE_TRACE           =3D QI_TRACE_INSTRUMENT + "_trace"
-+    QI_TRACE_GEN             =3D QI_TRACE_INSTRUMENT + "_gen_exec"
-+    QI_TRACE_TRACEGEN        =3D QI_TRACE_INSTRUMENT + "_trace_and_gen_e=
-xec"
-=20
-     def api(self, fmt=3DNone):
-         if fmt is None:
+ /**
++ * QIEvent:
++ *
++ * Opaque structure defining an instrumentation event.
++ */
++struct QIEvent;
++typedef struct QIEvent QIEvent;
++
++/**
+  * QICPU:
+  *
+  * Opaque guest CPU pointer.
 diff --git a/scripts/tracetool/backend/instr_dynamic.py b/scripts/traceto=
 ol/backend/instr_dynamic.py
-index f42d3afa8f..6f9f8e49fb 100644
+index 6f9f8e49fb..2efd4a7eb1 100644
 --- a/scripts/tracetool/backend/instr_dynamic.py
 +++ b/scripts/tracetool/backend/instr_dynamic.py
-@@ -65,3 +65,87 @@ def generate_instr_tcg_h(event, group):
-         args=3Devent.args,
-         argnames=3D", ".join(event.args.names()),
-         argtypes=3Dargtypes)
-+
-+
-+##################################################
-+# instr-tcg-c
-+
-+def generate_instr_tcg_c_begin(events, group):
-+    out('#include "qemu-instr/events.h"',
-+        '')
-+
-+def generate_instr_tcg_c(event, group):
-+    if "tcg" in event.properties:
-+        event =3D event.event_trans
-+
-+    iargs =3D tracetool.vcpu.transform_args("tcg_h", event.original)
-+    api_args =3D iargs.transform(TCG_2_QI_TCG)
-+
-+    qtargs =3D ["(%s)%s" % (arg[0], arg[1])
-+              for arg in event.args]
-+    gargs =3D tracetool.vcpu.transform_args(
-+        "tcg_helper_c", event.original, "wrapper")
-+    qgargs =3D ["(%s)%s" % (arg[0], arg[1])
-+              for arg in gargs]
-+    qargs =3D ["(%s)%s" % (arg[0], arg[1])
-+             for arg in iargs]
-+
-+    out('QI_VPUBLIC void %(nop)s(%(api_args)s)',
-+        '{',
-+        '}',
-+        'QI_VPUBLIC void %(trace)s(%(api_args)s)',
-+        '{',
-+        '     %(b_trace)s(%(qtargs)s);',
-+        '}',
-+        'QI_VPUBLIC void %(gen)s(%(api_args)s)',
-+        '{',
-+        '     %(b_gen)s(%(qgargs)s);',
-+        '}',
-+        'QI_VPUBLIC void %(trace_gen)s(%(api_args)s)',
-+        '{',
-+        '     %(b_trace_gen)s(%(qargs)s);',
-+        '}',
-+        'void *%(qi_cb)s_cb =3D %(trace_gen)s;',
-+        '',
-+        api_args=3Dapi_args,
-+        nop=3Devent.api(event.QI_TRACE_NOP),
-+        trace=3Devent.api(event.QI_TRACE_TRACE),
-+        b_trace=3Devent.api(event.QEMU_TRACE_BACKEND),
-+        gen=3Devent.api(event.QI_TRACE_GEN),
-+        b_gen=3D"gen_helper_" + event.original.event_exec.api(event.QEMU=
-_TRACE_BACKEND),
-+        trace_gen=3Devent.api(event.QI_TRACE_TRACEGEN),
-+        b_trace_gen=3Devent.original.api(event.QEMU_TRACE_TCG_BACKEND),
-+        iargs=3Diargs,
-+        qargs=3D", ".join(qargs),
-+        qtargs=3D", ".join(qtargs),
-+        qgargs=3D", ".join(qgargs),
-+        qi_cb=3Devent.original.api(event.QI_TRACE_INSTRUMENT_TCG))
-+
-+
-+##################################################
-+# instr-c
-+
-+def generate_instr_c_begin(events, group):
-+    out('#include "qemu-instr/events.h"',
-+        '')
-+
-+def generate_instr_c(event, group):
-+    args =3D event.args.transform(TCG_2_QI_TCG)
-+    qargs =3D ["(%s)%s" % (arg[0], arg[1])
-+             for arg in event.args]
-+    out('QI_VPUBLIC void %(nop)s(%(args)s)',
-+        '{',
-+        '}',
-+        'QI_VPUBLIC void %(trace)s(%(args)s)',
-+        '{',
-+        '     %(backend)s(%(qargs)s);',
-+        '}',
-+        'void *%(qi_cb)s_cb =3D %(qi_trace)s;',
-+        '',
-+        args=3Dargs,
-+        nop=3Devent.api(event.QI_TRACE_NOP),
-+        trace=3Devent.api(event.QI_TRACE_TRACE),
-+        backend=3Devent.api(event.QEMU_TRACE_BACKEND),
-+        qargs=3D", ".join(qargs),
-+        qi_cb=3Devent.api(event.QI_TRACE_INSTRUMENT),
-+        qi_trace=3Devent.api(event.QI_TRACE_TRACE))
-diff --git a/scripts/tracetool/backend/instr_none.py b/scripts/tracetool/=
-backend/instr_none.py
-index 56508cfcbe..95aed5e96f 100644
---- a/scripts/tracetool/backend/instr_none.py
-+++ b/scripts/tracetool/backend/instr_none.py
-@@ -32,3 +32,21 @@ def generate_instr_h(event, group):
-     out('    %(backend)s(%(argnames)s);',
-         backend=3Devent.api(event.QEMU_TRACE_BACKEND),
-         argnames=3D", ".join(event.args.names()))
-+
-+
-+##################################################
-+# instr-tcg-c
-+
-+def generate_instr_tcg_c(event, group):
-+    out('void *%(qi_cb)s_cb =3D %(qi_trace)s;',
-+        qi_cb=3Devent.api(event.QI_TRACE_INSTRUMENT_TCG),
-+        qi_trace=3Devent.api(event.QEMU_TRACE_TCG_BACKEND))
-+
-+
-+##################################################
-+# instr-c
-+
-+def generate_instr_c(event, group):
-+    out('void *%(qi_cb)s_cb =3D %(qi_trace)s;',
-+        qi_cb=3Devent.api(event.QI_TRACE_INSTRUMENT),
-+        qi_trace=3Devent.api(event.QEMU_TRACE_BACKEND))
-diff --git a/scripts/tracetool/format/instr_api_h.py b/scripts/tracetool/=
-format/instr_api_h.py
-new file mode 100644
-index 0000000000..d85f64df45
---- /dev/null
-+++ b/scripts/tracetool/format/instr_api_h.py
-@@ -0,0 +1,65 @@
-+#!/usr/bin/env python
-+# -*- coding: utf-8 -*-
-+
-+"""
-+instrument/qemu-instr/events.h
-+
-+"""
-+
-+__author__     =3D "Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>"
+@@ -90,7 +90,8 @@ def generate_instr_tcg_c(event, group):
+     qargs =3D ["(%s)%s" % (arg[0], arg[1])
+              for arg in iargs]
+=20
+-    out('QI_VPUBLIC void %(nop)s(%(api_args)s)',
++    out('QIEvent *%(qevent)s =3D (QIEvent *)&%(tevent)s;',
++        'QI_VPUBLIC void %(nop)s(%(api_args)s)',
+         '{',
+         '}',
+         'QI_VPUBLIC void %(trace)s(%(api_args)s)',
+@@ -99,7 +100,10 @@ def generate_instr_tcg_c(event, group):
+         '}',
+         'QI_VPUBLIC void %(gen)s(%(api_args)s)',
+         '{',
++        # does not exist when event is disabled
++        '#if %(teventu)s_ENABLED',
+         '     %(b_gen)s(%(qgargs)s);',
++        '#endif',
+         '}',
+         'QI_VPUBLIC void %(trace_gen)s(%(api_args)s)',
+         '{',
+@@ -107,6 +111,9 @@ def generate_instr_tcg_c(event, group):
+         '}',
+         'void *%(qi_cb)s_cb =3D %(trace_gen)s;',
+         '',
++        qevent=3Devent.api(event.QI_TRACE_INSTRUMENT).upper(),
++        tevent=3Devent.api(event.QEMU_EVENT),
++        teventu=3Devent.api(event.QEMU_TRACE).upper(),
+         api_args=3Dapi_args,
+         nop=3Devent.api(event.QI_TRACE_NOP),
+         trace=3Devent.api(event.QI_TRACE_TRACE),
+@@ -133,7 +140,8 @@ def generate_instr_c(event, group):
+     args =3D event.args.transform(TCG_2_QI_TCG)
+     qargs =3D ["(%s)%s" % (arg[0], arg[1])
+              for arg in event.args]
+-    out('QI_VPUBLIC void %(nop)s(%(args)s)',
++    out('QIEvent *%(qevent)s =3D (QIEvent *)&%(tevent)s;',
++        'QI_VPUBLIC void %(nop)s(%(args)s)',
+         '{',
+         '}',
+         'QI_VPUBLIC void %(trace)s(%(args)s)',
+@@ -142,6 +150,8 @@ def generate_instr_c(event, group):
+         '}',
+         'void *%(qi_cb)s_cb =3D %(qi_trace)s;',
+         '',
++        qevent=3Devent.api(event.QI_TRACE_INSTRUMENT).upper(),
++        tevent=3Devent.api(event.QEMU_EVENT),
+         args=3Dargs,
+         nop=3Devent.api(event.QI_TRACE_NOP),
+         trace=3Devent.api(event.QI_TRACE_TRACE),
+diff --git a/scripts/tracetool/format/c.py b/scripts/tracetool/format/c.p=
+y
+index 833c05a022..0b8bb98d24 100644
+--- a/scripts/tracetool/format/c.py
++++ b/scripts/tracetool/format/c.py
+@@ -6,7 +6,7 @@ trace/generated-tracers.c
+ """
+=20
+ __author__     =3D "Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>"
+-__copyright__  =3D "Copyright 2012-2014, Llu=C3=ADs Vilanova <vilanova@a=
+c.upc.edu>"
 +__copyright__  =3D "Copyright 2012-2017, Llu=C3=ADs Vilanova <vilanova@a=
 c.upc.edu>"
-+__license__    =3D "GPL version 2 or (at your option) any later version"
+ __license__    =3D "GPL version 2 or (at your option) any later version"
+=20
+ __maintainer__ =3D "Stefan Hajnoczi"
+@@ -39,18 +39,49 @@ def generate(events, backend, group):
+             vcpu_id =3D 0
+         else:
+             vcpu_id =3D "TRACE_VCPU_EVENT_NONE"
 +
-+__maintainer__ =3D "Stefan Hajnoczi"
-+__email__      =3D "stefanha@linux.vnet.ibm.com"
-+
-+
-+from tracetool import out
-+from tracetool.transform import *
-+import tracetool.vcpu
-+
-+
-+def generate(events, backend, group):
-+    # We won't be using any backend, because this code is only compiled =
-in when
-+    # dynamic instrumentation mode is enabled
-+
-+    out('/* This file is autogenerated by tracetool, do not edit. */',
-+        '',
-+        '#ifndef QI__EVENTS_H',
-+        '#define QI__EVENTS_H',
-+        '',
-+        '#ifdef __cplusplus',
-+        'extern "C" {',
-+        '#endif',
-+        '',
-+        '#include <stdbool.h>',
-+        '#include <stdint.h>',
-+        '#include <qemu-instr/types.h>',
-+        '#include <qemu-instr/visibility-internal.h>',
-+        '',
-+        '')
-+
-+    for e in events:
-+        if "tcg-trans" in e.properties:
-+            args =3D tracetool.vcpu.transform_args("tcg_h", e.original)
-+            args =3D args.transform(TCG_2_QI_TCG)
++        if "instrument" in e.properties:
++            is_instr =3D "true"
++            out('#if defined(CONFIG_INSTRUMENT)')
++            if "tcg-trans" in e.properties:
++                instr_cb =3D e.original.api(e.QI_TRACE_INSTRUMENT_TCG) +=
+ "_cb"
++                instr_cb_default =3D e.api(e.QI_TRACE_TRACEGEN)
++                out('static void *_tmp__%(name1)s;',
++                    'extern void *%(name1)s __attribute__((weak, alias("=
+_tmp__%(name1)s")));',
++                    name1=3Dinstr_cb)
++            else:
++                instr_cb =3D e.api(e.QI_TRACE_INSTRUMENT) + "_cb"
++                instr_cb_default =3D e.api(e.QI_TRACE_TRACE)
++            out('static void _tmp__%(name2)s(void) {};',
++                'void %(name2)s(void) __attribute__((weak, alias("_tmp__=
+%(name2)s")));',
++                '#endif',
++                name2=3Dinstr_cb_default)
++            instr_cb =3D "&" + instr_cb
 +        else:
-+            args =3D e.args.transform(TCG_2_QI_TCG)
-+        out('QI_VPUBLIC void %(nop)s(%(args)s);',
-+            'QI_VPUBLIC void %(trace)s(%(args)s);',
-+            args=3Dargs,
-+            nop=3De.api(e.QI_TRACE_NOP),
-+            trace=3De.api(e.QI_TRACE_TRACE))
-+        if "tcg-trans" in e.properties:
-+            out('QI_VPUBLIC void %(gen)s(%(args)s);',
-+                'QI_VPUBLIC void %(trace_gen)s(%(args)s);',
-+                args=3Dargs,
-+                gen=3De.api(e.QI_TRACE_GEN),
-+                trace_gen=3De.api(e.QI_TRACE_TRACEGEN))
-+        out('')
++            is_instr =3D "false"
++            instr_cb =3D "NULL"
++            instr_cb_default =3D "NULL"
 +
-+    out('#ifdef __cplusplus',
-+        '}',
-+        '#endif',
-+        '',
-+        '#endif  /* QI__EVENTS_H */')
-diff --git a/scripts/tracetool/format/instr_c.py b/scripts/tracetool/form=
-at/instr_c.py
-index 987ecbf5c2..35b7955641 100644
---- a/scripts/tracetool/format/instr_c.py
-+++ b/scripts/tracetool/format/instr_c.py
-@@ -21,8 +21,7 @@ from tracetool.transform import *
+         out('TraceEvent %(event)s =3D {',
+             '    .id =3D 0,',
+             '    .vcpu_id =3D %(vcpu_id)s,',
+             '    .name =3D \"%(name)s\",',
+             '    .sstate =3D %(sstate)s,',
+-            '    .dstate =3D &%(dstate)s ',
++            '    .dstate =3D &%(dstate)s,',
++            '#if defined(CONFIG_INSTRUMENT)',
++            '    .is_instr =3D %(is_instr)s,',
++            '    .instr_cb =3D %(instr_cb)s,',
++            '    .instr_cb_default =3D %(instr_cb_default)s,',
++            '#endif',
+             '};',
+             event =3D e.api(e.QEMU_EVENT),
+             vcpu_id =3D vcpu_id,
+             name =3D e.name,
+             sstate =3D "TRACE_%s_ENABLED" % e.name.upper(),
+-            dstate =3D e.api(e.QEMU_DSTATE))
++            dstate =3D e.api(e.QEMU_DSTATE),
++            is_instr=3Dis_instr,
++            instr_cb=3Dinstr_cb,
++            instr_cb_default=3Dinstr_cb_default)
 =20
- def generate(events, backend, group):
-     events =3D [e for e in events
--              if "tcg-trans" not in e.properties and
--              "instrument" in e.properties]
-+              if "tcg-trans" not in e.properties]
-=20
-     if group =3D=3D "root":
-         header =3D "trace-root.h"
-@@ -37,8 +36,6 @@ def generate(events, backend, group):
-     backend.generate_begin(events, group)
+     out('TraceEvent *%(group)s_trace_events[] =3D {',
+         group =3D group.lower())
+diff --git a/scripts/tracetool/format/instr_api_h.py b/scripts/tracetool/=
+format/instr_api_h.py
+index d85f64df45..812a5d44ec 100644
+--- a/scripts/tracetool/format/instr_api_h.py
++++ b/scripts/tracetool/format/instr_api_h.py
+@@ -40,13 +40,24 @@ def generate(events, backend, group):
+         '')
 =20
      for e in events:
--        out('void *%(qi_cb)s_cb =3D %(qi_trace)s;',
--            qi_cb=3De.api(e.QI_TRACE_INSTRUMENT),
--            qi_trace=3De.api(e.QEMU_TRACE_BACKEND))
-+        backend.generate(e, group)
-=20
-     backend.generate_end(events, group)
-diff --git a/scripts/tracetool/format/instr_tcg_c.py b/scripts/tracetool/=
-format/instr_tcg_c.py
-index 382709d0bd..61407a68c0 100644
---- a/scripts/tracetool/format/instr_tcg_c.py
-+++ b/scripts/tracetool/format/instr_tcg_c.py
-@@ -20,8 +20,7 @@ from tracetool.transform import *
-=20
- def generate(events, backend, group):
-     events =3D [e.original for e in events
--              if "tcg-trans" in e.properties and
--              "instrument" in e.properties]
-+              if "tcg-trans" in e.properties]
-=20
-     out('/* This file is autogenerated by tracetool, do not edit. */',
-         '',
-@@ -33,8 +32,6 @@ def generate(events, backend, group):
-     backend.generate_begin(events, group)
-=20
-     for e in events:
--        out('void *%(qi_cb)s_cb =3D %(qi_trace)s;',
--            qi_cb=3De.api(e.QI_TRACE_INSTRUMENT_TCG),
--            qi_trace=3De.api(e.QEMU_TRACE_TCG_BACKEND))
-+        backend.generate(e, group)
-=20
-     backend.generate_end(events, group)
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool=
-/format/tcg_helper_c.py
-index e9ba62a136..db431797d9 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -75,7 +75,7 @@ def generate(events, backend, group):
-             '    %(name)s(%(args_call)s);',
-             '}',
-             name_tcg=3D"helper_%s_proxy" % e.api(e.QEMU_TRACE_BACKEND),
--            name=3De.api(e.QEMU_TRACE_NOCHECK),
-+            name=3De.api(e.QEMU_TRACE),
-             args_api=3De_args_api,
-             args_call=3D", ".join(e_args_call.casted()),
-             )
-diff --git a/scripts/tracetool/transform.py b/scripts/tracetool/transform=
-.py
-index e18b05315e..400d36a6ed 100644
---- a/scripts/tracetool/transform.py
-+++ b/scripts/tracetool/transform.py
-@@ -137,6 +137,19 @@ TCG_2_TCG_HELPER_DECL =3D {
-=20
-=20
- ##################################################
-+# host/tcg -> instrumentation-client tcg type
++        if "disable" in e.properties:
++            enabled =3D 0
++        else:
++            enabled =3D 1
 +
-+def TCG_2_QI_TCG(type_):
-+    if type_ =3D=3D "TCGv_env":
-+        return "QITCGv_cpu"
-+    elif type_.startswith("TCGv"):
-+        return "QI" + type_
-+    elif type_.startswith("CPUState"):
-+        return type_.replace("CPUState", "QICPU", 1)
-+    else:
-+        return type_
+         if "tcg-trans" in e.properties:
+             args =3D tracetool.vcpu.transform_args("tcg_h", e.original)
+             args =3D args.transform(TCG_2_QI_TCG)
+         else:
+             args =3D e.args.transform(TCG_2_QI_TCG)
+-        out('QI_VPUBLIC void %(nop)s(%(args)s);',
 +
-+##################################################
- # host/tcg -> tcg temporal constant allocation
++        out('#define %(qeventu)s_ENABLED %(enabled)d',
++            'extern QI_VPUBLIC QIEvent *%(event)s;',
++            'QI_VPUBLIC void %(nop)s(%(args)s);',
+             'QI_VPUBLIC void %(trace)s(%(args)s);',
++            qeventu=3De.api(e.QI_TRACE_INSTRUMENT).upper(),
++            enabled=3Denabled,
++            event=3De.api(e.QI_TRACE_INSTRUMENT).upper(),
+             args=3Dargs,
+             nop=3De.api(e.QI_TRACE_NOP),
+             trace=3De.api(e.QI_TRACE_TRACE))
+diff --git a/trace/event-internal.h b/trace/event-internal.h
+index f63500b37e..b12cc110b6 100644
+--- a/trace/event-internal.h
++++ b/trace/event-internal.h
+@@ -1,7 +1,7 @@
+ /*
+  * Interface for configuring and controlling the state of tracing events.
+  *
+- * Copyright (C) 2012-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+@@ -23,6 +23,9 @@
+  * @name: Event name.
+  * @sstate: Static tracing state.
+  * @dstate: Dynamic tracing state
++ * @is_instr: Whether the event is instrumentable.
++ * @instr_cb: Current instrumentation callback.
++ * @instr_cb_default: Default instrumentation callback.
+  *
+  * Interpretation of @dstate depends on whether the event has the 'vcpu'
+  *  property:
+@@ -37,6 +40,11 @@ typedef struct TraceEvent {
+     const char * name;
+     const bool sstate;
+     uint16_t *dstate;
++#if defined(CONFIG_INSTRUMENT)
++    bool is_instr;
++    void **instr_cb;
++    void *instr_cb_default;
++#endif
+ } TraceEvent;
 =20
- def _host_2_tcg_tmp_new(type_):
+ void trace_event_set_state_dynamic_init(TraceEvent *ev, bool state);
