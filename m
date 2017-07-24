@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dZeQr-0002n7-CU
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:34:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZeRw-0003g0-O3
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dZeQq-0000Dk-Kh
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:34:01 -0400
-Date: Mon, 24 Jul 2017 16:33:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170724143347.GH4630@noname.str.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dZeRv-0001QV-S3
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:35:08 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZeRv-0001NW-M0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:35:07 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id c184so33453387wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 07:35:07 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
 References: <20170721093416.17816-1-stefanha@redhat.com>
 	<5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
-Content-Disposition: inline
-In-Reply-To: <5c16cc8e-884c-6e2b-ad60-b72ef6c59337@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Jul 2017 15:34:45 +0100
+Message-ID: <CAFEAcA_njsLSkV1xvQ19j+89=prJGAbktkK9kNiaEQXTUtDkEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,53 +30,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-block@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, Qemu-block <qemu-block@nongnu.org>
 
-
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 24.07.2017 um 16:28 hat Eric Blake geschrieben:
+On 24 July 2017 at 15:28, Eric Blake <eblake@redhat.com> wrote:
 > On 07/21/2017 04:34 AM, Stefan Hajnoczi wrote:
-> > There is not much getting started documentation for qemu-iotests.  This
-> > patch explains how to create a new test and covers the overall testing
-> > approach.
-> >=20
-> > +2. Create the test file
-> > +
-> > +Copy an existing test (one that most closely resembles what you wish t=
-o test)
-> > +to the new test number:
-> > +
-> > +  cp 001 <test-number>
->=20
+>> There is not much getting started documentation for qemu-iotests.  This
+>> patch explains how to create a new test and covers the overall testing
+>> approach.
+>>
+>> +2. Create the test file
+>> +
+>> +Copy an existing test (one that most closely resembles what you wish to test)
+>> +to the new test number:
+>> +
+>> +  cp 001 <test-number>
+>
 > And mark it executable (chmod a+x <test-number>)
 
-If you copy an existing test, it's already executable.
+It should already be executable because the test file being
+copied (001 in this case) is executable, shouldn't it?
 
-Kevin
-
---mYCpIKhGyMATD0i+
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZdgVLAAoJEH8JsnLIjy/Wpi4QALRXxrTCYoHUY/51lxG04qsU
-Jgu7mFkPJuET48OFMQIw56911w8nu3cikd+r1d9c3c91CpdUorbhDDh99Yz6v5Sj
-hn4iDuY6STm84afTv3ItOuhTT8+NwuTRG4LjLEvD5NxPOeHSMRcaewUOkCbByZbu
-tHOcoJediWCWzu/9POYm1qIpDe6dqQxjw2O9ocYCrqE/LUvrOBGptpEhnAdacdRZ
-RbRxcd58t0Yd8Pl5j0ay7y/wAu42keX+9zbvthU+RKM2pOPw2cB9yoh6/3V78Qx1
-LzRh6FhYfHShYkjb2YVrSmVygNuBoCW1UvGNghfaoknU8yD/hhXKyWBEnGUqDEwK
-klHolWGcRbZQ6Jgx37sfqvOr40zfYPJL89CfcOlCfQCeuFYFPIylD9iUTCPBTOTD
-pcrEd7EnKBF+YwPOta4Z7RWtAvmt5assWTenL64ZHpSPM0S2hTbSiTPEEPanqDuc
-xxssiFwL3S52v4fIMDSeXQ7rYzr0AXkOCHAQpR/+Jwur0qtgt42Q4IVn2qfr76DW
-op1P95P0OrVs/RG1vl08tCjZVwKbI4NTw6x68FL4L+14J5Ixvt6cEZfTQ1ZFVMCm
-3RatxAeyo1nxB5GN8OElnj+K1FiblR0D28YUVPpC8zZHuTHWkqha7ghUDugrkObW
-fuOxx4UuD8m7DdusAyQp
-=/YmG
------END PGP SIGNATURE-----
-
---mYCpIKhGyMATD0i+--
+thanks
+-- PMM
