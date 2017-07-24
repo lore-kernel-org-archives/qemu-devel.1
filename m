@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZfSj-0007eO-MT
+	(envelope-from <eblake@redhat.com>) id 1dZfSj-0007eG-Ib
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:40:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZfSi-0006V8-V2
+	(envelope-from <eblake@redhat.com>) id 1dZfSi-0006Ut-OE
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 11:40:01 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 24 Jul 2017 10:39:51 -0500
-Message-Id: <20170724153952.26510-2-eblake@redhat.com>
-In-Reply-To: <20170724153952.26510-1-eblake@redhat.com>
-References: <20170724153952.26510-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] iotests: Check dirty bitmap statistics in
- 124
+Date: Mon, 24 Jul 2017 10:39:50 -0500
+Message-Id: <20170724153952.26510-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 0/2] Test for bug fixes from
+ byte-based block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,34 +19,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-We had a bug for multiple releases where dirty-bitmap count was
-documented in bytes but reported in sectors; enhance the testsuite
-to add coverage of DirtyBitmapInfo to ensure we do not regress again.
+Kevin is correct, and I need tests of my recent bug fixes :)
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/124 | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07235.html
 
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index d0d2c2bfb0..8e76e62f93 100644
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -336,7 +336,12 @@ class TestIncrementalBackup(TestIncrementalBackupBase):
-                            (('0xab', 0, 512),
-                             ('0xfe', '16M', '256k'),
-                             ('0x64', '32736k', '64k')))
--
-+        # Check the dirty bitmap stats
-+        result = self.vm.qmp('query-block')
-+        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/name', 'bitmap0')
-+        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/count', 458752)
-+        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/granularity', 65536)
-+        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/status', 'active')
+Eric Blake (2):
+  iotests: Check dirty bitmap statistics in 124
+  iotests: Add test of recent fix to 'qemu-img measure'
 
-         # Prepare a cluster_size=128k backup target without a backing file.
-         (target, _) = bitmap0.new_target()
+ tests/qemu-iotests/124     |  7 +++++-
+ tests/qemu-iotests/190     | 59 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/190.out | 11 +++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 77 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/190
+ create mode 100644 tests/qemu-iotests/190.out
+
 -- 
 2.13.3
