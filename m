@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZXn8-0004Ti-Sw
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:28:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dZXoz-0005mC-Gp
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZXn5-0001Uy-OR
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:28:34 -0400
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:45139)
+	(envelope-from <pbonzini@redhat.com>) id 1dZXow-0002IR-CG
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:30:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35022)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZXn5-0001U0-HY
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:28:31 -0400
-Received: from player792.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 01CF470428
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 09:28:22 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<20170719030053.GP3140@umbus.fritz.box>
-	<1500436532.3350.8.camel@kernel.crashing.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <89336f55-bcc1-c496-5277-66219149f17a@kaod.org>
-Date: Mon, 24 Jul 2017 09:28:09 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZXow-0002I9-3E
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:30:26 -0400
+References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
+	<1499952476-3454-7-git-send-email-armbru@redhat.com>
+	<20170717101906.GC5301@noname.redhat.com>
+	<87a842b9yo.fsf@dusky.pond.sub.org>
+	<87bmoauz2s.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
+Date: Mon, 24 Jul 2017 09:30:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <1500436532.3350.8.camel@kernel.crashing.org>
+In-Reply-To: <87bmoauz2s.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 00/26] guest exploitation of the XIVE
- interrupt controller (POWER9)
+Subject: Re: [Qemu-devel] [PULL 6/9] Convert error_report() to warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Jeff Cody <jcody@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 07/19/2017 05:55 AM, Benjamin Herrenschmidt wrote:
-> On Wed, 2017-07-19 at 13:00 +1000, David Gibson wrote:
->> So, this is probably obvious, but I'm not considering this a candidate
->> for qemu 2.10 (seeing as the soft freeze was yesterday).  I'll still
->> try to review and, once ready, queue for 2.11.
+On 24/07/2017 08:30, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
 > 
-> Right. I need to review still and we need to make sure we have the
-> right plumbing for migration etc... and of course I need to do the
-> KVM bits. So it's definitely not 2.10 material.
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>>
+>>> Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
+>>>> From: Alistair Francis <alistair.francis@xilinx.com>
+>>>>
+>>>> Convert all uses of error_report("warning:"... to use warn_report()
+>>>> instead. This helps standardise on a single method of printing warnings
+>>>> to the user.
+>>>>
+>>>> All of the warnings were changed using these two commands:
+>>>>     find ./* -type f -exec sed -i \
+>>>>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
+>>>>
+>>>> Indentation fixed up manually afterwards.
+>>>>
+>>>> The test-qdev-global-props test case was manually updated to ensure that
+>>>> this patch passes make check (as the test cases are case sensitive).
+>>>
+>>> This patch broke qemu-iotests 051 because it neglected to update the
+>>> reference output. Not sure if a change of the message was even intended,
+>>> but with a error location prefix, the order changes:
+>>>
+>>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+>>> +(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
+>>>
+>>> Personally, I would expect the error location or at least the program
+>>> name to come first even for warnings.
+>>
+>> I'll fix it.
+>>
+>> While focusing on something other than block, I forget qemu-iotests
+>> exist.  My fault, but it's a pretty common fault.  I reiterate my plea
+>> to include (a sensible subset of) it in "make check".
+> 
+> Oh, 051 isn't run by "make check-block".  It could just as well not
+> exist then.
+> 
+> What's the recommended way to run all iotests a build of QEMU can run?
 
-yes. This is not for 2.10 clearly. This is just an RFC to get
-some feedback on the approach and on some ugly hacks I have 
-put in place.
+I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
 
-I have given KVM a quick look and it should be addressed before
-we start merging anything. I think PowerNV should wait a bit. 
+There are two issues with check-block:
 
-As for TCG, my branch supports reset, changing model XICS <-> XIVE, 
-migration and CPU hotplug. KVM+kernel_irqchip=off is supported
-also. Most of the issues have found a solution but now we need 
-to discuss.   
+* tests that require QEMU are skipped (rationale: you might be building
+without the x86_64-softmmu target).
 
-I was out last week. Catching up.
+* it only runs the "quick" group, but I think we should reverse the
+direction and mark slow tests specifically (that would cut about 10
+minutes out of the 20).
 
-Thanks,
+It's a pity that qemu-iotests doesn't parallelize.  Maybe the harness
+could be changed to something more standard.
 
-C.
+Paolo
