@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <huayanghao@gmail.com>) id 1dZcN4-0000N3-Vn
+	(envelope-from <thuth@redhat.com>) id 1dZcN5-0000NF-Br
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <huayanghao@gmail.com>) id 1dZcN3-000290-OB
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:58 -0400
-Received: from mail-yw0-x234.google.com ([2607:f8b0:4002:c05::234]:35433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <huayanghao@gmail.com>)
-	id 1dZcN3-00028g-He
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:57 -0400
-Received: by mail-yw0-x234.google.com with SMTP id h189so22037372ywf.2
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 05:21:57 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dZcN0-00027J-Fn
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dZcN0-00026q-6l
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:54 -0400
+References: <20170724121409.8623-1-dgilbert@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8c776e3a-a744-86e2-ba68-bf60e5234e20@redhat.com>
+Date: Mon, 24 Jul 2017 14:21:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAPTzt1COW1yQs-1LE5TnUXf_v10jKvAU0wq=-7jK7S=fpuKh9Q@mail.gmail.com>
-References: <CAPTzt1Ai9x4OiHMH4HrDzj=vNbqhNnkmdDQ7wBLxYTJ-kcNM_w@mail.gmail.com>
-	<CAFEAcA_TYFbv9EeafV8FZ=HEXx=kArVb2OYiC3mGQiP7_N1-UA@mail.gmail.com>
-	<CAPTzt1ACBuwkY0YSjhMLrv+1OJyCLEM7xQZqTGKbxxsLfqVN=g@mail.gmail.com>
-	<CAFEAcA9TUxr0ZfpNBuSc+jaz2e6mHtQwdo-s-DK=HjJe7bAFXA@mail.gmail.com>
-	<CAPTzt1CYxudRK_TUVk2_=H0GHZxK5GDSaVzhQE9Pyw+=Jy-ajg@mail.gmail.com>
-	<CAFEAcA8yzFNr1sGLgDq=u0naYhst5EstJxMje_8OvUN8CJ1AEg@mail.gmail.com>
-	<CAPTzt1DDFomJ-c57_e5HXGUH3L=pR6jEGwkap6Wsr4Z04SmMjg@mail.gmail.com>
-	<CAFEAcA8QnUN6ZRYSUR1GBMU_yfW0a3rWd5H8kmerrNhQ5rwbkg@mail.gmail.com>
-	<CAPTzt1COW1yQs-1LE5TnUXf_v10jKvAU0wq=-7jK7S=fpuKh9Q@mail.gmail.com>
-From: Hua Yanghao <huayanghao@gmail.com>
-Date: Mon, 24 Jul 2017 14:21:56 +0200
-Message-ID: <CAPTzt1CatyAKdeGdr1jp0xsudgrjKETA1MULj1oEcHkkyG99DA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/core/loader: do not check for regions
- overlap
+In-Reply-To: <20170724121409.8623-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hmp/(p)memsave: Allow >32bit file size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, admin@manateeshome.com
+Cc: Markus Armbruster <armbru@redhat.com>
 
-On Mon, Jul 24, 2017 at 2:09 PM, Hua Yanghao <huayanghao@gmail.com> wrote:
->> Yep, this is complaining because you have two LOAD
->> segments which overlap:
->>      LOAD off    0x000000e0 vaddr 0x60000000 paddr 0x60000000 align 2**5
->>           filesz 0x0007773c memsz 0x00077c00 flags rwx
->>
->> which goes from 0x60000000 up to 0x600077bff, and
->>
->>      LOAD off    0x00077820 vaddr 0x70000000 paddr 0x60077740 align 2**3
->>           filesz 0x00000038 memsz 0x00000038 flags r-x
->>
->> which starts at 0x60077740, in the middle of the previous one.
->> So should the loader honour the first of these segment
->> definitions (which says "fill it with zeroes", because the
->> memsz is greater than the filesz), or the second (which says
->> "fill it with data from the file") ?
->> Also, it has different rwx flags -- so are you asking for the
->> memory to be rwx or r-x ?  (This kind of inconsistency is why
->> overlapping segments are weird.)
->
-> I don't quite understand how those load segments are created.
-> Bear with me, from section point of view, 0x600077740 is both
-> the .bss (which is NOLOAD) and the .lmu0 section. Why this bss
-> section could end up in a loadable segments? I don't understand
-> how those rwx/r-x permission are created from my linker script all
-> memory regions share the same rwx attribute:
->
->  11 MEMORY
->  12 {
->  13     dram (rwx) : ORIGIN = CONFIG_DRAM_START, LENGTH = CONFIG_DRAM_SIZE
->  14     lmu0 (rwx) : ORIGIN = CONFIG_LMU0_START, LENGTH = CONFIG_LMU0_SIZE
->  15     lmu1 (rwx) : ORIGIN = CONFIG_LMU1_START, LENGTH = CONFIG_LMU1_SIZE
->  16     lmu2 (rwx) : ORIGIN = CONFIG_LMU2_START, LENGTH = CONFIG_LMU2_SIZE
->  17 }
->
-> output/qemu_arm_vexpress/qemu_arm_vexpress.elf | sort | grep bss
-> 60077738 B __bss_start
-> 60077c00 B __bss_end
->
-> from this link: http://nairobi-embedded.org/040_elf_sec_seg_vma_mappings.html
-> It seems segments do consider NOLOAD .bss sections as part of loadable
-> data segments.
-> Does the loader needs to consider more things from the segments table
-> to distinguish that
-> the .bss section actually does not need to be touched?
->
-> BR, Yanghao
+On 24.07.2017 14:14, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> memsave and pmemsave only take 32bit size arguments in HMP at the
+> moment; let them take 64bit values.
+>=20
+> Reported-by: Pierre Kim <admin@manateeshome.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hmp-commands.hx | 4 ++--
+>  hmp.c           | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 1941e19932..ddf77ae7ac 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -829,7 +829,7 @@ ETEXI
+> =20
+>      {
+>          .name       =3D "memsave",
+> -        .args_type  =3D "val:l,size:i,filename:s",
+> +        .args_type  =3D "val:l,size:l,filename:s",
+>          .params     =3D "addr size file",
+>          .help       =3D "save to disk virtual memory dump starting at =
+'addr' of size 'size'",
+>          .cmd        =3D hmp_memsave,
+> @@ -843,7 +843,7 @@ ETEXI
+> =20
+>      {
+>          .name       =3D "pmemsave",
+> -        .args_type  =3D "val:l,size:i,filename:s",
+> +        .args_type  =3D "val:l,size:l,filename:s",
+>          .params     =3D "addr size file",
+>          .help       =3D "save to disk physical memory dump starting at=
+ 'addr' of size 'size'",
+>          .cmd        =3D hmp_pmemsave,
+> diff --git a/hmp.c b/hmp.c
+> index bf1de747d5..dfbd615380 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1066,7 +1066,7 @@ void hmp_cpu(Monitor *mon, const QDict *qdict)
+> =20
+>  void hmp_memsave(Monitor *mon, const QDict *qdict)
+>  {
+> -    uint32_t size =3D qdict_get_int(qdict, "size");
+> +    uint64_t size =3D qdict_get_int(qdict, "size");
+>      const char *filename =3D qdict_get_str(qdict, "filename");
+>      uint64_t addr =3D qdict_get_int(qdict, "val");
+>      Error *err =3D NULL;
+> @@ -1083,7 +1083,7 @@ void hmp_memsave(Monitor *mon, const QDict *qdict=
+)
+> =20
+>  void hmp_pmemsave(Monitor *mon, const QDict *qdict)
+>  {
+> -    uint32_t size =3D qdict_get_int(qdict, "size");
+> +    uint64_t size =3D qdict_get_int(qdict, "size");
+>      const char *filename =3D qdict_get_str(qdict, "filename");
+>      uint64_t addr =3D qdict_get_int(qdict, "val");
+>      Error *err =3D NULL;
 
-I think I got where qemu went wrong, it should pick filesz instead of
-memsz, right? ;-)
-You see here the filesz does not actually include the bss section
-where if you only check the memsz then it overlaps.
+The "size" parameter of the qmp_memsave() and qmp_pmemsave() function is
+a signed integer (int64_t) ... could we get into trouble here if the
+integer is really big? E.g. should we make "size" here signed, too, and
+then add a sanity check for "size >=3D 0" ?
 
-    LOAD off    0x000000e0 vaddr 0x60000000 paddr 0x60000000 align 2**5
-         filesz 0x0007773c memsz 0x00077c00 flags rwx
-
------
-PT_LOAD
-
-The array element specifies a loadable segment, described by p_filesz
-and p_memsz. The bytes from the file are mapped to the beginning of
-the memory segment. If the segment's memory size (p_memsz) is larger
-than the file size (p_filesz), the "extra" bytes are defined to hold
-the value 0 and to follow the segment's initialized area. The file
-size may not be larger than the memory size. Loadable segment entries
-in the program header table appear in ascending order,
-
-sorted on the p_vaddr member.
------
+ Thomas
