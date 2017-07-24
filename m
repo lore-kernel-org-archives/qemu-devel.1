@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1dZcIi-0006oh-Ee
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:17:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZcMk-0000DL-Cl
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1dZcIf-00088c-AC
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:17:28 -0400
-Received: from mail-he1eur01on070d.outbound.protection.outlook.com
-	([2a01:111:f400:fe1e::70d]:49226
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1dZcIe-00087V-DI
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:17:25 -0400
-References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
-	<20170724113422.GC2784@stefanha-x1.localdomain>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
-Date: Mon, 24 Jul 2017 15:17:16 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1dZcMj-0001vV-M5
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:38 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:38005)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZcMj-0001v9-FS
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:21:37 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id f21so48947970wrf.5
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 05:21:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170724113422.GC2784@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
+In-Reply-To: <CAFEAcA-m60XQOGJApVeezS1RUxdd=iTzPt=L2eqGpwqBEjNYUA@mail.gmail.com>
+References: <20170719044018.18063-1-rth@twiddle.net>
+	<CAFEAcA-m60XQOGJApVeezS1RUxdd=iTzPt=L2eqGpwqBEjNYUA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Jul 2017 13:21:15 +0100
+Message-ID: <CAFEAcA_5n8KcphyOMadVUdJhexXO+idHU+dk3kv4egQPbu8Cxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] util: Introduce
+ include/qemu/cpuid.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
-> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievskiy =
-wrote:
->> Current trace system have a drawback: parameters of trace functions
->> are calculated even if corresponding tracepoint is disabled. Also, it
->> looks like trace function are not actually inlined by compiler (at
->> least for me).
+On 24 July 2017 at 11:40, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 19 July 2017 at 05:40, Richard Henderson <rth@twiddle.net> wrote:
+>> Clang 3.9 passes the CONFIG_AVX2_OPT configure test.  However, the
+>> supplied <cpuid.h> does not contain the bit_AVX2 define that we use
+>> when detecting whether the routine can be enabled.
 >>
->> Here is a fix proposal: move from function call to macros. Patch 02
->> is an example, of how to reduce extra calculations with help of
->> patch 01.
+>> Introduce a qemu-specific header that uses the compiler's definition
+>> of __cpuid et al, but supplies any missing bit_* definitions needed.
+>> This avoids introducing any extra ifdefs to util/bufferiszero.c, and
+>> allows quite a few to be removed from tcg/i386/tcg-target.inc.c.
 >>
->> Vladimir Sementsov-Ogievskiy (2):
->>   trace: do not calculate arguments for disabled trace-points
->>   monitor: improve tracing in handle_qmp_command
-> Please use the TRACE_FOO_ENABLED macro instead of putting computation
-> inside the trace event arguments.  This makes the code cleaner and
-> easier to read.
-At our opinion this ENABLED is compile time check while the option
-could be tuned in runtime. Thus normally it would normally be
-enabled while the trace is silent.
+>> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>
+>> Peter, this is the clang 3.9 problem I mentioned the other day,
+>> when attempting to reproduce the other clang 3.8 problem.
+>>
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-So, under load, we will have extra allocation, copying the command buffer=
-,
-freeing memory without actual trace. In order to fix that we should
-do something like
+...and applied to master as a buildfix for clang 3.9.
 
-if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
-   req_json =3D qobject_to_json(req);
-   trace_handle_qmp_command(mon, req_json);
-   QDECREF(req_json);
-}
-
-which is possible, but at our (me + Vova) opinion is ugly.
-That is why we are proposing to switch to macro, which
-will not require such tweaking.
-
-Arguments will be only evaluated when necessary and we
-will not have side-effects if the tracepoint is compile time
-enabled and run-time disabled.
-
-Though if the code above is acceptable, we can send the
-patch with it. No problem.
-
-Den
+thanks
+-- PMM
