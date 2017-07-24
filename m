@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack@suse.cz>) id 1dZccc-0006vs-BK
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:38:03 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dZcgA-0008KY-Mc
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack@suse.cz>) id 1dZccY-0005dZ-Dc
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:38:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45254 helo=mx1.suse.de)
+	(envelope-from <ldoktor@redhat.com>) id 1dZcg6-0006xi-Qd
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:41:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1dZccY-0005bd-3Z
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:37:58 -0400
-Date: Mon, 24 Jul 2017 14:37:52 +0200
-From: Jan Kara <jack@suse.cz>
-Message-ID: <20170724123752.GN652@quack2.suse.cz>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<20170721155848.GO18014@stefanha-x1.localdomain>
-	<CAPcyv4gtWYpzbmggsbdLocPiMzU2rVt-ee+kL24gbrPxKd5Eyw@mail.gmail.com>
-	<1500818683.4073.31.camel@redhat.com>
-	<CAPcyv4h5O4D2kp6SJhWiz4V=dOLDa_Q3pk2B=u-x7hKKQqdXsQ@mail.gmail.com>
-	<1500833428.4073.36.camel@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dZcg6-0006x4-G2
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:41:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 68ADEFBBB
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 12:41:37 +0000 (UTC)
+References: <20170720162815.19802-1-ldoktor@redhat.com>
+	<20170720162815.19802-10-ldoktor@redhat.com>
+	<20170720183832.GY2757@localhost.localdomain>
+	<c964cd15-16f6-e330-ebac-f7e71918471d@redhat.com>
+	<20170721184657.GD2757@localhost.localdomain>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <c12adc5d-afd5-9f22-d251-1106b2b7bfcd@redhat.com>
+Date: Mon, 24 Jul 2017 14:41:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+In-Reply-To: <20170721184657.GD2757@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="klqbqhahTjA4NT15mGlGh9w4eBqCGm7Mi"
+Subject: Re: [Qemu-devel] [PATCH 09/11] qmp.py: Avoid overriding a builtin
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,113 +38,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Jan Kara <jack@suse.cz>, Dan Williams <dan.j.williams@intel.com>, Rik van Riel <riel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-On Mon 24-07-17 08:06:07, Pankaj Gupta wrote:
-> 
-> > On Sun 23-07-17 13:10:34, Dan Williams wrote:
-> > > On Sun, Jul 23, 2017 at 11:10 AM, Rik van Riel <riel@redhat.com> wrote:
-> > > > On Sun, 2017-07-23 at 09:01 -0700, Dan Williams wrote:
-> > > >> [ adding Ross and Jan ]
-> > > >>
-> > > >> On Sun, Jul 23, 2017 at 7:04 AM, Rik van Riel <riel@redhat.com>
-> > > >> wrote:
-> > > >> >
-> > > >> > The goal is to increase density of guests, by moving page
-> > > >> > cache into the host (where it can be easily reclaimed).
-> > > >> >
-> > > >> > If we assume the guests will be backed by relatively fast
-> > > >> > SSDs, a "whole device flush" from filesystem journaling
-> > > >> > code (issued where the filesystem issues a barrier or
-> > > >> > disk cache flush today) may be just what we need to make
-> > > >> > that work.
-> > > >>
-> > > >> Ok, apologies, I indeed had some pieces of the proposal confused.
-> > > >>
-> > > >> However, it still seems like the storage interface is not capable of
-> > > >> expressing what is needed, because the operation that is needed is a
-> > > >> range flush. In the guest you want the DAX page dirty tracking to
-> > > >> communicate range flush information to the host, but there's no
-> > > >> readily available block i/o semantic that software running on top of
-> > > >> the fake pmem device can use to communicate with the host. Instead
-> > > >> you
-> > > >> want to intercept the dax_flush() operation and turn it into a queued
-> > > >> request on the host.
-> > > >>
-> > > >> In 4.13 we have turned this dax_flush() operation into an explicit
-> > > >> driver call. That seems a better interface to modify than trying to
-> > > >> map block-storage flush-cache / force-unit-access commands to this
-> > > >> host request.
-> > > >>
-> > > >> The additional piece you would need to consider is whether to track
-> > > >> all writes in addition to mmap writes in the guest as DAX-page-cache
-> > > >> dirtying events, or arrange for every dax_copy_from_iter()
-> > > >> operation()
-> > > >> to also queue a sync on the host, but that essentially turns the host
-> > > >> page cache into a pseudo write-through mode.
-> > > >
-> > > > I suspect initially it will be fine to not offer DAX
-> > > > semantics to applications using these "fake DAX" devices
-> > > > from a virtual machine, because the DAX APIs are designed
-> > > > for a much higher performance device than these fake DAX
-> > > > setups could ever give.
-> > > 
-> > > Right, we don't need DAX, per se, in the guest.
-> > > 
-> > > >
-> > > > Having userspace call fsync/msync like done normally, and
-> > > > having those coarser calls be turned into somewhat efficient
-> > > > backend flushes would be perfectly acceptable.
-> > > >
-> > > > The big question is, what should that kind of interface look
-> > > > like?
-> > > 
-> > > To me, this looks much like the dirty cache tracking that is done in
-> > > the address_space radix for the DAX case, but modified to coordinate
-> > > queued / page-based flushing when the guest  wants to persist data.
-> > > The similarity to DAX is not storing guest allocated pages in the
-> > > radix but entries that track dirty guest physical addresses.
-> > 
-> > Let me check whether I understand the problem correctly. So we want to
-> > export a block device (essentially a page cache of this block device) to a
-> > guest as PMEM and use DAX in the guest to save guest's page cache. The
-> 
-> that's correct.
-> 
-> > natural way to make the persistence work would be to make ->flush callback
-> > of the PMEM device to do an upcall to the host which could then fdatasync()
-> > appropriate image file range however the performance would suck in such
-> > case since ->flush gets called for at most one page ranges from DAX.
-> 
-> Discussion is : sync a range using paravirt device or flush hit addresses 
-> vs block device flush.
-> 
-> > 
-> > So what you could do instead is to completely ignore ->flush calls for the
-> > PMEM device and instead catch the bio with REQ_PREFLUSH flag set on the
-> > PMEM device (generated by blkdev_issue_flush() or the journalling
-> > machinery) and fdatasync() the whole image file at that moment - in fact
-> > you must do that for metadata IO to hit persistent storage anyway in your
-> > setting. This would very closely follow how exporting block devices with
-> > volatile cache works with KVM these days AFAIU and the performance will be
-> > the same.
-> 
-> yes 'blkdev_issue_flush' does set 'REQ_OP_WRITE | REQ_PREFLUSH' flags.
-> As per suggestions looks like block flushing device is way ahead. 
-> 
-> If we do an asynchronous block flush at guest side(put current task in
-> wait queue till host side fdatasync completes) can solve the purpose? Or
-> do we need another paravirt device for this?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--klqbqhahTjA4NT15mGlGh9w4eBqCGm7Mi
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com
+Message-ID: <c12adc5d-afd5-9f22-d251-1106b2b7bfcd@redhat.com>
+Subject: Re: [PATCH 09/11] qmp.py: Avoid overriding a builtin object
+References: <20170720162815.19802-1-ldoktor@redhat.com>
+ <20170720162815.19802-10-ldoktor@redhat.com>
+ <20170720183832.GY2757@localhost.localdomain>
+ <c964cd15-16f6-e330-ebac-f7e71918471d@redhat.com>
+ <20170721184657.GD2757@localhost.localdomain>
+In-Reply-To: <20170721184657.GD2757@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Well, even currently if you have PMEM device, you still have also a block
-device and a request queue associated with it and metadata IO goes through
-that path. So in your case you will have the same in the guest as a result
-of exposing virtual PMEM device to the guest and you just need to make sure
-this virtual block device behaves the same way as traditional virtualized
-block devices in KVM in respose to 'REQ_OP_WRITE | REQ_PREFLUSH' requests.
+Dne 21.7.2017 v 20:46 Eduardo Habkost napsal(a):
+> On Fri, Jul 21, 2017 at 08:53:49AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:=
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>> Dne 20.7.2017 v 20:38 Eduardo Habkost napsal(a):
+>>> On Thu, Jul 20, 2017 at 06:28:13PM +0200, Luk=C3=A1=C5=A1 Doktor wrot=
+e:
+>>>> The "id" is a builtin method to get object's identity and should not=
+ be
+>>>> overridden. This might bring some issues in case someone was directl=
+y
+>>>> calling "cmd(..., id=3Did)" but I haven't found such usage on brief =
+search
+>>>> for "cmd\(.*id=3D".
+>>>>
+>>>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+>>>> ---
+>>>>  scripts/qmp/qmp.py | 8 ++++----
+>>>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+>>>> index a14b001..c3e0206 100644
+>>>> --- a/scripts/qmp/qmp.py
+>>>> +++ b/scripts/qmp/qmp.py
+>>>> @@ -177,19 +177,19 @@ class QEMUMonitorProtocol(object):
+>>>>              print >>sys.stderr, "QMP:<<< %s" % resp
+>>>>          return resp
+>>>> =20
+>>>> -    def cmd(self, name, args=3DNone, id=3DNone):
+>>>> +    def cmd(self, name, args=3DNone, cmd_id=3DNone):
+>>>>          """
+>>>>          Build a QMP command and send it to the QMP Monitor.
+>>>> =20
+>>>>          @param name: command name (string)
+>>>>          @param args: command arguments (dict)
+>>>> -        @param id: command id (dict, list, string or int)
+>>>> +        @param cmd_id: command id (dict, list, string or int)
+>>>>          """
+>>>>          qmp_cmd =3D {'execute': name}
+>>>>          if args:
+>>>>              qmp_cmd['arguments'] =3D args
+>>>> -        if id:
+>>>> -            qmp_cmd['id'] =3D id
+>>>> +        if cmd_id:
+>>>> +            qmp_cmd['cmd_id'] =3D cmd_id
+>>>
+>>> The member sent through the monitor should still be called "id".
+>>> i.e.:
+>>>
+>>>     qmp_cmd['id'] =3D cmd_id
+>>>
+>> Oups, sorry, automatic rename changed it and I forgot to fix
+>> this one back. I'll address this in v2. The main problem with
+>> this patch is it could break named arguments (`cmd(..., id=3Did)`
+>> calls) so I'm not sure it's worth including. But as mentioned
+>> in commit message I grepped full sources so we better fix this
+>> before someone starts using it.
+>=20
+> I'm not convinced we need this patch, either.  What exactly
+> breaks if we don't apply this patch and somebody tries to use
+> cmd(..., id=3Did)?
+>=20
+
+It'll work properly. The only issue is the `id` method will be unavailabl=
+e inside that function. So let's say you want to add `print` method to de=
+bug issue with duplicate arguments, you'd be unable to use `id` to distin=
+guish between them. The other issue is that people will see it and copy&p=
+aste this ugliness to other projects poisoning the world :-)
+
+Therefor I'd like to include it, but I'm prepared to yield.
+
+Luk=C3=A1=C5=A1
+
+
+--klqbqhahTjA4NT15mGlGh9w4eBqCGm7Mi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZder5ExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsEe
+UQgAy7yBUACVE3M2GSbP2dwp1NS+yG36+NpIOa0JubdNCMOs0gbDMzYc2eiyLe3B
+Mojgett4yI0kQRgvOBseS5jJit9qpZiaOpCOkgnXLnksBNfx2jHuo9vMKM71HIwh
+A7L9zJb99v2UKw7OvDwo2wE+e7infO1jozuFha6XOQp7THIJvREPwiMAUU1vfqTS
+HFRVwZDs9x8MzPVZvtC776auQZ1EtWn8R2DcS5Xppdpopi8t6zlr5rFvGodn9WOq
+TWhUo1GAHRfYywGxPy4oLnPslpmQeHmrWc1F9Ihe/JBMAzp+bWweYEDfb9QrGyRS
+F2CBixtKVTfFZlfgns98ZOWNQw==
+=/8G0
+-----END PGP SIGNATURE-----
+
+--klqbqhahTjA4NT15mGlGh9w4eBqCGm7Mi--
