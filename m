@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZaEa-00015t-Ci
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:05:09 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dZaF9-0001Zo-0S
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZaEW-00078B-3v
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:05:04 -0400
-Date: Mon, 24 Jul 2017 20:03:14 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170724100314.GP17228@umbus.fritz.box>
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-5-git-send-email-clg@kaod.org>
-	<20170719030849.GQ3140@umbus.fritz.box>
-	<1500436938.3350.11.camel@kernel.crashing.org>
-	<20170721075015.GE3717@umbus.fritz.box>
-	<1500625291.10674.22.camel@kernel.crashing.org>
-	<20170724032853.GB17228@umbus.fritz.box>
-	<1500872645.10674.52.camel@kernel.crashing.org>
-	<20170724053827.GI17228@umbus.fritz.box>
-	<1500880826.10674.66.camel@kernel.crashing.org>
+	(envelope-from <imammedo@redhat.com>) id 1dZaF3-0007am-Vj
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:05:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZaF3-0007ZN-F0
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:05:33 -0400
+Date: Mon, 24 Jul 2017 12:05:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170724120522.7313c742@nial.brq.redhat.com>
+In-Reply-To: <20170721232134-mutt-send-email-mst@kernel.org>
+References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
+	<20170719114612.GC3500@work-vm>
+	<20170719152427.620b2a2a@nial.brq.redhat.com>
+	<20170719184748-mutt-send-email-mst@kernel.org>
+	<20170721164158.72fc3798@nial.brq.redhat.com>
+	<20170721232134-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hHiQ9nAwW5IGN2dL"
-Content-Disposition: inline
-In-Reply-To: <1500880826.10674.66.camel@kernel.crashing.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
+ vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,119 +33,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
+
+On Sat, 22 Jul 2017 00:30:17 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Fri, Jul 21, 2017 at 04:41:58PM +0200, Igor Mammedov wrote:
+> > On Wed, 19 Jul 2017 18:52:56 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:  
+> > > > On Wed, 19 Jul 2017 12:46:13 +0100
+> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > >     
+> > > > > * Igor Mammedov (imammedo@redhat.com) wrote:    
+> > > > > > On Wed, 19 Jul 2017 23:17:32 +0800
+> > > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > > > >       
+> > > > > > > When a guest that has several hotplugged dimms is migrated, in
+> > > > > > > destination host it will fail to resume. Because vhost regions of
+> > > > > > > several dimms in source host are merged and in the restore stage
+> > > > > > > in destination host it computes whether more than vhost slot limit
+> > > > > > > before merging vhost regions of several dimms.      
+> > > > > > could you provide a bit more detailed description of the problem
+> > > > > > including command line+used device_add commands on source and
+> > > > > > command line on destination?      
+> > > > > 
+> > > > > (ccing in Marc Andre and Maxime)
+> > > > > 
+> > > > > Hmm, I'd like to understade the situation where you get merging between
+> > > > > RAMBlocks; that complicates some stuff for postcopy.    
+> > > > and probably inconsistent merging breaks vhost as well
+> > > > 
+> > > > merging might happen if regions are adjacent or overlap
+> > > > but for that to happen merged regions must have equal
+> > > > distance between their GPA:HVA pairs, so that following
+> > > > translation would work:
+> > > > 
+> > > > if gva in regionX[gva_start, len, hva_start]
+> > > >    hva = hva_start + gva - gva_start
+> > > > 
+> > > > while GVA of regions is under QEMU control and deterministic
+> > > > HVA is not, so in migration case merging might happen on source
+> > > > side but not on destination, resulting in different memory maps.
+> > > > 
+> > > > Maybe Michael might know details why migration works in vhost usecase,
+> > > > but I don't see vhost sending any vmstate data.    
+> > > 
+> > > We aren't merging ramblocks at all.
+> > > When we are passing blocks A and B to vhost, if we see that
+> > > 
+> > > hvaB=hvaA + lenA
+> > > gpaB=gpaA + lenA
+> > > 
+> > > then we can improve performance a bit by passing a single
+> > > chunk to vhost: hvaA,gpaA,lena+lenB  
+> > kernel used to maintain flat array map for look up where
+> > such optimization could give some benefit which is negligible
+> > as in practice merging reduces array size only by ~5 entries.
+> > 
+> > In addition kernel backend has been converted to interval tree
+> > as flat array doesn't scale, so merging doesn't really matters
+> > there anymore.  
+> 
+> In my opinion not merging slots is an obvious waste - I
+> think there were patches that added a cache and that
+> showed some promise. cache will be more effective
+> if regions are bigger.
+if I recall correctly caching patches were there to alleviate
+bad scaling of lookup in the flat array memory map, the later
+were replaced in vhost kernel with interval tree.
 
 
---hHiQ9nAwW5IGN2dL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > If we can get rid of merging on QEMU side, resulting memory
+> > map will become of the same size regardless of the order
+> > in which entries are added or chancy random allocation
+> > that could allow region merging (i.e. size will become
+> > deterministic).  
+> 
+> It seems somehow wrong to avoid doing (even minor) optimizations just to
+> make error handling simpler.
+it's not question of simplifying error handling but
+more like making behavior more consistent.
 
-On Mon, Jul 24, 2017 at 05:20:26PM +1000, Benjamin Herrenschmidt wrote:
-> On Mon, 2017-07-24 at 15:38 +1000, David Gibson wrote:
-> >=20
-> > Can we assign our logical numbers sparsely, or will that cause other
-> > problems?
->=20
-> The main issue is that they probably needs to be the same between XICS
-> and XIVE because by the time we get the CAS call to chose between XICS
-> and XIVE, we have already handed out interrupts and constructed the DT,
-> no ? Unless we do a real CAS reboot...
+Backend can do compression on its side or even use
+more suitable data structure then flat array
+(like vhost kernel does).
 
-A real CAS reboot probably isn't unreasonable for this case.
 
-I definitely think we need to go one way or the other - either fully
-unify the irq mapping between xics and xive, or fully separate them.
+> > Looking at vhost_user_set_mem_table() it sends actual number of
+> > entries to backend over the wire, so it shouldn't break backend
+> > if it were written right (i.e. uses msg.payload.memory.nregions
+> > instead of VHOST_MEMORY_MAX_NREGIONS from QEMU.), if it breaks
+> > then it's backend's fault and it should be fixed.
+> > 
+> > Another thing that could break is too low limit
+> >  VHOST_MEMORY_MAX_NREGIONS = 8
+> > and QEMU started with default options takes upto 7 entries in map
+> > unmerged, so any configuration that consumes additional slots won't
+> > start after upgrade. We could counter the most of issues by rising
+> > VHOST_MEMORY_MAX_NREGIONS limit and/or teaching vhost-user protocol
+> > to fetch limit from backend similar to vhost_kernel_memslots_limit().  
+> 
+> I absolutely agree we should fix vhost-user to raise the slot
+> limit, along the lines you suggest. Care looking into it?
+I'd leave fixing vhost-user to someone who actually works on it
+or its maintainers.
 
-> Otherwise, there's no reason they can't be sparse no.
->=20
-> > Note that for PAPR we also have the question of finding logical
-> > interrupts for legacy PAPR VIO devices.
->=20
-> We just make them another range ? With KVM legacy today, I just use the
-> generic interrupt facility for those. So when you do the ioctl to
-> "trigger" one, I just do an MMIO to the corresponding page and the
-> interrupt magically shows up wherever the guest is running the target
-> vcpu. In fact, I'd like to add a way to mmap that page into qemu so
-> that qemu can triggers them without an ioctl.
 
-Ok.
-
-> The guest doesn't care, from the guest perspective they are interrupts
-> coming from the DT, so they are like PCI etc...
-
-Ok.
-
-> > > We can fix the number of "generic" interrupts given to a guest. The
-> > > only requirements from a PAPR perspective is that there should be at
-> > > least as many as there are possible threads in the guest so they can =
-be
-> > > used as IPIs.
-> >=20
-> > Ok.  If we can do things sparsely, allocating these well away from the
-> > hw interrupts would make things easier.
-> >=20
-> > > But we may need more for other things. We can make this a machine
-> > > parameter with a default value of something like 4096. If we call N
-> > > that number of extra generic interrupts, then the number of generic
-> > > interrutps would be #possible-vcpu's + N, or something like that.
-> >=20
-> > That seems reasonable.
-> >=20
-> > > > > But it's fundamentally an allocator that sits in the hypervisor, =
-so in
-> > > > > our case, I would say in the spapr "component" of XIVE, rather th=
-an the
-> > > > > XIVE HW model itself.
-> > > >=20
-> > > > Maybe..
-> > >=20
-> > > You are right in that a mapping is a better term than an allocator
-> > > here.
-> > >=20
-> > > > > Now what Cedric did, because XIVE is very complex and we need som=
-ething
-> > > > > for PAPR quickly, is not a complete HW model, but a somewhat simp=
-lified
-> > > > > one that only handles what PAPR exposes. So in that case where the
-> > > > > allocator sits is a bit of a TBD...
-> > > >=20
-> > > > Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
-> > > > machine type level needs extreme caution, or the irqs may not be
-> > > > stable which will generally break migration.
-> > >=20
-> > > Yes you are right. We should probably create a more "static" scheme.
-> >=20
-> > Sounds like we're in violent agreement.
->=20
-> Yup :)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---hHiQ9nAwW5IGN2dL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll1xd8ACgkQbDjKyiDZ
-s5Jc3hAAjk5Dlepz3kx6xshdlTAznmiSzPZTGdtgWAp95POUDY5NTUsPqz9CrSm4
-/P5nq6gyxVEUv7+UNgyYnpYh0CA0o06LVLXqNKlaUBQ1Xgx8Z5Q4Wr5a2gSySZCT
-4VHQkGK4JGWsrOgjAn20jwgZ4bBrxUrjhjEK8Ol2mofNoEYM8w2VCCI5Hr1Ias93
-TMCTtbhW7ERxtteSgEkQAzqv0DdziKGOj5wcGxVcFbMEkgYB05jPZTrEbuSiPn4x
-aMX/dWWveLuJt4pCN52VkUt7aZJBSX1UQsu0ohBDs9K3sl4ZlCrpN3q3Vw1aEIFI
-FCPnm8efPPSd4J8Gfak0PR2BCPsJLb9DIq7ER4lGE/Mf7A82/neoLDCJfG2QvYyw
-rABki1eDMH67CM+AZLkWsUMqpHVvo7dPRXFXvg20/GywotCkVpnNv/jRxzJCl78u
-ADPhEXWQOzHEqP8rjlbZTi88l3KyQfXzhkZan24KDsU/iW0pT0CYUnHMgQ0CFatG
-HATLKIDwqmjtKQEhRp2nfwZgErtdIW6iO7X03PJ8Xd+5C+pOaFBRv3/6xbP+vSUD
-O4R8ClAJGjN9R9fhVL938DRU0bhv8LqT7WWTeIbHgCqd7g1Q9zbnXCuxtt4ngJjS
-R/t1FeGd2ggCC7nsQzvA5vnsyEr39++ZfnyP0aBO8z00exKeaAU=
-=uTBz
------END PGP SIGNATURE-----
-
---hHiQ9nAwW5IGN2dL--
+> > > so it does not affect migration normally.
+> > >   
+> > > >     
+> > > > >     
+> > > > > > > 
+> > > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > > > ---
+> > > > > > >  hw/mem/pc-dimm.c | 2 +-
+> > > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > > 
+> > > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > > > index ea67b46..bb0fa08 100644
+> > > > > > > --- a/hw/mem/pc-dimm.c
+> > > > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > > > > >          goto out;
+> > > > > > >      }
+> > > > > > >  
+> > > > > > > -    if (!vhost_has_free_slot()) {
+> > > > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
+> > > > > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > > > > >                                 " memory slots left");
+> > > > > > >          goto out;      
+> > > > > 
+> > > > > Even this produces the wrong error message in this case,
+> > > > > it also makes me think if the existing code should undo a lot of
+> > > > > the object_property_set's that happen.
+> > > > > 
+> > > > > Dave    
+> > > > > > 
+> > > > > >       
+> > > > > --
+> > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK    
