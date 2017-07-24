@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZdwF-0003s5-W6
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:02:28 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZe1G-0007Zy-C2
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZdwD-0007JR-BR
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:02:24 -0400
-Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:40880)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZdwD-0007Hh-1o
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:02:21 -0400
-Received: from player732.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 8EB37123E3F
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 16:02:19 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-14-git-send-email-clg@kaod.org>
-	<20170724060539.GK17228@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ba1babfd-7dd9-0575-6d95-caa0c1939205@kaod.org>
-Date: Mon, 24 Jul 2017 16:02:13 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170724060539.GK17228@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 13/26] ppc/xive: introduce a XIVE
- interrupt presenter model
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZe1C-0002hM-DT
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:07:34 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:46600)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZe1A-0002eP-Vy
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:07:30 -0400
+Date: Mon, 24 Jul 2017 22:07:22 +0800 (CST)
+Message-ID: <201707242207222697699@zte.com.cn>
+References: 1500921322-36875-1-git-send-email-peng.hao2@zte.com.cn,
+	961f88c4-c863-5242-c38a-f86dfa6834ee@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: multipart/related;
+	boundary="=====_002_next====="
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V3=5D_rtc=3A_fix_a_infinite_loop?=
+ =?utf-8?q?_in_windows_vmstartup?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,263 +28,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: eblake@redhat.com
+Cc: mst@redhat.com, pbonzini@redhat.com, liu.yi24@zte.com.cn, qemu-devel@nongnu.org
 
-On 07/24/2017 08:05 AM, David Gibson wrote:
-> On Wed, Jul 05, 2017 at 07:13:26PM +0200, C=E9dric Le Goater wrote:
->> Just like the interrupt source model, we try to reuse the ICP model
->> because the sPAPR machine is tied to the XICSFabric interface and
->> should be using a common framework to switch from one controller model
->> to another: XICS <-> XIVE.
->>
->> The XIVE interrupt presenter exposes a set of Thread Interrupt
->> Management Areas, also called rings, one per different level of
->> privilege (four in all). We only expose the OS ring for the sPAPR
->> support for the moment. This area is used to handle priority
->> management and interrupt acknowledgment among other things.
->>
->> The next patch will introduce the MMIO handlers to interact with the
->> TIMA, OS only.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> As with the ICS, I'm not really clear where you're going with this.
-> Is this a first step towards independent xics and xive ICP objects, or
-> a first step towards fully unified xics/xive ICPs?
 
-As stated in a previous email, I think that this patch is the wrong=20
-approach. sPAPR is strongly tied to ICPState and it is complex to introdu=
-ce=20
-a new ICPState class for the sPAPR machine. We should just add a couple=20
-of attributes to ICPState to support XIVE.
 
->=20
->> ---
->>  hw/intc/xive-internal.h | 84 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  hw/intc/xive.c          | 43 +++++++++++++++++++++++++
->>  include/hw/ppc/xive.h   | 14 +++++++++
->>  3 files changed, 141 insertions(+)
->>
->> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
->> index c06be823aad0..ba5e648a5258 100644
->> --- a/hw/intc/xive-internal.h
->> +++ b/hw/intc/xive-internal.h
->> @@ -24,6 +24,90 @@
->>  #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
->>                                   PPC_BIT32(bs))
->> =20
->> +/*
->> + * Thread Management (aka "TM") registers
->> + */
->> +
->> +/* TM register offsets */
->> +#define TM_QW0_USER             0x000 /* All rings */
->> +#define TM_QW1_OS               0x010 /* Ring 0..2 */
->> +#define TM_QW2_HV_POOL          0x020 /* Ring 0..1 */
->> +#define TM_QW3_HV_PHYS          0x030 /* Ring 0..1 */
->> +
->> +/* Byte offsets inside a QW             QW0 QW1 QW2 QW3 */
->> +#define TM_NSR                  0x0  /*  +   +   -   +  */
->> +#define TM_CPPR                 0x1  /*  -   +   -   +  */
->> +#define TM_IPB                  0x2  /*  -   +   +   +  */
->> +#define TM_LSMFB                0x3  /*  -   +   +   +  */
->> +#define TM_ACK_CNT              0x4  /*  -   +   -   -  */
->> +#define TM_INC                  0x5  /*  -   +   -   +  */
->> +#define TM_AGE                  0x6  /*  -   +   -   +  */
->> +#define TM_PIPR                 0x7  /*  -   +   -   +  */
->> +
->> +#define TM_WORD0                0x0
->> +#define TM_WORD1                0x4
->> +
->> +/*
->> + * QW word 2 contains the valid bit at the top and other fields
->> + * depending on the QW.
->> + */
->> +#define TM_WORD2                0x8
->> +#define   TM_QW0W2_VU           PPC_BIT32(0)
->> +#define   TM_QW0W2_LOGIC_SERV   PPC_BITMASK32(1, 31) /* XX 2,31 ? */
->> +#define   TM_QW1W2_VO           PPC_BIT32(0)
->> +#define   TM_QW1W2_OS_CAM       PPC_BITMASK32(8, 31)
->> +#define   TM_QW2W2_VP           PPC_BIT32(0)
->> +#define   TM_QW2W2_POOL_CAM     PPC_BITMASK32(8, 31)
->> +#define   TM_QW3W2_VT           PPC_BIT32(0)
->> +#define   TM_QW3W2_LP           PPC_BIT32(6)
->> +#define   TM_QW3W2_LE           PPC_BIT32(7)
->> +#define   TM_QW3W2_T            PPC_BIT32(31)
->> +
->> +/*
->> + * In addition to normal loads to "peek" and writes (only when invali=
-d)
->> + * using 4 and 8 bytes accesses, the above registers support these
->> + * "special" byte operations:
->> + *
->> + *   - Byte load from QW0[NSR] - User level NSR (EBB)
->> + *   - Byte store to QW0[NSR] - User level NSR (EBB)
->> + *   - Byte load/store to QW1[CPPR] and QW3[CPPR] - CPPR access
->> + *   - Byte load from QW3[TM_WORD2] - Read VT||00000||LP||LE on thrd =
-0
->> + *                                    otherwise VT||0000000
->> + *   - Byte store to QW3[TM_WORD2] - Set VT bit (and LP/LE if present=
-)
->> + *
->> + * Then we have all these "special" CI ops at these offset that trigg=
-er
->> + * all sorts of side effects:
->> + */
->> +#define TM_SPC_ACK_EBB          0x800   /* Load8 ack EBB to reg*/
->> +#define TM_SPC_ACK_OS_REG       0x810   /* Load16 ack OS irq to reg *=
-/
->> +#define TM_SPC_PUSH_USR_CTX     0x808   /* Store32 Push/Validate user=
- context */
->> +#define TM_SPC_PULL_USR_CTX     0x808   /* Load32 Pull/Invalidate use=
-r
->> +                                         * context */
->> +#define TM_SPC_SET_OS_PENDING   0x812   /* Store8 Set OS irq pending =
-bit */
->> +#define TM_SPC_PULL_OS_CTX      0x818   /* Load32/Load64 Pull/Invalid=
-ate OS
->> +                                         * context to reg */
->> +#define TM_SPC_PULL_POOL_CTX    0x828   /* Load32/Load64 Pull/Invalid=
-ate Pool
->> +                                         * context to reg*/
->> +#define TM_SPC_ACK_HV_REG       0x830   /* Load16 ack HV irq to reg *=
-/
->> +#define TM_SPC_PULL_USR_CTX_OL  0xc08   /* Store8 Pull/Inval usr ctx =
-to odd
->> +                                         * line */
->> +#define TM_SPC_ACK_OS_EL        0xc10   /* Store8 ack OS irq to even =
-line */
->> +#define TM_SPC_ACK_HV_POOL_EL   0xc20   /* Store8 ack HV evt pool to =
-even
->> +                                         * line */
->> +#define TM_SPC_ACK_HV_EL        0xc30   /* Store8 ack HV irq to even =
-line */
->> +/* XXX more... */
->> +
->> +/* NSR fields for the various QW ack types */
->> +#define TM_QW0_NSR_EB           PPC_BIT8(0)
->> +#define TM_QW1_NSR_EO           PPC_BIT8(0)
->> +#define TM_QW3_NSR_HE           PPC_BITMASK8(0, 1)
->> +#define  TM_QW3_NSR_HE_NONE     0
->> +#define  TM_QW3_NSR_HE_POOL     1
->> +#define  TM_QW3_NSR_HE_PHYS     2
->> +#define  TM_QW3_NSR_HE_LSI      3
->> +#define TM_QW3_NSR_I            PPC_BIT8(2)
->> +#define TM_QW3_NSR_GRP_LVL      PPC_BIT8(3, 7)
->> +
->>  /* IVE/EAS
->>   *
->>   * One per interrupt source. Targets that interrupt to a given EQ
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index db808e0cbe3d..c08a4f8efb58 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -26,6 +26,48 @@
->> =20
->>  #include "xive-internal.h"
->> =20
->> +static void xive_icp_reset(ICPState *icp)
->> +{
->> +    XiveICPState *xicp =3D XIVE_ICP(icp);
->> +
->> +    memset(xicp->tima, 0, sizeof(xicp->tima));
->> +}
->> +
->> +static void xive_icp_print_info(ICPState *icp, Monitor *mon)
->> +{
->> +    XiveICPState *xicp =3D XIVE_ICP(icp);
->> +
->> +    monitor_printf(mon, " CPPR=3D%02x IPB=3D%02x PIPR=3D%02x NSR=3D%0=
-2x\n",
->> +                   xicp->tima_os[TM_CPPR], xicp->tima_os[TM_IPB],
->> +                   xicp->tima_os[TM_PIPR], xicp->tima_os[TM_NSR]);
->> +}
->> +
->> +static void xive_icp_init(Object *obj)
->> +{
->> +    XiveICPState *xicp =3D XIVE_ICP(obj);
->> +
->> +    xicp->tima_os =3D &xicp->tima[TM_QW1_OS];
->=20
-> Storing an easily derivable pointer in your structure seems a bit
-> pointless.
+--=====_002_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
 
-Well, it is a nice-to-have to simplify a bit the code. =20
+SSdtIHNvcnJ5IEkgY29weSBhbmQgcGFzdGUgY29kZSB0byBtYWtlIGEgcGF0Y2gsIGJ1dCBJIG1h
+a2UgYSBtaXN0YWtlIHRvIHNlbmQgYSB1bmNvbXBsZXRlZCBwYXRjaC4NCg0KDQoNCg0KDQoNCg0K
+DQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K5b2t5rWpIHBlbmdoYW8NCg0KDQoNCg0KDQoNCklU5byA
+5Y+R5bel56iL5biIIElUIERldmVsb3BtZW50CkVuZ2luZWVyDQrmk43kvZzns7vnu5/kuqflk4Hp
+g6gv5Lit5b+D56CU56m26ZmiL+ezu+e7n+S6p+WTgSBPUyBQcm9kdWN0IERlcGFydG1lbnQvQ2Vu
+dHJhbCBS77yGRCBJbnN0aXR1dGUvU3lzdGVtIFByb2R1Y3QNCg0KDQoNCg0KDQoNCg0KDQoNCuaI
+kOmDveW4guWkqeW6nOWkp+mBk+S4reautTgwMOWPt+S4reWFtOWkp+WOpkHluqcgDQpUOiArODYg
+MDI4IDE4MTIzMjc0MDA1DQpFOiBwZW5nLmhhbzJAenRlLmNvbS5jbiANCnd3dy56dGUuY29tLmNu
+DQoNCg0KDQoNCg0KDQoNCg0KT3JpZ2luYWwgTWFpbA0KDQoNCg0KU2VuZGVyOiAgPGVibGFrZUBy
+ZWRoYXQuY29tPg0KVG86IFBlbmdIYW8xMDA5Njc0MiA8bXN0QHJlZGhhdC5jb20+IDxwYm9uemlu
+aUByZWRoYXQuY29tPg0KQ0M6IExpdVlpMTAwNjY0NjMgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4N
+CkRhdGU6IDIwMTcvMDcvMjQgMTk6NTUNClN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENI
+IFYzXSBydGM6IGZpeCBhIGluZmluaXRlIGxvb3AgaW4gd2luZG93cyB2bXN0YXJ0dXANCg0KDQoN
+Cg0KDQpPbiAwNy8yNC8yMDE3IDAxOjM1IFBNLCBQZW5nIEhhbyB3cm90ZToNCj4gV2hlbiBhIHdp
+bmRvd3Mgdm0gc3RhcnRzLCBwZXJpb2RpYyB0aW1lciBvZiBydGMgd2lsbCBzdG9wIHNldmVyYWwg
+dGltZXMuDQo+IHdpbmRvd3Mga2VybmVsIHdpbGwgY2hlY2sgd2hldGhlciBSRUdfQV9VSVAgaXMg
+Y2hhbmdlZC4gUkVHX0MncyBpbnRlcnJ1cHQNCj4gZmxhZ3Mgd2lsbCBub3QgYmUgY2xlYXJlZCB3
+aGVuIHBlcmlvZGljIHRpbWVyIHN0b3BzIGFuZCB0aGUgdXBkYXRlIHRpbWVyDQo+IHdpbGwgc3dp
+dGNoIHRvIGFsYXJtIHRpbWVyLiBTbyB0aGUgZXhwaXJhdGlvbiB0aW1lIG9mIGFsYXJtIHRpbWVy
+IGlzIHZlcnkNCj4gbG9uZyBhbmQgUkVHX0FfVUlQIHdpbGwgbm90IHZhcnkuQXQgbGFzdCB3aW5k
+b3dzIGtlcm5lbCB3aWxsIHJlcGVhdCB0byANCj4gY2hlY2sgUkVHX0FfVUlQIGFsbCB0aGUgdGlt
+ZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4N
+Cj4gU2lnbmVkLW9mZi1ieTogTGl1IFlpIDxsaXUueWkyNEB6dGUuY29tLmNuPg0KPiAtLS0NCg0K
+V2hlbiBwb3N0aW5nIGEgdjMsIGl0J3MgdXNlZnVsIHRvIHRlbGwgdXMgKGFmdGVyIHRoZSAtLS0g
+c2VwYXJhdG9yKSB3aGF0DQpjaGFuZ2VkIGZyb20gdjIsIHRvIGhlbHAgdXMgZm9jdXMgb24gd2h5
+IGEgdjMgd2FzIG5lZWRlZC4NCg0KLS0gDQpFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUg
+RW5naW5lZXINClJlZCBIYXQsIEluYy4gICAgICAgICAgICsxLTkxOS0zMDEtMzI2Ng0KVmlydHVh
+bGl6YXRpb246ICBxZW11Lm9yZyB8IGxpYnZpcnQub3Jn
 
-Thanks,
 
-C.
+--=====_002_next=====
+Content-Type: image/jpeg;
+	 name="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
+Content-Disposition: inline;
+	filename="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
+Content-Transfer-Encoding: base64
+Content-ID: <24242e5637af428891c4db731e7765ad>
 
->> +}
->> +
->> +static void xive_icp_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    ICPStateClass *icpc =3D ICP_CLASS(klass);
->> +
->> +    dc->desc =3D "PowerNV Xive ICP";
->> +    icpc->reset =3D xive_icp_reset;
->> +    icpc->print_info =3D xive_icp_print_info;
->> +}
->> +
->> +static const TypeInfo xive_icp_info =3D {
->> +    .name          =3D TYPE_XIVE_ICP,
->> +    .parent        =3D TYPE_ICP,
->> +    .instance_size =3D sizeof(XiveICPState),
->> +    .instance_init =3D xive_icp_init,
->> +    .class_init    =3D xive_icp_class_init,
->> +    .class_size    =3D sizeof(ICPStateClass),
->> +};
->> +
->>  static void xive_icp_irq(XiveICSState *xs, int lisn)
->>  {
->> =20
->> @@ -529,6 +571,7 @@ static void xive_register_types(void)
->>  {
->>      type_register_static(&xive_info);
->>      type_register_static(&xive_ics_info);
->> +    type_register_static(&xive_icp_info);
->>  }
->> =20
->>  type_init(xive_register_types)
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index b06bc861b845..f87df8107dd9 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -23,6 +23,7 @@
->> =20
->>  typedef struct XIVE XIVE;
->>  typedef struct XiveICSState XiveICSState;
->> +typedef struct XiveICPState XiveICPState;
->> =20
->>  #define TYPE_XIVE "xive"
->>  #define XIVE(obj) OBJECT_CHECK(XIVE, (obj), TYPE_XIVE)
->> @@ -38,6 +39,9 @@ typedef struct XiveICSState XiveICSState;
->>  #define XIVE_SRC_TRIGGER       (1ull << (63 - 62))
->>  #define XIVE_SRC_STORE_EOI     (1ull << (63 - 63))
->> =20
->> +#define TYPE_XIVE_ICP "xive-icp"
->> +#define XIVE_ICP(obj) OBJECT_CHECK(XiveICPState, (obj), TYPE_XIVE_ICP=
-)
->> +
->>  struct XiveICSState {
->>      ICSState parent_obj;
->> =20
->> @@ -49,4 +53,14 @@ struct XiveICSState {
->>      XIVE         *xive;
->>  };
->> =20
->> +/* Number of Thread Management Interrupt Areas */
->> +#define XIVE_TM_RING_COUNT 4
->> +
->> +struct XiveICPState {
->> +    ICPState parent_obj;
->> +
->> +    uint8_t tima[XIVE_TM_RING_COUNT * 0x10];
->> +    uint8_t *tima_os;
->> +};
->> +
->>  #endif /* PPC_XIVE_H */
->=20
+R0lGODlhcwAmAPcAAAAAAP///wCP1QCP1Pf7/vL5/QCP1gWR1gqT1gyU2AyU1w6V1xWY2BeZ2R6c
+2iGd2iyi3C6j3TOl3Tqo3kWt4Emv4Uyw4U2x4lOz4ly35F645GO65WW75me85m6/53XC6IHH64XJ
+64bK7IzM7I/N7JXQ7ZfR7pnS7pzT7p3U76PW8KPW76XX8K7b8bDc8rff87vh9Lzh9L7i9cnn9tLr
++Nnu+eDx+uf0++n1++33/PD4/PT6/fj8/gKQ1AWR1QeS1QiT1QmT1g+W1xCW1xOX1xia2Bub2Ryb
+2R+d2SCd2SKe2iSf2iag2ymh2yqh2yui3DSm3Tio3Typ3j2q3j6q3kCr30Os30eu4Euw4U6x4U+y
+4k+y4VGz4lCy4Va141W04li241q341245F+55GW75Ga85Wm95mi95Gq+5Wu+5m2/5m/A53HB6HDA
+53HB5nLB53PC53XC53bD53nE6HvF6X3G6X/H6YHI6oHI6YLI6oLI6YbK64TJ6YnL64rM64zM65HP
+7JPQ7ZbR7ZrT7qXX76bY8KfY76jZ8Kra8azb8a/c8bDc8bHd8rLd8rXe8rXe8bjg87zi9Lzh873i
+88Dj9MPl9cXm9cfm9cnn9c3p9s/q987p9tHr99Lr99Xt+Nbt+Nrv+d/x+eDx+eX0++Tz+u/4/OHy
++ePz+ur2+/b7/fr9/vz+/v7//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAK0ALAAAAABzACYA
+Rwj/AAMIHEiwoMGDCBMqXMiwoUOGiti0mUhxopcBAgZoHKAglcATFaVg3DgAC0U2hgKsKkJyiZqK
+FUV4bHijx4AHDFmN0BiJ4A2NRFYRJKAAo6WFKzJibOCQEclMB1WxxOgDUQEeqbKm2sEDoQaMhAqS
+sonE4B2MeQ7WmGlwj0YKCv0oHeDkIUGnAvJCNShVowA7dgXyyXKhsGEJG6kYNqxFUEImGSsQDJFR
+gOSClUj61cx5wAmEBKJk9JIwTefTaxzaGNnQxhIBex0WAUPwRZoOZnLr3q27Q6CBKXgL742mhUBW
+e3AP771HlcNSaDjQCVwwByQc1A2+9vtbodONsQn2/8UI2O6F03lP+/1QcEpeJgMbabwyMEzeOQuJ
+bBSAyC5ejeENNN5GQzBAxIEHNgAGAQZ9JQAlBvUggBIGlYDWQBtYoKGGW1yw4YZacPGhBVjsIRAB
+B4xEV3YCfZdRgAKNJ0ATLBo01gBlOXSIARgpohAEeQkgSo1EFmnkkUgmqeSSCKkxl3qaMRUBZ5V1
+llcHAaQ40lxP+uXQWALkmB0HGplhECYHWADDQ24oJYAVClHilwCgRMVSXiYGhgIZG/TZZxlXaNTD
+F2X4+adxA+Fg0wBkEGTfACkQhNgAKzR0iop0MvQdgHZu5EdgXw0AYUE2UViQhQKkVdAcQZYSAA9D
+GP/xxQ4B1KHRFg1h4OYYDzHiJowBDKgiSZXlSZAGeYVFEJhiDnRHXnoM5EOXxO7HmQMGdRJkRtj5
+txmwMqoRWBZPplftuXEkxIUJBj2CxUJSVPkGi5sOAO5UA6hqJCql2sVKEBilcRCyAxhQB0GFqEet
+X3IglAhJlxzEAwPoaSaABV+S1VAmQ+RlREOTBHkGkySXbPLJKKes8sosC6TJllCS9JshC8NsbSUB
+eFAzZ244FIpSNfrRxADsGoRKQS/ETCWWIShspSMBUGyteu82dGOzCr3AR0EyaESFQU4OAJdDcBC7
+SEJjuJmuQTzg+0SSNmG7ECuQDZBAQUlo9AlBg2D/BMVDm2wpQA4KOUISJ53mpa9DJVRmLkZcUgv1
+QDRjRMNAI2SUmkAzYDSEcw3xMVcEmj7VqUblPSRGRl2ooMIKK6hAh0Y/kMBC7K9PkBceBeGwUaUB
+gLKRc/xqZIpD7vkFR0Obwna6AGiAqlEhBY1iUxIG5YFRtAZh1IYOAh090AIY9cRQAUBALsBRzM91
+734CICDEAvQvoMAQGNBaELICKDvQ1Wa5kEBi4IJGNMITmTCgAhvhgg8o5QsvMKALcHaQSKRHAAro
+SlO+ZafHQQ5mAuhDg8AiFo0VBAQCDAAIMWWuKlWGKQZJg5vg5C2/vI92LujKKna4CtAdRAwa8QIL
+7YY4xLPErwREHGIVMMI7km0nL4CgjovsdboBiNAumbPYsKpkLUQZRAZ5+dtAOrEAAXwtITjgkiey
+U68bDiB1RSKARo4QmEOkR3wDOUNlMnCQQrgJPvQyHV+KUCwkAfAhYMjLD4RyECxUJhEESeRmBCAB
+mMCkBAlpnhsHwAQPWHIifWCQ1UzIEFAEqQsLwQEQ8gIBgWiBS0qbI0JeMJcaHGQV04plXr6kEbkp
+hBVTEkAPjtcQOWSEVwGQxBw+wMxmOvOZHxiEQnIAgj1o8JZ/gKY2SeDDhejgDW1YnEI+AUm7fIKR
+LUunOtfJThYFBAA7
+
+
+--=====_002_next=====
+Content-Type: image/jpeg;
+	 name="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
+Content-Disposition: inline;
+	filename="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
+Content-Transfer-Encoding: base64
+Content-ID: <9ae3e214c17d49ed935d87c674ba3ee2>
+
+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
+
+
+--=====_002_next=====--
