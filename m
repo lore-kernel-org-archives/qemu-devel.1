@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dZZsx-0005Aw-8s
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:42:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dZZwX-00065u-5a
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dZZsu-0004rz-4l
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:42:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dZZst-0004rj-Uw
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:42:40 -0400
-Message-ID: <1500889352.15837.7.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 24 Jul 2017 11:42:32 +0200
-In-Reply-To: <CAKSfGUDbW8psdPGOXUQDWBV6OJL8z_hxp5NL-=Pg+OHu5ZGfvA@mail.gmail.com>
-References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
-	<1500761510-1556-5-git-send-email-zuban32s@gmail.com>
-	<20170723054445-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAHPHwgLa=jNUGpW-saHK6rGK5epBY2ixizeuCwvE77wA@mail.gmail.com>
-	<CAKSfGUDbW8psdPGOXUQDWBV6OJL8z_hxp5NL-=Pg+OHu5ZGfvA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] pci: enable RedHat PCI bridges
- to reserve additional buses on PCI init
+	(envelope-from <kwolf@redhat.com>) id 1dZZwW-0006S9-Gd
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 05:46:25 -0400
+Date: Mon, 24 Jul 2017 11:46:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170724094614.GF4630@noname.str.redhat.com>
+References: <20170627154120.20346-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170627154120.20346-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] docs: add qemu-block-drivers(7) man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Bezzubikov <zuban32s@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: seabios@seabios.org, Marcel Apfelbaum <marcel@redhat.com>, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, el13635@mail.ntua.gr
 
-On Sun, 2017-07-23 at 22:44 +0300, Alexander Bezzubikov wrote:
-> By the way, any ideas on how to avoid 'bus overstealing' would=C2=A0
-> be greatly appreciated.
-> Static BIOS variable isn't applicable since its value isn't saved
-> across reboots.
+Am 27.06.2017 um 17:41 hat Stefan Hajnoczi geschrieben:
+> Block driver documentation is available in qemu-doc.html.  It would be
+> convenient to have documentation for formats, protocols, and filter
+> drivers in a man page.
 
-I think the reservation hints should be a absolute number, not a
-increment.  i.e. if qemu suggests to reserve three extra bus numbers
-seabios should reserve three, no matter whenever there are zero, one,
-two or three child busses present.  And I guess seabios should
-interpret that as minimum, so in case it finds five child busses it
-will allocate five bus numbers of course ...
+This is specifically for create options, which is a good start.
 
-Same with the other limit hints.  If the hint says to allocate 16M, and
-existing device bars sum up to 4M, allocate 16M (and therefore leave
-12M address space for hotplug).  If the device bars sum up to 32M,
-allocate that.
+I think we should probably also plan how to integrate run-time options
+(basically the equivalent of the QAPI schema comments for blockdev-add).
+Maybe we can even generate this from the schema in order to avoid that
+the documentation becomes outdated?
 
-While being at it:  I have my doubts the capability struct layout
-(which mimics register layout) buys us that much, seabios wouldn't
-blindly copy over the values anyway.  Having regular u32 fields looks
-more useful to me.
+> Extract the relevant part of qemu-doc.html into a new file called
+> docs/qemu-block-drivers.texi.  This file can also be built as a
+> stand-alone document (man, html, etc).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
-cheers,
-  Gerd
+Looks good, but doesn't apply any more.
+
+A rebased version can still be included in QEMU 2.10, documentation
+improvements are fine during the freeze.
+
+Kevin
