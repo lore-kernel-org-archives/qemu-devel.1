@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZac4-0001u0-Ej
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:29:21 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZafP-00032I-6O
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dZac3-00016u-GY
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:29:20 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35971)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dZac3-00016I-9n
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:29:19 -0400
-Received: by mail-wm0-x233.google.com with SMTP id t201so14653185wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 03:29:19 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1500309462-12792-1-git-send-email-peter.maydell@linaro.org>
-References: <1500309462-12792-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Jul 2017 11:28:57 +0100
-Message-ID: <CAFEAcA9yup9CQzst6m14oO+7JHZ2F0mkrsnUN5LLx++=9ctqMw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] hw/display/sm501: Don't use
- vmstate_register_ram_global()
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZafK-0002ma-Vb
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:32:46 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:14292)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZafJ-0002ln-Sd
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:32:42 -0400
+Date: Mon, 24 Jul 2017 18:32:35 +0800 (CST)
+Message-ID: <201707241832350823841@zte.com.cn>
+References: 1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn,
+	20170724111419.720aa168@nial.brq.redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V2=5D_vhost=3A_fix_a_migration_f?=
+ =?utf-8?q?ailed_becauseof_vhost_region_merge?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: imammedo@redhat.com
+Cc: mst@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
 
-Ping for review, please? Would be nice to get this into rc0.
-
-thanks
--- PMM
-
-On 17 July 2017 at 17:37, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The sm501 device uses vmstate_register_ram_global() to register its
-> memory region for migration.  This means it gets a name that is
-> assumed to be global to the whole system, which in turn means that if
-> you create two of the device we assert because of the duplication:
->
-> qemu-system-ppc -device sm501 -device sm501
-> RAMBlock "sm501.local" already registered, abort!
-> Aborted (core dumped)
->
-> Changing this to just use memory_region_init_ram()'s automatic
-> registration of the memory region with a device-local name fixes
-> this.  The downside is that it breaks migration compatibility, but
-> luckily we only added migration support to this device in the 2.10
-> release cycle so we haven't released a QEMU version with the broken
-> implementation.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Recent refactoring that renamed the old "memory_region_init_ram"
-> to memory_region_init_ram_nomigrate" made this bug a bit easier
-> to find via grep...
->
->  hw/display/sm501.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index af792c5..9aa515b 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -1578,9 +1578,8 @@ static void sm501_init(SM501State *s, DeviceState *dev,
->                    s->local_mem_size_index);
->
->      /* local memory */
-> -    memory_region_init_ram_nomigrate(&s->local_mem_region, OBJECT(dev), "sm501.local",
-> +    memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
->                             get_local_mem_size(s), &error_fatal);
-> -    vmstate_register_ram_global(&s->local_mem_region);
->      memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
->      s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
->
-> --P
+PiBPbiBTdW4sIDIzIEp1bCAyMDE3IDIwOjQ2OjExICswODAwDQoNCg0KDQoNCg0KPiBQZW5nIEhh
+byA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdyb3RlOg0KDQo+ID4gV2hlbiBhIGd1ZXN0IHRoYXQg
+aGFzIHNldmVyYWwgaG90cGx1Z2dlZCBkaW1tcyBpcyBtaWdyYXRlZCwgb24NCj4gPiBkZXN0aW5h
+dGlvbiBpdCB3aWxsIGZhaWwgdG8gcmVzdW1lLiBCZWNhdXNlIHJlZ2lvbnMgb24gc291cmNlDQo+
+ID4gYXJlIG1lcmdlZCBhbmQgb24gZGVzdGluYXRpb24gdGhlIG9yZGVyIG9mIHJlYWxpemluZyBk
+ZXZpY2VzDQo+ID4gaXMgZGlmZmVyZW50IGZyb20gb24gc291cmNlIHdpdGggZGltbXMsIHNvIHdo
+ZW4gcGFydCBvZiBkZXZpY2VzDQo+ID4gYXJlIHJlYWxpemQgc29tZSByZWdpb24gY2FuIG5vdCBi
+ZSBtZXJnZWQuVGhhdCBtYXkgYmUgbW9yZSB0aGFuDQo+ID4gdmhvc3Qgc2xvdCBsaW1pdC4NCj4g
+PiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+DQo+
+ID4gU2lnbmVkLW9mZi1ieTogV2FuZyBZZWNoYW8gPHdhbmcueWVjaGFvMjU1QHp0ZS5jb20uY24+
+DQo+ID4gLS0tDQo+ID4gIGh3L21lbS9wYy1kaW1tLmMgICAgICAgIHwgMiArLQ0KPiA+ICBpbmNs
+dWRlL3N5c2VtdS9zeXNlbXUuaCB8IDEgKw0KPiA+ICB2bC5jICAgICAgICAgICAgICAgICAgICB8
+IDUgKysrKysNCj4gPiAgMyBmaWxlcyBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
+b24oLSkNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvaHcvbWVtL3BjLWRpbW0uYyBiL2h3L21lbS9w
+Yy1kaW1tLmMNCj4gPiBpbmRleCBlYTY3YjQ2Li4xM2YzZGI1IDEwMDY0NA0KPiA+IC0tLSBhL2h3
+L21lbS9wYy1kaW1tLmMNCj4gPiArKysgYi9ody9tZW0vcGMtZGltbS5jDQo+ID4gQEAgLTEwMSw3
+ICsxMDEsNyBAQCB2b2lkIHBjX2RpbW1fbWVtb3J5X3BsdWcoRGV2aWNlU3RhdGUgKmRldiwgTWVt
+b3J5SG90cGx1Z1N0YXRlICpocG1zLA0KPiA+ICAgICAgICAgIGdvdG8gb3V0DQo+ID4gICAgICB9
+DQo+ID4gIA0KPiA+IC0gICAgaWYgKCF2aG9zdF9oYXNfZnJlZV9zbG90KCkpIHsNCj4gPiArICAg
+IGlmICghdmhvc3RfaGFzX2ZyZWVfc2xvdCgpICYmIHFlbXVfaXNfbWFjaGluZV9pbml0X2RvbmUo
+KSkgew0KPiA+ICAgICAgICAgIGVycm9yX3NldGcoJmxvY2FsX2VyciwgImEgdXNlZCB2aG9zdCBi
+YWNrZW5kIGhhcyBubyBmcmVlIg0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IiBtZW1vcnkgc2xvdHMgbGVmdCIpDQo+IHRoYXQgZG9lc24ndCBmaXggaXNzdWUsDQo+ICAgIDFz
+dDogbnVtYmVyIG9mIHVzZWQgZW50cmllcyBpcyBjaGFuZ2luZyBhZnRlciBtYWNoaW5lX2luaXRf
+ZG9uZSgpIGlzIGNhbGxlZA0KPiAgICAgICAgIGFzIHJlZ2lvbnMgY29udGludWUgdG8gbWFwcGVk
+L3VubWFwcGVkIGR1cmluZyBydW50aW1lDQo+ICAgIDJuZDogaXQgYnJpbmdzIHJlZ3Jlc3Npb24g
+YW5kIGFsbG93cyB0byBzdGFydCBRRU1VIHdpdGggbnVtYmVyIG1lbW9yeQ0KPiAgICAgICAgIHJl
+Z2lvbnMgbW9yZSB0aGFuIHN1cHBvcnRlZCBieSBiYWNrZW5kLCB3aGljaCBjb21iaW5lZCB3aXRo
+IG1pc3NpbmcNCj4gICAgICAgICBlcnJvciBoYW5kbGluZyBpbiB2aG9zdCB3aWxsIGxlYWQgdG8g
+cWVtdSBjcmFzaGVzIG9yIG9ic2N1cmUgYnVncyBpbg0KID4gICAgICAgIGd1ZXN0IGJyZWFraW5n
+IHZob3N0IGVuYWJsZWQgZHJpdmVycy4NCj4gICAgICAgICBpLmUuIHBhdGNoIHVuZG9lcyB3aGF0
+IHdlcmUgZml4ZWQgYnkNCj4gICAgICAgICBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9o
+dG1sL3FlbXUtZGV2ZWwvMjAxNS0xMC9tc2cwMDc4OS5odG1sDQpJIGRvbid0IHRoaW5rIEkgdW5k
+byB0aGUgcHJldmlvdXMgcGF0Y2guIFRoZXJlIGFyZSB0b3cgc2NlbmFyaW9zIDoNCg0KaG90cGx1
+Z2dpbmcgbWVtb3J5IGhhcHBlbnMgYWZ0ZXIgbWFjaGluZV9pbml0X2RvbmUoKS4gc28gdGhlIG1v
+ZGlmaWVkIGNvZGUgaXMgbm8gDQoNCmluZmx1ZW5jZS4NCg0KaG90cGx1Z2dlZCBtZW1vcnkncyBW
+TSBpcyBqdXN0IG1pZ3JhdGVkIC4gb24gc291cmNlIGl0cyByZWdpb25zIGlzIGxlc3MgdGhhbiAN
+Cg0Kc3VwcG9ydGVkIGJ5IGJhY2tlbmQgLHNvIG9uIGRlc3RpbmF0aW9uIGl0IHNob3VsZCBzYXRp
+c2Z5LiBEdXJpbmcgcmVzdG9yaW5nIFZNJ3MgcmVnaW9ucw0KDQptYXkgYmUgbW9yZSB0aGFuIHN1
+cHBvcnRlZCBieSBiYWNrZW5kIGJ1dCBhZnRlciBtYWNoaW5lX2luaXRfZG9uZSBWTSdzIHJlZ2lv
+bnMNCg0KDQoNCmNhbiBiZSBsZXNzIHRoYW4gIHN1cHBvcnRlZCBieSBiYWNrZW5kLg0KPiAgICAg
+ICAgICBnb3RvIG91dA0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9zeXNlbXUvc3lzZW11LmggYi9p
+bmNsdWRlL3N5c2VtdS9zeXNlbXUuaA0KPiBpbmRleCBiMjEzNjk2Li40ODIyOGFkIDEwMDY0NA0K
+PiAtLS0gYS9pbmNsdWRlL3N5c2VtdS9zeXNlbXUuaA0KPiArKysgYi9pbmNsdWRlL3N5c2VtdS9z
+eXNlbXUuaA0KPiBAQCAtODgsNiArODgsNyBAQCB2b2lkIHFlbXVfc3lzdGVtX2d1ZXN0X3Bhbmlj
+a2VkKEd1ZXN0UGFuaWNJbmZvcm1hdGlvbiAqaW5mbykNCj4gIHZvaWQgcWVtdV9hZGRfZXhpdF9u
+b3RpZmllcihOb3RpZmllciAqbm90aWZ5KQ0KPiAgdm9pZCBxZW11X3JlbW92ZV9leGl0X25vdGlm
+aWVyKE5vdGlmaWVyICpub3RpZnkpDQo+ICANCj4gK2Jvb2wgcWVtdV9pc19tYWNoaW5lX2luaXRf
+ZG9uZSh2b2lkKQ0KPiAgdm9pZCBxZW11X2FkZF9tYWNoaW5lX2luaXRfZG9uZV9ub3RpZmllcihO
+b3RpZmllciAqbm90aWZ5KQ0KPiAgdm9pZCBxZW11X3JlbW92ZV9tYWNoaW5lX2luaXRfZG9uZV9u
+b3RpZmllcihOb3RpZmllciAqbm90aWZ5KQ0KPiAgDQo+IGRpZmYgLS1naXQgYS92bC5jIGIvdmwu
+Yw0KPiBpbmRleCBmYjZiMmVmLi40M2FlZTIyIDEwMDY0NA0KPiAtLS0gYS92bC5jDQo+ICsrKyBi
+L3ZsLmMNCj4gQEAgLTI2ODEsNiArMjY4MSwxMSBAQCBzdGF0aWMgdm9pZCBxZW11X3J1bl9leGl0
+X25vdGlmaWVycyh2b2lkKQ0KPiAgDQo+ICBzdGF0aWMgYm9vbCBtYWNoaW5lX2luaXRfZG9uZQ0K
+PiAgDQo+ICtib29sIHFlbXVfaXNfbWFjaGluZV9pbml0X2RvbmUodm9pZCkNCj4gK3sNCj4gKyAg
+ICByZXR1cm4gbWFjaGluZV9pbml0X2RvbmUNCj4gK30NCj4gKw0KPiAgdm9pZCBxZW11X2FkZF9t
+YWNoaW5lX2luaXRfZG9uZV9ub3RpZmllcihOb3RpZmllciAqbm90aWZ5KQ0KPiAgew0KPiAgICAg
+IG5vdGlmaWVyX2xpc3RfYWRkKCZtYWNoaW5lX2luaXRfZG9uZV9ub3RpZmllcnMsIG5vdGlmeSk=
