@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZhVJ-0004v7-Po
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:50:50 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhVb-00051K-MW
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dZhVE-0005to-UD
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:50:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56314)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZhVE-0005tV-CV
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:50:44 -0400
-Date: Mon, 24 Jul 2017 18:50:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170724175031.GG2127@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-15-dgilbert@redhat.com>
-	<726dd083-341b-aa13-37d2-b66479f6039a@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhVW-00060x-R1
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:51:07 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:35840)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dZhVW-00060i-Ec
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 13:51:02 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Mon, 24 Jul 2017 20:50:52 +0300
+Message-Id: <150091865221.30739.8093437461715631283.stgit@frigg.lan>
+In-Reply-To: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <726dd083-341b-aa13-37d2-b66479f6039a@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 14/29] vhost+postcopy: Register new regions
- with the ufd
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 12/13] instrument: [hmp] Add library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +26,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-* Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> 
-> 
-> On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > When new regions are sent to the client using SET_MEM_TABLE, register
-> > them with the userfaultfd.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >   contrib/libvhost-user/libvhost-user.c | 33 +++++++++++++++++++++++++++++++++
-> >   1 file changed, 33 insertions(+)
-> > 
-> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> > index 6de339fb7a..be7470e3a9 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -450,6 +450,39 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >                      dev_region->mmap_addr);
-> >           }
-> > +        if (dev->postcopy_listening) {
-> > +            /* We should already have an open ufd need to mark each memory
-> > +             * range as ufd.
-> > +             * Note: Do we need any madvises? Well it's not been accessed
-> > +             * yet, still probably need no THP to be safe, discard to be safe?
-> > +             */
-> > +            struct uffdio_register reg_struct;
-> > +            /* Note: We might need to go back to using mmap_addr and
-> > +             * len + mmap_offset for * huge pages, but then we do hope not to
-> > +             * see accesses in that area below the offset
-> > +             */
-> > +            reg_struct.range.start = (uintptr_t)(dev_region->mmap_addr +
-> > +                                                 dev_region->mmap_offset);
-> > +            reg_struct.range.len = dev_region->size;
-> > +            reg_struct.mode = UFFDIO_REGISTER_MODE_MISSING;
-> > +
-> > +            if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
-> > +                vu_panic(dev, "%s: Failed to userfault region %d: (ufd=%d)%s\n",
-> > +                         __func__, i, strerror(errno), dev->postcopy_ufd);
-> Aren't the two last args swapped?
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ hmp-commands.hx |   28 ++++++++++++++++++++++++++++
+ monitor.c       |   55 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 2 files changed, 83 insertions(+)
 
-Fixed.
-Thanks for spotting that; adding a GCC_FMT_ATTR(2, 3) before vu_panic
-doesn't show any more from me, but there are a couple of existing cases
-that look wrong;  I think they just need a * before them, but am not
-100% sure.
-
-Dave
-
-> > +                continue;
-> > +            }
-> > +            if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
-> > +                vu_panic(dev, "%s Region (%d) doesn't support COPY",
-> > +                         __func__, i);
-> > +                continue;
-> > +            }
-> > +            DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
-> > +                    __func__, i, reg_struct.range.start, reg_struct.range.len);
-> > +            /* TODO: Stash 'zero' support flags somewhere */
-> > +            /* TODO: Get address back to QEMU */
-> > +
-> > +        }
-> > +
-> >           close(vmsg->fds[i]);
-> >       }
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 1941e19932..b1f3a75ab0 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1858,6 +1858,34 @@ ETEXI
+         .sub_table  =3D info_cmds,
+     },
+=20
++    {
++        .name       =3D "instr-load",
++        .args_type  =3D "path:F,args:s?",
++        .params     =3D "path [args]",
++        .help       =3D "load an instrumentation library",
++        .cmd        =3D hmp_instr_load,
++    },
++
++STEXI
++@item instr-load @var{path} [args=3Dvalue[,...]]
++@findex instr-load
++Load an instrumentation library.
++ETEXI
++
++    {
++        .name       =3D "instr-unload",
++        .args_type  =3D "handle:i",
++        .params     =3D "",
++        .help       =3D "unload an instrumentation library",
++        .cmd        =3D hmp_instr_unload,
++    },
++
++STEXI
++@item instr-unload
++@findex instr-unload
++Unload an instrumentation library.
++ETEXI
++
+ STEXI
+ @end table
+ ETEXI
+diff --git a/monitor.c b/monitor.c
+index 6d040e620f..4784356798 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -2319,6 +2319,61 @@ int monitor_fd_param(Monitor *mon, const char *fdn=
+ame, Error **errp)
+     return fd;
+ }
+=20
++static void hmp_instr_load(Monitor *mon, const QDict *qdict)
++{
++    const char *path =3D qdict_get_str(qdict, "path");
++    String str;
++    str.str =3D (char *)qdict_get_try_str(qdict, "args");
++    StringList args;
++    args.value =3D str.str =3D=3D NULL ? NULL : &str;
++    args.next =3D NULL;
++    InstrLoadResult *res =3D qmp_instr_load(path, args.value !=3D NULL,
++                                          args.value !=3D NULL ? &args :=
+ NULL,
++                                          NULL);
++    switch (res->code) {
++    case INSTR_LOAD_CODE_OK:
++        monitor_printf(mon, "Handle: %"PRId64"\n", res->handle);
++        monitor_printf(mon, "OK\n");
++        break;
++    case INSTR_LOAD_CODE_UNAVAILABLE:
++        monitor_printf(mon, "Not available\n");
++        break;
++    case INSTR_LOAD_CODE_ERROR:
++        monitor_printf(mon, "Error loading library: %s\n", res->msg);
++        break;
++    default:
++        fprintf(stderr, "Unknown instrumentation load code: %d", res->co=
+de);
++        exit(1);
++        break;
++    }
++    qapi_free_InstrLoadResult(res);
++}
++
++static void hmp_instr_unload(Monitor *mon, const QDict *qdict)
++{
++    int64_t handle =3D qdict_get_int(qdict, "handle");
++    InstrUnloadResult *res =3D qmp_instr_unload(handle, NULL);
++    switch (res->code) {
++    case INSTR_UNLOAD_CODE_OK:
++        monitor_printf(mon, "OK\n");
++        break;
++    case INSTR_UNLOAD_CODE_UNAVAILABLE:
++        monitor_printf(mon, "Not available\n");
++        break;
++    case INSTR_UNLOAD_CODE_INVALID:
++        monitor_printf(mon, "Invalid handle\n");
++        break;
++    case INSTR_UNLOAD_CODE_ERROR:
++        monitor_printf(mon, "Error unloading library: %s\n", res->msg);
++        break;
++    default:
++        fprintf(stderr, "Unknown instrumentation unload code: %d", res->=
+code);
++        exit(1);
++        break;
++    }
++    qapi_free_InstrUnloadResult(res);
++}
++
+ /* Please update hmp-commands.hx when adding or changing commands */
+ static mon_cmd_t info_cmds[] =3D {
+ #include "hmp-commands-info.h"
