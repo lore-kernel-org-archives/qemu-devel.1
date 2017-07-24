@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZbyz-00015a-DL
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dZbz0-00016M-8N
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZbyy-0006tN-9D
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34180)
+	(envelope-from <armbru@redhat.com>) id 1dZbyy-0006ti-DV
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZbyy-0006sF-0L
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZbyy-0006sJ-37
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 07:57:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E691AC0B772A
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 094A0369C4
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-94.ams2.redhat.com
 	[10.36.116.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 72DE184788
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D2E591E93
 	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 11:57:02 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Jul 2017 13:56:56 +0200
-Message-Id: <1500897419-15539-8-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Jul 2017 13:56:58 +0200
+Message-Id: <1500897419-15539-10-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500897419-15539-1-git-send-email-armbru@redhat.com>
 References: <1500897419-15539-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 07/10] migration: Clean up around tls_creds,
- tls_hostname
+Subject: [Qemu-devel] [PULL v2 09/10] migration: Unshare MigrationParameters
+ struct for now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +36,281 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Optional MigrationParameters members tls_creds and tls_hostname can't
-actually be absent outside qmp_migrate_set_parameters() since commit
-4af245d (v2.9.0).
+Commit de63ab6 "migrate: Share common MigrationParameters struct"
+reused MigrationParameters for the arguments of
+migrate-set-parameters, with the following rationale:
 
-Note that commit 4af245d reverted the part of commit de63ab6 (v2.8.0)
-that made tls_creds and tls_hostname absent instead of "" in the value
-of query-migrate-parameters, even though commit de63ab6 called that a
-mistake.  What a mess.
+    It is rather verbose, and slightly error-prone, to repeat
+    the same set of parameters for input (migrate-set-parameters)
+    as for output (query-migrate-parameters), where the only
+    difference is whether the members are optional.  We can just
+    document that the optional members will always be present
+    on output, and then share a common struct between both
+    commands.  The next patch can then reduce the amount of
+    code needed on input.
 
-Drop the redundant tests for presence, and update documentation.
+I need to unshare them to correct a design flaw in a stupid, but
+minimally invasive way, in the next commit.  We can restore the
+sharing when we redo that patch in a less stupid way.  Add a suitable
+TODO comment.
+
+Note that I revert only the sharing part of commit de63ab6, not the
+part that made the members of query-migrate-parameters' result
+optional.  The schema (and thus introspection) remains inaccurate for
+query-migrate-parameters.  If we decide not to restore the sharing, we
+should revert that part, too.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hmp.c                 |  6 ++++--
- migration/migration.c |  4 ++--
- qapi-schema.json      | 11 +++++------
- 3 files changed, 11 insertions(+), 10 deletions(-)
+ hmp.c                 |  4 +--
+ migration/migration.c | 66 ++++++++++++++++++++++++++++++++++++---
+ qapi-schema.json      | 85 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 140 insertions(+), 15 deletions(-)
 
 diff --git a/hmp.c b/hmp.c
-index dae4604..d7b4727 100644
+index d7b4727..4b6b114 100644
 --- a/hmp.c
 +++ b/hmp.c
-@@ -313,12 +313,14 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %" PRId64 "\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT],
-             params->cpu_throttle_increment);
-+        assert(params->has_tls_creds);
-         monitor_printf(mon, "%s: '%s'\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
--            params->has_tls_creds ? params->tls_creds : "");
-+            params->tls_creds);
-+        assert(params->has_tls_hostname);
-         monitor_printf(mon, "%s: '%s'\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
--            params->has_tls_hostname ? params->tls_hostname : "");
-+            params->tls_hostname);
-         assert(params->has_max_bandwidth);
-         monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
-             MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH],
+@@ -1556,7 +1556,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     const char *param = qdict_get_str(qdict, "parameter");
+     const char *valuestr = qdict_get_str(qdict, "value");
+     Visitor *v = string_input_visitor_new(valuestr);
+-    MigrationParameters *p = g_new0(MigrationParameters, 1);
++    MigrateSetParameters *p = g_new0(MigrateSetParameters, 1);
+     uint64_t valuebw = 0;
+     Error *err = NULL;
+     int i, ret;
+@@ -1634,7 +1634,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     }
+ 
+  cleanup:
+-    qapi_free_MigrationParameters(p);
++    qapi_free_MigrateSetParameters(p);
+     visit_free(v);
+     if (err) {
+         error_report_err(err);
 diff --git a/migration/migration.c b/migration/migration.c
-index 7615391..88b9277 100644
+index 6b4d17f..205b801 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -444,9 +444,9 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
-     params->cpu_throttle_initial = s->parameters.cpu_throttle_initial;
-     params->has_cpu_throttle_increment = true;
-     params->cpu_throttle_increment = s->parameters.cpu_throttle_increment;
--    params->has_tls_creds = !!s->parameters.tls_creds;
-+    params->has_tls_creds = true;
-     params->tls_creds = g_strdup(s->parameters.tls_creds);
--    params->has_tls_hostname = !!s->parameters.tls_hostname;
-+    params->has_tls_hostname = true;
-     params->tls_hostname = g_strdup(s->parameters.tls_hostname);
-     params->has_max_bandwidth = true;
-     params->max_bandwidth = s->parameters.max_bandwidth;
+@@ -742,7 +742,59 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
+     return true;
+ }
+ 
+-static void migrate_params_apply(MigrationParameters *params)
++static void migrate_params_test_apply(MigrateSetParameters *params,
++                                      MigrationParameters *dest)
++{
++    *dest = migrate_get_current()->parameters;
++
++    /* TODO use QAPI_CLONE() instead of duplicating it inline */
++
++    if (params->has_compress_level) {
++        dest->compress_level = params->compress_level;
++    }
++
++    if (params->has_compress_threads) {
++        dest->compress_threads = params->compress_threads;
++    }
++
++    if (params->has_decompress_threads) {
++        dest->decompress_threads = params->decompress_threads;
++    }
++
++    if (params->has_cpu_throttle_initial) {
++        dest->cpu_throttle_initial = params->cpu_throttle_initial;
++    }
++
++    if (params->has_cpu_throttle_increment) {
++        dest->cpu_throttle_increment = params->cpu_throttle_increment;
++    }
++
++    if (params->has_tls_creds) {
++        dest->tls_creds = g_strdup(params->tls_creds);
++    }
++
++    if (params->has_tls_hostname) {
++        dest->tls_hostname = g_strdup(params->tls_hostname);
++    }
++
++    if (params->has_max_bandwidth) {
++        dest->max_bandwidth = params->max_bandwidth;
++    }
++
++    if (params->has_downtime_limit) {
++        dest->downtime_limit = params->downtime_limit;
++    }
++
++    if (params->has_x_checkpoint_delay) {
++        dest->x_checkpoint_delay = params->x_checkpoint_delay;
++    }
++
++    if (params->has_block_incremental) {
++        dest->block_incremental = params->block_incremental;
++    }
++}
++
++static void migrate_params_apply(MigrateSetParameters *params)
+ {
+     MigrationState *s = migrate_get_current();
+ 
+@@ -802,9 +854,13 @@ static void migrate_params_apply(MigrationParameters *params)
+     }
+ }
+ 
+-void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
++void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+ {
+-    if (!migrate_params_check(params, errp)) {
++    MigrationParameters tmp;
++
++    migrate_params_test_apply(params, &tmp);
++
++    if (!migrate_params_check(&tmp, errp)) {
+         /* Invalid parameter */
+         return;
+     }
+@@ -1240,7 +1296,7 @@ int64_t qmp_query_migrate_cache_size(Error **errp)
+ 
+ void qmp_migrate_set_speed(int64_t value, Error **errp)
+ {
+-    MigrationParameters p = {
++    MigrateSetParameters p = {
+         .has_max_bandwidth = true,
+         .max_bandwidth = value,
+     };
+@@ -1260,7 +1316,7 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+     value *= 1000; /* Convert to milliseconds */
+     value = MAX(0, MIN(INT64_MAX, value));
+ 
+-    MigrationParameters p = {
++    MigrateSetParameters p = {
+         .has_downtime_limit = true,
+         .downtime_limit = value,
+     };
 diff --git a/qapi-schema.json b/qapi-schema.json
-index 58d3a02..a9c2f05 100644
+index a9c2f05..70c3541 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -1054,9 +1054,7 @@
+@@ -1035,6 +1035,77 @@
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ] }
+ 
+ ##
++# @MigrateSetParameters:
++#
++# @compress-level: compression level
++#
++# @compress-threads: compression thread count
++#
++# @decompress-threads: decompression thread count
++#
++# @cpu-throttle-initial: Initial percentage of time guest cpus are
++#                        throttled when migration auto-converge is activated.
++#                        The default value is 20. (Since 2.7)
++#
++# @cpu-throttle-increment: throttle percentage increase each time
++#                          auto-converge detects that migration is not making
++#                          progress. The default value is 10. (Since 2.7)
++#
++# @tls-creds: ID of the 'tls-creds' object that provides credentials
++#             for establishing a TLS connection over the migration data
++#             channel. On the outgoing side of the migration, the credentials
++#             must be for a 'client' endpoint, while for the incoming side the
++#             credentials must be for a 'server' endpoint. Setting this
++#             to a non-empty string enables TLS for all migrations.
++#             An empty string means that QEMU will use plain text mode for
++#             migration, rather than TLS (Since 2.9)
++#             Previously (since 2.7), this was reported by omitting
++#             tls-creds instead.
++#
++# @tls-hostname: hostname of the target host for the migration. This
++#                is required when using x509 based TLS credentials and the
++#                migration URI does not already include a hostname. For
++#                example if using fd: or exec: based migration, the
++#                hostname must be provided so that the server's x509
++#                certificate identity can be validated. (Since 2.7)
++#                An empty string means that QEMU will use the hostname
++#                associated with the migration URI, if any. (Since 2.9)
++#                Previously (since 2.7), this was reported by omitting
++#                tls-hostname instead.
++#
++# @max-bandwidth: to set maximum speed for migration. maximum speed in
++#                 bytes per second. (Since 2.8)
++#
++# @downtime-limit: set maximum tolerated downtime for migration. maximum
++#                  downtime in milliseconds (Since 2.8)
++#
++# @x-checkpoint-delay: the delay time between two COLO checkpoints. (Since 2.8)
++#
++# @block-incremental: Affects how much storage is migrated when the
++# 	block migration capability is enabled.  When false, the entire
++# 	storage backing chain is migrated into a flattened image at
++# 	the destination; when true, only the active qcow2 layer is
++# 	migrated and the destination must already have access to the
++# 	same backing chain as was used on the source.  (since 2.10)
++#
++# Since: 2.4
++##
++# TODO either fuse back into MigrationParameters, or make
++# MigrationParameters members mandatory
++{ 'struct': 'MigrateSetParameters',
++  'data': { '*compress-level': 'int',
++            '*compress-threads': 'int',
++            '*decompress-threads': 'int',
++            '*cpu-throttle-initial': 'int',
++            '*cpu-throttle-increment': 'int',
++            '*tls-creds': 'str',
++            '*tls-hostname': 'str',
++            '*max-bandwidth': 'int',
++            '*downtime-limit': 'int',
++            '*x-checkpoint-delay': 'int',
++            '*block-incremental': 'bool' } }
++
++##
+ # @migrate-set-parameters:
+ #
+ # Set various migration parameters.
+@@ -1048,13 +1119,12 @@
+ #
+ ##
+ { 'command': 'migrate-set-parameters', 'boxed': true,
+-  'data': 'MigrationParameters' }
++  'data': 'MigrateSetParameters' }
+ 
+ ##
  # @MigrationParameters:
  #
- # Optional members can be omitted on input ('migrate-set-parameters')
--# but most members will always be present on output
--# ('query-migrate-parameters'), with the exception of tls-creds and
--# tls-hostname.
-+# but members will always be present on output.
+-# Optional members can be omitted on input ('migrate-set-parameters')
+-# but members will always be present on output.
++# The optional members aren't actually optional.
  #
  # @compress-level: compression level
  #
-@@ -1077,10 +1075,10 @@
+@@ -1063,19 +1133,18 @@
+ # @decompress-threads: decompression thread count
+ #
+ # @cpu-throttle-initial: Initial percentage of time guest cpus are
+-#                        throttledwhen migration auto-converge is activated.
+-#                        The default value is 20. (Since 2.7)
++#                        throttled when migration auto-converge is activated.
++#                        (Since 2.7)
+ #
+ # @cpu-throttle-increment: throttle percentage increase each time
+ #                          auto-converge detects that migration is not making
+-#                          progress. The default value is 10. (Since 2.7)
++#                          progress. (Since 2.7)
+ #
+ # @tls-creds: ID of the 'tls-creds' object that provides credentials
+ #             for establishing a TLS connection over the migration data
  #             channel. On the outgoing side of the migration, the credentials
  #             must be for a 'client' endpoint, while for the incoming side the
- #             credentials must be for a 'server' endpoint. Setting this
--#             will enable TLS for all migrations. The default is unset,
--#             resulting in unsecured migration at the QEMU level. (Since 2.7)
-+#             to a non-empty string enables TLS for all migrations.
+-#             credentials must be for a 'server' endpoint. Setting this
+-#             to a non-empty string enables TLS for all migrations.
++#             credentials must be for a 'server' endpoint.
  #             An empty string means that QEMU will use plain text mode for
--#             migration, rather than TLS (Since 2.9)
-+#             migration, rather than TLS (Since 2.7)
-+#             Note: 2.8 reports this by omitting tls-creds instead.
- #
- # @tls-hostname: hostname of the target host for the migration. This
- #                is required when using x509 based TLS credentials and the
-@@ -1090,6 +1088,7 @@
- #                certificate identity can be validated. (Since 2.7)
- #                An empty string means that QEMU will use the hostname
- #                associated with the migration URI, if any. (Since 2.9)
-+#                Note: 2.8 reports this by omitting tls-hostname instead.
- #
- # @max-bandwidth: to set maximum speed for migration. maximum speed in
- #                 bytes per second. (Since 2.8)
+ #             migration, rather than TLS (Since 2.7)
+ #             Note: 2.8 reports this by omitting tls-creds instead.
 -- 
 2.7.5
