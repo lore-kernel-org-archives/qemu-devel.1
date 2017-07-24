@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZeVn-0006xd-2q
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:39:08 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dZeW5-0007E6-Um
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:39:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZeVl-0004vd-Vo
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:39:07 -0400
-Date: Mon, 24 Jul 2017 15:38:58 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170724143858.GH2784@stefanha-x1.localdomain>
-References: <20170714094521.4909-1-el13635@mail.ntua.gr>
-	<20170714094521.4909-3-el13635@mail.ntua.gr>
+	(envelope-from <zuban32s@gmail.com>) id 1dZeW4-000574-W1
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:39:26 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:34335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dZeW4-00054o-Oq
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 10:39:24 -0400
+Received: by mail-pf0-x233.google.com with SMTP id q85so47757058pfq.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 07:39:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NzX0AQGjRQPusK/O"
-Content-Disposition: inline
-In-Reply-To: <20170714094521.4909-3-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH 2/7] block: add aio_context field in
- ThrottleGroupMember
+In-Reply-To: <1500889352.15837.7.camel@redhat.com>
+References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+	<1500761510-1556-5-git-send-email-zuban32s@gmail.com>
+	<20170723054445-mutt-send-email-mst@kernel.org>
+	<CAKSfGUAHPHwgLa=jNUGpW-saHK6rGK5epBY2ixizeuCwvE77wA@mail.gmail.com>
+	<CAKSfGUDbW8psdPGOXUQDWBV6OJL8z_hxp5NL-=Pg+OHu5ZGfvA@mail.gmail.com>
+	<1500889352.15837.7.camel@redhat.com>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Mon, 24 Jul 2017 17:39:21 +0300
+Message-ID: <CAKSfGUDBRj8QMi45EKaDb0Ce19Yd_XqkMVUWQiaeUqCyMVcQpQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] pci: enable RedHat PCI bridges
+ to reserve additional buses on PCI init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, seabios@seabios.org, Marcel Apfelbaum <marcel@redhat.com>, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+
+2017-07-24 12:42 GMT+03:00 Gerd Hoffmann <kraxel@redhat.com>:
+
+> On Sun, 2017-07-23 at 22:44 +0300, Alexander Bezzubikov wrote:
+> > By the way, any ideas on how to avoid 'bus overstealing' would
+> > be greatly appreciated.
+> > Static BIOS variable isn't applicable since its value isn't saved
+> > across reboots.
+>
+> I think the reservation hints should be a absolute number, not a
+> increment.  i.e. if qemu suggests to reserve three extra bus numbers
+> seabios should reserve three, no matter whenever there are zero, one,
+> two or three child busses present.  And I guess seabios should
+> interpret that as minimum, so in case it finds five child busses it
+> will allocate five bus numbers of course ...
+>
+
+Personally I have nothing against it. Marcel, Michael, what do you think?
 
 
---NzX0AQGjRQPusK/O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>
+> Same with the other limit hints.  If the hint says to allocate 16M, and
+> existing device bars sum up to 4M, allocate 16M (and therefore leave
+> 12M address space for hotplug).  If the device bars sum up to 32M,
+> allocate that.
+>
+> While being at it:  I have my doubts the capability struct layout
+> (which mimics register layout) buys us that much, seabios wouldn't
+> blindly copy over the values anyway.  Having regular u32 fields looks
+> more useful to me.
+>
+>
+Again, if nobody has any objections, I can change it in v3.
 
-On Fri, Jul 14, 2017 at 12:45:16PM +0300, Manos Pitsidianakis wrote:
-> timer_cb() needs to know about the current Aio context of the throttle
-> request that is woken up. In order to make ThrottleGroupMember backend
-> agnostic, this information is stored in an aio_context field instead of
-> accessing it from BlockBackend.
->=20
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> ---
->  block/block-backend.c           | 14 ++++-----
->  block/throttle-groups.c         | 38 ++++++++++++++++---------
->  include/block/throttle-groups.h |  7 ++++-
->  tests/test-throttle.c           | 63 +++++++++++++++++++++--------------=
-------
->  4 files changed, 69 insertions(+), 53 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> cheers,
+>   Gerd
+>
+>
 
---NzX0AQGjRQPusK/O
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZdgaCAAoJEJykq7OBq3PITF8H/3NOE9OpPF8TiyAjVUBnsLJy
-bcwe90V4yTHlSrYdp6qJN6Hr1m/wIC0d3FgzfJnM/npE68SM8XQZo09brKpWjyAs
-111+jXwN3BGuMh+24diovW5pNJc6F0ozwRD3E8MEbZMRL9hDoGMbIyOMz2Bl82qA
-TzX/FZXqFR9h9AF5f2Z6EqIbX38nlE3GkbHkwu4T4Qipy+1ZHliA60oB3hfvdupk
-a9fct12UwtjWPTf42IeRdDB+MlrllyCyg0N4NHgvBC2nroZINlHpNmlPQxR6jSLA
-NzTkTWgTwtkXfsNEW3bVQIcKALf4ZiP/+DnXiSQw0YrDdtdIP/nWba+qsAh0gUY=
-=dgRy
------END PGP SIGNATURE-----
-
---NzX0AQGjRQPusK/O--
+-- 
+Alexander Bezzubikov
