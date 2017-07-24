@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZVWV-0000EA-Pi
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 01:03:17 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1dZVXi-00013B-6M
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 01:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZVWU-0005Oo-MO
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 01:03:15 -0400
-Date: Mon, 24 Jul 2017 14:49:48 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170724044948.GF17228@umbus.fritz.box>
+	(envelope-from <benh@kernel.crashing.org>) id 1dZVXe-0005uh-SA
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 01:04:30 -0400
+Message-ID: <1500872645.10674.52.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Mon, 24 Jul 2017 15:04:05 +1000
+In-Reply-To: <20170724032853.GB17228@umbus.fritz.box>
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-10-git-send-email-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wtjvnLv0o8UUzur2"
-Content-Disposition: inline
-In-Reply-To: <1499274819-15607-10-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 09/26] ppc/xive: add an overall memory
- region for the ESBs
+	<1499274819-15607-5-git-send-email-clg@kaod.org>
+	<20170719030849.GQ3140@umbus.fritz.box>
+	<1500436938.3350.11.camel@kernel.crashing.org>
+	<20170721075015.GE3717@umbus.fritz.box>
+	<1500625291.10674.22.camel@kernel.crashing.org>
+	<20170724032853.GB17228@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
+ for the XIVE interrupt controller model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,185 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
+On Mon, 2017-07-24 at 13:28 +1000, David Gibson wrote:
+> > So yes, in PAPR there's an "allocator" because the hypervisor will
+> > create a guest "virtual" (or logical to use PAPR terminology) interrupt
+> > number space, in order to represents the various interrupts into the
+> > guest.
+> 
+> Ok, but are each of those logical irqs bound to a specific device/PHB
+> line/whatever, or can they be configured by the guest?
 
---wtjvnLv0o8UUzur2
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+So for clarity, let's first establish the terminology :-)
 
-On Wed, Jul 05, 2017 at 07:13:22PM +0200, C=E9dric Le Goater wrote:
-> Each source adds its own ESB mempry region to the overall ESB memory
-> region of the controller. It will be mapped in the CPU address space
-> when XIVE is activated.
->=20
-> The default mapping address for the ESB memory region is the same one
-> used on baremetal.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  hw/intc/xive-internal.h |  5 +++++
->  hw/intc/xive.c          | 44 +++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 48 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
-> index 8e755aa88a14..c06be823aad0 100644
-> --- a/hw/intc/xive-internal.h
-> +++ b/hw/intc/xive-internal.h
-> @@ -98,6 +98,7 @@ struct XIVE {
->      SysBusDevice parent;
-> =20
->      /* Properties */
-> +    uint32_t     chip_id;
+ - HW number is a HW interrupt number on a "bare metal" system or
+powernv guest. For now we will ignore those, they are effectively a
+side effect of how skiboot configure the XIVE and qemu per-se doesn't
+allocate them.
 
-So there is a XIVE object per chip.  How does this work on PAPR?  One
-logical chip/XIVE, or something more complex?
+ - A logical number is a "guest physical" interrupt number for a PAPR
+guest. These fall into roughly 2 categories at the moment:
 
->      uint32_t     nr_targets;
-> =20
->      /* IRQ number allocator */
-> @@ -111,6 +112,10 @@ struct XIVE {
->      void         *sbe;
->      XiveIVE      *ivt;
->      XiveEQ       *eqdt;
-> +
-> +    /* ESB and TIMA memory location */
-> +    hwaddr       vc_base;
-> +    MemoryRegion esb_iomem;
->  };
-> =20
->  void xive_reset(void *dev);
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 8f8bb8b787bd..a1cb87a07b76 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -312,6 +312,7 @@ static void xive_ics_realize(ICSState *ics, Error **e=
-rrp)
->      XiveICSState *xs =3D ICS_XIVE(ics);
->      Object *obj;
->      Error *err =3D NULL;
-> +    XIVE *x;
+    * "interrupts" (or related) properties in the DT, typically
+interrupts for a PCI device, ranges of MSIs etc... that correspond to
+HW sources from a PHB.
 
-I don't really like just 'x' for a context variable like this (as
-opposed to a temporary).
+    * "generic IPIs". Those are ranges of "generic" interrupts that the
+hypervisor gives the guest. On a real system, they correspond to chunks
+allocated off a HW facility for generic interrupts. Generic interrupts
+are the same as normal interrupts from the prespective of
+managing/receiving them, but are "triggered" by an MMIO to a certain HW
+page. There's a DT property telling the guest the interrupt number
+ranges for these guys.
 
-> =20
->      obj =3D object_property_get_link(OBJECT(xs), "xive", &err);
->      if (!obj) {
-> @@ -319,7 +320,7 @@ static void xive_ics_realize(ICSState *ics, Error **e=
-rrp)
->                     __func__, error_get_pretty(err));
->          return;
->      }
-> -    xs->xive =3D XIVE(obj);
-> +    x =3D xs->xive =3D XIVE(obj);
-> =20
->      if (!ics->nr_irqs) {
->          error_setg(errp, "Number of interrupts needs to be greater 0");
-> @@ -338,6 +339,11 @@ static void xive_ics_realize(ICSState *ics, Error **=
-errp)
->                            "xive.esb",
->                            (1ull << xs->esb_shift) * ICS_BASE(xs)->nr_irq=
-s);
-> =20
-> +    /* Install the ESB memory region in the overall one */
-> +    memory_region_add_subregion(&x->esb_iomem,
-> +                                ICS_BASE(xs)->offset * (1 << xs->esb_shi=
-ft),
-> +                                &xs->esb_iomem);
-> +
->      qemu_register_reset(xive_ics_reset, xs);
->  }
-> =20
-> @@ -375,6 +381,32 @@ static const TypeInfo xive_ics_info =3D {
->   */
->  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
-> =20
-> +/* VC BAR contains set translations for the ESBs and the EQs. */
-> +#define VC_BAR_DEFAULT   0x10000000000ull
-> +#define VC_BAR_SIZE      0x08000000000ull
-> +
-> +#define P9_MMIO_BASE     0x006000000000000ull
-> +#define P9_CHIP_BASE(id) (P9_MMIO_BASE | (0x40000000000ull * (uint64_t) =
-(id)))
+So that logical number above is what a PAPR guest obtains from the DT
+and uses for the various H-call used to manage and configure interrupt
+sources.
 
-chip-based MMIO addresses leaking into the PAPR model seems like it
-might not be what you want
+In addition, the XIVE supports renumbering the interrupt number that
+you obtain in the queues. Both bare metal linux, KVM and guests make
+use of this. This only changes the number you observe in a queue when
+you receive an interrupt, it has no effect on the HW number or logical
+number used for the various management calls.
 
-> +static uint64_t xive_esb_default_read(void *p, hwaddr offset, unsigned s=
-ize)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
-> +                  __func__, offset, size);
-> +    return 0;
-> +}
-> +
-> +static void xive_esb_default_write(void *opaque, hwaddr offset, uint64_t=
- value,
-> +                unsigned size)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%=
-u]\n",
-> +                  __func__, offset, value, size);
-> +}
-> +
-> +static const MemoryRegionOps xive_esb_default_ops =3D {
-> +    .read =3D xive_esb_default_read,
-> +    .write =3D xive_esb_default_write,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +};
-> =20
->  void xive_reset(void *dev)
->  {
-> @@ -435,10 +467,20 @@ static void xive_realize(DeviceState *dev, Error **=
-errp)
->      x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
->                          sizeof(XiveEQ));
-> =20
-> +    /* VC BAR. That's the full window but we will only map the
-> +     * subregions in use. */
-> +    x->vc_base =3D (hwaddr)(P9_CHIP_BASE(x->chip_id) | VC_BAR_DEFAULT);
-> +
-> +    /* install default memory region handlers to log bogus access */
-> +    memory_region_init_io(&x->esb_iomem, NULL, &xive_esb_default_ops,
-> +                          NULL, "xive.esb", VC_BAR_SIZE);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->esb_iomem);
-> +
->      qemu_register_reset(xive_reset, dev);
->  }
-> =20
->  static Property xive_properties[] =3D {
-> +    DEFINE_PROP_UINT32("chip-id", XIVE, chip_id, 0),
->      DEFINE_PROP_UINT32("nr-targets", XIVE, nr_targets, 0),
->      DEFINE_PROP_END_OF_LIST(),
->  };
+This is used by Linux so that:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+  - On bare metal systems or PAPR guest with "exploitation mode" (ie,
+PAPR guest directly using the XIVE), we put the linux interrupt number
+in there as to avoid the reverse-mapping done by linux otherwise when
+receiving an interrupt.
 
---wtjvnLv0o8UUzur2
-Content-Type: application/pgp-signature; name="signature.asc"
+  - On PARP guests using the legacy hcalls, KVM configures the logical
+number there.
 
------BEGIN PGP SIGNATURE-----
+> > Those numbers however are just tokens, they don't have to represent any
+> > real HW concept. So they can be "allocated" in a rather fixed way, for
+> > example, you could have something like a fixed map where you put all
+> > the PCI interrupts at a certain number (a factor of the PHB# with room
+> > or a fix number per PHB, maybe 16K or so, the HW does 4K max). Another
+> > based would have a chunk of "general purpose" IPIs (for use for actual
+> > IPIs and for other things to come). And a range for the virtual device
+> > interrupts for example. Or you can just use an allocator.
+> 
+> Hm.  So what I'm meaning by an "allocator" is something at least
+> partially dynamic.  Something you say "give me an irq" and it gives
+> you the next available or similar.  As opposed to any mapping from
+> devices to (logical) irqs, which the machine will need to supply one
+> way or another.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll1fGoACgkQbDjKyiDZ
-s5KFIw/8DMV8xPYBtcn4bS2ReOad4qEpowZSu6dcqd6FWtojaUtVDBpQYkx/TwOf
-6LvzQ+kZvXxpMSq5jlQVTvJFq5hMHD5NY5eXsFukZp/LrZZHQ+JIKZIOall9RNV1
-wk8eYgsXeW9I/yUknFHmPCrZ1bycj1K1iHaWokTDjFiw1SNFmQ2Bsx62vImWFvwB
-wPdEhBJT9QqNrcGqJLNLeplwgo2nHa/Ms/xToc3aKWlCtWgyTSx3ZUOX9uUplac4
-fWc07cDwE5u9aqAC0IYClStw9L18+REJobT1CVybMvMk0VZ94kS4C5jkPeujnVpu
-LKImQd1hi3NGqarZvoh2sgNFGDx8LiCajbAR6hTNZQ0P/zrDM8T1+6jXQuJzfGrU
-XE+StsBBFDCxLddUjc9ChwDcM4Nq4DroB2t+9g5OowTE9+mhQ1J391e3TF3iqdNJ
-0gGnPQXb23YOwaXK5hAAcbfVrei3lb4S7m6p+i/ZMPBlNs9YfuZ1ujHhv9SZcGtA
-YNkem3gv6uFXsmbV2TNdtmA0OYT8kJuBCGNYmmlRywl2oVNqn+VO/lKJHKytdq6L
-why/z6Bi0exPdrd1+BaGQDX4YqkdOlhyDFcaFPGUqmdYI7glG1vQ2cA7gWV9uOCr
-qL3eFF6XoIbfAo7owhyDh+DenkAVXcd8C2ANFr+JymEOYxYn96w=
-=7+ja
------END PGP SIGNATURE-----
+For the sake of repeatability/migration etc... I think a mapping is
+better than an allocator.  IE, a fixed number scheme so that the range
+of interrupts for PHB#x is always a fixed function of x.
 
---wtjvnLv0o8UUzur2--
+We can fix the number of "generic" interrupts given to a guest. The
+only requirements from a PAPR perspective is that there should be at
+least as many as there are possible threads in the guest so they can be
+used as IPIs.
+
+But we may need more for other things. We can make this a machine
+parameter with a default value of something like 4096. If we call N
+that number of extra generic interrupts, then the number of generic
+interrutps would be #possible-vcpu's + N, or something like that.
+
+> > But it's fundamentally an allocator that sits in the hypervisor, so in
+> > our case, I would say in the spapr "component" of XIVE, rather than the
+> > XIVE HW model itself.
+> 
+> Maybe..
+
+You are right in that a mapping is a better term than an allocator
+here.
+
+> > Now what Cedric did, because XIVE is very complex and we need something
+> > for PAPR quickly, is not a complete HW model, but a somewhat simplified
+> > one that only handles what PAPR exposes. So in that case where the
+> > allocator sits is a bit of a TBD...
+> 
+> Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
+> machine type level needs extreme caution, or the irqs may not be
+> stable which will generally break migration.
+
+Yes you are right. We should probably create a more "static" scheme.
+
+Cheers,
+Ben.
