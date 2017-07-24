@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjxX-0002zE-FB
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:08 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dZjxb-00031d-AM
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dZjxW-0000pC-1X
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:07 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:38316)
+	(envelope-from <rth7680@gmail.com>) id 1dZjxX-0000qm-V5
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:11 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34469)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjxV-0000oh-Sj
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:05 -0400
-Received: by mail-qk0-x243.google.com with SMTP id t2so10964748qkc.5
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dZjxX-0000q8-Ox
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:28:07 -0400
+Received: by mail-qk0-x242.google.com with SMTP id q66so10949067qki.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 13:28:07 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 24 Jul 2017 13:26:59 -0700
-Message-Id: <20170724202728.25960-4-rth@twiddle.net>
+Date: Mon, 24 Jul 2017 13:27:00 -0700
+Message-Id: <20170724202728.25960-5-rth@twiddle.net>
 In-Reply-To: <20170724202728.25960-1-rth@twiddle.net>
 References: <20170724202728.25960-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v15 03/32] target/arm: Use DISAS_NORETURN
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v15 04/32] target: [tcg] Use a generic enum for
+ DISAS_ values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,202 +33,411 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org, vilanova@ac.upc.edu
 
-Fold DISAS_EXC and DISAS_TB_JUMP into DISAS_NORETURN.
+From: Lluís Vilanova <vilanova@ac.upc.edu>
 
-In both cases all following code is dead.  In the first
-case because we have exited the TB via exception; in the
-second case because we have exited the TB via goto_tb
-and its associated machinery.
+Used later. An enum makes expected values explicit and
+bounds the value space of switches.
 
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <150002049746.22386.2316077281615710615.stgit@frigg.lan>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.h     |  8 ++------
- target/arm/translate-a64.c | 37 ++++++++++++++++++++-----------------
- target/arm/translate.c     | 14 ++++++++------
- 3 files changed, 30 insertions(+), 29 deletions(-)
+ include/exec/exec-all.h       | 30 ------------------------------
+ include/exec/translator.h     | 40 ++++++++++++++++++++++++++++++++++++++++
+ target/arm/translate.h        | 23 ++++++++++++++---------
+ target/arm/translate.c        |  2 +-
+ target/cris/translate.c       |  7 ++++++-
+ target/i386/translate.c       |  3 +--
+ target/lm32/translate.c       |  6 ++++++
+ target/m68k/translate.c       |  7 ++++++-
+ target/microblaze/translate.c |  6 ++++++
+ target/nios2/translate.c      |  6 ++++++
+ target/openrisc/translate.c   |  6 ++++++
+ target/s390x/translate.c      |  3 ++-
+ target/unicore32/translate.c  |  7 ++++++-
+ target/xtensa/translate.c     |  4 ++++
+ 14 files changed, 104 insertions(+), 46 deletions(-)
+ create mode 100644 include/exec/translator.h
 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index b434988979..ff8fbe423d 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -35,36 +35,6 @@ typedef abi_ulong tb_page_addr_t;
+ typedef ram_addr_t tb_page_addr_t;
+ #endif
+ 
+-/* DisasContext is_jmp field values
+- *
+- * is_jmp starts as DISAS_NEXT. The translator will keep processing
+- * instructions until an exit condition is reached. If we reach the
+- * exit condition and is_jmp is still DISAS_NEXT (because of some
+- * other condition) we simply "jump" to the next address.
+- * The remaining exit cases are:
+- *
+- *   DISAS_JUMP    - Only the PC was modified dynamically (e.g computed)
+- *   DISAS_TB_JUMP - Only the PC was modified statically (e.g. branch)
+- *
+- * In these cases as long as the PC is updated we can chain to the
+- * next TB either by exiting the loop or looking up the next TB via
+- * the loookup helper.
+- *
+- *   DISAS_UPDATE  - CPU State was modified dynamically
+- *
+- * This covers any other CPU state which necessities us exiting the
+- * TCG code to the main run-loop. Typically this includes anything
+- * that might change the interrupt state.
+- *
+- * Individual translators may define additional exit cases to deal
+- * with per-target special conditions.
+- */
+-#define DISAS_NEXT    0 /* next instruction can be analyzed */
+-#define DISAS_JUMP    1 /* only pc was modified dynamically */
+-#define DISAS_TB_JUMP 2 /* only pc was modified statically */
+-#define DISAS_UPDATE  3 /* cpu state was modified dynamically */
+-#define DISAS_NORETURN 4 /* the tb has already been exited */
+-
+ #include "qemu/log.h"
+ 
+ void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb);
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+new file mode 100644
+index 0000000000..b51b8f8a4e
+--- /dev/null
++++ b/include/exec/translator.h
+@@ -0,0 +1,40 @@
++/*
++ * Generic intermediate code generation.
++ *
++ * Copyright (C) 2016-2017 Lluís Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef EXEC__TRANSLATOR_H
++#define EXEC__TRANSLATOR_H
++
++/**
++ * DisasJumpType:
++ * @DISAS_NEXT: Next instruction in program order.
++ * @DISAS_TOO_MANY: Too many instructions translated.
++ * @DISAS_NORETURN: Following code is dead.
++ * @DISAS_TARGET_*: Start of target-specific conditions.
++ *
++ * What instruction to disassemble next.
++ */
++typedef enum DisasJumpType {
++    DISAS_NEXT,
++    DISAS_TOO_MANY,
++    DISAS_NORETURN,
++    DISAS_TARGET_0,
++    DISAS_TARGET_1,
++    DISAS_TARGET_2,
++    DISAS_TARGET_3,
++    DISAS_TARGET_4,
++    DISAS_TARGET_5,
++    DISAS_TARGET_6,
++    DISAS_TARGET_7,
++    DISAS_TARGET_8,
++    DISAS_TARGET_9,
++    DISAS_TARGET_10,
++    DISAS_TARGET_11,
++} DisasJumpType;
++
++#endif  /* EXEC__TRANSLATOR_H */
 diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 2fe144baa9..90f64d9716 100644
+index 90f64d9716..1eb432dc2c 100644
 --- a/target/arm/translate.h
 +++ b/target/arm/translate.h
-@@ -124,12 +124,8 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+@@ -1,6 +1,9 @@
+ #ifndef TARGET_ARM_TRANSLATE_H
+ #define TARGET_ARM_TRANSLATE_H
+ 
++#include "exec/translator.h"
++
++
+ /* internal defines */
+ typedef struct DisasContext {
+     target_ulong pc;
+@@ -119,29 +122,31 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+     s->insn_start_idx = 0;
+ }
+ 
+-/* target-specific extra values for is_jmp */
++/* is_jmp field values */
++#define DISAS_JUMP      DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE    DISAS_TARGET_1 /* cpu state was modified dynamically */
+ /* These instructions trap after executing, so the A32/T32 decoder must
   * defer them until after the conditional execution state has been updated.
   * WFI also needs special handling when single-stepping.
   */
--#define DISAS_WFI 4
--#define DISAS_SWI 5
--/* For instructions which unconditionally cause an exception we can skip
-- * emitting unreachable code at the end of the TB in the A64 decoder
-- */
--#define DISAS_EXC 6
-+#define DISAS_WFI 5
-+#define DISAS_SWI 6
+-#define DISAS_WFI 5
+-#define DISAS_SWI 6
++#define DISAS_WFI       DISAS_TARGET_2
++#define DISAS_SWI       DISAS_TARGET_3
  /* WFE */
- #define DISAS_WFE 7
- #define DISAS_HVC 8
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 883e9df0c2..789c66e634 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -304,7 +304,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
- {
-     gen_a64_set_pc_im(s->pc - offset);
-     gen_exception_internal(excp);
--    s->is_jmp = DISAS_EXC;
-+    s->is_jmp = DISAS_NORETURN;
- }
+-#define DISAS_WFE 7
+-#define DISAS_HVC 8
+-#define DISAS_SMC 9
+-#define DISAS_YIELD 10
++#define DISAS_WFE       DISAS_TARGET_4
++#define DISAS_HVC       DISAS_TARGET_5
++#define DISAS_SMC       DISAS_TARGET_6
++#define DISAS_YIELD     DISAS_TARGET_7
+ /* M profile branch which might be an exception return (and so needs
+  * custom end-of-TB code)
+  */
+-#define DISAS_BX_EXCRET 11
++#define DISAS_BX_EXCRET DISAS_TARGET_8
+ /* For instructions which want an immediate exit to the main loop,
+  * as opposed to attempting to use lookup_and_goto_ptr. Unlike
+  * DISAS_UPDATE this doesn't write the PC on exiting the translation
+  * loop so you need to ensure something (gen_a64_set_pc_im or runtime
+  * helper) has done so before we reach return from cpu_tb_exec.
+  */
+-#define DISAS_EXIT 12
++#define DISAS_EXIT      DISAS_TARGET_9
  
- static void gen_exception_insn(DisasContext *s, int offset, int excp,
-@@ -312,7 +312,7 @@ static void gen_exception_insn(DisasContext *s, int offset, int excp,
- {
-     gen_a64_set_pc_im(s->pc - offset);
-     gen_exception(excp, syndrome, target_el);
--    s->is_jmp = DISAS_EXC;
-+    s->is_jmp = DISAS_NORETURN;
- }
- 
- static void gen_ss_advance(DisasContext *s)
-@@ -340,7 +340,7 @@ static void gen_step_complete_exception(DisasContext *s)
-     gen_ss_advance(s);
-     gen_exception(EXCP_UDEF, syn_swstep(s->ss_same_el, 1, s->is_ldex),
-                   default_exception_el(s));
--    s->is_jmp = DISAS_EXC;
-+    s->is_jmp = DISAS_NORETURN;
- }
- 
- static inline bool use_goto_tb(DisasContext *s, int n, uint64_t dest)
-@@ -371,7 +371,7 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
-         tcg_gen_goto_tb(n);
-         gen_a64_set_pc_im(dest);
-         tcg_gen_exit_tb((intptr_t)tb + n);
--        s->is_jmp = DISAS_TB_JUMP;
-+        s->is_jmp = DISAS_NORETURN;
-     } else {
-         gen_a64_set_pc_im(dest);
-         if (s->ss_active) {
-@@ -380,7 +380,7 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
-             gen_exception_internal(EXCP_DEBUG);
-         } else {
-             tcg_gen_lookup_and_goto_ptr(cpu_pc);
--            s->is_jmp = DISAS_TB_JUMP;
-+            s->is_jmp = DISAS_NORETURN;
-         }
-     }
- }
-@@ -11305,7 +11305,7 @@ void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
-             assert(num_insns == 1);
-             gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
-                           default_exception_el(dc));
--            dc->is_jmp = DISAS_EXC;
-+            dc->is_jmp = DISAS_NORETURN;
-             break;
-         }
- 
-@@ -11332,21 +11332,25 @@ void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
-         gen_io_end();
-     }
- 
--    if (unlikely(cs->singlestep_enabled || dc->ss_active)
--        && dc->is_jmp != DISAS_EXC) {
-+    if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
-         /* Note that this means single stepping WFI doesn't halt the CPU.
-          * For conditional branch insns this is harmless unreachable code as
-          * gen_goto_tb() has already handled emitting the debug exception
-          * (and thus a tb-jump is not possible when singlestepping).
-          */
--        assert(dc->is_jmp != DISAS_TB_JUMP);
--        if (dc->is_jmp != DISAS_JUMP) {
-+        switch (dc->is_jmp) {
-+        default:
-             gen_a64_set_pc_im(dc->pc);
--        }
--        if (cs->singlestep_enabled) {
--            gen_exception_internal(EXCP_DEBUG);
--        } else {
--            gen_step_complete_exception(dc);
-+            /* fall through */
-+        case DISAS_JUMP:
-+            if (cs->singlestep_enabled) {
-+                gen_exception_internal(EXCP_DEBUG);
-+            } else {
-+                gen_step_complete_exception(dc);
-+            }
-+            break;
-+        case DISAS_NORETURN:
-+            break;
-         }
-     } else {
-         switch (dc->is_jmp) {
-@@ -11356,8 +11360,7 @@ void gen_intermediate_code_a64(CPUState *cs, TranslationBlock *tb)
-         case DISAS_JUMP:
-             tcg_gen_lookup_and_goto_ptr(cpu_pc);
-             break;
--        case DISAS_TB_JUMP:
--        case DISAS_EXC:
-+        case DISAS_NORETURN:
-         case DISAS_SWI:
-             break;
-         case DISAS_WFE:
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d1a5f56998..699e810157 100644
+index 699e810157..2bde418ddf 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -297,7 +297,7 @@ static void gen_step_complete_exception(DisasContext *s)
-     gen_ss_advance(s);
-     gen_exception(EXCP_UDEF, syn_swstep(s->ss_same_el, 1, s->is_ldex),
-                   default_exception_el(s));
--    s->is_jmp = DISAS_EXC;
+@@ -4174,7 +4174,7 @@ static void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
+         gen_set_pc_im(s, dest);
+         gen_goto_ptr();
+     }
+-    s->is_jmp = DISAS_TB_JUMP;
 +    s->is_jmp = DISAS_NORETURN;
  }
  
- static void gen_singlestep_exception(DisasContext *s)
-@@ -1184,7 +1184,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
-     gen_set_condexec(s);
-     gen_set_pc_im(s, s->pc - offset);
-     gen_exception_internal(excp);
--    s->is_jmp = DISAS_EXC;
-+    s->is_jmp = DISAS_NORETURN;
+ static inline void gen_jmp (DisasContext *s, uint32_t dest)
+diff --git a/target/cris/translate.c b/target/cris/translate.c
+index 12b96eb68f..38a999e6f1 100644
+--- a/target/cris/translate.c
++++ b/target/cris/translate.c
+@@ -31,6 +31,7 @@
+ #include "exec/helper-proto.h"
+ #include "mmu.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/translator.h"
+ #include "crisv32-decode.h"
+ 
+ #include "exec/helper-gen.h"
+@@ -50,7 +51,11 @@
+ #define BUG() (gen_BUG(dc, __FILE__, __LINE__))
+ #define BUG_ON(x) ({if (x) BUG();})
+ 
+-#define DISAS_SWI 5
++/* is_jmp field values */
++#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
++#define DISAS_SWI     DISAS_TARGET_3
+ 
+ /* Used by the decoder.  */
+ #define EXTRACT_FIELD(src, start, end) \
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 3ffbf1bb4e..11bc4559af 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -24,6 +24,7 @@
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/translator.h"
+ 
+ #include "exec/helper-proto.h"
+ #include "exec/helper-gen.h"
+@@ -31,8 +32,6 @@
+ #include "trace-tcg.h"
+ #include "exec/log.h"
+ 
+-#define DISAS_TOO_MANY 5
+-
+ #define PREFIX_REPZ   0x01
+ #define PREFIX_REPNZ  0x02
+ #define PREFIX_LOCK   0x04
+diff --git a/target/lm32/translate.c b/target/lm32/translate.c
+index f68f372f15..65bc9c0bf6 100644
+--- a/target/lm32/translate.c
++++ b/target/lm32/translate.c
+@@ -22,6 +22,7 @@
+ #include "disas/disas.h"
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
++#include "exec/translator.h"
+ #include "tcg-op.h"
+ 
+ #include "exec/cpu_ldst.h"
+@@ -47,6 +48,11 @@
+ 
+ #define MEM_INDEX 0
+ 
++/* is_jmp field values */
++#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
++
+ static TCGv_env cpu_env;
+ static TCGv cpu_R[32];
+ static TCGv cpu_pc;
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index ada2a91b64..755d7795ee 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -25,6 +25,7 @@
+ #include "tcg-op.h"
+ #include "qemu/log.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/translator.h"
+ 
+ #include "exec/helper-proto.h"
+ #include "exec/helper-gen.h"
+@@ -173,7 +174,11 @@ static void do_writebacks(DisasContext *s)
+     }
  }
  
- static void gen_exception_insn(DisasContext *s, int offset, int excp,
-@@ -1193,7 +1193,7 @@ static void gen_exception_insn(DisasContext *s, int offset, int excp,
-     gen_set_condexec(s);
-     gen_set_pc_im(s, s->pc - offset);
-     gen_exception(excp, syn, target_el);
--    s->is_jmp = DISAS_EXC;
-+    s->is_jmp = DISAS_NORETURN;
- }
+-#define DISAS_JUMP_NEXT 4
++/* is_jmp field values */
++#define DISAS_JUMP      DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE    DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP   DISAS_TARGET_2 /* only pc was modified statically */
++#define DISAS_JUMP_NEXT DISAS_TARGET_3
  
- /* Force a TB lookup after an instruction that changes the CPU state.  */
-@@ -11944,7 +11944,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-             /* We always get here via a jump, so know we are not in a
-                conditional execution block.  */
-             gen_exception_internal(EXCP_KERNEL_TRAP);
--            dc->is_jmp = DISAS_EXC;
-+            dc->is_jmp = DISAS_NORETURN;
-             break;
-         }
+ #if defined(CONFIG_USER_ONLY)
+ #define IS_USER(s) 1
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index a24373c0be..bd43a42d4f 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -27,6 +27,7 @@
+ #include "microblaze-decode.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/helper-gen.h"
++#include "exec/translator.h"
+ 
+ #include "trace-tcg.h"
+ #include "exec/log.h"
+@@ -46,6 +47,11 @@
+ #define EXTRACT_FIELD(src, start, end) \
+             (((src) >> start) & ((1 << (end - start + 1)) - 1))
+ 
++/* is_jmp field values */
++#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
++
+ static TCGv env_debug;
+ static TCGv_env cpu_env;
+ static TCGv cpu_R[32];
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+index 8b97d6585f..6b0961837d 100644
+--- a/target/nios2/translate.c
++++ b/target/nios2/translate.c
+@@ -29,6 +29,12 @@
+ #include "exec/helper-gen.h"
+ #include "exec/log.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/translator.h"
++
++/* is_jmp field values */
++#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
+ 
+ #define INSTRUCTION_FLG(func, flags) { (func), (flags) }
+ #define INSTRUCTION(func)                  \
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index a01413113b..112db1ad0f 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -27,6 +27,7 @@
+ #include "qemu/log.h"
+ #include "qemu/bitops.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/translator.h"
+ 
+ #include "exec/helper-proto.h"
+ #include "exec/helper-gen.h"
+@@ -37,6 +38,11 @@
+ #define LOG_DIS(str, ...) \
+     qemu_log_mask(CPU_LOG_TB_IN_ASM, "%08x: " str, dc->pc, ## __VA_ARGS__)
+ 
++/* is_jmp field values */
++#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
++
+ typedef struct DisasContext {
+     TranslationBlock *tb;
+     target_ulong pc;
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 48b71f9604..436295cc5f 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -76,7 +76,8 @@ typedef struct {
+     } u;
+ } DisasCompare;
+ 
+-#define DISAS_EXCP 4
++/* is_jmp field values */
++#define DISAS_EXCP DISAS_TARGET_0
+ 
+ #ifdef DEBUG_INLINE_BRANCHES
+ static uint64_t inline_branch_hit[CC_OP_MAX];
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 8f30cff932..6c094d59d7 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -16,6 +16,7 @@
+ #include "tcg-op.h"
+ #include "qemu/log.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/translator.h"
+ 
+ #include "exec/helper-proto.h"
+ #include "exec/helper-gen.h"
+@@ -45,9 +46,13 @@ typedef struct DisasContext {
+ #define IS_USER(s)      1
  #endif
-@@ -12089,6 +12089,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-         default:
-             /* FIXME: Single stepping a WFI insn will not halt the CPU. */
-             gen_singlestep_exception(dc);
-+            break;
-+        case DISAS_NORETURN:
-+            break;
-         }
-     } else {
-         /* While branches must always occur at the end of an IT block,
-@@ -12113,8 +12116,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-             /* indicate that the hash table must be used to find the next TB */
-             tcg_gen_exit_tb(0);
-             break;
--        case DISAS_TB_JUMP:
--        case DISAS_EXC:
-+        case DISAS_NORETURN:
-             /* nothing more to generate */
-             break;
-         case DISAS_WFI:
+ 
++/* is_jmp field values */
++#define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
++#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
+ /* These instructions trap after executing, so defer them until after the
+    conditional executions state has been updated.  */
+-#define DISAS_SYSCALL 5
++#define DISAS_SYSCALL DISAS_TARGET_3
+ 
+ static TCGv_env cpu_env;
+ static TCGv_i32 cpu_R[32];
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index f3f0ff589c..d7bf07e8e6 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -38,6 +38,7 @@
+ #include "sysemu/sysemu.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/semihost.h"
++#include "exec/translator.h"
+ 
+ #include "exec/helper-proto.h"
+ #include "exec/helper-gen.h"
+@@ -46,6 +47,9 @@
+ #include "exec/log.h"
+ 
+ 
++/* is_jmp field values */
++#define DISAS_UPDATE  DISAS_TARGET_0 /* cpu state was modified dynamically */
++
+ typedef struct DisasContext {
+     const XtensaConfig *config;
+     TranslationBlock *tb;
 -- 
 2.13.3
