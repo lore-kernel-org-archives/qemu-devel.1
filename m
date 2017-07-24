@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dZXpc-0006A0-Vo
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:31:10 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dZYOA-0002on-Vl
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dZXpb-0002WR-SK
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:31:08 -0400
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:37720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1dZXpb-0002WE-MG
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 03:31:07 -0400
-Received: by mail-io0-x235.google.com with SMTP id c74so39807163iod.4
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 00:31:07 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dZYO7-0007ya-Or
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:06:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dZYO7-0007xg-FX
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 04:06:47 -0400
+Date: Mon, 24 Jul 2017 09:06:33 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170724080633.GA2127@work-vm>
+References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
+	<20170719114612.GC3500@work-vm>
+	<20170719152427.620b2a2a@nial.brq.redhat.com>
+	<20170719184748-mutt-send-email-mst@kernel.org>
+	<20170720172215.GH2456@work-vm>
+	<20170721224259-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMxP3BQ+2nPjoEcB4w3gb5=CykUQUuWsjzi8N5XHLgPphbm=wQ@mail.gmail.com>
-References: <CAMxP3BQ+2nPjoEcB4w3gb5=CykUQUuWsjzi8N5XHLgPphbm=wQ@mail.gmail.com>
-From: Bob Chen <a175818323@gmail.com>
-Date: Mon, 24 Jul 2017 15:31:06 +0800
-Message-ID: <CAMxP3BSDEwHFLrfXP72hpaVhSsLoVtZ9S_uSZYFd-pReeqyJYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Device passthrough] Is there a way to passthrough
- PCIE switch/bridge ?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170721224259-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
+ vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +33,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-Details attached...
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Thu, Jul 20, 2017 at 06:22:15PM +0100, Dr. David Alan Gilbert wrote:
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
+> > > > On Wed, 19 Jul 2017 12:46:13 +0100
+> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > > 
+> > > > > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > > > > On Wed, 19 Jul 2017 23:17:32 +0800
+> > > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > > > >   
+> > > > > > > When a guest that has several hotplugged dimms is migrated, in
+> > > > > > > destination host it will fail to resume. Because vhost regions of
+> > > > > > > several dimms in source host are merged and in the restore stage
+> > > > > > > in destination host it computes whether more than vhost slot limit
+> > > > > > > before merging vhost regions of several dimms.  
+> > > > > > could you provide a bit more detailed description of the problem
+> > > > > > including command line+used device_add commands on source and
+> > > > > > command line on destination?  
+> > > > > 
+> > > > > (ccing in Marc Andre and Maxime)
+> > > > > 
+> > > > > Hmm, I'd like to understade the situation where you get merging between
+> > > > > RAMBlocks; that complicates some stuff for postcopy.
+> > > > and probably inconsistent merging breaks vhost as well
+> > > > 
+> > > > merging might happen if regions are adjacent or overlap
+> > > > but for that to happen merged regions must have equal
+> > > > distance between their GPA:HVA pairs, so that following
+> > > > translation would work:
+> > > > 
+> > > > if gva in regionX[gva_start, len, hva_start]
+> > > >    hva = hva_start + gva - gva_start
+> > > > 
+> > > > while GVA of regions is under QEMU control and deterministic
+> > > > HVA is not, so in migration case merging might happen on source
+> > > > side but not on destination, resulting in different memory maps.
+> > > > 
+> > > > Maybe Michael might know details why migration works in vhost usecase,
+> > > > but I don't see vhost sending any vmstate data.
+> > > 
+> > > We aren't merging ramblocks at all.
+> > > When we are passing blocks A and B to vhost, if we see that
+> > > 
+> > > hvaB=hvaA + lenA
+> > > gpaB=gpaA + lenA
+> > > 
+> > > then we can improve performance a bit by passing a single
+> > > chunk to vhost: hvaA,gpaA,lena+lenB
+> > 
+> > OK, but that means that a region can incorporate multiple
+> > RAMBlocks though? Hmm that's not fun on postcopy.
+> > 
+> > > so it does not affect migration normally.
+> > 
+> > Well, why? What's required - if the region sizes/lengths/orders
+> > are different on the source and destination does it matter - if
+> > it does then that means we have a problem, since that heuristic
+> > is non-deterministic.
+> > 
+> > Dave
+> 
+> It doesn't matter normally. But there's a limit
+> on number of regions that vhost can support.
+> pc_dimm_memory_plug tries to guess this number early
+> because it wants to fail hotplug requests gracefully.
 
-I was trying to passthrough multiple GPUs into a single VM, the topology
-looks like these below.
+Why doesn't it matter - can't this heuristic potentially trigger on a
+source but not a destination even in the case of something like NUMA
+without hotplug?
 
-Without the help of PCIE switches, data traversing between GPUs are
-extremely slow. (depends on memcopy by CPU)
+> See
+> commit 3fad87881e55aaff659408dcf25fa204f89a7896
+> Author: Igor Mammedov <imammedo@redhat.com>
+> Date:   Tue Oct 6 10:37:28 2015 +0200
+> 
+>     pc-dimm: add vhost slots limit check before commiting to hotplug
+> 
+> It might make sense to limit this to hotplug, though
+> runstate check seems like a wrong way to do this -
+> VM could be stopped e.g. through QMP at the time.
 
-So my question is can I passthrough all the switches and PCIE Root, in
-order to make the Nvidia p2p feature work?
+My other problem is this optimisation makes it tricky for postcopy;
+one-region -> one-ramblock is easy, but there's a potential for problems
+if different RAMBlock's within the region have different
+characteristics.
 
+Dave
 
-
-Host:
-[root@localhost ~]# nvidia-smi topo -m
-GPU0 GPU1 GPU2 GPU3 GPU4 GPU5 GPU6 GPU7 CPU Affinity
-GPU0 X PIX PHB PHB SOC SOC SOC SOC 0-9,20-29
-GPU1 PIX X PHB PHB SOC SOC SOC SOC 0-9,20-29
-GPU2 PHB PHB X PIX SOC SOC SOC SOC 0-9,20-29
-GPU3 PHB PHB PIX X SOC SOC SOC SOC 0-9,20-29
-GPU4 SOC SOC SOC SOC X PIX PHB PHB 10-19,30-39
-GPU5 SOC SOC SOC SOC PIX X PHB PHB 10-19,30-39
-GPU6 SOC SOC SOC SOC PHB PHB X PIX 10-19,30-39
-GPU7 SOC SOC SOC SOC PHB PHB PIX X 10-19,30-39
-
-
-VM:
-[root@titan-xp-chenbo-2 ~]# nvidia-smi topo -m
-GPU0 GPU1 GPU2 GPU3 GPU4 GPU5 GPU6 GPU7 CPU Affinity
-GPU0 X PHB PHB PHB PHB PHB PHB PHB 0-15
-GPU1 PHB X PHB PHB PHB PHB PHB PHB 0-15
-GPU2 PHB PHB X PHB PHB PHB PHB PHB 0-15
-GPU3 PHB PHB PHB X PHB PHB PHB PHB 0-15
-GPU4 PHB PHB PHB PHB X PHB PHB PHB 0-15
-GPU5 PHB PHB PHB PHB PHB X PHB PHB 0-15
-GPU6 PHB PHB PHB PHB PHB PHB X PHB 0-15
-GPU7 PHB PHB PHB PHB PHB PHB PHB X 0-15
-
-
-Legend:
-
-  X   = Self
-  SOC  = Connection traversing PCIe as well as the SMP link between CPU
-sockets(e.g. QPI)
-  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge
-(typically the CPU)
-  PXB  = Connection traversing multiple PCIe switches (without traversing
-the PCIe Host Bridge)
-  PIX  = Connection traversing a single PCIe switch
-  NV#  = Connection traversing a bonded set of # NVLinks
-
-
-
-2017-07-24 14:03 GMT+08:00 Bob Chen <a175818323@gmail.com>:
-
->
-> - Bob
->
+> > > 
+> > > > 
+> > > > > 
+> > > > > > > 
+> > > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > > > ---
+> > > > > > >  hw/mem/pc-dimm.c | 2 +-
+> > > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > > 
+> > > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > > > index ea67b46..bb0fa08 100644
+> > > > > > > --- a/hw/mem/pc-dimm.c
+> > > > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > > > > >          goto out;
+> > > > > > >      }
+> > > > > > >  
+> > > > > > > -    if (!vhost_has_free_slot()) {
+> > > > > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
+> > > > > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > > > > >                                 " memory slots left");
+> > > > > > >          goto out;  
+> > > > > 
+> > > > > Even this produces the wrong error message in this case,
+> > > > > it also makes me think if the existing code should undo a lot of
+> > > > > the object_property_set's that happen.
+> > > > > 
+> > > > > Dave
+> > > > > > 
+> > > > > >   
+> > > > > --
+> > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
