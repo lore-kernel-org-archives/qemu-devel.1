@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZcI3-0006Nd-Sd
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:16:48 -0400
+	(envelope-from <den@virtuozzo.com>) id 1dZcIi-0006oh-Ee
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:17:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dZcI2-0007oH-0R
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:16:47 -0400
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-20-f4bug@amsat.org>
-	<CAJ+F1CJL8krrmFwCgqx6qZepkNZbcvTJrkOEVcsWiHurCBcUZw@mail.gmail.com>
-	<3b25ec9f-5711-de4c-eade-eecef96b6379@redhat.com>
-	<a49428cc-88e9-dbd8-3d2f-207acbef68f9@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <90438d63-2cfc-ad79-a490-7a50e40fe53a@redhat.com>
-Date: Mon, 24 Jul 2017 07:16:41 -0500
+	(envelope-from <den@virtuozzo.com>) id 1dZcIf-00088c-AC
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:17:28 -0400
+Received: from mail-he1eur01on070d.outbound.protection.outlook.com
+	([2a01:111:f400:fe1e::70d]:49226
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1dZcIe-00087V-DI
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 08:17:25 -0400
+References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+	<20170724113422.GC2784@stefanha-x1.localdomain>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
+Date: Mon, 24 Jul 2017 15:17:16 +0300
 MIME-Version: 1.0
-In-Reply-To: <a49428cc-88e9-dbd8-3d2f-207acbef68f9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9hvfmm8o325U8VpeThWUicNTF58AjdgqO"
-Subject: Re: [Qemu-devel] [PATCH 19/29] disas: use QEMU_IS_ALIGNED macro
+In-Reply-To: <20170724113422.GC2784@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu trival <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9hvfmm8o325U8VpeThWUicNTF58AjdgqO
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- qemu trival <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
- QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
-Message-ID: <90438d63-2cfc-ad79-a490-7a50e40fe53a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 19/29] disas: use QEMU_IS_ALIGNED macro
-References: <20170718061005.29518-1-f4bug@amsat.org>
- <20170718061005.29518-20-f4bug@amsat.org>
- <CAJ+F1CJL8krrmFwCgqx6qZepkNZbcvTJrkOEVcsWiHurCBcUZw@mail.gmail.com>
- <3b25ec9f-5711-de4c-eade-eecef96b6379@redhat.com>
- <a49428cc-88e9-dbd8-3d2f-207acbef68f9@redhat.com>
-In-Reply-To: <a49428cc-88e9-dbd8-3d2f-207acbef68f9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
+> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievskiy =
+wrote:
+>> Current trace system have a drawback: parameters of trace functions
+>> are calculated even if corresponding tracepoint is disabled. Also, it
+>> looks like trace function are not actually inlined by compiler (at
+>> least for me).
+>>
+>> Here is a fix proposal: move from function call to macros. Patch 02
+>> is an example, of how to reduce extra calculations with help of
+>> patch 01.
+>>
+>> Vladimir Sementsov-Ogievskiy (2):
+>>   trace: do not calculate arguments for disabled trace-points
+>>   monitor: improve tracing in handle_qmp_command
+> Please use the TRACE_FOO_ENABLED macro instead of putting computation
+> inside the trace event arguments.  This makes the code cleaner and
+> easier to read.
+At our opinion this ENABLED is compile time check while the option
+could be tuned in runtime. Thus normally it would normally be
+enabled while the trace is silent.
 
-On 07/23/2017 09:52 AM, Paolo Bonzini wrote:
+So, under load, we will have extra allocation, copying the command buffer=
+,
+freeing memory without actual trace. In order to fix that we should
+do something like
 
->=20
-> But I agree that QEMU_IS_ALIGNED looks weird here.  I think it should
-> mostly be used when the argument is a pointer, to hide the cast.  Uses
-> for non-pointer arguments should be decided on a one-by-one basis; "is
-> the first argument an address" is definitely a good thing to consider.
-> Another might be "is the second argument a variable", because "i % n =3D=
-=3D
-> 0" is less efficient than "(i & (n - 1)) =3D=3D 0".
+if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
+   req_json =3D qobject_to_json(req);
+   trace_handle_qmp_command(mon, req_json);
+   QDECREF(req_json);
+}
 
-How often is QEMU_IS_ALIGNED used on non-power-of-2?  Would it be worth
-rewriting it into bit-wise ops, at the expense of declaring that any
-code aligning to other values must open-code their own %?  Can we have
-the compiler help us ensure that the second argument is a power-of-2?
-Conversely, if the compiler is given a constant for the second argument,
-and is not optimizing modulo power of two into bitwise ops (at least at
-CFLAGS=3D-O2), then that's a compiler bug.
+which is possible, but at our (me + Vova) opinion is ugly.
+That is why we are proposing to switch to macro, which
+will not require such tweaking.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Arguments will be only evaluated when necessary and we
+will not have side-effects if the tracepoint is compile time
+enabled and run-time disabled.
 
+Though if the code above is acceptable, we can send the
+patch with it. No problem.
 
---9hvfmm8o325U8VpeThWUicNTF58AjdgqO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll15SkACgkQp6FrSiUn
-Q2orHgf/Q3alf1cx9tr1nTJ/dQ0GuruPZDZxWHU6KEIKYnNCUD/aa4VWzFswQAiG
-MPpSFm76cKusH5B1FlMA5cwgvP2MKVdOYAlWI8BplQAwJI8h7PDlP2STEDPOoWey
-susrV8qWQ69iZlOGA3i4xvdN8xvwknrQl9+sGv5dRxA+02OPxvIST4531vzD8egD
-XxmE4scret21BswRSEmNVQAcY6PVG1Fa85FKMF6BswgxsGI3QCSdNxzByPBdrWQS
-qVZ+AJs7ZGFhwyaPfJDn7OFi+v3NxzGMWoUsViZLaknqW03laVf6cE0mHlcqA/q0
-Ye3ax+qKpo0xj+8//WsNKrbJ/v1vIA==
-=ND9r
------END PGP SIGNATURE-----
-
---9hvfmm8o325U8VpeThWUicNTF58AjdgqO--
+Den
