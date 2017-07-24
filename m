@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZaGS-0002cx-RS
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:07:02 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dZaHX-0003Op-Hu
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dZaGR-000847-KZ
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:07:00 -0400
-Date: Mon, 24 Jul 2017 11:06:46 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170724100646.GA12009@stefanha-x1.localdomain>
-References: <20170721093416.17816-1-stefanha@redhat.com>
-	<fb720b66-8b5f-bd84-2cb6-aa7d7d14b2db@redhat.com>
-	<20170721155146.GN18014@stefanha-x1.localdomain>
-	<0fd1f1b7-12e8-fc0b-96ce-4b3eee5b08af@amsat.org>
+	(envelope-from <lprosek@redhat.com>) id 1dZaHS-0008Em-Kv
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:08:07 -0400
+Received: from mail-ua0-f178.google.com ([209.85.217.178]:33152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dZaHS-0008EA-Gs
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 06:08:02 -0400
+Received: by mail-ua0-f178.google.com with SMTP id 80so74540213uas.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 03:08:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
-Content-Disposition: inline
-In-Reply-To: <0fd1f1b7-12e8-fc0b-96ce-4b3eee5b08af@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add a "how to" to ./README
+In-Reply-To: <20170721121206.63bcbffd@nial.brq.redhat.com>
+References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+	<CABdb736GdDK_Kxa4u_eCt=1qiV0Hn69NfrvofJTFgaXJzx1gow@mail.gmail.com>
+	<20170721121206.63bcbffd@nial.brq.redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 24 Jul 2017 12:07:59 +0200
+Message-ID: <CABdb734pB_DHeZ=NRp4DOP=fiXz-+wN=DX5fx2hUuo-u=4HJFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
 
+On Fri, Jul 21, 2017 at 12:12 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Fri, 21 Jul 2017 11:54:20 +0200
+> Ladi Prosek <lprosek@redhat.com> wrote:
+>
+>> On Fri, Jul 21, 2017 at 11:32 AM, Igor Mammedov <imammedo@redhat.com> wrote:
+>> > w2k used to boot on QEMU until we bumped revision of FADT to rev3
+>> > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+>> >
+>> > Considering that w2k is ancient and long time EOLed, leave default
+>> > rev3 but make pc-i440fx-2.9 and older machine types to force rev1
+>> > so old setups won't break (w2k could boot).
+>> >
+>> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> > ---
+>> > CC: Programmingkid <programmingkidx@gmail.com>
+>> > CC: Phil Dennis-Jordan <lists@philjordan.eu>
+>> > CC: "Michael S. Tsirkin" <mst@redhat.com>
+>> >
+>> > Only compile test since I don't have w2k to test with
+>>
+>> Confirming that Windows 2000 boots with this patch and -machine pc-i440fx-2.9.
+> Ladi,
+>
+> Could you to try find out reason why w2k doesn't boot?
 
---qMm9M+Fa2AknHoGS
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The FADT table must be 134 bytes or less. The revision number does not
+matter and neither does the checksum.
 
-On Sun, Jul 23, 2017 at 11:18:50AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> On 07/21/2017 12:51 PM, Stefan Hajnoczi wrote:
-> > On Fri, Jul 21, 2017 at 07:16:34AM -0500, Eric Blake wrote:
-> > > On 07/21/2017 04:34 AM, Stefan Hajnoczi wrote:
-> > > > There is not much getting started documentation for qemu-iotests.  =
-This
-> > > > patch explains how to create a new test and covers the overall test=
-ing
-> > > > approach.
-> > > >=20
-> > > > Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> > > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > ---
-> > >=20
-> > > > +3. Assign groups to the test
-> > > > +
-> > > > +Add your test to the ./group file.  This file is the index of test=
-s and assigns
-> > > > +them to functional groups like "rw" for read-write tests.  Most te=
-sts belong to
-> > > > +the "rw" and "auto" groups.  "auto" means the test runs when ./che=
-ck is invoked
-> > > > +without a -g argument.
-> > > > +
-> > > > +Consider adding your test to the "quick" group if it executes quic=
-kly (<1s).
-> > >=20
-> > > We have several tests going up to 5s (and I have a patch pending to
-> > > remove two tests that took longer) - I think 1s is a bit on the short
-> > > end for still classifying a test as quick.
-> >=20
-> > I'm happy to accept any number blessed by Kevin.  I do think that 1
-> > second is a safe maximum and no one should get in trouble for adding a
-> > test that takes 1 second to the "quick" group.
-> >=20
-> > > > +This group is run by "make check-block" and is often included as p=
-art of build
-> > > > +tests in continuous integration systems.
-> > >=20
-> > > It would still be nice to have 'make check' run 'make check-block'...
-> > > but that's independent of this patch.
-> >=20
-> > Yes, there is a separate discussion about that on the list right now.
-> > Hopefully it will be added back.
-> >=20
-> > > > +Once you are happy with the test output it can be used as the gold=
-en master
-> > > > +with "mv <test-number>.out.bad <test-number>.out".  Rerun the test=
- to verify
-> > > > +that it passes.
-> > > > +
-> > > > +Congratulations, you've created a new test!
-> > >=20
-> > > Maybe a reminder to 'git add' the new files, then submit the patch?
-> >=20
-> > I thought about this too but decided not to get into the git and patch
-> > submission business.  I carefully worded it to be about "creating" tests
-> > rather than "adding" them to qemu.git because I wanted to limit the
-> > scope of this README :).
->=20
-> Maybe something tiny like:
->=20
->   Congratulations, you've created a new test!
->=20
->   To share your test to upstream QEMU (highly recommended!) just follow
->   these recommendations: http://wiki.qemu.org/Contribute/SubmitAPatch
+This is experimental data, I haven't been able to find the offending code.
 
-Sounds good.
-
-Kevin: Any thoughts on this patch?
-
-Stefan
-
---qMm9M+Fa2AknHoGS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZdca1AAoJEJykq7OBq3PIlxwH/iB24CxO3oU977TOs8bZ4zg+
-CE2zHd58x9AYhTFYcfaR6sIWoKdsILmX2mkyKOz9WlhDk04KqLBDActhmYToMIVm
-rBP6jE0lsHFQEQVuB/u00D3szb6L2OQEqZg7uIBeUDm2KFgVgKUErvipieqclwcz
-ybu2rZCc3xSlHlElt86jyHqhRn3ErnZ60jQz1REzOy0XFfdyqZ9MHA6Mez7gZXke
-FXjXhp7JgroQQb532XThD3fxHfnHscvflcCS3Xcf5S6srU5VHO7LZ1jKbWkV01rY
-KkLF6PrOo2a6bCgKRxeRwtkKQYkyKzXDFELFDFOn1ihZPepreQTJ8x3Xs1zpIms=
-=CMBv
------END PGP SIGNATURE-----
-
---qMm9M+Fa2AknHoGS--
+>>
+>> Tested-by: Ladi Prosek <lprosek@redhat.com>
+>
