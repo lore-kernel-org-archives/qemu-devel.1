@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZkFr-0001vV-4N
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:47:04 -0400
+	(envelope-from <mst@redhat.com>) id 1dZkIo-0004Z7-Az
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:50:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZkFn-0006rX-7D
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:47:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51740)
+	(envelope-from <mst@redhat.com>) id 1dZkIl-0000km-9N
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:50:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZkFm-0006r7-Uj
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:46:59 -0400
-Date: Mon, 24 Jul 2017 23:46:53 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZkIl-0000ia-0U
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 16:50:03 -0400
+Date: Mon, 24 Jul 2017 23:50:00 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170724234353-mutt-send-email-mst@kernel.org>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
-	<20170723055006-mutt-send-email-mst@kernel.org>
-	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+Message-ID: <20170724234849-mutt-send-email-mst@kernel.org>
+References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170724111419.720aa168@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
- property to pcie-root-port
+In-Reply-To: <20170724111419.720aa168@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
+ of vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, seabios@seabios.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
-> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
-> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
-> > > To enable hotplugging of a newly created pcie-pci-bridge,
-> > > we need to tell firmware (SeaBIOS in this case)
+On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:
+> On Sun, 23 Jul 2017 20:46:11 +0800
+> Peng Hao <peng.hao2@zte.com.cn> wrote:
+> 
+> > When a guest that has several hotplugged dimms is migrated, on
+> > destination it will fail to resume. Because regions on source
+> > are merged and on destination the order of realizing devices
+> > is different from on source with dimms, so when part of devices
+> > are realizd some region can not be merged.That may be more than
+> > vhost slot limit.
 > > 
-> 
-> Hi Michael,
-> 
-> > Presumably, EFI would need to support this too?
+> > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > ---
+> >  hw/mem/pc-dimm.c        | 2 +-
+> >  include/sysemu/sysemu.h | 1 +
+> >  vl.c                    | 5 +++++
+> >  3 files changed, 7 insertions(+), 1 deletion(-)
 > > 
-> 
-> Sure, Eduardo added to CC, but he is in PTO now.
-> 
-> > > to reserve
-> > > additional buses for pcie-root-port, that allows us to
-> > > hotplug pcie-pci-bridge into this root port.
-> > > The number of buses to reserve is provided to the device via a corresponding
-> > > property, and to the firmware via new PCI capability (next patch).
-> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
-> > 
-> > If so you should just teach firmware to allocate one bus #
-> > unconditionally.
-> > 
-> 
-> That would be a problem for the PCIe machines, since each PCIe
-> devices is plugged in a different bus and we are already
-> limited to 256 PCIe devices. Allocating an extra-bus always
-> would really limit the PCIe devices we can use.
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index ea67b46..13f3db5 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> >          goto out;
+> >      }
+> >  
+> > -    if (!vhost_has_free_slot()) {
+> > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
+> >          error_setg(&local_err, "a used vhost backend has no free"
+> >                                 " memory slots left");
+> that doesn't fix issue,
+>    1st: number of used entries is changing after machine_init_done() is called
+>         as regions continue to mapped/unmapped during runtime
 
-But this is exactly what this patch does as the property is added to all
-buses and default to 1 (1 extra bus).
+But that's fine, we want hotplug to fail if we can not guarantee vhost
+will work.
 
-> > But why would that be so? What's wrong with a device
-> > directly in the root port?
-> > 
-> 
-> First, plugging a legacy PCI device into a PCIe Root Port
-> looks strange at least, and it can;t be done on real HW anyway.
-> (incompatible slots)
+>    2nd: it brings regression and allows to start QEMU with number memory
+>         regions more than supported by backend, which combined with missing
+>         error handling in vhost will lead to qemu crashes or obscure bugs in
+>         guest breaking vhost enabled drivers.
+>         i.e. patch undoes what were fixed by
+>         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html
 
-You can still plug in PCIe devices there.
+Why does it? The issue you fixed there is hotplug, and that means
+pc_dimm_memory_plug called after machine done.
 
-> Second (and more important), if we want 2 or more PCI
-> devices we would loose both IO ports space and bus numbers.
-
-What I am saying is maybe default should not be 1.
-
-> > 
-> > > 
-> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> > > ---
-> > >   hw/pci-bridge/pcie_root_port.c | 1 +
-> > >   include/hw/pci/pcie_port.h     | 3 +++
-> > >   2 files changed, 4 insertions(+)
-> > > 
-> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> > > index 4d588cb..b0e49e1 100644
-> > > --- a/hw/pci-bridge/pcie_root_port.c
-> > > +++ b/hw/pci-bridge/pcie_root_port.c
-> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
-> > >   static Property rp_props[] = {
-> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
-> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
-> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
-> > >       DEFINE_PROP_END_OF_LIST()
-> > >   };
-> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> > > index 1333266..1b2dd1f 100644
-> > > --- a/include/hw/pci/pcie_port.h
-> > > +++ b/include/hw/pci/pcie_port.h
-> > > @@ -34,6 +34,9 @@ struct PCIEPort {
-> > >       /* pci express switch port */
-> > >       uint8_t     port;
-> > > +
-> > > +    /* additional buses to reserve on firmware init */
-> > > +    uint8_t     bus_reserve;
-> > >   };
-> > >   void pcie_port_init_reg(PCIDevice *d);
-> > 
-> > So here is a property and it does not do anything.
-> > It makes it easier to work on series maybe, but review
-> > is harder since we do not see what it does at all.
-> > Please do not split up patches like this - you can maintain
-> > it split up in your branch if you like and merge before sending.
-> > 
 > 
-> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
-> 
-> Thanks,
-> Marcel
-> 
-> 
-> > > -- 
-> > > 2.7.4
+> >          goto out;
+> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > index b213696..48228ad 100644
+> > --- a/include/sysemu/sysemu.h
+> > +++ b/include/sysemu/sysemu.h
+> > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+> >  void qemu_add_exit_notifier(Notifier *notify);
+> >  void qemu_remove_exit_notifier(Notifier *notify);
+> >  
+> > +bool qemu_is_machine_init_done(void);
+> >  void qemu_add_machine_init_done_notifier(Notifier *notify);
+> >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+> >  
+> > diff --git a/vl.c b/vl.c
+> > index fb6b2ef..43aee22 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
+> >  
+> >  static bool machine_init_done;
+> >  
+> > +bool qemu_is_machine_init_done(void)
+> > +{
+> > +    return machine_init_done;
+> > +}
+> > +
+> >  void qemu_add_machine_init_done_notifier(Notifier *notify)
+> >  {
+> >      notifier_list_add(&machine_init_done_notifiers, notify);
