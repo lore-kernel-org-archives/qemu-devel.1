@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1da01U-0006BK-9p
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:37:17 -0400
+	(envelope-from <mst@redhat.com>) id 1da07R-0002IG-6E
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1da01Q-0005fJ-DQ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:37:16 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1da01Q-0005f0-6Y
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:37:12 -0400
-Received: by mail-wm0-x241.google.com with SMTP id c184so3808082wmd.1
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:37:12 -0700 (PDT)
-Date: Tue, 25 Jul 2017 14:37:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170725133708.GE23343@stefanha-x1.localdomain>
-References: <20170724124438.27344-1-apahim@redhat.com>
-	<20170724124438.27344-2-apahim@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1da07O-0007sV-1w
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:43:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1da07N-0007sG-PA
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:43:21 -0400
+Date: Tue, 25 Jul 2017 16:43:15 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170723173111-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
+	<20170723055006-mutt-send-email-mst@kernel.org>
+	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="47eKBCiAZYFK5l32"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170724124438.27344-2-apahim@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu.py: make 'args' public
+In-Reply-To: <b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
+ property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, ehabkost@redhat.com, armbru@redhat.com, mreitz@redhat.com, crosa@redhat.com, famz@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, seabios@seabios.org
 
+On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
+> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
+> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
+> > > To enable hotplugging of a newly created pcie-pci-bridge,
+> > > we need to tell firmware (SeaBIOS in this case)
+> > 
+> 
+> Hi Michael,
+> 
+> > Presumably, EFI would need to support this too?
+> > 
+> 
+> Sure, Eduardo added to CC, but he is in PTO now.
+> 
+> > > to reserve
+> > > additional buses for pcie-root-port, that allows us to
+> > > hotplug pcie-pci-bridge into this root port.
+> > > The number of buses to reserve is provided to the device via a corresponding
+> > > property, and to the firmware via new PCI capability (next patch).
+> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
+> > 
+> > If so you should just teach firmware to allocate one bus #
+> > unconditionally.
+> > 
+> 
+> That would be a problem for the PCIe machines, since each PCIe
+> devices is plugged in a different bus and we are already
+> limited to 256 PCIe devices. Allocating an extra-bus always
+> would really limit the PCIe devices we can use.
 
---47eKBCiAZYFK5l32
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+One of the declared advantages of PCIe is easy support for multiple roots.
+We really should look at that IMHO so we do not need to pile up hacks.
 
-On Mon, Jul 24, 2017 at 02:44:37PM +0200, Amador Pahim wrote:
-> Let's make args public so users can extend it without feeling like
-> abusing the internal API.
+> > But why would that be so? What's wrong with a device
+> > directly in the root port?
+> > 
 
-Nothing is abusing an internal API.  PEP8 describes the difference
-between public (no underscore), protected aka subclass API (single
-underscore), and private fields (single or double underscore):
+To clarify, my point is we might be wasting bus numbers by reservation
+since someone might just want to put pcie devices there.
 
-  https://www.python.org/dev/peps/pep-0008/
-
-_args is a protected field.  It is perfectly normal for a subclass to
-access a protected field in its parent class.
-
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->  scripts/qemu.py               | 10 +++++-----
->  tests/qemu-iotests/iotests.py | 18 +++++++++---------
->  2 files changed, 14 insertions(+), 14 deletions(-)
-
-Please don't do this, it encourages code duplication.  Now arbitrary
-users can start accessing the public field directly instead of adding a
-reusable interfaces like add_monitor_telnet(), add_fd(), etc.
-
---47eKBCiAZYFK5l32
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZd0mEAAoJEJykq7OBq3PI8tQIALBZxAhD900bOP1ePk5+XRyK
-TDhzRLPrugvVi/zSiATgs+GwFJR9OqA6P9klD89NQPKl3I7PxxhjkOx6U7vlg58d
-YMgtnHmtSK5wXAaT7qZIud88ObwAK00SJt/l63ZSoQEw2nJidUy0hmYARWSg78sM
-TbifEO1QgOluNF4Kfb5eC7kU2Cr365muccFvinKos4Hb7VBAOdojQVU/OTw+UPx4
-3qJvNWTTbrtBHH7i9kgs7HUHNFUO0i7qYRRzK5Gzb5ByB10chs77B1FhrpiMtKSr
-AJRioYoKCPiCAJNzlejdp4DZywPNCYbir0AjDyIDAAuVrcmnUhOVZ15ngr1t4FU=
-=/kmA
------END PGP SIGNATURE-----
-
---47eKBCiAZYFK5l32--
+> First, plugging a legacy PCI device into a PCIe Root Port
+> looks strange at least, and it can;t be done on real HW anyway.
+> (incompatible slots)
+> 
+> Second (and more important), if we want 2 or more PCI
+> devices we would loose both IO ports space and bus numbers.
+> 
+> > 
+> > > 
+> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > > ---
+> > >   hw/pci-bridge/pcie_root_port.c | 1 +
+> > >   include/hw/pci/pcie_port.h     | 3 +++
+> > >   2 files changed, 4 insertions(+)
+> > > 
+> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> > > index 4d588cb..b0e49e1 100644
+> > > --- a/hw/pci-bridge/pcie_root_port.c
+> > > +++ b/hw/pci-bridge/pcie_root_port.c
+> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+> > >   static Property rp_props[] = {
+> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+> > >       DEFINE_PROP_END_OF_LIST()
+> > >   };
+> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> > > index 1333266..1b2dd1f 100644
+> > > --- a/include/hw/pci/pcie_port.h
+> > > +++ b/include/hw/pci/pcie_port.h
+> > > @@ -34,6 +34,9 @@ struct PCIEPort {
+> > >       /* pci express switch port */
+> > >       uint8_t     port;
+> > > +
+> > > +    /* additional buses to reserve on firmware init */
+> > > +    uint8_t     bus_reserve;
+> > >   };
+> > >   void pcie_port_init_reg(PCIDevice *d);
+> > 
+> > So here is a property and it does not do anything.
+> > It makes it easier to work on series maybe, but review
+> > is harder since we do not see what it does at all.
+> > Please do not split up patches like this - you can maintain
+> > it split up in your branch if you like and merge before sending.
+> > 
+> 
+> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
+> 
+> Thanks,
+> Marcel
+> 
+> 
+> > > -- 
+> > > 2.7.4
