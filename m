@@ -1,41 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1da4ta-0006EJ-P3
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:49:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1da4vM-0006xq-B5
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1da4tX-0001wu-LL
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:49:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48635
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1da4vJ-0003DN-4R
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:51:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1da4tX-0001wQ-FT
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:49:23 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6PImhGN130369
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 14:49:22 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bx8auhh6u-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 14:49:22 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 25 Jul 2017 12:49:21 -0600
-References: <20170725153330.14966-1-cohuck@redhat.com>
-	<20170725153330.14966-5-cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 25 Jul 2017 20:49:13 +0200
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1da4vI-0003CO-UT
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:51:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1da4vG-0000fe-TO
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 18:51:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 36E512E80D7
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 18:51:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170725153330.14966-5-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <ad8644c1-8679-378b-680e-813b3840fe1f@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/9] s390x/pci: do not advertise pci on
- non-pci builds
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Jul 2017 18:38:53 -0000
+From: Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
+Message-Id: <150100793322.24380.3169902382542114871.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
+ Ryzen CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,73 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-On 07/25/2017 05:33 PM, Cornelia Huck wrote:
-> Only set the zpci feature bit on builds that actually support pci.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+The core topology info used by Linux (see
+linux/arch/x86/kernel/cpu/amd.c:amd_get_topology()) is actually at
+CPUID[0x8000001e].
 
-I like this variant.
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+AMD's documentation is a bit confusing, as the Architecture Programmer's
+Manual still refers to CPUID[0x8000001e].EBX[bits 7:0] as "compute unit
+ID", but the Processor Programming Reference for AMD Family 17h
+documents the same bits as "Core ID".  We can implement
+CPUID[0x8000001e] and print the existing warning only if CPU vendor is
+AMD and cpuid_family !=3D 0x17.
 
-> ---
->  hw/s390x/s390-pci-bus.c  | 5 +++++
->  hw/s390x/s390-pci-bus.h  | 1 +
->  hw/s390x/s390-pci-stub.c | 4 ++++
->  target/s390x/kvm.c       | 2 +-
->  4 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index c57f6ebae0..7b30d4c7bd 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -34,6 +34,11 @@
->          }                                                         \
->      } while (0)
-> 
-> +void pci_enable_zpci_feature(S390CPUModel *model)
-> +{
-> +    set_bit(S390_FEAT_ZPCI, model->features);
-> +}
-> +
->  S390pciState *s390_get_phb(void)
->  {
->      static S390pciState *phb;
-> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-> index 5df6292509..d8796536b0 100644
-> --- a/hw/s390x/s390-pci-bus.h
-> +++ b/hw/s390x/s390-pci-bus.h
-> @@ -333,4 +333,5 @@ S390PCIBusDevice *s390_pci_find_dev_by_fid(S390pciState *s, uint32_t fid);
->  S390PCIBusDevice *s390_pci_find_next_avail_dev(S390pciState *s,
->                                                 S390PCIBusDevice *pbdev);
-> 
-> +void pci_enable_zpci_feature(S390CPUModel *model);
->  #endif
-> diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
-> index cc7278a865..8ceaf482e7 100644
-> --- a/hw/s390x/s390-pci-stub.c
-> +++ b/hw/s390x/s390-pci-stub.c
-> @@ -72,3 +72,7 @@ S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
->  {
->      return NULL;
->  }
-> +
-> +void pci_enable_zpci_feature(S390CPUModel *model)
-> +{
-> +}
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index c4c5791d27..866ac3d414 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2662,7 +2662,7 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->      }
-> 
->      /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
-> -    set_bit(S390_FEAT_ZPCI, model->features);
-> +    pci_enable_zpci_feature(model);
->      set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
-> 
->      if (s390_known_cpu_type(cpu_type)) {
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703506
+
+Title:
+  SMT not supported by QEMU on AMD Ryzen CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+  message when setting the topology to threads=3D2:
+
+  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+  configure -smp options properly.
+
+  Checking in a Windows 10 guest reveals that SMT is not enabled, and
+  from what I understand, QEMU converts the topology from threads to
+  cores internally on AMD CPUs. This appears to cause performance
+  problems in the guest perhaps because programs are assuming that these
+  threads are actual cores.
+
+  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+  guest
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
