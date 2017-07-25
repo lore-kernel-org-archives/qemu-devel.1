@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1da3VB-00045M-7j
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:11 -0400
+	(envelope-from <apahim@redhat.com>) id 1da3WI-0004vt-1A
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1da3VA-0001Vl-Bz
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33582)
+	(envelope-from <apahim@redhat.com>) id 1da3WE-00025x-1R
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1da3VA-0001RW-4j
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:08 -0400
-References: <20170725150951.16038-1-ldoktor@redhat.com>
-	<20170725150951.16038-11-ldoktor@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8f540eb9-ea3c-2e0a-e754-fa50554ea282@redhat.com>
-Date: Tue, 25 Jul 2017 13:19:53 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170725150951.16038-11-ldoktor@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] qtest.py: Few pylint/style fixes
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1da3WD-00025e-RL
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:13 -0400
+From: Amador Pahim <apahim@redhat.com>
+Date: Tue, 25 Jul 2017 19:10:11 +0200
+Message-Id: <20170725171014.25193-4-apahim@redhat.com>
+In-Reply-To: <20170725171014.25193-1-apahim@redhat.com>
+References: <20170725171014.25193-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 3/6] qemu.py: cleanup message on negative
+ exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, ehabkost@redhat.com, armbru@redhat.com, apahim@redhat.com, f4bug@amsat.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
 
+The message contains the self._args, which has only part of the
+options used in the qemu command line and is not representative
+enough to figure out what happened to the process.
 
+This patch drops the self._args part of the message.
 
-On 07/25/2017 11:09 AM, Luk=C3=A1=C5=A1 Doktor wrote:
-> No actual code changes, just few pylint/style fixes.
->=20
+Signed-off-by: Amador Pahim <apahim@redhat.com>
+---
+ scripts/qemu.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-More than welcome, given the state of our python scripts.
-
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> ---
->   scripts/qtest.py | 11 +++++------
->   1 file changed, 5 insertions(+), 6 deletions(-)
->=20
-> diff --git a/scripts/qtest.py b/scripts/qtest.py
-> index ab183c0..df0daf2 100644
-> --- a/scripts/qtest.py
-> +++ b/scripts/qtest.py
-> @@ -11,14 +11,11 @@
->   # Based on qmp.py.
->   #
->  =20
-> -import errno
->   import socket
-> -import string
->   import os
-> -import subprocess
-> -import qmp.qmp
->   import qemu
->  =20
-> +
->   class QEMUQtestProtocol(object):
->       def __init__(self, address, server=3DFalse):
->           """
-> @@ -83,8 +80,10 @@ class QEMUQtestMachine(qemu.QEMUMachine):
->                    socket_scm_helper=3DNone):
->           if name is None:
->               name =3D "qemu-%d" % os.getpid()
-> -        super(QEMUQtestMachine, self).__init__(binary, args, name=3Dna=
-me, test_dir=3Dtest_dir,
-> -                                               socket_scm_helper=3Dsoc=
-ket_scm_helper)
-> +        super(QEMUQtestMachine,
-> +              self).__init__(binary, args, name=3Dname, test_dir=3Dtes=
-t_dir,
-> +                             socket_scm_helper=3Dsocket_scm_helper)
-> +        self._qtest =3D None
->           self._qtest_path =3D os.path.join(test_dir, name + "-qtest.so=
-ck")
->  =20
->       def _base_args(self):
->=20
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index f37e2fe58e..56142ed59b 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -154,7 +154,8 @@ class QEMUMachine(object):
+ 
+             exitcode = self._popen.wait()
+             if exitcode < 0:
+-                sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode, ' '.join(self.args)))
++                sys.stderr.write('qemu received signal %i\n' % -exitcode)
++
+             self._load_io_log()
+             self._post_shutdown()
+ 
+-- 
+2.13.3
