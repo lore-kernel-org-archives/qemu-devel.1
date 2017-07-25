@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dZzIp-0005At-Ec
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:51:09 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1dZzWc-0000eT-5c
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dZzIo-0007ol-IA
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:51:07 -0400
-Date: Tue, 25 Jul 2017 13:50:57 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170725125057.GB23343@stefanha-x1.localdomain>
-References: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1dZzWZ-0005y6-27
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:05:22 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:50759)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1dZzWY-0005vL-O2
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:05:19 -0400
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <e071dd23-8d19-93ba-7962-b2e2df69a6ee@mail.uni-paderborn.de>
+Date: Tue, 25 Jul 2017 15:04:18 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="St7VIuEGZ6dlpu13"
-Content-Disposition: inline
-In-Reply-To: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Fix reference output for 186
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] RFC: QEMU RISC-V modular ISA decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org
+To: RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+Hi QEMU devs, hi risc-v-sw devs,
 
---St7VIuEGZ6dlpu13
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm posting this cross mailing list since I'd like to get feedback from
+the both sides.
 
-On Tue, Jul 25, 2017 at 10:59:36AM +0200, Kevin Wolf wrote:
-> Commits 70f17a1 ('error: Revert unwanted change of warning messages')
-> and e1824e5 ('qemu-iotests: Test 'info block'') had a semantic merge
-> conflict, which results in failure for qemu-iotests case 186. Fix the
-> reference output to consider the changes of 70f17a1.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/186.out | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Right now the RISC-V port for QEMU uses the classic decoding scheme of
+one function decoding the first opcode (and prefixes) and then branches
+to different functions for decoding the rest (as in target/arm or most
+of the other targets). This is all done using switch, case statements.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This is a little bit tricky to extend, especially for third parties. I
+don't think it's too bad, but it can definitely be improved and I really
+like the way target/s390x does it, but I'm not sure about it's drawbacks.
 
---St7VIuEGZ6dlpu13
-Content-Type: application/pgp-signature; name="signature.asc"
+I see three options to proceed from here:
 
------BEGIN PGP SIGNATURE-----
+    1) Completely move to a decoding scheme similar to target/s390x in
+       QEMU. On the plus side it make it super easy to add new
+       instructions and/or new instruction formats, and reduces decoding
+       errors. I don't know the major drawbacks to this approach, maybe
+       performance. Does anyone know? Other than that it needs a major
+       rewrite of the decoder, which will take some time and thus delay
+       the development of RISC-V QEMU upstream. (I think RV32/64I can
+       be left as is, since everybody has to implement it anyways)
 
-iQEcBAEBAgAGBQJZdz6xAAoJEJykq7OBq3PIYCsIAJQes7GyDq2jANRjyqaK5UMx
-r01CuuJjHJaAlSMJ5VOnELpavzp7AXG+Apu0/y1RI49DGXKLIFQAmHl+b12ppnnD
-GgFKMFcv8MRQ8bzrSmwut9NTXPmb+bsJHTt/p3rjln29/ieZgSc488XAEg+MuO20
-zIXbE0pBWJupcWQGVgImC/Xc0OZ4m0nAj7dvtYs3djktQX5or9YxI0Ict0o8IrxN
-EzaEWTTPlcYEoFZUGmLLG4/m0+V12OQ7YwAgHYFCHHzTNucBQCgoaKGP229OP4lU
-wIUy8wJ7+S6yrep1BKvuL/gAt7HYsot1xogrDgQ5MOq3hhXpfhR8Y3H14EtoZ4g=
-=epht
------END PGP SIGNATURE-----
+    2) The compromise: Leave the core as is, i.e. RV32GC, and provide a
+       nice interface for any other extension similar to target/s390.
+       The big plus here is that no code needs to be changed and only
+       the interface needs to be added. We don't add any performance
+       overhead (if s390x-style decoding adds any), but this might
+       result in nobody using it, since they don't know about the
+       interface and they just hack their stuff in. Then it was a waste
+       of our time to implement the interface.
 
---St7VIuEGZ6dlpu13--
+    3) The status quo. Just leave it as is.
+
+Any comments?
+
+Cheers,
+Bastian
