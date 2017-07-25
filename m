@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34676)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1da6SV-00015E-Ax
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:29:36 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38691)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ehabkost@redhat.com>) id 1da6fF-0003MU-Jm
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1da6SR-0004Fg-A2
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:29:35 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60577 helo=mx01.kamp.de)
+	(envelope-from <ehabkost@redhat.com>) id 1da6fC-0003I6-Ch
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:42:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1da6SR-0004F2-0P
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:29:31 -0400
-References: <1500993699-19299-1-git-send-email-pl@kamp.de>
-	<1500993699-19299-2-git-send-email-pl@kamp.de>
-	<e4639625-7674-dfa8-8597-3e142b9931a0@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <8f1f2bd2-4509-e603-218d-942859d6316f@kamp.de>
-Date: Tue, 25 Jul 2017 22:29:25 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1da6fC-0003Fs-2X
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:42:42 -0400
+Date: Tue, 25 Jul 2017 17:42:33 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170725204233.GV2757@localhost.localdomain>
+References: <20170725171014.25193-1-apahim@redhat.com>
+	<20170725171014.25193-5-apahim@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e4639625-7674-dfa8-8597-3e142b9931a0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V5 01/10] specs/qcow2: add compress format
- extension
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170725171014.25193-5-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] qemu.py: cleanup launch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +27,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
 
-Am 25.07.2017 um 17:03 schrieb Eric Blake:
-> On 07/25/2017 09:41 AM, Peter Lieven wrote:
->> Signed-off-by: Peter Lieven <pl@kamp.de>
->> ---
->>  docs/interop/qcow2.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++-
->>  roms/ipxe              |  2 +-
->>  2 files changed, 51 insertions(+), 2 deletions(-)
->>
->> +
->> +== Compress format extension ==
->> +
->> +The compress format extension is an optional header extension. It provides
->> +the ability to specify the compress algorithm and compress parameters
-> s/the compress algorithm/the compression algorithm/
->
->> +that are used for compressed clusters. This new header MUST be present if
->> +the incompatible-feature bit "compress format bit" is set and MUST be absent
->> +otherwise.
->> +
->> +The fields of the compress format extension are:
->> +
->> +    Byte  0 - 13:  compress_format_name (padded with zeros, but not
->> +                   necessarily null terminated if it has full length).
->> +                   Valid compression format names currently are:
->> +
->> +                   deflate: Standard zlib deflate compression without
->> +                            compression header
-> Why did you name it "deflate" instead of "zlib" again?
+On Tue, Jul 25, 2017 at 07:10:12PM +0200, Amador Pahim wrote:
+> launch() is currently taking care of a number of flows, each one if its
+> own exception treatment, depending on the VM state and the files
+> creation state.
+> 
+> This patch makes launch() more resilient, off-loading the core calls to
+> the new _launch() and calling shutdown() if any exception is raised by
+> _launch(), making sure VM will be terminated and cleaned up.
+> 
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 42 +++++++++++++++++++++++++-----------------
+>  1 file changed, 25 insertions(+), 17 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 56142ed59b..45a63e8e9d 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -99,8 +99,11 @@ class QEMUMachine(object):
+>          return self._popen.pid
+>  
+>      def _load_io_log(self):
+> -        with open(self._qemu_log_path, "r") as fh:
+> -            self._iolog = fh.read()
+> +        try:
+> +            with open(self._qemu_log_path, "r") as fh:
+> +                self._iolog = fh.read()
+> +        except IOError:
+> +            pass
 
-zlib provides raw deflate encoding and gzip encoding both with and without header afaik.
-We use raw deflate encoding without header in QEMU. And the name of the algorithm is deflate.
-I found it more appropriate than zlib.
+I don't like the idea of ignoring errors unconditionally.  It's
+OK to ignore the file if we are recovering from a crash and
+didn't even create it, but it's not OK if we ran QEMU
+successfully and we really want to load the log file.
 
->
->> +
->> +              14:  compress_level (uint8_t)
->> +
->> +                   0 = default compress level (valid for all formats, default)
->> +
->> +                   Additional valid compression levels for deflate compression:
->> +
->> +                   All values between 1 and 9. 1 gives best speed, 9 gives best
->> +                   compression. The default compression level is defined by zlib
->> +                   and currently defaults to 6.
->> +
->> +              15:  compress_window_size (uint8_t)
->> +
->> +                   Window or dictionary size used by the compression format.
->> +                   Currently only used by the deflate compression algorithm.
-> What must this be set to for other algorithms?  I guess we get to that
-> in later patches.
+Maybe an optional ignore_errors argument to shutdown() and its
+helpers, to tell the shutdown functions that it is really OK to
+ignore errors?
 
-Its only used by the deflate algorithm. At this point we only have that algorithm.
-lzo has no such encoding. If we add e.g. lzma it has a dictionary size which is
-a power of two (typcial value would be 2^20).
+>  
+>      def _base_args(self):
+>          if isinstance(self._monitor_address, tuple):
+> @@ -126,23 +129,28 @@ class QEMUMachine(object):
+>          self._remove_if_exists(self._qemu_log_path)
+>  
+>      def launch(self):
+> -        '''Launch the VM and establish a QMP connection'''
+> -        devnull = open('/dev/null', 'rb')
+> -        qemulog = open(self._qemu_log_path, 'wb')
 
->
->> +
->> +                   Valid window sizes for deflate compression range from 8 to
->> +                   15 inclusively.
->> +
->> +Note: Omitting the incompatible "Compress format bit" results in the usage
->> +of deflate compression with default compression level and a window size of 12
->> +(which was default before QEMU 2.11). If exactly these parameters are choosen
-> s/choosen/chosen,/
->
->> +it is free to the implementation to omit the "Compress format bit" and the
-> s/it is free to the implementation to omit/the implementation may omit/
->
->> +compress format extension when updating the QCOW2 header.
->> +
->> +
->>  == Host cluster management ==
->>  
->>  qcow2 manages the allocation of host clusters by maintaining a reference count
->> diff --git a/roms/ipxe b/roms/ipxe
->> index 0600d3a..b991c67 160000
->> --- a/roms/ipxe
->> +++ b/roms/ipxe
->> @@ -1 +1 @@
->> -Subproject commit 0600d3ae94f93efd10fc6b3c7420a9557a3a1670
->> +Subproject commit b991c67c1d91574ef22336cc3a5944d1e63230c9
-> Oops.
+This was moved inside the try block.
 
-Yes, oops. But I guess I have to respin anyway ;-)
+This means we may try to read the log file even if we failed to
+create it.  This will have funny side-effects if the log file
+already existed and we didn't have permissions to write to it.
 
-Can you also have a look at the remainder of the series?
+For example:
 
-Thanks,
-Peter
+  ("/var/tmp/myvm.log" was created by another user)
+
+  >>> m = qemu.QEMUMachine(binary='/usr/bin/qemu-system-x86_64', name='myvm')
+  >>> m.launch()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "qemu.py", line 151, in launch
+      self.shutdown()
+    File "qemu.py", line 182, in shutdown
+      self._post_shutdown()
+    File "qemu.py", line 130, in _post_shutdown
+      self._remove_if_exists(self._qemu_log_path)
+    File "qemu.py", line 83, in _remove_if_exists
+      os.remove(path)
+  OSError: [Errno 1] Operation not permitted: '/var/tmp/myvm.log'
+  >>> m.get_log()
+  'old log file\n'
+  >>> 
+
+
+> +        '''
+> +        Try to launch the VM and make sure we cleanup on exception.
+> +        '''
+> +        if self.is_running():
+> +            return
+
+Why exactly is this necessary?
+
+Calling launch() twice is likely to be a mistake (e.g. what if
+self.args was changed?).  I would raise an Exception instead.
+
+
+> +
+>          try:
+> -            self._pre_launch()
+> -            args = self._wrapper + [self._binary] + self._base_args() + self.args
+> -            self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+> -                                           stderr=subprocess.STDOUT, shell=False)
+> -            self._post_launch()
+> +            self._launch()
+>          except:
+> -            if self.is_running():
+> -                self._popen.kill()
+> -                self._popen.wait()
+> -            self._load_io_log()
+> -            self._post_shutdown()
+
+> +            self.shutdown()
+>              raise
+>  
+> +    def _launch(self):
+> +        '''Launch the VM and establish a QMP connection.'''
+> +        devnull = open('/dev/null', 'rb')
+> +        qemulog = open(self._qemu_log_path, 'wb')
+> +        self._pre_launch()
+> +        args = self._wrapper + [self._binary] + self._base_args() + self._args
+
+This looks broken:
+
+  >>> m.launch()
+  Error launching VM.
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "qemu.py", line 147, in launch
+      args = self._wrapper + [self._binary] + self._base_args() + self._args
+  AttributeError: 'QEMUMachine' object has no attribute '_args'
+
+
+> +        self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+> +                                       stderr=subprocess.STDOUT, shell=False)
+> +        self._post_launch()
+> +
+>      def shutdown(self):
+>          '''Terminate the VM and clean up'''
+>          if self.is_running():
+> @@ -156,8 +164,8 @@ class QEMUMachine(object):
+>              if exitcode < 0:
+>                  sys.stderr.write('qemu received signal %i\n' % -exitcode)
+>  
+> -            self._load_io_log()
+> -            self._post_shutdown()
+
+It looks like the existing code isn't safe, and can call
+_post_shutdown() before _post_launch() was called.
+
+What if QEMUQtestMachine._pre_launch() failed because the qtest
+socket is already in use by another process?  We shouldn't delete
+a socket that doesn't even belong to us.
+
+I suggest setting self._qemu_log_path, self._monitor_address,
+self._qtest_path only after the files were really created, and
+make _post_shutdown() delete the files only if those attributes
+are not None (meaning we will only delete files that we created).
+
+
+> +        self._load_io_log()
+> +        self._post_shutdown()
+>  
+>      underscore_to_dash = string.maketrans('_', '-')
+>      def qmp(self, cmd, conv_keys=True, **args):
+> -- 
+> 2.13.3
+> 
+
+-- 
+Eduardo
