@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dZwi5-0007nW-Bz
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:05:02 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dZww6-000100-Kb
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dZwi2-0000IG-2P
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:05:01 -0400
-Received: from mail-eopbgr30091.outbound.protection.outlook.com
-	([40.107.3.91]:14416
-	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dZwi1-0000Gx-60
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:04:58 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 25 Jul 2017 13:04:41 +0300
-Message-Id: <1500977081-120929-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <cohuck@redhat.com>) id 1dZww3-000690-Vc
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:19:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51664)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dZww3-00068r-PD
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:19:27 -0400
+Date: Tue, 25 Jul 2017 12:19:18 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170725121918.7c3f1d56@gondolin>
+In-Reply-To: <150097670624.105.11799417719809984169@5d477a5b5989>
+References: <20170725094026.5376-1-cohuck@redhat.com>
+	<150097670624.105.11799417719809984169@5d477a5b5989>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] char: don't exit on hmp 'chardev-add help'
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: no-reply@patchew.org
+Cc: qemu-devel@nongnu.org, famz@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
 
-qemu_chr_new_from_opts() is used from both vl.c and hmp,
-and it is quite confusing to see qemu suddenly exit after receiving a help
-option in hmp.
+On Tue, 25 Jul 2017 02:58:27 -0700 (PDT)
+no-reply@patchew.org wrote:
 
-Do exit(0) from vl.c instead.
+> Hi,
+> 
+> This series failed build test on FreeBSD host. Please find the details below.
+> 
+> Message-id: 20170725094026.5376-1-cohuck@redhat.com
+> Subject: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/sh
+> # Testing script will be invoked under the git checkout with
+> # HEAD pointing to a commit that has the patches applied on top of "base"
+> # branch
+> set -e
+> echo "=== ENV ==="
+> env
+> echo "=== PACKAGES ==="
+> pkg info
+> echo "=== TEST BEGIN ==="
+> CC=/usr/local/libexec/ccache/cc
+> INSTALL=$PWD/install
+> BUILD=$PWD/build
+> echo -n "Using CC: "
+> realpath $CC
+> mkdir -p $BUILD $INSTALL
+> SRC=$PWD
+> cd $BUILD
+> $SRC/configure --cc=$CC --prefix=$INSTALL --target-list=x86_64-softmmu
+> gmake -j4
+> # XXX: we need reliable clean up
+> # make check -j4 V=1
+> gmake install
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> fatal: unable to access 'https://github.com/patchew-project/qemu/': OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to github.com:443 
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
----
- include/chardev/char.h |  4 +++-
- chardev/char.c         |  2 +-
- vl.c                   | 10 ++++++----
- 3 files changed, 10 insertions(+), 6 deletions(-)
+Hm... connection issues?
 
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 1604ea9..66dde46 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -65,7 +65,9 @@ struct Chardev {
-  *
-  * @opts see qemu-config.c for a list of valid options
-  *
-- * Returns: a new character backend
-+ * Returns: on success: a new character backend
-+ *          otherwise:  NULL; @errp specifies the error
-+ *                            or left untouched in case of help option
-  */
- Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-                                 Error **errp);
-diff --git a/chardev/char.c b/chardev/char.c
-index c34b44a..5d283b9 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -620,7 +620,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
- 
-         error_report("Available chardev backend types: %s", str->str);
-         g_string_free(str, true);
--        exit(0);
-+        return NULL;
-     }
- 
-     if (id == NULL) {
-diff --git a/vl.c b/vl.c
-index fb6b2ef..47bfe51 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2344,10 +2344,12 @@ static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
- {
-     Error *local_err = NULL;
- 
--    qemu_chr_new_from_opts(opts, &local_err);
--    if (local_err) {
--        error_report_err(local_err);
--        return -1;
-+    if (!qemu_chr_new_from_opts(opts, &local_err)) {
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return -1;
-+        }
-+        exit(0);
-     }
-     return 0;
- }
--- 
-2.7.4
+> error: Could not fetch 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Traceback (most recent call last):
+>   File "/home/patchew-tester/patchew/patchew-cli", line 412, in test_one
+>     git_clone_repo(clone, r["repo"], r["head"], logf)
+>   File "/home/patchew-tester/patchew/patchew-cli", line 48, in git_clone_repo
+>     stdout=logf, stderr=logf)
+>   File "/usr/local/lib/python3.5/subprocess.py", line 271, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['git', 'remote', 'add', '-f', '--mirror=fetch', '3c8cf5a9c21ff8782164d1def7f44bd888713384', 'https://github.com/patchew-project/qemu']' returned non-zero exit status 1
+> 
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
