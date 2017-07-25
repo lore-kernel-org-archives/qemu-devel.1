@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1da1TT-0008Sa-MX
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:16 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1da1Tb-00007J-7V
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1da1TS-0006kz-PE
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42824)
+	(envelope-from <ldoktor@redhat.com>) id 1da1Ta-0006oe-C9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1da1TS-0006kW-Iv
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:14 -0400
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1da1Ta-0006oS-5k
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:22 -0400
 From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Tue, 25 Jul 2017 17:09:43 +0200
-Message-Id: <20170725150951.16038-3-ldoktor@redhat.com>
+Date: Tue, 25 Jul 2017 17:09:45 +0200
+Message-Id: <20170725150951.16038-5-ldoktor@redhat.com>
 In-Reply-To: <20170725150951.16038-1-ldoktor@redhat.com>
 References: <20170725150951.16038-1-ldoktor@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 02/10] qemu|qtest: Avoid dangerous arguments
+Subject: [Qemu-devel] [PATCH v2 04/10] qemu.py: Simplify QMP key-conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +29,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
 
-The list object is mutable in python and potentially might modify other
-object's arguments when used as default argument. Reproducer:
-
-    >>> vm1 =3D QEMUMachine("qemu")
-    >>> vm2 =3D QEMUMachine("qemu")
-    >>> vm1._wrapper.append("foo")
-    >>> print vm2._wrapper
-    ['foo']
-
-In this case the `args` is actually copied so it would be safe to keep
-it, but it's not a good practice to keep it. The same issue applies in
-inherited qtest module.
+The QMP key conversion consist of '_'s to be replaced with '-'s, which
+can easily be done by a single `str.replace` method which is faster and
+does not require `string` module import.
 
 Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qemu.py  | 6 +++++-
- scripts/qtest.py | 2 +-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ scripts/qemu.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 191c916..66fd863 100644
+index 7e95c25..5948e19 100644
 --- a/scripts/qemu.py
 +++ b/scripts/qemu.py
-@@ -23,7 +23,7 @@ import qmp.qmp
- class QEMUMachine(object):
-     '''A QEMU VM'''
+@@ -13,7 +13,6 @@
+ #
 =20
--    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
-+    def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DNone,
-                  test_dir=3D"/var/tmp", monitor_address=3DNone,
-                  socket_scm_helper=3DNone, debug=3DFalse):
-         '''
-@@ -39,6 +39,10 @@ class QEMUMachine(object):
-         @param debug: enable debug mode (forwarded to QMP helper and suc=
-h)
-         @note: Qemu process is not started until launch() is used.
-         '''
-+        if args is None:
-+            args =3D []
-+        if wrapper is None:
-+            wrapper =3D []
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
-         if monitor_address is None:
-diff --git a/scripts/qtest.py b/scripts/qtest.py
-index d5aecb5..ab183c0 100644
---- a/scripts/qtest.py
-+++ b/scripts/qtest.py
-@@ -79,7 +79,7 @@ class QEMUQtestProtocol(object):
- class QEMUQtestMachine(qemu.QEMUMachine):
-     '''A QEMU VM'''
+ import errno
+-import string
+ import os
+ import sys
+ import subprocess
+@@ -180,14 +179,12 @@ class QEMUMachine(object):
+             self._load_io_log()
+             self._post_shutdown()
 =20
--    def __init__(self, binary, args=3D[], name=3DNone, test_dir=3D"/var/=
-tmp",
-+    def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/va=
-r/tmp",
-                  socket_scm_helper=3DNone):
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
+-    underscore_to_dash =3D string.maketrans('_', '-')
+-
+     def qmp(self, cmd, conv_keys=3DTrue, **args):
+         '''Invoke a QMP command and return the result dict'''
+         qmp_args =3D dict()
+         for key, value in args.iteritems():
+             if conv_keys:
+-                qmp_args[key.translate(self.underscore_to_dash)] =3D val=
+ue
++                qmp_args[key.replace('_', '-')] =3D value
+             else:
+                 qmp_args[key] =3D value
+=20
 --=20
 2.9.4
