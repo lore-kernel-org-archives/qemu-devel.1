@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZw1R-0003ld-Sf
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:20:59 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dZw7Z-0005BR-IX
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZw1O-0001Nd-Md
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:20:57 -0400
-Received: from 16.mo1.mail-out.ovh.net ([178.33.104.224]:40441)
+	(envelope-from <jfreimann@redhat.com>) id 1dZw7U-0004cK-Go
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:27:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28413)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZw1O-0001M8-Ca
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:20:54 -0400
-Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id DA16688F78
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 11:20:52 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-27-git-send-email-clg@kaod.org>
-	<61f9467e-f7be-e939-ce7e-d83b70933576@ozlabs.ru>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5e2c76ad-679a-d367-a478-9d50509a0547@kaod.org>
-Date: Tue, 25 Jul 2017 11:20:49 +0200
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1dZw7U-0004am-7y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:27:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DEAB768E05
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 09:17:42 +0000 (UTC)
+Date: Tue, 25 Jul 2017 11:17:29 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+Message-ID: <20170725091729.7o5rhsx2zkrr2mqk@localhost.localdomain>
+References: <20170721095553.10717-1-jfreimann@redhat.com>
+	<20170721095553.10717-5-jfreimann@redhat.com>
+	<20170725010503-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <61f9467e-f7be-e939-ce7e-d83b70933576@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 26/26] spapr: force XIVE
- exploitation mode for POWER9 (HACK)
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20170725010503-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 4/4] tests/pxe-test: add testcase using
+ vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,161 +36,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com
 
-On 07/25/2017 04:43 AM, Alexey Kardashevskiy wrote:
-> On 06/07/17 03:13, C=C3=A9dric Le Goater wrote:
->> The CAS negotiation process determines the interrupt controller model
->> to use in the guest but currently, the sPAPR machine make uses of the
->> controller very early in the initialization sequence. The interrupt
->> source is used to allocate IRQ numbers and populate the device tree
->> and the interrupt presenter objects are created along with the CPU.
+On Tue, Jul 25, 2017 at 01:06:51AM +0300, Michael S. Tsirkin wrote:
+>On Fri, Jul 21, 2017 at 11:55:53AM +0200, Jens Freimann wrote:
+>> From: Jens Freimann <jfreiman@redhat.com>
 >>
->> One solution would be use a bitmap to allocate these IRQ numbers and
->> then instantiate the interrupt source object of the correct type with
->> the bitmap as a constructor parameter.
+>> Add a PXE testcase tunneling traffic through vhost-user-bridge process.
+>> Create a vhost-user-bridge  process and connect it to qemu via a socket.
 >>
->> As for the interrupt presenter objects, we could allocated them later
->> in the boot process. May be on demand, when a CPU is first notified.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 >> ---
->>  hw/ppc/spapr.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  1 file changed, 62 insertions(+)
+>>  tests/Makefile.include |   4 +-
+>>  tests/pxe-test.c       | 140 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  2 files changed, 142 insertions(+), 2 deletions(-)
 >>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index ca3a6bc2ea16..623fc776c886 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -237,6 +237,38 @@ error:
->>      return NULL;
->>  }
->> =20
->> +static XiveICSState *spapr_xive_ics_create(XIVE *x, int nr_irqs, Erro=
-r **errp)
->> +{
->> +    Error *local_err =3D NULL;
->> +    int irq_base;
->> +    Object *obj;
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 7af278d..e40550c 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -705,7 +705,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
+>>  tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
+>>  tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+>>  	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+>> -tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+>> +tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
+>> +    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
+>>  tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+>>  tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
+>>  tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+>> @@ -834,6 +835,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+>>  	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+>>  	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+>>  		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
+>> +		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
+>>  		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+>>  		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
+>>  	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
+>> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+>> index 34282d3..d6379a8 100644
+>> --- a/tests/pxe-test.c
+>> +++ b/tests/pxe-test.c
+>> @@ -5,7 +5,8 @@
+>>   *
+>>   * Authors:
+>>   *  Michael S. Tsirkin <mst@redhat.com>,
+>> - *  Victor Kaplansky <victork@redhat.com>
+>> + *  Victor Kaplansky <victork@redhat.com>,
+>> + *  Jens Freimann <jfreiman@redhat.com>
+>>   *
+>>   * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>>   * See the COPYING file in the top-level directory.
+>> @@ -13,14 +14,150 @@
+>>
+>>  #include "qemu/osdep.h"
+>>  #include <glib/gstdio.h>
+>> +#include <glib.h>
+>>  #include "qemu-common.h"
+>>  #include "libqtest.h"
+>>  #include "boot-sector.h"
+>> +#include <sys/vfs.h>
+>>
+>> +#define LPORT 5555
+>> +#define RPORT 4444
+>>  #define NETNAME "net0"
+>> +#define QEMU_CMD_MEM    "--enable-kvm -m %d "\
+>> +                        "-object memory-backend-file,id=mem,size=%dM,"\
+>> +                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
+>> +#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
+>> +#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
+>> +                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
+>> +                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
+>> +                        " -netdev socket,id=n1,fd=%d"
+>> +#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
+>> +                        " -device virtio-net-pci,netdev=n1 "
 >> +
->> +    /*
->> +     * TODO: use an XICS_IRQ_BASE alignment to be in sync with XICS
->> +     * irq numbers. we should probably simplify the XIVE model or use
->> +     * a common allocator. a bitmap maybe ?
->> +     */
->> +    irq_base =3D xive_alloc_hw_irqs(x, nr_irqs, XICS_IRQ_BASE);
->> +    if (irq_base < 0) {
->> +        error_setg(errp, "Failed to allocate %d irqs", nr_irqs);
+>> +#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
+>> +                        QEMU_CMD_NETDEV QEMU_CMD_NET
+>> +
+>> +#define HUGETLBFS_MAGIC       0x958458f6
+>> +#define VUBR_SOCK "vubr.sock"
+>> +#define MEMSZ 1024
+>>
+>>  static char disk[] = "tests/pxe-test-disk-XXXXXX";
+>>
+>> +static const char *init_hugepagefs(const char *path)
+>> +{
+>> +    struct statfs fs;
+>> +    int ret;
+>> +
+>> +    if (access(path, R_OK | W_OK | X_OK)) {
+>> +        g_test_message("access on path (%s): %s\n", path, strerror(errno));
 >> +        return NULL;
 >> +    }
 >> +
->> +    obj =3D object_new(TYPE_ICS_XIVE);
->> +    object_property_add_child(OBJECT(x), "hw", obj, NULL);
+>> +    do {
+>> +        ret = statfs(path, &fs);
+>> +    } while (ret != 0 && errno == EINTR);
 >> +
->> +    xive_ics_create(ICS_XIVE(obj), x, irq_base, nr_irqs, 16 /* 64KB p=
-age */,
->> +                    XIVE_SRC_TRIGGER, &local_err);
->> +    if (local_err) {
->> +        goto error;
+>> +    if (ret != 0) {
+>> +        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
+>> +        return NULL;
 >> +    }
->> +    return ICS_XIVE(obj);
 >> +
->> +error:
->> +    error_propagate(errp, local_err);
->> +    return NULL;
+>> +    if (fs.f_type != HUGETLBFS_MAGIC) {
+>> +        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    return path;
+>> +}
+>
+>Why bother?  Rest of the patchset works find on any filesystem.  User
+>set this for some reason, let's just roll with it.
+
+We do it like this for the vhost-user testcase. 
+Just to be sure: you're suggesting to just get rid of
+init_hugepagefs()? 
+
+regards,
+Jens 
+
+>> +
+>> +static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
+>> +{
+>> +    int sock;
+>> +
+>> +    if (inet_aton("127.0.0.1", (struct in_addr *) &si_remote->sin_addr.s_addr)
+>> +            == 0) {
+>> +        g_test_message("inet_aton failed\n");
+>> +        return -1;
+>> +    }
+>> +    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+>> +    if (sock == -1) {
+>> +        g_test_message("socket creation failed\n");
+>> +        return -1;
+>> +    }
+>> +    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
+>> +        g_test_message("connect failed: %s", strerror(errno));
+>> +        return -1;
+>> +    }
+>> +
+>> +    return sock;
 >> +}
 >> +
->>  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *=
-cpu,
->>                                    int smt_threads)
->>  {
->> @@ -814,6 +846,11 @@ static int spapr_dt_cas_updates(sPAPRMachineState=
- *spapr, void *fdt,
->>      /* /interrupt controller */
->>      if (!spapr_ovec_test(ov5_updates, OV5_XIVE_EXPLOIT)) {
->>          spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
+>> +static void test_pxe_vhost_user(void)
+>> +{
+>> +    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
+>> +    char template2[] = "/tmp/hugepages-XXXXXX";
+>> +    gchar * vubr_args[] = {NULL, NULL, NULL, NULL};
+>> +    struct sockaddr_in si_remote = {
+>> +        .sin_family = AF_INET,
+>> +        .sin_port = htons(RPORT),
+>> +    };
+>> +    const char *hugefs = NULL;
+>> +    const char *tmpfs2 = NULL;
+>> +    const char *tmpfs = NULL;
+>> +    const char *root = NULL;
+>> +    GError *error = NULL;
+>> +    char *vubr_binary;
+>> +    char *qemu_args;
+>> +    GPid vubr_pid;
+>> +    int sock = -1;
+>> +
+>> +    tmpfs = mkdtemp(template);
+>> +    if (!tmpfs) {
+>> +        g_test_message("mkdtemp on path(%s): %s\n",
+>> +                       template, strerror(errno));
+>> +    }
+>> +    vubr_binary = getenv("QTEST_VUBR_BINARY");
+>> +    g_assert(vubr_binary);
+>> +    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
+>> +    vubr_args[1] = g_strdup_printf("-u");
+>> +    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
+>> +    g_spawn_async(NULL, vubr_args, NULL,
+>> +                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
+>> +                  G_SPAWN_SEARCH_PATH,
+>> +                  NULL, NULL, &vubr_pid, &error);
+>> +    g_assert_no_error(error);
+>> +
+>> +    hugefs = getenv("QTEST_HUGETLBFS_PATH");
+>> +    if (hugefs) {
+>> +        root = init_hugepagefs(hugefs);
+>> +        g_assert(root);
 >> +    } else {
->> +        xive_spapr_populate(spapr->xive, fdt);
->> +
->> +        /* Install XIVE MMIOs */
->> +        xive_mmio_map(spapr->xive);
->=20
->=20
-> xive_mmio_map() could be called where sysbus_init_mmio() is called as o=
-nce
-> these are mmap'ed, they are never unmapped and tm_base/vc_base never
-> change. And XIVE is always created on P9 anyway.
-
-OK. So you don't think we should map/unmap depending on=20
-CAS negotiation of the OV5_XIVE_EXPLOIT bit ?=20
-
-Thanks,
-
-C.=20
-
-
->=20
->=20
->>      }
->> =20
->>      offset =3D fdt_path_offset(fdt, "/chosen");
->> @@ -963,6 +1000,13 @@ static void spapr_dt_ov5_platform_support(void *=
-fdt, int chosen)
->>          } else {
->>              val[3] =3D 0x00; /* Hash */
->>          }
->> +
->> +        /* TODO: introduce a kvmppc_has_cap_xive() ? Works with
->=20
->=20
-> Yes.
->=20
->> +         * irqchip=3Doff for now
->> +         */
->> +        if (first_ppc_cpu->env.excp_model & POWERPC_EXCP_POWER9) {
->> +            val[1] =3D 0x01;
->> +        }
->>      } else {
->>          if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
->>              /* V3 MMU supports both hash and radix (with dynamic swit=
-ching) */
->> @@ -971,6 +1015,9 @@ static void spapr_dt_ov5_platform_support(void *f=
-dt, int chosen)
->>              /* Otherwise we can only do hash */
->>              val[3] =3D 0x00;
->>          }
->> +        if (first_ppc_cpu->env.excp_model & POWERPC_EXCP_POWER9) {
->> +            val[1] =3D 0x01;
->> +        }
->>      }
->>      _FDT(fdt_setprop(fdt, chosen, "ibm,arch-vec-5-platform-support",
->>                       val, sizeof(val)));
->> @@ -2237,6 +2284,21 @@ static void ppc_spapr_init(MachineState *machin=
-e)
->>      spapr->ov5 =3D spapr_ovec_new();
->>      spapr->ov5_cas =3D spapr_ovec_new();
->> =20
->> +    /* TODO: force XIVE mode by default on POWER9.
->> +     *
->> +     * Switching from XICS to XIVE is badly broken. The ICP type is
->> +     * incorrect and the ICS is needed before the CAS negotiation to
->> +     * allocate irq numbers ...
->> +     */
->> +    if (strstr(machine->cpu_model, "POWER9") ||
->> +        !strcmp(machine->cpu_model, "host")) {
->> +        spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
->> +
->> +        spapr->icp_type =3D TYPE_XIVE_ICP;
->> +        spapr->ics =3D ICS_BASE(
->> +            spapr_xive_ics_create(spapr->xive, XICS_IRQS_SPAPR, &erro=
-r_fatal));
+>> +        tmpfs2 = mkdtemp(template2);
+>> +        g_assert(tmpfs2);
+>> +        root = tmpfs2;
 >> +    }
 >> +
->>      if (smc->dr_lmb_enabled) {
->>          spapr_ovec_set(spapr->ov5, OV5_DRCONF_MEMORY);
->>          spapr_validate_node_memory(machine, &error_fatal);
->>
->=20
->=20
+>> +    sock = vubr_create_socket(&si_remote, RPORT);
+>> +    g_assert_cmpint(sock, !=, -1);
+>> +
+>> +    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
+>> +                                "char0", vubr_args[2], "char0",
+>> +                                disk, sock);
+>> +    qtest_start(qemu_args);
+>> +    boot_sector_test();
+>> +    qtest_quit(global_qtest);
+>> +    g_free(qemu_args);
+>> +    g_free(vubr_args[0]);
+>> +    g_free(vubr_args[1]);
+>> +    g_free(vubr_args[2]);
+>> +    g_assert_cmpint(g_remove(g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK)),
+>> +                    ==, 0);
+>> +    if (tmpfs2) {
+>> +        g_assert_cmpint(rmdir(tmpfs2), ==, 0);
+>> +    }
+>> +    g_assert_cmpint(g_rmdir(tmpfs), ==, 0);
+>> +}
+>> +
+>>  static void test_pxe_one(const char *params, bool ipv6)
+>>  {
+>>      char *args;
+>> @@ -65,6 +202,7 @@ int main(int argc, char *argv[])
+>>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>>          qtest_add_func("pxe/e1000", test_pxe_e1000);
+>>          qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
+>> +        qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
+>>      } else if (strcmp(arch, "ppc64") == 0) {
+>>          qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
+>>          qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
+>> --
+>> 2.9.4
