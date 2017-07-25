@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1da1dv-0000j8-Ko
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:21:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1da1fn-0002Ga-HH
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1da1ds-0002PZ-F1
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:21:03 -0400
-Date: Tue, 25 Jul 2017 16:20:52 +0100
+	(envelope-from <stefanha@gmail.com>) id 1da1fk-00034Z-Cb
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:22:59 -0400
+Date: Tue, 25 Jul 2017 16:22:52 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170725152052.GP23343@stefanha-x1.localdomain>
+Message-ID: <20170725152252.GQ23343@stefanha-x1.localdomain>
 References: <20170721093416.17816-1-stefanha@redhat.com>
-	<CAFEAcA_+ffmyvExhFvm2JTmoipum6GeWiFPP5kuxRKb9+ezRzA@mail.gmail.com>
+	<20170724091128.GB4630@noname.str.redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MM5RgFPKyuP3gDcV"
+	protocol="application/pgp-signature"; boundary="H2kTGx6mr3R59oXC"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_+ffmyvExhFvm2JTmoipum6GeWiFPP5kuxRKb9+ezRzA@mail.gmail.com>
+In-Reply-To: <20170724091128.GB4630@noname.str.redhat.com>
 Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: add a "how to"
  to ./README
 List-Id: <qemu-devel.nongnu.org>
@@ -25,69 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
---MM5RgFPKyuP3gDcV
+--H2kTGx6mr3R59oXC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 24, 2017 at 11:20:44AM +0100, Peter Maydell wrote:
-> On 21 July 2017 at 10:34, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > There is not much getting started documentation for qemu-iotests.  This
-> > patch explains how to create a new test and covers the overall testing
-> > approach.
-> >
-> > Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  tests/qemu-iotests/README | 83 +++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  1 file changed, 83 insertions(+)
-> >
-> > diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
-> > index 6079b40..8259b9f 100644
-> > --- a/tests/qemu-iotests/README
-> > +++ b/tests/qemu-iotests/README
-> > @@ -14,8 +14,91 @@ Just run ./check to run all tests for the raw image =
-format, or ./check
-> >  -qcow2 to test the qcow2 image format.  The output of ./check -h expla=
-ins
-> >  additional options to test further image formats or I/O methods.
-> >
-> > +* Testing approach
+On Mon, Jul 24, 2017 at 11:11:28AM +0200, Kevin Wolf wrote:
+> Am 21.07.2017 um 11:34 hat Stefan Hajnoczi geschrieben:
+> > +5. Generate the golden master file
 > > +
-> > +Each test is an executable file (usually a bash script) that is run by=
- the
-> > +./check test harness.  Standard out and standard error are captured to=
- an
-> > +output file.  If the output file differs from the "golden master" outp=
-ut file
-> > +for the test then it fails.
+> > +Run your test with "./check <test-number>".  You may need to pass addi=
+tional
+> > +options to use an image format or protocol.
 >=20
-> Should ./check be run from the source tree, or the build tree? The
-> existing README text doesn't say and I don't think your additions
-> do either.
+> ./check refuses to even run a test if the reference output is missing.
+> So in practice you need a 'touch <test-number>.out' first.
 
-It doesn't matter, both should work.  The script detects both
-possibilities and rejigs itself to compensate.
+Oops, will fix!
 
 Stefan
 
---MM5RgFPKyuP3gDcV
+--H2kTGx6mr3R59oXC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZd2HUAAoJEJykq7OBq3PIDuoH/iM+SiznaARUC46BF5HJBmb1
-MDEfjKpj3TyuAQA1rSD7neF5702FslddJflkOavZqXJnZOkeM3/GoEEuvpPI9X70
-EsZTJkb2FH6MOaadgCUOVKKf2FruRe3NsJLJ7nzL3XKp/EpFsBEPYl6IFNwBHidB
-V75eZmvO6ILj2IR4PoWC++DQ5FDKRVTqZ33wydSqaMYxlVC3vQKv7Kt16FMjYj48
-0ODyoN55DgQ9t7iTn+Wwme1iO62NMoA1hb/vNwDqn3Tc/1RtsiVAqxI6Wy+nxD+U
-GEDtViHeSdt8dvs0Dtt1wjlXi+bI5ifGVExEhwSU9nTWlFt5+bHuiXr8PcNqeZE=
-=p+do
+iQEcBAEBAgAGBQJZd2JMAAoJEJykq7OBq3PIRu4H/1Yen8Q9rr9BjnDb1pxPteuO
+GeyqzClCCf4o96YXBXPwPuwlesg4j5a0NPV0eyC1lrwZgkPqXB3DDLjBfhAZ5dRt
+cvtZN8lKCxjiydCfVY0IOumQ99qOpkYva+8rZy74iHZtl40p2Zap/IjzD2O2sul9
+RZLgUm3lRh5qh9o1K41B88wXSBmBfDVJFE2xejXm+W4EvWPJUPuM9sIpQDjQ+Vv+
+SVUXjuc8QKllXo8HGXIjCpMZXFDh8YdpeJYjiE26qPIziP+1pbW+XyY8RawJpU5V
+Vwf0e8bIsdkWVi6M4wbKuXqMisJV2sBYixqPoF2cCgG2D7weJMrovyMotpkYMLc=
+=0jx2
 -----END PGP SIGNATURE-----
 
---MM5RgFPKyuP3gDcV--
+--H2kTGx6mr3R59oXC--
