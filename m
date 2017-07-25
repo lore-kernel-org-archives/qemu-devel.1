@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dZvU2-00025a-EG
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:46:32 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dZvYm-0002yt-NC
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dZvTy-0008LT-O6
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:46:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56688)
+	(envelope-from <imammedo@redhat.com>) id 1dZvYi-0002Hb-Fe
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:51:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63057)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZvTy-0008L9-Hv
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:46:22 -0400
-Date: Tue, 25 Jul 2017 09:46:14 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170725084614.GF26394@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170725011530.17958-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZvYi-0002Gk-6B
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:51:16 -0400
+Date: Tue, 25 Jul 2017 10:44:38 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170725104438.5eb90865@nial.brq.redhat.com>
+In-Reply-To: <20170724234849-mutt-send-email-mst@kernel.org>
+References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170724111419.720aa168@nial.brq.redhat.com>
+	<20170724234849-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170725011530.17958-1-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
- extension on windows
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
+ of vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Sameeh Jubran <sjubran@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Daniel Rempel <daniel@daynix.com>, =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-On Mon, Jul 24, 2017 at 10:15:30PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Reported-by: Sameeh Jubran <sjubran@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> original report from Sameeh Jubran:
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.html
->=20
->  Makefile  | 2 +-
->  configure | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+On Mon, 24 Jul 2017 23:50:00 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:
+> > On Sun, 23 Jul 2017 20:46:11 +0800
+> > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> >   
+> > > When a guest that has several hotplugged dimms is migrated, on
+> > > destination it will fail to resume. Because regions on source
+> > > are merged and on destination the order of realizing devices
+> > > is different from on source with dimms, so when part of devices
+> > > are realizd some region can not be merged.That may be more than
+> > > vhost slot limit.
+> > > 
+> > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > ---
+> > >  hw/mem/pc-dimm.c        | 2 +-
+> > >  include/sysemu/sysemu.h | 1 +
+> > >  vl.c                    | 5 +++++
+> > >  3 files changed, 7 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > index ea67b46..13f3db5 100644
+> > > --- a/hw/mem/pc-dimm.c
+> > > +++ b/hw/mem/pc-dimm.c
+> > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > >          goto out;
+> > >      }
+> > >  
+> > > -    if (!vhost_has_free_slot()) {
+> > > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
+> > >          error_setg(&local_err, "a used vhost backend has no free"
+> > >                                 " memory slots left");  
+> > that doesn't fix issue,
+> >    1st: number of used entries is changing after machine_init_done() is called
+> >         as regions continue to mapped/unmapped during runtime  
+> 
+> But that's fine, we want hotplug to fail if we can not guarantee vhost
+> will work.
+don't we want guarantee that vhost will work with dimm devices at startup
+if it were requested on CLI or fail startup cleanly if it can't?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> 
+> >    2nd: it brings regression and allows to start QEMU with number memory
+> >         regions more than supported by backend, which combined with missing
+> >         error handling in vhost will lead to qemu crashes or obscure bugs in
+> >         guest breaking vhost enabled drivers.
+> >         i.e. patch undoes what were fixed by
+> >         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html  
+> 
+> Why does it? The issue you fixed there is hotplug, and that means
+> pc_dimm_memory_plug called after machine done.
+I wasn't able to crash fc24 guest with current qemu/rhen7 kernel,
+it fallbacks back to virtio and switches off vhost. 
+
+
+> 
+> >   
+> > >          goto out;
+> > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > index b213696..48228ad 100644
+> > > --- a/include/sysemu/sysemu.h
+> > > +++ b/include/sysemu/sysemu.h
+> > > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+> > >  void qemu_add_exit_notifier(Notifier *notify);
+> > >  void qemu_remove_exit_notifier(Notifier *notify);
+> > >  
+> > > +bool qemu_is_machine_init_done(void);
+> > >  void qemu_add_machine_init_done_notifier(Notifier *notify);
+> > >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+> > >  
+> > > diff --git a/vl.c b/vl.c
+> > > index fb6b2ef..43aee22 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
+> > >  
+> > >  static bool machine_init_done;
+> > >  
+> > > +bool qemu_is_machine_init_done(void)
+> > > +{
+> > > +    return machine_init_done;
+> > > +}
+> > > +
+> > >  void qemu_add_machine_init_done_notifier(Notifier *notify)
+> > >  {
+> > >      notifier_list_add(&machine_init_done_notifiers, notify);  
