@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1da7Bg-0002QC-6v
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:16:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1da7D0-0003QH-OD
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:17:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1da7Bc-0004dA-0Y
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:16:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32768)
+	(envelope-from <ehabkost@redhat.com>) id 1da7Cz-0005Ia-R2
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:17:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1da7Bb-0004cm-Nq
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:16:11 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C7FBFC0587E5
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 21:16:10 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 25 Jul 2017 16:15:23 -0500
-Message-Id: <20170725211523.3998-13-eblake@redhat.com>
-In-Reply-To: <20170725211523.3998-1-eblake@redhat.com>
-References: <20170725211523.3998-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 12/12] tests/libqtest: Enable compile-time
- format string checking
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1da7Cz-0005IC-IA
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:17:37 -0400
+Date: Tue, 25 Jul 2017 18:17:29 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170725211729.GX2757@localhost.localdomain>
+References: <20170725171014.25193-1-apahim@redhat.com>
+	<20170725171014.25193-7-apahim@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170725171014.25193-7-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 6/6] qemu.py: include qemu command line
+ and output on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, armbru@redhat.com
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
 
-From: Markus Armbruster <armbru@redhat.com>
+On Tue, Jul 25, 2017 at 07:10:14PM +0200, Amador Pahim wrote:
+> When launching a VM, if an exception happens and the VM is not
+> initiated, it is useful to see the qemu command line that was executed
+> and the output of that command.
+> 
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index e18e8ec657..abfa3eebe9 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -131,7 +131,8 @@ class QEMUMachine(object):
+>  
+>      def launch(self):
+>          '''
+> -        Try to launch the VM and make sure we cleanup on exception.
+> +        Try to launch the VM and make sure we cleanup and expose the
+> +        command line/output in case of exception.
+>          '''
+>          if self.is_running():
+>              return
+> @@ -142,18 +143,24 @@ class QEMUMachine(object):
+>              self.shutdown()
+>  
+>          try:
+> -            self._launch()
+> +            args = None
+> +            args = self._wrapper + [self._binary] + self._base_args() + self._args
+> +            self._launch(args)
 
-qtest_qmp() & friends pass their format string and variable arguments
-to qobject_from_jsonv().  Unlike qobject_from_jsonv(), they aren't
-decorated with GCC_FMT_ATTR().  Fix that to get compile-time format
-string checking.
+I think it would be easier to set a self._full_qemu_args
+attribute instead of passing data around through local variables
+and method arguments.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1500645206-13559-10-git-send-email-armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/libqtest.h | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+>              self._shutdown_pending = True
+>          except:
+>              self.shutdown()
+> +            sys.stderr.write('Error launching VM.\n%s%s' %
+> +                             ('Command:\n%s\n' %
+> +                              ' '.join(args) if args else '',
+> +                              'Output:\n%s\n' %
+> +                              ''.join(self._iolog) if self._iolog else ''))
 
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 26930fed4d..7e1bd474aa 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -55,7 +55,8 @@ void qtest_quit(QTestState *s);
-  *
-  * Sends a QMP message to QEMU and consumes the response.
-  */
--void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
-+void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
+I suggest making this conditional on self._debug.
 
- /**
-  * qtest_qmp:
-@@ -65,7 +66,8 @@ void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
-  *
-  * Sends a QMP message to QEMU and returns the response.
-  */
--QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
-+QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
+We could also introduce a QEMULaunchError exception class
+containing this info, but I'm unsure if we should raise it on
+every exception, or raise more specific custom exceptions on
+specific cases (e.g. one exception for QMP timeout, another for
+QEMU binary not found, another for QEMU killed by a signal, etc).
 
- /**
-  * qtest_qmp_cmd:
-@@ -86,7 +88,8 @@ QDict *qtest_qmp_cmd(QTestState *s, const char *cmd, QObject *args);
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
--void qtest_async_qmp(QTestState *s, const char *fmt, ...);
-+void qtest_async_qmp(QTestState *s, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
 
- /**
-  * qtest_qmpv_discard_response:
-@@ -97,7 +100,8 @@ void qtest_async_qmp(QTestState *s, const char *fmt, ...);
-  *
-  * Sends a QMP message to QEMU and consumes the response.
-  */
--void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap);
-+void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap)
-+    GCC_FMT_ATTR(2, 0);
+>              raise
+>  
+> -    def _launch(self):
+> +    def _launch(self, args):
+>          '''Launch the VM and establish a QMP connection.'''
+>          devnull = open('/dev/null', 'rb')
+>          qemulog = open(self._qemu_log_path, 'wb')
+>          self._pre_launch()
+> -        args = self._wrapper + [self._binary] + self._base_args() + self._args
+>          self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+>                                         stderr=subprocess.STDOUT, shell=False)
+>          self._post_launch()
+> -- 
+> 2.13.3
+> 
 
- /**
-  * qtest_qmpv:
-@@ -108,7 +112,8 @@ void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap);
-  *
-  * Sends a QMP message to QEMU and returns the response.
-  */
--QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
-+QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
-+    GCC_FMT_ATTR(2, 0);
-
- /**
-  * qtest_async_qmpv:
-@@ -119,7 +124,8 @@ QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
--void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap);
-+void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap)
-+    GCC_FMT_ATTR(2, 0);
-
- /**
-  * qtest_receive:
-@@ -558,7 +564,7 @@ static inline void qtest_end(void)
-  *
-  * Sends a QMP message to QEMU and returns the response.
-  */
--QDict *qmp(const char *fmt, ...);
-+QDict *qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-
- /**
-  * qmp_cmd:
-@@ -577,7 +583,7 @@ QDict *qmp_cmd(const char *cmd, QObject *args);
-  *
-  * Sends a QMP message to QEMU and leaves the response in the stream.
-  */
--void qmp_async(const char *fmt, ...);
-+void qmp_async(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-
- /**
-  * qmp_discard_response:
-@@ -586,7 +592,7 @@ void qmp_async(const char *fmt, ...);
-  *
-  * Sends a QMP message to QEMU and consumes the response.
-  */
--void qmp_discard_response(const char *fmt, ...);
-+void qmp_discard_response(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-
- /**
-  * qmp_cmd_discard_response:
-@@ -955,10 +961,10 @@ static inline int64_t clock_set(int64_t val)
- }
-
- QDict *qmp_fd_receive(int fd);
--void qmp_fd_sendv(int fd, const char *fmt, va_list ap);
--void qmp_fd_send(int fd, const char *fmt, ...);
--QDict *qmp_fdv(int fd, const char *fmt, va_list ap);
--QDict *qmp_fd(int fd, const char *fmt, ...);
-+void qmp_fd_sendv(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-+void qmp_fd_send(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
-+QDict *qmp_fdv(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-+QDict *qmp_fd(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
-
- /**
-  * qtest_cb_for_every_machine:
 -- 
-2.13.3
+Eduardo
