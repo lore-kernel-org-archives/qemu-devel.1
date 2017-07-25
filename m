@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1da1qO-00007o-0V
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:34:01 -0400
+	(envelope-from <cohuck@redhat.com>) id 1da1qT-0000CL-3g
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1da1qN-00081s-1S
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37244)
+	(envelope-from <cohuck@redhat.com>) id 1da1qP-00082b-52
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:34:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1da1qM-00081Z-Oq
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:54 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1da1qO-00082O-VJ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:57 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 25 Jul 2017 17:33:24 +0200
-Message-Id: <20170725153330.14966-4-cohuck@redhat.com>
+Date: Tue, 25 Jul 2017 17:33:25 +0200
+Message-Id: <20170725153330.14966-5-cohuck@redhat.com>
 In-Reply-To: <20170725153330.14966-1-cohuck@redhat.com>
 References: <20170725153330.14966-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/9] s390x: chsc nt2 events are pci-only
+Subject: [Qemu-devel] [PATCH v3 4/9] s390x/pci: do not advertise pci on
+ non-pci builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +27,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-The nt2 event class is pci-only - don't look for events if pci is
-not in the active cpu model.
+Only set the zpci feature bit on builds that actually support pci.
 
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c  |  4 ++--
- hw/s390x/s390-pci-bus.h  |  4 ++--
- hw/s390x/s390-pci-stub.c |  4 ++--
- target/s390x/ioinst.c    | 16 ++++++++++++++++
- 4 files changed, 22 insertions(+), 6 deletions(-)
+ hw/s390x/s390-pci-bus.c  | 5 +++++
+ hw/s390x/s390-pci-bus.h  | 1 +
+ hw/s390x/s390-pci-stub.c | 4 ++++
+ target/s390x/kvm.c       | 2 +-
+ 4 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 61cfd2138f..c57f6ebae0 100644
+index c57f6ebae0..7b30d4c7bd 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -47,7 +47,7 @@ S390pciState *s390_get_phb(void)
-     return phb;
- }
+@@ -34,6 +34,11 @@
+         }                                                         \
+     } while (0)
  
--int chsc_sei_nt2_get_event(void *res)
-+int pci_chsc_sei_nt2_get_event(void *res)
++void pci_enable_zpci_feature(S390CPUModel *model)
++{
++    set_bit(S390_FEAT_ZPCI, model->features);
++}
++
+ S390pciState *s390_get_phb(void)
  {
-     ChscSeiNt2Res *nt2_res = (ChscSeiNt2Res *)res;
-     PciCcdfAvail *accdf;
-@@ -87,7 +87,7 @@ int chsc_sei_nt2_get_event(void *res)
-     return rc;
- }
- 
--int chsc_sei_nt2_have_event(void)
-+int pci_chsc_sei_nt2_have_event(void)
- {
-     S390pciState *s = s390_get_phb();
- 
+     static S390pciState *phb;
 diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-index 67af2c12ff..5df6292509 100644
+index 5df6292509..d8796536b0 100644
 --- a/hw/s390x/s390-pci-bus.h
 +++ b/hw/s390x/s390-pci-bus.h
-@@ -319,8 +319,8 @@ typedef struct S390pciState {
- } S390pciState;
+@@ -333,4 +333,5 @@ S390PCIBusDevice *s390_pci_find_dev_by_fid(S390pciState *s, uint32_t fid);
+ S390PCIBusDevice *s390_pci_find_next_avail_dev(S390pciState *s,
+                                                S390PCIBusDevice *pbdev);
  
- S390pciState *s390_get_phb(void);
--int chsc_sei_nt2_get_event(void *res);
--int chsc_sei_nt2_have_event(void);
-+int pci_chsc_sei_nt2_get_event(void *res);
-+int pci_chsc_sei_nt2_have_event(void);
- void s390_pci_sclp_configure(SCCB *sccb);
- void s390_pci_sclp_deconfigure(SCCB *sccb);
- void s390_pci_iommu_enable(S390PCIIOMMU *iommu);
++void pci_enable_zpci_feature(S390CPUModel *model);
+ #endif
 diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
-index 2e7e42a2af..cc7278a865 100644
+index cc7278a865..8ceaf482e7 100644
 --- a/hw/s390x/s390-pci-stub.c
 +++ b/hw/s390x/s390-pci-stub.c
-@@ -7,12 +7,12 @@
- #include "s390-pci-bus.h"
- 
- /* target/s390x/ioinst.c */
--int chsc_sei_nt2_get_event(void *res)
-+int pci_chsc_sei_nt2_get_event(void *res)
+@@ -72,3 +72,7 @@ S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
  {
-     return 1;
+     return NULL;
  }
- 
--int chsc_sei_nt2_have_event(void)
-+int pci_chsc_sei_nt2_have_event(void)
- {
-     return 0;
- }
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index 51fbea620d..3fa3301f50 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -599,6 +599,22 @@ static int chsc_sei_nt0_have_event(void)
-     return 0;
- }
- 
-+static int chsc_sei_nt2_get_event(void *res)
-+{
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return pci_chsc_sei_nt2_get_event(res);
-+    }
-+    return 1;
-+}
 +
-+static int chsc_sei_nt2_have_event(void)
++void pci_enable_zpci_feature(S390CPUModel *model)
 +{
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return pci_chsc_sei_nt2_have_event();
-+    }
-+    return 0;
 +}
-+
- #define CHSC_SEI_NT0    (1ULL << 63)
- #define CHSC_SEI_NT2    (1ULL << 61)
- static void ioinst_handle_chsc_sei(ChscReq *req, ChscResp *res)
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index c4c5791d27..866ac3d414 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2662,7 +2662,7 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+     }
+ 
+     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
+-    set_bit(S390_FEAT_ZPCI, model->features);
++    pci_enable_zpci_feature(model);
+     set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
+ 
+     if (s390_known_cpu_type(cpu_type)) {
 -- 
 2.13.3
