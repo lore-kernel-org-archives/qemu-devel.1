@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZzmT-0004pF-9I
+	(envelope-from <dgibson@ozlabs.org>) id 1dZzmU-0004pr-6o
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZzmP-0005su-7E
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:45 -0400
-Date: Tue, 25 Jul 2017 23:21:29 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dZzmP-0005uH-V8
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:46 -0400
+Date: Tue, 25 Jul 2017 22:21:54 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170725132129.GH8978@umbus.fritz.box>
+Message-ID: <20170725122154.GE8978@umbus.fritz.box>
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-15-git-send-email-clg@kaod.org>
-	<20170724063534.GM17228@umbus.fritz.box>
-	<fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
-	<20170725042027.GC8978@umbus.fritz.box>
-	<1d7d50ee-7559-2e6b-4ed0-741d810052d0@kaod.org>
+	<1499274819-15607-8-git-send-email-clg@kaod.org>
+	<20170724042956.GD17228@umbus.fritz.box>
+	<006293c9-b396-82f9-19ba-d57301934ffe@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="54u2kuW9sGWg/X+X"
+	protocol="application/pgp-signature"; boundary="T6xhMxlHU34Bk0ad"
 Content-Disposition: inline
-In-Reply-To: <1d7d50ee-7559-2e6b-4ed0-741d810052d0@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 14/26] ppc/xive: add MMIO handlers to
- the XIVE interrupt presenter model
+In-Reply-To: <006293c9-b396-82f9-19ba-d57301934ffe@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 07/26] ppc/xive: add MMIO handlers to
+ the XIVE interrupt source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +31,168 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---54u2kuW9sGWg/X+X
+--T6xhMxlHU34Bk0ad
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 25, 2017 at 11:08:46AM +0200, C=E9dric Le Goater wrote:
-> On 07/25/2017 06:20 AM, David Gibson wrote:
-> > On Mon, Jul 24, 2017 at 04:44:00PM +0200, C=E9dric Le Goater wrote:
-> >> On 07/24/2017 08:35 AM, David Gibson wrote:
-> >>> On Wed, Jul 05, 2017 at 07:13:27PM +0200, C=E9dric Le Goater wrote:
-> >>>> The Thread Interrupt Management Area for the OS is mostly used to
-> >>>> acknowledge interrupts and set the CPPR of the CPU.
-> >>>>
-> >>>> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
-> >>>> used to retrieve the targeted interrupt presenter object.
-> >>>>
-> >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>>
-> >>> Am I right in thinking that this shoehorns the XIVE TIMA state into
-> >>> the existing XICS ICP object.  That.. doesn't seem like a good idea.
-> >>
-> >> The TIMA memory region is under the XIVE object because it is=20
-> >> unique for the system. The lookup of the ICP is simply done using=20
-> >> 'current_cpu'. The TIMA state is under the ICPState, yes, but this=20
-> >> model does not seem incorrect to me as this state contains the=20
-> >> interrupt information presented to a CPU.
+On Mon, Jul 24, 2017 at 05:55:42PM +0200, C=E9dric Le Goater wrote:
+> On 07/24/2017 06:29 AM, David Gibson wrote:
+> > On Wed, Jul 05, 2017 at 07:13:20PM +0200, C=E9dric Le Goater wrote:
+> >> Each interrupt source is associated with a 2-bit state machine called
+> >> an Event State Buffer (ESB). It is controlled by MMIO to trigger
+> >> events.
+[snip]
+> >> +/* TODO: handle second page */
 > >=20
-> > Yeah, that's not the point I'm making.  My point is that the TIMA
-> > state isn't really the same as xics ICP state.  You're squeezing one
-> > into the other in a pretty ugly way.
+> > Is this comment still relevent?
 >=20
-> yes, well, we need to have compatible objects between the XICS and XIVE=
-=20
-> mode because of the CAS negotiation. for migration compatibility, it is=
-=20
-> much easier to extend existing objects. This approach I am taking today.
+> Some HW have a second page to trigger the event. I am not sure we need=20
+> to model it though. I will make some inquiries.
 
-Yeah, I really don't think this approach is workable.
+Ah, ok.  Maybe clarify the comment a bit.
 
-Roughly speaking, you're keeping the same structures between xics and
-xive, but with mostly different code.  I can't see any way that's not
-going to be horribly fragile, with any update to xics OR xive
-requiring enormous caution not to break the other.
+[snip]
+> >> +static void xive_esb_write(void *opaque, hwaddr addr,
+> >> +                           uint64_t value, unsigned size)
+> >> +{
+> >> +    XiveICSState *xs =3D ICS_XIVE(opaque);
+> >> +    XIVE *x =3D xs->xive;
+> >> +    uint32_t offset =3D addr & 0xF00;
+> >> +    uint32_t srcno =3D addr >> xs->esb_shift;
+> >> +    uint32_t lisn =3D srcno + ICS_BASE(xs)->offset;
+> >> +    XiveIVE *ive;
+> >> +    bool notify =3D false;
+> >> +
+> >> +    ive =3D xive_get_ive(x, lisn);
+> >> +    if (!ive || !(ive->w & IVE_VALID))  {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", lis=
+n);
+> >> +        return;
+> >> +    }
+> >=20
+> > Having this code associated with the individual ICS look directly at
+> > the IVE table in the core xive object seems a bit dubious.
+>=20
+> The IVE table holds the validity and mask status of the interrupt=20
+> entries, so we need that lookup. However, (continues below) ...
+>=20
+> > This also
+> > points out another mismatch between the re-used ICS code and the new
+> > XIVE code: ICS gathers all the per-source-irq flags/state into the
+> > irqstate structure, whereas xive has per-irq information in the
+> > centralized ecb and IVE tables.  There can certainly be good reasons
+> > for that, but using both at once is kind of clunky.
+>=20
+> I understand that you would rather put the esbs in the source they=20
+> belong to. That is the case on real HW but it makes the modeling a=20
+> bit more difficult. We would need to choose a MMIO address to give=20
+> to the guest OS. I had some issues with the allocator (I need=20
+> to look at this problem closer).
 
-I really think we have to go one of two ways:
+Uh.. what do MMIO addresses have to do with this?  I'm talking about
+the actual ESB state in the packed bit array.
 
-1) Abstract the notion of interrupt source and interrupt presenter, so
-we can use a truly common model between xics and xive.
-
-Given the differences between the two, I don't know this is even
-possible.
-
-2) Separate the objects entirely.  ICPs are entirely separate from
-TIMAs, like wise ICSes and xive interrupt sources.
-
-I think this is probably the way to go.  To make this work with CAS
-switching will require different methods, but I don't think it's
-impossible.
-
-For example, we could (on the new machine type) create both xics ICSes
-and ICPs and xive sources and TIMAs.  We'd have a (migrated) flag in
-the machine saying which is currently active.  All the objects would
-hang around, but only the active ones would do anything.
-
-Now obviously that means we'd be migrating a bunch of redundant state,
-but I still think it's preferable to a Frankenstinian fusion of
-xics-ish and xive-ish state.  I think there's a good chance we can
-improve on the basic idea to remove most or all of that redundant
-state.
+> It might also be an "issue" for KVM. Ben talked about maintaining=20
+> all the esbs of a guest under a single memory region to be able to=20
+> map the pages in the host.
+>=20
+> Any how, I agree this is another point to discuss in the sPAPR=20
+> model.
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+>=20
+> >> +    if (srcno >=3D ICS_BASE(xs)->nr_irqs) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR,
+> >> +                      "XIVE: invalid IRQ number: %d/%d lisn: %d\n",
+> >> +                      srcno, ICS_BASE(xs)->nr_irqs, lisn);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    switch (offset) {
+> >> +    case 0:
+> >> +        /* TODO: should we trigger even if the IVE is masked ? */
+> >> +        notify =3D xive_pq_trigger(x, lisn);
+> >> +        break;
+> >> +    default:
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr =
+%d\n",
+> >> +                      offset);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (notify && !(ive->w & IVE_MASKED)) {
+> >> +        qemu_irq_pulse(ICS_BASE(xs)->qirqs[srcno]);
+> >> +    }
+> >> +}
+> >> +
+> >> +static const MemoryRegionOps xive_esb_ops =3D {
+> >> +    .read =3D xive_esb_read,
+> >> +    .write =3D xive_esb_write,
+> >> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> >> +    .valid =3D {
+> >> +        .min_access_size =3D 8,
+> >> +        .max_access_size =3D 8,
+> >> +    },
+> >> +    .impl =3D {
+> >> +        .min_access_size =3D 8,
+> >> +        .max_access_size =3D 8,
+> >> +    },
+> >> +};
+> >> +
+> >> +/*
+> >>   * XIVE Interrupt Source
+> >>   */
+> >>  static void xive_ics_set_irq_msi(XiveICSState *xs, int srcno, int val)
+> >> @@ -106,15 +326,25 @@ static void xive_ics_realize(ICSState *ics, Erro=
+r **errp)
+> >>          return;
+> >>      }
+> >> =20
+> >> +    if (!xs->esb_shift) {
+> >> +        error_setg(errp, "ESB page size needs to be greater 0");
+> >> +        return;
+> >> +    }
+> >> +
+> >>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+> >>      ics->qirqs =3D qemu_allocate_irqs(xive_ics_set_irq, xs, ics->nr_i=
+rqs);
+> >> =20
+> >> +    memory_region_init_io(&xs->esb_iomem, OBJECT(xs), &xive_esb_ops, =
+xs,
+> >> +                          "xive.esb",
+> >> +                          (1ull << xs->esb_shift) * ICS_BASE(xs)->nr_=
+irqs);
+> >> +
+> >>      qemu_register_reset(xive_ics_reset, xs);
+> >>  }
+> >> =20
+> >>  static Property xive_ics_properties[] =3D {
+> >>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+> >>      DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
+> >> +    DEFINE_PROP_UINT32("shift", XiveICSState, esb_shift, 0),
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >> =20
+> >> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> >> index 544cc6e0c796..5303d96f5f59 100644
+> >> --- a/include/hw/ppc/xive.h
+> >> +++ b/include/hw/ppc/xive.h
+> >> @@ -33,6 +33,9 @@ typedef struct XiveICSState XiveICSState;
+> >>  struct XiveICSState {
+> >>      ICSState parent_obj;
+> >> =20
+> >> +    uint32_t     esb_shift;
+> >> +    MemoryRegion esb_iomem;
+> >> +
+> >>      XIVE         *xive;
+> >>  };
+> >> =20
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -109,24 +200,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---54u2kuW9sGWg/X+X
+--T6xhMxlHU34Bk0ad
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll3RdYACgkQbDjKyiDZ
-s5JvKw/9GMaNFOovXbATfLjDpcFoto5vA1Qc3d29DzRJZYmGb3nTm7ElE2qtrhhE
-EughxYeS2K5s/NdHJBP86OYwhaF5N/tT6LdMNYgx2xBp1eAGX4fgFdiFUWNgWCem
-KbjPgaf4eEAuZZ4j2ZFC/t6gmplIfVNlfI9AcYgMD7mYVk6vMZE8ZdLAiL9bqM6S
-MhNRW2PS1ui0VJnlgxgRp30+mvf8kQjlrQtoFRHZtBtlAOreYXAWp9xGlbw5docc
-Az39ALMH6FXqntNT+e7xmT3XNgWtsqOoPajj+szv662KjGkAVY4gb0dlQKE6RcLJ
-qAdbNmqn6FcIqe0GrPrIi9nGYCFyPc3lTbY56v8a6y24gZAC95E8ZJrojIW9vBvl
-5/0q9XEVTCsQ4O5MkrOoaCFmRZpMSxws7gbbYUkaq/0CgbvBPOF4xwTO0D+KOFtH
-EghLg4Epn5CkHdde8m19ONA9tKWiw/QkRYF2SLFhVlhAQrjT7Ei5m6kxXV7kmyh8
-fUUu8Pidbjm7+0SGBqS4QBunQmY0iBtBdDIkY2FJqfxEH13vburQSmMqBqPAEGsB
-Nnc6Jxf0aA0bfd2gY4WnxrdGdX2a28YlT6ZSNtEmqslj8U4nblnniOtuACndtzzv
-lSw4FB0EfxKLSWk4oxNeu7UYI1rLjYCfGrc0jDrw8mbMqTHib+U=
-=+BY+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll3N+AACgkQbDjKyiDZ
+s5IJeRAA36n29IwDfliNjQvQe3echREpXWkHpf9e2PVDnP77rfIyHUl3vgMYQK9F
+fWU6vdVf/iBi/VVdyGbhiS4+yLaLL5hIuYBJeJrX2NR3NZZqkx8mp7OQ9eFw5tqg
+LgtdNjuKIJa/r2XM9pJePB37CNO/1bB7FJ/QWO9FYhNxDZ38pWGm4w4/AJw4P4gK
+I6UK3iyUE72/XhuUcaVbWltybBWAeLEIpN03hzj2m20yzMsEmbG/0HxPk4cp7hgk
+taQzK71lGp7H8jWq7mEBLGe0DtPXwUZzrP4HJ6EDhT66uOVmlpyT3tka0ZvYaReN
+2TTb6S6wGiAf+SxE6MXXNeEXOVcAcufPGmpbruQfNgcdoZFJvg0xJJMcobM4h/mp
+6MjV+vgUqirBOpqtjKbOvEaSDj4y+jPKg23D4uN2/DPEVfGpruRNcbgtc8bHYhHG
+GSnk6lZkGWLPSIT0uA2KfK6kDOsz1v23mdU/E83cG+oqxFw24Y1WpB8w8cIB/3c+
+ET6/Sz58Uf4ETcaMSjbzed6E3ZKpFhfiFpYbZGcyL+s7UtqlZ6mrZ7RRqaNJOXtq
+0PoqJrYfyHHeEgjM0QALmqTaOnAw1gQk53V45W/6DRGd4aVie2sJbb6d+35v21+f
+GXldLRYnc+uQkrPN5S8hMb1tI5uU3Aa2tSa1YuanCBpwkM2cAzs=
+=G9Bm
 -----END PGP SIGNATURE-----
 
---54u2kuW9sGWg/X+X--
+--T6xhMxlHU34Bk0ad--
