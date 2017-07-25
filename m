@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1da2es-0000Gw-Ty
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:26:09 -0400
+	(envelope-from <crosa@redhat.com>) id 1da2zY-0003Sa-C7
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1da2er-0001hr-Hx
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:26:06 -0400
-References: <20170725153645.26412-1-stefanha@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a42739b2-23d6-17a6-8f3c-f554d262e606@redhat.com>
-Date: Tue, 25 Jul 2017 12:25:55 -0400
+	(envelope-from <crosa@redhat.com>) id 1da2zX-0002ww-D2
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:47:28 -0400
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721123325.GC18014@stefanha-x1.localdomain>
+	<20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+	<20170725162405.GT26394@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <b0b6a212-2be4-dfb2-3c99-615555efbb60@redhat.com>
+Date: Tue, 25 Jul 2017 12:47:11 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170725153645.26412-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-iotests: add a "how to" to ./README
+In-Reply-To: <20170725162405.GT26394@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FH97MlbokmIHEjbjcwSJqp1Men26hPNc6"
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,169 +30,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FH97MlbokmIHEjbjcwSJqp1Men26hPNc6
+From: Cleber Rosa <crosa@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <b0b6a212-2be4-dfb2-3c99-615555efbb60@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
+References: <20170721034730.25612-1-crosa@redhat.com>
+ <20170721123325.GC18014@stefanha-x1.localdomain>
+ <20170721140155.GQ17693@redhat.com>
+ <bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+ <20170725154921.GS23343@stefanha-x1.localdomain>
+ <547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+ <20170725162405.GT26394@redhat.com>
+In-Reply-To: <20170725162405.GT26394@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
 
-On 07/25/2017 11:36 AM, Stefan Hajnoczi wrote:
-> There is not much getting started documentation for qemu-iotests.  This
-> patch explains how to create a new test and covers the overall testing
-> approach.
+On 07/25/2017 12:24 PM, Daniel P. Berrange wrote:
+>>
+>> OK, let's abstract a bit more.  Let's take this part of your statement=
+:
+>>
+>>  "if qemu-io in this environment cannot do aio=3Dnative"
+>>
+>> Let's call that a feature check.  Depending on how the *feature check*=
+
+>> is written, a negative result may hide a test failure, because it woul=
+d
+>> now be skipped.
+>>
+>> Suppose that a feature check for "SDL display" is such that you run
+>> "qemu -display sdl".  A *feature failure* here (SDL init is broken), o=
+r
+>> an environment issue (DISPLAY=3D), will cause a SDL test skip.
 >=20
-> Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v2:
->   * Added missing "touch <test-number>.out" step [Kevin]
->   * Added reference to SubmitAPatch wiki page [Eric & Philippe]
-> ---
->   tests/qemu-iotests/README | 94 ++++++++++++++++++++++++++++++++++++++=
-+++++++++
->   1 file changed, 94 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
-> index 6079b401ae..245f509b14 100644
-> --- a/tests/qemu-iotests/README
-> +++ b/tests/qemu-iotests/README
-> @@ -14,8 +14,102 @@ Just run ./check to run all tests for the raw image=
- format, or ./check
->   -qcow2 to test the qcow2 image format.  The output of ./check -h expl=
-ains
->   additional options to test further image formats or I/O methods.
->  =20
-> +* Testing approach
-> +
-> +Each test is an executable file (usually a bash script) that is run by=
- the
-> +./check test harness.  Standard out and standard error are captured to=
- an
-> +output file.  If the output file differs from the "golden master" outp=
-ut file
-> +for the test then it fails.
-> +
-> +Tests are simply a sequence of commands that produce output and the te=
-st itself
-> +does not judge whether it passed or failed.  If you find yourself writ=
-ing
-> +checks to determine success or failure then you should rethink the tes=
-t and
-> +rely on output diffing instead.
-> +
-> +** Filtering volatile output
-> +
-> +When output contains absolute file paths, timestamps, process IDs, hos=
-tnames,
-> +or other volatile strings, the diff against golden master output will =
-fail.
-> +Such output must be filtered to replace volatile strings with fixed
-> +placeholders.
-> +
-> +For example, the path to the temporary working directory changes betwe=
-en test
-> +runs so it must be filtered:
-> +
-> +  sed -e "s#$TEST_DIR/#TEST_DIR/#g"
-> +
-> +Commonly needed filters are available in ./common.filter.
-> +
-> +** Python tests
-> +
-> +Most tests are implemented in bash but it is difficult to interact wit=
-h the QMP
-> +monitor.  A Python module called 'iotests' is available for tests that=
- require
-> +JSON and interacting with QEMU.
-> +
-> +* How to create a test
-> +
-> +1. Choose an unused test number
-> +
-> +Tests are identified by a unique number.  Look for the highest test ca=
-se number
-> +by looking at the test files.  Then search the qemu-devel@nongnu.org m=
-ailing
-> +list to check if anyone has already sent patches using the next availa=
-ble
-> +number.  You may need to increment the number a few times to reach an =
-unused
-> +number.
-> +
-> +2. Create the test file
-> +
-> +Copy an existing test (one that most closely resembles what you wish t=
-o test)
-> +to the new test number:
-> +
-> +  cp 001 <test-number>
-> +
-> +3. Assign groups to the test
-> +
-> +Add your test to the ./group file.  This file is the index of tests an=
-d assigns
-> +them to functional groups like "rw" for read-write tests.  Most tests =
-belong to
-> +the "rw" and "auto" groups.  "auto" means the test runs when ./check i=
-s invoked
-> +without a -g argument.
-> +
-> +Consider adding your test to the "quick" group if it executes quickly =
-(<1s).
-> +This group is run by "make check-block" and is often included as part =
-of build
-> +tests in continuous integration systems.
-> +
-> +4. Write the test
-> +
-> +Edit the test script.  Look at existing tests for examples.
-> +
-> +5. Generate the golden master file
-> +
-> +Create an empty golden master file:
-> +
-> +  touch <test-number>.out
-> +
-> +Then run your test:
-> +
-> +  ./check <test-number>
-> +
-> +You may need additional command-line options to use an image format or
-> +protocol like -qcow2.
-> +
-> +The test will fail because there is no golden master yet.  Inspect the=
- output
-> +that your test generated with "cat <test-number>.out.bad".
-> +
-> +Verify that the output is as expected and contains no volatile strings=
- like
-> +timestamps.  You may need to add filters to your test to remove volati=
-le
-> +strings.
-> +
-> +Once you are happy with the test output it can be used as the golden m=
-aster
-> +with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to =
-verify
-> +that it passes.
-> +
-> +Congratulations, you've created a new test!
-> +
-> +To contribute your test to qemu.git please follow the guidelines here:
-> +http://wiki.qemu.org/Contribute/SubmitAPatch
-> +
->   * Feedback and patches
->  =20
->   Please send improvements to the test suite, general feedback or just
->   reports of failing tests cases to qemu-devel@nongnu.org with a CC:
->   to qemu-block@nongnu.org.
-> +
+> You could have a way to statically define what features any given run
+> of the test suite should enable, then report failure if they were not
+> detected.
 >=20
 
-Nice!
+You hit a key point here: statically define(d).  As a said before,
+feature statements are a safer place upon which to base tests.  Ad hoc
+checks, as suggested by Stefan, are definitely not.
 
-Unfortunately this does highlight how ridiculous our test number=20
-procurement process is, but at least it's documented.
+> This is a similar situation to that seen with configure scripts. If inv=
+oked
+> with no --enable-xxx flags, it will probe for features & enable them if=
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+> found.  This means you can accidentally build without expected features=
+ if
+> you have a missing -devel package, or a header/library is broken in som=
+e
+> way. This is why configure prints a summary of which features it actual=
+ly
+> found. It is also why when building binary packages like RPMs, it is co=
+mmon
+> to explicitly give --enable-xxx flags for all features you expect to se=
+e.
+> Automatic enablement is none the less still useful for people in genera=
+l.
+>=20
+> So if we applied this kind of approach for testing, then any automated
+> test systems at least, ought to provide a fixed list of features they
+> expect to be present for tests. So if any features accidentally broke
+> the tests would error.
+>=20
+> Regards,
+> Daniel
+>=20
+
+Right.  The key question here seems to be the distance of the "fixed
+list of features" from the test itself.  For instance, think of this
+workflow/approach:
+
+ 1) ./scripts/configured-features-to-feature-list.sh > ~/feature_list
+ 2) tweak feature_list
+ 3) ./rpm -e SDL-devel
+ 4) ./configure  --enable-sdl
+ 5) ./make
+ 6) ./scripts/run-test-suite.sh --only-features=3D~/feature_list
+
+This would only run tests that are expected to PASS within the given
+feature list.  The test runner (run-test-suite.sh) would select only
+tests that match the features given.  No SKIPs would be expected as the
+outcome of *any test*.
+
+The other approach is to let the feature match to the test, and SKIPs
+would then be OK.  The downside to this is that a "--enable-xxx" with
+missing "-devel" package, as you exemplified, would not show up as ERRORs=
+=2E
+
+Makes sense?
+
+Regards!
+
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+
+
+--FH97MlbokmIHEjbjcwSJqp1Men26hPNc6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZd3YPAAoJEGV+jTOl8gnzyYcP/iVc6kDu8wVOjTpZPUz1lnWw
+v6fzqiDX78Lf6kUjumQA6B24YMyvt427xOSlQRjJWaE6fOYangTx0MurmqVT6fzp
+Sa3nitue6vKXfpvCHt7InV2zmAZSHuKtVE2Fl+y0SAOLAu1S3B8o3VKhm/FWtvOw
+UYlIkLAw0F9O75Aqrato3SJUAm4702v2smuMHo59NY1pCoZyCiguP529EDuRxWrD
+2pm+Z2O/9CsBnhzvgfGGsJ91+AF4dH+FtzpFFmMqGbwmnjHll8SZG0UCpPO/Cm8/
+BVFawYRU+H+eUk+PiDgDhnR3uyvkeD4OR2jYVSBONo7qq1unar8MQ0ue0w5ki+LM
+ZCLcYXYLYdk0u6x9BdYL/Lg67K1UfAVf42R6E4vX4Jo/auHNaSo1FBpPAh6V/LVN
+SK/6HFV4i8fdCuQUQ/QmYL6COYLIxaVKz18ykJ6vVOK+Mq2WbCHB/jmz6KHwLrJa
+eOfKp3wDtphCOLrIs4Q9AEzOOyjkgyFpDR7WBOGi6/ktZVvS9m+zQM0/icCvBYVO
+dvaXgdurSUtaWoxmlZNf+D1Np2iwWGqNg67MfChByX6Rgj/1LPC+1jCa0UP4Po+9
+mhWYZLyJwBTiEmmJmcmn07F7/E/3a+56hzGoAryAytsOd9Nw9wBGmcNU9rKoJbz1
+EPLiP0GcWgvNR48nfWNu
+=zU6r
+-----END PGP SIGNATURE-----
+
+--FH97MlbokmIHEjbjcwSJqp1Men26hPNc6--
