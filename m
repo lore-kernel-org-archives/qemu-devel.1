@@ -1,37 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZva2-0003Wh-J1
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:52:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dZvgx-0004jl-4y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dZvZy-0002tN-Kt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:52:38 -0400
-Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:51317)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZvZy-0002sp-DC
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:52:34 -0400
-Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 90F3F88A99
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 10:52:32 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-5-git-send-email-clg@kaod.org>
-	<20170719030849.GQ3140@umbus.fritz.box>
-	<1500436938.3350.11.camel@kernel.crashing.org>
-	<20170721075015.GE3717@umbus.fritz.box>
-	<1500625291.10674.22.camel@kernel.crashing.org>
-	<20170724032853.GB17228@umbus.fritz.box>
-	<1500872645.10674.52.camel@kernel.crashing.org>
-	<20170724053827.GI17228@umbus.fritz.box>
-	<1500880826.10674.66.camel@kernel.crashing.org>
-	<20170724100314.GP17228@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <17c42efa-9ef0-077b-a29b-e836f6643768@kaod.org>
-Date: Tue, 25 Jul 2017 10:52:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170724100314.GP17228@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+	(envelope-from <kwolf@redhat.com>) id 1dZvgw-0006NJ-DU
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:59:47 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 25 Jul 2017 10:59:36 +0200
+Message-Id: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests: Fix reference output for 186
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,96 +17,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 07/24/2017 12:03 PM, David Gibson wrote:
-> On Mon, Jul 24, 2017 at 05:20:26PM +1000, Benjamin Herrenschmidt wrote:
->> On Mon, 2017-07-24 at 15:38 +1000, David Gibson wrote:
->>>
->>> Can we assign our logical numbers sparsely, or will that cause other
->>> problems?
->>
->> The main issue is that they probably needs to be the same between XICS
->> and XIVE because by the time we get the CAS call to chose between XICS
->> and XIVE, we have already handed out interrupts and constructed the DT,
->> no ? Unless we do a real CAS reboot...
-> 
-> A real CAS reboot probably isn't unreasonable for this case.
-> 
-> I definitely think we need to go one way or the other - either fully
-> unify the irq mapping between xics and xive, or fully separate them.
+Commits 70f17a1 ('error: Revert unwanted change of warning messages')
+and e1824e5 ('qemu-iotests: Test 'info block'') had a semantic merge
+conflict, which results in failure for qemu-iotests case 186. Fix the
+reference output to consider the changes of 70f17a1.
 
-To be able to change interrupt model at CAS time, we need to unify 
-the IRQ numbering. We don't have much choice because the DT is 
-already populated. We also need to share the ICSIRQState flags unless
-we share the interrupt source object between the XIVE and XICS mode. 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/186.out | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-In my current tree, I made sure that the same IRQ number ranges 
-were being used in the XIVE and in the XICS allocator and that the 
-ICSIRQState flags of the different sPAPR Interrupt sources (XIVE 
-and XICS) were in sync. That works pretty well for reset, migration 
-and hotplug, but it is bit hacky.
-
-C.
-
-
->> Otherwise, there's no reason they can't be sparse no.
->>
->>> Note that for PAPR we also have the question of finding logical
->>> interrupts for legacy PAPR VIO devices.
->>
->> We just make them another range ? With KVM legacy today, I just use the
->> generic interrupt facility for those. So when you do the ioctl to
->> "trigger" one, I just do an MMIO to the corresponding page and the
->> interrupt magically shows up wherever the guest is running the target
->> vcpu. In fact, I'd like to add a way to mmap that page into qemu so
->> that qemu can triggers them without an ioctl.
-> 
-> Ok.
-> 
->> The guest doesn't care, from the guest perspective they are interrupts
->> coming from the DT, so they are like PCI etc...
-> 
-> Ok.
-> 
->>>> We can fix the number of "generic" interrupts given to a guest. The
->>>> only requirements from a PAPR perspective is that there should be at
->>>> least as many as there are possible threads in the guest so they can be
->>>> used as IPIs.
->>>
->>> Ok.  If we can do things sparsely, allocating these well away from the
->>> hw interrupts would make things easier.
->>>
->>>> But we may need more for other things. We can make this a machine
->>>> parameter with a default value of something like 4096. If we call N
->>>> that number of extra generic interrupts, then the number of generic
->>>> interrutps would be #possible-vcpu's + N, or something like that.
->>>
->>> That seems reasonable.
->>>
->>>>>> But it's fundamentally an allocator that sits in the hypervisor, so in
->>>>>> our case, I would say in the spapr "component" of XIVE, rather than the
->>>>>> XIVE HW model itself.
->>>>>
->>>>> Maybe..
->>>>
->>>> You are right in that a mapping is a better term than an allocator
->>>> here.
->>>>
->>>>>> Now what Cedric did, because XIVE is very complex and we need something
->>>>>> for PAPR quickly, is not a complete HW model, but a somewhat simplified
->>>>>> one that only handles what PAPR exposes. So in that case where the
->>>>>> allocator sits is a bit of a TBD...
->>>>>
->>>>> Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
->>>>> machine type level needs extreme caution, or the irqs may not be
->>>>> stable which will generally break migration.
->>>>
->>>> Yes you are right. We should probably create a more "static" scheme.
->>>
->>> Sounds like we're in violent agreement.
->>
->> Yup :)
->>
-> 
+diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+index b963b12..b8bf9a2 100644
+--- a/tests/qemu-iotests/186.out
++++ b/tests/qemu-iotests/186.out
+@@ -442,7 +442,7 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+     Cache mode:       writeback
+ (qemu) quit
+ 
+-warning: qemu-system-x86_64: -drive if=scsi,driver=null-co: bus=0,unit=0 is deprecated with this machine type
++qemu-system-x86_64: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
+ Testing: -drive if=scsi,driver=null-co
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) info block
+@@ -451,7 +451,7 @@ scsi0-hd0 (NODE_NAME): null-co:// (null-co)
+     Cache mode:       writeback
+ (qemu) quit
+ 
+-warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
++qemu-system-x86_64: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+ Testing: -drive if=scsi,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) info block
+@@ -460,7 +460,7 @@ scsi0-cd0: [not inserted]
+     Removable device: not locked, tray closed
+ (qemu) quit
+ 
+-warning: qemu-system-x86_64: -drive if=scsi,driver=null-co,media=cdrom: bus=0,unit=0 is deprecated with this machine type
++qemu-system-x86_64: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+ Testing: -drive if=scsi,driver=null-co,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) info block
+-- 
+1.8.3.1
