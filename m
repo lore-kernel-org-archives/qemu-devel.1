@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1da0CZ-0005qX-JI
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:48:47 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1da0Ee-0007cz-3I
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1da0CY-0001NZ-Fj
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:48:43 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38056)
+	(envelope-from <zuban32s@gmail.com>) id 1da0Ed-00026s-01
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:50:52 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:38157)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1da0CY-0001NA-6F
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:48:42 -0400
-Received: by mail-wm0-x243.google.com with SMTP id r123so7037086wmb.5
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:48:42 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 25 Jul 2017 15:48:31 +0200
-Message-Id: <1500990514-30326-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1500990514-30326-1-git-send-email-pbonzini@redhat.com>
-References: <1500990514-30326-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] rtc-test: cleanup register_b_set_flag test
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1da0Ec-00026f-Pt
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:50:50 -0400
+Received: by mail-pg0-x231.google.com with SMTP id k190so4961985pgk.5
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:50:50 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170723173111-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
+	<20170723055006-mutt-send-email-mst@kernel.org>
+	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+	<20170723173111-mutt-send-email-mst@kernel.org>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Tue, 25 Jul 2017 16:50:49 +0300
+Message-ID: <CAKSfGUBP8oH2YymDnCA+Q=ngmyyVRYTVujwfOLRgdBQ82qgivg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
+ property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,139 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peng.hao2@zte.com.cn, liu.yi24@zte.com.cn
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
 
-Introduce set_datetime_bcd/assert_datetime_bcd, and handle
-UIP correctly.
+2017-07-25 16:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
+>> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
+>> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
+>> > > To enable hotplugging of a newly created pcie-pci-bridge,
+>> > > we need to tell firmware (SeaBIOS in this case)
+>> >
+>>
+>> Hi Michael,
+>>
+>> > Presumably, EFI would need to support this too?
+>> >
+>>
+>> Sure, Eduardo added to CC, but he is in PTO now.
+>>
+>> > > to reserve
+>> > > additional buses for pcie-root-port, that allows us to
+>> > > hotplug pcie-pci-bridge into this root port.
+>> > > The number of buses to reserve is provided to the device via a corresponding
+>> > > property, and to the firmware via new PCI capability (next patch).
+>> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
+>> >
+>> > If so you should just teach firmware to allocate one bus #
+>> > unconditionally.
+>> >
+>>
+>> That would be a problem for the PCIe machines, since each PCIe
+>> devices is plugged in a different bus and we are already
+>> limited to 256 PCIe devices. Allocating an extra-bus always
+>> would really limit the PCIe devices we can use.
+>
+> One of the declared advantages of PCIe is easy support for multiple roots.
+> We really should look at that IMHO so we do not need to pile up hacks.
+>
+>> > But why would that be so? What's wrong with a device
+>> > directly in the root port?
+>> >
+>
+> To clarify, my point is we might be wasting bus numbers by reservation
+> since someone might just want to put pcie devices there.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/rtc-test.c | 76 ++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 46 insertions(+), 30 deletions(-)
+I think, changing default value to 0 can help us avoid this,
+as no bus reservation by default. If one's surely wants
+to hotplug pcie-pci-bridge into this root port in future,
+the property gives him such an opportunity.
+So, sure need pcie-pci-bridge hotplug -> creating a root port with
+bus_reserve > 0. Otherwise (and default) - just as now, no changes
+in bus topology.
 
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index e78f701..798cf5e 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -17,6 +17,8 @@
- #include "qemu/timer.h"
- #include "hw/timer/mc146818rtc_regs.h"
- 
-+#define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
-+
- static uint8_t base = 0x70;
- 
- static int bcd2dec(int value)
-@@ -297,16 +299,30 @@ static void alarm_time(void)
-     g_assert(cmos_read(RTC_REG_C) == 0);
- }
- 
-+static void set_time_regs(int h, int m, int s)
-+{
-+    cmos_write(RTC_HOURS, h);
-+    cmos_write(RTC_MINUTES, m);
-+    cmos_write(RTC_SECONDS, s);
-+}
-+
- static void set_time(int mode, int h, int m, int s)
- {
--    /* set BCD 12 hour mode */
-     cmos_write(RTC_REG_B, mode);
--
-     cmos_write(RTC_REG_A, 0x76);
-+    set_time_regs(h, m, s);
-+    cmos_write(RTC_REG_A, 0x26);
-+}
-+
-+static void set_datetime_bcd(int h, int min, int s, int d, int m, int y)
-+{
-     cmos_write(RTC_HOURS, h);
--    cmos_write(RTC_MINUTES, m);
-+    cmos_write(RTC_MINUTES, min);
-     cmos_write(RTC_SECONDS, s);
--    cmos_write(RTC_REG_A, 0x26);
-+    cmos_write(RTC_YEAR, y & 0xFF);
-+    cmos_write(RTC_CENTURY, y >> 8);
-+    cmos_write(RTC_MONTH, m);
-+    cmos_write(RTC_DAY_OF_MONTH, d);
- }
- 
- #define assert_time(h, m, s) \
-@@ -316,6 +332,17 @@ static void set_time(int mode, int h, int m, int s)
-         g_assert_cmpint(cmos_read(RTC_SECONDS), ==, s); \
-     } while(0)
- 
-+#define assert_datetime_bcd(h, min, s, d, m, y) \
-+    do { \
-+        g_assert_cmpint(cmos_read(RTC_HOURS), ==, h); \
-+        g_assert_cmpint(cmos_read(RTC_MINUTES), ==, min); \
-+        g_assert_cmpint(cmos_read(RTC_SECONDS), ==, s); \
-+        g_assert_cmpint(cmos_read(RTC_DAY_OF_MONTH), ==, d); \
-+        g_assert_cmpint(cmos_read(RTC_MONTH), ==, m); \
-+        g_assert_cmpint(cmos_read(RTC_YEAR), ==, (y & 0xFF)); \
-+        g_assert_cmpint(cmos_read(RTC_CENTURY), ==, (y >> 8)); \
-+    } while(0)
-+
- static void basic_12h_bcd(void)
- {
-     /* set BCD 12 hour mode */
-@@ -506,41 +533,30 @@ static void fuzz_registers(void)
- 
- static void register_b_set_flag(void)
- {
-+    if (cmos_read(RTC_REG_A) & REG_A_UIP) {
-+        clock_step(UIP_HOLD_LENGTH + NANOSECONDS_PER_SECOND / 5);
-+    }
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-+
-     /* Enable binary-coded decimal (BCD) mode and SET flag in Register B*/
-     cmos_write(RTC_REG_B, REG_B_24H | REG_B_SET);
- 
--    cmos_write(RTC_REG_A, 0x76);
--    cmos_write(RTC_YEAR, 0x11);
--    cmos_write(RTC_CENTURY, 0x20);
--    cmos_write(RTC_MONTH, 0x02);
--    cmos_write(RTC_DAY_OF_MONTH, 0x02);
--    cmos_write(RTC_HOURS, 0x02);
--    cmos_write(RTC_MINUTES, 0x04);
--    cmos_write(RTC_SECONDS, 0x58);
--    cmos_write(RTC_REG_A, 0x26);
-+    set_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
- 
--    /* Since SET flag is still enabled, these are equality checks. */
--    g_assert_cmpint(cmos_read(RTC_HOURS), ==, 0x02);
--    g_assert_cmpint(cmos_read(RTC_MINUTES), ==, 0x04);
--    g_assert_cmpint(cmos_read(RTC_SECONDS), ==, 0x58);
--    g_assert_cmpint(cmos_read(RTC_DAY_OF_MONTH), ==, 0x02);
--    g_assert_cmpint(cmos_read(RTC_MONTH), ==, 0x02);
--    g_assert_cmpint(cmos_read(RTC_YEAR), ==, 0x11);
--    g_assert_cmpint(cmos_read(RTC_CENTURY), ==, 0x20);
-+    assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-+
-+    /* Since SET flag is still enabled, time does not advance. */
-+    clock_step(1000000000LL);
-+    assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
- 
-     /* Disable SET flag in Register B */
-     cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) & ~REG_B_SET);
- 
--    g_assert_cmpint(cmos_read(RTC_HOURS), ==, 0x02);
--    g_assert_cmpint(cmos_read(RTC_MINUTES), ==, 0x04);
-+    assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
- 
--    /* Since SET flag is disabled, this is an inequality check.
--     * We (reasonably) assume that no (sexagesimal) overflow occurs. */
--    g_assert_cmpint(cmos_read(RTC_SECONDS), >=, 0x58);
--    g_assert_cmpint(cmos_read(RTC_DAY_OF_MONTH), ==, 0x02);
--    g_assert_cmpint(cmos_read(RTC_MONTH), ==, 0x02);
--    g_assert_cmpint(cmos_read(RTC_YEAR), ==, 0x11);
--    g_assert_cmpint(cmos_read(RTC_CENTURY), ==, 0x20);
-+    /* Since SET flag is disabled, the clock now advances.  */
-+    clock_step(1000000000LL);
-+    assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
- }
- 
- #define RTC_PERIOD_CODE1    13   /* 8 Hz */
+>
+>> First, plugging a legacy PCI device into a PCIe Root Port
+>> looks strange at least, and it can;t be done on real HW anyway.
+>> (incompatible slots)
+>>
+>> Second (and more important), if we want 2 or more PCI
+>> devices we would loose both IO ports space and bus numbers.
+>>
+>> >
+>> > >
+>> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>> > > ---
+>> > >   hw/pci-bridge/pcie_root_port.c | 1 +
+>> > >   include/hw/pci/pcie_port.h     | 3 +++
+>> > >   2 files changed, 4 insertions(+)
+>> > >
+>> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+>> > > index 4d588cb..b0e49e1 100644
+>> > > --- a/hw/pci-bridge/pcie_root_port.c
+>> > > +++ b/hw/pci-bridge/pcie_root_port.c
+>> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+>> > >   static Property rp_props[] = {
+>> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+>> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+>> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+>> > >       DEFINE_PROP_END_OF_LIST()
+>> > >   };
+>> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+>> > > index 1333266..1b2dd1f 100644
+>> > > --- a/include/hw/pci/pcie_port.h
+>> > > +++ b/include/hw/pci/pcie_port.h
+>> > > @@ -34,6 +34,9 @@ struct PCIEPort {
+>> > >       /* pci express switch port */
+>> > >       uint8_t     port;
+>> > > +
+>> > > +    /* additional buses to reserve on firmware init */
+>> > > +    uint8_t     bus_reserve;
+>> > >   };
+>> > >   void pcie_port_init_reg(PCIDevice *d);
+>> >
+>> > So here is a property and it does not do anything.
+>> > It makes it easier to work on series maybe, but review
+>> > is harder since we do not see what it does at all.
+>> > Please do not split up patches like this - you can maintain
+>> > it split up in your branch if you like and merge before sending.
+>> >
+>>
+>> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
+>>
+>> Thanks,
+>> Marcel
+>>
+>>
+>> > > --
+>> > > 2.7.4
+
+
+
 -- 
-1.8.3.1
+Alexander Bezzubikov
