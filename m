@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1da58j-000188-5L
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:05:06 -0400
+	(envelope-from <crosa@redhat.com>) id 1da5Ck-00028D-I2
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1da58e-00017E-8z
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:05:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44042)
+	(envelope-from <crosa@redhat.com>) id 1da5Ch-0002tH-Dr
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:09:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64877)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1da58e-00016C-0o
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:05:00 -0400
-Date: Tue, 25 Jul 2017 12:04:57 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1327586655.18981029.1501008326637.JavaMail.zimbra@redhat.com>
-Message-ID: <alpine.DEB.2.10.1707251155460.22381@sstabellini-ThinkPad-X260>
-References: <20170725171302.GK1587@perard.uk.xensource.com>
-	<349062488.18968647.1501004879602.JavaMail.zimbra@redhat.com>
-	<alpine.DEB.2.10.1707251102130.22381@sstabellini-ThinkPad-X260>
-	<1327586655.18981029.1501008326637.JavaMail.zimbra@redhat.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1da5Ch-0002sb-3N
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:09:11 -0400
+References: <20170725171014.25193-1-apahim@redhat.com>
+	<20170725171014.25193-4-apahim@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <75816277-a3cd-3114-2732-d138eb4fb21f@redhat.com>
+Date: Tue, 25 Jul 2017 15:08:56 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] QEMU commit 04bf2526ce breaks use of xen-mapcache
+In-Reply-To: <20170725171014.25193-4-apahim@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5nh6vtHXgWtjcjoOC0JGhAxwlB07ac3kl"
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] qemu.py: cleanup message on
+ negative exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xen.org, qemu-devel@nongnu.org
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, ldoktor@redhat.com
 
-On Tue, 25 Jul 2017, Paolo Bonzini wrote:
-> ----- Original Message -----
-> > From: "Stefano Stabellini" <sstabellini@kernel.org>
-> > To: "Paolo Bonzini" <pbonzini@redhat.com>
-> > Cc: "Anthony PERARD" <anthony.perard@citrix.com>, "Stefano Stabellini" <sstabellini@kernel.org>,
-> > xen-devel@lists.xen.org, qemu-devel@nongnu.org
-> > Sent: Tuesday, July 25, 2017 8:08:21 PM
-> > Subject: Re: QEMU commit 04bf2526ce breaks use of xen-mapcache
-> > 
-> > On Tue, 25 Jul 2017, Paolo Bonzini wrote:
-> > > > Hi,
-> > > > 
-> > > > Commits 04bf2526ce (exec: use qemu_ram_ptr_length to access guest ram)
-> > > > start using qemu_ram_ptr_length() instead of qemu_map_ram_ptr().
-> > > > That result in calling xen_map_cache() with lock=true, but this mapping
-> > > > is never invalidated.
-> > > > So QEMU use more and more RAM until it stop working for a reason or an
-> > > > other. (crash if host have little RAM or stop emulating but no crash)
-> > > > 
-> > > > I don't know if calling xen_invalidate_map_cache_entry() in
-> > > > address_space_read_continue() and address_space_write_continue() is the
-> > > > right answer.  Is there something better to do ?
-> > > 
-> > > I think it's correct for dma to be true... maybe add a lock argument to
-> > > qemu_ram_ptr_length, so that make address_space_{read,write}_continue can
-> > > pass 0 and everyone else passes 1?
-> > 
-> > I think that is a great suggestion. That way, the difference between
-> > locked mappings and unlocked mappings would be explicit, rather than
-> > relying on callers to use qemu_map_ram_ptr for unlocked mappings and
-> > qemu_ram_ptr_length for locked mappings. And there aren't that many
-> > callers of qemu_ram_ptr_length, so adding a parameter wouldn't be an
-> > issue.
-> 
-> Thanks---however, after re-reading xen-mapcache.c, dma needs to be false
-> for unlocked mappings.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5nh6vtHXgWtjcjoOC0JGhAxwlB07ac3kl
+From: Cleber Rosa <crosa@redhat.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com,
+ ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com,
+ ldoktor@redhat.com
+Message-ID: <75816277-a3cd-3114-2732-d138eb4fb21f@redhat.com>
+Subject: Re: [PATCH v5 3/6] qemu.py: cleanup message on negative exit code
+References: <20170725171014.25193-1-apahim@redhat.com>
+ <20170725171014.25193-4-apahim@redhat.com>
+In-Reply-To: <20170725171014.25193-4-apahim@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If there is a DMA operation already in progress, it means that we'll
-already have a locked mapping for it.
 
-When address_space_write_continue is called, which in turn would call
-qemu_map_ram_ptr, or qemu_ram_ptr_length(unlocked), if the start and
-size of the requested mapping matches the one of the previously created
-locked mapping, then a pointer to the locked mapping will be returned.
 
-If they don't match, a new unlocked mapping will be created and a
-pointer to it will be returned. (Arguably the algorithm could be
-improved so that a new mapping is not created if the address and size
-are contained within the locked mapping. This is a missing optimization
-today.)
+On 07/25/2017 01:10 PM, Amador Pahim wrote:
+> The message contains the self._args, which has only part of the
+> options used in the qemu command line and is not representative
+> enough to figure out what happened to the process.
+>=20
+> This patch drops the self._args part of the message.
+>=20
 
-It doesn't matter if a new unlocked mapping is created, or if the locked
-mapping is returned, because the pointer returned by
-qemu_ram_ptr_length(unlocked) is only used to do the memcpy, and never
-again. So I don't think this is a problem.
+Since this patch comes after the proposed "self._args" rename, it should
+use the new name.
+
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index f37e2fe58e..56142ed59b 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -154,7 +154,8 @@ class QEMUMachine(object):
+> =20
+>              exitcode =3D self._popen.wait()
+>              if exitcode < 0:
+> -                sys.stderr.write('qemu received signal %i: %s\n' % (-e=
+xitcode, ' '.join(self.args)))
+> +                sys.stderr.write('qemu received signal %i\n' % -exitco=
+de)
+> +
+>              self._load_io_log()
+>              self._post_shutdown()
+> =20
+>=20
+
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+
+
+--5nh6vtHXgWtjcjoOC0JGhAxwlB07ac3kl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZd5dIAAoJEGV+jTOl8gnzd2oP/ReZiC3AXOD0ztfjzxJyQad7
++QG7DJXf7qS9qhPN6EkclD7F2u6W8YTokDWRtOtNgj6WWpJt07/aFW/gTka3Pb0e
+dtMdFHI95AKGl+RFDw3CZIKIHXV4fKUOAYUMjiBR9ADt+BulBTA36z2ytb4sXAC4
+dLnGPdK0ywf5W1uMcevTtabIx/RH5OjGUDZrbYcFzCG7WBi8hGHRfxkQAlGEEnNN
+QNNIRQ0bU7q8NF8eWLDHyb7vmQ4rxg8sbbqR8yI/x5btYxTWogaySMHlzw8c6Ifg
+6T/iiCj7INl52A5oN5FAdW1W4agXE9rHmmhkmq2H5hCStZp0efR8qcajQUf1Xzum
+/V96QpKqNvSIMmfPIGjrjKWQUaK6qCHrssQPrc4Hbcei3MeUCdDcn2GPHnpky/S0
+EMrPwOinxvnSogc1Ky09TZWHJSOl82zYFVMQEr0qXU5yFrDYjTWIHHujOUWMsU9R
+h6ABDk9HcxDfgDy7GrYpwLAf3HyKlHHttWi0Qvib8/5InWIDMFZxFpQdZpteRMEU
+0J+D1rr0YgBKwdgrvqra9afKHqb+MhsRczR47QrE4nUjba8+edVx+D64gLhNxGll
+T/e8pA3+jW2E9FCvF0viKqb/IyKjpdxUP9ocAxxIqq1ydVCvxGEb4DW4GjeneKIO
+pbMf0eJLZub4xjLyIubo
+=0Kn5
+-----END PGP SIGNATURE-----
+
+--5nh6vtHXgWtjcjoOC0JGhAxwlB07ac3kl--
