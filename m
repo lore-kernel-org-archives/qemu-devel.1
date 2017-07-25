@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1da07R-0002IG-6E
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:43:26 -0400
+	(envelope-from <stefanha@gmail.com>) id 1da09H-0003m0-Qa
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1da07O-0007sV-1w
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:43:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1da07N-0007sG-PA
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:43:21 -0400
-Date: Tue, 25 Jul 2017 16:43:15 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170723173111-mutt-send-email-mst@kernel.org>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
-	<20170723055006-mutt-send-email-mst@kernel.org>
-	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1da09E-0000NX-MR
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:45:19 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1da09E-0000Mv-FX
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:45:16 -0400
+Received: by mail-wm0-x229.google.com with SMTP id m85so42708551wma.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:45:16 -0700 (PDT)
+Date: Tue, 25 Jul 2017 14:45:12 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170725134512.GF23343@stefanha-x1.localdomain>
+References: <20170724124438.27344-1-apahim@redhat.com>
+	<20170724124438.27344-3-apahim@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="cz6wLo+OExbGG7q/"
 Content-Disposition: inline
-In-Reply-To: <b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
- property to pcie-root-port
+In-Reply-To: <20170724124438.27344-3-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] qemu.py: cleanup and fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kraxel@redhat.com, seabios@seabios.org
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, ehabkost@redhat.com, armbru@redhat.com, mreitz@redhat.com, crosa@redhat.com, famz@redhat.com
 
-On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
-> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
-> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
-> > > To enable hotplugging of a newly created pcie-pci-bridge,
-> > > we need to tell firmware (SeaBIOS in this case)
-> > 
-> 
-> Hi Michael,
-> 
-> > Presumably, EFI would need to support this too?
-> > 
-> 
-> Sure, Eduardo added to CC, but he is in PTO now.
-> 
-> > > to reserve
-> > > additional buses for pcie-root-port, that allows us to
-> > > hotplug pcie-pci-bridge into this root port.
-> > > The number of buses to reserve is provided to the device via a corresponding
-> > > property, and to the firmware via new PCI capability (next patch).
-> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
-> > 
-> > If so you should just teach firmware to allocate one bus #
-> > unconditionally.
-> > 
-> 
-> That would be a problem for the PCIe machines, since each PCIe
-> devices is plugged in a different bus and we are already
-> limited to 256 PCIe devices. Allocating an extra-bus always
-> would really limit the PCIe devices we can use.
 
-One of the declared advantages of PCIe is easy support for multiple roots.
-We really should look at that IMHO so we do not need to pile up hacks.
+--cz6wLo+OExbGG7q/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > But why would that be so? What's wrong with a device
-> > directly in the root port?
-> > 
+On Mon, Jul 24, 2017 at 02:44:38PM +0200, Amador Pahim wrote:
+> is_running():
+> - Use Popen.poll() instead of Popen.returncode to check whether
+>   the VM is running or not.
+>=20
+> exitcode():
+> - Use Popen.poll() instead of Popen.returncode to return an updated
+> exit code.
+>=20
+> _load_io_log():
+> - Add a try/except to prevent raising exception when qemu io file
+> does not exist.
+>=20
+> launch():
+> - If VM is already running, do nothing.
+> - If vm is not running but was not cleaned up, call shutdown()
+>   before launching again.
+> - Offload the core of this method to _launch().
+> - Load the args and try to call _launch().
+> - Make sure we cleanup on exception.
+> - On exception, print an error message with the qemu command line
+>   and output.
+>=20
+> _launch():
+> - Execute _pre_launch(), subprocess.Popen() and self._post_launch().
+> - No try/except here. Any exceptions will be handled by the caller.
+>=20
+> shutdown():
+> - Make sure self._popen is not None before calling self._popen.wait().
+> - Cleanup the message on negative exit codes.
+> - Always execute self._load_io_log() and self._post_shutdown().
+>=20
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
 
-To clarify, my point is we might be wasting bus numbers by reservation
-since someone might just want to put pcie devices there.
+Please break this up into logical changes and include the rationale for
+making them.  The commit description should explain "why" rather than
+"what" the code change is.
 
-> First, plugging a legacy PCI device into a PCIe Root Port
-> looks strange at least, and it can;t be done on real HW anyway.
-> (incompatible slots)
-> 
-> Second (and more important), if we want 2 or more PCI
-> devices we would loose both IO ports space and bus numbers.
-> 
-> > 
-> > > 
-> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> > > ---
-> > >   hw/pci-bridge/pcie_root_port.c | 1 +
-> > >   include/hw/pci/pcie_port.h     | 3 +++
-> > >   2 files changed, 4 insertions(+)
-> > > 
-> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> > > index 4d588cb..b0e49e1 100644
-> > > --- a/hw/pci-bridge/pcie_root_port.c
-> > > +++ b/hw/pci-bridge/pcie_root_port.c
-> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
-> > >   static Property rp_props[] = {
-> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
-> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
-> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
-> > >       DEFINE_PROP_END_OF_LIST()
-> > >   };
-> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> > > index 1333266..1b2dd1f 100644
-> > > --- a/include/hw/pci/pcie_port.h
-> > > +++ b/include/hw/pci/pcie_port.h
-> > > @@ -34,6 +34,9 @@ struct PCIEPort {
-> > >       /* pci express switch port */
-> > >       uint8_t     port;
-> > > +
-> > > +    /* additional buses to reserve on firmware init */
-> > > +    uint8_t     bus_reserve;
-> > >   };
-> > >   void pcie_port_init_reg(PCIDevice *d);
-> > 
-> > So here is a property and it does not do anything.
-> > It makes it easier to work on series maybe, but review
-> > is harder since we do not see what it does at all.
-> > Please do not split up patches like this - you can maintain
-> > it split up in your branch if you like and merge before sending.
-> > 
-> 
-> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
-> 
-> Thanks,
-> Marcel
-> 
-> 
-> > > -- 
-> > > 2.7.4
+--cz6wLo+OExbGG7q/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZd0toAAoJEJykq7OBq3PIChYH+wXYWOEOsSfpI/lfJHXJcsss
+YR/VkUbxv9BwI64YPIBu+Kw3arZdeBwkzvmBamnq0Eavm/DjeZQ1CeX7lqPdFhJm
+OQY4EjWrxdWiYeGWcKZycUBVUolXs0N7sMgdC6Cr3/ET7oSkvNOpoLV1YUfCJoh5
+bSGQvDHGlqEGN7q4P+K7qyOIOA3kYEhIZsGo2Rc6gliLDj2EVJNABYJV2a8tvsZi
+GKXt6Zsee+8kTkSfUkYpu+dzVU8CraKGqYjuSHaNoaxkK9eDAfanabV3roMIAyTR
+V9B3LV5WRsRjq/XJsIYzyLZSe7y89WEuJMk/aKcO+MpnYHRneeLPysZGjzvRK0M=
+=OwaD
+-----END PGP SIGNATURE-----
+
+--cz6wLo+OExbGG7q/--
