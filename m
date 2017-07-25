@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1da2Ve-0004FO-IM
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:35 -0400
+	(envelope-from <crosa@redhat.com>) id 1da2Vh-0004FZ-86
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1da2VZ-0004Nh-WA
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51672)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1da2VZ-0004NC-Mr
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:29 -0400
-Date: Tue, 25 Jul 2017 13:06:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170725160639.GO2757@localhost.localdomain>
-References: <20170725150951.16038-1-ldoktor@redhat.com>
-	<20170725150951.16038-6-ldoktor@redhat.com>
+	(envelope-from <crosa@redhat.com>) id 1da2Vg-0004Oo-6n
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:37 -0400
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721123325.GC18014@stefanha-x1.localdomain>
+	<20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+Date: Tue, 25 Jul 2017 12:16:13 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170725150951.16038-6-ldoktor@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] qemu.py: Use custom exceptions
- rather than Exception
+In-Reply-To: <20170725154921.GS23343@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="41wxxoi5r60WuoiSOWtBnE6l9q6j1G4Pe"
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, Jul 25, 2017 at 05:09:46PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> The naked Exception should not be widely used. It makes sense to be a
-> bit more specific and use better-suited custom exceptions. As a benefit
-> we can store the full reply in the exception in case someone needs it
-> when catching the exception.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--41wxxoi5r60WuoiSOWtBnE6l9q6j1G4Pe
+From: Cleber Rosa <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
+References: <20170721034730.25612-1-crosa@redhat.com>
+ <20170721123325.GC18014@stefanha-x1.localdomain>
+ <20170721140155.GQ17693@redhat.com>
+ <bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+ <20170725154921.GS23343@stefanha-x1.localdomain>
+In-Reply-To: <20170725154921.GS23343@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
+> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
+>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
+>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
+>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+>> Without the static capabilities defined, the dynamic check would be
+>> influenced by the run time environment.  It would really mean "qemu-io=
+
+>> running on this environment (filesystem?) can do native aio".  Again,
+>> that's not the best type of information to depend on when writing test=
+s.
 >=20
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  scripts/qemu.py | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
+> Can you explain this more?
 >=20
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 5948e19..e6df54c 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -19,6 +19,19 @@ import subprocess
->  import qmp.qmp
-> =20
-> =20
-> +class MonitorResponseError(qmp.qmp.QMPError):
-> +    '''
-> +    Represents erroneous QMP monitor reply
-> +    '''
-> +    def __init__(self, reply):
-> +        try:
-> +            desc =3D reply["error"]["desc"]
-> +        except KeyError:
-> +            desc =3D reply
-                      ^^^ (*)
-> +        super(MonitorResponseError, self).__init__(repr(desc))
-
-This will end up calling Exception.__init__.  I previously
-suggested repr(desc) above(*) because I didn't know what happened
-when the Exception.__init__ argument is not a string.
-
-I couldn't find any documentation on the right argument types for
-Exception.__init__.  The examples in the Python documentation[1]
-don't call Exception.__init__ at all: they simply implement
-__str__().
-
-However, based on my testing and on the BaseException
-documentation[2], I believe repr() isn't really necessary:
-
-"If str() or unicode() is called on an instance of this class,
-the representation of the argument(s) to the instance are
-returned, or the empty string when there were no arguments."
-
-So your previous version was good, already.
-
-But maybe we could do this instead, to make the constructor as
-simple as possible:
-
-class MonitorResponseError(qmp.qmp.QMPError):
-    def __init__(self, reply):
-        self.reply =3D reply
-
-    def __str__(self):
-        return self.reply.get('error', {}).get('desc', repr(self.reply))
-
-
-[1] https://docs.python.org/2/tutorial/errors.html#user-defined-exception=
-s
-[2] https://docs.python.org/2/library/exceptions.html#exceptions.BaseExce=
-ption
-
-> +        self.reply =3D reply
-> +
-> +
->  class QEMUMachine(object):
->      '''A QEMU VM'''
-> =20
-> @@ -197,9 +210,9 @@ class QEMUMachine(object):
->          '''
->          reply =3D self.qmp(cmd, conv_keys, **args)
->          if reply is None:
-> -            raise Exception("Monitor is closed")
-> +            raise qmp.qmp.QMPError("Monitor is closed")
->          if "error" in reply:
-> -            raise Exception(reply["error"]["desc"])
-> +            raise MonitorResponseError(reply)
->          return reply["return"]
-> =20
->      def get_qmp_event(self, wait=3DFalse):
-> --=20
-> 2.9.4
+> It seems logical to me that if qemu-io in this environment cannot do
+> aio=3Dnative then we must skip those tests.
 >=20
+> Stefan
+>=20
+
+OK, let's abstract a bit more.  Let's take this part of your statement:
+
+ "if qemu-io in this environment cannot do aio=3Dnative"
+
+Let's call that a feature check.  Depending on how the *feature check*
+is written, a negative result may hide a test failure, because it would
+now be skipped.
+
+Suppose that a feature check for "SDL display" is such that you run
+"qemu -display sdl".  A *feature failure* here (SDL init is broken), or
+an environment issue (DISPLAY=3D), will cause a SDL test skip.
+
+If you base the test skip decision to a simple lookup on a list of
+features (not calling them build configuration anymore, as this is clear
+not attractive), this won't happen.  A "feature statement check" will
+make the test proceed, and the *failure* will be presented.
+
+I hope the pattern is visible.
 
 --=20
-Eduardo
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+
+
+--41wxxoi5r60WuoiSOWtBnE6l9q6j1G4Pe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZd27NAAoJEGV+jTOl8gnzucoP+gNwF+14NMRDbltc7UVebX/+
+6wXeSUfWK0lQ6shCHr+Hp+9M2/fmVFsXT1gtOuSm3Qmqdjz4iIQCMbeTUlPW+vi/
+Yj3LPsvy/Vhn0AV0sVaXS/Lbdkd//yJkaQb2zwhS4CUpXpR29qJpXwdjuvdxOQAX
+PGeqri36lX9s3IQ8CTb47nXuncaGiAAbFdLesnylydVNngrGT5RxT1YEA+PqXv5Y
+1R6K29qkRhQUzy+IjRLdVukvkPXdXfo3XfaAqDZYfW4LzyAUKVyWBMdoSfx8bgY7
+0phuCbdgl6jlOPSta4F9q2nN9lGdMdy0gs05Z2dKqx03fxXCtbL1yurBTVC+M2Sx
+S1guD3uZ3p33twzcgVdkgGMzZDr2yzMUk7Vl62MAsDfebT6Bk7BV/iHxh5CdGV3l
+OldHz+ns+Ki/7pgdBUZPz4wSqe7FSxT+91xMo58NSRsFV5l++uI5ltE1oCJ6mu80
+ikzLtKPO+VU3Bwehw+vEb2M6wKBfa/J8Hi9VfHy8uxboPSO3KkaXkpbWWw4qDgvd
+B15ifwylOiX9JbFhl6TNTFsc09MGtAMqP2zdvjhAqJYn8xhiXedM4/HqyLfWBOvx
+c7otH7oJzKGrqKe9mVOX4hk95E9Y5m0uX1NeaKHoB68caQu36MHDLJ2c2vxrH9pf
+rvQIjcCJBJeb8B2DGwSG
+=XGUx
+-----END PGP SIGNATURE-----
+
+--41wxxoi5r60WuoiSOWtBnE6l9q6j1G4Pe--
