@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1da0QL-0006AM-FU
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:02:58 -0400
+	(envelope-from <huayanghao@gmail.com>) id 1da0RJ-0006qP-AL
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1da0QI-0007pS-Cx
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:02:57 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37844)
+	(envelope-from <huayanghao@gmail.com>) id 1da0RI-0008DH-GQ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:03:57 -0400
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:33151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1da0QI-0007p8-5K
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:02:54 -0400
-Received: by mail-wr0-x244.google.com with SMTP id 12so11927348wrb.4
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:02:54 -0700 (PDT)
-Date: Tue, 25 Jul 2017 15:02:50 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170725140250.GK23343@stefanha-x1.localdomain>
-References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
-	<1500645206-13559-6-git-send-email-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <huayanghao@gmail.com>)
+	id 1da0RI-0008Ct-C8
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:03:56 -0400
+Received: by mail-yw0-x242.google.com with SMTP id u207so3000253ywc.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:03:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yiup30KVCQiHUZFC"
-Content-Disposition: inline
-In-Reply-To: <1500645206-13559-6-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/9] tests/libqos/usb: Clean up string
- interpolation into QMP input
+In-Reply-To: <CAFEAcA8oqwPav4gU-Gk=JHnMfgzz8pdgFEPs-=u=MTVmJpP3KQ@mail.gmail.com>
+References: <CAPTzt1Ai9x4OiHMH4HrDzj=vNbqhNnkmdDQ7wBLxYTJ-kcNM_w@mail.gmail.com>
+	<CAFEAcA_TYFbv9EeafV8FZ=HEXx=kArVb2OYiC3mGQiP7_N1-UA@mail.gmail.com>
+	<CAFEAcA-R5DJUgT=fLDM4uYcRFyDWVm6hnJiPuS55jg=1AThZ6Q@mail.gmail.com>
+	<CAPTzt1DoAyZ3bCD3JDrt2-7UckQQ9dzG5mTrNBApoPpQ1GpV-g@mail.gmail.com>
+	<CAFEAcA8oqwPav4gU-Gk=JHnMfgzz8pdgFEPs-=u=MTVmJpP3KQ@mail.gmail.com>
+From: Hua Yanghao <huayanghao@gmail.com>
+Date: Tue, 25 Jul 2017 16:03:53 +0200
+Message-ID: <CAPTzt1Cqht1HHpR6PwqVoToYDtEqgxOLPaQYCOkv2ZReMb+6eA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/core/loader: do not check for regions
+ overlap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Mon, Jul 24, 2017 at 11:21 PM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 24 July 2017 at 21:03, Hua Yanghao <huayanghao@gmail.com> wrote:
+>> Sounds good PPM! currently I am working around this by
+>> objcopy a pure binary and it looks like qemu-system-arm is
+>> loading a binary at loader address + 0x10000. From man page
+>> it claims it also supports multiboot image which I thought I could
+>> remove this loader address + 0x10000 limiation however with
+>> no luck. but the binary works pretty fine though at the fixed address.
+>> not as convenient as elf image which I can run from any address.
+>
+> If you give -kernel on ARM (non-M-profile) systems something
+> that isn't an ELF file this means "I am a Linux kernel and
+> want the calling convention documented for the kernel" (which
+> includes that load address, among other things). If you're
+> not a Linux kernel then don't do that.
+>
+> You probably want the "-device loader" documented in
+> docs/generic-loader.txt, which is (as the name suggests)
+> a generic way to load an arbitrary binary into memory,
+> and lets you specify whatever load address you want.
+>
 
---yiup30KVCQiHUZFC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jul 21, 2017 at 03:53:22PM +0200, Markus Armbruster wrote:
-> Leaving interpolation into JSON to qmp() is more robust than building
-> QMP input manually, as explained in the previous commit.
->=20
-> The case in usb_test_hotplug() slightly more complicated: it
-> interpolates *into* JSON values.  Clean it up by building the values
-> separately, so we can again leave interpolation to qmp().
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/libqos/usb.c | 30 ++++++++++++++----------------
->  1 file changed, 14 insertions(+), 16 deletions(-)
->=20
-> diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
-> index 0cdfaec..f88d4a6 100644
-> --- a/tests/libqos/usb.c
-> +++ b/tests/libqos/usb.c
-> @@ -40,18 +40,20 @@ void uhci_port_test(struct qhc *hc, int port, uint16_=
-t expect)
->  void usb_test_hotplug(const char *hcd_id, const int port,
->                        void (*port_check)(void))
->  {
-> +    char id[32];
-> +    char *bus;
->      QDict *response;
-> -    char  *cmd;
-> =20
-> -    cmd =3D g_strdup_printf("{'execute': 'device_add',"
-> -                          " 'arguments': {"
-> -                          "   'driver': 'usb-tablet',"
-> -                          "   'port': '%d',"
-> -                          "   'bus': '%s.0',"
-> -                          "   'id': 'usbdev%d'"
-> -                          "}}", port, hcd_id, port);
-> -    response =3D qmp(cmd);
-> -    g_free(cmd);
-> +    sprintf(id, "usbdev%d", port);
-> +    bus =3D g_strdup_printf("%s.0", hcd_id);
-> +    response =3D qmp("{'execute': 'device_add',"
-> +                   " 'arguments': {"
-> +                   "   'driver': 'usb-tablet',"
-> +                   "   'port': %s,"
-> +                   "   'bus': %s,"
-> +                   "   'id': %s"
-> +                   " }}", id + 6, bus, id);
-
-Or: id + strlen("usbdev")
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---yiup30KVCQiHUZFC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZd0+KAAoJEJykq7OBq3PILfcIAIabO5eVkcDq3YAPUOFNmw13
-CqFXLGMVxOVJOtC4hCjLfvPjnsHDU6BL8baAwx42h9tl0I0fJUk9F519EdwEyd/F
-U1LFmwWolv46FK5Pb5/5KivQg1jzexgmAZwWdw9n9aPK8Dc6QoGFn0CyoYTEMx0s
-ZJgFjn/+aq1OWA+UQ7py8ZK/vuo2KfVgaMlNcmpJB05BGWl1H6tkA/26X7T5uLYy
-rl8myVLmTWD7O1G8aGlw317OoaOXbcUbP0FA9W9M+2iGM3qi7HFJdSdzMiJKO5Fm
-s4ZPrt9McFa8mCy68HvqKYGp/wXuGqg8ZnudIrdMCcu5F1GCxyRpFYgfljiskGk=
-=Kfzz
------END PGP SIGNATURE-----
-
---yiup30KVCQiHUZFC--
+It works like a charm, thanks PPM. I think this already solves my
+problem for using elf, now I just use objcopied binary. However
+if qemu could support elf type with overlapping segments that is
+even better. ;-)
