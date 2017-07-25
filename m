@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1da1DV-0003K1-50
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:53:46 -0400
+	(envelope-from <sam.falvo@gmail.com>) id 1da0sF-00076s-EU
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1da1DR-00070d-7v
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:53:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48471 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1da1DR-00070T-0U
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:53:41 -0400
-Date: Tue, 25 Jul 2017 16:53:34 +0200
-From: Michal Hocko <mhocko@kernel.org>
-Message-ID: <20170725145333.GK26723@dhcp22.suse.cz>
-References: <20170717152448.GN12888@dhcp22.suse.cz>
-	<596D6E7E.4070700@intel.com>
-	<20170719081311.GC26779@dhcp22.suse.cz>
-	<596F4A0E.4010507@intel.com>
-	<20170724090042.GF25221@dhcp22.suse.cz>
-	<59771010.6080108@intel.com>
-	<20170725112513.GD26723@dhcp22.suse.cz>
-	<597731E8.9040803@intel.com>
-	<20170725124141.GF26723@dhcp22.suse.cz>
-	<286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <sam.falvo@gmail.com>) id 1da0sE-00048Y-3y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:31:47 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:34047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sam.falvo@gmail.com>) id 1da0sD-00047j-WE
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:31:46 -0400
+Received: by mail-ua0-x243.google.com with SMTP id k43so8283194uaf.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:31:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+In-Reply-To: <e071dd23-8d19-93ba-7962-b2e2df69a6ee@mail.uni-paderborn.de>
+References: <e071dd23-8d19-93ba-7962-b2e2df69a6ee@mail.uni-paderborn.de>
+From: Samuel Falvo II <sam.falvo@gmail.com>
+Date: Tue, 25 Jul 2017 07:31:43 -0700
+Message-ID: <CAEz=sonvfDHymUBec0Xw3RqhiANmUvrCjqMvn2eQ4zuOu1rH5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [sw-dev] RFC: QEMU RISC-V modular ISA decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue 25-07-17 14:47:16, Wang, Wei W wrote:
-> On Tuesday, July 25, 2017 8:42 PM, hal Hocko wrote:
-> > On Tue 25-07-17 19:56:24, Wei Wang wrote:
-> > > On 07/25/2017 07:25 PM, Michal Hocko wrote:
-> > > >On Tue 25-07-17 17:32:00, Wei Wang wrote:
-> > > >>On 07/24/2017 05:00 PM, Michal Hocko wrote:
-> > > >>>On Wed 19-07-17 20:01:18, Wei Wang wrote:
-> > > >>>>On 07/19/2017 04:13 PM, Michal Hocko wrote:
-> > > >>>[...
-> > > We don't need to do the pfn walk in the guest kernel. When the API
-> > > reports, for example, a 2MB free page block, the API caller offers to
-> > > the hypervisor the base address of the page block, and size=2MB, to
-> > > the hypervisor.
-> > 
-> > So you want to skip pfn walks by regularly calling into the page allocator to
-> > update your bitmap. If that is the case then would an API that would allow you
-> > to update your bitmap via a callback be s sufficient? Something like
-> > 	void walk_free_mem(int node, int min_order,
-> > 			void (*visit)(unsigned long pfn, unsigned long nr_pages))
-> > 
-> > The function will call the given callback for each free memory block on the given
-> > node starting from the given min_order. The callback will be strictly an atomic
-> > and very light context. You can update your bitmap from there.
-> 
-> I would need to introduce more about the background here:
-> The hypervisor and the guest live in their own address space. The hypervisor's bitmap
-> isn't seen by the guest. I think we also wouldn't be able to give a callback function 
-> from the hypervisor to the guest in this case.
+For those of us who are not in the know, how does target/s390 decoding work?
 
-How did you plan to use your original API which export struct page array
-then?
+I've maintained a 65816 emulator
+(https://bitbucket.org/kc5tja/lib65816/src) which also uses a giant
+case construct.  This method is used because it's fast.  Any
+alternative approaches you decide to take might well work and satisfy
+extensibility requirements, but it'll likely take a performance hit as
+well.
 
-> > This would address my main concern that the allocator internals would get
-> > outside of the allocator proper. 
-> 
-> What issue would it have to expose the internal, for_each_zone()?
+On Tue, Jul 25, 2017 at 6:04 AM, Bastian Koppelmann
+<kbastian@mail.uni-paderborn.de> wrote:
+> Hi QEMU devs, hi risc-v-sw devs,
+>
+> I'm posting this cross mailing list since I'd like to get feedback from
+> the both sides.
+>
+> Right now the RISC-V port for QEMU uses the classic decoding scheme of
+> one function decoding the first opcode (and prefixes) and then branches
+> to different functions for decoding the rest (as in target/arm or most
+> of the other targets). This is all done using switch, case statements.
+>
+> This is a little bit tricky to extend, especially for third parties. I
+> don't think it's too bad, but it can definitely be improved and I really
+> like the way target/s390x does it, but I'm not sure about it's drawbacks.
+>
+> I see three options to proceed from here:
+>
+>     1) Completely move to a decoding scheme similar to target/s390x in
+>        QEMU. On the plus side it make it super easy to add new
+>        instructions and/or new instruction formats, and reduces decoding
+>        errors. I don't know the major drawbacks to this approach, maybe
+>        performance. Does anyone know? Other than that it needs a major
+>        rewrite of the decoder, which will take some time and thus delay
+>        the development of RISC-V QEMU upstream. (I think RV32/64I can
+>        be left as is, since everybody has to implement it anyways)
+>
+>     2) The compromise: Leave the core as is, i.e. RV32GC, and provide a
+>        nice interface for any other extension similar to target/s390.
+>        The big plus here is that no code needs to be changed and only
+>        the interface needs to be added. We don't add any performance
+>        overhead (if s390x-style decoding adds any), but this might
+>        result in nobody using it, since they don't know about the
+>        interface and they just hack their stuff in. Then it was a waste
+>        of our time to implement the interface.
+>
+>     3) The status quo. Just leave it as is.
+>
+> Any comments?
+>
+> Cheers,
+> Bastian
+>
+>
+>
+> --
+> You received this message because you are subscribed to the Google Groups "RISC-V SW Dev" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to sw-dev+unsubscribe@groups.riscv.org.
+> To post to this group, send email to sw-dev@groups.riscv.org.
+> Visit this group at https://groups.google.com/a/groups.riscv.org/group/sw-dev/.
+> To view this discussion on the web visit https://groups.google.com/a/groups.riscv.org/d/msgid/sw-dev/e071dd23-8d19-93ba-7962-b2e2df69a6ee%40mail.uni-paderborn.de.
 
-zone is a MM internal concept. No code outside of the MM proper should
-really care about zones. 
+
+
 -- 
-Michal Hocko
-SUSE Labs
+Samuel A. Falvo II
