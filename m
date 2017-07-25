@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1da3VA-00043m-3w
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:08 -0400
+	(envelope-from <jsnow@redhat.com>) id 1da3VB-00045M-7j
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1da3V6-0001QJ-3S
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20744)
+	(envelope-from <jsnow@redhat.com>) id 1da3VA-0001Vl-Bz
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1da3V5-0001Pq-TY
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:04 -0400
-From: Amador Pahim <apahim@redhat.com>
-Date: Tue, 25 Jul 2017 19:10:10 +0200
-Message-Id: <20170725171014.25193-3-apahim@redhat.com>
-In-Reply-To: <20170725171014.25193-1-apahim@redhat.com>
-References: <20170725171014.25193-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 2/6] qemu.py: use poll() instead of
- 'returncode'
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1da3VA-0001RW-4j
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:20:08 -0400
+References: <20170725150951.16038-1-ldoktor@redhat.com>
+	<20170725150951.16038-11-ldoktor@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8f540eb9-ea3c-2e0a-e754-fa50554ea282@redhat.com>
+Date: Tue, 25 Jul 2017 13:19:53 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170725150951.16038-11-ldoktor@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] qtest.py: Few pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, ehabkost@redhat.com, armbru@redhat.com, apahim@redhat.com, f4bug@amsat.org, mreitz@redhat.com
 
-The 'returncode' Popen attribute is not guaranteed to be updated. It
-actually depends on a call to either poll(), wait() or communicate().
 
-On the other hand, poll() will "Check if child process has terminated.
-Set and return returncode attribute."
 
-Let's use the poll() to check whether the process is running and also
-to get the updated process exit code, if any.
+On 07/25/2017 11:09 AM, Luk=C3=A1=C5=A1 Doktor wrote:
+> No actual code changes, just few pylint/style fixes.
+>=20
 
-Signed-off-by: Amador Pahim <apahim@redhat.com>
----
- scripts/qemu.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+More than welcome, given the state of our python scripts.
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 59ed5270f8..f37e2fe58e 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -86,12 +86,12 @@ class QEMUMachine(object):
-             raise
- 
-     def is_running(self):
--        return self._popen and (self._popen.returncode is None)
-+        return self._popen and (self._popen.poll() is None)
- 
-     def exitcode(self):
-         if self._popen is None:
-             return None
--        return self._popen.returncode
-+        return self._popen.poll()
- 
-     def get_pid(self):
-         if not self.is_running():
--- 
-2.13.3
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> ---
+>   scripts/qtest.py | 11 +++++------
+>   1 file changed, 5 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/scripts/qtest.py b/scripts/qtest.py
+> index ab183c0..df0daf2 100644
+> --- a/scripts/qtest.py
+> +++ b/scripts/qtest.py
+> @@ -11,14 +11,11 @@
+>   # Based on qmp.py.
+>   #
+>  =20
+> -import errno
+>   import socket
+> -import string
+>   import os
+> -import subprocess
+> -import qmp.qmp
+>   import qemu
+>  =20
+> +
+>   class QEMUQtestProtocol(object):
+>       def __init__(self, address, server=3DFalse):
+>           """
+> @@ -83,8 +80,10 @@ class QEMUQtestMachine(qemu.QEMUMachine):
+>                    socket_scm_helper=3DNone):
+>           if name is None:
+>               name =3D "qemu-%d" % os.getpid()
+> -        super(QEMUQtestMachine, self).__init__(binary, args, name=3Dna=
+me, test_dir=3Dtest_dir,
+> -                                               socket_scm_helper=3Dsoc=
+ket_scm_helper)
+> +        super(QEMUQtestMachine,
+> +              self).__init__(binary, args, name=3Dname, test_dir=3Dtes=
+t_dir,
+> +                             socket_scm_helper=3Dsocket_scm_helper)
+> +        self._qtest =3D None
+>           self._qtest_path =3D os.path.join(test_dir, name + "-qtest.so=
+ck")
+>  =20
+>       def _base_args(self):
+>=20
+
+Reviewed-by: John Snow <jsnow@redhat.com>
