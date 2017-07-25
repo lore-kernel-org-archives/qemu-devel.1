@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1da0Ee-0007cz-3I
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:50:53 -0400
+	(envelope-from <stefanha@gmail.com>) id 1da0Fv-00009q-QZ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:52:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1da0Ed-00026s-01
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:50:52 -0400
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:38157)
+	(envelope-from <stefanha@gmail.com>) id 1da0Fs-0002Q7-MK
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:52:11 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1da0Ec-00026f-Pt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:50:50 -0400
-Received: by mail-pg0-x231.google.com with SMTP id k190so4961985pgk.5
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:50:50 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1da0Fs-0002Pv-CE
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:52:08 -0400
+Received: by mail-wr0-x242.google.com with SMTP id y43so19885823wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:52:08 -0700 (PDT)
+Date: Tue, 25 Jul 2017 14:52:04 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170725135204.GG23343@stefanha-x1.localdomain>
+References: <20170721143149.43721-1-vsementsov@virtuozzo.com>
+	<20170724113422.GC2784@stefanha-x1.localdomain>
+	<2c20cdf2-9e70-89ef-f323-d7ef77f70b29@openvz.org>
+	<87y3rdopza.fsf@frigg.lan>
+	<d5c6df93-1610-cf55-71b9-940da91a355e@openvz.org>
+	<87zibtkd7m.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170723173111-mutt-send-email-mst@kernel.org>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
-	<20170723055006-mutt-send-email-mst@kernel.org>
-	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
-	<20170723173111-mutt-send-email-mst@kernel.org>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Tue, 25 Jul 2017 16:50:49 +0300
-Message-ID: <CAKSfGUBP8oH2YymDnCA+Q=ngmyyVRYTVujwfOLRgdBQ82qgivg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
- property to pcie-root-port
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="8bBEDOJVaa9YlTAt"
+Content-Disposition: inline
+In-Reply-To: <87zibtkd7m.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/2] improve tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +34,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
-
-2017-07-25 16:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
-> On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
->> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
->> > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
->> > > To enable hotplugging of a newly created pcie-pci-bridge,
->> > > we need to tell firmware (SeaBIOS in this case)
->> >
->>
->> Hi Michael,
->>
->> > Presumably, EFI would need to support this too?
->> >
->>
->> Sure, Eduardo added to CC, but he is in PTO now.
->>
->> > > to reserve
->> > > additional buses for pcie-root-port, that allows us to
->> > > hotplug pcie-pci-bridge into this root port.
->> > > The number of buses to reserve is provided to the device via a corresponding
->> > > property, and to the firmware via new PCI capability (next patch).
->> > > The property's default value is 1 as we want to hotplug at least 1 bridge.
->> >
->> > If so you should just teach firmware to allocate one bus #
->> > unconditionally.
->> >
->>
->> That would be a problem for the PCIe machines, since each PCIe
->> devices is plugged in a different bus and we are already
->> limited to 256 PCIe devices. Allocating an extra-bus always
->> would really limit the PCIe devices we can use.
->
-> One of the declared advantages of PCIe is easy support for multiple roots.
-> We really should look at that IMHO so we do not need to pile up hacks.
->
->> > But why would that be so? What's wrong with a device
->> > directly in the root port?
->> >
->
-> To clarify, my point is we might be wasting bus numbers by reservation
-> since someone might just want to put pcie devices there.
-
-I think, changing default value to 0 can help us avoid this,
-as no bus reservation by default. If one's surely wants
-to hotplug pcie-pci-bridge into this root port in future,
-the property gives him such an opportunity.
-So, sure need pcie-pci-bridge hotplug -> creating a root port with
-bus_reserve > 0. Otherwise (and default) - just as now, no changes
-in bus topology.
-
->
->> First, plugging a legacy PCI device into a PCIe Root Port
->> looks strange at least, and it can;t be done on real HW anyway.
->> (incompatible slots)
->>
->> Second (and more important), if we want 2 or more PCI
->> devices we would loose both IO ports space and bus numbers.
->>
->> >
->> > >
->> > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> > > ---
->> > >   hw/pci-bridge/pcie_root_port.c | 1 +
->> > >   include/hw/pci/pcie_port.h     | 3 +++
->> > >   2 files changed, 4 insertions(+)
->> > >
->> > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
->> > > index 4d588cb..b0e49e1 100644
->> > > --- a/hw/pci-bridge/pcie_root_port.c
->> > > +++ b/hw/pci-bridge/pcie_root_port.c
->> > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
->> > >   static Property rp_props[] = {
->> > >       DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
->> > >                       QEMU_PCIE_SLTCAP_PCP_BITNR, true),
->> > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
->> > >       DEFINE_PROP_END_OF_LIST()
->> > >   };
->> > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
->> > > index 1333266..1b2dd1f 100644
->> > > --- a/include/hw/pci/pcie_port.h
->> > > +++ b/include/hw/pci/pcie_port.h
->> > > @@ -34,6 +34,9 @@ struct PCIEPort {
->> > >       /* pci express switch port */
->> > >       uint8_t     port;
->> > > +
->> > > +    /* additional buses to reserve on firmware init */
->> > > +    uint8_t     bus_reserve;
->> > >   };
->> > >   void pcie_port_init_reg(PCIDevice *d);
->> >
->> > So here is a property and it does not do anything.
->> > It makes it easier to work on series maybe, but review
->> > is harder since we do not see what it does at all.
->> > Please do not split up patches like this - you can maintain
->> > it split up in your branch if you like and merge before sending.
->> >
->>
->> Agreed, Alexandr please merge patches 4-5-6 for your next submission.
->>
->> Thanks,
->> Marcel
->>
->>
->> > > --
->> > > 2.7.4
+To: "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, armbru@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
 
+--8bBEDOJVaa9YlTAt
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Alexander Bezzubikov
+On Mon, Jul 24, 2017 at 07:32:29PM +0300, Llu=EDs Vilanova wrote:
+> Denis V Lunev writes:
+>=20
+> > On 07/24/2017 05:43 PM, Llu=EDs Vilanova wrote:
+> >> Denis V Lunev writes:
+> >>=20
+> >>> On 07/24/2017 02:34 PM, Stefan Hajnoczi wrote:
+> >>>> On Fri, Jul 21, 2017 at 05:31:47PM +0300, Vladimir Sementsov-Ogievsk=
+iy wrote:
+> >>>>> Current trace system have a drawback: parameters of trace functions
+> >>>>> are calculated even if corresponding tracepoint is disabled. Also, =
+it
+> >>>>> looks like trace function are not actually inlined by compiler (at
+> >>>>> least for me).
+> >>>>>=20
+> >>>>> Here is a fix proposal: move from function call to macros. Patch 02
+> >>>>> is an example, of how to reduce extra calculations with help of
+> >>>>> patch 01.
+> >>>>>=20
+> >>>>> Vladimir Sementsov-Ogievskiy (2):
+> >>>>> trace: do not calculate arguments for disabled trace-points
+> >>>>> monitor: improve tracing in handle_qmp_command
+> >>>> Please use the TRACE_FOO_ENABLED macro instead of putting computation
+> >>>> inside the trace event arguments.  This makes the code cleaner and
+> >>>> easier to read.
+> >>> At our opinion this ENABLED is compile time check while the option
+> >>> could be tuned in runtime. Thus normally it would normally be
+> >>> enabled while the trace is silent.
+> >>> So, under load, we will have extra allocation, copying the command bu=
+ffer,
+> >>> freeing memory without actual trace. In order to fix that we should
+> >>> do something like
+> >>> if (trace_event_get_state(TRACE_HANDLE_QMP_COMMAND)) {
+> >>> req_json =3D qobject_to_json(req);
+> >>> trace_handle_qmp_command(mon, req_json);
+> >>> QDECREF(req_json);
+> >>> }
+> >>> which is possible, but at our (me + Vova) opinion is ugly.
+> >>> That is why we are proposing to switch to macro, which
+> >>> will not require such tweaking.
+> >>> Arguments will be only evaluated when necessary and we
+> >>> will not have side-effects if the tracepoint is compile time
+> >>> enabled and run-time disabled.
+> >>> Though if the code above is acceptable, we can send the
+> >>> patch with it. No problem.
+> >> I completely get your point, but:
+> >>=20
+> >> * I'm not sure it will have much of a performance impact.
+> >> * It is not obvious what's going to happen just by looking at the code=
+ of the
+> >> calling site.
+> >>=20
+> >> I prefer to minimize the use of macros, even if that makes a few trace=
+ event
+> >> calls to be a bit more verbose, as in your example above. Also, I quit=
+e dislike
+> >> the new style you propose:
+> >>=20
+> >> trace_handle_qmp_command(mon,
+> >> qstring_get_str(req_json =3D qobject_to_json(req)));
+> >> QDECREF(req_json);
+> >>=20
+> >>=20
+> >> Cheers,
+> >> Lluis
+> > This is a matter of overall performance. For example I can have 500 VMs.
+> > In order to manage them, f.e. tweak balloon I have to collect statistic=
+s.
+> > This happens 1 time/10 sec/VM. Libvirt issues the following
+>=20
+> > 494665@1486641285.213042:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name=
+ "query-balloon"
+> > 494665@1486641285.214181:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name=
+ "qom-get"
+> > 494665@1486641285.214792:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name=
+ "query-hotpluggable-cpus"
+> > 494665@1486641285.215283:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name=
+ "query-cpus"
+> > 494665@1486641285.216153:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name=
+ "query-blockstats"
+> > 494665@1486641285.216827:handle_qmp_command mon 0x7f7fbce6bea0 cmd_name=
+ "query-block"
+>=20
+> > We will have 300 commands in a second in all VMs. This is not that small
+> > load. OK. I do think that I'll lost 2-3-5 percents of one host CPU due
+> > to this allocation/free/copy. There are no measurements unfortunately.
+> > At my opinion this matters.
+>=20
+> Sorry for beating the point, but I just want to make sure we're on the sa=
+me
+> page. The example above (with the state check) and the one you propose in=
+ your
+> patch have exactly the same performance.
+>=20
+> The change is then only in coding style, and I think the macros you propo=
+se make
+> the code harder to understand:
+>=20
+>   trace_handle_qmp_command(mon,
+>                            qstring_get_str(req_json =3D qobject_to_json(r=
+eq)));
+>   QDECREF(req_json);
+>=20
+> If qobject_to_json() had any side-effect, it is not obvious why it would =
+happen
+> only when tracing of that event is dynaically enabled. IMO that's a recip=
+e for
+> errors.
+
+I agree and this is why I said "cleaner and easier to read".  Side
+effects in macro/function arguments are prone to bugs.
+
+Stefan
+
+--8bBEDOJVaa9YlTAt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZd00EAAoJEJykq7OBq3PIr0sH/32crHDKsMV96AbcxNO+TUMu
+tBPZJcKsAsfJN/CY+uhxq0OE6xj0Rks877WSdtiGX/EMfMExDCDx7sL7Q0LEVQE7
+bCn1cEjxb+Idvj3ayh82IFKrSpYkiAxTAa2caNHMnglAvzUvA6jto43CqCgJXyFh
+sHSCpQjPriPv6tZ9PzgzWigfw8gC6Ei6YDNCUOi4wgEKt3Pel//W7eZ8NxTap7wq
+1d14LxB/TfHeYXVa3cmtcm7n/T5ztydV4fd1tCGknMTpeL1pdPoUpwrAwtGOH14h
+ydmBsu1TI4TeDpvt0rSrRscbvYuMXpkjgVDzf+bKTLhZfXc1mKgyjvz6wrvpun0=
+=cwBv
+-----END PGP SIGNATURE-----
+
+--8bBEDOJVaa9YlTAt--
