@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1da5ED-0002tv-GD
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:10:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1da5JC-0003pO-2D
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1da5EA-0003od-AI
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:10:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54586)
+	(envelope-from <dgilbert@redhat.com>) id 1da5J8-00066o-TS
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:15:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:16148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1da5EA-0003oH-0x
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:10:42 -0400
-Date: Tue, 25 Jul 2017 16:08:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170725190818.GQ2757@localhost.localdomain>
-References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
-	<1499952476-3454-7-git-send-email-armbru@redhat.com>
-	<20170717101906.GC5301@noname.redhat.com>
-	<87a842b9yo.fsf@dusky.pond.sub.org>
-	<87bmoauz2s.fsf@dusky.pond.sub.org>
-	<5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1da5J8-000655-Jm
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:15:50 -0400
+Date: Tue, 25 Jul 2017 20:15:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170725191542.GD2820@work-vm>
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
+	<20170724153521.GD2127@work-vm>
+	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
+	<20170724190331.GH2127@work-vm>
+	<a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
-Subject: [Qemu-devel] Slow tests on "make check" (was Re: [PULL 6/9] Convert
- error_report() to warn_report())
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +33,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Jeff Cody <jcody@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Mon, Jul 24, 2017 at 09:30:06AM +0200, Paolo Bonzini wrote:
-> On 24/07/2017 08:30, Markus Armbruster wrote:
-> > Markus Armbruster <armbru@redhat.com> writes:
-> > 
-> >> Kevin Wolf <kwolf@redhat.com> writes:
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 24/07/2017 21:03, Dr. David Alan Gilbert wrote:
+> >> I don't like having such a long-lived mutex (it seems like a recipe for
+> >> deadlocks with the BQL), plus memory_region_transaction_commit (the
+> >> expensive part of memory_global_dirty_log_stop) needs to be under the
+> >> BQL itself because it calls MemoryListeners.
 > >>
-> >>> Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
-> >>>> From: Alistair Francis <alistair.francis@xilinx.com>
-> >>>>
-> >>>> Convert all uses of error_report("warning:"... to use warn_report()
-> >>>> instead. This helps standardise on a single method of printing warnings
-> >>>> to the user.
-> >>>>
-> >>>> All of the warnings were changed using these two commands:
-> >>>>     find ./* -type f -exec sed -i \
-> >>>>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
-> >>>>
-> >>>> Indentation fixed up manually afterwards.
-> >>>>
-> >>>> The test-qdev-global-props test case was manually updated to ensure that
-> >>>> this patch passes make check (as the test cases are case sensitive).
-> >>>
-> >>> This patch broke qemu-iotests 051 because it neglected to update the
-> >>> reference output. Not sure if a change of the message was even intended,
-> >>> but with a error location prefix, the order changes:
-> >>>
-> >>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
-> >>> +(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
-> >>>
-> >>> Personally, I would expect the error location or at least the program
-> >>> name to come first even for warnings.
+> >> Maybe memory_global_dirty_log_stop can delay itself to the next vm_sta=
+rt
+> >> if it's called while runstate_running() returns false (which should be
+> >> always the case)?
 > >>
-> >> I'll fix it.
-> >>
-> >> While focusing on something other than block, I forget qemu-iotests
-> >> exist.  My fault, but it's a pretty common fault.  I reiterate my plea
-> >> to include (a sensible subset of) it in "make check".
-> > 
-> > Oh, 051 isn't run by "make check-block".  It could just as well not
-> > exist then.
-> > 
-> > What's the recommended way to run all iotests a build of QEMU can run?
-> 
-> I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
-> 
-> There are two issues with check-block:
-> 
-> * tests that require QEMU are skipped (rationale: you might be building
-> without the x86_64-softmmu target).
-> 
-> * it only runs the "quick" group, but I think we should reverse the
-> direction and mark slow tests specifically (that would cut about 10
-> minutes out of the 20).
+> >> It could even be entirely enclosed within memory.c if you do it with a
+> >> VMChangeStateHandler.
+> > This still causes the BQL to be held for quite a while; albeit at a less
+> > critical point.
+> >=20
+> > In this and the existing case we don't actually need efficiency - what =
+we need is just
+> > not to be holding onto the BQL for so long;  could we do a less
+> > efficient commit here, removing one region at a time, yielding the lock
+> > and retaking it?
+>=20
+> I'm worried that if you release the lock and retake it you open a window
+> where someone else could start a commit, and
+> memory_global_dirty_log_stop's commit would use outdated information.
+>=20
+> The problem is that a coarse lock, such as the BQL, is very hard to
+> break into another lock with long critical sections (a "memory map
+> commit lock" in this case).  It's obviously very easy to say "the new
+> lock nests inside the BQL"... but then, because you created the lock to
+> move things out of the BQL, any callback inside the new lock cannot take
+> the memory map commit lock, and you need to make entire subsystems
+> thread-safe.  If the new lock nests outside the BQL instead, it's
+> simpler to avoid deadlocks, but you need to be careful about releasing
+> the BQL and any reentrancy implications of doing that.
+>=20
+> One strategy that worked well so far has been to use two locks, one of
+> them being the BQL, where you can take either lock for reads and both
+> for writes.
 
-About slow tests: I never included device-crash-test on "make
-check" because it would take too long to run.  Also, "make
-check-help" lies when it says "make check" runs all tests,
-because it doesn't run check-block.
+I guess you could say that in the event someone wants to do something
+with the memory map they have to wait for the cleanup to complete?
 
-Should we add a new Makefile target (check-all?) that includes
-slower tests?
+=46rom a bit of stracing though, it looks like even this isn't enough;
+with a 70G VM:
+we've got a worst case of about 150ms for any one region:
+40430@1501009325.613214:kvm_log_stop_entry
+40430@1501009325.760481:kvm_log_stop_exit
 
--- 
-Eduardo
+of which the actual ioctl is:
+39925      0.000042 ioctl(11, KVM_SET_USER_MEMORY_REGION <unfinished ...>
+=2E..
+39925      0.099510 <... ioctl resumed> , 0x7fb3d11fe660) =3D 0
+
+about 100ms.
+
+but the whole chunk of them is:
+
+40430@1501009325.451807:kvm_log_stop_entry
+40430@1501009325.451893:kvm_log_stop_exit
+40430@1501009325.451899:kvm_log_stop_entry
+=2E....<lots more>....
+40430@1501009325.613214:kvm_log_stop_entry
+40430@1501009325.760481:kvm_log_stop_exit
+
+so that's about 310ms.
+
+So:
+  a) either way we've got 100ms in one syscall even if we could chop
+this into separate operations; so it's still depressingly long.
+  b) Is there anything we can do in the kernel to make it less
+  expensive?
+  c) Could we build a list of KVM_SET_USER_MEMORY_REGION calls
+  that were needed, and perform these in the background
+  while letting the rest of the world carry on?  Any changes
+  cause us to have to wait for completion.
+  d) If this is still something that Jay sees on the new libvirt
+  then we need to do something; so doing it on runtype change seems
+  OKish - but there again ~300ms to restart the VM if the migration
+  fails is objectionable as well.
+
+Dave
+
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
