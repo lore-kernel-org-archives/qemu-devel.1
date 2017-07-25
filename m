@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1da7lU-0002qG-2H
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:53:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1da7nS-0003id-3c
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1da7lQ-0002I5-VS
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:53:16 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 25 Jul 2017 21:53:08 +0000
-Message-ID: <DM2PR21MB00602DE4F811D886C5E5C75C9EB80@DM2PR21MB0060.namprd21.prod.outlook.com>
-References: <DM2PR21MB0060EFC1F6B9F0883A1792369EBB0@DM2PR21MB0060.namprd21.prod.outlook.com>
-	<20170724212327.GA24963@flamenco>
-	<fda73f35-098f-c190-4d15-4363e28872f1@twiddle.net>
-In-Reply-To: <fda73f35-098f-c190-4d15-4363e28872f1@twiddle.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1da7nR-0003Rt-48
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:55:18 -0400
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+	<1500993699-19299-11-git-send-email-pl@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <546c49d1-57c3-7ba7-c0cf-558da609e7a7@redhat.com>
+Date: Tue, 25 Jul 2017 16:55:07 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Torn read/write possible on aarch64/x86-64 MTTCG?
+In-Reply-To: <1500993699-19299-11-git-send-email-pl@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Kcgalba6bgbiCHdgOPPKQdQ5rS2EReAmx"
+Subject: Re: [Qemu-devel] [PATCH V5 10/10] block/qcow2: add compress info to
+ image specific info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrey Shedel <ashedel@microsoft.com>, =?utf-8?B?QWxleCBCZW5u77+9ZQ==?= <alex.bennee@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
-PiBGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiBbbWFpbHRvOnJ0aDc2ODBAZ21haWwuY29tXSBPbiBC
-ZWhhbGYgT2YgUmljaGFyZA0KPiBIZW5kZXJzb24NCj4gU2VudDogTW9uZGF5LCAyNCBKdWx5IDIw
-MTcgMTU6MDMNCj4gDQo+IE9uIDA3LzI0LzIwMTcgMDI6MjMgUE0sIEVtaWxpbyBHLiBDb3RhIHdy
-b3RlOg0KPiA+IChBZGRpbmcgc29tZSBDYydzKQ0KPiA+DQo+ID4gT24gTW9uLCBKdWwgMjQsIDIw
-MTcgYXQgMTk6MDU6MzMgKzAwMDAsIEFuZHJldyBCYXVtYW5uIHZpYSBRZW11LWRldmVsDQo+IHdy
-b3RlOg0KPiA+PiBIaSBhbGwsDQo+ID4+DQo+ID4+IEknbSB0cnlpbmcgdG8gdHJhY2sgZG93biB3
-aGF0IGFwcGVhcnMgdG8gYmUgYSB0cmFuc2xhdGlvbiBidWcgaW4gZWl0aGVyDQo+ID4+IHRoZSBh
-YXJjaDY0IHRhcmdldCBvciB4ODZfNjQgVENHIChpbiBtdWx0aXRocmVhZGVkIG1vZGUpLiBUaGUN
-Cj4gc3ltcHRvbXMNCj4gDQo+IEkgYXNzdW1lIHRoaXMgaXMgcmVhbGx5IHg4Nl82NCBhbmQgbm90
-IGk2ODYgYXMgaG9zdC4NCg0KWWVzLg0KDQo+ID4+IGFyZSBlbnRpcmVseSBjb25zaXN0ZW50IHdp
-dGggYSB0b3JuIHJlYWQvd3JpdGUgLS0gdGhhdCBpcywgYSA2NC1iaXQNCj4gPj4gbG9hZCBvciBz
-dG9yZSB0aGF0IHdhcyB0cmFuc2xhdGVkIHRvIHR3byAzMi1iaXQgbG9hZHMgYW5kIHN0b3JlcyAt
-LQ0KPiA+PiBidXQgdGhhdCdzIG9idmlvdXNseSBub3Qgd2hhdCBoYXBwZW5zIGluIHRoZSBjb21t
-b24gcGF0aCB0aHJvdWdoIHRoZQ0KPiA+PiB0cmFuc2xhdGlvbiBmb3IgdGhpcyBjb2RlLCBzbyBJ
-J20gd29uZGVyaW5nOiBhcmUgdGhlcmUgYW55IGNhc2VzIGluDQo+ID4+IHdoaWNoIHFlbXUgd2ls
-bCBzcGxpdCBhIDY0LWJpdCBtZW1vcnkgYWNjZXNzIGludG8gdHdvIDMyLWJpdCBhY2Nlc3Nlcz8N
-Cj4gPg0KPiA+IFRoYXQgd291bGQgYmUgYSBidWcgaW4gTVRUQ0cuDQo+ID4NCj4gPj4gVGhlIGNv
-ZGU6IEd1ZXN0IENQVSBBIHdyaXRlcyBhIDY0LWJpdCB2YWx1ZSB0byBhbiBhbGlnbmVkIG1lbW9y
-eQ0KPiA+PiBsb2NhdGlvbiB0aGF0IHdhcyBwcmV2aW91c2x5IDAsIHVzaW5nIGEgcmVndWxhciBz
-dG9yZTsgZS5nLjoNCj4gPj4gCWY5MDAwMDM0IHN0cgkgICAgIHgyMCxbeDFdDQo+ID4+DQo+ID4+
-IEd1ZXN0IENQVSBCICh3aG8gaXMgYnVzeS13YWl0aW5nKSByZWFkcyBhIHZhbHVlIGZyb20gdGhl
-IHNhbWUgbG9jYXRpb246DQo+ID4+IAlmOTQwMDI4MCBsZHIJICAgICB4MCxbeDIwXQ0KPiA+Pg0K
-PiA+PiBUaGUgc3ltcHRvbTogQ1BVIEIgbG9hZHMgYSB2YWx1ZSB0aGF0IGlzIG5laXRoZXIgTlVM
-TCBub3IgdGhlIHZhbHVlDQo+ID4+IHdyaXR0ZW4uIEluc3RlYWQsIHgwIGdldHMgb25seSB0aGUg
-bG93IDMyLWJpdHMgb2YgdGhlIHZhbHVlIHdyaXR0ZW4NCj4gPj4gKGhpZ2ggYml0cyBhcmUgYWxs
-IHplcm8pLiBCeSB0aGUgdGltZSB0aGlzIHZhbHVlIGlzIGRlcmVmZXJlbmNlZCAoYQ0KPiA+PiBm
-ZXcgaW5zdHJ1Y3Rpb25zIGxhdGVyKSBhbmQgdGhlIGV4Y2VwdGlvbiBoYW5kbGVycyBydW4sIHRo
-ZSBtZW1vcnkNCj4gPj4gbG9jYXRpb24gZnJvbSB3aGljaCBpdCB3YXMgbG9hZGVkIGhhcyB0aGUg
-Y29ycmVjdCA2NC1iaXQgdmFsdWUgd2l0aA0KPiA+PiBhIG5vbi16ZXJvIHVwcGVyIGhhbGYuDQo+
-ID4+DQo+ID4+IE9idmlvdXNseSBvbiBhIHJlYWwgQVJNIG1lbW9yeSBiYXJyaWVycyBhcmUgY3Jp
-dGljYWwsIGFuZCBpbmRlZWQNCj4gPj4gdGhlIGNvZGUgaGFzIHN1Y2ggYmFycmllcnMgaW4gaXQs
-IGJ1dCBJJ20gYXNzdW1pbmcgdGhhdCBhbnkgcG9zc2libGUNCj4gPj4gbWlzdHJhbnNsYXRpb24g
-b2YgdGhlIGJhcnJpZXJzIGlzIGlycmVsZXZhbnQgYmVjYXVzZSBmb3IgYSA2NC1iaXQgbG9hZA0K
-PiA+PiBhbmQgYSA2NC1iaXQgc3RvcmUgeW91IHNob3VsZCBnZXQgYWxsIG9yIG5vdGhpbmcuIE90
-aGVyIGNsdWVzIHRoYXQgbWF5DQo+ID4+IGJlIHJlbGV2YW50OiB0aGUgY29kZSBpcyBfbmVhcl8g
-YSBMRFJFWC9TVFJFWCBwYWlyICh0aGUgYnVzeS13YWl0aW5nDQo+ID4+IGlzIHVzZWQgdG8gcmVz
-b2x2ZSBhIHJhY2Ugd2hlbiB1cGRhdGluZyBhbm90aGVyIHZhcmlhYmxlKSwgYW5kIHRoZQ0KPiA+
-PiBidXN5LXdhaXQgbG9vcCBoYXMgYSB5aWVsZCBpbnN0cnVjdGlvbiBpbiBpdCAoYWx0aG91Z2gg
-dGhvc2UgYXBwZWFyDQo+ID4+IHRvIGJlIG5vLW9wcyB3aXRoIE1UVENHKS4NCj4gPg0KPiA+IFRo
-aXMgbWlnaHQgaGF2ZSB0byBkbyB3aXRoIGhvdyBsZHJleC9zdHJleCBpcyBlbXVsYXRlZDsgYXJl
-IHlvdSByZWx5aW5nDQo+ID4gb24gdGhlIGV4Y2x1c2l2ZSBwYWlyIGRldGVjdGluZyBBQkE/IElm
-IHNvLCB5b3VyIGNvZGUgd29uJ3Qgd29yayBpbg0KPiA+IFFFTVUgc2luY2UgaXQgdXNlcyBjbXB4
-Y2hnIHRvIGVtdWxhdGUgbGRyZXgvc3RyZXguDQo+IA0KPiBBQkEgcHJvYmxlbSBpcyBub3RoaW5n
-IHRvIGRvIHdpdGggdGVhcmluZy4gIEFuZCBjbXB4Y2hnIHdpbGwgZGVmaW5pdGVseSBub3QNCj4g
-Y3JlYXRlIHRlYXJpbmcgcHJvYmxlbXMuDQoNCkluIGZhY3QsIHRoZSBsZHJleC9zdHJleCBhcmUg
-dGhlcmUgaW1wbGVtZW50aW5nIGEgY21weGNoZy4gOikNCg0KPiBJIGRvbid0IGtub3cgaG93IHdl
-IHdvdWxkIG1hbmFnZSA2NC1iaXQgdGVhcmluZyBvbiBhIDY0LWJpdCBob3N0LCBhdCBsZWFzdA0K
-PiBmb3INCj4gdGhlIGFhcmNoNjQgZ3Vlc3QsIGZvciB3aGljaCBJIGJlbGlldmUgd2UgaGF2ZSBh
-IGdvb2QgZW11bGF0aW9uLg0KPiANCj4gPiAtIFBpbiB0aGUgUUVNVS1NVFRDRyBwcm9jZXNzIHRv
-IGEgc2luZ2xlIENQVS4gQ2FuIHlvdSByZXBybyB0aGVuPw0KPiANCj4gQSBnb29kIHN1Z2dlc3Rp
-b24uDQoNClRoYW5rcyBmb3IgdGhlIHN1Z2dlc3Rpb25zLiBJJ3ZlIGJlZW4gcnVubmluZyB0aGlz
-IGNvbmZpZ3VyYXRpb24gYWxsIGRheSwgYW5kIGhhdmVuJ3Qgc2VlbiBhIHJlcHJvIHlldCBpbiBo
-dW5kcmVkcyBvZiBhdHRlbXB0cy4gSSdsbCByZXBvcnQgaWYgdGhhdCBjaGFuZ2VzLg0KDQpUaGUg
-cHJvYmxlbSBpcyB0aGF0IHRoaXMgdGVzdCBpc24ndCB2ZXJ5IGNvbmNsdXNpdmUuLi4gSSBkb24n
-dCBrbm93IGhvdyBvZnRlbiB0aGUgVkNQVSB0aHJlYWRzIHdpbGwgY29udGV4dCBzd2l0Y2gsIGJ1
-dCBJIHN1c3BlY3QgaXQncyBwcmV0dHkgcmFyZSByZWxhdGl2ZSB0byB0aGUgYWJpbGl0eSB0byBl
-eHBvc2UgcmFjZXMgd2hlbiB0aGV5IHJ1biBkaXJlY3RseSBvbiBkaWZmZXJlbnQgaG9zdCBjb3Jl
-cy4gQW5kIGlmIHRoZSByYWNlIHJlYWxseSBkb2Vzbid0IGV4aXN0IHdoZW4gcnVubmluZyBvbiBh
-IHNpbmdsZSBjb3JlLCB0aGF0IHRvIG1lIHN1Z2dlc3RzIGEgaGFyZHdhcmUgcHJvYmxlbSwgd2hp
-Y2ggaXMgZXZlbiBsZXNzIGxpa2VseS4NCg0KPiA+IC0gRm9yY2UgdGhlIGVtdWxhdGlvbiBvZiBj
-bXB4Y2hnIHZpYSBFWENQX0FUT01JQyB3aXRoOg0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3RjZy90
-Y2ctb3AuYyBiL3RjZy90Y2ctb3AuYw0KPiA+IGluZGV4IDg3ZjY3M2UuLjc3MWVmZmU1IDEwMDY0
-NA0KPiA+IC0tLSBhL3RjZy90Y2ctb3AuYw0KPiA+ICsrKyBiL3RjZy90Y2ctb3AuYw0KPiA+IEBA
-IC0yODU2LDcgKzI4NTYsNyBAQCB2b2lkIHRjZ19nZW5fYXRvbWljX2NtcHhjaGdfaTY0KFRDR3Zf
-aTY0DQo+IHJldHYsIFRDR3YgYWRkciwgVENHdl9pNjQgY21wdiwNCj4gPiAgICAgICAgICAgfQ0K
-PiA+ICAgICAgICAgICB0Y2dfdGVtcF9mcmVlX2k2NCh0MSk7DQo+ID4gICAgICAgfSBlbHNlIGlm
-ICgobWVtb3AgJiBNT19TSVpFKSA9PSBNT182NCkgew0KPiA+IC0jaWZkZWYgQ09ORklHX0FUT01J
-QzY0DQo+ID4gKyNpZiAwDQo+IA0KPiBJIHN1c3BlY3QgdGhpcyB3aWxsIHNpbXBseSBhbHRlciB0
-aGUgdGltaW5nLiAgSG93ZXZlciwgZ2l2ZSBpdCBhIGdvIGJ5IGFsbCBtZWFucy4NCg0KSSBoYXZl
-bid0IHRyaWVkIHRoaXMgeWV0LiBJZiBpdCBiZWhhdmVzIGFzIHlvdSBkZXNjcmliZSwgaXQgc2Vl
-bXMgbGlrZWx5IHRvIG1ha2UgdGhlIHJhY2UgaGFyZGVyIHRvIGhpdC4NCg0KPiBJZiB0aGVyZSdz
-IGEgdGVzdCBjYXNlIHRoYXQgeW91IGNhbiBzaGFyZSwgdGhhdCB3b3VsZCBiZSBhd2Vzb21lLg0K
-DQpJIHdpc2ggd2UgY291bGQgOigNCg0KPiBFc3BlY2lhbGx5IGlmIHlvdSBjYW4gcHJvZCBpdCB0
-byBoYXBwZW4gd2l0aCBhIHN0YW5kYWxvbmUgbWluaW1hbCBiaW5hcnkuICBXaXRoDQo+IGx1Y2sg
-eW91IGNhbiByZXByb2R1Y2UgdmlhIGFhcmNoNjQtbGludXgtdXNlciB0b28sIGFuZCBzaW1wbHkg
-c2lnbmFsIGFuIGVycm9yDQo+IHZpYSBicmFuY2ggdG8gX19idWlsdGluX3RyYXAuDQoNCkluaXRp
-YWwgYXR0ZW1wdHMgdG8gcmVwcm8gdGhpcyB3aXRoIGEgdGlnaHQgbG9vcCBmYWlsZWQsIGJ1dCBJ
-J2xsIHRha2UgYW5vdGhlciBzdGFiIGF0IHByb2R1Y2luZyBhIHN0YW5kYWxvbmUgdGVzdCBwcm9n
-cmFtIHRoYXQgd2UgY2FuIHNoYXJlLg0KDQpBbmRyZXcNCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Kcgalba6bgbiCHdgOPPKQdQ5rS2EReAmx
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
+ den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+Message-ID: <546c49d1-57c3-7ba7-c0cf-558da609e7a7@redhat.com>
+Subject: Re: [PATCH V5 10/10] block/qcow2: add compress info to image specific
+ info
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+ <1500993699-19299-11-git-send-email-pl@kamp.de>
+In-Reply-To: <1500993699-19299-11-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/25/2017 09:41 AM, Peter Lieven wrote:
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  block/qcow2.c        | 7 +++++++
+>  qapi/block-core.json | 6 +++++-
+>  2 files changed, 12 insertions(+), 1 deletion(-)
+>=20
+> +++ b/qapi/block-core.json
+> @@ -68,6 +68,9 @@
+>  # @encrypt: details about encryption parameters; only set if image
+>  #           is encrypted (since 2.10)
+>  #
+> +# @compress: details about parameters for compressed clusters; only se=
+t if
+> +#            the compress format header extension is present (since 2.=
+11)
+
+Thinking aloud:
+
+I still think this is better as "only set if the image uses compressed
+headers" (similar to encrypt).  That is, I would like this output to be
+present even when opening legacy deflate/0/12 images.
+
+But thinking more, what I am REALLY asking for is "if any cluster is
+compressed, then this information is present; if nothing is compressed,
+the choice of compression header doesn't matter".  But we don't have a
+quick-and-dirty way to tell if an image has any compressed clusters,
+short of examining every L2 map (including maps inside internal snapshots=
+).
+
+Hmm - we already have 'Dirty bit' and 'Corrupt bit' as
+incompatible_features that can quickly identify certain image
+properties; do we want another bit set to 1 for images known to use
+compressed clusters?  Or even make it an auto-clear bit (or even a pair
+of auto-clear bits: one to designate that this image was written by a
+new-enough qemu that promises to mark the image if any compressed
+clusters exist, and the other is set only if such clusters do exist;
+that way, if both bits are clear, we know we have to walk L2 tables to
+look for compressed clusters, but if the first bit is set, then the
+second bit is reliable)?
+
+So maybe this means we are still debating spec ideas.  Kevin, do you
+want to chime in?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Kcgalba6bgbiCHdgOPPKQdQ5rS2EReAmx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll3vjwACgkQp6FrSiUn
+Q2pZyQgAldh+87nUcZLX+QM2iyid+dRZV4YJYaQr+TsHXUGOPTiekj6+Y/I++TOJ
+08PEP1dtAqn/+N+JG26i4lvYOUzj1tHjbjzLgcbiG6gmMMGg1NLAJ1YGTwW44eMa
+B6UGPvfFCbtbQY4EHsMbU8xahYn/w2bKrlrfXxltC2BadVR0id1zVQkSfy+anbnX
+mLQZ1AGqEAafj5k0IEjXY2JZ9oXTKybacplsfwGNrR9Wf551NHknMgwh0y3HTNsm
+5898WnLGQna6Y9ohuqX+78QimDbXfTmQy9pO/i19ZrWfHZXVe9XPX5qEJVIaXtFD
+qVpSxSPSlBCP9hrqBgO3FdmJTIv3sA==
+=PiNl
+-----END PGP SIGNATURE-----
+
+--Kcgalba6bgbiCHdgOPPKQdQ5rS2EReAmx--
