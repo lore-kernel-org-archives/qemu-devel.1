@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZyNx-00073O-SV
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:52:23 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dZyPP-00083B-1d
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dZyNu-0002JX-RU
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:52:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33852)
+	(envelope-from <wei.w.wang@intel.com>) id 1dZyPL-0002qm-VU
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:53:51 -0400
+Received: from mga11.intel.com ([192.55.52.93]:51274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dZyNu-0002JL-Kt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:52:18 -0400
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-7-git-send-email-zuban32s@gmail.com>
-	<20170724234138-mutt-send-email-mst@kernel.org>
-	<CAKSfGUDf090V2Q=Vnpxq0S1o+Ho5gp63BKgkzmDMU=HDL7fGHA@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <c3c38eb9-a229-431d-c2e6-fb78b4ad41bd@redhat.com>
-Date: Tue, 25 Jul 2017 14:52:06 +0300
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dZyPL-0002qc-M9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:53:47 -0400
+Message-ID: <597731E8.9040803@intel.com>
+Date: Tue, 25 Jul 2017 19:56:24 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUDf090V2Q=Vnpxq0S1o+Ho5gp63BKgkzmDMU=HDL7fGHA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	<20170714123023.GA2624@dhcp22.suse.cz>
+	<20170714181523-mutt-send-email-mst@kernel.org>
+	<20170717152448.GN12888@dhcp22.suse.cz>
+	<596D6E7E.4070700@intel.com>
+	<20170719081311.GC26779@dhcp22.suse.cz>
+	<596F4A0E.4010507@intel.com>
+	<20170724090042.GF25221@dhcp22.suse.cz>
+	<59771010.6080108@intel.com>
+	<20170725112513.GD26723@dhcp22.suse.cz>
+In-Reply-To: <20170725112513.GD26723@dhcp22.suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 6/6] hw/pci: add hint capabilty for
- additional bus reservation to pcie-root-port
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +38,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Bezzubikov <zuban32s@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
+To: Michal Hocko <mhocko@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On 25/07/2017 0:43, Alexander Bezzubikov wrote:
-> 2017-07-24 23:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
->> On Sun, Jul 23, 2017 at 01:15:43AM +0300, Aleksandr Bezzubikov wrote:
->>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>> ---
->>>   hw/pci-bridge/pcie_root_port.c | 5 +++++
->>>   1 file changed, 5 insertions(+)
->>>
->>> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
->>> index b0e49e1..ca92d85 100644
->>> --- a/hw/pci-bridge/pcie_root_port.c
->>> +++ b/hw/pci-bridge/pcie_root_port.c
->>> @@ -106,6 +106,11 @@ static void rp_realize(PCIDevice *d, Error **errp)
->>>       pcie_aer_root_init(d);
->>>       rp_aer_vector_update(d);
->>>
->>> +    rc = pci_bridge_help_cap_init(d, 0, p->bus_reserve, 0, 0, 0, errp);
->>> +    if (rc < 0) {
->>> +        goto err;
->>> +    }
->>> +
->>>       return;
->>>
->>>   err:
->>
->> It looks like this will add the capability unconditionally to all
->> pcie root ports. Two issues with it:
->> 1. you can't add vendor properties to devices where vendor is
->>     not qemu as they might have their own concept of what it does.
->> 2. this will break compatibility with old machine types,
->>     need to disable for these
->>
-> 
-> Actually the original idea was to add it for pcie-root-port excusively
-> (for now at least), looks like I've confused a little with files naming.
+On 07/25/2017 07:25 PM, Michal Hocko wrote:
+> On Tue 25-07-17 17:32:00, Wei Wang wrote:
+>> On 07/24/2017 05:00 PM, Michal Hocko wrote:
+>>> On Wed 19-07-17 20:01:18, Wei Wang wrote:
+>>>> On 07/19/2017 04:13 PM, Michal Hocko wrote:
+>>> [...
+>>>>> All you should need is the check for the page reference count, no?  I
+>>>>> assume you do some sort of pfn walk and so you should be able to get an
+>>>>> access to the struct page.
+>>>> Not necessarily - the guest struct page is not seen by the hypervisor. The
+>>>> hypervisor only gets those guest pfns which are hinted as unused. From the
+>>>> hypervisor (host) point of view, a guest physical address corresponds to a
+>>>> virtual address of a host process. So, once the hypervisor knows a guest
+>>>> physical page is unsued, it knows that the corresponding virtual memory of
+>>>> the process doesn't need to be transferred in the 1st round.
+>>> I am sorry, but I do not understand. Why cannot _guest_ simply check the
+>>> struct page ref count and send them to the hypervisor?
+>> Were you suggesting the following?
+>> 1) get a free page block from the page list using the API;
+> No. Use a pfn walk, check the reference count and skip those pages which
+> have 0 ref count.
 
-Right, for the Generic PCIe Root Port and not for all the root ports.
-In the future we may want to add it to the PCI-brigde so we can have
-nested bridges, but we are not there yet.
 
-> Will add it for v3.
-> 
+"pfn walk" - do you mean start from the first pfn, and scan all the pfns 
+that the VM has?
 
-Thanks,
-Marcel
 
->>> --
->>> 2.7.4
-> 
-> 
-> 
+> I suspected that you need to do some sort of the pfn
+> walk anyway because you somehow have to evaluate a memory to migrate,
+> right?
+
+
+We don't need to do the pfn walk in the guest kernel. When the API 
+reports, for example,
+a 2MB free page block, the API caller offers to the hypervisor the base 
+address of the page
+block, and size=2MB, to the hypervisor.
+
+The hypervisor maintains a bitmap of all the guest physical memory (a 
+bit corresponds to
+a guest pfn). When migrating memory, only the pfns that are set in the 
+bitmap are transferred
+to the destination machine. So, when the hypervisor receives a 2MB free 
+page block, the
+corresponding bits in the bitmap are cleared.
+
+Best,
+Wei
