@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1da1Bb-0001cB-1N
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:51:48 -0400
+	(envelope-from <mhocko@kernel.org>) id 1da1DV-0003K1-50
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1da1BW-0006Os-5Z
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:51:47 -0400
-Received: from mail-qk0-x22d.google.com ([2607:f8b0:400d:c09::22d]:35693)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1da1BW-0006Of-0m
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:51:42 -0400
-Received: by mail-qk0-x22d.google.com with SMTP id d145so63544794qkc.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:51:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-35-f4bug@amsat.org> <87k22weh78.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <658ad40d-4bef-0da8-f7ea-88ae1bec3f12@amsat.org>
-Date: Tue, 25 Jul 2017 11:51:36 -0300
+	(envelope-from <mhocko@kernel.org>) id 1da1DR-00070d-7v
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:53:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48471 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1da1DR-00070T-0U
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:53:41 -0400
+Date: Tue, 25 Jul 2017 16:53:34 +0200
+From: Michal Hocko <mhocko@kernel.org>
+Message-ID: <20170725145333.GK26723@dhcp22.suse.cz>
+References: <20170717152448.GN12888@dhcp22.suse.cz>
+	<596D6E7E.4070700@intel.com>
+	<20170719081311.GC26779@dhcp22.suse.cz>
+	<596F4A0E.4010507@intel.com>
+	<20170724090042.GF25221@dhcp22.suse.cz>
+	<59771010.6080108@intel.com>
+	<20170725112513.GD26723@dhcp22.suse.cz>
+	<597731E8.9040803@intel.com>
+	<20170725124141.GF26723@dhcp22.suse.cz>
+	<286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87k22weh78.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.10 34/35] docker: add debian
- 'bleeding' image with gcc7 and clang5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 
-On 07/25/2017 11:15 AM, Alex Bennée wrote:
->> +++ b/tests/docker/dockerfiles/debian-bleeding-dev.docker
->> @@ -0,0 +1,94 @@
->> +#
->> +# Docker x86_64 bleeding image
->> +#
->> +# This docker target builds on the debian unstable base image. Further
->> +# libraries which are not widely available are installed by hand.
->> +#
+On Tue 25-07-17 14:47:16, Wang, Wei W wrote:
+> On Tuesday, July 25, 2017 8:42 PM, hal Hocko wrote:
+> > On Tue 25-07-17 19:56:24, Wei Wang wrote:
+> > > On 07/25/2017 07:25 PM, Michal Hocko wrote:
+> > > >On Tue 25-07-17 17:32:00, Wei Wang wrote:
+> > > >>On 07/24/2017 05:00 PM, Michal Hocko wrote:
+> > > >>>On Wed 19-07-17 20:01:18, Wei Wang wrote:
+> > > >>>>On 07/19/2017 04:13 PM, Michal Hocko wrote:
+> > > >>>[...
+> > > We don't need to do the pfn walk in the guest kernel. When the API
+> > > reports, for example, a 2MB free page block, the API caller offers to
+> > > the hypervisor the base address of the page block, and size=2MB, to
+> > > the hypervisor.
+> > 
+> > So you want to skip pfn walks by regularly calling into the page allocator to
+> > update your bitmap. If that is the case then would an API that would allow you
+> > to update your bitmap via a callback be s sufficient? Something like
+> > 	void walk_free_mem(int node, int min_order,
+> > 			void (*visit)(unsigned long pfn, unsigned long nr_pages))
+> > 
+> > The function will call the given callback for each free memory block on the given
+> > node starting from the given min_order. The callback will be strictly an atomic
+> > and very light context. You can update your bitmap from there.
 > 
-> Not for 2.10 please.
+> I would need to introduce more about the background here:
+> The hypervisor and the guest live in their own address space. The hypervisor's bitmap
+> isn't seen by the guest. I think we also wouldn't be able to give a callback function 
+> from the hypervisor to the guest in this case.
 
-Surely not ;) Also unlikely to get merged in mainline...
+How did you plan to use your original API which export struct page array
+then?
 
-[...]
-> There are a lot of moving parts basing this in debian unstable and
-> compiling extra bleeding edge stuff. What does this buy that the clang
-> and toolchain builds in Travis don't already cover?
+> > This would address my main concern that the allocator internals would get
+> > outside of the allocator proper. 
+> 
+> What issue would it have to expose the internal, for_each_zone()?
 
-Bleeding is bleeding :) This is an implicit No Warranty clause...
-It might trigger something useful or give you slow death.
-
-https://wiki.debian.org/DebianUnstable
-"If you are a hardcore developer or tester you should use this release."
-
-https://www.debian.org/doc/manuals/securing-debian-howto/ch10.en.html#s10.1.3
-"you should not use Debian's unstable branch for production-level systems"
+zone is a MM internal concept. No code outside of the MM proper should
+really care about zones. 
+-- 
+Michal Hocko
+SUSE Labs
