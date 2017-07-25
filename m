@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1da5JC-0003pO-2D
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:15:55 -0400
+	(envelope-from <crosa@redhat.com>) id 1da5Ku-0004OU-KD
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1da5J8-00066o-TS
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:15:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:16148)
+	(envelope-from <crosa@redhat.com>) id 1da5Kr-0006b9-Dr
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:17:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1da5J8-000655-Jm
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:15:50 -0400
-Date: Tue, 25 Jul 2017 20:15:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170725191542.GD2820@work-vm>
-References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
-	<20170724153521.GD2127@work-vm>
-	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
-	<20170724190331.GH2127@work-vm>
-	<a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1da5Kr-0006ay-47
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:17:37 -0400
+References: <20170725171014.25193-1-apahim@redhat.com>
+	<20170725171014.25193-5-apahim@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <c043bf9b-84ad-161b-8498-a9d74c419c9a@redhat.com>
+Date: Tue, 25 Jul 2017 15:17:24 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
+In-Reply-To: <20170725171014.25193-5-apahim@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="70UNJ5LwdXWx8l6mQoBWf18Gxo5PNidGm"
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] qemu.py: cleanup launch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +28,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, ldoktor@redhat.com
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 24/07/2017 21:03, Dr. David Alan Gilbert wrote:
-> >> I don't like having such a long-lived mutex (it seems like a recipe for
-> >> deadlocks with the BQL), plus memory_region_transaction_commit (the
-> >> expensive part of memory_global_dirty_log_stop) needs to be under the
-> >> BQL itself because it calls MemoryListeners.
-> >>
-> >> Maybe memory_global_dirty_log_stop can delay itself to the next vm_sta=
-rt
-> >> if it's called while runstate_running() returns false (which should be
-> >> always the case)?
-> >>
-> >> It could even be entirely enclosed within memory.c if you do it with a
-> >> VMChangeStateHandler.
-> > This still causes the BQL to be held for quite a while; albeit at a less
-> > critical point.
-> >=20
-> > In this and the existing case we don't actually need efficiency - what =
-we need is just
-> > not to be holding onto the BQL for so long;  could we do a less
-> > efficient commit here, removing one region at a time, yielding the lock
-> > and retaking it?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--70UNJ5LwdXWx8l6mQoBWf18Gxo5PNidGm
+From: Cleber Rosa <crosa@redhat.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com,
+ ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com,
+ ldoktor@redhat.com
+Message-ID: <c043bf9b-84ad-161b-8498-a9d74c419c9a@redhat.com>
+Subject: Re: [PATCH v5 4/6] qemu.py: cleanup launch()
+References: <20170725171014.25193-1-apahim@redhat.com>
+ <20170725171014.25193-5-apahim@redhat.com>
+In-Reply-To: <20170725171014.25193-5-apahim@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 07/25/2017 01:10 PM, Amador Pahim wrote:
+> launch() is currently taking care of a number of flows, each one if its=
+
+> own exception treatment, depending on the VM state and the files
+> creation state.
 >=20
-> I'm worried that if you release the lock and retake it you open a window
-> where someone else could start a commit, and
-> memory_global_dirty_log_stop's commit would use outdated information.
+> This patch makes launch() more resilient, off-loading the core calls to=
+
+> the new _launch() and calling shutdown() if any exception is raised by
+> _launch(), making sure VM will be terminated and cleaned up.
 >=20
-> The problem is that a coarse lock, such as the BQL, is very hard to
-> break into another lock with long critical sections (a "memory map
-> commit lock" in this case).  It's obviously very easy to say "the new
-> lock nests inside the BQL"... but then, because you created the lock to
-> move things out of the BQL, any callback inside the new lock cannot take
-> the memory map commit lock, and you need to make entire subsystems
-> thread-safe.  If the new lock nests outside the BQL instead, it's
-> simpler to avoid deadlocks, but you need to be careful about releasing
-> the BQL and any reentrancy implications of doing that.
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 42 +++++++++++++++++++++++++-----------------
+>  1 file changed, 25 insertions(+), 17 deletions(-)
 >=20
-> One strategy that worked well so far has been to use two locks, one of
-> them being the BQL, where you can take either lock for reads and both
-> for writes.
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 56142ed59b..45a63e8e9d 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -99,8 +99,11 @@ class QEMUMachine(object):
+>          return self._popen.pid
+> =20
+>      def _load_io_log(self):
+> -        with open(self._qemu_log_path, "r") as fh:
+> -            self._iolog =3D fh.read()
+> +        try:
+> +            with open(self._qemu_log_path, "r") as fh:
+> +                self._iolog =3D fh.read()
+> +        except IOError:
+> +            pass
+> =20
+>      def _base_args(self):
+>          if isinstance(self._monitor_address, tuple):
+> @@ -126,23 +129,28 @@ class QEMUMachine(object):
+>          self._remove_if_exists(self._qemu_log_path)
+> =20
+>      def launch(self):
+> -        '''Launch the VM and establish a QMP connection'''
+> -        devnull =3D open('/dev/null', 'rb')
+> -        qemulog =3D open(self._qemu_log_path, 'wb')
+> +        '''
+> +        Try to launch the VM and make sure we cleanup on exception.
+> +        '''
+> +        if self.is_running():
+> +            return
+> +
+>          try:
+> -            self._pre_launch()
+> -            args =3D self._wrapper + [self._binary] + self._base_args(=
+) + self.args
+> -            self._popen =3D subprocess.Popen(args, stdin=3Ddevnull, st=
+dout=3Dqemulog,
+> -                                           stderr=3Dsubprocess.STDOUT,=
+ shell=3DFalse)
+> -            self._post_launch()
+> +            self._launch()
+>          except:
+> -            if self.is_running():
+> -                self._popen.kill()
+> -                self._popen.wait()
+> -            self._load_io_log()
+> -            self._post_shutdown()
+> +            self.shutdown()
+>              raise
+> =20
+> +    def _launch(self):
+> +        '''Launch the VM and establish a QMP connection.'''
+> +        devnull =3D open('/dev/null', 'rb')
 
-I guess you could say that in the event someone wants to do something
-with the memory map they have to wait for the cleanup to complete?
+Nitpick: using "os.path.devnull" can improve portability.
 
-=46rom a bit of stracing though, it looks like even this isn't enough;
-with a 70G VM:
-we've got a worst case of about 150ms for any one region:
-40430@1501009325.613214:kvm_log_stop_entry
-40430@1501009325.760481:kvm_log_stop_exit
+- Cleber.
 
-of which the actual ioctl is:
-39925      0.000042 ioctl(11, KVM_SET_USER_MEMORY_REGION <unfinished ...>
-=2E..
-39925      0.099510 <... ioctl resumed> , 0x7fb3d11fe660) =3D 0
+> +        qemulog =3D open(self._qemu_log_path, 'wb')
+> +        self._pre_launch()
+> +        args =3D self._wrapper + [self._binary] + self._base_args() + =
+self._args
+> +        self._popen =3D subprocess.Popen(args, stdin=3Ddevnull, stdout=
+=3Dqemulog,
+> +                                       stderr=3Dsubprocess.STDOUT, she=
+ll=3DFalse)
+> +        self._post_launch()
+> +
+>      def shutdown(self):
+>          '''Terminate the VM and clean up'''
+>          if self.is_running():
+> @@ -156,8 +164,8 @@ class QEMUMachine(object):
+>              if exitcode < 0:
+>                  sys.stderr.write('qemu received signal %i\n' % -exitco=
+de)
+> =20
+> -            self._load_io_log()
+> -            self._post_shutdown()
+> +        self._load_io_log()
+> +        self._post_shutdown()
+> =20
+>      underscore_to_dash =3D string.maketrans('_', '-')
+>      def qmp(self, cmd, conv_keys=3DTrue, **args):
+>=20
 
-about 100ms.
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
 
-but the whole chunk of them is:
 
-40430@1501009325.451807:kvm_log_stop_entry
-40430@1501009325.451893:kvm_log_stop_exit
-40430@1501009325.451899:kvm_log_stop_entry
-=2E....<lots more>....
-40430@1501009325.613214:kvm_log_stop_entry
-40430@1501009325.760481:kvm_log_stop_exit
+--70UNJ5LwdXWx8l6mQoBWf18Gxo5PNidGm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-so that's about 310ms.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-So:
-  a) either way we've got 100ms in one syscall even if we could chop
-this into separate operations; so it's still depressingly long.
-  b) Is there anything we can do in the kernel to make it less
-  expensive?
-  c) Could we build a list of KVM_SET_USER_MEMORY_REGION calls
-  that were needed, and perform these in the background
-  while letting the rest of the world carry on?  Any changes
-  cause us to have to wait for completion.
-  d) If this is still something that Jay sees on the new libvirt
-  then we need to do something; so doing it on runtype change seems
-  OKish - but there again ~300ms to restart the VM if the migration
-  fails is objectionable as well.
+iQIcBAEBCAAGBQJZd5lEAAoJEGV+jTOl8gnzFBwQAIBNOG6F9VfDm7ea/XgYAhZb
+eZmlmoJV6WpWCkG9d8oHhmxu6UXuHoNeIHTQkzzLiGnvCBuxEXS1p0rGsOjt4FPp
+4tEYZ7TVA6sKm2ZlsLLUnx7zR0WS2YQ380gEipkD3QHoS3aSmoGmdAHzVRQutjSX
+0kzpBPTTDNHf40qVLBYNJm4207nKEvqUx8cN+hOUdHckaYe+B6jqfbmWKiaAK6GO
+jLFtDD/yulycGADavsV5JgIwPPcPqnatOF0iNak7mKcZ8e9TB9LRXNsAXfXcbFJ0
+nOf+rUnevZFgxD0zsIvRz1HfNnJuVTqjsxd0O2KhPVTzWcF4f+FR2zhyoY/IOeW6
+rzHSLTGu4lHPrIDpVjj2iksJDJrFCqmnY5+UsDzAc6j21tlTADrbfZw36M0ZgOCB
+xknTysmj60XEfY8OnG/strlXdEjXXJ/t8XRxHUuVnRSsBli/nYTn7GffAwwttpci
+MfGZimNJJRab25GQI1n86/9WhNrkAsXqh/nAHlRsrrHKK/QbbjxzFDWWmx2XFyxb
+kG9Em7otZHB4u2MBTDMveYzOk0daLZipzbZnuw0ppbpviHaT64C5z82yXpF1Aamu
+vS9TqJLjV3yBGI95o38ec0HoLFapuTfIuYOkevZthQHmaBb0n3YgwbxyAXBLzp1k
+Xxpq/tyv47DYSlXmlum2
+=LEah
+-----END PGP SIGNATURE-----
 
-Dave
-
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--70UNJ5LwdXWx8l6mQoBWf18Gxo5PNidGm--
