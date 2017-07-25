@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZv31-0000iP-Kd
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1dZv3G-0000wT-PS
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dZv2x-00039Z-MF
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52146)
+	(envelope-from <armbru@redhat.com>) id 1dZv3C-0003Ed-Qv
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZv2x-00039B-Fq
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:27 -0400
-References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
-	<20170724153521.GD2127@work-vm>
-	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
-	<5976F364.1050705@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2abe2c11-a942-ab7c-a6a2-2fd3f8d08ac0@redhat.com>
-Date: Tue, 25 Jul 2017 10:18:06 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZv3C-0003E7-LF
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:42 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-5-f4bug@amsat.org>
+Date: Tue, 25 Jul 2017 10:18:38 +0200
+In-Reply-To: <20170724182751.18261-5-f4bug@amsat.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon,
+	24 Jul 2017 15:27:20 -0300")
+Message-ID: <87d18pudy9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <5976F364.1050705@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 2.10 04/35] ivshmem: fix incorrect
+ error handling in ivshmem_recv_msg()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, rkrcmar@redhat.com
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 25/07/2017 09:29, Jay Zhou wrote:
->>
->>
->> Maybe memory_global_dirty_log_stop can delay itself to the next vm_start
->> if it's called while runstate_running() returns false (which should be
->> always the case)?
-> 
-> It is logical, but then we need to put some migration related codes into
-> the file of cpus.c(in my patch, I put some codes into the file of qmp.c),
-> is there any elegant way to reduce the coupling?
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-See below:
+> If qemu_chr_fe_read_all() returns -EINTR the do {} statement continues an=
+d the
+> n accumulator used to complete reads upto sizeof(msg) is decremented by 4=
+ (the
+> value of EINTR on Linux).
+> To avoid that, use simpler if() statements and continue if EINTR occured.
+>
+> hw/misc/ivshmem.c:650:14: warning: Loss of sign in implicit conversion
+>     } while (n < sizeof(msg));
+>              ^
+>
 
->> It could even be entirely enclosed within memory.c if you do it with a
->> VMChangeStateHandler. 
+Let's add "Screwed up in commit 3a55fc0f, v2.6.0."
 
-If memory_global_dirty_log_stop runs with !runstate_running(), instead
-of doing the memory transaction you set a VMChangeStateHandler and
-return immediately.
+> Reported-by: Clang Static Analyzer
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> get_maintainer.pl: No maintainers found!
+>
+>  hw/misc/ivshmem.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index a58f9ee579..47a015f072 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -642,7 +642,10 @@ static int64_t ivshmem_recv_msg(IVShmemState *s, int=
+ *pfd, Error **errp)
+>      do {
+>          ret =3D qemu_chr_fe_read_all(&s->server_chr, (uint8_t *)&msg + n,
+>                                     sizeof(msg) - n);
+> -        if (ret < 0 && ret !=3D -EINTR) {
+> +        if (ret < 0) {
+> +            if (ret =3D=3D -EINTR) {
+> +                continue;
+> +            }
+>              error_setg_errno(errp, -ret, "read from server failed");
+>              return INT64_MIN;
+>          }
 
-The VMChangeStateHandler then does the actual work just before the VM
-starts running.
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-memory_global_dirty_log_start also needs to delete the
-VMChangeStateHandler if it is present.
-
-Paolo
+Paolo, you taking this through your miscellaneous queue would save me
+(and possibly Peter) a bit of work.  Only if you have something queued
+already.  Let me know.
