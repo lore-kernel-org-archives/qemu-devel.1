@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dZqAv-0003Kh-MJ
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 23:06:22 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZrEl-00028c-W1
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:14:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dZqAs-0002P3-Hr
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 23:06:21 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dZqAs-0002Oq-C8
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 23:06:18 -0400
-Received: by mail-pg0-x242.google.com with SMTP id v190so13333504pgv.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 20:06:18 -0700 (PDT)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-7-git-send-email-clg@kaod.org>
-	<20170724040220.GC17228@umbus.fritz.box>
-	<86b8aca2-ffc9-e912-da00-b64a78cfc338@ozlabs.ru>
-	<ef215827-4d22-7386-d389-d058c6b1f292@kaod.org>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <6d7d541c-613e-9a12-34e1-8de8a2858fe6@ozlabs.ru>
-Date: Tue, 25 Jul 2017 13:06:10 +1000
-MIME-Version: 1.0
-In-Reply-To: <ef215827-4d22-7386-d389-d058c6b1f292@kaod.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 06/26] ppc/xive: introduce a XIVE
- interrupt source model
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZrEi-0000AG-On
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:14:23 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:42432)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZrEh-00005U-JU
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:14:20 -0400
+Date: Tue, 25 Jul 2017 12:14:05 +0800 (CST)
+Message-ID: <201707251214058120036@zte.com.cn>
+References: 1500921322-36875-1-git-send-email-peng.hao2@zte.com.cn,
+	e2d87744-a823-977a-df1f-dc54d664e5e3@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V3=5D_rtc=3A_fix_a_infinite_loop?=
+ =?utf-8?q?_in_windows_vm_startup?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+To: pbonzini@redhat.com
+Cc: mst@redhat.com, qemu-devel@nongnu.org, liu.yi24@zte.com.cn
 
-On 25/07/17 01:20, Cédric Le Goater wrote:
-> On 07/24/2017 08:00 AM, Alexey Kardashevskiy wrote:
->> On 24/07/17 14:02, David Gibson wrote:
->>> On Wed, Jul 05, 2017 at 07:13:19PM +0200, Cédric Le Goater wrote:
->>>> This is very similar to the current ICS_SIMPLE model in XICS. We try
->>>> to reuse the ICS model because the sPAPR machine is tied to the
->>>> XICSFabric interface and should be using a common framework to switch
->>>> from one controller model to another: XICS <-> XIVE.
->>>
->>> Hm.  I'm not entirely concvinced re-using the xics ICSState class in
->>> this way is a good idea, though maybe it's a reasonable first step.
->>> With this patch alone some code is shared, but there are some real
->>> uglies around the edges.
->>
->>
->> Agree, using the "ICS" term in XIVE is quite confusing as "ICS" is not
->> mentioned in neither XIVE nor P9 specs.
-> 
-> Indeed. 
-> 
-> The XIVE specs mention Source Controller (P3SC) or Interrupt 
-> Virtualization Source Engine (IVSE). The sPAPR specs use 
-> Interrupt Source a lot.
-> 
-> Let's unify them all under one name ? I propose ICS :)
-
-
-Too late because it is a part of XICS :) Ben calls them "source
-controller", seems appropriate.
-
-
--- 
-Alexey
+Pk9uIDI0LzA3LzIwMTcgMjA6MzUsIFBlbmcgSGFvIHdyb3RlOg0KDQoNCg0KDQoNCj4+IFdoZW4g
+YSB3aW5kb3dzIHZtIHN0YXJ0cywgcGVyaW9kaWMgdGltZXIgb2YgcnRjIHdpbGwgc3RvcCBzZXZl
+cmFsIHRpbWVzLg0KPj4gd2luZG93cyBrZXJuZWwgd2lsbCBjaGVjayB3aGV0aGVyIFJFR19BX1VJ
+UCBpcyBjaGFuZ2VkLiBSRUdfQydzIGludGVycnVwdA0KPj4gZmxhZ3Mgd2lsbCBub3QgYmUgY2xl
+YXJlZCB3aGVuIHBlcmlvZGljIHRpbWVyIHN0b3BzIGFuZCB0aGUgdXBkYXRlIHRpbWVyDQo+PiB3
+aWxsIHN3aXRjaCB0byBhbGFybSB0aW1lci4gU28gdGhlIGV4cGlyYXRpb24gdGltZSBvZiBhbGFy
+bSB0aW1lciBpcyB2ZXJ5DQo+PiBsb25nIGFuZCBSRUdfQV9VSVAgd2lsbCBub3QgdmFyeS5BdCBs
+YXN0IHdpbmRvd3Mga2VybmVsIHdpbGwgcmVwZWF0IHRvIA0KPj4gY2hlY2sgUkVHX0FfVUlQIGFs
+bCB0aGUgdGltZS4NCg0KPlRoaXMgc2hvdWxkIG5vdCBoYXBwZW4uICBSRUdfQV9VSVAgaXMgc2V0
+IGFuZCBjbGVhcmVkIGluIHJlZ2lzdGVyIEENCj5ldmVyeSBzZWNvbmQsIGxpa2UgdGhpczoNCj4g
+ICAgICAgIGNhc2UgUlRDX1JFR19BOg0KDQo+ICAgICAgICAgICAgaWYgKHVwZGF0ZV9pbl9wcm9n
+cmVzcyhzKSkgew0KPiAgICAgICAgICAgICAgICBzLT5jbW9zX2RhdGFbcy0+Y21vc19pbmRleF0g
+fD0gUkVHX0FfVUlQDQo+ICAgICAgICAgICAgfSBlbHNlIHsNCj4gICAgICAgICAgICAgICAgcy0+
+Y21vc19kYXRhW3MtPmNtb3NfaW5kZXhdICY9IH5SRUdfQV9VSVANCj4gICAgICAgICAgICB9DQo+
+ICAgICAgICAgICAgcmV0ID0gcy0+Y21vc19kYXRhW3MtPmNtb3NfaW5kZXhdDQo+ICAgICAgICAg
+ICAgYnJlYWsNCg0KDQoNCndoZW4gcGVyaW9kaWMgdGltZXIgc3RvcCwgdXBkYXRlIHRpbWVyIGlz
+IHNldCB0byBhIGxvbmcgZXhwaXJlIHRpbWUgKGFzIGFsYXJtIHRpbWVyKS4NCg0KU28gdXBkYXRl
+X2luX3Byb2dyZXNzIGFsd2F5cyByZXR1cm4gMSBhbmQgUkVHX0FfVUlQIGlzIG5ldmVyICBjbGVh
+cmVkLg0KDQo+d2hlcmUgdXBkYXRlX2luX3Byb2dyZXNzIGRvZXM6DQoNCj4gICAgZ3Vlc3RfbnNl
+YyA9IGdldF9ndWVzdF9ydGNfbnMocykNCj4gICAgLyogVUlQIGJpdCB3aWxsIGJlIHNldCBhdCBs
+YXN0IDI0NHVzIG9mIGV2ZXJ5IHNlY29uZC4gKi8NCj4gICAgaWYgKChndWVzdF9uc2VjICUgTkFO
+T1NFQ09ORFNfUEVSX1NFQ09ORCkgPj0NCj4gICAgICAgIChOQU5PU0VDT05EU19QRVJfU0VDT05E
+IC0gVUlQX0hPTERfTEVOR1RIKSkgew0KPiAgICAgICAgcmV0dXJuIDENCj4gICAgfQ0KPiAgICBy
+ZXR1cm4gMA0KDQo+VGhpcyBpcyBkb25lIGV2ZW4gaWYgdGhlIHRpbWVyIGlzIG5vdCBwZW5kaW5n
+Lg0KDQo+SG93IGNhbiB0aGUgYnVnIGJlIHJlcHJvZHVjZWQ/DQoNCm1hbnkgd2luZG93cyBWTXMg
+cmVib290IGF0IHRoZSBzYW1lIHRpbWUuc29tZSBWTSdzIHZjcHUgdGhyZWFkIGdvIHRvIGEgaW5m
+aW5pdGUgbG9vcCANCg0KYXQgdGhlIHN0YXJ0aW5nIHN0YWdlLg0KDQoNCg0KDQoNCj5QYW9sbw0K
+DQo+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4NCj4gU2ln
+bmVkLW9mZi1ieTogTGl1IFlpIDxsaXUueWkyNEB6dGUuY29tLmNuPg0KPiAtLS0NCj4gIGh3L3Rp
+bWVyL21jMTQ2ODE4cnRjLmMgfCA0ICsrKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlv
+bnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody90aW1lci9tYzE0Njgx
+OHJ0Yy5jIGIvaHcvdGltZXIvbWMxNDY4MThydGMuYw0KPiBpbmRleCAxYjhkM2Q3Li5hYTU1ZmFl
+IDEwMDY0NA0KPiAtLS0gYS9ody90aW1lci9tYzE0NjgxOHJ0Yy5jDQo+ICsrKyBiL2h3L3RpbWVy
+L21jMTQ2ODE4cnRjLmMNCj4gQEAgLTQ1Nyw2ICs0NTcsOCBAQCBzdGF0aWMgdm9pZCBydGNfdXBk
+YXRlX3RpbWVyKHZvaWQgKm9wYXF1ZSkNCj4gICAgICBpZiAoKG5ld19pcnFzICYgcy0+Y21vc19k
+YXRhW1JUQ19SRUdfQl0pICE9IDApIHsNCj4gICAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19SRUdf
+Q10gfD0gUkVHX0NfSVJRRg0KPiAgICAgICAgICBxZW11X2lycV9yYWlzZShzLT5pcnEpDQo+ICsg
+ICAgfSBlbHNlIGlmICgocy0+Y21vc19kYXRhW1JUQ19SRUdfQl0gJiBSRUdfQl9VSUUpID09IDAp
+IHsNCj4gKyAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19SRUdfQ10gJj0gflJFR19DX1VGDQo+ICAg
+ICAgfQ0KPiAgICAgIGNoZWNrX3VwZGF0ZV90aW1lcihzKQ0KPiAgfQ0KPiBAQCAtNTU5LDcgKzU2
+MSw3IEBAIHN0YXRpYyB2b2lkIGNtb3NfaW9wb3J0X3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRy
+IGFkZHIsDQo+ICAgICAgICAgICAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19SRUdfQ10gfD0gUkVH
+X0NfSVJRRg0KPiAgICAgICAgICAgICAgICAgIHFlbXVfaXJxX3JhaXNlKHMtPmlycSkNCj4gICAg
+ICAgICAgICAgIH0gZWxzZSB7DQo+IC0gICAgICAgICAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19S
+RUdfQ10gJj0gflJFR19DX0lSUUYNCj4gKyAgICAgICAgICAgICAgICBzLT5jbW9zX2RhdGFbUlRD
+X1JFR19DXSAmPSB+KFJFR19DX1VGIHwgUkVHX0NfSVJRRikNCj4gICAgICAgICAgICAgICAgICBx
+ZW11X2lycV9sb3dlcihzLT5pcnEpDQo+ICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICBz
+LT5jbW9zX2RhdGFbUlRDX1JFR19CXSA9IGRhdGENCj4=
