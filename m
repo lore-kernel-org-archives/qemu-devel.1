@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZrEl-00028c-W1
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:14:25 -0400
+	(envelope-from <pahome.chen@mirlab.org>) id 1dZrQy-0003bq-JF
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:27:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZrEi-0000AG-On
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:14:23 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:42432)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dZrEh-00005U-JU
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:14:20 -0400
-Date: Tue, 25 Jul 2017 12:14:05 +0800 (CST)
-Message-ID: <201707251214058120036@zte.com.cn>
-References: 1500921322-36875-1-git-send-email-peng.hao2@zte.com.cn,
-	e2d87744-a823-977a-df1f-dc54d664e5e3@redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V3=5D_rtc=3A_fix_a_infinite_loop?=
- =?utf-8?q?_in_windows_vm_startup?=
+	(envelope-from <pahome.chen@mirlab.org>) id 1dZrQx-0005me-9P
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:27:00 -0400
+Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:36036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
+	id 1dZrQw-0005lu-Vz
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 00:26:59 -0400
+Received: by mail-ua0-x22c.google.com with SMTP id k43so57376203uaf.3
+	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 21:26:57 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <deb984a7-3d71-9db0-f3fb-eaf12c13064e@redhat.com>
+References: <20170720085958.GC21566@redhat.com>
+	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
+	<20170720091224.GD21566@redhat.com>
+	<CAB3eZfupcH0G+zRBaaE-8OU1JjM3exSOEvYeuOtB1uRUCZ4yiQ@mail.gmail.com>
+	<20170721083816.GC17693@redhat.com>
+	<CAB3eZfu8dhhaxe-MEj+=WFxCCns6prZEjZnjg2rDd_RCmG8x8w@mail.gmail.com>
+	<20170721093433.GG17693@redhat.com>
+	<CAB3eZfuWJGwO1m8SgVr=x6NLtfvZFOuLQEdzs+9K5osStM2nOA@mail.gmail.com>
+	<9959acca-6934-97c0-20a2-ff793d05f526@redhat.com>
+	<18c3027a-d30b-98df-9693-826751f80ea9@redhat.com>
+	<20170721140631.GS17693@redhat.com>
+	<81f2f144-896a-d16e-83da-1fae313ccfff@redhat.com>
+	<CAB3eZfsDUpcYDLogUuz4H-X-petqnc4+hXwkXjO3v1jrRB=r2w@mail.gmail.com>
+	<deb984a7-3d71-9db0-f3fb-eaf12c13064e@redhat.com>
+From: lampahome <pahome.chen@mirlab.org>
+Date: Tue, 25 Jul 2017 12:26:56 +0800
+Message-ID: <CAB3eZft4kBbxfR1L080p7SF5X3XJk1Bmr3Y6uw6z9X4U44tOfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +42,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: mst@redhat.com, qemu-devel@nongnu.org, liu.yi24@zte.com.cn
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Pk9uIDI0LzA3LzIwMTcgMjA6MzUsIFBlbmcgSGFvIHdyb3RlOg0KDQoNCg0KDQoNCj4+IFdoZW4g
-YSB3aW5kb3dzIHZtIHN0YXJ0cywgcGVyaW9kaWMgdGltZXIgb2YgcnRjIHdpbGwgc3RvcCBzZXZl
-cmFsIHRpbWVzLg0KPj4gd2luZG93cyBrZXJuZWwgd2lsbCBjaGVjayB3aGV0aGVyIFJFR19BX1VJ
-UCBpcyBjaGFuZ2VkLiBSRUdfQydzIGludGVycnVwdA0KPj4gZmxhZ3Mgd2lsbCBub3QgYmUgY2xl
-YXJlZCB3aGVuIHBlcmlvZGljIHRpbWVyIHN0b3BzIGFuZCB0aGUgdXBkYXRlIHRpbWVyDQo+PiB3
-aWxsIHN3aXRjaCB0byBhbGFybSB0aW1lci4gU28gdGhlIGV4cGlyYXRpb24gdGltZSBvZiBhbGFy
-bSB0aW1lciBpcyB2ZXJ5DQo+PiBsb25nIGFuZCBSRUdfQV9VSVAgd2lsbCBub3QgdmFyeS5BdCBs
-YXN0IHdpbmRvd3Mga2VybmVsIHdpbGwgcmVwZWF0IHRvIA0KPj4gY2hlY2sgUkVHX0FfVUlQIGFs
-bCB0aGUgdGltZS4NCg0KPlRoaXMgc2hvdWxkIG5vdCBoYXBwZW4uICBSRUdfQV9VSVAgaXMgc2V0
-IGFuZCBjbGVhcmVkIGluIHJlZ2lzdGVyIEENCj5ldmVyeSBzZWNvbmQsIGxpa2UgdGhpczoNCj4g
-ICAgICAgIGNhc2UgUlRDX1JFR19BOg0KDQo+ICAgICAgICAgICAgaWYgKHVwZGF0ZV9pbl9wcm9n
-cmVzcyhzKSkgew0KPiAgICAgICAgICAgICAgICBzLT5jbW9zX2RhdGFbcy0+Y21vc19pbmRleF0g
-fD0gUkVHX0FfVUlQDQo+ICAgICAgICAgICAgfSBlbHNlIHsNCj4gICAgICAgICAgICAgICAgcy0+
-Y21vc19kYXRhW3MtPmNtb3NfaW5kZXhdICY9IH5SRUdfQV9VSVANCj4gICAgICAgICAgICB9DQo+
-ICAgICAgICAgICAgcmV0ID0gcy0+Y21vc19kYXRhW3MtPmNtb3NfaW5kZXhdDQo+ICAgICAgICAg
-ICAgYnJlYWsNCg0KDQoNCndoZW4gcGVyaW9kaWMgdGltZXIgc3RvcCwgdXBkYXRlIHRpbWVyIGlz
-IHNldCB0byBhIGxvbmcgZXhwaXJlIHRpbWUgKGFzIGFsYXJtIHRpbWVyKS4NCg0KU28gdXBkYXRl
-X2luX3Byb2dyZXNzIGFsd2F5cyByZXR1cm4gMSBhbmQgUkVHX0FfVUlQIGlzIG5ldmVyICBjbGVh
-cmVkLg0KDQo+d2hlcmUgdXBkYXRlX2luX3Byb2dyZXNzIGRvZXM6DQoNCj4gICAgZ3Vlc3RfbnNl
-YyA9IGdldF9ndWVzdF9ydGNfbnMocykNCj4gICAgLyogVUlQIGJpdCB3aWxsIGJlIHNldCBhdCBs
-YXN0IDI0NHVzIG9mIGV2ZXJ5IHNlY29uZC4gKi8NCj4gICAgaWYgKChndWVzdF9uc2VjICUgTkFO
-T1NFQ09ORFNfUEVSX1NFQ09ORCkgPj0NCj4gICAgICAgIChOQU5PU0VDT05EU19QRVJfU0VDT05E
-IC0gVUlQX0hPTERfTEVOR1RIKSkgew0KPiAgICAgICAgcmV0dXJuIDENCj4gICAgfQ0KPiAgICBy
-ZXR1cm4gMA0KDQo+VGhpcyBpcyBkb25lIGV2ZW4gaWYgdGhlIHRpbWVyIGlzIG5vdCBwZW5kaW5n
-Lg0KDQo+SG93IGNhbiB0aGUgYnVnIGJlIHJlcHJvZHVjZWQ/DQoNCm1hbnkgd2luZG93cyBWTXMg
-cmVib290IGF0IHRoZSBzYW1lIHRpbWUuc29tZSBWTSdzIHZjcHUgdGhyZWFkIGdvIHRvIGEgaW5m
-aW5pdGUgbG9vcCANCg0KYXQgdGhlIHN0YXJ0aW5nIHN0YWdlLg0KDQoNCg0KDQoNCj5QYW9sbw0K
-DQo+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4NCj4gU2ln
-bmVkLW9mZi1ieTogTGl1IFlpIDxsaXUueWkyNEB6dGUuY29tLmNuPg0KPiAtLS0NCj4gIGh3L3Rp
-bWVyL21jMTQ2ODE4cnRjLmMgfCA0ICsrKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlv
-bnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody90aW1lci9tYzE0Njgx
-OHJ0Yy5jIGIvaHcvdGltZXIvbWMxNDY4MThydGMuYw0KPiBpbmRleCAxYjhkM2Q3Li5hYTU1ZmFl
-IDEwMDY0NA0KPiAtLS0gYS9ody90aW1lci9tYzE0NjgxOHJ0Yy5jDQo+ICsrKyBiL2h3L3RpbWVy
-L21jMTQ2ODE4cnRjLmMNCj4gQEAgLTQ1Nyw2ICs0NTcsOCBAQCBzdGF0aWMgdm9pZCBydGNfdXBk
-YXRlX3RpbWVyKHZvaWQgKm9wYXF1ZSkNCj4gICAgICBpZiAoKG5ld19pcnFzICYgcy0+Y21vc19k
-YXRhW1JUQ19SRUdfQl0pICE9IDApIHsNCj4gICAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19SRUdf
-Q10gfD0gUkVHX0NfSVJRRg0KPiAgICAgICAgICBxZW11X2lycV9yYWlzZShzLT5pcnEpDQo+ICsg
-ICAgfSBlbHNlIGlmICgocy0+Y21vc19kYXRhW1JUQ19SRUdfQl0gJiBSRUdfQl9VSUUpID09IDAp
-IHsNCj4gKyAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19SRUdfQ10gJj0gflJFR19DX1VGDQo+ICAg
-ICAgfQ0KPiAgICAgIGNoZWNrX3VwZGF0ZV90aW1lcihzKQ0KPiAgfQ0KPiBAQCAtNTU5LDcgKzU2
-MSw3IEBAIHN0YXRpYyB2b2lkIGNtb3NfaW9wb3J0X3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRy
-IGFkZHIsDQo+ICAgICAgICAgICAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19SRUdfQ10gfD0gUkVH
-X0NfSVJRRg0KPiAgICAgICAgICAgICAgICAgIHFlbXVfaXJxX3JhaXNlKHMtPmlycSkNCj4gICAg
-ICAgICAgICAgIH0gZWxzZSB7DQo+IC0gICAgICAgICAgICAgICAgcy0+Y21vc19kYXRhW1JUQ19S
-RUdfQ10gJj0gflJFR19DX0lSUUYNCj4gKyAgICAgICAgICAgICAgICBzLT5jbW9zX2RhdGFbUlRD
-X1JFR19DXSAmPSB+KFJFR19DX1VGIHwgUkVHX0NfSVJRRikNCj4gICAgICAgICAgICAgICAgICBx
-ZW11X2lycV9sb3dlcihzLT5pcnEpDQo+ICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICBz
-LT5jbW9zX2RhdGFbUlRDX1JFR19CXSA9IGRhdGENCj4=
+I thought 2.9.0 is the latest and check to the wrong commit.
+Now it supports encryption.
+
+My cmd is:
+
+> qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
+>              --image-opts
+> driver=3Dqcow2,file.filename=3Ddemo.qcow2,encrypt.format=3Dluks,encrypt.k=
+ey-secret=3Dsec0
+
+But it shows error message:
+
+> No encryption in image header, but options specified format 'luks'
+
+Something wrong?
+
+My procedure is below:
+1. create a clean demo.qcow2 image(no compression, no encryption)
+2. use the cmd above to encrypt the demo.qcow2 image
+
+2017-07-24 20:25 GMT+08:00 Eric Blake <eblake@redhat.com>:
+
+> On 07/23/2017 08:49 PM, =E9=99=B3=E5=9F=B9=E6=B3=93 wrote:
+> > I check to the newest version of qemu.
+>
+> You're still top-posting, which makes it really hard to answer your
+> questions.
+>
+> >
+> > and do the cmds to install followed by the documents in github:
+> >
+> >> mkdir build
+> >> cd build
+> >> ../configure
+> >> make
+> >
+> >
+> > and it show nothing errors=E2=80=8B
+> > It's the version when I enter qemu-img --help:
+> >
+> > and I execute encrypt format(luks) to the qcow2 file:
+> >
+> > =E2=80=8B
+>
+> Attaching inline images is a horrible waste of bandwidth, compared to
+> copying-and-pasting the terminal text directly.  Furthermore, your email
+> is illegible in a plain-text client (like what I prefer to use), and
+> requires that I switch to html view to even understand what you are askin=
+g.
+>
+> > always shows the error, how to solve it?=E2=80=8B
+>
+> Transcribing one of your images:
+>
+> > pahome@pahome-QW09:~/git/qemu/build$ ./qemu-img --help
+> > qemu-img version 2.9.0 (v2.9.0-dirty)
+>
+> You aren't building the latest version of qemu.git.  If you were, you'd
+> be getting something like this:
+>
+> $ ./qemu-img --help | head -n1
+> qemu-img version 2.9.50 (v2.9.0-2519-gb52f59694d)
+>
+> Before you can complain that something recently added isn't working, you
+> first have to make sure you are building the right version.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
+>
