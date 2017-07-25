@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1da1Tm-0000GY-R0
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:35 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1da1Tt-0000OA-LW
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1da1Tm-0006sj-0I
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51632)
+	(envelope-from <ldoktor@redhat.com>) id 1da1Tq-0006tm-FI
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1da1Tl-0006sK-JR
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:33 -0400
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1da1Tq-0006tV-0q
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:38 -0400
 From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Tue, 25 Jul 2017 17:09:49 +0200
-Message-Id: <20170725150951.16038-9-ldoktor@redhat.com>
+Date: Tue, 25 Jul 2017 17:09:50 +0200
+Message-Id: <20170725150951.16038-10-ldoktor@redhat.com>
 In-Reply-To: <20170725150951.16038-1-ldoktor@redhat.com>
 References: <20170725150951.16038-1-ldoktor@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 08/10] qmp.py: Avoid "has_key" usage
+Subject: [Qemu-devel] [PATCH v2 09/10] qmp.py: Avoid overriding a builtin
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +30,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
 
-The "has_key" is deprecated in favor of "__in__" operator.
+The "id" is a builtin method to get object's identity and should not be
+overridden. This might bring some issues in case someone was directly
+calling "cmd(..., id=3Did)" but I haven't found such usage on brief searc=
+h
+for "cmd\(.*id=3D".
 
 Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- scripts/qmp/qmp.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/qmp/qmp.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index 95ff5cc..f2f5a9b 100644
+index f2f5a9b..ef12e8a 100644
 --- a/scripts/qmp/qmp.py
 +++ b/scripts/qmp/qmp.py
-@@ -197,7 +197,7 @@ class QEMUMonitorProtocol(object):
-         Build and send a QMP command to the monitor, report errors if an=
-y
-         """
-         ret =3D self.cmd(cmd, kwds)
--        if ret.has_key('error'):
-+        if "error" in ret:
-             raise Exception(ret['error']['desc'])
-         return ret['return']
+@@ -177,19 +177,19 @@ class QEMUMonitorProtocol(object):
+             print >>sys.stderr, "QMP:<<< %s" % resp
+         return resp
 =20
+-    def cmd(self, name, args=3DNone, id=3DNone):
++    def cmd(self, name, args=3DNone, cmd_id=3DNone):
+         """
+         Build a QMP command and send it to the QMP Monitor.
+=20
+         @param name: command name (string)
+         @param args: command arguments (dict)
+-        @param id: command id (dict, list, string or int)
++        @param cmd_id: command id (dict, list, string or int)
+         """
+         qmp_cmd =3D {'execute': name}
+         if args:
+             qmp_cmd['arguments'] =3D args
+-        if id:
+-            qmp_cmd['id'] =3D id
++        if cmd_id:
++            qmp_cmd['id'] =3D cmd_id
+         return self.cmd_obj(qmp_cmd)
+=20
+     def command(self, cmd, **kwds):
 --=20
 2.9.4
