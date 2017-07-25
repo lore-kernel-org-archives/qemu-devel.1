@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dZy8W-000260-JP
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:36:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1dZy8z-0002J3-4z
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dZy8T-0003Ao-Fw
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:36:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52044)
+	(envelope-from <berrange@redhat.com>) id 1dZy8v-0003WV-VO
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:36:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dZy8T-0003AH-6N
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:36:21 -0400
-References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b64e52eb-47ca-7264-0e09-1dc9b3794e92@redhat.com>
-Date: Tue, 25 Jul 2017 13:36:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1706296] [NEW] Booting NT 4 disk causes
- /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
- (!qemu_mutex_iothread_locked())
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZy8v-0003WM-Mf
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:36:49 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 25 Jul 2017 12:36:38 +0100
+Message-Id: <20170725113638.7019-1-berrange@redhat.com>
+In-Reply-To: <20170725112656.30122-1-berrange@redhat.com>
+References: <20170725112656.30122-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 (for 2.10) 1/1] docs: document deprecation
+ policy & deprecated features in appendix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +24,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1706296 <1706296@bugs.launchpad.net>, qemu-devel@nongnu.org
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>, KONRAD Frederic <fred.konrad@greensocs.com>, Pranith Kumar <bobby.prani@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 25.07.2017 11:30, Richard Jones wrote:
-> ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: asserti=
-on failed: (!qemu_mutex_iothread_locked())
-> Aborted (core dumped)
->=20
-> The stack trace in the failing thread is:
->=20
-> Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
-> #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
-> #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
-> #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.=
-so.0
-> #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
->     at /lib64/libglib-2.0.so.0
-> #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
->     at /home/rjones/d/qemu/cpus.c:1580
-> #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, =
-iotlbentry=3D0x55555675b678,=20
->     iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Dadd=
-r@entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3D=
-size@entry=3D4)
->     at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
-> #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D2=
-148532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
->     at /home/rjones/d/qemu/softmmu_template.h:265
-> #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x555556=
-751400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimi=
-zed out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/=
-qemu/softmmu_template.h:300
-> #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
-2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_l=
-dst_template.h:182
-> #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized ou=
-t>, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>,=
- intno=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/ta=
-rget/i386/seg_helper.c:758
-> #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x5555567=
-49170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2,=
- next_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/q=
-emu/target/i386/seg_helper.c:1252
-> #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
->     at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
-> #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointe=
-r>, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
-> #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
->     at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
-> #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
->     at /home/rjones/d/qemu/cpus.c:1270
-> #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized o=
-ut>)
->     at /home/rjones/d/qemu/cpus.c:1365
-> #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
-> #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
+The deprecation of features in QEMU is totally adhoc currently,
+with no way for the user to get a list of what is deprecated
+in each release. This adds an appendix to the doc that records
+when each deprecation was made and provides text explaining
+what to use instead, if anything.
 
-Looks like the iothread lock is taken twice here, one time in
-accel/tcg/cpu-exec.c around line 465 and one time in
-accel/tcg/cputlb.c:795 again.
+Since there has been no formal policy around removal of deprecated
+features in the past, any deprecations prior to 2.10.0 are to be
+treated as if they had been made at the 2.10.0 release. Thus the
+earliest that existing deprecations will be deleted is the start
+of the 2.12.0 cycle.
 
-If I've get that right, the locks have been added by this commit here:
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-doc.texi | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
 
- 8d04fb55dec381bc5105cb47f29d918e579e8cbd
- tcg: drop global lock during TCG code execution
-
-so this looks related to the MTTCG reworks that happened recently. I
-hope one of the MTTCG gurus has some spare time to look at this...
-
- Thomas
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 48af5155c7..aeb7bc52f5 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -38,6 +38,7 @@
+ * QEMU Guest Agent::
+ * QEMU User space emulator::
+ * Implementation notes::
++* Deprecated features::
+ * License::
+ * Index::
+ @end menu
+@@ -3128,6 +3129,180 @@ Run the emulation in single step mode.
+ 
+ @include qemu-tech.texi
+ 
++@node Deprecated features
++@appendix Deprecated features
++
++In general features are intended to be supported indefinitely once
++introduced into QEMU. In the event that a feature needs to be removed,
++it will be listed in this appendix. The feature will remain functional
++for 2 releases prior to actual removal. Deprecated features may also
++generate warnings on the console when QEMU starts up, or if activated
++via a monitor command, however, this is not a mandatory requirement.
++
++Prior to the 2.10.0 release there was no official policy on how
++long features would be deprecated prior to their removal, nor
++any documented list of which features were deprecated. Thus
++any features deprecated prior to 2.10.0 will be treated as if
++they were first deprecated in the 2.10.0 release.
++
++What follows is a list of all features currently marked as
++deprecated.
++
++@section System emulator command line arguments
++
++@subsection -drive boot=on|off (since 1.3.0)
++
++The ``boot=on|off'' option to the ``-drive'' argument is
++ignored. Applications should use the ``bootindex=N'' parameter
++to set an absolute ordering between devices instead.
++
++@subsection -tdf (since 1.3.0)
++
++The ``-tdf'' argument is ignored. The behaviour implemented
++by this argument is now the default when using the KVM PIT,
++but can be requested explicitly using
++``-global kvm-pit.lost_tick_policy=slew''.
++
++@subsection -no-kvm-pit-reinjection (since 1.3.0)
++
++The ``-no-kvm-pit-reinjection'' argument is now a
++synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
++
++@subsection -no-kvm-irqchip (since 1.3.0)
++
++The ``-no-kvm-irqchip'' argument is now a synonym for
++setting ``-machine kernel_irqchip=off''.
++
++@subsection -no-kvm-pit (since 1.3.0)
++
++The ``-no-kvm-pit'' argument is ignored. It is no longer
++possible to disable the KVM PIT directly.
++
++@subsection -no-kvm (since 1.3.0)
++
++The ``-no-kvm'' argument is now a synonym for setting
++``-machine accel=tcg''.
++
++@subsection -mon default=on (since 2.4.0)
++
++The ``default'' option to the ``-mon'' argument is
++now ignored. When multiple monitors were enabled, it
++indicated which monitor would receive log messages
++from the various subsystems. This feature is no longer
++required as messages are now only sent to the monitor
++in response to explicitly monitor commands.
++
++@subsection -vnc tls (since 2.5.0)
++
++The ``-vnc tls'' argument is now a synonym for setting
++``-object tls-creds-anon,id=tls0'' combined with
++``-vnc tls-creds=tls0'
++
++@subsection -vnc x509 (since 2.5.0)
++
++The ``-vnc x509=/path/to/certs'' argument is now a
++synonym for setting
++``-object tls-creds-x509,dir=/path/to/certs,id=tls0,verify-peer=no''
++combined with ``-vnc tls-creds=tls0'
++
++@subsection -vnc x509verify (since 2.5.0)
++
++The ``-vnc x509verify=/path/to/certs'' argument is now a
++synonym for setting
++``-object tls-creds-x509,dir=/path/to/certs,id=tls0,verify-peer=yes''
++combined with ``-vnc tls-creds=tls0'
++
++@subsection -tftp (since 2.6.0)
++
++The ``-tftp /some/dir'' argument is now a synonym for setting
++the ``-netdev user,tftp=/some/dir' argument. The new syntax
++allows different settings to be provided per NIC.
++
++@subsection -bootp (since 2.6.0)
++
++The ``-bootp /some/file'' argument is now a synonym for setting
++the ``-netdev user,bootp=/some/file' argument. The new syntax
++allows different settings to be provided per NIC.
++
++@subsection -redir (since 2.6.0)
++
++The ``-redir ARGS'' argument is now a synonym for setting
++the ``-netdev user,hostfwd=ARGS'' argument instead. The new
++syntax allows different settings to be provided per NIC.
++
++@subsection -smb (since 2.6.0)
++
++The ``-smb /some/dir'' argument is now a synonym for setting
++the ``-netdev user,smb=/some/dir'' argument instead. The new
++syntax allows different settings to be provided per NIC.
++
++@subsection -net channel (since 2.6.0)
++
++The ``--net channel,ARGS'' argument is now a synonym for setting
++the ``-netdev user,guestfwd=ARGS'' argument instead.
++
++@subsection -net vlan (since 2.9.0)
++
++The ``-net van=NN'' argument is partially replaced with the
++new ``-netdev'' argument. The remaining use cases will no
++longer be directly supported in QEMU.
++
++@subsection -drive if=scsi (since 2.9.0)
++
++The ``-drive if=scsi'' argument is replaced by the the
++``-device BUS-TYPE'' argument combined with ``-drive if=none''.
++
++@subsection -net dump (since 2.10.0)
++
++The ``--net dump'' argument is now replaced with the
++``-object filter-dump'' argument which works in combination
++with the modern ``-netdev`` backends instead.
++
++@subsection -hdachs (since 2.10.0)
++
++The ``-hdachs'' argument is now a synonym for setting
++the ``cyls'', ``heads'', ``secs'', and ``trans'' properties
++on the ``ide-hd'' device using the ``-device'' argument.
++The new syntax allows different settings to be provided
++per disk.
++
++@subsection -usbdevice (since 2.10.0)
++
++The ``-usbdevice DEV'' argument is now a synonym for setting
++the ``-device usb-DEV'' argument instead. The deprecated syntax
++would automatically enable USB support on the machine type.
++If using the new syntax, USB support must be explicitly
++enabled via the ``-machine usb=on'' argument.
++
++@section qemu-img command line arguments
++
++@subsection convert -s (since 2.0.0)
++
++The ``convert -s snapshot_id_or_name'' argument is obsoleted
++by the ``convert -l snapshot_param'' argument instead.
++
++@section System emulator human monitor commands
++
++@subsection usb_add (since 2.10.0)
++
++The ``usb_add'' command is replaced by the ``device_add'' command.
++
++@subsection usb_del (since 2.10.0)
++
++The ``usb_del'' command is replaced by the ``device_del'' command.
++
++@section System emulator devices
++
++@subsection ivshmem (since 2.6.0)
++
++The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
++or ``ivshmem-doorbell`` device types.
++
++@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
++
++The ``spapr-pci-vfio-host-bridge'' device type is replaced by
++the ``spapr-pci-host-bridge'' device type.
++
+ @node License
+ @appendix License
+ 
+-- 
+2.13.3
