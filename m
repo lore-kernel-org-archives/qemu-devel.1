@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46821)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1da3JT-0007NC-1n
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:08:07 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47182)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pbonzini@redhat.com>) id 1da3Lp-00007K-Iq
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1da3JO-0003yl-0v
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:08:03 -0400
-Received: from mout.gmx.net ([212.227.15.15]:54572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1da3JN-0003xv-LL
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:07:57 -0400
-References: <504798a0-0ac3-bfab-a451-2eb0cfca43ff@amsat.org>
-	<66ff3f38-b62b-ca59-e155-d9e4f67693aa@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <10a92bb8-3798-830e-47c7-1485eea9174d@gmx.com>
-Date: Tue, 25 Jul 2017 19:10:04 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1da3Ll-0004tL-Bq
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:10:29 -0400
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:33789)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1da3Ll-0004tB-0S
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:10:25 -0400
+Received: by mail-wr0-f173.google.com with SMTP id v105so91532066wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 10:10:24 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+	<20170721110636.19412e6c@nial.brq.redhat.com>
+	<20170721092338.GE17693@redhat.com>
+	<20170721143432.0e888800@nial.brq.redhat.com>
+	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
+	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
+	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
+Message-ID: <a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
+Date: Tue, 25 Jul 2017 19:10:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <66ff3f38-b62b-ca59-e155-d9e4f67693aa@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2CDIC1jhaBtpjToNvPDhmLxkIv8Bhaho5"
-Subject: Re: [Qemu-devel] MAINTAINERS: surprising get_maintainer.pl output
- for ./configure
+In-Reply-To: <165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +37,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>, Gerd Hoffmann <kraxel@redhat.com>, "seabios@seabios.org" <seabios@seabios.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2CDIC1jhaBtpjToNvPDhmLxkIv8Bhaho5
-From: Kamil Rytarowski <n54@gmx.com>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <10a92bb8-3798-830e-47c7-1485eea9174d@gmx.com>
-Subject: Re: [Qemu-devel] MAINTAINERS: surprising get_maintainer.pl output for
- ./configure
-References: <504798a0-0ac3-bfab-a451-2eb0cfca43ff@amsat.org>
- <66ff3f38-b62b-ca59-e155-d9e4f67693aa@redhat.com>
-In-Reply-To: <66ff3f38-b62b-ca59-e155-d9e4f67693aa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 25.07.2017 07:48, Thomas Huth wrote:
-> On 25.07.2017 00:40, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi perl gurus :)
+On 25/07/2017 18:23, Paolo Bonzini wrote:
+> On 25/07/2017 18:14, Laszlo Ersek wrote:
+>>   "No regressions became apparent in tests with a range of Windows
+>>    (XP-10)"
 >>
->> after changing the ./configure I wanted to figure to whom email and go=
-t
->> this:
->>
->> $ ./scripts/get_maintainer.pl -f configure
->> Kamil Rytarowski <kamil@netbsd.org> (maintainer:NETBSD)
->> qemu-devel@nongnu.org (open list:All patches CC here)
->>
->> $ fgrep -A5 NETBSD MAINTAINERS
->> NETBSD
->> L: qemu-devel@nongnu.org
->> M: Kamil Rytarowski <kamil@netbsd.org>
->> S: Maintained
->> K: (?i)NetBSD
->>
->> Descriptions of section entries:
->>
->>   K: Keyword perl extended regex pattern to match
->>      content in a patch or file.
->>
->> $ fgrep -inA1 NetBSD configure
->> 547:elif check_define __NetBSD__; then
->> 548:  targetos=3D'NetBSD'
->> --=20
->> 709:NetBSD)
->> 710-  bsd=3D"yes"
->> --=20
->> 715:  HOST_VARIANT_DIR=3D"netbsd"
->> 716-  supported_os=3D"yes"
->>
->> since ./configure check for NetBSD host/target, the string appears in
->> the ./configure and the K regex is matched...
->>
->> I tried to add a 'F: configure' in NETBSD entry but it doesn't change.=
+>> In theory, w2k falls within that range.
+> 
+> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
+> 
+> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
+> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
+> patching the RSDT to point to it.
+> 
+> It's a hack, but it's the only place I see to make it "just work".  And
+> it could be extended nicely in the future.
+> 
+> All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.
 
->> The easier is to kill the K entry :)
->=20
-> But without the K: entry there is no more pattern for this entry at all=
+Completely untested code follows.  Machine type compatibility code 
+should not be necessary because new QEMU always starts with a new BIOS.
 
-> anymore - since there are also no F: entries here.
->=20
-> I'd suggest to do it the same way as the "Trivial patches" entry:
->=20
-> K: ^Subject:.*(?i)NetBSD
->=20
-> ... then it should hopefully only trigger on patch titles.
->=20
-> Philippe, Kamil, if one of you has got some spare minutes, could you
-> please send a patch?
->=20
->  Thomas
->=20
+Not sure I'll have much time for this in the next few days, so help
+is appreciated.
 
-I don't have preference here. I'm fine either way.
+Paolo
+
+QEMU:
+
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 36a6cc450e..ea750d54d9 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1573,33 +1573,6 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+     g_array_free(tables->vmgenid, mfre);
+ }
+ 
+-/* Build rsdt table */
+-void
+-build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+-           const char *oem_id, const char *oem_table_id)
+-{
+-    int i;
+-    unsigned rsdt_entries_offset;
+-    AcpiRsdtDescriptorRev1 *rsdt;
+-    const unsigned table_data_len = (sizeof(uint32_t) * table_offsets->len);
+-    const unsigned rsdt_entry_size = sizeof(rsdt->table_offset_entry[0]);
+-    const size_t rsdt_len = sizeof(*rsdt) + table_data_len;
+-
+-    rsdt = acpi_data_push(table_data, rsdt_len);
+-    rsdt_entries_offset = (char *)rsdt->table_offset_entry - table_data->data;
+-    for (i = 0; i < table_offsets->len; ++i) {
+-        uint32_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
+-        uint32_t rsdt_entry_offset = rsdt_entries_offset + rsdt_entry_size * i;
+-
+-        /* rsdt->table_offset_entry to be filled by Guest linker */
+-        bios_linker_loader_add_pointer(linker,
+-            ACPI_BUILD_TABLE_FILE, rsdt_entry_offset, rsdt_entry_size,
+-            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
+-    }
+-    build_header(linker, table_data,
+-                 (void *)rsdt, "RSDT", rsdt_len, 1, oem_id, oem_table_id);
+-}
+-
+ /* Build xsdt table */
+ void
+ build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 6b7bade183..ad00f6affd 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2557,12 +2557,12 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+ }
+ 
+ static GArray *
+-build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
++build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+ {
+     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+-    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
+-    unsigned rsdt_pa_offset =
+-        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
++    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
++    unsigned xsdt_pa_offset =
++        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
+ 
+     bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
+                              true /* fseg memory */);
+@@ -2571,8 +2571,8 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+     memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
+     /* Address to be filled by Guest linker */
+     bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
+-        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
++        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
++        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+ 
+     /* Checksum to be filled by Guest linker */
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+@@ -2621,7 +2621,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     PCMachineState *pcms = PC_MACHINE(machine);
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     GArray *table_offsets;
+-    unsigned facs, dsdt, rsdt, fadt;
++    unsigned facs, dsdt, xsdt, fadt;
+     AcpiPmInfo pm;
+     AcpiMiscInfo misc;
+     AcpiMcfgInfo mcfg;
+@@ -2730,12 +2730,12 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     }
+ 
+     /* RSDT is pointed to by RSDP */
+-    rsdt = tables_blob->len;
+-    build_rsdt(tables_blob, tables->linker, table_offsets,
++    xsdt = tables_blob->len;
++    build_xsdt(tables_blob, tables->linker, table_offsets,
+                slic_oem.id, slic_oem.table_id);
+ 
+     /* RSDP is in FSEG memory, so allocate it separately */
+-    build_rsdp(tables->rsdp, tables->linker, rsdt);
++    build_rsdp(tables->rsdp, tables->linker, xsdt);
+ 
+     /* We'll expose it all to Guest so we want to reduce
+      * chance of size changes.
 
 
---2CDIC1jhaBtpjToNvPDhmLxkIv8Bhaho5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+SeaBIOS:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+>From 73b0facdb7349f5dbf24dc675647b68eeeec0ff4 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 25 Jul 2017 18:50:19 +0200
+Subject: [PATCH 1/2] seabios: build RSDT from XSDT
 
-iQIcBAEBCAAGBQJZd3tyAAoJEEuzCOmwLnZsDV8P/ArVGu5Vd9YL4azQmXH072rK
-4Q4bTKdSnSWCM0iTc07z6FXhCReTeT0Q4SggMo92KgN79qZx0UxMD4cP8pMPU+lt
-8xFUIohFdb+s2a8H1h+RK++rqF7gLKs1UReNTzbIhN8CEpB5OutArurHMQznh95T
-r8HM2Q/0L324QOif7RtBansYatRhHIqisWg77/tuoNs6Rd+/ffRQD6bV1NyqGlwL
-x8xz3Rw4o09q8/m0i7yu2qoRRSWmnOYaceFbs0bdvV0hJqj31/aIlmqLPfoqe0e/
-WEAW55GWfLHEflQ2UqPO7yrhoRo9PwblubiuvIoMxiwEAjcWDO/wieGIWTQS4JIa
-G5ayJQIQlhn624poJDsZDpSa2mMFaqzgB+Q44O/LV2wg7+imxsHtA/eXrew5RBKc
-K7NuDr3+VnOYfGT71ka0SZXEqxQGuSFY8w/FIfMmbWAjZvsRdkWJBoUIEwf/fIxN
-50Z2glyvDmnU4IavKXi4y2hogmkccEO+B7UjgHKsg2GprVJFVX55YONm+CWXJaWk
-kD7LTw3BZxu0M6USBXwjI89JyVVzCuEugR3+bUqLbeeRVNWJ461hNacChp8c01zL
-yXk/9j+EzN/MTC6gxLa5d8uqH4cWW9HkMc5BCGRtj9UjjYeThzJhat3AMH1gOVYW
-ZvsRNzYT15vCFtA0DqRK
-=sSmf
------END PGP SIGNATURE-----
+Old operating systems would like to have a v1 FADT, but new
+operating systems would like to have v3.
 
---2CDIC1jhaBtpjToNvPDhmLxkIv8Bhaho5--
+Since old operating systems do not know about XSDTs, the
+solution is to point the RSDT to a v1 FADT and the XSDT to a
+v3 FADT.
+
+But, OVMF is not able to do that and barfs when it sees the
+second FADT---plus really it's only BIOS operating systems
+such as win2k that complain.  So instead: 1) make QEMU provide
+an XSDT only; 2) build the RSDT and v1 FADT in SeaBIOS.
+
+This patch makes SeaBIOS build an RSDT out of an existing XSDT.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ src/fw/paravirt.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ src/std/acpi.h    | 11 +++++++++++
+ 2 files changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
+index 5b23d78..19a4abe 100644
+--- a/src/fw/paravirt.c
++++ b/src/fw/paravirt.c
+@@ -25,6 +25,7 @@
+ #include "x86.h" // cpuid
+ #include "xen.h" // xen_biostable_setup
+ #include "stacks.h" // yield
++#include "std/acpi.h"
+ 
+ // Amount of continuous ram under 4Gig
+ u32 RamSize;
+@@ -147,6 +148,46 @@ static void msr_feature_control_setup(void)
+         wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
+ }
+ 
++static void
++build_compatibility_rsdt(void)
++{
++    if (RsdpAddr->rsdt_physical_address)
++        return;
++
++    u64 xsdt_addr = RsdpAddr->xsdt_physical_address;
++    if (xsdt_addr & ~0xffffffffULL)
++        return;
++
++    struct xsdt_descriptor_rev1 *xsdt = (void*)(u32)xsdt_addr;
++    void *end = (void*)xsdt + xsdt->length;
++    struct rsdt_descriptor_rev1 *rsdt;
++    int rsdt_size = offsetof(struct rsdt_descriptor_rev1, table_offset_entry[0]);
++    int i;
++    for (i=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
++        u64 tbl_addr = xsdt->table_offset_entry[i];
++        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
++            continue;
++        rsdt_size += 4;
++    }
++
++    rsdt = malloc_high(rsdt_size);
++    RsdpAddr->rsdt_physical_address = (u32)rsdt;
++
++    memcpy(rsdt, xsdt, sizeof(struct acpi_table_header));
++    rsdt->signature = RSDT_SIGNATURE;
++    rsdt->length = rsdt_size;
++    rsdt->revision = 1;
++    int j;
++    for (i=j=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
++        u64 tbl_addr = xsdt->table_offset_entry[i];
++        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
++            continue;
++        rsdt->table_offset_entry[j++] = (u32)tbl_addr;
++    }
++
++    rsdt->checksum -= checksum(rsdt, rsdt_size);
++}
++
+ void
+ qemu_platform_setup(void)
+ {
+@@ -186,8 +227,10 @@ qemu_platform_setup(void)
+ 
+         RsdpAddr = find_acpi_rsdp();
+ 
+-        if (RsdpAddr)
++        if (RsdpAddr) {
++            build_compatibility_rsdt();
+             return;
++        }
+ 
+         /* If present, loader should have installed an RSDP.
+          * Not installed? We might still be able to continue
+diff --git a/src/std/acpi.h b/src/std/acpi.h
+index c2ea707..caf5e7e 100644
+--- a/src/std/acpi.h
++++ b/src/std/acpi.h
+@@ -133,6 +133,17 @@ struct rsdt_descriptor_rev1
+ } PACKED;
+ 
+ /*
++ * ACPI 2.0 Root System Description Table (RSDT)
++ */
++#define XSDT_SIGNATURE 0x54445358 // RSDT
++struct xsdt_descriptor_rev1
++{
++    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
++    u64 table_offset_entry[0];  /* Array of pointers to other */
++    /* ACPI tables */
++} PACKED;
++
++/*
+  * ACPI 1.0 Firmware ACPI Control Structure (FACS)
+  */
+ #define FACS_SIGNATURE 0x53434146 // FACS
+-- 
+2.13.3
+
+
+>From 46c7a296d27bd487cfd89a40973b1e61426dfbd0 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 25 Jul 2017 18:59:20 +0200
+Subject: [PATCH 2/2] seabios: create v1 FADT in compatibility RSDT
+
+This patch presents a v1 FADT inside the compatibility RSDT, so
+that old operating systems are not broken.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ src/fw/paravirt.c | 18 +++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
+index 19a4abe..a9b9e80 100644
+--- a/src/fw/paravirt.c
++++ b/src/fw/paravirt.c
+@@ -148,6 +148,18 @@ static void msr_feature_control_setup(void)
+         wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
+ }
+ 
++static void*
++build_rev1_fadt(struct fadt_descriptor_rev1 *fadt_v3)
++{
++    struct fadt_descriptor_rev1 *fadt_v1 = malloc_high(sizeof *fadt_v1);
++
++    memcpy(fadt_v1, fadt_v3, sizeof *fadt_v1);
++    fadt_v1->length = sizeof *fadt_v1;
++    fadt_v1->revision = 1;
++    fadt_v1->checksum -= checksum(fadt_v1, fadt_v1->length);
++    return fadt_v1;
++}
++
+ static void
+ build_compatibility_rsdt(void)
+ {
+@@ -182,6 +194,12 @@ build_compatibility_rsdt(void)
+         u64 tbl_addr = xsdt->table_offset_entry[i];
+         if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
+             continue;
++        struct acpi_table_header *tbl = (void*)(u32)tbl_addr;
++        /* The RSDT should only have an ACPI 1.0 FADT according to
++         * the spec.
++         */
++        if (tbl->signature == FACP_SIGNATURE && tbl->revision > 1)
++            tbl_addr = (u32)build_rev1_fadt((void *)tbl);
+         rsdt->table_offset_entry[j++] = (u32)tbl_addr;
+     }
+ 
+-- 
+2.13.3
