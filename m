@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1da1pt-0008Ja-K9
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1da1qH-00005l-UJ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1da1ps-0007qd-GL
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:25 -0400
-References: <20170714123341.373857-1-vsementsov@virtuozzo.com>
-	<b9f574d1-91b5-c5dc-46b2-1a8976c5539f@redhat.com>
-	<f8f9bbae-2440-b2e0-b0dd-0c407515e736@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3b0bb163-8852-cb12-9eb7-8524c9b1e02a@redhat.com>
-Date: Tue, 25 Jul 2017 10:33:13 -0500
-MIME-Version: 1.0
-In-Reply-To: <f8f9bbae-2440-b2e0-b0dd-0c407515e736@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IQ6h8DMknNTIwPr9s2GmJXEhkRiNEUKEq"
-Subject: Re: [Qemu-devel] [PATCH] qcow2-bitmap: fix bitmap_free
+	(envelope-from <cohuck@redhat.com>) id 1da1qD-0007xp-JS
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55650)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1da1qD-0007xQ-DW
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:33:45 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Tue, 25 Jul 2017 17:33:21 +0200
+Message-Id: <20170725153330.14966-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/9] s390x: zPCI detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +21,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IQ6h8DMknNTIwPr9s2GmJXEhkRiNEUKEq
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, peter.maydell@linaro.org
-Message-ID: <3b0bb163-8852-cb12-9eb7-8524c9b1e02a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2-bitmap: fix bitmap_free
-References: <20170714123341.373857-1-vsementsov@virtuozzo.com>
- <b9f574d1-91b5-c5dc-46b2-1a8976c5539f@redhat.com>
- <f8f9bbae-2440-b2e0-b0dd-0c407515e736@amsat.org>
-In-Reply-To: <f8f9bbae-2440-b2e0-b0dd-0c407515e736@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Next version, now without RFC. The goals are still the same:
+- Being able to disable PCI support in a build completely.
+- Properly fencing off PCI if the relevant facility bit is not provided.
 
-On 07/25/2017 10:02 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Maybe worth adding "Coverity: CID 1377700"
+Changes v2->v3:
+- Only enable the zpci bit conditionally, keep the aen bit always on.
+  Use a method that actually works...
+- Some reordering in the msi route patch to keep the change small.
+- Collected some r-bs.
 
-At this point, the PULL request is already posted, so it may be too
-late.  But it's not the end of the world if we miss the extra comment.
+Branch is still git://github.com/cohuck/qemu no-zpci-cpumodel
 
->=20
-> On 07/14/2017 01:00 PM, Max Reitz wrote:
->> On 2017-07-14 14:33, Vladimir Sementsov-Ogievskiy wrote:
->>> Fix possible crash on error path in
->>> qcow2_remove_persistent_dirty_bitmap. Although bitmap_free was added =
-in
->>> 88ddffae8fc the bug was introduced later in commit 469c71edc72 (when
->>> qcow2_remove_persistent_dirty_bitmap was added).
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>   block/qcow2-bitmap.c | 4 ++++
->>>   1 file changed, 4 insertions(+)
->>
->> Thanks, applied to my block branch:
->>
->> https://github.com/XanClic/qemu/commits/block
->>
->> Max
->>
->=20
+Likely 2.11 material, even though the 'fence off if facility bit is not
+set' part could count as bugfixes. Thoughts?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cornelia Huck (9):
+  kvm: remove hard dependency on pci
+  s390x/pci: add stubs
+  s390x: chsc nt2 events are pci-only
+  s390x/pci: do not advertise pci on non-pci builds
+  s390x/ccw: create s390 phb conditionally
+  s390x/sclp: properly guard pci-specific functions
+  s390x/pci: fence off instructions for non-pci
+  s390x/kvm: msi route fixup for non-pci
+  s390x: refine pci dependencies
 
+ default-configs/s390x-softmmu.mak |  2 +-
+ hw/pci/pci-stub.c                 | 12 ++++++
+ hw/s390x/Makefile.objs            |  3 +-
+ hw/s390x/s390-pci-bus.c           |  9 ++++-
+ hw/s390x/s390-pci-bus.h           |  5 ++-
+ hw/s390x/s390-pci-stub.c          | 78 +++++++++++++++++++++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c        | 12 +++---
+ hw/s390x/sclp.c                   | 19 ++++++++--
+ target/s390x/ioinst.c             | 16 ++++++++
+ target/s390x/kvm.c                | 61 +++++++++++++++++++++++-------
+ 10 files changed, 188 insertions(+), 29 deletions(-)
+ create mode 100644 hw/s390x/s390-pci-stub.c
 
---IQ6h8DMknNTIwPr9s2GmJXEhkRiNEUKEq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll3ZLkACgkQp6FrSiUn
-Q2qW5wf/Xf42boFL2TaRRAjnrRTnXXCPVqKQgoxADEFQF7gtlbKiVoiKLwAqHApY
-QOoDBsh/LYibwm2T2pdxqQ64F1+8cAFuhdj2E3lahIxwQaB0fOA6Ejaurp8s29X8
-FKnajTxvcRMkqnLBqua0sUQH9XkeTr1nltS11cQnCZ7NpQ/7crmdoh5RTf9sUlsh
-oBppkU9Nd0Iuq1HBjsGkQs62NSBP7LU3djFjGC9UizL/ydX6jWib/Al8NuK9zSvg
-OvBqm4uQULvjjMiWC3av+uYZavqe0wuWUOnAuIw1LOiNxf62xSvKRUmpvvIOX8Hc
-rjOKIw3UYPyqVLMfH4xnwMjDELnHCw==
-=6a+F
------END PGP SIGNATURE-----
-
---IQ6h8DMknNTIwPr9s2GmJXEhkRiNEUKEq--
+-- 
+2.13.3
