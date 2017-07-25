@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1da1Tu-0000Om-AJ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1da1Uy-0001I6-2F
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1da1Tt-0006uF-9S
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1da1Ts-0006u4-OV
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:40 -0400
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Tue, 25 Jul 2017 17:09:51 +0200
-Message-Id: <20170725150951.16038-11-ldoktor@redhat.com>
-In-Reply-To: <20170725150951.16038-1-ldoktor@redhat.com>
-References: <20170725150951.16038-1-ldoktor@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1da1Ux-0007AG-CO
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:11:48 -0400
+References: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <99f48803-6a21-10b4-7e46-fd1381437253@redhat.com>
+Date: Tue, 25 Jul 2017 17:11:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/10] qtest.py: Few pylint/style fixes
+In-Reply-To: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cmjRK45a1Th0e8CXH224nhsKOP6K2vLMs"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: Fix reference
+ output for 186
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, qemu-devel@nongnu.org
 
-No actual code changes, just few pylint/style fixes.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cmjRK45a1Th0e8CXH224nhsKOP6K2vLMs
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, qemu-devel@nongnu.org
+Message-ID: <99f48803-6a21-10b4-7e46-fd1381437253@redhat.com>
+Subject: Re: [Qemu-block] [PATCH] qemu-iotests: Fix reference output for 186
+References: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1500973176-29235-1-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
----
- scripts/qtest.py | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+On 2017-07-25 10:59, Kevin Wolf wrote:
+> Commits 70f17a1 ('error: Revert unwanted change of warning messages')
+> and e1824e5 ('qemu-iotests: Test 'info block'') had a semantic merge
+> conflict, which results in failure for qemu-iotests case 186. Fix the
+> reference output to consider the changes of 70f17a1.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/186.out | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/qtest.py b/scripts/qtest.py
-index ab183c0..df0daf2 100644
---- a/scripts/qtest.py
-+++ b/scripts/qtest.py
-@@ -11,14 +11,11 @@
- # Based on qmp.py.
- #
-=20
--import errno
- import socket
--import string
- import os
--import subprocess
--import qmp.qmp
- import qemu
-=20
-+
- class QEMUQtestProtocol(object):
-     def __init__(self, address, server=3DFalse):
-         """
-@@ -83,8 +80,10 @@ class QEMUQtestMachine(qemu.QEMUMachine):
-                  socket_scm_helper=3DNone):
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
--        super(QEMUQtestMachine, self).__init__(binary, args, name=3Dname=
-, test_dir=3Dtest_dir,
--                                               socket_scm_helper=3Dsocke=
-t_scm_helper)
-+        super(QEMUQtestMachine,
-+              self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
-dir,
-+                             socket_scm_helper=3Dsocket_scm_helper)
-+        self._qtest =3D None
-         self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
-)
-=20
-     def _base_args(self):
---=20
-2.9.4
+I've noticed that test 186 fails when not using qemu-system-x86_64,
+though (just build with --target-list=3Di386-softmmu, for example). But
+this patch doesn't make it worse, so I'll keep it.
+
+Max
+
+
+--cmjRK45a1Th0e8CXH224nhsKOP6K2vLMs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZd1+qEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQF47
+B/0U6hxN1o2WfFEi6jxpTDxXGs8zWfGNfRIwpNUVd6JNBk2Xh5mYufdR9hfwcTep
+NK2NYNxb6c/EnuvZUpgqey6g3lykpWI1lYJaxACAbmYdTD8IVZS9QMk8+TMeAtTt
+NdWY6bHTW9i88plEMZIRJ4CboR2XrUC64iQkrg9kVxHUl0rXSei4N5lf/ifaXSos
+od8NOuX16Gbb3+Ts6n0XnsI3J2peeYu4V2h857eBMvJrsmZ4p/PmjY5nLKmAx00T
+m166z+sW5IfwGTCPe+s4Jd2KVLM+iYRx772ahefSBAjQYp5Cg9jFQn9D5Fw2fp9/
+ghYNQiDtq6IIgY2RQ24f57/C
+=OmRl
+-----END PGP SIGNATURE-----
+
+--cmjRK45a1Th0e8CXH224nhsKOP6K2vLMs--
