@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZwTJ-0000d3-KC
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:49:47 -0400
+	(envelope-from <clg@kaod.org>) id 1dZwTv-00019i-Jx
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:50:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dZwTF-0007sg-Ji
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:49:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40845)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dZwTF-0007rp-AY
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:49:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dZwTC-0000xl-Qe
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 09:49:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 928D12E80D2
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 09:40:57 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1dZwTr-00007r-J8
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:50:23 -0400
+Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:44385)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZwTr-000061-A6
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:50:19 -0400
+Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 69FC988FBE
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 11:50:17 +0200 (CEST)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-10-git-send-email-clg@kaod.org>
+	<20170724044948.GF17228@umbus.fritz.box>
+	<1500876571.10674.58.camel@kernel.crashing.org>
+	<9a97771c-7895-26af-d3b7-06404199684f@kaod.org>
+	<20170725021907.GD9471@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5a5aa779-f472-db7f-f902-4908f8ac4b5c@kaod.org>
+Date: Tue, 25 Jul 2017 11:50:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170725021907.GD9471@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 25 Jul 2017 09:30:29 -0000
-From: Richard Jones <rjones@redhat.com>
-Reply-To: Bug 1706296 <1706296@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706296] [NEW] Booting NT 4 disk causes
- /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
- (!qemu_mutex_iothread_locked())
+Subject: Re: [Qemu-devel] [RFC PATCH 09/26] ppc/xive: add an overall memory
+ region for the ESBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,165 +35,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Public bug reported:
+On 07/25/2017 04:19 AM, David Gibson wrote:
+> On Mon, Jul 24, 2017 at 03:25:29PM +0200, C=E9dric Le Goater wrote:
+>> On 07/24/2017 08:09 AM, Benjamin Herrenschmidt wrote:
+>>> On Mon, 2017-07-24 at 14:49 +1000, David Gibson wrote:
+>>>> On Wed, Jul 05, 2017 at 07:13:22PM +0200, C=E9dric Le Goater wrote:
+>>>>> Each source adds its own ESB mempry region to the overall ESB memor=
+y
+>>>>> region of the controller. It will be mapped in the CPU address spac=
+e
+>>>>> when XIVE is activated.
+>>>>>
+>>>>> The default mapping address for the ESB memory region is the same o=
+ne
+>>>>> used on baremetal.
+>>>>>
+>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>>> ---
+>>>>>  hw/intc/xive-internal.h |  5 +++++
+>>>>>  hw/intc/xive.c          | 44 +++++++++++++++++++++++++++++++++++++=
+++++++-
+>>>>>  2 files changed, 48 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
+>>>>> index 8e755aa88a14..c06be823aad0 100644
+>>>>> --- a/hw/intc/xive-internal.h
+>>>>> +++ b/hw/intc/xive-internal.h
+>>>>> @@ -98,6 +98,7 @@ struct XIVE {
+>>>>>      SysBusDevice parent;
+>>>>> =20
+>>>>>      /* Properties */
+>>>>> +    uint32_t     chip_id;
+>>>>
+>>>> So there is a XIVE object per chip.  How does this work on PAPR?  On=
+e
+>>>> logical chip/XIVE, or something more complex?
+>>>
+>>> One global XIVE for PAPR.=20
+>>
+>> Yes.=20
+>>
+>> The chip-id is useless for sPAPR (0 is the default) but for a PowerNV
+>> system, the address used to map the ESB memory region depends on the=20
+>> chip-id and  I thought we could reuse the same XIVE object.=20
+>=20
+> Hmm, maybe.
 
-Grab the NT 4 disk from
-https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-075
--385_CD-KEY_419-1343253_1996
+yes.=20
 
-Try to boot it as follows:
+I am thinking of greatly simplifying the allocator to fit only=20
+the sPAPR needs : a simple range of IRQ numbers with the IPIs=20
+at the beginning, and the HW interrupts starting at an offset=20
+(in sync with the XICS allocator). That's what I ended doing=20
+for CAS negotiation.
 
-qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Version=
-_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,ac=
-cel=3Dtcg
-WARNING: Image format was not specified for 'disk.img' and probing guessed =
-raw.
-         Automatically detecting the format is dangerous for raw images, wr=
-ite operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
-**
-ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion f=
-ailed: (!qemu_mutex_iothread_locked())
-Aborted (core dumped)
+So we could just call it sPAPRXive and forget about PowerNV
+support for the moment.=20
+=20
+C.
 
-The stack trace in the failing thread is:
-
-Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
-#0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
-#1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
-#2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so.0
-#3  0x00007fffdff8c7ea in g_assertion_message_expr ()
-    at /lib64/libglib-2.0.so.0
-#4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
-    at /home/rjones/d/qemu/cpus.c:1580
-#5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, iotl=
-bentry=3D0x55555675b678, =
-
-    iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@en=
-try=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsize@=
-entry=3D4)
-    at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
-#6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D21485=
-32220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
-    at /home/rjones/d/qemu/softmmu_template.h:265
-#7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x5555567514=
-00, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized ou=
-t>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/sof=
-tmmu_template.h:300
-#8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D21=
-48532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_ldst_=
-template.h:182
-#9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>, =
-next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, intno=
-=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i38=
-6/seg_helper.c:758
-#10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x55555674917=
-0, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, next_=
-eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/targ=
-et/i386/seg_helper.c:1252
-#11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
-    at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
-#12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>, =
-cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
-#13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
-    at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
-#14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
-    at /home/rjones/d/qemu/cpus.c:1270
-#15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out>)
-    at /home/rjones/d/qemu/cpus.c:1365
-#16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
-#17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706296
-
-Title:
-  Booting NT 4 disk causes
-  /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion
-  failed: (!qemu_mutex_iothread_locked())
-
-Status in QEMU:
-  New
-
-Bug description:
-  Grab the NT 4 disk from
-  https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-0=
-75
-  -385_CD-KEY_419-1343253_1996
-
-  Try to boot it as follows:
-
-  qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Versi=
-on_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,=
-accel=3Dtcg
-  WARNING: Image format was not specified for 'disk.img' and probing guesse=
-d raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-  **
-  ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion=
- failed: (!qemu_mutex_iothread_locked())
-  Aborted (core dumped)
-
-  The stack trace in the failing thread is:
-
-  Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
-  #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
-  #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
-  #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so=
-.0
-  #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
-      at /lib64/libglib-2.0.so.0
-  #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
-      at /home/rjones/d/qemu/cpus.c:1580
-  #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, io=
-tlbentry=3D0x55555675b678, =
-
-      iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@=
-entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsiz=
-e@entry=3D4)
-      at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
-  #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D214=
-8532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
-      at /home/rjones/d/qemu/softmmu_template.h:265
-  #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x55555675=
-1400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized =
-out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/s=
-oftmmu_template.h:300
-  #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
-2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_lds=
-t_template.h:182
-  #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>=
-, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, int=
-no=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i=
-386/seg_helper.c:758
-  #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x555556749=
-170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, nex=
-t_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/ta=
-rget/i386/seg_helper.c:1252
-  #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
-      at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
-  #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>=
-, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
-  #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
-      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
-  #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
-      at /home/rjones/d/qemu/cpus.c:1270
-  #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
->)
-      at /home/rjones/d/qemu/cpus.c:1365
-  #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
-  #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706296/+subscriptions
+>=20
+>> So, a sPAPR guest would use the address of a single chip baremetal=20
+>> system. This needs more explanation I agree. Thanks to Ben who is=20
+>> providing a lot. I will update the changelogs in the next version.=20
+>=20
+>> The TIMA is mapped at a fixed address so the chip-id does not come=20
+>> in play.
+>>
+>>> For the MMIOs, the way it works is that:
+>>>
+>>>  - For MMIOs pertaining to a specific interrupt or queue, there's an =
+H-
+>>> call that will return the proper "guest physical" address. For qemu
+>>> with KVM we'll have to probably create a single chunk of qemu address
+>>> space (a single mem region) that contains individual pages mapped wit=
+h
+>>> MAP_FIXED originating from the different HW bits, we still need to so=
+rt
+>>> out how exactly we'll do that in practice.
+>>
+>> I haven't looked at all the KVM details. But, regarding the ESBs, I ha=
+d
+>> the above in mind and used a single memory region to contain them all.=
+=20
+>> =20
+>>>  - For the TIMA (the presentation MMIOs), those are always at the sam=
+e
+>>> physical address for everybody (so for a guest it's a single memory
+>>> region we'll map to that physical address), the HW "knows" which HW
+>>> thread is talking to it (and the hypervisor tells the HW which vcpu i=
+s
+>>> running on a given HW thread at a given point in time). That address =
+is
+>>> obtained from the device-tree
+>>>
+>>>>>      uint32_t     nr_targets;
+>>>>> =20
+>>>>>      /* IRQ number allocator */
+>>>>> @@ -111,6 +112,10 @@ struct XIVE {
+>>>>>      void         *sbe;
+>>>>>      XiveIVE      *ivt;
+>>>>>      XiveEQ       *eqdt;
+>>>>> +
+>>>>> +    /* ESB and TIMA memory location */
+>>>>> +    hwaddr       vc_base;
+>>>>> +    MemoryRegion esb_iomem;
+>>>>>  };
+>>>>> =20
+>>>>>  void xive_reset(void *dev);
+>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>>> index 8f8bb8b787bd..a1cb87a07b76 100644
+>>>>> --- a/hw/intc/xive.c
+>>>>> +++ b/hw/intc/xive.c
+>>>>> @@ -312,6 +312,7 @@ static void xive_ics_realize(ICSState *ics, Err=
+or **errp)
+>>>>>      XiveICSState *xs =3D ICS_XIVE(ics);
+>>>>>      Object *obj;
+>>>>>      Error *err =3D NULL;
+>>>>> +    XIVE *x;
+>>>>
+>>>> I don't really like just 'x' for a context variable like this (as
+>>>> opposed to a temporary).
+>>
+>> OK. I will change 'x' in 'xive' then.
+>>
+>>>>> =20
+>>>>>      obj =3D object_property_get_link(OBJECT(xs), "xive", &err);
+>>>>>      if (!obj) {
+>>>>> @@ -319,7 +320,7 @@ static void xive_ics_realize(ICSState *ics, Err=
+or **errp)
+>>>>>                     __func__, error_get_pretty(err));
+>>>>>          return;
+>>>>>      }
+>>>>> -    xs->xive =3D XIVE(obj);
+>>>>> +    x =3D xs->xive =3D XIVE(obj);
+>>>>> =20
+>>>>>      if (!ics->nr_irqs) {
+>>>>>          error_setg(errp, "Number of interrupts needs to be greater=
+ 0");
+>>>>> @@ -338,6 +339,11 @@ static void xive_ics_realize(ICSState *ics, Er=
+ror **errp)
+>>>>>                            "xive.esb",
+>>>>>                            (1ull << xs->esb_shift) * ICS_BASE(xs)->=
+nr_irqs);
+>>>>> =20
+>>>>> +    /* Install the ESB memory region in the overall one */
+>>>>> +    memory_region_add_subregion(&x->esb_iomem,
+>>>>> +                                ICS_BASE(xs)->offset * (1 << xs->e=
+sb_shift),
+>>>>> +                                &xs->esb_iomem);
+>>>>> +
+>>>>>      qemu_register_reset(xive_ics_reset, xs);
+>>>>>  }
+>>>>> =20
+>>>>> @@ -375,6 +381,32 @@ static const TypeInfo xive_ics_info =3D {
+>>>>>   */
+>>>>>  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
+>>>>> =20
+>>>>> +/* VC BAR contains set translations for the ESBs and the EQs. */
+>>>>> +#define VC_BAR_DEFAULT   0x10000000000ull
+>>>>> +#define VC_BAR_SIZE      0x08000000000ull
+>>>>> +
+>>>>> +#define P9_MMIO_BASE     0x006000000000000ull
+>>>>> +#define P9_CHIP_BASE(id) (P9_MMIO_BASE | (0x40000000000ull * (uint=
+64_t) (id)))
+>>>>
+>>>> chip-based MMIO addresses leaking into the PAPR model seems like it
+>>>> might not be what you want
+>>
+>> See above for the reason.
+>>
+>>
+>> Thanks,
+>>
+>> C.=20
+>>
+>>>>
+>>>>> +static uint64_t xive_esb_default_read(void *p, hwaddr offset, unsi=
+gned size)
+>>>>> +{
+>>>>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
+>>>>> +                  __func__, offset, size);
+>>>>> +    return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static void xive_esb_default_write(void *opaque, hwaddr offset, ui=
+nt64_t value,
+>>>>> +                unsigned size)
+>>>>> +{
+>>>>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx6=
+4 " [%u]\n",
+>>>>> +                  __func__, offset, value, size);
+>>>>> +}
+>>>>> +
+>>>>> +static const MemoryRegionOps xive_esb_default_ops =3D {
+>>>>> +    .read =3D xive_esb_default_read,
+>>>>> +    .write =3D xive_esb_default_write,
+>>>>> +    .endianness =3D DEVICE_BIG_ENDIAN,
+>>>>> +};
+>>>>> =20
+>>>>>  void xive_reset(void *dev)
+>>>>>  {
+>>>>> @@ -435,10 +467,20 @@ static void xive_realize(DeviceState *dev, Er=
+ror **errp)
+>>>>>      x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
+>>>>>                          sizeof(XiveEQ));
+>>>>> =20
+>>>>> +    /* VC BAR. That's the full window but we will only map the
+>>>>> +     * subregions in use. */
+>>>>> +    x->vc_base =3D (hwaddr)(P9_CHIP_BASE(x->chip_id) | VC_BAR_DEFA=
+ULT);
+>>>>> +
+>>>>> +    /* install default memory region handlers to log bogus access =
+*/
+>>>>> +    memory_region_init_io(&x->esb_iomem, NULL, &xive_esb_default_o=
+ps,
+>>>>> +                          NULL, "xive.esb", VC_BAR_SIZE);
+>>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->esb_iomem);
+>>>>> +
+>>>>>      qemu_register_reset(xive_reset, dev);
+>>>>>  }
+>>>>> =20
+>>>>>  static Property xive_properties[] =3D {
+>>>>> +    DEFINE_PROP_UINT32("chip-id", XIVE, chip_id, 0),
+>>>>>      DEFINE_PROP_UINT32("nr-targets", XIVE, nr_targets, 0),
+>>>>>      DEFINE_PROP_END_OF_LIST(),
+>>>>>  };
+>>>>
+>>>>
+>>
+>=20
