@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZpRd-0000qh-Oo
+	(envelope-from <dgibson@ozlabs.org>) id 1dZpRd-0000qg-Op
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:19:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZpRa-0005zx-HJ
+	(envelope-from <dgibson@ozlabs.org>) id 1dZpRa-000602-Hf
 	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:19:33 -0400
-Date: Tue, 25 Jul 2017 12:19:07 +1000
+Date: Tue, 25 Jul 2017 12:16:48 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170725021907.GD9471@umbus.fritz.box>
+Message-ID: <20170725021648.GB9471@umbus.fritz.box>
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-10-git-send-email-clg@kaod.org>
-	<20170724044948.GF17228@umbus.fritz.box>
-	<1500876571.10674.58.camel@kernel.crashing.org>
-	<9a97771c-7895-26af-d3b7-06404199684f@kaod.org>
+	<1499274819-15607-6-git-send-email-clg@kaod.org>
+	<20170719032438.GR3140@umbus.fritz.box>
+	<1e07b803-433a-3475-9396-a1f6b82293ff@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cHMo6Wbp1wrKhbfi"
+	protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
 Content-Disposition: inline
-In-Reply-To: <9a97771c-7895-26af-d3b7-06404199684f@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 09/26] ppc/xive: add an overall memory
- region for the ESBs
+In-Reply-To: <1e07b803-433a-3475-9396-a1f6b82293ff@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 05/26] ppc/xive: define XIVE internal
+ tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,210 +31,302 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---cHMo6Wbp1wrKhbfi
+--FkmkrVfFsRoUs1wW
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 24, 2017 at 03:25:29PM +0200, C=E9dric Le Goater wrote:
-> On 07/24/2017 08:09 AM, Benjamin Herrenschmidt wrote:
-> > On Mon, 2017-07-24 at 14:49 +1000, David Gibson wrote:
-> >> On Wed, Jul 05, 2017 at 07:13:22PM +0200, C=E9dric Le Goater wrote:
-> >>> Each source adds its own ESB mempry region to the overall ESB memory
-> >>> region of the controller. It will be mapped in the CPU address space
-> >>> when XIVE is activated.
-> >>>
-> >>> The default mapping address for the ESB memory region is the same one
-> >>> used on baremetal.
-> >>>
-> >>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>> ---
-> >>>  hw/intc/xive-internal.h |  5 +++++
-> >>>  hw/intc/xive.c          | 44 +++++++++++++++++++++++++++++++++++++++=
-++++-
-> >>>  2 files changed, 48 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
-> >>> index 8e755aa88a14..c06be823aad0 100644
-> >>> --- a/hw/intc/xive-internal.h
-> >>> +++ b/hw/intc/xive-internal.h
-> >>> @@ -98,6 +98,7 @@ struct XIVE {
-> >>>      SysBusDevice parent;
-> >>> =20
-> >>>      /* Properties */
-> >>> +    uint32_t     chip_id;
+On Mon, Jul 24, 2017 at 02:52:29PM +0200, C=E9dric Le Goater wrote:
+> On 07/19/2017 05:24 AM, David Gibson wrote:
+> > On Wed, Jul 05, 2017 at 07:13:18PM +0200, C=E9dric Le Goater wrote:
+> >> The XIVE interrupt controller of the POWER9 uses a set of tables to
+> >> redirect exception from event sources to CPU threads. Among which we
+> >> choose to model :
 > >>
-> >> So there is a XIVE object per chip.  How does this work on PAPR?  One
-> >> logical chip/XIVE, or something more complex?
+> >>  - the State Bit Entries (SBE), also known as Event State Buffer
+> >>    (ESB). This is a two bit state machine for each event source which
+> >>    is used to trigger events. The bits are named "P" (pending) and "Q"
+> >>    (queued) and can be controlled by MMIO.
+> >>
+> >>  - the Interrupt Virtualization Entry (IVE) table, also known as Event
+> >>    Assignment Structure (EAS). This table is indexed by the IRQ number
+> >>    and is looked up to find the Event Queue associated with a
+> >>    triggered event.
+> >>
+> >>  - the Event Queue Descriptor (EQD) table, also known as Event
+> >>    Notification Descriptor (END). The EQD contains fields that specify
+> >>    the Event Queue on which event data is posted (and later pulled by
+> >>    the OS) and also a target (or VPD) to notify.
+> >>
+> >> An additional table was not modeled but we might need to to support
+> >> the H_INT_SET_OS_REPORTING_LINE hcall:
+> >>
+> >>  - the Virtual Processor Descriptor (VPD) table, also known as
+> >>    Notification Virtual Target (NVT).
+> >>
+> >> The XIVE object is expanded with the tables described above. The size
+> >> of each table depends on the number of provisioned IRQ and the maximum
+> >> number of CPUs in the system. The indexing is very basic and might
+> >> need to be improved for the EQs.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  hw/intc/xive-internal.h | 95 ++++++++++++++++++++++++++++++++++++++++=
++++++++++
+> >>  hw/intc/xive.c          | 72 +++++++++++++++++++++++++++++++++++++
+> >>  2 files changed, 167 insertions(+)
+> >>
+> >> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
+> >> index 155c2dcd6066..8e755aa88a14 100644
+> >> --- a/hw/intc/xive-internal.h
+> >> +++ b/hw/intc/xive-internal.h
+> >> @@ -11,6 +11,89 @@
+> >> =20
+> >>  #include <hw/sysbus.h>
+> >> =20
+> >> +/* Utilities to manipulate these (originaly from OPAL) */
+> >> +#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> >> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> >> +#define SETFIELD(m, v, val)                             \
+> >> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)=
+))
+> >> +
+> >> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
+> >> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
+> >> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
+> >> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BI=
+T(bs))
+> >> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+> >> +                                 PPC_BIT32(bs))
+> >> +
+> >> +/* IVE/EAS
+> >> + *
+> >> + * One per interrupt source. Targets that interrupt to a given EQ
+> >> + * and provides the corresponding logical interrupt number (EQ data)
+> >> + *
+> >> + * We also map this structure to the escalation descriptor inside
+> >> + * an EQ, though in that case the valid and masked bits are not used.
+> >> + */
+> >> +typedef struct XiveIVE {
+> >> +        /* Use a single 64-bit definition to make it easier to
+> >> +         * perform atomic updates
+> >> +         */
+> >> +        uint64_t        w;
+> >> +#define IVE_VALID       PPC_BIT(0)
+> >> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ bl=
+ock# */
+> >> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ in=
+dex */
+> >> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
+> >> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to t=
+he EQ */
+> >> +} XiveIVE;
+> >> +
+> >> +/* EQ */
+> >> +typedef struct XiveEQ {
+> >> +        uint32_t        w0;
+> >> +#define EQ_W0_VALID             PPC_BIT32(0)
+> >> +#define EQ_W0_ENQUEUE           PPC_BIT32(1)
+> >> +#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2)
+> >> +#define EQ_W0_BACKLOG           PPC_BIT32(3)
+> >> +#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4)
+> >> +#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5)
+> >> +#define EQ_W0_END_OF_INTR       PPC_BIT32(6)
+> >> +#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
+> >> +#define EQ_W0_SW0               PPC_BIT32(16)
+> >> +#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
+> >> +#define EQ_QSIZE_4K             0
+> >> +#define EQ_QSIZE_64K            4
+> >> +#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
+> >> +        uint32_t        w1;
+> >> +#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
+> >> +#define EQ_W1_ESn_P             PPC_BIT32(0)
+> >> +#define EQ_W1_ESn_Q             PPC_BIT32(1)
+> >> +#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
+> >> +#define EQ_W1_ESe_P             PPC_BIT32(2)
+> >> +#define EQ_W1_ESe_Q             PPC_BIT32(3)
+> >> +#define EQ_W1_GENERATION        PPC_BIT32(9)
+> >> +#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
+> >> +        uint32_t        w2;
+> >> +#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
+> >> +#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
+> >> +        uint32_t        w3;
+> >> +#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
+> >> +        uint32_t        w4;
+> >> +#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
+> >> +#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
+> >> +        uint32_t        w5;
+> >> +#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
+> >> +        uint32_t        w6;
+> >> +#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
+> >> +#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
+> >> +#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
+> >> +        uint32_t        w7;
+> >> +#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
+> >> +#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
+> >> +#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
+> >> +#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
+> >> +#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
+> >> +} XiveEQ;
+> >> +
+> >> +#define XIVE_EQ_PRIORITY_COUNT 8
+> >> +#define XIVE_PRIORITY_MAX  (XIVE_EQ_PRIORITY_COUNT - 1)
+> >> +
+> >>  struct XIVE {
+> >>      SysBusDevice parent;
+> >> =20
+> >> @@ -23,6 +106,18 @@ struct XIVE {
+> >>      uint32_t     int_max;       /* Max index */
+> >>      uint32_t     int_hw_bot;    /* Bottom index of HW IRQ allocator */
+> >>      uint32_t     int_ipi_top;   /* Highest IPI index handed out so fa=
+r + 1 */
+> >> +
+> >> +    /* XIVE internal tables */
+> >> +    void         *sbe;
+> >> +    XiveIVE      *ivt;
+> >> +    XiveEQ       *eqdt;
+> >>  };
+> >> =20
+> >> +void xive_reset(void *dev);
+> >> +XiveIVE *xive_get_ive(XIVE *x, uint32_t isn);
+> >> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx);
+> >> +
+> >> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t prio,
+> >> +                        uint32_t *out_eq_idx);
+> >> +
+> >>  #endif /* _INTC_XIVE_INTERNAL_H */
+> >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> >> index 5b4ea915d87c..5b14d8155317 100644
+> >> --- a/hw/intc/xive.c
+> >> +++ b/hw/intc/xive.c
+> >> @@ -35,6 +35,27 @@
+> >>   */
+> >>  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
+> >> =20
+> >> +
+> >> +void xive_reset(void *dev)
+> >> +{
+> >> +    XIVE *x =3D XIVE(dev);
+> >> +    int i;
+> >> +
+> >> +    /* SBEs are initialized to 0b01 which corresponds to "ints off" */
+> >> +    memset(x->sbe, 0x55, x->int_count / 4);
 > >=20
-> > One global XIVE for PAPR.=20
+> > I think strictly this should be a DIV_ROUND_UP to handle the case of
+> > int_count not a multiple of 4.
 >=20
-> Yes.=20
->=20
-> The chip-id is useless for sPAPR (0 is the default) but for a PowerNV
-> system, the address used to map the ESB memory region depends on the=20
-> chip-id and  I thought we could reuse the same XIVE object.=20
-
-Hmm, maybe.
-
-> So, a sPAPR guest would use the address of a single chip baremetal=20
-> system. This needs more explanation I agree. Thanks to Ben who is=20
-> providing a lot. I will update the changelogs in the next version.=20
-
-> The TIMA is mapped at a fixed address so the chip-id does not come=20
-> in play.
->=20
-> > For the MMIOs, the way it works is that:
-> >=20
-> >  - For MMIOs pertaining to a specific interrupt or queue, there's an H-
-> > call that will return the proper "guest physical" address. For qemu
-> > with KVM we'll have to probably create a single chunk of qemu address
-> > space (a single mem region) that contains individual pages mapped with
-> > MAP_FIXED originating from the different HW bits, we still need to sort
-> > out how exactly we'll do that in practice.
->=20
-> I haven't looked at all the KVM details. But, regarding the ESBs, I had
-> the above in mind and used a single memory region to contain them all.=20
+> ok.=20
 > =20
-> >  - For the TIMA (the presentation MMIOs), those are always at the same
-> > physical address for everybody (so for a guest it's a single memory
-> > region we'll map to that physical address), the HW "knows" which HW
-> > thread is talking to it (and the hypervisor tells the HW which vcpu is
-> > running on a given HW thread at a given point in time). That address is
-> > obtained from the device-tree
+> >> +
+> >> +    /* Clear and mask all valid IVEs */
+> >> +    for (i =3D x->int_base; i < x->int_max; i++) {
+> >> +        XiveIVE *ive =3D &x->ivt[i];
+> >> +        if (ive->w & IVE_VALID) {
+> >> +            ive->w =3D IVE_VALID | IVE_MASKED;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    /* clear all EQs */
+> >> +    memset(x->eqdt, 0, x->nr_targets * XIVE_EQ_PRIORITY_COUNT * sizeo=
+f(XiveEQ));
+> >> +}
+> >> +
+> >>  static void xive_init(Object *obj)
+> >>  {
+> >>      ;
+> >> @@ -62,6 +83,19 @@ static void xive_realize(DeviceState *dev, Error **=
+errp)
+> >>      if (x->int_ipi_top < 0x10) {
+> >>          x->int_ipi_top =3D 0x10;
+> >>      }
+> >> +
+> >> +    /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte=
+ */
+> >> +    x->sbe =3D g_malloc0(x->int_count / 4);
 > >=20
-> >>>      uint32_t     nr_targets;
-> >>> =20
-> >>>      /* IRQ number allocator */
-> >>> @@ -111,6 +112,10 @@ struct XIVE {
-> >>>      void         *sbe;
-> >>>      XiveIVE      *ivt;
-> >>>      XiveEQ       *eqdt;
-> >>> +
-> >>> +    /* ESB and TIMA memory location */
-> >>> +    hwaddr       vc_base;
-> >>> +    MemoryRegion esb_iomem;
-> >>>  };
-> >>> =20
-> >>>  void xive_reset(void *dev);
-> >>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> >>> index 8f8bb8b787bd..a1cb87a07b76 100644
-> >>> --- a/hw/intc/xive.c
-> >>> +++ b/hw/intc/xive.c
-> >>> @@ -312,6 +312,7 @@ static void xive_ics_realize(ICSState *ics, Error=
- **errp)
-> >>>      XiveICSState *xs =3D ICS_XIVE(ics);
-> >>>      Object *obj;
-> >>>      Error *err =3D NULL;
-> >>> +    XIVE *x;
-> >>
-> >> I don't really like just 'x' for a context variable like this (as
-> >> opposed to a temporary).
+> > And here as well.
 >=20
-> OK. I will change 'x' in 'xive' then.
+> yes.
 >=20
-> >>> =20
-> >>>      obj =3D object_property_get_link(OBJECT(xs), "xive", &err);
-> >>>      if (!obj) {
-> >>> @@ -319,7 +320,7 @@ static void xive_ics_realize(ICSState *ics, Error=
- **errp)
-> >>>                     __func__, error_get_pretty(err));
-> >>>          return;
-> >>>      }
-> >>> -    xs->xive =3D XIVE(obj);
-> >>> +    x =3D xs->xive =3D XIVE(obj);
-> >>> =20
-> >>>      if (!ics->nr_irqs) {
-> >>>          error_setg(errp, "Number of interrupts needs to be greater 0=
-");
-> >>> @@ -338,6 +339,11 @@ static void xive_ics_realize(ICSState *ics, Erro=
-r **errp)
-> >>>                            "xive.esb",
-> >>>                            (1ull << xs->esb_shift) * ICS_BASE(xs)->nr=
-_irqs);
-> >>> =20
-> >>> +    /* Install the ESB memory region in the overall one */
-> >>> +    memory_region_add_subregion(&x->esb_iomem,
-> >>> +                                ICS_BASE(xs)->offset * (1 << xs->esb=
-_shift),
-> >>> +                                &xs->esb_iomem);
-> >>> +
-> >>>      qemu_register_reset(xive_ics_reset, xs);
-> >>>  }
-> >>> =20
-> >>> @@ -375,6 +381,32 @@ static const TypeInfo xive_ics_info =3D {
-> >>>   */
-> >>>  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
-> >>> =20
-> >>> +/* VC BAR contains set translations for the ESBs and the EQs. */
-> >>> +#define VC_BAR_DEFAULT   0x10000000000ull
-> >>> +#define VC_BAR_SIZE      0x08000000000ull
-> >>> +
-> >>> +#define P9_MMIO_BASE     0x006000000000000ull
-> >>> +#define P9_CHIP_BASE(id) (P9_MMIO_BASE | (0x40000000000ull * (uint64=
-_t) (id)))
-> >>
-> >> chip-based MMIO addresses leaking into the PAPR model seems like it
-> >> might not be what you want
+> >> +
+> >> +    /* Allocate the IVT (Interrupt Virtualization Table) */
+> >> +    x->ivt =3D g_malloc0(x->int_count * sizeof(XiveIVE));
+> >> +
+> >> +    /* Allocate the EQDT (Event Queue Descriptor Table), 8 priorities
+> >> +     * for each thread in the system */
+> >> +    x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
+> >> +                        sizeof(XiveEQ));
+> >> +
+> >> +    qemu_register_reset(xive_reset, dev);
+> >>  }
+> >> =20
+> >>  static Property xive_properties[] =3D {
+> >> @@ -92,3 +126,41 @@ static void xive_register_types(void)
+> >>  }
+> >> =20
+> >>  type_init(xive_register_types)
+> >> +
+> >> +XiveIVE *xive_get_ive(XIVE *x, uint32_t lisn)
+> >> +{
+> >> +    uint32_t idx =3D lisn;
+> >> +
+> >> +    if (idx < x->int_base || idx >=3D x->int_max) {
+> >> +        return NULL;
+> >> +    }
+> >> +
+> >> +    return &x->ivt[idx];
+> >=20
+> > Should be idx - int_base, no?
 >=20
-> See above for the reason.
+> no, not in the allocator model I have chosen. The IRQ numbers=20
+> are exposed to the guest with their offset. But this is another=20
+> discussion which I would rather continue in another thread.=20
+
+Uh.. but you're using idx to index IVT directly, after verifying that
+it lies between int_base and int_max.  AFAICT IVT is only allocated
+with int_max - int_base entries, so without an offset here you'll
+overrun it, won't you?
+
+> >> +}
+> >> +
+> >> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx)
+> >> +{
+> >> +    if (idx >=3D x->nr_targets * XIVE_EQ_PRIORITY_COUNT) {
+> >> +        return NULL;
+> >> +    }
+> >> +
+> >> +    return &x->eqdt[idx];
+> >> +}
+> >> +
+> >> +/* TODO: improve EQ indexing. This is very simple and relies on the
+> >> + * fact that target (CPU) numbers start at 0 and are contiguous. It
+> >> + * should be OK for sPAPR.
+> >> + */
+> >> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t priority,
+> >> +                        uint32_t *out_eq_idx)
+> >> +{
+> >> +    if (priority > XIVE_PRIORITY_MAX || target >=3D x->nr_targets) {
+> >> +        return false;
+> >> +    }
+> >> +
+> >> +    if (out_eq_idx) {
+> >> +        *out_eq_idx =3D target + priority;
+> >> +    }
+> >> +
+> >> +    return true;
+> >=20
+> > Seems a clunky interface.  Why not return a XiveEQ *, NULL if the
+> > inputs aren't valud.
 >=20
+> Yes. This interface is inherited from OPAL and it's not consistent=20
+> with the other xive_get_*() routines. But we are missing a XIVE=20
+> internal table for VPs which explains the difference. I need to look=20
+> at the support of the OS_REPORTING_LINE hcalls before simplifying.
 >=20
 > Thanks,
 >=20
 > C.=20
 >=20
-> >>
-> >>> +static uint64_t xive_esb_default_read(void *p, hwaddr offset, unsign=
-ed size)
-> >>> +{
-> >>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
-> >>> +                  __func__, offset, size);
-> >>> +    return 0;
-> >>> +}
-> >>> +
-> >>> +static void xive_esb_default_write(void *opaque, hwaddr offset, uint=
-64_t value,
-> >>> +                unsigned size)
-> >>> +{
-> >>> +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 =
-" [%u]\n",
-> >>> +                  __func__, offset, value, size);
-> >>> +}
-> >>> +
-> >>> +static const MemoryRegionOps xive_esb_default_ops =3D {
-> >>> +    .read =3D xive_esb_default_read,
-> >>> +    .write =3D xive_esb_default_write,
-> >>> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> >>> +};
-> >>> =20
-> >>>  void xive_reset(void *dev)
-> >>>  {
-> >>> @@ -435,10 +467,20 @@ static void xive_realize(DeviceState *dev, Erro=
-r **errp)
-> >>>      x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
-> >>>                          sizeof(XiveEQ));
-> >>> =20
-> >>> +    /* VC BAR. That's the full window but we will only map the
-> >>> +     * subregions in use. */
-> >>> +    x->vc_base =3D (hwaddr)(P9_CHIP_BASE(x->chip_id) | VC_BAR_DEFAUL=
-T);
-> >>> +
-> >>> +    /* install default memory region handlers to log bogus access */
-> >>> +    memory_region_init_io(&x->esb_iomem, NULL, &xive_esb_default_ops,
-> >>> +                          NULL, "xive.esb", VC_BAR_SIZE);
-> >>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &x->esb_iomem);
-> >>> +
-> >>>      qemu_register_reset(xive_reset, dev);
-> >>>  }
-> >>> =20
-> >>>  static Property xive_properties[] =3D {
-> >>> +    DEFINE_PROP_UINT32("chip-id", XIVE, chip_id, 0),
-> >>>      DEFINE_PROP_UINT32("nr-targets", XIVE, nr_targets, 0),
-> >>>      DEFINE_PROP_END_OF_LIST(),
-> >>>  };
-> >>
-> >>
 >=20
 
 --=20
@@ -244,24 +335,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cHMo6Wbp1wrKhbfi
+--FkmkrVfFsRoUs1wW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll2qpsACgkQbDjKyiDZ
-s5LRIA/8CENsn+3+ZRxAHVFthPk4Keik1D7dQMvcl1hvxeTNPsFbiaK8Ucp64+5z
-EVog/AxqElGrJmJS2pn1VW29iC5byIEmwXgK5XSEGc+CZQxdinAXrIMyEaj5Soqs
-lAAWCFVNVCTnotbz5xoa+RlaNlhqPB/rhDBrTTCSU0tp2QqHlKZPJJeKGdpj9W+G
-ygs2xy0qIk/rEI4Ep7Ti71Smh0KdK6CEd8GKkXGiuIZC1ubdn+BxRf0ak6Rgqzag
-/TRxNzEaRrA00HUlSjRxE7Ngc7LaFXvHxwVC/5wKN6utvKRL0RKOrnywCSZvHzkp
-Y4sai/mO6PEYEbTs/kUabifpHr884DHYip9CGr9fSfYvxwQ3D46W0er6bEyuyneK
-+uGMCcsxRI2dp6l2eU6P+DEbvG9fNBp5aVcOtniJqToEjYSCjvCDCb4qKw0rZCul
-AR+28szj0X3AqT2cSD/0C/nQ1RsC/CNFM5vwAyNN07zE5qdqE7HCxR7u0lSuoQHP
-w1q1CVJCPv6fLIDI0ynAGL7FoVcJInpD6hLpuQzA8lgrDxV5/QpUkIt/LbmZXjQv
-xEYIo5JWdLk5rrEdgwfBWN+wGCEoPzAq8sAVq7vo8sgMEGHfH1+2eXdMErzQoWXj
-QXvievkg/oVgWz25wNu0yfSYdM8uR3kxxcpo+y/xMX0fCNfsmrk=
-=/U/J
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll2qggACgkQbDjKyiDZ
+s5J2zRAAsGxRZ5ar3tzf3R3MbKo4P7q8DblkZ9G9kQNZTdd0uLeZOoYzcYDSUGF2
+LxvjPRY6R3DoiDWw638PX6x+CUjG/pNQNsgWVUdLcWFCT4dz917ewDVWIWBLPNF5
+h/zy8SmE0XRKySAJjGtV3Xpg49avAmJ+VZfZModIc/2zlYN6BA/9QPsLctk/de5N
+WIiBbOX6p6vmWRk93mKMMH/DEo1V6c+CDWY+dCeTqNqwuFLy5k+62/1Rup9a1Vjs
+SpGZYZCFpoNAcf3Yu5Ra+sgEInXCTx+0YnEMRvAQG4EBZhRMncoIVIjjWwoXuzCi
+b9Na3cz4RQ0zCgntgYNgp+EAqjTZKDoY9+Olx/MidlZ1vjntB/ofIx08oSZBD8a2
+3EpQRWyp/5zx38M/7OrGkcNcbLi4eISNIfOYf3SjI6wCkJB7Hg93DIpNTsfDRMYm
+p8AUkC/fmuw0bzwL6xNw4skkCqQeRsxTDbQT2Ampj2XWVvJQK+PPsGNny+TeAGYf
+fsw/Le4uB3vj9d0nQ85ZSS7XfRnzmPeNq+vVT1+fLhoQUnKxlLRzkJVDs9McfgKL
+lkr7qhf1G2vjqE25rFjJ0AIXvTgq/nojhlQkO58rdAjSxZLcSSSXix5xdgIUk2sF
+GSdiwWhikciyPafok3iMFAFy7JAP10fm+18zliRoBIX0wlOA8m8=
+=fxlW
 -----END PGP SIGNATURE-----
 
---cHMo6Wbp1wrKhbfi--
+--FkmkrVfFsRoUs1wW--
