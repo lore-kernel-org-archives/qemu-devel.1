@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1da1z5-0007ZI-Q0
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:42:57 -0400
+	(envelope-from <stefanha@gmail.com>) id 1da21y-0001V7-15
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1da1z1-00040h-PE
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:42:55 -0400
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:45270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1da1z1-000408-Fm
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:42:51 -0400
-Received: from player168.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id AC6FA59B62
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 17:42:49 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-8-git-send-email-clg@kaod.org>
-	<20170724042956.GD17228@umbus.fritz.box>
-	<006293c9-b396-82f9-19ba-d57301934ffe@kaod.org>
-	<20170725122154.GE8978@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <449ced34-c454-0984-ce37-193b86cad293@kaod.org>
-Date: Tue, 25 Jul 2017 17:42:40 +0200
+	(envelope-from <stefanha@gmail.com>) id 1da21t-0005pU-Vu
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:45:54 -0400
+Date: Tue, 25 Jul 2017 16:45:46 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170725154546.GR23343@stefanha-x1.localdomain>
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721034730.25612-4-crosa@redhat.com>
+	<ddf57b6c-42b2-0ec1-7d53-71d5266727fe@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170725122154.GE8978@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 07/26] ppc/xive: add MMIO handlers to
- the XIVE interrupt source
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="mjrw6G9AoRBv8oQK"
+Content-Disposition: inline
+In-Reply-To: <ddf57b6c-42b2-0ec1-7d53-71d5266727fe@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] qemu-iotests: require
+ CONFIG_LINUX_AIO for test 087
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,179 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Daniel Berrange <berrange@redhat.com>
 
-On 07/25/2017 02:21 PM, David Gibson wrote:
-> On Mon, Jul 24, 2017 at 05:55:42PM +0200, C=E9dric Le Goater wrote:
->> On 07/24/2017 06:29 AM, David Gibson wrote:
->>> On Wed, Jul 05, 2017 at 07:13:20PM +0200, C=E9dric Le Goater wrote:
->>>> Each interrupt source is associated with a 2-bit state machine calle=
-d
->>>> an Event State Buffer (ESB). It is controlled by MMIO to trigger
->>>> events.
-> [snip]
->>>> +/* TODO: handle second page */
->>>
->>> Is this comment still relevent?
->>
->> Some HW have a second page to trigger the event. I am not sure we need=
-=20
->> to model it though. I will make some inquiries.
->=20
-> Ah, ok.  Maybe clarify the comment a bit.
->=20
-> [snip]
->>>> +static void xive_esb_write(void *opaque, hwaddr addr,
->>>> +                           uint64_t value, unsigned size)
->>>> +{
->>>> +    XiveICSState *xs =3D ICS_XIVE(opaque);
->>>> +    XIVE *x =3D xs->xive;
->>>> +    uint32_t offset =3D addr & 0xF00;
->>>> +    uint32_t srcno =3D addr >> xs->esb_shift;
->>>> +    uint32_t lisn =3D srcno + ICS_BASE(xs)->offset;
->>>> +    XiveIVE *ive;
->>>> +    bool notify =3D false;
->>>> +
->>>> +    ive =3D xive_get_ive(x, lisn);
->>>> +    if (!ive || !(ive->w & IVE_VALID))  {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", l=
-isn);
->>>> +        return;
->>>> +    }
->>>
->>> Having this code associated with the individual ICS look directly at
->>> the IVE table in the core xive object seems a bit dubious.
->>
->> The IVE table holds the validity and mask status of the interrupt=20
->> entries, so we need that lookup. However, (continues below) ...
->>
->>> This also
->>> points out another mismatch between the re-used ICS code and the new
->>> XIVE code: ICS gathers all the per-source-irq flags/state into the
->>> irqstate structure, whereas xive has per-irq information in the
->>> centralized ecb and IVE tables.  There can certainly be good reasons
->>> for that, but using both at once is kind of clunky.
->>
->> I understand that you would rather put the esbs in the source they=20
->> belong to. That is the case on real HW but it makes the modeling a=20
->> bit more difficult. We would need to choose a MMIO address to give=20
->> to the guest OS. I had some issues with the allocator (I need=20
->> to look at this problem closer).
->=20
-> Uh.. what do MMIO addresses have to do with this?  I'm talking about
-> the actual ESB state in the packed bit array.
 
-To ease the modeling, the ESB states of all IRQs are under the same
-bit array and they are exposed to the guest OS through a single memory=20
-region so that all accesses to the ESB states are centralized. On real=20
-HW, the ESB cache and the MMIO base depends on the source.=20
-=20
-Anyway, that might not be an issue. I will see what I can do to=20
-decorrelate the XIVE source from the main XIVE object. We can=20
-probably move the ESB state array below the XIVE source.
+--mjrw6G9AoRBv8oQK
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-C.
-
->> It might also be an "issue" for KVM. Ben talked about maintaining=20
->> all the esbs of a guest under a single memory region to be able to=20
->> map the pages in the host.
->>
->> Any how, I agree this is another point to discuss in the sPAPR=20
->> model.
->>
->> Thanks,
->>
->> C.=20
->>
->>
->>>> +    if (srcno >=3D ICS_BASE(xs)->nr_irqs) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR,
->>>> +                      "XIVE: invalid IRQ number: %d/%d lisn: %d\n",
->>>> +                      srcno, ICS_BASE(xs)->nr_irqs, lisn);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    switch (offset) {
->>>> +    case 0:
->>>> +        /* TODO: should we trigger even if the IVE is masked ? */
->>>> +        notify =3D xive_pq_trigger(x, lisn);
->>>> +        break;
->>>> +    default:
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write add=
-r %d\n",
->>>> +                      offset);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (notify && !(ive->w & IVE_MASKED)) {
->>>> +        qemu_irq_pulse(ICS_BASE(xs)->qirqs[srcno]);
->>>> +    }
->>>> +}
->>>> +
->>>> +static const MemoryRegionOps xive_esb_ops =3D {
->>>> +    .read =3D xive_esb_read,
->>>> +    .write =3D xive_esb_write,
->>>> +    .endianness =3D DEVICE_BIG_ENDIAN,
->>>> +    .valid =3D {
->>>> +        .min_access_size =3D 8,
->>>> +        .max_access_size =3D 8,
->>>> +    },
->>>> +    .impl =3D {
->>>> +        .min_access_size =3D 8,
->>>> +        .max_access_size =3D 8,
->>>> +    },
->>>> +};
->>>> +
->>>> +/*
->>>>   * XIVE Interrupt Source
->>>>   */
->>>>  static void xive_ics_set_irq_msi(XiveICSState *xs, int srcno, int v=
-al)
->>>> @@ -106,15 +326,25 @@ static void xive_ics_realize(ICSState *ics, Er=
-ror **errp)
->>>>          return;
->>>>      }
->>>> =20
->>>> +    if (!xs->esb_shift) {
->>>> +        error_setg(errp, "ESB page size needs to be greater 0");
->>>> +        return;
->>>> +    }
->>>> +
->>>>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->>>>      ics->qirqs =3D qemu_allocate_irqs(xive_ics_set_irq, xs, ics->nr=
-_irqs);
->>>> =20
->>>> +    memory_region_init_io(&xs->esb_iomem, OBJECT(xs), &xive_esb_ops=
-, xs,
->>>> +                          "xive.esb",
->>>> +                          (1ull << xs->esb_shift) * ICS_BASE(xs)->n=
-r_irqs);
->>>> +
->>>>      qemu_register_reset(xive_ics_reset, xs);
->>>>  }
->>>> =20
->>>>  static Property xive_ics_properties[] =3D {
->>>>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
->>>>      DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
->>>> +    DEFINE_PROP_UINT32("shift", XiveICSState, esb_shift, 0),
->>>>      DEFINE_PROP_END_OF_LIST(),
->>>>  };
->>>> =20
->>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>> index 544cc6e0c796..5303d96f5f59 100644
->>>> --- a/include/hw/ppc/xive.h
->>>> +++ b/include/hw/ppc/xive.h
->>>> @@ -33,6 +33,9 @@ typedef struct XiveICSState XiveICSState;
->>>>  struct XiveICSState {
->>>>      ICSState parent_obj;
->>>> =20
->>>> +    uint32_t     esb_shift;
->>>> +    MemoryRegion esb_iomem;
->>>> +
->>>>      XIVE         *xive;
->>>>  };
->>>> =20
->>>
->>
+On Mon, Jul 24, 2017 at 02:44:13PM +0800, Jing Liu wrote:
+> On 2017/7/21 =E4=B8=8A=E5=8D=8811:47, Cleber Rosa wrote:
+> > One of the "sub-"tests of test 087 requires CONFIG_LINUX_AIO.
+> >=20
+> > As a PoC/RFC, this goes the easy route and skips the test as a whole
+> > when that feature is missing.  Other approaches include splitting
+> > the test and adding extra filtering.
+> >=20
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >   tests/qemu-iotests/087 | 1 +
+> >   1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+> > index f8e4903..a2fb7de 100755
+> > --- a/tests/qemu-iotests/087
+> > +++ b/tests/qemu-iotests/087
+> > @@ -34,6 +34,7 @@ status=3D1	# failure is the default!
+> >   _supported_fmt qcow2
+> >   _supported_proto file
+> >   _supported_os Linux
+> > +_require_feature CONFIG_LINUX_AIO
+> I tested that CONFIG_NETTLE_KDF is also a necessary for 087.
 >=20
+> +_require_feature CONFIG_NETTLE_KDF
+
+Are you sure?  Looks like either nettle or gcrypt is needed:
+
+crypto/Makefile.objs:crypto-obj-$(CONFIG_NETTLE_KDF) +=3D pbkdf-nettle.o
+crypto/Makefile.objs:crypto-obj-$(if $(CONFIG_NETTLE_KDF),n,$(CONFIG_GCRYPT=
+_KDF)) +=3D pbkdf-gcrypt.o
+
+But this shows why the compile-time testing of features is ugly:
+
+1. It duplicates build dependency logic into the test cases.
+
+2. The test cases don't care about nettle vs gcrypt and they shouldn't
+   have to know about it.  They just care whether LUKS is available or
+   not.
+
+As I mentioned earlier, let's test whether the QEMU binaries offer
+_features_, not which _config options_ they were built with.
+
+--mjrw6G9AoRBv8oQK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZd2eqAAoJEJykq7OBq3PIMtsH/1ujuAG7uOfJHgi9PObSDpPo
+Yh4DlC8/4a8Ajt21AiyBSB/gqAhIi/OG7Bglz35WWLGl9IpO4fVvu2YhsmWlhWT/
+XvKNo0pnHIYsiX8J9lliB0613GvrB1yvtK9OiI93r0lhcWN6R2HDMSFJIlCFVOeH
+qPsH05HUpoW8zEvRnvDAr+EpfJeOwcziS41a3Mm8DJTHUpo+QYW6pqBQy+NJN0Rp
+uVBSSr4rUVLga7Aqft4PWTbxECUNwQ37TFBIJMKhVY9xQMngMcwnoLUWOArjcvbE
+unQxcYgdbtbIJ2lzqF6icQ4tqOr8nIg5ULvbm4/e9K5kGBeGCv+jQ3Rrc7tjJvw=
+=3mxG
+-----END PGP SIGNATURE-----
+
+--mjrw6G9AoRBv8oQK--
