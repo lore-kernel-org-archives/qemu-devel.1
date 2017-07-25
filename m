@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZsd5-0007ZU-53
+	(envelope-from <dgibson@ozlabs.org>) id 1dZsd5-0007ZV-5I
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZsd2-00059O-3G
+	(envelope-from <dgibson@ozlabs.org>) id 1dZsd2-00059G-33
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:43:35 -0400
-Date: Tue, 25 Jul 2017 14:20:27 +1000
+Date: Tue, 25 Jul 2017 14:18:41 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170725042027.GC8978@umbus.fritz.box>
+Message-ID: <20170725041841.GA8978@umbus.fritz.box>
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-15-git-send-email-clg@kaod.org>
-	<20170724063534.GM17228@umbus.fritz.box>
-	<fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
+	<1499274819-15607-9-git-send-email-clg@kaod.org>
+	<20170724043624.GE17228@umbus.fritz.box>
+	<1500879657.10674.64.camel@kernel.crashing.org>
+	<20170724095052.GO17228@umbus.fritz.box>
+	<1500894439.10674.76.camel@kernel.crashing.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FsscpQKzF/jJk6ya"
+	protocol="application/pgp-signature"; boundary="3MwIy2ne0vdjdPXF"
 Content-Disposition: inline
-In-Reply-To: <fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 14/26] ppc/xive: add MMIO handlers to
- the XIVE interrupt presenter model
+In-Reply-To: <1500894439.10674.76.camel@kernel.crashing.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 08/26] ppc/xive: add flags to the XIVE
+ interrupt source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---FsscpQKzF/jJk6ya
+--3MwIy2ne0vdjdPXF
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 24, 2017 at 04:44:00PM +0200, C=E9dric Le Goater wrote:
-> On 07/24/2017 08:35 AM, David Gibson wrote:
-> > On Wed, Jul 05, 2017 at 07:13:27PM +0200, C=E9dric Le Goater wrote:
-> >> The Thread Interrupt Management Area for the OS is mostly used to
-> >> acknowledge interrupts and set the CPPR of the CPU.
-> >>
-> >> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
-> >> used to retrieve the targeted interrupt presenter object.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+On Mon, Jul 24, 2017 at 09:07:19PM +1000, Benjamin Herrenschmidt wrote:
+> On Mon, 2017-07-24 at 19:50 +1000, David Gibson wrote:
+> > On Mon, Jul 24, 2017 at 05:00:57PM +1000, Benjamin Herrenschmidt wrote:
+> > > On Mon, 2017-07-24 at 14:36 +1000, David Gibson wrote:
+> > > > On Wed, Jul 05, 2017 at 07:13:21PM +0200, C=E9dric Le Goater wrote:
+> > > > > These flags define some characteristics of the source :
+> > > > >=20
+> > > > >  - XIVE_SRC_H_INT_ESB  the Event State Buffer are controlled with=
+ a
+> > > > >                        specific hcall H_INT_ESB
+> > > >=20
+> > > > What's the other option?
+> > >=20
+> > > Direct MMIO access. Normally all interrupts use normal MMIOs,
+> > > each interrupts has an associated MMIO page with special MMIOs
+> > > to control the source state (PQ bits). This is something I added
+> > > to the PAPR spec (and the OPAL <-> Linux interface) to allow firmware
+> > > to work around broken HW (which happens on some P9 versions).
 > >=20
-> > Am I right in thinking that this shoehorns the XIVE TIMA state into
-> > the existing XICS ICP object.  That.. doesn't seem like a good idea.
+> > Ok.. and that's something that can be decided at runtime?
 >=20
-> The TIMA memory region is under the XIVE object because it is=20
-> unique for the system. The lookup of the ICP is simply done using=20
-> 'current_cpu'. The TIMA state is under the ICPState, yes, but this=20
-> model does not seem incorrect to me as this state contains the=20
-> interrupt information presented to a CPU.
+> Well, at this point I think nothing will set that flag.... It's there
+> for workaround around HW bugs on some chips. At least in full emu it
+> shouldn't happen unless we try to emulate those bugs. Hopefully direct
+> MMIO will just work.
 
-Yeah, that's not the point I'm making.  My point is that the TIMA
-state isn't really the same as xics ICP state.  You're squeezing one
-into the other in a pretty ugly way.
+Hm.  That doesn't seem like a good match for a per-irq state
+structure.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -66,24 +73,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---FsscpQKzF/jJk6ya
+--3MwIy2ne0vdjdPXF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll2xwoACgkQbDjKyiDZ
-s5JMPA/+ICrvNaaffRmAAAsM403WR2JbcZ7mRnymbkWasYtKpjTEXQN4wc52d3pn
-K8p2uX9Q8d0MUlk79THnKCIUuOz/LGtS2k9zQRnxnycvWqOPqLGfSxkztwXOEt8N
-ZYlCAbz9+WYG1zgA7Pq3YxdBeNLltgE+uhAMvFxpu6p5m+uQvR2k5sjHmeE9p6GL
-sj+1BGCla7iPJUGfQ+sH+RS9C9uJtu7A9Yi5dmqoN/8H8ujcH77MJCjeRah4WIp5
-KID+4IYOFxV/y+Vm1QrIyXCHBpm3/HOHAHUT9VqzHC1l5YYe++j5vo6sAPgwJBia
-xWhDD3ki2mXV3/27HKSBiZoeRvrqgZGdlkx2/mUG5vWzCZfOZEDt9TZW5HDnYv8i
-sg5F2Fs71kJMtwmuXHfbbEiooWI0nGf6JcoHriO4FHlPgFxpaWzqWy1wjUlpLpoN
-HE8uo2pmQGPivoajXwM3bXN/5z44C4vgoMWZGckK1qvsvF+8kCjXaRQGHXnhZssU
-v4fRoE2D0l3dxJpRoolH0+at13JLpCDN2jVKj7Q8xMsWqTsMmjevu6z+QVUMWA/R
-3SwoW5FfJaHGjMgJhozani69l8s9NLhQgFqldaKyFT9SNIx+tUZlTjPKqHiUxfOt
-APciP9Mwpv1x/tSi4ljFp4Fy+V23UahVvaiwR1enlK7L3p/a52Q=
-=EfR+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll2xp8ACgkQbDjKyiDZ
+s5IHQA//T0okvh4HLOAE1812GD9jls/rj+nDoDLt1aRbF9JKP+whWOYT+c6nElJ9
+hhFi8cFRpnzIlHkZ3bcILyiYdNoLlz6Gu5hfHP+o0Je7P3KPH6UzHXT5EazzDNfN
+/iyk6Bdbpi8g6qMWOymCxqB67H7STnHFBEvBA5MAoGv1Rd3u+QcGKW85UGW33E17
+YTcL7S2W8uPtRsXT7ORaWXaaPmQBUSEEXoqjQyyrwn7Q6II9+YOHJ1lyUNTMolvT
+Wptcql58w/auZdGghJ5Od80JDQKFE8Njd6ZbjUB/d61TLRTHr7AXliDXFJ0VdYxT
+movDESnMtYdtMZAxiWQVslgJbRm+2ZB8U+3Wxi2SgjlUdhfVp0MPUpUDcnN1z8cI
+nPVv/g2KcnYqzee1ZwtgGwVOWl7nZsc7VJrTWU5EodMjn3G1oFhX9/qrWMeHywq0
+E1YA42+Vkzx51GH468uwBfhrn23O85os1/MRGfzjIIzywZnxcj1lnmLA6OqHZzYU
+kPgtuio+s02VsBsgKlKyT1jL56oO30mAag4HkpKuJNERWnIMBzemUfx+zUfjbxbi
+lQDCc5qxlOvIwHLtUo1PU0AixagWV/L/D0yTRgxV3VZ0429nAA9ez6l4rv5ycUL3
+POnfOexGdaoLa2WZv1aaFUej9GTeTItBXU+FT9QgjEnXEBqgbzg=
+=LA/O
 -----END PGP SIGNATURE-----
 
---FsscpQKzF/jJk6ya--
+--3MwIy2ne0vdjdPXF--
