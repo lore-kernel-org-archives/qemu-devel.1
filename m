@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1da1VC-0001Vz-Iw
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:12:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1da1Vo-00023F-3E
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1da1V9-0007CI-EG
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:12:02 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:33272 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1da1V9-0007Bq-1a
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:11:59 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-	<20170725131931.GC23343@stefanha-x1.localdomain>
-	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-Date: Tue, 25 Jul 2017 18:11:43 +0300
-In-Reply-To: <CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 25 Jul 2017 14:30:06 +0100")
-Message-ID: <87o9s88sb4.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+	(envelope-from <mreitz@redhat.com>) id 1da1Vn-0007Ld-9C
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:12:40 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Tue, 25 Jul 2017 17:12:30 +0200
+Message-Id: <20170725151233.26077-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 0/3] Block patches for 2.10-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +17,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Peter Maydell writes:
+The following changes since commit 4c4414a4388f902b7ae2814f9a64898dd0e426a5:
 
-> On 25 July 2017 at 14:19, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> Instead I suggest adding a trace backend generates calls to registered
->> "callback" functions:
->> 
->> $ cat >my-instrumentation.c
->> #include "trace/control.h"
->> 
->> static void my_cpu_in(unsigned int addr, char size, unsigned int val)
->> {
->> printf("my_cpu_in\n");
->> }
->> 
->> static void my_init(void)
->> {
->> trace_register_event_callback("cpu_in", my_cpu_in);
->> trace_enable_events("cpu_in");
->> }
->> trace_init(my_init);
->> 
->> $ ./configure --enable-trace-backends=log,callback && make -j4
->> 
->> This is still a clean interface that allows instrumentation code to be
->> kept separate from the trace event call sites.
->> 
->> The instrumentation code gets compiled into QEMU, but that shouldn't be
->> a huge burden since QEMU's Makefiles only recompile changed source
->> files (only the first build is slow).
+  hw/display/sm501: Don't use vmstate_register_ram_global() (2017-07-25 13:04:28 +0100)
 
-> Is your proposal that my-instrumentation.c gets compiled into
-> QEMU at this point? That doesn't seem like a great idea to
-> me, because it means you can only use this tracing if you
-> build QEMU yourself, and distros won't enable it and so
-> lots of our users won't have convenient access to it.
-> I'd much rather see a cleanly designed plugin interface
-> (which we should be able to implement in a manner that doesn't
-> let the plugin monkey patch arbitrary parts of QEMU beyond
-> what can already be achieved via LD_PRELOAD).
+are available in the git repository at:
 
-Just to be clear, what do you both mean by monkey-patching?
+  git://github.com/XanClic/qemu.git tags/pull-block-2017-07-25
 
-* Accessing unintended symbols in QEMU from the library (and from there
-  modifying QEMU's behavior).
-* QEMU using symbols on the library instead of its own just because they have
-  the same name.
+for you to fetch changes up to bd998d7cc8ced211def90e4225042d63dddecc54:
 
-As I said, the former can be accomplished by compiling QEMU with
-"-fvisibility=hidden".
+  qemu-iotests: Fix reference output for 186 (2017-07-25 16:33:58 +0200)
 
-The latter is already achieved by using dlopen with RTLD_LOCAL (the default).
+----------------------------------------------------------------
+Block patches for 2.10-rc0
 
+----------------------------------------------------------------
+Daniel P. Berrange (1):
+  qcow: fix memory leaks related to encryption
 
-Cheers,
-  Lluis
+Kevin Wolf (1):
+  qemu-iotests: Fix reference output for 186
+
+Vladimir Sementsov-Ogievskiy (1):
+  qcow2-bitmap: fix bitmap_free
+
+ block/qcow.c               | 5 +++--
+ block/qcow2-bitmap.c       | 4 ++++
+ block/qcow2.c              | 7 ++++---
+ tests/qemu-iotests/186.out | 6 +++---
+ 4 files changed, 14 insertions(+), 8 deletions(-)
+
+-- 
+2.9.4
