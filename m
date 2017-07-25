@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1da46f-0000lz-3t
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:58:53 -0400
+	(envelope-from <groug@kaod.org>) id 1da46r-0000zM-N9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1da46c-0000xT-2r
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:58:53 -0400
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:44076)
+	(envelope-from <groug@kaod.org>) id 1da46o-00013c-NB
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:59:05 -0400
+Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:34550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1da46b-0000wX-SG
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:58:50 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1da46o-00013F-GI
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:59:02 -0400
 Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6CD7711641C
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 19:58:48 +0200 (CEST)
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 20FB911641E
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 19:59:01 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 25 Jul 2017 19:58:40 +0200
-Message-ID: <150100552078.27487.390170136970607382.stgit@bahia>
+Date: Tue, 25 Jul 2017 19:58:53 +0200
+Message-ID: <150100553345.27487.10049014405920351882.stgit@bahia>
 In-Reply-To: <150100547373.27487.3154210751350595400.stgit@bahia>
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.11 PATCH 03/26] spapr_iommu: use
+Subject: [Qemu-devel] [for-2.11 PATCH 04/26] spapr_drc: use
  g_strdup_printf() instead of snprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,53 +39,64 @@ to be silently truncated.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_iommu.c |   13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ hw/ppc/spapr_drc.c |   15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-index e614621a8317..740d42608b61 100644
---- a/hw/ppc/spapr_iommu.c
-+++ b/hw/ppc/spapr_iommu.c
-@@ -252,17 +252,19 @@ static int spapr_tce_table_realize(DeviceState *dev)
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 15bae5c216a9..e4e8383ec7b5 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -488,7 +488,7 @@ static void realize(DeviceState *d, Error **errp)
  {
-     sPAPRTCETable *tcet = SPAPR_TCE_TABLE(dev);
-     Object *tcetobj = OBJECT(tcet);
--    char tmp[32];
-+    gchar *tmp;
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
+     Object *root_container;
+-    char link_name[256];
++    gchar *link_name;
+     gchar *child_name;
+     Error *err = NULL;
  
-     tcet->fd = -1;
-     tcet->need_vfio = false;
--    snprintf(tmp, sizeof(tmp), "tce-root-%x", tcet->liobn);
-+    tmp = g_strdup_printf("tce-root-%x", tcet->liobn);
-     memory_region_init(&tcet->root, tcetobj, tmp, UINT64_MAX);
-+    g_free(tmp);
- 
--    snprintf(tmp, sizeof(tmp), "tce-iommu-%x", tcet->liobn);
-+    tmp = g_strdup_printf("tce-iommu-%x", tcet->liobn);
-     memory_region_init_iommu(&tcet->iommu, sizeof(tcet->iommu),
-                              TYPE_SPAPR_IOMMU_MEMORY_REGION,
-                              tcetobj, tmp, 0);
-+    g_free(tmp);
- 
-     QLIST_INSERT_HEAD(&spapr_tce_tables, tcet, list);
- 
-@@ -307,7 +309,7 @@ void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bool need_vfio)
- sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn)
+@@ -501,11 +501,12 @@ static void realize(DeviceState *d, Error **errp)
+      * existing in the composition tree
+      */
+     root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
+-    snprintf(link_name, sizeof(link_name), "%x", spapr_drc_index(drc));
++    link_name = g_strdup_printf("%x", spapr_drc_index(drc));
+     child_name = object_get_canonical_path_component(OBJECT(drc));
+     trace_spapr_drc_realize_child(spapr_drc_index(drc), child_name);
+     object_property_add_alias(root_container, link_name,
+                               drc->owner, child_name, &err);
++    g_free(link_name);
+     if (err) {
+         error_report_err(err);
+         object_unref(OBJECT(drc));
+@@ -521,13 +522,14 @@ static void unrealize(DeviceState *d, Error **errp)
  {
-     sPAPRTCETable *tcet;
--    char tmp[32];
-+    gchar *tmp;
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
+     Object *root_container;
+-    char name[256];
++    gchar *name;
+     Error *err = NULL;
  
-     if (spapr_tce_find_by_liobn(liobn)) {
-         error_report("Attempted to create TCE table with duplicate"
-@@ -318,8 +320,9 @@ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn)
-     tcet = SPAPR_TCE_TABLE(object_new(TYPE_SPAPR_TCE_TABLE));
-     tcet->liobn = liobn;
+     trace_spapr_drc_unrealize(spapr_drc_index(drc));
+     root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
+-    snprintf(name, sizeof(name), "%x", spapr_drc_index(drc));
++    name = g_strdup_printf("%x", spapr_drc_index(drc));
+     object_property_del(root_container, name, &err);
++    g_free(name);
+     if (err) {
+         error_report_err(err);
+         object_unref(OBJECT(drc));
+@@ -729,10 +731,11 @@ static const TypeInfo spapr_drc_lmb_info = {
+ sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
+ {
+     Object *obj;
+-    char name[256];
++    gchar *name;
  
--    snprintf(tmp, sizeof(tmp), "tce-table-%x", liobn);
-+    tmp = g_strdup_printf("tce-table-%x", liobn);
-     object_property_add_child(OBJECT(owner), tmp, OBJECT(tcet), NULL);
-+    g_free(tmp);
+-    snprintf(name, sizeof(name), "%s/%x", DRC_CONTAINER_PATH, index);
++    name = g_strdup_printf("%s/%x", DRC_CONTAINER_PATH, index);
+     obj = object_resolve_path(name, NULL);
++    g_free(name);
  
-     object_property_set_bool(OBJECT(tcet), true, "realized", NULL);
- 
+     return !obj ? NULL : SPAPR_DR_CONNECTOR(obj);
+ }
