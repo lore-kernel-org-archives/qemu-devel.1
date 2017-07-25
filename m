@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1da2AN-00079j-9G
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:54:37 -0400
+	(envelope-from <lersek@redhat.com>) id 1da2Ae-0007Kt-2I
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:54:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1da2AK-0002Os-61
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:54:35 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:55665)
+	(envelope-from <lersek@redhat.com>) id 1da2Ac-0002Yd-42
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:54:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1da2AJ-0002Np-SZ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:54:32 -0400
-Received: from player168.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 34F0C591AC
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 17:54:30 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-6-git-send-email-clg@kaod.org>
-	<20170719032438.GR3140@umbus.fritz.box>
-	<1e07b803-433a-3475-9396-a1f6b82293ff@kaod.org>
-	<20170725021648.GB9471@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <53474624-6ca4-526f-0e8f-096c2cadeac3@kaod.org>
-Date: Tue, 25 Jul 2017 17:54:20 +0200
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1da2Ab-0002XH-Q3
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:54:50 -0400
+References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d0bd04f4-1ac4-0e3a-885f-2ceb6180f69a@redhat.com>
+Date: Tue, 25 Jul 2017 17:46:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170725021648.GB9471@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 05/26] ppc/xive: define XIVE internal
- tables
+In-Reply-To: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/4] Allow RedHat PCI bridges
+ reserve more buses than necessary during init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,324 +28,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>, marcel@redhat.com, kraxel@redhat.com
+Cc: seabios@seabios.org, kevin@koconnor.net, qemu-devel@nongnu.org, konrad.wilk@oracle.com, mst@redhat.com
 
-On 07/25/2017 04:16 AM, David Gibson wrote:
-> On Mon, Jul 24, 2017 at 02:52:29PM +0200, C=E9dric Le Goater wrote:
->> On 07/19/2017 05:24 AM, David Gibson wrote:
->>> On Wed, Jul 05, 2017 at 07:13:18PM +0200, C=E9dric Le Goater wrote:
->>>> The XIVE interrupt controller of the POWER9 uses a set of tables to
->>>> redirect exception from event sources to CPU threads. Among which we
->>>> choose to model :
->>>>
->>>>  - the State Bit Entries (SBE), also known as Event State Buffer
->>>>    (ESB). This is a two bit state machine for each event source whic=
-h
->>>>    is used to trigger events. The bits are named "P" (pending) and "=
-Q"
->>>>    (queued) and can be controlled by MMIO.
->>>>
->>>>  - the Interrupt Virtualization Entry (IVE) table, also known as Eve=
-nt
->>>>    Assignment Structure (EAS). This table is indexed by the IRQ numb=
-er
->>>>    and is looked up to find the Event Queue associated with a
->>>>    triggered event.
->>>>
->>>>  - the Event Queue Descriptor (EQD) table, also known as Event
->>>>    Notification Descriptor (END). The EQD contains fields that speci=
-fy
->>>>    the Event Queue on which event data is posted (and later pulled b=
-y
->>>>    the OS) and also a target (or VPD) to notify.
->>>>
->>>> An additional table was not modeled but we might need to to support
->>>> the H_INT_SET_OS_REPORTING_LINE hcall:
->>>>
->>>>  - the Virtual Processor Descriptor (VPD) table, also known as
->>>>    Notification Virtual Target (NVT).
->>>>
->>>> The XIVE object is expanded with the tables described above. The siz=
-e
->>>> of each table depends on the number of provisioned IRQ and the maxim=
-um
->>>> number of CPUs in the system. The indexing is very basic and might
->>>> need to be improved for the EQs.
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>  hw/intc/xive-internal.h | 95 ++++++++++++++++++++++++++++++++++++++=
-+++++++++++
->>>>  hw/intc/xive.c          | 72 +++++++++++++++++++++++++++++++++++++
->>>>  2 files changed, 167 insertions(+)
->>>>
->>>> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
->>>> index 155c2dcd6066..8e755aa88a14 100644
->>>> --- a/hw/intc/xive-internal.h
->>>> +++ b/hw/intc/xive-internal.h
->>>> @@ -11,6 +11,89 @@
->>>> =20
->>>>  #include <hw/sysbus.h>
->>>> =20
->>>> +/* Utilities to manipulate these (originaly from OPAL) */
->>>> +#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
->>>> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
->>>> +#define SETFIELD(m, v, val)                             \
->>>> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (=
-m)))
->>>> +
->>>> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
->>>> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
->>>> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
->>>> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_=
-BIT(bs))
->>>> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | =
-\
->>>> +                                 PPC_BIT32(bs))
->>>> +
->>>> +/* IVE/EAS
->>>> + *
->>>> + * One per interrupt source. Targets that interrupt to a given EQ
->>>> + * and provides the corresponding logical interrupt number (EQ data=
-)
->>>> + *
->>>> + * We also map this structure to the escalation descriptor inside
->>>> + * an EQ, though in that case the valid and masked bits are not use=
-d.
->>>> + */
->>>> +typedef struct XiveIVE {
->>>> +        /* Use a single 64-bit definition to make it easier to
->>>> +         * perform atomic updates
->>>> +         */
->>>> +        uint64_t        w;
->>>> +#define IVE_VALID       PPC_BIT(0)
->>>> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ =
-block# */
->>>> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ =
-index */
->>>> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
->>>> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to=
- the EQ */
->>>> +} XiveIVE;
->>>> +
->>>> +/* EQ */
->>>> +typedef struct XiveEQ {
->>>> +        uint32_t        w0;
->>>> +#define EQ_W0_VALID             PPC_BIT32(0)
->>>> +#define EQ_W0_ENQUEUE           PPC_BIT32(1)
->>>> +#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2)
->>>> +#define EQ_W0_BACKLOG           PPC_BIT32(3)
->>>> +#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4)
->>>> +#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5)
->>>> +#define EQ_W0_END_OF_INTR       PPC_BIT32(6)
->>>> +#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
->>>> +#define EQ_W0_SW0               PPC_BIT32(16)
->>>> +#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
->>>> +#define EQ_QSIZE_4K             0
->>>> +#define EQ_QSIZE_64K            4
->>>> +#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
->>>> +        uint32_t        w1;
->>>> +#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
->>>> +#define EQ_W1_ESn_P             PPC_BIT32(0)
->>>> +#define EQ_W1_ESn_Q             PPC_BIT32(1)
->>>> +#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
->>>> +#define EQ_W1_ESe_P             PPC_BIT32(2)
->>>> +#define EQ_W1_ESe_Q             PPC_BIT32(3)
->>>> +#define EQ_W1_GENERATION        PPC_BIT32(9)
->>>> +#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
->>>> +        uint32_t        w2;
->>>> +#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
->>>> +#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
->>>> +        uint32_t        w3;
->>>> +#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
->>>> +        uint32_t        w4;
->>>> +#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
->>>> +#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
->>>> +        uint32_t        w5;
->>>> +#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
->>>> +        uint32_t        w6;
->>>> +#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
->>>> +#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
->>>> +#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
->>>> +        uint32_t        w7;
->>>> +#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
->>>> +#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
->>>> +#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
->>>> +#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
->>>> +#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
->>>> +} XiveEQ;
->>>> +
->>>> +#define XIVE_EQ_PRIORITY_COUNT 8
->>>> +#define XIVE_PRIORITY_MAX  (XIVE_EQ_PRIORITY_COUNT - 1)
->>>> +
->>>>  struct XIVE {
->>>>      SysBusDevice parent;
->>>> =20
->>>> @@ -23,6 +106,18 @@ struct XIVE {
->>>>      uint32_t     int_max;       /* Max index */
->>>>      uint32_t     int_hw_bot;    /* Bottom index of HW IRQ allocator=
- */
->>>>      uint32_t     int_ipi_top;   /* Highest IPI index handed out so =
-far + 1 */
->>>> +
->>>> +    /* XIVE internal tables */
->>>> +    void         *sbe;
->>>> +    XiveIVE      *ivt;
->>>> +    XiveEQ       *eqdt;
->>>>  };
->>>> =20
->>>> +void xive_reset(void *dev);
->>>> +XiveIVE *xive_get_ive(XIVE *x, uint32_t isn);
->>>> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx);
->>>> +
->>>> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t prio,
->>>> +                        uint32_t *out_eq_idx);
->>>> +
->>>>  #endif /* _INTC_XIVE_INTERNAL_H */
->>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>> index 5b4ea915d87c..5b14d8155317 100644
->>>> --- a/hw/intc/xive.c
->>>> +++ b/hw/intc/xive.c
->>>> @@ -35,6 +35,27 @@
->>>>   */
->>>>  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
->>>> =20
->>>> +
->>>> +void xive_reset(void *dev)
->>>> +{
->>>> +    XIVE *x =3D XIVE(dev);
->>>> +    int i;
->>>> +
->>>> +    /* SBEs are initialized to 0b01 which corresponds to "ints off"=
- */
->>>> +    memset(x->sbe, 0x55, x->int_count / 4);
->>>
->>> I think strictly this should be a DIV_ROUND_UP to handle the case of
->>> int_count not a multiple of 4.
->>
->> ok.=20
->> =20
->>>> +
->>>> +    /* Clear and mask all valid IVEs */
->>>> +    for (i =3D x->int_base; i < x->int_max; i++) {
->>>> +        XiveIVE *ive =3D &x->ivt[i];
->>>> +        if (ive->w & IVE_VALID) {
->>>> +            ive->w =3D IVE_VALID | IVE_MASKED;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    /* clear all EQs */
->>>> +    memset(x->eqdt, 0, x->nr_targets * XIVE_EQ_PRIORITY_COUNT * siz=
-eof(XiveEQ));
->>>> +}
->>>> +
->>>>  static void xive_init(Object *obj)
->>>>  {
->>>>      ;
->>>> @@ -62,6 +83,19 @@ static void xive_realize(DeviceState *dev, Error =
-**errp)
->>>>      if (x->int_ipi_top < 0x10) {
->>>>          x->int_ipi_top =3D 0x10;
->>>>      }
->>>> +
->>>> +    /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per by=
-te */
->>>> +    x->sbe =3D g_malloc0(x->int_count / 4);
->>>
->>> And here as well.
->>
->> yes.
->>
->>>> +
->>>> +    /* Allocate the IVT (Interrupt Virtualization Table) */
->>>> +    x->ivt =3D g_malloc0(x->int_count * sizeof(XiveIVE));
->>>> +
->>>> +    /* Allocate the EQDT (Event Queue Descriptor Table), 8 prioriti=
-es
->>>> +     * for each thread in the system */
->>>> +    x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
->>>> +                        sizeof(XiveEQ));
->>>> +
->>>> +    qemu_register_reset(xive_reset, dev);
->>>>  }
->>>> =20
->>>>  static Property xive_properties[] =3D {
->>>> @@ -92,3 +126,41 @@ static void xive_register_types(void)
->>>>  }
->>>> =20
->>>>  type_init(xive_register_types)
->>>> +
->>>> +XiveIVE *xive_get_ive(XIVE *x, uint32_t lisn)
->>>> +{
->>>> +    uint32_t idx =3D lisn;
->>>> +
->>>> +    if (idx < x->int_base || idx >=3D x->int_max) {
->>>> +        return NULL;
->>>> +    }
->>>> +
->>>> +    return &x->ivt[idx];
->>>
->>> Should be idx - int_base, no?
->>
->> no, not in the allocator model I have chosen. The IRQ numbers=20
->> are exposed to the guest with their offset. But this is another=20
->> discussion which I would rather continue in another thread.=20
->=20
-> Uh.. but you're using idx to index IVT directly, after verifying that
-> it lies between int_base and int_max.  AFAICT IVT is only allocated
-> with int_max - int_base entries, so without an offset here you'll
-> overrun it, won't you?
+On 07/23/17 00:11, Aleksandr Bezzubikov wrote:
+> Now PCI bridges get a bus range number on a system init, basing on
+> currently plugged devices. That's why when one wants to hotplug
+> another bridge, it needs his child bus, which the parent is unable to
+> provide (speaking about virtual device). The suggested workaround is
+> to have vendor-specific capability in Red Hat PCI bridges that
+> contains number of additional bus to reserve on BIOS PCI init. So this
+> capability is intented only for pure QEMU->SeaBIOS usage.
+>
+> Considering all aforesaid, this series is directly connected with
+> QEMU RFC series (v2) "Generic PCIE-PCI Bridge".
+>
+> Although the new PCI capability is supposed to contain various limits
+> along with bus number to reserve, now only its full layout is
+> proposed, but only bus_reserve field is used in QEMU and BIOS. Limits
+> usage is still a subject for implementation as now the main goal of
+> this series to provide necessary support from the  firmware side to
+> PCIE-PCI bridge hotplug.
+>
+> Changes v1->v2:
+> 1. New #define for Red Hat vendor added (addresses Konrad's comment).
+> 2. Refactored pci_find_capability function (addresses Marcel's
+>    comment).
+> 3. Capability reworked:
+> 	- data type added;
+> 	- reserve space in a structure for IO, memory and
+> 	  prefetchable memory limits.
+>
+>
+> Aleksandr Bezzubikov (4):
+>   pci: refactor pci_find_capapibilty to get bdf as the first argument
+>     instead of the whole pci_device
+>   pci: add RedHat vendor ID
+>   pci: add QEMU-specific PCI capability structure
+>   pci: enable RedHat PCI bridges to reserve additional buses on PCI
+>     init
+>
+>  src/fw/pciinit.c    | 18 ++++++++++++++----
+>  src/hw/pci_cap.h    | 23 +++++++++++++++++++++++
+>  src/hw/pci_ids.h    |  2 ++
+>  src/hw/pcidevice.c  | 12 ++++++------
+>  src/hw/pcidevice.h  |  2 +-
+>  src/hw/virtio-pci.c |  4 ++--
+>  6 files changed, 48 insertions(+), 13 deletions(-)
+>  create mode 100644 src/hw/pci_cap.h
+>
 
-ah yes, you are right. I got confused because the idx used to be
-calculated in a different way. Luckily, 'int_base' is zero for the=20
-moment. Anyway I need to rework the allocator and the indexing=20
-of these tables, it's too complex for sPAPR.=20
+Coming back from PTO, it's hard for me to follow up on all the comments
+that have been made across the v1 and v2 of this RFC series, so I'll
+just provide a brain dump here:
 
-Thanks,
+(1) Mentioned by Michael: documentation. That's the most important part.
+I haven't seen the QEMU patches, so perhaps they already include
+documentation. If not, please start this work with adding a detailed
+description do QEMU's docs/ or docs/specs/.
 
-C.=20
+There are a number of preexistent documents that might be related, just
+search docs/ for filenames with "pci" in them.
 
->>>> +}
->>>> +
->>>> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx)
->>>> +{
->>>> +    if (idx >=3D x->nr_targets * XIVE_EQ_PRIORITY_COUNT) {
->>>> +        return NULL;
->>>> +    }
->>>> +
->>>> +    return &x->eqdt[idx];
->>>> +}
->>>> +
->>>> +/* TODO: improve EQ indexing. This is very simple and relies on the
->>>> + * fact that target (CPU) numbers start at 0 and are contiguous. It
->>>> + * should be OK for sPAPR.
->>>> + */
->>>> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t priority,
->>>> +                        uint32_t *out_eq_idx)
->>>> +{
->>>> +    if (priority > XIVE_PRIORITY_MAX || target >=3D x->nr_targets) =
-{
->>>> +        return false;
->>>> +    }
->>>> +
->>>> +    if (out_eq_idx) {
->>>> +        *out_eq_idx =3D target + priority;
->>>> +    }
->>>> +
->>>> +    return true;
->>>
->>> Seems a clunky interface.  Why not return a XiveEQ *, NULL if the
->>> inputs aren't valud.
->>
->> Yes. This interface is inherited from OPAL and it's not consistent=20
->> with the other xive_get_*() routines. But we are missing a XIVE=20
->> internal table for VPs which explains the difference. I need to look=20
->> at the support of the OS_REPORTING_LINE hcalls before simplifying.
->>
->> Thanks,
->>
->> C.=20
->>
->>
->=20
+
+(2) Bus range reservation, and hotplugging bridges. What's the
+motivation? Our recommendations in "docs/pcie.txt" suggest flat
+hierarchies.
+
+If this use case is really necessary, I think it should be covered in
+"docs/pcie.txt". In particular it has a consequence for PXB as well
+(search "pcie.txt" for "bus_nr") -- if users employ extra root buses,
+then the bus number partitions that they specify must account for any
+bridges that they plan to hot-plug (and for the bus range reservations
+on the cold-plugged bridges behind those extra root buses).
+
+
+(3) Regarding the contents and the format of the capability structure, I
+wrote up my thoughts earlier in
+
+  https://bugzilla.redhat.com/show_bug.cgi?id=1434747#c8
+
+Let me quote it here for ease of commenting:
+
+> (In reply to Gerd Hoffmann from comment #7)
+> > So, now that the generic ports are there we can go on figure how to
+> > handle this best.  I still think the best way to communicate window
+> > size hints would be to use a vendor specific pci capability (instead
+> > of setting the desired size on reset).  The information will always
+> > be available then and we don't run into initialization order issues.
+>
+> This seems good to me -- I can't promise 100% without actually trying,
+> but I think I should be able to parse the capability list in config
+> space for this hint, in the GetResourcePadding() callback.
+>
+> I propose that we try to handle this issue "holistically", together
+> with bug 1434740. We need a method that provides controls for both IO
+> and MMIO:
+>
+> - For IO, we need a mechanism that can prevent *both* firmware *and*
+>   Linux from reserving IO for PCI Express ports. I think Marcel's
+>   approach in bug 1344299 is sufficient, i.e., set the IO base/limit
+>   registers of the bridge to 0 for disabling IO support. And, if not
+>   disabled, just go with the default 4KB IO reservation (for both PCI
+>   Express ports and legacy PCI bridges, as the latter is documented in
+>   the guidelines).
+>
+> - For MMIO, the vendor specific capability structure should work
+>   something like this:
+>     - if the capability is missing, reserve 2MB, 32-bit,
+>       non-prefetchable,
+>
+>     - otherwise, the capability structure should consist of 3 fields
+>       (reservation sizes):
+>         - uint32_t non_prefetchable_32,
+>         - uint32_t prefetchable_32,
+>         - uint64_t prefetchable_64,
+>
+>     - of prefetchable_32 and prefetchable_64, at most one may be
+>       nonzero (they are mutually exclusive, and they can be both
+>       zero),
+>
+>     - whenever a field is 0, that kind of reservation is not needed.
+
+This would now have to be extended with bus range reservation.
+
+
+(4) Whether the reservation size should be absolute or relative (raised
+by Gerd). IIUC, Gerd suggests that the absolute aperture size should be
+specified (as a minimum), not the increment / reservation for hotplug
+purposes.
+
+The Platform Initialization Specification, v1.6, downloadable at
+<http://www.uefi.org/specs>, writes the following under
+
+  EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetResourcePadding()
+
+in whose implementation I will have to parse the values from the
+capability structure, and return the appropriate representation to the
+platform-independent PciBusDxe driver (i.e., the enumeration /
+allocation agent):
+
+> The padding is returned in the form of ACPI (2.0 & 3.0) resource
+> descriptors. The exact definition of each of the fields is the same as
+> in the
+> EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.SubmitResources()
+> function. See the section 10.8 for the definition of this function.
+>
+> The PCI bus driver is responsible for adding this resource request to
+> the resource requests by the physical PCI devices. If Attributes is
+> EfiPaddingPciBus, the padding takes effect at the PCI bus level. If
+> Attributes is EfiPaddingPciRootBridge, the required padding takes
+> effect at the root bridge level. For details, see the definition of
+> EFI_HPC_PADDING_ATTRIBUTES in "Related Definitions" below.
+
+Emphasis on "*adding* this resource request to the resource requests by
+the physical PCI devices".
+
+However... After checking some OVMF logs, it seems that in practice,
+PciBusDxe does exactly what Gerd suggests.
+
+Currently OVMF returns a constant 2MB MMIO padding and a constant 512B
+IO padding for all hotplug-capable bridges (including PCI Express root
+ports), from GetResourcePadding(). For example, for the following QEMU
+command line fragment:
+
+  -device pxb-pcie,bus_nr=64,id=rootbr1,numa_node=1,bus=pcie.0,addr=0x3 \
+  \
+  -device ioh3420,id=rootbr1-port1,bus=rootbr1,addr=0x1,slot=3 \
+  -device e1000e,bus=rootbr1-port1,netdev=net0 \
+  \
+  -device ioh3420,id=rootbr1-port2,bus=rootbr1,addr=0x2,slot=4 \
+  -device e1000e,bus=rootbr1-port2,netdev=net1 \
+
+PciBusDxe produces the following log (extract):
+
+> PciBus: Resource Map for Root Bridge PciRoot(0x40)
+> Type =   Io16; Base = 0x8000;   Length = 0x2000;        Alignment = 0xFFF
+>    Base = 0x8000;       Length = 0x1000;        Alignment = 0xFFF;      Owner = PPB [40|02|00:**]
+>    Base = 0x9000;       Length = 0x1000;        Alignment = 0xFFF;      Owner = PPB [40|01|00:**]
+> Type =  Mem32; Base = 0x98600000;       Length = 0x400000;      Alignment = 0x1FFFFF
+>    Base = 0x98600000;   Length = 0x200000;      Alignment = 0x1FFFFF;   Owner = PPB [40|02|00:**]
+>    Base = 0x98800000;   Length = 0x200000;      Alignment = 0x1FFFFF;   Owner = PPB [40|01|00:**]
+>
+> PciBus: Resource Map for Bridge [40|01|00]
+> Type =   Io16; Base = 0x9000;   Length = 0x1000;        Alignment = 0xFFF
+>    Base = Padding;      Length = 0x200; Alignment = 0x1FF
+>    Base = 0x9000;       Length = 0x20;  Alignment = 0x1F;       Owner = PCI [41|00|00:18]
+> Type =  Mem32; Base = 0x98800000;       Length = 0x200000;      Alignment = 0x1FFFFF
+>    Base = Padding;      Length = 0x200000;      Alignment = 0x1FFFFF
+>    Base = 0x98800000;   Length = 0x20000;       Alignment = 0x1FFFF;    Owner = PCI [41|00|00:14]
+>    Base = 0x98820000;   Length = 0x20000;       Alignment = 0x1FFFF;    Owner = PCI [41|00|00:10]
+>    Base = 0x98840000;   Length = 0x4000;        Alignment = 0x3FFF;     Owner = PCI [41|00|00:1C]
+>
+> PciBus: Resource Map for Bridge [40|02|00]
+> Type =   Io16; Base = 0x8000;   Length = 0x1000;        Alignment = 0xFFF
+>    Base = Padding;      Length = 0x200; Alignment = 0x1FF
+>    Base = 0x8000;       Length = 0x20;  Alignment = 0x1F;       Owner = PCI [42|00|00:18]
+> Type =  Mem32; Base = 0x98600000;       Length = 0x200000;      Alignment = 0x1FFFFF
+>    Base = Padding;      Length = 0x200000;      Alignment = 0x1FFFFF
+>    Base = 0x98600000;   Length = 0x20000;       Alignment = 0x1FFFF;    Owner = PCI [42|00|00:14]
+>    Base = 0x98620000;   Length = 0x20000;       Alignment = 0x1FFFF;    Owner = PCI [42|00|00:10]
+>    Base = 0x98640000;   Length = 0x4000;        Alignment = 0x3FFF;     Owner = PCI [42|00|00:1C]
+
+This means that
+- both ioh3420 root ports get a padding of 512B for IO and 2MB fo MMIO,
+- the actual resources for each e1000e NIC on the respective ioh3420
+  root port are allocated *within* the padding,
+- because each MMIO padding is larger than the actual resource needs of
+  the respective e1000e NIC, it is the MMIO paddings that are ultimately
+  considered on the root bridge,
+- additionally, the 0x200 IO paddings are rounded up to 0x1000 on the
+  root bridge.
+
+So, it seems that PciBusDxe
+- conflicts with the Platform Initialization spec, but
+- at the same time it seems to do what Gerd is suggesting.
+
+
+(5) Returning to bus range reservation... This looks problematic with
+edk2.
+
+* Some background first:
+
+In the Platform Init spec, two kinds of hotplug controllers are
+distinguished: "root" and "non-root". This naming is confusing because
+in this context, "root" simply means
+
+  cannot be found by normal enumeration, or needs special initialization
+  when found before recursing it
+
+whereas "non-root" means
+
+  can be found by normal enumeration and needs no special initialization
+  before recursing it
+
+In this context, QEMU does not provide any "root" hotplug controllers,
+because all the controllers that support hotplug -- i.e., can *accept* a
+hot-plugged device -- *can* be found with enumeration, and need no
+platform-specific initialization callback:
+- PCI Express root ports
+- PCI Express downstream ports
+- PCI-PCI Bridges
+
+Now, if a platform provides "root" (in the above context) hotplug
+controllers, then the platform's
+
+  EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetRootHpcList()
+
+method has to return them. (Importantly, this function has to return the
+list of "root HPCs" *without* accessing PCI config space, using
+"apriori" knowledge.) Accordingly to the QEMU situation, OVMF returns an
+empty list here.
+
+* Why this is a problem:
+
+For "non-root" (in the above sense) hotplug controllers, PciBusDxe
+considers the IO and MMIO paddings, but it does *not* consider bus
+number paddings, even if
+EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetResourcePadding() returns some. (As
+far as I can see from the source -- I have never tested it, obviously.)
+For QEMU, this means all of the hotplug controllers.
+
+For "root" (in the above sense) hotplug controllers, PciBusDxe considers
+bus number paddings. However, on QEMU, this set of controllers is empty.
+
+The PI spec says,
+
+> [...] For all the root HPCs and the nonroot HPCs, call
+> EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetResourcePadding() to obtain the
+> amount of overallocation and add that amount to the requests from the
+> physical devices. Reprogram the bus numbers by taking into account the
+> bus resource padding information. [...]
+
+However, according to my interpretation of the source code, PciBusDxe
+does not consider bus number padding for non-root HPCs (which are "all"
+HPCs on QEMU).
+
+So, I agree that we can add a bus number range field to the capability,
+but I'm fairly sure it won't work with edk2's PciBusDxe without major
+surgery. (Given that we haven't ever considered hot-plugging entire
+bridges until now, i.e., anything that would require bus number
+reservation, I think we can live with such a limitation when using OVMF,
+for an indefinite time to come.)
+
+Thanks
+Laszlo
