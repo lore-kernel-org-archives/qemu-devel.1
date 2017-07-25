@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dZzyu-00049z-G7
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:34:37 -0400
+	(envelope-from <mst@redhat.com>) id 1da00Y-0005Sb-TD
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dZzyt-0004TC-Hj
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:34:36 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dZzyt-0004SW-Bu
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:34:35 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id k71so65612440wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 06:34:35 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 25 Jul 2017 14:34:24 +0100
-Message-Id: <20170725133425.436-6-alex.bennee@linaro.org>
-In-Reply-To: <20170725133425.436-1-alex.bennee@linaro.org>
-References: <20170725133425.436-1-alex.bennee@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1da00U-0005Ah-Us
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:36:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58706)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1da00U-00059x-MJ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:36:14 -0400
+Date: Tue, 25 Jul 2017 16:36:06 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170725163315-mutt-send-email-mst@kernel.org>
+References: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.10 v2 5/6] docker: don't install
- device-tree-compiler build-deps in travis.docker
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx
+ based machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +27,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>, Phil Dennis-Jordan <lists@philjordan.eu>
 
-Installing the device-tree-compiler build-deps is a little extreme. We
-only actually need the binary so include it with the other packages.
+On Mon, Jul 24, 2017 at 03:50:20PM +0200, Igor Mammedov wrote:
+> w2k used to boot on QEMU until revision of FADT has
+> been bumped to rev3
+> (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+> 
+> Keep PC machine at rev1 to remain compatible and Q35
+> at rev3 where w2k isn't supported anyway so OSX could
+> run as well.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>    - make pc rev1 and q35 rev3.
+>        "Michael S. Tsirkin" <mst@redhat.com>
+> 
+> PS:
+> Only compile tested.
+> 
+> 
+> CC: Programmingkid <programmingkidx@gmail.com>
+> CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+> 
+> ---
+>  hw/i386/acpi-build.c | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 6b7bade..b9c245c 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
+>  } AcpiMcfgInfo;
+>  
+>  typedef struct AcpiPmInfo {
+> +    bool force_rev1_fadt;
+>      bool s3_disabled;
+>      bool s4_disabled;
+>      bool pcihp_bridge_en;
+> @@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+>      Object *obj = NULL;
+>      QObject *o;
+>  
+> +    pm->force_rev1_fadt = false;
+>      pm->cpu_hp_io_base = 0;
+>      pm->pcihp_io_base = 0;
+>      pm->pcihp_io_len = 0;
+>      if (piix) {
+> +        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+> +        pm->force_rev1_fadt = true;
+>          obj = piix;
+>          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+>          pm->pcihp_io_base =
+> @@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+>          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+>      }
+>      fadt->century = RTC_CENTURY;
+> +    if (pm->force_rev1_fadt) {
+> +        return;
+> +    }
+>  
+>      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+>      fadt->reset_value = 0xf;
+> @@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+>      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+>      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+>      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> +    int fadt_size = sizeof(*fadt);
+> +    int rev = 3;
+>  
+>      /* FACS address to be filled by Guest linker */
+>      bios_linker_loader_add_pointer(linker,
+> @@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+>      bios_linker_loader_add_pointer(linker,
+>          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> -    bios_linker_loader_add_pointer(linker,
+> -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> +    if (pm->force_rev1_fadt) {
+> +        rev = 1;
+> +        fadt_size = offsetof(typeof(*fadt), reset_register);
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/dockerfiles/travis.docker | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I don't really like it that we are using structs to format fields - I
+would prefer build_append_int_noprefix based APIs - but since we do,
+let's add a proper structure for FADT rev 1 instead of this hack.
 
-diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
-index 636fa590a5..57ac8e1419 100644
---- a/tests/docker/dockerfiles/travis.docker
-+++ b/tests/docker/dockerfiles/travis.docker
-@@ -1,6 +1,5 @@
- FROM quay.io/travisci/travis-ruby
- RUN apt-get update
- RUN apt-get -y build-dep qemu
--RUN apt-get -y build-dep device-tree-compiler
--RUN apt-get -y install python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
-+RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
- ENV FEATURES pyyaml
--- 
-2.13.0
+While we are at it, maybe we should replace macro hacks like
+ACPI_FADT_COMMON_DEF with simple sub-structures (unless you see a reason
+not to).
+
+
+> +    } else {
+> +        bios_linker_loader_add_pointer(linker,
+> +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> +    }
+>  
+>      build_header(linker, table_data,
+> -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
+> +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
+>  }
+>  
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> -- 
+> 2.7.4
