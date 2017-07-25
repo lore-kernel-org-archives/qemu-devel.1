@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dZwJP-0000wx-PV
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:39:32 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dZwKR-0001eH-7o
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dZwJO-0002bD-Rt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:39:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37942)
+	(envelope-from <cohuck@redhat.com>) id 1dZwKN-0003Ff-80
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZwJO-0002aQ-Lu
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:39:30 -0400
-Date: Tue, 25 Jul 2017 10:39:21 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170725093921.GK26394@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-	<f65fafa6dbfe151b16cc1b2528ddb7ab7e9fbfcf.1500709594.git-series.knut.omang@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f65fafa6dbfe151b16cc1b2528ddb7ab7e9fbfcf.1500709594.git-series.knut.omang@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] sockets: factor out a new
- try_bind() function
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dZwKN-0003FI-1h
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:31 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Tue, 25 Jul 2017 11:40:12 +0200
+Message-Id: <20170725094026.5376-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +21,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-On Sat, Jul 22, 2017 at 09:49:32AM +0200, Knut Omang wrote:
-> Another refactoring step to prepare for the problem
-> exposed by the test-listen test.
-> 
-> This time simplify and reorganize the IPv6 specific extra
-> measures and move it out of the for loop to increase
-> code readability. No semantic changes.
-> 
-> Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> ---
->  util/qemu-sockets.c | 69 ++++++++++++++++++++++++++--------------------
->  1 file changed, 39 insertions(+), 30 deletions(-)
+The following changes since commit b5a74cd81d76cb467552f38f2b39520d07c65ea2:
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170724' into staging (2017-07-24 18:15:45 +0100)
 
+are available in the git repository at:
 
-Regards,
-Daniel
+  git://github.com/cohuck/qemu tags/s390x-20170725
+
+for you to fetch changes up to 7e01376daea75e888c370aab521a7d4aeaf2ffd1:
+
+  s390x/css: fix ilen in IO instruction handlers (2017-07-25 09:17:42 +0200)
+
+----------------------------------------------------------------
+Various changes for the s390x code:
+- updates for cpu model handling
+- fix compilation with --disable-tcg
+- fixes in vfio-ccw and I/O instruction handling
+
+----------------------------------------------------------------
+
+Christian Borntraeger (1):
+  s390/cpumodel: remove KSS from the default model of z14
+
+David Hildenbrand (5):
+  target/s390x: drop BE_BIT()
+  target/s390x: indicate query subfunction in s390_fill_feat_block
+  target/s390x: introduce (test|set)_be_bit
+  s390x/kvm: better comment regarding zPCI feature availability
+  target/s390x: improve baselining if certain base features are missing
+
+Dong Jia Shi (1):
+  vfio/ccw: fix initialization of the Object DeviceState pointer in the
+    common base-device
+
+Halil Pasic (1):
+  s390x/css: fix ilen in IO instruction handlers
+
+Jing Zhang (1):
+  vfio/ccw: allocate irq info with the right size
+
+Thomas Huth (5):
+  target/s390x: Move s390_cpu_dump_state() to helper.c
+  target/s390x: Move diag helpers to a separate file
+  target/s390x: Rework program_interrupt() and related functions
+  target/s390x: Move exception-related functions to a new excp_helper.c
+    file
+  target/s390x: Add remaining switches to compile with --disable-tcg
+
+ hw/vfio/ccw.c               |   3 +-
+ target/s390x/Makefile.objs  |   8 +-
+ target/s390x/cpu.c          |   4 +
+ target/s390x/cpu.h          |  17 +-
+ target/s390x/cpu_features.c |  33 ++-
+ target/s390x/cpu_features.h |   9 +-
+ target/s390x/cpu_models.c   |  34 +++
+ target/s390x/diag.c         | 179 +++++++++++++++
+ target/s390x/excp_helper.c  | 515 ++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/gen-features.c |   1 -
+ target/s390x/helper.c       | 528 +++++---------------------------------------
+ target/s390x/interrupt.c    |  39 ++++
+ target/s390x/ioinst.c       |  42 ++--
+ target/s390x/kvm.c          |  45 +---
+ target/s390x/misc_helper.c  | 193 ----------------
+ target/s390x/translate.c    |  60 -----
+ 16 files changed, 914 insertions(+), 796 deletions(-)
+ create mode 100644 target/s390x/diag.c
+ create mode 100644 target/s390x/excp_helper.c
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.3
