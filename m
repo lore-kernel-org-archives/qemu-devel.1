@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1da17N-0006MU-E4
+	(envelope-from <vilanova@ac.upc.edu>) id 1da17N-0006Mg-Jg
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1da17I-0003nF-Hm
+	(envelope-from <vilanova@ac.upc.edu>) id 1da17I-0003nX-Mn
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:47:25 -0400
-Received: from mga05.intel.com ([192.55.52.43]:23388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1da17I-0003mV-8P
+Received: from roura.ac.upc.es ([147.83.33.10]:42093)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1da17I-0003mM-AC
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:47:20 -0400
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Tue, 25 Jul 2017 14:47:16 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
-References: <20170714123023.GA2624@dhcp22.suse.cz>
-	<20170714181523-mutt-send-email-mst@kernel.org>
-	<20170717152448.GN12888@dhcp22.suse.cz> <596D6E7E.4070700@intel.com>
-	<20170719081311.GC26779@dhcp22.suse.cz> <596F4A0E.4010507@intel.com>
-	<20170724090042.GF25221@dhcp22.suse.cz> <59771010.6080108@intel.com>
-	<20170725112513.GD26723@dhcp22.suse.cz> <597731E8.9040803@intel.com>
-	<20170725124141.GF26723@dhcp22.suse.cz>
-In-Reply-To: <20170725124141.GF26723@dhcp22.suse.cz>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+	<20170725131931.GC23343@stefanha-x1.localdomain>
+Date: Tue, 25 Jul 2017 17:47:08 +0300
+In-Reply-To: <20170725131931.GC23343@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Tue, 25 Jul 2017 14:19:31 +0100")
+Message-ID: <87wp6wa80j.fsf@frigg.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Hocko <mhocko@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tuesday, July 25, 2017 8:42 PM, hal Hocko wrote:
-> On Tue 25-07-17 19:56:24, Wei Wang wrote:
-> > On 07/25/2017 07:25 PM, Michal Hocko wrote:
-> > >On Tue 25-07-17 17:32:00, Wei Wang wrote:
-> > >>On 07/24/2017 05:00 PM, Michal Hocko wrote:
-> > >>>On Wed 19-07-17 20:01:18, Wei Wang wrote:
-> > >>>>On 07/19/2017 04:13 PM, Michal Hocko wrote:
-> > >>>[...
-> > We don't need to do the pfn walk in the guest kernel. When the API
-> > reports, for example, a 2MB free page block, the API caller offers to
-> > the hypervisor the base address of the page block, and size=3D2MB, to
-> > the hypervisor.
->=20
-> So you want to skip pfn walks by regularly calling into the page allocato=
-r to
-> update your bitmap. If that is the case then would an API that would allo=
-w you
-> to update your bitmap via a callback be s sufficient? Something like
-> 	void walk_free_mem(int node, int min_order,
-> 			void (*visit)(unsigned long pfn, unsigned long nr_pages))
->=20
-> The function will call the given callback for each free memory block on t=
-he given
-> node starting from the given min_order. The callback will be strictly an =
-atomic
-> and very light context. You can update your bitmap from there.
+Stefan Hajnoczi writes:
 
-I would need to introduce more about the background here:
-The hypervisor and the guest live in their own address space. The hyperviso=
-r's bitmap
-isn't seen by the guest. I think we also wouldn't be able to give a callbac=
-k function=20
-from the hypervisor to the guest in this case.
+> On Mon, Jul 24, 2017 at 08:02:24PM +0300, Llu=C3=ADs Vilanova wrote:
+>> This series adds a basic interface to instrument tracing events and cont=
+rol
+>> their tracing state.
+>>=20
+>> The instrumentation code is dynamically loaded into QEMU (either when it=
+ starts
+>> or later using its remote control interfaces).
+>>=20
+>> All events can be instrumented, but the instrumentable events must be ex=
+plicitly
+>> specified at configure time.
+>>=20
+>> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 
->=20
-> This would address my main concern that the allocator internals would get
-> outside of the allocator proper.=20
+> Hi Llu=C3=ADs,
+> I'm concerned that the shared library interface will be abused to monkey
+> patch code into QEMU far beyond instrumentation use cases and/or avoid
+> the responsibilities of the GPL license.
 
-What issue would it have to expose the internal, for_each_zone()?
-I think new code which would call it will also be strictly checked when the=
-y
-are pushed to upstream.
+> Instead I suggest adding a trace backend generates calls to registered
+> "callback" functions:
 
-Best,
-Wei
+>   $ cat >my-instrumentation.c
+>   #include "trace/control.h"
+
+>   static void my_cpu_in(unsigned int addr, char size, unsigned int val)
+>   {
+>       printf("my_cpu_in\n");
+>   }
+
+>   static void my_init(void)
+>   {
+>       trace_register_event_callback("cpu_in", my_cpu_in);
+>       trace_enable_events("cpu_in");
+>   }
+>   trace_init(my_init);
+
+>   $ ./configure --enable-trace-backends=3Dlog,callback && make -j4
+
+> This is still a clean interface that allows instrumentation code to be
+> kept separate from the trace event call sites.
+
+> The instrumentation code gets compiled into QEMU, but that shouldn't be
+> a huge burden since QEMU's Makefiles only recompile changed source
+> files (only the first build is slow).
+
+> Does this alternative sound reasonable to you?
+
+You mean to add a user-provided .c file to QEMU at compile-time? (I'm assum=
+ing
+we can keep the "user API" proposed in this series, instead of the one you
+showed).
+
+First, a user might want to provide more than just a .c, so we might have to
+accept a directory that produces a library that is included into QEMU at li=
+nk
+time (a bit more complicated to do portably).
+
+Second, the user can still do the same actions you want to shield from,
+regardless of whether it's a dynamically loaded library (i.e., access any
+fuction in QEMU).
+
+What I propose to do instead is:
+
+* For the monkey-patch part, we can limit symbol resolution to the
+  instrumentation API functions when loading the library (e.g., compile QEMU
+  with -fvisibility=3Dhidden).
+
+* For the license part, that is a legal issue that can be handled by the API
+  header license, right? (the "public" headers I added are GPL, not
+  LGPL). Besides, if only the intended API is available, I'm not sure if th=
+at
+  matters (e.g., we don't care about the license of a dtrace script, since =
+it
+  only has the API provided by QEMU+dtrace).
+
+This would be similar to Linux's module support; only selected functions are
+available to modules, and we could add a license check (e.g., QI_LICENSE("G=
+PL")
+must be on the instrumentation library or it won't be loaded).
+
+
+Thanks,
+  Lluis
