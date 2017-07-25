@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZzmU-0004pr-6o
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:48 -0400
+	(envelope-from <mst@redhat.com>) id 1dZzqq-0007hL-3o
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZzmP-0005uH-V8
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:46 -0400
-Date: Tue, 25 Jul 2017 22:21:54 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170725122154.GE8978@umbus.fritz.box>
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-8-git-send-email-clg@kaod.org>
-	<20170724042956.GD17228@umbus.fritz.box>
-	<006293c9-b396-82f9-19ba-d57301934ffe@kaod.org>
+	(envelope-from <mst@redhat.com>) id 1dZzqm-0008Cf-4E
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:26:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZzql-0008CM-Qb
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:26:12 -0400
+Date: Tue, 25 Jul 2017 16:26:04 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170725162344-mutt-send-email-mst@kernel.org>
+References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
+	<20170721094955.GH17693@redhat.com>
+	<20170721121048.44d617ea@nial.brq.redhat.com>
+	<20170722023020-mutt-send-email-mst@kernel.org>
+	<20170724084848.259c0bfc@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="T6xhMxlHU34Bk0ad"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <006293c9-b396-82f9-19ba-d57301934ffe@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 07/26] ppc/xive: add MMIO handlers to
- the XIVE interrupt source
+In-Reply-To: <20170724084848.259c0bfc@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,197 +31,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
+
+On Mon, Jul 24, 2017 at 08:48:48AM +0200, Igor Mammedov wrote:
+> On Sat, 22 Jul 2017 02:40:46 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Fri, Jul 21, 2017 at 12:10:48PM +0200, Igor Mammedov wrote:
+> > > On Fri, 21 Jul 2017 10:49:55 +0100
+> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > >   
+> > > > On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:  
+> > > > > w2k used to boot on QEMU until we bumped revision of FADT to rev3
+> > > > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+> > > > > 
+> > > > > Considering that w2k is ancient and long time EOLed, leave default
+> > > > > rev3 but make pc-i440fx-2.9 and older machine types to force rev1
+> > > > > so old setups won't break (w2k could boot).    
+> > > > 
+> > > > There needs to be a machine type property added to control this
+> > > > feature. When provisioning new VMs, management apps need to be
+> > > > able to set the property explicitly - having them rely on picking
+> > > > particular machine type name+versions is not viable, because
+> > > > downstream vendors replace the machine types with their own
+> > > > names + versions.  
+> > > having property doesn't really help here and we don't do it for every
+> > > compat tweak /ex: save_tsc_khz, linuxboot_dma_enabled/.
+> > > 
+> > > Management would not benefit much from having property vs machine version
+> > > as it would have to encode somewhere that for w2k it should set
+> > > some machine property or pick a particular machine type.  
+> > 
+> > I think I'd disagree with that. If
+> > users might need this for compatibility with some guests,
+> > then it should be a property not just a machine type.
+> > 
+> > But see below - I think we rushed it for the PC anyway.
+> > 
+> > > Probably no one would worry about fixing virt-install or something
+> > > else for the sake of w2k and if they are going to fix it
+> > > it doesn't matter if they map machine type vs property.
+> > > 
+> > > Also with new machine type deprecation policy we would be able
+> > > easily to phase out rev1 support along with 2.9 machine,
+> > > but if you expose property then removing it would break
+> > > CLI not only for 2.9 but possible later machines if it's set there.
+> > > 
+> > > So I'm against adding properties/CLI options for unless we have to in this case,
+> > > and I'm not convinced that w2k deserves it.  
+> > 
+> > If I have to choose, I'd say Mac OSX is way less interesting than old
+> > windows versions. Lots of people have software that will only run on old
+> > windows and there's probably good money to be had running it on new
+> > hardware in VMs. And PC machine is all about compatibility - we have Q35
+> > for new stuff.  Besides OSX uses q35 anyway I think.
+> Question is for how long we are going to maintain legacy stuff,
+> ACPI spec periodically adds new stuff, which someday is going
+> to break legacy OSes. And maintaining 2 branches of or worse
+> a mix will cost us in time and future regressions, we need to
+> have some policy to cut off legacy features that hold us back,
+> like we are starting to do with machine types.
+> w2k has been EOLed in 2010 even if we drop its support now,
+> users still can use it as they have an option to use old QEMU
+> for that.
+
+Users can't normally get old QEMU, even if they could it is not
+a good idea because of security.
+
+> (Ladi said that w2k fails to install since 2.7).
+
+Bisect will likely find what's wrong.
 
 
---T6xhMxlHU34Bk0ad
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 24, 2017 at 05:55:42PM +0200, C=E9dric Le Goater wrote:
-> On 07/24/2017 06:29 AM, David Gibson wrote:
-> > On Wed, Jul 05, 2017 at 07:13:20PM +0200, C=E9dric Le Goater wrote:
-> >> Each interrupt source is associated with a 2-bit state machine called
-> >> an Event State Buffer (ESB). It is controlled by MMIO to trigger
-> >> events.
-[snip]
-> >> +/* TODO: handle second page */
-> >=20
-> > Is this comment still relevent?
->=20
-> Some HW have a second page to trigger the event. I am not sure we need=20
-> to model it though. I will make some inquiries.
-
-Ah, ok.  Maybe clarify the comment a bit.
-
-[snip]
-> >> +static void xive_esb_write(void *opaque, hwaddr addr,
-> >> +                           uint64_t value, unsigned size)
-> >> +{
-> >> +    XiveICSState *xs =3D ICS_XIVE(opaque);
-> >> +    XIVE *x =3D xs->xive;
-> >> +    uint32_t offset =3D addr & 0xF00;
-> >> +    uint32_t srcno =3D addr >> xs->esb_shift;
-> >> +    uint32_t lisn =3D srcno + ICS_BASE(xs)->offset;
-> >> +    XiveIVE *ive;
-> >> +    bool notify =3D false;
-> >> +
-> >> +    ive =3D xive_get_ive(x, lisn);
-> >> +    if (!ive || !(ive->w & IVE_VALID))  {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", lis=
-n);
-> >> +        return;
-> >> +    }
-> >=20
-> > Having this code associated with the individual ICS look directly at
-> > the IVE table in the core xive object seems a bit dubious.
->=20
-> The IVE table holds the validity and mask status of the interrupt=20
-> entries, so we need that lookup. However, (continues below) ...
->=20
-> > This also
-> > points out another mismatch between the re-used ICS code and the new
-> > XIVE code: ICS gathers all the per-source-irq flags/state into the
-> > irqstate structure, whereas xive has per-irq information in the
-> > centralized ecb and IVE tables.  There can certainly be good reasons
-> > for that, but using both at once is kind of clunky.
->=20
-> I understand that you would rather put the esbs in the source they=20
-> belong to. That is the case on real HW but it makes the modeling a=20
-> bit more difficult. We would need to choose a MMIO address to give=20
-> to the guest OS. I had some issues with the allocator (I need=20
-> to look at this problem closer).
-
-Uh.. what do MMIO addresses have to do with this?  I'm talking about
-the actual ESB state in the packed bit array.
-
-> It might also be an "issue" for KVM. Ben talked about maintaining=20
-> all the esbs of a guest under a single memory region to be able to=20
-> map the pages in the host.
->=20
-> Any how, I agree this is another point to discuss in the sPAPR=20
-> model.
->=20
-> Thanks,
->=20
-> C.=20
->=20
->=20
-> >> +    if (srcno >=3D ICS_BASE(xs)->nr_irqs) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                      "XIVE: invalid IRQ number: %d/%d lisn: %d\n",
-> >> +                      srcno, ICS_BASE(xs)->nr_irqs, lisn);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    switch (offset) {
-> >> +    case 0:
-> >> +        /* TODO: should we trigger even if the IVE is masked ? */
-> >> +        notify =3D xive_pq_trigger(x, lisn);
-> >> +        break;
-> >> +    default:
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr =
-%d\n",
-> >> +                      offset);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (notify && !(ive->w & IVE_MASKED)) {
-> >> +        qemu_irq_pulse(ICS_BASE(xs)->qirqs[srcno]);
-> >> +    }
-> >> +}
-> >> +
-> >> +static const MemoryRegionOps xive_esb_ops =3D {
-> >> +    .read =3D xive_esb_read,
-> >> +    .write =3D xive_esb_write,
-> >> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> >> +    .valid =3D {
-> >> +        .min_access_size =3D 8,
-> >> +        .max_access_size =3D 8,
-> >> +    },
-> >> +    .impl =3D {
-> >> +        .min_access_size =3D 8,
-> >> +        .max_access_size =3D 8,
-> >> +    },
-> >> +};
-> >> +
-> >> +/*
-> >>   * XIVE Interrupt Source
-> >>   */
-> >>  static void xive_ics_set_irq_msi(XiveICSState *xs, int srcno, int val)
-> >> @@ -106,15 +326,25 @@ static void xive_ics_realize(ICSState *ics, Erro=
-r **errp)
-> >>          return;
-> >>      }
-> >> =20
-> >> +    if (!xs->esb_shift) {
-> >> +        error_setg(errp, "ESB page size needs to be greater 0");
-> >> +        return;
-> >> +    }
-> >> +
-> >>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
-> >>      ics->qirqs =3D qemu_allocate_irqs(xive_ics_set_irq, xs, ics->nr_i=
-rqs);
-> >> =20
-> >> +    memory_region_init_io(&xs->esb_iomem, OBJECT(xs), &xive_esb_ops, =
-xs,
-> >> +                          "xive.esb",
-> >> +                          (1ull << xs->esb_shift) * ICS_BASE(xs)->nr_=
-irqs);
-> >> +
-> >>      qemu_register_reset(xive_ics_reset, xs);
-> >>  }
-> >> =20
-> >>  static Property xive_ics_properties[] =3D {
-> >>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
-> >>      DEFINE_PROP_UINT32("irq-base", ICSState, offset, 0),
-> >> +    DEFINE_PROP_UINT32("shift", XiveICSState, esb_shift, 0),
-> >>      DEFINE_PROP_END_OF_LIST(),
-> >>  };
-> >> =20
-> >> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> >> index 544cc6e0c796..5303d96f5f59 100644
-> >> --- a/include/hw/ppc/xive.h
-> >> +++ b/include/hw/ppc/xive.h
-> >> @@ -33,6 +33,9 @@ typedef struct XiveICSState XiveICSState;
-> >>  struct XiveICSState {
-> >>      ICSState parent_obj;
-> >> =20
-> >> +    uint32_t     esb_shift;
-> >> +    MemoryRegion esb_iomem;
-> >> +
-> >>      XIVE         *xive;
-> >>  };
-> >> =20
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---T6xhMxlHU34Bk0ad
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll3N+AACgkQbDjKyiDZ
-s5IJeRAA36n29IwDfliNjQvQe3echREpXWkHpf9e2PVDnP77rfIyHUl3vgMYQK9F
-fWU6vdVf/iBi/VVdyGbhiS4+yLaLL5hIuYBJeJrX2NR3NZZqkx8mp7OQ9eFw5tqg
-LgtdNjuKIJa/r2XM9pJePB37CNO/1bB7FJ/QWO9FYhNxDZ38pWGm4w4/AJw4P4gK
-I6UK3iyUE72/XhuUcaVbWltybBWAeLEIpN03hzj2m20yzMsEmbG/0HxPk4cp7hgk
-taQzK71lGp7H8jWq7mEBLGe0DtPXwUZzrP4HJ6EDhT66uOVmlpyT3tka0ZvYaReN
-2TTb6S6wGiAf+SxE6MXXNeEXOVcAcufPGmpbruQfNgcdoZFJvg0xJJMcobM4h/mp
-6MjV+vgUqirBOpqtjKbOvEaSDj4y+jPKg23D4uN2/DPEVfGpruRNcbgtc8bHYhHG
-GSnk6lZkGWLPSIT0uA2KfK6kDOsz1v23mdU/E83cG+oqxFw24Y1WpB8w8cIB/3c+
-ET6/Sz58Uf4ETcaMSjbzed6E3ZKpFhfiFpYbZGcyL+s7UtqlZ6mrZ7RRqaNJOXtq
-0PoqJrYfyHHeEgjM0QALmqTaOnAw1gQk53V45W/6DRGd4aVie2sJbb6d+35v21+f
-GXldLRYnc+uQkrPN5S8hMb1tI5uU3Aa2tSa1YuanCBpwkM2cAzs=
-=G9Bm
------END PGP SIGNATURE-----
-
---T6xhMxlHU34Bk0ad--
+> > 
+> > So maybe the right thing to do is to
+> > - switch default for PC back to rev 1
+> > - keep default for Q35 at rev 3
+> > 
+> > No machinetype hacks.
+> it's still machine hack pc vs q35 and an extra branch to look
+> after but it's better than an option, I'll respin patch.
+> 
+> > 
+> > > > > 
+> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > ---
+> > > > > CC: Programmingkid <programmingkidx@gmail.com>
+> > > > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> > > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
+> > > > > 
+> > > > > Only compile test since I don't have w2k to test with
+> > > > > 
+> > > > > ---
+> > > > >  include/hw/i386/pc.h |  1 +
+> > > > >  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
+> > > > >  hw/i386/pc_piix.c    |  2 ++
+> > > > >  3 files changed, 22 insertions(+), 7 deletions(-)
+> > > > > 
+> > > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > > > index d80859b..d6f65dd 100644
+> > > > > --- a/include/hw/i386/pc.h
+> > > > > +++ b/include/hw/i386/pc.h
+> > > > > @@ -122,6 +122,7 @@ struct PCMachineClass {
+> > > > >      bool rsdp_in_ram;
+> > > > >      int legacy_acpi_table_size;
+> > > > >      unsigned acpi_data_size;
+> > > > > +    bool force_rev1_fadt;
+> > > > >  
+> > > > >      /* SMBIOS compat: */
+> > > > >      bool smbios_defaults;
+> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > index 6b7bade..227f9ad 100644
+> > > > > --- a/hw/i386/acpi-build.c
+> > > > > +++ b/hw/i386/acpi-build.c
+> > > > > @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
+> > > > >  }
+> > > > >  
+> > > > >  /* Load chipset information in FADT */
+> > > > > -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > > > > +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, bool rev1)
+> > > > >  {
+> > > > >      fadt->model = 1;
+> > > > >      fadt->reserved1 = 0;
+> > > > > @@ -304,6 +304,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > > > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+> > > > >      }
+> > > > >      fadt->century = RTC_CENTURY;
+> > > > > +    if (rev1) {
+> > > > > +        return;
+> > > > > +    }
+> > > > >  
+> > > > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+> > > > >      fadt->reset_value = 0xf;
+> > > > > @@ -335,6 +338,7 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > > > >  /* FADT */
+> > > > >  static void
+> > > > >  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > > > > +           MachineState *machine,
+> > > > >             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
+> > > > >             const char *oem_id, const char *oem_table_id)
+> > > > >  {
+> > > > > @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > > > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+> > > > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+> > > > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> > > > > +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
+> > > > > +    int fadt_size = sizeof(*fadt);
+> > > > > +    int rev = 3;
+> > > > >  
+> > > > >      /* FACS address to be filled by Guest linker */
+> > > > >      bios_linker_loader_add_pointer(linker,
+> > > > > @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > > > >          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
+> > > > >  
+> > > > >      /* DSDT address to be filled by Guest linker */
+> > > > > -    fadt_setup(fadt, pm);
+> > > > > +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
+> > > > >      bios_linker_loader_add_pointer(linker,
+> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > > > -    bios_linker_loader_add_pointer(linker,
+> > > > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > > > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > > > +    if (pcmc->force_rev1_fadt) {
+> > > > > +        rev = 1;
+> > > > > +        fadt_size = offsetof(typeof(*fadt), reset_register);
+> > > > > +    } else {
+> > > > > +        bios_linker_loader_add_pointer(linker,
+> > > > > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > > > > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > > > +    }
+> > > > >  
+> > > > >      build_header(linker, table_data,
+> > > > > -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
+> > > > > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
+> > > > >  }
+> > > > >  
+> > > > >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> > > > > @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> > > > >      /* ACPI tables pointed to by RSDT */
+> > > > >      fadt = tables_blob->len;
+> > > > >      acpi_add_table(table_offsets, tables_blob);
+> > > > > -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
+> > > > > +    build_fadt(tables_blob, tables->linker, &pm, machine, facs, dsdt,
+> > > > >                 slic_oem.id, slic_oem.table_id);
+> > > > >      aml_len += tables_blob->len - fadt;
+> > > > >  
+> > > > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> > > > > index 11b4336..bc61332 100644
+> > > > > --- a/hw/i386/pc_piix.c
+> > > > > +++ b/hw/i386/pc_piix.c
+> > > > > @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+> > > > >  
+> > > > >  static void pc_i440fx_2_9_machine_options(MachineClass *m)
+> > > > >  {
+> > > > > +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+> > > > >      pc_i440fx_2_10_machine_options(m);
+> > > > >      m->is_default = 0;
+> > > > >      m->alias = NULL;
+> > > > > +    pcmc->force_rev1_fadt = true;
+> > > > >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);  
+> > 
+> > whatever switch we use for this option, I think it makes
+> > sense to add comments to document why we keep this around.
+> ok
+> 
+> > 
+> > 
+> > > > >  }
+> > > > >  
+> > > > > -- 
+> > > > > 2.7.4
+> > > > > 
+> > > > >     
+> > > > 
+> > > > Regards,
+> > > > Daniel  
+> > 
