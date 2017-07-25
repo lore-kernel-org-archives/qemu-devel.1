@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dZwG7-0008LN-Fx
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:36:08 -0400
+	(envelope-from <berrange@redhat.com>) id 1dZwIW-0000Vv-OL
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dZwG2-0000aU-Gt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:36:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57814)
+	(envelope-from <berrange@redhat.com>) id 1dZwIT-00023F-0G
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:38:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dZwG2-0000Wz-B0
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:36:02 -0400
-References: <20170719100802.14094-1-berrange@redhat.com>
-	<20170719100802.14094-3-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c54bf8d4-571e-e4b5-0103-e23be3785139@redhat.com>
-Date: Tue, 25 Jul 2017 11:35:53 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dZwIS-00022l-Mp
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:38:32 -0400
+Date: Tue, 25 Jul 2017 10:38:24 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170725093824.GJ26394@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+	<ee5cd7796873b061804bf6f8546759109473000b.1500709594.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20170719100802.14094-3-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/2 (for 2.10)] docs: document
- deprecated features in appendix
+Content-Disposition: inline
+In-Reply-To: <ee5cd7796873b061804bf6f8546759109473000b.1500709594.git-series.knut.omang@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] sockets: factor out
+ create_fast_reuse_socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 19.07.2017 12:08, Daniel P. Berrange wrote:
-> The deprecation of features in QEMU is totally adhoc currently,
-> with no way for the user to get a list of what is deprecated
-> in each release. This adds an appendix to the doc that records
-> when each deprecation was made and provides text explaining
-> what to use instead, if anything.
+On Sat, Jul 22, 2017 at 09:49:31AM +0200, Knut Omang wrote:
+> First refactoring step to prepare for fixing the problem
+> exposed with the test-listen test in the previous commit
 > 
-> Since there has been no formal policy around removal of deprecated
-> features in the past, any deprecations prior to 2.10.0 are to be
-> treated as if they had been made at the 2.10.0 release. Thus the
-> earliest that existing deprecations will be deleted is the start
-> of the 2.12.0 cycle.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
 > ---
->  qemu-doc.texi | 168 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 168 insertions(+)
-[...]
-> +@subsection -monitor default=on (since 2.4.0)
+>  util/qemu-sockets.c | 24 +++++++++++++++++-------
+>  1 file changed, 17 insertions(+), 7 deletions(-)
+> 
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 1358c81..578f25b 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -149,6 +149,20 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
+>      return PF_UNSPEC;
+>  }
+>  
+> +static int create_fast_reuse_socket(struct addrinfo *e, Error **errp)
+> +{
+> +    int slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
+> +    if (slisten < 0) {
+> +        if (!e->ai_next) {
+> +            error_setg_errno(errp, errno, "Failed to create socket");
+> +        }
+> +        return -1;
+> +    }
 > +
-> +The ``default'' option to the ``-monitor'' argument is
-> +now ignored. When multiple monitors were enabled, it
-> +indicated which monitor would receive log messages
-> +from the various subsystems. This feature is no longer
-> +required as messages are now only sent to the monitor
-> +in response to explicitly monitor commands.
+> +    socket_set_fast_reuse(slisten);
+> +    return slisten;
+> +}
 
-BTW, seems like it's the "-mon" option, not the "-monitor" option that
-has this "default" parameter?
+As mentioned in the previous review, I don't think we should have
+methods like this which sometimes report an error on failure, and
+sometimes don't report an error. It makes it hard to review the
+callers for correctness of error handling. 
 
- Thomas
+> +
+>  static int inet_listen_saddr(InetSocketAddress *saddr,
+>                               int port_offset,
+>                               bool update_addr,
+> @@ -210,21 +224,17 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+>          return -1;
+>      }
+>  
+> -    /* create socket + bind */
+> +    /* create socket + bind/listen */
+>      for (e = res; e != NULL; e = e->ai_next) {
+>          getnameinfo((struct sockaddr*)e->ai_addr,e->ai_addrlen,
+>  		        uaddr,INET6_ADDRSTRLEN,uport,32,
+>  		        NI_NUMERICHOST | NI_NUMERICSERV);
+> -        slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
+> +
+> +        slisten = create_fast_reuse_socket(e, &err);
+>          if (slisten < 0) {
+> -            if (!e->ai_next) {
+> -                error_setg_errno(errp, errno, "Failed to create socket");
+> -            }
+
+So please leave this here.
+
+>              continue;
+>          }
+>  
+> -        socket_set_fast_reuse(slisten);
+> -
+>          port_min = inet_getport(e);
+>          port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+>          for (p = port_min; p <= port_max; p++) {
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
