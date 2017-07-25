@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dZyUk-0000pa-TX
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:59:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZyXp-0002EJ-0R
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dZyUk-000533-60
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:59:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35392)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dZyUj-00052U-Vj
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:59:22 -0400
-Message-ID: <1500983620.29790.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 25 Jul 2017 13:53:40 +0200
-In-Reply-To: <20170725083251.GB26394@redhat.com>
-References: <20170724164601.21063-1-berrange@redhat.com>
-	<88f8a661-f832-1d03-2736-d7b35c920e32@reactos.org>
-	<20170725083251.GB26394@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dZyXo-0006bK-8o
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:02:33 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36589)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZyXo-0006ax-25
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:02:32 -0400
+Received: by mail-wm0-x229.google.com with SMTP id t201so43787192wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 05:02:31 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170725094026.5376-1-cohuck@redhat.com>
+References: <20170725094026.5376-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Jul 2017 13:02:10 +0100
+Message-ID: <CAFEAcA8qDfGYQCLaCbLQXP4Fyi0Utq4D+c5J97sYM6AEa869yg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10] ps2: fix sending of PAUSE/BREAK
- scancodes
+Subject: Re: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, =?ISO-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-  Hi,
+On 25 July 2017 at 10:40, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit b5a74cd81d76cb467552f38f2b39520d07c65ea2:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170724' into staging (2017-07-24 18:15:45 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20170725
+>
+> for you to fetch changes up to 7e01376daea75e888c370aab521a7d4aeaf2ffd1:
+>
+>   s390x/css: fix ilen in IO instruction handlers (2017-07-25 09:17:42 +0200)
+>
+> ----------------------------------------------------------------
+> Various changes for the s390x code:
+> - updates for cpu model handling
+> - fix compilation with --disable-tcg
+> - fixes in vfio-ccw and I/O instruction handling
+>
+> ----------------------------------------------------------------
 
-> > You're putting some specific code for spice in ps2 emulation.
-> > IMO, the workaround should be moved to spice keyboard handling
-> > (ui/spice-input.c),
-> > which needs to generate a qcode instead of a scancode.
-> 
-> This isn't really a spice specific hack. QEMU internal code is *not*
-> required
-> to use qcodes 
+Applied, thanks.
 
-qcodes are prefered in new code though.
-
-> - the KeyValue struct is a union that allows use of either qcodes
-> or XT scancodes, and the latter is what all the frontends (SPICE,
-> VNC, GTk, SDL)
-> use. QCodes are really only input by the monitor (the sendkey
-> command).
-
-Well, PAUSE is actually sent as qcode by sdl and gtk.  This avoids
-special cases in the input layer (PAUSE is the only three scancodes key
-sequence).  IMO spice should do the same.  I want switch UIs to qcodes
-anyway.
-
-cheers,
-  Gerd
+-- PMM
