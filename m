@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dZu9H-0004br-78
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 03:20:56 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dZuEQ-0005l2-BL
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 03:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dZu9C-00042S-2z
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 03:20:55 -0400
-Date: Tue, 25 Jul 2017 09:20:40 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170725092040.6406aa94@gondolin>
-In-Reply-To: <20170724182751.18261-15-f4bug@amsat.org>
+	(envelope-from <laurent@vivier.eu>) id 1dZuEP-00067q-BF
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 03:26:14 -0400
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-15-f4bug@amsat.org>
+	<20170724182751.18261-28-f4bug@amsat.org>
+	<CAFEAcA86cuTukJ4HXVKDjewpxy2myPU1Gdbn671zqxJq6d09Wg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <069e3f18-317e-49d7-263f-206d5c21a755@vivier.eu>
+Date: Tue, 25 Jul 2017 09:25:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 14/35] vfio/ccw: fix incorrect
- malloc() size
+In-Reply-To: <CAFEAcA86cuTukJ4HXVKDjewpxy2myPU1Gdbn671zqxJq6d09Wg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 27/35] syscall: fix dereference of
+ undefined pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 24 Jul 2017 15:27:30 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+Le 24/07/2017 à 23:26, Peter Maydell a écrit :
+> On 24 July 2017 at 19:27, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Clang's scan-build-5.0 reports:
+>>
+>> linux-user/syscall.c:5581:9: warning: Dereference of undefined pointer value
+>>     if (*host_rt_dev_ptr != 0) {
+>>         ^~~~~~~~~~~~~~~~
+>>
+>> Reported-by: Clang Static Analyzer
+>> Suggested-by: Laurent Vivier <lvivier@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  linux-user/syscall.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index fcd20fa276..e79b5baec4 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -5524,7 +5524,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
+>>      int target_size;
+>>      void *argptr;
+>>      abi_ulong *target_rt_dev_ptr;
+>> -    unsigned long *host_rt_dev_ptr;
+>> +    unsigned long *host_rt_dev_ptr = NULL;
+>>      abi_long ret;
+>>      int i;
+>>
+>> @@ -5570,6 +5570,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
+>>      unlock_user(argptr, arg, 0);
+>>
+>>      ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+>> +    assert(host_rt_dev_ptr);
+> 
+> There's not much point in this assert because it doesn't
+> tell us anything we're not about to find out immediately
+> by dereferencing the pointer...
 
-> Since sizeof(struct vfio_irq_info) < sizeof(struct vfio_irq_set) a heap o=
-verflow
-> never occured. Still, let's use the correct size.
->=20
-> hw/vfio/ccw.c:170:16: warning: Cast a region whose size is not a multiple=
- of the destination type size
->     irq_info =3D g_malloc0(sizeof(*irq_set));
->                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/vfio/ccw.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 12d0262336..8d97b53e77 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -168,7 +168,7 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDevi=
-ce *vcdev, Error **errp)
->          return;
->      }
-> =20
-> -    argsz =3D sizeof(*irq_set);
-> +    argsz =3D sizeof(*irq_info);
->      irq_info =3D g_malloc0(argsz);
->      irq_info->index =3D VFIO_CCW_IO_IRQ_INDEX;
->      irq_info->argsz =3D argsz;
+It's just to shut off the warning.
 
-Thanks for the patch, but I already have "vfio/ccw: allocate irq info
-with the right size" queued in my s390-next branch (for which I plan to
-send a pull req today).
+What I said in the comment of the previous version of this patch:
+
+I think we should "assert(host_rt_dev_ptr)" here. It's a bug if
+host_rt_dev_ptr is not set.
+
+The "for" loop scans the structure to find the rt_dev field, and we
+should always enter in the first "if", so "host_rt_dev_ptr" is always set.
+
+Thanks,
+Laurent
