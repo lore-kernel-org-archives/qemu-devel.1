@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1da4Az-0004jT-LS
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:03:23 -0400
+	(envelope-from <groug@kaod.org>) id 1da4BC-0004sy-3w
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1da4Aw-0004fE-Gi
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:03:21 -0400
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:47838)
+	(envelope-from <groug@kaod.org>) id 1da4B9-0004pO-0g
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:03:34 -0400
+Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:40106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1da4Aw-0004eQ-5h
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:03:18 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1da4B8-0004oH-Qr
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:03:30 -0400
 Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 19DB411665C
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:03:17 +0200 (CEST)
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 8B5E9116654
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:03:29 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 25 Jul 2017 20:03:06 +0200
-Message-ID: <150100578691.27487.8944448515009831240.stgit@bahia>
+Date: Tue, 25 Jul 2017 20:03:21 +0200
+Message-ID: <150100580191.27487.17612552307249886496.stgit@bahia>
 In-Reply-To: <150100547373.27487.3154210751350595400.stgit@bahia>
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to update
- the XICS phandle
+Subject: [Qemu-devel] [for-2.11 PATCH 25/26] spapr_pci: drop abusive sanity
+ check when migrating the LSI table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,163 +33,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The "phandle" property of the XICS node is referenced by the "interrupt-map"
-property of each PHB node. This is used by the guest OS to setup IRQs for
-all PCI devices.
+The guest can allocate blocks of IRQs when calling the ibm,change-msi
+RTAS call. This has an impact on the IRQ numbers returned by subsequent
+calls to spapr_ics_alloc_block().
 
-QEMU uses an arbitrary value (0x1111) for this phandle, but SLOF converts
-this value to a SLOF specific one, which is then presented to the guest OS.
+It doesn't cause any problem right now because PHB are cold plugged and
+the LSI table have the same numbers at the destination and the source.
 
-This patches introduces the new KVMPPC_H_UPDATE_PHANDLE hcall, which is used
-by SLOF to communicate the patched phandle value back to QEMU. This value
-is then cached and preserved accross migration until machine reset.
+But this won't be the case anymore when we support PHB hotplug. In this
+case the IRQ numbers in the LSI table are state that we should migrate.
 
-This is required to be able to support PHB hotplug.
+This patch hence changes the destination to always accept the LSI table
+from the migration stream, like it is already done for MSIs. No effort
+is made to preserve the current behavior of failing migration when LSI
+numbers are different with older machine types, for simplicity.
 
-Note, that SLOF already has some code to call KVMPPC_H_RTAS_UPDATE, so we
-have to introduce its number even if QEMU currently doesn't implement it.
-
-Suggested-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |   25 +++++++++++++++++++++++--
- hw/ppc/spapr_hcall.c   |   20 ++++++++++++++++++++
- include/hw/ppc/spapr.h |   11 ++++++++++-
- 3 files changed, 53 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_pci.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1a6cd4efeb97..90485054c2e7 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -96,8 +96,6 @@
- 
- #define MIN_RMA_SLOF            128UL
- 
--#define PHANDLE_XICP            0x00001111
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 58406a1b7e93..157867af8178 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1887,8 +1887,7 @@ static const VMStateDescription vmstate_spapr_pci_lsi = {
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+-        VMSTATE_UINT32_EQUAL(irq, struct spapr_pci_lsi, NULL),
 -
- /* maximum number of hotpluggable PHBs */
- #define SPAPR_DRC_MAX_PHB       256
- 
-@@ -1454,6 +1452,7 @@ static void ppc_spapr_reset(void)
-     first_ppc_cpu->env.nip = SPAPR_ENTRY_POINT;
- 
-     spapr->cas_reboot = false;
-+    spapr->xics_phandle = UINT32_MAX;
- }
- 
- static void spapr_create_nvram(sPAPRMachineState *spapr)
-@@ -1652,6 +1651,26 @@ static const VMStateDescription vmstate_spapr_patb_entry = {
++        VMSTATE_UINT32(irq, struct spapr_pci_lsi),
+         VMSTATE_END_OF_LIST()
      },
  };
- 
-+static bool spapr_xics_phandle_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(MACHINE(spapr));
-+
-+    /* Don't break older machine types that don't support PHB hotplug. */
-+    return smc->dr_phb_enabled && spapr->xics_phandle != UINT32_MAX;
-+}
-+
-+static const VMStateDescription vmstate_spapr_xics_phandle = {
-+    .name = "spapr_xics_phandle",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_xics_phandle_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(xics_phandle, sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_spapr = {
-     .name = "spapr",
-     .version_id = 3,
-@@ -1671,6 +1690,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-         &vmstate_spapr_pending_events,
-+        &vmstate_spapr_xics_phandle,
-         NULL
-     }
- };
-@@ -2702,6 +2722,7 @@ static void spapr_machine_initfn(Object *obj)
- 
-     spapr->htab_fd = -1;
-     spapr->use_hotplug_event_source = true;
-+    spapr->xics_phandle = UINT32_MAX;
-     object_property_add_str(obj, "kvm-type",
-                             spapr_get_kvm_type, spapr_set_kvm_type, NULL);
-     object_property_set_description(obj, "kvm-type",
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 72ea5a8247bf..ce8a9eb66b23 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1623,6 +1623,25 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_update_phandle(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-+                                     target_ulong opcode, target_ulong *args)
-+{
-+    target_ulong old_phandle = args[0];
-+    target_ulong new_phandle = args[1];
-+
-+    if (new_phandle >= UINT32_MAX) {
-+        return H_PARAMETER;
-+    }
-+
-+    /* We only have a "phandle" property in the XICS node at the moment. */
-+    if (old_phandle != (uint32_t) PHANDLE_XICP) {
-+        return H_PARAMETER;
-+    }
-+
-+    spapr->xics_phandle = (uint32_t) new_phandle;
-+    return H_SUCCESS;
-+}
-+
- static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
- static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
- 
-@@ -1717,6 +1736,7 @@ static void hypercall_register_types(void)
- 
-     /* qemu/KVM-PPC specific hcalls */
-     spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
-+    spapr_register_hypercall(KVMPPC_H_UPDATE_PHANDLE, h_update_phandle);
- 
-     /* ibm,client-architecture-support support */
-     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 8004d9c2ab2c..f09c54d5bb94 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -125,6 +125,8 @@ struct sPAPRMachineState {
- 
-     bool dr_phb_enabled; /* hotplug / dynamic-reconfiguration of PHBs */
- 
-+    uint32_t xics_phandle;
-+
-     /*< public >*/
-     char *kvm_type;
-     MemoryHotplugState hotplug_memory;
-@@ -402,7 +404,9 @@ struct sPAPRMachineState {
- #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
- /* Client Architecture support */
- #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
--#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
-+#define KVMPPC_H_RTAS_UPDATE    (KVMPPC_HCALL_BASE + 0x3)
-+#define KVMPPC_H_UPDATE_PHANDLE (KVMPPC_HCALL_BASE + 0x4)
-+#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_PHANDLE
- 
- typedef struct sPAPRDeviceTreeUpdateHeader {
-     uint32_t version_id;
-@@ -707,4 +711,9 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
- 
- #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
- 
-+/* Boot time value of the "phandle" property of the "interrupt-controller"
-+ * node.
-+ */
-+#define PHANDLE_XICP            0x00001111
-+
- #endif /* HW_SPAPR_H */
