@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dZxw2-00060g-IQ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:23:31 -0400
+	(envelope-from <mhocko@kernel.org>) id 1dZxxr-0006gI-Vs
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:25:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dZxvz-0006oa-DF
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54008)
+	(envelope-from <mhocko@kernel.org>) id 1dZxxo-0007o4-Qk
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:25:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54734 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dZxvz-0006oH-44
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:23:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 34FB9C1EAA15
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 11:23:26 +0000 (UTC)
-References: <1500980879-28505-1-git-send-email-thuth@redhat.com>
-	<7ac9fc11-e39a-3e1b-801a-95ae19d6ebd1@redhat.com>
-	<20170725111532.GM26394@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a7fa9a6b-d7f3-cfa7-4270-98507b817f93@redhat.com>
-Date: Tue, 25 Jul 2017 13:23:24 +0200
+	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1dZxxo-0007mI-J4
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 07:25:20 -0400
+Date: Tue, 25 Jul 2017 13:25:13 +0200
+From: Michal Hocko <mhocko@kernel.org>
+Message-ID: <20170725112513.GD26723@dhcp22.suse.cz>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	<20170714123023.GA2624@dhcp22.suse.cz>
+	<20170714181523-mutt-send-email-mst@kernel.org>
+	<20170717152448.GN12888@dhcp22.suse.cz>
+	<596D6E7E.4070700@intel.com>
+	<20170719081311.GC26779@dhcp22.suse.cz>
+	<596F4A0E.4010507@intel.com>
+	<20170724090042.GF25221@dhcp22.suse.cz>
+	<59771010.6080108@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170725111532.GM26394@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a blog post about deprecation
- of old interfaces and features
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59771010.6080108@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,78 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On 25.07.2017 13:15, Daniel P. Berrange wrote:
-> On Tue, Jul 25, 2017 at 01:10:38PM +0200, Paolo Bonzini wrote:
->> On 25/07/2017 13:07, Thomas Huth wrote:
->>> The list of deprecated interfaces/features in the wiki should be pretty
->>> complete now, so it is now time to draw some more public attention to our
->>> plans of removing certain interfaces/features in future releases.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  _posts/2017-07-25-deprecation.md | 26 ++++++++++++++++++++++++++
->>>  1 file changed, 26 insertions(+)
->>>  create mode 100644 _posts/2017-07-25-deprecation.md
->>>
->>> diff --git a/_posts/2017-07-25-deprecation.md b/_posts/2017-07-25-deprecation.md
->>> new file mode 100644
->>> index 0000000..b5eaf0b
->>> --- /dev/null
->>> +++ b/_posts/2017-07-25-deprecation.md
->>> @@ -0,0 +1,26 @@
->>> +---
->>> +layout: post
->>> +title:  "Deprecation of old parameters and features"
->>> +date:   2017-07-25 9:00:00 +0200
->>> +author: Thomas Huth
->>> +categories: [features, 'web site']
->>
->> Maybe s/web site/wiki/?
->>
->>> +---
->>> +QEMU has a lot of interfaces (like command line options or HMP commands) and
->>> +old features (like certain devices) which are considered as deprecated
->>> +since other more generic or better interfaces/features have been established
->>> +instead. While the QEMU developers are generally trying to keep each QEMU
->>> +release compatible with the previous ones, the old legacy sometimes gets into
->>> +the way when developing new code and/or causes quite some burden of maintaining
->>> +it.
->>> +
->>> +Thus we are currently considering to get rid of some of the old interfaces
->>> +and features in a future release and have started to collect a list of such
->>> +old items in our Wiki on a
->>> +[page about removing legacy parts](http://wiki.qemu.org/Features/LegacyRemoval).
->>> +If you are running QEMU directly, please have a look at this page to see
->>> +whether you are still using one of these old interfaces or features, so you
->>> +can adapt your setup to use the new interfaces or features instead. Or if
->>> +you rather think that one of the legacy interfaces/features should *not* be
->>> +removed from QEMU at all, please speak up on the
->>> +[qemu-devel mailing list](http://wiki.qemu.org/Contribute/MailingLists)
->>> +to explain why the interface or feature is still required.
->>
->> This text looks good.
->>
->> However, we should first finalize Daniel's patches and update the wiki
->> to match the newly-instated policy.  The blog post might also include
->> the text that is added to the manual.
+On Tue 25-07-17 17:32:00, Wei Wang wrote:
+> On 07/24/2017 05:00 PM, Michal Hocko wrote:
+> >On Wed 19-07-17 20:01:18, Wei Wang wrote:
+> >>On 07/19/2017 04:13 PM, Michal Hocko wrote:
+> >[...
+> >>>All you should need is the check for the page reference count, no?  I
+> >>>assume you do some sort of pfn walk and so you should be able to get an
+> >>>access to the struct page.
+> >>Not necessarily - the guest struct page is not seen by the hypervisor. The
+> >>hypervisor only gets those guest pfns which are hinted as unused. From the
+> >>hypervisor (host) point of view, a guest physical address corresponds to a
+> >>virtual address of a host process. So, once the hypervisor knows a guest
+> >>physical page is unsued, it knows that the corresponding virtual memory of
+> >>the process doesn't need to be transferred in the 1st round.
+> >I am sorry, but I do not understand. Why cannot _guest_ simply check the
+> >struct page ref count and send them to the hypervisor?
 > 
-> IMHO we shouldn't really point people to the wiki at all. The qemu-doc
-> content is what any 3rd parties should rely, since that has been formally
-> reviewed & approved by maintainers.
+> Were you suggesting the following?
+> 1) get a free page block from the page list using the API;
+
+No. Use a pfn walk, check the reference count and skip those pages which
+have 0 ref count. I suspected that you need to do some sort of the pfn
+walk anyway because you somehow have to evaluate a memory to migrate,
+right?
+
+> 2) if page->ref_count == 0, send it to the hypervisor
+
+yes
+
+> Btw, ref_count may also change at any time.
 > 
-> The remaining content on the wiki page that differs from qemu-doc, is a
-> braindump of stuff that could potentially be removed, but is not at all
-> certain that any will be deprecated. IOW the wiki page is fine for QEMU
-> maintainers to use, but 3rd parties should only use the published docs.
+> >Is there any
+> >documentation which describes the workflow or code which would use your
+> >new API?
+> >
+> 
+> It's used in the balloon driver (patch 8). We don't have any docs yet, but
+> I think the high level workflow is the two steps above.
 
-Ok, your points about the wiki are certainly true ... but so far we
-still haven't decided on a final wording for qemu-doc yet ... or do we
-have an agreement on the machine type deprecation already? Maybe it's
-really best if you omit the part about machine type deprecation there
-for now, and discuss that again in the 2.11 time frame, so that we at
-least get the other parts still into the qemu-doc for 2.10 ?
-
- Thomas
+I will have a look.
+-- 
+Michal Hocko
+SUSE Labs
