@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZzqq-0007hL-3o
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:26:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dZzum-0000sB-3W
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZzqm-0008Cf-4E
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:26:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45352)
+	(envelope-from <pbonzini@redhat.com>) id 1dZzuh-0001bb-PG
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:30:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZzql-0008CM-Qb
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:26:12 -0400
-Date: Tue, 25 Jul 2017 16:26:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170725162344-mutt-send-email-mst@kernel.org>
-References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
-	<20170721094955.GH17693@redhat.com>
-	<20170721121048.44d617ea@nial.brq.redhat.com>
-	<20170722023020-mutt-send-email-mst@kernel.org>
-	<20170724084848.259c0bfc@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dZzuh-0001bB-FH
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:30:15 -0400
+References: <20170725112656.30122-1-berrange@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ae98f8b1-1d49-ced9-200b-4fb9406ebfdf@redhat.com>
+Date: Tue, 25 Jul 2017 15:30:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170724084848.259c0bfc@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
- machine types
+In-Reply-To: <20170725112656.30122-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 (for 2.10) 0/1] Document deprecation
+ policy & features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,221 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Mon, Jul 24, 2017 at 08:48:48AM +0200, Igor Mammedov wrote:
-> On Sat, 22 Jul 2017 02:40:46 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 25/07/2017 13:26, Daniel P. Berrange wrote:
+> This is a followup to
 > 
-> > On Fri, Jul 21, 2017 at 12:10:48PM +0200, Igor Mammedov wrote:
-> > > On Fri, 21 Jul 2017 10:49:55 +0100
-> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > >   
-> > > > On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:  
-> > > > > w2k used to boot on QEMU until we bumped revision of FADT to rev3
-> > > > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
-> > > > > 
-> > > > > Considering that w2k is ancient and long time EOLed, leave default
-> > > > > rev3 but make pc-i440fx-2.9 and older machine types to force rev1
-> > > > > so old setups won't break (w2k could boot).    
-> > > > 
-> > > > There needs to be a machine type property added to control this
-> > > > feature. When provisioning new VMs, management apps need to be
-> > > > able to set the property explicitly - having them rely on picking
-> > > > particular machine type name+versions is not viable, because
-> > > > downstream vendors replace the machine types with their own
-> > > > names + versions.  
-> > > having property doesn't really help here and we don't do it for every
-> > > compat tweak /ex: save_tsc_khz, linuxboot_dma_enabled/.
-> > > 
-> > > Management would not benefit much from having property vs machine version
-> > > as it would have to encode somewhere that for w2k it should set
-> > > some machine property or pick a particular machine type.  
-> > 
-> > I think I'd disagree with that. If
-> > users might need this for compatibility with some guests,
-> > then it should be a property not just a machine type.
-> > 
-> > But see below - I think we rushed it for the PC anyway.
-> > 
-> > > Probably no one would worry about fixing virt-install or something
-> > > else for the sake of w2k and if they are going to fix it
-> > > it doesn't matter if they map machine type vs property.
-> > > 
-> > > Also with new machine type deprecation policy we would be able
-> > > easily to phase out rev1 support along with 2.9 machine,
-> > > but if you expose property then removing it would break
-> > > CLI not only for 2.9 but possible later machines if it's set there.
-> > > 
-> > > So I'm against adding properties/CLI options for unless we have to in this case,
-> > > and I'm not convinced that w2k deserves it.  
-> > 
-> > If I have to choose, I'd say Mac OSX is way less interesting than old
-> > windows versions. Lots of people have software that will only run on old
-> > windows and there's probably good money to be had running it on new
-> > hardware in VMs. And PC machine is all about compatibility - we have Q35
-> > for new stuff.  Besides OSX uses q35 anyway I think.
-> Question is for how long we are going to maintain legacy stuff,
-> ACPI spec periodically adds new stuff, which someday is going
-> to break legacy OSes. And maintaining 2 branches of or worse
-> a mix will cost us in time and future regressions, we need to
-> have some policy to cut off legacy features that hold us back,
-> like we are starting to do with machine types.
-> w2k has been EOLed in 2010 even if we drop its support now,
-> users still can use it as they have an option to use old QEMU
-> for that.
-
-Users can't normally get old QEMU, even if they could it is not
-a good idea because of security.
-
-> (Ladi said that w2k fails to install since 2.7).
-
-Bisect will likely find what's wrong.
-
-
-> > 
-> > So maybe the right thing to do is to
-> > - switch default for PC back to rev 1
-> > - keep default for Q35 at rev 3
-> > 
-> > No machinetype hacks.
-> it's still machine hack pc vs q35 and an extra branch to look
-> after but it's better than an option, I'll respin patch.
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02390.html
+>   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01286.html
+>   v3: https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00651.html
+>   v4: https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04239.html
 > 
-> > 
-> > > > > 
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > ---
-> > > > > CC: Programmingkid <programmingkidx@gmail.com>
-> > > > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> > > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > > 
-> > > > > Only compile test since I don't have w2k to test with
-> > > > > 
-> > > > > ---
-> > > > >  include/hw/i386/pc.h |  1 +
-> > > > >  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
-> > > > >  hw/i386/pc_piix.c    |  2 ++
-> > > > >  3 files changed, 22 insertions(+), 7 deletions(-)
-> > > > > 
-> > > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > > > index d80859b..d6f65dd 100644
-> > > > > --- a/include/hw/i386/pc.h
-> > > > > +++ b/include/hw/i386/pc.h
-> > > > > @@ -122,6 +122,7 @@ struct PCMachineClass {
-> > > > >      bool rsdp_in_ram;
-> > > > >      int legacy_acpi_table_size;
-> > > > >      unsigned acpi_data_size;
-> > > > > +    bool force_rev1_fadt;
-> > > > >  
-> > > > >      /* SMBIOS compat: */
-> > > > >      bool smbios_defaults;
-> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > > index 6b7bade..227f9ad 100644
-> > > > > --- a/hw/i386/acpi-build.c
-> > > > > +++ b/hw/i386/acpi-build.c
-> > > > > @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
-> > > > >  }
-> > > > >  
-> > > > >  /* Load chipset information in FADT */
-> > > > > -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > > > > +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, bool rev1)
-> > > > >  {
-> > > > >      fadt->model = 1;
-> > > > >      fadt->reserved1 = 0;
-> > > > > @@ -304,6 +304,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > > > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-> > > > >      }
-> > > > >      fadt->century = RTC_CENTURY;
-> > > > > +    if (rev1) {
-> > > > > +        return;
-> > > > > +    }
-> > > > >  
-> > > > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-> > > > >      fadt->reset_value = 0xf;
-> > > > > @@ -335,6 +338,7 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > > > >  /* FADT */
-> > > > >  static void
-> > > > >  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > > > +           MachineState *machine,
-> > > > >             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
-> > > > >             const char *oem_id, const char *oem_table_id)
-> > > > >  {
-> > > > > @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-> > > > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-> > > > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> > > > > +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
-> > > > > +    int fadt_size = sizeof(*fadt);
-> > > > > +    int rev = 3;
-> > > > >  
-> > > > >      /* FACS address to be filled by Guest linker */
-> > > > >      bios_linker_loader_add_pointer(linker,
-> > > > > @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > > >          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
-> > > > >  
-> > > > >      /* DSDT address to be filled by Guest linker */
-> > > > > -    fadt_setup(fadt, pm);
-> > > > > +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
-> > > > >      bios_linker_loader_add_pointer(linker,
-> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > > -    bios_linker_loader_add_pointer(linker,
-> > > > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > > > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > > +    if (pcmc->force_rev1_fadt) {
-> > > > > +        rev = 1;
-> > > > > +        fadt_size = offsetof(typeof(*fadt), reset_register);
-> > > > > +    } else {
-> > > > > +        bios_linker_loader_add_pointer(linker,
-> > > > > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > > > > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > > +    }
-> > > > >  
-> > > > >      build_header(linker, table_data,
-> > > > > -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
-> > > > > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
-> > > > >  }
-> > > > >  
-> > > > >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-> > > > > @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-> > > > >      /* ACPI tables pointed to by RSDT */
-> > > > >      fadt = tables_blob->len;
-> > > > >      acpi_add_table(table_offsets, tables_blob);
-> > > > > -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
-> > > > > +    build_fadt(tables_blob, tables->linker, &pm, machine, facs, dsdt,
-> > > > >                 slic_oem.id, slic_oem.table_id);
-> > > > >      aml_len += tables_blob->len - fadt;
-> > > > >  
-> > > > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > > > > index 11b4336..bc61332 100644
-> > > > > --- a/hw/i386/pc_piix.c
-> > > > > +++ b/hw/i386/pc_piix.c
-> > > > > @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
-> > > > >  
-> > > > >  static void pc_i440fx_2_9_machine_options(MachineClass *m)
-> > > > >  {
-> > > > > +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> > > > >      pc_i440fx_2_10_machine_options(m);
-> > > > >      m->is_default = 0;
-> > > > >      m->alias = NULL;
-> > > > > +    pcmc->force_rev1_fadt = true;
-> > > > >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);  
-> > 
-> > whatever switch we use for this option, I think it makes
-> > sense to add comments to document why we keep this around.
-> ok
+> I would really strongly like to see this documented in time for the
+> 2.10 release, so that we can start the clock ticking on our deprecation
+> policy and thus actually delete some stuff in the not too distant
+> future.
 > 
-> > 
-> > 
-> > > > >  }
-> > > > >  
-> > > > > -- 
-> > > > > 2.7.4
-> > > > > 
-> > > > >     
-> > > > 
-> > > > Regards,
-> > > > Daniel  
-> > 
+> The goal is to clarify to users & app developers what they can expect
+> from QEMU in terms of feature life & any deprecation policy should
+> it be neccessary to remove features.
+> 
+> The list of features marked as deprecated was determined by looking at
+> the QEMU source for the word "deprecated'. It was then compared with
+> the doc Thomas put up at http://wiki.qemu.org/Features/LegacyRemoval
+> 
+> Key differences with the wiki page that Thomas wrote up vs patch 2
+> in this series
+> 
+>  - Deprecated features are given a fixed lifespan of 2 releases,
+>    rather than listing deletion at a future "major" v3.0.0 release.
+>    This ensures that applications like libvirt have a predictable
+>    fixed amount of time to react to deprecations.
+> 
+>  - Only lists features which are currently officially deprecated,
+>    no list of possible future candidates. The wiki page is probably
+>    a good place to maintain a list of future possible deprecations.
+>    To turn them into actual deprecations, a patch to the QEMU doc
+>    can then be posted & reviewed in the normal manner.
+> 
+>  - Not listing the '-6' and '-e' args to qemu-img create. Those
+>    were never deprecations, because the functionality was
+>    immediately turned into a fatal error. Patches to delete these
+>    have been merged now
+> 
+> Changed in v6:
+> 
+>  - Remove all discussion of machine types lifecycle since it
+>    looks like they will be better kept upstream for as long 
+>    as any downstream wants them (Paolo)
+> 
+>  - Get rid of separate "Support lifecycle" appendix and fold
+>    its content into the "Deprecated features" appendix (Daniel)
+> 
+>  - Fix s/-monitor/-mon/  (Thomas)
+> 
+> Changed in v5:
+> 
+>  - Removed misleading reference to "major" release (Eduardo)
+> 
+> Changed in v4:
+> 
+>  - Misc typos / wording clarification (Thomas)
+> 
+> Changed in v3:
+> 
+>  - Rename appendix to "Deprecated features" (Markus)
+>  - List all currently deprecated features
+>  - Document that deprecated features will be removed after
+>    2 releases of being deprecated
+>  - Clarify that clock for removing historically deprecated
+>    features starts with the forthcoming release.
+> 
+> Changed in v2:
+> 
+>  - Split into 2 patches so we can consider each suggested addition
+>    independantly.
+> 
+> 
+> Daniel P. Berrange (1):
+>   docs: document deprecation policy & deprecated features in appendix
+> 
+>  qemu-doc.texi | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 175 insertions(+)
+> 
+
+
+Queued for 2.10, thanks.
+
+Paolo
