@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dZww6-000100-Kb
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:19:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dZx5J-0003D9-Bq
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:29:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dZww3-000690-Vc
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:19:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dZww3-00068r-PD
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:19:27 -0400
-Date: Tue, 25 Jul 2017 12:19:18 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170725121918.7c3f1d56@gondolin>
-In-Reply-To: <150097670624.105.11799417719809984169@5d477a5b5989>
-References: <20170725094026.5376-1-cohuck@redhat.com>
-	<150097670624.105.11799417719809984169@5d477a5b5989>
+	(envelope-from <peter.maydell@linaro.org>) id 1dZx5I-0001u1-CB
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:29:01 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:37265)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dZx5I-0001tf-4B
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 06:29:00 -0400
+Received: by mail-wr0-x231.google.com with SMTP id 33so60513813wrz.4
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 03:28:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
+In-Reply-To: <20170725054510.15177-1-david@gibson.dropbear.id.au>
+References: <20170725054510.15177-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Jul 2017 11:28:38 +0100
+Message-ID: <CAFEAcA-rZ62E_dVULrLjzPSszKN7HTnU-sTXQtmXXWhSdrJHLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] ppc-for-2.10 queue 20170725
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: qemu-devel@nongnu.org, famz@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Alexey Kardashevskiy <aik@ozlabs.ru>, Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-On Tue, 25 Jul 2017 02:58:27 -0700 (PDT)
-no-reply@patchew.org wrote:
+On 25 July 2017 at 06:45, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit b5a74cd81d76cb467552f38f2b39520d07c65ea2:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170724' into staging (2017-07-24 18:15:45 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170725
+>
+> for you to fetch changes up to 86844c213348a596ea716a44a6f337555e07ad09:
+>
+>   pseries: Update SLOF firmware image (2017-07-25 14:35:42 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-07-25
+>
+> Last pull request for the 2.10 hard freeze, and correspondingly small.
+> There are a handful of bugfixes here plus an update for the "pseries"
+> guest firmware (SLOF).
+>
+> This is later than ideal for a guest firmware update.  However, this
+> does include a number of fixes in that guest firmware, so I think it's
+> worth the risk of squeezing this in just before the hard freeze.
+>
+> ----------------------------------------------------------------
+> Alexey Kardashevskiy (2):
+>       spapr_pci: Fix obsolete comment about MSIX encoding in addr/data
+>       pseries: Update SLOF firmware image
+>
+> Bharata B Rao (1):
+>       spapr: Fix QEMU abort during memory unplug
+>
+> Laurent Vivier (1):
+>       spapr/htab: fix savevm
 
-> Hi,
-> 
-> This series failed build test on FreeBSD host. Please find the details below.
-> 
-> Message-id: 20170725094026.5376-1-cohuck@redhat.com
-> Subject: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
-> Type: series
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/sh
-> # Testing script will be invoked under the git checkout with
-> # HEAD pointing to a commit that has the patches applied on top of "base"
-> # branch
-> set -e
-> echo "=== ENV ==="
-> env
-> echo "=== PACKAGES ==="
-> pkg info
-> echo "=== TEST BEGIN ==="
-> CC=/usr/local/libexec/ccache/cc
-> INSTALL=$PWD/install
-> BUILD=$PWD/build
-> echo -n "Using CC: "
-> realpath $CC
-> mkdir -p $BUILD $INSTALL
-> SRC=$PWD
-> cd $BUILD
-> $SRC/configure --cc=$CC --prefix=$INSTALL --target-list=x86_64-softmmu
-> gmake -j4
-> # XXX: we need reliable clean up
-> # make check -j4 V=1
-> gmake install
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> fatal: unable to access 'https://github.com/patchew-project/qemu/': OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to github.com:443 
+Applied, thanks.
 
-Hm... connection issues?
-
-> error: Could not fetch 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Traceback (most recent call last):
->   File "/home/patchew-tester/patchew/patchew-cli", line 412, in test_one
->     git_clone_repo(clone, r["repo"], r["head"], logf)
->   File "/home/patchew-tester/patchew/patchew-cli", line 48, in git_clone_repo
->     stdout=logf, stderr=logf)
->   File "/usr/local/lib/python3.5/subprocess.py", line 271, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['git', 'remote', 'add', '-f', '--mirror=fetch', '3c8cf5a9c21ff8782164d1def7f44bd888713384', 'https://github.com/patchew-project/qemu']' returned non-zero exit status 1
-> 
-> 
-> 
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
+-- PMM
