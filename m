@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1da1P1-0005M5-Fo
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:05:40 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1da1TQ-0008Pr-7z
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1da1Ox-0004gD-GM
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:05:39 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1da1Ox-0004ft-72
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:05:35 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id c184so58931429wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 08:05:35 -0700 (PDT)
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-35-f4bug@amsat.org>
-	<87k22weh78.fsf@linaro.org>
-	<658ad40d-4bef-0da8-f7ea-88ae1bec3f12@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <658ad40d-4bef-0da8-f7ea-88ae1bec3f12@amsat.org>
-Date: Tue, 25 Jul 2017 16:05:31 +0100
-Message-ID: <87d18oeev8.fsf@linaro.org>
+	(envelope-from <ldoktor@redhat.com>) id 1da1TN-0006fr-2A
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1da1TM-0006bn-S9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:10:08 -0400
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
+Date: Tue, 25 Jul 2017 17:09:41 +0200
+Message-Id: <20170725150951.16038-1-ldoktor@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.10 34/35] docker: add debian
- 'bleeding' image with gcc7 and clang5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
 
+Hello guys,
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+I'm reading the available python modules to exercise qemu and while readi=
+ng them
+I fixed some issues that caught my attention. It usually starts with a si=
+mple
+pylint/docstring fixes and slowly graduates to more controversial ones so=
+ I'm
+open to suggestion to remove some of them.
 
-> On 07/25/2017 11:15 AM, Alex Bennée wrote:
->>> +++ b/tests/docker/dockerfiles/debian-bleeding-dev.docker
->>> @@ -0,0 +1,94 @@
->>> +#
->>> +# Docker x86_64 bleeding image
->>> +#
->>> +# This docker target builds on the debian unstable base image. Further
->>> +# libraries which are not widely available are installed by hand.
->>> +#
->>
->> Not for 2.10 please.
->
-> Surely not ;) Also unlikely to get merged in mainline...
->
-> [...]
->> There are a lot of moving parts basing this in debian unstable and
->> compiling extra bleeding edge stuff. What does this buy that the clang
->> and toolchain builds in Travis don't already cover?
->
-> Bleeding is bleeding :) This is an implicit No Warranty clause...
-> It might trigger something useful or give you slow death.
->
-> https://wiki.debian.org/DebianUnstable
-> "If you are a hardcore developer or tester you should use this release."
->
-> https://www.debian.org/doc/manuals/securing-debian-howto/ch10.en.html#s10.1.3
-> "you should not use Debian's unstable branch for production-level systems"
+Kind regards,
+Luk=C3=A1=C5=A1
 
-Quite but from a QEMU point of view these are being used for CI loops
-and proving a known state of something for users to test on. As I said
-in reply elsewhere I think to get the benefit of recent Clang and GCCs
-it would be best to base of some sort of stable base.
+Changes v1->v2
+ - Squashed 2nd and 10th patches into 2nd one
+ - Use repr() in MonitorResponseError's description
+ - Improved commit message of the 6th patch
+ - Two tweaks to docstrings changed in the 6th patch
+ - Also updated qmp-shell to use new-style super calls (7th patch)
+ - Fixed the accidental rename of qmp `cmd_id` (kept the id->cmd_id patch=
+)
+ - Changed the style of the style-fix in the 10th commit
 
---
-Alex Bennée
+Luk=C3=A1=C5=A1 Doktor (10):
+  qemu.py: Pylint/style fixes
+  qemu|qtest: Avoid dangerous arguments
+  qemu.py: Use iteritems rather than keys()
+  qemu.py: Simplify QMP key-conversion
+  qemu.py: Use custom exceptions rather than Exception
+  qmp.py: Couple of pylint/style fixes
+  qmp.py: Use object-based class for QEMUMonitorProtocol
+  qmp.py: Avoid "has_key" usage
+  qmp.py: Avoid overriding a builtin object
+  qtest.py: Few pylint/style fixes
+
+ scripts/qemu.py       | 98 +++++++++++++++++++++++++++++++++++++--------=
+------
+ scripts/qmp/qmp-shell |  4 +--
+ scripts/qmp/qmp.py    | 49 ++++++++++++++++----------
+ scripts/qtest.py      | 13 ++++---
+ 4 files changed, 109 insertions(+), 55 deletions(-)
+
+--=20
+2.9.4
