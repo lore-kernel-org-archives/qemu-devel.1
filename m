@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1da2Fb-0002me-5Q
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:00:00 -0400
+	(envelope-from <stefanha@gmail.com>) id 1da2P8-0008IA-Ex
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1da2FY-0004MH-5G
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:59:59 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:38614)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1da2FX-0004Ly-Va
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:59:56 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id k190so6428412pgk.5
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 08:59:55 -0700 (PDT)
-Date: Tue, 25 Jul 2017 08:59:52 -0700
-From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Message-Id: <1500998392.23634.0@smtp.gmail.com>
-In-Reply-To: <20170725083849.GE26394@redhat.com>
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-	<20170725083849.GE26394@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1da2P3-0001M4-FQ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:09:50 -0400
+Date: Tue, 25 Jul 2017 17:09:41 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170725160941.GT23343@stefanha-x1.localdomain>
+References: <20170714094521.4909-1-el13635@mail.ntua.gr>
+	<20170714094521.4909-5-el13635@mail.ntua.gr>
+	<20170724151247.GJ2784@stefanha-x1.localdomain>
+	<20170725102908.6bwzz543pfi7ef7z@postretch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] io: Improve websocket support by becoming
- more RFC compliant.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="G2d+m75Tjo442KmM"
+Content-Disposition: inline
+In-Reply-To: <20170725102908.6bwzz543pfi7ef7z@postretch>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/7] block: convert
+ ThrottleGroup to object with QOM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
-
-Sure thing. I implemented it in multiple commits, but there was enough 
-overlap in those commits that I thought it would require extra 
-unnecessary work to review. But I also found an issue that needs fixed, 
-so I need to resubmit anyway.
-
---
-Brandon Carpenter | Software Engineer
-Cypherpath, Inc.
-400 Columbia Point Drive Ste 101 | Richland, Washington USA
-Office: (650) 713-3060
-
-On Tue, Jul 25, 2017 at 1:38 AM, Daniel P. Berrange 
-<berrange@redhat.com> wrote:
-> On Mon, Jul 24, 2017 at 11:42:17AM -0700, Brandon Carpenter wrote:
->>  Remembering the opcode is sufficient for handling fragmented frames 
->> from
->>  the client, which may be introduced by an intermediary server/proxy.
->>  Respond to pings and ignore pongs rather than close the connection 
->> as
->>  many browsers use ping/pong to test an idle connection. Close
->>  connections according to the RFC, including providing reason code 
->> and
->>  message to aid debugging of unexpected disconnects. Empty payloads
->>  should not cause a disconnect.
-> 
-> Couuld you split this up into multiple patches, each one only fixing
-> a single problem at a time. It is rather hard to review this for
-> correctness when everything is changed at once.
-> 
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    
-> https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    
-> https://www.instagram.com/dberrange :|
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
 
 
--- 
+--G2d+m75Tjo442KmM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jul 25, 2017 at 01:29:08PM +0300, Manos Pitsidianakis wrote:
+> On Mon, Jul 24, 2017 at 04:12:47PM +0100, Stefan Hajnoczi wrote:
+> > On Fri, Jul 14, 2017 at 12:45:18PM +0300, Manos Pitsidianakis wrote:
+> > > ThrottleGroup is converted to an object. This will allow the future
+> > > throttle block filter drive easy creation and configuration of thrott=
+le
+> > > groups in QMP and cli.
+> > >=20
+> > > A new QAPI struct, ThrottleLimits, is introduced to provide a shared
+> > > struct for all throttle configuration needs in QMP.
+> > >=20
+> > > ThrottleGroups can be created via CLI as
+> > >     -object throttling-group,id=3Dfoo,x-iops-total=3D100,x-..
+> >=20
+> > Please make the QOM name and struct name consistent.  Either
+> > ThrottleGroup/throttle-group or ThrottlingGroup/throttling-group but not
+> > ThrottleGroup/throttling-group.
+>=20
+> I did this on purpose because current throttling has ThrottleGroup
+> internally and throttling.group in the command line. Should we keep this
+> only in legacy and make it throttle-group everywhere?
 
-CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
-for the sole use of the intended recipient(s) and may contain proprietary, 
-confidential or privileged information or otherwise be protected by law. 
-Any unauthorized review, use, disclosure or distribution is prohibited. If 
-you are not the intended recipient, please notify the sender and destroy 
-all copies and the original message.
+I don't see a compatibility issue because -drive throttling.group=3D is a
+-drive property while THROTTLE_GROUP ("throttling-group") is a QOM class
+name.  They are unrelated and the QOM convention is for the
+typedef/struct name (ThrottleGroup) to be consistent with the QOM class
+name.
+
+Therefore it should be safe to use "throttle-group" as the QOM class
+name instead of "throttling-group".
+
+> > > +    visit_type_int64(v, name, &value, &local_err);
+> > > +    if (local_err) {
+> > > +        goto fail;
+> > > +    }
+> > > +    if (value < 0) {
+> > > +        error_setg(&local_err, "Property value must be in range "
+> > > +                               "[0, %"PRId64"]", INT64_MAX);
+> >=20
+> > Please print the maximum value relevant to the actual field type instead
+> > of INT64_MAX.
+>=20
+> This checks the limits of the int64 field you give to QOM. I think you me=
+an
+> in the value assignment to each field that follows? In any case, since
+> unsigned is the only smaller field we could convert it to uint64_t/uint32=
+_t
+> internally.
+
+I'm saying that UNSIGNED fields are silently truncated if the value is
+larger than UINT_MAX, and also that the error message is misleading
+since UNSIGNED fields cannot take values in the whole range we print.
+
+--G2d+m75Tjo442KmM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZd21FAAoJEJykq7OBq3PI1WYH/2rz1RKen8x8srm38+9BpfzY
+5gyzpwQD6u0QE0CbkvnRN0wax8X2A+vg8FNVSGStkOT3wDcc6VljVqN55eo3yW+Q
+Sfp6Z40CKQxbScu7GhkSjO08vr4gmXaU1pPLV/JOHwHU6BON7jDsbixx+KQmrRoY
+YNhrbWJoyZm2aP35j3a213IeYiXwU97+utXFs+Ee6L9Vdo08rYs+rtqwJRK/2Ux8
+lyzvxgIV5ttJH3/hKQT+mhVm2IoHA28K5sA8LlkGG+XRt60lochaAIEJh8XjOAsv
+MN9UG9+t1jtlNq+dcJGQnOVUV2bRBhrPiz5eCfe2DZa9tC5r+J/1BmIDyRinE54=
+=q7SC
+-----END PGP SIGNATURE-----
+
+--G2d+m75Tjo442KmM--
