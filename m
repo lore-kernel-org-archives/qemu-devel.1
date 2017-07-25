@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1da0cE-00064Y-Gp
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:15:15 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1da0dc-0006dM-LE
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:16:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1da0cA-0004lV-Rd
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:15:14 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35241)
+	(envelope-from <aik@ozlabs.ru>) id 1da0dZ-0005Bg-IZ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:16:40 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1da0cA-0004kz-GH
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:15:10 -0400
-Received: by mail-wm0-x231.google.com with SMTP id c184so53420315wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:15:10 -0700 (PDT)
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-35-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170724182751.18261-35-f4bug@amsat.org>
-Date: Tue, 25 Jul 2017 15:15:07 +0100
-Message-ID: <87k22weh78.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1da0dZ-0005Ah-D2
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:16:37 -0400
+Received: by mail-pf0-x243.google.com with SMTP id 1so4937083pfi.3
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:16:35 -0700 (PDT)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-20-git-send-email-clg@kaod.org>
+	<6e9f8817-2ecc-4ea3-8f22-17496b520bb4@ozlabs.ru>
+	<d0e51819-6ee3-67ca-d736-fe7f37ef84c8@kaod.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <d1f565d9-9c2f-3081-be42-e9d01b89f25f@ozlabs.ru>
+Date: Wed, 26 Jul 2017 00:16:29 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <d0e51819-6ee3-67ca-d736-fe7f37ef84c8@kaod.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Language: en-AU
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.10 34/35] docker: add debian
- 'bleeding' image with gcc7 and clang5
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 19/26] ppc/xive: introduce a
+ helper to map the XIVE memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,128 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+
+On 25/07/17 19:18, Cédric Le Goater wrote:
+> On 07/25/2017 04:54 AM, Alexey Kardashevskiy wrote:
+>> On 06/07/17 03:13, Cédric Le Goater wrote:
+>>> It will be used when the guest chooses the XIVE exploitation mode in
+>>> CAS.
+>>>
+>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>>> ---
+>>>  hw/intc/xive.c        | 11 +++++++++++
+>>>  include/hw/ppc/xive.h |  2 ++
+>>>  2 files changed, 13 insertions(+)
+>>>
+>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>> index cda1fa18e44d..895dd2b2f61b 100644
+>>> --- a/hw/intc/xive.c
+>>> +++ b/hw/intc/xive.c
+>>> @@ -915,3 +915,14 @@ bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t priority,
+>>>  
+>>>      return true;
+>>>  }
+>>> +
+>>> +void xive_mmio_map(XIVE *x)
+>>> +{
+>>> +    /* ESBs */
+>>> +    sysbus_mmio_map(SYS_BUS_DEVICE(x), 0, x->vc_base);
+>>> +
+>>> +    /* Thread Management Interrupt Areas */
+>>> +    /* TODO: Only map the OS TIMA for the moment. Mapping the whole
+>>> +     * region needs some rework in the handlers */
+>>> +    sysbus_mmio_map(SYS_BUS_DEVICE(x), 1, x->tm_base + (1 << x->tm_shift));
+>>> +}
+>>
+>>
+>> imho it makes more sense to squash such small patches (this one and 20/26,
+>> 21/26) into those which actually make use of the new helpers - easier to
+>> review, better for bisectability.
+> 
+> ok. I am also realizing we should unmap.
 
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  .../docker/dockerfiles/debian-bleeding-dev.docker  | 94 ++++++++++++++++++++++
->  1 file changed, 94 insertions(+)
->  create mode 100644 tests/docker/dockerfiles/debian-bleeding-dev.docker
->
-> diff --git a/tests/docker/dockerfiles/debian-bleeding-dev.docker b/tests/docker/dockerfiles/debian-bleeding-dev.docker
-> new file mode 100644
-> index 0000000000..d6ae20692c
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/debian-bleeding-dev.docker
-> @@ -0,0 +1,94 @@
-> +#
-> +# Docker x86_64 bleeding image
-> +#
-> +# This docker target builds on the debian unstable base image. Further
-> +# libraries which are not widely available are installed by hand.
-> +#
-
-Not for 2.10 please.
-
-> +FROM debian:unstable
-> +
-> +MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
-> +
-> +RUN echo 'Acquire::ForceIPv4 "true";' >> /etc/apt/apt.conf.d/01network
-> +
-> +# Duplicate deb line as deb-src
-> +RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
-> +
-> +# Install common build utilities
-> +RUN apt-get update && \
-> +    DEBIAN_FRONTEND=noninteractive apt-get install -yy eatmydata
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        bison \
-> +        build-essential \
-> +        ca-certificates \
-> +        ccache \
-> +        flex \
-> +        git \
-> +        less \
-> +        pkg-config \
-> +        psmisc \
-> +        python \
-> +        texinfo \
-> +        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
-> +
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        binutils-multiarch \
-> +        gdb-multiarch \
-> +        libnewlib-dev \
-> +        musl-dev \
-> +        uclibc-source
-> +
-> +############################################################################
-> +# GCC 7
-> +
-> +RUN echo deb http://httpredir.debian.org/debian experimental main >> \
-> +    /etc/apt/sources.list.d/experimental.list && apt-get update
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        gcc-7 \
-> +        gcc-7-cross-base-ports \
-> +        gcc-7-multilib \
-> +        g++-7
-> +
-> +############################################################################
-> +# Clang 5
-> +
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        curl gnupg
-> +RUN curl http://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-> +    echo 'deb http://apt.llvm.org/unstable/ llvm-toolchain main' \
-> +        > /etc/apt/sources.list.d/llvm.list && \
-> +    apt-get update
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        clang-5.0 \
-> +        lldb-5.0 \
-> +        llvm-5.0 && \
-> +    test -x /usr/bin/clang || ln -s clang-5.0 /usr/bin/clang
-> +
-> +############################################################################
-> +# QEMU specific starts here
-> +
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get build-dep -yy qemu
-> +
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        libbz2-dev \
-> +        liblzo2-dev \
-> +        librdmacm-dev \
-> +        libsnappy-dev \
-> +        libvte-dev
-> +
-> +# virgl
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        libegl1-mesa-dev \
-> +        libepoxy-dev \
-> +        libgbm-dev
-> +RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virglrenderer
-> +RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure
-> --with-glx --disable-tests && make install
-
-There are a lot of moving parts basing this in debian unstable and
-compiling extra bleeding edge stuff. What does this buy that the clang
-and toolchain builds in Travis don't already cover?
-
-> +
-> +ENV QEMU_CONFIGURE_OPTS --host-cc=clang-5.0 --cc=clang-5.0 --cxx=clang++-5.0
+I could not find a helper to do unmapping for sysbus regions so I suppose
+it has to be memory_region_set_enabled() or (imho better)
+memory_region_set_size() which would take zero size for the XICS emulation
+case.
 
 
---
-Alex Bennée
+> 
+> Thanks,
+> 
+> C.
+>  
+>>
+>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>>> index 288116aeb8f4..560f6ab66f73 100644
+>>> --- a/include/hw/ppc/xive.h
+>>> +++ b/include/hw/ppc/xive.h
+>>> @@ -68,4 +68,6 @@ typedef struct sPAPRMachineState sPAPRMachineState;
+>>>  void xive_spapr_init(sPAPRMachineState *spapr);
+>>>  void xive_spapr_populate(XIVE *x, void *fdt);
+>>>  
+>>> +void xive_mmio_map(XIVE *x);
+>>> +
+>>>  #endif /* PPC_XIVE_H */
+>>>
+>>
+>>
+> 
+
+
+-- 
+Alexey
