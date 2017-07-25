@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dZylp-0005QI-EP
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:17:02 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dZz2c-00010G-8F
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dZylm-0005dp-9e
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:17:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37570)
+	(envelope-from <kraxel@redhat.com>) id 1dZz2X-0006Et-CA
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:34:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dZylm-0005dc-32
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:16:58 -0400
-References: <20170721125609.11117-1-david@redhat.com>
-	<20170725135534.55f9bd38@gondolin>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <971f9c67-1556-d002-07fa-a48929e335ec@redhat.com>
-Date: Tue, 25 Jul 2017 14:16:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170725135534.55f9bd38@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/6] target/s390x: tcg improvments + MSA
- functions
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dZz2X-0006EJ-5y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 08:34:17 -0400
+Message-ID: <1500986052.29790.5.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 25 Jul 2017 14:34:12 +0200
+In-Reply-To: <20170724182751.18261-17-f4bug@amsat.org>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-17-f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 2.10 16/35] usb/dev-mtp: fix use of
+ uninitialized values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 25.07.2017 13:55, Cornelia Huck wrote:
-> On Fri, 21 Jul 2017 14:56:03 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Based on series:
->>     "[PATCH v2 0/5] target/s390x: cpu model cleanups + improvements"
-> 
-> I'm trying to decide what to do with this series; probably nothing for
-> 2.10.
-> 
->>
->> 1. smaller pgm irq instruction length fixes
-> 
-> These, I would have considered. But it seems Richard had an alternative
-> idea which is 2.11 material. So I'll probably just ignore these for now.
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case CMD_GET_OBJECT_INFO:
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0o =3D usb_mtp_object_l=
+ookup(s, c->argv[0]);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (c->argc > 0) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+o =3D usb_mtp_object_lookup(s, c->argv[0]);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
 
-I'd suggest to simply pick these two up. Simple fixes. Richards series
-is a step into the right direction, getting rid of explicit ILEN
-specification/ILEN_AUTO completely, avoiding such bugs in the future.
+How about zero-initializing c->argv instead?
 
-But I'll let Richard + you decide.
-
-> 
->> 2. implement IPM, which is often used in context of MSA instructions
->> 3. implement all basic MSA (cpacf/crypto) instructions <= z13. Only provide
->>    the query subfunction (to query available subfunctions), no actual
->>    de/encryption yet
-> 
-> This is certainly 2.11 material.
-
-We could discuss if IPM makes sense. I can resend the updated version.
-MSA can certainly wait for 2.11.
-
-Thanks.
-
--- 
-
-Thanks,
-
-David
+cheers,
+  Gerd
