@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dZpIP-0007vK-HD
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:10:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dZpRb-0000qU-PI
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dZpIM-0002B4-7b
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:10:01 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dZpIL-0002Af-Ud
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:09:58 -0400
-Received: by mail-pg0-x243.google.com with SMTP id v190so13229320pgv.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 19:09:57 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1dZpRa-00060F-KQ
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 22:19:31 -0400
+Date: Tue, 25 Jul 2017 12:17:49 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170725021749.GC9471@umbus.fritz.box>
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-18-git-send-email-clg@kaod.org>
-	<64a506b0-9ba0-0fce-9285-534710a492b4@ozlabs.ru>
-	<14dc225b-5dd3-a1a4-542b-247495735af1@kaod.org>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <481a3b52-c063-1dd3-f451-7c272c7bd990@ozlabs.ru>
-Date: Tue, 25 Jul 2017 12:09:51 +1000
+	<1499274819-15607-5-git-send-email-clg@kaod.org>
+	<20170719030849.GQ3140@umbus.fritz.box>
+	<5ead830d-760e-3486-9287-c1243acad3ea@kaod.org>
+	<b94d43ed-3d9b-2727-fb0f-8ffb2910aa00@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <14dc225b-5dd3-a1a4-542b-247495735af1@kaod.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 17/26] ppc/xive: add hcalls
- support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dkEUBIird37B8yKS"
+Content-Disposition: inline
+In-Reply-To: <b94d43ed-3d9b-2727-fb0f-8ffb2910aa00@ozlabs.ru>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 04/26] ppc/xive: introduce a
+ skeleton for the XIVE interrupt controller model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-
-On 25/07/17 00:55, Cédric Le Goater wrote:
-> On 07/24/2017 11:39 AM, Alexey Kardashevskiy wrote:
->> On 06/07/17 03:13, Cédric Le Goater wrote:
->>> A set of Hypervisor's call are used to configure the interrupt sources
->>> and the event/notification queues of the guest:
->>>
->>>    H_INT_GET_SOURCE_INFO
->>>    H_INT_SET_SOURCE_CONFIG
->>>    H_INT_GET_SOURCE_CONFIG
->>>    H_INT_GET_QUEUE_INFO
->>>    H_INT_SET_QUEUE_CONFIG
->>>    H_INT_GET_QUEUE_CONFIG
->>>    H_INT_RESET
->>>    H_INT_ESB
->>>
->>> Calls that still need to be addressed :
->>>
->>>    H_INT_SET_OS_REPORTING_LINE
->>>    H_INT_GET_OS_REPORTING_LINE
->>>    H_INT_SYNC
->>>
->>> See below for the documentation on each hcall.
->>>
->>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>> ---
-
-[...]
-
->>
->> R6 is missing but you added it in your github tree so never mind :)
->>
-> 
-> Yes. I have updated the hcalls in my github tree with some fixes and 
-> also some small recent changes in the specs.
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
-This was rather a note for other reviewers if they read the specs and find
-mismatches (18/26 is also updated), really :)
+--dkEUBIird37B8yKS
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jul 25, 2017 at 11:26:13AM +1000, Alexey Kardashevskiy wrote:
+> On 24/07/17 23:00, C=E9dric Le Goater wrote:
+> >>> +#include "qemu/osdep.h"
+> >>> +#include "qemu/log.h"
+> >>> +#include "qapi/error.h"
+> >>> +#include "target/ppc/cpu.h"
+> >>> +#include "sysemu/cpus.h"
+> >>> +#include "sysemu/dma.h"
+> >>> +#include "monitor/monitor.h"
+> >>> +#include "hw/ppc/xive.h"
+> >>> +
+> >>> +#include "xive-internal.h"
+> >>> +
+> >>> +/*
+> >>> + * Main XIVE object
+> >>
+> >> As with XICs, does it really make sense for there to be a "main" XIVE
+> >> object, or should be an interface attached to the machine?
+> >=20
+> > yes. There are internal tables which are very specific to the controlle=
+r=20
+> > and I don't think they belong to the machine.
+>=20
+> These tables belong to a CPU chip (die?) and we do not emulate these now
+> (machines and cores are the closest) and since we do not want (do we?) to
+> treat a core as a chip, the machine is the most obvious owner for these t=
+ables.
 
--- 
-Alexey
+No, I think it's reasonable for them to be owned by a XIVE object
+under the machine.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--dkEUBIird37B8yKS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll2qk0ACgkQbDjKyiDZ
+s5JQIxAA0giGqR9pPBnMhb0bwRhmKHLcyCm8ufws2PquzNfbWxr+yzswSb8hBfE/
+HQlrBLfOY/nlPFDGATeh9PzAnhfECNujzEdpeq2aKg/uxgvHWD/fN1ZkiMvCdzhI
+o4vMgT8KRr6ZcwUQ65iOB/Zu0sYOIyzl2F6KmF5xbq5VVLeDmIhUwnR9NAAuGwlh
+yH1lhxcA7fJLHPu2u03mr35dTd3cwYZFYA86YNB0gz+g2VRy3CJUDhOZkoUyx599
++vqEbJqO4IekCnOSeGO/UZDHIkhzNij2PnVtC93jrYBfHi52rwyWL0Kb0ZnqXccn
+MXvs1BUS61R/0xQLhk084oQuMeJfBqomZbx6VqOy3bkgorG33709s2Bj0vc2RePj
+MQzxb6TFjPeTvitc3PmgLFWI4NppDOm/isuswoDDtCJV8iMp3rSOBvtluSTQFzb1
+uwmMY2ECgLTnKAkF8fwfc58xMAkDrLS50gpRlqhgTOHWqXSxiNMxB7Nlbbh9cjYP
+l4kRTtsP2tkViHGY5ZiaQ0ULU4f5q+9tZ9MDmjloYt3ZBsAXEUjuX8kbtdBTGLdq
+Aw33iqz59O+ULnXjUTB8zAICgvdaj6WDoYat5raON5AmovfI5m8KEuSy6giXIfWH
+r0Af+1wstaR8J6Me8ccBGCcTHUVzxXsq/RuvAuIeWzF5IJdk6Os=
+=y6PO
+-----END PGP SIGNATURE-----
+
+--dkEUBIird37B8yKS--
