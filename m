@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dZw9h-0005yH-VF
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:29:30 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZw9x-000678-D5
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dZw9c-0005kk-Uo
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:29:29 -0400
-Received: from mga14.intel.com ([192.55.52.115]:60008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dZw9c-0005k6-L6
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:29:24 -0400
-Message-ID: <59771010.6080108@intel.com>
-Date: Tue, 25 Jul 2017 17:32:00 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
-	<20170714123023.GA2624@dhcp22.suse.cz>
-	<20170714181523-mutt-send-email-mst@kernel.org>
-	<20170717152448.GN12888@dhcp22.suse.cz>
-	<596D6E7E.4070700@intel.com>
-	<20170719081311.GC26779@dhcp22.suse.cz>
-	<596F4A0E.4010507@intel.com>
-	<20170724090042.GF25221@dhcp22.suse.cz>
-In-Reply-To: <20170724090042.GF25221@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZw9s-0005s3-Rt
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:29:45 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:59611)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dZw9r-0005pW-2n
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:29:40 -0400
+Date: Tue, 25 Jul 2017 17:29:02 +0800 (CST)
+Message-ID: <201707251729027333495@zte.com.cn>
+References: 201707251214058120036@zte.com.cn,
+	713ce91f-d163-8607-ea39-673317b70eed@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V3=5D_rtc=3A_fix_a_infinite_loop?=
+ =?utf-8?q?_in_windows_vmstartup?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Hocko <mhocko@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: pbonzini@redhat.com
+Cc: liu.yi24@zte.com.cn, qemu-devel@nongnu.org, mst@redhat.com
 
-On 07/24/2017 05:00 PM, Michal Hocko wrote:
-> On Wed 19-07-17 20:01:18, Wei Wang wrote:
->> On 07/19/2017 04:13 PM, Michal Hocko wrote:
-> [...
->>> All you should need is the check for the page reference count, no?  I
->>> assume you do some sort of pfn walk and so you should be able to get an
->>> access to the struct page.
->> Not necessarily - the guest struct page is not seen by the hypervisor. The
->> hypervisor only gets those guest pfns which are hinted as unused. From the
->> hypervisor (host) point of view, a guest physical address corresponds to a
->> virtual address of a host process. So, once the hypervisor knows a guest
->> physical page is unsued, it knows that the corresponding virtual memory of
->> the process doesn't need to be transferred in the 1st round.
-> I am sorry, but I do not understand. Why cannot _guest_ simply check the
-> struct page ref count and send them to the hypervisor?
-
-Were you suggesting the following?
-1) get a free page block from the page list using the API;
-2) if page->ref_count == 0, send it to the hypervisor
-
-Btw, ref_count may also change at any time.
-
-> Is there any
-> documentation which describes the workflow or code which would use your
-> new API?
->
-
-It's used in the balloon driver (patch 8). We don't have any docs yet, but
-I think the high level workflow is the two steps above.
-
-
-Best,
-Wei
+Pk9uIDI1LzA3LzIwMTcgMDY6MTQsIHBlbmcuaGFvMkB6dGUuY29tLmNuIHdyb3RlOg0KDQoNCg0K
+DQoNCj4+PiBPbiAyNC8wNy8yMDE3IDIwOjM1LCBQZW5nIEhhbyB3cm90ZToNCj4+IA0KPj4gDQo+
+PiANCj4+IA0KPj4gDQo+Pj4+IFdoZW4gYSB3aW5kb3dzIHZtIHN0YXJ0cywgcGVyaW9kaWMgdGlt
+ZXIgb2YgcnRjIHdpbGwgc3RvcCBzZXZlcmFsIHRpbWVzLg0KPj4+PiB3aW5kb3dzIGtlcm5lbCB3
+aWxsIGNoZWNrIHdoZXRoZXIgUkVHX0FfVUlQIGlzIGNoYW5nZWQuIFJFR19DJ3MgaW50ZXJydXB0
+DQo+Pj4+IGZsYWdzIHdpbGwgbm90IGJlIGNsZWFyZWQgd2hlbiBwZXJpb2RpYyB0aW1lciBzdG9w
+cyBhbmQgdGhlIHVwZGF0ZSB0aW1lcg0KPj4+PiB3aWxsIHN3aXRjaCB0byBhbGFybSB0aW1lci4g
+U28gdGhlIGV4cGlyYXRpb24gdGltZSBvZiBhbGFybSB0aW1lciBpcyB2ZXJ5DQo+Pj4+IGxvbmcg
+YW5kIFJFR19BX1VJUCB3aWxsIG5vdCB2YXJ5LkF0IGxhc3Qgd2luZG93cyBrZXJuZWwgd2lsbCBy
+ZXBlYXQgdG8gDQo+Pj4+IGNoZWNrIFJFR19BX1VJUCBhbGwgdGhlIHRpbWUuDQo+PiANCj4+PiBU
+aGlzIHNob3VsZCBub3QgaGFwcGVuLiAgUkVHX0FfVUlQIGlzIHNldCBhbmQgY2xlYXJlZCBpbiBy
+ZWdpc3RlciBBDQo+Pj4gZXZlcnkgc2Vjb25kLCBsaWtlIHRoaXM6DQo+Pj4gICAgICAgIGNhc2Ug
+UlRDX1JFR19BOg0KPj4+ICAgICAgICAgICAgaWYgKHVwZGF0ZV9pbl9wcm9ncmVzcyhzKSkgew0K
+Pj4+ICAgICAgICAgICAgICAgIHMtPmNtb3NfZGF0YVtzLT5jbW9zX2luZGV4XSB8PSBSRUdfQV9V
+SVANCj4+PiAgICAgICAgICAgIH0gZWxzZSB7DQo+Pj4gICAgICAgICAgICAgICAgcy0+Y21vc19k
+YXRhW3MtPmNtb3NfaW5kZXhdICY9IH5SRUdfQV9VSVANCj4+PiAgICAgICAgICAgIH0NCj4+PiAg
+ICAgICAgICAgIHJldCA9IHMtPmNtb3NfZGF0YVtzLT5jbW9zX2luZGV4XQ0KPj4+ICAgICAgICAg
+ICAgYnJlYWsNCj4+IA0KPj4gDQo+PiANCj4+IHdoZW4gcGVyaW9kaWMgdGltZXIgc3RvcCwgdXBk
+YXRlIHRpbWVyIGlzIHNldCB0byBhIGxvbmcgZXhwaXJlIHRpbWUgKGFzIGFsYXJtIHRpbWVyKS4N
+Cg0KPkkgdGhpbmsgSSBzZWUgdGhlIGJ1ZyBub3c6DQoNCj5kaWZmIC0tZ2l0IGEvaHcvdGltZXIv
+bWMxNDY4MThydGMuYyBiL2h3L3RpbWVyL21jMTQ2ODE4cnRjLmMNCj5pbmRleCAxYjhkM2Q3ZDRj
+Li42MTg0YjQzNzhlIDEwMDY0NA0KPi0tLSBhL2h3L3RpbWVyL21jMTQ2ODE4cnRjLmMNCj4rKysg
+Yi9ody90aW1lci9tYzE0NjgxOHJ0Yy5jDQo+QEAgLTMyMSw5ICszMjEsMTEgQEAgc3RhdGljIHZv
+aWQgY2hlY2tfdXBkYXRlX3RpbWVyKFJUQ1N0YXRlICpzKQ0KPiAgICAgcy0+bmV4dF9hbGFybV90
+aW1lID0gbmV4dF91cGRhdGVfdGltZSArDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAobmV4
+dF9hbGFybV9zZWMgLSAxKSAqIE5BTk9TRUNPTkRTX1BFUl9TRUNPTkQNCj4gDQo+LSAgICBpZiAo
+cy0+Y21vc19kYXRhW1JUQ19SRUdfQ10gJiBSRUdfQ19VRikgew0KPi0gICAgICAgIC8qIFVGIGlz
+IHNldCwgYnV0IEFGIGlzIGNsZWFyLiAgUHJvZ3JhbSB0aGUgdGltZXIgdG8gdGFyZ2V0DQo+LSAg
+ICAgICAgICogdGhlIGFsYXJtIHRpbWUuICAqLw0KPisgICAgaWYgKChzLT5jbW9zX2RhdGFbUlRD
+X1JFR19DXSAmIFJFR19DX1VGKSAmJg0KPisgICAgICAgICEocy0+Y21vc19kYXRhW1JUQ19SRUdf
+QV0gJiBSRUdfQV9VSVApKSB7DQo+KyAgICAgICAgLyogSWYgVUlQIHdhcyBsYXRjaGVkLCB3ZSBu
+ZWVkIHRvIGNsZWFyIGl0IGF0IHRoZSBuZXh0IHVwZGF0ZS4NCj4rICAgICAgICAgKiBPdGhlcndp
+c2UsIGlmIFVGIGlzIHNldCB3ZSBvbmx5IG5lZWQgdG8gcHJvZ3JhbSB0aGUgdGltZXIgdG8NCj4r
+ICAgICAgICAgKiB0YXJnZXQgdGhlIGFsYXJtIHRpbWUuICAqLw0KPiAgICAgICAgIG5leHRfdXBk
+YXRlX3RpbWUgPSBzLT5uZXh0X2FsYXJtX3RpbWUNCj4gICAgIH0NCj4gICAgIGlmIChuZXh0X3Vw
+ZGF0ZV90aW1lICE9IHRpbWVyX2V4cGlyZV90aW1lX25zKHMtPnVwZGF0ZV90aW1lcikpIHsNCj5i
+dXQgSSB3b3VsZCBsaWtlIHRvIGhhdmUgYSB0ZXN0Y2FzZSBmb3IgaXQgaW4gdGVzdHMvcnRjLXRl
+c3QuYy4NCg0KPkNhbiB5b3UgY2hlY2sgaWYgdGhlIGFib3ZlIHdvcmtzIGFuZCB0cnkgd3JpdGlu
+ZyBhIHRlc3RjYXNlICh0aGF0IGZhaWxzIA0KPndpdGhvdXQgdGhlIHBhdGNoIGFuZCBzdWNjZWVk
+cyB3aXRoIGl0KT8NCj5UaGFua3MsDQpJIGRvbid0ICB0aGluayBpdCBjYW4gd29ya3MuIFJFR19D
+X1VGIGlzIHRvdGFsbHkgY2xlYXJlZCBieSBwZXJpb2RpYyB0aW1lciBpbiBvcmlnaW5hbCBjb2Rl
+Lg0KDQphZnRlciBwZXJpb2RpYyB0aW1lciBzdG9wZWQsIHRoZSBSRUdfQ19VRiAgaXMgbmV2ZXIg
+Y2xlYXJlZC4NCg0KcnRjX3VwZGF0ZV90aW1lciBoYXMgY2xlYXJlZCBSRUdfQV9VSVAsSSB0aGlu
+ayAgdGhlIHBhdGNoICBkb2VzIG5vdGhpbmcuDQoNCkkgcmVwcm9kdWNlIHRoZSBidWcgd2hlbiBt
+YW55IHdpbmRvd3MgVk1zIHJlYm9vdCBhbmQgaXQgaXMgYWJvdXQgdGhlIG1ldGhvZCBvZiAgd2lu
+ZG93cyBrZXJuZWwgYWNjZXNzaW5nIHJ0YyAuDQoNCnNvIGkgZG9uJ3Qga25vdyBob3cgdG8gd3Jp
+dGUgdGhlIHRlc3RjYXNlLg0KDQoNCg0KDQo+UGFvbG8=
