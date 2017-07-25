@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1da4wo-0007kL-QW
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:52:48 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1da58j-000188-5L
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:05:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1da4wl-0003ts-LE
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:52:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58492)
+	(envelope-from <sstabellini@kernel.org>) id 1da58e-00017E-8z
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:05:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1da4wl-0003tW-Bn
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 14:52:43 -0400
-Date: Tue, 25 Jul 2017 15:52:40 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170725185240.GP2757@localhost.localdomain>
-References: <201707221307459622030@zte.com.cn>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1da58e-00016C-0o
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:05:00 -0400
+Date: Tue, 25 Jul 2017 12:04:57 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1327586655.18981029.1501008326637.JavaMail.zimbra@redhat.com>
+Message-ID: <alpine.DEB.2.10.1707251155460.22381@sstabellini-ThinkPad-X260>
+References: <20170725171302.GK1587@perard.uk.xensource.com>
+	<349062488.18968647.1501004879602.JavaMail.zimbra@redhat.com>
+	<alpine.DEB.2.10.1707251102130.22381@sstabellini-ThinkPad-X260>
+	<1327586655.18981029.1501008326637.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201707221307459622030@zte.com.cn>
-Subject: Re: [Qemu-devel] [PATCH 1/2] [PATCH] hmp: dump ids
- includingsocket-id, core-id and so on for 'info registers'
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] QEMU commit 04bf2526ce breaks use of xen-mapcache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,152 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wang.yi59@zte.com.cn
-Cc: imammedo@redhat.com, dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, liu.yunh@zte.com.cn, Liu.Jianjun3@zte.com.cn
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xen.org, qemu-devel@nongnu.org
 
-On Sat, Jul 22, 2017 at 01:07:45PM +0800, wang.yi59@zte.com.cn wrote:
-> > On Fri, 22 Jul 2017 03:38:55 -0400
-> > Yi Wang <wang.yi59@zte.com.cn> wrote:
-> > > This patch add output of CPUs' socket-id, core-id, thread-id and
-> > > apic-id for 'info registers', which can be used for querying other
-> > > hmp commands.
-> > > 
-> > > Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> > > Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
-> > > ---
-> > >  include/qom/cpu.h    | 12 ++++++++++++
-> > >  monitor.c            |  1 +
-> > >  qom/cpu.c            | 10 ++++++++++
-> > >  target/i386/cpu.c    |  1 +
-> > >  target/i386/cpu.h    |  1 +
-> > >  target/i386/helper.c | 13 +++++++++++++
-> > >  6 files changed, 38 insertions(+)
-> > > 
-> > > diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> > > index 25eefea..4717bd7 100644
-> > > --- a/include/qom/cpu.h
-> > > +++ b/include/qom/cpu.h
-> > > @@ -92,6 +92,7 @@ struct TranslationBlock
-> > >   * CPUs can use the default implementation of this method. This method should
-> > >   * not be used by any callers other than the pre-1.0 virtio devices.
-> > >   * @memory_rw_debug: Callback for GDB memory access.
-> > > + * @dump_ids: Callback for dumping ids.
-> > >   * @dump_state: Callback for dumping state.
-> > >   * @dump_statistics: Callback for dumping statistics.
-> > >   * @get_arch_id: Callback for getting architecture-dependent CPU ID.
-> > > @@ -156,6 +157,7 @@ typedef struct CPUClass {
-> > >      bool (*virtio_is_big_endian)(CPUState *cpu)
-> > >      int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
-> > >                             uint8_t *buf, int len, bool is_write)
-> > > +    void (*dump_ids)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf)
-> > >      void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-> > >                         int flags)
-> > >      GuestPanicInformation* (*get_crash_info)(CPUState *cpu)
-> > > @@ -518,6 +520,16 @@ enum CPUDumpFlags {
-> > >  }
-> > >  
-> > >  /**
-> > > + * cpu_dump_ids:
-> > > + * @cpu: The CPU whose state is to be dumped.
-> > > + * @f: File to dump to.
-> > > + * @cpu_fprintf: Function to dump with.
-> > > + *
-> > > + * Dumps CPU socket-id, core-id, thread-id and apic-id.
-> > > + */
-> > > +void cpu_dump_ids(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf)
-> > > +
-> > > +/**
-> > >   * cpu_dump_state:
-> > >   * @cpu: The CPU whose state is to be dumped.
-> > >   * @f: File to dump to.
-> > > diff --git a/monitor.c b/monitor.c
-> > > index 6d040e6..30f898c 100644
-> > > --- a/monitor.c
-> > > +++ b/monitor.c
-> > > @@ -1085,6 +1085,7 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
-> > >      if (all_cpus) {
-> > >          CPU_FOREACH(cs) {
-> > >              monitor_printf(mon, "\nCPU#%d\n", cs->cpu_index)
-> > > +            cpu_dump_ids(cs, (FILE *)mon, monitor_fprintf)
-> > >              cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU)
-> > >          }
-> > >      } else {
-> > > diff --git a/qom/cpu.c b/qom/cpu.c
-> > > index 4f38db0..a9df661 100644
-> > > --- a/qom/cpu.c
-> > > +++ b/qom/cpu.c
-> > > @@ -242,6 +242,16 @@ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
-> > >      return res
-> > >  }
-> > >  
-> > > +void cpu_dump_ids(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf)
-> > > +{
-> > > +    CPUClass *cc = CPU_GET_CLASS(cpu)
-> > > +
-> > > +    if (cc->dump_ids) {
-> > > +        cpu_synchronize_state(cpu)
-> > > +        cc->dump_ids(cpu, f, cpu_fprintf)
-> > > +    }
-> > > +}
-> > > +
-> > >  void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-> > >                      int flags)
-> > >  {
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > index 0bbda76..0aa488f 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -4120,6 +4120,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-> > >      cc->do_interrupt = x86_cpu_do_interrupt
-> > >      cc->cpu_exec_interrupt = x86_cpu_exec_interrupt
-> > >  #endif
-> > > +    cc->dump_ids = x86_cpu_dump_ids
-> > >      cc->dump_state = x86_cpu_dump_state
-> > >      cc->get_crash_info = x86_cpu_get_crash_info
-> > >      cc->set_pc = x86_cpu_set_pc
-> > > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > > index 0518673..31ad681 100644
-> > > --- a/target/i386/cpu.h
-> > > +++ b/target/i386/cpu.h
-> > > @@ -1316,6 +1316,7 @@ int x86_cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
-> > >  void x86_cpu_get_memory_mapping(CPUState *cpu, MemoryMappingList *list,
-> > >                                  Error **errp)
-> > >  
-> > > +void x86_cpu_dump_ids(CPUState *cs, FILE *f, fprintf_function cpu_fprintf)
-> > >  void x86_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-> > >                          int flags)
-> > >  
-> > > diff --git a/target/i386/helper.c b/target/i386/helper.c
-> > > index f63eb3d..fd4f1af 100644
-> > > --- a/target/i386/helper.c
-> > > +++ b/target/i386/helper.c
-> > > @@ -408,6 +408,19 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, FILE *f,
-> > >  #define DUMP_CODE_BYTES_TOTAL    50
-> > >  #define DUMP_CODE_BYTES_BACKWARD 20
-> > >  
-> > > +void x86_cpu_dump_ids(CPUState *cs, FILE *f, fprintf_function cpu_fprintf)
-> > > +{
-> > > +    X86CPU *cpu = X86_CPU(cs)
-> > > +    APICCommonState *s = APIC_COMMON(cpu->apic_state)
-> > > +    if (!s) {
-> > > +        cpu_fprintf(f, "local apic state not available\n")
-> > > +        return
-> > > +    }
-> > > +
-> > > +    cpu_fprintf(f, "(socket-id:%d core-id:%d thread-id:%d apic-id:%d)\n",
-> > > +            cpu->socket_id, cpu->core_id, cpu->thread_id, s->id)
+On Tue, 25 Jul 2017, Paolo Bonzini wrote:
+> ----- Original Message -----
+> > From: "Stefano Stabellini" <sstabellini@kernel.org>
+> > To: "Paolo Bonzini" <pbonzini@redhat.com>
+> > Cc: "Anthony PERARD" <anthony.perard@citrix.com>, "Stefano Stabellini" <sstabellini@kernel.org>,
+> > xen-devel@lists.xen.org, qemu-devel@nongnu.org
+> > Sent: Tuesday, July 25, 2017 8:08:21 PM
+> > Subject: Re: QEMU commit 04bf2526ce breaks use of xen-mapcache
 > > 
-> > I'd move this hunk into x86_cpu_dump_state() and drop the rest of the patch.
+> > On Tue, 25 Jul 2017, Paolo Bonzini wrote:
+> > > > Hi,
+> > > > 
+> > > > Commits 04bf2526ce (exec: use qemu_ram_ptr_length to access guest ram)
+> > > > start using qemu_ram_ptr_length() instead of qemu_map_ram_ptr().
+> > > > That result in calling xen_map_cache() with lock=true, but this mapping
+> > > > is never invalidated.
+> > > > So QEMU use more and more RAM until it stop working for a reason or an
+> > > > other. (crash if host have little RAM or stop emulating but no crash)
+> > > > 
+> > > > I don't know if calling xen_invalidate_map_cache_entry() in
+> > > > address_space_read_continue() and address_space_write_continue() is the
+> > > > right answer.  Is there something better to do ?
+> > > 
+> > > I think it's correct for dma to be true... maybe add a lock argument to
+> > > qemu_ram_ptr_length, so that make address_space_{read,write}_continue can
+> > > pass 0 and everyone else passes 1?
 > > 
-> > If we'd need to generalize it for other targets, we could do it later.
+> > I think that is a great suggestion. That way, the difference between
+> > locked mappings and unlocked mappings would be explicit, rather than
+> > relying on callers to use qemu_map_ram_ptr for unlocked mappings and
+> > qemu_ram_ptr_length for locked mappings. And there aren't that many
+> > callers of qemu_ram_ptr_length, so adding a parameter wouldn't be an
+> > issue.
 > 
-> Thanks, Igor.
-> Should I rework this patch as you said above and send it with the other [PATCH 2/2]
-> as a entire series then? If no, I will resend the new version of [PATCH 2/2] only :)
+> Thanks---however, after re-reading xen-mapcache.c, dma needs to be false
+> for unlocked mappings.
 
-I suggest redoing this patch too, as moving the code to
-x86_cpu_dump_state() like he suggests would make the patch much
-simpler.
+If there is a DMA operation already in progress, it means that we'll
+already have a locked mapping for it.
 
--- 
-Eduardo
+When address_space_write_continue is called, which in turn would call
+qemu_map_ram_ptr, or qemu_ram_ptr_length(unlocked), if the start and
+size of the requested mapping matches the one of the previously created
+locked mapping, then a pointer to the locked mapping will be returned.
+
+If they don't match, a new unlocked mapping will be created and a
+pointer to it will be returned. (Arguably the algorithm could be
+improved so that a new mapping is not created if the address and size
+are contained within the locked mapping. This is a missing optimization
+today.)
+
+It doesn't matter if a new unlocked mapping is created, or if the locked
+mapping is returned, because the pointer returned by
+qemu_ram_ptr_length(unlocked) is only used to do the memcpy, and never
+again. So I don't think this is a problem.
