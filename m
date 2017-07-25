@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZzmQ-0004nk-RA
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dZzmT-0004pF-9I
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZzmP-0005tY-Iw
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:42 -0400
-Date: Tue, 25 Jul 2017 22:39:39 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dZzmP-0005su-7E
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:21:45 -0400
+Date: Tue, 25 Jul 2017 23:21:29 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170725123939.GG8978@umbus.fritz.box>
-References: <20170719030849.GQ3140@umbus.fritz.box>
-	<1500436938.3350.11.camel@kernel.crashing.org>
-	<20170721075015.GE3717@umbus.fritz.box>
-	<1500625291.10674.22.camel@kernel.crashing.org>
-	<20170724032853.GB17228@umbus.fritz.box>
-	<1500872645.10674.52.camel@kernel.crashing.org>
-	<20170724053827.GI17228@umbus.fritz.box>
-	<1500880826.10674.66.camel@kernel.crashing.org>
-	<20170724100314.GP17228@umbus.fritz.box>
-	<17c42efa-9ef0-077b-a29b-e836f6643768@kaod.org>
+Message-ID: <20170725132129.GH8978@umbus.fritz.box>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-15-git-send-email-clg@kaod.org>
+	<20170724063534.GM17228@umbus.fritz.box>
+	<fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
+	<20170725042027.GC8978@umbus.fritz.box>
+	<1d7d50ee-7559-2e6b-4ed0-741d810052d0@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XaUbO9McV5wPQijU"
+	protocol="application/pgp-signature"; boundary="54u2kuW9sGWg/X+X"
 Content-Disposition: inline
-In-Reply-To: <17c42efa-9ef0-077b-a29b-e836f6643768@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+In-Reply-To: <1d7d50ee-7559-2e6b-4ed0-741d810052d0@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 14/26] ppc/xive: add MMIO handlers to
+ the XIVE interrupt presenter model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,116 +33,75 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---XaUbO9McV5wPQijU
+--54u2kuW9sGWg/X+X
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 25, 2017 at 10:52:27AM +0200, C=E9dric Le Goater wrote:
-> On 07/24/2017 12:03 PM, David Gibson wrote:
-> > On Mon, Jul 24, 2017 at 05:20:26PM +1000, Benjamin Herrenschmidt wrote:
-> >> On Mon, 2017-07-24 at 15:38 +1000, David Gibson wrote:
-> >>>
-> >>> Can we assign our logical numbers sparsely, or will that cause other
-> >>> problems?
-> >>
-> >> The main issue is that they probably needs to be the same between XICS
-> >> and XIVE because by the time we get the CAS call to chose between XICS
-> >> and XIVE, we have already handed out interrupts and constructed the DT,
-> >> no ? Unless we do a real CAS reboot...
-> >=20
-> > A real CAS reboot probably isn't unreasonable for this case.
-> >=20
-> > I definitely think we need to go one way or the other - either fully
-> > unify the irq mapping between xics and xive, or fully separate them.
->=20
-> To be able to change interrupt model at CAS time, we need to unify=20
-> the IRQ numbering.
-
-Not necessarily, though it certainly might make things easier.
-
-> We don't have much choice because the DT is=20
-> already populated.
-
-We could change that, though.
-
-> We also need to share the ICSIRQState flags unless
-> we share the interrupt source object between the XIVE and XICS mode.=20
->=20
-> In my current tree, I made sure that the same IRQ number ranges=20
-> were being used in the XIVE and in the XICS allocator and that the=20
-> ICSIRQState flags of the different sPAPR Interrupt sources (XIVE=20
-> and XICS) were in sync. That works pretty well for reset, migration=20
-> and hotplug, but it is bit hacky.
->=20
-> C.
->=20
->=20
-> >> Otherwise, there's no reason they can't be sparse no.
-> >>
-> >>> Note that for PAPR we also have the question of finding logical
-> >>> interrupts for legacy PAPR VIO devices.
-> >>
-> >> We just make them another range ? With KVM legacy today, I just use the
-> >> generic interrupt facility for those. So when you do the ioctl to
-> >> "trigger" one, I just do an MMIO to the corresponding page and the
-> >> interrupt magically shows up wherever the guest is running the target
-> >> vcpu. In fact, I'd like to add a way to mmap that page into qemu so
-> >> that qemu can triggers them without an ioctl.
-> >=20
-> > Ok.
-> >=20
-> >> The guest doesn't care, from the guest perspective they are interrupts
-> >> coming from the DT, so they are like PCI etc...
-> >=20
-> > Ok.
-> >=20
-> >>>> We can fix the number of "generic" interrupts given to a guest. The
-> >>>> only requirements from a PAPR perspective is that there should be at
-> >>>> least as many as there are possible threads in the guest so they can=
- be
-> >>>> used as IPIs.
-> >>>
-> >>> Ok.  If we can do things sparsely, allocating these well away from the
-> >>> hw interrupts would make things easier.
-> >>>
-> >>>> But we may need more for other things. We can make this a machine
-> >>>> parameter with a default value of something like 4096. If we call N
-> >>>> that number of extra generic interrupts, then the number of generic
-> >>>> interrutps would be #possible-vcpu's + N, or something like that.
-> >>>
-> >>> That seems reasonable.
-> >>>
-> >>>>>> But it's fundamentally an allocator that sits in the hypervisor, s=
-o in
-> >>>>>> our case, I would say in the spapr "component" of XIVE, rather tha=
-n the
-> >>>>>> XIVE HW model itself.
-> >>>>>
-> >>>>> Maybe..
+On Tue, Jul 25, 2017 at 11:08:46AM +0200, C=E9dric Le Goater wrote:
+> On 07/25/2017 06:20 AM, David Gibson wrote:
+> > On Mon, Jul 24, 2017 at 04:44:00PM +0200, C=E9dric Le Goater wrote:
+> >> On 07/24/2017 08:35 AM, David Gibson wrote:
+> >>> On Wed, Jul 05, 2017 at 07:13:27PM +0200, C=E9dric Le Goater wrote:
+> >>>> The Thread Interrupt Management Area for the OS is mostly used to
+> >>>> acknowledge interrupts and set the CPPR of the CPU.
 > >>>>
-> >>>> You are right in that a mapping is a better term than an allocator
-> >>>> here.
+> >>>> The TIMA is mapped at the same address for each CPU. 'current_cpu' is
+> >>>> used to retrieve the targeted interrupt presenter object.
 > >>>>
-> >>>>>> Now what Cedric did, because XIVE is very complex and we need some=
-thing
-> >>>>>> for PAPR quickly, is not a complete HW model, but a somewhat simpl=
-ified
-> >>>>>> one that only handles what PAPR exposes. So in that case where the
-> >>>>>> allocator sits is a bit of a TBD...
-> >>>>>
-> >>>>> Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
-> >>>>> machine type level needs extreme caution, or the irqs may not be
-> >>>>> stable which will generally break migration.
-> >>>>
-> >>>> Yes you are right. We should probably create a more "static" scheme.
+> >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > >>>
-> >>> Sounds like we're in violent agreement.
+> >>> Am I right in thinking that this shoehorns the XIVE TIMA state into
+> >>> the existing XICS ICP object.  That.. doesn't seem like a good idea.
 > >>
-> >> Yup :)
-> >>
+> >> The TIMA memory region is under the XIVE object because it is=20
+> >> unique for the system. The lookup of the ICP is simply done using=20
+> >> 'current_cpu'. The TIMA state is under the ICPState, yes, but this=20
+> >> model does not seem incorrect to me as this state contains the=20
+> >> interrupt information presented to a CPU.
 > >=20
+> > Yeah, that's not the point I'm making.  My point is that the TIMA
+> > state isn't really the same as xics ICP state.  You're squeezing one
+> > into the other in a pretty ugly way.
 >=20
+> yes, well, we need to have compatible objects between the XICS and XIVE=
+=20
+> mode because of the CAS negotiation. for migration compatibility, it is=
+=20
+> much easier to extend existing objects. This approach I am taking today.
+
+Yeah, I really don't think this approach is workable.
+
+Roughly speaking, you're keeping the same structures between xics and
+xive, but with mostly different code.  I can't see any way that's not
+going to be horribly fragile, with any update to xics OR xive
+requiring enormous caution not to break the other.
+
+I really think we have to go one of two ways:
+
+1) Abstract the notion of interrupt source and interrupt presenter, so
+we can use a truly common model between xics and xive.
+
+Given the differences between the two, I don't know this is even
+possible.
+
+2) Separate the objects entirely.  ICPs are entirely separate from
+TIMAs, like wise ICSes and xive interrupt sources.
+
+I think this is probably the way to go.  To make this work with CAS
+switching will require different methods, but I don't think it's
+impossible.
+
+For example, we could (on the new machine type) create both xics ICSes
+and ICPs and xive sources and TIMAs.  We'd have a (migrated) flag in
+the machine saying which is currently active.  All the objects would
+hang around, but only the active ones would do anything.
+
+Now obviously that means we'd be migrating a bunch of redundant state,
+but I still think it's preferable to a Frankenstinian fusion of
+xics-ish and xive-ish state.  I think there's a good chance we can
+improve on the basic idea to remove most or all of that redundant
+state.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -154,24 +109,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---XaUbO9McV5wPQijU
+--54u2kuW9sGWg/X+X
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll3PAgACgkQbDjKyiDZ
-s5JosA//XWR4Paxvnm3mY1VOncfbcdKWtylkyU47FVEUp6YTD0r/Au0wz6IkQa3F
-kp3Otg4brbqtIerdycY4zzs33WOfSeW+zvAneWUzOMrzy52VBB5r3kWYmYEfMHX0
-8eDKJAxg43FItNy575YhJ71bRsqC3Cb/Ko2MYsXq42wKjAfAq0mVgKAYqArBzq7+
-3MI3un3UN/2I9AWAoPbD9XkGtrSXCmIpCmzoQ2AVVw7E0AkIxBd4Jfve+0/N4vP/
-STQd/FFZSiX60Im00LBXJeB/d2G3bwpP5KfgVadgxWKoPFHouWhqTJpjAa+8MlFm
-Gb6f8ip61abKgv24Ia2j7rRkNVGhM9ATselOjhy0cu/ljz3wh+QfAmWnOUBZz95E
-d7WKA+AhnTE2u1zUgbAIgC6NWBypvBiKDdNte2HQaRELyhA7Ljoc4tuj4AHY2Ykn
-7fhdMFbkHOMunK8ncTo/g1GhckytTOnurFB+PO9tMxKmk+yzP4Vz89za9+HERYcy
-h8/5gyghIxYcQ+viJwDPvX9tUN6suxiq+t5z7oXyeqDv+76qhtIGObVL77NAkHgj
-g65du7MuPbKaziAp3UacUzG/faBR1pfQlLIMQWDMhF1BP+7GRkbDLuU7hkfQWsm9
-ghFjhXtWwf00Fth/S0wwwtdbzBaPRpVr7JROXkUohoHyOqGUSbU=
-=Bhfj
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll3RdYACgkQbDjKyiDZ
+s5JvKw/9GMaNFOovXbATfLjDpcFoto5vA1Qc3d29DzRJZYmGb3nTm7ElE2qtrhhE
+EughxYeS2K5s/NdHJBP86OYwhaF5N/tT6LdMNYgx2xBp1eAGX4fgFdiFUWNgWCem
+KbjPgaf4eEAuZZ4j2ZFC/t6gmplIfVNlfI9AcYgMD7mYVk6vMZE8ZdLAiL9bqM6S
+MhNRW2PS1ui0VJnlgxgRp30+mvf8kQjlrQtoFRHZtBtlAOreYXAWp9xGlbw5docc
+Az39ALMH6FXqntNT+e7xmT3XNgWtsqOoPajj+szv662KjGkAVY4gb0dlQKE6RcLJ
+qAdbNmqn6FcIqe0GrPrIi9nGYCFyPc3lTbY56v8a6y24gZAC95E8ZJrojIW9vBvl
+5/0q9XEVTCsQ4O5MkrOoaCFmRZpMSxws7gbbYUkaq/0CgbvBPOF4xwTO0D+KOFtH
+EghLg4Epn5CkHdde8m19ONA9tKWiw/QkRYF2SLFhVlhAQrjT7Ei5m6kxXV7kmyh8
+fUUu8Pidbjm7+0SGBqS4QBunQmY0iBtBdDIkY2FJqfxEH13vburQSmMqBqPAEGsB
+Nnc6Jxf0aA0bfd2gY4WnxrdGdX2a28YlT6ZSNtEmqslj8U4nblnniOtuACndtzzv
+lSw4FB0EfxKLSWk4oxNeu7UYI1rLjYCfGrc0jDrw8mbMqTHib+U=
+=+BY+
 -----END PGP SIGNATURE-----
 
---XaUbO9McV5wPQijU--
+--54u2kuW9sGWg/X+X--
