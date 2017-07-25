@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZuwn-0005lT-0j
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:12:05 -0400
+	(envelope-from <clg@kaod.org>) id 1dZv2W-0000Np-Ox
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dZuwj-0000ky-1m
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:12:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37388)
+	(envelope-from <clg@kaod.org>) id 1dZv2S-0002zH-PS
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:18:00 -0400
+Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:48473)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dZuwi-0000kY-Ql
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:12:00 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170724150805.19563-1-dgilbert@redhat.com>
-Date: Tue, 25 Jul 2017 10:11:48 +0200
-In-Reply-To: <20170724150805.19563-1-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Mon, 24 Jul 2017 16:08:05 +0100")
-Message-ID: <87y3rdvsu3.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZv2S-0002wM-JD
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:17:56 -0400
+Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 2E15F88DE5
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 10:17:47 +0200 (CEST)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-9-git-send-email-clg@kaod.org>
+	<20170724043624.GE17228@umbus.fritz.box>
+	<1500879657.10674.64.camel@kernel.crashing.org>
+	<20170724095052.GO17228@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0f23cda8-0101-550c-eeb2-3ca08d6c52ea@kaod.org>
+Date: Tue, 25 Jul 2017 10:17:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] hmp/(p)memsave: Allow >32bit file size
+In-Reply-To: <20170724095052.GO17228@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 08/26] ppc/xive: add flags to the XIVE
+ interrupt source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, admin@manateeshome.com
+To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+On 07/24/2017 11:50 AM, David Gibson wrote:
+> On Mon, Jul 24, 2017 at 05:00:57PM +1000, Benjamin Herrenschmidt wrote:
+>> On Mon, 2017-07-24 at 14:36 +1000, David Gibson wrote:
+>>> On Wed, Jul 05, 2017 at 07:13:21PM +0200, C=E9dric Le Goater wrote:
+>>>> These flags define some characteristics of the source :
+>>>>
+>>>>  - XIVE_SRC_H_INT_ESB  the Event State Buffer are controlled with a
+>>>>                        specific hcall H_INT_ESB
+>>>
+>>> What's the other option?
+>>
+>> Direct MMIO access. Normally all interrupts use normal MMIOs,
+>> each interrupts has an associated MMIO page with special MMIOs
+>> to control the source state (PQ bits). This is something I added
+>> to the PAPR spec (and the OPAL <-> Linux interface) to allow firmware
+>> to work around broken HW (which happens on some P9 versions).
+>=20
+> Ok.. and that's something that can be decided at runtime?
+>=20
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> memsave and pmemsave only take 32bit size arguments in HMP at the
-> moment; let them take 64bit values.
->
-> Reported-by: Pierre Kim <admin@manateeshome.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hmp-commands.hx |  4 ++--
->  hmp.c           | 13 +++++++++++--
->  2 files changed, 13 insertions(+), 4 deletions(-)
->
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 1941e19932..ddf77ae7ac 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -829,7 +829,7 @@ ETEXI
->  
->      {
->          .name       = "memsave",
-> -        .args_type  = "val:l,size:i,filename:s",
-> +        .args_type  = "val:l,size:l,filename:s",
->          .params     = "addr size file",
->          .help       = "save to disk virtual memory dump starting at 'addr' of size 'size'",
->          .cmd        = hmp_memsave,
+This is a characteristic of an Interrupt Source and the associated=20
+object should be created with such a flag. But I don't think will=20
+ever use it in QEMU, maybe with KVM.
 
-The size is wider, but still signed.  Reproduces QAPI/QMP's mistake.  We
-should fix it there, and make this "size:o" here, so suffixes work as
-they should.
-
-I'll cook up a QAPI/QMP patch.
-
-[...]
+C.
