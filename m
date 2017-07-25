@@ -1,33 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1da9EH-0001fg-Vt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 19:27:07 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1da9jI-0005Gj-Ot
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 19:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1da9EG-0004eF-OR
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 19:27:05 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35301)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1da9EG-0004dN-Ex
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 19:27:04 -0400
-Received: by mail-wm0-x241.google.com with SMTP id r77so4798140wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 16:27:04 -0700 (PDT)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1da9jD-0004Og-Nl
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 19:59:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50210
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1da9jD-0004Na-Hi
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 19:59:03 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6PNwnRF025657
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 19:59:02 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxdwfnsdj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 19:59:02 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 25 Jul 2017 17:59:01 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKP5OYjXto=zRd_xvjUgniscX_jsDg-+ai6Xxv7YJSDUxQ@mail.gmail.com>
-References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
-	<1499952476-3454-7-git-send-email-armbru@redhat.com>
-	<20170717101906.GC5301@noname.redhat.com>
-	<87a842b9yo.fsf@dusky.pond.sub.org> <87bmoauz2s.fsf@dusky.pond.sub.org>
-	<5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
-	<20170725190818.GQ2757@localhost.localdomain>
-	<CAKmqyKP5OYjXto=zRd_xvjUgniscX_jsDg-+ai6Xxv7YJSDUxQ@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 25 Jul 2017 16:26:32 -0700
-Message-ID: <CAKmqyKO9zzv=YYyB2f0a9ERbp8BYdtXjo_c12fmiq6WLzO5Jog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Slow tests on "make check" (was Re: [PULL 6/9]
- Convert error_report() to warn_report())
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170705075411.6556-3-sameeh@daynix.com>
+References: <20170705075411.6556-1-sameeh@daynix.com>
+	<20170705075411.6556-3-sameeh@daynix.com>
+Date: Tue, 25 Jul 2017 18:32:24 -0500
+Message-Id: <150102554420.26979.10451385667905822656@loki>
+Subject: Re: [Qemu-devel] [PATCH 2/5] qga-win: service-win32: Add
+ start_service and stop_service functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,91 +43,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Peter Chubb <peter.chubb@nicta.com.au>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
+To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-On Tue, Jul 25, 2017 at 4:24 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Tue, Jul 25, 2017 at 12:08 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> On Mon, Jul 24, 2017 at 09:30:06AM +0200, Paolo Bonzini wrote:
->>> On 24/07/2017 08:30, Markus Armbruster wrote:
->>> > Markus Armbruster <armbru@redhat.com> writes:
->>> >
->>> >> Kevin Wolf <kwolf@redhat.com> writes:
->>> >>
->>> >>> Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
->>> >>>> From: Alistair Francis <alistair.francis@xilinx.com>
->>> >>>>
->>> >>>> Convert all uses of error_report("warning:"... to use warn_report()
->>> >>>> instead. This helps standardise on a single method of printing warnings
->>> >>>> to the user.
->>> >>>>
->>> >>>> All of the warnings were changed using these two commands:
->>> >>>>     find ./* -type f -exec sed -i \
->>> >>>>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
->>> >>>>
->>> >>>> Indentation fixed up manually afterwards.
->>> >>>>
->>> >>>> The test-qdev-global-props test case was manually updated to ensure that
->>> >>>> this patch passes make check (as the test cases are case sensitive).
->>> >>>
->>> >>> This patch broke qemu-iotests 051 because it neglected to update the
->>> >>> reference output. Not sure if a change of the message was even intended,
->>> >>> but with a error location prefix, the order changes:
->>> >>>
->>> >>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
->>> >>> +(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
->>> >>>
->>> >>> Personally, I would expect the error location or at least the program
->>> >>> name to come first even for warnings.
->>> >>
->>> >> I'll fix it.
->>> >>
->>> >> While focusing on something other than block, I forget qemu-iotests
->>> >> exist.  My fault, but it's a pretty common fault.  I reiterate my plea
->>> >> to include (a sensible subset of) it in "make check".
->>> >
->>> > Oh, 051 isn't run by "make check-block".  It could just as well not
->>> > exist then.
->>> >
->>> > What's the recommended way to run all iotests a build of QEMU can run?
->>>
->>> I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
->>>
->>> There are two issues with check-block:
->>>
->>> * tests that require QEMU are skipped (rationale: you might be building
->>> without the x86_64-softmmu target).
->>>
->>> * it only runs the "quick" group, but I think we should reverse the
->>> direction and mark slow tests specifically (that would cut about 10
->>> minutes out of the 20).
->>
->> About slow tests: I never included device-crash-test on "make
->> check" because it would take too long to run.  Also, "make
->> check-help" lies when it says "make check" runs all tests,
->> because it doesn't run check-block.
->>
->> Should we add a new Makefile target (check-all?) that includes
->> slower tests?
->
-> Or a make check-slow?
+Quoting Sameeh Jubran (2017-07-05 02:54:08)
+> From: Sameeh Jubran <sjubran@redhat.com>
+> =
 
-Actually, what about to avoid duplication we can add a make check-slow
-that runs all the slow tests that make check doesn't run. Then make
-check-all can run both make check and make check-slow.
+> This commits adds two functions which handle service's start and stop
+> process in Windows.
+> =
 
-That way you can run make check for a quick sanity test and then run
-make check-slow to test everything, without duplicating tests.
+> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+> ---
+>  qga/service-win32.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++=
++++++
+>  qga/service-win32.h |  2 ++
+>  2 files changed, 54 insertions(+)
+> =
 
->
-> I think that is a great idea, having tests but not running them isn't
-> helping anyone.
->
-> Thanks,
-> Alistair
->
->>
->> --
->> Eduardo
->>
+> diff --git a/qga/service-win32.c b/qga/service-win32.c
+> index fd434e3..dc41d63 100644
+> --- a/qga/service-win32.c
+> +++ b/qga/service-win32.c
+> @@ -95,6 +95,26 @@ static const char *win_escape_arg(const char *to_escap=
+e, GString *buffer)
+>      return buffer->str;
+>  }
+> =
+
+> +
+> +static int get_service(const char *service_name, SC_HANDLE* service)
+
+SC_HANDLE *service
+
+> +{
+> +    SC_HANDLE manager =3D NULL;
+
+OpenSCManager returns NULL on error so no need to initialize the
+value here.
+
+> +    manager =3D OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+> +    if (manager =3D=3D NULL) {
+> +        printf_win_error("No handle to service control manager");
+> +        return EXIT_FAILURE;
+> +    }
+> +
+> +    *service =3D OpenService(manager, service_name, SERVICE_ALL_ACCESS);
+> +    if (service =3D=3D NULL) {
+
+This should be checking *service AFAICT.
+
+> +        printf_win_error("Failed to open service");
+> +        return EXIT_FAILURE;
+> +    }
+> +
+> +    CloseServiceHandle(manager);
+> +    return EXIT_SUCCESS;
+> +}
+> +
+>  int ga_install_service(const char *path, const char *logfile,
+>                         const char *state_dir)
+>  {
+> @@ -188,3 +208,35 @@ int ga_uninstall_service(void)
+> =
+
+>      return EXIT_SUCCESS;
+>  }
+> +
+> +int start_service(const char *service_name)
+> +{
+> +    int ret =3D EXIT_FAILURE;
+
+get_service() will set this either way so no need to initialize.
+
+> +    SC_HANDLE service =3D NULL;
+> +    ret =3D get_service(service_name, &service);
+> +    if (ret !=3D EXIT_SUCCESS) {
+> +        return ret;
+> +    }
+> +    ret =3D StartService(service, 0 , NULL) ? EXIT_SUCCESS : GetLastErro=
+r();
+> +
+> +    CloseServiceHandle(service);
+> +    return ret;
+> +}
+> +
+> +int stop_service(const char *service_name)
+> +{
+> +    int ret =3D EXIT_FAILURE;
+
+No need to initialize
+
+> +    SC_HANDLE service =3D NULL;
+> +
+> +    SERVICE_STATUS service_status;
+> +    ret =3D get_service(service_name, &service);
+> +
+> +    if (ret !=3D EXIT_SUCCESS) {
+> +        return ret;
+> +    }
+> +    ret =3D ControlService(service, SERVICE_CONTROL_STOP, &service_statu=
+s) ?
+> +        EXIT_SUCCESS : GetLastError();
+> +
+> +    CloseServiceHandle(service);
+> +    return ret;
+> +}
+> diff --git a/qga/service-win32.h b/qga/service-win32.h
+> index 89e99df..65248ea 100644
+> --- a/qga/service-win32.h
+> +++ b/qga/service-win32.h
+> @@ -28,5 +28,7 @@ typedef struct GAService {
+>  int ga_install_service(const char *path, const char *logfile,
+>                         const char *state_dir);
+>  int ga_uninstall_service(void);
+> +int start_service(const char *service_name);
+> +int stop_service(const char *service_name);
+> =
+
+>  #endif
+> -- =
+
+> 2.9.4
+>=20
