@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1da17N-0006Mg-Jg
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:47:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1da1Bb-0001cB-1N
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1da17I-0003nX-Mn
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:47:25 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:42093)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1da17I-0003mM-AC
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:47:20 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-	<20170725131931.GC23343@stefanha-x1.localdomain>
-Date: Tue, 25 Jul 2017 17:47:08 +0300
-In-Reply-To: <20170725131931.GC23343@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Tue, 25 Jul 2017 14:19:31 +0100")
-Message-ID: <87wp6wa80j.fsf@frigg.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1da1BW-0006Os-5Z
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:51:47 -0400
+Received: from mail-qk0-x22d.google.com ([2607:f8b0:400d:c09::22d]:35693)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1da1BW-0006Of-0m
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 10:51:42 -0400
+Received: by mail-qk0-x22d.google.com with SMTP id d145so63544794qkc.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 07:51:41 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-35-f4bug@amsat.org> <87k22weh78.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <658ad40d-4bef-0da8-f7ea-88ae1bec3f12@amsat.org>
+Date: Tue, 25 Jul 2017 11:51:36 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+In-Reply-To: <87k22weh78.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH for 2.10 34/35] docker: add debian
+ 'bleeding' image with gcc7 and clang5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-Stefan Hajnoczi writes:
+On 07/25/2017 11:15 AM, Alex Bennée wrote:
+>> +++ b/tests/docker/dockerfiles/debian-bleeding-dev.docker
+>> @@ -0,0 +1,94 @@
+>> +#
+>> +# Docker x86_64 bleeding image
+>> +#
+>> +# This docker target builds on the debian unstable base image. Further
+>> +# libraries which are not widely available are installed by hand.
+>> +#
+> 
+> Not for 2.10 please.
 
-> On Mon, Jul 24, 2017 at 08:02:24PM +0300, Llu=C3=ADs Vilanova wrote:
->> This series adds a basic interface to instrument tracing events and cont=
-rol
->> their tracing state.
->>=20
->> The instrumentation code is dynamically loaded into QEMU (either when it=
- starts
->> or later using its remote control interfaces).
->>=20
->> All events can be instrumented, but the instrumentable events must be ex=
-plicitly
->> specified at configure time.
->>=20
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Surely not ;) Also unlikely to get merged in mainline...
 
-> Hi Llu=C3=ADs,
-> I'm concerned that the shared library interface will be abused to monkey
-> patch code into QEMU far beyond instrumentation use cases and/or avoid
-> the responsibilities of the GPL license.
+[...]
+> There are a lot of moving parts basing this in debian unstable and
+> compiling extra bleeding edge stuff. What does this buy that the clang
+> and toolchain builds in Travis don't already cover?
 
-> Instead I suggest adding a trace backend generates calls to registered
-> "callback" functions:
+Bleeding is bleeding :) This is an implicit No Warranty clause...
+It might trigger something useful or give you slow death.
 
->   $ cat >my-instrumentation.c
->   #include "trace/control.h"
+https://wiki.debian.org/DebianUnstable
+"If you are a hardcore developer or tester you should use this release."
 
->   static void my_cpu_in(unsigned int addr, char size, unsigned int val)
->   {
->       printf("my_cpu_in\n");
->   }
-
->   static void my_init(void)
->   {
->       trace_register_event_callback("cpu_in", my_cpu_in);
->       trace_enable_events("cpu_in");
->   }
->   trace_init(my_init);
-
->   $ ./configure --enable-trace-backends=3Dlog,callback && make -j4
-
-> This is still a clean interface that allows instrumentation code to be
-> kept separate from the trace event call sites.
-
-> The instrumentation code gets compiled into QEMU, but that shouldn't be
-> a huge burden since QEMU's Makefiles only recompile changed source
-> files (only the first build is slow).
-
-> Does this alternative sound reasonable to you?
-
-You mean to add a user-provided .c file to QEMU at compile-time? (I'm assum=
-ing
-we can keep the "user API" proposed in this series, instead of the one you
-showed).
-
-First, a user might want to provide more than just a .c, so we might have to
-accept a directory that produces a library that is included into QEMU at li=
-nk
-time (a bit more complicated to do portably).
-
-Second, the user can still do the same actions you want to shield from,
-regardless of whether it's a dynamically loaded library (i.e., access any
-fuction in QEMU).
-
-What I propose to do instead is:
-
-* For the monkey-patch part, we can limit symbol resolution to the
-  instrumentation API functions when loading the library (e.g., compile QEMU
-  with -fvisibility=3Dhidden).
-
-* For the license part, that is a legal issue that can be handled by the API
-  header license, right? (the "public" headers I added are GPL, not
-  LGPL). Besides, if only the intended API is available, I'm not sure if th=
-at
-  matters (e.g., we don't care about the license of a dtrace script, since =
-it
-  only has the API provided by QEMU+dtrace).
-
-This would be similar to Linux's module support; only selected functions are
-available to modules, and we could add a license check (e.g., QI_LICENSE("G=
-PL")
-must be on the instrumentation library or it won't be loaded).
-
-
-Thanks,
-  Lluis
+https://www.debian.org/doc/manuals/securing-debian-howto/ch10.en.html#s10.1.3
+"you should not use Debian's unstable branch for production-level systems"
