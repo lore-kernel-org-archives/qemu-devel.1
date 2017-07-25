@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riel@redhat.com>) id 1da6vi-0006ol-Vt
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:59:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1da6x5-0007UQ-JM
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riel@redhat.com>) id 1da6vg-0005Yo-Ad
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:59:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1da6vg-0005YK-0q
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 16:59:44 -0400
-Message-ID: <1501016375.26846.21.camel@redhat.com>
-From: Rik van Riel <riel@redhat.com>
-Date: Tue, 25 Jul 2017 16:59:35 -0400
-In-Reply-To: <CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<1500818683.4073.31.camel@redhat.com>
-	<CAPcyv4h5O4D2kp6SJhWiz4V=dOLDa_Q3pk2B=u-x7hKKQqdXsQ@mail.gmail.com>
-	<1500833428.4073.36.camel@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-0yV1qDWO2FxT0D2yrVqZ"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+	(envelope-from <eblake@redhat.com>) id 1da6x4-00067L-J9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:01:11 -0400
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+	<1500993699-19299-2-git-send-email-pl@kamp.de>
+	<e4639625-7674-dfa8-8597-3e142b9931a0@redhat.com>
+	<8f1f2bd2-4509-e603-218d-942859d6316f@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <89ad7fdf-b6fe-cd96-10e4-7384cdcb1c77@redhat.com>
+Date: Tue, 25 Jul 2017 16:01:04 -0500
+MIME-Version: 1.0
+In-Reply-To: <8f1f2bd2-4509-e603-218d-942859d6316f@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ng3dEM8mNRa9VkOTiuX76sElc2B0cJBNw"
+Subject: Re: [Qemu-devel] [PATCH V5 01/10] specs/qcow2: add compress format
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>, Pankaj Gupta <pagupta@redhat.com>
-Cc: Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
-
---=-0yV1qDWO2FxT0D2yrVqZ
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ng3dEM8mNRa9VkOTiuX76sElc2B0cJBNw
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
+ den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+Message-ID: <89ad7fdf-b6fe-cd96-10e4-7384cdcb1c77@redhat.com>
+Subject: Re: [PATCH V5 01/10] specs/qcow2: add compress format extension
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+ <1500993699-19299-2-git-send-email-pl@kamp.de>
+ <e4639625-7674-dfa8-8597-3e142b9931a0@redhat.com>
+ <8f1f2bd2-4509-e603-218d-942859d6316f@kamp.de>
+In-Reply-To: <8f1f2bd2-4509-e603-218d-942859d6316f@kamp.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2017-07-25 at 07:46 -0700, Dan Williams wrote:
-> On Tue, Jul 25, 2017 at 7:27 AM, Pankaj Gupta <pagupta@redhat.com>
-> wrote:
-> >=20
-> > Looks like only way to send flush(blk dev) from guest to host with
-> > nvdimm
-> > is using flush hint addresses. Is this the correct interface I am
-> > looking?
-> >=20
-> > blkdev_issue_flush
-> > =C2=A0submit_bio_wait
-> > =C2=A0 submit_bio
-> > =C2=A0=C2=A0=C2=A0=C2=A0generic_make_request
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pmem_make_request
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (b=
-io->bi_opf & REQ_FLUSH)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0nvdimm_flush(nd_region);
->=20
-> I would inject a paravirtualized version of pmem_make_request() that
-> sends an async flush operation over virtio to the host. Don't try to
-> use flush hint addresses for this, they don't have the proper
-> semantics. The guest should be allowed to issue the flush and receive
-> the completion asynchronously rather than taking a vm exist and
-> blocking on that request.
+On 07/25/2017 03:29 PM, Peter Lieven wrote:
 
-That is my feeling, too. A slower IO device benefits
-greatly from an asynchronous flush mechanism.
+>>> +                   deflate: Standard zlib deflate compression withou=
+t
+>>> +                            compression header
+>> Why did you name it "deflate" instead of "zlib" again?
+>=20
+> zlib provides raw deflate encoding and gzip encoding both with and with=
+out header afaik.
+> We use raw deflate encoding without header in QEMU. And the name of the=
+ algorithm is deflate.
+> I found it more appropriate than zlib.
+
+Okay, I can live with that.
+
+>=20
+>>
+>>> +
+>>> +              14:  compress_level (uint8_t)
+>>> +
+>>> +                   0 =3D default compress level (valid for all forma=
+ts, default)
+>>> +
+>>> +                   Additional valid compression levels for deflate c=
+ompression:
+>>> +
+>>> +                   All values between 1 and 9. 1 gives best speed, 9=
+ gives best
+>>> +                   compression. The default compression level is def=
+ined by zlib
+>>> +                   and currently defaults to 6.
+>>> +
+>>> +              15:  compress_window_size (uint8_t)
+>>> +
+>>> +                   Window or dictionary size used by the compression=
+ format.
+>>> +                   Currently only used by the deflate compression al=
+gorithm.
+>> What must this be set to for other algorithms?  I guess we get to that=
+
+>> in later patches.
+>=20
+> Its only used by the deflate algorithm. At this point we only have that=
+ algorithm.
+> lzo has no such encoding. If we add e.g. lzma it has a dictionary size =
+which is
+> a power of two (typcial value would be 2^20).
+
+So for lzo, we should document that the field must be 0 (when we get to
+adding it).
+
+>=20
+> Can you also have a look at the remainder of the series?
+
+It's on my list for 2.11 reviews, although 2.10 freeze stuff is taking
+priority, so it may be a few days yet.
 
 --=20
-All rights reversed
---=-0yV1qDWO2FxT0D2yrVqZ
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ng3dEM8mNRa9VkOTiuX76sElc2B0cJBNw
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAABCAAGBQJZd7E3AAoJEM553pKExN6DyR0H/jCXdUHi8A0l9aysr2waOPQ+
-IjABA2T0vyG9QqufzE268g9NO7W9a79k0wcwvtU8S6P/7MUE6DU8ZLDvbQW+M3Td
-VxBL9DmthzJFJy8/3EGvTUU+sEB1Qm8EeGu844ME8Ea6/rPHJwjHG/shnmocHeyl
-G4Mpvc+zzz2WvZSwpsWtodon7jYfWY7NpPHp/JjwMfIVTErTFpSDZsTKpneFs9aC
-s2EwM5WyuLlGt9bEPhQe9eQMiGeHsz5hLnO/9HdUZ8Let61bCGrZ5gn+yg0FHit7
-lvQFPh1FxjWdFiRNYcAtFOATHWsNhhMWgRUZ2+GX3JKABDa+/LVaRYqtFDErmz8=
-=usoe
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll3sZAACgkQp6FrSiUn
+Q2q7SQf/U3hfdMRIlg4Yw0+KNuRJNhTQ1/4FNGEJk5I/isO6iOEHQoPJZByxLpeo
+ODgk93i0CnSSEUMCQcJgCxjDUOEnm9lPCaI+LlSV0NtzlKeTabirPp1RdHdNpnjn
+TGN/PfqIRj5RG1zx7SVO3gUqE0+YKROqtz2qFjGZhwe6AiYdYwWNUUabYYpEJ2qu
+KeimI9bosEnOtj+eZ0aibnIF9n4pE3M4okbdaUxWmco+9Sc8PY7TA0Cq/K/qszdo
+XPNWsbO/KhpB8PtoM0A2sPkgpTkHzR9+SuGBPlJg81oixrotHAF8EoWfXcY2NxQS
+UOLZOJYONGnJfasyWds/TD9Haoge7Q==
+=KQpe
 -----END PGP SIGNATURE-----
 
---=-0yV1qDWO2FxT0D2yrVqZ--
+--ng3dEM8mNRa9VkOTiuX76sElc2B0cJBNw--
