@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1da3ui-0004vM-95
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:46:33 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1da3wC-0005Td-Uc
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1da3uf-0003rm-NR
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:46:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39242)
+	(envelope-from <pbonzini@redhat.com>) id 1da3wA-0004H6-Cy
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:48:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1da3uf-0003re-Ho
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:46:29 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7FAD737EEC
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 17:46:28 +0000 (UTC)
-References: <20170725141041.1195-1-berrange@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <be2523ce-7505-b3dd-d359-e91ac25f3cc4@redhat.com>
-Date: Tue, 25 Jul 2017 13:46:23 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1da3wA-0004Gv-6Y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:48:02 -0400
+Date: Tue, 25 Jul 2017 13:47:59 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <349062488.18968647.1501004879602.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170725171302.GK1587@perard.uk.xensource.com>
+References: <20170725171302.GK1587@perard.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <20170725141041.1195-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-options: document existance of
- versioned machine types
+Subject: Re: [Qemu-devel] QEMU commit 04bf2526ce breaks use of xen-mapcache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xen.org, qemu-devel@nongnu.org
 
-
-
-On 07/25/2017 10:10 AM, Daniel P. Berrange wrote:
-> The -machine docs did not explain what the versioned machine
-> types are for, nor that they'll be maintained across
-> releases.
+> Hi,
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->   qemu-options.hx | 15 ++++++++++++++-
->   1 file changed, 14 insertions(+), 1 deletion(-)
+> Commits 04bf2526ce (exec: use qemu_ram_ptr_length to access guest ram)
+> start using qemu_ram_ptr_length() instead of qemu_map_ram_ptr().
+> That result in calling xen_map_cache() with lock=true, but this mapping
+> is never invalidated.
+> So QEMU use more and more RAM until it stop working for a reason or an
+> other. (crash if host have little RAM or stop emulating but no crash)
 > 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 746b5fa75d..9f6e2adfff 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -49,7 +49,20 @@ STEXI
->   @item -machine [type=]@var{name}[,prop=@var{value}[,...]]
->   @findex -machine
->   Select the emulated machine by @var{name}. Use @code{-machine help} to list
-> -available machines. Supported machine properties are:
-> +available machines.
-> +
-> +For architectures which aim to support live migration compatibility
-> +across releases, each release will introduce a new versioned machine
-> +type. For example, the 2.8.0 release introduced machine types
-> +``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
-> +
-> +To allow live migration of guests from QEMU version 2.8.0, to QEMU
-> +version 2.9.0, the 2.9.0 version must support the ``pc-i440fx-2.8''
-> +and ``pc-q35-2.8'' machines too. To allow users live migrating VMs
-> +to skip multiple intermediate releases when upgrading, new releases
-> +of QEMU will support machine types from many previous versions.
-> +
-> +Supported machine properties are:
->   @table @option
->   @item accel=@var{accels1}[:@var{accels2}[:...]]
->   This is used to enable an accelerator. Depending on the target architecture,
-> 
+> I don't know if calling xen_invalidate_map_cache_entry() in
+> address_space_read_continue() and address_space_write_continue() is the
+> right answer.  Is there something better to do ?
 
-Seems like an improvement to me, but do we have any formal policy on how 
-long we support said machine types? The new wording prompts that question.
+I think it's correct for dma to be true... maybe add a lock argument to
+qemu_ram_ptr_length, so that make address_space_{read,write}_continue can
+pass 0 and everyone else passes 1?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Paolo
