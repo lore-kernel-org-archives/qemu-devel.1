@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dZwKo-0001xX-PF
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:59 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dZwKn-0003er-Nq
+	(envelope-from <cohuck@redhat.com>) id 1dZwKn-0001w1-Ac
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dZwKn-0003dD-F1
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1dZwKj-0003bb-Bs
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dZwKj-0003b9-1w
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 05:40:53 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 25 Jul 2017 11:40:18 +0200
-Message-Id: <20170725094026.5376-7-cohuck@redhat.com>
+Date: Tue, 25 Jul 2017 11:40:17 +0200
+Message-Id: <20170725094026.5376-6-cohuck@redhat.com>
 In-Reply-To: <20170725094026.5376-1-cohuck@redhat.com>
 References: <20170725094026.5376-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.10 06/14] target/s390x: introduce
- (test|set)_be_bit
+Subject: [Qemu-devel] [PULL for-2.10 05/14] target/s390x: indicate query
+ subfunction in s390_fill_feat_block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +29,104 @@ Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.ne
 
 From: David Hildenbrand <david@redhat.com>
 
-Using ordinary bitmap operations to set/test bits does not work properly
-on architectures !s390x. Let's drop (test|set)_bit_inv and introduce
-(test|set)_be_bit instead. These functions work on uint8_t array, not on
-unsigned longs arrays and are for now only used in the context of
-CPU features.
+We'll have to do the same for TCG, so let's just move it in there.
 
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170720123721.12366-4-david@redhat.com>
+Message-Id: <20170720123721.12366-3-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_features.c |  8 ++++----
- target/s390x/cpu_features.h |  8 ++++++++
- target/s390x/kvm.c          | 14 ++------------
- 3 files changed, 14 insertions(+), 16 deletions(-)
+ target/s390x/cpu_features.c | 31 ++++++++++++++++++++++++++-----
+ target/s390x/kvm.c          | 13 -------------
+ 2 files changed, 26 insertions(+), 18 deletions(-)
 
 diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 8b1491734f..1d3a036393 100644
+index fa887d9b6f..8b1491734f 100644
 --- a/target/s390x/cpu_features.c
 +++ b/target/s390x/cpu_features.c
-@@ -340,8 +340,8 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-     case S390_FEAT_TYPE_STFL:
-         if (test_bit(S390_FEAT_ZARCH, features)) {
-             /* Features that are always active */
--            data[0] |= 0x20;  /* z/Architecture */
--            data[17] |= 0x20; /* Configuration-z-architectural-mode */
-+            set_be_bit(2, data);   /* z/Architecture */
-+            set_be_bit(138, data); /* Configuration-z-architectural-mode */
-         }
-         break;
-     case S390_FEAT_TYPE_PTFF:
-@@ -357,7 +357,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-     case S390_FEAT_TYPE_PCC:
-     case S390_FEAT_TYPE_PPNO:
-     case S390_FEAT_TYPE_KMA:
--        data[0] |= 0x80; /* query is always available */
-+        set_be_bit(0, data); /* query is always available */
-         break;
-     default:
-         break;
-@@ -368,7 +368,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-         if (s390_features[feat].type == type) {
-             bit_nr = s390_features[feat].bit;
-             /* big endian on uint8_t array */
--            data[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+            set_be_bit(bit_nr, data);
-         }
-         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
-     }
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index 770435e0cc..e306aa7ab2 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -93,4 +93,12 @@ const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group);
+@@ -336,11 +336,32 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+     S390Feat feat;
+     int bit_nr;
  
- #define BE_BIT_NR(BIT) (BIT ^ (BITS_PER_LONG - 1))
+-    if (type == S390_FEAT_TYPE_STFL && test_bit(S390_FEAT_ZARCH, features)) {
+-        /* Features that are always active */
+-        data[0] |= 0x20;  /* z/Architecture */
+-        data[17] |= 0x20; /* Configuration-z-architectural-mode */
+-    }
++    switch (type) {
++    case S390_FEAT_TYPE_STFL:
++        if (test_bit(S390_FEAT_ZARCH, features)) {
++            /* Features that are always active */
++            data[0] |= 0x20;  /* z/Architecture */
++            data[17] |= 0x20; /* Configuration-z-architectural-mode */
++        }
++        break;
++    case S390_FEAT_TYPE_PTFF:
++    case S390_FEAT_TYPE_KMAC:
++    case S390_FEAT_TYPE_KMC:
++    case S390_FEAT_TYPE_KM:
++    case S390_FEAT_TYPE_KIMD:
++    case S390_FEAT_TYPE_KLMD:
++    case S390_FEAT_TYPE_PCKMO:
++    case S390_FEAT_TYPE_KMCTR:
++    case S390_FEAT_TYPE_KMF:
++    case S390_FEAT_TYPE_KMO:
++    case S390_FEAT_TYPE_PCC:
++    case S390_FEAT_TYPE_PPNO:
++    case S390_FEAT_TYPE_KMA:
++        data[0] |= 0x80; /* query is always available */
++        break;
++    default:
++        break;
++    };
  
-+static inline void set_be_bit(unsigned int bit_nr, uint8_t *array)
-+{
-+    array[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+}
-+static inline bool test_be_bit(unsigned int bit_nr, const uint8_t *array)
-+{
-+    return array[bit_nr / 8] & (0x80 >> (bit_nr % 8));
-+}
- #endif /* TARGET_S390X_CPU_FEATURES_H */
+     feat = find_first_bit(features, S390_FEAT_MAX);
+     while (feat < S390_FEAT_MAX) {
 diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 999ea570c3..9bec48152f 100644
+index 831492f9a2..999ea570c3 100644
 --- a/target/s390x/kvm.c
 +++ b/target/s390x/kvm.c
-@@ -2430,16 +2430,6 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
-     abort();
- }
- 
--static inline int test_bit_inv(long nr, const unsigned long *addr)
--{
--    return test_bit(BE_BIT_NR(nr), addr);
--}
--
--static inline void set_bit_inv(long nr, unsigned long *addr)
--{
--    set_bit(BE_BIT_NR(nr), addr);
--}
--
- static int query_cpu_subfunc(S390FeatBitmap features)
- {
-     struct kvm_s390_vm_cpu_subfunc prop;
-@@ -2566,7 +2556,7 @@ static int query_cpu_feat(S390FeatBitmap features)
+@@ -2506,41 +2506,28 @@ static int configure_cpu_subfunc(const S390FeatBitmap features)
+     s390_fill_feat_block(features, S390_FEAT_TYPE_PLO, prop.plo);
+     if (test_bit(S390_FEAT_TOD_CLOCK_STEERING, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_PTFF, prop.ptff);
+-        prop.ptff[0] |= 0x80; /* query is always available */
      }
- 
-     for (i = 0; i < ARRAY_SIZE(kvm_to_feat); i++) {
--        if (test_bit_inv(kvm_to_feat[i][0], (unsigned long *)prop.feat)) {
-+        if (test_be_bit(kvm_to_feat[i][0], (uint8_t *) prop.feat)) {
-             set_bit(kvm_to_feat[i][1], features);
-         }
+     if (test_bit(S390_FEAT_MSA, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMAC, prop.kmac);
+-        prop.kmac[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMC, prop.kmc);
+-        prop.kmc[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KM, prop.km);
+-        prop.km[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KIMD, prop.kimd);
+-        prop.kimd[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KLMD, prop.klmd);
+-        prop.klmd[0] |= 0x80; /* query is always available */
      }
-@@ -2585,7 +2575,7 @@ static int configure_cpu_feat(const S390FeatBitmap features)
- 
-     for (i = 0; i < ARRAY_SIZE(kvm_to_feat); i++) {
-         if (test_bit(kvm_to_feat[i][1], features)) {
--            set_bit_inv(kvm_to_feat[i][0], (unsigned long *)prop.feat);
-+            set_be_bit(kvm_to_feat[i][0], (uint8_t *) prop.feat);
-         }
+     if (test_bit(S390_FEAT_MSA_EXT_3, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_PCKMO, prop.pckmo);
+-        prop.pckmo[0] |= 0x80; /* query is always available */
+     }
+     if (test_bit(S390_FEAT_MSA_EXT_4, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMCTR, prop.kmctr);
+-        prop.kmctr[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMF, prop.kmf);
+-        prop.kmf[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMO, prop.kmo);
+-        prop.kmo[0] |= 0x80; /* query is always available */
+         s390_fill_feat_block(features, S390_FEAT_TYPE_PCC, prop.pcc);
+-        prop.pcc[0] |= 0x80; /* query is always available */
+     }
+     if (test_bit(S390_FEAT_MSA_EXT_5, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_PPNO, prop.ppno);
+-        prop.ppno[0] |= 0x80; /* query is always available */
+     }
+     if (test_bit(S390_FEAT_MSA_EXT_8, features)) {
+         s390_fill_feat_block(features, S390_FEAT_TYPE_KMA, prop.kma);
+-        prop.kma[0] |= 0x80; /* query is always available */
      }
      return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+ }
 -- 
 2.13.3
