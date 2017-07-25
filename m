@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1da7a1-000186-Qp
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:41:26 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1da7lU-0002qG-2H
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1da7a0-0002eH-Nm
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:41:25 -0400
-References: <1500993699-19299-1-git-send-email-pl@kamp.de>
-	<1500993699-19299-10-git-send-email-pl@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3b2bc845-2201-a813-ad4e-d3cf86666bbd@redhat.com>
-Date: Tue, 25 Jul 2017 16:41:16 -0500
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1da7lQ-0002I5-VS
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 17:53:16 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 25 Jul 2017 21:53:08 +0000
+Message-ID: <DM2PR21MB00602DE4F811D886C5E5C75C9EB80@DM2PR21MB0060.namprd21.prod.outlook.com>
+References: <DM2PR21MB0060EFC1F6B9F0883A1792369EBB0@DM2PR21MB0060.namprd21.prod.outlook.com>
+	<20170724212327.GA24963@flamenco>
+	<fda73f35-098f-c190-4d15-4363e28872f1@twiddle.net>
+In-Reply-To: <fda73f35-098f-c190-4d15-4363e28872f1@twiddle.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1500993699-19299-10-git-send-email-pl@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6cnlIQVOKoggkRaUl6a3STMxoPO621R75"
-Subject: Re: [Qemu-devel] [PATCH V5 09/10] block/qcow2: add lzo compress
- format
+Subject: Re: [Qemu-devel] Torn read/write possible on aarch64/x86-64 MTTCG?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+To: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrey Shedel <ashedel@microsoft.com>, =?utf-8?B?QWxleCBCZW5u77+9ZQ==?= <alex.bennee@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6cnlIQVOKoggkRaUl6a3STMxoPO621R75
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
- den@openvz.org, mreitz@redhat.com, berrange@redhat.com
-Message-ID: <3b2bc845-2201-a813-ad4e-d3cf86666bbd@redhat.com>
-Subject: Re: [PATCH V5 09/10] block/qcow2: add lzo compress format
-References: <1500993699-19299-1-git-send-email-pl@kamp.de>
- <1500993699-19299-10-git-send-email-pl@kamp.de>
-In-Reply-To: <1500993699-19299-10-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/25/2017 09:41 AM, Peter Lieven wrote:
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  block/qcow2-cluster.c  | 15 +++++++++++++++
->  block/qcow2.c          | 25 ++++++++++++++++++++++++-
->  configure              |  2 +-
->  docs/interop/qcow2.txt |  2 ++
->  qapi/block-core.json   | 15 ++++++++++++---
->  qemu-img.texi          |  1 +
->  6 files changed, 55 insertions(+), 5 deletions(-)
->=20
-
-> +++ b/docs/interop/qcow2.txt
-> @@ -335,6 +335,8 @@ The fields of the compress format extension are:
->                     deflate: Standard zlib deflate compression without
->                              compression header
-> =20
-> +                   lzo:     LZO1X compression without additional heade=
-r
-> +
->                14:  compress_level (uint8_t)
-> =20
->                     0 =3D default compress level (valid for all formats=
-, default)
-
-What do compress_level and compress_window have to be for lzo?  (If they
-are not useful, document that it must be 0 - which you've already done
-for compress_level).
-
-
-> +# @Qcow2CompressLZO:
-> +#
-> +# Since: 2.10
-
-2.11
-
-> +##
-> +{ 'struct': 'Qcow2CompressLZO',
-> +  'data': { } }
-> +
-> +##
->  # @Qcow2Compress:
->  #
->  # Specifies the compression format and compression level that should
-> @@ -2491,8 +2500,8 @@
->  { 'union': 'Qcow2Compress',
->    'base': { 'format': 'Qcow2CompressFormat' },
->    'discriminator': 'format',
-> -  'data': { 'deflate': 'Qcow2CompressDeflate' } }
-> -
-> +  'data': { 'deflate': 'Qcow2CompressDeflate',
-> +            'lzo': 'Qcow2CompressLZO' } }
-> =20
-
-Was the loss of the blank line intentional?
-
-> +++ b/qemu-img.texi
-> @@ -682,6 +682,7 @@ The following options are available if support for =
-the respective libraries
->  has been enabled at compile time:
-> =20
->     deflate        Uses standard zlib defalte compression
-> +   lzo            Uses LZO1X compression
-
-The .json file spelled it lzo1x; is there a difference implied by the
-choice of capitalization?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---6cnlIQVOKoggkRaUl6a3STMxoPO621R75
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll3uvwACgkQp6FrSiUn
-Q2rmcgf/VEOW3FrdzPEjdsoWFgw6aDOP1FYkulfX5RfheD6VgwX4k5d6/c2Xq2vN
-XFKuOr+5vAyBOoWCDCn8WdUgaukinFt0JBntZcZCQgOem0bhsqSWluC44UZkMamA
-USCVtEkEzxvd+MKvsUGWU0QAh/kq6BNKHBvjrDcdDpbYgCf9x7LE2zuv/ECfyiQp
-2h6mZ7Qr5ponUIBWpezsiXwDIm+p2mw/fDn79ny0Xx9W+Cr2SV++75wqMBXTW5sY
-+fmBstdiUT9//9Gxz5sK5q3IAD2ar/FmFwzH+l04GzqZ5LN11m9EJ4IsHQ4xMIBw
-+aO2LWRePDj8UQ1tCqwqAqbOwCojpg==
-=Tt1e
------END PGP SIGNATURE-----
-
---6cnlIQVOKoggkRaUl6a3STMxoPO621R75--
+PiBGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiBbbWFpbHRvOnJ0aDc2ODBAZ21haWwuY29tXSBPbiBC
+ZWhhbGYgT2YgUmljaGFyZA0KPiBIZW5kZXJzb24NCj4gU2VudDogTW9uZGF5LCAyNCBKdWx5IDIw
+MTcgMTU6MDMNCj4gDQo+IE9uIDA3LzI0LzIwMTcgMDI6MjMgUE0sIEVtaWxpbyBHLiBDb3RhIHdy
+b3RlOg0KPiA+IChBZGRpbmcgc29tZSBDYydzKQ0KPiA+DQo+ID4gT24gTW9uLCBKdWwgMjQsIDIw
+MTcgYXQgMTk6MDU6MzMgKzAwMDAsIEFuZHJldyBCYXVtYW5uIHZpYSBRZW11LWRldmVsDQo+IHdy
+b3RlOg0KPiA+PiBIaSBhbGwsDQo+ID4+DQo+ID4+IEknbSB0cnlpbmcgdG8gdHJhY2sgZG93biB3
+aGF0IGFwcGVhcnMgdG8gYmUgYSB0cmFuc2xhdGlvbiBidWcgaW4gZWl0aGVyDQo+ID4+IHRoZSBh
+YXJjaDY0IHRhcmdldCBvciB4ODZfNjQgVENHIChpbiBtdWx0aXRocmVhZGVkIG1vZGUpLiBUaGUN
+Cj4gc3ltcHRvbXMNCj4gDQo+IEkgYXNzdW1lIHRoaXMgaXMgcmVhbGx5IHg4Nl82NCBhbmQgbm90
+IGk2ODYgYXMgaG9zdC4NCg0KWWVzLg0KDQo+ID4+IGFyZSBlbnRpcmVseSBjb25zaXN0ZW50IHdp
+dGggYSB0b3JuIHJlYWQvd3JpdGUgLS0gdGhhdCBpcywgYSA2NC1iaXQNCj4gPj4gbG9hZCBvciBz
+dG9yZSB0aGF0IHdhcyB0cmFuc2xhdGVkIHRvIHR3byAzMi1iaXQgbG9hZHMgYW5kIHN0b3JlcyAt
+LQ0KPiA+PiBidXQgdGhhdCdzIG9idmlvdXNseSBub3Qgd2hhdCBoYXBwZW5zIGluIHRoZSBjb21t
+b24gcGF0aCB0aHJvdWdoIHRoZQ0KPiA+PiB0cmFuc2xhdGlvbiBmb3IgdGhpcyBjb2RlLCBzbyBJ
+J20gd29uZGVyaW5nOiBhcmUgdGhlcmUgYW55IGNhc2VzIGluDQo+ID4+IHdoaWNoIHFlbXUgd2ls
+bCBzcGxpdCBhIDY0LWJpdCBtZW1vcnkgYWNjZXNzIGludG8gdHdvIDMyLWJpdCBhY2Nlc3Nlcz8N
+Cj4gPg0KPiA+IFRoYXQgd291bGQgYmUgYSBidWcgaW4gTVRUQ0cuDQo+ID4NCj4gPj4gVGhlIGNv
+ZGU6IEd1ZXN0IENQVSBBIHdyaXRlcyBhIDY0LWJpdCB2YWx1ZSB0byBhbiBhbGlnbmVkIG1lbW9y
+eQ0KPiA+PiBsb2NhdGlvbiB0aGF0IHdhcyBwcmV2aW91c2x5IDAsIHVzaW5nIGEgcmVndWxhciBz
+dG9yZTsgZS5nLjoNCj4gPj4gCWY5MDAwMDM0IHN0cgkgICAgIHgyMCxbeDFdDQo+ID4+DQo+ID4+
+IEd1ZXN0IENQVSBCICh3aG8gaXMgYnVzeS13YWl0aW5nKSByZWFkcyBhIHZhbHVlIGZyb20gdGhl
+IHNhbWUgbG9jYXRpb246DQo+ID4+IAlmOTQwMDI4MCBsZHIJICAgICB4MCxbeDIwXQ0KPiA+Pg0K
+PiA+PiBUaGUgc3ltcHRvbTogQ1BVIEIgbG9hZHMgYSB2YWx1ZSB0aGF0IGlzIG5laXRoZXIgTlVM
+TCBub3IgdGhlIHZhbHVlDQo+ID4+IHdyaXR0ZW4uIEluc3RlYWQsIHgwIGdldHMgb25seSB0aGUg
+bG93IDMyLWJpdHMgb2YgdGhlIHZhbHVlIHdyaXR0ZW4NCj4gPj4gKGhpZ2ggYml0cyBhcmUgYWxs
+IHplcm8pLiBCeSB0aGUgdGltZSB0aGlzIHZhbHVlIGlzIGRlcmVmZXJlbmNlZCAoYQ0KPiA+PiBm
+ZXcgaW5zdHJ1Y3Rpb25zIGxhdGVyKSBhbmQgdGhlIGV4Y2VwdGlvbiBoYW5kbGVycyBydW4sIHRo
+ZSBtZW1vcnkNCj4gPj4gbG9jYXRpb24gZnJvbSB3aGljaCBpdCB3YXMgbG9hZGVkIGhhcyB0aGUg
+Y29ycmVjdCA2NC1iaXQgdmFsdWUgd2l0aA0KPiA+PiBhIG5vbi16ZXJvIHVwcGVyIGhhbGYuDQo+
+ID4+DQo+ID4+IE9idmlvdXNseSBvbiBhIHJlYWwgQVJNIG1lbW9yeSBiYXJyaWVycyBhcmUgY3Jp
+dGljYWwsIGFuZCBpbmRlZWQNCj4gPj4gdGhlIGNvZGUgaGFzIHN1Y2ggYmFycmllcnMgaW4gaXQs
+IGJ1dCBJJ20gYXNzdW1pbmcgdGhhdCBhbnkgcG9zc2libGUNCj4gPj4gbWlzdHJhbnNsYXRpb24g
+b2YgdGhlIGJhcnJpZXJzIGlzIGlycmVsZXZhbnQgYmVjYXVzZSBmb3IgYSA2NC1iaXQgbG9hZA0K
+PiA+PiBhbmQgYSA2NC1iaXQgc3RvcmUgeW91IHNob3VsZCBnZXQgYWxsIG9yIG5vdGhpbmcuIE90
+aGVyIGNsdWVzIHRoYXQgbWF5DQo+ID4+IGJlIHJlbGV2YW50OiB0aGUgY29kZSBpcyBfbmVhcl8g
+YSBMRFJFWC9TVFJFWCBwYWlyICh0aGUgYnVzeS13YWl0aW5nDQo+ID4+IGlzIHVzZWQgdG8gcmVz
+b2x2ZSBhIHJhY2Ugd2hlbiB1cGRhdGluZyBhbm90aGVyIHZhcmlhYmxlKSwgYW5kIHRoZQ0KPiA+
+PiBidXN5LXdhaXQgbG9vcCBoYXMgYSB5aWVsZCBpbnN0cnVjdGlvbiBpbiBpdCAoYWx0aG91Z2gg
+dGhvc2UgYXBwZWFyDQo+ID4+IHRvIGJlIG5vLW9wcyB3aXRoIE1UVENHKS4NCj4gPg0KPiA+IFRo
+aXMgbWlnaHQgaGF2ZSB0byBkbyB3aXRoIGhvdyBsZHJleC9zdHJleCBpcyBlbXVsYXRlZDsgYXJl
+IHlvdSByZWx5aW5nDQo+ID4gb24gdGhlIGV4Y2x1c2l2ZSBwYWlyIGRldGVjdGluZyBBQkE/IElm
+IHNvLCB5b3VyIGNvZGUgd29uJ3Qgd29yayBpbg0KPiA+IFFFTVUgc2luY2UgaXQgdXNlcyBjbXB4
+Y2hnIHRvIGVtdWxhdGUgbGRyZXgvc3RyZXguDQo+IA0KPiBBQkEgcHJvYmxlbSBpcyBub3RoaW5n
+IHRvIGRvIHdpdGggdGVhcmluZy4gIEFuZCBjbXB4Y2hnIHdpbGwgZGVmaW5pdGVseSBub3QNCj4g
+Y3JlYXRlIHRlYXJpbmcgcHJvYmxlbXMuDQoNCkluIGZhY3QsIHRoZSBsZHJleC9zdHJleCBhcmUg
+dGhlcmUgaW1wbGVtZW50aW5nIGEgY21weGNoZy4gOikNCg0KPiBJIGRvbid0IGtub3cgaG93IHdl
+IHdvdWxkIG1hbmFnZSA2NC1iaXQgdGVhcmluZyBvbiBhIDY0LWJpdCBob3N0LCBhdCBsZWFzdA0K
+PiBmb3INCj4gdGhlIGFhcmNoNjQgZ3Vlc3QsIGZvciB3aGljaCBJIGJlbGlldmUgd2UgaGF2ZSBh
+IGdvb2QgZW11bGF0aW9uLg0KPiANCj4gPiAtIFBpbiB0aGUgUUVNVS1NVFRDRyBwcm9jZXNzIHRv
+IGEgc2luZ2xlIENQVS4gQ2FuIHlvdSByZXBybyB0aGVuPw0KPiANCj4gQSBnb29kIHN1Z2dlc3Rp
+b24uDQoNClRoYW5rcyBmb3IgdGhlIHN1Z2dlc3Rpb25zLiBJJ3ZlIGJlZW4gcnVubmluZyB0aGlz
+IGNvbmZpZ3VyYXRpb24gYWxsIGRheSwgYW5kIGhhdmVuJ3Qgc2VlbiBhIHJlcHJvIHlldCBpbiBo
+dW5kcmVkcyBvZiBhdHRlbXB0cy4gSSdsbCByZXBvcnQgaWYgdGhhdCBjaGFuZ2VzLg0KDQpUaGUg
+cHJvYmxlbSBpcyB0aGF0IHRoaXMgdGVzdCBpc24ndCB2ZXJ5IGNvbmNsdXNpdmUuLi4gSSBkb24n
+dCBrbm93IGhvdyBvZnRlbiB0aGUgVkNQVSB0aHJlYWRzIHdpbGwgY29udGV4dCBzd2l0Y2gsIGJ1
+dCBJIHN1c3BlY3QgaXQncyBwcmV0dHkgcmFyZSByZWxhdGl2ZSB0byB0aGUgYWJpbGl0eSB0byBl
+eHBvc2UgcmFjZXMgd2hlbiB0aGV5IHJ1biBkaXJlY3RseSBvbiBkaWZmZXJlbnQgaG9zdCBjb3Jl
+cy4gQW5kIGlmIHRoZSByYWNlIHJlYWxseSBkb2Vzbid0IGV4aXN0IHdoZW4gcnVubmluZyBvbiBh
+IHNpbmdsZSBjb3JlLCB0aGF0IHRvIG1lIHN1Z2dlc3RzIGEgaGFyZHdhcmUgcHJvYmxlbSwgd2hp
+Y2ggaXMgZXZlbiBsZXNzIGxpa2VseS4NCg0KPiA+IC0gRm9yY2UgdGhlIGVtdWxhdGlvbiBvZiBj
+bXB4Y2hnIHZpYSBFWENQX0FUT01JQyB3aXRoOg0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3RjZy90
+Y2ctb3AuYyBiL3RjZy90Y2ctb3AuYw0KPiA+IGluZGV4IDg3ZjY3M2UuLjc3MWVmZmU1IDEwMDY0
+NA0KPiA+IC0tLSBhL3RjZy90Y2ctb3AuYw0KPiA+ICsrKyBiL3RjZy90Y2ctb3AuYw0KPiA+IEBA
+IC0yODU2LDcgKzI4NTYsNyBAQCB2b2lkIHRjZ19nZW5fYXRvbWljX2NtcHhjaGdfaTY0KFRDR3Zf
+aTY0DQo+IHJldHYsIFRDR3YgYWRkciwgVENHdl9pNjQgY21wdiwNCj4gPiAgICAgICAgICAgfQ0K
+PiA+ICAgICAgICAgICB0Y2dfdGVtcF9mcmVlX2k2NCh0MSk7DQo+ID4gICAgICAgfSBlbHNlIGlm
+ICgobWVtb3AgJiBNT19TSVpFKSA9PSBNT182NCkgew0KPiA+IC0jaWZkZWYgQ09ORklHX0FUT01J
+QzY0DQo+ID4gKyNpZiAwDQo+IA0KPiBJIHN1c3BlY3QgdGhpcyB3aWxsIHNpbXBseSBhbHRlciB0
+aGUgdGltaW5nLiAgSG93ZXZlciwgZ2l2ZSBpdCBhIGdvIGJ5IGFsbCBtZWFucy4NCg0KSSBoYXZl
+bid0IHRyaWVkIHRoaXMgeWV0LiBJZiBpdCBiZWhhdmVzIGFzIHlvdSBkZXNjcmliZSwgaXQgc2Vl
+bXMgbGlrZWx5IHRvIG1ha2UgdGhlIHJhY2UgaGFyZGVyIHRvIGhpdC4NCg0KPiBJZiB0aGVyZSdz
+IGEgdGVzdCBjYXNlIHRoYXQgeW91IGNhbiBzaGFyZSwgdGhhdCB3b3VsZCBiZSBhd2Vzb21lLg0K
+DQpJIHdpc2ggd2UgY291bGQgOigNCg0KPiBFc3BlY2lhbGx5IGlmIHlvdSBjYW4gcHJvZCBpdCB0
+byBoYXBwZW4gd2l0aCBhIHN0YW5kYWxvbmUgbWluaW1hbCBiaW5hcnkuICBXaXRoDQo+IGx1Y2sg
+eW91IGNhbiByZXByb2R1Y2UgdmlhIGFhcmNoNjQtbGludXgtdXNlciB0b28sIGFuZCBzaW1wbHkg
+c2lnbmFsIGFuIGVycm9yDQo+IHZpYSBicmFuY2ggdG8gX19idWlsdGluX3RyYXAuDQoNCkluaXRp
+YWwgYXR0ZW1wdHMgdG8gcmVwcm8gdGhpcyB3aXRoIGEgdGlnaHQgbG9vcCBmYWlsZWQsIGJ1dCBJ
+J2xsIHRha2UgYW5vdGhlciBzdGFiIGF0IHByb2R1Y2luZyBhIHN0YW5kYWxvbmUgdGVzdCBwcm9n
+cmFtIHRoYXQgd2UgY2FuIHNoYXJlLg0KDQpBbmRyZXcNCg==
