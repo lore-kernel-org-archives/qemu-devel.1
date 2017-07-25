@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1da3WI-0004vt-1A
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1da3WW-00055C-5I
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1da3WE-00025x-1R
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44292)
+	(envelope-from <jsnow@redhat.com>) id 1da3WS-0002Ba-41
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56092)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1da3WD-00025e-RL
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:13 -0400
-From: Amador Pahim <apahim@redhat.com>
-Date: Tue, 25 Jul 2017 19:10:11 +0200
-Message-Id: <20170725171014.25193-4-apahim@redhat.com>
-In-Reply-To: <20170725171014.25193-1-apahim@redhat.com>
-References: <20170725171014.25193-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 3/6] qemu.py: cleanup message on negative
- exit code
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1da3WR-0002BO-Tc
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:21:28 -0400
+References: <20170725150951.16038-1-ldoktor@redhat.com>
+	<20170725150951.16038-3-ldoktor@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <57520d2b-c04c-ccc0-8bb5-5331217efe86@redhat.com>
+Date: Tue, 25 Jul 2017 13:14:25 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170725150951.16038-3-ldoktor@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] qemu|qtest: Avoid dangerous
+ arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, ehabkost@redhat.com, armbru@redhat.com, apahim@redhat.com, f4bug@amsat.org, mreitz@redhat.com
 
-The message contains the self._args, which has only part of the
-options used in the qemu command line and is not representative
-enough to figure out what happened to the process.
 
-This patch drops the self._args part of the message.
 
-Signed-off-by: Amador Pahim <apahim@redhat.com>
----
- scripts/qemu.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 07/25/2017 11:09 AM, Luk=C3=A1=C5=A1 Doktor wrote:
+> The list object is mutable in python and potentially might modify other
+> object's arguments when used as default argument. Reproducer:
+>=20
+>      >>> vm1 =3D QEMUMachine("qemu")
+>      >>> vm2 =3D QEMUMachine("qemu")
+>      >>> vm1._wrapper.append("foo")
+>      >>> print vm2._wrapper
+>      ['foo']
+>=20
+> In this case the `args` is actually copied so it would be safe to keep
+> it, but it's not a good practice to keep it. The same issue applies in
+> inherited qtest module.
+>=20
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index f37e2fe58e..56142ed59b 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -154,7 +154,8 @@ class QEMUMachine(object):
- 
-             exitcode = self._popen.wait()
-             if exitcode < 0:
--                sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode, ' '.join(self.args)))
-+                sys.stderr.write('qemu received signal %i\n' % -exitcode)
-+
-             self._load_io_log()
-             self._post_shutdown()
- 
--- 
-2.13.3
+ohh, grr, this trips me up in Python all the time. Definitely best to=20
+remove such usages where possible.
+
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Reviewed-by: John Snow <jsnow@redhat.com>
