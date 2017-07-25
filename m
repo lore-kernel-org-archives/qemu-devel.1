@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1da2cP-0007Ck-Cf
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:23:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1da2dA-0007fM-Es
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1da2cL-0000BU-DS
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:23:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58352)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1da2cL-0000Aw-7H
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:23:29 -0400
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-	<20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-Date: Tue, 25 Jul 2017 18:23:22 +0200
+	(envelope-from <berrange@redhat.com>) id 1da2d9-0000mo-3f
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:24:20 -0400
+Date: Tue, 25 Jul 2017 17:24:05 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170725162405.GT26394@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721123325.GC18014@stefanha-x1.localdomain>
+	<20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Disposition: inline
+In-Reply-To: <547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 25/07/2017 18:14, Laszlo Ersek wrote:
->   "No regressions became apparent in tests with a range of Windows
->    (XP-10)"
+On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
 > 
-> In theory, w2k falls within that range.
+> 
+> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
+> > On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
+> >> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
+> >>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
+> >>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+> >> Without the static capabilities defined, the dynamic check would be
+> >> influenced by the run time environment.  It would really mean "qemu-io
+> >> running on this environment (filesystem?) can do native aio".  Again,
+> >> that's not the best type of information to depend on when writing tests.
+> > 
+> > Can you explain this more?
+> > 
+> > It seems logical to me that if qemu-io in this environment cannot do
+> > aio=native then we must skip those tests.
+> > 
+> > Stefan
+> > 
+> 
+> OK, let's abstract a bit more.  Let's take this part of your statement:
+> 
+>  "if qemu-io in this environment cannot do aio=native"
+> 
+> Let's call that a feature check.  Depending on how the *feature check*
+> is written, a negative result may hide a test failure, because it would
+> now be skipped.
+> 
+> Suppose that a feature check for "SDL display" is such that you run
+> "qemu -display sdl".  A *feature failure* here (SDL init is broken), or
+> an environment issue (DISPLAY=), will cause a SDL test skip.
 
-Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
+You could have a way to statically define what features any given run
+of the test suite should enable, then report failure if they were not
+detected.
 
-One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
-and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
-patching the RSDT to point to it.
+This is a similar situation to that seen with configure scripts. If invoked
+with no --enable-xxx flags, it will probe for features & enable them if
+found.  This means you can accidentally build without expected features if
+you have a missing -devel package, or a header/library is broken in some
+way. This is why configure prints a summary of which features it actually
+found. It is also why when building binary packages like RPMs, it is common
+to explicitly give --enable-xxx flags for all features you expect to see.
+Automatic enablement is none the less still useful for people in general.
 
-It's a hack, but it's the only place I see to make it "just work".  And
-it could be extended nicely in the future.
+So if we applied this kind of approach for testing, then any automated
+test systems at least, ought to provide a fixed list of features they
+expect to be present for tests. So if any features accidentally broke
+the tests would error.
 
-All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.
-
-Paolo
-
-> In practice, it is impossible to
-> test *all* Windows versions against ACPI generator changes, even if you
-> try to be thorough (which Phil was). One might not even *know about*
-> "all" Windows versions. So people using w2k and similar should
-> co-maintain the ACPI stuff and report back with testing on the fly;
-> otherwise regressions are impossible to avoid.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
