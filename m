@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1da1sr-0002HA-AJ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:36:32 -0400
+	(envelope-from <stefanha@redhat.com>) id 1da1td-0002rL-Lk
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1da1sm-0000hQ-Bm
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:36:29 -0400
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:35963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1da1sm-0000gU-66
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:36:24 -0400
-Received: by mail-wm0-f54.google.com with SMTP id t201so49394856wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 08:36:22 -0700 (PDT)
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-7-f4bug@amsat.org>
-	<35e2489f-9cd6-ae5e-39b6-297b6cf5d2ea@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f59b38db-f2a4-cb13-73a3-8167be3df217@redhat.com>
-Date: Tue, 25 Jul 2017 17:36:19 +0200
+	(envelope-from <stefanha@redhat.com>) id 1da1tZ-00014J-Nf
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:37:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1da1tZ-0000zY-Ew
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:37:13 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 25 Jul 2017 16:36:45 +0100
+Message-Id: <20170725153645.26412-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <35e2489f-9cd6-ae5e-39b6-297b6cf5d2ea@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 06/35] qcow2: remove inconsistent
- check
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +24,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, eblake@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-On 24/07/2017 20:42, Eric Blake wrote:
-> On 07/24/2017 01:27 PM, Philippe Mathieu-Daudé wrote:
->> This is equivalent to assert(russian roulette) so better remove it.
->>
->> block/qcow2-bitmap.c:259:29: warning: The left operand of '==' is a garbage value
->>         assert(bitmap_table == NULL);
->>                ~~~~~~~~~~~~ ^
->>
->> Reported-by: Clang Static Analyzer
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  block/qcow2-bitmap.c | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->> index 3e8735a20d..fe72df5057 100644
->> --- a/block/qcow2-bitmap.c
->> +++ b/block/qcow2-bitmap.c
->> @@ -254,7 +254,6 @@ static int free_bitmap_clusters(BlockDriverState *bs, Qcow2BitmapTable *tb)
->>  
->>      ret = bitmap_table_load(bs, tb, &bitmap_table);
->>      if (ret < 0) {
->> -        assert(bitmap_table == NULL);
-> 
-> Rather, we should fix bitmap_table_load() to ensure that bitmap_table is
-> always assigned, even on error.
+There is not much getting started documentation for qemu-iotests.  This
+patch explains how to create a new test and covers the overall testing
+approach.
 
-I think it's even better to initialize bitmap_table to NULL in
-free_bitmap_clusters, as all other callers do.
+Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v2:
+ * Added missing "touch <test-number>.out" step [Kevin]
+ * Added reference to SubmitAPatch wiki page [Eric & Philippe]
+---
+ tests/qemu-iotests/README | 94 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 94 insertions(+)
 
-Paolo
+diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
+index 6079b401ae..245f509b14 100644
+--- a/tests/qemu-iotests/README
++++ b/tests/qemu-iotests/README
+@@ -14,8 +14,102 @@ Just run ./check to run all tests for the raw image f=
+ormat, or ./check
+ -qcow2 to test the qcow2 image format.  The output of ./check -h explain=
+s
+ additional options to test further image formats or I/O methods.
+=20
++* Testing approach
++
++Each test is an executable file (usually a bash script) that is run by t=
+he
++./check test harness.  Standard out and standard error are captured to a=
+n
++output file.  If the output file differs from the "golden master" output=
+ file
++for the test then it fails.
++
++Tests are simply a sequence of commands that produce output and the test=
+ itself
++does not judge whether it passed or failed.  If you find yourself writin=
+g
++checks to determine success or failure then you should rethink the test =
+and
++rely on output diffing instead.
++
++** Filtering volatile output
++
++When output contains absolute file paths, timestamps, process IDs, hostn=
+ames,
++or other volatile strings, the diff against golden master output will fa=
+il.
++Such output must be filtered to replace volatile strings with fixed
++placeholders.
++
++For example, the path to the temporary working directory changes between=
+ test
++runs so it must be filtered:
++
++  sed -e "s#$TEST_DIR/#TEST_DIR/#g"
++
++Commonly needed filters are available in ./common.filter.
++
++** Python tests
++
++Most tests are implemented in bash but it is difficult to interact with =
+the QMP
++monitor.  A Python module called 'iotests' is available for tests that r=
+equire
++JSON and interacting with QEMU.
++
++* How to create a test
++
++1. Choose an unused test number
++
++Tests are identified by a unique number.  Look for the highest test case=
+ number
++by looking at the test files.  Then search the qemu-devel@nongnu.org mai=
+ling
++list to check if anyone has already sent patches using the next availabl=
+e
++number.  You may need to increment the number a few times to reach an un=
+used
++number.
++
++2. Create the test file
++
++Copy an existing test (one that most closely resembles what you wish to =
+test)
++to the new test number:
++
++  cp 001 <test-number>
++
++3. Assign groups to the test
++
++Add your test to the ./group file.  This file is the index of tests and =
+assigns
++them to functional groups like "rw" for read-write tests.  Most tests be=
+long to
++the "rw" and "auto" groups.  "auto" means the test runs when ./check is =
+invoked
++without a -g argument.
++
++Consider adding your test to the "quick" group if it executes quickly (<=
+1s).
++This group is run by "make check-block" and is often included as part of=
+ build
++tests in continuous integration systems.
++
++4. Write the test
++
++Edit the test script.  Look at existing tests for examples.
++
++5. Generate the golden master file
++
++Create an empty golden master file:
++
++  touch <test-number>.out
++
++Then run your test:
++
++  ./check <test-number>
++
++You may need additional command-line options to use an image format or
++protocol like -qcow2.
++
++The test will fail because there is no golden master yet.  Inspect the o=
+utput
++that your test generated with "cat <test-number>.out.bad".
++
++Verify that the output is as expected and contains no volatile strings l=
+ike
++timestamps.  You may need to add filters to your test to remove volatile
++strings.
++
++Once you are happy with the test output it can be used as the golden mas=
+ter
++with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to ve=
+rify
++that it passes.
++
++Congratulations, you've created a new test!
++
++To contribute your test to qemu.git please follow the guidelines here:
++http://wiki.qemu.org/Contribute/SubmitAPatch
++
+ * Feedback and patches
+=20
+ Please send improvements to the test suite, general feedback or just
+ reports of failing tests cases to qemu-devel@nongnu.org with a CC:
+ to qemu-block@nongnu.org.
++
+--=20
+2.13.3
