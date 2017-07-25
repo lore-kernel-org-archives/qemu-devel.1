@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZser-0000Yt-2z
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:45:26 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dZseo-0006Fe-7u
+	(envelope-from <dgibson@ozlabs.org>) id 1dZseo-0000XI-Gc
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:45:25 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1dZsen-0006FH-Jz
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:45:22 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 25 Jul 2017 15:45:09 +1000
-Message-Id: <20170725054510.15177-4-david@gibson.dropbear.id.au>
-In-Reply-To: <20170725054510.15177-1-david@gibson.dropbear.id.au>
-References: <20170725054510.15177-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 3/4] spapr: Fix QEMU abort during memory unplug
+Date: Tue, 25 Jul 2017 15:45:06 +1000
+Message-Id: <20170725054510.15177-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 0/4] ppc-for-2.10 queue 20170725
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,115 +20,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, lvivier@redhat.com, groug@kaod.org, bharata@linux.vnet.ibm.com, thuth@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+The following changes since commit b5a74cd81d76cb467552f38f2b39520d07c65ea2:
 
-Commit 0cffce56 (hw/ppc/spapr.c: adding pending_dimm_unplugs to
-sPAPRMachineState) introduced a new way to track pending LMBs of DIMM
-device that is marked for removal. Since this commit we can hit the
-assert in spapr_pending_dimm_unplugs_add() in the following situation:
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170724' into staging (2017-07-24 18:15:45 +0100)
 
-- DIMM device removal fails as the guest doesn't allow the removal.
-- Subsequent attempt to remove the same DIMM would hit the assert
-  as the corresponding sPAPRDIMMState is still part of the
-  pending_dimm_unplugs list.
+are available in the git repository at:
 
-Fix this by removing the assert and conditionally adding the
-sPAPRDIMMState to pending_dimm_unplugs list only when it is not
-already present.
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170725
 
-Fixes: 0cffce56ae3501c5783d779f97993ce478acf856
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-[dwg: Tweaked to avoid returning NULL when spapr_pending_dimm_unplugs_add()
- does find an existing entry]
-Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c | 38 ++++++++++++++++++++++----------------
- 1 file changed, 22 insertions(+), 16 deletions(-)
+for you to fetch changes up to 86844c213348a596ea716a44a6f337555e07ad09:
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1cb09e7c64..2a3e53d5d5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2850,11 +2850,26 @@ static sPAPRDIMMState *spapr_pending_dimm_unplugs_find(sPAPRMachineState *s,
-     return dimm_state;
- }
- 
--static void spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
--                                           sPAPRDIMMState *dimm_state)
-+static sPAPRDIMMState *spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
-+                                                      uint32_t nr_lmbs,
-+                                                      PCDIMMDevice *dimm)
- {
--    g_assert(!spapr_pending_dimm_unplugs_find(spapr, dimm_state->dimm));
--    QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, dimm_state, next);
-+    sPAPRDIMMState *ds = NULL;
-+
-+    /*
-+     * If this request is for a DIMM whose removal had failed earlier
-+     * (due to guest's refusal to remove the LMBs), we would have this
-+     * dimm already in the pending_dimm_unplugs list. In that
-+     * case don't add again.
-+     */
-+    ds = spapr_pending_dimm_unplugs_find(spapr, dimm);
-+    if (!ds) {
-+        ds = g_malloc0(sizeof(sPAPRDIMMState));
-+        ds->nr_lmbs = nr_lmbs;
-+        ds->dimm = dimm;
-+        QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, ds, next);
-+    }
-+    return ds;
- }
- 
- static void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
-@@ -2875,7 +2890,6 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
-     uint32_t avail_lmbs = 0;
-     uint64_t addr_start, addr;
-     int i;
--    sPAPRDIMMState *ds;
- 
-     addr_start = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-                                          &error_abort);
-@@ -2891,11 +2905,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
-         addr += SPAPR_MEMORY_BLOCK_SIZE;
-     }
- 
--    ds = g_malloc0(sizeof(sPAPRDIMMState));
--    ds->nr_lmbs = avail_lmbs;
--    ds->dimm = dimm;
--    spapr_pending_dimm_unplugs_add(ms, ds);
--    return ds;
-+    return spapr_pending_dimm_unplugs_add(ms, avail_lmbs, dimm);
- }
- 
- /* Callback to be called during DRC release. */
-@@ -2911,6 +2921,7 @@ void spapr_lmb_release(DeviceState *dev)
-      * during the unplug process. In this case recover it. */
-     if (ds == NULL) {
-         ds = spapr_recover_pending_dimm_state(spapr, PC_DIMM(dev));
-+        g_assert(ds);
-         /* The DRC being examined by the caller at least must be counted */
-         g_assert(ds->nr_lmbs);
-     }
-@@ -2942,18 +2953,13 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-     uint64_t addr_start, addr;
-     int i;
-     sPAPRDRConnector *drc;
--    sPAPRDIMMState *ds;
--
-     addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-                                          &local_err);
-     if (local_err) {
-         goto out;
-     }
- 
--    ds = g_malloc0(sizeof(sPAPRDIMMState));
--    ds->nr_lmbs = nr_lmbs;
--    ds->dimm = dimm;
--    spapr_pending_dimm_unplugs_add(spapr, ds);
-+    spapr_pending_dimm_unplugs_add(spapr, nr_lmbs, dimm);
- 
-     addr = addr_start;
-     for (i = 0; i < nr_lmbs; i++) {
--- 
-2.13.3
+  pseries: Update SLOF firmware image (2017-07-25 14:35:42 +1000)
+
+----------------------------------------------------------------
+ppc patch queue 2017-07-25
+
+Last pull request for the 2.10 hard freeze, and correspondingly small.
+There are a handful of bugfixes here plus an update for the "pseries"
+guest firmware (SLOF).
+
+This is later than ideal for a guest firmware update.  However, this
+does include a number of fixes in that guest firmware, so I think it's
+worth the risk of squeezing this in just before the hard freeze.
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (2):
+      spapr_pci: Fix obsolete comment about MSIX encoding in addr/data
+      pseries: Update SLOF firmware image
+
+Bharata B Rao (1):
+      spapr: Fix QEMU abort during memory unplug
+
+Laurent Vivier (1):
+      spapr/htab: fix savevm
+
+ hw/ppc/spapr.c     |  40 +++++++++++++++++++++++-----------------
+ hw/ppc/spapr_pci.c |   4 +---
+ pc-bios/README     |   2 +-
+ pc-bios/slof.bin   | Bin 902120 -> 905200 bytes
+ roms/SLOF          |   2 +-
+ 5 files changed, 26 insertions(+), 22 deletions(-)
