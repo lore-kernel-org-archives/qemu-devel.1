@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZzfp-0002Nl-BG
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:14:54 -0400
+	(envelope-from <mst@redhat.com>) id 1dZzhD-0002zU-UJ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dZzfk-0002Y6-EI
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:14:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40194)
+	(envelope-from <mst@redhat.com>) id 1dZzhC-0003PD-Mv
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:16:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZzfk-0002XS-46
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:14:48 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dZzhC-0003Nz-EW
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 09:16:18 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E77DD1FB0D
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 13:14:46 +0000 (UTC)
-Date: Tue, 25 Jul 2017 16:14:35 +0300
+	by mx1.redhat.com (Postfix) with ESMTPS id 87D558E3EB
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 13:16:17 +0000 (UTC)
+Date: Tue, 25 Jul 2017 16:15:07 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170725010730-mutt-send-email-mst@kernel.org>
+Message-ID: <20170725161500-mutt-send-email-mst@kernel.org>
 References: <20170721095553.10717-1-jfreimann@redhat.com>
 	<20170721095553.10717-3-jfreimann@redhat.com>
 MIME-Version: 1.0
@@ -35,7 +35,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jens Freimann <jfreimann@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com
 
 On Fri, Jul 21, 2017 at 11:55:51AM +0200, Jens Freimann wrote:
 > This patch fixes -netdev socket,fd= for UDP sockets
@@ -53,7 +53,7 @@ On Fri, Jul 21, 2017 at 11:55:51AM +0200, Jens Freimann wrote:
 > Fixes: 3d830459b1eccdb61b75e2712fd364012ce5a115
 > Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 
-Pls Cc Jason.
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
 > ---
 >  net/socket.c | 37 ++++++++++++++++++-------------------
