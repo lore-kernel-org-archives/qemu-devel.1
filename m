@@ -1,26 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dZvYm-0002yt-NC
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:51:21 -0400
+	(envelope-from <clg@kaod.org>) id 1dZva2-0003Wh-J1
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:52:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dZvYi-0002Hb-Fe
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:51:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63057)
+	(envelope-from <clg@kaod.org>) id 1dZvZy-0002tN-Kt
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:52:38 -0400
+Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:51317)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dZvYi-0002Gk-6B
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:51:16 -0400
-Date: Tue, 25 Jul 2017 10:44:38 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170725104438.5eb90865@nial.brq.redhat.com>
-In-Reply-To: <20170724234849-mutt-send-email-mst@kernel.org>
-References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
-	<20170724111419.720aa168@nial.brq.redhat.com>
-	<20170724234849-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dZvZy-0002sp-DC
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 04:52:34 -0400
+Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 90F3F88A99
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 10:52:32 +0200 (CEST)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-5-git-send-email-clg@kaod.org>
+	<20170719030849.GQ3140@umbus.fritz.box>
+	<1500436938.3350.11.camel@kernel.crashing.org>
+	<20170721075015.GE3717@umbus.fritz.box>
+	<1500625291.10674.22.camel@kernel.crashing.org>
+	<20170724032853.GB17228@umbus.fritz.box>
+	<1500872645.10674.52.camel@kernel.crashing.org>
+	<20170724053827.GI17228@umbus.fritz.box>
+	<1500880826.10674.66.camel@kernel.crashing.org>
+	<20170724100314.GP17228@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <17c42efa-9ef0-077b-a29b-e836f6643768@kaod.org>
+Date: Tue, 25 Jul 2017 10:52:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170724100314.GP17228@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
- of vhost region merge
+Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
+ for the XIVE interrupt controller model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +40,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 24 Jul 2017 23:50:00 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:
-> > On Sun, 23 Jul 2017 20:46:11 +0800
-> > Peng Hao <peng.hao2@zte.com.cn> wrote:
-> >   
-> > > When a guest that has several hotplugged dimms is migrated, on
-> > > destination it will fail to resume. Because regions on source
-> > > are merged and on destination the order of realizing devices
-> > > is different from on source with dimms, so when part of devices
-> > > are realizd some region can not be merged.That may be more than
-> > > vhost slot limit.
-> > > 
-> > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> > > ---
-> > >  hw/mem/pc-dimm.c        | 2 +-
-> > >  include/sysemu/sysemu.h | 1 +
-> > >  vl.c                    | 5 +++++
-> > >  3 files changed, 7 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > index ea67b46..13f3db5 100644
-> > > --- a/hw/mem/pc-dimm.c
-> > > +++ b/hw/mem/pc-dimm.c
-> > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > >          goto out;
-> > >      }
-> > >  
-> > > -    if (!vhost_has_free_slot()) {
-> > > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
-> > >          error_setg(&local_err, "a used vhost backend has no free"
-> > >                                 " memory slots left");  
-> > that doesn't fix issue,
-> >    1st: number of used entries is changing after machine_init_done() is called
-> >         as regions continue to mapped/unmapped during runtime  
+On 07/24/2017 12:03 PM, David Gibson wrote:
+> On Mon, Jul 24, 2017 at 05:20:26PM +1000, Benjamin Herrenschmidt wrote:
+>> On Mon, 2017-07-24 at 15:38 +1000, David Gibson wrote:
+>>>
+>>> Can we assign our logical numbers sparsely, or will that cause other
+>>> problems?
+>>
+>> The main issue is that they probably needs to be the same between XICS
+>> and XIVE because by the time we get the CAS call to chose between XICS
+>> and XIVE, we have already handed out interrupts and constructed the DT,
+>> no ? Unless we do a real CAS reboot...
 > 
-> But that's fine, we want hotplug to fail if we can not guarantee vhost
-> will work.
-don't we want guarantee that vhost will work with dimm devices at startup
-if it were requested on CLI or fail startup cleanly if it can't?
-
+> A real CAS reboot probably isn't unreasonable for this case.
 > 
-> >    2nd: it brings regression and allows to start QEMU with number memory
-> >         regions more than supported by backend, which combined with missing
-> >         error handling in vhost will lead to qemu crashes or obscure bugs in
-> >         guest breaking vhost enabled drivers.
-> >         i.e. patch undoes what were fixed by
-> >         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html  
-> 
-> Why does it? The issue you fixed there is hotplug, and that means
-> pc_dimm_memory_plug called after machine done.
-I wasn't able to crash fc24 guest with current qemu/rhen7 kernel,
-it fallbacks back to virtio and switches off vhost. 
+> I definitely think we need to go one way or the other - either fully
+> unify the irq mapping between xics and xive, or fully separate them.
+
+To be able to change interrupt model at CAS time, we need to unify 
+the IRQ numbering. We don't have much choice because the DT is 
+already populated. We also need to share the ICSIRQState flags unless
+we share the interrupt source object between the XIVE and XICS mode. 
+
+In my current tree, I made sure that the same IRQ number ranges 
+were being used in the XIVE and in the XICS allocator and that the 
+ICSIRQState flags of the different sPAPR Interrupt sources (XIVE 
+and XICS) were in sync. That works pretty well for reset, migration 
+and hotplug, but it is bit hacky.
+
+C.
 
 
+>> Otherwise, there's no reason they can't be sparse no.
+>>
+>>> Note that for PAPR we also have the question of finding logical
+>>> interrupts for legacy PAPR VIO devices.
+>>
+>> We just make them another range ? With KVM legacy today, I just use the
+>> generic interrupt facility for those. So when you do the ioctl to
+>> "trigger" one, I just do an MMIO to the corresponding page and the
+>> interrupt magically shows up wherever the guest is running the target
+>> vcpu. In fact, I'd like to add a way to mmap that page into qemu so
+>> that qemu can triggers them without an ioctl.
 > 
-> >   
-> > >          goto out;
-> > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > > index b213696..48228ad 100644
-> > > --- a/include/sysemu/sysemu.h
-> > > +++ b/include/sysemu/sysemu.h
-> > > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
-> > >  void qemu_add_exit_notifier(Notifier *notify);
-> > >  void qemu_remove_exit_notifier(Notifier *notify);
-> > >  
-> > > +bool qemu_is_machine_init_done(void);
-> > >  void qemu_add_machine_init_done_notifier(Notifier *notify);
-> > >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
-> > >  
-> > > diff --git a/vl.c b/vl.c
-> > > index fb6b2ef..43aee22 100644
-> > > --- a/vl.c
-> > > +++ b/vl.c
-> > > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
-> > >  
-> > >  static bool machine_init_done;
-> > >  
-> > > +bool qemu_is_machine_init_done(void)
-> > > +{
-> > > +    return machine_init_done;
-> > > +}
-> > > +
-> > >  void qemu_add_machine_init_done_notifier(Notifier *notify)
-> > >  {
-> > >      notifier_list_add(&machine_init_done_notifiers, notify);  
+> Ok.
+> 
+>> The guest doesn't care, from the guest perspective they are interrupts
+>> coming from the DT, so they are like PCI etc...
+> 
+> Ok.
+> 
+>>>> We can fix the number of "generic" interrupts given to a guest. The
+>>>> only requirements from a PAPR perspective is that there should be at
+>>>> least as many as there are possible threads in the guest so they can be
+>>>> used as IPIs.
+>>>
+>>> Ok.  If we can do things sparsely, allocating these well away from the
+>>> hw interrupts would make things easier.
+>>>
+>>>> But we may need more for other things. We can make this a machine
+>>>> parameter with a default value of something like 4096. If we call N
+>>>> that number of extra generic interrupts, then the number of generic
+>>>> interrutps would be #possible-vcpu's + N, or something like that.
+>>>
+>>> That seems reasonable.
+>>>
+>>>>>> But it's fundamentally an allocator that sits in the hypervisor, so in
+>>>>>> our case, I would say in the spapr "component" of XIVE, rather than the
+>>>>>> XIVE HW model itself.
+>>>>>
+>>>>> Maybe..
+>>>>
+>>>> You are right in that a mapping is a better term than an allocator
+>>>> here.
+>>>>
+>>>>>> Now what Cedric did, because XIVE is very complex and we need something
+>>>>>> for PAPR quickly, is not a complete HW model, but a somewhat simplified
+>>>>>> one that only handles what PAPR exposes. So in that case where the
+>>>>>> allocator sits is a bit of a TBD...
+>>>>>
+>>>>> Hm, ok.  My concern here is that "dynamic" allocation of irqs at the
+>>>>> machine type level needs extreme caution, or the irqs may not be
+>>>>> stable which will generally break migration.
+>>>>
+>>>> Yes you are right. We should probably create a more "static" scheme.
+>>>
+>>> Sounds like we're in violent agreement.
+>>
+>> Yup :)
+>>
+> 
