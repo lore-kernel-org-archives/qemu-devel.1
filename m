@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1da1r8-0000he-9c
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:34:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1da1sr-0002HA-AJ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1da1r7-00009p-JX
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:34:42 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:37004)
+	(envelope-from <pbonzini@redhat.com>) id 1da1sm-0000hQ-Bm
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:36:29 -0400
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:35963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1da1r7-00009P-Bx
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:34:41 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id 33so64164009wrz.4
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 08:34:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1da1sm-0000gU-66
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 11:36:24 -0400
+Received: by mail-wm0-f54.google.com with SMTP id t201so49394856wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 08:36:22 -0700 (PDT)
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-7-f4bug@amsat.org>
+	<35e2489f-9cd6-ae5e-39b6-297b6cf5d2ea@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f59b38db-f2a4-cb13-73a3-8167be3df217@redhat.com>
+Date: Tue, 25 Jul 2017 17:36:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170725152052.GP23343@stefanha-x1.localdomain>
-References: <20170721093416.17816-1-stefanha@redhat.com>
-	<CAFEAcA_+ffmyvExhFvm2JTmoipum6GeWiFPP5kuxRKb9+ezRzA@mail.gmail.com>
-	<20170725152052.GP23343@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Jul 2017 16:34:19 +0100
-Message-ID: <CAFEAcA9J=m+aVWH1piHA=dzXU_ND9O1=whkpis9mb=WM8m_40g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: add a "how to"
- to ./README
+In-Reply-To: <35e2489f-9cd6-ae5e-39b6-297b6cf5d2ea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 06/35] qcow2: remove inconsistent
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 25 July 2017 at 16:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Mon, Jul 24, 2017 at 11:20:44AM +0100, Peter Maydell wrote:
->> Should ./check be run from the source tree, or the build tree? The
->> existing README text doesn't say and I don't think your additions
->> do either.
->
-> It doesn't matter, both should work.  The script detects both
-> possibilities and rejigs itself to compensate.
+On 24/07/2017 20:42, Eric Blake wrote:
+> On 07/24/2017 01:27 PM, Philippe Mathieu-Daudé wrote:
+>> This is equivalent to assert(russian roulette) so better remove it.
+>>
+>> block/qcow2-bitmap.c:259:29: warning: The left operand of '==' is a garbage value
+>>         assert(bitmap_table == NULL);
+>>                ~~~~~~~~~~~~ ^
+>>
+>> Reported-by: Clang Static Analyzer
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  block/qcow2-bitmap.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>> index 3e8735a20d..fe72df5057 100644
+>> --- a/block/qcow2-bitmap.c
+>> +++ b/block/qcow2-bitmap.c
+>> @@ -254,7 +254,6 @@ static int free_bitmap_clusters(BlockDriverState *bs, Qcow2BitmapTable *tb)
+>>  
+>>      ret = bitmap_table_load(bs, tb, &bitmap_table);
+>>      if (ret < 0) {
+>> -        assert(bitmap_table == NULL);
+> 
+> Rather, we should fix bitmap_table_load() to ensure that bitmap_table is
+> always assigned, even on error.
 
-Does that mean
- if you run it from the source tree in a tree configured
- for out of tree build it will:
- (a) pollute your source tree with test output and binaries
- (b) give you a helpful message about what to do
- (c) magically find the build tree somehow
- (d) not need to write any binaries/test output/temp files at all
+I think it's even better to initialize bitmap_table to NULL in
+free_bitmap_clusters, as all other callers do.
 
-?
-
-thanks
--- PMM
+Paolo
