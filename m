@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZsUI-0005bd-2g
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:34:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dZsd5-0007ZT-4o
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZsUH-0001eI-A3
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:34:30 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-28-f4bug@amsat.org>
-	<9ed15cf4-3b4b-2d67-7278-feb5503bd9f6@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f1f686ac-ae94-500c-1401-de7ab44b666c@amsat.org>
-Date: Tue, 25 Jul 2017 02:34:20 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1dZsd2-00059F-3K
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 01:43:35 -0400
+Date: Tue, 25 Jul 2017 14:19:23 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170725041923.GB8978@umbus.fritz.box>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-9-git-send-email-clg@kaod.org>
+	<20170724043624.GE17228@umbus.fritz.box>
+	<1500879657.10674.64.camel@kernel.crashing.org>
+	<20170724095052.GO17228@umbus.fritz.box>
+	<1500894439.10674.76.camel@kernel.crashing.org>
+	<c94d515a-0d8b-921e-1ccb-bd92284c3967@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <9ed15cf4-3b4b-2d67-7278-feb5503bd9f6@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 27/35] syscall: fix dereference of
- undefined pointer
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tsOsTdHNUZQcU9Ye"
+Content-Disposition: inline
+In-Reply-To: <c94d515a-0d8b-921e-1ccb-bd92284c3967@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 08/26] ppc/xive: add flags to the XIVE
+ interrupt source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 07/24/2017 04:33 PM, Laurent Vivier wrote:
-> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
->> Clang's scan-build-5.0 reports:
->>
->> linux-user/syscall.c:5581:9: warning: Dereference of undefined pointer value
->>      if (*host_rt_dev_ptr != 0) {
->>          ^~~~~~~~~~~~~~~~
->>
->> Reported-by: Clang Static Analyzer
->> Suggested-by: Laurent Vivier <lvivier@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   linux-user/syscall.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index fcd20fa276..e79b5baec4 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -5524,7 +5524,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
->>       int target_size;
->>       void *argptr;
->>       abi_ulong *target_rt_dev_ptr;
->> -    unsigned long *host_rt_dev_ptr;
->> +    unsigned long *host_rt_dev_ptr = NULL;
->>       abi_long ret;
->>       int i;
->>   
->> @@ -5570,6 +5570,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
->>       unlock_user(argptr, arg, 0);
->>   
->>       ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
->> +    assert(host_rt_dev_ptr);
->>       if (*host_rt_dev_ptr != 0) {
->>           unlock_user((void *)*host_rt_dev_ptr,
->>                       *target_rt_dev_ptr, 0);
->>
-> 
-> I think if you add the assert you should not have to add the "= NULL".
-> Could you check?
 
-Indeed!
+--tsOsTdHNUZQcU9Ye
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks :)
+On Mon, Jul 24, 2017 at 01:47:28PM +0200, C=E9dric Le Goater wrote:
+> On 07/24/2017 01:07 PM, Benjamin Herrenschmidt wrote:
+> > On Mon, 2017-07-24 at 19:50 +1000, David Gibson wrote:
+> >> On Mon, Jul 24, 2017 at 05:00:57PM +1000, Benjamin Herrenschmidt wrote:
+> >>> On Mon, 2017-07-24 at 14:36 +1000, David Gibson wrote:
+> >>>> On Wed, Jul 05, 2017 at 07:13:21PM +0200, C=E9dric Le Goater wrote:
+> >>>>> These flags define some characteristics of the source :
+> >>>>>
+> >>>>>  - XIVE_SRC_H_INT_ESB  the Event State Buffer are controlled with a
+> >>>>>                        specific hcall H_INT_ESB
+> >>>>
+> >>>> What's the other option?
+> >>>
+> >>> Direct MMIO access. Normally all interrupts use normal MMIOs,
+> >>> each interrupts has an associated MMIO page with special MMIOs
+> >>> to control the source state (PQ bits). This is something I added
+> >>> to the PAPR spec (and the OPAL <-> Linux interface) to allow firmware
+> >>> to work around broken HW (which happens on some P9 versions).
+> >>
+> >> Ok.. and that's something that can be decided at runtime?
+> >=20
+> > Well, at this point I think nothing will set that flag.... It's there
+> > for workaround around HW bugs on some chips. At least in full emu it
+> > shouldn't happen unless we try to emulate those bugs. Hopefully direct
+> > MMIO will just work.
+>=20
+> Nevertheless I have added support for the hcall in Linux and QEMU.
+> To use, I think we could create a specific source.
 
-Phil.
+So, IIUC, it's host constraints that would make this one way or the
+other.  So what happens when a guest migrates from a host which has it
+one way to one which has it the other way?
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--tsOsTdHNUZQcU9Ye
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll2xssACgkQbDjKyiDZ
+s5KTeA//YolXxPlIW1eLjD+tSZRs8e4XeLMfnJxQv2ZTcqVUFd5ixVKCBtWj5Qj/
+Xm26kreYOGGYSbM++ywmSDj00g+teKUsKJhR6IKgV87Hix6pE8Z9HmMHsPWc6gsh
+KPdlN7BjCkYDILdolsMCO5hXLpvwC/lOzYi/xH7L5FqmgqgTebTuXFazEHUkxVMY
+8oNWhqnEGx8zJCI3Ua5itrA1Ar5Bs1aVuvyNfO0brwk19txAEmScNRV7lHfZvMhk
+IjbdYiKm+swGRf0Y3k3Wdp3RBlV+sREpUgBTtXmrKvqdysBRx9jktGMgk/N1PFKl
+bH4dfH2WdySp13xPF6bN1KeGES9MpK9mbDrMBroTvRtdceQTZS43SmPf7TiMej1V
+YauSf8m/846aqTPLn4YUT318fXb6bWPeG2H1E9UU8xpgzrpDBZ+YiwzeqhQQL1xf
+mFpxu7eDzpffm/M6A5914sKbmhG1Zsmoh9ZvwCaeZNrp/YFw+EQpbZHEQNlB1wUv
+tylBwi7O5XIkX1SMbb6LxDCHUVOP8/aD2vxNmNhdwPGdWROk0mlsksBeJYC3fnEg
+PNQ194/AVvArLj9W8wtD0Fw4moGcEJ1a0s3qJToCmTjnIev4uXeuNKoGWfX0TuMf
+jRytvKDqC7uz5UOXlJvxiopUYRsKwIXFwC46oG9dEu0LQBlr/Zw=
+=YOux
+-----END PGP SIGNATURE-----
+
+--tsOsTdHNUZQcU9Ye--
