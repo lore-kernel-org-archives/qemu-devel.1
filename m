@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1da5kq-0001O1-7H
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:44:29 -0400
+	(envelope-from <mst@redhat.com>) id 1da5nm-0002GY-2Z
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1da5km-00020F-Af
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:44:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58338)
+	(envelope-from <mst@redhat.com>) id 1da5ni-0003es-4n
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:47:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1da5km-0001zb-27
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:44:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 102CD710A8
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 19:44:23 +0000 (UTC)
-Date: Tue, 25 Jul 2017 21:43:57 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20170725194357.nz2svyvw3dnh4jxc@localhost.localdomain>
-References: <20170721095553.10717-1-jfreimann@redhat.com>
-	<20170721095553.10717-5-jfreimann@redhat.com>
-	<20170724134243.GE2784@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1da5nh-0003em-RQ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 15:47:26 -0400
+Date: Tue, 25 Jul 2017 22:47:18 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170725161025-mutt-send-email-mst@kernel.org>
+References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170724111419.720aa168@nial.brq.redhat.com>
+	<20170724234849-mutt-send-email-mst@kernel.org>
+	<20170725104438.5eb90865@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170724134243.GE2784@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 4/4] tests/pxe-test: add testcase using
- vhost-user-bridge
+In-Reply-To: <20170725104438.5eb90865@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
+ of vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,131 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-On Mon, Jul 24, 2017 at 02:42:43PM +0100, Stefan Hajnoczi wrote:
->On Fri, Jul 21, 2017 at 11:55:53AM +0200, Jens Freimann wrote:
->> +static const char *init_hugepagefs(const char *path)
->> +{
->> +    struct statfs fs;
->> +    int ret;
->> +
->> +    if (access(path, R_OK | W_OK | X_OK)) {
->> +        g_test_message("access on path (%s): %s\n", path, strerror(errno));
->> +        return NULL;
->> +    }
->> +
->> +    do {
->> +        ret = statfs(path, &fs);
->
->This system-call and HUGETLBFS_MAGIC are Linux-specific but I don't see
->anything in the makefile or this test code that restricts it to Linux.
->Will this break non-Linux hosts?
->
->Perhaps #ifdef __linux__ is needed.
+On Tue, Jul 25, 2017 at 10:44:38AM +0200, Igor Mammedov wrote:
+> On Mon, 24 Jul 2017 23:50:00 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:
+> > > On Sun, 23 Jul 2017 20:46:11 +0800
+> > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > >   
+> > > > When a guest that has several hotplugged dimms is migrated, on
+> > > > destination it will fail to resume. Because regions on source
+> > > > are merged and on destination the order of realizing devices
+> > > > is different from on source with dimms, so when part of devices
+> > > > are realizd some region can not be merged.That may be more than
+> > > > vhost slot limit.
+> > > > 
+> > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > ---
+> > > >  hw/mem/pc-dimm.c        | 2 +-
+> > > >  include/sysemu/sysemu.h | 1 +
+> > > >  vl.c                    | 5 +++++
+> > > >  3 files changed, 7 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > index ea67b46..13f3db5 100644
+> > > > --- a/hw/mem/pc-dimm.c
+> > > > +++ b/hw/mem/pc-dimm.c
+> > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > >          goto out;
+> > > >      }
+> > > >  
+> > > > -    if (!vhost_has_free_slot()) {
+> > > > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
+> > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > >                                 " memory slots left");  
+> > > that doesn't fix issue,
+> > >    1st: number of used entries is changing after machine_init_done() is called
+> > >         as regions continue to mapped/unmapped during runtime  
+> > 
+> > But that's fine, we want hotplug to fail if we can not guarantee vhost
+> > will work.
+> don't we want guarantee that vhost will work with dimm devices at startup
+> if it were requested on CLI or fail startup cleanly if it can't?
 
-Yes, I think so. I might get rid of it init_hugepagefs altogether
-though. 
+Yes. And failure to start vhost will achieve this without need to much with
+DIMMs. The issue is only with DIMM hotplug when vhost is already running,
+specifically because notifiers have no way to report or handle errors.
 
->
->> +    } while (ret != 0 && errno == EINTR);
->> +
->> +    if (ret != 0) {
->> +        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
->> +        return NULL;
->> +    }
->> +
->> +    if (fs.f_type != HUGETLBFS_MAGIC) {
->> +        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
->> +        return NULL;
->> +    }
->> +
->> +    return path;
->> +}
->> +
->> +static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
->> +{
->> +    int sock;
->> +
->> +    if (inet_aton("127.0.0.1", (struct in_addr *) &si_remote->sin_addr.s_addr)
->> +            == 0) {
->> +        g_test_message("inet_aton failed\n");
->> +        return -1;
->> +    }
->
->Or:
->
->  si_remote->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+> > 
+> > >    2nd: it brings regression and allows to start QEMU with number memory
+> > >         regions more than supported by backend, which combined with missing
+> > >         error handling in vhost will lead to qemu crashes or obscure bugs in
+> > >         guest breaking vhost enabled drivers.
+> > >         i.e. patch undoes what were fixed by
+> > >         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html  
+> > 
+> > Why does it? The issue you fixed there is hotplug, and that means
+> > pc_dimm_memory_plug called after machine done.
+> I wasn't able to crash fc24 guest with current qemu/rhen7 kernel,
+> it fallbacks back to virtio and switches off vhost. 
 
-Yes, I'll change it. 
+I think vhostforce should make vhost fail and not fall back,
+but that is another bug.
 
->> +    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
->> +    if (sock == -1) {
->> +        g_test_message("socket creation failed\n");
->> +        return -1;
->> +    }
->> +    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
->> +        g_test_message("connect failed: %s", strerror(errno));
->> +        return -1;
->> +    }
->> +
->> +    return sock;
->> +}
->> +
->> +static void test_pxe_vhost_user(void)
->> +{
->> +    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
->> +    char template2[] = "/tmp/hugepages-XXXXXX";
->> +    gchar * vubr_args[] = {NULL, NULL, NULL, NULL};
->> +    struct sockaddr_in si_remote = {
->> +        .sin_family = AF_INET,
->> +        .sin_port = htons(RPORT),
->> +    };
->> +    const char *hugefs = NULL;
->> +    const char *tmpfs2 = NULL;
->> +    const char *tmpfs = NULL;
->> +    const char *root = NULL;
->> +    GError *error = NULL;
->> +    char *vubr_binary;
->> +    char *qemu_args;
->> +    GPid vubr_pid;
->> +    int sock = -1;
->> +
->> +    tmpfs = mkdtemp(template);
->> +    if (!tmpfs) {
->> +        g_test_message("mkdtemp on path(%s): %s\n",
->> +                       template, strerror(errno));
->> +    }
->> +    vubr_binary = getenv("QTEST_VUBR_BINARY");
->> +    g_assert(vubr_binary);
->> +    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
->> +    vubr_args[1] = g_strdup_printf("-u");
->> +    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
->> +    g_spawn_async(NULL, vubr_args, NULL,
->> +                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
->> +                  G_SPAWN_SEARCH_PATH,
->> +                  NULL, NULL, &vubr_pid, &error);
->
->I think a few things are missing for test cleanup (especially on
->failure).
->
->From https://developer.gnome.org/glib/stable/glib-Spawning-Processes.html#g-spawn-async-with-pipes:
->
->  If child_pid is not NULL and an error does not occur then the returned
->  process reference must be closed using g_spawn_close_pid().
->
->G_SPAWN_DO_NOT_REAP_CHILD wasn't specified so glib will automatically
->reap the child but the test case will not know when the vubr process has
->terminated.
->
->A qtest_add_abrt_handler() is also missing to kill the vubr child if the
->test case terminates.
-
-I'll add an abort handler and make sure that the vubr process is
-terminated. 
-
-Thanks for the review!
-
-regards,
-Jens 
+> 
+> > 
+> > >   
+> > > >          goto out;
+> > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > > index b213696..48228ad 100644
+> > > > --- a/include/sysemu/sysemu.h
+> > > > +++ b/include/sysemu/sysemu.h
+> > > > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+> > > >  void qemu_add_exit_notifier(Notifier *notify);
+> > > >  void qemu_remove_exit_notifier(Notifier *notify);
+> > > >  
+> > > > +bool qemu_is_machine_init_done(void);
+> > > >  void qemu_add_machine_init_done_notifier(Notifier *notify);
+> > > >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+> > > >  
+> > > > diff --git a/vl.c b/vl.c
+> > > > index fb6b2ef..43aee22 100644
+> > > > --- a/vl.c
+> > > > +++ b/vl.c
+> > > > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
+> > > >  
+> > > >  static bool machine_init_done;
+> > > >  
+> > > > +bool qemu_is_machine_init_done(void)
+> > > > +{
+> > > > +    return machine_init_done;
+> > > > +}
+> > > > +
+> > > >  void qemu_add_machine_init_done_notifier(Notifier *notify)
+> > > >  {
+> > > >      notifier_list_add(&machine_init_done_notifiers, notify);  
