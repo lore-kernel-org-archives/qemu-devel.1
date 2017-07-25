@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1da2UK-0003hJ-CO
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:15:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1da2Ve-0004FO-IM
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1da2UG-0003xV-2v
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:15:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40554)
+	(envelope-from <ehabkost@redhat.com>) id 1da2VZ-0004Nh-WA
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1da2UF-0003vu-Pd
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:15:08 -0400
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-	<20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-Date: Tue, 25 Jul 2017 18:14:59 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1da2VZ-0004NC-Mr
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 12:16:29 -0400
+Date: Tue, 25 Jul 2017 13:06:39 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170725160639.GO2757@localhost.localdomain>
+References: <20170725150951.16038-1-ldoktor@redhat.com>
+	<20170725150951.16038-6-ldoktor@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Disposition: inline
+In-Reply-To: <20170725150951.16038-6-ldoktor@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] qemu.py: Use custom exceptions
+ rather than Exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,187 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
 
-On 07/21/17 20:29, Phil Dennis-Jordan wrote:
-> On Fri, Jul 21, 2017 at 2:34 PM, Igor Mammedov <imammedo@redhat.com> wrote:
->> On Fri, 21 Jul 2017 10:23:38 +0100
->> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->>
->>> On Fri, Jul 21, 2017 at 11:06:36AM +0200, Igor Mammedov wrote:
->>>> On Thu, 20 Jul 2017 21:29:33 +0200
->>>> Phil Dennis-Jordan <lists@philjordan.eu> wrote:
->>>>
->>>>> On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
->>>>> <programmingkidx@gmail.com> wrote:
->>>>>> I noticed that Windows 2000 does not boot up in QEMU recently. After bisecting the issue I found the offending commit:
->>>> w2k is very ancient (and long time EOLed), I can't even download it from msdn to test
->>>> (oldest available is XP)
->>>>
->>>> do we really care about it?
->>>
->>> From a Red Hat, we don't care about it, because we're only targetting
->>> modern OS in RHEL, but from a QEMU community POV ability to run pretty
->>> much any guest OS you care to find is definitely in scope.
->> As far as someone is willing to maintain it and test it regularly,
->> otherwise it will beak someday anyway.
->> (I'm not really willing to do it as I don't have access to w2k and
->> interested in reducing maintainable code, but maybe someone would
->> like to step up, feel free to post patch to amend acpi maintaners)
->>
->> currently option 1 looks like the most compatible approach
->> but there is no way to predict if it will break some other OS
->> and it is not trivial to implement and maintain.
->>
->> CCing Laszlo, to get his opinion if option 1 is viable from
->> old/new OVMF standpoint (is it possible in 2.10 time frame?).
-> 
-> I've not done a deep investigation yet, but I've put together a really
-> quick prototype for the split RSDT/XSDT with 2 FADTs. I tested my
-> existing WinXP x86, Win10 x64, and Ubuntu 16.04 x86-64 test images
-> with SeaBIOS and they all worked.
-> 
-> With OVMF, neither Windows 10 nor macOS would boot with this change -
-> I don't currently know if that's OVMF's fault or if my prototype is
-> broken. I don't have time right now to dig deeper into this, but
-> hopefully I can look at it on Monday and also dig out a Win2000 disc
-> then as well and test with that.
+On Tue, Jul 25, 2017 at 05:09:46PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> The naked Exception should not be widely used. It makes sense to be a
+> bit more specific and use better-suited custom exceptions. As a benefit
+> we can store the full reply in the exception in case someone needs it
+> when catching the exception.
+>=20
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  scripts/qemu.py | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 5948e19..e6df54c 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -19,6 +19,19 @@ import subprocess
+>  import qmp.qmp
+> =20
+> =20
+> +class MonitorResponseError(qmp.qmp.QMPError):
+> +    '''
+> +    Represents erroneous QMP monitor reply
+> +    '''
+> +    def __init__(self, reply):
+> +        try:
+> +            desc =3D reply["error"]["desc"]
+> +        except KeyError:
+> +            desc =3D reply
+                      ^^^ (*)
+> +        super(MonitorResponseError, self).__init__(repr(desc))
 
-Thanks for the CC.
+This will end up calling Exception.__init__.  I previously
+suggested repr(desc) above(*) because I didn't know what happened
+when the Exception.__init__ argument is not a string.
 
-With edk2 you cannot install one FADT that is pointed-to by an RSDT
-entry and another FADT that is pointed-to by an XSDT entry.
+I couldn't find any documentation on the right argument types for
+Exception.__init__.  The examples in the Python documentation[1]
+don't call Exception.__init__ at all: they simply implement
+__str__().
 
-- The two FADT versions are at separate places in guest memory, so the
-multiply-pointed-to table handling that we collaborated on last time
-does not apply (justifiedly -- these are separate tables, not a single
-table being the target of multiple pointers).
+However, based on my testing and on the BaseException
+documentation[2], I believe repr() isn't really necessary:
 
-- This means that both FADT versions will be passed to
-InstallAcpiTable(). The implementation in
-"MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableProtocol.c" handles
-both RSDT and XSDT entries automatically (there's no way for OVMF to say
-"I want this one linked into RSDT, and that one linked into XSDT"), so
-the firstly installed FADT is linked into both root tables, and the
-secondly installed FADT is rejected with EFI_ACCESS_DENIED.
+"If str() or unicode() is called on an instance of this class,
+the representation of the argument(s) to the instance are
+returned, or the empty string when there were no arguments."
 
-- The failure in turn causes OVMF to roll back all the ACPI
-linker/loader processing done thus far, and to fall back to the built-in
-(very ancient) default tables. It's not surprising that modern OSes
-don't boot with those tables.
+So your previous version was good, already.
 
-So approach (1) cannot work with UEFI.
+But maybe we could do this instead, to make the constructor as
+simple as possible:
 
-I could imagine approach (2) like this:
+class MonitorResponseError(qmp.qmp.QMPError):
+    def __init__(self, reply):
+        self.reply =3D reply
 
-- continue with unversioned firmware
-- introduce a master switch called "ancient ACPI" vs. "modern ACPI"
-- tie this knob to machine types
-- factor the "ancient ACPI" stuff out to a separate set of source files
-- assign additional maintainers (like Igor suggests) to the "ancient
-  ACPI" source files.
+    def __str__(self):
+        return self.reply.get('error', {}).get('desc', repr(self.reply))
 
-I agree with Igor 100% that the "ancient ACPI" stuff has to be
-maintained by people that *actually use* OSes that require ancient ACPI.
-In commit 77af8a2b95b7 ("hw/i386: Use Rev3 FADT (ACPI 2.0) instead of
-Rev1 to improve guest OS support.", 2017-03-15), Phil wrote
 
-  "No regressions became apparent in tests with a range of Windows
-   (XP-10)"
+[1] https://docs.python.org/2/tutorial/errors.html#user-defined-exception=
+s
+[2] https://docs.python.org/2/library/exceptions.html#exceptions.BaseExce=
+ption
 
-In theory, w2k falls within that range. In practice, it is impossible to
-test *all* Windows versions against ACPI generator changes, even if you
-try to be thorough (which Phil was). One might not even *know about*
-"all" Windows versions. So people using w2k and similar should
-co-maintain the ACPI stuff and report back with testing on the fly;
-otherwise regressions are impossible to avoid.
+> +        self.reply =3D reply
+> +
+> +
+>  class QEMUMachine(object):
+>      '''A QEMU VM'''
+> =20
+> @@ -197,9 +210,9 @@ class QEMUMachine(object):
+>          '''
+>          reply =3D self.qmp(cmd, conv_keys, **args)
+>          if reply is None:
+> -            raise Exception("Monitor is closed")
+> +            raise qmp.qmp.QMPError("Monitor is closed")
+>          if "error" in reply:
+> -            raise Exception(reply["error"]["desc"])
+> +            raise MonitorResponseError(reply)
+>          return reply["return"]
+> =20
+>      def get_qmp_event(self, wait=3DFalse):
+> --=20
+> 2.9.4
+>=20
 
-(Continuous integration covering *all* Windows versions is impossible
-for obvious reasons ($$$).)
-
-Thanks
-Laszlo
-
-> 
-> The prototype patch is at https://github.com/pmj/qemu/tree/xsdt right
-> now for anyone curious, or with more time on their hands to test it
-> with Win2K and figure out why it's not working with OVMF. I'll try to
-> do a proper RFC patch submission on Monday once I have a better handle
-> on what's going on.
-> 
-> I don't have any strong release policy opinions - I'll leave that to
-> those with more experience. I'd be disappointed though if we had to
-> entirely revert the Rev3 FADT patch for 2.10.
-> 
->>>>> Ouch. I reckon we have 2 options for fixing this:
->>>>>
->>>>> 1. Export two FADTs, one ACPI 1.0, one ACPI 2.0. The latter would need
->>>>> to be pointed to by an XSDT, which Qemu currently doesn't implement at
->>>>> all as far as I'm aware. Any ideas on how SeaBIOS or OVMF would handle
->>>>> this? Any likely other OS regressions?
->>>>>
->>>>> 2. Select FADT version with an option. This one is definitely safe,
->>>>> but adds yet another option.
->>>> the 3rd simpler option is:
->>>>   force rev1 on old machine types (2.9 and older),
->>>>   using machine compat machinery and use rev3 on newer machines
->>>
->>> That's not really a 3rd option - it is something that applies to
->>> both option 1 and 2.
->>>
->>> The original commit, and both these options involve changes are
->>> sensitive to guest ABI. So all machine types from 2.9 and earlier
->>> *must* be configured to stick with the ACPI 1.0 FADT only.
->> It's not per se ABI change, ABI is still the same but BIOS
->> supplied ACPI tables changed (nowdays they are generated by QEMU)
->> to new ones. Currently QEMU does not support versioned firmware,
->> i.e. each new release ships updated firmware and old machines
->> also use it. The same typically applies to ACPI tables.
->>
->> Alternative workaround, for w2k user (management), doesn't even
->> requires any fixes to qemu, he/she should just use old enough bios
->> with new QEMU (bios from 1.7 or 1.6 should work as it doesn't fetch
->> ACPI tables from QEMU).
->>
->> Another alternative is just keep just using old QEMU version with w2k,
->> the sources are available.
->> If user's figured out that he/she needs to force FADT(rev1) for w2k
->> not to crash (he is either able to bisect/compile QEMU or read this
->> thread at which point he/she should be able to his poison i.e.
->> compiling vs old bios)
->>
->>
->>> Whether we then have an option to turn on ACPI 2.0, or instead
->>> expose 1.0 and 2.0 at the same time, both must only happen on
->>> the 2.10 machine type (or newer if it misses this release).
->>>
->>>
->>>>>> commit 77af8a2b95b79699de650965d5228772743efe84
->>>>>> Author: Phil Dennis-Jordan <phil@philjordan.eu>
->>>>>> Date:   Wed Mar 15 19:20:26 2017 +1300
->>>>>>
->>>>>>     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.
->>>>>>
->>>>>>     This updates the FADT generated for x86/64 machine types from Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is to expose the reset register information to guest operating systems which require it, specifically OS X/macOS. Revision 1 FADTs do not contain the fields relating to the reset register.
->>>>>>
->>>>>>     The new layout and contents remains backwards-compatible with operating systems which only support ACPI 1.0, as the existing fields are not modified by this change, as the 64-bit and 32-bit variants are allowed to co-exist according to the ACPI 2.0 standard. No regressions became apparent in tests with a range of Windows (XP-10) and Linux versions.
->>>>>>
->>>>>>     The BIOS tables test suite's FADT checksum test has also been updated to reflect the new FADT layout and content.
->>>>>>
->>>>>>     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
->>>>>>     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
->>>>>>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>>>
->>>>>> :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 6d2a94150cf1eafb16f0ccf6325281415fef64a6 M      hw
->>>>>> :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d 68f9368d8d78fd3267f609b603f97e8a74bdf528 M      include
->>>>>> :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff 8ed08cef10fddee7814e38ad62be11371592a75a M      tests
->>>>>>
->>>>>>
->>>>>
->>>>
->>>>
->>>
->>> Regards,
->>> Daniel
->>
+--=20
+Eduardo
