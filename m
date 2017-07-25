@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZoRv-0007UG-Ei
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 21:15:48 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dZoUB-0008Mq-4V
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 21:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZoRs-0002oo-B8
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 21:15:47 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dZoRs-0002ob-5Q
-	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 21:15:44 -0400
-Received: by mail-qt0-x244.google.com with SMTP id i19so3040032qte.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Jul 2017 18:15:44 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 24 Jul 2017 22:15:30 -0300
-Message-Id: <20170725011530.17958-1-f4bug@amsat.org>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dZoUA-0003sz-1r
+	for qemu-devel@nongnu.org; Mon, 24 Jul 2017 21:18:07 -0400
+References: <7fb8c9ff25d183cf7c0f729a90ee4f59c0632d64.1497602554.git.maozy.fnst@cn.fujitsu.com>
+	<38f43362-e3a3-44ab-9c29-d04b4c825085@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <ee87c1b8-d34d-566e-b7cf-3c5700d76352@cn.fujitsu.com>
+Date: Tue, 25 Jul 2017 09:16:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
- extension on windows
+In-Reply-To: <38f43362-e3a3-44ab-9c29-d04b4c825085@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] util: remove the obsolete
+ non-blocking connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sjubran@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Daniel Rempel <daniel@daynix.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, mitake.hitoshi@lab.ntt.co.jp, Cao jin <caoj.fnst@cn.fujitsu.com>, mreitz@redhat.com, sheepdog@lists.wpkg.org, kraxel@redhat.com, pbonzini@redhat.com, famz@redhat.com, namei.unix@gmail.com
 
-Reported-by: Sameeh Jubran <sjubran@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-original report from Sameeh Jubran:
-http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.html
 
- Makefile  | 2 +-
- configure | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index ef721480eb..5f18243d05 100644
---- a/Makefile
-+++ b/Makefile
-@@ -490,7 +490,7 @@ clean:
- 	rm -f qemu-options.def
- 	rm -f *.msi
- 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f -exec rm {} +
--	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.pod *~ */*~
-+	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
- 	rm -f fsdev/*.pod
- 	rm -f qemu-img-cmds.h
- 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
-diff --git a/configure b/configure
-index 48d4d7a2a7..f8b1d014d7 100755
---- a/configure
-+++ b/configure
-@@ -5073,7 +5073,7 @@ fi
- 
- if [ "$guest_agent" != "no" ]; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" -o "$mingw32" = "yes" ] ; then
--      tools="qemu-ga $tools"
-+      tools="qemu-ga\$(EXESUF) $tools"
-       guest_agent=yes
-   elif [ "$guest_agent" != yes ]; then
-       guest_agent=no
--- 
-2.13.3
+On 07/25/2017 06:07 AM, John Snow wrote:
+> This was posted over a month ago with two R-Bs, did it get merged or dropped?
+>
+> --js
+
+Not yet, I hope that it will.
+
+Thanks,
+Mao
+
+>
+> On 06/16/2017 04:54 AM, Mao Zhongyi wrote:
+>> From: Cao jin <caoj.fnst@cn.fujitsu.com>
+>>
+>> The non-blocking connect mechanism is obsolete, and it doesn't
+>> work well in inet connection, because it will call getaddrinfo
+>> first and getaddrinfo will blocks on DNS lookups. Since commit
+>> e65c67e4 & d984464e, the non-blocking connect of migration goes
+>> through QIOChannel in a different manner(using a thread), and
+>> nobody use this old non-blocking connect anymore.
+>>
+>> Any newly written code which needs a non-blocking connect should
+>> use the QIOChannel code, so we can drop NonBlockingConnectHandler
+>> as a concept entirely.
+>>
+>> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>> v3:
+>> 1. fix the mistake that adds a unmodified file '--help' [Fam Zheng]
+>>
+>> v2:
+>> 1. block/ssh.c is not compiled in v1 which leads to no error
+>>     reported when I run make & make check, although I make a
+>>     mistake in block/ssh.c, because the package libssh2-devel
+>>     missed in my system. Now fixed it.
+>> 2. Write the prototype in a single line. [Juan Quintela]
+>>
+>> Because it's a minor change, so still add the r-b.
+>>
+>> v1:
+>> This patch was reviewed by Daniel about a years ago, but it has never
+>> been merged just since socket_connect() called by net_socket_connect_init()
+>> where NonBlockingConnectHandler was passed to socket_connect(). it's broken.
+>>
+>> Now this problem was worked around by Daniel's patch(commit 6701e551 'Revert
+>> "Change net/socket.c to use socket_*() functions" again'). Therefore, resend
+>> it, of course, part of related code has changed over the years, so changed
+>> the patch accordingly.
+>>
+>> The reviewed patch listed on:
+>> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06373.html
+>>
+>>   block/sheepdog.c       |   2 +-
+>>   block/ssh.c            |   2 +-
+>>   include/qemu/sockets.h |  12 +--
+>>   io/channel-socket.c    |   2 +-
+>>   util/qemu-sockets.c    | 205 ++++++-------------------------------------------
+>>   5 files changed, 28 insertions(+), 195 deletions(-)
+>>
+>
+> [snip]
+>
+>
+>
