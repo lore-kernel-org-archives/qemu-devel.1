@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1da3Lp-00007K-Iq
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:10:31 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1da3NE-0000gs-Ts
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1da3Ll-0004tL-Bq
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:10:29 -0400
-Received: from mail-wr0-f173.google.com ([209.85.128.173]:33789)
+	(envelope-from <zuban32s@gmail.com>) id 1da3ND-0005WE-2w
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:11:56 -0400
+Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:37374)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1da3Ll-0004tB-0S
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:10:25 -0400
-Received: by mail-wr0-f173.google.com with SMTP id v105so91532066wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 10:10:24 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-	<20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-Message-ID: <a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
-Date: Tue, 25 Jul 2017 19:10:21 +0200
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1da3NC-0005VR-QQ
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 13:11:55 -0400
+Received: by mail-pg0-x230.google.com with SMTP id y129so72644772pgy.4
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 10:11:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
+	<20170723055006-mutt-send-email-mst@kernel.org>
+	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+	<20170723173111-mutt-send-email-mst@kernel.org>
+	<CAKSfGUBP8oH2YymDnCA+Q=ngmyyVRYTVujwfOLRgdBQ82qgivg@mail.gmail.com>
+	<20170725165213-mutt-send-email-mst@kernel.org>
+	<CAKSfGUDiJ9GVNepiX7nGHtPf5=OqUaZgyPwwwDUDWuwnAND-Ew@mail.gmail.com>
+	<a16dcefb-8abd-cf24-762c-82e26a0f9ec4@redhat.com>
+In-Reply-To: <a16dcefb-8abd-cf24-762c-82e26a0f9ec4@redhat.com>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Tue, 25 Jul 2017 17:11:41 +0000
+Message-ID: <CAKSfGUDOC7vBG30+NmrTr+UO4=vb6phiDreTA=4mA1LOfLs3Tw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
+ property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,306 +37,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>, Gerd Hoffmann <kraxel@redhat.com>, "seabios@seabios.org" <seabios@seabios.org>
+To: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net, seabios@seabios.org
 
-On 25/07/2017 18:23, Paolo Bonzini wrote:
-> On 25/07/2017 18:14, Laszlo Ersek wrote:
->>   "No regressions became apparent in tests with a range of Windows
->>    (XP-10)"
->>
->> In theory, w2k falls within that range.
-> 
-> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
-> 
-> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
-> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
-> patching the RSDT to point to it.
-> 
-> It's a hack, but it's the only place I see to make it "just work".  And
-> it could be extended nicely in the future.
-> 
-> All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.
+=D0=B2=D1=82, 25 =D0=B8=D1=8E=D0=BB=D1=8F 2017 =D0=B3. =D0=B2 19:10, Marcel=
+ Apfelbaum <marcel@redhat.com>:
 
-Completely untested code follows.  Machine type compatibility code 
-should not be necessary because new QEMU always starts with a new BIOS.
-
-Not sure I'll have much time for this in the next few days, so help
-is appreciated.
-
-Paolo
-
-QEMU:
-
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 36a6cc450e..ea750d54d9 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1573,33 +1573,6 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
-     g_array_free(tables->vmgenid, mfre);
- }
- 
--/* Build rsdt table */
--void
--build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
--           const char *oem_id, const char *oem_table_id)
--{
--    int i;
--    unsigned rsdt_entries_offset;
--    AcpiRsdtDescriptorRev1 *rsdt;
--    const unsigned table_data_len = (sizeof(uint32_t) * table_offsets->len);
--    const unsigned rsdt_entry_size = sizeof(rsdt->table_offset_entry[0]);
--    const size_t rsdt_len = sizeof(*rsdt) + table_data_len;
--
--    rsdt = acpi_data_push(table_data, rsdt_len);
--    rsdt_entries_offset = (char *)rsdt->table_offset_entry - table_data->data;
--    for (i = 0; i < table_offsets->len; ++i) {
--        uint32_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
--        uint32_t rsdt_entry_offset = rsdt_entries_offset + rsdt_entry_size * i;
--
--        /* rsdt->table_offset_entry to be filled by Guest linker */
--        bios_linker_loader_add_pointer(linker,
--            ACPI_BUILD_TABLE_FILE, rsdt_entry_offset, rsdt_entry_size,
--            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
--    }
--    build_header(linker, table_data,
--                 (void *)rsdt, "RSDT", rsdt_len, 1, oem_id, oem_table_id);
--}
--
- /* Build xsdt table */
- void
- build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6b7bade183..ad00f6affd 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2557,12 +2557,12 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
- }
- 
- static GArray *
--build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
-+build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
- {
-     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
--    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
--    unsigned rsdt_pa_offset =
--        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
-+    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-+    unsigned xsdt_pa_offset =
-+        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
- 
-     bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-                              true /* fseg memory */);
-@@ -2571,8 +2571,8 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
-     memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
-     /* Address to be filled by Guest linker */
-     bios_linker_loader_add_pointer(linker,
--        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
--        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
-+        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-+        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
- 
-     /* Checksum to be filled by Guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-@@ -2621,7 +2621,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     PCMachineState *pcms = PC_MACHINE(machine);
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     GArray *table_offsets;
--    unsigned facs, dsdt, rsdt, fadt;
-+    unsigned facs, dsdt, xsdt, fadt;
-     AcpiPmInfo pm;
-     AcpiMiscInfo misc;
-     AcpiMcfgInfo mcfg;
-@@ -2730,12 +2730,12 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     }
- 
-     /* RSDT is pointed to by RSDP */
--    rsdt = tables_blob->len;
--    build_rsdt(tables_blob, tables->linker, table_offsets,
-+    xsdt = tables_blob->len;
-+    build_xsdt(tables_blob, tables->linker, table_offsets,
-                slic_oem.id, slic_oem.table_id);
- 
-     /* RSDP is in FSEG memory, so allocate it separately */
--    build_rsdp(tables->rsdp, tables->linker, rsdt);
-+    build_rsdp(tables->rsdp, tables->linker, xsdt);
- 
-     /* We'll expose it all to Guest so we want to reduce
-      * chance of size changes.
+> On 25/07/2017 17:09, Alexander Bezzubikov wrote:
+> > 2017-07-25 16:53 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> >> On Tue, Jul 25, 2017 at 04:50:49PM +0300, Alexander Bezzubikov wrote:
+> >>> 2017-07-25 16:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> >>>> On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
+> >>>>> On 23/07/2017 15:22, Michael S. Tsirkin wrote:
+> >>>>>> On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov
+> wrote:
+> >>>>>>> To enable hotplugging of a newly created pcie-pci-bridge,
+> >>>>>>> we need to tell firmware (SeaBIOS in this case)
+> >>>>>>
+> >>>>>
+> >>>>> Hi Michael,
+> >>>>>
+> >>>>>> Presumably, EFI would need to support this too?
+> >>>>>>
+> >>>>>
+> >>>>> Sure, Eduardo added to CC, but he is in PTO now.
+> >>>>>
+> >>>>>>> to reserve
+> >>>>>>> additional buses for pcie-root-port, that allows us to
+> >>>>>>> hotplug pcie-pci-bridge into this root port.
+> >>>>>>> The number of buses to reserve is provided to the device via a
+> corresponding
+> >>>>>>> property, and to the firmware via new PCI capability (next patch)=
+.
+> >>>>>>> The property's default value is 1 as we want to hotplug at least =
+1
+> bridge.
+> >>>>>>
+> >>>>>> If so you should just teach firmware to allocate one bus #
+> >>>>>> unconditionally.
+> >>>>>>
+> >>>>>
+> >>>>> That would be a problem for the PCIe machines, since each PCIe
+> >>>>> devices is plugged in a different bus and we are already
+> >>>>> limited to 256 PCIe devices. Allocating an extra-bus always
+> >>>>> would really limit the PCIe devices we can use.
+> >>>>
+> >>>> One of the declared advantages of PCIe is easy support for multiple
+> roots.
+> >>>> We really should look at that IMHO so we do not need to pile up hack=
+s.
+> >>>>
+> >>>>>> But why would that be so? What's wrong with a device
+> >>>>>> directly in the root port?
+> >>>>>>
+> >>>>
+> >>>> To clarify, my point is we might be wasting bus numbers by reservati=
+on
+> >>>> since someone might just want to put pcie devices there.
+> >>>
+> >>> I think, changing default value to 0 can help us avoid this,
+> >>> as no bus reservation by default. If one's surely wants
+> >>> to hotplug pcie-pci-bridge into this root port in future,
+> >>> the property gives him such an opportunity.
+> >>> So, sure need pcie-pci-bridge hotplug -> creating a root port with
+> >>> bus_reserve > 0. Otherwise (and default) - just as now, no changes
+> >>> in bus topology.
+> >>
+> >> I guess 0 should mean "do not reserve any buses".  So I think we also
+> >> need a flag to just avoid the capability altogether.  Maybe -1?  *That=
+*
+> >> should be the default.
+> >
+> > -1 might be useful if any limit value 0 is legal, but is it?
+> > If not, we can set every field to 0 and
+> > this is a sign of avoiding capability since none legal
+> > values are provided.
+> >
+>
+> As Gerd suggested, this value is not a "delta" but the number
+> of buses to be reserved behind the bridge. If I got it right,
+> 0 is not a valid value, since the bridge by definition
+> has a list one bus behind.
 
 
-SeaBIOS:
-
->From 73b0facdb7349f5dbf24dc675647b68eeeec0ff4 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 25 Jul 2017 18:50:19 +0200
-Subject: [PATCH 1/2] seabios: build RSDT from XSDT
-
-Old operating systems would like to have a v1 FADT, but new
-operating systems would like to have v3.
-
-Since old operating systems do not know about XSDTs, the
-solution is to point the RSDT to a v1 FADT and the XSDT to a
-v3 FADT.
-
-But, OVMF is not able to do that and barfs when it sees the
-second FADT---plus really it's only BIOS operating systems
-such as win2k that complain.  So instead: 1) make QEMU provide
-an XSDT only; 2) build the RSDT and v1 FADT in SeaBIOS.
-
-This patch makes SeaBIOS build an RSDT out of an existing XSDT.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- src/fw/paravirt.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- src/std/acpi.h    | 11 +++++++++++
- 2 files changed, 55 insertions(+), 1 deletion(-)
-
-diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
-index 5b23d78..19a4abe 100644
---- a/src/fw/paravirt.c
-+++ b/src/fw/paravirt.c
-@@ -25,6 +25,7 @@
- #include "x86.h" // cpuid
- #include "xen.h" // xen_biostable_setup
- #include "stacks.h" // yield
-+#include "std/acpi.h"
- 
- // Amount of continuous ram under 4Gig
- u32 RamSize;
-@@ -147,6 +148,46 @@ static void msr_feature_control_setup(void)
-         wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
- }
- 
-+static void
-+build_compatibility_rsdt(void)
-+{
-+    if (RsdpAddr->rsdt_physical_address)
-+        return;
-+
-+    u64 xsdt_addr = RsdpAddr->xsdt_physical_address;
-+    if (xsdt_addr & ~0xffffffffULL)
-+        return;
-+
-+    struct xsdt_descriptor_rev1 *xsdt = (void*)(u32)xsdt_addr;
-+    void *end = (void*)xsdt + xsdt->length;
-+    struct rsdt_descriptor_rev1 *rsdt;
-+    int rsdt_size = offsetof(struct rsdt_descriptor_rev1, table_offset_entry[0]);
-+    int i;
-+    for (i=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
-+        u64 tbl_addr = xsdt->table_offset_entry[i];
-+        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
-+            continue;
-+        rsdt_size += 4;
-+    }
-+
-+    rsdt = malloc_high(rsdt_size);
-+    RsdpAddr->rsdt_physical_address = (u32)rsdt;
-+
-+    memcpy(rsdt, xsdt, sizeof(struct acpi_table_header));
-+    rsdt->signature = RSDT_SIGNATURE;
-+    rsdt->length = rsdt_size;
-+    rsdt->revision = 1;
-+    int j;
-+    for (i=j=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
-+        u64 tbl_addr = xsdt->table_offset_entry[i];
-+        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
-+            continue;
-+        rsdt->table_offset_entry[j++] = (u32)tbl_addr;
-+    }
-+
-+    rsdt->checksum -= checksum(rsdt, rsdt_size);
-+}
-+
- void
- qemu_platform_setup(void)
- {
-@@ -186,8 +227,10 @@ qemu_platform_setup(void)
- 
-         RsdpAddr = find_acpi_rsdp();
- 
--        if (RsdpAddr)
-+        if (RsdpAddr) {
-+            build_compatibility_rsdt();
-             return;
-+        }
- 
-         /* If present, loader should have installed an RSDP.
-          * Not installed? We might still be able to continue
-diff --git a/src/std/acpi.h b/src/std/acpi.h
-index c2ea707..caf5e7e 100644
---- a/src/std/acpi.h
-+++ b/src/std/acpi.h
-@@ -133,6 +133,17 @@ struct rsdt_descriptor_rev1
- } PACKED;
- 
- /*
-+ * ACPI 2.0 Root System Description Table (RSDT)
-+ */
-+#define XSDT_SIGNATURE 0x54445358 // RSDT
-+struct xsdt_descriptor_rev1
-+{
-+    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
-+    u64 table_offset_entry[0];  /* Array of pointers to other */
-+    /* ACPI tables */
-+} PACKED;
-+
-+/*
-  * ACPI 1.0 Firmware ACPI Control Structure (FACS)
-  */
- #define FACS_SIGNATURE 0x53434146 // FACS
--- 
-2.13.3
+Gerd's suggestion was to set min(cap_value, children_found). From such
+point of view 0 can be a valid value.
 
 
->From 46c7a296d27bd487cfd89a40973b1e61426dfbd0 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 25 Jul 2017 18:59:20 +0200
-Subject: [PATCH 2/2] seabios: create v1 FADT in compatibility RSDT
-
-This patch presents a v1 FADT inside the compatibility RSDT, so
-that old operating systems are not broken.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- src/fw/paravirt.c | 18 +++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
-index 19a4abe..a9b9e80 100644
---- a/src/fw/paravirt.c
-+++ b/src/fw/paravirt.c
-@@ -148,6 +148,18 @@ static void msr_feature_control_setup(void)
-         wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
- }
- 
-+static void*
-+build_rev1_fadt(struct fadt_descriptor_rev1 *fadt_v3)
-+{
-+    struct fadt_descriptor_rev1 *fadt_v1 = malloc_high(sizeof *fadt_v1);
-+
-+    memcpy(fadt_v1, fadt_v3, sizeof *fadt_v1);
-+    fadt_v1->length = sizeof *fadt_v1;
-+    fadt_v1->revision = 1;
-+    fadt_v1->checksum -= checksum(fadt_v1, fadt_v1->length);
-+    return fadt_v1;
-+}
-+
- static void
- build_compatibility_rsdt(void)
- {
-@@ -182,6 +194,12 @@ build_compatibility_rsdt(void)
-         u64 tbl_addr = xsdt->table_offset_entry[i];
-         if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
-             continue;
-+        struct acpi_table_header *tbl = (void*)(u32)tbl_addr;
-+        /* The RSDT should only have an ACPI 1.0 FADT according to
-+         * the spec.
-+         */
-+        if (tbl->signature == FACP_SIGNATURE && tbl->revision > 1)
-+            tbl_addr = (u32)build_rev1_fadt((void *)tbl);
-         rsdt->table_offset_entry[j++] = (u32)tbl_addr;
-     }
- 
--- 
-2.13.3
+>
+> Michael, would you be OK with that?
+>
+> Thanks,
+> Marcel
+>
+> >>
+> >>>>
+> >>>>> First, plugging a legacy PCI device into a PCIe Root Port
+> >>>>> looks strange at least, and it can;t be done on real HW anyway.
+> >>>>> (incompatible slots)
+> >>>>>
+> >>>>> Second (and more important), if we want 2 or more PCI
+> >>>>> devices we would loose both IO ports space and bus numbers.
+> >>>>>
+> >>>>>>
+> >>>>>>>
+> >>>>>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> >>>>>>> ---
+> >>>>>>>    hw/pci-bridge/pcie_root_port.c | 1 +
+> >>>>>>>    include/hw/pci/pcie_port.h     | 3 +++
+> >>>>>>>    2 files changed, 4 insertions(+)
+> >>>>>>>
+> >>>>>>> diff --git a/hw/pci-bridge/pcie_root_port.c
+> b/hw/pci-bridge/pcie_root_port.c
+> >>>>>>> index 4d588cb..b0e49e1 100644
+> >>>>>>> --- a/hw/pci-bridge/pcie_root_port.c
+> >>>>>>> +++ b/hw/pci-bridge/pcie_root_port.c
+> >>>>>>> @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+> >>>>>>>    static Property rp_props[] =3D {
+> >>>>>>>        DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> >>>>>>>                        QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> >>>>>>> +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+> >>>>>>>        DEFINE_PROP_END_OF_LIST()
+> >>>>>>>    };
+> >>>>>>> diff --git a/include/hw/pci/pcie_port.h
+> b/include/hw/pci/pcie_port.h
+> >>>>>>> index 1333266..1b2dd1f 100644
+> >>>>>>> --- a/include/hw/pci/pcie_port.h
+> >>>>>>> +++ b/include/hw/pci/pcie_port.h
+> >>>>>>> @@ -34,6 +34,9 @@ struct PCIEPort {
+> >>>>>>>        /* pci express switch port */
+> >>>>>>>        uint8_t     port;
+> >>>>>>> +
+> >>>>>>> +    /* additional buses to reserve on firmware init */
+> >>>>>>> +    uint8_t     bus_reserve;
+> >>>>>>>    };
+> >>>>>>>    void pcie_port_init_reg(PCIDevice *d);
+> >>>>>>
+> >>>>>> So here is a property and it does not do anything.
+> >>>>>> It makes it easier to work on series maybe, but review
+> >>>>>> is harder since we do not see what it does at all.
+> >>>>>> Please do not split up patches like this - you can maintain
+> >>>>>> it split up in your branch if you like and merge before sending.
+> >>>>>>
+> >>>>>
+> >>>>> Agreed, Alexandr please merge patches 4-5-6 for your next submissio=
+n.
+> >>>>>
+> >>>>> Thanks,
+> >>>>> Marcel
+> >>>>>
+> >>>>>
+> >>>>>>> --
+> >>>>>>> 2.7.4
+> >>>
+> >>>
+> >>>
+> >>> --
+> >>> Alexander Bezzubikov
+> >
+> >
+> >
+>
+> --
+Alexander Bezzubikov
