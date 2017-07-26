@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1daFOI-0006QV-TM
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 02:01:52 -0400
+	(envelope-from <wang.yi59@zte.com.cn>) id 1daFOI-0006QT-T3
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 02:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1daFOG-0006CR-4c
+	(envelope-from <wang.yi59@zte.com.cn>) id 1daFOF-0006CB-Rl
 	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 02:01:50 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:56031)
+Received: from out1.zte.com.cn ([202.103.147.172]:56032)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1daFOF-0006B7-Gd
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 02:01:48 -0400
+	(envelope-from <wang.yi59@zte.com.cn>) id 1daFOF-0006B6-GB
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 02:01:47 -0400
 From: Yi Wang <wang.yi59@zte.com.cn>
-Date: Wed, 26 Jul 2017 02:18:36 -0400
-Message-Id: <1501049917-4701-2-git-send-email-wang.yi59@zte.com.cn>
-In-Reply-To: <1501049917-4701-1-git-send-email-wang.yi59@zte.com.cn>
-References: <1501049917-4701-1-git-send-email-wang.yi59@zte.com.cn>
-Subject: [Qemu-devel]  [PATCH v2 1/2] hmp: dump ids including socket-id,
- core-id and so on for 'info registers'
+Date: Wed, 26 Jul 2017 02:18:35 -0400
+Message-Id: <1501049917-4701-1-git-send-email-wang.yi59@zte.com.cn>
+Subject: [Qemu-devel] [PATCH v2 0/2] hmp: support querying lapic through
+ apic-id for 'info lapic'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +25,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org
 Cc: wang.yi59@zte.com.cn, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
 
-This patch add output of CPUs' socket-id, core-id, thread-id and
-apic-id for 'info registers', which can be used for querying other
-hmp commands.
+This series add support querying local apic through apic-id for 'info
+lapic'.
+As cpu_index will not be used afterwards, so extend 'info registers'
+firstly to get apic-id through monitor commands.
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
----
- target/i386/helper.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+v1 -> v2:
+ * PATCH 01: Make the code simpler [Igor]
+ * PATCH 02: use cpu_by_arch_id() to obtain CPU [Eduardo]
 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index f63eb3d..a52f300 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -416,6 +416,14 @@ void x86_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     int eflags, i, nb;
-     char cc_op_name[32];
-     static const char *seg_name[6] = { "ES", "CS", "SS", "DS", "FS", "GS" };
-+    APICCommonState *s = APIC_COMMON(cpu->apic_state);
-+
-+    if (!s) {
-+        cpu_fprintf(f, "local apic state not available\n");
-+        return;
-+    }
-+    cpu_fprintf(f, "(socket-id:%d core-id:%d thread-id:%d apic-id:%d)\n",
-+            cpu->socket_id, cpu->core_id, cpu->thread_id, s->id);
- 
-     eflags = cpu_compute_eflags(env);
- #ifdef TARGET_X86_64
--- 
-1.8.3.1
+Yi Wang (2):
+  hmp: dump ids including socket-id, core-id and so on for 'info registers'
+  hmp: allow apic-id for "info lapic"
+
+ hmp-commands-info.hx  |  7 ++++---
+ include/qom/cpu.h     | 10 ++++++++++
+ qom/cpu.c             | 11 ++++++++---
+ target/i386/helper.c  |  8 ++++++++
+ target/i386/monitor.c | 10 +++++++++-
+ 5 files changed, 39 insertions(+), 7 deletions(-)
