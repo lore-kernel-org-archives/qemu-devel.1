@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daSDN-0003to-IA
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:43:26 -0400
+	(envelope-from <mst@redhat.com>) id 1daSYR-0003uL-AR
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 16:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daSDL-0000gk-Ev
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:43:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46516)
+	(envelope-from <mst@redhat.com>) id 1daSYO-0008EF-0n
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 16:05:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daSDL-0000gA-5L
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:43:23 -0400
-Date: Wed, 26 Jul 2017 22:43:09 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daSYN-0008CX-Oy
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 16:05:07 -0400
+Date: Wed, 26 Jul 2017 23:05:03 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170726215625-mutt-send-email-mst@kernel.org>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
+Message-ID: <20170726230055-mutt-send-email-mst@kernel.org>
+References: <20170726094235.14267-1-pbonzini@redhat.com>
+	<20170726094235.14267-2-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/6] hw/pci: introduce bridge-only
- vendor-specific capability to provide some hints to firmware
+In-Reply-To: <20170726094235.14267-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [seabios PATCH 1/2] seabios: build RSDT from XSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,132 +27,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kraxel@redhat.com, seabios@seabios.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: seabios@seabios.org, Kevin O'Connor <kevin@koconnor.net>, qemu-devel@nongnu.org, lersek@redhat.com, lists@philjordan.eu, imammedo@redhat.com, phil@philjordan.eu, programmingkidx@gmail.com, kraxel@redhat.com
 
-On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
-> On PCI init PCI bridges may need some
-> extra info about bus number to reserve, IO, memory and
-> prefetchable memory limits. QEMU can provide this
-> with special
-
-with a special
-
-> vendor-specific PCI capability.
+On Wed, Jul 26, 2017 at 11:42:34AM +0200, Paolo Bonzini wrote:
+> Old operating systems would like to have a rev1 (ACPI 1.0) FADT, but
+> new operating systems would like to have rev3 (ACPI 2.0).
 > 
-> Sizes of limits match ones from
-> PCI Type 1 Configuration Space Header,
-> number of buses to reserve occupies only 1 byte 
-> since it is the size of Subordinate Bus Number register.
+> Since old operating systems do not know about XSDTs, the
+> solution is to point the RSDT to a rev1 FADT and the XSDT to a
+> rev3 FADT.
 > 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> But, edk2 is not able to handle QEMU providing two FADTs and barfs when
+> it sees the second; edk2 subscribes to the view that the platform code
+> (meaning not only OVMF, but transitively QEMU's ACPI table builder)
+> should not handle such hacks; it's common edk2 code that should handle
+> FADT rev1 vs. rev3 and RSDT vs. XSDT.
+
+What exactly does it do wrt RSDT?
+
+
+> These patches make SeaBIOS follow the same model as edk2, the only
+> difference being how the two identify ACPI tables from the BIOS
+> linker/loader script.  For SeaBIOS, this task is actually much
+> simpler since it can just look into the RSDP: if QEMU only
+> provides an XSDT, SeaBIOS takes care of building the RSDT and
+> rev1 FADT to satisfy ACPI 1.0-compliant operating systems.
+> 
+> This part makes SeaBIOS build an RSDT out of an existing XSDT,
+> patching the RSDP to point to the RSDT.
+> 
+> Reviewed-by: Phil Dennis-Jordan <phil@philjordan.eu>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
->  include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
->  2 files changed, 45 insertions(+)
+>  src/fw/paravirt.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  src/std/acpi.h    | 11 +++++++++++
+>  2 files changed, 59 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> index 720119b..8ec6c2c 100644
-> --- a/hw/pci/pci_bridge.c
-> +++ b/hw/pci/pci_bridge.c
-> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->      br->bus_name = bus_name;
+> diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
+> index 5b23d78..927fd75 100644
+> --- a/src/fw/paravirt.c
+> +++ b/src/fw/paravirt.c
+> @@ -25,6 +25,7 @@
+>  #include "x86.h" // cpuid
+>  #include "xen.h" // xen_biostable_setup
+>  #include "stacks.h" // yield
+> +#include "std/acpi.h"
+>  
+>  // Amount of continuous ram under 4Gig
+>  u32 RamSize;
+> @@ -147,6 +148,50 @@ static void msr_feature_control_setup(void)
+>          wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
 >  }
 >  
-> +
-> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
-
-help? should be qemu_cap_init?
-
-> +                              uint8_t bus_reserve, uint32_t io_limit,
-> +                              uint16_t mem_limit, uint64_t pref_limit,
-> +                              Error **errp)
+> +static void
+> +build_compatibility_rsdt(void)
 > +{
-> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
-> +    PCIBridgeQemuCap cap;
-
-This leaks info to guest. You want to init all fields here:
-
-cap = {
- .len = ....
-};
-
+> +    if (RsdpAddr->rsdt_physical_address)
+> +        return;
 > +
-> +    cap.len = cap_len;
-> +    cap.bus_res = bus_reserve;
-> +    cap.io_lim = io_limit & 0xFF;
-> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
-> +    cap.mem_lim = mem_limit;
-> +    cap.pref_lim = pref_limit & 0xFFFF;
-> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
-
-Please use pci_set_word etc or cpu_to_leXX.
-
-I think it's easiest to replace struct with a set of macros then
-pci_set_word does the work for you.
-
-
+> +    u64 xsdt_addr = RsdpAddr->xsdt_physical_address;
+> +    if (xsdt_addr & ~0xffffffffULL)
+> +        return;
 > +
-> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
-> +                                    cap_offset, cap_len, errp);
-> +    if (offset < 0) {
-> +        return offset;
+> +    struct xsdt_descriptor_rev1 *xsdt = (void*)(u32)xsdt_addr;
+> +    void *end = (void*)xsdt + xsdt->length;
+> +    struct rsdt_descriptor_rev1 *rsdt;
+> +    int rsdt_size = offsetof(struct rsdt_descriptor_rev1, table_offset_entry[0]);
+> +    int i;
+> +    for (i=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
+> +        u64 tbl_addr = xsdt->table_offset_entry[i];
+> +        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
+> +            continue;
+> +        rsdt_size += 4;
 > +    }
 > +
-> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
-
-+2 is yacky. See how virtio does it:
-
-    memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
-           cap->cap_len - PCI_CAP_FLAGS);
-
-
-> +    return 0;
+> +    rsdt = malloc_high(rsdt_size);
+> +    RsdpAddr->rsdt_physical_address = (u32)rsdt;
+> +    RsdpAddr->checksum -= checksum(RsdpAddr,
+> +				   offsetof(struct rsdp_descriptor, length));
+> +    RsdpAddr->extended_checksum -= checksum(RsdpAddr,
+> +					    sizeof(struct rsdp_descriptor));
+> +
+> +    memcpy(rsdt, xsdt, sizeof(struct acpi_table_header));
+> +    rsdt->signature = RSDT_SIGNATURE;
+> +    rsdt->length = rsdt_size;
+> +    rsdt->revision = 1;
+> +    int j;
+> +    for (i=j=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
+> +        u64 tbl_addr = xsdt->table_offset_entry[i];
+> +        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
+> +            continue;
+> +        rsdt->table_offset_entry[j++] = (u32)tbl_addr;
+> +    }
+> +
+> +    rsdt->checksum -= checksum(rsdt, rsdt_size);
 > +}
 > +
->  static const TypeInfo pci_bridge_type_info = {
->      .name = TYPE_PCI_BRIDGE,
->      .parent = TYPE_PCI_DEVICE,
-> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-> index ff7cbaa..c9f642c 100644
-> --- a/include/hw/pci/pci_bridge.h
-> +++ b/include/hw/pci/pci_bridge.h
-> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->  #define  PCI_BRIDGE_CTL_DISCARD_STATUS	0x400	/* Discard timer status */
->  #define  PCI_BRIDGE_CTL_DISCARD_SERR	0x800	/* Discard timer SERR# enable */
+>  void
+>  qemu_platform_setup(void)
+>  {
+> @@ -186,8 +231,10 @@ qemu_platform_setup(void)
 >  
-> +typedef struct PCIBridgeQemuCap {
-> +    uint8_t id;     /* Standard PCI capability header field */
-> +    uint8_t next;   /* Standard PCI capability header field */
-> +    uint8_t len;    /* Standard PCI vendor-specific capability header field */
-> +    uint8_t bus_res;
-> +    uint32_t pref_lim_upper;
-
-Big endian? Ugh.
-
-> +    uint16_t pref_lim;
-> +    uint16_t mem_lim;
-
-I'd say we need 64 bit for memory.
-
-> +    uint16_t io_lim_upper;
-> +    uint8_t io_lim;
-> +    uint8_t padding;
-
-IMHO each type should have a special "don't care" flag
-that would mean "I don't know".
-
-
-> +} PCIBridgeQemuCap;
-
-You don't really need this struct in the header. And pls document all fields.
-
+>          RsdpAddr = find_acpi_rsdp();
+>  
+> -        if (RsdpAddr)
+> +        if (RsdpAddr) {
+> +            build_compatibility_rsdt();
+>              return;
+> +        }
+>  
+>          /* If present, loader should have installed an RSDP.
+>           * Not installed? We might still be able to continue
+> diff --git a/src/std/acpi.h b/src/std/acpi.h
+> index c2ea707..a77b53c 100644
+> --- a/src/std/acpi.h
+> +++ b/src/std/acpi.h
+> @@ -133,6 +133,17 @@ struct rsdt_descriptor_rev1
+>  } PACKED;
+>  
+>  /*
+> + * ACPI 2.0 Extended System Description Table (XSDT)
+> + */
+> +#define XSDT_SIGNATURE 0x54445358 // XSDT
+> +struct xsdt_descriptor_rev1
+> +{
+> +    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
+> +    u64 table_offset_entry[0];  /* Array of pointers to other */
+> +    /* ACPI tables */
+> +} PACKED;
 > +
-> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
-> +                              uint8_t bus_reserve, uint32_t io_limit,
-> +                              uint16_t mem_limit, uint64_t pref_limit,
-> +                              Error **errp);
-> +
->  #endif /* QEMU_PCI_BRIDGE_H */
+> +/*
+>   * ACPI 1.0 Firmware ACPI Control Structure (FACS)
+>   */
+>  #define FACS_SIGNATURE 0x53434146 // FACS
 > -- 
-> 2.7.4
+> 2.13.3
+> 
