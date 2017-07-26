@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daOjt-0006Am-FB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:00:46 -0400
+	(envelope-from <mst@redhat.com>) id 1daOkw-0000PD-Hs
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daOjp-0006en-8D
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:00:45 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36793)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daOjp-0006eb-0S
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:00:41 -0400
-Received: by mail-qk0-x244.google.com with SMTP id d136so15796036qkg.3
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 09:00:40 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170726150446.20381-1-otubo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7ff46b33-1b47-88ad-83e3-54030c12eaa0@amsat.org>
-Date: Wed, 26 Jul 2017 13:00:36 -0300
+	(envelope-from <mst@redhat.com>) id 1daOkr-00076a-Mo
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:01:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53488)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daOkr-00075g-D0
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:01:45 -0400
+Date: Wed, 26 Jul 2017 19:01:39 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170726185814-mutt-send-email-mst@kernel.org>
+References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170724111419.720aa168@nial.brq.redhat.com>
+	<20170724234849-mutt-send-email-mst@kernel.org>
+	<20170725104438.5eb90865@nial.brq.redhat.com>
+	<20170725161025-mutt-send-email-mst@kernel.org>
+	<20170726160543.1a66bf10@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170726150446.20381-1-otubo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
- calling without -kernel
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170726160543.1a66bf10@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
+ of vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +32,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 07/26/2017 12:04 PM, Eduardo Otubo wrote:
-> Starting qemu-system-unicore32 without the -kernel parameter results in
-> an assert() returns false and aborts qemu. This patch replaces it with a
-> proper error message followed by exit(1).
+On Wed, Jul 26, 2017 at 04:05:43PM +0200, Igor Mammedov wrote:
+> On Tue, 25 Jul 2017 22:47:18 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
-> ---
->   hw/unicore32/puv3.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+> > On Tue, Jul 25, 2017 at 10:44:38AM +0200, Igor Mammedov wrote:
+> > > On Mon, 24 Jul 2017 23:50:00 +0300
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:  
+> > > > > On Sun, 23 Jul 2017 20:46:11 +0800
+> > > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > > >     
+> > > > > > When a guest that has several hotplugged dimms is migrated, on
+> > > > > > destination it will fail to resume. Because regions on source
+> > > > > > are merged and on destination the order of realizing devices
+> > > > > > is different from on source with dimms, so when part of devices
+> > > > > > are realizd some region can not be merged.That may be more than
+> > > > > > vhost slot limit.
+> > > > > > 
+> > > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > > ---
+> > > > > >  hw/mem/pc-dimm.c        | 2 +-
+> > > > > >  include/sysemu/sysemu.h | 1 +
+> > > > > >  vl.c                    | 5 +++++
+> > > > > >  3 files changed, 7 insertions(+), 1 deletion(-)
+> > > > > > 
+> > > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > > index ea67b46..13f3db5 100644
+> > > > > > --- a/hw/mem/pc-dimm.c
+> > > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > > > >          goto out;
+> > > > > >      }
+> > > > > >  
+> > > > > > -    if (!vhost_has_free_slot()) {
+> > > > > > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
+> > > > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > > > >                                 " memory slots left");    
+> > > > > that doesn't fix issue,
+> > > > >    1st: number of used entries is changing after machine_init_done() is called
+> > > > >         as regions continue to mapped/unmapped during runtime    
+> > > > 
+> > > > But that's fine, we want hotplug to fail if we can not guarantee vhost
+> > > > will work.  
+> > > don't we want guarantee that vhost will work with dimm devices at startup
+> > > if it were requested on CLI or fail startup cleanly if it can't?  
+> > 
+> > Yes. And failure to start vhost will achieve this without need to much with
+> > DIMMs. The issue is only with DIMM hotplug when vhost is already running,
+> > specifically because notifiers have no way to report or handle errors.
+> > 
+> > > >   
+> > > > >    2nd: it brings regression and allows to start QEMU with number memory
+> > > > >         regions more than supported by backend, which combined with missing
+> > > > >         error handling in vhost will lead to qemu crashes or obscure bugs in
+> > > > >         guest breaking vhost enabled drivers.
+> > > > >         i.e. patch undoes what were fixed by
+> > > > >         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html    
+> > > > 
+> > > > Why does it? The issue you fixed there is hotplug, and that means
+> > > > pc_dimm_memory_plug called after machine done.  
+> > > I wasn't able to crash fc24 guest with current qemu/rhen7 kernel,
+> > > it fallbacks back to virtio and switches off vhost.   
+> > 
+> > I think vhostforce should make vhost fail and not fall back,
+> > but that is another bug.
+> currently vhostforce is broken, qemu continues to happily run with this patch
+> and without patch it fails to start up so I'd just NACK this patch
+> on this behavioral change and ask to fix both issues in the same series.
+
+Please do not send nacks. They are not really helpful.
+
+Ack is like +1. You save some space since all you are saying is "all's
+well". But if there's an issue you want to explain what it is 99% of the
+time. So nack does not save any space and just pushes contributors away.
+Especially if it's in all caps, that's just against netiquette.
+
 > 
-> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-> index e9d1a60b6f..ff62efb4df 100644
-> --- a/hw/unicore32/puv3.c
-> +++ b/hw/unicore32/puv3.c
-> @@ -92,7 +92,10 @@ static void puv3_load_kernel(const char *kernel_filename)
->       if (kernel_filename == NULL && qtest_enabled()) {
->           return;
->       }
-> -    assert(kernel_filename != NULL);
-> +    if (kernel_filename == NULL) {
-> +        error_report("kernel parameter cannot be empty");
-> +        exit(1);
+> While looking at vhost memmap, I've also noticed that option rom
+> "pc.rom" maps/remaps it self multiple times and it affects
+> number of vhost mem map slots. I suspect that vhost is not interested
+> in accessing pc.rom occupied memory and to hide it from vhost
+> we need to make it RO. Also looking at roms initialization
+> I've noticed that roms are typically mapped as RO if PCI is enabled.
+> Taking in account that vhost is available only when PCI is enabled
+> could be following patch be acceptable:
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index e3fcd51..de459e2 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1449,6 +1449,9 @@ void pc_memory_init(PCMachineState *pcms,
+>      option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+>      memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+>                             &error_fatal);
+> +    if (pcmc->pci_enabled) {
+> +        memory_region_set_readonly(option_rom_mr, true);
 > +    }
-
-This seems a temporary kludge for 2.10 but not the correct long-term fix.
-
-As commented in another thread [1] where I got a bit discomfited, it'd 
-be nice if during the 2.11 schedule the industry provide some help to 
-clean/unify the loader.c code, ideally remove all duplicated code not 
-arch-specific and use hw/core/loader*.
-
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06760.html
-
->   
->       /* only zImage format supported */
->       size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
+>      vmstate_register_ram_global(option_rom_mr);
+>      memory_region_add_subregion_overlap(rom_memory,
+>                                          PC_ROM_MIN_VGA,
 > 
+> 
+> it will keep ROM as RW on isa machine but RO for the rest PCI based.
+
+Makes sense.
+
+> > 
+> > >   
+> > > >   
+> > > > >     
+> > > > > >          goto out;
+> > > > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > > > > index b213696..48228ad 100644
+> > > > > > --- a/include/sysemu/sysemu.h
+> > > > > > +++ b/include/sysemu/sysemu.h
+> > > > > > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+> > > > > >  void qemu_add_exit_notifier(Notifier *notify);
+> > > > > >  void qemu_remove_exit_notifier(Notifier *notify);
+> > > > > >  
+> > > > > > +bool qemu_is_machine_init_done(void);
+> > > > > >  void qemu_add_machine_init_done_notifier(Notifier *notify);
+> > > > > >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+> > > > > >  
+> > > > > > diff --git a/vl.c b/vl.c
+> > > > > > index fb6b2ef..43aee22 100644
+> > > > > > --- a/vl.c
+> > > > > > +++ b/vl.c
+> > > > > > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
+> > > > > >  
+> > > > > >  static bool machine_init_done;
+> > > > > >  
+> > > > > > +bool qemu_is_machine_init_done(void)
+> > > > > > +{
+> > > > > > +    return machine_init_done;
+> > > > > > +}
+> > > > > > +
+> > > > > >  void qemu_add_machine_init_done_notifier(Notifier *notify)
+> > > > > >  {
+> > > > > >      notifier_list_add(&machine_init_done_notifiers, notify);    
