@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daD3T-0004TL-M3
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:32:12 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1daD49-0004qm-2N
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daD3O-0008Gf-QF
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:32:11 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:33974)
+	(envelope-from <aik@ozlabs.ru>) id 1daD45-00006r-4z
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:32:53 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35199)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daD3O-0008GV-LT
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:32:06 -0400
-Received: by mail-ua0-x243.google.com with SMTP id k43so9211912uaf.1
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:32:06 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170725011530.17958-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a13bfee5-f38a-86f4-d107-3b1e9fcc70d9@amsat.org>
-Date: Wed, 26 Jul 2017 00:32:01 -0300
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1daD44-00006Q-SO
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:32:49 -0400
+Received: by mail-pf0-x244.google.com with SMTP id q85so14347983pfq.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:32:48 -0700 (PDT)
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100549536.27487.11322702271540744350.stgit@bahia>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <f278e478-83a7-0842-5cfb-f0582aec3b5d@ozlabs.ru>
+Date: Wed, 26 Jul 2017 13:32:41 +1000
 MIME-Version: 1.0
-In-Reply-To: <20170725011530.17958-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
- extension on windows
+In-Reply-To: <150100549536.27487.11322702271540744350.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 01/26] spapr: move
+ spapr_create_phb() to core machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sjubran@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Daniel Rempel <daniel@daynix.com>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-As noticed by Michael Roth the ./configure entry for qemu-ga is missing 
-the $(EXESUF) on purpose (see fafcaf1d).
-
-Patch dropped for 2.10
-
-On 07/24/2017 10:15 PM, Philippe Mathieu-Daudé wrote:
-> Reported-by: Sameeh Jubran <sjubran@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 26/07/17 03:58, Greg Kurz wrote:
+> This function is only used when creating the default PHB. Let's rename
+> it and move it to the core machine code for clarity.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
-> original report from Sameeh Jubran:
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.html
+>  hw/ppc/spapr.c              |   13 ++++++++++++-
+>  hw/ppc/spapr_pci.c          |   11 -----------
+>  include/hw/pci-host/spapr.h |    2 --
+>  3 files changed, 12 insertions(+), 14 deletions(-)
 > 
->   Makefile  | 2 +-
->   configure | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2a3e53d5d58c..53969315ac24 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2142,6 +2142,17 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+>      g_free(type);
+>  }
+>  
+> +static PCIHostState *spapr_create_default_phb(sPAPRMachineState *spapr)
+
+
+Nit: you could get rid of the *spapr here.
+
+Anyway,
+
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+
+
+> +{
+> +    DeviceState *dev;
+> +
+> +    dev = qdev_create(NULL, TYPE_SPAPR_PCI_HOST_BRIDGE);
+> +    qdev_prop_set_uint32(dev, "index", 0);
+> +    qdev_init_nofail(dev);
+> +
+> +    return PCI_HOST_BRIDGE(dev);
+> +}
+> +
+>  /* pSeries LPAR / sPAPR hardware init */
+>  static void ppc_spapr_init(MachineState *machine)
+>  {
+> @@ -2374,7 +2385,7 @@ static void ppc_spapr_init(MachineState *machine)
+>      /* Set up PCI */
+>      spapr_pci_rtas_init();
+>  
+> -    phb = spapr_create_phb(spapr, 0);
+> +    phb = spapr_create_default_phb(spapr);
+>  
+>      for (i = 0; i < nb_nics; i++) {
+>          NICInfo *nd = &nd_table[i];
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index d84abf1070a0..70a99a032267 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1982,17 +1982,6 @@ static const TypeInfo spapr_phb_info = {
+>      }
+>  };
+>  
+> -PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index)
+> -{
+> -    DeviceState *dev;
+> -
+> -    dev = qdev_create(NULL, TYPE_SPAPR_PCI_HOST_BRIDGE);
+> -    qdev_prop_set_uint32(dev, "index", index);
+> -    qdev_init_nofail(dev);
+> -
+> -    return PCI_HOST_BRIDGE(dev);
+> -}
+> -
+>  typedef struct sPAPRFDT {
+>      void *fdt;
+>      int node_off;
+> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> index 38470b2f0e5c..5a4e9686d562 100644
+> --- a/include/hw/pci-host/spapr.h
+> +++ b/include/hw/pci-host/spapr.h
+> @@ -111,8 +111,6 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAPRPHBState *phb, int pin)
+>      return xics_get_qirq(XICS_FABRIC(spapr), phb->lsi_table[pin].irq);
+>  }
+>  
+> -PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
+> -
+>  int spapr_populate_pci_dt(sPAPRPHBState *phb,
+>                            uint32_t xics_phandle,
+>                            void *fdt);
 > 
-> diff --git a/Makefile b/Makefile
-> index ef721480eb..5f18243d05 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -490,7 +490,7 @@ clean:
->   	rm -f qemu-options.def
->   	rm -f *.msi
->   	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f -exec rm {} +
-> -	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.pod *~ */*~
-> +	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
->   	rm -f fsdev/*.pod
->   	rm -f qemu-img-cmds.h
->   	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
-> diff --git a/configure b/configure
-> index 48d4d7a2a7..f8b1d014d7 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5073,7 +5073,7 @@ fi
->   
->   if [ "$guest_agent" != "no" ]; then
->     if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" -o "$mingw32" = "yes" ] ; then
-> -      tools="qemu-ga $tools"
-> +      tools="qemu-ga\$(EXESUF) $tools"
->         guest_agent=yes
->     elif [ "$guest_agent" != yes ]; then
->         guest_agent=no
 > 
+
+
+-- 
+Alexey
