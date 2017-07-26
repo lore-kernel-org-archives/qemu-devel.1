@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1daKSh-0006KL-Di
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:26:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1daKTW-0006iK-UI
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1daKSb-0002C1-Bu
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:26:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1daKSb-0002Ah-2L
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:26:37 -0400
-Date: Wed, 26 Jul 2017 12:26:33 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170726112633.GE18489@stefanha-x1.localdomain>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-	<20170725131931.GC23343@stefanha-x1.localdomain>
-	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1daKTS-0002WZ-RV
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:27:34 -0400
+Received: from mail-wr0-f182.google.com ([209.85.128.182]:37183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daKTS-0002WC-Ki
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:27:30 -0400
+Received: by mail-wr0-f182.google.com with SMTP id 33so73765037wrz.4
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:27:30 -0700 (PDT)
+References: <20170717212446.15268-1-rth@twiddle.net>
+	<20170717212446.15268-2-rth@twiddle.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a7b583a7-2043-6b64-7d83-ba00255553dc@redhat.com>
+Date: Wed, 26 Jul 2017 13:27:26 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VdOwlNaOFKGAtAAV"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+In-Reply-To: <20170717212446.15268-2-rth@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v2 1/8] target/s390x: Implement CSST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
+On 17/07/2017 23:24, Richard Henderson wrote:
+> +        case 4:
+> +            if (parallel_cpus) {
+> +#ifdef CONFIG_ATOMIC128
+> +                TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> +                Int128 sv = int128_make128(svl, svh);
+> +                helper_atomic_sto_be_mmu(env, a2, sv, oi, ra);
+> +#else
+> +                /* Note that we asserted !parallel_cpus above.  */
+> +                g_assert_not_reached();
+> +#endif
+> +            } else {
+> +                cpu_stq_data_ra(env, a2 + 0, svh, ra);
+> +                cpu_stq_data_ra(env, a2 + 8, svl, ra);
+> +            }
+> +        default:
+> +            g_assert_not_reached();
 
---VdOwlNaOFKGAtAAV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Coverity complains about a missing "break".
 
-On Tue, Jul 25, 2017 at 02:30:06PM +0100, Peter Maydell wrote:
-> On 25 July 2017 at 14:19, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > Instead I suggest adding a trace backend generates calls to registered
-> > "callback" functions:
-> >
-> >   $ cat >my-instrumentation.c
-> >   #include "trace/control.h"
-> >
-> >   static void my_cpu_in(unsigned int addr, char size, unsigned int val)
-> >   {
-> >       printf("my_cpu_in\n");
-> >   }
-> >
-> >   static void my_init(void)
-> >   {
-> >       trace_register_event_callback("cpu_in", my_cpu_in);
-> >       trace_enable_events("cpu_in");
-> >   }
-> >   trace_init(my_init);
-> >
-> >   $ ./configure --enable-trace-backends=3Dlog,callback && make -j4
-> >
-> > This is still a clean interface that allows instrumentation code to be
-> > kept separate from the trace event call sites.
-> >
-> > The instrumentation code gets compiled into QEMU, but that shouldn't be
-> > a huge burden since QEMU's Makefiles only recompile changed source
-> > files (only the first build is slow).
->=20
-> Is your proposal that my-instrumentation.c gets compiled into
-> QEMU at this point? That doesn't seem like a great idea to
-> me, because it means you can only use this tracing if you
-> build QEMU yourself, and distros won't enable it and so
-> lots of our users won't have convenient access to it.
-> I'd much rather see a cleanly designed plugin interface
-> (which we should be able to implement in a manner that doesn't
-> let the plugin monkey patch arbitrary parts of QEMU beyond
-> what can already be achieved via LD_PRELOAD).
-
-Trace events are not a stable public API.  They change between releases
-and need to be interpreted together with the QEMU source code.
-
-It doesn't make sense to be doing instrumentation inside the QEMU
-process but not want to compile QEMU.
-
-What is the use case?
-
-Stefan
-
---VdOwlNaOFKGAtAAV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZeHxpAAoJEJykq7OBq3PIqaMH/35zPaVWfPb7onVe8UJ2EqnO
-Y9NIVvs2RkydgeUuDPHAWzWxrAgUfgD9k6qXJnHWF1kb6y2n8Mlpk59+XymkahCA
-BZPXP6ZofZIMMxrAqs3JwH+3KBpjFjyoz8FUN+xtZnZZZpuhaWsI4SCNzsLZp97Y
-C5Yrk0g/G9ca3BeJBKhGLBVF4N2IDPSerfNV+2k1U0mVkrs36zbTOzjyyn5mEbe1
-Tfi7ZeR7q3+n/ce/KvVjz6A7J+zl6eq8BdZQFiMJU557QTvUiwex3OgwKRHNgfng
-pr0Fzt2wXMMMz+7WuBrWnzDCvsOksXJ6s88mHFmO9XqR9H9cjoynBXxa0nNwQiM=
-=Ay2l
------END PGP SIGNATURE-----
-
---VdOwlNaOFKGAtAAV--
+Paolo
