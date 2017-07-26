@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1daQqw-0004fs-O9
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:16:11 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1daQy6-0006le-AE
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:23:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1daQqu-0007Aq-2o
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:16:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59709)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1daQqt-0007AQ-Sp
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:16:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1daQqq-0007em-Ok
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 18:16:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8AB462E80CF
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 18:16:04 +0000 (UTC)
+	(envelope-from <el13635@mail.ntua.gr>) id 1daQy5-0003Ql-Ck
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:23:34 -0400
+Date: Wed, 26 Jul 2017 21:23:20 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170726182320.cnqx3y64c7nmhvp3@postretch>
+References: <20170726141924.qaqclberxsup5cdm@postretch>
+	<20170726151221.GA3600@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Jul 2017 18:00:58 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1096714 <1096714@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130107012337.1165.80927.malonedeb@gac.canonical.com>
-Message-Id: <150109205863.31580.16835536325744423471.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1096714] Re: qemu 1.3.0: usb devices shouldn't
- have same vendor/product ID and same serial
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3zl2gdrxd5gom5kf"
+Content-Disposition: inline
+In-Reply-To: <20170726151221.GA3600@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC] block-insert-node and block-job-delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-Hi Sven,
-  Hmm you do have a point - I wonder if this is fixed on windows by commit =
-5319dc7 from Gerd in November 2013 that added 'msos-desc' compat properties=
-; but I see your point about having the same IDs
 
-(ccing in Gerd)
+--3zl2gdrxd5gom5kf
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Wed, Jul 26, 2017 at 04:12:21PM +0100, Stefan Hajnoczi wrote:
+>On Wed, Jul 26, 2017 at 05:19:24PM +0300, Manos Pitsidianakis wrote:
+>> This proposal follows a discussion we had with Kevin and Stefan on filter
+>> node management.
+>>
+>> With block filter drivers arises a need to configure filter nodes on run=
+time
+>> with QMP on live graphs. A problem with doing live graph modifications is
+>> that some block jobs modify the graph when they are done and don't opera=
+te
+>> under any synchronisation, resulting in a race condition if we try to in=
+sert
+>> a filter node in the place of an existing edge.
+>
+>But maybe you are thinking about higher level race conditions between
+>QMP commands.  Can you give an example of the race?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1096714
+Exactly, synchronisation between the QMP/user actions. Here's an=20
+example, correct me if I'm wrong:
 
-Title:
-  qemu 1.3.0: usb devices shouldn't have same vendor/product ID and same
-  serial
+User issues a block-commit to this tree to commit A onto B:
+    BB -> A -> B
 
-Status in QEMU:
-  New
+This inserts the dummy mirror node at the top since this is a mirror job=20
+(active commit)
+    BB -> dummy -> A -> B
 
-Bug description:
-  Boot Windows XP with
-  ./qemu-system-i386 -device pci-ohci -device usb-tablet
-  and then with
-  ./qemu-system-i386 -device pci-ohci -device usb-kbd
+User wants to add a filter node F below the BB. First we create the=20
+node:
+    BB -> dummy -> A -> B
+       F /
 
-  and you will notice, that the usb keyboard is not detected. In fact,
-  Windows XP detects the usb tablet and loads the driver for the tablet
-  instead of the driver for the keyboard.
+Commit finishes before we do block-insert-node, dummy and A is removed=20
+=66rom the BB's chain, mirror_exit calls bdrv_replace_node()
 
-  The problem seems to be, that vendor and product ID and even the
-  seriel of both the usb tablet and the usb keyboard are the same as an
-  lsusb reveiles. Hence, Windows XP doesn't detect when you replace the
-  tablet by a keyboard and vice versa. I didn't check other USB devices,
-  but it seems a bad idea to me to have devices with the same
-  vendor/product Id. I'm not aware, whether it is sufficient to change
-  the seriel numbers of the devices.
+    BB ------------> B
+                F -> /
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1096714/+subscriptions
+Now inserting F under BB will error since dummy does not exist any more.
+
+The proposal doesn't guard against the following:
+User issues a block-commit to this tree to commit B onto C:
+    BB -> A -> B -> C
+
+The dummy node (commit's top bs is A):
+    BB -> A -> dummy -> B -> C
+
+blockdev-add of a filter we wish to eventually be between A and C:
+    BB -> A -> dummy -> B -> C
+             F/
+
+if commit finishes before we issue block-insert-node (commit_complete()
+calls bdrv_set_backing_hd() which only touches A)
+    BB -> A --------------> C
+           F -> dummy -> B /
+    resulting in error when issuing block-insert-node,
+
+else if we set the job to manual-delete and insert F:
+    BB -> A -> F -> dummy -> B -> C
+deleting the job will result in F being lost since the job's top bs=20
+wasn't updated.
+
+
+--3zl2gdrxd5gom5kf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAll43hgACgkQc2J8L2kN
+9xBD0hAApO6KgI6LSF+LRSCC72WQIrTq2r9BmhHzyxeZ2EGFmvdoBUhkp1eluytu
+qPWC/duhrUXOQsGMR99ZWqFngp5kofsVRBFlO5OyxXrX4Vai+oOJ612YGnwwQa0D
+qaQqyGDzWlDIOxYq55SwjHVrbxCxouIqzeW3ICrVgPXOHztsg0PNHFsJ7Qkdgr1R
+xxCXIzRhfCwcYc8XhXclKLv9MnjMwTsR5rUAejz1/n96cIT55TjDS/y47Mtlxk67
+o0Abs5y72ISYvVNSCRDE5sgzhPorMsIrUL3y+EbTIsF/KkPFIRJjDe0btYei58AF
+mPlP5CxtGBHvc4Xpj/ppzCKTWhYI1u6IceWcxRXwNLStTVtXf1lHZG9shrLMBLJ4
+XsDMPnZzTR0Wjr/ZVXOcxzGJt2Mw10BWZ0ykfNh6JBdHmiQGbnBNQ2GBXtxu+Uea
+IYOL92bOo01c9EwVv86X5FSV5fKd19zcXDQRpKwxKE6B587gM8CB7BuCKP+r8PYt
+fRNWQevTxeY6tZ+G1H2a6dEb8GR+zIiTMijBnvJbbFeS0HsRzROQB15ydgwkeq1Z
+e8Vaj3rxToZy3dHhgNKxvIGBmdQoXlN3Z9EPxC56B0oXblCfuOs9IGvU5zb+nyab
+GwT4JAyC2XH/wcHHdutNM3j1fhBqcuIlyYlaTpEqk2b6d7unGgU=
+=7Uw7
+-----END PGP SIGNATURE-----
+
+--3zl2gdrxd5gom5kf--
