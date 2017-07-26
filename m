@@ -1,55 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1daPRT-0005EP-VB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:45:49 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1daPS1-0005Vr-EV
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1daPRO-0007uw-Vy
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:45:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36457)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1daPRO-0007ue-Gs
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:45:42 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6QGhtHJ038295
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:45:40 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxshh9pkd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:45:40 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 26 Jul 2017 17:45:38 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
-	[9.149.105.62])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v6QGjZax20513040
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 16:45:35 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 73ADEAE04D
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:41:55 +0100 (BST)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5BD4EAE045
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:41:55 +0100 (BST)
-Received: from oc3836556865.ibm.com (unknown [9.152.224.141])
-	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:41:55 +0100 (BST)
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170725224442.13383-2-pasic@linux.vnet.ibm.com>
-	<20170726033121.GP7483@bjsdjshi@linux.vnet.ibm.com>
-	<af44463e-9a90-d769-32d7-53e43852cb89@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 26 Jul 2017 18:45:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <af44463e-9a90-d769-32d7-53e43852cb89@linux.vnet.ibm.com>
+	(envelope-from <programmingkidx@gmail.com>) id 1daPRw-0008Ds-NX
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:46:21 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:35701)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1daPRw-0008Ci-JP
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:46:16 -0400
+Received: by mail-it0-x241.google.com with SMTP id v127so11843138itd.2
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 09:46:16 -0700 (PDT)
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <7067811a-825b-adbb-78a9-5d06083f50ec@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/css: check ccw address validity
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA_BRPRAmA5cJEtsY8zn0K358peX5PzvD05vZys1swo0EQ@mail.gmail.com>
+Date: Wed, 26 Jul 2017 12:46:13 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AF369030-9AE0-4C46-A416-7B92359C1851@gmail.com>
+References: <65ED9743-B53C-4E6A-866F-C883650914CE@gmail.com>
+	<91ba54de-b2eb-f3a9-eb0f-a697b7698149@amsat.org>
+	<D06632B7-4405-47C8-BCF6-3C90274923E4@gmail.com>
+	<CAFEAcA_BRPRAmA5cJEtsY8zn0K358peX5PzvD05vZys1swo0EQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] hw/core/loader-fit.c:105:41: error: expected
+ expression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -58,152 +33,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
 
+> On Jul 26, 2017, at 6:24 AM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> On 26 July 2017 at 06:15, Programmingkid <programmingkidx@gmail.com> =
+wrote:
+>>=20
+>>> On Jul 26, 2017, at 12:13 AM, Philippe Mathieu-Daud=C3=A9 =
+<f4bug@amsat.org> wrote:
+>>>=20
+>>> Hi John,
+>>>=20
+>>> On 07/25/2017 07:55 PM, Programmingkid wrote:
+>>>> While compiling the mips64el-softmmu target I encountered these =
+errors:
+>>>>  CC      hw/display/g364fb.o
+>>>> hw/core/loader-fit.c:105:41: error: expected expression
+>>>>        *addr =3D fdt32_to_cpu(*(fdt32_t *)prop);
+>>>>                                        ^
+>>>> hw/core/loader-fit.c:105:32: error: use of undeclared identifier =
+'fdt32_t'
+>>>=20
+>>> It seems you are missing the libfdt headers, so indeed you found =
+bug.
+>=20
+> Configure requires libfdt to exist to enable mips64el-softmmu,
+> so something is going wrong with our configure test compared
+> to how QEMU itself is being built.
+>=20
+>> That appears to help make things move past the loader-fit.c file. =
+Here are the new errors:
+>>=20
+>>  CC      hw/core/loader-fit.o
+>>  CC      hw/dma/rc4030.o
+>>  CC      hw/ide/via.o
+>> hw/core/loader-fit.c:105:41: error: expected expression
+>>        *addr =3D fdt32_to_cpu(*(fdt32_t *)prop);
+>>                                        ^
+>=20
+> ...this is still failing on loader-fit.c in the same way.
+>=20
+>>> And also the ./configure output, I'm interested by:
+>>>=20
+>>> "fdt support       no=E2=80=9D
+>>=20
+>> Actually it was "fdt support       yes=E2=80=9D.
+>=20
+> Configure thinks the fdt headers are available=E2=80=A6
 
-On 07/26/2017 02:05 PM, Halil Pasic wrote:
-> 
-> 
-> On 07/26/2017 05:31 AM, Dong Jia Shi wrote:
->> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-26 00:44:41 +0200]:
->>
->>> According to the PoP channel command words (CCW) must be doubleword
->>> aligned and 31 bit addressable for format 1 and 24 bit addressable for
->>> format 0 CCWs.
->>>
->>> If the channel subsystem encounters ccw address which does not satisfy
->>> this alignment requirement a program-check condition is recognised.
->>>
->>> The situation with 31 bit addressable is a bit more complicated: both the
->>> ORB and a format 1 CCW TIC hold the address of the (rest of) the channel
->>                                               ^^^^^^^^^^^^^^^^^^^^
->> Meant to be (?):
->> of the (rest of the)
-> 
-> Yes.
-> 
->>
->> Maybe just saying:
->> the address of a channel probram
->>
-> 
-> "the rest of the channel program" was supposed to refer to the TIC scenario,
-> and "the channel program" to ORB.
-> 
->>> program, that is the address of the next CCW in a word, and the PoP
->>> mandates that bit 0 of that word shall be zero -- or a program-check
->>> condition is to be recognized -- and does not belong to the field holding
->>> the ccw address.
->>>
->>> Since in code the corresponding fields span across the whole word (unlike
->>> in PoP where these are defined as 31 bit wide) we can check this by
->>> applying a mask. The 24 addressable case isn't affecting TIC because the
->>> address is composed of a halfword and a byte portion (no additional zero
->>> bit requirements) and just slightly complicates the ORB case where also
->>> bits 1-7 need to be zero.
->>>
->>> Let's make our CSS implementation follow the AR more closely.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> ---
->>> Note: Checking for 31 bit addressable ain't strictly necessary:
->>> According to the AR the all zero fields of the ORB may or may not be
->>> checked during the execution of SSCH. We do check the corresponding
->>> single bit field of the ORB and respond to it accordingly. Using
->>> the same mask for TIC and for ORB does not hurt.
->>> ---
->>>  hw/s390x/css.c | 18 ++++++++++++++++++
->>>  1 file changed, 18 insertions(+)
->>>
->>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->>> index 6a42b95cee..d17e21b7af 100644
->>> --- a/hw/s390x/css.c
->>> +++ b/hw/s390x/css.c
->>> @@ -24,6 +24,9 @@
->>>  #include "hw/s390x/s390_flic.h"
->>>  #include "hw/s390x/s390-virtio-ccw.h"
->>>
->>> +/* CCWs are doubleword aligned and addressable by 31 bit */
->>> +#define CCW1_ADDR_MASK 0x80000007
->>> +
->> Move this hunk to ioinst.h?
->>
->>>  typedef struct CrwContainer {
->>>      CRW crw;
->>>      QTAILQ_ENTRY(CrwContainer) sibling;
->>> @@ -885,6 +888,10 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->>>              ret = -EINVAL;
->>>              break;
->>>          }
->>> +        if (ccw.cda & CCW1_ADDR_MASK) {
->>> +            ret = -EINVAL;
->>> +            break;
->>> +        }
->>>          sch->channel_prog = ccw.cda;
->>>          ret = -EAGAIN;
->>>          break;
->>> @@ -946,6 +953,17 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
->>>          suspend_allowed = true;
->>>      }
->>>      sch->last_cmd_valid = false;
->>> +    if (sch->channel_prog & (CCW1_ADDR_MASK |
->>> +                             sch->ccw_fmt_1 ? 0 : 0xff000000)) {
->> I have problem in recognizing the operator precedence here:
->>     (CCW1_ADDR_MASK | sch->ccw_fmt_1 ? 0 : 0xff000000)
->>
->> Bitwise '|' has higher precedence than '?:', so the above equals to:
->>     (CCW1_ADDR_MASK | sch->ccw_fmt_1) ? 0 : 0xff000000
->>
->> So you will always get a '0', no?
->>
-> 
-> I'm afraid you are right. Good catch! This was supposed to be
-> (CCW1_ADDR_MASK | (sch->ccw_fmt_1 ? 0 : 0xff000000))
-> 
-> 
->>> +            /* generate channel program check */
->>> +            s->ctrl &= ~SCSW_ACTL_START_PEND;
->>> +            s->cstat = SCSW_CSTAT_PROG_CHECK;
->>> +            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
->>> +            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
->>> +                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
->>> +            s->cpa = sch->channel_prog + 8;
->>> +            return;
->>> +    }
->> I think you could let css_interpret_ccw() do the sanity check on its
->> @ccw_addr parameter when (sch->last_cmd_valid == false), to reuse the
->> code of generating channel program check.
->>
-> 
-> I'm working on factoring out the code manipulating SCSW (among others). If we
-> do that this will look nicer. What you propose is certainly viable, althoug
-> maybe little less straight forward.
-> 
-> Yet another option would be to use a label and jump into the loop (AFAIR that
-> would be also valid).
-> 
-> Let us see what is Connie's opinion.
-> 
+They appear to be available. The dtc/libfdt folder does have the files =
+QEMU uses.=20
 
-After re-examining the PoP I'm inclined to say we have to check this on every
-iteration because of how "main-storage location is unavailable" is defined in
-this context: the definition depends on the ccw format. There is nothing about
-this in the ccw chaining section of the pop but it can be found in the
-I/O interrupts chapter.
+>=20
+>> ./configure --target-list=3Dmips64el-softmmu
+>> Install prefix    /usr/local
+>> BIOS directory    /usr/local/share/qemu
+>> binary directory  /usr/local/bin
+>> library directory /usr/local/lib
+>> module directory  /usr/local/lib/qemu
+>> libexec directory /usr/local/libexec
+>> include directory /usr/local/include
+>> config directory  /usr/local/etc
+>> local state directory   /usr/local/var
+>> Manual directory  /usr/local/share/man
+>> ELF interp prefix /usr/gnemul/qemu-%M
+>> Source path       =
+/Users/john/Documents/Development/Projects/Qemu/qemu-git
+>> C compiler        cc
+>> Host C compiler   cc
+>> C++ compiler      c++
+>> Objective-C compiler clang
+>> ARFLAGS           rv
+>> CFLAGS            -O2 -g
+>> QEMU_CFLAGS       -I/usr/local/Cellar/pixman/0.34.0/include/pixman-1 =
+-I$(SRC_PATH)/dtc/libfdt -D_REENTRANT =
+-I/usr/local/Cellar/glib/2.46.2/include
+>=20
+> ...and it's put our local copy of libfdt on the include path.
+>=20
+> The fdt32_t type that the compiler is complaining
+> about ought to be defined in the header in
+> dtc/libfdt/libfdt_env.h.
 
-I think I will have to redo this patch :/
+The fdt32_t type is not there. Here is the full libfdt_env.h file:
 
-Regards,
-Halil
+#ifndef _LIBFDT_ENV_H
+#define _LIBFDT_ENV_H
 
-> 
->>>      do {
->>>          ret = css_interpret_ccw(sch, sch->channel_prog, suspend_allowed);
->>>          switch (ret) {
->>> -- 
->>> 2.11.2
->>>
->>
-> 
-> 
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+#define _B(n)	((unsigned long long)((uint8_t *)&x)[n])
+static inline uint32_t fdt32_to_cpu(uint32_t x)
+{
+	return (_B(0) << 24) | (_B(1) << 16) | (_B(2) << 8) | _B(3);
+}
+#define cpu_to_fdt32(x) fdt32_to_cpu(x)
+
+static inline uint64_t fdt64_to_cpu(uint64_t x)
+{
+	return (_B(0) << 56) | (_B(1) << 48) | (_B(2) << 40) | (_B(3) << =
+32)
+		| (_B(4) << 24) | (_B(5) << 16) | (_B(6) << 8) | _B(7);
+}
+#define cpu_to_fdt64(x) fdt64_to_cpu(x)
+#undef _B
+
+#endif /* _LIBFDT_ENV_H */
+
+
+> I wonder if you have an old copy of that submodule;
+> if so then "git submodule update" ought to fix it.
+
+I=E2=80=99m not sure how to obtain the version of libfdt. I did see a =
+file called version.lds.
+At the top of this file is this text: "LIBFDT_1.2 {"
+So maybe I am using version 1.2. Perhaps the configure test should =
+declare a variable
+of the fdt32_t type in the test code.
+
+After doing a git submodule update qemu-system-mips64el compiled =
+successfully. Thank you.=
