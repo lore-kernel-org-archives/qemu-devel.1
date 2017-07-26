@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1daNWh-0000Tg-DH
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:43:04 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1daNWr-0000by-Qd
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1daNWe-0006IR-8M
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:43:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23247)
+	(envelope-from <ldoktor@redhat.com>) id 1daNWo-0006PR-M5
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:43:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1daNWe-0006Hw-2N
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:43:00 -0400
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1daNWo-0006Oj-H0
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:43:10 -0400
 From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Wed, 26 Jul 2017 16:42:20 +0200
-Message-Id: <20170726144226.6913-5-ldoktor@redhat.com>
+Date: Wed, 26 Jul 2017 16:42:21 +0200
+Message-Id: <20170726144226.6913-6-ldoktor@redhat.com>
 In-Reply-To: <20170726144226.6913-1-ldoktor@redhat.com>
 References: <20170726144226.6913-1-ldoktor@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 04/10] qemu.py: Simplify QMP key-conversion
+Subject: [Qemu-devel] [PATCH v4 05/10] qemu.py: Use custom exceptions rather
+ than Exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-The QMP key conversion consist of '_'s to be replaced with '-'s, which
-can easily be done by a single `str.replace` method which is faster and
-does not require `string` module import.
+The naked Exception should not be widely used. It makes sense to be a
+bit more specific and use better-suited custom exceptions. As a benefit
+we can store the full reply in the exception in case someone needs it
+when catching the exception.
 
 Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qemu.py | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ scripts/qemu.py | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 7e95c25..5948e19 100644
+index 5948e19..2bd522f 100644
 --- a/scripts/qemu.py
 +++ b/scripts/qemu.py
-@@ -13,7 +13,6 @@
- #
+@@ -19,6 +19,19 @@ import subprocess
+ import qmp.qmp
 =20
- import errno
--import string
- import os
- import sys
- import subprocess
-@@ -180,14 +179,12 @@ class QEMUMachine(object):
-             self._load_io_log()
-             self._post_shutdown()
 =20
--    underscore_to_dash =3D string.maketrans('_', '-')
--
-     def qmp(self, cmd, conv_keys=3DTrue, **args):
-         '''Invoke a QMP command and return the result dict'''
-         qmp_args =3D dict()
-         for key, value in args.iteritems():
-             if conv_keys:
--                qmp_args[key.translate(self.underscore_to_dash)] =3D val=
-ue
-+                qmp_args[key.replace('_', '-')] =3D value
-             else:
-                 qmp_args[key] =3D value
++class MonitorResponseError(qmp.qmp.QMPError):
++    '''
++    Represents erroneous QMP monitor reply
++    '''
++    def __init__(self, reply):
++        try:
++            desc =3D reply["error"]["desc"]
++        except KeyError:
++            desc =3D reply
++        super(MonitorResponseError, self).__init__(desc)
++        self.reply =3D reply
++
++
+ class QEMUMachine(object):
+     '''A QEMU VM'''
 =20
+@@ -197,9 +210,9 @@ class QEMUMachine(object):
+         '''
+         reply =3D self.qmp(cmd, conv_keys, **args)
+         if reply is None:
+-            raise Exception("Monitor is closed")
++            raise qmp.qmp.QMPError("Monitor is closed")
+         if "error" in reply:
+-            raise Exception(reply["error"]["desc"])
++            raise MonitorResponseError(reply)
+         return reply["return"]
+=20
+     def get_qmp_event(self, wait=3DFalse):
 --=20
 2.9.4
