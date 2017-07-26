@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daHMU-00081e-Di
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:08:07 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daHSl-0001Qb-TU
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daHMQ-0003o2-Dx
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:08:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47158)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daHMQ-0003nX-4y
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:08:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29C49356F3
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 08:08:01 +0000 (UTC)
-Date: Wed, 26 Jul 2017 09:07:54 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170726080754.GB28914@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170725141041.1195-1-berrange@redhat.com>
-	<be2523ce-7505-b3dd-d359-e91ac25f3cc4@redhat.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daHSk-0007Ic-Uc
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:14:35 -0400
+Received: from [59.151.112.132] (port=27895 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daHSk-0007Ht-Hy
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:14:34 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Wed, 26 Jul 2017 16:13:35 +0800
+Message-ID: <6d339059d168f3a9d89f89e2125db1131b4f3023.1501052660.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <be2523ce-7505-b3dd-d359-e91ac25f3cc4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-options: document existance of
- versioned machine types
+In-Reply-To: <cover.1501052660.git.maozy.fnst@cn.fujitsu.com>
+References: <cover.1501052660.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 4/4] net/rocker: Fix the unusual macro name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,63 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, jiri@resnulli.us, armbru@redhat.com, f4bug@amsat.org
 
-On Tue, Jul 25, 2017 at 01:46:23PM -0400, John Snow wrote:
-> 
-> 
-> On 07/25/2017 10:10 AM, Daniel P. Berrange wrote:
-> > The -machine docs did not explain what the versioned machine
-> > types are for, nor that they'll be maintained across
-> > releases.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >   qemu-options.hx | 15 ++++++++++++++-
-> >   1 file changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 746b5fa75d..9f6e2adfff 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -49,7 +49,20 @@ STEXI
-> >   @item -machine [type=]@var{name}[,prop=@var{value}[,...]]
-> >   @findex -machine
-> >   Select the emulated machine by @var{name}. Use @code{-machine help} to list
-> > -available machines. Supported machine properties are:
-> > +available machines.
-> > +
-> > +For architectures which aim to support live migration compatibility
-> > +across releases, each release will introduce a new versioned machine
-> > +type. For example, the 2.8.0 release introduced machine types
-> > +``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
-> > +
-> > +To allow live migration of guests from QEMU version 2.8.0, to QEMU
-> > +version 2.9.0, the 2.9.0 version must support the ``pc-i440fx-2.8''
-> > +and ``pc-q35-2.8'' machines too. To allow users live migrating VMs
-> > +to skip multiple intermediate releases when upgrading, new releases
-> > +of QEMU will support machine types from many previous versions.
-> > +
-> > +Supported machine properties are:
-> >   @table @option
-> >   @item accel=@var{accels1}[:@var{accels2}[:...]]
-> >   This is used to enable an accelerator. Depending on the target architecture,
-> > 
-> 
-> Seems like an improvement to me, but do we have any formal policy on how
-> long we support said machine types? The new wording prompts that question.
+Cc: jasowang@redhat.com
+Cc: jiri@resnulli.us
+Cc: armbru@redhat.com
+Cc: f4bug@amsat.org
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/net/rocker/rocker.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-I wasn't going to mention that in this patch, to avoid delay on getting it
-merged. I was going to send a further patch that makes it explicit that we
-will never delete machine types for as long as any active QEMU contributor
-has need for them in downstream version they maintain
-
-> Reviewed-by: John Snow <jsnow@redhat.com>
-
-Regards,
-Daniel
+diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+index bb38cba..9273473 100644
+--- a/hw/net/rocker/rocker.c
++++ b/hw/net/rocker/rocker.c
+@@ -69,10 +69,10 @@ struct rocker {
+     QLIST_ENTRY(rocker) next;
+ };
+ 
+-#define ROCKER "rocker"
++#define TYPE_ROCKER "rocker"
+ 
+-#define to_rocker(obj) \
+-    OBJECT_CHECK(Rocker, (obj), ROCKER)
++#define ROCKER(obj) \
++    OBJECT_CHECK(Rocker, (obj), TYPE_ROCKER)
+ 
+ static QLIST_HEAD(, rocker) rockers;
+ 
+@@ -1285,7 +1285,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
+ 
+ static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+ {
+-    Rocker *r = to_rocker(dev);
++    Rocker *r = ROCKER(dev);
+     const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+     const MACAddr dflt = { .a = { 0x52, 0x54, 0x00, 0x12, 0x35, 0x01 } };
+     static int sw_index;
+@@ -1331,7 +1331,7 @@ static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+     /* validate switch properties */
+ 
+     if (!r->name) {
+-        r->name = g_strdup(ROCKER);
++        r->name = g_strdup(TYPE_ROCKER);
+     }
+ 
+     if (rocker_find(r->name)) {
+@@ -1427,7 +1427,7 @@ err_world_type_by_name:
+ 
+ static void pci_rocker_uninit(PCIDevice *dev)
+ {
+-    Rocker *r = to_rocker(dev);
++    Rocker *r = ROCKER(dev);
+     int i;
+ 
+     QLIST_REMOVE(r, next);
+@@ -1460,7 +1460,7 @@ static void pci_rocker_uninit(PCIDevice *dev)
+ 
+ static void rocker_reset(DeviceState *dev)
+ {
+-    Rocker *r = to_rocker(dev);
++    Rocker *r = ROCKER(dev);
+     int i;
+ 
+     for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+@@ -1498,7 +1498,7 @@ static Property rocker_properties[] = {
+ };
+ 
+ static const VMStateDescription rocker_vmsd = {
+-    .name = ROCKER,
++    .name = TYPE_ROCKER,
+     .unmigratable = 1,
+ };
+ 
+@@ -1521,7 +1521,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo rocker_info = {
+-    .name          = ROCKER,
++    .name          = TYPE_ROCKER,
+     .parent        = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(Rocker),
+     .class_init    = rocker_class_init,
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.9.4
