@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1daD4V-000543-Bg
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:33:16 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1daD8O-0006pR-S9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1daD4R-0000Ff-Em
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:33:15 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:36601)
+	(envelope-from <aik@ozlabs.ru>) id 1daD8K-0002Ou-7j
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:37:16 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38735)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1daD4R-0000Ep-8g
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:33:11 -0400
-Received: by mail-pg0-x243.google.com with SMTP id y129so16121368pgy.3
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:33:11 -0700 (PDT)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1daD8K-0002OR-0x
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:37:12 -0400
+Received: by mail-pf0-x241.google.com with SMTP id c23so14372044pfe.5
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:37:11 -0700 (PDT)
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100550805.27487.16069660631488548584.stgit@bahia>
+	<150100552078.27487.390170136970607382.stgit@bahia>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <a33ca4ee-9f73-c1d0-1348-970e628dae3b@ozlabs.ru>
-Date: Wed, 26 Jul 2017 13:33:04 +1000
+Message-ID: <506fd8f5-15e1-8b24-a942-f59fa8f52312@ozlabs.ru>
+Date: Wed, 26 Jul 2017 13:37:03 +1000
 MIME-Version: 1.0
-In-Reply-To: <150100550805.27487.16069660631488548584.stgit@bahia>
+In-Reply-To: <150100552078.27487.390170136970607382.stgit@bahia>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 02/26] spapr_pci: use
- memory_region_add_subregion() with DMA windows
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 03/26] spapr_iommu: use
+ g_strdup_printf() instead of snprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +35,67 @@ To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
 On 26/07/17 03:58, Greg Kurz wrote:
-> Passing a null priority to memory_region_add_subregion_overlap() is
-> strictly equivalent to calling memory_region_add_subregion().
+> Passing a stack allocated buffer of arbitrary length to snprintf()
+> without checking the return value can cause the resultant strings
+> to be silently truncated.
+
+The strings it is touching cannot be silently truncated as
+"tce-iommu-XXXXXXXX" are shorter than 32 chars.
+
+
 > 
 > Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
 > ---
->  hw/ppc/spapr_pci.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/ppc/spapr_iommu.c |   13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 70a99a032267..3fe7f3145467 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1752,8 +1752,8 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
->                         i, sphb->dtbusname);
->              return;
->          }
-> -        memory_region_add_subregion_overlap(&sphb->iommu_root, 0,
-> -                                            spapr_tce_get_iommu(tcet), 0);
-> +        memory_region_add_subregion(&sphb->iommu_root, 0,
-> +                                    spapr_tce_get_iommu(tcet));
->      }
+> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> index e614621a8317..740d42608b61 100644
+> --- a/hw/ppc/spapr_iommu.c
+> +++ b/hw/ppc/spapr_iommu.c
+> @@ -252,17 +252,19 @@ static int spapr_tce_table_realize(DeviceState *dev)
+>  {
+>      sPAPRTCETable *tcet = SPAPR_TCE_TABLE(dev);
+>      Object *tcetobj = OBJECT(tcet);
+> -    char tmp[32];
+> +    gchar *tmp;
 >  
->      sphb->msi = g_hash_table_new_full(g_int_hash, g_int_equal, g_free, g_free);
+>      tcet->fd = -1;
+>      tcet->need_vfio = false;
+> -    snprintf(tmp, sizeof(tmp), "tce-root-%x", tcet->liobn);
+> +    tmp = g_strdup_printf("tce-root-%x", tcet->liobn);
+>      memory_region_init(&tcet->root, tcetobj, tmp, UINT64_MAX);
+> +    g_free(tmp);
+>  
+> -    snprintf(tmp, sizeof(tmp), "tce-iommu-%x", tcet->liobn);
+> +    tmp = g_strdup_printf("tce-iommu-%x", tcet->liobn);
+>      memory_region_init_iommu(&tcet->iommu, sizeof(tcet->iommu),
+>                               TYPE_SPAPR_IOMMU_MEMORY_REGION,
+>                               tcetobj, tmp, 0);
+> +    g_free(tmp);
+>  
+>      QLIST_INSERT_HEAD(&spapr_tce_tables, tcet, list);
+>  
+> @@ -307,7 +309,7 @@ void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bool need_vfio)
+>  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn)
+>  {
+>      sPAPRTCETable *tcet;
+> -    char tmp[32];
+> +    gchar *tmp;
+>  
+>      if (spapr_tce_find_by_liobn(liobn)) {
+>          error_report("Attempted to create TCE table with duplicate"
+> @@ -318,8 +320,9 @@ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn)
+>      tcet = SPAPR_TCE_TABLE(object_new(TYPE_SPAPR_TCE_TABLE));
+>      tcet->liobn = liobn;
+>  
+> -    snprintf(tmp, sizeof(tmp), "tce-table-%x", liobn);
+> +    tmp = g_strdup_printf("tce-table-%x", liobn);
+>      object_property_add_child(OBJECT(owner), tmp, OBJECT(tcet), NULL);
+> +    g_free(tmp);
+>  
+>      object_property_set_bool(OBJECT(tcet), true, "realized", NULL);
+>  
 > 
 > 
 
