@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daOc7-0003ZI-3Z
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:52:44 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daOjt-0006Am-FB
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daOc4-0001M7-JF
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:52:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1daOc4-0001Lo-D8
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:52:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 181F2C06C9D2
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:52:39 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daOjp-0006en-8D
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:00:45 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daOjp-0006eb-0S
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:00:41 -0400
+Received: by mail-qk0-x244.google.com with SMTP id d136so15796036qkg.3
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 09:00:40 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <20170726150446.20381-1-otubo@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b550f6ee-f1e3-6f4f-5315-0dbcc2f7ca2e@redhat.com>
-Date: Wed, 26 Jul 2017 17:52:35 +0200
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7ff46b33-1b47-88ad-83e3-54030c12eaa0@amsat.org>
+Date: Wed, 26 Jul 2017 13:00:36 -0300
 MIME-Version: 1.0
 In-Reply-To: <20170726150446.20381-1-otubo@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
@@ -35,34 +36,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 26.07.2017 17:04, Eduardo Otubo wrote:
+On 07/26/2017 12:04 PM, Eduardo Otubo wrote:
 > Starting qemu-system-unicore32 without the -kernel parameter results in
 > an assert() returns false and aborts qemu. This patch replaces it with a
 > proper error message followed by exit(1).
 > 
 > Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 > ---
->  hw/unicore32/puv3.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>   hw/unicore32/puv3.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 > 
 > diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
 > index e9d1a60b6f..ff62efb4df 100644
 > --- a/hw/unicore32/puv3.c
 > +++ b/hw/unicore32/puv3.c
 > @@ -92,7 +92,10 @@ static void puv3_load_kernel(const char *kernel_filename)
->      if (kernel_filename == NULL && qtest_enabled()) {
->          return;
->      }
+>       if (kernel_filename == NULL && qtest_enabled()) {
+>           return;
+>       }
 > -    assert(kernel_filename != NULL);
 > +    if (kernel_filename == NULL) {
 > +        error_report("kernel parameter cannot be empty");
 > +        exit(1);
 > +    }
->  
->      /* only zImage format supported */
->      size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
 
-That fixes the "crash", indeed.
+This seems a temporary kludge for 2.10 but not the correct long-term fix.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+As commented in another thread [1] where I got a bit discomfited, it'd 
+be nice if during the 2.11 schedule the industry provide some help to 
+clean/unify the loader.c code, ideally remove all duplicated code not 
+arch-specific and use hw/core/loader*.
+
+[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06760.html
+
+>   
+>       /* only zImage format supported */
+>       size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
+> 
