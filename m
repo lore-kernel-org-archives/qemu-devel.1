@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daIxC-0005Px-L8
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:50:10 -0400
+	(envelope-from <dmitry@daynix.com>) id 1daIyI-00064F-VO
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daIxB-0001lt-Ld
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:50:06 -0400
-Date: Wed, 26 Jul 2017 10:49:51 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170726094951.GC28914@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170721034730.25612-1-crosa@redhat.com>
-	<20170721034730.25612-4-crosa@redhat.com>
-	<ddf57b6c-42b2-0ec1-7d53-71d5266727fe@linux.vnet.ibm.com>
-	<20170725154546.GR23343@stefanha-x1.localdomain>
-	<20170725154854.GS26394@redhat.com>
-	<7343a904-6f31-b8b1-c721-267c66e4cb75@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7343a904-6f31-b8b1-c721-267c66e4cb75@linux.vnet.ibm.com>
+	(envelope-from <dmitry@daynix.com>) id 1daIyE-0002h1-L0
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:51:15 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35328)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1daIyE-0002gH-8S
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:51:10 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id c184so73554193wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 02:51:10 -0700 (PDT)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Message-Id: <5CB0C39F-09B4-465B-BAB5-05A0DF07A4FC@daynix.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Wed, 26 Jul 2017 12:51:06 +0300
+In-Reply-To: <20170724182751.18261-11-f4bug@amsat.org>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-11-f4bug@amsat.org>
+Content-Type: text/plain;
+	charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] qemu-iotests: require
- CONFIG_LINUX_AIO for test 087
+Subject: Re: [Qemu-devel] [PATCH for 2.10 10/35] net/eth: fix incorrect
+ check of iov_to_buf() return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jing Liu <liujbjl@linux.vnet.ibm.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>, Jason Wang <jasowang@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, qemu-trivial@nongnu.org
 
-On Wed, Jul 26, 2017 at 04:55:39PM +0800, Jing Liu wrote:
+
+> On 24 Jul 2017, at 21:27 PM, Philippe Mathieu-Daud=C3=A9 =
+<f4bug@amsat.org> wrote:
 >=20
+> So we have sizeof(struct in6_address) !=3D sizeof(uintptr_t)
+> and Clang > Coverity on this, see 4555ca6816c :)
 >=20
-> On 2017/7/25 =E4=B8=8B=E5=8D=8811:48, Daniel P. Berrange wrote:
-> > On Tue, Jul 25, 2017 at 04:45:46PM +0100, Stefan Hajnoczi wrote:
-> > > On Mon, Jul 24, 2017 at 02:44:13PM +0800, Jing Liu wrote:
-> > > > On 2017/7/21 =E4=B8=8A=E5=8D=8811:47, Cleber Rosa wrote:
-> > > > > One of the "sub-"tests of test 087 requires CONFIG_LINUX_AIO.
-> > > > >=20
-> > > > > As a PoC/RFC, this goes the easy route and skips the test as a =
-whole
-> > > > > when that feature is missing.  Other approaches include splitti=
-ng
-> > > > > the test and adding extra filtering.
-> > > > >=20
-> > > > > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > > > > ---
-> > > > >    tests/qemu-iotests/087 | 1 +
-> > > > >    1 file changed, 1 insertion(+)
-> > > > >=20
-> > > > > diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
-> > > > > index f8e4903..a2fb7de 100755
-> > > > > --- a/tests/qemu-iotests/087
-> > > > > +++ b/tests/qemu-iotests/087
-> > > > > @@ -34,6 +34,7 @@ status=3D1	# failure is the default!
-> > > > >    _supported_fmt qcow2
-> > > > >    _supported_proto file
-> > > > >    _supported_os Linux
-> > > > > +_require_feature CONFIG_LINUX_AIO
-> > > > I tested that CONFIG_NETTLE_KDF is also a necessary for 087.
-> > > >=20
-> > > > +_require_feature CONFIG_NETTLE_KDF
-> > > Are you sure?  Looks like either nettle or gcrypt is needed:
-> > Correct, it works with either.
-> Ah, because I just found out nettle which related to KDF.
-> why can not find out gcrypt.h in qemu?
-> How to compile config_gcrypt_kdf into qemu?
+> net/eth.c:426:30: warning: The code calls sizeof() on a pointer type. =
+This can produce an unexpected result
+>        return bytes_read =3D=3D sizeof(dst_addr);
+>                             ^     ~~~~~~~~~~
+> net/eth.c:475:34: warning: The code calls sizeof() on a pointer type. =
+This can produce an unexpected result
+>            return bytes_read =3D=3D sizeof(src_addr);
+>                                 ^     ~~~~~~~~~~
+>=20
+> Reported-by: Clang Static Analyzer
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> net/eth.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/net/eth.c b/net/eth.c
+> index 5b9ba26a56..ae5d881aae 100644
+> --- a/net/eth.c
+> +++ b/net/eth.c
+> @@ -423,7 +423,7 @@ _eth_get_rss_ex_dst_addr(const struct iovec *pkt, =
+int pkt_frags,
+>                                 rthdr_offset + sizeof(*ext_hdr),
+>                                 dst_addr, sizeof(*dst_addr));
+>=20
+> -        return bytes_read =3D=3D sizeof(dst_addr);
+> +        return bytes_read =3D=3D sizeof(*dst_addr);
+>     }
+>=20
+>     return false;
+> @@ -472,7 +472,7 @@ _eth_get_rss_ex_src_addr(const struct iovec *pkt, =
+int pkt_frags,
+>                                     opt_offset + sizeof(opthdr),
+>                                     src_addr, sizeof(*src_addr));
+>=20
+> -            return bytes_read =3D=3D sizeof(src_addr);
+> +            return bytes_read =3D=3D sizeof(*src_addr);
+>         }
+>=20
 
-QEMU picks either nettle or libgcrypt automatically, dependant on which
-of these gnutls is linked to.
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 
-You can force override this via  --disable-nettle --enable-gcrypt
-(or vica-verca), for sake of testing, but you shouldn't do that
-for production builds.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>         opt_offset +=3D optlen;
+> --=20
+> 2.13.3
+>=20
