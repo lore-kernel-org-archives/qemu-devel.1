@@ -1,40 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daCZr-0007PA-CU
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:01:36 -0400
+	(envelope-from <flukshun@gmail.com>) id 1daCZy-0007Sk-3Y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daCZn-0001W3-GI
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:01:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43125
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1daCZn-0001Vl-Ak
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:01:31 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6Q2xF58048579
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 23:01:29 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bxcab8nyb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 23:01:29 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 25 Jul 2017 23:01:29 -0400
-Date: Wed, 26 Jul 2017 11:01:25 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
+	(envelope-from <flukshun@gmail.com>) id 1daCZu-0001Yz-5u
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:01:42 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1daCZu-0001Yo-00
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:01:38 -0400
+Received: by mail-oi0-x241.google.com with SMTP id q70so8208298oic.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:01:37 -0700 (PDT)
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170725224442.13383-3-pasic@linux.vnet.ibm.com>
-Message-Id: <20170726030125.GO7483@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
- for TIC
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <150103777491.26979.16844695290515425301@loki>
+References: <20170725011530.17958-1-f4bug@amsat.org>
+	<150102382734.26979.483898024984598924@loki>
+	<cb21f5d1-18be-51a4-5e51-e429ab4b1b46@amsat.org>
+	<150103762159.26979.13316299204767598566@loki>
+	<150103777491.26979.16844695290515425301@loki>
+Message-ID: <150103809017.26979.10722238241902089649@loki>
+Date: Tue, 25 Jul 2017 22:01:30 -0500
+Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
+ extension on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,50 +34,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Sameeh Jubran <sjubran@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-Hello Halil,
+Quoting Michael Roth (2017-07-25 21:56:14)
+> Quoting Michael Roth (2017-07-25 21:53:41)
+> > Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-25 20:45:31)
+> > > Hi Michael,
+> > > =
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-26 00:44:42 +0200]:
+> > > On 07/25/2017 08:03 PM, Michael Roth wrote:
+> > > > Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-24 20:15:30)
+> > > >> Reported-by: Sameeh Jubran <sjubran@redhat.com>
+> > > >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > >> ---
+> > > >> original report from Sameeh Jubran:
+> > > >> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.h=
+tml
+> > > > =
 
-> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
-> contain zeros.  Bits 0-3 are already covered by cmd_code validity
-> checking, and bit 32 is covered by the CCW address checking.
-> 
-> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
-> check for the absence of certain flags.  Let's fix this.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  hw/s390x/css.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index d17e21b7af..1f04ce4a1b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->              ret = -EINVAL;
->              break;
->          }
-> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
-> +        if (ccw.flags || ccw.count) {
-> +            /* We have already sanitized these if fmt 0. */
-ccw0 does not have the same restrictions as ccw1. We don't sanitize
-these for ccw0.
+> > > > AFAICT the issue discussed in the context of that patch is simply t=
+hat
+> > > > the qemu-ga.exe file isn't deleted as part of `make clean`, which d=
+oes
+> > > > seem to be an issue.
+> > > > =
 
-(This comment is still here. Did I misunderstand things? :)
+> > > > But qemu.ga.exe is created just fine as part of `make qemu-ga`, at =
+least
+> > > > as of:
+> > > > =
 
->              ret = -EINVAL;
->              break;
->          }
-> -- 
-> 2.11.2
-> 
+> > > >    fafcaf1d build: qemu-ga: add 'qemu-ga' build target for w32
+> > > > =
 
-With the comment removed:
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > > =
 
--- 
-Dong Jia Shi
+> > > Yes, on w32 if "make ASDF" invokes the linker, it will create ASDF.ex=
+e.
+> > > =
+
+> > > > The 'qemu-ga' target is actually an intermediate target which, on w=
+32,
+> > > > creates the MSI package (if configured) as well as qemu-ga.exe.
+> > > > =
+
+> > > >>
+> > > >>   Makefile  | 2 +-
+> > > >>   configure | 2 +-
+> > > >>   2 files changed, 2 insertions(+), 2 deletions(-)
+> > > >>
+> > > >> diff --git a/Makefile b/Makefile
+> > > >> index ef721480eb..5f18243d05 100644
+> > > >> --- a/Makefile
+> > > >> +++ b/Makefile
+> > > >> @@ -490,7 +490,7 @@ clean:
+> > > >>          rm -f qemu-options.def
+> > > >>          rm -f *.msi
+> > > >>          find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -=
+o -name '*.[oda]' \) -type f -exec rm {} +
+> > > >> -       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TA=
+GS cscope.* *.pod *~ */*~
+> > > >> +       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscop=
+e.* *.pod *~ */*~
+> > > =
+
+> > > On win32, this patch add qemu-ga.exe instead of qemu-ga in $TOOLS, so =
+
+> > > when the 'clean' target is executed it removes qemu-ga.exe (Sameeh =
+
+> > =
+
+> > Ok, that makes more sense, but it's not what the commit msg implies.
+> > =
+
+> > > Jubran report). Before this patch the $TOOLS looks like:
+> > > "qemu-img.exe qemu-io.exe qemu-nbd.exe ivshmem-client.exe =
+
+> > > ivshmem-server.exe qemu-ga fsdev/virtfs-proxy-helper.exe"
+> > =
+
+> > That change was done explicitly via fafcaf1d so that `make qemu-ga` and
+> > `make` without --disable-tools specified to configure will generate the
+> > MSI package when the user configures it. So, unlike the other $TOOLS
+> > targets, the qemu-ga "distributables" encompass more than just the .exe
+> > on w32, so we use the "qemu-ga" target instead of "qemu-ga.exe" directl=
+y.
+> > =
+
+> > Reverting that change to coax `make clean` into cleaning up qemu-ga.exe
+> > means that `make` no longer builds the qemu-ga-*.msi when the user
+> > configures it, which is a regression.
+> > =
+
+> > > The only executables which doesn't match %.exe is qemu-ga, so the =
+
+> > > 'clean' target remove all .exe _but_ qemu-ga.exe.
+> > =
+
+> > As with Sameeh's original patch, the qemu-ga target would already
+> > require special handling to deal with qemu-ga-*.msi file. We should
+> > similarly just cleanup qemu-ga.exe as a special case instead of
+> > modifying $TOOLS, since that brings about unecessary side-effects
+> > described above.
+> > =
+
+> > As a workaround to the issue you/Peter pointed out with Sameeh's patch
+> > (nuking the entire source tree for posix builds where $EXESUF =3D=3D ""=
+), I
+> > proposed we just do:
+> > =
+
+> >   make clean:
+> >     ...
+> >   ifneq($EXESUF,)
+> >     rm -f *$(EXESUF)
+> >   endif
+> > =
+
+> > But given your clarification here, I understand that $TOOLS already
+> > takes care of everything except qemu-ga.exe, so I think you've already
+> > mentioned the most straightforward fix in the other thread:
+> > =
+
+> > - rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.*=
+ *.pod *~ */*~
+> > + rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga${EXESUF} TAGS=
+ cscope.* *.pod *~ */*~
+> > =
+
+> > It's a bit ugly since `rm -f qemu-ga.exe` would silently fail on posix,
+> =
+
+> On w32 I mean, sorry.
+
+Ugh, no, on posix. Let's just try that again:
+
+It's a bit ugly since `rm -f ... qemu-ga${EXESUF}` would silently fail on p=
+osix,
+but `rm -f $TOOLS qemu-ga ...` already silently fails since qemu-ga already=
+ gets
+removed via $TOOLS, so it's not any worse.
+
+> =
+
+> > but `rm -f $TOOLS qemu-ga ...` already silently fails since it already =
+gets
+> > removed via $TOOLS.
+> > =
+
+> > Alternatively, you can explicitly check for qemu-ga.exe and remove it if
+> > it exists. I would consider either acceptable, but not this patch as it
+> > currently stands.
+> > =
+
+> > > =
+
+> > > Now if by "this is not an issue" you mean it is not a bug, I agree th=
+is =
+
+> > > can wait 2.11.
+> > =
+
+> > I just mean the issue as described in the commit msg.
+> > =
+
+> > For the `make clean` stuff, if it's simple enough it might be acceptabl=
+e for
+> > rc1 if you can get it out this week. Otherwise we can wait for 2.11.
+> > =
+
+> > > =
+
+> > > Regards,
+> > > =
+
+> > > Phil.
+> > > =
+
+> > > >>          rm -f fsdev/*.pod
+> > > >>          rm -f qemu-img-cmds.h
+> > > >>          rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+> > > >> diff --git a/configure b/configure
+> > > >> index 48d4d7a2a7..f8b1d014d7 100755
+> > > >> --- a/configure
+> > > >> +++ b/configure
+> > > >> @@ -5073,7 +5073,7 @@ fi
+> > > >>
+> > > >>   if [ "$guest_agent" !=3D "no" ]; then
+> > > >>     if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D =
+"yes" -o "$mingw32" =3D "yes" ] ; then
+> > > >> -      tools=3D"qemu-ga $tools"
+> > > >> +      tools=3D"qemu-ga\$(EXESUF) $tools"
+> > > >>         guest_agent=3Dyes
+> > > >>     elif [ "$guest_agent" !=3D yes ]; then
+> > > >>         guest_agent=3Dno
+> > > >> -- =
+
+> > > >> 2.13.3
+> > > >>
+> > > >>
+> > > > =
+
+> > >=20
