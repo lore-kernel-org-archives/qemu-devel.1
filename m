@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lists@philjordan.eu>) id 1daH0u-0003GS-Kg
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 03:45:51 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1daHES-0005hc-Ku
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 03:59:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lists@philjordan.eu>) id 1daH0r-0003yd-Uv
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 03:45:48 -0400
-Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:36461)
+	(envelope-from <alex.bennee@linaro.org>) id 1daHEO-0000fh-Ak
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 03:59:48 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35201)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lists@philjordan.eu>) id 1daH0r-0003yH-JQ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 03:45:45 -0400
-Received: by mail-ua0-x230.google.com with SMTP id k43so77678063uaf.3
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 00:45:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1daHEN-0000eX-Vr
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 03:59:44 -0400
+Received: by mail-wm0-x234.google.com with SMTP id c184so71030104wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 00:59:43 -0700 (PDT)
+References: <DM2PR21MB0060EFC1F6B9F0883A1792369EBB0@DM2PR21MB0060.namprd21.prod.outlook.com>
+	<20170724212327.GA24963@flamenco>
+	<fda73f35-098f-c190-4d15-4363e28872f1@twiddle.net>
+	<DM2PR21MB00602DE4F811D886C5E5C75C9EB80@DM2PR21MB0060.namprd21.prod.outlook.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <DM2PR21MB00602DE4F811D886C5E5C75C9EB80@DM2PR21MB0060.namprd21.prod.outlook.com>
+Date: Wed, 26 Jul 2017 08:59:40 +0100
+Message-ID: <87bmo7eihf.fsf@linaro.org>
 MIME-Version: 1.0
-References: <1500629531-184026-1-git-send-email-imammedo@redhat.com>
-	<20170721094955.GH17693@redhat.com>
-	<20170721121048.44d617ea@nial.brq.redhat.com>
-	<20170722023020-mutt-send-email-mst@kernel.org>
-	<20170724084848.259c0bfc@nial.brq.redhat.com>
-	<20170725162344-mutt-send-email-mst@kernel.org>
-	<CABdb735ET-AzGRtz44qX3avAY16PQOT2ENASmmyyT=_j_D=T6w@mail.gmail.com>
-In-Reply-To: <CABdb735ET-AzGRtz44qX3avAY16PQOT2ENASmmyyT=_j_D=T6w@mail.gmail.com>
-From: Phil Dennis-Jordan <lists@philjordan.eu>
-Date: Wed, 26 Jul 2017 07:45:33 +0000
-Message-ID: <CAGCz3vvhfdQirjOj9vvbC_WUtgpdnKWt3dEn3eKc+uJ-pwMqJw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: force FADT rev1 for old i440fx
- machine types
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Torn read/write possible on aarch64/x86-64 MTTCG?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,270 +32,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Programmingkid <programmingkidx@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Andrey Shedel <ashedel@microsoft.com>, Pranith Kumar <bobby.prani@gmail.com>
 
-On Wed, 26 Jul 2017 at 09:39, Ladi Prosek <lprosek@redhat.com> wrote:
 
-> On Tue, Jul 25, 2017 at 3:26 PM, Michael S. Tsirkin <mst@redhat.com>
-> wrote:
-> > On Mon, Jul 24, 2017 at 08:48:48AM +0200, Igor Mammedov wrote:
-> >> On Sat, 22 Jul 2017 02:40:46 +0300
-> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >>
-> >> > On Fri, Jul 21, 2017 at 12:10:48PM +0200, Igor Mammedov wrote:
-> >> > > On Fri, 21 Jul 2017 10:49:55 +0100
-> >> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> >> > >
-> >> > > > On Fri, Jul 21, 2017 at 11:32:11AM +0200, Igor Mammedov wrote:
-> >> > > > > w2k used to boot on QEMU until we bumped revision of FADT to
-> rev3
-> >> > > > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of
-> Rev1 to improve guest OS support.)
-> >> > > > >
-> >> > > > > Considering that w2k is ancient and long time EOLed, leave
-> default
-> >> > > > > rev3 but make pc-i440fx-2.9 and older machine types to force
-> rev1
-> >> > > > > so old setups won't break (w2k could boot).
-> >> > > >
-> >> > > > There needs to be a machine type property added to control this
-> >> > > > feature. When provisioning new VMs, management apps need to be
-> >> > > > able to set the property explicitly - having them rely on picking
-> >> > > > particular machine type name+versions is not viable, because
-> >> > > > downstream vendors replace the machine types with their own
-> >> > > > names + versions.
-> >> > > having property doesn't really help here and we don't do it for
-> every
-> >> > > compat tweak /ex: save_tsc_khz, linuxboot_dma_enabled/.
-> >> > >
-> >> > > Management would not benefit much from having property vs machine
-> version
-> >> > > as it would have to encode somewhere that for w2k it should set
-> >> > > some machine property or pick a particular machine type.
-> >> >
-> >> > I think I'd disagree with that. If
-> >> > users might need this for compatibility with some guests,
-> >> > then it should be a property not just a machine type.
-> >> >
-> >> > But see below - I think we rushed it for the PC anyway.
-> >> >
-> >> > > Probably no one would worry about fixing virt-install or something
-> >> > > else for the sake of w2k and if they are going to fix it
-> >> > > it doesn't matter if they map machine type vs property.
-> >> > >
-> >> > > Also with new machine type deprecation policy we would be able
-> >> > > easily to phase out rev1 support along with 2.9 machine,
-> >> > > but if you expose property then removing it would break
-> >> > > CLI not only for 2.9 but possible later machines if it's set there.
-> >> > >
-> >> > > So I'm against adding properties/CLI options for unless we have to
-> in this case,
-> >> > > and I'm not convinced that w2k deserves it.
-> >> >
-> >> > If I have to choose, I'd say Mac OSX is way less interesting than old
-> >> > windows versions. Lots of people have software that will only run on
-> old
-> >> > windows and there's probably good money to be had running it on new
-> >> > hardware in VMs. And PC machine is all about compatibility - we have
-> Q35
-> >> > for new stuff.  Besides OSX uses q35 anyway I think.
-> >> Question is for how long we are going to maintain legacy stuff,
-> >> ACPI spec periodically adds new stuff, which someday is going
-> >> to break legacy OSes. And maintaining 2 branches of or worse
-> >> a mix will cost us in time and future regressions, we need to
-> >> have some policy to cut off legacy features that hold us back,
-> >> like we are starting to do with machine types.
-> >> w2k has been EOLed in 2010 even if we drop its support now,
-> >> users still can use it as they have an option to use old QEMU
-> >> for that.
-> >
-> > Users can't normally get old QEMU, even if they could it is not
-> > a good idea because of security.
-> >
-> >> (Ladi said that w2k fails to install since 2.7).
-> >
-> > Bisect will likely find what's wrong.
+Andrew Baumann <Andrew.Baumann@microsoft.com> writes:
+
+>> From: Richard Henderson [mailto:rth7680@gmail.com] On Behalf Of Richard
+>> Henderson
+>> Sent: Monday, 24 July 2017 15:03
+>>
+>> On 07/24/2017 02:23 PM, Emilio G. Cota wrote:
+>> > (Adding some Cc's)
+>> >
+>> > On Mon, Jul 24, 2017 at 19:05:33 +0000, Andrew Baumann via Qemu-devel
+>> wrote:
+>> >> Hi all,
+>> >>
+>> >> I'm trying to track down what appears to be a translation bug in either
+>> >> the aarch64 target or x86_64 TCG (in multithreaded mode). The
+>> symptoms
+>>
+>> I assume this is really x86_64 and not i686 as host.
 >
-> I still intend to find the issue. Unlike this FADT revision/length
-> problem, setup fails after a long time, basically at the very end of
-> the process. I tried to speed up bisecting it by saving the state of
-> the VM before the failure and running just the problematic part but it
-> didn't work. I'll just have to bite the bullet and run setup from the
-> beginning every time.
+> Yes.
 >
-
-Anecdotal evidence: I managed to install Windows 2000 Pro from scratch a
-few days ago using this patch on qemu master. (i386, TCG, -m 512) No setup
-failures, system booted up fine after install. Maybe it doesn't like one of
-your options, or your installer disk image has got corrupted? (Or maybe
-there are different variants of Win2K installer images.)
-
-
-> >> >
-> >> > So maybe the right thing to do is to
-> >> > - switch default for PC back to rev 1
-> >> > - keep default for Q35 at rev 3
-> >> >
-> >> > No machinetype hacks.
-> >> it's still machine hack pc vs q35 and an extra branch to look
-> >> after but it's better than an option, I'll respin patch.
-> >>
-> >> >
-> >> > > > >
-> >> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >> > > > > ---
-> >> > > > > CC: Programmingkid <programmingkidx@gmail.com>
-> >> > > > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> >> > > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> >> > > > >
-> >> > > > > Only compile test since I don't have w2k to test with
-> >> > > > >
-> >> > > > > ---
-> >> > > > >  include/hw/i386/pc.h |  1 +
-> >> > > > >  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
-> >> > > > >  hw/i386/pc_piix.c    |  2 ++
-> >> > > > >  3 files changed, 22 insertions(+), 7 deletions(-)
-> >> > > > >
-> >> > > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> >> > > > > index d80859b..d6f65dd 100644
-> >> > > > > --- a/include/hw/i386/pc.h
-> >> > > > > +++ b/include/hw/i386/pc.h
-> >> > > > > @@ -122,6 +122,7 @@ struct PCMachineClass {
-> >> > > > >      bool rsdp_in_ram;
-> >> > > > >      int legacy_acpi_table_size;
-> >> > > > >      unsigned acpi_data_size;
-> >> > > > > +    bool force_rev1_fadt;
-> >> > > > >
-> >> > > > >      /* SMBIOS compat: */
-> >> > > > >      bool smbios_defaults;
-> >> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >> > > > > index 6b7bade..227f9ad 100644
-> >> > > > > --- a/hw/i386/acpi-build.c
-> >> > > > > +++ b/hw/i386/acpi-build.c
-> >> > > > > @@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker
-> *linker)
-> >> > > > >  }
-> >> > > > >
-> >> > > > >  /* Load chipset information in FADT */
-> >> > > > > -static void fadt_setup(AcpiFadtDescriptorRev3 *fadt,
-> AcpiPmInfo *pm)
-> >> > > > > +static void fadt_setup(AcpiFadtDescriptorRev3 *fadt,
-> AcpiPmInfo *pm, bool rev1)
-> >> > > > >  {
-> >> > > > >      fadt->model = 1;
-> >> > > > >      fadt->reserved1 = 0;
-> >> > > > > @@ -304,6 +304,9 @@ static void
-> fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> >> > > > >          fadt->flags |= cpu_to_le32(1 <<
-> ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-> >> > > > >      }
-> >> > > > >      fadt->century = RTC_CENTURY;
-> >> > > > > +    if (rev1) {
-> >> > > > > +        return;
-> >> > > > > +    }
-> >> > > > >
-> >> > > > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-> >> > > > >      fadt->reset_value = 0xf;
-> >> > > > > @@ -335,6 +338,7 @@ static void
-> fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> >> > > > >  /* FADT */
-> >> > > > >  static void
-> >> > > > >  build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo
-> *pm,
-> >> > > > > +           MachineState *machine,
-> >> > > > >             unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
-> >> > > > >             const char *oem_id, const char *oem_table_id)
-> >> > > > >  {
-> >> > > > > @@ -342,6 +346,9 @@ build_fadt(GArray *table_data, BIOSLinker
-> *linker, AcpiPmInfo *pm,
-> >> > > > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl -
-> table_data->data;
-> >> > > > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt -
-> table_data->data;
-> >> > > > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt -
-> table_data->data;
-> >> > > > > +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
-> >> > > > > +    int fadt_size = sizeof(*fadt);
-> >> > > > > +    int rev = 3;
-> >> > > > >
-> >> > > > >      /* FACS address to be filled by Guest linker */
-> >> > > > >      bios_linker_loader_add_pointer(linker,
-> >> > > > > @@ -349,16 +356,21 @@ build_fadt(GArray *table_data, BIOSLinker
-> *linker, AcpiPmInfo *pm,
-> >> > > > >          ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
-> >> > > > >
-> >> > > > >      /* DSDT address to be filled by Guest linker */
-> >> > > > > -    fadt_setup(fadt, pm);
-> >> > > > > +    fadt_setup(fadt, pm, pcmc->force_rev1_fadt);
-> >> > > > >      bios_linker_loader_add_pointer(linker,
-> >> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset,
-> sizeof(fadt->dsdt),
-> >> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> >> > > > > -    bios_linker_loader_add_pointer(linker,
-> >> > > > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset,
-> sizeof(fadt->x_dsdt),
-> >> > > > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> >> > > > > +    if (pcmc->force_rev1_fadt) {
-> >> > > > > +        rev = 1;
-> >> > > > > +        fadt_size = offsetof(typeof(*fadt), reset_register);
-> >> > > > > +    } else {
-> >> > > > > +        bios_linker_loader_add_pointer(linker,
-> >> > > > > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset,
-> sizeof(fadt->x_dsdt),
-> >> > > > > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> >> > > > > +    }
-> >> > > > >
-> >> > > > >      build_header(linker, table_data,
-> >> > > > > -                 (void *)fadt, "FACP", sizeof(*fadt), 3,
-> oem_id, oem_table_id);
-> >> > > > > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id,
-> oem_table_id);
-> >> > > > >  }
-> >> > > > >
-> >> > > > >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-> >> > > > > @@ -2667,7 +2679,7 @@ void acpi_build(AcpiBuildTables *tables,
-> MachineState *machine)
-> >> > > > >      /* ACPI tables pointed to by RSDT */
-> >> > > > >      fadt = tables_blob->len;
-> >> > > > >      acpi_add_table(table_offsets, tables_blob);
-> >> > > > > -    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
-> >> > > > > +    build_fadt(tables_blob, tables->linker, &pm, machine,
-> facs, dsdt,
-> >> > > > >                 slic_oem.id, slic_oem.table_id);
-> >> > > > >      aml_len += tables_blob->len - fadt;
-> >> > > > >
-> >> > > > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> >> > > > > index 11b4336..bc61332 100644
-> >> > > > > --- a/hw/i386/pc_piix.c
-> >> > > > > +++ b/hw/i386/pc_piix.c
-> >> > > > > @@ -449,9 +449,11 @@ DEFINE_I440FX_MACHINE(v2_10,
-> "pc-i440fx-2.10", NULL,
-> >> > > > >
-> >> > > > >  static void pc_i440fx_2_9_machine_options(MachineClass *m)
-> >> > > > >  {
-> >> > > > > +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> >> > > > >      pc_i440fx_2_10_machine_options(m);
-> >> > > > >      m->is_default = 0;
-> >> > > > >      m->alias = NULL;
-> >> > > > > +    pcmc->force_rev1_fadt = true;
-> >> > > > >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
-> >> >
-> >> > whatever switch we use for this option, I think it makes
-> >> > sense to add comments to document why we keep this around.
-> >> ok
-> >>
-> >> >
-> >> >
-> >> > > > >  }
-> >> > > > >
-> >> > > > > --
-> >> > > > > 2.7.4
-> >> > > > >
-> >> > > > >
-> >> > > >
-> >> > > > Regards,
-> >> > > > Daniel
-> >> >
-> >
+>> >> are entirely consistent with a torn read/write -- that is, a 64-bit
+>> >> load or store that was translated to two 32-bit loads and stores --
+>> >> but that's obviously not what happens in the common path through the
+>> >> translation for this code, so I'm wondering: are there any cases in
+>> >> which qemu will split a 64-bit memory access into two 32-bit accesses?
+>> >
+>> > That would be a bug in MTTCG.
+>> >
+>> >> The code: Guest CPU A writes a 64-bit value to an aligned memory
+>> >> location that was previously 0, using a regular store; e.g.:
+>> >> 	f9000034 str	     x20,[x1]
+>> >>
+>> >> Guest CPU B (who is busy-waiting) reads a value from the same location:
+>> >> 	f9400280 ldr	     x0,[x20]
+>> >>
+>> >> The symptom: CPU B loads a value that is neither NULL nor the value
+>> >> written. Instead, x0 gets only the low 32-bits of the value written
+>> >> (high bits are all zero). By the time this value is dereferenced (a
+>> >> few instructions later) and the exception handlers run, the memory
+>> >> location from which it was loaded has the correct 64-bit value with
+>> >> a non-zero upper half.
+>> >>
+>> >> Obviously on a real ARM memory barriers are critical, and indeed
+>> >> the code has such barriers in it, but I'm assuming that any possible
+>> >> mistranslation of the barriers is irrelevant because for a 64-bit load
+>> >> and a 64-bit store you should get all or nothing. Other clues that may
+>> >> be relevant: the code is _near_ a LDREX/STREX pair (the busy-waiting
+>> >> is used to resolve a race when updating another variable), and the
+>> >> busy-wait loop has a yield instruction in it (although those appear
+>> >> to be no-ops with MTTCG).
+>> >
+>> > This might have to do with how ldrex/strex is emulated; are you relying
+>> > on the exclusive pair detecting ABA? If so, your code won't work in
+>> > QEMU since it uses cmpxchg to emulate ldrex/strex.
+>>
+>> ABA problem is nothing to do with tearing.  And cmpxchg will definitely not
+>> create tearing problems.
 >
+> In fact, the ldrex/strex are there implementing a cmpxchg. :)
+>
+>> I don't know how we would manage 64-bit tearing on a 64-bit host, at least
+>> for
+>> the aarch64 guest, for which I believe we have a good emulation.
+>>
+>> > - Pin the QEMU-MTTCG process to a single CPU. Can you repro then?
+>>
+>> A good suggestion.
+>
+> Thanks for the suggestions. I've been running this configuration all day, and haven't seen a repro yet in hundreds of attempts. I'll report if that changes.
+>
+> The problem is that this test isn't very conclusive... I don't know
+> how often the VCPU threads will context switch, but I suspect it's
+> pretty rare relative to the ability to expose races when they run
+> directly on different host cores. And if the race really doesn't exist
+> when running on a single core, that to me suggests a hardware problem,
+> which is even less likely.
+
+They will likely context switch as they drop/clear locks coming out of
+the translated code
+
+>
+>> > - Force the emulation of cmpxchg via EXCP_ATOMIC with:
+>> >
+>> > diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+>> > index 87f673e..771effe5 100644
+>> > --- a/tcg/tcg-op.c
+>> > +++ b/tcg/tcg-op.c
+>> > @@ -2856,7 +2856,7 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64
+>> retv, TCGv addr, TCGv_i64 cmpv,
+>> >           }
+>> >           tcg_temp_free_i64(t1);
+>> >       } else if ((memop & MO_SIZE) == MO_64) {
+>> > -#ifdef CONFIG_ATOMIC64
+>> > +#if 0
+>>
+>> I suspect this will simply alter the timing.  However, give it a go by all means.
+>
+> I haven't tried this yet. If it behaves as you describe, it seems likely to make the race harder to hit.
+>
+>> If there's a test case that you can share, that would be awesome.
+>
+> I wish we could :(
+>
+>> Especially if you can prod it to happen with a standalone minimal binary.  With
+>> luck you can reproduce via aarch64-linux-user too, and simply signal an error
+>> via branch to __builtin_trap.
+>
+> Initial attempts to repro this with a tight loop failed, but I'll take
+> another stab at producing a standalone test program that we can share.
+
+You could try using the counter value as a way to synchronise threads if
+there is a certain race you are trying to engineer. I did something
+similar in the barrier tests I wrote while doing the MTTCG work:
+
+  https://github.com/stsquad/kvm-unit-tests/blob/mttcg/current-tests-v8/arm/barrier-litmus-test.c#L61
+
+>
+> Andrew
+
+
+--
+Alex Bennée
