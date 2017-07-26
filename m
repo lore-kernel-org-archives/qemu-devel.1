@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1daBvV-00025T-Sy
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:19:55 -0400
+	(envelope-from <flukshun@gmail.com>) id 1daCSW-0005fn-6L
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:54:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1daBvQ-0003AT-Ti
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:19:53 -0400
-Received: from mga03.intel.com ([134.134.136.65]:43181)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1daBvQ-00037U-Iz
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:19:48 -0400
-Message-ID: <5977FCDF.7040606@intel.com>
-Date: Wed, 26 Jul 2017 10:22:23 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <flukshun@gmail.com>) id 1daCSR-0006hO-9m
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:54:00 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1daCSR-0006h7-2y
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:53:55 -0400
+Received: by mail-oi0-x241.google.com with SMTP id s21so6565270oie.5
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 19:53:53 -0700 (PDT)
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20170717152448.GN12888@dhcp22.suse.cz>
-	<596D6E7E.4070700@intel.com>
-	<20170719081311.GC26779@dhcp22.suse.cz>
-	<596F4A0E.4010507@intel.com>
-	<20170724090042.GF25221@dhcp22.suse.cz>
-	<59771010.6080108@intel.com>
-	<20170725112513.GD26723@dhcp22.suse.cz>
-	<597731E8.9040803@intel.com>
-	<20170725124141.GF26723@dhcp22.suse.cz>
-	<286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
-	<20170725145333.GK26723@dhcp22.suse.cz>
-In-Reply-To: <20170725145333.GK26723@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <cb21f5d1-18be-51a4-5e51-e429ab4b1b46@amsat.org>
+References: <20170725011530.17958-1-f4bug@amsat.org>
+	<150102382734.26979.483898024984598924@loki>
+	<cb21f5d1-18be-51a4-5e51-e429ab4b1b46@amsat.org>
+Message-ID: <150103762159.26979.13316299204767598566@loki>
+Date: Tue, 25 Jul 2017 21:53:41 -0500
+Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
+ extension on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,64 +32,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Hocko <mhocko@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Sameeh Jubran <sjubran@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-On 07/25/2017 10:53 PM, Michal Hocko wrote:
-> On Tue 25-07-17 14:47:16, Wang, Wei W wrote:
->> On Tuesday, July 25, 2017 8:42 PM, hal Hocko wrote:
->>> On Tue 25-07-17 19:56:24, Wei Wang wrote:
->>>> On 07/25/2017 07:25 PM, Michal Hocko wrote:
->>>>> On Tue 25-07-17 17:32:00, Wei Wang wrote:
->>>>>> On 07/24/2017 05:00 PM, Michal Hocko wrote:
->>>>>>> On Wed 19-07-17 20:01:18, Wei Wang wrote:
->>>>>>>> On 07/19/2017 04:13 PM, Michal Hocko wrote:
->>>>>>> [...
->>>> We don't need to do the pfn walk in the guest kernel. When the API
->>>> reports, for example, a 2MB free page block, the API caller offers to
->>>> the hypervisor the base address of the page block, and size=2MB, to
->>>> the hypervisor.
->>> So you want to skip pfn walks by regularly calling into the page allocator to
->>> update your bitmap. If that is the case then would an API that would allow you
->>> to update your bitmap via a callback be s sufficient? Something like
->>> 	void walk_free_mem(int node, int min_order,
->>> 			void (*visit)(unsigned long pfn, unsigned long nr_pages))
->>>
->>> The function will call the given callback for each free memory block on the given
->>> node starting from the given min_order. The callback will be strictly an atomic
->>> and very light context. You can update your bitmap from there.
->> I would need to introduce more about the background here:
->> The hypervisor and the guest live in their own address space. The hypervisor's bitmap
->> isn't seen by the guest. I think we also wouldn't be able to give a callback function
->> from the hypervisor to the guest in this case.
-> How did you plan to use your original API which export struct page array
-> then?
+Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-25 20:45:31)
+> Hi Michael,
+> =
+
+> On 07/25/2017 08:03 PM, Michael Roth wrote:
+> > Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-24 20:15:30)
+> >> Reported-by: Sameeh Jubran <sjubran@redhat.com>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> ---
+> >> original report from Sameeh Jubran:
+> >> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.html
+> > =
+
+> > AFAICT the issue discussed in the context of that patch is simply that
+> > the qemu-ga.exe file isn't deleted as part of `make clean`, which does
+> > seem to be an issue.
+> > =
+
+> > But qemu.ga.exe is created just fine as part of `make qemu-ga`, at least
+> > as of:
+> > =
+
+> >    fafcaf1d build: qemu-ga: add 'qemu-ga' build target for w32
+> > =
+
+> =
+
+> Yes, on w32 if "make ASDF" invokes the linker, it will create ASDF.exe.
+> =
+
+> > The 'qemu-ga' target is actually an intermediate target which, on w32,
+> > creates the MSI package (if configured) as well as qemu-ga.exe.
+> > =
+
+> >>
+> >>   Makefile  | 2 +-
+> >>   configure | 2 +-
+> >>   2 files changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/Makefile b/Makefile
+> >> index ef721480eb..5f18243d05 100644
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >> @@ -490,7 +490,7 @@ clean:
+> >>          rm -f qemu-options.def
+> >>          rm -f *.msi
+> >>          find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -n=
+ame '*.[oda]' \) -type f -exec rm {} +
+> >> -       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS c=
+scope.* *.pod *~ */*~
+> >> +       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* =
+*.pod *~ */*~
+> =
+
+> On win32, this patch add qemu-ga.exe instead of qemu-ga in $TOOLS, so =
+
+> when the 'clean' target is executed it removes qemu-ga.exe (Sameeh =
 
 
-That's where the virtio-balloon driver comes in. It uses a shared ring 
-mechanism to
-send the guest memory info to the hypervisor.
+Ok, that makes more sense, but it's not what the commit msg implies.
 
-We didn't expose the struct page array from the guest to the hypervisor. 
-For example, when
-a 2MB free page block is reported from the free page list, the info put 
-on the ring is just
-(base address of the 2MB continuous memory, size=2M).
+> Jubran report). Before this patch the $TOOLS looks like:
+> "qemu-img.exe qemu-io.exe qemu-nbd.exe ivshmem-client.exe =
 
+> ivshmem-server.exe qemu-ga fsdev/virtfs-proxy-helper.exe"
 
->
->>> This would address my main concern that the allocator internals would get
->>> outside of the allocator proper.
->> What issue would it have to expose the internal, for_each_zone()?
-> zone is a MM internal concept. No code outside of the MM proper should
-> really care about zones.
+That change was done explicitly via fafcaf1d so that `make qemu-ga` and
+`make` without --disable-tools specified to configure will generate the
+MSI package when the user configures it. So, unlike the other $TOOLS
+targets, the qemu-ga "distributables" encompass more than just the .exe
+on w32, so we use the "qemu-ga" target instead of "qemu-ga.exe" directly.
 
-I think this is also what Andrew suggested in the previous discussion:
-https://lkml.org/lkml/2017/3/16/951
+Reverting that change to coax `make clean` into cleaning up qemu-ga.exe
+means that `make` no longer builds the qemu-ga-*.msi when the user
+configures it, which is a regression.
 
-Move the code to virtio-balloon and a little layering violation seems 
-acceptable.
+> The only executables which doesn't match %.exe is qemu-ga, so the =
 
+> 'clean' target remove all .exe _but_ qemu-ga.exe.
 
-Best,
-Wei
+As with Sameeh's original patch, the qemu-ga target would already
+require special handling to deal with qemu-ga-*.msi file. We should
+similarly just cleanup qemu-ga.exe as a special case instead of
+modifying $TOOLS, since that brings about unecessary side-effects
+described above.
+
+As a workaround to the issue you/Peter pointed out with Sameeh's patch
+(nuking the entire source tree for posix builds where $EXESUF =3D=3D ""), I
+proposed we just do:
+
+  make clean:
+    ...
+  ifneq($EXESUF,)
+    rm -f *$(EXESUF)
+  endif
+
+But given your clarification here, I understand that $TOOLS already
+takes care of everything except qemu-ga.exe, so I think you've already
+mentioned the most straightforward fix in the other thread:
+
+- rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.p=
+od *~ */*~
++ rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga${EXESUF} TAGS csc=
+ope.* *.pod *~ */*~
+
+It's a bit ugly since `rm -f qemu-ga.exe` would silently fail on posix,
+but `rm -f $TOOLS qemu-ga ...` already silently fails since it already gets
+removed via $TOOLS.
+
+Alternatively, you can explicitly check for qemu-ga.exe and remove it if
+it exists. I would consider either acceptable, but not this patch as it
+currently stands.
+
+> =
+
+> Now if by "this is not an issue" you mean it is not a bug, I agree this =
+
+> can wait 2.11.
+
+I just mean the issue as described in the commit msg.
+
+For the `make clean` stuff, if it's simple enough it might be acceptable for
+rc1 if you can get it out this week. Otherwise we can wait for 2.11.
+
+> =
+
+> Regards,
+> =
+
+> Phil.
+> =
+
+> >>          rm -f fsdev/*.pod
+> >>          rm -f qemu-img-cmds.h
+> >>          rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+> >> diff --git a/configure b/configure
+> >> index 48d4d7a2a7..f8b1d014d7 100755
+> >> --- a/configure
+> >> +++ b/configure
+> >> @@ -5073,7 +5073,7 @@ fi
+> >>
+> >>   if [ "$guest_agent" !=3D "no" ]; then
+> >>     if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes=
+" -o "$mingw32" =3D "yes" ] ; then
+> >> -      tools=3D"qemu-ga $tools"
+> >> +      tools=3D"qemu-ga\$(EXESUF) $tools"
+> >>         guest_agent=3Dyes
+> >>     elif [ "$guest_agent" !=3D yes ]; then
+> >>         guest_agent=3Dno
+> >> -- =
+
+> >> 2.13.3
+> >>
+> >>
+> > =
+
+>=20
