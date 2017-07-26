@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daL5U-0003eg-LB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:49 -0400
+	(envelope-from <berrange@redhat.com>) id 1daL75-0004yR-I2
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daL5R-0002IP-UM
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48460)
+	(envelope-from <berrange@redhat.com>) id 1daL72-0003LF-Q7
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:08:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49058)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daL5R-0002Hp-LT
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:45 -0400
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-	<20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-	<a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
-	<CAGCz3vvyxbe7D2OL08Bo+mzvgP_51c3iPCQ-+PeROC9aZdMo3A@mail.gmail.com>
-	<21592b3f-1a0c-c573-b5e6-754a44582309@redhat.com>
-	<f9db34d0-759a-c2f4-d8a5-9bddd79cca4b@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4c8a6dc2-7732-1dd3-982a-f39b3fe69e11@redhat.com>
-Date: Wed, 26 Jul 2017 14:06:38 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daL72-0003KZ-Jw
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:08:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 987527F405
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:08:23 +0000 (UTC)
+Date: Wed, 26 Jul 2017 13:08:19 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170726120819.GH7620@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170726115637.21558-1-kraxel@redhat.com>
+	<20170726115637.21558-5-kraxel@redhat.com>
+	<85e9156c-1a11-4757-996d-877e40e316bc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f9db34d0-759a-c2f4-d8a5-9bddd79cca4b@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Disposition: inline
+In-Reply-To: <85e9156c-1a11-4757-996d-877e40e316bc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/5] ui: add multimedia keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,58 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "seabios@seabios.org" <seabios@seabios.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 26/07/2017 13:42, Laszlo Ersek wrote:
-> Not exactly; the PCD controls whether the EFI_ACPI_TABLE_PROTOCOL will
-> expose an RSDT, an XSDT, or both (with matching contents).
+On Wed, Jul 26, 2017 at 07:02:48AM -0500, Eric Blake wrote:
+> On 07/26/2017 06:56 AM, Gerd Hoffmann wrote:
+> > Add multimedia keys to QKeyCodes and to the keymaps.
+> > 
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  ui/input-keymap.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+> >  qapi-schema.json  | 17 ++++++++++++++++-
+> >  2 files changed, 60 insertions(+), 1 deletion(-)
+> 
+> > +++ b/qapi-schema.json
+> > @@ -4843,6 +4843,16 @@
+> >  # @henkan: since 2.9
+> >  # @yen: since 2.9
+> >  #
+> > +# @sleep: since 2.10
+> > +# @wake: since 2.10
+> > +# @audio*: since 2.10
+> > +# @volume*: since 2.10
+> > +# @mediaselect: since 2.10
+> > +# @mail: since 2.10
+> > +# @calculator: since 2.10
+> > +# @computer: since 2.10
+> > +# @ac_*: since 2.10
+> 
+> Borderline between bug-fix and new feature (arguing that the bug is that
+> we don't represent all keys).  Does this need to be 2.11 instead?
 
-You're right that the code does not produce a v1 FADT, I mis-skimmed the
-awful code of AcpiTableDxe.  Though the intentions seems to be there in
-the UEFI spec, because UEFI has different GUIDs for ACPI 1.0 and 2.0+
-RSDPs---and they need not point to the same tables, even though the ACPI
-1.0 RSDP is a subset of the 2.0+ one.
+It is really fixing a bug introduced in the PS2 driver in 2.8.0.  It
+roundtrips via QKeyCode now, so any key where there is an AT Set 1
+scancode defined, but for which we lack a QKeyCode can't be sent to
+guests since QEMU 2.8.0 onwards.
 
-AcpiTableDxe's data structures have an "Rsdp1" field (pointing to
-"Rsdt1" and from there to "Fadt1") and an "Rsdp3" field (pointing to
-"Xsdt" and optionally "Rsdt3", and from both to "Fadt3").  However:
-
-* Fadt1 and Fadt3 have exactly the same content.
-
-* Rsdt3 doesn't point to Fadt1.
-
-It should be easy to make "Fadt1" a v1 table instead of copying the same
-contents to Fadt1 and Fadt3, and to make Rsdt3 point to Fadt1.  The CSM
-would just work if edk2 did this; until then Windows 2000 over SeaBIOS
-over OVMF remains broken, but I guess that's not that much of an issue.
-
-Anyway, once you take CSM into account, IMHO a firmware solution becomes
-preferrable to Kevin's proposals to add a etc/table-loader-legacy (or
-similar) file in fw_cfg.
-
-Paolo
-
-> The FADT
-> always comes from the specific edk2 platform (i.e., OVMF client code),
-> and it is not translated in any way, regardless of the PCD value.
->=20
-> From "MdeModulePkg/MdeModulePkg.dec":
->=20
->>   ## Indicates which ACPI versions are targeted by the ACPI tables exp=
-osed to the OS
->>   #  These values are aligned with the definitions in MdePkg/Include/P=
-rotocol/AcpiSystemDescriptionTable.h
->>   #   BIT 1 - EFI_ACPI_TABLE_VERSION_1_0B.<BR>
->>   #   BIT 2 - EFI_ACPI_TABLE_VERSION_2_0.<BR>
->>   #   BIT 3 - EFI_ACPI_TABLE_VERSION_3_0.<BR>
->>   #   BIT 4 - EFI_ACPI_TABLE_VERSION_4_0.<BR>
->>   #   BIT 5 - EFI_ACPI_TABLE_VERSION_5_0.<BR>
->>   # @Prompt Exposed ACPI table versions.
->>   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x3E|UINT=
-32|0x0001004c
-> The expectation is that the specific edk2 platform overrides this PCD a=
-t
-> build time (if necessary), and then goes on (at boot time) to install
-> ACPI tables -- using EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() -- that
-> actually match the PCD setting.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
