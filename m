@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1daN0X-0000UO-FG
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:09:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1daN1W-00012z-QS
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1daN0U-0000WW-8J
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:09:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1daN0U-0000Vd-0T
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:09:46 -0400
-Date: Wed, 26 Jul 2017 16:09:37 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170726160937.74e18968@nial.brq.redhat.com>
-In-Reply-To: <20170725163315-mutt-send-email-mst@kernel.org>
-References: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
-	<20170725163315-mutt-send-email-mst@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1daN1V-0001Ud-QI
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:10:50 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1daN1V-0001U2-JZ
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:10:49 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id 12so132348214wrb.1
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 07:10:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx
- based machine types
+In-Reply-To: <20170726140218.15904-4-eblake@redhat.com>
+References: <20170726140218.15904-1-eblake@redhat.com>
+	<20170726140218.15904-4-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 26 Jul 2017 15:10:27 +0100
+Message-ID: <CAFEAcA9sOaN+yLbikODGN5NTaX88rSU=vTpdD_ovfPzTv=Hu9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/3] maint: Include bug-reporting info in
+ --help output.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, 25 Jul 2017 16:36:06 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 26 July 2017 at 15:02, Eric Blake <eblake@redhat.com> wrote:
+> These days, many programs are including a bug-reporting address,
+> or better yet, a link to the project web site, at the tail of
+> their --help output.  However, we were not very consistent at
+> doing so: only qemu-nbd and qemu-qa mentioned anything, with the
+> latter pointing to an individual person instead of the project.
+>
+> Add a new #define that sets up a uniform string, mentioning both
+> bug reporting instructions and overall project details, and which
+> a downstream vendor could tweak if they want bugs to go to a
+> downstream database.  Then use it in all of our binaries which
+> have --help output.
+>
+> The canned text intentionally references http:// instead of https://
+> because our https website currently causes certificate errors in
+> some browsers.  That can be tweaked later once we have resolved the
+> web site issued.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/qemu-common.h | 5 +++++
+>  vl.c                  | 4 +++-
+>  bsd-user/main.c       | 2 ++
+>  linux-user/main.c     | 4 +++-
+>  qemu-img.c            | 2 +-
+>  qemu-io.c             | 5 +++--
+>  qemu-nbd.c            | 2 +-
+>  qga/main.c            | 2 +-
+>  8 files changed, 19 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index b5adbfa5e9..e751361458 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -22,6 +22,11 @@
+>  #define QEMU_COPYRIGHT "Copyright (c) 2003-2017 " \
+>      "Fabrice Bellard and the QEMU Project developers"
+>
+> +/* Bug reporting information for --help arguments, About dialogs, etc */
+> +#define QEMU_BUGREPORTS \
+> +    "See <http://qemu.org/contribute/report-a-bug> for bug reports.\n" \
+> +    "More information on the qemu project at <http://qemu.org>"
 
-> On Mon, Jul 24, 2017 at 03:50:20PM +0200, Igor Mammedov wrote:
-> > w2k used to boot on QEMU until revision of FADT has
-> > been bumped to rev3
-> > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
-> > 
-> > Keep PC machine at rev1 to remain compatible and Q35
-> > at rev3 where w2k isn't supported anyway so OSX could
-> > run as well.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > v2:
-> >    - make pc rev1 and q35 rev3.
-> >        "Michael S. Tsirkin" <mst@redhat.com>
-> > 
-> > PS:
-> > Only compile tested.
-> > 
-> > 
-> > CC: Programmingkid <programmingkidx@gmail.com>
-> > CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > 
-> > ---
-> >  hw/i386/acpi-build.c | 22 ++++++++++++++++++----
-> >  1 file changed, 18 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index 6b7bade..b9c245c 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
-> >  } AcpiMcfgInfo;
-> >  
-> >  typedef struct AcpiPmInfo {
-> > +    bool force_rev1_fadt;
-> >      bool s3_disabled;
-> >      bool s4_disabled;
-> >      bool pcihp_bridge_en;
-> > @@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-> >      Object *obj = NULL;
-> >      QObject *o;
-> >  
-> > +    pm->force_rev1_fadt = false;
-> >      pm->cpu_hp_io_base = 0;
-> >      pm->pcihp_io_base = 0;
-> >      pm->pcihp_io_len = 0;
-> >      if (piix) {
-> > +        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
-> > +        pm->force_rev1_fadt = true;
-> >          obj = piix;
-> >          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-> >          pm->pcihp_io_base =
-> > @@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-> >      }
-> >      fadt->century = RTC_CENTURY;
-> > +    if (pm->force_rev1_fadt) {
-> > +        return;
-> > +    }
-> >  
-> >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-> >      fadt->reset_value = 0xf;
-> > @@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-> >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-> >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> > +    int fadt_size = sizeof(*fadt);
-> > +    int rev = 3;
-> >  
-> >      /* FACS address to be filled by Guest linker */
-> >      bios_linker_loader_add_pointer(linker,
-> > @@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> >      bios_linker_loader_add_pointer(linker,
-> >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > -    bios_linker_loader_add_pointer(linker,
-> > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > +    if (pm->force_rev1_fadt) {
-> > +        rev = 1;
-> > +        fadt_size = offsetof(typeof(*fadt), reset_register);  
-> 
-> I don't really like it that we are using structs to format fields - I
-> would prefer build_append_int_noprefix based APIs - but since we do,
-> let's add a proper structure for FADT rev 1 instead of this hack.
-I'll do it.
+QEMU should be all upper case.
 
-> 
-> While we are at it, maybe we should replace macro hacks like
-> ACPI_FADT_COMMON_DEF with simple sub-structures (unless you see a reason
-> not to).
-that would be rewriting every user that touches fields,
-I'd ratter slowly /one table at time/ switch to build_append_int_noprefix() API
-instead of amending legacy approach.
+> +
 
-> 
-> 
-> > +    } else {
-> > +        bios_linker_loader_add_pointer(linker,
-> > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > +    }
-> >  
-> >      build_header(linker, table_data,
-> > -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
-> > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
-> >  }
-> >  
-> >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-> > -- 
-> > 2.7.4  
-> 
+I wonder if we may regret the embedded newline when
+we come to handling UI about dialogs. I guess we
+can cross that bridge when we come to it (they
+may need to special case it anyway if they want
+to make the links clicky).
+
+thanks
+-- PMM
