@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1daHGm-0006jQ-GA
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:02:13 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1daHLy-0007oK-1T
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1daHGh-0001za-QV
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:02:12 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1daHGh-0001zS-Jr
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:02:07 -0400
-Received: by mail-wm0-x234.google.com with SMTP id c184so74361185wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 01:02:07 -0700 (PDT)
-References: <20170629010300.2848-1-f4bug@amsat.org>
-	<20170629010300.2848-7-f4bug@amsat.org>
-	<9a40c690-0b80-cd34-6129-849703b452e2@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <9a40c690-0b80-cd34-6129-849703b452e2@amsat.org>
-Date: Wed, 26 Jul 2017 09:02:04 +0100
-Message-ID: <87a83reidf.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 6/8] tcg/tci: disable MTTCG if TCI is
- enabled
+	(envelope-from <a.perevalov@samsung.com>) id 1daHLs-0003hK-Uy
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:07:34 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:18089)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1daHLs-0003gr-Lc
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:07:28 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OTO00K0GUK9JS10@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:07:21 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <19a15ce5-5427-c85b-f194-c3eb6740aef3@samsung.com>
+Date: Wed, 26 Jul 2017 11:07:17 +0300
+MIME-version: 1.0
+In-reply-to: <20170726014921.GK1595@pxdev.xzpeter.org>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1500533554-5779-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170720065249eucas1p2cc3e779e2cde2125f90ae25ff03ac646@eucas1p2.samsung.com>
+	<1500533554-5779-4-git-send-email-a.perevalov@samsung.com>
+	<20170726014921.GK1595@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v8 3/3] migration: add bitmap for received
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G . Cota" <cota@braap.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, heetae82.ahn@samsung.com, dgilbert@redhat.com
 
-
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-
-> Hi Peter,
->
-> I think this patch belongs to 2.10, as there is no time to fix TCI +
-> MTTCG. Should I RESEND it alone with "for 2.10" subject?
->
-> One other option might be disable TCI if MTTCG enabled, but there is
-> no ./configure option for MTTCG while there is for TCI.
->
-> Regards,
->
-> Phil.
->
-> On 06/28/2017 10:02 PM, Philippe Mathieu-Daudé wrote:
->> TCI + MTTCG cause strange errors...
+On 07/26/2017 04:49 AM, Peter Xu wrote:
+> On Thu, Jul 20, 2017 at 09:52:34AM +0300, Alexey Perevalov wrote:
+>> This patch adds ability to track down already received
+>> pages, it's necessary for calculation vCPU block time in
+>> postcopy migration feature, maybe for restore after
+>> postcopy migration failure.
+>> Also it's necessary to solve shared memory issue in
+>> postcopy livemigration. Information about received pages
+>> will be transferred to the software virtual bridge
+>> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+>> already received pages. fallocate syscall is required for
+>> remmaped shared memory, due to remmaping itself blocks
+>> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+>> error (struct page is exists after remmap).
 >>
->>    $ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4 -accel tcg,thread=multi -kernel kernel7.img
->>    qemu-system-arm: Guest expects a stronger memory ordering than the host provides
->>    This may cause strange/hard to debug errors
->>    Segmentation fault (core dumped)
-
-So this isn't TCI enabling MTTCG by accident - this is the user forcing
-it when it wouldn't otherwise be enabled. Hence the scary warning...
-
+>> Bitmap is placed into RAMBlock as another postcopy/precopy
+>> related bitmaps.
 >>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 >> ---
->>   configure | 6 +++++-
->>   1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/configure b/configure
->> index c571ad14e5..510f443e06 100755
->> --- a/configure
->> +++ b/configure
->> @@ -6225,7 +6225,11 @@ fi
->>   if test "$target_softmmu" = "yes" ; then
->>     echo "CONFIG_SOFTMMU=y" >> $config_target_mak
->>     if test "$mttcg" = "yes" ; then
->> -    echo "TARGET_SUPPORTS_MTTCG=y" >> $config_target_mak
->> +    if test "$tcg_interpreter" = "yes" ; then
->> +        echo "TCI enabled, disabling MTTCG"
->> +    else
->> +        echo "TARGET_SUPPORTS_MTTCG=y" >> $config_target_mak
->> +    fi
->>     fi
->>   fi
->>   if test "$target_user_only" = "yes" ; then
->>
+> [...]
+>
+>>   static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+>> -        void *from_addr, uint64_t pagesize)
+>> +                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
+>>   {
+>> +    int ret;
+>>       if (from_addr) {
+>>           struct uffdio_copy copy_struct;
+>>           copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
+>>           copy_struct.src = (uint64_t)(uintptr_t)from_addr;
+>>           copy_struct.len = pagesize;
+>>           copy_struct.mode = 0;
+>> -        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
+>> +        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
+>>       } else {
+>>           struct uffdio_zeropage zero_struct;
+>>           zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
+>>           zero_struct.range.len = pagesize;
+>>           zero_struct.mode = 0;
+>> -        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+>> +        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+>> +    }
+>> +    if (!ret) {
+>> +        ramblock_recv_bitmap_set(host_addr, rb);
+> Wait...
+>
+> Now we are using 4k-page/bit bitmap, do we need to take care of the
+> huge pages here?  Looks like we are only setting the first bit of it
+> if it is a huge page?
+First version was per ramblock page size, IOW bitmap was smaller in
+case of hugepages.
 
 
---
-Alex Bennée
+You mentioned that TARGET_PAGE_SIZE is reasonable for precopy case,
+in "Re: [Qemu-devel] [PATCH v1 2/2] migration: add bitmap for copied page"
+I though TARGET_PAGE_SIZE as transmition unit, is using in precopy even 
+hugepage case.
+But it's not so logically, page being marked as dirty, should be sent as 
+a whole page.
+
+>
+
+-- 
+Best regards,
+Alexey Perevalov
