@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1daPUI-0006j7-0c
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:48:43 -0400
+	(envelope-from <jcody@redhat.com>) id 1daPUR-0006pe-60
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:48:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1daPUD-0000vO-3a
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:48:42 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:35994)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1daPUC-0000uS-NU
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:48:37 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 26 Jul 2017 19:48:25 +0300
-Message-Id: <150108770564.11502.9555409719195740021.stgit@frigg.lan>
+	(envelope-from <jcody@redhat.com>) id 1daPUM-00010E-A0
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:48:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1daPUM-0000yw-3e
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:48:46 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3081B13A43
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 16:43:02 +0000 (UTC)
+Date: Wed, 26 Jul 2017 12:43:01 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170726164301.GA5109@localhost.localdomain>
+References: <1501075650-6971-1-git-send-email-thuth@redhat.com>
+	<20170726140208.GO7620@redhat.com>
+	<236fd293-5d5e-0436-afc3-599ae9de6f92@redhat.com>
+	<ab87e4f9-c270-80ec-ed3d-8b315dfacef8@redhat.com>
+	<b9db0cdc-f03c-dfec-cf6a-bd2b004c5c3e@redhat.com>
+	<3824bef1-1d90-e22f-03a1-9b66dbe1ccb5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 0/5] hypertrace: Lightweight guest-to-QEMU
- trace channel
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3824bef1-1d90-e22f-03a1-9b66dbe1ccb5@redhat.com>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a favicon.ico file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +37,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-The hypertrace channel allows guest code to emit events in QEMU (the host=
-) using
-its tracing infrastructure (see "docs/trace.txt"). This works in both 'sy=
-stem'
-and 'user' modes, is architecture-agnostic and introduces minimal noise o=
-n the
-guest.
+On Wed, Jul 26, 2017 at 04:54:48PM +0200, Paolo Bonzini wrote:
+> On 26/07/2017 16:47, Thomas Huth wrote:
+> > If you're willing to maintain that "mess", sure, please go ahead! But
+> > please remove my SoB, I don't want to be responsible for all those files ;-)
+> 
+> Changed it to suggested-by then, and pushed. :>
+> 
+> Please test!
+>
 
-See first commit for a full description, use-cases and an example.
+I just tested in:
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
+chrome
+firefox
+konqueror
+internet explorer
+edge
+opera
 
-Changes in v5
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 5a477a7806.
-* Fix typo in "bsd-user/main.c" [Stephan Hajnoczi].
-* Replace abort() with exit() in command-line errors [Stephan Hajnoczi].
-* Fix alignment of data and control channels [Stephan Hajnoczi].
-* Fix signal reflection in user-mode (SIGINT, SIGABRT, SIGSEGV) [Stephan =
-Hajnoczi].
-* Clarify semantics of hypertrace_guest_mmap_check() [Stephan Hajnoczi].
-* Use uintptr_t instead of unsigned long in SEGV handler [Stephan Hajnocz=
-i].
-* Emit hypertrace's event with host-endian arguments [Stephan Hajnoczi].
-* Enable true concurrency between user-mode guest threads by using a spea=
-rate control channel page per client [Stephan Hajnoczi].
-* Remove unused PAGE_SIZE define [Stephan Hajnoczi].
-* Submit linux kernel API module separately to Linux upstream [Stephan Ha=
-jnoczi].
-* Assume guest code events are always enabled.
-
-
-Changes in v4
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Fix typo in stap script example.
-* Fix compilation instructions in doc/hypertrace.txt.
-* Rebase on 0737f32daf.
-
-
-Changes in v3
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 4a58f35.
-* Remove debugging printf's.
-* Fix style issues identified by checkpatch.
-* Fix control channel mapping in guest linux module.
-* Add a short event description in "trace-events".
-* Polish documentation in 1st patch.
-
-
-Changes in v2
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Remove unnecessary casts for g2h() [Eric Blake].
-* Use perror() [Eric Blake].
-* Avoid expansions in application example [Eric Blake].
-* Add copyright in document "hypertrace.txt" [Eric Blake].
-* Make the user-mode hypertrace invocations thread-safe [Stefan Hajnoczi].
-* Split dynamic hypertrace configuration into a separate "config" channel.
-
-Llu=C3=ADs Vilanova (5):
-      hypertrace: Add documentation
-      hypertrace: Add tracing event "guest_hypertrace"
-      hypertrace: [*-user] Add QEMU-side proxy to "guest_hypertrace" even=
-t
-      hypertrace: [softmmu] Add QEMU-side proxy to "guest_hypertrace" eve=
-nt
-      hypertrace: Add guest-side user-level library
-
-
- Makefile                           |   12 +
- Makefile.objs                      |    6 +
- bsd-user/main.c                    |   17 +
- bsd-user/mmap.c                    |   15 +
- bsd-user/syscall.c                 |   34 ++-
- configure                          |   36 +++
- docs/devel/tracing.txt             |    3=20
- docs/hypertrace.txt                |  225 ++++++++++++++++++++
- hypertrace/Makefile.objs           |   23 ++
- hypertrace/common.c                |   55 +++++
- hypertrace/common.h                |   25 ++
- hypertrace/guest/Makefile          |   30 +++
- hypertrace/guest/common.c          |  301 ++++++++++++++++++++++++++
- hypertrace/guest/qemu-hypertrace.h |   80 +++++++
- hypertrace/softmmu.c               |  235 ++++++++++++++++++++
- hypertrace/user.c                  |  414 ++++++++++++++++++++++++++++++=
-++++++
- hypertrace/user.h                  |   71 ++++++
- include/hw/pci/pci.h               |    2=20
- include/qom/cpu.h                  |    4=20
- linux-user/main.c                  |   19 ++
- linux-user/mmap.c                  |   16 +
- linux-user/qemu.h                  |    3=20
- linux-user/signal.c                |   12 +
- linux-user/syscall.c               |   31 ++-
- trace-events                       |   11 +
- 25 files changed, 1651 insertions(+), 29 deletions(-)
- create mode 100644 docs/hypertrace.txt
- create mode 100644 hypertrace/Makefile.objs
- create mode 100644 hypertrace/common.c
- create mode 100644 hypertrace/common.h
- create mode 100644 hypertrace/guest/Makefile
- create mode 100644 hypertrace/guest/common.c
- create mode 100644 hypertrace/guest/qemu-hypertrace.h
- create mode 100644 hypertrace/softmmu.c
- create mode 100644 hypertrace/user.c
- create mode 100644 hypertrace/user.h
-
-
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Luiz Capitulino <lcapitulino@redhat.com>
-Cc: Daniel P Berrange <berrange@redhat.com>
+Looks as expected in those, at least.
