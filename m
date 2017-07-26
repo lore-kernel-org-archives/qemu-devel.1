@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daMDv-0007tk-S8
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:19:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1daMLh-0001go-J7
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daMDr-0003Cu-TF
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:19:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44828)
+	(envelope-from <thuth@redhat.com>) id 1daMLd-0007pO-Ld
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:27:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daMDr-0003Cm-MC
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:19:31 -0400
-Date: Wed, 26 Jul 2017 16:19:24 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170726161840-mutt-send-email-mst@kernel.org>
-References: <20170726093136.13627-1-pbonzini@redhat.com>
-	<20170726155118-mutt-send-email-mst@kernel.org>
-	<20170726130713.GL7620@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170726130713.GL7620@redhat.com>
-Subject: Re: [Qemu-devel] [qemu PATCH for 2.10] i386: acpi: provide an XSDT
- instead of an RSDT
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1daMLd-0007on-Fh
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:27:33 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 44CBD7F40F
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 13:27:32 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 26 Jul 2017 15:27:30 +0200
+Message-Id: <1501075650-6971-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [qemu-web PATCH] Add a favicon.ico file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, phil@philjordan.eu, seabios@seabios.org, qemu-devel@nongnu.org, programmingkidx@gmail.com, Kevin O'Connor <kevin@koconnor.net>, kraxel@redhat.com, lists@philjordan.eu, imammedo@redhat.com, lersek@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Jeff Cody <jcody@redhat.com>
 
-On Wed, Jul 26, 2017 at 02:07:13PM +0100, Daniel P. Berrange wrote:
-> On Wed, Jul 26, 2017 at 03:52:43PM +0300, Michael S. Tsirkin wrote:
-> > On Wed, Jul 26, 2017 at 11:31:36AM +0200, Paolo Bonzini wrote:
-> > > The tables that QEMU provides are not ACPI 1.0 compatible since commit
-> > > 77af8a2b95 ("hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve
-> > > guest OS support.", 2017-05-03).  This is visible with Windows 2000,
-> > > which refuses to parse the rev3 FADT and fails to boot.
-> > > 
-> > > The recommended solution in this case is to build two FADTs, v1 being
-> > > pointed to by the RSDT and v3 by the XSDT.  However, we leave this task
-> > > to the firmware.  This patch simply switches the RSDT to the XSDT, which
-> > > is valid for all ACPI 2.0-friendly operating systems and also leaves
-> > > SeaBIOS the freedom to build an RSDT that points to the compatibility
-> > > FADT.
-> > > 
-> > > When running Windows 2000 with an old BIOS, Windows would simply fall
-> > > back to a non-ACPI HAL; however, the plan should be to include a BIOS with
-> > > the new feature in 2.10.
-> > > 
-> > > Reported-by: Programmingkid <programmingkidx@gmail.com>
-> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > 
-> > I'm not against this but let's do it for q35 only please. PC is a legacy
-> > machine type and let's just leave it alone.
-> 
-> We've already touched the PC machine type in 77af8a2b95 and that needs
-> fixing to deal with the regressions it caused. Even if you call it
-> "legacy", the PC machine is used by the vast majority of deployments
-> that exist today & likely to be done for the foreseeable future too.
-> 
-> Regards,
-> Daniel
+Most browsers try to download a /favicon.ico file from the web servers
+which is then e.g. used in the browser tabs or bookmark lists. So let's
+add such a file for the QEMU website, too. The .ico has been created
+resizing the logo from http://wiki.qemu.org/Logo to 16x16 pixels.
 
-Fine. So let's avoid making cosmetic changes there. Keep working things
-working.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ If I've got the Jekyll magic right, it should be enough to create this
+ file in the top of the repository, right? Or do we need to mark this
+ in one of the configuration files, too?
 
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+ favicon.ico | Bin 0 -> 1150 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 favicon.ico
+
+diff --git a/favicon.ico b/favicon.ico
+new file mode 100644
+index 0000000000000000000000000000000000000000..f22440604f92468c7102b1293bcc59426f0e5bbd
+GIT binary patch
+literal 1150
+zcmaizQAkr^6vxk&tGVdTETpGpNakuH(R%P9qV-Ul4}yd~lml1Jgz6y}S|r4v2VL}1
+z53Nz8R?tIWv_~sfFJab05QA8yk=07KW!v2D?(WzBY`Y;+bjI(Vd(U_O=bZ05cSJh;
+zYHA4AdOBG}R7XTj03k%maX2EZMK_cwJ^%f}@_uj+JO`8DCg=w1K^VLQ(_lZ)Oplv0
+z-~)(*A7FuMn^W+K3iI%bfY;sv17Krq5PSuic99yp)3micjTq-(l7Mq@jv=7g0B%-l
+z6I8u9MaRCVWUTvzwWSI_;W-EEdjVTLm;+i}<kzL>(4zu%yecBj^%*UXwx9QiN#Fwb
+z26#`LH$}V8=g2Dr?Y$)9Ia?tE&pEgU-opa$fG6NPU~Q6i^ej_vQIzy`t*p<1Ww2V$
+z^+rJqaIOSx*_ZyK^{PUusg)&3Vsa*vDXZ7(SJr3!V=xO!eVg{2E%%Myb-jw%xvRNo
+zv)L4o2RW<NnlTs*ynlY5d*<F>fF$BejYn=2N`3R*!S>Ek^{~^WIGs+}<#OfP+S;;q
+zyPapj{qlK_gAtHwXlTeB?7O9`)bsr&?`QQu-)*JKJCt{H4d&aAo?6B}xOYBtFKA&s
+z@@5A7R|~qna_w>+RaCj>g`w+>Sl2ltHg<$n=ZVX*(P(5n&yT-#wrduPB{McQrZoBD
+zs@8+vs|a0-Pe`6Q;U1Y*#>emE1Azd~lWU)5Va2N9C;fiE9DFcST-#rnANrS$e-f?d
+z-l<QgB85mKB0C%op8a*8t7tV>Z8n=j!C+AK-Ca<7f(a3L7+0UYo-M{=v0^kDRXiRK
+zYX<@UU;bq+Znyh>C=`l^!{OY-#6)&@c=#jE=L!VdR*QI;Q{W=HVg6^@dsAz0=w_nd
+DdRjod
+
+literal 0
+HcmV?d00001
+
+-- 
+1.8.3.1
