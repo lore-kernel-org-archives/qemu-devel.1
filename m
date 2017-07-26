@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52785)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daTSA-0007R0-5H
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:02:47 -0400
+	id 1daTSv-0007q6-9o
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daTS6-0005un-8s
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:02:46 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36519)
+	id 1daTSr-0006Fo-5H
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:03:33 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36567)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daTS6-0005sS-2H
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:02:42 -0400
-Received: by mail-qt0-x244.google.com with SMTP id c15so2893042qta.3
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 14:02:40 -0700 (PDT)
+	id 1daTSr-0006FR-0I
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:03:29 -0400
+Received: by mail-qt0-x243.google.com with SMTP id c15so2894771qta.3
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 14:03:28 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <65ED9743-B53C-4E6A-866F-C883650914CE@gmail.com>
@@ -22,8 +22,8 @@ References: <65ED9743-B53C-4E6A-866F-C883650914CE@gmail.com>
 	<CAFEAcA_BRPRAmA5cJEtsY8zn0K358peX5PzvD05vZys1swo0EQ@mail.gmail.com>
 	<AF369030-9AE0-4C46-A416-7B92359C1851@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <76a9f07d-fd95-9b6e-4d2d-4884541239dd@amsat.org>
-Date: Wed, 26 Jul 2017 18:02:36 -0300
+Message-ID: <62e0a3f1-844e-1f3b-0cff-5fd0b9a13192@amsat.org>
+Date: Wed, 26 Jul 2017 18:03:25 -0300
 MIME-Version: 1.0
 In-Reply-To: <AF369030-9AE0-4C46-A416-7B92359C1851@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
