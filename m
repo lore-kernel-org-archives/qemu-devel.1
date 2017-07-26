@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1daMwj-0006s1-IB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:56 -0400
+	(envelope-from <imammedo@redhat.com>) id 1daN0X-0000UO-FG
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:09:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1daMwi-0006K8-1Z
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41020)
+	(envelope-from <imammedo@redhat.com>) id 1daN0U-0000WW-8J
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:09:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1daMwh-0006ID-Oh
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:51 -0400
-Date: Wed, 26 Jul 2017 16:05:43 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1daN0U-0000Vd-0T
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:09:46 -0400
+Date: Wed, 26 Jul 2017 16:09:37 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170726160543.1a66bf10@nial.brq.redhat.com>
-In-Reply-To: <20170725161025-mutt-send-email-mst@kernel.org>
-References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
-	<20170724111419.720aa168@nial.brq.redhat.com>
-	<20170724234849-mutt-send-email-mst@kernel.org>
-	<20170725104438.5eb90865@nial.brq.redhat.com>
-	<20170725161025-mutt-send-email-mst@kernel.org>
+Message-ID: <20170726160937.74e18968@nial.brq.redhat.com>
+In-Reply-To: <20170725163315-mutt-send-email-mst@kernel.org>
+References: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
+	<20170725163315-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
- of vhost region merge
+Subject: Re: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx
+ based machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +29,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
 
-On Tue, 25 Jul 2017 22:47:18 +0300
+On Tue, 25 Jul 2017 16:36:06 +0300
 "Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Tue, Jul 25, 2017 at 10:44:38AM +0200, Igor Mammedov wrote:
-> > On Mon, 24 Jul 2017 23:50:00 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:  
-> > > > On Sun, 23 Jul 2017 20:46:11 +0800
-> > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
-> > > >     
-> > > > > When a guest that has several hotplugged dimms is migrated, on
-> > > > > destination it will fail to resume. Because regions on source
-> > > > > are merged and on destination the order of realizing devices
-> > > > > is different from on source with dimms, so when part of devices
-> > > > > are realizd some region can not be merged.That may be more than
-> > > > > vhost slot limit.
-> > > > > 
-> > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> > > > > ---
-> > > > >  hw/mem/pc-dimm.c        | 2 +-
-> > > > >  include/sysemu/sysemu.h | 1 +
-> > > > >  vl.c                    | 5 +++++
-> > > > >  3 files changed, 7 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > > index ea67b46..13f3db5 100644
-> > > > > --- a/hw/mem/pc-dimm.c
-> > > > > +++ b/hw/mem/pc-dimm.c
-> > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > > >          goto out;
-> > > > >      }
-> > > > >  
-> > > > > -    if (!vhost_has_free_slot()) {
-> > > > > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
-> > > > >          error_setg(&local_err, "a used vhost backend has no free"
-> > > > >                                 " memory slots left");    
-> > > > that doesn't fix issue,
-> > > >    1st: number of used entries is changing after machine_init_done() is called
-> > > >         as regions continue to mapped/unmapped during runtime    
-> > > 
-> > > But that's fine, we want hotplug to fail if we can not guarantee vhost
-> > > will work.  
-> > don't we want guarantee that vhost will work with dimm devices at startup
-> > if it were requested on CLI or fail startup cleanly if it can't?  
+> On Mon, Jul 24, 2017 at 03:50:20PM +0200, Igor Mammedov wrote:
+> > w2k used to boot on QEMU until revision of FADT has
+> > been bumped to rev3
+> > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+> > 
+> > Keep PC machine at rev1 to remain compatible and Q35
+> > at rev3 where w2k isn't supported anyway so OSX could
+> > run as well.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > v2:
+> >    - make pc rev1 and q35 rev3.
+> >        "Michael S. Tsirkin" <mst@redhat.com>
+> > 
+> > PS:
+> > Only compile tested.
+> > 
+> > 
+> > CC: Programmingkid <programmingkidx@gmail.com>
+> > CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> > CC: "Michael S. Tsirkin" <mst@redhat.com>
+> > 
+> > ---
+> >  hw/i386/acpi-build.c | 22 ++++++++++++++++++----
+> >  1 file changed, 18 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 6b7bade..b9c245c 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
+> >  } AcpiMcfgInfo;
+> >  
+> >  typedef struct AcpiPmInfo {
+> > +    bool force_rev1_fadt;
+> >      bool s3_disabled;
+> >      bool s4_disabled;
+> >      bool pcihp_bridge_en;
+> > @@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+> >      Object *obj = NULL;
+> >      QObject *o;
+> >  
+> > +    pm->force_rev1_fadt = false;
+> >      pm->cpu_hp_io_base = 0;
+> >      pm->pcihp_io_base = 0;
+> >      pm->pcihp_io_len = 0;
+> >      if (piix) {
+> > +        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+> > +        pm->force_rev1_fadt = true;
+> >          obj = piix;
+> >          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+> >          pm->pcihp_io_base =
+> > @@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+> >      }
+> >      fadt->century = RTC_CENTURY;
+> > +    if (pm->force_rev1_fadt) {
+> > +        return;
+> > +    }
+> >  
+> >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+> >      fadt->reset_value = 0xf;
+> > @@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+> >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+> >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> > +    int fadt_size = sizeof(*fadt);
+> > +    int rev = 3;
+> >  
+> >      /* FACS address to be filled by Guest linker */
+> >      bios_linker_loader_add_pointer(linker,
+> > @@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> >      bios_linker_loader_add_pointer(linker,
+> >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+> >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > -    bios_linker_loader_add_pointer(linker,
+> > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > +    if (pm->force_rev1_fadt) {
+> > +        rev = 1;
+> > +        fadt_size = offsetof(typeof(*fadt), reset_register);  
 > 
-> Yes. And failure to start vhost will achieve this without need to much with
-> DIMMs. The issue is only with DIMM hotplug when vhost is already running,
-> specifically because notifiers have no way to report or handle errors.
-> 
-> > >   
-> > > >    2nd: it brings regression and allows to start QEMU with number memory
-> > > >         regions more than supported by backend, which combined with missing
-> > > >         error handling in vhost will lead to qemu crashes or obscure bugs in
-> > > >         guest breaking vhost enabled drivers.
-> > > >         i.e. patch undoes what were fixed by
-> > > >         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html    
-> > > 
-> > > Why does it? The issue you fixed there is hotplug, and that means
-> > > pc_dimm_memory_plug called after machine done.  
-> > I wasn't able to crash fc24 guest with current qemu/rhen7 kernel,
-> > it fallbacks back to virtio and switches off vhost.   
-> 
-> I think vhostforce should make vhost fail and not fall back,
-> but that is another bug.
-currently vhostforce is broken, qemu continues to happily run with this patch
-and without patch it fails to start up so I'd just NACK this patch
-on this behavioral change and ask to fix both issues in the same series.
-
-
-While looking at vhost memmap, I've also noticed that option rom
-"pc.rom" maps/remaps it self multiple times and it affects
-number of vhost mem map slots. I suspect that vhost is not interested
-in accessing pc.rom occupied memory and to hide it from vhost
-we need to make it RO. Also looking at roms initialization
-I've noticed that roms are typically mapped as RO if PCI is enabled.
-Taking in account that vhost is available only when PCI is enabled
-could be following patch be acceptable:
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e3fcd51..de459e2 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1449,6 +1449,9 @@ void pc_memory_init(PCMachineState *pcms,
-     option_rom_mr = g_malloc(sizeof(*option_rom_mr));
-     memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
-                            &error_fatal);
-+    if (pcmc->pci_enabled) {
-+        memory_region_set_readonly(option_rom_mr, true);
-+    }
-     vmstate_register_ram_global(option_rom_mr);
-     memory_region_add_subregion_overlap(rom_memory,
-                                         PC_ROM_MIN_VGA,
-
-
-it will keep ROM as RW on isa machine but RO for the rest PCI based.
+> I don't really like it that we are using structs to format fields - I
+> would prefer build_append_int_noprefix based APIs - but since we do,
+> let's add a proper structure for FADT rev 1 instead of this hack.
+I'll do it.
 
 > 
-> >   
-> > >   
-> > > >     
-> > > > >          goto out;
-> > > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > > > > index b213696..48228ad 100644
-> > > > > --- a/include/sysemu/sysemu.h
-> > > > > +++ b/include/sysemu/sysemu.h
-> > > > > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
-> > > > >  void qemu_add_exit_notifier(Notifier *notify);
-> > > > >  void qemu_remove_exit_notifier(Notifier *notify);
-> > > > >  
-> > > > > +bool qemu_is_machine_init_done(void);
-> > > > >  void qemu_add_machine_init_done_notifier(Notifier *notify);
-> > > > >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
-> > > > >  
-> > > > > diff --git a/vl.c b/vl.c
-> > > > > index fb6b2ef..43aee22 100644
-> > > > > --- a/vl.c
-> > > > > +++ b/vl.c
-> > > > > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
-> > > > >  
-> > > > >  static bool machine_init_done;
-> > > > >  
-> > > > > +bool qemu_is_machine_init_done(void)
-> > > > > +{
-> > > > > +    return machine_init_done;
-> > > > > +}
-> > > > > +
-> > > > >  void qemu_add_machine_init_done_notifier(Notifier *notify)
-> > > > >  {
-> > > > >      notifier_list_add(&machine_init_done_notifiers, notify);    
+> While we are at it, maybe we should replace macro hacks like
+> ACPI_FADT_COMMON_DEF with simple sub-structures (unless you see a reason
+> not to).
+that would be rewriting every user that touches fields,
+I'd ratter slowly /one table at time/ switch to build_append_int_noprefix() API
+instead of amending legacy approach.
+
+> 
+> 
+> > +    } else {
+> > +        bios_linker_loader_add_pointer(linker,
+> > +            ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > +            ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > +    }
+> >  
+> >      build_header(linker, table_data,
+> > -                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
+> > +                 (void *)fadt, "FACP", fadt_size, rev, oem_id, oem_table_id);
+> >  }
+> >  
+> >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> > -- 
+> > 2.7.4  
+> 
