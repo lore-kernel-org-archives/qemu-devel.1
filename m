@@ -1,30 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daMtG-0003uB-SR
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:02:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1daMta-00046a-A1
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daMtC-0003m4-N3
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:02:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daMtC-0003le-Fu
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:02:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E1D1806A6
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 14:02:13 +0000 (UTC)
-Date: Wed, 26 Jul 2017 15:02:08 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170726140208.GO7620@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1501075650-6971-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1501075650-6971-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a favicon.ico file
+	(envelope-from <eblake@redhat.com>) id 1daMtU-0003s8-QR
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:02:38 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 26 Jul 2017 09:02:16 -0500
+Message-Id: <20170726140218.15904-2-eblake@redhat.com>
+In-Reply-To: <20170726140218.15904-1-eblake@redhat.com>
+References: <20170726140218.15904-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] qemu-io: Give more --version information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +19,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Jeff Cody <jcody@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On Wed, Jul 26, 2017 at 03:27:30PM +0200, Thomas Huth wrote:
-> Most browsers try to download a /favicon.ico file from the web servers
-> which is then e.g. used in the browser tabs or bookmark lists. So let's
-> add such a file for the QEMU website, too. The .ico has been created
-> resizing the logo from http://wiki.qemu.org/Logo to 16x16 pixels.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Include the package version information (useful for detecting
+builds from git or downstream backports), and the copyright notice.
 
-FYI, just having a single 'favicon.ico' file isn't generally sufficient
-anymore. Thanks to explosion of mobile devices there are 20+ different files
-that various browsers  / clients look for now :-(
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-io.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-  https://realfavicongenerator.net/faq
+diff --git a/qemu-io.c b/qemu-io.c
+index 4cfa41c8f9..ec175630a6 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -26,6 +26,7 @@
+ #include "block/block_int.h"
+ #include "trace/control.h"
+ #include "crypto/init.h"
++#include "qemu-version.h"
 
-That site thankfully has ability to generate you all the various
-required files + HTML snippet to make it work, if you just upload
-a large (260x260 px) image.
+ #define CMD_NOFILE_OK   0x01
 
-
-Regards,
-Daniel
+@@ -522,7 +523,8 @@ int main(int argc, char **argv)
+             trace_file = trace_opt_parse(optarg);
+             break;
+         case 'V':
+-            printf("%s version %s\n", progname, QEMU_VERSION);
++            printf("%s version " QEMU_VERSION QEMU_PKGVERSION "\n"
++                   QEMU_COPYRIGHT "\n", progname);
+             exit(0);
+         case 'h':
+             usage(progname);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.3
