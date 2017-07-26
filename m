@@ -1,43 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53560)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1daI6i-0008GS-9I
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:55:53 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55586)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1daIGF-0002Mn-2o
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1daI6d-0002ZW-EL
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:55:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50307
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liujbjl@linux.vnet.ibm.com>)
-	id 1daI6d-0002Y9-9D
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:55:47 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6Q8rgo2102954
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:55:46 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxpk23wxn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:55:45 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <liujbjl@linux.vnet.ibm.com>;
-	Wed, 26 Jul 2017 02:55:45 -0600
-References: <20170721034730.25612-1-crosa@redhat.com>
-	<20170721034730.25612-4-crosa@redhat.com>
-	<ddf57b6c-42b2-0ec1-7d53-71d5266727fe@linux.vnet.ibm.com>
-	<20170725154546.GR23343@stefanha-x1.localdomain>
-	<20170725154854.GS26394@redhat.com>
-From: Jing Liu <liujbjl@linux.vnet.ibm.com>
-Date: Wed, 26 Jul 2017 16:55:39 +0800
+	(envelope-from <pl@kamp.de>) id 1daIGB-0007KY-KV
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:05:42 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:43931 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1daIGB-0007Jb-9F
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:05:39 -0400
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+	<1500993699-19299-11-git-send-email-pl@kamp.de>
+	<546c49d1-57c3-7ba7-c0cf-558da609e7a7@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <6a32de35-09d8-cccf-6b53-561255e4b806@kamp.de>
+Date: Wed, 26 Jul 2017 11:05:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170725154854.GS26394@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <7343a904-6f31-b8b1-c721-267c66e4cb75@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] qemu-iotests: require
- CONFIG_LINUX_AIO for test 087
+In-Reply-To: <546c49d1-57c3-7ba7-c0cf-558da609e7a7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V5 10/10] block/qcow2: add compress info to
+ image specific info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,59 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
+Am 25.07.2017 um 23:55 schrieb Eric Blake:
+> On 07/25/2017 09:41 AM, Peter Lieven wrote:
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>> ---
+>>  block/qcow2.c        | 7 +++++++
+>>  qapi/block-core.json | 6 +++++-
+>>  2 files changed, 12 insertions(+), 1 deletion(-)
+>>
+>> +++ b/qapi/block-core.json
+>> @@ -68,6 +68,9 @@
+>>  # @encrypt: details about encryption parameters; only set if image
+>>  #           is encrypted (since 2.10)
+>>  #
+>> +# @compress: details about parameters for compressed clusters; only set if
+>> +#            the compress format header extension is present (since 2.11)
+> Thinking aloud:
+>
+> I still think this is better as "only set if the image uses compressed
+> headers" (similar to encrypt).  That is, I would like this output to be
+> present even when opening legacy deflate/0/12 images.
+>
+> But thinking more, what I am REALLY asking for is "if any cluster is
+> compressed, then this information is present; if nothing is compressed,
+> the choice of compression header doesn't matter".  But we don't have a
+> quick-and-dirty way to tell if an image has any compressed clusters,
+> short of examining every L2 map (including maps inside internal snapshots).
+>
+> Hmm - we already have 'Dirty bit' and 'Corrupt bit' as
+> incompatible_features that can quickly identify certain image
+> properties; do we want another bit set to 1 for images known to use
+> compressed clusters?  Or even make it an auto-clear bit (or even a pair
+> of auto-clear bits: one to designate that this image was written by a
+> new-enough qemu that promises to mark the image if any compressed
+> clusters exist, and the other is set only if such clusters do exist;
+> that way, if both bits are clear, we know we have to walk L2 tables to
+> look for compressed clusters, but if the first bit is set, then the
+> second bit is reliable)?
+>
+> So maybe this means we are still debating spec ideas.  Kevin, do you
+> want to chime in?
+>
 
+I would also vote for adding an information to the image if it contains
+compressed clusters. 2 bits sounds reasonable. One to promise we set
+the compressed bit if we write any compressed cluster and one to tell
+that there are actually compressed cluster. If we set the "promise" bit
+at create time we can simply hook up in qcow2_co_pwritev_comperssed
+and set the bit there as soon as we write any compressed cluster.
 
-On 2017/7/25 =E4=B8=8B=E5=8D=8811:48, Daniel P. Berrange wrote:
-> On Tue, Jul 25, 2017 at 04:45:46PM +0100, Stefan Hajnoczi wrote:
->> On Mon, Jul 24, 2017 at 02:44:13PM +0800, Jing Liu wrote:
->>> On 2017/7/21 =E4=B8=8A=E5=8D=8811:47, Cleber Rosa wrote:
->>>> One of the "sub-"tests of test 087 requires CONFIG_LINUX_AIO.
->>>>
->>>> As a PoC/RFC, this goes the easy route and skips the test as a whole
->>>> when that feature is missing.  Other approaches include splitting
->>>> the test and adding extra filtering.
->>>>
->>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>>> ---
->>>>    tests/qemu-iotests/087 | 1 +
->>>>    1 file changed, 1 insertion(+)
->>>>
->>>> diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
->>>> index f8e4903..a2fb7de 100755
->>>> --- a/tests/qemu-iotests/087
->>>> +++ b/tests/qemu-iotests/087
->>>> @@ -34,6 +34,7 @@ status=3D1	# failure is the default!
->>>>    _supported_fmt qcow2
->>>>    _supported_proto file
->>>>    _supported_os Linux
->>>> +_require_feature CONFIG_LINUX_AIO
->>> I tested that CONFIG_NETTLE_KDF is also a necessary for 087.
->>>
->>> +_require_feature CONFIG_NETTLE_KDF
->> Are you sure?  Looks like either nettle or gcrypt is needed:
-> Correct, it works with either.
-Ah, because I just found out nettle which related to KDF.
-why can not find out gcrypt.h in qemu?
-How to compile config_gcrypt_kdf into qemu?
->
->> crypto/Makefile.objs:crypto-obj-$(CONFIG_NETTLE_KDF) +=3D pbkdf-nettle=
-.o
->> crypto/Makefile.objs:crypto-obj-$(if $(CONFIG_NETTLE_KDF),n,$(CONFIG_G=
-CRYPT_KDF)) +=3D pbkdf-gcrypt.o
->>
->> But this shows why the compile-time testing of features is ugly:
->>
->> 1. It duplicates build dependency logic into the test cases.
->>
->> 2. The test cases don't care about nettle vs gcrypt and they shouldn't
->>     have to know about it.  They just care whether LUKS is available o=
-r
->>     not.
-> Yeah that knowledge is messy and fragile wrt future changes.
->
->
-> Regards,
-> Daniel
+The compression info I would display unconditionally. Because the compress
+settings are made at create time and are there even if we don't have compressed
+clusters yet.
+
+Peter
