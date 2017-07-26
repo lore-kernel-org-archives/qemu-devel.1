@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daVgv-0005xH-7s
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:26:10 -0400
+	(envelope-from <jsnow@redhat.com>) id 1daViu-0006Wp-Tl
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daVgr-0001oD-AZ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:26:09 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daVgr-0001nz-5E
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:26:05 -0400
-Received: by mail-qk0-x241.google.com with SMTP id q66so16843283qki.1
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 16:26:05 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-18-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1481407a-3be7-36aa-d62b-51f69bc3436d@amsat.org>
-Date: Wed, 26 Jul 2017 20:26:01 -0300
+	(envelope-from <jsnow@redhat.com>) id 1daVit-0002tS-RW
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:28:12 -0400
+References: <20170725211523.3998-1-eblake@redhat.com>
+	<20170725211523.3998-5-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <25f12e18-b096-99b9-e235-1f8f93466107@redhat.com>
+Date: Wed, 26 Jul 2017 19:28:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170724182751.18261-18-f4bug@amsat.org>
+In-Reply-To: <20170725211523.3998-5-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 17/35] usb/dev-mtp: fix use of
- uninitialized values
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 04/12] tests: Pass literal format
+ strings directly to qmp_FOO()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,103 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: "open list:IDE" <qemu-block@nongnu.org>, armbru@redhat.com, stefanha@redhat.com
 
-On 07/24/2017 03:27 PM, Philippe Mathieu-Daudé wrote:
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   hw/usb/dev-mtp.c | 36 +++++++++++++++++++++---------------
->   1 file changed, 21 insertions(+), 15 deletions(-)
+
+
+On 07/25/2017 05:15 PM, Eric Blake wrote:
+> From: Markus Armbruster <armbru@redhat.com>
 > 
-> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> index 6dfece9ea9..ad64495f05 100644
-> --- a/hw/usb/dev-mtp.c
-> +++ b/hw/usb/dev-mtp.c
-> @@ -1134,7 +1134,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
->                                    c->trans, 1, s->session, 0);
->               return;
->           }
-> -        if (c->argv[0] == 0) {
-> +        if (c->argc == 0 || c->argv[0] == 0) {
->               usb_mtp_queue_result(s, RES_INVALID_PARAMETER,
->                                    c->trans, 0, 0, 0);
-
-^ This is OK,
-
-but part below is incorrect, after reading the MTP specs 1.1 I 
-understood the correct code to return is RES_INVALID_PARAMETER.
-
->               return;
-> @@ -1162,8 +1162,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
->           data_in = usb_mtp_get_storage_ids(s, c);
->           break;
->       case CMD_GET_STORAGE_INFO:
-> -        if (c->argv[0] != QEMU_STORAGE_ID &&
-> -            c->argv[0] != 0xffffffff) {
-> +        if (c->argc == 0 ||
-> +           (c->argv[0] != QEMU_STORAGE_ID &&
-> +            c->argv[0] != 0xffffffff)) {
->               usb_mtp_queue_result(s, RES_INVALID_STORAGE_ID,
->                                    c->trans, 0, 0, 0);
->               return;
-> @@ -1172,22 +1173,25 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
->           break;
->       case CMD_GET_NUM_OBJECTS:
->       case CMD_GET_OBJECT_HANDLES:
-> -        if (c->argv[0] != QEMU_STORAGE_ID &&
-> -            c->argv[0] != 0xffffffff) {
-> +        if (c->argc == 0 ||
-> +           (c->argv[0] != QEMU_STORAGE_ID &&
-> +            c->argv[0] != 0xffffffff)) {
->               usb_mtp_queue_result(s, RES_INVALID_STORAGE_ID,
->                                    c->trans, 0, 0, 0);
->               return;
->           }
-> -        if (c->argv[1] != 0x00000000) {
-> +        if (c->argc > 1 && c->argv[1] != 0x00000000) {
->               usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
->                                    c->trans, 0, 0, 0);
->               return;
->           }
-> -        if (c->argv[2] == 0x00000000 ||
-> -            c->argv[2] == 0xffffffff) {
-> -            o = QTAILQ_FIRST(&s->objects);
-> -        } else {
-> -            o = usb_mtp_object_lookup(s, c->argv[2]);
-> +        if (c->argc > 2) {
-> +            if (c->argv[2] == 0x00000000 ||
-> +                c->argv[2] == 0xffffffff) {
-> +                o = QTAILQ_FIRST(&s->objects);
-> +            } else {
-> +                o = usb_mtp_object_lookup(s, c->argv[2]);
-> +            }
->           }
->           if (o == NULL) {
->               usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
-> @@ -1264,8 +1268,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
->           res0 = data_in->length;
->           break;
->       case CMD_GET_OBJECT_PROPS_SUPPORTED:
-> -        if (c->argv[0] != FMT_UNDEFINED_OBJECT &&
-> -            c->argv[0] != FMT_ASSOCIATION) {
-> +        if (c->argc == 0 ||
-> +           (c->argv[0] != FMT_UNDEFINED_OBJECT &&
-> +            c->argv[0] != FMT_ASSOCIATION)) {
->               usb_mtp_queue_result(s, RES_INVALID_OBJECT_FORMAT_CODE,
->                                    c->trans, 0, 0, 0);
->               return;
-> @@ -1273,8 +1278,9 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
->           data_in = usb_mtp_get_object_props_supported(s, c);
->           break;
->       case CMD_GET_OBJECT_PROP_DESC:
-> -        if (c->argv[1] != FMT_UNDEFINED_OBJECT &&
-> -            c->argv[1] != FMT_ASSOCIATION) {
-> +        if (c->argc > 1 &&
-> +           (c->argv[1] != FMT_UNDEFINED_OBJECT &&
-> +            c->argv[1] != FMT_ASSOCIATION)) {
->               usb_mtp_queue_result(s, RES_INVALID_OBJECT_FORMAT_CODE,
->                                    c->trans, 0, 0, 0);
->               return;
+> The qmp_FOO() take a printf-like format string.  In a few places, we
+> assign a string literal to a variable and pass that instead of simply
+> passing the literal.  Clean that up.
 > 
+> Bonus: gets rid of non-literal format strings.  A step towards
+> compile-time format string checking without triggering
+> -Wformat-nonliteral.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Message-Id: <1500645206-13559-4-git-send-email-armbru@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+Reviewed-by: John Snow <jsnow@redhat.com>
