@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1daQEd-0007ev-E5
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:36:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1daQEq-0007kT-6m
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1daQEZ-0006CX-LI
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:36:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51920)
+	(envelope-from <ehabkost@redhat.com>) id 1daQEl-0006Js-Cl
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:36:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1daQEZ-0006CK-Ce
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:36:31 -0400
-Date: Wed, 26 Jul 2017 18:36:28 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170726173628.GF30459@redhat.com>
-References: <e071dd23-8d19-93ba-7962-b2e2df69a6ee@mail.uni-paderborn.de>
-	<CAEz=sonvfDHymUBec0Xw3RqhiANmUvrCjqMvn2eQ4zuOu1rH5A@mail.gmail.com>
-	<58da690d-03d4-2c96-469a-35ff8c25ef1d@mail.uni-paderborn.de>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1daQEl-0006IR-4x
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:36:43 -0400
+Date: Wed, 26 Jul 2017 14:36:38 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170726173638.GG20793@localhost.localdomain>
+References: <1501049917-4701-1-git-send-email-wang.yi59@zte.com.cn>
+	<1501049917-4701-3-git-send-email-wang.yi59@zte.com.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <58da690d-03d4-2c96-469a-35ff8c25ef1d@mail.uni-paderborn.de>
-Subject: Re: [Qemu-devel] [sw-dev] RFC: QEMU RISC-V modular ISA decoding
+In-Reply-To: <1501049917-4701-3-git-send-email-wang.yi59@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hmp: allow apic-id for "info lapic"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +27,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Samuel Falvo II <sam.falvo@gmail.com>, RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Yi Wang <wang.yi59@zte.com.cn>
+Cc: dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, imammedo@redhat.com, qemu-devel@nongnu.org, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
 
-On Wed, Jul 26, 2017 at 02:00:14PM +0200, Bastian Koppelmann wrote:
-> Hi Samuel,
+On Wed, Jul 26, 2017 at 02:18:37AM -0400, Yi Wang wrote:
+> Add [apic-id] support for hmp command "info lapic", which is
+> useful when debugging ipi and so on. Current behavior is not
+> changed when the parameter isn't specified.
 > 
-> On 07/25/2017 04:31 PM, Samuel Falvo II wrote:
-> > For those of us who are not in the know, how does target/s390 decoding work?
-> 
-> sorry about that. I was going into this with a QEMU-dev mindset :)
-> 
-> The basic idea of s390x is to have every instruction + instruction
-> formats specified in files that are parsed by the preprocessor and then
-> used through preprocessor magic to generate switch-case statements for
-> insn selection and data structures filled with the decoded data.
-> 
-> s390x has two files:
->     - insn-data.def -> contains all the instructions, including opcodes,
->                        name, ref to insn specific translate function,
->                        ref to insn format, and some more
->     - insn-format.def -> contains all the instruction formats
-> 
-> these are then used to automatically generate the switch-case statements
-> and decoding code.
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-I looked at the s390x TCG code for the first time now and this is a
-far more sensible way of doing it.  We should do it for all the arches :-)
-I wonder if there's a performance penalty?
+I believe your sign-off should come last, or it looks like I
+signed-off this whole commit.  And I will only sign it off when
+merging the patch on my tree.
 
-Rich.
+I suggest sending cpu_by_arch_id() in a separate patch, to let
+maintainers cherry-pick and revert individual patches more
+easily.  But there's no need to send v3 just because of that, I
+can split it while committing.
 
-> If you want to extend this, you add your own insn format to the
-> insn-format.def files add functions for decoding parameters in
-> translate.c. And then add your insn referencing the new format to
-> insn-def.data and add translation functions for each of them.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+> ---
+>  hmp-commands-info.hx  |  7 ++++---
+>  include/qom/cpu.h     | 10 ++++++++++
+>  qom/cpu.c             | 11 ++++++++---
+>  target/i386/monitor.c | 10 +++++++++-
+>  4 files changed, 31 insertions(+), 7 deletions(-)
 > 
-> The main benefit here is that you don't have to bother with writing all
-> that boring glue code.
-> 
-> I hope that helped :)
-> 
-> Cheers,
-> Bastian
-> 
-> > 
-> > I've maintained a 65816 emulator
-> > (https://bitbucket.org/kc5tja/lib65816/src) which also uses a giant
-> > case construct.  This method is used because it's fast.  Any
-> > alternative approaches you decide to take might well work and satisfy
-> > extensibility requirements, but it'll likely take a performance hit as
-> > well.
-> > 
-> > On Tue, Jul 25, 2017 at 6:04 AM, Bastian Koppelmann
-> > <kbastian@mail.uni-paderborn.de> wrote:
-> >> Hi QEMU devs, hi risc-v-sw devs,
-> >>
-> >> I'm posting this cross mailing list since I'd like to get feedback from
-> >> the both sides.
-> >>
-> >> Right now the RISC-V port for QEMU uses the classic decoding scheme of
-> >> one function decoding the first opcode (and prefixes) and then branches
-> >> to different functions for decoding the rest (as in target/arm or most
-> >> of the other targets). This is all done using switch, case statements.
-> >>
-> >> This is a little bit tricky to extend, especially for third parties. I
-> >> don't think it's too bad, but it can definitely be improved and I really
-> >> like the way target/s390x does it, but I'm not sure about it's drawbacks.
-> >>
-> >> I see three options to proceed from here:
-> >>
-> >>     1) Completely move to a decoding scheme similar to target/s390x in
-> >>        QEMU. On the plus side it make it super easy to add new
-> >>        instructions and/or new instruction formats, and reduces decoding
-> >>        errors. I don't know the major drawbacks to this approach, maybe
-> >>        performance. Does anyone know? Other than that it needs a major
-> >>        rewrite of the decoder, which will take some time and thus delay
-> >>        the development of RISC-V QEMU upstream. (I think RV32/64I can
-> >>        be left as is, since everybody has to implement it anyways)
-> >>
-> >>     2) The compromise: Leave the core as is, i.e. RV32GC, and provide a
-> >>        nice interface for any other extension similar to target/s390.
-> >>        The big plus here is that no code needs to be changed and only
-> >>        the interface needs to be added. We don't add any performance
-> >>        overhead (if s390x-style decoding adds any), but this might
-> >>        result in nobody using it, since they don't know about the
-> >>        interface and they just hack their stuff in. Then it was a waste
-> >>        of our time to implement the interface.
-> >>
-> >>     3) The status quo. Just leave it as is.
-> >>
-> >> Any comments?
-> >>
-> >> Cheers,
-> >> Bastian
-> >>
-> >>
-> >>
-> >> --
-> >> You received this message because you are subscribed to the Google Groups "RISC-V SW Dev" group.
-> >> To unsubscribe from this group and stop receiving emails from it, send an email to sw-dev+unsubscribe@groups.riscv.org.
-> >> To post to this group, send email to sw-dev@groups.riscv.org.
-> >> Visit this group at https://groups.google.com/a/groups.riscv.org/group/sw-dev/.
-> >> To view this discussion on the web visit https://groups.google.com/a/groups.riscv.org/d/msgid/sw-dev/e071dd23-8d19-93ba-7962-b2e2df69a6ee%40mail.uni-paderborn.de.
-> > 
-> > 
-> > 
-> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index d9df238..4ab7fce 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -115,9 +115,10 @@ ETEXI
+>  #if defined(TARGET_I386)
+>      {
+>          .name       = "lapic",
+> -        .args_type  = "",
+> -        .params     = "",
+> -        .help       = "show local apic state",
+> +        .args_type  = "apic-id:i?",
+> +        .params     = "[apic-id]",
+> +        .help       = "show local apic state (apic-id: local apic to read, default is which of current CPU)",
+> +
+>          .cmd        = hmp_info_local_apic,
+>      },
+>  #endif
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 25eefea..b7ac949 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -755,6 +755,16 @@ CPUState *qemu_get_cpu(int index);
+>  bool cpu_exists(int64_t id);
+>  
+>  /**
+> + * cpu_by_arch_id:
+> + * @id: Guest-exposed CPU ID of the CPU to obtain.
+> + *
+> + * Get a CPU with matching @id.
+> + *
+> + * Returns: The CPU or %NULL if there is no matching CPU.
+> + */
+> +CPUState *cpu_by_arch_id(int64_t id);
+> +
+> +/**
+>   * cpu_throttle_set:
+>   * @new_throttle_pct: Percent of sleep time. Valid range is 1 to 99.
+>   *
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 4f38db0..e6210d5 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -34,7 +34,7 @@
+>  
+>  CPUInterruptHandler cpu_interrupt_handler;
+>  
+> -bool cpu_exists(int64_t id)
+> +CPUState *cpu_by_arch_id(int64_t id)
+>  {
+>      CPUState *cpu;
+>  
+> @@ -42,10 +42,15 @@ bool cpu_exists(int64_t id)
+>          CPUClass *cc = CPU_GET_CLASS(cpu);
+>  
+>          if (cc->get_arch_id(cpu) == id) {
+> -            return true;
+> +            return cpu;
+>          }
+>      }
+> -    return false;
+> +    return NULL;
+> +}
+> +
+> +bool cpu_exists(int64_t id)
+> +{
+> +    return !!cpu_by_arch_id(id);
+>  }
+>  
+>  CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
+> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+> index 77ead60..fe7d57b 100644
+> --- a/target/i386/monitor.c
+> +++ b/target/i386/monitor.c
+> @@ -632,7 +632,15 @@ const MonitorDef *target_monitor_defs(void)
+>  
+>  void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
+>  {
+> -    CPUState *cs = mon_get_cpu();
+> +    CPUState *cs;
+> +
+> +    if (qdict_haskey(qdict, "apic-id")) {
+> +        int id = qdict_get_try_int(qdict, "apic-id", 0);
+> +        cs = cpu_by_arch_id(id);
+> +    } else {
+> +        cs = mon_get_cpu();
+> +    }
+> +
+>  
+>      if (!cs) {
+>          monitor_printf(mon, "No CPU available\n");
 > -- 
-> You received this message because you are subscribed to the Google Groups "RISC-V SW Dev" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to sw-dev+unsubscribe@groups.riscv.org.
-> To post to this group, send email to sw-dev@groups.riscv.org.
-> Visit this group at https://groups.google.com/a/groups.riscv.org/group/sw-dev/.
-> To view this discussion on the web visit https://groups.google.com/a/groups.riscv.org/d/msgid/sw-dev/58da690d-03d4-2c96-469a-35ff8c25ef1d%40mail.uni-paderborn.de.
+> 1.8.3.1
+> 
+> 
 
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+Eduardo
