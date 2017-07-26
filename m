@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1daOFc-0008G3-9D
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:29 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1daOFo-0008Rb-KH
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1daOFb-0003O7-F4
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34688)
+	(envelope-from <alex.williamson@redhat.com>) id 1daOFl-0003ff-ER
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1daOFb-0003Ml-8h
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C5C0445F5
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:29:26 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 26 Jul 2017 17:29:18 +0200
-Message-Id: <20170726152918.11995-6-kraxel@redhat.com>
-In-Reply-To: <20170726152918.11995-1-kraxel@redhat.com>
-References: <20170726152918.11995-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] ps2: enable multimedia keys
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1daOFl-0003ea-9D
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:37 -0400
+Date: Wed, 26 Jul 2017 09:29:31 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170726092931.0678689e@w520.home>
+In-Reply-To: <859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
+	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
+	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
+	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, Michael Tsirkin <mst@redhat.com>, qemu-devel@nongnu.org
 
-Fixes: 8c10e0baf0260b59a4e984744462a18016662e3e
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- hw/input/ps2.c | 4 ----
- 1 file changed, 4 deletions(-)
+On Wed, 26 Jul 2017 09:21:38 +0300
+Marcel Apfelbaum <marcel@redhat.com> wrote:
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 3ba05efd06..25ae7fc852 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -224,7 +224,6 @@ static const uint16_t qcode_to_keycode_set1[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_DOT] = 0x34,
-     [Q_KEY_CODE_SLASH] = 0x35,
- 
--#if 0
-     [Q_KEY_CODE_POWER] = 0x0e5e,
-     [Q_KEY_CODE_SLEEP] = 0x0e5f,
-     [Q_KEY_CODE_WAKE] = 0x0e63,
-@@ -247,7 +246,6 @@ static const uint16_t qcode_to_keycode_set1[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_AC_STOP] = 0xe068,
-     [Q_KEY_CODE_AC_REFRESH] = 0xe067,
-     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe066,
--#endif
- 
-     [Q_KEY_CODE_ASTERISK] = 0x37,
-     [Q_KEY_CODE_LESS] = 0x56,
-@@ -366,7 +364,6 @@ static const uint16_t qcode_to_keycode_set2[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_DOT] = 0x49,
-     [Q_KEY_CODE_SLASH] = 0x4a,
- 
--#if 0
-     [Q_KEY_CODE_POWER] = 0x0e37,
-     [Q_KEY_CODE_SLEEP] = 0x0e3f,
-     [Q_KEY_CODE_WAKE] = 0x0e5e,
-@@ -389,7 +386,6 @@ static const uint16_t qcode_to_keycode_set2[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_AC_STOP] = 0xe028,
-     [Q_KEY_CODE_AC_REFRESH] = 0xe020,
-     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe018,
--#endif
- 
-     [Q_KEY_CODE_ALTGR] = 0x08,
-     [Q_KEY_CODE_ALTGR_R] = 0xe008,
--- 
-2.9.3
+> On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote:
+> > To accelerate data traversing between devices under the same PCIE Root=
+=20
+> > Port or Switch.
+> >=20
+> > See https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.h=
+tml
+> >  =20
+>=20
+> Hi,
+>=20
+> It may be possible, but maybe PCIe Switch assignment is not
+> the only way to go.
+>=20
+> Adding Alex and Michael for their input on this matter.
+> More info at:
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.html
+
+I think you need to look at where the IOMMU is in the topology and what
+address space the devices are working in when assigned to a VM to
+realize that it doesn't make any sense to assign switch ports to a VM.
+GPUs cannot do switch level peer to peer when assigned because they are
+operating in an I/O virtual address space.  This is why we configure
+ACS on downstream ports to prevent peer to peer.  Peer to peer
+transactions must be forwarded upstream by the switch ports in order to
+reach the IOMMU for translation.  Note however that we do populate peer
+to peer mappings within the IOMMU, so if the hardware supports it, the
+IOMMU can reflect the transaction back out to the I/O bus to reach the
+other device without CPU involvement.
+
+Therefore I think the better solution, if it encourages the NVIDIA
+driver to do the right thing, is to use emulated switches.  Assigning
+the physical switch would really do nothing more than make the PCIe link
+information more correct in the VM, everything else about the switch
+would be emulated.  Even still, unless you have an I/O topology which
+integrates the IOMMU into the switch itself, the data flow still needs
+to go all the way to the root complex to hit the IOMMU before being
+reflected to the other device.  Direct peer to peer between downstream
+switch ports operates in the wrong address space.  Thanks,
+
+Alex
