@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1daKqC-0001Bl-3j
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:51:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1daKrH-0001hK-I1
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:52:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1daKqB-0000kv-3l
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:51:00 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1daKqA-0000kM-TZ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:50:59 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id m85so65237384wma.1
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:50:58 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1daKrE-000182-Ap
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:52:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daKrE-00017Z-1l
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:52:04 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B8DDF356F6
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 11:52:02 +0000 (UTC)
+References: <20170726114437.19624-1-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dff2d29a-1c80-a624-6476-5104c0b5344e@redhat.com>
+Date: Wed, 26 Jul 2017 06:52:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170726113308.GG18489@stefanha-x1.localdomain>
-References: <20170721093416.17816-1-stefanha@redhat.com>
-	<CAFEAcA_+ffmyvExhFvm2JTmoipum6GeWiFPP5kuxRKb9+ezRzA@mail.gmail.com>
-	<20170725152052.GP23343@stefanha-x1.localdomain>
-	<CAFEAcA9J=m+aVWH1piHA=dzXU_ND9O1=whkpis9mb=WM8m_40g@mail.gmail.com>
-	<20170726113308.GG18489@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 26 Jul 2017 12:50:37 +0100
-Message-ID: <CAFEAcA_oapBTwRqHH0Rn8gJ6FnRLs2isejYMzr9aXLLwS5Tx+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: add a "how to"
- to ./README
+In-Reply-To: <20170726114437.19624-1-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="usVism282R7NSgAIF6h49siwQ6W9Hd5l7"
+Subject: Re: [Qemu-devel] [qemu-web PATCH] add Thomas's bug reporting dos
+ and don'ts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +34,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
-On 26 July 2017 at 12:33, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Tue, Jul 25, 2017 at 04:34:19PM +0100, Peter Maydell wrote:
->> On 25 July 2017 at 16:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> > On Mon, Jul 24, 2017 at 11:20:44AM +0100, Peter Maydell wrote:
->> >> Should ./check be run from the source tree, or the build tree? The
->> >> existing README text doesn't say and I don't think your additions
->> >> do either.
->> >
->> > It doesn't matter, both should work.  The script detects both
->> > possibilities and rejigs itself to compensate.
->>
->> Does that mean
->>  if you run it from the source tree in a tree configured
->>  for out of tree build it will:
->>  (a) pollute your source tree with test output and binaries
->>  (b) give you a helpful message about what to do
->>  (c) magically find the build tree somehow
->>  (d) not need to write any binaries/test output/temp files at all
->>
->> ?
->
-> I think it would fail since the binaries would be missing in the source
-> tree.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--usVism282R7NSgAIF6h49siwQ6W9Hd5l7
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
+Message-ID: <dff2d29a-1c80-a624-6476-5104c0b5344e@redhat.com>
+Subject: Re: [qemu-web PATCH] add Thomas's bug reporting dos and don'ts
+References: <20170726114437.19624-1-pbonzini@redhat.com>
+In-Reply-To: <20170726114437.19624-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That sounds like "the README should say you need to run it
-from the build tree", then ?
+On 07/26/2017 06:44 AM, Paolo Bonzini wrote:
+> We don't want the page to become too long, but these are good suggestio=
+ns.
+>=20
+> Also tone down the sentence about using the latest release or latest gi=
+t
+> tree, though we do prefer those.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  contribute.md              |  2 +-
+>  contribute/report-a-bug.md | 13 ++++++++++---
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+>=20
 
-thanks
--- PMM
+>  * Reproduce the problem directly with a QEMU command-line.  Avoid fron=
+tends and management stacks, to ensure that the bug is in QEMU itself and=
+ not in a frontend.
+> =20
+> -* Include as information about the guest (operating system, version, 3=
+2/64-bit).
+> +* Include as information about the host and guest (operating system, v=
+ersion, 32/64-bit).
+
+Grammar. Your choice of which fix to use:
+s/as //
+s/as information/as much information as possible/
+
+With that fixed:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--usVism282R7NSgAIF6h49siwQ6W9Hd5l7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll4gmAACgkQp6FrSiUn
+Q2qWKggApotCQW5XWhCr6VyP0RwqezrOrPr29I9nkQ1xMjJuGbB9Geg45uzI0mLY
+wY8bYwxTPm8BImP2RnBSFqTuxX+/qIm5SqPtZA+AjxURQVG5sUS0zBdWe3jMOzq2
+/WwNz/OjxXR+VDi0MxABs/6tg8gGLyeNHXBDAcgPMNYRzMmZhNLMC36Ddk7GRC5E
+yRuEqvyGE6k+hT0o2fFp04KCk8goG49XH78HideRF8WG4w4iUm1kLhjTNcS7+h3w
+KAEQPhaeU5s+VK5OnRQcBPkMjrAGCucqXdbQYiyMrhGdDLcMbPs3fztlPmf5cuUy
+ZYSq1iIQycFPVDfG2jua+MCo4Z34/Q==
+=Ztug
+-----END PGP SIGNATURE-----
+
+--usVism282R7NSgAIF6h49siwQ6W9Hd5l7--
