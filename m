@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1daNRG-0003za-1U
+	(envelope-from <ldoktor@redhat.com>) id 1daNRF-0003zW-9q
 	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:37:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1daNRE-0002ob-OU
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:37:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60714)
+	(envelope-from <ldoktor@redhat.com>) id 1daNR9-0002l1-IY
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:37:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1daNRE-0002oH-IL
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:37:24 -0400
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1daNR9-0002kn-Cz
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:37:19 -0400
 From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Wed, 26 Jul 2017 16:35:40 +0200
-Message-Id: <20170726143543.2530-12-ldoktor@redhat.com>
+Date: Wed, 26 Jul 2017 16:35:38 +0200
+Message-Id: <20170726143543.2530-10-ldoktor@redhat.com>
 In-Reply-To: <20170726143543.2530-1-ldoktor@redhat.com>
 References: <20170726143543.2530-1-ldoktor@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 11/14] qmp.py: Use object-based class for
- QEMUMonitorProtocol
+Subject: [Qemu-devel] [PATCH v3 09/14] qemu.py: Use custom exceptions rather
+ than Exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, armbru@redhat.com, apahim@redhat.com, f4bug@amsat.org, mreitz@redhat.com, jsnow@redhat.com
 
-There is no need to define QEMUMonitorProtocol as old-style class.
+The naked Exception should not be widely used. It makes sense to be a
+bit more specific and use better-suited custom exceptions. As a benefit
+we can store the full reply in the exception in case someone needs it
+when catching the exception.
 
 Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qmp-shell | 4 ++--
- scripts/qmp/qmp.py    | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ scripts/qemu.py | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 860ffb2..be449de 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -106,7 +106,7 @@ class FuzzyJSON(ast.NodeTransformer):
- #       _execute_cmd()). Let's design a better one.
- class QMPShell(qmp.QEMUMonitorProtocol):
-     def __init__(self, address, pretty=3DFalse):
--        qmp.QEMUMonitorProtocol.__init__(self, self.__get_address(addres=
-s))
-+        super(QMPShell, self).__init__(self.__get_address(address))
-         self._greeting =3D None
-         self._completer =3D None
-         self._pretty =3D pretty
-@@ -281,7 +281,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-         return True
-=20
-     def connect(self, negotiate):
--        self._greeting =3D qmp.QEMUMonitorProtocol.connect(self, negotia=
-te)
-+        self._greeting =3D super(QMPShell, self).connect(negotiate)
-         self.__completer_setup()
-=20
-     def show_banner(self, msg=3D'Welcome to the QMP low-level shell!'):
-diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index 782d1ac..95ff5cc 100644
---- a/scripts/qmp/qmp.py
-+++ b/scripts/qmp/qmp.py
-@@ -30,7 +30,7 @@ class QMPTimeoutError(QMPError):
-     pass
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 5948e19..2bd522f 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -19,6 +19,19 @@ import subprocess
+ import qmp.qmp
 =20
 =20
--class QEMUMonitorProtocol:
-+class QEMUMonitorProtocol(object):
++class MonitorResponseError(qmp.qmp.QMPError):
++    '''
++    Represents erroneous QMP monitor reply
++    '''
++    def __init__(self, reply):
++        try:
++            desc =3D reply["error"]["desc"]
++        except KeyError:
++            desc =3D reply
++        super(MonitorResponseError, self).__init__(desc)
++        self.reply =3D reply
++
++
+ class QEMUMachine(object):
+     '''A QEMU VM'''
 =20
-     #: Socket's error class
-     error =3D socket.error
+@@ -197,9 +210,9 @@ class QEMUMachine(object):
+         '''
+         reply =3D self.qmp(cmd, conv_keys, **args)
+         if reply is None:
+-            raise Exception("Monitor is closed")
++            raise qmp.qmp.QMPError("Monitor is closed")
+         if "error" in reply:
+-            raise Exception(reply["error"]["desc"])
++            raise MonitorResponseError(reply)
+         return reply["return"]
+=20
+     def get_qmp_event(self, wait=3DFalse):
 --=20
 2.9.4
