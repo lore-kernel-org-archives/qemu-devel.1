@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daRNU-0002eO-Lm
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:49:49 -0400
+	(envelope-from <jsnow@redhat.com>) id 1daRNj-00033M-Ni
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:50:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daRNP-0004Df-OM
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:49:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daRNP-0004BD-Fx
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:49:43 -0400
-Date: Wed, 26 Jul 2017 21:49:36 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170726214852-mutt-send-email-mst@kernel.org>
-References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
-	<d0bd04f4-1ac4-0e3a-885f-2ceb6180f69a@redhat.com>
-	<dfb9663b-c31b-2def-9df6-754fb18bb27f@redhat.com>
-	<b3936955-d84a-d2ba-e1a0-3ca90547ece7@redhat.com>
-	<c1502763-61e8-159a-4455-37e833ca5b6d@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1daRNh-0004UZ-Qe
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:50:02 -0400
+References: <20170721183243.22706-1-eblake@redhat.com>
+	<20170721183243.22706-2-eblake@redhat.com>
+	<76a5ebbd-5261-a3f0-2dc1-a236c6c3f97a@redhat.com>
+	<7c61246c-3098-3b8f-bb1a-fec58d80961d@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <98e135f6-fe4e-d572-5567-bddbf8ef86c0@redhat.com>
+Date: Wed, 26 Jul 2017 14:49:46 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c1502763-61e8-159a-4455-37e833ca5b6d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/4] Allow RedHat PCI bridges
- reserve more buses than necessary during init
+In-Reply-To: <7c61246c-3098-3b8f-bb1a-fec58d80961d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] dirty-bitmap: Report
+ BlockDirtyInfo.count in bytes, as documented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, kraxel@redhat.com, seabios@seabios.org, kevin@koconnor.net, qemu-devel@nongnu.org, konrad.wilk@oracle.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
 
-On Wed, Jul 26, 2017 at 07:22:42PM +0300, Marcel Apfelbaum wrote:
-> On 26/07/2017 18:20, Laszlo Ersek wrote:
-> > On 07/26/17 08:48, Marcel Apfelbaum wrote:
-> > > On 25/07/2017 18:46, Laszlo Ersek wrote:
-> > 
-> > [snip]
-> > 
-> > > > (2) Bus range reservation, and hotplugging bridges. What's the
-> > > > motivation? Our recommendations in "docs/pcie.txt" suggest flat
-> > > > hierarchies.
-> > > > 
-> > > 
-> > > It remains flat. You have one single PCIE-PCI bridge plugged
-> > > into a PCIe Root Port, no deep nesting.
-> > > 
-> > > The reason is to be able to support legacy PCI devices without
-> > > "committing" with a DMI-PCI bridge in advance. (Keep Q35 without)
-> > > legacy hw.
-> > > 
-> > > The only way to support PCI devices in Q35 is to have them cold-plugged
-> > > into the pcie.0 bus, which is good, but not enough for expanding the
-> > > Q35 usability in order to make it eventually the default
-> > > QEMU x86 machine (I know this is another discussion and I am in
-> > > minority, at least for now).
-> > > 
-> > > The plan is:
-> > > Start Q35 machine as usual, but one of the PCIe Root Ports includes
-> > > hints for firmware needed t support legacy PCI devices. (IO Ports range,
-> > > extra bus,...)
-> > > 
-> > > Once a pci device is needed you have 2 options:
-> > > 1. Plug a PCIe-PCI bridge into a PCIe Root Port and the PCI device
-> > >     in the bridge.
-> > > 2. Hotplug a PCIe-PCI bridge into a PCIe Root Port and then hotplug
-> > >     a PCI device into the bridge.
-> > 
-> 
-> Hi Laszlo,
-> 
-> > Thank you for the explanation, it makes the intent a lot clearer.
-> > 
-> > However, what does the hot-pluggability of the PCIe-PCI bridge buy us?
-> > In other words, what does it buy us when we do not add the PCIe-PCI
-> > bridge immediately at guest startup, as an integrated device?
-> >  > Why is it a problem to "commit" in advance? I understand that we might
-> > not like the DMI-PCI bridge (due to it being legacy), but what speaks
-> > against cold-plugging the PCIe-PCI bridge either as an integrated device
-> > in pcie.0 (assuming that is permitted), or cold-plugging the PCIe-PCI
-> > bridge in a similarly cold-plugged PCIe root port?
-> > 
-> 
-> We want to keep Q35 clean, and for most cases we don't want any
-> legacy PCI stuff if not especially required.
 
-BTW, what are the PCI devices that we actually need?
 
--- 
-MST
+On 07/25/2017 05:37 PM, Eric Blake wrote:
+> On 07/25/2017 04:28 PM, John Snow wrote:
+>>
+>>
+>> On 07/21/2017 02:32 PM, Eric Blake wrote:
+>>> We've been documenting the value in bytes since its introduction
+>>> in commit b9a9b3a4 (v1.3), where it was actually reported in bytes.
+>>>
+>>> Commit e4654d2 (v2.0) then removed things from block/qapi.c, in
+>>> preparation for a rewrite to a list of dirty sectors in the next
+>>> commit 21b5683 in block.c, but the new code mistakenly started
+>>> reporting in sectors.
+>>>
+>>> Fixes: https://bugzilla.redhat.com/1441460
+>>>
+>>> CC: qemu-stable@nongnu.org
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>>
+>>
+>> I must have forgotten about this -- Didn't this get reviewed as part of
+>> your byte series? Is this a resend for a stable branch?
+> 
+> Yes, it was reviewed during my part 2-of-4 series on byte-base block
+> status (the dirty bitmap series).  Series 1 made it into 2.10, but
+> series 2-4 did not; ergo, I filtered out the true bug-fixes that were
+> still worthy post-freeze.
+> 
+
+Thanks for the clarification. Short term memory is a little strapped 
+right now due to my move.
+
+ACK
