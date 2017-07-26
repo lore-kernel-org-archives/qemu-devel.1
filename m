@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1daRju-0004nS-01
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:12:59 -0400
+	(envelope-from <mst@redhat.com>) id 1daSDN-0003to-IA
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1daRjq-0004Nc-OY
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:12:57 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35219)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1daRjq-0004NG-GE
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:12:54 -0400
-Received: by mail-qk0-x244.google.com with SMTP id k2so8824679qkf.2
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:12:54 -0700 (PDT)
-Date: Wed, 26 Jul 2017 15:12:52 -0400
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20170726191252.GA8769@morn.lan>
-References: <CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-	<20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-	<a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
-	<20170725220150.GA2891@morn.lan>
-	<8ce79be9-5512-148d-f2d4-3bb8c04d6eda@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1daSDL-0000gk-Ev
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:43:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daSDL-0000gA-5L
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 15:43:23 -0400
+Date: Wed, 26 Jul 2017 22:43:09 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170726215625-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8ce79be9-5512-148d-f2d4-3bb8c04d6eda@redhat.com>
-Subject: Re: [Qemu-devel] [SeaBIOS] Commit
- 77af8a2b95b79699de650965d5228772743efe84 breaks Windows 2000 support
+In-Reply-To: <1500761743-1669-5-git-send-email-zuban32s@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/6] hw/pci: introduce bridge-only
+ vendor-specific capability to provide some hints to firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,110 +28,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, "seabios@seabios.org" <seabios@seabios.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kraxel@redhat.com, seabios@seabios.org
 
-On Wed, Jul 26, 2017 at 09:20:16AM +0200, Paolo Bonzini wrote:
-> On 26/07/2017 00:01, Kevin O'Connor wrote:
-> > On Tue, Jul 25, 2017 at 07:10:21PM +0200, Paolo Bonzini wrote:
-> >> On 25/07/2017 18:23, Paolo Bonzini wrote:
-> >>> On 25/07/2017 18:14, Laszlo Ersek wrote:
-> >>>>   "No regressions became apparent in tests with a range of Windows
-> >>>>    (XP-10)"
-> >>>>
-> >>>> In theory, w2k falls within that range.
-> >>>
-> >>> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
-> >>>
-> >>> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
-> >>> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
-> >>> patching the RSDT to point to it.
-> >>>
-> >>> It's a hack, but it's the only place I see to make it "just work".  And
-> >>> it could be extended nicely in the future.
-> > 
-> > It's an impressive hack!
-> > 
-> >>>
-> >>> All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.
-> > [...]
-> >> SeaBIOS:
-> >>
-> >> From 73b0facdb7349f5dbf24dc675647b68eeeec0ff4 Mon Sep 17 00:00:00 2001
-> >> From: Paolo Bonzini <pbonzini@redhat.com>
-> >> Date: Tue, 25 Jul 2017 18:50:19 +0200
-> >> Subject: [PATCH 1/2] seabios: build RSDT from XSDT
-> >>
-> >> Old operating systems would like to have a v1 FADT, but new
-> >> operating systems would like to have v3.
-> >>
-> >> Since old operating systems do not know about XSDTs, the
-> >> solution is to point the RSDT to a v1 FADT and the XSDT to a
-> >> v3 FADT.
-> >>
-> >> But, OVMF is not able to do that and barfs when it sees the
-> >> second FADT---plus really it's only BIOS operating systems
-> >> such as win2k that complain.  So instead: 1) make QEMU provide
-> >> an XSDT only; 2) build the RSDT and v1 FADT in SeaBIOS.
-> >>
-> >> This patch makes SeaBIOS build an RSDT out of an existing XSDT.
-> > 
-> > I'd really prefer not to have SeaBIOS go back to producing ACPI
-> > tables.
+On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
+> On PCI init PCI bridges may need some
+> extra info about bus number to reserve, IO, memory and
+> prefetchable memory limits. QEMU can provide this
+> with special
+
+with a special
+
+> vendor-specific PCI capability.
 > 
-> Me too, but this is different from SeaBIOS producing ACPI tables.
-> (Patched) QEMU produces entirely valid ACPI 2.0 tables, while SeaBIOS is
-> only producing compatibility glue for old OSes.  Compared to producing
-> ACPI tables, SeaBIOS needs no knowledge of the underlying hardware, only
-> of the limitations of those old OSes.  Responsibilities between QEMU and
-> SeaBIOS are nicely split.
+> Sizes of limits match ones from
+> PCI Type 1 Configuration Space Header,
+> number of buses to reserve occupies only 1 byte 
+> since it is the size of Subordinate Bus Number register.
 > 
-> > As an alternative, how about some other possible hacks:
-> > 
-> > 1 - ovmf filters out the extra tables that it barfs on.
-> > 
-> > 2 - change ovmf to read the fw_cfg linker script
-> >     'etc/table-loader-ovmf' instead of '/etc/table-loader' and change
-> >     qemu to generate two linker scripts - one for seabios and one for
-> >     ovmf.
-> > 
-> > 3 - same as 2, but change seabios to use 'etc/table-loader-seabios'
-> >     and leave ovmf unchanged.
-> > 
-> > 4 - change seabios to read both the linker script 'etc/table-loader'
-> >     _and_ some new linker script '/etc/table-loader-legacy'.  Have
-> >     qemu introduce the RSDT/FADTv1 in the "legacy" linker script.
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>  hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
+>  include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
+>  2 files changed, 45 insertions(+)
 > 
-> (4) would be acceptable I guess.  However I think it's a bit worse
-> because fw-cfg files are a somewhat scarce resource.  The "legacy"
-> aspect is something that SeaBIOS is in the best position to address,
-> because it knows what OSes are running on it; QEMU instead only takes
-> care of describing the hardware.
+> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> index 720119b..8ec6c2c 100644
+> --- a/hw/pci/pci_bridge.c
+> +++ b/hw/pci/pci_bridge.c
+> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
+>      br->bus_name = bus_name;
+>  }
+>  
+> +
+> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
 
-SeaBIOS is used with both modern and legacy OSes, and it doesn't have
-any knowledge about what kind of OS will be used.  If anything, I'd
-argue that QEMU has more knowledge about the guest OS than SeaBIOS
-does (due to command-line options like machine version).
+help? should be qemu_cap_init?
 
-As I see it, fundamentally the proposal here is to deploy different
-ACPI tables when using SeaBIOS then when using OVMF.  I think that's
-fine, but I think we should directly address that issue then.
+> +                              uint8_t bus_reserve, uint32_t io_limit,
+> +                              uint16_t mem_limit, uint64_t pref_limit,
+> +                              Error **errp)
+> +{
+> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
+> +    PCIBridgeQemuCap cap;
 
-Specifically, I have the following concerns with the original approach:
+This leaks info to guest. You want to init all fields here:
 
-A - It would require deploying SeaBIOS and QEMU in lock-step.  To get
-    this in for QEMU v2.10 would require making QEMU changes during
-    the soft freeze and would require a SeaBIOS "stable" release that
-    introduces ACPI table manipulation.
+cap = {
+ .len = ....
+};
 
-B - I don't have full confidence the proposed ACPI changes wont expose
-    a quirk in some obscure OS from the last 25 years.  If it does
-    expose a quirk, any work-around would likely require deploying a
-    new SeaBIOS and QEMU in lock-step.
+> +
+> +    cap.len = cap_len;
+> +    cap.bus_res = bus_reserve;
+> +    cap.io_lim = io_limit & 0xFF;
+> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
+> +    cap.mem_lim = mem_limit;
+> +    cap.pref_lim = pref_limit & 0xFFFF;
+> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
 
-C - We'd be introducing "shared ownership" of the acpi tables.  Some
-    of the tables would be produced by QEMU and some of them by
-    SeaBIOS.  Explaining when and why to future developers would be a
-    challenge.
+Please use pci_set_word etc or cpu_to_leXX.
 
--Kevin
+I think it's easiest to replace struct with a set of macros then
+pci_set_word does the work for you.
+
+
+> +
+> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
+> +                                    cap_offset, cap_len, errp);
+> +    if (offset < 0) {
+> +        return offset;
+> +    }
+> +
+> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
+
++2 is yacky. See how virtio does it:
+
+    memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
+           cap->cap_len - PCI_CAP_FLAGS);
+
+
+> +    return 0;
+> +}
+> +
+>  static const TypeInfo pci_bridge_type_info = {
+>      .name = TYPE_PCI_BRIDGE,
+>      .parent = TYPE_PCI_DEVICE,
+> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> index ff7cbaa..c9f642c 100644
+> --- a/include/hw/pci/pci_bridge.h
+> +++ b/include/hw/pci/pci_bridge.h
+> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
+>  #define  PCI_BRIDGE_CTL_DISCARD_STATUS	0x400	/* Discard timer status */
+>  #define  PCI_BRIDGE_CTL_DISCARD_SERR	0x800	/* Discard timer SERR# enable */
+>  
+> +typedef struct PCIBridgeQemuCap {
+> +    uint8_t id;     /* Standard PCI capability header field */
+> +    uint8_t next;   /* Standard PCI capability header field */
+> +    uint8_t len;    /* Standard PCI vendor-specific capability header field */
+> +    uint8_t bus_res;
+> +    uint32_t pref_lim_upper;
+
+Big endian? Ugh.
+
+> +    uint16_t pref_lim;
+> +    uint16_t mem_lim;
+
+I'd say we need 64 bit for memory.
+
+> +    uint16_t io_lim_upper;
+> +    uint8_t io_lim;
+> +    uint8_t padding;
+
+IMHO each type should have a special "don't care" flag
+that would mean "I don't know".
+
+
+> +} PCIBridgeQemuCap;
+
+You don't really need this struct in the header. And pls document all fields.
+
+> +
+> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
+> +                              uint8_t bus_reserve, uint32_t io_limit,
+> +                              uint16_t mem_limit, uint64_t pref_limit,
+> +                              Error **errp);
+> +
+>  #endif /* QEMU_PCI_BRIDGE_H */
+> -- 
+> 2.7.4
