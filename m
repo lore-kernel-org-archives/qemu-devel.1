@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daEyX-0001jG-BE
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 01:35:14 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1daF2S-0003C1-68
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 01:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daEyT-0002Nf-B2
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 01:35:13 -0400
-Date: Wed, 26 Jul 2017 15:28:41 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170726052841.GG8978@umbus.fritz.box>
+	(envelope-from <aik@ozlabs.ru>) id 1daF2O-00050T-3c
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 01:39:16 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:34922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1daF2N-0004z9-RJ
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 01:39:12 -0400
+Received: by mail-it0-x244.google.com with SMTP id v127so10909918itd.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 22:39:11 -0700 (PDT)
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100567284.27487.16381745122889215367.stgit@bahia>
+	<150100578691.27487.8944448515009831240.stgit@bahia>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <69a908a6-3ec6-54ca-9bda-08d65aae76c1@ozlabs.ru>
+Date: Wed, 26 Jul 2017 15:38:43 +1000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YhYebsMuj/FQeBW/"
-Content-Disposition: inline
-In-Reply-To: <150100567284.27487.16381745122889215367.stgit@bahia>
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 15/26] spapr: add pseries-2.11
- machine type
+In-Reply-To: <150100578691.27487.8944448515009831240.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to
+ update the XICS phandle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +31,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
---YhYebsMuj/FQeBW/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jul 25, 2017 at 08:01:12PM +0200, Greg Kurz wrote:
+On 26/07/17 04:03, Greg Kurz wrote:
+> The "phandle" property of the XICS node is referenced by the "interrupt-map"
+> property of each PHB node. This is used by the guest OS to setup IRQs for
+> all PCI devices.
+> 
+> QEMU uses an arbitrary value (0x1111) for this phandle, but SLOF converts
+> this value to a SLOF specific one, which is then presented to the guest OS.
+> 
+> This patches introduces the new KVMPPC_H_UPDATE_PHANDLE hcall, which is used
+> by SLOF to communicate the patched phandle value back to QEMU. This value
+> is then cached and preserved accross migration until machine reset.
+> 
+> This is required to be able to support PHB hotplug.
+> 
+> Note, that SLOF already has some code to call KVMPPC_H_RTAS_UPDATE, so we
+> have to introduce its number even if QEMU currently doesn't implement it.
+> 
+> Suggested-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied to ppc-for-2.11.  Might as well get the new machine type
-template ready.
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 > ---
->  hw/ppc/spapr.c      |   22 ++++++++++++++++++++--
->  include/hw/compat.h |    3 +++
->  2 files changed, 23 insertions(+), 2 deletions(-)
->=20
+>  hw/ppc/spapr.c         |   25 +++++++++++++++++++++++--
+>  hw/ppc/spapr_hcall.c   |   20 ++++++++++++++++++++
+>  include/hw/ppc/spapr.h |   11 ++++++++++-
+>  3 files changed, 53 insertions(+), 3 deletions(-)
+> 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 53969315ac24..277daa4f9645 100644
+> index 1a6cd4efeb97..90485054c2e7 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -3533,18 +3533,36 @@ static const TypeInfo spapr_machine_info =3D {
->      type_init(spapr_machine_register_##suffix)
-> =20
->  /*
-> + * pseries-2.11
+> @@ -96,8 +96,6 @@
+>  
+>  #define MIN_RMA_SLOF            128UL
+>  
+> -#define PHANDLE_XICP            0x00001111
+> -
+>  /* maximum number of hotpluggable PHBs */
+>  #define SPAPR_DRC_MAX_PHB       256
+>  
+> @@ -1454,6 +1452,7 @@ static void ppc_spapr_reset(void)
+>      first_ppc_cpu->env.nip = SPAPR_ENTRY_POINT;
+>  
+>      spapr->cas_reboot = false;
+> +    spapr->xics_phandle = UINT32_MAX;
+>  }
+>  
+>  static void spapr_create_nvram(sPAPRMachineState *spapr)
+> @@ -1652,6 +1651,26 @@ static const VMStateDescription vmstate_spapr_patb_entry = {
+>      },
+>  };
+>  
+> +static bool spapr_xics_phandle_needed(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr = opaque;
+> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(MACHINE(spapr));
+> +
+> +    /* Don't break older machine types that don't support PHB hotplug. */
+> +    return smc->dr_phb_enabled && spapr->xics_phandle != UINT32_MAX;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_xics_phandle = {
+> +    .name = "spapr_xics_phandle",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = spapr_xics_phandle_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(xics_phandle, sPAPRMachineState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr = {
+>      .name = "spapr",
+>      .version_id = 3,
+> @@ -1671,6 +1690,7 @@ static const VMStateDescription vmstate_spapr = {
+>          &vmstate_spapr_ov5_cas,
+>          &vmstate_spapr_patb_entry,
+>          &vmstate_spapr_pending_events,
+> +        &vmstate_spapr_xics_phandle,
+>          NULL
+>      }
+>  };
+> @@ -2702,6 +2722,7 @@ static void spapr_machine_initfn(Object *obj)
+>  
+>      spapr->htab_fd = -1;
+>      spapr->use_hotplug_event_source = true;
+> +    spapr->xics_phandle = UINT32_MAX;
+>      object_property_add_str(obj, "kvm-type",
+>                              spapr_get_kvm_type, spapr_set_kvm_type, NULL);
+>      object_property_set_description(obj, "kvm-type",
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 72ea5a8247bf..ce8a9eb66b23 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1623,6 +1623,25 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>      return H_SUCCESS;
+>  }
+>  
+> +static target_ulong h_update_phandle(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+> +                                     target_ulong opcode, target_ulong *args)
+> +{
+> +    target_ulong old_phandle = args[0];
+> +    target_ulong new_phandle = args[1];
+> +
+> +    if (new_phandle >= UINT32_MAX) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    /* We only have a "phandle" property in the XICS node at the moment. */
+> +    if (old_phandle != (uint32_t) PHANDLE_XICP) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    spapr->xics_phandle = (uint32_t) new_phandle;
+> +    return H_SUCCESS;
+> +}
+> +
+>  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+>  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
+>  
+> @@ -1717,6 +1736,7 @@ static void hypercall_register_types(void)
+>  
+>      /* qemu/KVM-PPC specific hcalls */
+>      spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
+> +    spapr_register_hypercall(KVMPPC_H_UPDATE_PHANDLE, h_update_phandle);
+>  
+>      /* ibm,client-architecture-support support */
+>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 8004d9c2ab2c..f09c54d5bb94 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -125,6 +125,8 @@ struct sPAPRMachineState {
+>  
+>      bool dr_phb_enabled; /* hotplug / dynamic-reconfiguration of PHBs */
+>  
+> +    uint32_t xics_phandle;
+> +
+>      /*< public >*/
+>      char *kvm_type;
+>      MemoryHotplugState hotplug_memory;
+> @@ -402,7 +404,9 @@ struct sPAPRMachineState {
+>  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+>  /* Client Architecture support */
+>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
+> +#define KVMPPC_H_RTAS_UPDATE    (KVMPPC_HCALL_BASE + 0x3)
+> +#define KVMPPC_H_UPDATE_PHANDLE (KVMPPC_HCALL_BASE + 0x4)
+> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_PHANDLE
+>  
+>  typedef struct sPAPRDeviceTreeUpdateHeader {
+>      uint32_t version_id;
+> @@ -707,4 +711,9 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+>  
+>  #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+>  
+> +/* Boot time value of the "phandle" property of the "interrupt-controller"
+> + * node.
 > + */
-> +static void spapr_machine_2_11_instance_options(MachineState *machine)
-> +{
-> +}
+> +#define PHANDLE_XICP            0x00001111
 > +
-> +static void spapr_machine_2_11_class_options(MachineClass *mc)
-> +{
-> +    /* Defaults for the latest behaviour inherited from the base class */
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
-> +
-> +/*
->   * pseries-2.10
->   */
-> +#define SPAPR_COMPAT_2_10                                              \
-> +    HW_COMPAT_2_10                                                     \
-> +
->  static void spapr_machine_2_10_instance_options(MachineState *machine)
->  {
->  }
-> =20
->  static void spapr_machine_2_10_class_options(MachineClass *mc)
->  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    spapr_machine_2_11_class_options(mc);
-> +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_10);
->  }
-> =20
-> -DEFINE_SPAPR_MACHINE(2_10, "2.10", true);
-> +DEFINE_SPAPR_MACHINE(2_10, "2.10", false);
-> =20
->  /*
->   * pseries-2.9
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index 08f36004dad7..3e101f8f6783 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -1,6 +1,9 @@
->  #ifndef HW_COMPAT_H
->  #define HW_COMPAT_H
-> =20
-> +#define HW_COMPAT_2_10 \
-> +    /* empty */
-> +
->  #define HW_COMPAT_2_9 \
->      {\
->          .driver   =3D "pci-bridge",\
->=20
+>  #endif /* HW_SPAPR_H */
+> 
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---YhYebsMuj/FQeBW/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll4KIkACgkQbDjKyiDZ
-s5K8XA/7BT/j24e2g9WyoTmROwLoqMP8hOyE1fLCDh5oS7Yo664wg/zRBICdulrd
-5h1G/Ix5UUhUHRNFQYEJwkqY+9+QLxGmvJRsOSgysknXuqiQl62f1uXXHU3Fc3/1
-HnMIu3mvdfjzygYqun+fdX8YTjR2gCSedTb6ZvHjuYnZ2ytg3lTULLOTRynF6oQz
-i+RbcqazDXmP/pqs/ar/GSoRAdMhvuhFuX7+hMFMDADJ5ZhNbPEflxcJBBUenyCW
-XHsBFvPRA0kVZ7oxEDgwYEPHysiqyR0zGnQroVTD/cQcVAop/gtvPFYfpfl+SUcL
-NQP8xMDyv4Vv2LwaWdKJ7AoAgttVLXAIgxDt9y7zH8NLv5XUvnWf0qcZptOFYsZ8
-W0xYQ+VdePYMdusvv7HAVgeOGdXq7oI8hyi5i91/urBXxv3oSgz+uIW/IPiP+uXf
-DnlFlc9by4b//QX2LXqR2iiTbxflSTfXcG/yXJMZfww1mCV2VejPSor+JehjGM47
-KsN6Y/ws/uqOaG4q3qEBqWXaKMx2Y/weIn2TTyJoW2bXgnrC0xY1VrKAkOofus1R
-Lu8PJndhxeyV3kVHY8ahqQIruBSV9mintSmgJ/8eO6S5PDmlfV53ZV+kYPzm97C8
-gwuGXMAb1nVFPPQyO2zLVLRbdCm33qHvH+sZsyKMIWXWH6dHzB0=
-=SKlw
------END PGP SIGNATURE-----
-
---YhYebsMuj/FQeBW/--
+-- 
+Alexey
