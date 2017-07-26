@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1daM33-0001tX-9w
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:08:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1daM3t-0002tS-75
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1daM31-0004qG-VG
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:08:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58560)
+	(envelope-from <ehabkost@redhat.com>) id 1daM3s-0005R3-1g
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1daM31-0004oh-P9
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:08:19 -0400
-Date: Wed, 26 Jul 2017 15:08:10 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170726150810.3a48d5f0@nial.brq.redhat.com>
-In-Reply-To: <165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<20170721110636.19412e6c@nial.brq.redhat.com>
-	<20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1daM3r-0005Oi-OK
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:11 -0400
+Date: Wed, 26 Jul 2017 10:00:25 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170726130025.GD20793@localhost.localdomain>
+References: <20170725150951.16038-1-ldoktor@redhat.com>
+	<20170725150951.16038-6-ldoktor@redhat.com>
+	<20170725160639.GO2757@localhost.localdomain>
+	<e9246b9c-c004-3647-edb7-44e849f33f94@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e9246b9c-c004-3647-edb7-44e849f33f94@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] qemu.py: Use custom exceptions
+ rather than Exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
 
-On Tue, 25 Jul 2017 18:23:22 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Jul 26, 2017 at 06:39:28AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> Dne 25.7.2017 v 18:06 Eduardo Habkost napsal(a):
+> > On Tue, Jul 25, 2017 at 05:09:46PM +0200, Luk=C3=A1=C5=A1 Doktor wrot=
+e:
+> >> The naked Exception should not be widely used. It makes sense to be =
+a
+> >> bit more specific and use better-suited custom exceptions. As a bene=
+fit
+> >> we can store the full reply in the exception in case someone needs i=
+t
+> >> when catching the exception.
+> >>
+> >> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> >> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> ---
+> >>  scripts/qemu.py | 17 +++++++++++++++--
+> >>  1 file changed, 15 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> >> index 5948e19..e6df54c 100644
+> >> --- a/scripts/qemu.py
+> >> +++ b/scripts/qemu.py
+> >> @@ -19,6 +19,19 @@ import subprocess
+> >>  import qmp.qmp
+> >> =20
+> >> =20
+> >> +class MonitorResponseError(qmp.qmp.QMPError):
+> >> +    '''
+> >> +    Represents erroneous QMP monitor reply
+> >> +    '''
+> >> +    def __init__(self, reply):
+> >> +        try:
+> >> +            desc =3D reply["error"]["desc"]
+> >> +        except KeyError:
+> >> +            desc =3D reply
+> >                       ^^^ (*)
+> >> +        super(MonitorResponseError, self).__init__(repr(desc))
+> >=20
+> > This will end up calling Exception.__init__.  I previously
+> > suggested repr(desc) above(*) because I didn't know what happened
+> > when the Exception.__init__ argument is not a string.
+> >=20
+> > I couldn't find any documentation on the right argument types for
+> > Exception.__init__.  The examples in the Python documentation[1]
+> > don't call Exception.__init__ at all: they simply implement
+> > __str__().
+> >=20
+> > However, based on my testing and on the BaseException
+> > documentation[2], I believe repr() isn't really necessary:
+> >=20
+> > "If str() or unicode() is called on an instance of this class,
+> > the representation of the argument(s) to the instance are
+> > returned, or the empty string when there were no arguments."
+> >=20
+> > So your previous version was good, already.
+> >=20
+> > But maybe we could do this instead, to make the constructor as
+> > simple as possible:
+> >=20
+> > class MonitorResponseError(qmp.qmp.QMPError):
+> >     def __init__(self, reply):
+> >         self.reply =3D reply
+> >=20
+> >     def __str__(self):
+> >         return self.reply.get('error', {}).get('desc', repr(self.repl=
+y))
+> >=20
+> Well I know I can implement custom `__str__` class, but the
+> default one simply stores the argument as string and reports
+> it, so for simple strings I usually go with super call and with
+> complex ones with custom `__str__`. Anyway if this suits this
+> project style better I'll change it in v2.
 
-> On 25/07/2017 18:14, Laszlo Ersek wrote:
-> >   "No regressions became apparent in tests with a range of Windows
-> >    (XP-10)"
-> > 
-> > In theory, w2k falls within that range.  
-> 
-> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
-> 
-> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
-> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
-> patching the RSDT to point to it.
-> 
-> It's a hack, but it's the only place I see to make it "just work".  And
-> it could be extended nicely in the future.
-> 
-> All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.
-I'd support it, however it would break migrated guests with old BIOS
-image in RAM on reboot.
+If you prefer it, your previous version (without repr) was good
+enough to me.
 
-Legacy users have an option to build SeaBIOS without ACPI from QEMU
-support by turning off CONFIG_FW_ROMFILE_LOAD (or use old SeaBIOS)
-which leads to using legacy tables included in SeaBIOS.
-Then mgmt layer above libvirt which knows what guest OS it's
-going to run can pick legacy BIOS image for it.
-
-But the testing issue will still stay as normally it's not tested
-path.
-
-PS:
-For now we are going to revert PC machine to rev1 and leave q35 at rev3
-as Michael suggested to keep both w2k and macos happy.
-
-> 
-> Paolo
-> 
-> > In practice, it is impossible to
-> > test *all* Windows versions against ACPI generator changes, even if you
-> > try to be thorough (which Phil was). One might not even *know about*
-> > "all" Windows versions. So people using w2k and similar should
-> > co-maintain the ACPI stuff and report back with testing on the fly;
-> > otherwise regressions are impossible to avoid.  
-> 
+--=20
+Eduardo
