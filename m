@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1daLOw-0001Pb-8l
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:26:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1daLQp-0002ib-Q9
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1daLOs-0006M9-Ru
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:26:54 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:40311)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1daLOs-0006L6-FW
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:26:50 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-	<20170725131931.GC23343@stefanha-x1.localdomain>
-	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-	<20170726112633.GE18489@stefanha-x1.localdomain>
-	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-Date: Wed, 26 Jul 2017 15:26:32 +0300
-In-Reply-To: <CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-	(Peter Maydell's message of "Wed, 26 Jul 2017 12:49:00 +0100")
-Message-ID: <87379j5qpz.fsf@frigg.lan>
+	(envelope-from <eblake@redhat.com>) id 1daLQm-0007NP-D1
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:28:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daLQm-0007MT-4I
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:28:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DBDA63144
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:28:47 +0000 (UTC)
+References: <20170726114437.19624-1-pbonzini@redhat.com>
+	<9e187829-fc01-8140-22f0-7cf67fc294bd@redhat.com>
+	<20170726121913.GJ7620@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0faa2a79-fd07-f4e3-9237-563e9e8d277d@redhat.com>
+Date: Wed, 26 Jul 2017 07:28:43 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+In-Reply-To: <20170726121913.GJ7620@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mUNmwx2HwM7qE43ok5O5Nvbdq2EqrxgrE"
+Subject: Re: [Qemu-devel] [qemu-web PATCH] add Thomas's bug reporting dos
+ and don'ts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Peter Maydell writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mUNmwx2HwM7qE43ok5O5Nvbdq2EqrxgrE
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <0faa2a79-fd07-f4e3-9237-563e9e8d277d@redhat.com>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] add Thomas's bug reporting dos and
+ don'ts
+References: <20170726114437.19624-1-pbonzini@redhat.com>
+ <9e187829-fc01-8140-22f0-7cf67fc294bd@redhat.com>
+ <20170726121913.GJ7620@redhat.com>
+In-Reply-To: <20170726121913.GJ7620@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 26 July 2017 at 12:26, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->> On Tue, Jul 25, 2017 at 02:30:06PM +0100, Peter Maydell wrote:
->>> Is your proposal that my-instrumentation.c gets compiled into
->>> QEMU at this point? That doesn't seem like a great idea to
->>> me, because it means you can only use this tracing if you
->>> build QEMU yourself, and distros won't enable it and so
->>> lots of our users won't have convenient access to it.
->>> I'd much rather see a cleanly designed plugin interface
->>> (which we should be able to implement in a manner that doesn't
->>> let the plugin monkey patch arbitrary parts of QEMU beyond
->>> what can already be achieved via LD_PRELOAD).
->> 
->> Trace events are not a stable public API.  They change between releases
->> and need to be interpreted together with the QEMU source code.
->> 
->> It doesn't make sense to be doing instrumentation inside the QEMU
->> process but not want to compile QEMU.
->> 
->> What is the use case?
+On 07/26/2017 07:19 AM, Daniel P. Berrange wrote:
+> On Wed, Jul 26, 2017 at 01:57:35PM +0200, Thomas Huth wrote:
+>> On 26.07.2017 13:44, Paolo Bonzini wrote:
+>>> We don't want the page to become too long, but these are good suggest=
+ions.
+>>>
+>>> Also tone down the sentence about using the latest release or latest =
+git
+>>> tree, though we do prefer those.
+>>
+>> Well, sometimes people still report bugs against QEMU 2.1 or so ... so=
 
-> I want the continuous stream of people who come along
-> and want to do interesting things (or even just straightforward
-> things like "show me all the memory accesses") with tracing
-> their guest binary to be able to do so without having to
-> rebuild QEMU. We don't require people to rebuild QEMU
-> themselves to attach gdb to it, and tracing of guest
-> behaviour is a similar "I just want to introspect what
-> my guest is doing" use case.
+>> I'd say everything that is older than the current version - 2 has a ve=
+ry
+>> high chance to be ignored completely. So maybe we should ask people to=
 
-> I think this is distinct from use of the trace API
-> for qemu-internal events as used in a lot of the C
-> code.
+>> use at least one of the versions that is mentioned on the front-page o=
+f
+>> www.qemu.org ?
+>=20
+> The biggest reason people would be using old versions of QEMU is if the=
+y
+> are running a distro's build. Such people should really file bugs in
+> their vendor's bug tracker, rather than against upstream directly.
+>=20
+> IOW, it would be worth having a bit of text on the bug reporting page
+> to suggest people should preferrentially use their vendor's bug tracker=
+,
+> if they are using a 3rd party build of QEMU.
 
-> Some simple use cases:
->  * a plugin which prints out instruction execution traces
-> by hooking into "insn executed" and printing something
-> helpful (you can extend this into producing traces
-> in whatever standard format some other program wants
-> to inhale, but at a minimum it would be something we
-> could point people at that makes more sense than our
-> current "only print insns at translate time" debug);
-> it's also easy to add bells and whistles for "start
-> tracing at time T" and so on
->  * a plugin that make cachegrind-style guesses about
-> cache usage by tracking memory accesses and simulating
-> cache effects
->  * a plugin that prints all the system calls the
-> guest makes (by hooking into "insn executed" and
-> printing info when the insn is an SVC)
->  * trivial statistics like "count executed instructions
-> and branches taken"
+Which was what the patch included:
 
-> (I also think that we should aim for that API for
-> things like guest register changes and guest memory
-> changes to not be particularly unstable even if we
-> allow ourselves to make non-back-compatible changes
-> to it.)
+> -Bugs can be filed at our [bug tracker](https://bugs.launchpad.net/qemu=
+/), which is hosted on Launchpad.
+> +Bugs can be filed at our [bug tracker](https://bugs.launchpad.net/qemu=
+/), which is hosted on Launchpad. If you've got a problem with how your L=
+inux distribution packages QEMU, use the bug tracker from your distro ins=
+tead.
 
-That's what I was thinking about (i.e., try to keep a minimally useful and
-stable set of guest_* tracepoints). And I guess this also answer's Stefan's
-other email about instrumentation use-cases.
+Although maybe the wording can be improved to mention that ALL bugs
+about qemu packaged downstream, and not just the packaging, should be
+referred to the downstream vendor (the vendor may then forward the bugs
+upstream).
 
-Cheers,
-  Lluis
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--mUNmwx2HwM7qE43ok5O5Nvbdq2EqrxgrE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll4ivwACgkQp6FrSiUn
+Q2oBaAf/THU7qgvLkDicwXS/R/4yWJOaIX9iW3wu+e3+eJPUWbSyjt11VNv5OE0H
+TKVsiotvJHMgDKpf68bUSPGRgqXjXMI1iaAuzO14RAnH0wDqYmKwabrpXei2rg+I
+kAWwh4yZZEbOcMk+leJB65T7kyHhtfF9RgHRw01VhVrQbfDG7POkU74VYM4TjFNi
+To53GJUEi8V+gVo5IrNKMOQ9K62jgGU0NUu1pyWaLD1sRadh7tmizcomcIwQCbSP
+NZ0Vi8xYHv2JVsgFhf2c02AsoIhrc2qzSuxiuuFOGm3Low/DUzYYnRNNTibY3vV7
+VA3qQBrZHNhaE5YvN/vLbbJZKgvlnw==
+=Cpxf
+-----END PGP SIGNATURE-----
+
+--mUNmwx2HwM7qE43ok5O5Nvbdq2EqrxgrE--
