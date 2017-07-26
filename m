@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1daL1m-0000VP-Dk
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:02:59 -0400
+	(envelope-from <flukshun@gmail.com>) id 1daL2F-0000iw-FS
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1daL1l-0007ys-Ev
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:02:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46404)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daL1l-0007yT-6Y
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:02:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D0E81806B4
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:02:55 +0000 (UTC)
-References: <20170726115637.21558-1-kraxel@redhat.com>
-	<20170726115637.21558-5-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <85e9156c-1a11-4757-996d-877e40e316bc@redhat.com>
-Date: Wed, 26 Jul 2017 07:02:48 -0500
+	(envelope-from <flukshun@gmail.com>) id 1daL2C-0008A0-HR
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:03:27 -0400
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170726115637.21558-5-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wij9unXfUpLuBRhfNPvQ51UHEkjw0ixdv"
-Subject: Re: [Qemu-devel] [PATCH 4/5] ui: add multimedia keys
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170726052443.GF8978@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100564746.27487.5195312465666688402.stgit@bahia>
+	<20170726052443.GF8978@umbus.fritz.box>
+Message-ID: <150107059396.26979.17676315848654528696@loki>
+Date: Wed, 26 Jul 2017 07:03:13 -0500
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 13/26] qdev: store DeviceState's
+ canonical path to use when unparenting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +26,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wij9unXfUpLuBRhfNPvQ51UHEkjw0ixdv
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, Markus Armbruster <armbru@redhat.com>
-Message-ID: <85e9156c-1a11-4757-996d-877e40e316bc@redhat.com>
-Subject: Re: [PATCH 4/5] ui: add multimedia keys
-References: <20170726115637.21558-1-kraxel@redhat.com>
- <20170726115637.21558-5-kraxel@redhat.com>
-In-Reply-To: <20170726115637.21558-5-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting David Gibson (2017-07-26 00:24:43)
+> On Tue, Jul 25, 2017 at 08:00:47PM +0200, Greg Kurz wrote:
+> > From: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > =
 
-On 07/26/2017 06:56 AM, Gerd Hoffmann wrote:
-> Add multimedia keys to QKeyCodes and to the keymaps.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/input-keymap.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  qapi-schema.json  | 17 ++++++++++++++++-
->  2 files changed, 60 insertions(+), 1 deletion(-)
+> > device_unparent(dev, ...) is called when a device is unparented,
+> > either directly, or as a result of a parent device being
+> > finalized, and handles some final cleanup for the device. Part
+> > of this includes emiting a DEVICE_DELETED QMP event to notify
+> > management, which includes the device's path in the composition
+> > tree as provided by object_get_canonical_path().
+> > =
 
-> +++ b/qapi-schema.json
-> @@ -4843,6 +4843,16 @@
->  # @henkan: since 2.9
->  # @yen: since 2.9
->  #
-> +# @sleep: since 2.10
-> +# @wake: since 2.10
-> +# @audio*: since 2.10
-> +# @volume*: since 2.10
-> +# @mediaselect: since 2.10
-> +# @mail: since 2.10
-> +# @calculator: since 2.10
-> +# @computer: since 2.10
-> +# @ac_*: since 2.10
+> > object_get_canonical_path() assumes the device is still connected
+> > to the machine/root container, and will assert otherwise, but
+> > in some situations this isn't the case:
+> > =
 
-Borderline between bug-fix and new feature (arguing that the bug is that
-we don't represent all keys).  Does this need to be 2.11 instead?
+> > If the parent is finalized as a result of object_unparent(), it
+> > will still be attached to the composition tree at the time any
+> > children are unparented as a result of that same call to
+> > object_unparent(). However, in some cases, object_unparent()
+> > will complete without finalizing the parent device, due to
+> > lingering references that won't be released till some time later.
+> > One such example is if the parent has MemoryRegion children (which
+> > take a ref on their parent), who in turn have AddressSpace's (which
+> > take a ref on their regions), since those AddressSpaces get cleaned
+> > up asynchronously by the RCU thread.
+> > =
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> > In this case qdev:device_unparent() may be called for a child Device
+> > that no longer has a path to the root/machine container, causing
+> > object_get_canonical_path() to assert.
+> > =
 
+> > Fix this by storing the canonical path during realize() so the
+> > information will still be available for device_unparent() in such
+> > cases.
+> =
 
---wij9unXfUpLuBRhfNPvQ51UHEkjw0ixdv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Hm.  I'm no expert on the QOM model, but I'm not sure this is the
+> right approach.
+> =
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> I would have thought the right time to emit the DEVICE_DELETED message
+> would be when the device leaves the main composition tree, even if it
+> could be finalized later.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll4hOgACgkQp6FrSiUn
-Q2pV4wf8DZRbprFiI9miCoOo735VHF5hPOvecmPupL0sA+5lfagfaEjgF37KDi7k
-0dqtsX0yagZRZJEPcgsTmusRuLT+Ko1zqzXspl/mhzcUJYGWAeycURzm9wV1PpbP
-7WGAjcDtWUXC7R1UYSOOPRd0nDLtbvZPZm1CeRwFlEbvxLK85OKdKbv5075hONnj
-eEInRFQW9NEM5wIJvb5xdr9d8uB5ZlJbscIJpfX59QXuxanJVGstmXINhVEoWr1P
-f2G0JUlQpCzGx5/lvxURDZoXjVpu5yN4x1uWiDX7+gybDoDzYs9sEsl3pVR6E+Ob
-zjwVc36qYJ+eJenG/LHbN1KGtPqU4g==
-=QcDW
------END PGP SIGNATURE-----
+That probably is how it should've been approached originally, since
+that's also the expectation for device_del on PCIDevices currently.
 
---wij9unXfUpLuBRhfNPvQ51UHEkjw0ixdv--
+However, there was a recent discussion which suggests we should move
+DEVICE_DELETED to finalize to fix a race with VFIO unplug in libvirt.
+
+  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06887.html
+
+Since the QOM path will be broken by that point, we likely would need a
+way to cache the path so it can be reported in the DEVICE_DELETED message.
+I was actually planning on using this patch as a prereq for that. I'll
+send that out soon.
+
+> =
+
+> If we made that the case, does this problem go away?
+> =
+
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > Changes since RFC:
+> > - rebased against ppc-for-2.10
+> > ---
+> >  hw/core/qdev.c         |   15 ++++++++++++---
+> >  include/hw/qdev-core.h |    1 +
+> >  2 files changed, 13 insertions(+), 3 deletions(-)
+> > =
+
+> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > index 606ab53c42cd..a64b35c16251 100644
+> > --- a/hw/core/qdev.c
+> > +++ b/hw/core/qdev.c
+> > @@ -928,6 +928,12 @@ static void device_set_realized(Object *obj, bool =
+value, Error **errp)
+> >              goto post_realize_fail;
+> >          }
+> >  =
+
+> > +        /* always re-initialize since we clean up in device_unparent()=
+ instead
+> > +         * of unrealize()
+> > +         */
+> > +        g_free(dev->canonical_path);
+> > +        dev->canonical_path =3D object_get_canonical_path(OBJECT(dev));
+> > +
+> >          if (qdev_get_vmsd(dev)) {
+> >              if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(=
+dev), dev,
+> >                                                 dev->instance_id_alias,
+> > @@ -984,6 +990,7 @@ child_realize_fail:
+> >      }
+> >  =
+
+> >  post_realize_fail:
+> > +    g_free(dev->canonical_path);
+> >      if (dc->unrealize) {
+> >          dc->unrealize(dev, NULL);
+> >      }
+> > @@ -1102,10 +1109,12 @@ static void device_unparent(Object *obj)
+> >  =
+
+> >      /* Only send event if the device had been completely realized */
+> >      if (dev->pending_deleted_event) {
+> > -        gchar *path =3D object_get_canonical_path(OBJECT(dev));
+> > +        g_assert(dev->canonical_path);
+> >  =
+
+> > -        qapi_event_send_device_deleted(!!dev->id, dev->id, path, &erro=
+r_abort);
+> > -        g_free(path);
+> > +        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canoni=
+cal_path,
+> > +                                       &error_abort);
+> > +        g_free(dev->canonical_path);
+> > +        dev->canonical_path =3D NULL;
+> >      }
+> >  =
+
+> >      qemu_opts_del(dev->opts);
+> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> > index ae317286a480..9237b6849ff3 100644
+> > --- a/include/hw/qdev-core.h
+> > +++ b/include/hw/qdev-core.h
+> > @@ -153,6 +153,7 @@ struct DeviceState {
+> >      /*< public >*/
+> >  =
+
+> >      const char *id;
+> > +    char *canonical_path;
+> >      bool realized;
+> >      bool pending_deleted_event;
+> >      QemuOpts *opts;
+> > =
+
+> =
+
+> -- =
+
+> David Gibson                    | I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_ _othe=
+r_
+>                                 | _way_ _around_!
+> http://www.ozlabs.org/~dgibson
