@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daOq6-00048T-2E
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:07:11 -0400
+	(envelope-from <alistai@xilinx.com>) id 1daOtd-00075j-7l
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1daOq0-0000yA-3K
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:07:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55329)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daOpz-0000xf-Rv
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:07:04 -0400
-Date: Wed, 26 Jul 2017 19:06:58 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170726190348-mutt-send-email-mst@kernel.org>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-	<20170726092931.0678689e@w520.home>
+	(envelope-from <alistai@xilinx.com>) id 1daOtZ-0003PI-1f
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:10:49 -0400
+Received: from mail-bn3nam01on0077.outbound.protection.outlook.com
+	([104.47.33.77]:42592
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1daOtY-0003Ms-F3
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:10:44 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 26 Jul 2017 09:07:22 -0700
+Message-ID: <cover.1501084908.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170726092931.0678689e@w520.home>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
- =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v1 0/5]  More warning reporting fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, =?utf-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 
-On Wed, Jul 26, 2017 at 09:29:31AM -0600, Alex Williamson wrote:
-> On Wed, 26 Jul 2017 09:21:38 +0300
-> Marcel Apfelbaum <marcel@redhat.com> wrote:
->=20
-> > On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote:
-> > > To accelerate data traversing between devices under the same PCIE R=
-oot=20
-> > > Port or Switch.
-> > >=20
-> > > See https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg072=
-09.html
-> > >  =20
-> >=20
-> > Hi,
-> >=20
-> > It may be possible, but maybe PCIe Switch assignment is not
-> > the only way to go.
-> >=20
-> > Adding Alex and Michael for their input on this matter.
-> > More info at:
-> > https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.htm=
-l
->=20
-> I think you need to look at where the IOMMU is in the topology and what
-> address space the devices are working in when assigned to a VM to
-> realize that it doesn't make any sense to assign switch ports to a VM.
-> GPUs cannot do switch level peer to peer when assigned because they are
-> operating in an I/O virtual address space.  This is why we configure
-> ACS on downstream ports to prevent peer to peer.  Peer to peer
-> transactions must be forwarded upstream by the switch ports in order to
-> reach the IOMMU for translation.  Note however that we do populate peer
-> to peer mappings within the IOMMU, so if the hardware supports it, the
-> IOMMU can reflect the transaction back out to the I/O bus to reach the
-> other device without CPU involvement.
->=20
-> Therefore I think the better solution, if it encourages the NVIDIA
-> driver to do the right thing, is to use emulated switches.  Assigning
-> the physical switch would really do nothing more than make the PCIe lin=
-k
-> information more correct in the VM, everything else about the switch
-> would be emulated.  Even still, unless you have an I/O topology which
-> integrates the IOMMU into the switch itself, the data flow still needs
-> to go all the way to the root complex to hit the IOMMU before being
-> reflected to the other device.  Direct peer to peer between downstream
-> switch ports operates in the wrong address space.  Thanks,
->=20
-> Alex
+This series expands on my previous series by converting more existing
+prints to use warn_report() instead of error_report() or fprintf().
 
-That's true of course. What would make sense would be for
-hardware vendors to add ATS support to their cards.
+Alistair Francis (5):
+  hw/i386: Improve some of the warning messages
+  Convert remaining error_report() to warn_report()
+  Convert single line fprintf() to warn_report()
+  Convert multi-line fprintf() to warn_report()
+  Convert single line fprintf() to warn_report()
 
-Then peer to peer should be allowed by hypervisor for translated transact=
-ions.
+ accel/kvm/kvm-all.c         |  7 +++----
+ block/qcow2.c               | 10 +++++-----
+ block/vvfat.c               |  8 +++++---
+ hw/acpi/core.c              | 10 +++++-----
+ hw/arm/vexpress.c           |  4 ++--
+ hw/i386/acpi-build.c        | 15 ++++++++++-----
+ hw/i386/pc.c                |  9 ++++-----
+ hw/i386/pc_q35.c            |  8 +++++---
+ hw/i386/xen/xen-mapcache.c  |  4 ++--
+ hw/mips/mips_malta.c        |  4 ++--
+ hw/mips/mips_r4k.c          |  7 ++++---
+ hw/misc/applesmc.c          |  2 +-
+ hw/s390x/s390-virtio.c      | 16 ++++++++--------
+ hw/usb/hcd-ehci.c           |  5 +++--
+ hw/virtio/virtio-balloon.c  |  3 ++-
+ net/hub.c                   | 12 ++++++------
+ net/net.c                   | 14 +++++++-------
+ net/socket.c                |  7 +++++--
+ qga/vss-win32.c             |  2 +-
+ target/i386/cpu.c           | 12 ++++++------
+ target/i386/hax-mem.c       |  6 +++---
+ target/mips/kvm.c           |  4 ++--
+ target/ppc/translate_init.c | 18 +++++++++---------
+ target/s390x/kvm.c          |  4 ++--
+ tests/Makefile.include      |  4 ++--
+ trace/control.c             |  4 ++--
+ trace/simple.c              |  2 +-
+ ui/keymaps.c                | 11 ++++++-----
+ ui/spice-display.c          |  2 +-
+ util/cutils.c               |  3 ++-
+ util/main-loop.c            |  6 +++---
+ 31 files changed, 119 insertions(+), 104 deletions(-)
 
-Gives you the performance benefit without the security issues.
-
-Does anyone know whether any hardware implements this?
-
-Of course that would mostly be transparent to guests so
-you would still use an emulated switch as Alex suggested.
-
---=20
-MST
+-- 
+2.11.0
