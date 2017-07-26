@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1daN1W-00012z-QS
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:10:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1daN8F-0002Tp-Cn
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:17:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1daN1V-0001Ud-QI
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:10:50 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34017)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1daN1V-0001U2-JZ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:10:49 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id 12so132348214wrb.1
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 07:10:49 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1daN8A-0005ma-G6
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:17:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1daN8A-0005m7-9O
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:17:42 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 36309C05689D
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 14:17:41 +0000 (UTC)
+References: <1501075650-6971-1-git-send-email-thuth@redhat.com>
+	<20170726140208.GO7620@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <236fd293-5d5e-0436-afc3-599ae9de6f92@redhat.com>
+Date: Wed, 26 Jul 2017 16:17:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170726140218.15904-4-eblake@redhat.com>
-References: <20170726140218.15904-1-eblake@redhat.com>
-	<20170726140218.15904-4-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 26 Jul 2017 15:10:27 +0100
-Message-ID: <CAFEAcA9sOaN+yLbikODGN5NTaX88rSU=vTpdD_ovfPzTv=Hu9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/3] maint: Include bug-reporting info in
- --help output.
+In-Reply-To: <20170726140208.GO7620@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a favicon.ico file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Jeff Cody <jcody@redhat.com>
 
-On 26 July 2017 at 15:02, Eric Blake <eblake@redhat.com> wrote:
-> These days, many programs are including a bug-reporting address,
-> or better yet, a link to the project web site, at the tail of
-> their --help output.  However, we were not very consistent at
-> doing so: only qemu-nbd and qemu-qa mentioned anything, with the
-> latter pointing to an individual person instead of the project.
->
-> Add a new #define that sets up a uniform string, mentioning both
-> bug reporting instructions and overall project details, and which
-> a downstream vendor could tweak if they want bugs to go to a
-> downstream database.  Then use it in all of our binaries which
-> have --help output.
->
-> The canned text intentionally references http:// instead of https://
-> because our https website currently causes certificate errors in
-> some browsers.  That can be tweaked later once we have resolved the
-> web site issued.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  include/qemu-common.h | 5 +++++
->  vl.c                  | 4 +++-
->  bsd-user/main.c       | 2 ++
->  linux-user/main.c     | 4 +++-
->  qemu-img.c            | 2 +-
->  qemu-io.c             | 5 +++--
->  qemu-nbd.c            | 2 +-
->  qga/main.c            | 2 +-
->  8 files changed, 19 insertions(+), 7 deletions(-)
->
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index b5adbfa5e9..e751361458 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -22,6 +22,11 @@
->  #define QEMU_COPYRIGHT "Copyright (c) 2003-2017 " \
->      "Fabrice Bellard and the QEMU Project developers"
->
-> +/* Bug reporting information for --help arguments, About dialogs, etc */
-> +#define QEMU_BUGREPORTS \
-> +    "See <http://qemu.org/contribute/report-a-bug> for bug reports.\n" \
-> +    "More information on the qemu project at <http://qemu.org>"
+On 26.07.2017 16:02, Daniel P. Berrange wrote:
+> On Wed, Jul 26, 2017 at 03:27:30PM +0200, Thomas Huth wrote:
+>> Most browsers try to download a /favicon.ico file from the web servers
+>> which is then e.g. used in the browser tabs or bookmark lists. So let'=
+s
+>> add such a file for the QEMU website, too. The .ico has been created
+>> resizing the logo from http://wiki.qemu.org/Logo to 16x16 pixels.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>=20
+> FYI, just having a single 'favicon.ico' file isn't generally sufficient
+> anymore. Thanks to explosion of mobile devices there are 20+ different =
+files
+> that various browsers  / clients look for now :-(
 
-QEMU should be all upper case.
+Well, yeah, but most of that is just sick. Adding things like '<link
+rel=3D"apple-touch-icon" .../>' to your web site is IMHO just how it
+should *not* be done.
+If we're afraid that the 16x16 pixel icon is not enough, I think we
+should add an additional SVG icon, smile at the browsers that support it
+and wait for the others to catch up.
 
-> +
-
-I wonder if we may regret the embedded newline when
-we come to handling UI about dialogs. I guess we
-can cross that bridge when we come to it (they
-may need to special case it anyway if they want
-to make the links clicky).
-
-thanks
--- PMM
+ Thomas
