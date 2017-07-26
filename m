@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1daBLL-0002o6-Ix
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:34 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daBOj-00053R-Mo
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1daBLH-0007Ns-Bn
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:31 -0400
-Received: from mga05.intel.com ([192.55.52.43]:48394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1daBLG-0007Ky-VV
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:27 -0400
-From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Thu, 27 Jul 2017 10:00:50 +0800
-Message-Id: <1501120851-4314-2-git-send-email-changpeng.liu@intel.com>
-In-Reply-To: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
-References: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH 1/2] vhost-user-blk: introduce a new
- vhost-user-blk host device
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daBOe-00032z-QS
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:46:01 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daBOe-000329-LE
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:45:56 -0400
+Received: by mail-qt0-x243.google.com with SMTP id p3so5995982qtg.5
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 18:45:56 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170725011530.17958-1-f4bug@amsat.org>
+	<150102382734.26979.483898024984598924@loki>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cb21f5d1-18be-51a4-5e51-e429ab4b1b46@amsat.org>
+Date: Tue, 25 Jul 2017 22:45:31 -0300
+MIME-Version: 1.0
+In-Reply-To: <150102382734.26979.483898024984598924@loki>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
+ extension on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,632 +36,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, stefanha@redhat.com, felipe@nutanix.com, mst@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Sameeh Jubran <sjubran@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-This commit introduces a vhost-user device for block, it uses a
-chardev to connect to the backend, Same with virito_blk, Guest
-OS still uses the virtio_blk frontend driver.
+Hi Michael,
 
-To use it, start Qemu with command line like this:
+On 07/25/2017 08:03 PM, Michael Roth wrote:
+> Quoting Philippe Mathieu-Daudé (2017-07-24 20:15:30)
+>> Reported-by: Sameeh Jubran <sjubran@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> original report from Sameeh Jubran:
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.html
+> 
+> AFAICT the issue discussed in the context of that patch is simply that
+> the qemu-ga.exe file isn't deleted as part of `make clean`, which does
+> seem to be an issue.
+> 
+> But qemu.ga.exe is created just fine as part of `make qemu-ga`, at least
+> as of:
+> 
+>    fafcaf1d build: qemu-ga: add 'qemu-ga' build target for w32
+> 
 
-qemu-system-x86_64 \
-    -chardev socket,id=char0,path=/path/vhost.socket \
-    -device vhost-user-blk-pci,chardev=char0,size=10G, \
-            logical_block_size=...
+Yes, on w32 if "make ASDF" invokes the linker, it will create ASDF.exe.
 
-Different with exist Qemu virtio_blk host device, it makes more easy
-for users to implement their own I/O processing logic, such as all
-user space I/O stack against hardware block device. However, due to
-exist vhost-user messages, Qemu can't get the parameters such as
-capacity of the backend block device, users need to append such
-parameters when start Qemu.
+> The 'qemu-ga' target is actually an intermediate target which, on w32,
+> creates the MSI package (if configured) as well as qemu-ga.exe.
+> 
+>>
+>>   Makefile  | 2 +-
+>>   configure | 2 +-
+>>   2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index ef721480eb..5f18243d05 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -490,7 +490,7 @@ clean:
+>>          rm -f qemu-options.def
+>>          rm -f *.msi
+>>          find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f -exec rm {} +
+>> -       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.pod *~ */*~
+>> +       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
----
- configure                          |  11 ++
- hw/block/Makefile.objs             |   3 +
- hw/block/vhost-user-blk.c          | 352 +++++++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c             |  55 ++++++
- hw/virtio/virtio-pci.h             |  18 ++
- include/hw/virtio/vhost-user-blk.h |  46 +++++
- 6 files changed, 485 insertions(+)
- create mode 100644 hw/block/vhost-user-blk.c
- create mode 100644 include/hw/virtio/vhost-user-blk.h
+On win32, this patch add qemu-ga.exe instead of qemu-ga in $TOOLS, so 
+when the 'clean' target is executed it removes qemu-ga.exe (Sameeh 
+Jubran report). Before this patch the $TOOLS looks like:
+"qemu-img.exe qemu-io.exe qemu-nbd.exe ivshmem-client.exe 
+ivshmem-server.exe qemu-ga fsdev/virtfs-proxy-helper.exe"
+The only executables which doesn't match %.exe is qemu-ga, so the 
+'clean' target remove all .exe _but_ qemu-ga.exe.
 
-diff --git a/configure b/configure
-index 987f59b..466b3b4 100755
---- a/configure
-+++ b/configure
-@@ -305,6 +305,7 @@ tcg="yes"
- 
- vhost_net="no"
- vhost_scsi="no"
-+vhost_user_blk="no"
- vhost_vsock="no"
- kvm="no"
- hax="no"
-@@ -778,6 +779,7 @@ Linux)
-   kvm="yes"
-   vhost_net="yes"
-   vhost_scsi="yes"
-+  vhost_user_blk="yes"
-   vhost_vsock="yes"
-   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
-   supported_os="yes"
-@@ -1135,6 +1137,10 @@ for opt do
-   ;;
-   --enable-vhost-scsi) vhost_scsi="yes"
-   ;;
-+  --disable-vhost-user-blk) vhost_user_blk="no"
-+  ;;
-+  --enable-vhost-user-blk) vhost_user_blk="yes"
-+  ;;
-   --disable-vhost-vsock) vhost_vsock="no"
-   ;;
-   --enable-vhost-vsock) vhost_vsock="yes"
-@@ -1489,6 +1495,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   cap-ng          libcap-ng support
-   attr            attr and xattr support
-   vhost-net       vhost-net acceleration support
-+  vhost-user-blk  VM virtio-blk acceleration in user space
-   spice           spice
-   rbd             rados block device (rbd)
-   libiscsi        iscsi support
-@@ -5347,6 +5354,7 @@ echo "posix_madvise     $posix_madvise"
- echo "libcap-ng support $cap_ng"
- echo "vhost-net support $vhost_net"
- echo "vhost-scsi support $vhost_scsi"
-+echo "vhost-user-blk support $vhost_user_blk"
- echo "vhost-vsock support $vhost_vsock"
- echo "Trace backends    $trace_backends"
- if have_backend "simple"; then
-@@ -5757,6 +5765,9 @@ fi
- if test "$vhost_scsi" = "yes" ; then
-   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
- fi
-+if test "$vhost_user_blk" = "yes" ; then
-+  echo "CONFIG_VHOST_USER_BLK=y" >> $config_host_mak
-+fi
- if test "$vhost_net" = "yes" ; then
-   echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
- fi
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index e0ed980..4c19a58 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -13,3 +13,6 @@ obj-$(CONFIG_SH4) += tc58128.o
- 
- obj-$(CONFIG_VIRTIO) += virtio-blk.o
- obj-$(CONFIG_VIRTIO) += dataplane/
-+ifeq ($(CONFIG_VIRTIO),y)
-+obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
-+endif
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-new file mode 100644
-index 0000000..38d7855
---- /dev/null
-+++ b/hw/block/vhost-user-blk.c
-@@ -0,0 +1,352 @@
-+/*
-+ * vhost-user-blk host device
-+ *
-+ * Copyright IBM, Corp. 2011
-+ * Copyright(C) 2017 Intel Corporation.
-+ *
-+ * Authors:
-+ *  Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
-+ *  Changpeng Liu <changpeng.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "migration/vmstate.h"
-+#include "migration/migration.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "qemu/typedefs.h"
-+#include "qemu/cutils.h"
-+#include "qom/object.h"
-+#include "hw/qdev-core.h"
-+#include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-user-blk.h"
-+#include "hw/virtio/virtio.h"
-+#include "hw/virtio/virtio-bus.h"
-+#include "hw/virtio/virtio-access.h"
-+
-+static const int user_feature_bits[] = {
-+    VIRTIO_BLK_F_SIZE_MAX,
-+    VIRTIO_BLK_F_SEG_MAX,
-+    VIRTIO_BLK_F_GEOMETRY,
-+    VIRTIO_BLK_F_BLK_SIZE,
-+    VIRTIO_BLK_F_TOPOLOGY,
-+    VIRTIO_BLK_F_SCSI,
-+    VIRTIO_BLK_F_MQ,
-+    VIRTIO_BLK_F_RO,
-+    VIRTIO_BLK_F_FLUSH,
-+    VIRTIO_BLK_F_BARRIER,
-+    VIRTIO_BLK_F_CONFIG_WCE,
-+    VIRTIO_F_VERSION_1,
-+    VIRTIO_RING_F_INDIRECT_DESC,
-+    VIRTIO_RING_F_EVENT_IDX,
-+    VIRTIO_F_NOTIFY_ON_EMPTY,
-+    VHOST_INVALID_FEATURE_BIT
-+};
-+
-+static void vhost_user_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    int blk_size = s->blkcfg.logical_block_size;
-+    struct virtio_blk_config blkcfg;
-+
-+    memset(&blkcfg, 0, sizeof(blkcfg));
-+
-+    virtio_stq_p(vdev, &blkcfg.capacity, s->capacity);
-+    virtio_stl_p(vdev, &blkcfg.seg_max, s->max_segment_num - 2);
-+    virtio_stl_p(vdev, &blkcfg.size_max, s->max_segment_size);
-+    virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
-+    virtio_stw_p(vdev, &blkcfg.min_io_size, s->blkcfg.min_io_size / blk_size);
-+    virtio_stl_p(vdev, &blkcfg.opt_io_size, s->blkcfg.opt_io_size / blk_size);
-+    virtio_stw_p(vdev, &blkcfg.num_queues, s->num_queues);
-+    virtio_stw_p(vdev, &blkcfg.geometry.cylinders,
-+                 s->blkcfg.cyls);
-+    blkcfg.geometry.heads = s->blkcfg.heads;
-+    blkcfg.geometry.sectors = s->blkcfg.secs;
-+    blkcfg.physical_block_exp = get_physical_block_exp(&s->blkcfg);
-+    blkcfg.alignment_offset = 0;
-+    blkcfg.wce = s->config_wce;
-+
-+    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-+}
-+
-+static void vhost_user_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    struct virtio_blk_config blkcfg;
-+
-+    memcpy(&blkcfg, config, sizeof(blkcfg));
-+
-+    if (blkcfg.wce != s->config_wce) {
-+        error_report("vhost-user-blk: does not support the operation");
-+    }
-+}
-+
-+static void vhost_user_blk_start(VirtIODevice *vdev)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+    int i, ret;
-+
-+    if (!k->set_guest_notifiers) {
-+        error_report("binding does not support guest notifiers");
-+        return;
-+    }
-+
-+    ret = vhost_dev_enable_notifiers(&s->dev, vdev);
-+    if (ret < 0) {
-+        error_report("Error enabling host notifiers: %d", -ret);
-+        return;
-+    }
-+
-+    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
-+    if (ret < 0) {
-+        error_report("Error binding guest notifier: %d", -ret);
-+        goto err_host_notifiers;
-+    }
-+
-+    s->dev.acked_features = vdev->guest_features;
-+    ret = vhost_dev_start(&s->dev, vdev);
-+    if (ret < 0) {
-+        error_report("Error starting vhost: %d", -ret);
-+        goto err_guest_notifiers;
-+    }
-+
-+    /* guest_notifier_mask/pending not used yet, so just unmask
-+     * everything here. virtio-pci will do the right thing by
-+     * enabling/disabling irqfd.
-+     */
-+    for (i = 0; i < s->dev.nvqs; i++) {
-+        vhost_virtqueue_mask(&s->dev, vdev, i, false);
-+    }
-+
-+    return;
-+
-+err_guest_notifiers:
-+    k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
-+err_host_notifiers:
-+    vhost_dev_disable_notifiers(&s->dev, vdev);
-+}
-+
-+static void vhost_user_blk_stop(VirtIODevice *vdev)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+    int ret;
-+
-+    if (!k->set_guest_notifiers) {
-+        return;
-+    }
-+
-+    vhost_dev_stop(&s->dev, vdev);
-+
-+    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
-+    if (ret < 0) {
-+        error_report("vhost guest notifier cleanup failed: %d", ret);
-+        return;
-+    }
-+
-+    vhost_dev_disable_notifiers(&s->dev, vdev);
-+}
-+
-+static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
-+
-+    if (!vdev->vm_running) {
-+        should_start = false;
-+    }
-+
-+    if (s->dev.started == should_start) {
-+        return;
-+    }
-+
-+    if (should_start) {
-+        vhost_user_blk_start(vdev);
-+    } else {
-+        vhost_user_blk_stop(vdev);
-+    }
-+
-+}
-+
-+static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-+                                            uint64_t features,
-+                                            Error **errp)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    uint64_t get_features;
-+
-+    /* Turn on pre-defined features */
-+    features |= s->host_features;
-+
-+    get_features = vhost_get_features(&s->dev, user_feature_bits, features);
-+
-+    return get_features;
-+}
-+
-+static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+
-+}
-+
-+static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    int ret;
-+    uint64_t size;
-+
-+    if (!s->chardev.chr) {
-+        error_setg(errp, "vhost-user-blk: chardev is mandatary");
-+        return;
-+    }
-+
-+    if (!s->num_queues) {
-+        error_setg(errp, "vhost-user-blk: invalid number of IO queues");
-+        return;
-+    }
-+
-+    if (!s->queue_size) {
-+        error_setg(errp, "vhost-user-blk: invalid count of the IO queue");
-+        return;
-+    }
-+
-+    if (!s->size) {
-+        error_setg(errp, "vhost-user-blk: block capacity must be assigned,"
-+                  "size can be specified by GiB or MiB");
-+        return;
-+    }
-+
-+    ret = qemu_strtosz_MiB(s->size, NULL, &size);
-+    if (ret < 0) {
-+        error_setg(errp, "vhost-user-blk: invalid size %s in GiB/MiB", s->size);
-+        return;
-+    }
-+    s->capacity = size / 512;
-+
-+    /* block size with default 512 Bytes */
-+    if (!s->blkcfg.logical_block_size) {
-+        s->blkcfg.logical_block_size = 512;
-+    }
-+
-+    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-+                sizeof(struct virtio_blk_config));
-+    virtio_add_queue(vdev, s->queue_size, vhost_user_blk_handle_output);
-+
-+    s->dev.nvqs = s->num_queues;
-+    s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
-+    s->dev.vq_index = 0;
-+    s->dev.backend_features = 0;
-+
-+    ret = vhost_dev_init(&s->dev, (void *)&s->chardev,
-+                         VHOST_BACKEND_TYPE_USER, 0);
-+    if (ret < 0) {
-+        error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
-+                   strerror(-ret));
-+        return;
-+    }
-+}
-+
-+static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(dev);
-+
-+    vhost_user_blk_set_status(vdev, 0);
-+    vhost_dev_cleanup(&s->dev);
-+    g_free(s->dev.vqs);
-+    virtio_cleanup(vdev);
-+}
-+
-+static void vhost_user_blk_instance_init(Object *obj)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(obj);
-+
-+    device_add_bootindex_property(obj, &s->bootindex, "bootindex",
-+                                  "/disk@0,0", DEVICE(obj), NULL);
-+}
-+
-+static const VMStateDescription vmstate_vhost_user_blk = {
-+    .name = "vhost-user-blk",
-+    .minimum_version_id = 2,
-+    .version_id = 2,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_VIRTIO_DEVICE,
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static Property vhost_user_blk_properties[] = {
-+    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
-+    DEFINE_BLOCK_PROPERTIES(VHostUserBlk, blkcfg),
-+    DEFINE_BLOCK_CHS_PROPERTIES(VHostUserBlk, blkcfg),
-+    DEFINE_PROP_STRING("size", VHostUserBlk, size),
-+    DEFINE_PROP_UINT16("num_queues", VHostUserBlk, num_queues, 1),
-+    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue_size, 128),
-+    DEFINE_PROP_UINT32("max_segment_size", VHostUserBlk, max_segment_size,
-+                       131072),
-+    DEFINE_PROP_UINT32("max_segment_num", VHostUserBlk, max_segment_num, 34),
-+    DEFINE_PROP_BIT("config_wce", VHostUserBlk, config_wce, 0, false),
-+    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_SIZE_MAX, true),
-+    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_SIZE_MAX, true),
-+    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_SEG_MAX, true),
-+    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_GEOMETRY, true),
-+    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_RO, false),
-+    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_BLK_SIZE, true),
-+    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_TOPOLOGY, true),
-+    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_MQ, true),
-+    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_FLUSH, true),
-+    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_BARRIER, false),
-+    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_SCSI, false),
-+    DEFINE_PROP_BIT64("f_writecache", VHostUserBlk, host_features,
-+                      VIRTIO_BLK_F_CONFIG_WCE, false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
-+
-+    dc->props = vhost_user_blk_properties;
-+    dc->vmsd = &vmstate_vhost_user_blk;
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    vdc->realize = vhost_user_blk_device_realize;
-+    vdc->unrealize = vhost_user_blk_device_unrealize;
-+    vdc->get_config = vhost_user_blk_update_config;
-+    vdc->set_config = vhost_user_blk_set_config;
-+    vdc->get_features = vhost_user_blk_get_features;
-+    vdc->set_status = vhost_user_blk_set_status;
-+}
-+
-+static const TypeInfo vhost_user_blk_info = {
-+    .name = TYPE_VHOST_USER_BLK,
-+    .parent = TYPE_VIRTIO_DEVICE,
-+    .instance_size = sizeof(VHostUserBlk),
-+    .instance_init = vhost_user_blk_instance_init,
-+    .class_init = vhost_user_blk_class_init,
-+};
-+
-+static void virtio_register_types(void)
-+{
-+    type_register_static(&vhost_user_blk_info);
-+}
-+
-+type_init(virtio_register_types)
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 5d14bd6..0cff259 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -2012,6 +2012,58 @@ static const TypeInfo virtio_blk_pci_info = {
-     .class_init    = virtio_blk_pci_class_init,
- };
- 
-+#ifdef CONFIG_VHOST_USER_BLK
-+/* vhost-user-blk */
-+
-+static Property vhost_user_blk_pci_properties[] = {
-+    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-+    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void vhost_user_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-+{
-+    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+
-+    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+}
-+
-+static void vhost_user_blk_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->props = vhost_user_blk_pci_properties;
-+    k->realize = vhost_user_blk_pci_realize;
-+    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
-+    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
-+    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
-+}
-+
-+static void vhost_user_blk_pci_instance_init(Object *obj)
-+{
-+    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VHOST_USER_BLK);
-+    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-+                              "bootindex", &error_abort);
-+}
-+
-+static const TypeInfo vhost_user_blk_pci_info = {
-+    .name           = TYPE_VHOST_USER_BLK_PCI,
-+    .parent         = TYPE_VIRTIO_PCI,
-+    .instance_size  = sizeof(VHostUserBlkPCI),
-+    .instance_init  = vhost_user_blk_pci_instance_init,
-+    .class_init     = vhost_user_blk_pci_class_init,
-+};
-+#endif
-+
- /* virtio-scsi-pci */
- 
- static Property virtio_scsi_pci_properties[] = {
-@@ -2658,6 +2710,9 @@ static void virtio_pci_register_types(void)
-     type_register_static(&virtio_9p_pci_info);
- #endif
-     type_register_static(&virtio_blk_pci_info);
-+#ifdef CONFIG_VHOST_USER_BLK
-+    type_register_static(&vhost_user_blk_pci_info);
-+#endif
-     type_register_static(&virtio_scsi_pci_info);
-     type_register_static(&virtio_balloon_pci_info);
-     type_register_static(&virtio_serial_pci_info);
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 69f5959..19a0d01 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -27,6 +27,9 @@
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-crypto.h"
- #include "hw/virtio/vhost-user-scsi.h"
-+#ifdef CONFIG_VHOST_USER_BLK
-+#include "hw/virtio/vhost-user-blk.h"
-+#endif
- 
- #ifdef CONFIG_VIRTFS
- #include "hw/9pfs/virtio-9p.h"
-@@ -46,6 +49,7 @@ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
- typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VHostSCSIPCI VHostSCSIPCI;
- typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
-+typedef struct VHostUserBlkPCI VHostUserBlkPCI;
- typedef struct VirtIORngPCI VirtIORngPCI;
- typedef struct VirtIOInputPCI VirtIOInputPCI;
- typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
-@@ -241,6 +245,20 @@ struct VHostUserSCSIPCI {
-     VHostUserSCSI vdev;
- };
- 
-+#ifdef CONFIG_VHOST_USER_BLK
-+/*
-+ * vhost-user-blk-pci: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci"
-+#define VHOST_USER_BLK_PCI(obj) \
-+        OBJECT_CHECK(VHostUserBlkPCI, (obj), TYPE_VHOST_USER_BLK_PCI)
-+
-+struct VHostUserBlkPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VHostUserBlk vdev;
-+};
-+#endif
-+
- /*
-  * virtio-blk-pci: This extends VirtioPCIProxy.
-  */
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
-new file mode 100644
-index 0000000..1d0079c
---- /dev/null
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -0,0 +1,46 @@
-+/*
-+ * vhost-user-blk host device
-+ * Copyright IBM, Corp. 2011
-+ * Copyright(C) 2017 Intel Corporation.
-+ *
-+ * Authors:
-+ *  Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
-+ *  Changpeng Liu <changpeng.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef VHOST_USER_BLK_H
-+#define VHOST_USER_BLK_H
-+
-+#include "standard-headers/linux/virtio_blk.h"
-+#include "qemu-common.h"
-+#include "hw/qdev.h"
-+#include "hw/block/block.h"
-+#include "chardev/char-fe.h"
-+#include "hw/virtio/vhost.h"
-+
-+#define TYPE_VHOST_USER_BLK "vhost-user-blk"
-+#define VHOST_USER_BLK(obj) \
-+        OBJECT_CHECK(VHostUserBlk, (obj), TYPE_VHOST_USER_BLK)
-+
-+typedef struct VHostUserBlk {
-+    VirtIODevice parent_obj;
-+    CharBackend chardev;
-+    Error *migration_blocker;
-+    int32_t bootindex;
-+    uint64_t host_features;
-+    BlockConf blkcfg;
-+    uint64_t capacity;
-+    char *size;
-+    uint32_t max_segment_size;
-+    uint32_t max_segment_num;
-+    uint16_t num_queues;
-+    uint32_t queue_size;
-+    uint32_t config_wce;
-+    struct vhost_dev dev;
-+} VHostUserBlk;
-+
-+#endif
--- 
-1.9.3
+Now if by "this is not an issue" you mean it is not a bug, I agree this 
+can wait 2.11.
+
+Regards,
+
+Phil.
+
+>>          rm -f fsdev/*.pod
+>>          rm -f qemu-img-cmds.h
+>>          rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+>> diff --git a/configure b/configure
+>> index 48d4d7a2a7..f8b1d014d7 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -5073,7 +5073,7 @@ fi
+>>
+>>   if [ "$guest_agent" != "no" ]; then
+>>     if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" -o "$mingw32" = "yes" ] ; then
+>> -      tools="qemu-ga $tools"
+>> +      tools="qemu-ga\$(EXESUF) $tools"
+>>         guest_agent=yes
+>>     elif [ "$guest_agent" != yes ]; then
+>>         guest_agent=no
+>> -- 
+>> 2.13.3
+>>
+>>
+> 
