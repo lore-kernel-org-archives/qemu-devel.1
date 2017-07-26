@@ -1,55 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1daL4q-000364-0g
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1daL5U-0003eg-LB
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1daL4n-0001ny-9o
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44511
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1daL4n-0001nl-3k
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:05 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6QC4f6o028855
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 08:06:04 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bxrgsex33-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 08:06:04 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 26 Jul 2017 13:06:02 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
-	[9.149.105.58])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v6QC60fv17564060
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:06:00 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ABAF34C040
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 13:03:32 +0100 (BST)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7250D4C044
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 13:03:32 +0100 (BST)
-Received: from oc3836556865.ibm.com (unknown [9.152.224.141])
-	by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 13:03:32 +0100 (BST)
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170725224442.13383-2-pasic@linux.vnet.ibm.com>
-	<20170726033121.GP7483@bjsdjshi@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 26 Jul 2017 14:05:59 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1daL5R-0002IP-UM
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daL5R-0002Hp-LT
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:06:45 -0400
+References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+	<20170721110636.19412e6c@nial.brq.redhat.com>
+	<20170721092338.GE17693@redhat.com>
+	<20170721143432.0e888800@nial.brq.redhat.com>
+	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
+	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
+	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
+	<a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
+	<CAGCz3vvyxbe7D2OL08Bo+mzvgP_51c3iPCQ-+PeROC9aZdMo3A@mail.gmail.com>
+	<21592b3f-1a0c-c573-b5e6-754a44582309@redhat.com>
+	<f9db34d0-759a-c2f4-d8a5-9bddd79cca4b@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4c8a6dc2-7732-1dd3-982a-f39b3fe69e11@redhat.com>
+Date: Wed, 26 Jul 2017 14:06:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170726033121.GP7483@bjsdjshi@linux.vnet.ibm.com>
+In-Reply-To: <f9db34d0-759a-c2f4-d8a5-9bddd79cca4b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <af44463e-9a90-d769-32d7-53e43852cb89@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/css: check ccw address validity
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -58,137 +39,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "seabios@seabios.org" <seabios@seabios.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On 26/07/2017 13:42, Laszlo Ersek wrote:
+> Not exactly; the PCD controls whether the EFI_ACPI_TABLE_PROTOCOL will
+> expose an RSDT, an XSDT, or both (with matching contents).
 
+You're right that the code does not produce a v1 FADT, I mis-skimmed the
+awful code of AcpiTableDxe.  Though the intentions seems to be there in
+the UEFI spec, because UEFI has different GUIDs for ACPI 1.0 and 2.0+
+RSDPs---and they need not point to the same tables, even though the ACPI
+1.0 RSDP is a subset of the 2.0+ one.
 
-On 07/26/2017 05:31 AM, Dong Jia Shi wrote:
-> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-26 00:44:41 +0200]:
-> 
->> According to the PoP channel command words (CCW) must be doubleword
->> aligned and 31 bit addressable for format 1 and 24 bit addressable for
->> format 0 CCWs.
->>
->> If the channel subsystem encounters ccw address which does not satisfy
->> this alignment requirement a program-check condition is recognised.
->>
->> The situation with 31 bit addressable is a bit more complicated: both the
->> ORB and a format 1 CCW TIC hold the address of the (rest of) the channel
->                                               ^^^^^^^^^^^^^^^^^^^^
-> Meant to be (?):
-> of the (rest of the)
+AcpiTableDxe's data structures have an "Rsdp1" field (pointing to
+"Rsdt1" and from there to "Fadt1") and an "Rsdp3" field (pointing to
+"Xsdt" and optionally "Rsdt3", and from both to "Fadt3").  However:
 
-Yes.
+* Fadt1 and Fadt3 have exactly the same content.
 
-> 
-> Maybe just saying:
-> the address of a channel probram
-> 
+* Rsdt3 doesn't point to Fadt1.
 
-"the rest of the channel program" was supposed to refer to the TIC scenario,
-and "the channel program" to ORB.
+It should be easy to make "Fadt1" a v1 table instead of copying the same
+contents to Fadt1 and Fadt3, and to make Rsdt3 point to Fadt1.  The CSM
+would just work if edk2 did this; until then Windows 2000 over SeaBIOS
+over OVMF remains broken, but I guess that's not that much of an issue.
 
->> program, that is the address of the next CCW in a word, and the PoP
->> mandates that bit 0 of that word shall be zero -- or a program-check
->> condition is to be recognized -- and does not belong to the field holding
->> the ccw address.
->>
->> Since in code the corresponding fields span across the whole word (unlike
->> in PoP where these are defined as 31 bit wide) we can check this by
->> applying a mask. The 24 addressable case isn't affecting TIC because the
->> address is composed of a halfword and a byte portion (no additional zero
->> bit requirements) and just slightly complicates the ORB case where also
->> bits 1-7 need to be zero.
->>
->> Let's make our CSS implementation follow the AR more closely.
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->> Note: Checking for 31 bit addressable ain't strictly necessary:
->> According to the AR the all zero fields of the ORB may or may not be
->> checked during the execution of SSCH. We do check the corresponding
->> single bit field of the ORB and respond to it accordingly. Using
->> the same mask for TIC and for ORB does not hurt.
->> ---
->>  hw/s390x/css.c | 18 ++++++++++++++++++
->>  1 file changed, 18 insertions(+)
->>
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index 6a42b95cee..d17e21b7af 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
->> @@ -24,6 +24,9 @@
->>  #include "hw/s390x/s390_flic.h"
->>  #include "hw/s390x/s390-virtio-ccw.h"
->>
->> +/* CCWs are doubleword aligned and addressable by 31 bit */
->> +#define CCW1_ADDR_MASK 0x80000007
->> +
-> Move this hunk to ioinst.h?
-> 
->>  typedef struct CrwContainer {
->>      CRW crw;
->>      QTAILQ_ENTRY(CrwContainer) sibling;
->> @@ -885,6 +888,10 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->>              ret = -EINVAL;
->>              break;
->>          }
->> +        if (ccw.cda & CCW1_ADDR_MASK) {
->> +            ret = -EINVAL;
->> +            break;
->> +        }
->>          sch->channel_prog = ccw.cda;
->>          ret = -EAGAIN;
->>          break;
->> @@ -946,6 +953,17 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
->>          suspend_allowed = true;
->>      }
->>      sch->last_cmd_valid = false;
->> +    if (sch->channel_prog & (CCW1_ADDR_MASK |
->> +                             sch->ccw_fmt_1 ? 0 : 0xff000000)) {
-> I have problem in recognizing the operator precedence here:
->     (CCW1_ADDR_MASK | sch->ccw_fmt_1 ? 0 : 0xff000000)
-> 
-> Bitwise '|' has higher precedence than '?:', so the above equals to:
->     (CCW1_ADDR_MASK | sch->ccw_fmt_1) ? 0 : 0xff000000
-> 
-> So you will always get a '0', no?
-> 
+Anyway, once you take CSM into account, IMHO a firmware solution becomes
+preferrable to Kevin's proposals to add a etc/table-loader-legacy (or
+similar) file in fw_cfg.
 
-I'm afraid you are right. Good catch! This was supposed to be
-(CCW1_ADDR_MASK | (sch->ccw_fmt_1 ? 0 : 0xff000000))
+Paolo
 
-
->> +            /* generate channel program check */
->> +            s->ctrl &= ~SCSW_ACTL_START_PEND;
->> +            s->cstat = SCSW_CSTAT_PROG_CHECK;
->> +            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
->> +            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
->> +                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
->> +            s->cpa = sch->channel_prog + 8;
->> +            return;
->> +    }
-> I think you could let css_interpret_ccw() do the sanity check on its
-> @ccw_addr parameter when (sch->last_cmd_valid == false), to reuse the
-> code of generating channel program check.
->
-
-I'm working on factoring out the code manipulating SCSW (among others). If we
-do that this will look nicer. What you propose is certainly viable, althoug
-maybe little less straight forward.
-
-Yet another option would be to use a label and jump into the loop (AFAIR that
-would be also valid).
-
-Let us see what is Connie's opinion.
-
-Regards,
-Halil 
- 
->>      do {
->>          ret = css_interpret_ccw(sch, sch->channel_prog, suspend_allowed);
->>          switch (ret) {
->> -- 
->> 2.11.2
->>
-> 
+> The FADT
+> always comes from the specific edk2 platform (i.e., OVMF client code),
+> and it is not translated in any way, regardless of the PCD value.
+>=20
+> From "MdeModulePkg/MdeModulePkg.dec":
+>=20
+>>   ## Indicates which ACPI versions are targeted by the ACPI tables exp=
+osed to the OS
+>>   #  These values are aligned with the definitions in MdePkg/Include/P=
+rotocol/AcpiSystemDescriptionTable.h
+>>   #   BIT 1 - EFI_ACPI_TABLE_VERSION_1_0B.<BR>
+>>   #   BIT 2 - EFI_ACPI_TABLE_VERSION_2_0.<BR>
+>>   #   BIT 3 - EFI_ACPI_TABLE_VERSION_3_0.<BR>
+>>   #   BIT 4 - EFI_ACPI_TABLE_VERSION_4_0.<BR>
+>>   #   BIT 5 - EFI_ACPI_TABLE_VERSION_5_0.<BR>
+>>   # @Prompt Exposed ACPI table versions.
+>>   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x3E|UINT=
+32|0x0001004c
+> The expectation is that the specific edk2 platform overrides this PCD a=
+t
+> build time (if necessary), and then goes on (at boot time) to install
+> ACPI tables -- using EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() -- that
+> actually match the PCD setting.
