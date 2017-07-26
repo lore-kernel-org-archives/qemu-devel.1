@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daLAx-0000Iw-JF
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:12:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1daLB7-0000RO-2P
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daLAw-00061f-6R
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:12:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46528)
+	(envelope-from <eblake@redhat.com>) id 1daLB2-00065o-PK
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:12:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daLAv-00060t-US
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:12:26 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daLB2-00065R-G0
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:12:32 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0488F285B5
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:12:25 +0000 (UTC)
-References: <20170726114437.19624-1-pbonzini@redhat.com>
-	<9e187829-fc01-8140-22f0-7cf67fc294bd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0f384035-c156-8a75-8909-e6afc692f6af@redhat.com>
-Date: Wed, 26 Jul 2017 14:12:22 +0200
+	by mx1.redhat.com (Postfix) with ESMTPS id 8F8078046A
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 12:12:31 +0000 (UTC)
+References: <20170726115637.21558-1-kraxel@redhat.com>
+	<20170726115637.21558-5-kraxel@redhat.com>
+	<85e9156c-1a11-4757-996d-877e40e316bc@redhat.com>
+	<20170726120819.GH7620@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <89ba674e-77f6-5859-bb17-1ffc1099a5eb@redhat.com>
+Date: Wed, 26 Jul 2017 07:12:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <9e187829-fc01-8140-22f0-7cf67fc294bd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] add Thomas's bug reporting dos
- and don'ts
+In-Reply-To: <20170726120819.GH7620@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xkWmjkOoISmj93fj0InQdAWQU6I3G5N4f"
+Subject: Re: [Qemu-devel] [PATCH 4/5] ui: add multimedia keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +36,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 26/07/2017 13:57, Thomas Huth wrote:
-> On 26.07.2017 13:44, Paolo Bonzini wrote:
->> We don't want the page to become too long, but these are good suggestions.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xkWmjkOoISmj93fj0InQdAWQU6I3G5N4f
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <89ba674e-77f6-5859-bb17-1ffc1099a5eb@redhat.com>
+Subject: Re: [PATCH 4/5] ui: add multimedia keys
+References: <20170726115637.21558-1-kraxel@redhat.com>
+ <20170726115637.21558-5-kraxel@redhat.com>
+ <85e9156c-1a11-4757-996d-877e40e316bc@redhat.com>
+ <20170726120819.GH7620@redhat.com>
+In-Reply-To: <20170726120819.GH7620@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/26/2017 07:08 AM, Daniel P. Berrange wrote:
+> On Wed, Jul 26, 2017 at 07:02:48AM -0500, Eric Blake wrote:
+>> On 07/26/2017 06:56 AM, Gerd Hoffmann wrote:
+>>> Add multimedia keys to QKeyCodes and to the keymaps.
+>>>
+>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>> ---
+>>>  ui/input-keymap.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>>>  qapi-schema.json  | 17 ++++++++++++++++-
+>>>  2 files changed, 60 insertions(+), 1 deletion(-)
+
+>>> +# @ac_*: since 2.10
 >>
->> Also tone down the sentence about using the latest release or latest git
->> tree, though we do prefer those.
-> 
-> Well, sometimes people still report bugs against QEMU 2.1 or so ... so
-> I'd say everything that is older than the current version - 2 has a very
-> high chance to be ignored completely. So maybe we should ask people to
-> use at least one of the versions that is mentioned on the front-page of
-> www.qemu.org ?
+>> Borderline between bug-fix and new feature (arguing that the bug is th=
+at
+>> we don't represent all keys).  Does this need to be 2.11 instead?
+>=20
+> It is really fixing a bug introduced in the PS2 driver in 2.8.0.  It
+> roundtrips via QKeyCode now, so any key where there is an AT Set 1
+> scancode defined, but for which we lack a QKeyCode can't be sent to
+> guests since QEMU 2.8.0 onwards.
 
-It depends on the bug... for some, the right person might immediately
-recognize that it's fixed or that it's just been reported.
+Sounds good to me, although that would be worth mentioning in the commit
+message.
 
-Certainly a bug for RHEL6's 0.12 fork is not going to receive much
-attention.  But in any case, all these recommendations are advisory
-("please try to do the following").
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-In the end, your recommendation about including the release version or
-git hash was somewhat at odds with "make sure you're reporting the bug
-against the latest release" (and I actually preferred your version).
-Hence the change.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Paolo
 
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  contribute.md              |  2 +-
->>  contribute/report-a-bug.md | 13 ++++++++++---
->>  2 files changed, 11 insertions(+), 4 deletions(-)
->>
->> diff --git a/contribute.md b/contribute.md
->> index e052654..b10ba7f 100644
->> --- a/contribute.md
->> +++ b/contribute.md
->> @@ -3,7 +3,7 @@ title: Contribute to QEMU!
->>  permalink: /contribute/
->>  ---
->>  
->> -* Report a bug: https://bugs.launchpad.net/qemu/<br>[How to report a bug](report-a-bug/)
->> +* Report a bug: [https://bugs.launchpad.net/qemu/](https://bugs.launchpad.net/qemu/)<br>[How to report a bug](report-a-bug/)
->>  
->>  * Clone the git repository: <br>`git clone git://git.qemu-project.org/qemu.git`
->>  
->> diff --git a/contribute/report-a-bug.md b/contribute/report-a-bug.md
->> index ce73d76..81eecf7 100644
->> --- a/contribute/report-a-bug.md
->> +++ b/contribute/report-a-bug.md
->> @@ -3,17 +3,24 @@ title: Reporting a bug
->>  permalink: /contribute/report-a-bug/
->>  ---
->>  
->> -Bugs can be filed at our [bug tracker](https://bugs.launchpad.net/qemu/), which is hosted on Launchpad.
->> +Bugs can be filed at our [bug tracker](https://bugs.launchpad.net/qemu/), which is hosted on Launchpad. If you've got a problem with how your Linux distribution packages QEMU, use the bug tracker from your distro instead.
->>  
->>  When submitting a bug report, please try to do the following:
->>  
->> -* Make sure you're reporting the bug against the [latest release](/download/#source).  If possible, please try to reproduce with the latest development tree too.
->> +* Include the QEMU release version or the git commit hash into the description, so that it is later still clear in which version you have found the bug.  Reports against the [latest release](/download/#source) or even the latest development tree are usually acted upon faster.
->>  
->>  * Include the full command line used to launch the QEMU guest.
->>  
->>  * Reproduce the problem directly with a QEMU command-line.  Avoid frontends and management stacks, to ensure that the bug is in QEMU itself and not in a frontend.
->>
-> 
-> Maybe better "front-end(s)" instead of "frontend(s)" ?
-> 
->> -* Include as information about the guest (operating system, version, 32/64-bit).
->> +* Include as information about the host and guest (operating system, version, 32/64-bit).
->>  
->>  * Do not contribute patches on the bug tracker; send patches to the mailing list. Follow QEMU's [guidelines about submitting patches](http://wiki.qemu.org/Contribute/SubmitAPatch).
->>  
->> +Do NOT report security issues (or other bugs, too) as
-> 
-> Thinking about the markup again, maybe better use "*not*" instead of
-> "NOT" (to avoid shouting).
-> 
-> Apart from that, looks fine to me, thanks for the update!
-> 
->  Thomas
-> 
+--xkWmjkOoISmj93fj0InQdAWQU6I3G5N4f
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll4hyoACgkQp6FrSiUn
+Q2oFdgf+O6JKBAbbxfezzWeMTog89l3/uxEtXtG2wsq/Fd8RJlZZNQyTIlXCP/6T
+Bo5jFXiN/qhl7tlOBbxQewLsQ74XNAzh8qgSFiP/GgRWy4YeHiatysWXd4HieK8c
+zVlTP1Y7r3myP/DkKehlTt5MLrvxj+B9YfBr4H41lBZg7XKpipH0QlaSNcKjccFD
+5WZtbNrKaB7CK3oGI3xKoXX1GyfMPR/zC+tuqcJBIa7qGTZQ1QA3u44YiOwg7CeF
+beHKGyQAGCZaeEmdh+FgujL5/o8XhQOkuqS+D5WcV+EI0lAXbzc0J3M27k91M7Jl
+vHbocLNnl73l9KpVtle9XKBH+U3ePw==
+=bwN8
+-----END PGP SIGNATURE-----
+
+--xkWmjkOoISmj93fj0InQdAWQU6I3G5N4f--
