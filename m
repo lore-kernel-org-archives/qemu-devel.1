@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1daVSu-00018N-9k
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:11:41 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daVet-0004kd-Oa
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1daVSp-00034T-Ar
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:11:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53544)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1daVSp-00034A-3g
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:11:35 -0400
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-	<20170726215625-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ea56b18e-b4fb-cfa0-d893-8bcd241ccdf4@redhat.com>
-Date: Thu, 27 Jul 2017 01:11:22 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daVep-0000p1-QI
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:24:03 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:35131)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daVep-0000no-LX
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:23:59 -0400
+Received: by mail-qt0-x229.google.com with SMTP id p3so52761682qtg.2
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 16:23:59 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-17-f4bug@amsat.org>
+	<1500986052.29790.5.camel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f561e5b5-6967-dab1-a285-cd756894b334@amsat.org>
+Date: Wed, 26 Jul 2017 20:23:55 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1500986052.29790.5.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC PATCH v2 4/6] hw/pci: introduce
- bridge-only vendor-specific capability to provide some hints to firmware
+Subject: Re: [Qemu-devel] [PATCH for 2.10 16/35] usb/dev-mtp: fix use of
+ uninitialized values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +37,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Bezzubikov <zuban32s@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: seabios@seabios.org, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, rth@twiddle.net
+To: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 07/26/17 23:54, Alexander Bezzubikov wrote:
-> 2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
->> On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
-
->>> +    PCIBridgeQemuCap cap;
->>
->> This leaks info to guest. You want to init all fields here:
->>
->> cap = {
->>  .len = ....
->> };
+On 07/25/2017 09:34 AM, Gerd Hoffmann wrote:
+>       case CMD_GET_OBJECT_INFO:
+>> -        o = usb_mtp_object_lookup(s, c->argv[0]);
+>> +        if (c->argc > 0) {
+>> +            o = usb_mtp_object_lookup(s, c->argv[0]);
+>> +        }
 > 
-> I surely can do this for len field, but as Laszlo proposed
-> we can use mutually exclusive fields,
-> e.g. pref_32 and pref_64, the only way I have left
-> is to use ternary operator (if we surely need this
-> big initializer). Keeping some if's would look better,
-> I think.
+> How about zero-initializing c->argv instead?
 
-I think it's fine to use "if"s in order to set up the structure
-partially / gradually, but then please clear the structure up-front:
+I checked the MTP specs rev. 1.1 and I understand the case argc == 0 
+fits in "Invalid Parameter" section (F.2.30, code 0x201d).
 
+So the correct patch is to queue a RES_INVALID_PARAMETER result.
 
-  PCIBridgeQemuCap cap = { 0 };
+I'll send another patch but since this require heavy testing this is 
+probably 2.11 material now.
 
-(In general "{ 0 }" is the best initializer ever, because it can
-zero-init a variable of *any* type at all. Gcc might complain about the
-inexact depth of {} nesting of course, but it's nonetheless valid C.)
+Regards,
 
-Or else add a memset-to-zero.
-
-Or else, do just
-
-  PCIBridgeQemuCap cap = { .len = ... };
-
-which will zero-fill every other field. ("[...] all subobjects that are
-not initialized explicitly shall be initialized implicitly the same as
-objects that have static storage duration").
-
-Thanks
-Laszlo
+Phil.
