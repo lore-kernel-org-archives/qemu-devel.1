@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daKTW-0006iK-UI
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:27:35 -0400
+	(envelope-from <berrange@redhat.com>) id 1daKUW-0007LT-Dt
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daKTS-0002WZ-RV
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:27:34 -0400
-Received: from mail-wr0-f182.google.com ([209.85.128.182]:37183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daKTS-0002WC-Ki
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:27:30 -0400
-Received: by mail-wr0-f182.google.com with SMTP id 33so73765037wrz.4
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:27:30 -0700 (PDT)
-References: <20170717212446.15268-1-rth@twiddle.net>
-	<20170717212446.15268-2-rth@twiddle.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a7b583a7-2043-6b64-7d83-ba00255553dc@redhat.com>
-Date: Wed, 26 Jul 2017 13:27:26 +0200
+	(envelope-from <berrange@redhat.com>) id 1daKUS-0003Ue-H8
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:28:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daKUS-0003Ta-BX
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:28:32 -0400
+Date: Wed, 26 Jul 2017 12:28:26 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170726112826.GE7620@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170724164601.21063-1-berrange@redhat.com>
+	<88f8a661-f832-1d03-2736-d7b35c920e32@reactos.org>
+	<20170725083251.GB26394@redhat.com>
+	<1500983620.29790.3.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170717212446.15268-2-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 1/8] target/s390x: Implement CSST
+Content-Disposition: inline
+In-Reply-To: <1500983620.29790.3.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.10] ps2: fix sending of PAUSE/BREAK
+ scancodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org
 
-On 17/07/2017 23:24, Richard Henderson wrote:
-> +        case 4:
-> +            if (parallel_cpus) {
-> +#ifdef CONFIG_ATOMIC128
-> +                TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
-> +                Int128 sv = int128_make128(svl, svh);
-> +                helper_atomic_sto_be_mmu(env, a2, sv, oi, ra);
-> +#else
-> +                /* Note that we asserted !parallel_cpus above.  */
-> +                g_assert_not_reached();
-> +#endif
-> +            } else {
-> +                cpu_stq_data_ra(env, a2 + 0, svh, ra);
-> +                cpu_stq_data_ra(env, a2 + 8, svl, ra);
-> +            }
-> +        default:
-> +            g_assert_not_reached();
+On Tue, Jul 25, 2017 at 01:53:40PM +0200, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> > > You're putting some specific code for spice in ps2 emulation.
+> > > IMO, the workaround should be moved to spice keyboard handling
+> > > (ui/spice-input.c),
+> > > which needs to generate a qcode instead of a scancode.
+> > 
+> > This isn't really a spice specific hack. QEMU internal code is *not*
+> > required
+> > to use qcodes 
+> 
+> qcodes are prefered in new code though.
+> 
+> > - the KeyValue struct is a union that allows use of either qcodes
+> > or XT scancodes, and the latter is what all the frontends (SPICE,
+> > VNC, GTk, SDL)
+> > use. QCodes are really only input by the monitor (the sendkey
+> > command).
+> 
+> Well, PAUSE is actually sent as qcode by sdl and gtk.  This avoids
+> special cases in the input layer (PAUSE is the only three scancodes key
+> sequence).  IMO spice should do the same.  I want switch UIs to qcodes
+> anyway.
 
-Coverity complains about a missing "break".
+qcodes as currently defined cover only a subset of the AT set1 scancodes,
+so we need to define countless more qcodes before we consider converting
+UIs to use qcodes.
 
-Paolo
+Aside from the pause/break bug, the changes to ps2 driver to round trip
+via qcodes have now made it impossible to send a large number of key
+sequences to the guest OS :-( Admittedly the missing key codes are not
+so commonly used, but it is still a notable regression in functionality
+today
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
