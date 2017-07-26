@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1daQy6-0006le-AE
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:23:35 -0400
+	(envelope-from <crosa@redhat.com>) id 1daQyw-0007tL-UF
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1daQy5-0003Ql-Ck
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:23:34 -0400
-Date: Wed, 26 Jul 2017 21:23:20 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170726182320.cnqx3y64c7nmhvp3@postretch>
-References: <20170726141924.qaqclberxsup5cdm@postretch>
-	<20170726151221.GA3600@stefanha-x1.localdomain>
+	(envelope-from <crosa@redhat.com>) id 1daQyw-0004KU-18
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:24:26 -0400
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721123325.GC18014@stefanha-x1.localdomain>
+	<20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+	<20170726175808.GD3600@stefanha-x1.localdomain>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
+Date: Wed, 26 Jul 2017 14:24:02 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3zl2gdrxd5gom5kf"
-Content-Disposition: inline
-In-Reply-To: <20170726151221.GA3600@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC] block-insert-node and block-job-delete
+In-Reply-To: <20170726175808.GD3600@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f"
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-
---3zl2gdrxd5gom5kf
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f
+From: Cleber Rosa <crosa@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
+References: <20170721034730.25612-1-crosa@redhat.com>
+ <20170721123325.GC18014@stefanha-x1.localdomain>
+ <20170721140155.GQ17693@redhat.com>
+ <bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+ <20170725154921.GS23343@stefanha-x1.localdomain>
+ <547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+ <20170726175808.GD3600@stefanha-x1.localdomain>
+In-Reply-To: <20170726175808.GD3600@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 26, 2017 at 04:12:21PM +0100, Stefan Hajnoczi wrote:
->On Wed, Jul 26, 2017 at 05:19:24PM +0300, Manos Pitsidianakis wrote:
->> This proposal follows a discussion we had with Kevin and Stefan on filter
->> node management.
+
+
+On 07/26/2017 01:58 PM, Stefan Hajnoczi wrote:
+> On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
+>> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
+>>> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
+>>>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
+>>>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
+>>>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+>>>> Without the static capabilities defined, the dynamic check would be
+>>>> influenced by the run time environment.  It would really mean "qemu-=
+io
+>>>> running on this environment (filesystem?) can do native aio".  Again=
+,
+>>>> that's not the best type of information to depend on when writing te=
+sts.
+>>>
+>>> Can you explain this more?
+>>>
+>>> It seems logical to me that if qemu-io in this environment cannot do
+>>> aio=3Dnative then we must skip those tests.
+>>>
+>>> Stefan
+>>>
 >>
->> With block filter drivers arises a need to configure filter nodes on run=
-time
->> with QMP on live graphs. A problem with doing live graph modifications is
->> that some block jobs modify the graph when they are done and don't opera=
-te
->> under any synchronisation, resulting in a race condition if we try to in=
-sert
->> a filter node in the place of an existing edge.
->
->But maybe you are thinking about higher level race conditions between
->QMP commands.  Can you give an example of the race?
+>> OK, let's abstract a bit more.  Let's take this part of your statement=
+:
+>>
+>>  "if qemu-io in this environment cannot do aio=3Dnative"
+>>
+>> Let's call that a feature check.  Depending on how the *feature check*=
 
-Exactly, synchronisation between the QMP/user actions. Here's an=20
-example, correct me if I'm wrong:
+>> is written, a negative result may hide a test failure, because it woul=
+d
+>> now be skipped.
+>=20
+> You are saying a pass->skip transition can hide a failure but ./check
+> tracks skipped tests.  See tests/qemu-iotests/check.log for a
+> pass/fail/skip history.
+>=20
 
-User issues a block-commit to this tree to commit A onto B:
-    BB -> A -> B
+You're not focusing on the problem here.  The problem is that a test
+that *was not* supposed to be skipped, would be skipped.
 
-This inserts the dummy mirror node at the top since this is a mirror job=20
-(active commit)
-    BB -> dummy -> A -> B
+Let me reinforce my point, and you can address it directly:  feature
+checks like you proposed can easily produce false negatives.  Not
+something hypothetical or far fetched, I gave very reasonable examples
+on this same thread.
 
-User wants to add a filter node F below the BB. First we create the=20
-node:
-    BB -> dummy -> A -> B
-       F /
+Do you think that's OK because the skip count will get an increment?
+That's exactly one of the main concerns raised in the original thread (
+and break room conversations) that motivated this experiment.
 
-Commit finishes before we do block-insert-node, dummy and A is removed=20
-=66rom the BB's chain, mirror_exit calls bdrv_replace_node()
+> It is the job of the CI system to flag up pass/fail/skip transitions.
+> You're no worse off using feature tests.
+>=20
+> Stefan
+>=20
 
-    BB ------------> B
-                F -> /
+What I'm trying to help us achieve here is a reliable and predictable
+way for the same test job execution to be comparable across
+environments.  From the individual developer workstation, CI, QA etc.
 
-Now inserting F under BB will error since dummy does not exist any more.
+Please let me know If you really believe this should *not* be done here
+(upstream QEMU).
 
-The proposal doesn't guard against the following:
-User issues a block-commit to this tree to commit B onto C:
-    BB -> A -> B -> C
+Regards!
 
-The dummy node (commit's top bs is A):
-    BB -> A -> dummy -> B -> C
-
-blockdev-add of a filter we wish to eventually be between A and C:
-    BB -> A -> dummy -> B -> C
-             F/
-
-if commit finishes before we issue block-insert-node (commit_complete()
-calls bdrv_set_backing_hd() which only touches A)
-    BB -> A --------------> C
-           F -> dummy -> B /
-    resulting in error when issuing block-insert-node,
-
-else if we set the job to manual-delete and insert F:
-    BB -> A -> F -> dummy -> B -> C
-deleting the job will result in F being lost since the job's top bs=20
-wasn't updated.
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
 
 
---3zl2gdrxd5gom5kf
+--ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAll43hgACgkQc2J8L2kN
-9xBD0hAApO6KgI6LSF+LRSCC72WQIrTq2r9BmhHzyxeZ2EGFmvdoBUhkp1eluytu
-qPWC/duhrUXOQsGMR99ZWqFngp5kofsVRBFlO5OyxXrX4Vai+oOJ612YGnwwQa0D
-qaQqyGDzWlDIOxYq55SwjHVrbxCxouIqzeW3ICrVgPXOHztsg0PNHFsJ7Qkdgr1R
-xxCXIzRhfCwcYc8XhXclKLv9MnjMwTsR5rUAejz1/n96cIT55TjDS/y47Mtlxk67
-o0Abs5y72ISYvVNSCRDE5sgzhPorMsIrUL3y+EbTIsF/KkPFIRJjDe0btYei58AF
-mPlP5CxtGBHvc4Xpj/ppzCKTWhYI1u6IceWcxRXwNLStTVtXf1lHZG9shrLMBLJ4
-XsDMPnZzTR0Wjr/ZVXOcxzGJt2Mw10BWZ0ykfNh6JBdHmiQGbnBNQ2GBXtxu+Uea
-IYOL92bOo01c9EwVv86X5FSV5fKd19zcXDQRpKwxKE6B587gM8CB7BuCKP+r8PYt
-fRNWQevTxeY6tZ+G1H2a6dEb8GR+zIiTMijBnvJbbFeS0HsRzROQB15ydgwkeq1Z
-e8Vaj3rxToZy3dHhgNKxvIGBmdQoXlN3Z9EPxC56B0oXblCfuOs9IGvU5zb+nyab
-GwT4JAyC2XH/wcHHdutNM3j1fhBqcuIlyYlaTpEqk2b6d7unGgU=
-=7Uw7
+iQIcBAEBCAAGBQJZeN5CAAoJEGV+jTOl8gnz1VYQALVsnkFvgqT69occwlGp2sqZ
+NznefO6vX0n/JSQb3RoyrqFpItlutPpYc7iKOsxTn8kRl6BMrzuw5XNfeSjQnRm8
+fJ/65oc+sgOvhpfu7/pSNGgvoWW4Nw+KMTOErKYzBLuha0gkPjURtbIrUFfkikp4
+6glhD//Pe1z7MFwOdAWdXrZk0q6neKuagfUMEh+W+dx9XfNdLQn2N95WD4po2jAz
+dUbAgpzQ/GKOA2u0mlbSfDu4hzFHCaHw9IVgDHoY447QImYJda4vutC4GC1zApOf
+XI7w35IB99BWQ/uiq3nvnss1wIXoGga6kwp2cKDZQpgwybM9Wn5IUNLia58gspGs
+inj4pZ5qsMo5e9HX2e9qpIdrLjcQrqUjRKN0YrSC0AKzddzgq5QaEz1WWKvUzV9i
+X1BbUhcU+hzhiKNPyC1+kHsx28mBmKfYS+0bOC4F9F9H6xO2Ig1jk1+BFwFsVRT5
+MwMVSjxZpl7KQHTrYzhPCdP/b7dVr/cJR8UqYekwwlWbXQXPNeT1ReJjo7HjDe+g
+rAFt3H/t4LYh+bz1+WxBsuVuJZ9BhAhaTjnpOOgT3c9mUad0I1Is7hpinMpeDhR1
+E4/75NGeHyxcyqq5hnNHIDfw/7POiHHRYB6Vj741h3v5SxxstbkxVsSBMi+l+yny
+KvTkyZcmURbMHnreIdMc
+=u1E6
 -----END PGP SIGNATURE-----
 
---3zl2gdrxd5gom5kf--
+--ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f--
