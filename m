@@ -1,14 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1daPuT-0004BS-Pr
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:15:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1daPuv-0004bm-8l
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1daPuS-0000HP-QP
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:15:45 -0400
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Wed, 26 Jul 2017 20:14:37 +0300
-Message-Id: <20170726171444.32218-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 0/7] add throttle block driver filter
+	(envelope-from <bounces@canonical.com>) id 1daPus-0000Tn-56
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:16:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1daPur-0000TX-VG
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:16:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1daPuq-0003ek-UN
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:16:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D410D2E80C8
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:16:08 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 26 Jul 2017 17:03:18 -0000
+From: Sven <1096714@bugs.launchpad.net>
+Reply-To: Bug 1096714 <1096714@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130107012337.1165.80927.malonedeb@gac.canonical.com>
+Message-Id: <150108859848.19726.12224153859464032794.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1096714] Re: qemu 1.3.0: usb devices shouldn't
+ have same vendor/product ID and same serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,54 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-This series adds a throttle block driver filter. Currently throttling is done
-at the BlockBackend level. Using block driver interfaces we can move the
-throttling to any point in the BDS graph using a throttle node which uses the
-existing throttling code. This allows for potentially more complex
-configurations (throttling at any point in the graph, chained filters)
+This bug is more than 4 years old. Why did I even bother writing it? Is
+the problem still there in recent qemu versions?
 
-There's also the question of how filter drivers affect the rest of the block
-layer, especially live block jobs. This won't be tackled in this series though.
+-- =
 
-v2:
-  change QOM throttle group object name
-  print valid ranges for uint on error
-  move frees in throttle_group_obj_finalize()
-  split throttle_group_{set,get}()
-  add throttle_recurse_is_first_non_filter()
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1096714
 
-Manos Pitsidianakis (7):
-  block: move ThrottleGroup membership to ThrottleGroupMember
-  block: add aio_context field in ThrottleGroupMember
-  block: tidy ThrottleGroupMember initializations
-  block: convert ThrottleGroup to object with QOM
-  block: add throttle block filter driver
-  block: add BlockDevOptionsThrottle to QAPI
-  block: add throttle block filter driver interface tests
+Title:
+  qemu 1.3.0: usb devices shouldn't have same vendor/product ID and same
+  serial
 
- block/Makefile.objs             |   1 +
- block/block-backend.c           |  61 ++--
- block/qapi.c                    |   8 +-
- block/throttle-groups.c         | 715 ++++++++++++++++++++++++++++++----------
- block/throttle.c                | 395 ++++++++++++++++++++++
- blockdev.c                      |   4 +-
- include/block/throttle-groups.h |  47 ++-
- include/qemu/throttle-options.h |  60 ++--
- include/qemu/throttle.h         |   3 +
- include/sysemu/block-backend.h  |  20 +-
- qapi/block-core.json            |  68 +++-
- tests/qemu-iotests/184          | 237 +++++++++++++
- tests/qemu-iotests/184.out      | 319 ++++++++++++++++++
- tests/qemu-iotests/group        |   1 +
- tests/test-throttle.c           | 111 ++++---
- util/throttle.c                 | 151 +++++++++
- 16 files changed, 1891 insertions(+), 310 deletions(-)
- create mode 100644 block/throttle.c
- create mode 100755 tests/qemu-iotests/184
- create mode 100644 tests/qemu-iotests/184.out
+Status in QEMU:
+  New
 
--- 
-2.11.0
+Bug description:
+  Boot Windows XP with
+  ./qemu-system-i386 -device pci-ohci -device usb-tablet
+  and then with
+  ./qemu-system-i386 -device pci-ohci -device usb-kbd
+
+  and you will notice, that the usb keyboard is not detected. In fact,
+  Windows XP detects the usb tablet and loads the driver for the tablet
+  instead of the driver for the keyboard.
+
+  The problem seems to be, that vendor and product ID and even the
+  seriel of both the usb tablet and the usb keyboard are the same as an
+  lsusb reveiles. Hence, Windows XP doesn't detect when you replace the
+  tablet by a keyboard and vice versa. I didn't check other USB devices,
+  but it seems a bad idea to me to have devices with the same
+  vendor/product Id. I'm not aware, whether it is sufficient to change
+  the seriel numbers of the devices.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1096714/+subscriptions
