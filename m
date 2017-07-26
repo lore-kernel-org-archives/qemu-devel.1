@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daOp3-0003eQ-SZ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:06:06 -0400
+	(envelope-from <mst@redhat.com>) id 1daOq6-00048T-2E
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daOoz-0000bH-Nt
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:06:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42350)
+	(envelope-from <mst@redhat.com>) id 1daOq0-0000yA-3K
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:07:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55329)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1daOoz-0000aw-Hr
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:06:01 -0400
-References: <20170726150446.20381-1-otubo@redhat.com>
-	<7ff46b33-1b47-88ad-83e3-54030c12eaa0@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <06b166d8-4c5c-aa78-c9c9-4be10b1c1e35@redhat.com>
-Date: Wed, 26 Jul 2017 18:05:55 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1daOpz-0000xf-Rv
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 12:07:04 -0400
+Date: Wed, 26 Jul 2017 19:06:58 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170726190348-mutt-send-email-mst@kernel.org>
+References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
+	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
+	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
+	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+	<20170726092931.0678689e@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <7ff46b33-1b47-88ad-83e3-54030c12eaa0@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20170726092931.0678689e@w520.home>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
- calling without -kernel
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, =?utf-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-On 26.07.2017 18:00, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 07/26/2017 12:04 PM, Eduardo Otubo wrote:
->> Starting qemu-system-unicore32 without the -kernel parameter results i=
-n
->> an assert() returns false and aborts qemu. This patch replaces it with=
- a
->> proper error message followed by exit(1).
->>
->> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
->> ---
->>   hw/unicore32/puv3.c | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
->> index e9d1a60b6f..ff62efb4df 100644
->> --- a/hw/unicore32/puv3.c
->> +++ b/hw/unicore32/puv3.c
->> @@ -92,7 +92,10 @@ static void puv3_load_kernel(const char
->> *kernel_filename)
->>       if (kernel_filename =3D=3D NULL && qtest_enabled()) {
->>           return;
->>       }
->> -    assert(kernel_filename !=3D NULL);
->> +    if (kernel_filename =3D=3D NULL) {
->> +        error_report("kernel parameter cannot be empty");
->> +        exit(1);
->> +    }
+On Wed, Jul 26, 2017 at 09:29:31AM -0600, Alex Williamson wrote:
+> On Wed, 26 Jul 2017 09:21:38 +0300
+> Marcel Apfelbaum <marcel@redhat.com> wrote:
 >=20
-> This seems a temporary kludge for 2.10 but not the correct long-term fi=
-x.
+> > On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote:
+> > > To accelerate data traversing between devices under the same PCIE R=
+oot=20
+> > > Port or Switch.
+> > >=20
+> > > See https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg072=
+09.html
+> > >  =20
+> >=20
+> > Hi,
+> >=20
+> > It may be possible, but maybe PCIe Switch assignment is not
+> > the only way to go.
+> >=20
+> > Adding Alex and Michael for their input on this matter.
+> > More info at:
+> > https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.htm=
+l
 >=20
-> As commented in another thread [1] where I got a bit discomfited, it'd
-> be nice if during the 2.11 schedule the industry provide some help to
-> clean/unify the loader.c code, ideally remove all duplicated code not
-> arch-specific and use hw/core/loader*.
+> I think you need to look at where the IOMMU is in the topology and what
+> address space the devices are working in when assigned to a VM to
+> realize that it doesn't make any sense to assign switch ports to a VM.
+> GPUs cannot do switch level peer to peer when assigned because they are
+> operating in an I/O virtual address space.  This is why we configure
+> ACS on downstream ports to prevent peer to peer.  Peer to peer
+> transactions must be forwarded upstream by the switch ports in order to
+> reach the IOMMU for translation.  Note however that we do populate peer
+> to peer mappings within the IOMMU, so if the hardware supports it, the
+> IOMMU can reflect the transaction back out to the I/O bus to reach the
+> other device without CPU involvement.
 >=20
-> [1] http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06760.ht=
-ml
+> Therefore I think the better solution, if it encourages the NVIDIA
+> driver to do the right thing, is to use emulated switches.  Assigning
+> the physical switch would really do nothing more than make the PCIe lin=
+k
+> information more correct in the VM, everything else about the switch
+> would be emulated.  Even still, unless you have an I/O topology which
+> integrates the IOMMU into the switch itself, the data flow still needs
+> to go all the way to the root complex to hit the IOMMU before being
+> reflected to the other device.  Direct peer to peer between downstream
+> switch ports operates in the wrong address space.  Thanks,
+>=20
+> Alex
 
-Sorry, but this here *is* a machine-specific problem. I fail to see how
-this should be related to the hw/core/loader.c code?
+That's true of course. What would make sense would be for
+hardware vendors to add ATS support to their cards.
 
- Thomas
+Then peer to peer should be allowed by hypervisor for translated transact=
+ions.
+
+Gives you the performance benefit without the security issues.
+
+Does anyone know whether any hardware implements this?
+
+Of course that would mostly be transparent to guests so
+you would still use an emulated switch as Alex suggested.
+
+--=20
+MST
