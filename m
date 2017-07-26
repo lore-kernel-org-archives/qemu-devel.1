@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1daUFw-0003Qv-Vb
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:54:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1daUI7-0004mR-KQ
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:56:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1daUFv-00067v-Kj
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:54:13 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1daUFv-00063w-Cv
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:54:11 -0400
-Received: by mail-pf0-x243.google.com with SMTP id k72so13019843pfj.0
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 14:54:09 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1daUI3-0007X3-Or
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:56:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daUI3-0007WN-Fs
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:56:23 -0400
+References: <150110567183.114.17390976982809714249@5d477a5b5989>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6ccbdea1-be5e-2dbe-d84a-314fc2d6f666@redhat.com>
+Date: Wed, 26 Jul 2017 16:56:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170726215625-mutt-send-email-mst@kernel.org>
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-	<20170726215625-mutt-send-email-mst@kernel.org>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Thu, 27 Jul 2017 00:54:07 +0300
-Message-ID: <CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/6] hw/pci: introduce bridge-only
- vendor-specific capability to provide some hints to firmware
+In-Reply-To: <150110567183.114.17390976982809714249@5d477a5b5989>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7OsM9CDoclOIUqEPPL21NvVsNfCo1Ss37"
+Subject: Re: [Qemu-devel] [PATCH for 2.10 0/4] check dtc submodule is
+ outdated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,170 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
+To: qemu-devel@nongnu.org, no-reply@patchew.org, f4bug@amsat.org
+Cc: peter.maydell@linaro.org, james.hogan@imgtec.com, famz@redhat.com, quintela@redhat.com, crosthwaite.peter@gmail.com, programmingkidx@gmail.com, yongbok.kim@imgtec.com, pbonzini@redhat.com, aurelien@aurel32.net
 
-2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
-> On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
->> On PCI init PCI bridges may need some
->> extra info about bus number to reserve, IO, memory and
->> prefetchable memory limits. QEMU can provide this
->> with special
->
-> with a special
->
->> vendor-specific PCI capability.
->>
->> Sizes of limits match ones from
->> PCI Type 1 Configuration Space Header,
->> number of buses to reserve occupies only 1 byte
->> since it is the size of Subordinate Bus Number register.
->>
->> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> ---
->>  hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
->>  include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
->>  2 files changed, 45 insertions(+)
->>
->> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->> index 720119b..8ec6c2c 100644
->> --- a/hw/pci/pci_bridge.c
->> +++ b/hw/pci/pci_bridge.c
->> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->>      br->bus_name = bus_name;
->>  }
->>
->> +
->> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
->
-> help? should be qemu_cap_init?
->
->> +                              uint8_t bus_reserve, uint32_t io_limit,
->> +                              uint16_t mem_limit, uint64_t pref_limit,
->> +                              Error **errp)
->> +{
->> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
->> +    PCIBridgeQemuCap cap;
->
-> This leaks info to guest. You want to init all fields here:
->
-> cap = {
->  .len = ....
-> };
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7OsM9CDoclOIUqEPPL21NvVsNfCo1Ss37
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org, no-reply@patchew.org, f4bug@amsat.org
+Cc: peter.maydell@linaro.org, james.hogan@imgtec.com, famz@redhat.com,
+ quintela@redhat.com, crosthwaite.peter@gmail.com, programmingkidx@gmail.com,
+ yongbok.kim@imgtec.com, pbonzini@redhat.com, aurelien@aurel32.net
+Message-ID: <6ccbdea1-be5e-2dbe-d84a-314fc2d6f666@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.10 0/4] check dtc submodule is outdated
+References: <150110567183.114.17390976982809714249@5d477a5b5989>
+In-Reply-To: <150110567183.114.17390976982809714249@5d477a5b5989>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I surely can do this for len field, but as Laszlo proposed
-we can use mutually exclusive fields,
-e.g. pref_32 and pref_64, the only way I have left
-is to use ternary operator (if we surely need this
-big initializer). Keeping some if's would look better,
-I think.
+On 07/26/2017 04:47 PM, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed build test on s390x host. Please find the details be=
+low.
+>=20
+> Type: series
+> Subject: [Qemu-devel] [PATCH for 2.10 0/4] check dtc submodule is outda=
+ted
+> Message-id: 20170726214010.420-1-f4bug@amsat.org
+>=20
 
->
->> +
->> +    cap.len = cap_len;
->> +    cap.bus_res = bus_reserve;
->> +    cap.io_lim = io_limit & 0xFF;
->> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
->> +    cap.mem_lim = mem_limit;
->> +    cap.pref_lim = pref_limit & 0xFFFF;
->> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
->
-> Please use pci_set_word etc or cpu_to_leXX.
->
+> =3D=3D=3D TEST BEGIN =3D=3D=3D
+> Using CC: /home/fam/bin/cc
+>=20
+> ERROR: fdt disabled but some requested targets require it.
+>        You can turn off fdt only if you also disable all the system emu=
+lation
+>        targets which need it (by specifying a cut down --target-list).
 
-Since now we've decided to avoid fields separation into <field> + <field_upper>,
-this bitmask along with pci_set_word are no longer needed.
+Well, your new configure check certainly fired!  The question is whether
+it was supposed to (meaning patchew needs to tweak what it tries to
+configure), or whether there's a logic bug in your patch (meaning it
+fails when it shouldn't have).
 
-> I think it's easiest to replace struct with a set of macros then
-> pci_set_word does the work for you.
->
-
-I don't really want to use macros here because structure
-show us the whole capability layout and this can
-decrease documenting efforts. More than that,
-memcpy usage is very convenient here, and I wouldn't like
-to lose it.
-
->
->> +
->> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
->> +                                    cap_offset, cap_len, errp);
->> +    if (offset < 0) {
->> +        return offset;
->> +    }
->> +
->> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
->
-> +2 is yacky. See how virtio does it:
->
->     memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
->            cap->cap_len - PCI_CAP_FLAGS);
->
->
-
-OK.
-
->> +    return 0;
->> +}
->> +
->>  static const TypeInfo pci_bridge_type_info = {
->>      .name = TYPE_PCI_BRIDGE,
->>      .parent = TYPE_PCI_DEVICE,
->> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
->> index ff7cbaa..c9f642c 100644
->> --- a/include/hw/pci/pci_bridge.h
->> +++ b/include/hw/pci/pci_bridge.h
->> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->>  #define  PCI_BRIDGE_CTL_DISCARD_STATUS       0x400   /* Discard timer status */
->>  #define  PCI_BRIDGE_CTL_DISCARD_SERR 0x800   /* Discard timer SERR# enable */
->>
->> +typedef struct PCIBridgeQemuCap {
->> +    uint8_t id;     /* Standard PCI capability header field */
->> +    uint8_t next;   /* Standard PCI capability header field */
->> +    uint8_t len;    /* Standard PCI vendor-specific capability header field */
->> +    uint8_t bus_res;
->> +    uint32_t pref_lim_upper;
->
-> Big endian? Ugh.
->
-
-Agreed, and this's gonna to disappear with
-the new layout.
-
->> +    uint16_t pref_lim;
->> +    uint16_t mem_lim;
->
-> I'd say we need 64 bit for memory.
->
-
-Why? Non-prefetchable MEMORY_LIMIT register is 16 bits long.
-
->> +    uint16_t io_lim_upper;
->> +    uint8_t io_lim;
->> +    uint8_t padding;
->
-> IMHO each type should have a special "don't care" flag
-> that would mean "I don't know".
->
->
-
-Don't know what? Now 0 is an indicator to do nothing with this field.
-
->> +} PCIBridgeQemuCap;
->
-> You don't really need this struct in the header. And pls document all fields.
->
->> +
->> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
->> +                              uint8_t bus_reserve, uint32_t io_limit,
->> +                              uint16_t mem_limit, uint64_t pref_limit,
->> +                              Error **errp);
->> +
->>  #endif /* QEMU_PCI_BRIDGE_H */
->> --
->> 2.7.4
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--7OsM9CDoclOIUqEPPL21NvVsNfCo1Ss37
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---
-Alexander Bezzubikov
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll5EAIACgkQp6FrSiUn
+Q2oVEwf/ZLjKlWmm21dDIqntrZxPOUYMt6dp4v2gHXMOx5LSZcuekx+SCu+47UGM
+XjrLGNEUxux3CWMst6nuhgWUwSByo/UeIO4pnb1NJB1U5zZDRyw2ZaE8TZ6uftxx
+UgNNakvp2ZQrLBCeZMrH4dg+jsP69ktpBWijh6hnQB7KUUcadzKsyxas5ryfyYs5
+YkJV6cu8xlR0lQlzmSSlsDMfezIE5hiUomJFg2aaGnXhxaDqi0lP4i+GiUt2IPS6
+g4lKhA80/almMiQ1jRhb6S+vHJ3u3W87CWZPzubJwfzw2WB+IFldA6RAc/KT2Mdy
+LvYmJtEf52FlRcKk8LPaFKtSHwBoLQ==
+=CWqF
+-----END PGP SIGNATURE-----
+
+--7OsM9CDoclOIUqEPPL21NvVsNfCo1Ss37--
