@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1daDFy-0008E8-JT
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:45:08 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1daDGq-0000La-9M
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1daDFu-0006At-RQ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:45:06 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1daDFu-00069X-Il
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:45:02 -0400
-Received: by mail-pf0-x243.google.com with SMTP id q85so14369014pfq.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:45:02 -0700 (PDT)
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <180bce1f-9da5-969e-df03-421f05285d00@ozlabs.ru>
-Date: Wed, 26 Jul 2017 13:44:55 +1000
-MIME-Version: 1.0
-In-Reply-To: <150100547373.27487.3154210751350595400.stgit@bahia>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 00/26] spapr: add support for PHB
- hotplug
+	(envelope-from <amarnath.valluri@intel.com>) id 1daDGm-0006SD-Cg
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:46:00 -0400
+Received: from mga01.intel.com ([192.55.52.88]:19432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1daDGm-0006RY-2n
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:45:56 -0400
+Message-ID: <1501040961.8796.11.camel@intel.com>
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Reply-To: amarnath.valluri@intel.com
+Date: Wed, 26 Jul 2017 06:49:21 +0300
+In-Reply-To: <5a3a8c55-6306-9055-2aa1-6d1cb1242e93@linux.vnet.ibm.com>
+References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
+	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
+	<5a3a8c55-6306-9055-2aa1-6d1cb1242e93@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +30,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-On 26/07/17 03:57, Greg Kurz wrote:
-> This series is based on patches from Michel Roth posted in 2015:
+On Tue, 2017-07-25 at 20:18 -0400, Stefan Berger wrote:
+> On 07/18/2017 04:49 AM, Amarnath Valluri wrote:
+> > diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> > index 64cecc3..41f0b7a 100644
+> > --- a/hw/tpm/Makefile.objs
+> > +++ b/hw/tpm/Makefile.objs
+> > @@ -1,2 +1,3 @@
+> >   common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
+> >   common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o tpm_util.o
+> > +common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o tpm_util.o
+> > diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> > new file mode 100644
+> > index 0000000..c90914c
+> > --- /dev/null
+> > +++ b/hw/tpm/tpm_emulator.c
+> > @@ -0,0 +1,973 @@
+> > +/*
+> > + *  emulator TPM driver
+> > + *
+> > + *  Copyright (c) 2017 Intel Corporation
+> > + *  Author: Amarnath Valluri <amarnath.valluri@intel.com>
+> > + *
+> > + *  Copyright (c) 2010 - 2013 IBM Corporation
+> > + *  Authors:
+> > + *    Stefan Berger <stefanb@us.ibm.com>
+> > + *
+> > + *  Copyright (C) 2011 IAIK, Graz University of Technology
+> > + *    Author: Andreas Niederl
+> > + *
+> > + * This library is free software; you can redistribute it and/or
+> > + * modify it under the terms of the GNU Lesser General Public
+> > + * License as published by the Free Software Foundation; either
+> > + * version 2 of the License, or (at your option) any later version.
+> > + *
+> > + * This library is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > + * Lesser General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU Lesser General Public
+> > + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/error-report.h"
+> > +#include "qemu/sockets.h"
+> > +#include "io/channel-socket.h"
+> > +#include "sysemu/tpm_backend.h"
+> > +#include "tpm_int.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/i386/pc.h"
+> > +#include "tpm_util.h"
+> > +#include "tpm_ioctl.h"
+> > +#include "migration/migration.h"
+> > +#include "qapi/error.h"
+> > +
+> > +#include <fcntl.h>
+> > +#include <sys/types.h>
+> > +#include <sys/stat.h>
+> > +#include <stdio.h>
+> > +
+> > +#define DEBUG_TPM 0
+> > +
+> > +#define DPRINT(fmt, ...) do { \
+> > +    if (DEBUG_TPM) { \
+> > +        fprintf(stderr, fmt, ## __VA_ARGS__); \
+> > +    } \
+> > +} while (0);
+> > +
+> > +#define DPRINTF(fmt, ...) DPRINT("tpm-emulator: "fmt"\n", __VA_ARGS__)
+> > +
+> > +#define TYPE_TPM_EMULATOR "tpm-emulator"
+> > +#define TPM_EMULATOR(obj) \
+> > +    OBJECT_CHECK(TPMEmulator, (obj), TYPE_TPM_EMULATOR)
+> > +
+> > +static const TPMDriverOps tpm_emulator_driver;
+> > +
+> > +/* data structures */
+> > +typedef struct TPMEmulator {
+> > +    TPMBackend parent;
+> > +
+> > +    TPMEmulatorOptions *ops;
+> > +    QIOChannel *data_ioc;
+> > +    QIOChannel *ctrl_ioc;
+> > +    bool op_executing;
+> > +    bool op_canceled;
+> > +    bool child_running;
+> > +    TPMVersion tpm_version;
+> > +    ptm_cap caps; /* capabilities of the TPM */
+> > +    uint8_t cur_locty_number; /* last set locality */
+> > +    QemuMutex state_lock;
+> > +    Error *migration_blocker;
+> > +} TPMEmulator;
+> > +
+> > +#define TPM_DEFAULT_EMULATOR "swtpm"
+> > +#define TPM_DEFAULT_LOGLEVEL 5
+> > +#define TPM_EMULATOR_PIDFILE "/tmp/qemu-tpm.pid"
 > 
-> https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg04246.html
-> 
-> It addresses comments made during the RFC review, and also provides a bunch
-> of preliminary cleanup/fix patches. Since we have reached hard-freeze, this
-> feature is provided by a new pseries-2.11 machine type, introduced by this
-> series. It is based on David Gibson's ppc-for-2.10 branch, and I believe some
-> of the preliminary fixes are eligible for 2.10.
-> 
-> Note that it also requires an updated SLOF that supports a new private hcall:
-> KVMPPC_H_UPDATE_PHANDLE. This is needed because SLOF changes FDT phandles to
-> Open Firmware phandles. Since the guest only sees the latter, QEMU must use
-> the updated value when populating the FDT for the hotplugged PHB (otherwise
-> the guest can't setup IRQs for the PCI devices). SLOF part is already upstream:
-> 
-> http://git.qemu.org/?p=SLOF.git;h=604d28cc3f791657414f8b21103921fa0147fc63
-> 
-> With these patches we support the following:
-> 
-> (qemu) device_add spapr-pci-host-bridge,index=2,id=phb2
-> (qemu) device_add virtio-net-pci,id=hp2.0,bus=phb2.0
-> (qemu) device_del hp2.0
-> (qemu) device_del phb2
-> 
-> I could run some successful tests with a fedora25 guest:
-> - hotplug PHB + migrate + unplug PHB
-> - hotplug PHB + hotplug PCI device + unplug PHB => PCI device gets unplugged
-> - migrate before OS starts + hotplug PHB => destination uses OF phandles
-> - no regression observed with older machine types
-> 
-> All the patches are also available here:
-> 
-> https://github.com/gkurz/qemu/commits/spapr-hotplug-phb
-> 
-> Cheers,
-> 
-> --
-> Greg
-> 
-> ---
-> 
-> Greg Kurz (14):
->       spapr: move spapr_create_phb() to core machine code
->       spapr_pci: use memory_region_add_subregion() with DMA windows
->       spapr_iommu: use g_strdup_printf() instead of snprintf()
->       spapr_drc: use g_strdup_printf() instead of snprintf()
->       spapr_iommu: convert TCE table object to realize()
->       spapr_pci: parent the MSI memory region to the PHB
->       spapr_drc: fix realize and unrealize
->       spapr_drc: add unrealize method to physical DRC class
->       spapr_iommu: unregister vmstate at unrealize time
->       spapr: add pseries-2.11 machine type
+> swtpm will write this file and remove it when it terminates. You may run 
+> into concurrency problems as well. I would extend this name with the pid 
+> of the QEMU process starting swtpm.
+Stefan, there was some issue in my reabasing and sent wrong version of
+patchset, but i made all the changes you suggested including the pid
+file.
 
->       spapr_pci: introduce drc_id property
->       spapr: allow guest to update the XICS phandle
->       spapr_pci: drop abusive sanity check when migrating the LSI table
->       spapr: add hotplug hooks for PHB hotplug
+But i did not sent the next version as Marc-André Lureau objected the
+the idea of spawning swtpm from Qemu. I started exploring his suggestion
+of 'chardev'.
 
+I feel like we are back to square one :).
 
-This one did not make it to the lists.
-
-
-
-> 
-> Michael Roth (11):
->       spapr_drc: pass object ownership to parent/owner
->       spapr_iommu: pass object ownership to parent/owner
->       pci: allow cleanup/unregistration of PCI buses
->       qdev: store DeviceState's canonical path to use when unparenting
->       spapr_pci: add PHB unrealize
->       spapr: enable PHB hotplug for pseries-2.11>       spapr: create DR connectors for PHBs
-
-
->       spapr_events: add support for phb hotplug events
->       qdev: pass an Object * to qbus_set_hotplug_handler()
->       spapr_pci: provide node start offset via spapr_populate_pci_dt()
->       spapr_pci: add ibm, my-drc-index property for PHB hotplug
-> 
-> Nathan Fontenot (1):
->       spapr: populate PHB DRC entries for root DT node
-> 
-> 
->  hw/acpi/piix4.c               |    2 
->  hw/char/virtio-serial-bus.c   |    2 
->  hw/core/bus.c                 |   11 --
->  hw/core/qdev.c                |   15 ++-
->  hw/pci/pci.c                  |   33 +++++++
->  hw/pci/pcie.c                 |    2 
->  hw/pci/shpc.c                 |    2 
->  hw/ppc/spapr.c                |  205 ++++++++++++++++++++++++++++++++++++++++-
->  hw/ppc/spapr_drc.c            |   65 ++++++++++---
->  hw/ppc/spapr_events.c         |    3 +
->  hw/ppc/spapr_hcall.c          |   20 ++++
->  hw/ppc/spapr_iommu.c          |   22 +++-
->  hw/ppc/spapr_pci.c            |   86 +++++++++++++----
->  hw/s390x/css-bridge.c         |    2 
->  hw/s390x/s390-pci-bus.c       |    6 +
->  hw/scsi/virtio-scsi.c         |    2 
->  hw/scsi/vmw_pvscsi.c          |    2 
->  hw/usb/dev-smartcard-reader.c |    2 
->  include/hw/compat.h           |    3 +
->  include/hw/pci-host/spapr.h   |    9 +-
->  include/hw/pci/pci.h          |    3 +
->  include/hw/ppc/spapr.h        |   15 +++
->  include/hw/ppc/spapr_drc.h    |    8 ++
->  include/hw/qdev-core.h        |    4 -
->  24 files changed, 446 insertions(+), 78 deletions(-)
-> 
-> 
-
-
--- 
-Alexey
+- Amarnath
