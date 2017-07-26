@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daMwA-0006VC-Ny
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1daMwj-0006s1-IB
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daMw7-0005vZ-Id
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35544)
+	(envelope-from <imammedo@redhat.com>) id 1daMwi-0006K8-1Z
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daMw7-0005uv-AQ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:15 -0400
-Date: Wed, 26 Jul 2017 15:04:59 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170726140459.GP7620@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170721092338.GE17693@redhat.com>
-	<20170721143432.0e888800@nial.brq.redhat.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-	<20170726150810.3a48d5f0@nial.brq.redhat.com>
-	<95a701f0-c693-e1f7-be52-36f05bfc856a@redhat.com>
-	<20170726153020.4c20b279@nial.brq.redhat.com>
-	<83edcc44-62ff-ff53-371d-efb4c0d10259@redhat.com>
-	<20170726154343.122935dc@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1daMwh-0006ID-Oh
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:05:51 -0400
+Date: Wed, 26 Jul 2017 16:05:43 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170726160543.1a66bf10@nial.brq.redhat.com>
+In-Reply-To: <20170725161025-mutt-send-email-mst@kernel.org>
+References: <1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn>
+	<20170724111419.720aa168@nial.brq.redhat.com>
+	<20170724234849-mutt-send-email-mst@kernel.org>
+	<20170725104438.5eb90865@nial.brq.redhat.com>
+	<20170725161025-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170726154343.122935dc@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2] vhost: fix a migration failed because
+ of vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +31,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Jul 26, 2017 at 03:43:43PM +0200, Igor Mammedov wrote:
-> On Wed, 26 Jul 2017 15:33:37 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, 25 Jul 2017 22:47:18 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Tue, Jul 25, 2017 at 10:44:38AM +0200, Igor Mammedov wrote:
+> > On Mon, 24 Jul 2017 23:50:00 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Mon, Jul 24, 2017 at 11:14:19AM +0200, Igor Mammedov wrote:  
+> > > > On Sun, 23 Jul 2017 20:46:11 +0800
+> > > > Peng Hao <peng.hao2@zte.com.cn> wrote:
+> > > >     
+> > > > > When a guest that has several hotplugged dimms is migrated, on
+> > > > > destination it will fail to resume. Because regions on source
+> > > > > are merged and on destination the order of realizing devices
+> > > > > is different from on source with dimms, so when part of devices
+> > > > > are realizd some region can not be merged.That may be more than
+> > > > > vhost slot limit.
+> > > > > 
+> > > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> > > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> > > > > ---
+> > > > >  hw/mem/pc-dimm.c        | 2 +-
+> > > > >  include/sysemu/sysemu.h | 1 +
+> > > > >  vl.c                    | 5 +++++
+> > > > >  3 files changed, 7 insertions(+), 1 deletion(-)
+> > > > > 
+> > > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > > > > index ea67b46..13f3db5 100644
+> > > > > --- a/hw/mem/pc-dimm.c
+> > > > > +++ b/hw/mem/pc-dimm.c
+> > > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> > > > >          goto out;
+> > > > >      }
+> > > > >  
+> > > > > -    if (!vhost_has_free_slot()) {
+> > > > > +    if (!vhost_has_free_slot() && qemu_is_machine_init_done()) {
+> > > > >          error_setg(&local_err, "a used vhost backend has no free"
+> > > > >                                 " memory slots left");    
+> > > > that doesn't fix issue,
+> > > >    1st: number of used entries is changing after machine_init_done() is called
+> > > >         as regions continue to mapped/unmapped during runtime    
+> > > 
+> > > But that's fine, we want hotplug to fail if we can not guarantee vhost
+> > > will work.  
+> > don't we want guarantee that vhost will work with dimm devices at startup
+> > if it were requested on CLI or fail startup cleanly if it can't?  
 > 
-> > On 26/07/2017 15:30, Igor Mammedov wrote:
-> > > On Wed, 26 Jul 2017 15:10:40 +0200
-> > > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Yes. And failure to start vhost will achieve this without need to much with
+> DIMMs. The issue is only with DIMM hotplug when vhost is already running,
+> specifically because notifiers have no way to report or handle errors.
+> 
 > > >   
-> > >> On 26/07/2017 15:08, Igor Mammedov wrote:  
-> > >>> On Tue, 25 Jul 2017 18:23:22 +0200
-> > >>> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >>>     
-> > >>>> On 25/07/2017 18:14, Laszlo Ersek wrote:    
-> > >>>>>   "No regressions became apparent in tests with a range of Windows
-> > >>>>>    (XP-10)"
-> > >>>>>
-> > >>>>> In theory, w2k falls within that range.      
-> > >>>>
-> > >>>> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
-> > >>>>
-> > >>>> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
-> > >>>> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
-> > >>>> patching the RSDT to point to it.
-> > >>>>
-> > >>>> It's a hack, but it's the only place I see to make it "just work".  And
-> > >>>> it could be extended nicely in the future.
-> > >>>>
-> > >>>> All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.    
-> > >>> I'd support it, however it would break migrated guests with old BIOS
-> > >>> image in RAM on reboot.    
-> > >>
-> > >> Why?  Shouldn't the old ACPI tables get migrated together with the old
-> > >> BIOS?  Or are they rebuilt after reset?  
-> > > they are rebuild on reset, but I've been wrong  
-> > 
-> > Hmm so we need this plus keeping old machine types fixed to rev1 and
-> > RSDT.  Diffstat will get worse. :)
-> Even though I'd prefer to tie revision switch to machine type+version,
-> and kill rev1 support along with machine type when it's removed
-> v1, https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06822.html,
-
-We're unlikely to be deleting machine types (and the features they
-depend on) for as long as there's downstream vendors who need compat
-with that vintage of features. So given RHEL lifetimes, a pc-2.8
-machine type (and features it needs) will be around another 10-15
-years. So making decisions based on an expectation of deleting
-machine types any time soon is questionable.
+> > > >    2nd: it brings regression and allows to start QEMU with number memory
+> > > >         regions more than supported by backend, which combined with missing
+> > > >         error handling in vhost will lead to qemu crashes or obscure bugs in
+> > > >         guest breaking vhost enabled drivers.
+> > > >         i.e. patch undoes what were fixed by
+> > > >         https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg00789.html    
+> > > 
+> > > Why does it? The issue you fixed there is hotplug, and that means
+> > > pc_dimm_memory_plug called after machine done.  
+> > I wasn't able to crash fc24 guest with current qemu/rhen7 kernel,
+> > it fallbacks back to virtio and switches off vhost.   
+> 
+> I think vhostforce should make vhost fail and not fall back,
+> but that is another bug.
+currently vhostforce is broken, qemu continues to happily run with this patch
+and without patch it fails to start up so I'd just NACK this patch
+on this behavioral change and ask to fix both issues in the same series.
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+While looking at vhost memmap, I've also noticed that option rom
+"pc.rom" maps/remaps it self multiple times and it affects
+number of vhost mem map slots. I suspect that vhost is not interested
+in accessing pc.rom occupied memory and to hide it from vhost
+we need to make it RO. Also looking at roms initialization
+I've noticed that roms are typically mapped as RO if PCI is enabled.
+Taking in account that vhost is available only when PCI is enabled
+could be following patch be acceptable:
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e3fcd51..de459e2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1449,6 +1449,9 @@ void pc_memory_init(PCMachineState *pcms,
+     option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+     memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+                            &error_fatal);
++    if (pcmc->pci_enabled) {
++        memory_region_set_readonly(option_rom_mr, true);
++    }
+     vmstate_register_ram_global(option_rom_mr);
+     memory_region_add_subregion_overlap(rom_memory,
+                                         PC_ROM_MIN_VGA,
+
+
+it will keep ROM as RW on isa machine but RO for the rest PCI based.
+
+> 
+> >   
+> > >   
+> > > >     
+> > > > >          goto out;
+> > > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > > > index b213696..48228ad 100644
+> > > > > --- a/include/sysemu/sysemu.h
+> > > > > +++ b/include/sysemu/sysemu.h
+> > > > > @@ -88,6 +88,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info);
+> > > > >  void qemu_add_exit_notifier(Notifier *notify);
+> > > > >  void qemu_remove_exit_notifier(Notifier *notify);
+> > > > >  
+> > > > > +bool qemu_is_machine_init_done(void);
+> > > > >  void qemu_add_machine_init_done_notifier(Notifier *notify);
+> > > > >  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+> > > > >  
+> > > > > diff --git a/vl.c b/vl.c
+> > > > > index fb6b2ef..43aee22 100644
+> > > > > --- a/vl.c
+> > > > > +++ b/vl.c
+> > > > > @@ -2681,6 +2681,11 @@ static void qemu_run_exit_notifiers(void)
+> > > > >  
+> > > > >  static bool machine_init_done;
+> > > > >  
+> > > > > +bool qemu_is_machine_init_done(void)
+> > > > > +{
+> > > > > +    return machine_init_done;
+> > > > > +}
+> > > > > +
+> > > > >  void qemu_add_machine_init_done_notifier(Notifier *notify)
+> > > > >  {
+> > > > >      notifier_list_add(&machine_init_done_notifiers, notify);    
