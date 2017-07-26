@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1daQ33-0003EM-Hr
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:24:38 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1daQAm-0005vG-5r
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1daQ30-0006OG-E5
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:24:37 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:38615)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1daQ30-0006Ni-8v
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:24:34 -0400
-Received: by mail-it0-x244.google.com with SMTP id h199so6945972ith.5
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 10:24:34 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <bbd9cca3-ffaa-2aba-1bc8-a9f0b0df0bb9@imgtec.com>
-Date: Wed, 26 Jul 2017 13:24:32 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1daQAh-0003mW-6W
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:32:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1daQAg-0003lG-UA
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:32:31 -0400
+Date: Wed, 26 Jul 2017 11:32:22 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170726113222.52aad9a6@w520.home>
+In-Reply-To: <20170726190348-mutt-send-email-mst@kernel.org>
+References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
+	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
+	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
+	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+	<20170726092931.0678689e@w520.home>
+	<20170726190348-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <0796D7B3-86EA-49E7-A3D3-D6D2E738515C@gmail.com>
-References: <65ED9743-B53C-4E6A-866F-C883650914CE@gmail.com>
-	<91ba54de-b2eb-f3a9-eb0f-a697b7698149@amsat.org>
-	<bbd9cca3-ffaa-2aba-1bc8-a9f0b0df0bb9@imgtec.com>
-Subject: Re: [Qemu-devel] hw/core/loader-fit.c:105:41: error: expected
- expression
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
+On Wed, 26 Jul 2017 19:06:58 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Jul 26, 2017, at 6:45 AM, Yongbok Kim <yongbok.kim@imgtec.com> =
-wrote:
+> On Wed, Jul 26, 2017 at 09:29:31AM -0600, Alex Williamson wrote:
+> > On Wed, 26 Jul 2017 09:21:38 +0300
+> > Marcel Apfelbaum <marcel@redhat.com> wrote:
+> >  =20
+> > > On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote: =20
+> > > > To accelerate data traversing between devices under the same PCIE R=
+oot=20
+> > > > Port or Switch.
+> > > >=20
+> > > > See https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg072=
+09.html
+> > > >    =20
+> > >=20
+> > > Hi,
+> > >=20
+> > > It may be possible, but maybe PCIe Switch assignment is not
+> > > the only way to go.
+> > >=20
+> > > Adding Alex and Michael for their input on this matter.
+> > > More info at:
+> > > https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.htm=
+l =20
+> >=20
+> > I think you need to look at where the IOMMU is in the topology and what
+> > address space the devices are working in when assigned to a VM to
+> > realize that it doesn't make any sense to assign switch ports to a VM.
+> > GPUs cannot do switch level peer to peer when assigned because they are
+> > operating in an I/O virtual address space.  This is why we configure
+> > ACS on downstream ports to prevent peer to peer.  Peer to peer
+> > transactions must be forwarded upstream by the switch ports in order to
+> > reach the IOMMU for translation.  Note however that we do populate peer
+> > to peer mappings within the IOMMU, so if the hardware supports it, the
+> > IOMMU can reflect the transaction back out to the I/O bus to reach the
+> > other device without CPU involvement.
+> >=20
+> > Therefore I think the better solution, if it encourages the NVIDIA
+> > driver to do the right thing, is to use emulated switches.  Assigning
+> > the physical switch would really do nothing more than make the PCIe link
+> > information more correct in the VM, everything else about the switch
+> > would be emulated.  Even still, unless you have an I/O topology which
+> > integrates the IOMMU into the switch itself, the data flow still needs
+> > to go all the way to the root complex to hit the IOMMU before being
+> > reflected to the other device.  Direct peer to peer between downstream
+> > switch ports operates in the wrong address space.  Thanks,
+> >=20
+> > Alex =20
 >=20
+> That's true of course. What would make sense would be for
+> hardware vendors to add ATS support to their cards.
 >=20
+> Then peer to peer should be allowed by hypervisor for translated transact=
+ions.
 >=20
-> On 26/07/2017 05:13, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi John,
->>=20
->> On 07/25/2017 07:55 PM, Programmingkid wrote:
->>> While compiling the mips64el-softmmu target I encountered these =
-errors:
->>>=20
->>>   CC      hw/display/g364fb.o
->>> hw/core/loader-fit.c:105:41: error: expected expression
->>>         *addr =3D fdt32_to_cpu(*(fdt32_t *)prop);
->>>                                         ^
->>> hw/core/loader-fit.c:105:32: error: use of undeclared identifier =
-'fdt32_t'
->>=20
->> It seems you are missing the libfdt headers, so indeed you found bug.
->>=20
->> Replacing CONFIG_FITLOADER by CONFIG_FDT in hw/core/Makefile.objs and
->> default-configs/mips64el-softmmu.mak should fix it, can you try?
->>=20
->>>         *addr =3D fdt32_to_cpu(*(fdt32_t *)prop);
->>>                                ^
->>> hw/core/loader-fit.c:108:41: error: expected expression
->>>         *addr =3D fdt64_to_cpu(*(fdt64_t *)prop);
->>>                                         ^
->>> hw/core/loader-fit.c:108:32: error: use of undeclared identifier =
-'fdt64_t'
->>>         *addr =3D fdt64_to_cpu(*(fdt64_t *)prop);
->>>                                ^
->>> hw/core/loader-fit.c:278:19: warning: implicit declaration of =
-function
->>>       'fdt_first_subnode' is invalid in C99
->>> [-Wimplicit-function-declaration]
->>>             off =3D fdt_first_subnode(itb, configs);
->>>                   ^
->>> hw/core/loader-fit.c:286:23: warning: implicit declaration of =
-function
->>>       'fdt_next_subnode' is invalid in C99
->>> [-Wimplicit-function-declaration]
->>>                 off =3D fdt_next_subnode(itb, off);
->>>                       ^
->>> 2 warnings and 4 errors generated.
->>> make: *** [hw/core/loader-fit.o] Error 1
->>> make: *** Waiting for unfinished jobs=E2=80=A6.
->>=20
->> It'd be useful if next time you also tell which compiler/version are =
-you
->> using.
->>=20
->>> Steps to reproduce the error:
->>> ./configure --target-list=3Dmips64el-softmmu && make
->>=20
->> And also the ./configure output, I'm interested by:
->>=20
->> "fdt support       no"
->>=20
->> Regards,
->>=20
->> Phil.
+> Gives you the performance benefit without the security issues.
 >=20
->=20
->=20
-> Hi,
->=20
-> As Philippe pointed, it looks like something with dtc(libfdt).
-> Could you also try to install DTC into your QEMU source base?
-> By default for mips64el-softmmu, if DTC is not compatible you should =
-get
-> this message.
->=20
-> ERROR: DTC (libfdt) version >=3D 1.4.2 not present. Your options:
->         (1) Preferred: Install the DTC (libfdt) devel package
->         (2) Fetch the DTC submodule, using:
->             git submodule update --init dtc
->=20
-> Since I am not able to reproduce the problem on my machines,
-> please let us know the detail of your system.
->=20
-> $ ../master/configure --target-list=3Dmips64el-softmmu && make -j
-> ...
->  GEN     trace/generated-helpers.c
->  CC      mips64el-softmmu/trace/control-target.o
->  CC      mips64el-softmmu/trace/generated-helpers.o
->  LINK    mips64el-softmmu/qemu-system-mips64el
->=20
-> Regards,
-> Yongbok
+> Does anyone know whether any hardware implements this?
 
-My host system is Mac OS 10.12. It looks like I was using an older =
-version of libfdt.
-Updating fixed the problem. Thank you.
+GPUs often do implement ATS and the ACS DT (Direct Translated P2P)
+capability should handle routing requests with the Address Type field
+indicating a translated address directly between downstream ports.  DT
+is however not part of the standard set of ACS bits that we enable.  It
+seems like it might be fairly easy to poke the DT enable bit with
+setpci from userspace to test whether this "just works", providing of
+course you can get the driver to attempt to do peer to peer and ATS is
+already functioning on the GPU.  If so, then we should look at where
+in the code to do that enabling automatically.  Thanks,
+
+Alex
