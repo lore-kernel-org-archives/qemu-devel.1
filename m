@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1daPuf-0004MQ-S8
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:15:58 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1daPuo-0004Um-6I
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1daPuf-0000NP-3z
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:15:57 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1daPum-0000RV-Ad
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:16:06 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Wed, 26 Jul 2017 20:14:40 +0300
-Message-Id: <20170726171444.32218-4-el13635@mail.ntua.gr>
+Date: Wed, 26 Jul 2017 20:14:44 +0300
+Message-Id: <20170726171444.32218-8-el13635@mail.ntua.gr>
 In-Reply-To: <20170726171444.32218-1-el13635@mail.ntua.gr>
 References: <20170726171444.32218-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 3/7] block: tidy ThrottleGroupMember
- initializations
+Subject: [Qemu-devel] [PATCH v2 7/7] block: add throttle block filter driver
+ interface tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,594 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
 
-Move the CoMutex and CoQueue inits inside throttle_group_register_tgm()
-which is called whenever a ThrottleGroupMember is initialized. There's
-no need for them to be separate.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- block/block-backend.c   | 3 ---
- block/throttle-groups.c | 3 +++
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/184     | 237 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/184.out | 319 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 557 insertions(+)
+ create mode 100755 tests/qemu-iotests/184
+ create mode 100644 tests/qemu-iotests/184.out
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 1fcf6055ff..74c1e7e058 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -215,9 +215,6 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     blk->shared_perm = shared_perm;
-     blk_set_enable_write_cache(blk, true);
- 
--    qemu_co_mutex_init(&blk->public.throttle_group_member.throttled_reqs_lock);
--    qemu_co_queue_init(&blk->public.throttle_group_member.throttled_reqs[0]);
--    qemu_co_queue_init(&blk->public.throttle_group_member.throttled_reqs[1]);
-     block_acct_init(&blk->stats);
- 
-     notifier_list_init(&blk->remove_bs_notifiers);
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index a979e86243..f711a3dc62 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -508,6 +508,9 @@ void throttle_group_register_tgm(ThrottleGroupMember *tgm,
-                          read_timer_cb,
-                          write_timer_cb,
-                          tgm);
-+    qemu_co_mutex_init(&tgm->throttled_reqs_lock);
-+    qemu_co_queue_init(&tgm->throttled_reqs[0]);
-+    qemu_co_queue_init(&tgm->throttled_reqs[1]);
- 
-     qemu_mutex_unlock(&tg->lock);
- }
+diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
+new file mode 100755
+index 0000000000..c3f3f2b7ca
+--- /dev/null
++++ b/tests/qemu-iotests/184
+@@ -0,0 +1,237 @@
++#!/bin/bash
++#
++# Test I/O throttle block filter driver interface
++#
++# Copyright (C) 2017 Manos Pitsidianakis
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner="Manos Pitsidianakis"
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt raw
++_supported_proto file
++_supported_os Linux
++
++function do_run_qemu()
++{
++    echo Testing: "$@" | _filter_imgfmt
++    $QEMU -nographic -qmp-pretty stdio -serial none "$@"
++    echo
++}
++
++function run_qemu()
++{
++    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp\
++                          | _filter_qemu_io | _filter_generated_node_ids
++}
++
++_make_test_img 64M
++test_throttle=$($QEMU_IMG --help|grep throttle)
++[ "$test_throttle" = "" ] && _supported_fmt throttle
++
++echo
++echo "== checking interface =="
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "$IMGFMT",
++    "node-name": "disk0",
++    "file": {
++      "driver": "file",
++      "filename": "$TEST_IMG"
++    }
++  }
++}
++{ "execute": "object-add",
++  "arguments": {
++    "qom-type": "throttle-group",
++    "id": "group0",
++    "props": {
++      "limits" : {
++        "iops-total": 1000
++      }
++    }
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "throttle",
++    "node-name": "throttle0",
++    "throttle-group": "group0",
++    "file": "disk0"
++  }
++}
++{ "execute": "query-named-block-nodes" }
++{ "execute": "query-block" }
++{ "execute": "quit" }
++EOF
++
++echo
++echo "== create anonymous group =="
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "$IMGFMT",
++    "node-name": "disk0",
++    "file": {
++      "driver": "file",
++      "filename": "$TEST_IMG"
++    }
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "throttle",
++    "node-name": "throttle-anonymous",
++    "limits" : {
++      "iops-total" : 1000
++    },
++    "file": "disk0"
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "== property changes in ThrottleGroup =="
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "object-add",
++  "arguments": {
++    "qom-type": "throttle-group",
++    "id": "group0",
++    "props" : {
++      "limits": {
++          "iops-total": 1000
++      }
++    }
++  }
++}
++{ "execute" : "qom-get",
++  "arguments" : {
++    "path" : "group0",
++    "property" : "limits"
++  }
++}
++{ "execute" : "qom-set",
++    "arguments" : {
++        "path" : "group0",
++        "property" : "limits",
++        "value" : {
++            "iops-total" : 0
++        }
++    }
++}
++{ "execute" : "qom-get",
++  "arguments" : {
++    "path" : "group0",
++    "property" : "limits"
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "$IMGFMT",
++    "node-name": "disk0",
++    "file": {
++      "driver": "file",
++      "filename": "$TEST_IMG"
++    }
++  }
++}
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "throttle",
++    "node-name": "throttle0",
++    "throttle-group": "group0",
++    "limits" : {
++      "iops-total" : 128,
++      "iops-total-max" : 256,
++      "iops-total-max-length" : 60
++    },
++    "file": "disk0"
++  }
++}
++{ "execute" : "qom-get",
++  "arguments" : {
++    "path" : "group0",
++    "property" : "limits"
++  }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++echo "== object creation/set errors  =="
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "object-add",
++  "arguments": {
++    "qom-type": "throttle-group",
++    "id": "group0",
++    "props" : {
++      "limits": {
++          "iops-total": 1000
++      }
++    }
++  }
++}
++{ "execute" : "qom-set",
++  "arguments" : {
++    "path" : "group0",
++    "property" : "x-iops-total",
++    "value" : 0
++  }
++}
++{ "execute" : "qom-set",
++    "arguments" : {
++        "path" : "group0",
++        "property" : "limits",
++        "value" : {
++            "iops-total" : 10,
++            "iops-read" : 10
++        }
++    }
++}
++{ "execute": "quit" }
++EOF
++
++echo
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
+new file mode 100644
+index 0000000000..1b9ac3ea65
+--- /dev/null
++++ b/tests/qemu-iotests/184.out
+@@ -0,0 +1,319 @@
++QA output created by 184
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++
++== checking interface ==
++Testing:
++{
++    QMP_VERSION
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": [
++        {
++            "iops_rd": 0,
++            "detect_zeroes": "off",
++            "image": {
++                "virtual-size": 67108864,
++                "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"raw\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.raw\"}}}",
++                "format": "throttle",
++                "actual-size": 0
++            },
++            "iops_wr": 0,
++            "ro": false,
++            "node-name": "throttle0",
++            "backing_file_depth": 0,
++            "drv": "throttle",
++            "iops": 0,
++            "bps_wr": 0,
++            "write_threshold": 0,
++            "encrypted": false,
++            "bps": 0,
++            "bps_rd": 0,
++            "cache": {
++                "no-flush": false,
++                "direct": false,
++                "writeback": true
++            },
++            "file": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"raw\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.raw\"}}}",
++            "encryption_key_missing": false
++        },
++        {
++            "iops_rd": 0,
++            "detect_zeroes": "off",
++            "image": {
++                "virtual-size": 67108864,
++                "filename": "TEST_DIR/t.raw",
++                "format": "raw",
++                "actual-size": 0,
++                "dirty-flag": false
++            },
++            "iops_wr": 0,
++            "ro": false,
++            "node-name": "disk0",
++            "backing_file_depth": 0,
++            "drv": "raw",
++            "iops": 0,
++            "bps_wr": 0,
++            "write_threshold": 0,
++            "encrypted": false,
++            "bps": 0,
++            "bps_rd": 0,
++            "cache": {
++                "no-flush": false,
++                "direct": false,
++                "writeback": true
++            },
++            "file": "TEST_DIR/t.raw",
++            "encryption_key_missing": false
++        },
++        {
++            "iops_rd": 0,
++            "detect_zeroes": "off",
++            "image": {
++                "virtual-size": 67108864,
++                "filename": "TEST_DIR/t.raw",
++                "format": "file",
++                "actual-size": 0,
++                "dirty-flag": false
++            },
++            "iops_wr": 0,
++            "ro": false,
++            "node-name": "NODE_NAME",
++            "backing_file_depth": 0,
++            "drv": "file",
++            "iops": 0,
++            "bps_wr": 0,
++            "write_threshold": 0,
++            "encrypted": false,
++            "bps": 0,
++            "bps_rd": 0,
++            "cache": {
++                "no-flush": false,
++                "direct": false,
++                "writeback": true
++            },
++            "file": "TEST_DIR/t.raw",
++            "encryption_key_missing": false
++        }
++    ]
++}
++{
++    "return": [
++    ]
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
++
++
++== create anonymous group ==
++Testing:
++{
++    QMP_VERSION
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
++
++
++== property changes in ThrottleGroup ==
++Testing:
++{
++    QMP_VERSION
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++        "bps-read-max-length": 1,
++        "iops-read-max-length": 1,
++        "bps-read-max": 0,
++        "bps-total": 0,
++        "iops-total-max-length": 1,
++        "iops-total": 1000,
++        "iops-write-max": 0,
++        "bps-write": 0,
++        "bps-total-max": 0,
++        "bps-write-max": 0,
++        "iops-size": 0,
++        "iops-read": 0,
++        "iops-write-max-length": 1,
++        "iops-write": 0,
++        "bps-total-max-length": 1,
++        "iops-read-max": 0,
++        "bps-read": 0,
++        "bps-write-max-length": 1,
++        "iops-total-max": 0
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++        "bps-read-max-length": 1,
++        "iops-read-max-length": 1,
++        "bps-read-max": 0,
++        "bps-total": 0,
++        "iops-total-max-length": 1,
++        "iops-total": 0,
++        "iops-write-max": 0,
++        "bps-write": 0,
++        "bps-total-max": 0,
++        "bps-write-max": 0,
++        "iops-size": 0,
++        "iops-read": 0,
++        "iops-write-max-length": 1,
++        "iops-write": 0,
++        "bps-total-max-length": 1,
++        "iops-read-max": 0,
++        "bps-read": 0,
++        "bps-write-max-length": 1,
++        "iops-total-max": 0
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++        "bps-read-max-length": 1,
++        "iops-read-max-length": 1,
++        "bps-read-max": 0,
++        "bps-total": 0,
++        "iops-total-max-length": 60,
++        "iops-total": 128,
++        "iops-write-max": 0,
++        "bps-write": 0,
++        "bps-total-max": 0,
++        "bps-write-max": 0,
++        "iops-size": 0,
++        "iops-read": 0,
++        "iops-write-max-length": 1,
++        "iops-write": 0,
++        "bps-total-max-length": 1,
++        "iops-read-max": 0,
++        "bps-read": 0,
++        "bps-write-max-length": 1,
++        "iops-total-max": 256
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
++
++
++== object creation/set errors  ==
++Testing:
++{
++    QMP_VERSION
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "error": {
++        "class": "GenericError",
++        "desc": "Property cannot be set after initialization"
++    }
++}
++{
++    "error": {
++        "class": "GenericError",
++        "desc": "bps/iops/max total values and read/write values cannot be used at the same time"
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
++
++
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 287f0ea27d..76483ea029 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -180,6 +180,7 @@
+ 181 rw auto migration
+ 182 rw auto quick
+ 183 rw auto migration
++184 rw auto quick
+ 185 rw auto
+ 186 rw auto
+ 188 rw auto quick
 -- 
 2.11.0
