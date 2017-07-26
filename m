@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1daJV6-0005X3-07
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:25:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1daJay-0007r7-Ts
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1daJV2-0002Pt-OQ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:25:07 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57629 helo=mx1.suse.de)
+	(envelope-from <berrange@redhat.com>) id 1daJav-00065n-3u
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:31:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1daJV2-0002Ov-Dx
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:25:04 -0400
-Date: Wed, 26 Jul 2017 12:24:58 +0200
-From: Michal Hocko <mhocko@kernel.org>
-Message-ID: <20170726102458.GH2981@dhcp22.suse.cz>
-References: <20170719081311.GC26779@dhcp22.suse.cz>
-	<596F4A0E.4010507@intel.com>
-	<20170724090042.GF25221@dhcp22.suse.cz>
-	<59771010.6080108@intel.com>
-	<20170725112513.GD26723@dhcp22.suse.cz>
-	<597731E8.9040803@intel.com>
-	<20170725124141.GF26723@dhcp22.suse.cz>
-	<286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
-	<20170725145333.GK26723@dhcp22.suse.cz>
-	<5977FCDF.7040606@intel.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daJau-00064V-Ry
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:31:09 -0400
+Date: Wed, 26 Jul 2017 11:30:24 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170726103024.GB7620@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
+	<1499952476-3454-7-git-send-email-armbru@redhat.com>
+	<20170717101906.GC5301@noname.redhat.com>
+	<87a842b9yo.fsf@dusky.pond.sub.org>
+	<87bmoauz2s.fsf@dusky.pond.sub.org>
+	<5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5977FCDF.7040606@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+In-Reply-To: <5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 6/9] Convert error_report() to warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,78 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Jeff Cody <jcody@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed 26-07-17 10:22:23, Wei Wang wrote:
-> On 07/25/2017 10:53 PM, Michal Hocko wrote:
-> >On Tue 25-07-17 14:47:16, Wang, Wei W wrote:
-> >>On Tuesday, July 25, 2017 8:42 PM, hal Hocko wrote:
-> >>>On Tue 25-07-17 19:56:24, Wei Wang wrote:
-> >>>>On 07/25/2017 07:25 PM, Michal Hocko wrote:
-> >>>>>On Tue 25-07-17 17:32:00, Wei Wang wrote:
-> >>>>>>On 07/24/2017 05:00 PM, Michal Hocko wrote:
-> >>>>>>>On Wed 19-07-17 20:01:18, Wei Wang wrote:
-> >>>>>>>>On 07/19/2017 04:13 PM, Michal Hocko wrote:
-> >>>>>>>[...
-> >>>>We don't need to do the pfn walk in the guest kernel. When the API
-> >>>>reports, for example, a 2MB free page block, the API caller offers to
-> >>>>the hypervisor the base address of the page block, and size=2MB, to
-> >>>>the hypervisor.
-> >>>So you want to skip pfn walks by regularly calling into the page allocator to
-> >>>update your bitmap. If that is the case then would an API that would allow you
-> >>>to update your bitmap via a callback be s sufficient? Something like
-> >>>	void walk_free_mem(int node, int min_order,
-> >>>			void (*visit)(unsigned long pfn, unsigned long nr_pages))
+On Mon, Jul 24, 2017 at 09:30:06AM +0200, Paolo Bonzini wrote:
+> On 24/07/2017 08:30, Markus Armbruster wrote:
+> > Markus Armbruster <armbru@redhat.com> writes:
+> > 
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >>
+> >>> Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
+> >>>> From: Alistair Francis <alistair.francis@xilinx.com>
+> >>>>
+> >>>> Convert all uses of error_report("warning:"... to use warn_report()
+> >>>> instead. This helps standardise on a single method of printing warnings
+> >>>> to the user.
+> >>>>
+> >>>> All of the warnings were changed using these two commands:
+> >>>>     find ./* -type f -exec sed -i \
+> >>>>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
+> >>>>
+> >>>> Indentation fixed up manually afterwards.
+> >>>>
+> >>>> The test-qdev-global-props test case was manually updated to ensure that
+> >>>> this patch passes make check (as the test cases are case sensitive).
 > >>>
-> >>>The function will call the given callback for each free memory block on the given
-> >>>node starting from the given min_order. The callback will be strictly an atomic
-> >>>and very light context. You can update your bitmap from there.
-> >>I would need to introduce more about the background here:
-> >>The hypervisor and the guest live in their own address space. The hypervisor's bitmap
-> >>isn't seen by the guest. I think we also wouldn't be able to give a callback function
-> >>from the hypervisor to the guest in this case.
-> >How did you plan to use your original API which export struct page array
-> >then?
+> >>> This patch broke qemu-iotests 051 because it neglected to update the
+> >>> reference output. Not sure if a change of the message was even intended,
+> >>> but with a error location prefix, the order changes:
+> >>>
+> >>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+> >>> +(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
+> >>>
+> >>> Personally, I would expect the error location or at least the program
+> >>> name to come first even for warnings.
+> >>
+> >> I'll fix it.
+> >>
+> >> While focusing on something other than block, I forget qemu-iotests
+> >> exist.  My fault, but it's a pretty common fault.  I reiterate my plea
+> >> to include (a sensible subset of) it in "make check".
+> > 
+> > Oh, 051 isn't run by "make check-block".  It could just as well not
+> > exist then.
+> > 
+> > What's the recommended way to run all iotests a build of QEMU can run?
 > 
+> I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
 > 
-> That's where the virtio-balloon driver comes in. It uses a shared ring
-> mechanism to
-> send the guest memory info to the hypervisor.
+> There are two issues with check-block:
 > 
-> We didn't expose the struct page array from the guest to the hypervisor. For
-> example, when
-> a 2MB free page block is reported from the free page list, the info put on
-> the ring is just
-> (base address of the 2MB continuous memory, size=2M).
+> * tests that require QEMU are skipped (rationale: you might be building
+> without the x86_64-softmmu target).
+> 
+> * it only runs the "quick" group, but I think we should reverse the
+> direction and mark slow tests specifically (that would cut about 10
+> minutes out of the 20).
 
-So what exactly prevents virtio-balloon from using the above proposed
-callback mechanism and export what is needed to the hypervisor?
- 
-> >>>This would address my main concern that the allocator internals would get
-> >>>outside of the allocator proper.
-> >>What issue would it have to expose the internal, for_each_zone()?
-> >zone is a MM internal concept. No code outside of the MM proper should
-> >really care about zones.
-> 
-> I think this is also what Andrew suggested in the previous discussion:
-> https://lkml.org/lkml/2017/3/16/951
-> 
-> Move the code to virtio-balloon and a little layering violation seems
-> acceptable.
+The notion of "slow" and "quick" in the iotests is rather dubious too.
+Effectively we're saying "slow for qcow2" and "quick for qcow2".
 
-Andrew didn't suggest to expose zones to modules. If I read his words
-properly he said that a functionality which "provides a snapshot of the
-present system unused pages" is just too specific for virtio usecase
-to be a generic function and as such it should be in virtio. I tend
-to agree. Even the proposed callback API is a layer violation. We
-should just make sure that the API is not inherently dangerous. That
-is why I have chosen to give only pfn and nr_pages to the caller. Sure
-somebody could argue that the caller could do pfn_to_page and do nasty
-things. That would be a fair argument but nothing really prevents
-anybody to do th pfn walk already so there shouldn't inherently more
-risk. We can document what we expect from the API user and that would be
-much easier to describe than struct page API IMHO.
+If you run qcow (v1) pretty much everything is slow, because qcow2
+speed improvements were never made to qcow1 for obvious reasons.
+
+If using the "luks" format tests which create alot of images are
+significantly slower, because there's a significant time penalty
+on formatting images. 
+
+I imagine other formats or protocol drivers have varying tradeoffs
+too.
+
+Regards,
+Daniel
 -- 
-Michal Hocko
-SUSE Labs
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
