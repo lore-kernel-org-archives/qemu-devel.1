@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daOYZ-0001tA-SR
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:49:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1daOc7-0003ZI-3Z
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daOYY-0007Wa-Sj
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:49:03 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170721041952.45950-1-aik@ozlabs.ru>
-	<b3ed544c-a576-7a74-b7b0-8067873cf11e@amsat.org>
-	<c7cc6429-fe77-2b47-d08b-f4266524407e@ozlabs.ru>
-	<2fee7ab1-7b77-50bb-21fe-c192d43ec8e5@amsat.org>
-	<2a9bdf93-a902-3e7f-b403-32f1fb784da8@ozlabs.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ee70bf2d-ed84-34d9-bf2f-76674ba37b61@amsat.org>
-Date: Wed, 26 Jul 2017 12:48:51 -0300
+	(envelope-from <thuth@redhat.com>) id 1daOc4-0001M7-JF
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:52:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1daOc4-0001Lo-D8
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:52:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 181F2C06C9D2
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:52:39 +0000 (UTC)
+References: <20170726150446.20381-1-otubo@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b550f6ee-f1e3-6f4f-5315-0dbcc2f7ca2e@redhat.com>
+Date: Wed, 26 Jul 2017 17:52:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <2a9bdf93-a902-3e7f-b403-32f1fb784da8@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170726150446.20381-1-otubo@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu] Revert "elf-loader: warn about
- invalid endianness"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
+ calling without -kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Paul Burton <paul.burton@imgtec.com>, Alistair Francis <alistair.francis@xilinx.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
 
-On 07/26/2017 12:47 AM, Alexey Kardashevskiy wrote:
-> On 21/07/17 18:05, Philippe Mathieu-Daudé wrote:
->> On 07/21/2017 04:30 AM, Alexey Kardashevskiy wrote:
->>> On 21/07/17 16:48, Philippe Mathieu-Daudé wrote:
->>>> I submitted this patch because I spent some time debugging while QEMU was
->>>> failing silently using a MIPS kernel image which used to work, after
->>>> realizing I was in an incorrect build_dir using qemu-system-mipsel to load
->>>> a big endian image and felt stupid [1]. This dumb error can happen to other
->>>> people so I added this warning here.
->>>
->>> Been there too. This is why we try loading images twice in pseries.
->>>
->>>> I was not aware of the ELF_LOAD_WRONG_ENDIAN related code, and at least the
->>>> MIPS arch is not using it.
->>>> As I can see in MAINTAINERS, sPAPR is "Supported" meaning "Someone is
->>>> actually paid to look after this", while there is no such paid person for
->>>> the MIPS part.
->>>> It seems each arch had a different way to load images and hw/core/loader.c
->>>> was an effort to merge common code but mostly "Supported" arch are using
->>>> it.
->>>
->>> afaict MIPS calls load_elf() in 4 places, each checks for the return value
->>> and already prints the message, how come that that message is not enough?
->>> What would probably make sense here is if MIPS also printed the return code
->>> from load_elf() but in any case it is easily visible from gdb.
->>>
->>>
->>>> While your revert does fixes your sPAPR warning issue, looking at the
->>>> problem roots I think the correct fix is to improve the MIPS port and
->>>> eventually the less loved archs to unify the loader.c calls and avoid such
->>>> problems.
->>>> I don't object reverting this patch for 2.10 and improve the loader.c usage
->>>> during 2.11 cycle, I only wonder if this is another corporate/hobbyist>
->>>> conflict of interest with corporate crushing on hobbyist instead of
->>>
->>> Come on mate...
->>
->> https://www.quora.com/Why-do-the-French-complain-all-the-time
->>
->> :D
+On 26.07.2017 17:04, Eduardo Otubo wrote:
+> Starting qemu-system-unicore32 without the -kernel parameter results in
+> an assert() returns false and aborts qemu. This patch replaces it with a
+> proper error message followed by exit(1).
 > 
-> Good one :)
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> ---
+>  hw/unicore32/puv3.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> 
-> What about the reverting patch, is it going anywhere? Thanks.
+> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+> index e9d1a60b6f..ff62efb4df 100644
+> --- a/hw/unicore32/puv3.c
+> +++ b/hw/unicore32/puv3.c
+> @@ -92,7 +92,10 @@ static void puv3_load_kernel(const char *kernel_filename)
+>      if (kernel_filename == NULL && qtest_enabled()) {
+>          return;
+>      }
+> -    assert(kernel_filename != NULL);
+> +    if (kernel_filename == NULL) {
+> +        error_report("kernel parameter cannot be empty");
+> +        exit(1);
+> +    }
+>  
+>      /* only zImage format supported */
+>      size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
 
-OK by me for 2.10.
+That fixes the "crash", indeed.
 
-Now, is there someone from the industry willing to cleanup/unify the 
-loader codes from the various archs during 2.11?
-
-Regards,
-
-Phil.
-
-> 
-> 
->>
->>>
->>>
->>>> helping, motivating contribution improving common code usage.
->>>>
->>>> Cc'ed MIPS and loader.c maintainers (both "Maintained" and not
->>>> "Supported").
->>>>
->>>> Phil.
->>>>
->>>> [1] http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05926.html
-> 
-> 
+Tested-by: Thomas Huth <thuth@redhat.com>
