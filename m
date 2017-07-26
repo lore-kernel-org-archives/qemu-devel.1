@@ -1,50 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1daHwe-0004WN-7N
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:45:29 -0400
+	(envelope-from <groug@kaod.org>) id 1daI0H-0005MB-6Q
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1daHwZ-0005CP-B1
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:45:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37882)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1daHwZ-0005Bp-0l
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:45:23 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6Q8hxxo075899
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:45:21 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxm0ksd9e-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:45:21 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Wed, 26 Jul 2017 04:45:19 -0400
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
-	[9.57.199.107])
-	by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v6Q8jGbD26935326
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 08:45:16 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C537412403D
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:42:41 -0400 (EDT)
-Received: from zyimindembp.cn.ibm.com (unknown [9.115.193.8])
-	by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP id 3F6F1124037
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:42:40 -0400 (EDT)
-References: <20170725153330.14966-1-cohuck@redhat.com>
-	<20170725153330.14966-5-cohuck@redhat.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Wed, 26 Jul 2017 16:45:14 +0800
+	(envelope-from <groug@kaod.org>) id 1daI0C-000717-Jc
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:49:13 -0400
+Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:49380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1daI0C-0006yP-9a
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:49:08 -0400
+Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C8D51116409
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 10:49:06 +0200 (CEST)
+Date: Wed, 26 Jul 2017 10:48:54 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170726104854.26ad0e3e@bahia.lan>
+In-Reply-To: <180bce1f-9da5-969e-df03-421f05285d00@ozlabs.ru>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<180bce1f-9da5-969e-df03-421f05285d00@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <20170725153330.14966-5-cohuck@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <fb9b7be0-2258-774f-b76f-ebf82c5e13d1@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/9] s390x/pci: do not advertise pci on
- non-pci builds
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/1b=lhkQlpNn_P5WH5pEniiG";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 00/26] spapr: add support for PHB
+ hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,77 +32,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Good. This patch resolves the problem I mentioned in previous verion.
+--Sig_/1b=lhkQlpNn_P5WH5pEniiG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for your work.
+On Wed, 26 Jul 2017 13:44:55 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> On 26/07/17 03:57, Greg Kurz wrote:
+> > This series is based on patches from Michel Roth posted in 2015:
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg04246.html
+> >=20
+> > It addresses comments made during the RFC review, and also provides a b=
+unch
+> > of preliminary cleanup/fix patches. Since we have reached hard-freeze, =
+this
+> > feature is provided by a new pseries-2.11 machine type, introduced by t=
+his
+> > series. It is based on David Gibson's ppc-for-2.10 branch, and I believ=
+e some
+> > of the preliminary fixes are eligible for 2.10.
+> >=20
+> > Note that it also requires an updated SLOF that supports a new private =
+hcall:
+> > KVMPPC_H_UPDATE_PHANDLE. This is needed because SLOF changes FDT phandl=
+es to
+> > Open Firmware phandles. Since the guest only sees the latter, QEMU must=
+ use
+> > the updated value when populating the FDT for the hotplugged PHB (other=
+wise
+> > the guest can't setup IRQs for the PCI devices). SLOF part is already u=
+pstream:
+> >=20
+> > http://git.qemu.org/?p=3DSLOF.git;h=3D604d28cc3f791657414f8b21103921fa0=
+147fc63
+> >=20
+> > With these patches we support the following:
+> >=20
+> > (qemu) device_add spapr-pci-host-bridge,index=3D2,id=3Dphb2
+> > (qemu) device_add virtio-net-pci,id=3Dhp2.0,bus=3Dphb2.0
+> > (qemu) device_del hp2.0
+> > (qemu) device_del phb2
+> >=20
+> > I could run some successful tests with a fedora25 guest:
+> > - hotplug PHB + migrate + unplug PHB
+> > - hotplug PHB + hotplug PCI device + unplug PHB =3D> PCI device gets un=
+plugged
+> > - migrate before OS starts + hotplug PHB =3D> destination uses OF phand=
+les
+> > - no regression observed with older machine types
+> >=20
+> > All the patches are also available here:
+> >=20
+> > https://github.com/gkurz/qemu/commits/spapr-hotplug-phb
+> >=20
+> > Cheers,
+> >=20
+> > --
+> > Greg
+> >=20
+> > ---
+> >=20
+> > Greg Kurz (14):
+> >       spapr: move spapr_create_phb() to core machine code
+> >       spapr_pci: use memory_region_add_subregion() with DMA windows
+> >       spapr_iommu: use g_strdup_printf() instead of snprintf()
+> >       spapr_drc: use g_strdup_printf() instead of snprintf()
+> >       spapr_iommu: convert TCE table object to realize()
+> >       spapr_pci: parent the MSI memory region to the PHB
+> >       spapr_drc: fix realize and unrealize
+> >       spapr_drc: add unrealize method to physical DRC class
+> >       spapr_iommu: unregister vmstate at unrealize time
+> >       spapr: add pseries-2.11 machine type =20
+>=20
+> >       spapr_pci: introduce drc_id property
+> >       spapr: allow guest to update the XICS phandle
+> >       spapr_pci: drop abusive sanity check when migrating the LSI table
+> >       spapr: add hotplug hooks for PHB hotplug =20
+>=20
+>=20
+> This one did not make it to the lists.
+>=20
+
+Yeah, I've just realized that 'stg mail' failed to send this patch because
+of a connection problem with OVH's mail relay... :-\
+
+I've sent it again with --in-reply-to, so that it goes to the appropriate
+thread.
+
+>=20
+>=20
+> >=20
+> > Michael Roth (11):
+> >       spapr_drc: pass object ownership to parent/owner
+> >       spapr_iommu: pass object ownership to parent/owner
+> >       pci: allow cleanup/unregistration of PCI buses
+> >       qdev: store DeviceState's canonical path to use when unparenting
+> >       spapr_pci: add PHB unrealize
+> >       spapr: enable PHB hotplug for pseries-2.11>       spapr: create D=
+R connectors for PHBs =20
+>=20
+>=20
+> >       spapr_events: add support for phb hotplug events
+> >       qdev: pass an Object * to qbus_set_hotplug_handler()
+> >       spapr_pci: provide node start offset via spapr_populate_pci_dt()
+> >       spapr_pci: add ibm, my-drc-index property for PHB hotplug
+> >=20
+> > Nathan Fontenot (1):
+> >       spapr: populate PHB DRC entries for root DT node
+> >=20
+> >=20
+> >  hw/acpi/piix4.c               |    2=20
+> >  hw/char/virtio-serial-bus.c   |    2=20
+> >  hw/core/bus.c                 |   11 --
+> >  hw/core/qdev.c                |   15 ++-
+> >  hw/pci/pci.c                  |   33 +++++++
+> >  hw/pci/pcie.c                 |    2=20
+> >  hw/pci/shpc.c                 |    2=20
+> >  hw/ppc/spapr.c                |  205 +++++++++++++++++++++++++++++++++=
++++++++-
+> >  hw/ppc/spapr_drc.c            |   65 ++++++++++---
+> >  hw/ppc/spapr_events.c         |    3 +
+> >  hw/ppc/spapr_hcall.c          |   20 ++++
+> >  hw/ppc/spapr_iommu.c          |   22 +++-
+> >  hw/ppc/spapr_pci.c            |   86 +++++++++++++----
+> >  hw/s390x/css-bridge.c         |    2=20
+> >  hw/s390x/s390-pci-bus.c       |    6 +
+> >  hw/scsi/virtio-scsi.c         |    2=20
+> >  hw/scsi/vmw_pvscsi.c          |    2=20
+> >  hw/usb/dev-smartcard-reader.c |    2=20
+> >  include/hw/compat.h           |    3 +
+> >  include/hw/pci-host/spapr.h   |    9 +-
+> >  include/hw/pci/pci.h          |    3 +
+> >  include/hw/ppc/spapr.h        |   15 +++
+> >  include/hw/ppc/spapr_drc.h    |    8 ++
+> >  include/hw/qdev-core.h        |    4 -
+> >  24 files changed, 446 insertions(+), 78 deletions(-)
+> >=20
+> >  =20
+>=20
+>=20
 
 
-=D4=DA 2017/7/25 =CF=C2=CE=E711:33, Cornelia Huck =D0=B4=B5=C0:
-> Only set the zpci feature bit on builds that actually support pci.
->
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->   hw/s390x/s390-pci-bus.c  | 5 +++++
->   hw/s390x/s390-pci-bus.h  | 1 +
->   hw/s390x/s390-ci-stub.c | 4 ++++
->   target/s390x/kvm.c       | 2 +-
->   4 files changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index c57f6ebae0..7b30d4c7bd 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -34,6 +34,11 @@
->           }                                                         \
->       } while (0)
->
-> +void pci_enable_zpci_feature(S390CPUModel *model)
-> +{
-> +    set_bit(S390_FEAT_ZPCI, model->features);
-> +}
-> +
->   S390pciState *s390_get_phb(void)
->   {
->       static S390pciState *phb;
-> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-> index 5df6292509..d8796536b0 100644
-> --- a/hw/s390x/s390-pci-bus.h
-> +++ b/hw/s390x/s390-pci-bus.h
-> @@ -333,4 +333,5 @@ S390PCIBusDevice *s390_pci_find_dev_by_fid(S390pciS=
-tate *s, uint32_t fid);
->   S390PCIBusDevice *s390_pci_find_next_avail_dev(S390pciState *s,
->                                                  S390PCIBusDevice *pbde=
-v);
->
-> +void pci_enable_zpci_feature(S390CPUModel *model);
->   #endif
-> diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
-> index cc7278a865..8ceaf482e7 100644
-> --- a/hw/s390x/s390-pci-stub.c
-> +++ b/hw/s390x/s390-pci-stub.c
-> @@ -72,3 +72,7 @@ S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciSta=
-te *s, uint32_t idx)
->   {
->       return NULL;
->   }
-> +
-> +void pci_enable_zpci_feature(S390CPUModel *model)
-> +{
-> +}
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index c4c5791d27..866ac3d414 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2662,7 +2662,7 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *mo=
-del, Error **errp)
->       }
->
->       /* We emulate a zPCI bus and AEN, therefore we don't need HW supp=
-ort */
-> -    set_bit(S390_FEAT_ZPCI, model->features);
-> +    pci_enable_zpci_feature(model);
->       set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
->
->       if (s390_known_cpu_type(cpu_type)) {
+--Sig_/1b=lhkQlpNn_P5WH5pEniiG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAll4V3YACgkQAvw66wEB28IZbwCfbfohYkqF7qL/jVlN45qKiXK3
+4/IAn3y0qAcMUYzWXhutHvBAMw9QWCE/
+=kPWJ
+-----END PGP SIGNATURE-----
+
+--Sig_/1b=lhkQlpNn_P5WH5pEniiG--
