@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1daMex-0008DZ-Qk
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:47:32 -0400
+	(envelope-from <groug@kaod.org>) id 1daMoJ-0001em-U0
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1daMeu-0003JA-NE
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:47:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38142)
+	(envelope-from <groug@kaod.org>) id 1daMoG-0001Eg-TK
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:57:12 -0400
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:49702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1daMeu-0003Ia-EJ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:47:28 -0400
-Date: Wed, 26 Jul 2017 09:47:21 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1501016375.26846.21.camel@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-	<1501016375.26846.21.camel@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1daMoG-0001EA-N1
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:57:08 -0400
+Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9E5E11161E0
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:57:05 +0200 (CEST)
+Date: Wed, 26 Jul 2017 15:56:53 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170726155653.234fb967@bahia.lan>
+In-Reply-To: <98e260fa-cb10-3d02-e240-7d7bc2a61fd2@ozlabs.ru>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100555881.27487.6700589734222986048.stgit@bahia>
+	<98e260fa-cb10-3d02-e240-7d7bc2a61fd2@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/WkDW6Eb8/TJhnf3DF1lrxTU";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 06/26] spapr_pci:
+ parent the MSI memory region to the PHB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +33,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rik van Riel <riel@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
+--Sig_/WkDW6Eb8/TJhnf3DF1lrxTU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 26 Jul 2017 14:29:26 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> On 26/07/17 03:59, Greg Kurz wrote:
+> > This memory region should be owned by the PHB. This ensures the PHB
+> > cannot be finalized as long as the the region is guest visible, or
+> > used by a CPU or a device. =20
+>=20
+> Out of curiosity - does it really ensure this? Passing a parent to
+> memory_region_init_io() adds a reference to a child (i.e. "msi" region),
+> not to the PHB object.=20
+
+You're right, being owner of the MR means the PHB is parent and takes
+a reference on the MR. But it also means a reference on the PHB is
+taken/dropped each time the MR gets referenced/unreferenced (ie, "guest
+visible or used by a CPU or a device").
+
+> It is probably a good thing to have an owner for
+> every MR anyway, I am just not sure about the commit log, what does not
+> work if you do not do this?
+>=20
+
+The PHB could theorically get unrealized while the MSI region is still acti=
+ve.
+But since the associated MMIO op spapr_msi_write() only uses the machine
+object and not the PHB, I admit I don't have a scenario where this could
+break something...
+
+So even if doesn't fix anything obvious, as you say, it is probably a good
+thing to have an owner for every MR anyway :)
 
 >=20
-> On Tue, 2017-07-25 at 07:46 -0700, Dan Williams wrote:
-> > On Tue, Jul 25, 2017 at 7:27 AM, Pankaj Gupta <pagupta@redhat.com>
-> > wrote:
-> > >=20
-> > > Looks like only way to send flush(blk dev) from guest to host with
-> > > nvdimm
-> > > is using flush hint addresses. Is this the correct interface I am
-> > > looking?
-> > >=20
-> > > blkdev_issue_flush
-> > > =C2=A0submit_bio_wait
-> > > =C2=A0 submit_bio
-> > > =C2=A0=C2=A0=C2=A0=C2=A0generic_make_request
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pmem_make_request
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if =
-(bio->bi_opf & REQ_FLUSH)
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0nvdimm_flush(nd_region);
 > >=20
-> > I would inject a paravirtualized version of pmem_make_request() that
-> > sends an async flush operation over virtio to the host. Don't try to
-> > use flush hint addresses for this, they don't have the proper
-> > semantics. The guest should be allowed to issue the flush and receive
-> > the completion asynchronously rather than taking a vm exist and
-> > blocking on that request.
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr_pci.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 3fe7f3145467..4e4165b44b9a 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1703,7 +1703,7 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+> >      }
+> >  #endif
+> > =20
+> > -    memory_region_init_io(&sphb->msiwindow, NULL, &spapr_msi_ops, spap=
+r,
+> > +    memory_region_init_io(&sphb->msiwindow, OBJECT(sphb), &spapr_msi_o=
+ps, spapr,
+> >                            "msi", msi_window_size);
+> >      memory_region_add_subregion(&sphb->iommu_root, SPAPR_PCI_MSI_WINDO=
+W,
+> >                                  &sphb->msiwindow);
+> >=20
+> >  =20
 >=20
-> That is my feeling, too. A slower IO device benefits
-> greatly from an asynchronous flush mechanism.
-
-Thanks for all the suggestions!
-
-Just want to summarize here(high level):
-
-This will require implementing new 'virtio-pmem' device which presents=20
-a DAX address range(like pmem) to guest with read/write(direct access)
-& device flush functionality. Also, qemu should implement corresponding
-support for flush using virtio.
-
-Thanks,
-Pankaj
 >=20
-> --
-> All rights reversed
+
+
+--Sig_/WkDW6Eb8/TJhnf3DF1lrxTU
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAll4n6UACgkQAvw66wEB28KE5wCgmvKoDhUM44vL6K3CoRobFTyu
+dJsAmwQFiMGcyj07afs6bJyK6cQBN6jl
+=Yf7t
+-----END PGP SIGNATURE-----
+
+--Sig_/WkDW6Eb8/TJhnf3DF1lrxTU--
