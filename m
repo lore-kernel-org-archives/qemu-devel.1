@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1daNzO-0000jn-GR
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:12:43 -0400
+	(envelope-from <otubo@redhat.com>) id 1daO0T-0001pL-Su
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1daNzK-0000Ox-Em
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:12:42 -0400
-Date: Wed, 26 Jul 2017 16:12:21 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170726151221.GA3600@stefanha-x1.localdomain>
-References: <20170726141924.qaqclberxsup5cdm@postretch>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
-Content-Disposition: inline
-In-Reply-To: <20170726141924.qaqclberxsup5cdm@postretch>
-Subject: Re: [Qemu-devel] [RFC] block-insert-node and block-job-delete
+	(envelope-from <otubo@redhat.com>) id 1daO0P-0000v3-Sc
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:13:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1daO0P-0000ty-Ns
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:13:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 460CE4629B
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:04:48 +0000 (UTC)
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Wed, 26 Jul 2017 17:04:46 +0200
+Message-Id: <20170726150446.20381-1-otubo@redhat.com>
+Subject: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
+ calling without -kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
+Starting qemu-system-unicore32 without the -kernel parameter results in
+an assert() returns false and aborts qemu. This patch replaces it with a
+proper error message followed by exit(1).
 
---qMm9M+Fa2AknHoGS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+---
+ hw/unicore32/puv3.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On Wed, Jul 26, 2017 at 05:19:24PM +0300, Manos Pitsidianakis wrote:
-> This proposal follows a discussion we had with Kevin and Stefan on filter
-> node management.
->=20
-> With block filter drivers arises a need to configure filter nodes on runt=
-ime
-> with QMP on live graphs. A problem with doing live graph modifications is
-> that some block jobs modify the graph when they are done and don't operate
-> under any synchronisation, resulting in a race condition if we try to ins=
-ert
-> a filter node in the place of an existing edge.
-
-Block jobs *do* operate under synchronization.  They only manipulate the
-graph from the main loop (under the QEMU global mutex just like a
-monitor command).
-
-But maybe you are thinking about higher level race conditions between
-QMP commands.  Can you give an example of the race?
-
-CCing John Snow (interested in commands for 'reaping' completed block
-jobs) and Jeff Cody (block jobs maintainer).
-
---qMm9M+Fa2AknHoGS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZeLFVAAoJEJykq7OBq3PIhqsH/1yJMp2I8/GIVyIHMW5vmw08
-GtXYz7ashXpS0wUfzLBLckm1OmwLyuh8M4IvtdI4y+uw1oe0MgsuqZX45f3sFqd7
-95YGOiOckZxEWGE02dPt3R6EIZvSVRbm//WUd3icP1J27x8U6GvdV3j/xPHFw6sA
-sP2MeReefgMxariqrwsY0mswPx142aZ2RMRsm3ir3nW57GidEtPVxwuzUo9oDqC1
-Yf9fG19iRX1ln0LCnCPTWVGAYonI/oZ1TsUHq6JNqfVPjcS6RardGdxvucOEJvpV
-Kt5EokVnVELj+Jg2nDVC00+3C4eX4QcEWIz2n1++fFLrb1BIIz6PLzpH8bsP1WI=
-=nPAz
------END PGP SIGNATURE-----
-
---qMm9M+Fa2AknHoGS--
+diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+index e9d1a60b6f..ff62efb4df 100644
+--- a/hw/unicore32/puv3.c
++++ b/hw/unicore32/puv3.c
+@@ -92,7 +92,10 @@ static void puv3_load_kernel(const char *kernel_filename)
+     if (kernel_filename == NULL && qtest_enabled()) {
+         return;
+     }
+-    assert(kernel_filename != NULL);
++    if (kernel_filename == NULL) {
++        error_report("kernel parameter cannot be empty");
++        exit(1);
++    }
+ 
+     /* only zImage format supported */
+     size = load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
+-- 
+2.13.3
