@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daIfV-0007Pm-5x
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:31:50 -0400
+	(envelope-from <dmitry@daynix.com>) id 1daInr-0000WK-AP
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:40:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daIfS-00026Z-29
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:31:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daIfR-00026M-Pb
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:31:45 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 26 Jul 2017 11:31:36 +0200
-Message-Id: <20170726093136.13627-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [qemu PATCH for 2.10] i386: acpi: provide an XSDT
- instead of an RSDT
+	(envelope-from <dmitry@daynix.com>) id 1daIno-00066D-7m
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:40:27 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37200)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1daInn-00065g-Tf
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 05:40:24 -0400
+Received: by mail-wm0-x229.google.com with SMTP id c184so76487887wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 02:40:22 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Dmitry Fleytman <dmitry@daynix.com>
+In-Reply-To: <8082FF9BCB2B054996454E47167FF4EC1C56E3CC@SHSMSX104.ccr.corp.intel.com>
+Date: Wed, 26 Jul 2017 12:40:18 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <751A50FA-0C7D-433F-B511-F4B13EC67DCC@daynix.com>
+References: <20170724120729.24350-1-dmitry@daynix.com>
+	<20170725093148.3898b2da@w520.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C56E3CC@SHSMSX104.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks: Set non-zero GMS memory
+ size for IGD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,156 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin O'Connor <kevin@koconnor.net>, seabios@seabios.org, lersek@redhat.com, lists@philjordan.eu, imammedo@redhat.com, mst@redhat.com, phil@philjordan.eu, programmingkidx@gmail.com, kraxel@redhat.com
+To: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-The tables that QEMU provides are not ACPI 1.0 compatible since commit
-77af8a2b95 ("hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve
-guest OS support.", 2017-05-03).  This is visible with Windows 2000,
-which refuses to parse the rev3 FADT and fails to boot.
 
-The recommended solution in this case is to build two FADTs, v1 being
-pointed to by the RSDT and v3 by the XSDT.  However, we leave this task
-to the firmware.  This patch simply switches the RSDT to the XSDT, which
-is valid for all ACPI 2.0-friendly operating systems and also leaves
-SeaBIOS the freedom to build an RSDT that points to the compatibility
-FADT.
+> On 26 Jul 2017, at 08:22 AM, Zhang, Xiong Y <xiong.y.zhang@intel.com> =
+wrote:
+>=20
+> Sorry, we indeed found Intel windows guest graphic driver couldn't be =
+bind when GMS memory size is zero. And we have fixed it and the next =
+intel windows driver release will contain this fix.
+> So currently please use x-igd-gms in legacy mode to work around this.=20=
 
-When running Windows 2000 with an old BIOS, Windows would simply fall
-back to a non-ACPI HAL; however, the plan should be to include a BIOS with
-the new feature in 2.10.
+>=20
+> BTW, how did you know window driver allocate extra ~4G memory when GMS =
+size set to 0 ?
 
-Reported-by: Programmingkid <programmingkidx@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/acpi/aml-build.c         | 27 ---------------------------
- hw/i386/acpi-build.c        | 30 ++++++++++++++++++------------
- include/hw/acpi/aml-build.h |  3 ---
- 3 files changed, 18 insertions(+), 42 deletions(-)
+We noticed that with new IGD driver memory usage on VMs raised by around =
+4G.
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 36a6cc450e..ea750d54d9 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1573,33 +1573,6 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
-     g_array_free(tables->vmgenid, mfre);
- }
- 
--/* Build rsdt table */
--void
--build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
--           const char *oem_id, const char *oem_table_id)
--{
--    int i;
--    unsigned rsdt_entries_offset;
--    AcpiRsdtDescriptorRev1 *rsdt;
--    const unsigned table_data_len = (sizeof(uint32_t) * table_offsets->len);
--    const unsigned rsdt_entry_size = sizeof(rsdt->table_offset_entry[0]);
--    const size_t rsdt_len = sizeof(*rsdt) + table_data_len;
--
--    rsdt = acpi_data_push(table_data, rsdt_len);
--    rsdt_entries_offset = (char *)rsdt->table_offset_entry - table_data->data;
--    for (i = 0; i < table_offsets->len; ++i) {
--        uint32_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
--        uint32_t rsdt_entry_offset = rsdt_entries_offset + rsdt_entry_size * i;
--
--        /* rsdt->table_offset_entry to be filled by Guest linker */
--        bios_linker_loader_add_pointer(linker,
--            ACPI_BUILD_TABLE_FILE, rsdt_entry_offset, rsdt_entry_size,
--            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
--    }
--    build_header(linker, table_data,
--                 (void *)rsdt, "RSDT", rsdt_len, 1, oem_id, oem_table_id);
--}
--
- /* Build xsdt table */
- void
- build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6b7bade183..e76cad2ad7 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2557,27 +2557,33 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
- }
- 
- static GArray *
--build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
-+build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
- {
-     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
--    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
--    unsigned rsdt_pa_offset =
--        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
-+    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-+    unsigned xsdt_pa_offset =
-+        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
- 
-     bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-                              true /* fseg memory */);
- 
-     memcpy(&rsdp->signature, "RSD PTR ", 8);
-     memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
-+    rsdp->length = cpu_to_le32(sizeof(*rsdp));
-+    rsdp->revision = 0x02;
-+
-     /* Address to be filled by Guest linker */
-     bios_linker_loader_add_pointer(linker,
--        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
--        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
-+        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-+        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
- 
-     /* Checksum to be filled by Guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
-+        (char *)rsdp - rsdp_table->data, offsetof(AcpiRsdpDescriptor, length),
-         (char *)&rsdp->checksum - rsdp_table->data);
-+    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-+        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
-+        (char *)&rsdp->extended_checksum - rsdp_table->data);
- 
-     return rsdp_table;
- }
-@@ -2621,7 +2627,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     PCMachineState *pcms = PC_MACHINE(machine);
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     GArray *table_offsets;
--    unsigned facs, dsdt, rsdt, fadt;
-+    unsigned facs, dsdt, xsdt, fadt;
-     AcpiPmInfo pm;
-     AcpiMiscInfo misc;
-     AcpiMcfgInfo mcfg;
-@@ -2729,13 +2735,13 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-         g_array_append_vals(tables_blob, u, len);
-     }
- 
--    /* RSDT is pointed to by RSDP */
--    rsdt = tables_blob->len;
--    build_rsdt(tables_blob, tables->linker, table_offsets,
-+    /* XSDT is pointed to by RSDP */
-+    xsdt = tables_blob->len;
-+    build_xsdt(tables_blob, tables->linker, table_offsets,
-                slic_oem.id, slic_oem.table_id);
- 
-     /* RSDP is in FSEG memory, so allocate it separately */
--    build_rsdp(tables->rsdp, tables->linker, rsdt);
-+    build_rsdp(tables->rsdp, tables->linker, xsdt);
- 
-     /* We'll expose it all to Guest so we want to reduce
-      * chance of size changes.
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 88d0738d76..4bdd88ee23 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -379,9 +379,6 @@ void acpi_add_table(GArray *table_offsets, GArray *table_data);
- void acpi_build_tables_init(AcpiBuildTables *tables);
- void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
- void
--build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
--           const char *oem_id, const char *oem_table_id);
--void
- build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
-            const char *oem_id, const char *oem_table_id);
- 
--- 
-2.13.3
+Then we examined memory allocations with poolmon =
+(https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/poolmon=
+)
+and saw that around 4G of memory is allocated with IGD driver pool tag.
+
+Additionally we noticed that on VMs with less than 5G of memory IGD =
+driver does not load and system does fallback to standard VGA driver.
+
+>=20
+> thanks
+>> -----Original Message-----
+>> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+>> Sent: Tuesday, July 25, 2017 11:32 PM
+>> To: Dmitry Fleytman <dmitry@daynix.com>
+>> Cc: qemu-devel@nongnu.org; Zhang, Xiong Y <xiong.y.zhang@intel.com>
+>> Subject: Re: [PATCH] vfio/pci-quirks: Set non-zero GMS memory size =
+for IGD
+>>=20
+>> [cc +Zhang, Xiong Y]
+>>=20
+>>=20
+>> Intel, any comments?
+>>=20
+>>=20
+>> On Mon, 24 Jul 2017 15:07:29 +0300
+>> Dmitry Fleytman <dmitry@daynix.com> wrote:
+>>=20
+>>> There is a claim that GMS memory is unused however
+>>> Intel Windows 10 drivers starting from V.4534 (10/7/2016)
+>>> allocate extra ~4G memory when GMS size set to 0.
+>>>=20
+>>> This patch fixes this issue by seting IGD GMS memory
+>>> size to minimum by changing default value of x-igd-gms
+>>> device parameter.
+>>>=20
+>>> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
+>>> ---
+>>> hw/vfio/pci-quirks.c | 13 +++++++++----
+>>> hw/vfio/pci.c        |  2 +-
+>>> 2 files changed, 10 insertions(+), 5 deletions(-)
+>>>=20
+>>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+>>> index 349085e..197cb90 100644
+>>> --- a/hw/vfio/pci-quirks.c
+>>> +++ b/hw/vfio/pci-quirks.c
+>>> @@ -1527,10 +1527,15 @@ static void
+>> vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+>>>     }
+>>>=20
+>>>     /*
+>>> -     * Assume we have no GMS memory, but allow it to be overrided =
+by
+>> device
+>>> -     * option (experimental).  The spec doesn't actually allow zero =
+GMS
+>> when
+>>> -     * when IVD (IGD VGA Disable) is clear, but the claim is that =
+it's unused,
+>>> -     * so let's not waste VM memory for it.
+>>> +     * There is a claim that GMS memory is unused and we want to =
+waste
+>> for it
+>>> +     * as less VM memory as possible, however Intel Windows 10 =
+drivers
+>> starting
+>>> +     * from V.4534 (10/7/2016) allocate extra ~4G memory when GMS
+>> size set to 0.
+>>> +     * The spec as well doesn't actually allow zero GMS when IVD
+>>> +     * (IGD VGA Disable) is clear.
+>>> +     *
+>>> +     * Therefore we set GMS memory size to minimal by default via =
+device
+>>> +     * option x-igd-gms (experimental) and allow further tweaking =
+of this
+>>> +     * parameter.
+>>>      */
+>>>     gmch &=3D ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
+>>>=20
+>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>> index d4051cb..bda07b7 100644
+>>> --- a/hw/vfio/pci.c
+>>> +++ b/hw/vfio/pci.c
+>>> @@ -2982,7 +2982,7 @@ static Property vfio_pci_dev_properties[] =3D =
+{
+>>>                        sub_vendor_id, PCI_ANY_ID),
+>>>     DEFINE_PROP_UINT32("x-pci-sub-device-id", VFIOPCIDevice,
+>>>                        sub_device_id, PCI_ANY_ID),
+>>> -    DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 0),
+>>> +    DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 1),
+>>>     /*
+>>>      * TODO - support passed fds... is this necessary?
+>>>      * DEFINE_PROP_STRING("vfiofd", VFIOPCIDevice, vfiofd_name),
+>=20
