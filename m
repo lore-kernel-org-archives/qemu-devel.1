@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daDTe-0004MD-8j
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:59:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daDhI-0008VK-Nt
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daDTb-0004AL-8e
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 23:59:14 -0400
-Date: Wed, 26 Jul 2017 13:53:57 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170726035357.GN8978@umbus.fritz.box>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100550805.27487.16069660631488548584.stgit@bahia>
-	<a33ca4ee-9f73-c1d0-1348-970e628dae3b@ozlabs.ru>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daDhF-0001jf-Hm
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:13:20 -0400
+Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:35180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daDhF-0001jE-Cy
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:13:17 -0400
+Received: by mail-qk0-x231.google.com with SMTP id d145so73329306qkc.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 21:13:17 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <65ED9743-B53C-4E6A-866F-C883650914CE@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <91ba54de-b2eb-f3a9-eb0f-a697b7698149@amsat.org>
+Date: Wed, 26 Jul 2017 01:13:12 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hNG1vEeyG8BCaHbQ"
-Content-Disposition: inline
-In-Reply-To: <a33ca4ee-9f73-c1d0-1348-970e628dae3b@ozlabs.ru>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 02/26] spapr_pci: use
- memory_region_add_subregion() with DMA windows
+In-Reply-To: <65ED9743-B53C-4E6A-866F-C883650914CE@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] hw/core/loader-fit.c:105:41: error: expected
+ expression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
+Hi John,
 
---hNG1vEeyG8BCaHbQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 07/25/2017 07:55 PM, Programmingkid wrote:
+> While compiling the mips64el-softmmu target I encountered these errors:
+> 
+>    CC      hw/display/g364fb.o
+> hw/core/loader-fit.c:105:41: error: expected expression
+>          *addr = fdt32_to_cpu(*(fdt32_t *)prop);
+>                                          ^
+> hw/core/loader-fit.c:105:32: error: use of undeclared identifier 'fdt32_t'
 
-On Wed, Jul 26, 2017 at 01:33:04PM +1000, Alexey Kardashevskiy wrote:
-> On 26/07/17 03:58, Greg Kurz wrote:
-> > Passing a null priority to memory_region_add_subregion_overlap() is
-> > strictly equivalent to calling memory_region_add_subregion().
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
->=20
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+It seems you are missing the libfdt headers, so indeed you found bug.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Replacing CONFIG_FITLOADER by CONFIG_FDT in hw/core/Makefile.objs and 
+default-configs/mips64el-softmmu.mak should fix it, can you try?
 
->=20
-> > ---
-> >  hw/ppc/spapr_pci.c |    4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 70a99a032267..3fe7f3145467 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1752,8 +1752,8 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
-> >                         i, sphb->dtbusname);
-> >              return;
-> >          }
-> > -        memory_region_add_subregion_overlap(&sphb->iommu_root, 0,
-> > -                                            spapr_tce_get_iommu(tcet),=
- 0);
-> > +        memory_region_add_subregion(&sphb->iommu_root, 0,
-> > +                                    spapr_tce_get_iommu(tcet));
-> >      }
-> > =20
-> >      sphb->msi =3D g_hash_table_new_full(g_int_hash, g_int_equal, g_fre=
-e, g_free);
-> >=20
-> >=20
->=20
->=20
+>          *addr = fdt32_to_cpu(*(fdt32_t *)prop);
+>                                 ^
+> hw/core/loader-fit.c:108:41: error: expected expression
+>          *addr = fdt64_to_cpu(*(fdt64_t *)prop);
+>                                          ^
+> hw/core/loader-fit.c:108:32: error: use of undeclared identifier 'fdt64_t'
+>          *addr = fdt64_to_cpu(*(fdt64_t *)prop);
+>                                 ^
+> hw/core/loader-fit.c:278:19: warning: implicit declaration of function
+>        'fdt_first_subnode' is invalid in C99 [-Wimplicit-function-declaration]
+>              off = fdt_first_subnode(itb, configs);
+>                    ^
+> hw/core/loader-fit.c:286:23: warning: implicit declaration of function
+>        'fdt_next_subnode' is invalid in C99 [-Wimplicit-function-declaration]
+>                  off = fdt_next_subnode(itb, off);
+>                        ^
+> 2 warnings and 4 errors generated.
+> make: *** [hw/core/loader-fit.o] Error 1
+> make: *** Waiting for unfinished jobs….
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+It'd be useful if next time you also tell which compiler/version are you 
+using.
 
---hNG1vEeyG8BCaHbQ
-Content-Type: application/pgp-signature; name="signature.asc"
+> Steps to reproduce the error:
+> ./configure --target-list=mips64el-softmmu && make
 
------BEGIN PGP SIGNATURE-----
+And also the ./configure output, I'm interested by:
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll4ElQACgkQbDjKyiDZ
-s5IGyxAAz937hkdVrNOAf51lwjxNNk4CLKLgiSn6USAcb2gFZYcx6hll/PWepY5Z
-ka4c/TC1FmoohbMVuPZh3RMJJsSt9OQ/BNeaTm13R/DP5RVc1B7iucGq6UjvTwC4
-ReBllCMYCWjKXQslyUHwj3obn3pCD3f9iMMC6ImT8dBEuApPAFTK0G/wUy6yRg6w
-zuyhtFnH2cuR8/tTj03e8Qm5zSqZNwOrtMFVWfJ49seHiwpdLiXsOBY6kKkqlcYk
-kmIO2He6WrqkroN/OAZpJN7tgrEwhXeiDqimgWRTS6K/yxFNKAZoqk4viZUgi2DC
-p15QLRwzYfCg10nhYkaO0RzPB+d6X2b6ctjHw4CvokAMRoBNCWQhgf2h2fDe8Zt4
-Tgz5W5LN4e2QpeqzTeI806nADW74u0EfBIqAK8sfw5YnANg24Dt659nGjYSxlZaQ
-RA+dyzH3yhwIzLs37wKb/KSo+EfB0UvpX8W2DjX5qSmQbKcbgC8UIylJazWRIeau
-CEnzNumBieuYVakU7FPIK+cIBwS9+sIU1VIbtuP2jKtnEwJ6Q0Wg3ykphxqjikna
-RB8so0wNMPL2LbY5BWY7QrWTeJbgkFl90mmHrXkFkRn+tmEc+g/4aN5UcaGAzWJH
-hMD3V9QuxKOONy0arW9oB+qrSTGyczAtqv/cLOVPIm3pUQTC5+0=
-=TM6R
------END PGP SIGNATURE-----
+"fdt support       no"
 
---hNG1vEeyG8BCaHbQ--
+Regards,
+
+Phil.
