@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1daQyw-0007tL-UF
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:24:27 -0400
+	(envelope-from <lersek@redhat.com>) id 1daR66-0001tO-09
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1daQyw-0004KU-18
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:24:26 -0400
-References: <20170721034730.25612-1-crosa@redhat.com>
-	<20170721123325.GC18014@stefanha-x1.localdomain>
-	<20170721140155.GQ17693@redhat.com>
-	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
-	<20170725154921.GS23343@stefanha-x1.localdomain>
-	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
-	<20170726175808.GD3600@stefanha-x1.localdomain>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
-Date: Wed, 26 Jul 2017 14:24:02 -0400
+	(envelope-from <lersek@redhat.com>) id 1daR62-0000IJ-PA
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:31:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1daR62-0000HQ-GU
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:31:46 -0400
+References: <1500761510-1556-1-git-send-email-zuban32s@gmail.com>
+	<d0bd04f4-1ac4-0e3a-885f-2ceb6180f69a@redhat.com>
+	<dfb9663b-c31b-2def-9df6-754fb18bb27f@redhat.com>
+	<b3936955-d84a-d2ba-e1a0-3ca90547ece7@redhat.com>
+	<c1502763-61e8-159a-4455-37e833ca5b6d@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2d20e129-cc89-7080-2862-757ce3147046@redhat.com>
+Date: Wed, 26 Jul 2017 20:31:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170726175808.GD3600@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f"
-Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
- conditional (qemu-io)test skip
+In-Reply-To: <c1502763-61e8-159a-4455-37e833ca5b6d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/4] Allow RedHat PCI bridges
+ reserve more buses than necessary during init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +32,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, kraxel@redhat.com
+Cc: seabios@seabios.org, kevin@koconnor.net, qemu-devel@nongnu.org, konrad.wilk@oracle.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f
-From: Cleber Rosa <crosa@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf
- <kwolf@redhat.com>, qemu-block@nongnu.org,
- Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
- conditional (qemu-io)test skip
-References: <20170721034730.25612-1-crosa@redhat.com>
- <20170721123325.GC18014@stefanha-x1.localdomain>
- <20170721140155.GQ17693@redhat.com>
- <bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
- <20170725154921.GS23343@stefanha-x1.localdomain>
- <547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
- <20170726175808.GD3600@stefanha-x1.localdomain>
-In-Reply-To: <20170726175808.GD3600@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On 07/26/17 18:22, Marcel Apfelbaum wrote:
+> On 26/07/2017 18:20, Laszlo Ersek wrote:
 
+[snip]
 
-
-On 07/26/2017 01:58 PM, Stefan Hajnoczi wrote:
-> On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
->> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
->>> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
->>>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
->>>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
->>>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
->>>> Without the static capabilities defined, the dynamic check would be
->>>> influenced by the run time environment.  It would really mean "qemu-=
-io
->>>> running on this environment (filesystem?) can do native aio".  Again=
-,
->>>> that's not the best type of information to depend on when writing te=
-sts.
->>>
->>> Can you explain this more?
->>>
->>> It seems logical to me that if qemu-io in this environment cannot do
->>> aio=3Dnative then we must skip those tests.
->>>
->>> Stefan
->>>
+>> However, what does the hot-pluggability of the PCIe-PCI bridge buy us?
+>> In other words, what does it buy us when we do not add the PCIe-PCI
+>> bridge immediately at guest startup, as an integrated device?
+>>  > Why is it a problem to "commit" in advance? I understand that we might
+>> not like the DMI-PCI bridge (due to it being legacy), but what speaks
+>> against cold-plugging the PCIe-PCI bridge either as an integrated device
+>> in pcie.0 (assuming that is permitted), or cold-plugging the PCIe-PCI
+>> bridge in a similarly cold-plugged PCIe root port?
 >>
->> OK, let's abstract a bit more.  Let's take this part of your statement=
-:
+> 
+> We want to keep Q35 clean, and for most cases we don't want any
+> legacy PCI stuff if not especially required.
+> 
+>> I mean, in the cold-plugged case, you use up two bus numbers at the
+>> most, one for the root port, and another for the PCIe-PCI bridge. In the
+>> hot-plugged case, you have to start with the cold-plugged root port just
+>> the same (so that you can communicate the bus number reservation *at
+>> all*), and then reserve (= use up in advance) the bus number, the IO
+>> space, and the MMIO space(s). I don't see the difference; hot-plugging
+>> the PCIe-PCI bridge (= not committing in advance) doesn't seem to save
+>> any resources.
 >>
->>  "if qemu-io in this environment cannot do aio=3Dnative"
+> 
+> Is not about resources, more about usage model.
+> 
+>> I guess I would see a difference if we reserved more than one bus number
+>> in the hotplug case, namely in order to support recursive hotplug under
+>> the PCIe-PCI bridge. But, you confirmed that we intend to keep the flat
+>> hierarchy (ie the exercise is only for enabling legacy PCI endpoints,
+>> not for recursive hotplug).  The PCIe-PCI bridge isn't a device that
+>> does anything at all on its own, so why not just coldplug it? Its
+>> resources have to be reserved in advance anyway.
 >>
->> Let's call that a feature check.  Depending on how the *feature check*=
+> 
+> Even if we prefer flat hierarchies, we should allow a sane nested
+> bridges configuration, so we will some times reserve more than one.
+> 
+>> So, thus far I would say "just cold-plug the PCIe-PCI bridge at startup,
+>> possibly even make it an integrated device, and then you don't need to
+>> reserve bus numbers (and other apertures)".
+>>
+>> Where am I wrong?
+>>
+> 
+> Nothing wrong, I am just looking for feature parity Q35 vs PC.
+> Users may want to continue using [nested] PCI bridges, and
+> we want the Q35 machine to be used by more users in order
+> to make it reliable faster, while keeping it clean by default.
+> 
+> We had a discussion on this matter on last year KVM forum
+> and the hot-pluggable PCIe-PCI bridge was the general consensus.
 
->> is written, a negative result may hide a test failure, because it woul=
-d
->> now be skipped.
->=20
-> You are saying a pass->skip transition can hide a failure but ./check
-> tracks skipped tests.  See tests/qemu-iotests/check.log for a
-> pass/fail/skip history.
->=20
+OK. I don't want to question or go back on that consensus now; I'd just
+like to point out that all that you describe (nested bridges, and
+enabling legacy PCI with PCIe-PCI bridges, *on demand*) is still
+possible with cold-plugging.
 
-You're not focusing on the problem here.  The problem is that a test
-that *was not* supposed to be skipped, would be skipped.
+I.e., the default setup of Q35 does not need to include legacy PCI
+bridges. It's just that the pre-launch configuration effort for a Q35
+user to *reserve* resources for legacy PCI is the exact same as the
+pre-launch configuration effort to *actually cold-plug* the bridge.
 
-Let me reinforce my point, and you can address it directly:  feature
-checks like you proposed can easily produce false negatives.  Not
-something hypothetical or far fetched, I gave very reasonable examples
-on this same thread.
+[snip]
 
-Do you think that's OK because the skip count will get an increment?
-That's exactly one of the main concerns raised in the original thread (
-and break room conversations) that motivated this experiment.
+>>>> The PI spec says,
+>>>>
+>>>>> [...] For all the root HPCs and the nonroot HPCs, call
+>>>>> EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetResourcePadding() to obtain the
+>>>>> amount of overallocation and add that amount to the requests from the
+>>>>> physical devices. Reprogram the bus numbers by taking into account the
+>>>>> bus resource padding information. [...]
+>>>>
+>>>> However, according to my interpretation of the source code, PciBusDxe
+>>>> does not consider bus number padding for non-root HPCs (which are "all"
+>>>> HPCs on QEMU).
+>>>>
+>>>
+>>> Theoretically speaking, it is possible to change the  behavior, right?
+>>
+>> Not just theoretically; in the past I have changed PciBusDxe -- it
+>> wouldn't identify QEMU's hotplug controllers (root port, downstream port
+>> etc) appropriately, and I managed to get some patches in. It's just that
+>> the less we understand the current code and the more intrusive/extensive
+>> the change is, the harder it is to sell the *idea*. PciBusDxe is
+>> platform-independent and shipped on many a physical system too.
+>>
+> 
+> Understood, but from your explanation it sounds like the existings
+> callback sites(hooks) are enough.
 
-> It is the job of the CI system to flag up pass/fail/skip transitions.
-> You're no worse off using feature tests.
->=20
-> Stefan
->=20
+That's the problem: they don't appear to, if you consider bus number
+reservations. The existing callback sites seem fine regarding IO and
+MMIO, but the only callback site that honors bus number reservation is
+limited to "root" (in the previously defined sense) hotplug controllers.
 
-What I'm trying to help us achieve here is a reliable and predictable
-way for the same test job execution to be comparable across
-environments.  From the individual developer workstation, CI, QA etc.
+So this is something that will need investigation, and my most recent
+queries into the "hotplug preparation" parts of PciBusDxe indicate that
+those parts are quite... "forgotten". :) I guess this might be because
+on physical systems the level of PCI(e) hotpluggery that we plan to do
+is likely unheard of :)
 
-Please let me know If you really believe this should *not* be done here
-(upstream QEMU).
-
-Regards!
-
---=20
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
-
-
---ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZeN5CAAoJEGV+jTOl8gnz1VYQALVsnkFvgqT69occwlGp2sqZ
-NznefO6vX0n/JSQb3RoyrqFpItlutPpYc7iKOsxTn8kRl6BMrzuw5XNfeSjQnRm8
-fJ/65oc+sgOvhpfu7/pSNGgvoWW4Nw+KMTOErKYzBLuha0gkPjURtbIrUFfkikp4
-6glhD//Pe1z7MFwOdAWdXrZk0q6neKuagfUMEh+W+dx9XfNdLQn2N95WD4po2jAz
-dUbAgpzQ/GKOA2u0mlbSfDu4hzFHCaHw9IVgDHoY447QImYJda4vutC4GC1zApOf
-XI7w35IB99BWQ/uiq3nvnss1wIXoGga6kwp2cKDZQpgwybM9Wn5IUNLia58gspGs
-inj4pZ5qsMo5e9HX2e9qpIdrLjcQrqUjRKN0YrSC0AKzddzgq5QaEz1WWKvUzV9i
-X1BbUhcU+hzhiKNPyC1+kHsx28mBmKfYS+0bOC4F9F9H6xO2Ig1jk1+BFwFsVRT5
-MwMVSjxZpl7KQHTrYzhPCdP/b7dVr/cJR8UqYekwwlWbXQXPNeT1ReJjo7HjDe+g
-rAFt3H/t4LYh+bz1+WxBsuVuJZ9BhAhaTjnpOOgT3c9mUad0I1Is7hpinMpeDhR1
-E4/75NGeHyxcyqq5hnNHIDfw/7POiHHRYB6Vj741h3v5SxxstbkxVsSBMi+l+yny
-KvTkyZcmURbMHnreIdMc
-=u1E6
------END PGP SIGNATURE-----
-
---ktAWILw7ksMO86x0D1qG0AmLLkl7iuk4f--
+Thanks!
+Laszlo
