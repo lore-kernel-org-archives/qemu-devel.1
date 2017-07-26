@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daL2m-0001Ma-Gv
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:04:02 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daL2q-0001QX-7t
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:04:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daL2k-00007g-US
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:04:00 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1daL2o-0000ER-TD
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 08:04:04 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Wed, 26 Jul 2017 20:02:54 +0800
-Message-ID: <20170726120255.14292-6-maozy.fnst@cn.fujitsu.com>
+Date: Wed, 26 Jul 2017 20:02:53 +0800
+Message-ID: <20170726120255.14292-5-maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <20170726120255.14292-1-maozy.fnst@cn.fujitsu.com>
 References: <20170726120255.14292-1-maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 5/6] hw/block: Use errp directly rather than
- local_err
+Subject: [Qemu-devel] [PATCH 4/6] hw/block: Fix the return type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,250 +22,184 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Pass the error message to errp directly rather than the local
-variable local_err and propagate it to errp via error_propagate().
+When the function no success value to transmit, it usually make the
+function return void. It has turned out not to be a success, because
+it means that the extra local_err variable and error_propagate() will
+be needed. It leads to cumbersome code, therefore, transmit success/
+failure in the return value is worth.
+
+So fix the return type of blkconf_apply_backend_options(),
+blkconf_geometry() and virtio_blk_data_plane_create() to avoid it.
 
 Cc: John Snow <jsnow@redhat.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
-Cc: Keith Busch <keith.busch@intel.com>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
 
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 ---
- hw/block/fdc.c        | 17 ++++++-----------
- hw/block/nvme.c       |  8 +++-----
- hw/block/virtio-blk.c | 17 +++++------------
- hw/ide/qdev.c         | 12 ++++--------
- hw/scsi/scsi-disk.c   | 13 ++++---------
- hw/usb/dev-storage.c  |  9 +++------
- 6 files changed, 25 insertions(+), 51 deletions(-)
+ hw/block/block.c                | 21 ++++++++++++---------
+ hw/block/dataplane/virtio-blk.c | 16 +++++++++-------
+ hw/block/dataplane/virtio-blk.h |  6 +++---
+ include/hw/block/block.h        | 10 +++++-----
+ 4 files changed, 29 insertions(+), 24 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 02f4a46..e6398c3 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -473,16 +473,13 @@ static void fd_revalidate(FDrive *drv)
- static void fd_change_cb(void *opaque, bool load, Error **errp)
- {
-     FDrive *drive = opaque;
--    Error *local_err = NULL;
+diff --git a/hw/block/block.c b/hw/block/block.c
+index 27878d0..717bd0e 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -51,8 +51,8 @@ void blkconf_blocksizes(BlockConf *conf)
+     }
+ }
  
-     if (!load) {
-         blk_set_perm(drive->blk, 0, BLK_PERM_ALL, &error_abort);
-     } else {
--        blkconf_apply_backend_options(drive->conf,
--                                      blk_is_read_only(drive->blk), false,
--                                      &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (blkconf_apply_backend_options(drive->conf,
-+                                          blk_is_read_only(drive->blk),
-+                                          false, errp) < 0) {
-             return;
+-void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+-                                   bool resizable, Error **errp)
++int blkconf_apply_backend_options(BlockConf *conf, bool readonly,
++                                  bool resizable, Error **errp)
+ {
+     BlockBackend *blk = conf->blk;
+     BlockdevOnError rerror, werror;
+@@ -76,7 +76,7 @@ void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+ 
+     ret = blk_set_perm(blk, perm, shared_perm, errp);
+     if (ret < 0) {
+-        return;
++        return -1;
+     }
+ 
+     switch (conf->wce) {
+@@ -99,11 +99,13 @@ void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+ 
+     blk_set_enable_write_cache(blk, wce);
+     blk_set_on_error(blk, rerror, werror);
++
++    return 0;
+ }
+ 
+-void blkconf_geometry(BlockConf *conf, int *ptrans,
+-                      unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+-                      Error **errp)
++int blkconf_geometry(BlockConf *conf, int *ptrans,
++                     unsigned cyls_max, unsigned heads_max, unsigned secs_max,
++                     Error **errp)
+ {
+     DriveInfo *dinfo;
+ 
+@@ -129,15 +131,16 @@ void blkconf_geometry(BlockConf *conf, int *ptrans,
+     if (conf->cyls || conf->heads || conf->secs) {
+         if (conf->cyls < 1 || conf->cyls > cyls_max) {
+             error_setg(errp, "cyls must be between 1 and %u", cyls_max);
+-            return;
++            return -1;
+         }
+         if (conf->heads < 1 || conf->heads > heads_max) {
+             error_setg(errp, "heads must be between 1 and %u", heads_max);
+-            return;
++            return -1;
+         }
+         if (conf->secs < 1 || conf->secs > secs_max) {
+             error_setg(errp, "secs must be between 1 and %u", secs_max);
+-            return;
++            return -1;
          }
      }
-@@ -522,7 +519,6 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-     FloppyDrive *dev = FLOPPY_DRIVE(qdev);
-     FloppyBus *bus = FLOPPY_BUS(qdev->parent_bus);
-     FDrive *drive;
--    Error *local_err = NULL;
-     int ret;
++    return 0;
+ }
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+index 5556f0e..619bc5e 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -76,9 +76,9 @@ static void notify_guest_bh(void *opaque)
+ }
  
-     if (dev->unit == -1) {
-@@ -568,10 +564,9 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-     dev->conf.rerror = BLOCKDEV_ON_ERROR_AUTO;
-     dev->conf.werror = BLOCKDEV_ON_ERROR_AUTO;
- 
--    blkconf_apply_backend_options(&dev->conf, blk_is_read_only(dev->conf.blk),
--                                  false, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (blkconf_apply_backend_options(&dev->conf,
-+                                      blk_is_read_only(dev->conf.blk),
-+                                      false, errp) < 0) {
-         return;
-     }
- 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 43c60ab..2a9d03b 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -928,7 +928,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     int i;
-     int64_t bs_size;
-     uint8_t *pci_conf;
--    Error *local_err = NULL;
- 
-     if (!n->conf.blk) {
-         error_setg(errp, "drive property not set");
-@@ -947,10 +946,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         return;
-     }
-     blkconf_blocksizes(&n->conf);
--    blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
--                                  false, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (blkconf_apply_backend_options(&n->conf,
-+                                      blk_is_read_only(n->conf.blk),
-+                                      false, errp) < 0) {
-         return;
-     }
- 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index b750bd8..5a4e9d2 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -911,7 +911,6 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOBlock *s = VIRTIO_BLK(dev);
-     VirtIOBlkConf *conf = &s->conf;
--    Error *err = NULL;
-     unsigned i;
- 
-     if (!conf->conf.blk) {
-@@ -928,17 +927,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     }
- 
-     blkconf_serial(&conf->conf, &conf->serial);
--    blkconf_apply_backend_options(&conf->conf,
--                                  blk_is_read_only(conf->conf.blk), true,
--                                  &err);
--    if (err) {
--        error_propagate(errp, err);
-+    if (blkconf_apply_backend_options(&conf->conf,
-+                                      blk_is_read_only(conf->conf.blk),
-+                                      true, errp) < 0) {
-         return;
-     }
-     s->original_wce = blk_enable_write_cache(conf->conf.blk);
--    blkconf_geometry(&conf->conf, NULL, 65535, 255, 255, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    if (blkconf_geometry(&conf->conf, NULL, 65535, 255, 255, errp) < 0) {
-         return;
-     }
-     blkconf_blocksizes(&conf->conf);
-@@ -953,9 +948,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i < conf->num_queues; i++) {
-         virtio_add_queue(vdev, 128, virtio_blk_handle_output);
-     }
--    virtio_blk_data_plane_create(vdev, conf, &s->dataplane, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+    if (virtio_blk_data_plane_create(vdev, conf, &s->dataplane, errp) < 0) {
-         virtio_cleanup(vdev);
-         return;
-     }
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index d60ac25..880b965 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -160,7 +160,6 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+ /* Context: QEMU global mutex held */
+-void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+-                                  VirtIOBlockDataPlane **dataplane,
+-                                  Error **errp)
++int virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
++                                 VirtIOBlockDataPlane **dataplane,
++                                 Error **errp)
  {
-     IDEBus *bus = DO_UPCAST(IDEBus, qbus, dev->qdev.parent_bus);
-     IDEState *s = bus->ifs + dev->unit;
--    Error *err = NULL;
-     int ret;
+     VirtIOBlockDataPlane *s;
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+@@ -91,11 +91,11 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+             error_setg(errp,
+                        "device is incompatible with iothread "
+                        "(transport does not support notifiers)");
+-            return;
++            return -1;
+         }
+         if (!virtio_device_ioeventfd_enabled(vdev)) {
+             error_setg(errp, "ioeventfd is required for iothread");
+-            return;
++            return -1;
+         }
  
-     if (!dev->conf.blk) {
-@@ -191,16 +190,13 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
- 
-     blkconf_serial(&dev->conf, &dev->serial);
-     if (kind != IDE_CD) {
--        blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        if (blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255,
-+                             errp) < 0) {
-             return;
+         /* If dataplane is (re-)enabled while the guest is running there could
+@@ -103,12 +103,12 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+          */
+         if (blk_op_is_blocked(conf->conf.blk, BLOCK_OP_TYPE_DATAPLANE, errp)) {
+             error_prepend(errp, "cannot start virtio-blk dataplane: ");
+-            return;
++            return -1;
          }
      }
--    blkconf_apply_backend_options(&dev->conf, kind == IDE_CD, kind != IDE_CD,
--                                  &err);
--    if (err) {
--        error_propagate(errp, err);
-+    if (blkconf_apply_backend_options(&dev->conf, kind == IDE_CD,
-+                                      kind != IDE_CD, errp) < 0) {
-         return;
+     /* Don't try if transport does not support notifiers. */
+     if (!virtio_device_ioeventfd_enabled(vdev)) {
+-        return;
++        return -1;
      }
  
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 5f1e5e8..6833819 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2306,7 +2306,6 @@ static void scsi_disk_unit_attention_reported(SCSIDevice *dev)
- static void scsi_realize(SCSIDevice *dev, Error **errp)
- {
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
--    Error *err = NULL;
+     s = g_new0(VirtIOBlockDataPlane, 1);
+@@ -126,6 +126,8 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+     s->batch_notify_vqs = bitmap_new(conf->num_queues);
  
-     if (!s->qdev.conf.blk) {
-         error_setg(errp, "drive property not set");
-@@ -2322,17 +2321,13 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-     blkconf_serial(&s->qdev.conf, &s->serial);
-     blkconf_blocksizes(&s->qdev.conf);
-     if (dev->type == TYPE_DISK) {
--        blkconf_geometry(&dev->conf, NULL, 65535, 255, 255, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        if (blkconf_geometry(&dev->conf, NULL, 65535, 255, 255, errp) < 0) {
-             return;
-         }
-     }
--    blkconf_apply_backend_options(&dev->conf,
--                                  blk_is_read_only(s->qdev.conf.blk),
--                                  dev->type == TYPE_DISK, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    if (blkconf_apply_backend_options(&dev->conf,
-+                                      blk_is_read_only(s->qdev.conf.blk),
-+                                      dev->type == TYPE_DISK, errp) < 0) {
-         return;
-     }
+     *dataplane = s;
++
++    return 0;
+ }
  
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 8a61ec9..bd88d6e 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -601,7 +601,6 @@ static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
-     MSDState *s = USB_STORAGE_DEV(dev);
-     BlockBackend *blk = s->conf.blk;
-     SCSIDevice *scsi_dev;
--    Error *err = NULL;
+ /* Context: QEMU global mutex held */
+diff --git a/hw/block/dataplane/virtio-blk.h b/hw/block/dataplane/virtio-blk.h
+index db3f47b..d25773d 100644
+--- a/hw/block/dataplane/virtio-blk.h
++++ b/hw/block/dataplane/virtio-blk.h
+@@ -19,9 +19,9 @@
  
-     if (!blk) {
-         error_setg(errp, "drive property not set");
-@@ -610,9 +609,8 @@ static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
+ typedef struct VirtIOBlockDataPlane VirtIOBlockDataPlane;
  
-     blkconf_serial(&s->conf, &dev->serial);
-     blkconf_blocksizes(&s->conf);
--    blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    if (blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk),
-+                                      true, errp) < 0) {
-         return;
-     }
+-void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
+-                                  VirtIOBlockDataPlane **dataplane,
+-                                  Error **errp);
++int virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
++                                 VirtIOBlockDataPlane **dataplane,
++                                 Error **errp);
+ void virtio_blk_data_plane_destroy(VirtIOBlockDataPlane *s);
+ void virtio_blk_data_plane_notify(VirtIOBlockDataPlane *s, VirtQueue *vq);
  
-@@ -636,10 +634,9 @@ static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
-                  &usb_msd_scsi_info_storage, NULL);
-     scsi_dev = scsi_bus_legacy_add_drive(&s->bus, blk, 0, !!s->removable,
-                                          s->conf.bootindex, dev->serial,
--                                         &err);
-+                                         errp);
-     blk_unref(blk);
-     if (!scsi_dev) {
--        error_propagate(errp, err);
-         return;
-     }
-     usb_msd_handle_reset(dev);
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index f3f6e8e..66117c6 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -72,12 +72,12 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+ /* Configuration helpers */
+ 
+ void blkconf_serial(BlockConf *conf, char **serial);
+-void blkconf_geometry(BlockConf *conf, int *trans,
+-                      unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+-                      Error **errp);
++int blkconf_geometry(BlockConf *conf, int *trans,
++                     unsigned cyls_max, unsigned heads_max, unsigned secs_max,
++                     Error **errp);
+ void blkconf_blocksizes(BlockConf *conf);
+-void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+-                                   bool resizable, Error **errp);
++int blkconf_apply_backend_options(BlockConf *conf, bool readonly,
++                                  bool resizable, Error **errp);
+ 
+ /* Hard disk geometry */
+ 
 -- 
 2.9.4
