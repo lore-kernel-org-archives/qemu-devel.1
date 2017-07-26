@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1daNPz-0003BD-9v
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:36:08 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1daNQJ-0003KM-UM
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1daNPv-0001fD-CL
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:36:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38916)
+	(envelope-from <ldoktor@redhat.com>) id 1daNQE-000244-5b
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:36:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1daNPv-0001eI-62
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:36:03 -0400
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1daNQD-00023E-SJ
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 10:36:22 -0400
 From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Wed, 26 Jul 2017 16:35:29 +0200
-Message-Id: <20170726143543.2530-1-ldoktor@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/14] qemu.py: Pylint/style fixes
+Date: Wed, 26 Jul 2017 16:35:30 +0200
+Message-Id: <20170726143543.2530-2-ldoktor@redhat.com>
+In-Reply-To: <20170726143543.2530-1-ldoktor@redhat.com>
+References: <20170726143543.2530-1-ldoktor@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/14] qcow: fix memory leaks related to
+ encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +25,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, armbru@redhat.com, apahim@redhat.com, f4bug@amsat.org, mreitz@redhat.com, jsnow@redhat.com
+Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, armbru@redhat.com, apahim@redhat.com, f4bug@amsat.org, mreitz@redhat.com, jsnow@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hello guys,
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-I'm reading the available python modules to exercise qemu and while readi=
-ng them
-I fixed some issues that caught my attention. It usually starts with a si=
-mple
-pylint/docstring fixes and slowly graduates to more controversial ones so=
- I'm
-open to suggestion to remove some of them.
+Fix leak of the 'encryptopts' string, which was mistakenly
+declared const.
 
-Kind regards,
-Luk=C3=A1=C5=A1
+Fix leak of QemuOpts entry which should not have been deleted
+from the opts array.
 
-Changes v1->v2
- - Squashed 2nd and 10th patches into 2nd one
- - Use repr() in MonitorResponseError's description
- - Improved commit message of the 6th patch
- - Two tweaks to docstrings changed in the 6th patch
- - Also updated qmp-shell to use new-style super calls (7th patch)
- - Fixed the accidental rename of qmp `cmd_id` (kept the id->cmd_id patch=
-)
- - Changed the style of the style-fix in the 10th commit
+Reported by: coverity
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170714103105.5781-1-berrange@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow.c  | 5 +++--
+ block/qcow2.c | 7 ++++---
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-Changes v2->v3
- - Don't use repr in the 5th patch in MonitorResponseError
-
-Daniel P. Berrange (1):
-  qcow: fix memory leaks related to encryption
-
-Kevin Wolf (1):
-  qemu-iotests: Fix reference output for 186
-
-Luk=C3=A1=C5=A1 Doktor (10):
-  qemu.py: Pylint/style fixes
-  qemu|qtest: Avoid dangerous arguments
-  qemu.py: Use iteritems rather than keys()
-  qemu.py: Simplify QMP key-conversion
-  qemu.py: Use custom exceptions rather than Exception
-  qmp.py: Couple of pylint/style fixes
-  qmp.py: Use object-based class for QEMUMonitorProtocol
-  qmp.py: Avoid "has_key" usage
-  qmp.py: Avoid overriding a builtin object
-  qtest.py: Few pylint/style fixes
-
-Peter Maydell (1):
-  Update version for v2.10.0-rc0 release
-
-Vladimir Sementsov-Ogievskiy (1):
-  qcow2-bitmap: fix bitmap_free
+diff --git a/block/qcow.c b/block/qcow.c
+index 66827d6..c08cdc4 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -768,7 +768,7 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     Error *local_err = NULL;
+     int ret;
+     BlockBackend *qcow_blk;
+-    const char *encryptfmt = NULL;
++    char *encryptfmt = NULL;
+     QDict *options;
+     QDict *encryptopts = NULL;
+     QCryptoBlockCreateOptions *crypto_opts = NULL;
+@@ -793,7 +793,7 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+             goto cleanup;
+         }
+     } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+-        encryptfmt = "aes";
++        encryptfmt = g_strdup("aes");
+     }
+ 
+     ret = bdrv_create_file(filename, opts, &local_err);
+@@ -908,6 +908,7 @@ exit:
+     blk_unref(qcow_blk);
+ cleanup:
+     QDECREF(encryptopts);
++    g_free(encryptfmt);
+     qcrypto_block_free(crypto);
+     qapi_free_QCryptoBlockCreateOptions(crypto_opts);
+     g_free(backing_file);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 90efa44..d7c600b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2905,7 +2905,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     int version;
+     uint64_t refcount_bits;
+     int refcount_order;
+-    const char *encryptfmt = NULL;
++    char *encryptfmt = NULL;
+     Error *local_err = NULL;
+     int ret;
+ 
+@@ -2916,14 +2916,14 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
+     encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
+     if (encryptfmt) {
+-        if (qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT)) {
++        if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
+             error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
+                        BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
+             ret = -EINVAL;
+             goto finish;
+         }
+     } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+-        encryptfmt = "aes";
++        encryptfmt = g_strdup("aes");
+     }
+     cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
+     if (local_err) {
+@@ -2983,6 +2983,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+ finish:
+     g_free(backing_file);
+     g_free(backing_fmt);
++    g_free(encryptfmt);
+     g_free(buf);
+     return ret;
+ }
+-- 
+2.9.4
