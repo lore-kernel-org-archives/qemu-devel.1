@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1daOFo-0008Rb-KH
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1daOM8-00053T-3j
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:36:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1daOFl-0003ff-ER
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32932)
+	(envelope-from <eblake@redhat.com>) id 1daOM4-00082z-Sv
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:36:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1daOFl-0003ea-9D
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:29:37 -0400
-Date: Wed, 26 Jul 2017 09:29:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170726092931.0678689e@w520.home>
-In-Reply-To: <859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daOM4-00082d-Mg
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:36:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 498D161D18
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:36:07 +0000 (UTC)
+References: <20170726152918.11995-1-kraxel@redhat.com>
+	<20170726152918.11995-5-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a9900e98-aecd-037c-8d53-63f5f973af03@redhat.com>
+Date: Wed, 26 Jul 2017 10:36:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
- =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+In-Reply-To: <20170726152918.11995-5-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6MQBB4kiNWvca9sSwHOpW4ij3oHq69PA5"
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] ui: add multimedia keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, Michael Tsirkin <mst@redhat.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 26 Jul 2017 09:21:38 +0300
-Marcel Apfelbaum <marcel@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6MQBB4kiNWvca9sSwHOpW4ij3oHq69PA5
+From: Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, Markus Armbruster <armbru@redhat.com>
+Message-ID: <a9900e98-aecd-037c-8d53-63f5f973af03@redhat.com>
+Subject: Re: [PATCH v2 4/5] ui: add multimedia keys
+References: <20170726152918.11995-1-kraxel@redhat.com>
+ <20170726152918.11995-5-kraxel@redhat.com>
+In-Reply-To: <20170726152918.11995-5-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote:
-> > To accelerate data traversing between devices under the same PCIE Root=
-=20
-> > Port or Switch.
-> >=20
-> > See https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.h=
-tml
-> >  =20
+On 07/26/2017 10:29 AM, Gerd Hoffmann wrote:
+> Add multimedia keys to QKeyCodes and to the keymaps.
 >=20
-> Hi,
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  ui/input-keymap.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  qapi-schema.json  | 28 +++++++++++++++++++++++++++-
+>  2 files changed, 71 insertions(+), 1 deletion(-)
 >=20
-> It may be possible, but maybe PCIe Switch assignment is not
-> the only way to go.
->=20
-> Adding Alex and Michael for their input on this matter.
-> More info at:
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.html
 
-I think you need to look at where the IOMMU is in the topology and what
-address space the devices are working in when assigned to a VM to
-realize that it doesn't make any sense to assign switch ports to a VM.
-GPUs cannot do switch level peer to peer when assigned because they are
-operating in an I/O virtual address space.  This is why we configure
-ACS on downstream ports to prevent peer to peer.  Peer to peer
-transactions must be forwarded upstream by the switch ports in order to
-reach the IOMMU for translation.  Note however that we do populate peer
-to peer mappings within the IOMMU, so if the hardware supports it, the
-IOMMU can reflect the transaction back out to the I/O bus to reach the
-other device without CPU involvement.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Therefore I think the better solution, if it encourages the NVIDIA
-driver to do the right thing, is to use emulated switches.  Assigning
-the physical switch would really do nothing more than make the PCIe link
-information more correct in the VM, everything else about the switch
-would be emulated.  Even still, unless you have an I/O topology which
-integrates the IOMMU into the switch itself, the data flow still needs
-to go all the way to the root complex to hit the IOMMU before being
-reflected to the other device.  Direct peer to peer between downstream
-switch ports operates in the wrong address space.  Thanks,
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Alex
+
+--6MQBB4kiNWvca9sSwHOpW4ij3oHq69PA5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll4tuIACgkQp6FrSiUn
+Q2pAtwgAp9c07/5SIQ9njWeiiUCqWsqUyZYw4xnJOWl1PkqOVD7xpVGlODNG70bb
+suT8kgMo/DMeiVgQyBsJOHkXY07eJlhkE+ngKZFsmix6W2QSaetqdVu+tO5rWa5g
+YIw7BniTYS1MBZbXEYsk1RYdNKAGbUQ+dcsOjuyNmy/GJJ9nOvD5uy62rrpeXr8s
+cZdijV7ixAjJb4MuD74oBgflaNqAT7EoHEpL7J/4LrSndUXfvg8qmBrkd8H0+dcz
+tmaR28WjaVllCRlSQH+524Zmb5cbyM/AnBPuqMCAtih9StdmpWkKFE8dbU9UQl/6
+fi9RXnBd+hWO2xp9DUnxLXlYjg1xSw==
+=4hDz
+-----END PGP SIGNATURE-----
+
+--6MQBB4kiNWvca9sSwHOpW4ij3oHq69PA5--
