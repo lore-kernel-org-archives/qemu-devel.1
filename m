@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1daQAm-0005vG-5r
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:32:37 -0400
+	(envelope-from <stefanha@gmail.com>) id 1daQDy-0007Kx-I3
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1daQAh-0003mW-6W
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:32:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1daQAg-0003lG-UA
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:32:31 -0400
-Date: Wed, 26 Jul 2017 11:32:22 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170726113222.52aad9a6@w520.home>
-In-Reply-To: <20170726190348-mutt-send-email-mst@kernel.org>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-	<20170726092931.0678689e@w520.home>
-	<20170726190348-mutt-send-email-mst@kernel.org>
+	(envelope-from <stefanha@gmail.com>) id 1daQDt-0005sB-PI
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:35:54 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1daQDt-0005q6-JT
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 13:35:49 -0400
+Received: by mail-wm0-x241.google.com with SMTP id q189so9586887wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 10:35:46 -0700 (PDT)
+Date: Wed, 26 Jul 2017 18:35:43 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170726173543.GC3600@stefanha-x1.localdomain>
+References: <20170724124438.27344-1-apahim@redhat.com>
+	<20170724124438.27344-2-apahim@redhat.com>
+	<20170725133708.GE23343@stefanha-x1.localdomain>
+	<fe45a297-3f65-e212-90fc-33dd6d48a2f0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
- =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="3siQDZowHQqNOShm"
+Content-Disposition: inline
+In-Reply-To: <fe45a297-3f65-e212-90fc-33dd6d48a2f0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu.py: make 'args' public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, ehabkost@redhat.com, armbru@redhat.com, mreitz@redhat.com, famz@redhat.com
 
-On Wed, 26 Jul 2017 19:06:58 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Wed, Jul 26, 2017 at 09:29:31AM -0600, Alex Williamson wrote:
-> > On Wed, 26 Jul 2017 09:21:38 +0300
-> > Marcel Apfelbaum <marcel@redhat.com> wrote:
-> >  =20
-> > > On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote: =20
-> > > > To accelerate data traversing between devices under the same PCIE R=
-oot=20
-> > > > Port or Switch.
-> > > >=20
-> > > > See https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg072=
-09.html
-> > > >    =20
-> > >=20
-> > > Hi,
-> > >=20
-> > > It may be possible, but maybe PCIe Switch assignment is not
-> > > the only way to go.
-> > >=20
-> > > Adding Alex and Michael for their input on this matter.
-> > > More info at:
-> > > https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07209.htm=
-l =20
+--3siQDZowHQqNOShm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jul 25, 2017 at 11:30:16AM -0400, Cleber Rosa wrote:
+> On 07/25/2017 09:37 AM, Stefan Hajnoczi wrote:
+> > On Mon, Jul 24, 2017 at 02:44:37PM +0200, Amador Pahim wrote:
+> >> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> >> Reviewed-by: Fam Zheng <famz@redhat.com>
+> >> ---
+> >>  scripts/qemu.py               | 10 +++++-----
+> >>  tests/qemu-iotests/iotests.py | 18 +++++++++---------
+> >>  2 files changed, 14 insertions(+), 14 deletions(-)
 > >=20
-> > I think you need to look at where the IOMMU is in the topology and what
-> > address space the devices are working in when assigned to a VM to
-> > realize that it doesn't make any sense to assign switch ports to a VM.
-> > GPUs cannot do switch level peer to peer when assigned because they are
-> > operating in an I/O virtual address space.  This is why we configure
-> > ACS on downstream ports to prevent peer to peer.  Peer to peer
-> > transactions must be forwarded upstream by the switch ports in order to
-> > reach the IOMMU for translation.  Note however that we do populate peer
-> > to peer mappings within the IOMMU, so if the hardware supports it, the
-> > IOMMU can reflect the transaction back out to the I/O bus to reach the
-> > other device without CPU involvement.
+> > Please don't do this, it encourages code duplication.  Now arbitrary
+> > users can start accessing the public field directly instead of adding a
+> > reusable interfaces like add_monitor_telnet(), add_fd(), etc.
 > >=20
-> > Therefore I think the better solution, if it encourages the NVIDIA
-> > driver to do the right thing, is to use emulated switches.  Assigning
-> > the physical switch would really do nothing more than make the PCIe link
-> > information more correct in the VM, everything else about the switch
-> > would be emulated.  Even still, unless you have an I/O topology which
-> > integrates the IOMMU into the switch itself, the data flow still needs
-> > to go all the way to the root complex to hit the IOMMU before being
-> > reflected to the other device.  Direct peer to peer between downstream
-> > switch ports operates in the wrong address space.  Thanks,
-> >=20
-> > Alex =20
 >=20
-> That's true of course. What would make sense would be for
-> hardware vendors to add ATS support to their cards.
+> Judging from tests/qemu-iotests/iotests.py:VM and your comment above, I
+> assume you see value in simple wrappers such as:
 >=20
-> Then peer to peer should be allowed by hypervisor for translated transact=
-ions.
+>    def add_device(self, opts):
+>         self._args.append('-device')
+>         self._args.append(opts)
+>         return self
 >=20
-> Gives you the performance benefit without the security issues.
->=20
-> Does anyone know whether any hardware implements this?
+> I honestly do not see any value here.  I do see value in other wrappers,
+> such as add_drive(), in which default values are there for convenience,
+> and a drive count is kept.  In the end, my point is that the there are
+> cases when a wrapper is just an annoyance and provides nothing more than
+>  the illusion of a better design.
 
-GPUs often do implement ATS and the ACS DT (Direct Translated P2P)
-capability should handle routing requests with the Address Type field
-indicating a translated address directly between downstream ports.  DT
-is however not part of the standard set of ACS bits that we enable.  It
-seems like it might be fairly easy to poke the DT enable bit with
-setpci from userspace to test whether this "just works", providing of
-course you can get the driver to attempt to do peer to peer and ATS is
-already functioning on the GPU.  If so, then we should look at where
-in the code to do that enabling automatically.  Thanks,
+I don't see much value in simple wrappers either besides method chaining
+(more on that below).
 
-Alex
+Getting back to this patch, I can only review patches in the context of
+the current code base.  I don't know future plans you may have.  The
+change may make sense together with other new changes that use a public
+args field in a useful way - it just doesn't make sense the way it has
+been presented in isolation.
+
+About method chaining, the current code seems to be written with method
+chaining in mind:
+
+https://en.wikipedia.org/wiki/Method_chaining#Python
+
+If all arguments are methods then everything can be chained:
+
+  (vm.add_fd(fd.fileno(), 1, 'image0')
+     .add_drive('fd:image0', interface=3D'none')
+     .add_device('virtio-blk-pci,drive=3Ddrive0'))
+
+So I guess there is a small value in having add_device().  That said,
+tests don't take advantage of method chaining much.
+
+--3siQDZowHQqNOShm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZeNLvAAoJEJykq7OBq3PI6SwIALE1i9cl3cZD9NAjNEdCuEyN
+rzNAr5xPRnSn7b4oLIKawmdCxzpc0oDVGCjuVL5E5hF4U0FQJPWQQzckQVt0WyXe
+CvU/Y3aCQPo6RmU2h4cknGGk2iPQAdTNJu2JNPrh+OZkMrabXoMUnL9HubDJWEML
+vVt6Y/FY/yxlASy0OdcfktnRnTz9YDc1r3ieQ0W+7r3spQwKovVgaZCbA4b8GacR
+24RJJGtV2O00uL1gxGrxkhjwW5XUnp+600Y8I6i6ujWLkOXkX3b4kkINA3EdA/JF
+Cu6IVPFidC5tDVohoUvzPbqICtlGFMF11T7BuDLg9e1nq6B3+AwkvQNIsPaXmVM=
+=z0xK
+-----END PGP SIGNATURE-----
+
+--3siQDZowHQqNOShm--
