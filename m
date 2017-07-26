@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daKk9-00073l-F8
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:44:46 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1daKlY-0007tG-L3
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:46:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1daKk6-0005pA-6h
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:44:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daKk5-0005o8-TM
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:44:42 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D691561D15
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 11:44:40 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 26 Jul 2017 13:44:37 +0200
-Message-Id: <20170726114437.19624-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [qemu-web PATCH] add Thomas's bug reporting dos and
- don'ts
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1daKlV-0006gR-Dv
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:46:12 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:54750)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1daKlV-0006fi-2U
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:46:09 -0400
+References: <e071dd23-8d19-93ba-7962-b2e2df69a6ee@mail.uni-paderborn.de>
+	<CAMU+Ekyxu9rwJ4s8xCGb87cSexfGweTmQ_Q7smLVWxjmbVqu_Q@mail.gmail.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <deabb08a-ed8d-55e0-ebd7-51302bf5260c@mail.uni-paderborn.de>
+Date: Wed, 26 Jul 2017 13:45:10 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAMU+Ekyxu9rwJ4s8xCGb87cSexfGweTmQ_Q7smLVWxjmbVqu_Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [sw-dev] RFC: QEMU RISC-V modular ISA decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, thuth@redhat.com
+To: Bruce Hoult <bruce@hoult.org>
+Cc: RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-We don't want the page to become too long, but these are good suggestions.
+On 07/25/2017 06:37 PM, Bruce Hoult wrote:
+> Do you have any good estimates for how much of the execution time is
+> typically spent in instruction decode?
+> 
+> RISC-V qemu is twice as fast as ARM or Aarch64 qemu, so it's doing
+> something right!
+> 
+> (I suspect it's probably mostly the lack of needing to emulate condition
+> codes)
 
-Also tone down the sentence about using the latest release or latest git
-tree, though we do prefer those.
+And most likely du to no overflow calculations. I don't expect
+performance to be too big of an issue (I don't have hard data on that),
+this was just the first thing that came to mind. I was rather hoping to
+get some feedback from the s390x maintainers/qemu devs on other problems
+I'm not seeing.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- contribute.md              |  2 +-
- contribute/report-a-bug.md | 13 ++++++++++---
- 2 files changed, 11 insertions(+), 4 deletions(-)
+The important question to me: Is it worth it to refactor the code to
+allow easy extensibility or not?
 
-diff --git a/contribute.md b/contribute.md
-index e052654..b10ba7f 100644
---- a/contribute.md
-+++ b/contribute.md
-@@ -3,7 +3,7 @@ title: Contribute to QEMU!
- permalink: /contribute/
- ---
- 
--* Report a bug: https://bugs.launchpad.net/qemu/<br>[How to report a bug](report-a-bug/)
-+* Report a bug: [https://bugs.launchpad.net/qemu/](https://bugs.launchpad.net/qemu/)<br>[How to report a bug](report-a-bug/)
- 
- * Clone the git repository: <br>`git clone git://git.qemu-project.org/qemu.git`
- 
-diff --git a/contribute/report-a-bug.md b/contribute/report-a-bug.md
-index ce73d76..81eecf7 100644
---- a/contribute/report-a-bug.md
-+++ b/contribute/report-a-bug.md
-@@ -3,17 +3,24 @@ title: Reporting a bug
- permalink: /contribute/report-a-bug/
- ---
- 
--Bugs can be filed at our [bug tracker](https://bugs.launchpad.net/qemu/), which is hosted on Launchpad.
-+Bugs can be filed at our [bug tracker](https://bugs.launchpad.net/qemu/), which is hosted on Launchpad. If you've got a problem with how your Linux distribution packages QEMU, use the bug tracker from your distro instead.
- 
- When submitting a bug report, please try to do the following:
- 
--* Make sure you're reporting the bug against the [latest release](/download/#source).  If possible, please try to reproduce with the latest development tree too.
-+* Include the QEMU release version or the git commit hash into the description, so that it is later still clear in which version you have found the bug.  Reports against the [latest release](/download/#source) or even the latest development tree are usually acted upon faster.
- 
- * Include the full command line used to launch the QEMU guest.
- 
- * Reproduce the problem directly with a QEMU command-line.  Avoid frontends and management stacks, to ensure that the bug is in QEMU itself and not in a frontend.
- 
--* Include as information about the guest (operating system, version, 32/64-bit).
-+* Include as information about the host and guest (operating system, version, 32/64-bit).
- 
- * Do not contribute patches on the bug tracker; send patches to the mailing list. Follow QEMU's [guidelines about submitting patches](http://wiki.qemu.org/Contribute/SubmitAPatch).
- 
-+Do NOT report security issues (or other bugs, too) as
-+"private" bugs in the bug tracker.  QEMU has a [security
-+process](http://wiki.qemu.org/SecurityProcess) for issues that should
-+be reported in a non-public way instead.
-+
-+For problems with KVM in the kernel, use the kernel bug tracker instead;
-+the [KVM wiki](http://www.linux-kvm.org/page/Bugs) has the details.
--- 
-2.13.3
+Cheers,
+Bastian
