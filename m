@@ -1,29 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1daI0H-0005MB-6Q
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:49:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1daI4U-0006hO-EU
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1daI0C-000717-Jc
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:49:13 -0400
-Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:49380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1daI0C-0006yP-9a
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:49:08 -0400
-Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C8D51116409
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 10:49:06 +0200 (CEST)
-Date: Wed, 26 Jul 2017 10:48:54 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170726104854.26ad0e3e@bahia.lan>
-In-Reply-To: <180bce1f-9da5-969e-df03-421f05285d00@ozlabs.ru>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<180bce1f-9da5-969e-df03-421f05285d00@ozlabs.ru>
+	(envelope-from <pbonzini@redhat.com>) id 1daI4P-0000z6-Am
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:53:34 -0400
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:36430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1daI4P-0000y5-0S
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:53:29 -0400
+Received: by mail-wm0-f43.google.com with SMTP id t201so66171444wmt.1
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 01:53:28 -0700 (PDT)
+References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+	<CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+	<20170721110636.19412e6c@nial.brq.redhat.com>
+	<20170721092338.GE17693@redhat.com>
+	<20170721143432.0e888800@nial.brq.redhat.com>
+	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
+	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
+	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
+	<a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
+	<CAGCz3vvyxbe7D2OL08Bo+mzvgP_51c3iPCQ-+PeROC9aZdMo3A@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <21592b3f-1a0c-c573-b5e6-754a44582309@redhat.com>
+Date: Wed, 26 Jul 2017 10:53:25 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/1b=lhkQlpNn_P5WH5pEniiG";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 00/26] spapr: add support for PHB
- hotplug
+In-Reply-To: <CAGCz3vvyxbe7D2OL08Bo+mzvgP_51c3iPCQ-+PeROC9aZdMo3A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,162 +39,368 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Phil Dennis-Jordan <lists@philjordan.eu>
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, "seabios@seabios.org" <seabios@seabios.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
 
---Sig_/1b=lhkQlpNn_P5WH5pEniiG
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 25/07/2017 23:25, Phil Dennis-Jordan wrote:
+> Thanks for this, Paolo. Very interesting idea.
+> 
+> I couldn't get things working initially, but with a few fixups on the
+> SeaBIOS side I can boot both legacy and modern OSes. See comments
+> inline below for details on changes required.
+> 
+> Successfully booted (only a brief test):
+> - Windows 2000
+> - Windows XP (32 bit)
+> - Windows 7 (32 bit)
+> - Windows 10 (64 bit, SeaBIOS)
+> - Windows 10 (64 bit, OVMF)
+> - macOS 10.12 (patched OVMF)
 
-On Wed, 26 Jul 2017 13:44:55 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Thanks Phil!  You unwittingly tested the compatibility path on all these
+OSes, since my QEMU patch forgot to setup rsdp->length, rsdp->revision
+and the extended checksum.  However, I've now tested Windows XP, Linux
+w/SeaBIOS, Linux w/patched SeaBIOS and Linux w/OVMF.
 
-> On 26/07/17 03:57, Greg Kurz wrote:
-> > This series is based on patches from Michel Roth posted in 2015:
-> >=20
-> > https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg04246.html
-> >=20
-> > It addresses comments made during the RFC review, and also provides a b=
-unch
-> > of preliminary cleanup/fix patches. Since we have reached hard-freeze, =
-this
-> > feature is provided by a new pseries-2.11 machine type, introduced by t=
-his
-> > series. It is based on David Gibson's ppc-for-2.10 branch, and I believ=
-e some
-> > of the preliminary fixes are eligible for 2.10.
-> >=20
-> > Note that it also requires an updated SLOF that supports a new private =
-hcall:
-> > KVMPPC_H_UPDATE_PHANDLE. This is needed because SLOF changes FDT phandl=
-es to
-> > Open Firmware phandles. Since the guest only sees the latter, QEMU must=
- use
-> > the updated value when populating the FDT for the hotplugged PHB (other=
-wise
-> > the guest can't setup IRQs for the PCI devices). SLOF part is already u=
-pstream:
-> >=20
-> > http://git.qemu.org/?p=3DSLOF.git;h=3D604d28cc3f791657414f8b21103921fa0=
-147fc63
-> >=20
-> > With these patches we support the following:
-> >=20
-> > (qemu) device_add spapr-pci-host-bridge,index=3D2,id=3Dphb2
-> > (qemu) device_add virtio-net-pci,id=3Dhp2.0,bus=3Dphb2.0
-> > (qemu) device_del hp2.0
-> > (qemu) device_del phb2
-> >=20
-> > I could run some successful tests with a fedora25 guest:
-> > - hotplug PHB + migrate + unplug PHB
-> > - hotplug PHB + hotplug PCI device + unplug PHB =3D> PCI device gets un=
-plugged
-> > - migrate before OS starts + hotplug PHB =3D> destination uses OF phand=
-les
-> > - no regression observed with older machine types
-> >=20
-> > All the patches are also available here:
-> >=20
-> > https://github.com/gkurz/qemu/commits/spapr-hotplug-phb
-> >=20
-> > Cheers,
-> >=20
-> > --
-> > Greg
-> >=20
-> > ---
-> >=20
-> > Greg Kurz (14):
-> >       spapr: move spapr_create_phb() to core machine code
-> >       spapr_pci: use memory_region_add_subregion() with DMA windows
-> >       spapr_iommu: use g_strdup_printf() instead of snprintf()
-> >       spapr_drc: use g_strdup_printf() instead of snprintf()
-> >       spapr_iommu: convert TCE table object to realize()
-> >       spapr_pci: parent the MSI memory region to the PHB
-> >       spapr_drc: fix realize and unrealize
-> >       spapr_drc: add unrealize method to physical DRC class
-> >       spapr_iommu: unregister vmstate at unrealize time
-> >       spapr: add pseries-2.11 machine type =20
->=20
-> >       spapr_pci: introduce drc_id property
-> >       spapr: allow guest to update the XICS phandle
-> >       spapr_pci: drop abusive sanity check when migrating the LSI table
-> >       spapr: add hotplug hooks for PHB hotplug =20
->=20
->=20
-> This one did not make it to the lists.
->=20
+I've now found out that edk2 contains similar logic.  It uses a PCD (a
+compile-time flag essentially) to choose between ACPI >= 2.0 tables or
+ACPI 1.0-compatible tables.  In the latter case, edk2 takes care of
+producing a v1 FADT if needed (similar to this patch) and linking the
+RSDT to it; otherwise it keeps whatever FADT was provided by platform
+code and produces an XSDT.  So I'm promoting the SeaBIOS code from
+"hack" to "right thing to do".  Though then I cannot brag about Kevin's
+nice words, too bad. :)
 
-Yeah, I've just realized that 'stg mail' failed to send this patch because
-of a connection problem with OVH's mail relay... :-\
+Paolo
 
-I've sent it again with --in-reply-to, so that it goes to the appropriate
-thread.
-
->=20
->=20
-> >=20
-> > Michael Roth (11):
-> >       spapr_drc: pass object ownership to parent/owner
-> >       spapr_iommu: pass object ownership to parent/owner
-> >       pci: allow cleanup/unregistration of PCI buses
-> >       qdev: store DeviceState's canonical path to use when unparenting
-> >       spapr_pci: add PHB unrealize
-> >       spapr: enable PHB hotplug for pseries-2.11>       spapr: create D=
-R connectors for PHBs =20
->=20
->=20
-> >       spapr_events: add support for phb hotplug events
-> >       qdev: pass an Object * to qbus_set_hotplug_handler()
-> >       spapr_pci: provide node start offset via spapr_populate_pci_dt()
-> >       spapr_pci: add ibm, my-drc-index property for PHB hotplug
-> >=20
-> > Nathan Fontenot (1):
-> >       spapr: populate PHB DRC entries for root DT node
-> >=20
-> >=20
-> >  hw/acpi/piix4.c               |    2=20
-> >  hw/char/virtio-serial-bus.c   |    2=20
-> >  hw/core/bus.c                 |   11 --
-> >  hw/core/qdev.c                |   15 ++-
-> >  hw/pci/pci.c                  |   33 +++++++
-> >  hw/pci/pcie.c                 |    2=20
-> >  hw/pci/shpc.c                 |    2=20
-> >  hw/ppc/spapr.c                |  205 +++++++++++++++++++++++++++++++++=
-+++++++-
-> >  hw/ppc/spapr_drc.c            |   65 ++++++++++---
-> >  hw/ppc/spapr_events.c         |    3 +
-> >  hw/ppc/spapr_hcall.c          |   20 ++++
-> >  hw/ppc/spapr_iommu.c          |   22 +++-
-> >  hw/ppc/spapr_pci.c            |   86 +++++++++++++----
-> >  hw/s390x/css-bridge.c         |    2=20
-> >  hw/s390x/s390-pci-bus.c       |    6 +
-> >  hw/scsi/virtio-scsi.c         |    2=20
-> >  hw/scsi/vmw_pvscsi.c          |    2=20
-> >  hw/usb/dev-smartcard-reader.c |    2=20
-> >  include/hw/compat.h           |    3 +
-> >  include/hw/pci-host/spapr.h   |    9 +-
-> >  include/hw/pci/pci.h          |    3 +
-> >  include/hw/ppc/spapr.h        |   15 +++
-> >  include/hw/ppc/spapr_drc.h    |    8 ++
-> >  include/hw/qdev-core.h        |    4 -
-> >  24 files changed, 446 insertions(+), 78 deletions(-)
-> >=20
-> >  =20
->=20
->=20
-
-
---Sig_/1b=lhkQlpNn_P5WH5pEniiG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAll4V3YACgkQAvw66wEB28IZbwCfbfohYkqF7qL/jVlN45qKiXK3
-4/IAn3y0qAcMUYzWXhutHvBAMw9QWCE/
-=kPWJ
------END PGP SIGNATURE-----
-
---Sig_/1b=lhkQlpNn_P5WH5pEniiG--
+> On Tue, Jul 25, 2017 at 7:10 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 25/07/2017 18:23, Paolo Bonzini wrote:
+>>> On 25/07/2017 18:14, Laszlo Ersek wrote:
+>>>>   "No regressions became apparent in tests with a range of Windows
+>>>>    (XP-10)"
+>>>>
+>>>> In theory, w2k falls within that range.
+>>>
+>>> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
+>>>
+>>> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 FADT
+>>> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT itself,
+>>> patching the RSDT to point to it.
+>>>
+>>> It's a hack, but it's the only place I see to make it "just work".  And
+>>> it could be extended nicely in the future.
+>>>
+>>> All QEMU would have to do is to provide an XSDT _instead_ of an RSDT.
+>>
+>> Completely untested code follows.  Machine type compatibility code
+>> should not be necessary because new QEMU always starts with a new BIOS.
+>>
+>> Not sure I'll have much time for this in the next few days, so help
+>> is appreciated.
+>>
+>> Paolo
+>>
+>> QEMU:
+>>
+>> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+>> index 36a6cc450e..ea750d54d9 100644
+>> --- a/hw/acpi/aml-build.c
+>> +++ b/hw/acpi/aml-build.c
+>> @@ -1573,33 +1573,6 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+>>      g_array_free(tables->vmgenid, mfre);
+>>  }
+>>
+>> -/* Build rsdt table */
+>> -void
+>> -build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+>> -           const char *oem_id, const char *oem_table_id)
+>> -{
+>> -    int i;
+>> -    unsigned rsdt_entries_offset;
+>> -    AcpiRsdtDescriptorRev1 *rsdt;
+>> -    const unsigned table_data_len = (sizeof(uint32_t) * table_offsets->len);
+>> -    const unsigned rsdt_entry_size = sizeof(rsdt->table_offset_entry[0]);
+>> -    const size_t rsdt_len = sizeof(*rsdt) + table_data_len;
+>> -
+>> -    rsdt = acpi_data_push(table_data, rsdt_len);
+>> -    rsdt_entries_offset = (char *)rsdt->table_offset_entry - table_data->data;
+>> -    for (i = 0; i < table_offsets->len; ++i) {
+>> -        uint32_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
+>> -        uint32_t rsdt_entry_offset = rsdt_entries_offset + rsdt_entry_size * i;
+>> -
+>> -        /* rsdt->table_offset_entry to be filled by Guest linker */
+>> -        bios_linker_loader_add_pointer(linker,
+>> -            ACPI_BUILD_TABLE_FILE, rsdt_entry_offset, rsdt_entry_size,
+>> -            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
+>> -    }
+>> -    build_header(linker, table_data,
+>> -                 (void *)rsdt, "RSDT", rsdt_len, 1, oem_id, oem_table_id);
+>> -}
+>> -
+>>  /* Build xsdt table */
+>>  void
+>>  build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 6b7bade183..ad00f6affd 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2557,12 +2557,12 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+>>  }
+>>
+>>  static GArray *
+>> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+>> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>>  {
+>>      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+>> -    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
+>> -    unsigned rsdt_pa_offset =
+>> -        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
+>> +    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+>> +    unsigned xsdt_pa_offset =
+>> +        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
+>>
+>>      bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
+>>                               true /* fseg memory */);
+>> @@ -2571,8 +2571,8 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+>>      memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
+>>      /* Address to be filled by Guest linker */
+>>      bios_linker_loader_add_pointer(linker,
+>> -        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
+>> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
+>> +        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+>> +        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+>>
+>>      /* Checksum to be filled by Guest linker */
+>>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+>> @@ -2621,7 +2621,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>      PCMachineState *pcms = PC_MACHINE(machine);
+>>      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>>      GArray *table_offsets;
+>> -    unsigned facs, dsdt, rsdt, fadt;
+>> +    unsigned facs, dsdt, xsdt, fadt;
+>>      AcpiPmInfo pm;
+>>      AcpiMiscInfo misc;
+>>      AcpiMcfgInfo mcfg;
+>> @@ -2730,12 +2730,12 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>      }
+>>
+>>      /* RSDT is pointed to by RSDP */
+>> -    rsdt = tables_blob->len;
+>> -    build_rsdt(tables_blob, tables->linker, table_offsets,
+>> +    xsdt = tables_blob->len;
+>> +    build_xsdt(tables_blob, tables->linker, table_offsets,
+>>                 slic_oem.id, slic_oem.table_id);
+>>
+>>      /* RSDP is in FSEG memory, so allocate it separately */
+>> -    build_rsdp(tables->rsdp, tables->linker, rsdt);
+>> +    build_rsdp(tables->rsdp, tables->linker, xsdt);
+>>
+>>      /* We'll expose it all to Guest so we want to reduce
+>>       * chance of size changes.
+>>
+>>
+>> SeaBIOS:
+>>
+>> From 73b0facdb7349f5dbf24dc675647b68eeeec0ff4 Mon Sep 17 00:00:00 2001
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>> Date: Tue, 25 Jul 2017 18:50:19 +0200
+>> Subject: [PATCH 1/2] seabios: build RSDT from XSDT
+>>
+>> Old operating systems would like to have a v1 FADT, but new
+>> operating systems would like to have v3.
+>>
+>> Since old operating systems do not know about XSDTs, the
+>> solution is to point the RSDT to a v1 FADT and the XSDT to a
+>> v3 FADT.
+>>
+>> But, OVMF is not able to do that and barfs when it sees the
+>> second FADT---plus really it's only BIOS operating systems
+>> such as win2k that complain.  So instead: 1) make QEMU provide
+>> an XSDT only; 2) build the RSDT and v1 FADT in SeaBIOS.
+>>
+>> This patch makes SeaBIOS build an RSDT out of an existing XSDT.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  src/fw/paravirt.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+>>  src/std/acpi.h    | 11 +++++++++++
+>>  2 files changed, 55 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
+>> index 5b23d78..19a4abe 100644
+>> --- a/src/fw/paravirt.c
+>> +++ b/src/fw/paravirt.c
+>> @@ -25,6 +25,7 @@
+>>  #include "x86.h" // cpuid
+>>  #include "xen.h" // xen_biostable_setup
+>>  #include "stacks.h" // yield
+>> +#include "std/acpi.h"
+>>
+>>  // Amount of continuous ram under 4Gig
+>>  u32 RamSize;
+>> @@ -147,6 +148,46 @@ static void msr_feature_control_setup(void)
+>>          wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
+>>  }
+>>
+>> +static void
+>> +build_compatibility_rsdt(void)
+>> +{
+>> +    if (RsdpAddr->rsdt_physical_address)
+>> +        return;
+>> +
+>> +    u64 xsdt_addr = RsdpAddr->xsdt_physical_address;
+>> +    if (xsdt_addr & ~0xffffffffULL)
+>> +        return;
+>> +
+>> +    struct xsdt_descriptor_rev1 *xsdt = (void*)(u32)xsdt_addr;
+>> +    void *end = (void*)xsdt + xsdt->length;
+>> +    struct rsdt_descriptor_rev1 *rsdt;
+>> +    int rsdt_size = offsetof(struct rsdt_descriptor_rev1, table_offset_entry[0]);
+>> +    int i;
+>> +    for (i=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
+>> +        u64 tbl_addr = xsdt->table_offset_entry[i];
+>> +        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
+>> +            continue;
+>> +        rsdt_size += 4;
+>> +    }
+>> +
+>> +    rsdt = malloc_high(rsdt_size);
+>> +    RsdpAddr->rsdt_physical_address = (u32)rsdt;
+> 
+> Modifying the RSDP like this invalidates both its checksums, so they
+> need to be adjusted. Something like this:
+> 
+>     RsdpAddr->checksum -= checksum(RsdpAddr, offsetof(struct
+> rsdp_descriptor, length));
+>     RsdpAddr->extended_checksum -= checksum(RsdpAddr, sizeof(struct
+> rsdp_descriptor));
+> 
+>> +
+>> +    memcpy(rsdt, xsdt, sizeof(struct acpi_table_header));
+>> +    rsdt->signature = RSDT_SIGNATURE;
+>> +    rsdt->length = rsdt_size;
+>> +    rsdt->revision = 1;
+>> +    int j;
+>> +    for (i=j=0; (void*)&xsdt->table_offset_entry[i] < end; i++) {
+>> +        u64 tbl_addr = xsdt->table_offset_entry[i];
+>> +        if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
+>> +            continue;
+>> +        rsdt->table_offset_entry[j++] = (u32)tbl_addr;
+>> +    }
+>> +
+>> +    rsdt->checksum -= checksum(rsdt, rsdt_size);
+>> +}
+>> +
+>>  void
+>>  qemu_platform_setup(void)
+>>  {
+>> @@ -186,8 +227,10 @@ qemu_platform_setup(void)
+>>
+>>          RsdpAddr = find_acpi_rsdp();
+>>
+>> -        if (RsdpAddr)
+>> +        if (RsdpAddr) {
+>> +            build_compatibility_rsdt();
+>>              return;
+>> +        }
+>>
+>>          /* If present, loader should have installed an RSDP.
+>>           * Not installed? We might still be able to continue
+>> diff --git a/src/std/acpi.h b/src/std/acpi.h
+>> index c2ea707..caf5e7e 100644
+>> --- a/src/std/acpi.h
+>> +++ b/src/std/acpi.h
+>> @@ -133,6 +133,17 @@ struct rsdt_descriptor_rev1
+>>  } PACKED;
+>>
+>>  /*
+>> + * ACPI 2.0 Root System Description Table (RSDT)
+>> + */
+> 
+> Comment should be "ACPI 2.0 Extended System Description Table (XSDT)"
+> 
+>> +#define XSDT_SIGNATURE 0x54445358 // RSDT
+> 
+> The signature is "XSDT", that works out to 0x58445358
+> 
+>> +struct xsdt_descriptor_rev1
+>> +{
+>> +    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
+>> +    u64 table_offset_entry[0];  /* Array of pointers to other */
+>> +    /* ACPI tables */
+>> +} PACKED;
+>> +
+>> +/*
+>>   * ACPI 1.0 Firmware ACPI Control Structure (FACS)
+>>   */
+>>  #define FACS_SIGNATURE 0x53434146 // FACS
+>> --
+>> 2.13.3
+>>
+>>
+>> From 46c7a296d27bd487cfd89a40973b1e61426dfbd0 Mon Sep 17 00:00:00 2001
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>> Date: Tue, 25 Jul 2017 18:59:20 +0200
+>> Subject: [PATCH 2/2] seabios: create v1 FADT in compatibility RSDT
+>>
+>> This patch presents a v1 FADT inside the compatibility RSDT, so
+>> that old operating systems are not broken.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  src/fw/paravirt.c | 18 +++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>>
+>> diff --git a/src/fw/paravirt.c b/src/fw/paravirt.c
+>> index 19a4abe..a9b9e80 100644
+>> --- a/src/fw/paravirt.c
+>> +++ b/src/fw/paravirt.c
+>> @@ -148,6 +148,18 @@ static void msr_feature_control_setup(void)
+>>          wrmsr_smp(MSR_IA32_FEATURE_CONTROL, feature_control_bits);
+>>  }
+>>
+>> +static void*
+>> +build_rev1_fadt(struct fadt_descriptor_rev1 *fadt_v3)
+>> +{
+>> +    struct fadt_descriptor_rev1 *fadt_v1 = malloc_high(sizeof *fadt_v1);
+>> +
+>> +    memcpy(fadt_v1, fadt_v3, sizeof *fadt_v1);
+>> +    fadt_v1->length = sizeof *fadt_v1;
+>> +    fadt_v1->revision = 1;
+> 
+> We should mask out the flags bits that are reserved in ACPI 1.0 as
+> they refer to fields not present in this revision's FADT. e.g.
+> 
+>     // upper 23 bits reserved in rev1 FADT
+>     fadt_v1->flags &= 0x1ff;
+> 
+> 
+>> +    fadt_v1->checksum -= checksum(fadt_v1, fadt_v1->length);
+>> +    return fadt_v1;
+>> +}
+>> +
+>>  static void
+>>  build_compatibility_rsdt(void)
+>>  {
+>> @@ -182,6 +194,12 @@ build_compatibility_rsdt(void)
+>>          u64 tbl_addr = xsdt->table_offset_entry[i];
+>>          if (!tbl_addr || (tbl_addr & ~0xffffffffULL))
+>>              continue;
+>> +        struct acpi_table_header *tbl = (void*)(u32)tbl_addr;
+>> +        /* The RSDT should only have an ACPI 1.0 FADT according to
+>> +         * the spec.
+>> +         */
+>> +        if (tbl->signature == FACP_SIGNATURE && tbl->revision > 1)
+>> +            tbl_addr = (u32)build_rev1_fadt((void *)tbl);
+>>          rsdt->table_offset_entry[j++] = (u32)tbl_addr;
+>>      }
+>>
+>> --
+>> 2.13.3
+>>
+>>
+> 
+> With these changes:
+> 
+> Reviewed-by: Phil Dennis-Jordan <phil@philjordan.eu>
+> 
