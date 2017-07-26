@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1daOV9-0008BC-F2
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:45:32 -0400
+	(envelope-from <crosa@redhat.com>) id 1daOWp-0000lw-8O
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1daOV6-0005i7-SL
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:45:31 -0400
-Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:43720)
+	(envelope-from <crosa@redhat.com>) id 1daOWm-0006Z7-KI
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:47:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1daOV6-0005h7-LT
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:45:28 -0400
-Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BC634116851
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:45:24 +0200 (CEST)
-Date: Wed, 26 Jul 2017 17:45:14 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170726174514.393c9be9@bahia.lan>
-In-Reply-To: <150101588183.26979.18259704887837340588@loki>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100572350.27487.14857589060586322098.stgit@bahia>
-	<150101588183.26979.18259704887837340588@loki>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1daOWm-0006WA-92
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 11:47:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC40267C4F
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 15:38:56 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+References: <20170726150446.20381-1-otubo@redhat.com>
+	<4339cf29-69cd-773d-2912-741cf9bd4da7@redhat.com>
+Message-ID: <14421c4e-fdbd-e969-cfca-6b0c3e155c8f@redhat.com>
+Date: Wed, 26 Jul 2017 11:38:50 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/J/A=disi47qA9Ybw605LDKF";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 19/26] spapr: populate PHB DRC
- entries for root DT node
+In-Reply-To: <4339cf29-69cd-773d-2912-741cf9bd4da7@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ESmojpxBb18QuwA5j3IoJd75nksliuDIf"
+Subject: Re: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
+ calling without -kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +35,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
---Sig_/J/A=disi47qA9Ybw605LDKF
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ESmojpxBb18QuwA5j3IoJd75nksliuDIf
+From: Cleber Rosa <crosa@redhat.com>
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
+Message-ID: <14421c4e-fdbd-e969-cfca-6b0c3e155c8f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] fix qemu-system-unicore32 crashing when
+ calling without -kernel
+References: <20170726150446.20381-1-otubo@redhat.com>
+ <4339cf29-69cd-773d-2912-741cf9bd4da7@redhat.com>
+In-Reply-To: <4339cf29-69cd-773d-2912-741cf9bd4da7@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 25 Jul 2017 15:51:21 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
 
-> Quoting Greg Kurz (2017-07-25 13:02:03)
-> > From: Nathan Fontenot <nfont@linux.vnet.ibm.com>
-> >=20
-> > This add entries to the root OF node to advertise our PHBs as being
-> > DR-capable in accordance with PAPR specification.
-> >=20
-> > Signed-off-by: Nathan Fontenot <nfont@linux.vnet.ibm.com>
-> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > Changes since RFC:
-> > - rebased against ppc-for-2.10
-> > - use error_report
-> > ---
-> >  hw/ppc/spapr.c |   10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 5950c009ab7e..632040f35ecc 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1151,6 +1151,16 @@ static void *spapr_build_fdt(sPAPRMachineState *=
-spapr,
-> >          exit(1);
-> >      }
-> >=20
-> > +    if (smc->dr_phb_enabled) {
-> > +        int offset =3D fdt_path_offset(fdt, "/");
-> > +        ret =3D spapr_drc_populate_dt(fdt, offset, NULL,
-> > +                                    SPAPR_DR_CONNECTOR_TYPE_PHB); =20
+
+On 07/26/2017 11:28 AM, Cleber Rosa wrote:
 >=20
-> This might actually clobber LMB/MEM entries added earlier since they both
-> try to create the /ibm,drc* entries in / from scratch.
->  =20
+>=20
+> On 07/26/2017 11:04 AM, Eduardo Otubo wrote:
+>> Starting qemu-system-unicore32 without the -kernel parameter results i=
+n
+>> an assert() returns false and aborts qemu. This patch replaces it with=
+ a
+>> proper error message followed by exit(1).
+>>
+>> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+>> ---
+>>  hw/unicore32/puv3.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+>> index e9d1a60b6f..ff62efb4df 100644
+>> --- a/hw/unicore32/puv3.c
+>> +++ b/hw/unicore32/puv3.c
+>> @@ -92,7 +92,10 @@ static void puv3_load_kernel(const char *kernel_fil=
+ename)
+>>      if (kernel_filename =3D=3D NULL && qtest_enabled()) {
+>>          return;
+>>      }
+>> -    assert(kernel_filename !=3D NULL);
+>> +    if (kernel_filename =3D=3D NULL) {
+>> +        error_report("kernel parameter cannot be empty");
+>> +        exit(1);
+>> +    }
+>> =20
+>=20
+> How do you actually trigger this?  There's already appropriate command
+> line options handling in vl.c, which all targets (I tried) incorporate.=
 
-Oh, looking at the description of fdt_setprop() in <libfdt.h>, I guess you'=
-re
-probably right.
-
-> If that's the case, we can arrange the code something like:
->  =20
->   uint32_t root_drc_types =3D 0;
->  =20
->   if (smc->dr_lmb_enabled) {
->       root_drc_types |=3D SPAPR_DR_CONNECTOR_TYPE_LMB;
->   }
->  =20
->   if (smc->dr_phb_enabled) {
->       root_drc_types |=3D SPAPR_DR_CONNECTOR_TYPE_PHB;
->   }
->  =20
->   ...
->  =20
->   if (root_drc_types) {
->     int offset =3D fdt_path_offset(fdt, "/");
->     ret =3D spapr_drc_populate_dt(fdt, offset, NULL, root_drc_types);
->   }
+> For unicore32:
 >=20
 
-Good idea. I'll do just that.
+Oh my, I misread your commit message.  I see this is actually triggered
+*without* -kernel, and not without a parameter.
 
-Thanks!
+- Cleber.
 
+> $ ./unicore32-softmmu/qemu-system-unicore32 -kernel
+> qemu-system-unicore32: -kernel: requires an argument
 >=20
-> > +        if (ret < 0) {
-> > +            error_report("Couldn't set up PHB DR device tree propertie=
-s");
-> > +            exit(1);
-> > +        }
-> > +    }
-> > +
-> >      return fdt;
-> >  }
-> >=20
-> >  =20
+> I also see what I believe is proper handling with invalid kernels (or
+> empty options):
+>=20
+> $ ./unicore32-softmmu/qemu-system-unicore32 -kernel ''
+> qemu-system-unicore32: Load kernel error: ''
+>=20
+> Regards,
+> - Cleber.
+>=20
+>>      /* only zImage format supported */
+>>      size =3D load_image_targphys(kernel_filename, KERNEL_LOAD_ADDR,
+>>
 >=20
 
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
 
---Sig_/J/A=disi47qA9Ybw605LDKF
-Content-Type: application/pgp-signature
+
+--ESmojpxBb18QuwA5j3IoJd75nksliuDIf
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAll4uQoACgkQAvw66wEB28IWUwCfXwk4frHtwwUTdG1X3CZJopL4
-JBsAoKg2vib42qZr+Ykwxef02+snhftw
-=S1M/
+iQIcBAEBCAAGBQJZeLeKAAoJEGV+jTOl8gnzov8P/2qkTwmJj2mUAzyjkDcp29qJ
+kYxFAuiPrBgR1d1ocASUxU/Xwqn/7Vot4tmEQ77Cd/EYOKi3ormPIUb2oTK0RMG2
+PG7brxA0O+WYHQQ6sRK2tXgfCOYm4gYEmGp3GdoiIfAAYlCd8yp4dqIqgQJoSXkB
+XYdds7QowzB32jO+Z9TsZ+Z+nCqIsowc8R3xbSdEXoxUuIIYaXEAj7aErudCPS7L
+9/DZzuLLZQO/EqFQTnbW/nJZaSy/WfoE/wULHYNY+Wo4b088x4W9RHgc6m9NecrQ
+jlZgP2PUUqwEMBr0Smrh9t7hm5sunPtQRLAqu8jWCMkVy5Mb7fxnTQlm9gm4VmU+
+tjNiPDGfCLpPLXDYyMlzDGNyF/vtCqVpsw0Ajlg60Oed3qemryw3b+8+Pgrvzcnz
+/sJq1IsyrKVEHMNW7uivPeCoeaLj6y/4Kr6x4+e+rhAmi3GZc0irOQG3TtyM76PP
+xWx7QNnEhc5zFZMivtaCvn+HHs8QdwtDnxJMUDdIVcoj5R0ZMIFY+j57az3lDOM2
+qEHyTwF0HT7xnvCB40LSxGzeLBwU9UlOqThOfkFVzAOxhiQPxx9IXz1zcIN6Rqc3
+i915Rsei9HtnVscZnDME2PBNJyDc+0TlhjHGeI1T5f/jzbxoPPrlPSxntOn5Pdx1
+n3fIoqqwd7LH0EPxyt17
+=tj3l
 -----END PGP SIGNATURE-----
 
---Sig_/J/A=disi47qA9Ybw605LDKF--
+--ESmojpxBb18QuwA5j3IoJd75nksliuDIf--
