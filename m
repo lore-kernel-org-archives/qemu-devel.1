@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riel@redhat.com>) id 1daTzW-0002Se-Ea
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:37:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daU2b-0004oi-57
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riel@redhat.com>) id 1daTzR-0004W9-FJ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:37:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1daTzR-0004VH-9k
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:37:09 -0400
-Message-ID: <1501104453.26846.45.camel@redhat.com>
-From: Rik van Riel <riel@redhat.com>
-Date: Wed, 26 Jul 2017 17:27:33 -0400
-In-Reply-To: <1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-	<1501016375.26846.21.camel@redhat.com>
-	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-JYusrPMC9q1mTsTTcAte"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daU2W-0006YF-6M
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:40:25 -0400
+Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:38883)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daU2W-0006Xx-0j
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 17:40:20 -0400
+Received: by mail-ua0-x229.google.com with SMTP id w45so127043666uac.5
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 14:40:19 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 26 Jul 2017 18:40:06 -0300
+Message-Id: <20170726214010.420-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for 2.10 0/4] check dtc submodule is outdated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: John Arbuckle <programmingkidx@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Yongbok Kim <yongbok.kim@imgtec.com>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
+On http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07987.html John
+hit the following error:
 
---=-JYusrPMC9q1mTsTTcAte
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+hw/core/loader-fit.c:105:41: error: expected expression
+        *addr = fdt32_to_cpu(*(fdt32_t *)prop);
+                                        ^
+having his ./configure --target-list=mips64el-softmmu on OSX returning:
+fdt support       yes
 
-On Wed, 2017-07-26 at 09:47 -0400, Pankaj Gupta wrote:
-> >=20
-> Just want to summarize here(high level):
->=20
-> This will require implementing new 'virtio-pmem' device which
-> presents=C2=A0
-> a DAX address range(like pmem) to guest with read/write(direct
-> access)
-> & device flush functionality. Also, qemu should implement
-> corresponding
-> support for flush using virtio.
->=20
-Alternatively, the existing pmem code, with
-a flush-only block device on the side, which
-is somehow associated with the pmem device.
+It seems his dtc submodule was out of date but the ./configure did not emit
+warning. I could reproduce checking out dtc tag v1.4.1.
 
-I wonder which alternative leads to the least
-code duplication, and the least maintenance
-hassle going forward.
+patch 1: if you are out of the source directory "git submodule" fails, try to
+improve the warning remembering the user to run this command in source/.
 
---=20
-All rights reversed
---=-JYusrPMC9q1mTsTTcAte
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+patch 2: a check exists to warn --disable-fdt --target-list=mips64el-softmmu
+is invalid. move the warning to also warn AFTER checking if libfdt is
+available and sane.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+patch 3: fdt_first_subnode() is available since v1.4.0 while we are requiring
+v1.4.2, better check a v1.4.2 function such as:
+fdt_setprop_inplace_namelen_partial()
 
-iQEcBAABCAAGBQJZeQlFAAoJEM553pKExN6DiSQH/1hmL95ousOGG7V/6Q2fhd+M
-0PxKilryMGxgkwyqCJlYtsOlkgJfwr5BHNdQpyy0FEuUC6zbv1hQN9bcKmhjS7Ay
-ix4JJ7Cc2GwYFO28olqdD3m8/kZZ4colOuJQH8aT+i/kxm1jHA4Sny0eqTkmblLG
-SMAQlVIDlQjsMryknymzriiv9aCV0IEDWfUqcvidWH0mpf1TixGxAi0nosQAkzPz
-8iCbsUt5ZiGNhbWIWIloIvMZwtFOW8rf+p/DwT9X3Rp8cCdCimHJDB9VnAugUnBP
-v+a/pXGYaTiyyFm8dEIURNRLKufHlrZ/AORWGNjsPwpsTakcjLZuDg6B9wsBR80=
-=KCNx
------END PGP SIGNATURE-----
+patch 4: if no system libdtc and submodule present, compile the dtc submodule
+and verify it is at least v1.4.2. Prefixed RFC because I'm not sure about
+these 3 lines:
 
---=-JYusrPMC9q1mTsTTcAte--
++    make -C dtc 1>/dev/null
+
+yes, we need to build the libdtc to be able to run the compile_prog link step
+
++    fdt_cflags="-I${source_path}/dtc/libfdt"
+
+$source_path seems ok...
+
++    fdt_libs="-L$(pwd)/dtc/libfdt $fdt_libs"
+
+maybe there is a better option than `pwd`
+
+how to reproduce:
+
+((v2.10.0-rc0))$ (cd dtc && git checkout v1.3.0)
+((v2.10.0-rc0))$ ./configure --target-list=mips64el-softmmu --extra-cflags=-fmax-errors=1 | fgrep fdt
+fdt support       yes
+((v2.10.0-rc0))$ make hw/core/loader-fit.o
+hw/core/loader-fit.c: In function ‘fit_image_addr’:
+hw/core/loader-fit.c:105:32: error: ‘fdt32_t’ undeclared (first use in this function)
+         *addr = fdt32_to_cpu(*(fdt32_t *)prop);
+                                ^~~~~~~
+compilation terminated due to -fmax-errors=1.
+rules.mak:66: recipe for target 'hw/core/loader-fit.o' failed
+
+(dtc-fix)$ mkdir test && cd test
+(dtc-fix)$ ../configure --target-list=mips64el-softmmu --extra-cflags=-fmax-errors=1
+ERROR: Your DTC submodule is outdated. Your options:
+         (1) Preferred: Install the DTC (libfdt) devel package
+         (2) Update the DTC submodule, using: (in /home/phil/source/qemu)
+             git submodule update --init dtc
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (4):
+  configure: remember the user to run 'git submodule' command in source dir
+  fdt: check fdt_required condition can be satisfied _after_ testing libfdt
+  fdt: probe for v1.4.2 using fdt_setprop_inplace_namelen_partial()
+  fdt: compile dtc submodule to check it is up-to-date
+
+ configure | 52 +++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 35 insertions(+), 17 deletions(-)
+
+-- 
+2.13.3
