@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1daDkB-0001PK-5b
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:16:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1daDr7-0002VX-BX
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:23:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1daDk8-0003fY-0O
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:16:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1daDk7-0003eg-QJ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:16:15 -0400
-References: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
-	<3738157a-e45b-72af-53a2-de9ab4b35a98@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <6a0b7f71-b221-d287-4037-c188e19e6a74@redhat.com>
-Date: Wed, 26 Jul 2017 12:09:11 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1daDr6-0005ld-Du
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 00:23:29 -0400
+Date: Wed, 26 Jul 2017 14:01:41 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170726040141.GS8978@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100555881.27487.6700589734222986048.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <3738157a-e45b-72af-53a2-de9ab4b35a98@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] Convert to realize and fix error
- handling
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="p2u4WfPhYOuYlOsk"
+Content-Disposition: inline
+In-Reply-To: <150100555881.27487.6700589734222986048.stgit@bahia>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 06/26] spapr_pci: parent the MSI
+ memory region to the PHB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: jiri@resnulli.us, armbru@redhat.com, f4bug@amsat.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
 
+--p2u4WfPhYOuYlOsk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B407=E6=9C=8826=E6=97=A5 11:45, Mao Zhongyi wrote:
-> Hi, Jason
->
-> This was posted over 2 months ago with two R-Bs(Markus & Philippe),
-> did it get merged or dropped?
->
-> Thanks,
-> Mao
+On Tue, Jul 25, 2017 at 07:59:18PM +0200, Greg Kurz wrote:
+> This memory region should be owned by the PHB. This ensures the PHB
+> cannot be finalized as long as the the region is guest visible, or
+> used by a CPU or a device.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Hi:
+Applied to ppc-for-2.11.
 
-Want to merge but it does not apply cleanly on HEAD. Could you please=20
-rebase and post a V6?
+> ---
+>  hw/ppc/spapr_pci.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 3fe7f3145467..4e4165b44b9a 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1703,7 +1703,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+>      }
+>  #endif
+> =20
+> -    memory_region_init_io(&sphb->msiwindow, NULL, &spapr_msi_ops, spapr,
+> +    memory_region_init_io(&sphb->msiwindow, OBJECT(sphb), &spapr_msi_ops=
+, spapr,
+>                            "msi", msi_window_size);
+>      memory_region_add_subregion(&sphb->iommu_root, SPAPR_PCI_MSI_WINDOW,
+>                                  &sphb->msiwindow);
+>=20
 
-Thanks
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--p2u4WfPhYOuYlOsk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll4FCUACgkQbDjKyiDZ
+s5KN2RAAyrjF8ABXcTp5TPyXk8iZI9bqwKgbSVHJ1nkVbByNvnpCIT9SsOfP2/sX
+HqBdFnebqHz0WVz54rEZZWTCDSL5QrvTtUrCqiemgTjA7klSiY+S2mdeP0oRlLSF
+sJD9fIIXU4naRF2R13sQaRr8KOnmytjoV/NGNW6PZVtw4LofOtHOhqpPi8fV+Y3u
+zPmvw0kMNGknJR9Suj+yStlYG1905ICEM/sL3r8J4G+9Ga49SxGq2F1x/XpQTloK
+w3KaYT5oimFt0NSEeMtUq3bgn3PIsM4CMd0GeNZn6vI0M9ZKPhmv1FYIK03FKSwP
+Ja27+tomPbE1cTdb/XR1f6RrNTmmMXG+pfhvcODrDIWyEUnRs9iLuDuCjkoaUZ/a
+MdUGbOj2QTsQenX5z9jG2zCDgkHvbuFftn0lBvgXT1YcYH1ve8QQ32dNJC41kAXa
+lYBNyvpfjAmXff7LoQq4nlzWGltcycxon6L+Uuq/93WF3IH89+5paM65Ia30XJX1
+q/qV8C4nZHrp5sXSWDUBEMUR26phYy1MrOpHbByW118sPtpAjL6xvtoShHWotbxl
+UeknHGWuOeNzHBZOSzpBEdRnRfQsBY/vwf2+0cuFlsbRi46zu2zyt0qrMlisiYUE
+D4X48ga1lXmO1uAB8nEU5w5BGaa85OPf0sHve5cCRaN7e3z0SVY=
+=vmON
+-----END PGP SIGNATURE-----
+
+--p2u4WfPhYOuYlOsk--
