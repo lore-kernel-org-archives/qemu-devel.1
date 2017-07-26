@@ -1,28 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1daHun-0002sI-Fr
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:43:34 -0400
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1daHwe-0004WN-7N
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:45:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1daHui-00047J-Pv
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:43:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57926)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1daHui-000475-G4
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:43:28 -0400
-Date: Wed, 26 Jul 2017 16:43:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170726084323.GL1595@pxdev.xzpeter.org>
-References: <1500533554-5779-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170720065249eucas1p2cc3e779e2cde2125f90ae25ff03ac646@eucas1p2.samsung.com>
-	<1500533554-5779-4-git-send-email-a.perevalov@samsung.com>
-	<20170726014921.GK1595@pxdev.xzpeter.org>
-	<19a15ce5-5427-c85b-f194-c3eb6740aef3@samsung.com>
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1daHwZ-0005CP-B1
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:45:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1daHwZ-0005Bp-0l
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 04:45:23 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6Q8hxxo075899
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:45:21 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxm0ksd9e-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:45:21 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Wed, 26 Jul 2017 04:45:19 -0400
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+	[9.57.199.107])
+	by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v6Q8jGbD26935326
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 08:45:16 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C537412403D
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:42:41 -0400 (EDT)
+Received: from zyimindembp.cn.ibm.com (unknown [9.115.193.8])
+	by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP id 3F6F1124037
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:42:40 -0400 (EDT)
+References: <20170725153330.14966-1-cohuck@redhat.com>
+	<20170725153330.14966-5-cohuck@redhat.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Wed, 26 Jul 2017 16:45:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <19a15ce5-5427-c85b-f194-c3eb6740aef3@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v8 3/3] migration: add bitmap for received
- page
+In-Reply-To: <20170725153330.14966-5-cohuck@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Message-Id: <fb9b7be0-2258-774f-b76f-ebf82c5e13d1@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] s390x/pci: do not advertise pci on
+ non-pci builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +53,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, heetae82.ahn@samsung.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, Jul 26, 2017 at 11:07:17AM +0300, Alexey Perevalov wrote:
-> On 07/26/2017 04:49 AM, Peter Xu wrote:
-> >On Thu, Jul 20, 2017 at 09:52:34AM +0300, Alexey Perevalov wrote:
-> >>This patch adds ability to track down already received
-> >>pages, it's necessary for calculation vCPU block time in
-> >>postcopy migration feature, maybe for restore after
-> >>postcopy migration failure.
-> >>Also it's necessary to solve shared memory issue in
-> >>postcopy livemigration. Information about received pages
-> >>will be transferred to the software virtual bridge
-> >>(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-> >>already received pages. fallocate syscall is required for
-> >>remmaped shared memory, due to remmaping itself blocks
-> >>ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-> >>error (struct page is exists after remmap).
-> >>
-> >>Bitmap is placed into RAMBlock as another postcopy/precopy
-> >>related bitmaps.
-> >>
-> >>Reviewed-by: Peter Xu <peterx@redhat.com>
-> >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> >>---
-> >[...]
-> >
-> >>  static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-> >>-        void *from_addr, uint64_t pagesize)
-> >>+                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
-> >>  {
-> >>+    int ret;
-> >>      if (from_addr) {
-> >>          struct uffdio_copy copy_struct;
-> >>          copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
-> >>          copy_struct.src = (uint64_t)(uintptr_t)from_addr;
-> >>          copy_struct.len = pagesize;
-> >>          copy_struct.mode = 0;
-> >>-        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> >>+        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> >>      } else {
-> >>          struct uffdio_zeropage zero_struct;
-> >>          zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
-> >>          zero_struct.range.len = pagesize;
-> >>          zero_struct.mode = 0;
-> >>-        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> >>+        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> >>+    }
-> >>+    if (!ret) {
-> >>+        ramblock_recv_bitmap_set(host_addr, rb);
-> >Wait...
-> >
-> >Now we are using 4k-page/bit bitmap, do we need to take care of the
-> >huge pages here?  Looks like we are only setting the first bit of it
-> >if it is a huge page?
-> First version was per ramblock page size, IOW bitmap was smaller in
-> case of hugepages.
+Good. This patch resolves the problem I mentioned in previous verion.
 
-Yes, but this is not the first version any more. :)
+Thanks for your work.
 
-This patch is using:
 
-  bitmap_new(rb->max_length >> TARGET_PAGE_BITS);
-
-to allocate bitmap, so it is using small pages always for bitmap,
-right? (I should not really say "4k" pages, here I think the size is
-host page size, which is the thing returned from getpagesize()).
-
-> 
-> 
-> You mentioned that TARGET_PAGE_SIZE is reasonable for precopy case,
-> in "Re: [Qemu-devel] [PATCH v1 2/2] migration: add bitmap for copied page"
-> I though TARGET_PAGE_SIZE as transmition unit, is using in precopy even
-> hugepage case.
-> But it's not so logically, page being marked as dirty, should be sent as a
-> whole page.
-
-Sorry if I misunderstood, but I didn't see anything wrong - we are
-sending pages in small pages, but when postcopy is there, we do
-UFFDIO_COPY in huge page, so everything is fine?
-
--- 
-Peter Xu
+=D4=DA 2017/7/25 =CF=C2=CE=E711:33, Cornelia Huck =D0=B4=B5=C0:
+> Only set the zpci feature bit on builds that actually support pci.
+>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   hw/s390x/s390-pci-bus.c  | 5 +++++
+>   hw/s390x/s390-pci-bus.h  | 1 +
+>   hw/s390x/s390-ci-stub.c | 4 ++++
+>   target/s390x/kvm.c       | 2 +-
+>   4 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index c57f6ebae0..7b30d4c7bd 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -34,6 +34,11 @@
+>           }                                                         \
+>       } while (0)
+>
+> +void pci_enable_zpci_feature(S390CPUModel *model)
+> +{
+> +    set_bit(S390_FEAT_ZPCI, model->features);
+> +}
+> +
+>   S390pciState *s390_get_phb(void)
+>   {
+>       static S390pciState *phb;
+> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+> index 5df6292509..d8796536b0 100644
+> --- a/hw/s390x/s390-pci-bus.h
+> +++ b/hw/s390x/s390-pci-bus.h
+> @@ -333,4 +333,5 @@ S390PCIBusDevice *s390_pci_find_dev_by_fid(S390pciS=
+tate *s, uint32_t fid);
+>   S390PCIBusDevice *s390_pci_find_next_avail_dev(S390pciState *s,
+>                                                  S390PCIBusDevice *pbde=
+v);
+>
+> +void pci_enable_zpci_feature(S390CPUModel *model);
+>   #endif
+> diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
+> index cc7278a865..8ceaf482e7 100644
+> --- a/hw/s390x/s390-pci-stub.c
+> +++ b/hw/s390x/s390-pci-stub.c
+> @@ -72,3 +72,7 @@ S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciSta=
+te *s, uint32_t idx)
+>   {
+>       return NULL;
+>   }
+> +
+> +void pci_enable_zpci_feature(S390CPUModel *model)
+> +{
+> +}
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index c4c5791d27..866ac3d414 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2662,7 +2662,7 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *mo=
+del, Error **errp)
+>       }
+>
+>       /* We emulate a zPCI bus and AEN, therefore we don't need HW supp=
+ort */
+> -    set_bit(S390_FEAT_ZPCI, model->features);
+> +    pci_enable_zpci_feature(model);
+>       set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
+>
+>       if (s390_known_cpu_type(cpu_type)) {
