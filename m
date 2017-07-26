@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1daM3t-0002tS-75
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1daM42-000306-Fm
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1daM3s-0005R3-1g
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60348)
+	(envelope-from <ehabkost@redhat.com>) id 1daM3z-0005eW-Bp
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1daM3r-0005Oi-OK
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:11 -0400
-Date: Wed, 26 Jul 2017 10:00:25 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1daM3z-0005cH-6K
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 09:09:19 -0400
+Date: Wed, 26 Jul 2017 10:01:20 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170726130025.GD20793@localhost.localdomain>
+Message-ID: <20170726130120.GE20793@localhost.localdomain>
 References: <20170725150951.16038-1-ldoktor@redhat.com>
-	<20170725150951.16038-6-ldoktor@redhat.com>
-	<20170725160639.GO2757@localhost.localdomain>
-	<e9246b9c-c004-3647-edb7-44e849f33f94@redhat.com>
+	<20170725150951.16038-10-ldoktor@redhat.com>
+	<20170725193442.GS2757@localhost.localdomain>
+	<a0a70f94-54a4-737e-cd17-478ff2ba854c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e9246b9c-c004-3647-edb7-44e849f33f94@redhat.com>
+In-Reply-To: <a0a70f94-54a4-737e-cd17-478ff2ba854c@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] qemu.py: Use custom exceptions
- rather than Exception
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] qmp.py: Avoid overriding a
+ builtin object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +34,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
 Cc: qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, mreitz@redhat.com, f4bug@amsat.org, armbru@redhat.com
 
-On Wed, Jul 26, 2017 at 06:39:28AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> Dne 25.7.2017 v 18:06 Eduardo Habkost napsal(a):
-> > On Tue, Jul 25, 2017 at 05:09:46PM +0200, Luk=C3=A1=C5=A1 Doktor wrot=
+On Wed, Jul 26, 2017 at 06:46:30AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> Dne 25.7.2017 v 21:34 Eduardo Habkost napsal(a):
+> > On Tue, Jul 25, 2017 at 05:09:50PM +0200, Luk=C3=A1=C5=A1 Doktor wrot=
 e:
-> >> The naked Exception should not be widely used. It makes sense to be =
-a
-> >> bit more specific and use better-suited custom exceptions. As a bene=
-fit
-> >> we can store the full reply in the exception in case someone needs i=
-t
-> >> when catching the exception.
+> >> The "id" is a builtin method to get object's identity and should not=
+ be
+> >> overridden. This might bring some issues in case someone was directl=
+y
+> >> calling "cmd(..., id=3Did)" but I haven't found such usage on brief =
+search
+> >> for "cmd\(.*id=3D".
 > >>
 > >> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> >> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> ---
-> >>  scripts/qemu.py | 17 +++++++++++++++--
-> >>  1 file changed, 15 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> >> index 5948e19..e6df54c 100644
-> >> --- a/scripts/qemu.py
-> >> +++ b/scripts/qemu.py
-> >> @@ -19,6 +19,19 @@ import subprocess
-> >>  import qmp.qmp
-> >> =20
-> >> =20
-> >> +class MonitorResponseError(qmp.qmp.QMPError):
-> >> +    '''
-> >> +    Represents erroneous QMP monitor reply
-> >> +    '''
-> >> +    def __init__(self, reply):
-> >> +        try:
-> >> +            desc =3D reply["error"]["desc"]
-> >> +        except KeyError:
-> >> +            desc =3D reply
-> >                       ^^^ (*)
-> >> +        super(MonitorResponseError, self).__init__(repr(desc))
 > >=20
-> > This will end up calling Exception.__init__.  I previously
-> > suggested repr(desc) above(*) because I didn't know what happened
-> > when the Exception.__init__ argument is not a string.
+> > I don't see the benefit of the patch, as the function is very
+> > short and unlikely to ever use the id() builtin.  But I am not
+> > against it if it will silence code analyzer warnings.
 > >=20
-> > I couldn't find any documentation on the right argument types for
-> > Exception.__init__.  The examples in the Python documentation[1]
-> > don't call Exception.__init__ at all: they simply implement
-> > __str__().
-> >=20
-> > However, based on my testing and on the BaseException
-> > documentation[2], I believe repr() isn't really necessary:
-> >=20
-> > "If str() or unicode() is called on an instance of this class,
-> > the representation of the argument(s) to the instance are
-> > returned, or the empty string when there were no arguments."
-> >=20
-> > So your previous version was good, already.
-> >=20
-> > But maybe we could do this instead, to make the constructor as
-> > simple as possible:
-> >=20
-> > class MonitorResponseError(qmp.qmp.QMPError):
-> >     def __init__(self, reply):
-> >         self.reply =3D reply
-> >=20
-> >     def __str__(self):
-> >         return self.reply.get('error', {}).get('desc', repr(self.repl=
-y))
-> >=20
-> Well I know I can implement custom `__str__` class, but the
-> default one simply stores the argument as string and reports
-> it, so for simple strings I usually go with super call and with
-> complex ones with custom `__str__`. Anyway if this suits this
-> project style better I'll change it in v2.
+> For me the biggest benefit is it decreases the probability of
+> someone copying the same "idea" to other pieces of code,
+> because, you know, developers are using copy&paste way too
+> often.
+>=20
+> Anyway pylint does complain about this issue. I can either
+> ignore it, skip it with an informative comment `# use id for
+> backward compatibility pylint: disable=3DW0622` or use this patch
+> to fix it properly. I'm inclined towards fixing it (until it
+> poisons other parts of the code), you are in favor of ignoring
+> it, so let's see whether someone else has another opinion,
+> otherwise I'll remove it in v3.
 
-If you prefer it, your previous version (without repr) was good
-enough to me.
+If pylint complains about it, it won't hurt to make it happy.
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
 --=20
 Eduardo
