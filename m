@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1da9l8-0006OL-05
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 20:01:03 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1daA1v-0001Bh-E9
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 20:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1da9l2-0006wn-Sq
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 20:01:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53645)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1daA1s-0004IR-2v
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 20:18:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1da9l2-0006vo-JZ
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 20:00:56 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1daA1r-0004Ge-ON
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 20:18:19 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6Q00ph6123929
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:00:55 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bx8t23mg2-1
+	v6Q0FmJ4088250
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:18:17 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxavfy0ma-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:00:52 -0400
+	for <qemu-devel@nongnu.org>; Tue, 25 Jul 2017 20:18:17 -0400
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 25 Jul 2017 17:59:01 -0600
-Content-Type: text/plain; charset="utf-8"
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 25 Jul 2017 18:18:16 -0600
+References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
+	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 25 Jul 2017 20:18:13 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170725011530.17958-1-f4bug@amsat.org>
-References: <20170725011530.17958-1-f4bug@amsat.org>
-Date: Tue, 25 Jul 2017 18:03:47 -0500
-Message-Id: <150102382734.26979.483898024984598924@loki>
-Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
- extension on windows
+In-Reply-To: <1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <5a3a8c55-6306-9055-2aa1-6d1cb1242e93@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,69 +41,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Daniel Rempel <daniel@daynix.com>, Sameeh Jubran <sjubran@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
-Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-24 20:15:30)
-> Reported-by: Sameeh Jubran <sjubran@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> original report from Sameeh Jubran:
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00906.html
+On 07/18/2017 04:49 AM, Amarnath Valluri wrote:
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 64cecc3..41f0b7a 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,2 +1,3 @@
+>   common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
+>   common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o tpm_util.o
+> +common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o tpm_util.o
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> new file mode 100644
+> index 0000000..c90914c
+> --- /dev/null
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -0,0 +1,973 @@
+> +/*
+> + *  emulator TPM driver
+> + *
+> + *  Copyright (c) 2017 Intel Corporation
+> + *  Author: Amarnath Valluri <amarnath.valluri@intel.com>
+> + *
+> + *  Copyright (c) 2010 - 2013 IBM Corporation
+> + *  Authors:
+> + *    Stefan Berger <stefanb@us.ibm.com>
+> + *
+> + *  Copyright (C) 2011 IAIK, Graz University of Technology
+> + *    Author: Andreas Niederl
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/sockets.h"
+> +#include "io/channel-socket.h"
+> +#include "sysemu/tpm_backend.h"
+> +#include "tpm_int.h"
+> +#include "hw/hw.h"
+> +#include "hw/i386/pc.h"
+> +#include "tpm_util.h"
+> +#include "tpm_ioctl.h"
+> +#include "migration/migration.h"
+> +#include "qapi/error.h"
+> +
+> +#include <fcntl.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +#include <stdio.h>
+> +
+> +#define DEBUG_TPM 0
+> +
+> +#define DPRINT(fmt, ...) do { \
+> +    if (DEBUG_TPM) { \
+> +        fprintf(stderr, fmt, ## __VA_ARGS__); \
+> +    } \
+> +} while (0);
+> +
+> +#define DPRINTF(fmt, ...) DPRINT("tpm-emulator: "fmt"\n", __VA_ARGS__)
+> +
+> +#define TYPE_TPM_EMULATOR "tpm-emulator"
+> +#define TPM_EMULATOR(obj) \
+> +    OBJECT_CHECK(TPMEmulator, (obj), TYPE_TPM_EMULATOR)
+> +
+> +static const TPMDriverOps tpm_emulator_driver;
+> +
+> +/* data structures */
+> +typedef struct TPMEmulator {
+> +    TPMBackend parent;
+> +
+> +    TPMEmulatorOptions *ops;
+> +    QIOChannel *data_ioc;
+> +    QIOChannel *ctrl_ioc;
+> +    bool op_executing;
+> +    bool op_canceled;
+> +    bool child_running;
+> +    TPMVersion tpm_version;
+> +    ptm_cap caps; /* capabilities of the TPM */
+> +    uint8_t cur_locty_number; /* last set locality */
+> +    QemuMutex state_lock;
+> +    Error *migration_blocker;
+> +} TPMEmulator;
+> +
+> +#define TPM_DEFAULT_EMULATOR "swtpm"
+> +#define TPM_DEFAULT_LOGLEVEL 5
+> +#define TPM_EMULATOR_PIDFILE "/tmp/qemu-tpm.pid"
 
-AFAICT the issue discussed in the context of that patch is simply that
-the qemu-ga.exe file isn't deleted as part of `make clean`, which does
-seem to be an issue.
+swtpm will write this file and remove it when it terminates. You may run 
+into concurrency problems as well. I would extend this name with the pid 
+of the QEMU process starting swtpm.
 
-But qemu.ga.exe is created just fine as part of `make qemu-ga`, at least
-as of:
-
-  fafcaf1d build: qemu-ga: add 'qemu-ga' build target for w32
-
-The 'qemu-ga' target is actually an intermediate target which, on w32,
-creates the MSI package (if configured) as well as qemu-ga.exe.
-
-> =
-
->  Makefile  | 2 +-
->  configure | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/Makefile b/Makefile
-> index ef721480eb..5f18243d05 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -490,7 +490,7 @@ clean:
->         rm -f qemu-options.def
->         rm -f *.msi
->         find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name =
-'*.[oda]' \) -type f -exec rm {} +
-> -       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS csco=
-pe.* *.pod *~ */*~
-> +       rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.p=
-od *~ */*~
->         rm -f fsdev/*.pod
->         rm -f qemu-img-cmds.h
->         rm -f ui/shader/*-vert.h ui/shader/*-frag.h
-> diff --git a/configure b/configure
-> index 48d4d7a2a7..f8b1d014d7 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5073,7 +5073,7 @@ fi
-> =
-
->  if [ "$guest_agent" !=3D "no" ]; then
->    if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes" -o=
- "$mingw32" =3D "yes" ] ; then
-> -      tools=3D"qemu-ga $tools"
-> +      tools=3D"qemu-ga\$(EXESUF) $tools"
->        guest_agent=3Dyes
->    elif [ "$guest_agent" !=3D yes ]; then
->        guest_agent=3Dno
-> -- =
-
-> 2.13.3
-> =
-
->=20
+    Stefan
