@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daJfr-0001AU-Jd
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:36:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1daJgp-0001f9-Dt
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daJfn-0000P3-RB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:36:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55162)
+	(envelope-from <eblake@redhat.com>) id 1daJgl-0000sj-0f
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:37:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daJfn-0000Of-Ho
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:36:11 -0400
-Date: Wed, 26 Jul 2017 11:35:53 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170726103553.GC7620@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
-	<1499952476-3454-7-git-send-email-armbru@redhat.com>
-	<20170717101906.GC5301@noname.redhat.com>
-	<87a842b9yo.fsf@dusky.pond.sub.org>
-	<87bmoauz2s.fsf@dusky.pond.sub.org>
-	<5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
-	<20170725190818.GQ2757@localhost.localdomain>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1daJgk-0000s4-NG
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 06:37:10 -0400
+References: <20170725011530.17958-1-f4bug@amsat.org>
+	<150102382734.26979.483898024984598924@loki>
+	<cb21f5d1-18be-51a4-5e51-e429ab4b1b46@amsat.org>
+	<150103762159.26979.13316299204767598566@loki>
+	<150103777491.26979.16844695290515425301@loki>
+	<cd92adf7-d750-a4e3-d4b6-b339cd7e7e11@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <12dec790-eeff-d0d2-a949-38af96902393@redhat.com>
+Date: Wed, 26 Jul 2017 05:37:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170725190818.GQ2757@localhost.localdomain>
-Subject: Re: [Qemu-devel] Slow tests on "make check" (was Re: [PULL 6/9]
- Convert error_report() to warn_report())
+In-Reply-To: <cd92adf7-d750-a4e3-d4b6-b339cd7e7e11@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rfjuvNSCJP6vgNDe5dciF7m4iQW9FEwjm"
+Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
+ extension on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +33,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Sameeh Jubran <sjubran@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Jul 25, 2017 at 04:08:18PM -0300, Eduardo Habkost wrote:
-> On Mon, Jul 24, 2017 at 09:30:06AM +0200, Paolo Bonzini wrote:
-> > On 24/07/2017 08:30, Markus Armbruster wrote:
-> > > Markus Armbruster <armbru@redhat.com> writes:
-> > > 
-> > >> Kevin Wolf <kwolf@redhat.com> writes:
-> > >>
-> > >>> Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
-> > >>>> From: Alistair Francis <alistair.francis@xilinx.com>
-> > >>>>
-> > >>>> Convert all uses of error_report("warning:"... to use warn_report()
-> > >>>> instead. This helps standardise on a single method of printing warnings
-> > >>>> to the user.
-> > >>>>
-> > >>>> All of the warnings were changed using these two commands:
-> > >>>>     find ./* -type f -exec sed -i \
-> > >>>>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
-> > >>>>
-> > >>>> Indentation fixed up manually afterwards.
-> > >>>>
-> > >>>> The test-qdev-global-props test case was manually updated to ensure that
-> > >>>> this patch passes make check (as the test cases are case sensitive).
-> > >>>
-> > >>> This patch broke qemu-iotests 051 because it neglected to update the
-> > >>> reference output. Not sure if a change of the message was even intended,
-> > >>> but with a error location prefix, the order changes:
-> > >>>
-> > >>> -(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
-> > >>> +(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
-> > >>>
-> > >>> Personally, I would expect the error location or at least the program
-> > >>> name to come first even for warnings.
-> > >>
-> > >> I'll fix it.
-> > >>
-> > >> While focusing on something other than block, I forget qemu-iotests
-> > >> exist.  My fault, but it's a pretty common fault.  I reiterate my plea
-> > >> to include (a sensible subset of) it in "make check".
-> > > 
-> > > Oh, 051 isn't run by "make check-block".  It could just as well not
-> > > exist then.
-> > > 
-> > > What's the recommended way to run all iotests a build of QEMU can run?
-> > 
-> > I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
-> > 
-> > There are two issues with check-block:
-> > 
-> > * tests that require QEMU are skipped (rationale: you might be building
-> > without the x86_64-softmmu target).
-> > 
-> > * it only runs the "quick" group, but I think we should reverse the
-> > direction and mark slow tests specifically (that would cut about 10
-> > minutes out of the 20).
-> 
-> About slow tests: I never included device-crash-test on "make
-> check" because it would take too long to run.  Also, "make
-> check-help" lies when it says "make check" runs all tests,
-> because it doesn't run check-block.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rfjuvNSCJP6vgNDe5dciF7m4iQW9FEwjm
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
+ Sameeh Jubran <sjubran@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek
+ <lersek@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <12dec790-eeff-d0d2-a949-38af96902393@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] configure: fix qemu-ga missing '.exe'
+ extension on windows
+References: <20170725011530.17958-1-f4bug@amsat.org>
+ <150102382734.26979.483898024984598924@loki>
+ <cb21f5d1-18be-51a4-5e51-e429ab4b1b46@amsat.org>
+ <150103762159.26979.13316299204767598566@loki>
+ <150103777491.26979.16844695290515425301@loki>
+ <cd92adf7-d750-a4e3-d4b6-b339cd7e7e11@amsat.org>
+In-Reply-To: <cd92adf7-d750-a4e3-d4b6-b339cd7e7e11@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Even if you also run "check-block", it would still be a lie because you'd
-not be running block tests for anything other than qcow2, which is far
-from "all tests".
+On 07/25/2017 10:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+
+>>> - rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS
+>>> cscope.* *.pod *~ */*~
+>>> + rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga${EXESUF}
+>>> TAGS cscope.* *.pod *~ */*~
+>>>
+>>> It's a bit ugly since `rm -f qemu-ga.exe` would silently fail on posi=
+x,
+
+But that's the whole point of 'rm -f' - to silently ignore files that
+didn't exist.
+
+>>
+>> On w32 I mean, sorry.
+>=20
+> side question: should we use $(RM) with something like:
+>=20
+> ifeq ($(OS),Windows_NT)
+>     RM =3D cmd //C del //Q //F
+> else
+>     RM =3D rf -f
+> endif
+>=20
+
+Absolutely not.  We can at least assume a mingw-like environment that
+has all the usual tools like rm.
+
+>>>
+>>> Alternatively, you can explicitly check for qemu-ga.exe and remove it=
+ if
+>>> it exists. I would consider either acceptable, but not this patch as =
+it
+>>> currently stands.
+
+But that's what 'rm -f' already does - I don't see the point in adding a
+racy check for existence prior to deletion, when deletion already
+handles the race.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--rfjuvNSCJP6vgNDe5dciF7m4iQW9FEwjm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll4cNMACgkQp6FrSiUn
+Q2pOwQgArZKuUgRpyWf8xlJj30OH05wlaxvDxxNUkJdDybSsUM3Pn7cReyXY+heu
+5tPVJYiWSbEA2gZ7qlRHYWhdeoTm5r1AtI+AcL6F3JuUW2N/2uypvoki342sLyJo
+dCz0lx9xZHGybtwG/wm6Qf8OTol7WPbocuy60Nv3anpmAMLUwQUZfDZ0f2y6OQFr
+P6ACmf857DHDfJIMTcQW9caMj/lQQwVrNRI3JCI2h9J/47jnsuGB+Q4/QLv55PJi
+b9hGU+1x0QyT4ojjbvBD8pLnzJxlrXnj23gTb/G2wUhJJhsEi/XHdSKU5AHBYmj7
+sLeLbxK7G0ZyIIK5DHPV9LmxxQ6R8w==
+=bHNX
+-----END PGP SIGNATURE-----
+
+--rfjuvNSCJP6vgNDe5dciF7m4iQW9FEwjm--
