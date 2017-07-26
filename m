@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1daQep-0000WJ-E4
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:03:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1daQqw-0004fs-O9
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1daQem-00087Z-57
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:03:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1daQel-000878-RX
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:03:36 -0400
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-14-dgilbert@redhat.com>
-	<0485818d-69e4-071e-572a-be4e111fe8c4@redhat.com>
-	<20170726174230.GC8648@work-vm>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <0fde17a4-5ae1-c628-bdac-b5143ddb6f14@redhat.com>
-Date: Wed, 26 Jul 2017 20:03:20 +0200
+	(envelope-from <bounces@canonical.com>) id 1daQqu-0007Aq-2o
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:16:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1daQqt-0007AQ-Sp
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 14:16:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1daQqq-0007em-Ok
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 18:16:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8AB462E80CF
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 18:16:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170726174230.GC8648@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 13/29] vhost+postcopy: Transmit 'listen' to
- client
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 26 Jul 2017 18:00:58 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1096714 <1096714@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130107012337.1165.80927.malonedeb@gac.canonical.com>
+Message-Id: <150109205863.31580.16835536325744423471.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1096714] Re: qemu 1.3.0: usb devices shouldn't
+ have same vendor/product ID and same serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
 
+Hi Sven,
+  Hmm you do have a point - I wonder if this is fixed on windows by commit =
+5319dc7 from Gerd in November 2013 that added 'msos-desc' compat properties=
+; but I see your point about having the same IDs
 
+(ccing in Gerd)
 
-On 07/26/2017 07:42 PM, Dr. David Alan Gilbert wrote:
-> * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
->>
->>
->> On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
->>> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
->>> index b98fbe4834..1f70f5760f 100644
->>> --- a/hw/virtio/vhost-user.c
->>> +++ b/hw/virtio/vhost-user.c
->>> @@ -67,6 +67,7 @@ typedef enum VhostUserRequest {
->>>        VHOST_USER_SET_SLAVE_REQ_FD = 21,
->>>        VHOST_USER_IOTLB_MSG = 22,
->>>        VHOST_USER_POSTCOPY_ADVISE  = 23,
->>> +    VHOST_USER_POSTCOPY_LISTEN  = 24,
->>>        VHOST_USER_MAX
->>>    } VhostUserRequest;
->>> @@ -771,6 +772,25 @@ static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **errp)
->>>        return 0;
->>>    }
->>> +/*
->>> + * Called at the switch to postcopy on reception of the 'listen' command.
->>> + */
->>> +static int vhost_user_postcopy_listen(struct vhost_dev *dev, Error **errp)
->>> +{
->>> +    VhostUserMsg msg = {
->>> +        .request = VHOST_USER_POSTCOPY_LISTEN,
->>> +        .flags = VHOST_USER_VERSION,
->>> +    };
->>
->> I think it should use REPLY_ACK feature when available for two reasons:
->> 1. The backend could reply nack if nregions is already set.
->> 2. When leaving vhost_user_postcopy_listen(), the message might likely
->>     not have been handled yet by the backend.
-> 
-> OK, I can do that.  What are the rules on features like that?   Can I
-> just assume that if you've got POSTCOPY then you'll ack for new messages
-> we add?
+-- =
 
-You can have a look at vhost_user_net_set_mtu() for example.
-Before sending the message, just set VHOST_USER_NEED_REPLY_MASK bit in
-message's flags if VHOST_USER_PROTOCOL_F_REPLY_ACK is advertised by the
-backend.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1096714
 
-After having sent the message, instead of returning directly, wait for
-the ack/nack by calling process_message_reply() if
-VHOST_USER_PROTOCOL_F_REPLY_ACK is advertised.
+Title:
+  qemu 1.3.0: usb devices shouldn't have same vendor/product ID and same
+  serial
 
-> The current contrib/libvhost-user code doesn't seem to do acks yet, but
-> I can add it here quite easily.
+Status in QEMU:
+  New
 
-Yes, agree it is not implemented in libvhost-user, but we will be able
-to test it with DPDK prototype.
+Bug description:
+  Boot Windows XP with
+  ./qemu-system-i386 -device pci-ohci -device usb-tablet
+  and then with
+  ./qemu-system-i386 -device pci-ohci -device usb-kbd
 
-Thanks,
-Maxime
+  and you will notice, that the usb keyboard is not detected. In fact,
+  Windows XP detects the usb tablet and loads the driver for the tablet
+  instead of the driver for the keyboard.
 
-> Dave
-> 
->>> +    trace_vhost_user_postcopy_listen();
->>> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
->>> +        error_setg(errp, "Failed to send postcopy_listen to vhost");
->>> +        return -1;
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>>    static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
->>>                                            void *opaque)
->>>    {
->>> @@ -793,6 +813,9 @@ static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
->>>        case POSTCOPY_NOTIFY_INBOUND_ADVISE:
->>>            return vhost_user_postcopy_advise(dev, pnd->errp);
->>> +    case POSTCOPY_NOTIFY_INBOUND_LISTEN:
->>> +        return vhost_user_postcopy_listen(dev, pnd->errp);
->>> +
->>>        default:
->>>            /* We ignore notifications we don't know */
->>>            break;
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+  The problem seems to be, that vendor and product ID and even the
+  seriel of both the usb tablet and the usb keyboard are the same as an
+  lsusb reveiles. Hence, Windows XP doesn't detect when you replace the
+  tablet by a keyboard and vice versa. I didn't check other USB devices,
+  but it seems a bad idea to me to have devices with the same
+  vendor/product Id. I'm not aware, whether it is sufficient to change
+  the seriel numbers of the devices.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1096714/+subscriptions
