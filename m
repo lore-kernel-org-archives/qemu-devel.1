@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daBeV-0008N9-75
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:02:20 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1daBvV-00025T-Sy
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:19:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daBeS-0004pz-4u
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:02:19 -0400
-Date: Wed, 26 Jul 2017 12:02:04 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170726020204.GK8978@umbus.fritz.box>
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-15-git-send-email-clg@kaod.org>
-	<20170724063534.GM17228@umbus.fritz.box>
-	<fa7a0b3f-89d5-b1ef-238d-0bda41beee9f@kaod.org>
-	<20170725042027.GC8978@umbus.fritz.box>
-	<1d7d50ee-7559-2e6b-4ed0-741d810052d0@kaod.org>
-	<20170725132129.GH8978@umbus.fritz.box>
-	<e579aef2-d8b3-180a-5250-2016060a6a05@kaod.org>
+	(envelope-from <wei.w.wang@intel.com>) id 1daBvQ-0003AT-Ti
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:19:53 -0400
+Received: from mga03.intel.com ([134.134.136.65]:43181)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1daBvQ-00037U-Iz
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 22:19:48 -0400
+Message-ID: <5977FCDF.7040606@intel.com>
+Date: Wed, 26 Jul 2017 10:22:23 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NhBACjNc9vV+/oop"
-Content-Disposition: inline
-In-Reply-To: <e579aef2-d8b3-180a-5250-2016060a6a05@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 14/26] ppc/xive: add MMIO handlers to
- the XIVE interrupt presenter model
+References: <20170717152448.GN12888@dhcp22.suse.cz>
+	<596D6E7E.4070700@intel.com>
+	<20170719081311.GC26779@dhcp22.suse.cz>
+	<596F4A0E.4010507@intel.com>
+	<20170724090042.GF25221@dhcp22.suse.cz>
+	<59771010.6080108@intel.com>
+	<20170725112513.GD26723@dhcp22.suse.cz>
+	<597731E8.9040803@intel.com>
+	<20170725124141.GF26723@dhcp22.suse.cz>
+	<286AC319A985734F985F78AFA26841F739283F62@shsmsx102.ccr.corp.intel.com>
+	<20170725145333.GK26723@dhcp22.suse.cz>
+In-Reply-To: <20170725145333.GK26723@dhcp22.suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,133 +38,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Michal Hocko <mhocko@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
+
+On 07/25/2017 10:53 PM, Michal Hocko wrote:
+> On Tue 25-07-17 14:47:16, Wang, Wei W wrote:
+>> On Tuesday, July 25, 2017 8:42 PM, hal Hocko wrote:
+>>> On Tue 25-07-17 19:56:24, Wei Wang wrote:
+>>>> On 07/25/2017 07:25 PM, Michal Hocko wrote:
+>>>>> On Tue 25-07-17 17:32:00, Wei Wang wrote:
+>>>>>> On 07/24/2017 05:00 PM, Michal Hocko wrote:
+>>>>>>> On Wed 19-07-17 20:01:18, Wei Wang wrote:
+>>>>>>>> On 07/19/2017 04:13 PM, Michal Hocko wrote:
+>>>>>>> [...
+>>>> We don't need to do the pfn walk in the guest kernel. When the API
+>>>> reports, for example, a 2MB free page block, the API caller offers to
+>>>> the hypervisor the base address of the page block, and size=2MB, to
+>>>> the hypervisor.
+>>> So you want to skip pfn walks by regularly calling into the page allocator to
+>>> update your bitmap. If that is the case then would an API that would allow you
+>>> to update your bitmap via a callback be s sufficient? Something like
+>>> 	void walk_free_mem(int node, int min_order,
+>>> 			void (*visit)(unsigned long pfn, unsigned long nr_pages))
+>>>
+>>> The function will call the given callback for each free memory block on the given
+>>> node starting from the given min_order. The callback will be strictly an atomic
+>>> and very light context. You can update your bitmap from there.
+>> I would need to introduce more about the background here:
+>> The hypervisor and the guest live in their own address space. The hypervisor's bitmap
+>> isn't seen by the guest. I think we also wouldn't be able to give a callback function
+>> from the hypervisor to the guest in this case.
+> How did you plan to use your original API which export struct page array
+> then?
 
 
---NhBACjNc9vV+/oop
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That's where the virtio-balloon driver comes in. It uses a shared ring 
+mechanism to
+send the guest memory info to the hypervisor.
 
-On Tue, Jul 25, 2017 at 05:01:48PM +0200, C=E9dric Le Goater wrote:
-> On 07/25/2017 03:21 PM, David Gibson wrote:
-> > On Tue, Jul 25, 2017 at 11:08:46AM +0200, C=E9dric Le Goater wrote:
-> >> On 07/25/2017 06:20 AM, David Gibson wrote:
-> >>> On Mon, Jul 24, 2017 at 04:44:00PM +0200, C=E9dric Le Goater wrote:
-> >>>> On 07/24/2017 08:35 AM, David Gibson wrote:
-> >>>>> On Wed, Jul 05, 2017 at 07:13:27PM +0200, C=E9dric Le Goater wrote:
-> >>>>>> The Thread Interrupt Management Area for the OS is mostly used to
-> >>>>>> acknowledge interrupts and set the CPPR of the CPU.
-> >>>>>>
-> >>>>>> The TIMA is mapped at the same address for each CPU. 'current_cpu'=
- is
-> >>>>>> used to retrieve the targeted interrupt presenter object.
-> >>>>>>
-> >>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>>>>
-> >>>>> Am I right in thinking that this shoehorns the XIVE TIMA state into
-> >>>>> the existing XICS ICP object.  That.. doesn't seem like a good idea.
-> >>>>
-> >>>> The TIMA memory region is under the XIVE object because it is=20
-> >>>> unique for the system. The lookup of the ICP is simply done using=20
-> >>>> 'current_cpu'. The TIMA state is under the ICPState, yes, but this=
-=20
-> >>>> model does not seem incorrect to me as this state contains the=20
-> >>>> interrupt information presented to a CPU.
-> >>>
-> >>> Yeah, that's not the point I'm making.  My point is that the TIMA
-> >>> state isn't really the same as xics ICP state.  You're squeezing one
-> >>> into the other in a pretty ugly way.
-> >>
-> >> yes, well, we need to have compatible objects between the XICS and XIV=
-E=20
-> >> mode because of the CAS negotiation. for migration compatibility, it i=
-s=20
-> >> much easier to extend existing objects. This approach I am taking toda=
-y.
-> >=20
-> > Yeah, I really don't think this approach is workable.
-> >=20
-> > Roughly speaking, you're keeping the same structures between xics and
-> > xive, but with mostly different code.  I can't see any way that's not
-> > going to be horribly fragile, with any update to xics OR xive
-> > requiring enormous caution not to break the other.
-> >=20
-> > I really think we have to go one of two ways:
-> >=20
-> > 1) Abstract the notion of interrupt source and interrupt presenter, so
-> > we can use a truly common model between xics and xive.
-> >=20
-> > Given the differences between the two, I don't know this is even
-> > possible.
-> >=20
-> > 2) Separate the objects entirely.  ICPs are entirely separate from
-> > TIMAs, like wise ICSes and xive interrupt sources.
-> >=20
-> > I think this is probably the way to go.  To make this work with CAS
-> > switching will require different methods, but I don't think it's
-> > impossible.
-> >
-> > For example, we could (on the new machine type) create both xics ICSes
-> > and ICPs and xive sources and TIMAs.  We'd have a (migrated) flag in
-> > the machine saying which is currently active.  All the objects would
-> > hang around, but only the active ones would do anything.
->=20
-> ok. There is still the question of sharing the IRQ numbers unless we=20
-> find away to allocate them after the CAS negotiation.=20
+We didn't expose the struct page array from the guest to the hypervisor. 
+For example, when
+a 2MB free page block is reported from the free page list, the info put 
+on the ring is just
+(base address of the 2MB continuous memory, size=2M).
 
-Right.  As I said, I think allocating after CAS is probably possible,
-but it may not be necessary.
 
-Merely lining up the irq numbers should be much simpler than actually
-fusing the source and presenter structures.  Especially since both
-xics and xive are flexible enough that we can map the irqs almost
-however we want.
+>
+>>> This would address my main concern that the allocator internals would get
+>>> outside of the allocator proper.
+>> What issue would it have to expose the internal, for_each_zone()?
+> zone is a MM internal concept. No code outside of the MM proper should
+> really care about zones.
 
-This definitely does mean the irq mapping / allocation should sit
-inside the machine type, rather than the xics *or* the xive code, and
-preferably be entirely common.  Then it's just a matter of setting up
-both the xics and xive components so they can back that irq allocation.
+I think this is also what Andrew suggested in the previous discussion:
+https://lkml.org/lkml/2017/3/16/951
 
-> I will take a look at KVM support now before reworking the patchset.
->=20
-> Thanks,
->=20
-> C.
->=20
-> > Now obviously that means we'd be migrating a bunch of redundant state,
-> > but I still think it's preferable to a Frankenstinian fusion of
-> > xics-ish and xive-ish state.  I think there's a good chance we can
-> > improve on the basic idea to remove most or all of that redundant
-> > state.
-> >=20
->=20
+Move the code to virtio-balloon and a little layering violation seems 
+acceptable.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---NhBACjNc9vV+/oop
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll3+BwACgkQbDjKyiDZ
-s5IZiQ//WK+vMj8vjofcTNi5eXBevHHzkoEHpMTrzsMBYtSdakmLPv3/Yd4YvrCZ
-eQJ1hHr9Nk5fUQiUsjM7zb6VXAO2lDZzAV637/wro1DNbZxn+nX5VEhM3/FV7Fr3
-mUY/aH4R3HkdNdLQ/ka4Nq8kZ0+IJdNROsqMoJfNkL6cYvVrQ836lhffDzlaVXaH
-3z8fseaYGBEMQJpHfBEHPZK8XQBn4WCajHkzI7DLmrP4riIiQfh54Ed8H+FS8CJE
-CbpH/8n8WHNeZ4BGH3AJE5dMhFkNwl9nc3bwlObXdlCF5JXFxavaA+h6ih8DO+bk
-iOjpWPLJ3KpIgPK6xbcbLwJc8ROJwI0XFA1JcoZIYWUnd0YEPWJqfVzv+ICmAsqR
-ieG192REnewGGrZv0zbuld/+xYVP3sxXTjb1xDlhRW50RZU/1zDVfKeyACWS4lO6
-1tUAfykT+vTy7tjktD7IzRempgQpF/sH+9uY2KdqUWDQXD+bVJV0/O/BU6ePVhN9
-N9MoyX56SeiIhzcn4kCquQjDi3ovNVPDsQQmeGZCl/LUMIjB+icxgONo2128F+zp
-nBTWcge4e1f091kzGVTaV8enW1lCvr5Qz0Ts+JVHHI5LwTTzIh4OLR7IkZ/6RVwO
-7UtzJzUuYpklWSEaPh0P5aGLDdV5ESv/SfPUNu1x83NENXQUukk=
-=/w21
------END PGP SIGNATURE-----
-
---NhBACjNc9vV+/oop--
+Best,
+Wei
