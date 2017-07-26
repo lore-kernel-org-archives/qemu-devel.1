@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1daKZ7-0000oS-Hx
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:33:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1daKbk-0002PY-3t
+	for Qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1daKZ5-0007TP-U8
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:33:21 -0400
-Date: Wed, 26 Jul 2017 12:33:08 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170726113308.GG18489@stefanha-x1.localdomain>
-References: <20170721093416.17816-1-stefanha@redhat.com>
-	<CAFEAcA_+ffmyvExhFvm2JTmoipum6GeWiFPP5kuxRKb9+ezRzA@mail.gmail.com>
-	<20170725152052.GP23343@stefanha-x1.localdomain>
-	<CAFEAcA9J=m+aVWH1piHA=dzXU_ND9O1=whkpis9mb=WM8m_40g@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1daKbj-0001Yv-7T
+	for Qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:36:04 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1daKbi-0001YL-Vg
+	for Qemu-devel@nongnu.org; Wed, 26 Jul 2017 07:36:03 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id 12so130569484wrb.1
+	for <Qemu-devel@nongnu.org>; Wed, 26 Jul 2017 04:36:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Y+xroYBkGM9OatJL"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9J=m+aVWH1piHA=dzXU_ND9O1=whkpis9mb=WM8m_40g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: add a "how to"
- to ./README
+In-Reply-To: <cc3f3aa6-155f-a50d-f89c-54effaaa69cc@redhat.com>
+References: <f3b1276a-92e3-54f3-c6a0-5f8e16124014@redhat.com>
+	<507e7a29-5461-e152-123e-aab9dfc1f8ac@redhat.com>
+	<cc3f3aa6-155f-a50d-f89c-54effaaa69cc@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 26 Jul 2017 12:35:41 +0100
+Message-ID: <CAFEAcA_MC1r4+qTsUief7zxz0a9qsM+2jO_SudydqCjzT6pkew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] RFC: unified --help information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu block <qemu-block@nongnu.org>
 
+On 26 July 2017 at 12:22, Eric Blake <eblake@redhat.com> wrote:
+> So something like these two lines (via a macro) in all of the
+> executables, ideally at the tail end of --help output?
+>
+> See <https://qemu.org/contribute/report-a-bug> for bug reports.
+> More information on the qemu project at <https://qemu.org>
 
---Y+xroYBkGM9OatJL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Text looks good to me. A minor nit: better not use https://
+URLs til we fix the website (which currently makes firefox
+warn about an invalid security certificate...)
 
-On Tue, Jul 25, 2017 at 04:34:19PM +0100, Peter Maydell wrote:
-> On 25 July 2017 at 16:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > On Mon, Jul 24, 2017 at 11:20:44AM +0100, Peter Maydell wrote:
-> >> Should ./check be run from the source tree, or the build tree? The
-> >> existing README text doesn't say and I don't think your additions
-> >> do either.
-> >
-> > It doesn't matter, both should work.  The script detects both
-> > possibilities and rejigs itself to compensate.
->=20
-> Does that mean
->  if you run it from the source tree in a tree configured
->  for out of tree build it will:
->  (a) pollute your source tree with test output and binaries
->  (b) give you a helpful message about what to do
->  (c) magically find the build tree somehow
->  (d) not need to write any binaries/test output/temp files at all
->=20
-> ?
+Would be good to put this in GUI about dialog boxes
+and the like too.
 
-I think it would fail since the binaries would be missing in the source
-tree.
-
-=2E/check handles either source or out-of-tree mode:
-
-if [ -L "$0" ]
-then
-    # called from the build tree
-    source_iotests=3D$(dirname "$(readlink "$0")")
-    if [ -z "$source_iotests" ]
-    then
-        _init_error "failed to obtain source tree name from check symlink"
-    fi
-    source_iotests=3D$(cd "$source_iotests"; pwd) || _init_error "failed to=
- enter source tree"
-    build_iotests=3D$PWD
-else
-    # called from the source tree
-    source_iotests=3D$PWD
-    # this may be an in-tree build (note that in the following code we may =
-not
-    # assume that it truly is and have to test whether the build results
-    # actually exist)
-    build_iotests=3D$PWD
-fi
-
-build_root=3D"$build_iotests/../.."
-
---Y+xroYBkGM9OatJL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZeH30AAoJEJykq7OBq3PIvaIIALnpA+iDtB1F9vxHRvL8g92y
-mThFR92GttA1vObU6xUXtdqN9um01IO+HT2tsmKkczYmyLsgAxbpLSflMDTOC0EQ
-NE71LFm8qOhTl6T+PP91Kcmvy69B3ZVXKcbQSy3E6T+w7kCES7MqNmVMKAdON2hL
-ctUmF8qi4dKyW4vdNLwVidnK2KJMcAgw3skVwuIK37EkPLLHopokqo7qLPpH/I+d
-X4nmwn8z2nzmdxoZQux1FIv0yqt8CDSU40kzGra6HEyM8MvuIMQneipIincqDGhR
-m23W7rssU/E/PIm4m53RhTSLP+vzHxTkWWopBCZkmhdbHTjc2GFjn/0aHBk1Io4=
-=qrVD
------END PGP SIGNATURE-----
-
---Y+xroYBkGM9OatJL--
+thanks
+-- PMM
