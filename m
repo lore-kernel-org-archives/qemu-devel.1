@@ -1,56 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dagq3-0007kl-6I
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:20:20 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dagsl-0008LK-Nz
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:23:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dagpz-00013E-SI
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:20:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58188
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dagpz-000122-Mc
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:20:15 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6RBJuxm178584
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:20:14 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bycygeej2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:20:13 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 27 Jul 2017 12:18:53 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
-	[9.149.105.59])
-	by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v6RBIos538797328
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 11:18:50 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D79C7A4053
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:55 +0100 (BST)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE41AA4051
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:55 +0100 (BST)
-Received: from oc3836556865.ibm.com (unknown [9.152.224.141])
-	by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:55 +0100 (BST)
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
-	<20170727100138.74ad2ad4@gondolin>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 27 Jul 2017 13:18:49 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dagsi-0002Zo-D0
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:23:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dagsi-0002ZC-3t
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:23:04 -0400
+Date: Thu, 27 Jul 2017 13:22:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170727132259.7102a715@gondolin>
+In-Reply-To: <20170727015418.85407-3-bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-3-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170727100138.74ad2ad4@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <fc4e9602-64ad-f010-b5f8-a0b2d19732a6@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
- for TIC
+Subject: Re: [Qemu-devel] [PATCH 2/3] s390x/css: generate solicited crw for
+ rchp completion signaling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -59,55 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
+On Thu, 27 Jul 2017 03:54:17 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
+> A successful completion of rchp should signal a solicited channel path
+> initialized CRW (channel report word), while the current implementation
+> always generates an un-solicited one. Let's fix this.
 
-On 07/27/2017 10:01 AM, Cornelia Huck wrote:
-> On Wed, 26 Jul 2017 00:44:42 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
->> contain zeros.  Bits 0-3 are already covered by cmd_code validity
->> checking, and bit 32 is covered by the CCW address checking.
->>
->> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
->> check for the absence of certain flags.  Let's fix this.
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>  hw/s390x/css.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index d17e21b7af..1f04ce4a1b 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
->> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->>              ret = -EINVAL;
->>              break;
->>          }
->> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
->> +        if (ccw.flags || ccw.count) {
->> +            /* We have already sanitized these if fmt 0. */
-> 
-> I'd tweak that to
-> 
-> /* We have already sanitized these if converted from fmt 0. */
-> 
+Sounds legit.
 
-Fine with me.
+> 
+> Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/css.c         | 15 +++++++++------
+>  include/hw/s390x/css.h |  2 +-
+>  2 files changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 5321ca016b..60e1592d5c 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -1745,10 +1745,10 @@ int css_do_rchp(uint8_t cssid, uint8_t chpid)
+>      }
+>  
+>      /* We don't really use a channel path, so we're done here. */
+> -    css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT,
+> +    css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT, 1,
+>                    channel_subsys.max_cssid > 0 ? 1 : 0, chpid);
+>      if (channel_subsys.max_cssid > 0) {
+> -        css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT, 0, real_cssid << 8);
+> +        css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT, 1, 0, real_cssid << 8);
+>      }
+>      return 0;
+>  }
+> @@ -2028,7 +2028,7 @@ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+>      }
+>  }
+>  
+> -void css_queue_crw(uint8_t rsc, uint8_t erc, int chain, uint16_t rsid)
+> +void css_queue_crw(uint8_t rsc, uint8_t erc, int s, int chain, uint16_t rsid)
 
-> Seems less confusing.
-> 
->>              ret = -EINVAL;
->>              break;
->>          }
-> 
-> I'm inclined to pick this as a 2.10 bugfix. Patch 1 still needs work
-> from what I've seen.
-> 
+'s' is not a very speaking name...
 
-Hm. The commit message becomes inaccurate if this goes in before
-patch 1. We still have must be zero bits which should be handled
-by the address (ccw.cda) checking. I think I can fix patch 1 today.
+>  {
+>      CrwContainer *crw_cont;
+>  
+> @@ -2040,6 +2040,9 @@ void css_queue_crw(uint8_t rsc, uint8_t erc, int chain, uint16_t rsid)
+>          return;
+>      }
+>      crw_cont->crw.flags = (rsc << 8) | erc;
+> +    if (s) {
+> +        crw_cont->crw.flags |= CRW_FLAGS_MASK_S;
+
+...as it obviously causes the S flag to be set ;) Let's call it 'solicited'?
+
+> +    }
+>      if (chain) {
+>          crw_cont->crw.flags |= CRW_FLAGS_MASK_C;
+>      }
+> @@ -2086,9 +2089,9 @@ void css_generate_sch_crws(uint8_t cssid, uint8_t ssid, uint16_t schid,
+>      }
+>      chain_crw = (channel_subsys.max_ssid > 0) ||
+>              (channel_subsys.max_cssid > 0);
+> -    css_queue_crw(CRW_RSC_SUBCH, CRW_ERC_IPI, chain_crw ? 1 : 0, schid);
+> +    css_queue_crw(CRW_RSC_SUBCH, CRW_ERC_IPI, 0, chain_crw ? 1 : 0, schid);
+>      if (chain_crw) {
+> -        css_queue_crw(CRW_RSC_SUBCH, CRW_ERC_IPI, 0,
+> +        css_queue_crw(CRW_RSC_SUBCH, CRW_ERC_IPI, 0, 0,
+>                        (guest_cssid << 8) | (ssid << 4));
+>      }
+>      /* RW_ERC_IPI --> clear pending interrupts */
+> @@ -2103,7 +2106,7 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid)
+>  void css_generate_css_crws(uint8_t cssid)
+>  {
+>      if (!channel_subsys.sei_pending) {
+> -        css_queue_crw(CRW_RSC_CSS, CRW_ERC_EVENT, 0, cssid);
+> +        css_queue_crw(CRW_RSC_CSS, CRW_ERC_EVENT, 0, 0, cssid);
+
+Should we want to support OS-triggered channel path vary (via SCLP or
+otherwise) in the future, we'll probably need a version that generates a
+solicited crw.
+
+>      }
+>      channel_subsys.sei_pending = true;
+>  }
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index 5c5fe6b202..d03b4ffeac 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -150,7 +150,7 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src);
+>  void css_inject_io_interrupt(SubchDev *sch);
+>  void css_reset(void);
+>  void css_reset_sch(SubchDev *sch);
+> -void css_queue_crw(uint8_t rsc, uint8_t erc, int chain, uint16_t rsid);
+> +void css_queue_crw(uint8_t rsc, uint8_t erc, int s, int chain, uint16_t rsid);
+>  void css_generate_sch_crws(uint8_t cssid, uint8_t ssid, uint16_t schid,
+>                             int hotplugged, int add);
+>  void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
+
+Otherwise, patch looks good.
