@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dahVg-0004qC-IK
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:23 -0400
+	(envelope-from <crosa@redhat.com>) id 1dahVj-0004tu-P8
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dahVW-0001kN-LA
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:16 -0400
+	(envelope-from <crosa@redhat.com>) id 1dahVh-0001q6-R9
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:23 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 27 Jul 2017 08:02:06 -0400
-Message-Id: <20170727120210.6943-2-crosa@redhat.com>
+Date: Thu, 27 Jul 2017 08:02:10 -0400
+Message-Id: <20170727120210.6943-6-crosa@redhat.com>
 In-Reply-To: <20170727120210.6943-1-crosa@redhat.com>
 References: <20170727120210.6943-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] configure: remove duplicate single quotes
- on config.log header
+Subject: [Qemu-devel] [PATCH 5/5] docs: fix broken paths to docs/interop dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +22,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-trivial@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-The generation of the informational header on config.log contains two
-pairs of single quotes, which seems unintentional, and looks like
-this:
-
-  # QEMU configure log Thu Jul 26 08:17:15 EDT 2017
-  # Configured with: './configure' '--target-list=x86_64-softmmu'
-
-With this change, the quotes comprehend the entire command line:
-
-  # QEMU configure log Mon Jul 26 08:17:35 EDT 2017
-  # Configured with: './configure --target-list=x86_64-softmmu'
+With the move of some docs to docs/interop on d59157e, a couple of
+references where not updated.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- configure | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ docs/devel/writing-qmp-commands.txt | 2 +-
+ qapi-schema.json                    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 987f59b..344d6d2 100755
---- a/configure
-+++ b/configure
-@@ -35,9 +35,7 @@ rm -f config.log
+diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp-commands.txt
+index 1e63754..69793e3 100644
+--- a/docs/devel/writing-qmp-commands.txt
++++ b/docs/devel/writing-qmp-commands.txt
+@@ -8,7 +8,7 @@ into the QAPI framework implementation.
  
- # Print a helpful header at the top of config.log
- echo "# QEMU configure log $(date)" >> config.log
--printf "# Configured with:" >> config.log
--printf " '%s'" "$0" "$@" >> config.log
--echo >> config.log
-+echo "# Configured with: '$0 $@'" >> config.log
- echo "#" >> config.log
+ For an in-depth introduction to the QAPI framework, please refer to
+ docs/qapi-code-gen.txt. For documentation about the QMP protocol,
+-start with docs/qmp-intro.txt.
++start with docs/interop/qmp-intro.txt.
  
- print_error() {
+ == Overview ==
+ 
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 9c6c3e1..37f1e6e 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -23,7 +23,7 @@
+ # | -> data issued by the Client
+ # | <- Server data response
+ #
+-# Please, refer to the QMP specification (docs/qmp-spec.txt) for
++# Please, refer to the QMP specification (docs/interop/qmp-spec.txt) for
+ # detailed information on the Server command and response formats.
+ #
+ # = Stability Considerations
 -- 
 2.9.4
