@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1daiEu-0000jc-Pf
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:50:05 -0400
+	(envelope-from <no-reply@patchew.org>) id 1daiIY-0002nP-Bo
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1daiEu-00035m-4p
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:50:04 -0400
-Date: Thu, 27 Jul 2017 20:49:52 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170727124952.GL5117@lemon.lan>
-References: <1498728221-23979-1-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1daiIU-0005PG-A1
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:53:50 -0400
+Resent-Message-Id: <E1daiIU-0005PG-A1@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21781)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1daiIU-0005Os-2b
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:53:46 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150116001010.114.4980009361772077086@5d477a5b5989>
+In-Reply-To: <1500625265-23844-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1498728221-23979-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/8] Optimize VMDK I/O by allocating
- multiple clusters
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 27 Jul 2017 05:53:30 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] block/vpc: fix uninitialised variable
+ compiler warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Thu, 06/29 14:53, Ashijeet Acharya wrote:
-> Changes in v7:
-> - comment the use of MIN() in calculating skip_end_bytes
-> - use extent->cluster_sectors instead of 128
-> - place check for m_data != NULL
-> - use g_new0(VmdkMetaData, 1) instead of g_malloc0(sizeof(*m_data))
-
-There is a minor regression as I replied inline, otherwise:
-
-Reviewed-by: Fam Zheng <famz@redhat.com>
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gYmxvY2svdnBjOiBm
+aXggdW5pbml0aWFsaXNlZCB2YXJpYWJsZSBjb21waWxlciB3YXJuaW5nCk1lc3NhZ2UtaWQ6IDE1
+MDA2MjUyNjUtMjM4NDQtMS1naXQtc2VuZC1lbWFpbC1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5j
+by51awoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1
+Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0YwojIExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9u
+bWVudCBpbmZvCmV4cG9ydCBTSE9XX0VOVj0xCmV4cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10
+ZXN0LXF1aWNrQGNlbnRvczYKdGltZSBtYWtlIGRvY2tlci10ZXN0LWJ1aWxkQG1pbi1nbGliCnRp
+bWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozYTMzZjA2IGJsb2NrL3ZwYzogZml4IHVuaW5pdGlh
+bGlzZWQgdmFyaWFibGUgY29tcGlsZXIgd2FybmluZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KU3Vi
+bW9kdWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0KSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLXE2bGYzOF9tL3NyYy9kdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91
+dCAnNTU4Y2Q4MWJkZDQzMjc2OWI1OWJmZjAxMjQwYzQ0ZjgyY2ZiMWE5ZCcKICBCVUlMRCAgIGNl
+bnRvczYKbWFrZVsxXTogRW50ZXJpbmcgZGlyZWN0b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
+ci10bXAtcTZsZjM4X20vc3JjJwogIEFSQ0hJVkUgcWVtdS50Z3oKICBBUkNISVZFIGR0Yy50Z3oK
+ICBDT1BZICAgIFJVTk5FUgogICAgUlVOIHRlc3QtcXVpY2sgaW4gcWVtdTpjZW50b3M2IAovdXNy
+L2Jpbi9kb2NrZXItY3VycmVudDogRXJyb3IgcmVzcG9uc2UgZnJvbSBkYWVtb246IGNvbnRhaW5l
+cmQ6IGNvbnRhaW5lciBkaWQgbm90IHN0YXJ0IGJlZm9yZSB0aGUgc3BlY2lmaWVkIHRpbWVvdXQu
+ClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tl
+ci9kb2NrZXIucHkiLCBsaW5lIDM4MiwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkK
+ICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDM3OSwgaW4gbWFpbgogICAg
+cmV0dXJuIGFyZ3MuY21kb2JqLnJ1bihhcmdzLCBhcmd2KQogIEZpbGUgIi4vdGVzdHMvZG9ja2Vy
+L2RvY2tlci5weSIsIGxpbmUgMjM3LCBpbiBydW4KICAgIHJldHVybiBEb2NrZXIoKS5ydW4oYXJn
+diwgYXJncy5rZWVwLCBxdWlldD1hcmdzLnF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2Rv
+Y2tlci5weSIsIGxpbmUgMjA1LCBpbiBydW4KICAgIHF1aWV0PXF1aWV0KQogIEZpbGUgIi4vdGVz
+dHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMTIzLCBpbiBfZG9fY2hlY2sKICAgIHJldHVybiBz
+dWJwcm9jZXNzLmNoZWNrX2NhbGwoc2VsZi5fY29tbWFuZCArIGNtZCwgKiprd2FyZ3MpCiAgRmls
+ZSAiL3Vzci9saWI2NC9weXRob24yLjcvc3VicHJvY2Vzcy5weSIsIGxpbmUgMTg2LCBpbiBjaGVj
+a19jYWxsCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9j
+ZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydkb2NrZXInLCAncnVuJywgJy0tbGFi
+ZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD0xMjUxMjE3ODcyY2ExMWU3OTMzMzUyNTQwMGM4
+MDNlMScsICctdScsICcwJywgJy10JywgJy0tcm0nLCAnLS1uZXQ9bm9uZScsICctZScsICdUQVJH
+RVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1l
+JywgJ0o9OCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FD
+SEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
+bXAtcTZsZjM4X20vc3JjL2RvY2tlci1zcmMuMjAxNy0wNy0yNy0wOC40OS40My4xNTA1Oi92YXIv
+dG1wL3FlbXU6eixybycsICctdicsICcvcm9vdC8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92
+YXIvdG1wL2NjYWNoZTp6JywgJ3FlbXU6Y2VudG9zNicsICcvdmFyL3RtcC9xZW11L3J1bicsICd0
+ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEyNQp0ZXN0cy9kb2Nr
+ZXIvTWFrZWZpbGUuaW5jbHVkZToxMzY6IHJlY2lwZSBmb3IgdGFyZ2V0ICdkb2NrZXItcnVuJyBm
+YWlsZWQKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcg
+ZGlyZWN0b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcTZsZjM4X20vc3JjJwp0ZXN0
+cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNjg6IHJlY2lwZSBmb3IgdGFyZ2V0ICdkb2NrZXIt
+cnVuLXRlc3QtcXVpY2tAY2VudG9zNicgZmFpbGVkCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0
+LXF1aWNrQGNlbnRvczZdIEVycm9yIDIKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
