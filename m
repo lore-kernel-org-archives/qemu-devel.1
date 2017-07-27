@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dajK5-0002Zb-AV
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:59:31 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dajLE-0003FH-It
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dajK2-0000zK-P5
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:59:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59886)
+	(envelope-from <kraxel@redhat.com>) id 1dajLD-0001rG-82
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:00:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dajK2-0000yL-Fn
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:59:26 -0400
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-	<20170726215625-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
-	<20170727022103-mutt-send-email-mst@kernel.org>
-	<f210b52b-b7ea-b27e-cca8-9f11a4b4f353@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <98048fb7-34e7-d92f-cbe5-90f39c9fcb46@redhat.com>
-Date: Thu, 27 Jul 2017 15:58:58 +0200
-MIME-Version: 1.0
-In-Reply-To: <f210b52b-b7ea-b27e-cca8-9f11a4b4f353@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC PATCH v2 4/6] hw/pci: introduce
- bridge-only vendor-specific capability to provide some hints to firmware
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dajLC-0001oF-W5
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:00:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8D0B32B362
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 14:00:34 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 27 Jul 2017 16:00:20 +0200
+Message-Id: <20170727140025.392-3-kraxel@redhat.com>
+In-Reply-To: <20170727140025.392-1-kraxel@redhat.com>
+References: <20170727140025.392-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 2/7] ui: move qemu_input_linux_to_qcode()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,185 +29,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>
-Cc: seabios@seabios.org, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 07/27/17 11:39, Marcel Apfelbaum wrote:
-> On 27/07/2017 2:28, Michael S. Tsirkin wrote:
->> On Thu, Jul 27, 2017 at 12:54:07AM +0300, Alexander Bezzubikov wrote:
->>> 2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
->>>> On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
->>>>> On PCI init PCI bridges may need some
->>>>> extra info about bus number to reserve, IO, memory and
->>>>> prefetchable memory limits. QEMU can provide this
->>>>> with special
->>>>
->>>> with a special
->>>>
->>>>> vendor-specific PCI capability.
->>>>>
->>>>> Sizes of limits match ones from
->>>>> PCI Type 1 Configuration Space Header,
->>>>> number of buses to reserve occupies only 1 byte
->>>>> since it is the size of Subordinate Bus Number register.
->>>>>
->>>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>>>> ---
->>>>>   hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
->>>>>   include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
->>>>>   2 files changed, 45 insertions(+)
->>>>>
->>>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->>>>> index 720119b..8ec6c2c 100644
->>>>> --- a/hw/pci/pci_bridge.c
->>>>> +++ b/hw/pci/pci_bridge.c
->>>>> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const
->>>>> char* bus_name,
->>>>>       br->bus_name = bus_name;
->>>>>   }
->>>>>
->>>>> +
->>>>> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
->>>>
->>>> help? should be qemu_cap_init?
->>>>
->>>>> +                              uint8_t bus_reserve, uint32_t io_limit,
->>>>> +                              uint16_t mem_limit, uint64_t
->>>>> pref_limit,
->>>>> +                              Error **errp)
->>>>> +{
->>>>> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
->>>>> +    PCIBridgeQemuCap cap;
->>>>
->>>> This leaks info to guest. You want to init all fields here:
->>>>
->>>> cap = {
->>>>   .len = ....
->>>> };
->>>
->>> I surely can do this for len field, but as Laszlo proposed
->>> we can use mutually exclusive fields,
->>> e.g. pref_32 and pref_64, the only way I have left
->>> is to use ternary operator (if we surely need this
->>> big initializer). Keeping some if's would look better,
->>> I think.
->>>
->>>>
->>>>> +
->>>>> +    cap.len = cap_len;
->>>>> +    cap.bus_res = bus_reserve;
->>>>> +    cap.io_lim = io_limit & 0xFF;
->>>>> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
->>>>> +    cap.mem_lim = mem_limit;
->>>>> +    cap.pref_lim = pref_limit & 0xFFFF;
->>>>> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
->>>>
->>>> Please use pci_set_word etc or cpu_to_leXX.
->>>>
->>>
->>> Since now we've decided to avoid fields separation into <field> +
->>> <field_upper>,
->>> this bitmask along with pci_set_word are no longer needed.
->>>
->>>> I think it's easiest to replace struct with a set of macros then
->>>> pci_set_word does the work for you.
->>>>
->>>
->>> I don't really want to use macros here because structure
->>> show us the whole capability layout and this can
->>> decrease documenting efforts. More than that,
->>> memcpy usage is very convenient here, and I wouldn't like
->>> to lose it.
->>>
->>>>
->>>>> +
->>>>> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
->>>>> +                                    cap_offset, cap_len, errp);
->>>>> +    if (offset < 0) {
->>>>> +        return offset;
->>>>> +    }
->>>>> +
->>>>> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
->>>>
->>>> +2 is yacky. See how virtio does it:
->>>>
->>>>      memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
->>>>             cap->cap_len - PCI_CAP_FLAGS);
->>>>
->>>>
->>>
->>> OK.
->>>
->>>>> +    return 0;
->>>>> +}
->>>>> +
->>>>>   static const TypeInfo pci_bridge_type_info = {
->>>>>       .name = TYPE_PCI_BRIDGE,
->>>>>       .parent = TYPE_PCI_DEVICE,
->>>>> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
->>>>> index ff7cbaa..c9f642c 100644
->>>>> --- a/include/hw/pci/pci_bridge.h
->>>>> +++ b/include/hw/pci/pci_bridge.h
->>>>> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const
->>>>> char* bus_name,
->>>>>   #define  PCI_BRIDGE_CTL_DISCARD_STATUS       0x400   /* Discard
->>>>> timer status */
->>>>>   #define  PCI_BRIDGE_CTL_DISCARD_SERR 0x800   /* Discard timer
->>>>> SERR# enable */
->>>>>
->>>>> +typedef struct PCIBridgeQemuCap {
->>>>> +    uint8_t id;     /* Standard PCI capability header field */
->>>>> +    uint8_t next;   /* Standard PCI capability header field */
->>>>> +    uint8_t len;    /* Standard PCI vendor-specific capability
->>>>> header field */
->>>>> +    uint8_t bus_res;
->>>>> +    uint32_t pref_lim_upper;
->>>>
->>>> Big endian? Ugh.
->>>>
->>>
->>> Agreed, and this's gonna to disappear with
->>> the new layout.
->>>
->>>>> +    uint16_t pref_lim;
->>>>> +    uint16_t mem_lim;
->>>>
->>>> I'd say we need 64 bit for memory.
->>>>
->>>
->>> Why? Non-prefetchable MEMORY_LIMIT register is 16 bits long.
->>
->> Hmm ok, but e.g. for io there are bridges that have extra registers
->> to specify non-standard non-aligned registers.
->>
->>>>> +    uint16_t io_lim_upper;
->>>>> +    uint8_t io_lim;
->>>>> +    uint8_t padding;
->>>>
->>>> IMHO each type should have a special "don't care" flag
->>>> that would mean "I don't know".
->>>>
->>>>
->>>
->>> Don't know what? Now 0 is an indicator to do nothing with this field.
->>
->> In that case how do you say "don't allocate any memory"?
->>
-> 
-> We can keep the MEM/Limit registers read-only for such cases,
-> as they are optional registers.
+Move from input-linux.c to input-keymap.c and export it,
+so the function is available elsewhere too.
 
-For OVMF, it would be really nice if OVMF could gather the reservation
-numbers with
-- read-only accesses
-- to the one exact hotplug controller (root port, bridge, etc) that's
-  being queried for reservation.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20170726152918.11995-3-kraxel@redhat.com
+---
+ include/ui/input.h |   1 +
+ ui/input-keymap.c  | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ ui/input-linux.c   | 113 ----------------------------------------------------
+ 3 files changed, 116 insertions(+), 113 deletions(-)
 
-Deciding whether some registers in config space are r/o would require
-OVMF to attempt a write and check the result (and if it succeeded, to
-restore the original value). I'm not too attracted to doing this in a
-platform hook, while PciBusDxe is in the middle of enumerating /
-configuring the PCI(e) hierarchy :)
-
-Thanks
-Laszlo
+diff --git a/include/ui/input.h b/include/ui/input.h
+index 3cfd0f3363..c488585def 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -48,6 +48,7 @@ int qemu_input_key_value_to_number(const KeyValue *value);
+ int qemu_input_key_value_to_qcode(const KeyValue *value);
+ int qemu_input_key_value_to_scancode(const KeyValue *value, bool down,
+                                      int *codes);
++int qemu_input_linux_to_qcode(unsigned int lnx);
+ 
+ InputEvent *qemu_input_event_new_btn(InputButton btn, bool down);
+ void qemu_input_queue_btn(QemuConsole *src, InputButton btn, bool down);
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index 8a1476fc48..d4972bb364 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -3,6 +3,115 @@
+ #include "ui/keymaps.h"
+ #include "ui/input.h"
+ 
++#include "standard-headers/linux/input.h"
++
++static int linux_to_qcode[KEY_CNT] = {
++    [KEY_ESC]            = Q_KEY_CODE_ESC,
++    [KEY_1]              = Q_KEY_CODE_1,
++    [KEY_2]              = Q_KEY_CODE_2,
++    [KEY_3]              = Q_KEY_CODE_3,
++    [KEY_4]              = Q_KEY_CODE_4,
++    [KEY_5]              = Q_KEY_CODE_5,
++    [KEY_6]              = Q_KEY_CODE_6,
++    [KEY_7]              = Q_KEY_CODE_7,
++    [KEY_8]              = Q_KEY_CODE_8,
++    [KEY_9]              = Q_KEY_CODE_9,
++    [KEY_0]              = Q_KEY_CODE_0,
++    [KEY_MINUS]          = Q_KEY_CODE_MINUS,
++    [KEY_EQUAL]          = Q_KEY_CODE_EQUAL,
++    [KEY_BACKSPACE]      = Q_KEY_CODE_BACKSPACE,
++    [KEY_TAB]            = Q_KEY_CODE_TAB,
++    [KEY_Q]              = Q_KEY_CODE_Q,
++    [KEY_W]              = Q_KEY_CODE_W,
++    [KEY_E]              = Q_KEY_CODE_E,
++    [KEY_R]              = Q_KEY_CODE_R,
++    [KEY_T]              = Q_KEY_CODE_T,
++    [KEY_Y]              = Q_KEY_CODE_Y,
++    [KEY_U]              = Q_KEY_CODE_U,
++    [KEY_I]              = Q_KEY_CODE_I,
++    [KEY_O]              = Q_KEY_CODE_O,
++    [KEY_P]              = Q_KEY_CODE_P,
++    [KEY_LEFTBRACE]      = Q_KEY_CODE_BRACKET_LEFT,
++    [KEY_RIGHTBRACE]     = Q_KEY_CODE_BRACKET_RIGHT,
++    [KEY_ENTER]          = Q_KEY_CODE_RET,
++    [KEY_LEFTCTRL]       = Q_KEY_CODE_CTRL,
++    [KEY_A]              = Q_KEY_CODE_A,
++    [KEY_S]              = Q_KEY_CODE_S,
++    [KEY_D]              = Q_KEY_CODE_D,
++    [KEY_F]              = Q_KEY_CODE_F,
++    [KEY_G]              = Q_KEY_CODE_G,
++    [KEY_H]              = Q_KEY_CODE_H,
++    [KEY_J]              = Q_KEY_CODE_J,
++    [KEY_K]              = Q_KEY_CODE_K,
++    [KEY_L]              = Q_KEY_CODE_L,
++    [KEY_SEMICOLON]      = Q_KEY_CODE_SEMICOLON,
++    [KEY_APOSTROPHE]     = Q_KEY_CODE_APOSTROPHE,
++    [KEY_GRAVE]          = Q_KEY_CODE_GRAVE_ACCENT,
++    [KEY_LEFTSHIFT]      = Q_KEY_CODE_SHIFT,
++    [KEY_BACKSLASH]      = Q_KEY_CODE_BACKSLASH,
++    [KEY_102ND]          = Q_KEY_CODE_LESS,
++    [KEY_Z]              = Q_KEY_CODE_Z,
++    [KEY_X]              = Q_KEY_CODE_X,
++    [KEY_C]              = Q_KEY_CODE_C,
++    [KEY_V]              = Q_KEY_CODE_V,
++    [KEY_B]              = Q_KEY_CODE_B,
++    [KEY_N]              = Q_KEY_CODE_N,
++    [KEY_M]              = Q_KEY_CODE_M,
++    [KEY_COMMA]          = Q_KEY_CODE_COMMA,
++    [KEY_DOT]            = Q_KEY_CODE_DOT,
++    [KEY_SLASH]          = Q_KEY_CODE_SLASH,
++    [KEY_RIGHTSHIFT]     = Q_KEY_CODE_SHIFT_R,
++    [KEY_LEFTALT]        = Q_KEY_CODE_ALT,
++    [KEY_SPACE]          = Q_KEY_CODE_SPC,
++    [KEY_CAPSLOCK]       = Q_KEY_CODE_CAPS_LOCK,
++    [KEY_F1]             = Q_KEY_CODE_F1,
++    [KEY_F2]             = Q_KEY_CODE_F2,
++    [KEY_F3]             = Q_KEY_CODE_F3,
++    [KEY_F4]             = Q_KEY_CODE_F4,
++    [KEY_F5]             = Q_KEY_CODE_F5,
++    [KEY_F6]             = Q_KEY_CODE_F6,
++    [KEY_F7]             = Q_KEY_CODE_F7,
++    [KEY_F8]             = Q_KEY_CODE_F8,
++    [KEY_F9]             = Q_KEY_CODE_F9,
++    [KEY_F10]            = Q_KEY_CODE_F10,
++    [KEY_NUMLOCK]        = Q_KEY_CODE_NUM_LOCK,
++    [KEY_SCROLLLOCK]     = Q_KEY_CODE_SCROLL_LOCK,
++    [KEY_KP0]            = Q_KEY_CODE_KP_0,
++    [KEY_KP1]            = Q_KEY_CODE_KP_1,
++    [KEY_KP2]            = Q_KEY_CODE_KP_2,
++    [KEY_KP3]            = Q_KEY_CODE_KP_3,
++    [KEY_KP4]            = Q_KEY_CODE_KP_4,
++    [KEY_KP5]            = Q_KEY_CODE_KP_5,
++    [KEY_KP6]            = Q_KEY_CODE_KP_6,
++    [KEY_KP7]            = Q_KEY_CODE_KP_7,
++    [KEY_KP8]            = Q_KEY_CODE_KP_8,
++    [KEY_KP9]            = Q_KEY_CODE_KP_9,
++    [KEY_KPMINUS]        = Q_KEY_CODE_KP_SUBTRACT,
++    [KEY_KPPLUS]         = Q_KEY_CODE_KP_ADD,
++    [KEY_KPDOT]          = Q_KEY_CODE_KP_DECIMAL,
++    [KEY_KPENTER]        = Q_KEY_CODE_KP_ENTER,
++    [KEY_KPSLASH]        = Q_KEY_CODE_KP_DIVIDE,
++    [KEY_KPASTERISK]     = Q_KEY_CODE_KP_MULTIPLY,
++    [KEY_F11]            = Q_KEY_CODE_F11,
++    [KEY_F12]            = Q_KEY_CODE_F12,
++    [KEY_RIGHTCTRL]      = Q_KEY_CODE_CTRL_R,
++    [KEY_SYSRQ]          = Q_KEY_CODE_SYSRQ,
++    [KEY_RIGHTALT]       = Q_KEY_CODE_ALT_R,
++    [KEY_HOME]           = Q_KEY_CODE_HOME,
++    [KEY_UP]             = Q_KEY_CODE_UP,
++    [KEY_PAGEUP]         = Q_KEY_CODE_PGUP,
++    [KEY_LEFT]           = Q_KEY_CODE_LEFT,
++    [KEY_RIGHT]          = Q_KEY_CODE_RIGHT,
++    [KEY_END]            = Q_KEY_CODE_END,
++    [KEY_DOWN]           = Q_KEY_CODE_DOWN,
++    [KEY_PAGEDOWN]       = Q_KEY_CODE_PGDN,
++    [KEY_INSERT]         = Q_KEY_CODE_INSERT,
++    [KEY_DELETE]         = Q_KEY_CODE_DELETE,
++    [KEY_LEFTMETA]       = Q_KEY_CODE_META_L,
++    [KEY_RIGHTMETA]      = Q_KEY_CODE_META_R,
++    [KEY_MENU]           = Q_KEY_CODE_MENU,
++};
++
+ static const int qcode_to_number[] = {
+     [Q_KEY_CODE_SHIFT] = 0x2a,
+     [Q_KEY_CODE_SHIFT_R] = 0x36,
+@@ -141,6 +250,12 @@ static const int qcode_to_number[] = {
+ 
+ static int number_to_qcode[0x100];
+ 
++int qemu_input_linux_to_qcode(unsigned int lnx)
++{
++    assert(lnx < KEY_CNT);
++    return linux_to_qcode[lnx];
++}
++
+ int qemu_input_key_value_to_number(const KeyValue *value)
+ {
+     if (value->type == KEY_VALUE_KIND_QCODE) {
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index 49d52a69cc..9720333b2c 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -16,119 +16,6 @@
+ #include <sys/ioctl.h>
+ #include "standard-headers/linux/input.h"
+ 
+-static int linux_to_qcode[KEY_CNT] = {
+-    [KEY_ESC]            = Q_KEY_CODE_ESC,
+-    [KEY_1]              = Q_KEY_CODE_1,
+-    [KEY_2]              = Q_KEY_CODE_2,
+-    [KEY_3]              = Q_KEY_CODE_3,
+-    [KEY_4]              = Q_KEY_CODE_4,
+-    [KEY_5]              = Q_KEY_CODE_5,
+-    [KEY_6]              = Q_KEY_CODE_6,
+-    [KEY_7]              = Q_KEY_CODE_7,
+-    [KEY_8]              = Q_KEY_CODE_8,
+-    [KEY_9]              = Q_KEY_CODE_9,
+-    [KEY_0]              = Q_KEY_CODE_0,
+-    [KEY_MINUS]          = Q_KEY_CODE_MINUS,
+-    [KEY_EQUAL]          = Q_KEY_CODE_EQUAL,
+-    [KEY_BACKSPACE]      = Q_KEY_CODE_BACKSPACE,
+-    [KEY_TAB]            = Q_KEY_CODE_TAB,
+-    [KEY_Q]              = Q_KEY_CODE_Q,
+-    [KEY_W]              = Q_KEY_CODE_W,
+-    [KEY_E]              = Q_KEY_CODE_E,
+-    [KEY_R]              = Q_KEY_CODE_R,
+-    [KEY_T]              = Q_KEY_CODE_T,
+-    [KEY_Y]              = Q_KEY_CODE_Y,
+-    [KEY_U]              = Q_KEY_CODE_U,
+-    [KEY_I]              = Q_KEY_CODE_I,
+-    [KEY_O]              = Q_KEY_CODE_O,
+-    [KEY_P]              = Q_KEY_CODE_P,
+-    [KEY_LEFTBRACE]      = Q_KEY_CODE_BRACKET_LEFT,
+-    [KEY_RIGHTBRACE]     = Q_KEY_CODE_BRACKET_RIGHT,
+-    [KEY_ENTER]          = Q_KEY_CODE_RET,
+-    [KEY_LEFTCTRL]       = Q_KEY_CODE_CTRL,
+-    [KEY_A]              = Q_KEY_CODE_A,
+-    [KEY_S]              = Q_KEY_CODE_S,
+-    [KEY_D]              = Q_KEY_CODE_D,
+-    [KEY_F]              = Q_KEY_CODE_F,
+-    [KEY_G]              = Q_KEY_CODE_G,
+-    [KEY_H]              = Q_KEY_CODE_H,
+-    [KEY_J]              = Q_KEY_CODE_J,
+-    [KEY_K]              = Q_KEY_CODE_K,
+-    [KEY_L]              = Q_KEY_CODE_L,
+-    [KEY_SEMICOLON]      = Q_KEY_CODE_SEMICOLON,
+-    [KEY_APOSTROPHE]     = Q_KEY_CODE_APOSTROPHE,
+-    [KEY_GRAVE]          = Q_KEY_CODE_GRAVE_ACCENT,
+-    [KEY_LEFTSHIFT]      = Q_KEY_CODE_SHIFT,
+-    [KEY_BACKSLASH]      = Q_KEY_CODE_BACKSLASH,
+-    [KEY_102ND]          = Q_KEY_CODE_LESS,
+-    [KEY_Z]              = Q_KEY_CODE_Z,
+-    [KEY_X]              = Q_KEY_CODE_X,
+-    [KEY_C]              = Q_KEY_CODE_C,
+-    [KEY_V]              = Q_KEY_CODE_V,
+-    [KEY_B]              = Q_KEY_CODE_B,
+-    [KEY_N]              = Q_KEY_CODE_N,
+-    [KEY_M]              = Q_KEY_CODE_M,
+-    [KEY_COMMA]          = Q_KEY_CODE_COMMA,
+-    [KEY_DOT]            = Q_KEY_CODE_DOT,
+-    [KEY_SLASH]          = Q_KEY_CODE_SLASH,
+-    [KEY_RIGHTSHIFT]     = Q_KEY_CODE_SHIFT_R,
+-    [KEY_LEFTALT]        = Q_KEY_CODE_ALT,
+-    [KEY_SPACE]          = Q_KEY_CODE_SPC,
+-    [KEY_CAPSLOCK]       = Q_KEY_CODE_CAPS_LOCK,
+-    [KEY_F1]             = Q_KEY_CODE_F1,
+-    [KEY_F2]             = Q_KEY_CODE_F2,
+-    [KEY_F3]             = Q_KEY_CODE_F3,
+-    [KEY_F4]             = Q_KEY_CODE_F4,
+-    [KEY_F5]             = Q_KEY_CODE_F5,
+-    [KEY_F6]             = Q_KEY_CODE_F6,
+-    [KEY_F7]             = Q_KEY_CODE_F7,
+-    [KEY_F8]             = Q_KEY_CODE_F8,
+-    [KEY_F9]             = Q_KEY_CODE_F9,
+-    [KEY_F10]            = Q_KEY_CODE_F10,
+-    [KEY_NUMLOCK]        = Q_KEY_CODE_NUM_LOCK,
+-    [KEY_SCROLLLOCK]     = Q_KEY_CODE_SCROLL_LOCK,
+-    [KEY_KP0]            = Q_KEY_CODE_KP_0,
+-    [KEY_KP1]            = Q_KEY_CODE_KP_1,
+-    [KEY_KP2]            = Q_KEY_CODE_KP_2,
+-    [KEY_KP3]            = Q_KEY_CODE_KP_3,
+-    [KEY_KP4]            = Q_KEY_CODE_KP_4,
+-    [KEY_KP5]            = Q_KEY_CODE_KP_5,
+-    [KEY_KP6]            = Q_KEY_CODE_KP_6,
+-    [KEY_KP7]            = Q_KEY_CODE_KP_7,
+-    [KEY_KP8]            = Q_KEY_CODE_KP_8,
+-    [KEY_KP9]            = Q_KEY_CODE_KP_9,
+-    [KEY_KPMINUS]        = Q_KEY_CODE_KP_SUBTRACT,
+-    [KEY_KPPLUS]         = Q_KEY_CODE_KP_ADD,
+-    [KEY_KPDOT]          = Q_KEY_CODE_KP_DECIMAL,
+-    [KEY_KPENTER]        = Q_KEY_CODE_KP_ENTER,
+-    [KEY_KPSLASH]        = Q_KEY_CODE_KP_DIVIDE,
+-    [KEY_KPASTERISK]     = Q_KEY_CODE_KP_MULTIPLY,
+-    [KEY_F11]            = Q_KEY_CODE_F11,
+-    [KEY_F12]            = Q_KEY_CODE_F12,
+-    [KEY_RIGHTCTRL]      = Q_KEY_CODE_CTRL_R,
+-    [KEY_SYSRQ]          = Q_KEY_CODE_SYSRQ,
+-    [KEY_RIGHTALT]       = Q_KEY_CODE_ALT_R,
+-    [KEY_HOME]           = Q_KEY_CODE_HOME,
+-    [KEY_UP]             = Q_KEY_CODE_UP,
+-    [KEY_PAGEUP]         = Q_KEY_CODE_PGUP,
+-    [KEY_LEFT]           = Q_KEY_CODE_LEFT,
+-    [KEY_RIGHT]          = Q_KEY_CODE_RIGHT,
+-    [KEY_END]            = Q_KEY_CODE_END,
+-    [KEY_DOWN]           = Q_KEY_CODE_DOWN,
+-    [KEY_PAGEDOWN]       = Q_KEY_CODE_PGDN,
+-    [KEY_INSERT]         = Q_KEY_CODE_INSERT,
+-    [KEY_DELETE]         = Q_KEY_CODE_DELETE,
+-    [KEY_LEFTMETA]       = Q_KEY_CODE_META_L,
+-    [KEY_RIGHTMETA]      = Q_KEY_CODE_META_R,
+-    [KEY_MENU]           = Q_KEY_CODE_MENU,
+-};
+-
+-static int qemu_input_linux_to_qcode(unsigned int lnx)
+-{
+-    assert(lnx < KEY_CNT);
+-    return linux_to_qcode[lnx];
+-}
+-
+ static bool linux_is_button(unsigned int lnx)
+ {
+     if (lnx < 0x100) {
+-- 
+2.9.3
