@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daXRk-00079f-EP
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:18:37 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daXei-0002sn-A5
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:32:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daXRh-0007aT-8y
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:18:36 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33901)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daXRh-0007aC-4i
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:18:33 -0400
-Received: by mail-qk0-x244.google.com with SMTP id q66so17024631qki.1
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 18:18:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170726235614.14687-1-aurelien@aurel32.net>
-	<20170726235614.14687-3-aurelien@aurel32.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dee17306-22f3-c8ac-f314-c27efe07e665@amsat.org>
-Date: Wed, 26 Jul 2017 22:18:29 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170726235614.14687-3-aurelien@aurel32.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 2/2] Revert "elf-loader: warn
- about invalid endianness"
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daXed-000884-D9
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:32:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40881
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1daXed-000878-8F
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:31:55 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6R1Si4F049106
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:31:54 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bxyxvgmjp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:31:54 -0400
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 26 Jul 2017 19:31:53 -0600
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Wed, 26 Jul 2017 20:30:54 -0500
+In-Reply-To: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Message-Id: <1501119055-4060-3-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH for-2.10 2/3] Revert "qdev: Free QemuOpts when
+ the QOM path goes away"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +39,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, berrange@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, groug@kaod.org, armbru@redhat.com
 
-On 07/26/2017 08:56 PM, Aurelien Jarno wrote:
-> From: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> This reverts c8e1158cf611 "elf-loader: warn about invalid endianness"
-> as it produces a useless message every time an LE kernel image is
-> passed via -kernel on a ppc64-pseries machine. The pseries machine
-> already checks for ELF_LOAD_WRONG_ENDIAN and tries with big_endian=0.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+This reverts commit abed886ec60cf239a03515cf0b30fb11fa964c44.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This patch originally addressed an issue where a DEVICE_DELETED
+event could be emitted (in device_unparent()) before a Device's
+QemuOpts were cleaned up (in device_finalize()), leading to a
+"duplicate ID" error if management attempted to immediately add
+a device with the same ID in response to the DEVICE_DELETED event.
 
-> ---
->   hw/core/loader.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index c17ace0a2e..e5e8cbb638 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -480,7 +480,6 @@ int load_elf_ram(const char *filename,
->       }
->   
->       if (target_data_order != e_ident[EI_DATA]) {
-> -        fprintf(stderr, "%s: wrong endianness\n", filename);
->           ret = ELF_LOAD_WRONG_ENDIAN;
->           goto fail;
->       }
-> 
+An alternative will be implemented in a subsequent patch where we
+defer the DEVICE_DELETED event until device_finalize(), which would
+also prevent the race, so we revert the original fix in preparation.
+
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ hw/core/qdev.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index a64b35c..08c4061 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -1067,6 +1067,7 @@ static void device_finalize(Object *obj)
+     NamedGPIOList *ngl, *next;
+ 
+     DeviceState *dev = DEVICE(obj);
++    qemu_opts_del(dev->opts);
+ 
+     QLIST_FOREACH_SAFE(ngl, &dev->gpios, node, next) {
+         QLIST_REMOVE(ngl, node);
+@@ -1116,9 +1117,6 @@ static void device_unparent(Object *obj)
+         g_free(dev->canonical_path);
+         dev->canonical_path = NULL;
+     }
+-
+-    qemu_opts_del(dev->opts);
+-    dev->opts = NULL;
+ }
+ 
+ static void device_class_init(ObjectClass *class, void *data)
+-- 
+2.7.4
