@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dah9g-0001Q8-J5
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:40:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dahCg-0002RU-F6
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dah9d-0001Uf-P1
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:40:36 -0400
-Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:44999)
+	(envelope-from <dgibson@ozlabs.org>) id 1dahCf-000385-Ge
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:43:42 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:56925)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dah9d-0001R3-IY
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:40:33 -0400
-Received: from player759.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 6D81E88FED
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 13:40:24 +0200 (CEST)
-Date: Thu, 27 Jul 2017 13:40:05 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170727134005.76e74eb6@bahia.lan>
-In-Reply-To: <20170727024224.22900-18-f4bug@amsat.org>
-References: <20170727024224.22900-1-f4bug@amsat.org>
-	<20170727024224.22900-18-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dahCe-000346-T1
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:43:41 -0400
+Date: Thu, 27 Jul 2017 20:53:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170727105348.GG7970@umbus.fritz.box>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/bfnJXxrYhM9lY8WmPrISK5q";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 18/20] 9pfs: avoid sign
- conversion error simplifying the code
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eVzOFob/8UvintSX"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Aneesh Kumar K . V" <aneesh.kumar@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
 
---Sig_/bfnJXxrYhM9lY8WmPrISK5q
-Content-Type: text/plain; charset=UTF-8
+
+--eVzOFob/8UvintSX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Jul 2017 23:42:22 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-
-> (note this is how other functions also handle the errors).
+On Thu, Jul 27, 2017 at 10:11:48AM +0100, Peter Maydell wrote:
+> On 27 July 2017 at 02:30, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> > In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
+> > quiesced by vfio-pci's finalize() routine until up to 6s after the
+> > DEVICE_DELETED was emitted, leading to detach-device on the libvirt sid=
+e pretty
+> > much always crashing the host.
 >=20
-> hw/9pfs/9p.c:948:18: warning: Loss of sign in implicit conversion
->         offset =3D err;
->                  ^~~
->=20
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
+> My initial naive thought is that if the host kernel can crash then
+> this is a host kernel bug... shouldn't the host kernel refuse
+> the subsequent libvirt rebind if it would cause a crash ?
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+I think so too, but I haven't been able to convince Alex.  Nor
+find time to fix it in the kernel myself.
 
-Now, I'm not sure this can be merged during hard freeze since it is
-more code cleanup than actual bug fixing...
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->  hw/9pfs/9p.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 333dbb6f8e..0a37c8bd13 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -945,7 +945,6 @@ static void coroutine_fn v9fs_version(void *opaque)
->      v9fs_string_init(&version);
->      err =3D pdu_unmarshal(pdu, offset, "ds", &s->msize, &version);
->      if (err < 0) {
-> -        offset =3D err;
->          goto out;
->      }
->      trace_v9fs_version(pdu->tag, pdu->id, s->msize, version.data);
-> @@ -962,13 +961,12 @@ static void coroutine_fn v9fs_version(void *opaque)
-> =20
->      err =3D pdu_marshal(pdu, offset, "ds", s->msize, &version);
->      if (err < 0) {
-> -        offset =3D err;
->          goto out;
->      }
-> -    offset +=3D err;
-> +    err +=3D offset;
->      trace_v9fs_version_return(pdu->tag, pdu->id, s->msize, version.data);
->  out:
-> -    pdu_complete(pdu, offset);
-> +    pdu_complete(pdu, err);
->      v9fs_string_free(&version);
->  }
-> =20
-
-
---Sig_/bfnJXxrYhM9lY8WmPrISK5q
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--eVzOFob/8UvintSX
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iEYEARECAAYFAll50RYACgkQAvw66wEB28LfBQCgjlsg2Pm9Nzt8b8MzQjfKhtrp
-WnEAn1nTWirDcX4MlUK7hE0/sHDZRzEL
-=wsQE
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll5xjoACgkQbDjKyiDZ
+s5I7AxAAkE9dAgjb7/sE9FD4yeqJoAs+RQbt5in3F6HqWlP6TlIKiB3L3WWRxZi9
+v4R3gRMRoL5WAHKqmpNqdRprdzUltKttAvJ25UDYkJJ63aYGawDkFbRtSbo/zSKT
+DaSBoL8R5GeVwdhUePWT1v7/UiJXbqqjF3nrTy0E/aNTMp33X31PtCHGWayM+YQj
+OobHL3zXCgCVpYrccFIJF0dH/UHy1Nv4E84eH6CQmunioyUBrLECDq+QBZBhTr3Z
+JZ/FAVdw3IY91r1tA55W8IyIsbz7lxfVcUdn1thhv+mU35LUUNMY5YruW9asJ46Z
+TpldsBPW8AXZ7LEmXo4xqPNJWSsluODv+5R258bWS8LoFKj6nUirHuP4Ubrh0Lmv
+9XulykAv+SbUFuS2caGSFoLqgGHnc+ZoTh7Xlows40DBmx/XtFhePoBVBcPAL6G3
+IeVEsSmAJQubnNRY4oDXm9Lac5wXE8kATYCTXKYLg/dyOcUSOr4OlKg9jFbMjMzV
+j1Q25iJc2q0DHBbYy7VBA69R4qrorRnTuVfb6Fi36rOMbEwuO1gosmzAK2rMrYZ6
+vFORJuEmycGwbwwNXOrkz6JfPWHtCtfPD7j1Ge8xjcCnlJKi9Khichqj9+mtx7E3
+DxjXsgBHI0dIeFszqjV/WJ8gskqbG0Ky2G3+uhq3Qy36k1A5G1Y=
+=FlMg
 -----END PGP SIGNATURE-----
 
---Sig_/bfnJXxrYhM9lY8WmPrISK5q--
+--eVzOFob/8UvintSX--
