@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dajkV-0005Qx-Ei
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:26:48 -0400
+	(envelope-from <otubo@redhat.com>) id 1dajoP-0006wQ-68
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dajkS-0002H1-Bh
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:26:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dajkS-0002Ga-2N
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:26:44 -0400
-References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
-	<20170724153521.GD2127@work-vm>
-	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
-	<20170724190331.GH2127@work-vm>
-	<a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
-	<20170725191542.GD2820@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <005f7387-d62d-3d51-4289-91184f084255@redhat.com>
-Date: Thu, 27 Jul 2017 16:26:36 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170725191542.GD2820@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
+	(envelope-from <otubo@redhat.com>) id 1dajoK-0004k8-9Y
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:30:49 -0400
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Thu, 27 Jul 2017 16:30:40 +0200
+Message-Id: <20170727143040.7236-1-otubo@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-system-tricore: segfault when entering "x
+ 0" on the monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +18,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, thuth@redhat.com
 
-On 25/07/2017 21:15, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->> On 24/07/2017 21:03, Dr. David Alan Gilbert wrote:
->>>> I don't like having such a long-lived mutex (it seems like a recipe for
->>>> deadlocks with the BQL), plus memory_region_transaction_commit (the
->>>> expensive part of memory_global_dirty_log_stop) needs to be under the
->>>> BQL itself because it calls MemoryListeners.
->>>>
->>>> Maybe memory_global_dirty_log_stop can delay itself to the next vm_start
->>>> if it's called while runstate_running() returns false (which should be
->>>> always the case)?
->>>>
->>>> It could even be entirely enclosed within memory.c if you do it with a
->>>> VMChangeStateHandler.
->>> This still causes the BQL to be held for quite a while; albeit at a less
->>> critical point.
->>>
->>> In this and the existing case we don't actually need efficiency - what we need is just
->>> not to be holding onto the BQL for so long;  could we do a less
->>> efficient commit here, removing one region at a time, yielding the lock
->>> and retaking it?
->>
->> I'm worried that if you release the lock and retake it you open a window
->> where someone else could start a commit, and
->> memory_global_dirty_log_stop's commit would use outdated information.
->>
->> The problem is that a coarse lock, such as the BQL, is very hard to
->> break into another lock with long critical sections (a "memory map
->> commit lock" in this case).  It's obviously very easy to say "the new
->> lock nests inside the BQL"... but then, because you created the lock to
->> move things out of the BQL, any callback inside the new lock cannot take
->> the memory map commit lock, and you need to make entire subsystems
->> thread-safe.  If the new lock nests outside the BQL instead, it's
->> simpler to avoid deadlocks, but you need to be careful about releasing
->> the BQL and any reentrancy implications of doing that.
->>
->> One strategy that worked well so far has been to use two locks, one of
->> them being the BQL, where you can take either lock for reads and both
->> for writes.
-> 
-> I guess you could say that in the event someone wants to do something
-> with the memory map they have to wait for the cleanup to complete?
+Starting Qemu with "qemu-system-tricore -nographic -M tricore_testboard -S"
+and entering "x 0" at the monitor prompt leads to Segmentation fault. This happens
+because tricore_cpu_get_phys_page_debug() is not implemented yet, this
+is a temporary workaround to avoid the crash.
 
-Yes, you could take pending "invisible" changes (well, toggling dirty
-bitmap status is the only invisible change to the guest I guess) and
-push those to a separate thread.  That optimization would be in the KVM
-memory listener.
+Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+---
+ target/tricore/cpu.c | 10 ++++++++++
+ target/tricore/cpu.h |  1 +
+ 2 files changed, 11 insertions(+)
 
-Paolo
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 08f50e2ba7..5ab5b56454 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -22,6 +22,15 @@
+ #include "cpu.h"
+ #include "qemu-common.h"
+ #include "exec/exec-all.h"
++#include "qemu/error-report.h"
++
++static hwaddr tricore_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr,
++                                         MemTxAttrs *attrs)
++{
++    error_report("function cpu_get_phys_page_attrs_debug not "
++                    "implemented, aborting");
++    return -1;
++}
+ 
+ static inline void set_feature(CPUTriCoreState *env, int feature)
+ {
+@@ -176,6 +185,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
+     cc->dump_state = tricore_cpu_dump_state;
+     cc->set_pc = tricore_cpu_set_pc;
+     cc->synchronize_from_tb = tricore_cpu_synchronize_from_tb;
++    cc->get_phys_page_attrs_debug = tricore_cpu_get_phys_page_attrs_debug;
+ }
+ 
+ static void cpu_register(const TriCoreCPUInfo *info)
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index a3493a123c..2663723955 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -224,6 +224,7 @@ static inline TriCoreCPU *tricore_env_get_cpu(CPUTriCoreState *env)
+ #define ENV_OFFSET offsetof(TriCoreCPU, env)
+ 
+ hwaddr tricore_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
++
+ void tricore_cpu_dump_state(CPUState *cpu, FILE *f,
+                             fprintf_function cpu_fprintf, int flags);
+ 
+-- 
+2.13.3
