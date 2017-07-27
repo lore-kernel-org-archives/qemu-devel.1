@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dajDO-0004lU-Sc
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:35 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dajDn-0004zd-HQ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dajDL-0004VO-Ll
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42719)
+	(envelope-from <no-reply@patchew.org>) id 1dajDk-0004h1-Be
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:59 -0400
+Resent-Message-Id: <E1dajDk-0004h1-Be@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dajDL-0004V2-CI
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:31 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6RDqQeN014160
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:52:30 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bye2dsh8k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:52:29 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 27 Jul 2017 14:52:27 +0100
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170727102636.43d6a789@gondolin>
-	<f05dcd54-dad7-8939-e87b-e39346cc986c@linux.vnet.ibm.com>
-	<20170727154005.0c99521b@gondolin>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 27 Jul 2017 15:52:23 +0200
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dajDk-0004gE-2K
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:56 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150116355202.114.5993594182133841519@5d477a5b5989>
+In-Reply-To: <150113848793.25904.12006041120076726256.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170727154005.0c99521b@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <8f101d44-4d7d-9a13-8d0c-ebb830010847@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] ccw interpretation AR compliance
- improvements
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 27 Jul 2017 06:52:32 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v6 0/5] hypertrace: Lightweight
+ guest-to-QEMU trace channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,59 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: vilanova@ac.upc.edu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, lcapitulino@redhat.com
 
-
-
-On 07/27/2017 03:40 PM, Cornelia Huck wrote:
-> On Thu, 27 Jul 2017 15:18:01 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> [Re-posting my previous reply because I've accidentally
->> dropped almost all addresses.]
->>
->> On 07/27/2017 10:26 AM, Cornelia Huck wrote:
->>> On Wed, 26 Jul 2017 00:44:40 +0200
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->>>> Regarding testing: did not do much more than a simple smoke test
->>>> with virtio-ccw.  
->>>
->>> I think we need a way to throw random channel programs at a channel
->>> device...
->>>   
->>
->> By random do you mean random random, or do you mean carefully crafted
->> to provoke (and verify) certain responses. If it's more like the second
->> case I've actually wrote something (a kernel driver) for 'internal use'
->> but at the moment it's limited to indirect data access support (no test
->> cases for invalid invalid channel programs).
-> 
-> That's what I've been thinking of. Standalone guest code would be even
-> better (can be integrated into automatic testing), but it's certainly
-> useful.
-> 
->> The 'internal guys' say it
->> probably ain't interesting for the rest of the world make this external,
->> but if you are interested I could send you the patch these days.
-> 
-> Would be great if you could make this available. It is especially
-> interesting for me, but possibly for other folks working on s390 as well.
-
-It is very wip and I don't feel comfortable with sharing it
-with the world yet. But I'm definitely interested in making this
-available. I haven't figured out what would be the best way to make
-it available, and I hope you can help me with that.
-
-> 
-> Might be good together with an "eat this" channel device in qemu.
-> 
-
-If course I do have a qemu counterpart.
-
-To sum it up, one I'm done with the next iteration I'm gonna send
-you with the patches unless you say otherwise.
-
-Regards,
-Halil
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjYgMC81XSBoeXBlcnRyYWNlOiBMaWdodHdlaWdo
+dCBndWVzdC10by1RRU1VIHRyYWNlIGNoYW5uZWwKTWVzc2FnZS1pZDogMTUwMTEzODQ4NzkzLjI1
+OTA0LjEyMDA2MDQxMTIwMDc2NzI2MjU2LnN0Z2l0QGZyaWdnLmxhbgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+OWIwY2I2MSBoeXBlcnRyYWNlOiBBZGQgZ3Vlc3Qtc2lkZSB1c2VyLWxldmVsIGxpYnJhcnkKZjAw
+NmE1NiBoeXBlcnRyYWNlOiBbc29mdG1tdV0gQWRkIFFFTVUtc2lkZSBwcm94eSB0byAiZ3Vlc3Rf
+aHlwZXJ0cmFjZSIgZXZlbnQKMDliYmI1MSBoeXBlcnRyYWNlOiBbKi11c2VyXSBBZGQgUUVNVS1z
+aWRlIHByb3h5IHRvICJndWVzdF9oeXBlcnRyYWNlIiBldmVudAo2YWJhYTA2IGh5cGVydHJhY2U6
+IEFkZCB0cmFjaW5nIGV2ZW50ICJndWVzdF9oeXBlcnRyYWNlIgo5ODQxMWVhIGh5cGVydHJhY2U6
+IEFkZCBkb2N1bWVudGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzU6IGh5cGVydHJhY2U6IEFkZCBkb2N1bWVudGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIvNTog
+aHlwZXJ0cmFjZTogQWRkIHRyYWNpbmcgZXZlbnQgImd1ZXN0X2h5cGVydHJhY2UiLi4uCkNoZWNr
+aW5nIFBBVENIIDMvNTogaHlwZXJ0cmFjZTogWyotdXNlcl0gQWRkIFFFTVUtc2lkZSBwcm94eSB0
+byAiZ3Vlc3RfaHlwZXJ0cmFjZSIgZXZlbnQuLi4KRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3Vs
+ZCBub3QgY29udGFpbiBuZXdsaW5lcwojOTE6IEZJTEU6IGJzZC11c2VyL21haW4uYzo5OTE6Cisg
+ICAgICAgIGVycm9yX3JlcG9ydCgiZXJyb3I6IGF0ZXhpdDogJXNcbiIsIHN0cmVycm9yKGVycm5v
+KSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjk1OiBGSUxFOiBoeXBlcnRy
+YWNlL2NvbW1vbi5jOjMwOgorICAgIC8qIFdlIG5lZWQgdHdpY2UgdGhlIG51bWJlciBvZiBjbGll
+bnRzICgqaW4gcGFnZXMqKSBmb3IgdGhlIGRvdWJsZS1mYXVsdCBwcm90b2NvbCAqLwoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ1NDogRklMRTogaHlwZXJ0cmFjZS91c2VyLmM6
+OTc6CisgICAgICAgIGVycm9yX3JlcG9ydCgiZXJyb3I6IC1oeXBlcnRyYWNlIG1heC1jbGllbnRz
+IGV4cGVjdHMgYSBwb3NpdGl2ZSBudW1iZXIiKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFm
+dGVyIHRoYXQgJyonIChjdHg6QnhXKQojNTA5OiBGSUxFOiBoeXBlcnRyYWNlL3VzZXIuYzoxNTI6
+Cit0eXBlZGVmIHZvaWQgKCogc2lnYWN0aW9uX3QpKGludCwgc2lnaW5mb190ICosIHZvaWQgKik7
+CiAgICAgICAgICAgICAgIF4KCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRh
+aW4gbmV3bGluZXMKIzkyNTogRklMRTogbGludXgtdXNlci9tYWluLmM6NDQ3MzoKKyAgICAgICAg
+ZXJyb3JfcmVwb3J0KCJlcnJvcjogYXRleGl0OiAlc1xuIiwgc3RyZXJyb3IoZXJybm8pKTsKCnRv
+dGFsOiAzIGVycm9ycywgMiB3YXJuaW5ncywgOTc2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNTogaHlwZXJ0cmFj
+ZTogW3NvZnRtbXVdIEFkZCBRRU1VLXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVydHJhY2UiIGV2
+ZW50Li4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNDogRklM
+RTogaHlwZXJ0cmFjZS9zb2Z0bW11LmM6ODU6CiteSWFib3J0KCk7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYzOiBGSUxFOiBoeXBlcnRyYWNlL3NvZnRtbXUu
+YzoxMjQ6CiteSWFib3J0KCk7JAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTkgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggNS81OiBoeXBlcnRyYWNlOiBBZGQgZ3Vlc3Qtc2lkZSB1c2VyLWxldmVsIGxpYnJh
+cnkuLi4KV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2
+b2lkZWQKIzE3MTogRklMRTogaHlwZXJ0cmFjZS9ndWVzdC9jb21tb24uYzo4NDoKKyNpZiAhZGVm
+aW5lZChDT05GSUdfVVNFUl9PTkxZKSAmJiBkZWZpbmVkKF9fbGludXhfXykKCkVSUk9SOiBjb25z
+aWRlciB1c2luZyBxZW11X3N0cnRvdWxsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzE5MTog
+RklMRTogaHlwZXJ0cmFjZS9ndWVzdC9jb21tb24uYzoxMDQ6CisgICAgdWludDY0X3QgdnYgPSBz
+dHJ0b3VsbCh2LCAmcmVzLCAxNik7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDQzMiBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
