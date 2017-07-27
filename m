@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1daYpt-0001rY-Ir
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:47:39 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1daZOK-0002B1-Mi
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1daYpq-0002ay-9x
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:47:37 -0400
-Received: from mga05.intel.com ([192.55.52.43]:53879)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1daYpp-0002aV-V9
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:47:34 -0400
-Message-ID: <597954E3.2070801@intel.com>
-Date: Thu, 27 Jul 2017 10:50:11 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
-	<20170712160129-mutt-send-email-mst@kernel.org>
-	<5966241C.9060503@intel.com>
-	<20170712163746-mutt-send-email-mst@kernel.org>
-	<5967246B.9030804@intel.com>
-	<20170713210819-mutt-send-email-mst@kernel.org>
-	<59686EEB.8080805@intel.com>
-	<20170723044036-mutt-send-email-mst@kernel.org>
-	<59781119.8010200@intel.com>
-	<20170726155856-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170726155856-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
+	(envelope-from <programmingkidx@gmail.com>) id 1daZOF-0003fB-Ps
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:23:12 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:33757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1daZOF-0003er-Kt
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:23:07 -0400
+Received: by mail-io0-x243.google.com with SMTP id q64so6951791ioi.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 20:23:07 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Message-Id: <68907037-02F0-465B-9D15-B1FBA7512F9D@gmail.com>
+Date: Wed, 26 Jul 2017 23:23:04 -0400
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,191 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, seabios@seabios.org
 
-On 07/27/2017 01:02 AM, Michael S. Tsirkin wrote:
-> On Wed, Jul 26, 2017 at 11:48:41AM +0800, Wei Wang wrote:
->> On 07/23/2017 09:45 AM, Michael S. Tsirkin wrote:
->>> On Fri, Jul 14, 2017 at 03:12:43PM +0800, Wei Wang wrote:
->>>> On 07/14/2017 04:19 AM, Michael S. Tsirkin wrote:
->>>>> On Thu, Jul 13, 2017 at 03:42:35PM +0800, Wei Wang wrote:
->>>>>> On 07/12/2017 09:56 PM, Michael S. Tsirkin wrote:
->>>>>>> So the way I see it, there are several issues:
->>>>>>>
->>>>>>> - internal wait - forces multiple APIs like kick/kick_sync
->>>>>>>       note how kick_sync can fail but your code never checks return code
->>>>>>> - need to re-write the last descriptor - might not work
->>>>>>>       for alternative layouts which always expose descriptors
->>>>>>>       immediately
->>>>>> Probably it wasn't clear. Please let me explain the two functions here:
->>>>>>
->>>>>> 1) virtqueue_add_chain_desc(vq, head_id, prev_id,..):
->>>>>> grabs a desc from the vq and inserts it to the chain tail (which is indexed
->>>>>> by
->>>>>> prev_id, probably better to call it tail_id). Then, the new added desc
->>>>>> becomes
->>>>>> the tail (i.e. the last desc). The _F_NEXT flag is cleared for each desc
->>>>>> when it's
->>>>>> added to the chain, and set when another desc comes to follow later.
->>>>> And this only works if there are multiple rings like
->>>>> avail + descriptor ring.
->>>>> It won't work e.g. with the proposed new layout where
->>>>> writing out a descriptor exposes it immediately.
->>>> I think it can support the 1.1 proposal, too. But before getting
->>>> into that, I think we first need to deep dive into the implementation
->>>> and usage of _first/next/last. The usage would need to lock the vq
->>>> from the first to the end (otherwise, the returned info about the number
->>>> of available desc in the vq, i.e. num_free, would be invalid):
->>>>
->>>> lock(vq);
->>>> add_first();
->>>> add_next();
->>>> add_last();
->>>> unlock(vq);
->>>>
->>>> However, I think the case isn't this simple, since we need to check more
->>>> things
->>>> after each add_xx() step. For example, if only one entry is available at the
->>>> time
->>>> we start to use the vq, that is, num_free is 0 after add_first(), we
->>>> wouldn't be
->>>> able to add_next and add_last. So, it would work like this:
->>>>
->>>> start:
->>>>       ...get free page block..
->>>>       lock(vq)
->>>> retry:
->>>>       ret = add_first(..,&num_free,);
->>>>       if(ret == -ENOSPC) {
->>>>           goto retry;
->>>>       } else if (!num_free) {
->>>>           add_chain_head();
->>>>           unlock(vq);
->>>>           kick & wait;
->>>>           goto start;
->>>>       }
->>>> next_one:
->>>>       ...get free page block..
->>>>       add_next(..,&num_free,);
->>>>       if (!num_free) {
->>>>           add_chain_head();
->>>>           unlock(vq);
->>>>           kick & wait;
->>>>           goto start;
->>>>       } if (num_free == 1) {
->>>>           ...get free page block..
->>>>           add_last(..);
->>>>           unlock(vq);
->>>>           kick & wait;
->>>>           goto start;
->>>>       } else {
->>>>           goto next_one;
->>>>       }
->>>>
->>>> The above seems unnecessary to me to have three different APIs.
->>>> That's the reason to combine them into one virtqueue_add_chain_desc().
->>>>
->>>> -- or, do you have a different thought about using the three APIs?
->>>>
->>>>
->>>> Implementation Reference:
->>>>
->>>> struct desc_iterator {
->>>>       unsigned int head;
->>>>       unsigned int tail;
->>>> };
->>>>
->>>> add_first(*vq, *desc_iterator, *num_free, ..)
->>>> {
->>>>       if (vq->vq.num_free < 1)
->>>>           return -ENOSPC;
->>>>       get_desc(&desc_id);
->>>>       desc[desc_id].flag &= ~_F_NEXT;
->>>>       desc_iterator->head = desc_id
->>>>       desc_iterator->tail = desc_iterator->head;
->>>>       *num_free = vq->vq.num_free;
->>>> }
->>>>
->>>> add_next(vq, desc_iterator, *num_free,..)
->>>> {
->>>>       get_desc(&desc_id);
->>>>       desc[desc_id].flag &= ~_F_NEXT;
->>>>       desc[desc_iterator.tail].next = desc_id;
->>>>       desc[desc_iterator->tail].flag |= _F_NEXT;
->>>>       desc_iterator->tail = desc_id;
->>>>       *num_free = vq->vq.num_free;
->>>> }
->>>>
->>>> add_last(vq, desc_iterator,..)
->>>> {
->>>>       get_desc(&desc_id);
->>>>       desc[desc_id].flag &= ~_F_NEXT;
->>>>       desc[desc_iterator.tail].next = desc_id;
->>>>       desc_iterator->tail = desc_id;
->>>>
->>>>       add_chain_head(); // put the desc_iterator.head to the ring
->>>> }
->>>>
->>>>
->>>> Best,
->>>> Wei
->>> OK I thought this over. While we might need these new APIs in
->>> the future, I think that at the moment, there's a way to implement
->>> this feature that is significantly simpler. Just add each s/g
->>> as a separate input buffer.
->>
->> Should it be an output buffer?
-> Hypervisor overwrites these pages with zeroes. Therefore it is
-> writeable by device: DMA_FROM_DEVICE.
+I just realized what we need in order to test QEMU better. We need a =
+list of people who
+are willing to support a certain operating system.=20
 
-Why would the hypervisor need to zero the buffer? I think it may only
-need to read out the info(base,size).
+The list would probably be located here: =
+http://wiki.qemu.org/Testing/Windows
 
-I think it should be like this:
-the cmd hdr buffer: input, because the hypervisor would write it to
-send a cmd to the guest
-the payload buffer: output, for the hypervisor to read the info
+It would look like this:
 
->> I think output means from the
->> driver to device (i.e. DMA_TO_DEVICE).
-> This part is correct I believe.
->
->>> This needs zero new APIs.
->>>
->>> I know that follow-up patches need to add a header in front
->>> so you might be thinking: how am I going to add this
->>> header? The answer is quite simple - add it as a separate
->>> out header.
->>>
->>> Host will be able to distinguish between header and pages
->>> by looking at the direction, and - should we want to add
->>> IN data to header - additionally size (<4K => header).
->>
->> I think this works fine when the cmdq is only used for
->> reporting the unused pages.
->> It would be an issue
->> if there are other usages (e.g. report memory statistics)
->> interleaving. I think one solution would be to lock the cmdq until
->> a cmd usage is done ((e.g. all the unused pages are reported) ) -
->> in this case, the periodically updated guest memory statistics
->> may be delayed for a while occasionally when live migration starts.
->> Would this be acceptable? If not, probably we can have the cmdq
->> for one usage only.
->>
->>
->> Best,
->> Wei
-> OK I see, I think the issue is that reporting free pages
-> was structured like stats. Let's split it -
-> send pages on e.g. free_vq, get commands on vq shared with
-> stats.
->
 
-Would it be better to have the "report free page" command to be sent
-through the free_vq? In this case,we will have
-stats_vq: for the stats usage, which is already there
-free_vq: for reporting free pages.
+Operating system	Tester
 
-Best,
-Wei
+Windows 3.1		<email address of a tester>, <email address of =
+another tester>, ...
+Windows NT 3.1		<email address of a tester>, <email address of =
+another tester>, ...
+Windows NT 3.5		<email address of a tester>, <email address of =
+another tester>, ...
+Windows 95		<email address of a tester>, <email address of =
+another tester>, ...
+Windows NT 4.0		<email address of a tester>, <email address of =
+another tester>, ...
+Windows 98		<email address of a tester>, <email address of =
+another tester>, ...
+Windows ME		<email address of a tester>, <email address of =
+another tester>, ...
+Windows 2000		<email address of a tester>, <email address of =
+another tester>, ...
+Windows XP		<email address of a tester>, <email address of =
+another tester>, ...
+Windows Vista		<email address of a tester>, <email address of =
+another tester>, ...
+Windows 7		<email address of a tester>, <email address of =
+another tester>, ...
+Windows 8		<email address of a tester>, <email address of =
+another tester>, ...
+Windows 10		<email address of a tester>, <email address of =
+another tester>, ...
+ReactOS			<email address of a tester>, <email address of =
+another tester>, ...
+
+
+If someone has a patch that makes a change to the qemu-system-i386 =
+emulator,
+the patch maker can consult the list of people who might be willing to =
+help test the patch.=20
+There are many people who work on QEMU with certain versions of Windows =
+at their
+disposal. With this knowledge compatibility testing can become more =
+thorough.
+Thoughts? Ideas?=
