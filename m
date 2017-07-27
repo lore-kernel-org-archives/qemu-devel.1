@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dakC1-0005Xw-Nj
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:15 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dakFr-00081M-5D
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:59:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dakC0-00069s-G4
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dakC0-00068n-38
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:12 -0400
-References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5c3214a0-196d-fa81-dbf8-237034b445de@redhat.com>
-Date: Thu, 27 Jul 2017 09:55:09 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1dakFo-0000yS-0g
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:59:11 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:48065)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dakFn-0000sH-LZ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:59:07 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+	<20170725131931.GC23343@stefanha-x1.localdomain>
+	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
+	<20170726112633.GE18489@stefanha-x1.localdomain>
+	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
+	<20170727104302.GI2555@redhat.com>
+	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
+Date: Thu, 27 Jul 2017 17:58:51 +0300
+In-Reply-To: <CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 27 Jul 2017 11:54:29 +0100")
+Message-ID: <87lgnavsd0.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3"
-Subject: Re: [Qemu-devel] [PATCH 1/2] Add more function keys to QEMU
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3
-From: Eric Blake <eblake@redhat.com>
-To: Programmingkid <programmingkidx@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
-Message-ID: <5c3214a0-196d-fa81-dbf8-237034b445de@redhat.com>
-Subject: Re: [PATCH 1/2] Add more function keys to QEMU
-References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
-In-Reply-To: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell writes:
 
-On 07/27/2017 09:51 AM, Programmingkid wrote:
+> On 27 July 2017 at 11:43, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> Maybe I'm missing something, but aren't all these things
+>> already possible via either the statically defined tracepoints
+>> QEMU exposes, or by placing dynamic tracepoints on arbitrary
+>> code locations using dtrace/systemtap/lttng-ust.
 
-You forgot in-reply-to: and references: headers, meaning this was not
-threaded with your 0/2 patch.
+> Last time I looked we didn't have tracepoints on most of
+> the events you'd be interested in.
 
-> There are now keyboards that have 19 function keys. This patch extends =
-QEMU so these function keys can be used.=20
->=20
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
->  qapi-schema.json  | 6 +++++-
->  ui/input-keymap.c | 4 ++++
->  2 files changed, 9 insertions(+), 1 deletion(-)
+> That said, yes, I was going to ask if we could do this via
+> leveraging the tracepoint infrastructure and whatever scripting
+> facilities it provides. Are there any good worked examples of
+> this sort of thing? Can you do it as an ordinary non-root user?
 
-Conflicts with Gerd's pending UI pull; so you'll need to rebase.
-Furthermore, while Gerd added keys after softfreeze (necessary to fix a
-regression), your additions seem to be a new feature rather than a bug
-fix, and may therefore be more appropriate for 2.11.
+The hypertrace series I just sent contains an example that uses dtrace to
+trigger changes on the tracing state of events based on information from other
+events [1].
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+AFAIK it requires root privileges, and it's much less efficient than loading the
+instrumentation library proposed in this series (see that there's also an API to
+control event tracing).
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg08458.html
 
 
---53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll5/s0ACgkQp6FrSiUn
-Q2rLcgf/ahctkTF9tHmjYBkz5R9vWZ/ZtUsrw/9SeN6IvgY1vkOSHJa2E+VNGEte
-1tVdLehY0bCxY739+PGIGfs5I2Eo0+zEQuOH+GshBUyzg+wSn1gwrgO95GXftM0G
-rrWD9L2I1BOwE0RhQ8x94oamI7Nm7HCpc+blcl40Gy3ILIFDcEuyUGSn7HWKIfE1
-uIyUUtLmSt17gTXnp7KsjtC1/r8ay3Ezr41f8ZDdGhVYX3KHlsq/5rbeJA6w9Gwa
-YZiols5iQ5s/LURYAiJ/AnNb+dHWoWdSebzT1xKpkgNE6ks+FqvDVxSjE1fXjq73
-tBiWloFQSi6J4Cz8KdF5DdrNfYolRw==
-=/I+H
------END PGP SIGNATURE-----
-
---53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3--
+Cheers,
+  Lluis
