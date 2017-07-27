@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daiy9-0004M1-Qm
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:36:51 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1daiye-0004gA-LZ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daiy5-0007qi-RQ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:36:49 -0400
-References: <20170727123710.29817-1-otubo@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <79d4cecf-3f84-2727-9f73-b3588ec6db9d@redhat.com>
-Date: Thu, 27 Jul 2017 15:36:32 +0200
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1daiya-0008FJ-K6
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:37:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1daiya-0008Ep-AC
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:37:16 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6RDYHkr119531
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:37:14 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2byerm7akq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:37:14 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 27 Jul 2017 14:37:12 +0100
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+	<20170727135910.27d9e42e@gondolin>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 27 Jul 2017 15:37:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170727123710.29817-1-otubo@redhat.com>
+In-Reply-To: <20170727135910.27d9e42e@gondolin>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-system-tricore: segfault when
- entering "x 0" on the monitor
+Content-Transfer-Encoding: 8bit
+Message-Id: <316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
+ initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +44,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>, qemu-trivial@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
 
- Hi Eduardo,
 
-Meta comment: Please always put the maintainer(s) and qemu-devel on CC:
 
-On 27.07.2017 14:37, Eduardo Otubo wrote:
-> Starting Qemu with "qemu-system-tricore -nographic -M tricore_testboard
-> -S" and entering "x 0" at the monitor prompt leads to Segmentation
-> fault. This happens because tricore_cpu_get_phys_page_debug() is not
-> implemented yet, this is a temporary workaround to avoid the crash do
-> just abort the execution with exit(1).
->=20
-> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
-> ---
->  target/tricore/cpu.c | 10 ++++++++++
->  target/tricore/cpu.h |  3 +++
->  2 files changed, 13 insertions(+)
->=20
-> diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-> index 08f50e2ba7..822c7f4092 100644
-> --- a/target/tricore/cpu.c
-> +++ b/target/tricore/cpu.c
-> @@ -22,6 +22,15 @@
->  #include "cpu.h"
->  #include "qemu-common.h"
->  #include "exec/exec-all.h"
-> +#include "qemu/error-report.h"
-> +
-> +hwaddr tricore_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr=
-,
-> +                                         MemTxAttrs *attrs)
-> +{
-> +    error_report("function cpu_get_phys_page_attrs_debug not"
-> +                    "implemented, aborting");
-> +    exit(1);
+On 07/27/2017 01:59 PM, Cornelia Huck wrote:
+> On Thu, 27 Jul 2017 03:54:18 +0200
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+>> When a channel path is hot plugged into a CSS, we should generate
+>> a channel path initialized CRW (channel report word). The current
+>> code does not do that, instead it puts a stub function with a TODO
+>> reminder there.
+>>
+>> This implements the css_generate_chp_crws() function by:
+>> 1. refactor the existing code.
+>> 2. add an @add parameter to provide future callers with the
+>>    capability of generating channel path permanent error with
+>>    facility not initialized CRW.
+>> 3. add a @hotplugged parameter, so to opt out generating initialized
+>>    CRWs for predefined channel paths.
+> 
+> I'm not 100% sure whether the logic is correct here. Let me elaborate:
+> 
+> The current code flow when hotplugging a device is:
+> - Generate the schib.
+> - Check if any of the chpids refers to a not yet existing channel path;
+>   generate it if that is the case.
+> - Post a crw for the subchannel.
+> 
+> The second step is where the current code seems to be not quite correct
+> already. It is fine for coldplugged devices, but I really think we need
+> to make sure that all referenced channel paths are in place before we
+> hotplug a new device. It was not really relevant when we just had one
+> very virtual channel path, and 3270 is experimental so it is not a
+> problem in practice.
 
-Looking at the description in include/qom/cpu.h and the callers in
-exec.c, it seems like it is OK if these functions return -1 if the page
-could not be found. I think you should do that here, too, instead of
-exiting - it's always a little bit annoying for the users if QEMU exits
-unexpectedly, so we should try to avoid that if possible.
+What do you mean by not quite correct?  Are we somewhere in conflict with
+the AR (if yes could you give me a pointer)? Or is it a modeling concern?
+Or is it about the user interface design? Or any combination of these?
 
-> +}
-> =20
->  static inline void set_feature(CPUTriCoreState *env, int feature)
->  {
-> @@ -176,6 +185,7 @@ static void tricore_cpu_class_init(ObjectClass *c, =
-void *data)
->      cc->dump_state =3D tricore_cpu_dump_state;
->      cc->set_pc =3D tricore_cpu_set_pc;
->      cc->synchronize_from_tb =3D tricore_cpu_synchronize_from_tb;
-> +    cc->get_phys_page_attrs_debug =3D tricore_cpu_get_phys_page_attrs_=
-debug;
->  }
-> =20
->  static void cpu_register(const TriCoreCPUInfo *info)
-> diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-> index a3493a123c..c374ed3213 100644
-> --- a/target/tricore/cpu.h
-> +++ b/target/tricore/cpu.h
-> @@ -224,6 +224,9 @@ static inline TriCoreCPU *tricore_env_get_cpu(CPUTr=
-iCoreState *env)
->  #define ENV_OFFSET offsetof(TriCoreCPU, env)
-> =20
->  hwaddr tricore_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+> 
+> This, of course, implies we need deeper changes. We need to create the
+> channel paths before the subchannel is created and refuse hotplug of a
+> device if not all channel paths it needs are defined. This means we
+> need some things before we can claim real channel path support:
+> - Have a way to specify channel paths on the command line resp. when
+>   hotplugging. This implies they need to be real objects.
+> - Have a way to specify which channel paths belong to a subchannel in
+>   the same context. Keep existing device types working with the current
+>   method.
+> - Give channel paths states: Defined, configured. The right time for a
+>   CRW is the transition between those states.
+> - Only queue a 'device come' CRW for a subchannel if at least one of
+>   its channel paths is in the configured state. Detach or make not
+>   operational a subchannel if all of its paths are deconfigured.
+> 
 
-I think you could also remove that prototype above now - since there is
-no implementation for this.
+AFAIU in your opinion our model is to simple and needs to get more
+complex. What benefits do we expect from the added complexity? I mean
+our current model works (and I'm not sure what limitations do we
+want to get rid of, or even what are the relevant limitations we have.)
 
-> +hwaddr tricore_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr=
-,
-> +                                         MemTxAttrs *attrs);
-> +
->  void tricore_cpu_dump_state(CPUState *cpu, FILE *f,
->                              fprintf_function cpu_fprintf, int flags);
-> =20
->=20
+> Something along those lines also matches better what I've seen on z/VM
+> or LPAR. I realize that it's not easy :(
+> 
+> tl;dr: I don't think we want chp crws until after we have a good chp
+> model.
 
- Thomas
+I fully agree with this point.
+
+Regards,
+Halil
+
+> 
+>>
+>> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/3270-ccw.c       |  3 ++-
+>>  hw/s390x/css.c            | 55 ++++++++++++++++++++++++++++++++++++-----------
+>>  hw/s390x/s390-ccw.c       |  2 +-
+>>  hw/s390x/virtio-ccw.c     |  3 ++-
+>>  include/hw/s390x/css.h    |  8 ++++---
+>>  include/hw/s390x/ioinst.h |  1 +
+>>  6 files changed, 53 insertions(+), 19 deletions(-)
+> 
