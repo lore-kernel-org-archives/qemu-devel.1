@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dakB5-0004os-JJ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:54:16 -0400
+	(envelope-from <berrange@redhat.com>) id 1dakBz-0005WV-KJ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dakB1-00059e-Hy
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:54:15 -0400
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:35146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dakB1-00058Z-8C
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:54:11 -0400
-Received: by mail-wm0-f43.google.com with SMTP id c184so107538653wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:54:11 -0700 (PDT)
-References: <20170727024224.22900-1-f4bug@amsat.org>
-	<20170727024224.22900-17-f4bug@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1fac8158-b1b4-5dea-9111-ef6ed3602ee4@redhat.com>
-Date: Thu, 27 Jul 2017 16:54:07 +0200
+	(envelope-from <berrange@redhat.com>) id 1dakBv-00062i-Ns
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dakBv-0005yM-I8
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:07 -0400
+Date: Thu, 27 Jul 2017 15:54:48 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170727145448.GV2555@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170727024224.22900-17-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 17/20] bt-sdp: fix memory leak
- in sdp_service_record_build()
+Content-Disposition: inline
+In-Reply-To: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] Add more function keys to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,152 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On 27/07/2017 04:42, Philippe Mathieu-Daudé wrote:
-> hw/bt/sdp.c:753:5: warning: Potential leak of memory pointed to by 'data'
->     qsort(record->attribute_list, record->attributes,
->     ^~~~~
+On Thu, Jul 27, 2017 at 10:51:33AM -0400, Programmingkid wrote:
+> There are now keyboards that have 19 function keys. This patch extends
+> QEMU so these function keys can be used. 
 > 
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 > ---
-> hw/bt/*:
-> get_maintainer.pl: No maintainers found
+>  qapi-schema.json  | 6 +++++-
+>  ui/input-keymap.c | 4 ++++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
 > 
->  hw/bt/sdp.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/bt/sdp.c b/hw/bt/sdp.c
-> index f67b3b89c0..7b2186e1f4 100644
-> --- a/hw/bt/sdp.c
-> +++ b/hw/bt/sdp.c
-> @@ -711,7 +711,7 @@ static void sdp_service_record_build(struct sdp_service_record_s *record,
->                  struct sdp_def_service_s *def, int handle)
->  {
->      int len = 0;
-> -    uint8_t *data;
-> +    uint8_t *buf, *data;
->      int *uuid;
->  
->      record->uuids = 0;
-> @@ -725,7 +725,8 @@ static void sdp_service_record_build(struct sdp_service_record_s *record,
->              g_malloc0(record->attributes * sizeof(*record->attribute_list));
->      record->uuid =
->              g_malloc0(record->uuids * sizeof(*record->uuid));
-> -    data = g_malloc(len);
-> +    buf = g_malloc(len);
-> +    data = buf;
->  
->      record->attributes = 0;
->      uuid = record->uuid;
-> @@ -748,6 +749,7 @@ static void sdp_service_record_build(struct sdp_service_record_s *record,
->          record->attribute_list[record->attributes ++].len = len;
->          data += len;
->      }
-> +    g_free(buf);
->  
->      /* Sort the attribute list by the AttributeID */
->      qsort(record->attribute_list, record->attributes,
-> 
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 9c6c3e1..a051820 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -4842,6 +4842,10 @@
+>  # @hiragana: since 2.9
+>  # @henkan: since 2.9
+>  # @yen: since 2.9
+> +# @f16: since 2.10
+> +# @f17: since 2.10
+> +# @f18: since 2.10
+> +# @f19: since 2.10
+>  #
+>  # Since: 1.3.0
+>  #
+> @@ -4864,7 +4868,7 @@
+>              'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
+>              'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
+>              'ro', 'hiragana', 'henkan', 'yen',
+> -            'kp_comma', 'kp_equals', 'power' ] }
+> +            'kp_comma', 'kp_equals', 'power', 'f16', 'f17', 'f18', 'f19'] }
 
-This is wrong, but the code is insane and wrong too so it's not your
-fault. :)  The allocated memory escapes here:
-    
-            record->attribute_list[record->attributes].pair = data;
-    
-So clang is correct that the memory might leak if len is zero.  We
-know it isn't, so there is no leak.  An assertion could shut up clang.
+Linux and AT set 1 go all the way to F24, and OS-X goes to F20, so don't
+arbitrarily stop short at F19
 
-But the craziness doesn't end there.  The memory is freed by
-bt_l2cap_sdp_close_ch:
-    
-           g_free(sdp->service_list[i].attribute_list->pair);
-    
-which actually should have been written:
-    
-           g_free(sdp->service_list[i].attribute_list[0].pair);
-
-because the first element of the array points to the malloc-ed buffer.
-
-The attribute_list is sorted with qsort, which would be very fishy,
-but indeed the first entry of attribute_list should point to data
-even after the qsort, because the first record has id
-SDP_ATTR_RECORD_HANDLE, whose numeric value is zero.  Another
-assertion will help here but... hang on...
-
-the qsort function is
-    
-        static int sdp_attributeid_compare(
-                    const struct sdp_service_attribute_s *a,
-                    const struct sdp_service_attribute_s *b)
-        {
-            return (int) b->attribute_id - a->attribute_id;
-        }
-    
-and _no one ever_ writes attribute_id.  So it only works if qsort is
-stable, and who knows what else is broken, but we can fix it by
-setting attribute_id in the while loop.
-
-The patch after the signature should do it.  Please review carefully
-because I've no idea how to test this stuff.
-
-Paolo
-
-diff --git a/hw/bt/sdp.c b/hw/bt/sdp.c
-index f67b3b89c0..f16a0f0b09 100644
---- a/hw/bt/sdp.c
-+++ b/hw/bt/sdp.c
-@@ -580,7 +580,7 @@ static void bt_l2cap_sdp_close_ch(void *opaque)
-     int i;
- 
-     for (i = 0; i < sdp->services; i ++) {
--        g_free(sdp->service_list[i].attribute_list->pair);
-+        g_free(sdp->service_list[i].attribute_list[0].pair);
-         g_free(sdp->service_list[i].attribute_list);
-         g_free(sdp->service_list[i].uuid);
-     }
-@@ -720,6 +720,8 @@ static void sdp_service_record_build(struct sdp_service_record_s *record,
-         len += sdp_attr_max_size(&def->attributes[record->attributes ++].data,
-                         &record->uuids);
-     }
-+
-+    assert(len > 0);
-     record->uuids = pow2ceil(record->uuids);
-     record->attribute_list =
-             g_malloc0(record->attributes * sizeof(*record->attribute_list));
-@@ -730,12 +730,14 @@ static void sdp_service_record_build(struct sdp_service_record_s *record,
-     record->attributes = 0;
-     uuid = record->uuid;
-     while (def->attributes[record->attributes].data.type) {
-+        int attribute_id = def->attributes[record->attributes].id;
-         record->attribute_list[record->attributes].pair = data;
-+        record->attribute_list[record->attributes].attribute_id = attribute_id;
- 
-         len = 0;
-         data[len ++] = SDP_DTYPE_UINT | SDP_DSIZE_2;
--        data[len ++] = def->attributes[record->attributes].id >> 8;
--        data[len ++] = def->attributes[record->attributes].id & 0xff;
-+        data[len ++] = attribute_id >> 8;
-+        data[len ++] = attribute_id & 0xff;
-         len += sdp_attr_write(data + len,
-                         &def->attributes[record->attributes].data, &uuid);
- 
-@@ -749,10 +751,15 @@ static void sdp_service_record_build(struct sdp_service_record_s *record,
-         data += len;
-     }
- 
--    /* Sort the attribute list by the AttributeID */
-+    /* Sort the attribute list by the AttributeID.  The first must be
-+     * SDP_ATTR_RECORD_HANDLE so that bt_l2cap_sdp_close_ch can free
-+     * the buffer.
-+     */
-     qsort(record->attribute_list, record->attributes,
-                     sizeof(*record->attribute_list),
-                     (void *) sdp_attributeid_compare);
-+    assert(record->attribute_list[0].pair == data);
-+
-     /* Sort the searchable UUIDs list for bisection */
-     qsort(record->uuid, record->uuids,
-                     sizeof(*record->uuid),
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
