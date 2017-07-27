@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1daZOK-0002B1-Mi
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:23:13 -0400
+	(envelope-from <pahome.chen@mirlab.org>) id 1daZru-0001Kh-8g
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1daZOF-0003fB-Ps
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:23:12 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:33757)
+	(envelope-from <pahome.chen@mirlab.org>) id 1daZrt-0007bx-F5
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:53:46 -0400
+Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:37891)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1daZOF-0003er-Kt
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:23:07 -0400
-Received: by mail-io0-x243.google.com with SMTP id q64so6951791ioi.0
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 20:23:07 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-Id: <68907037-02F0-465B-9D15-B1FBA7512F9D@gmail.com>
-Date: Wed, 26 Jul 2017 23:23:04 -0400
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
+	id 1daZrt-0007aJ-6i
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 23:53:45 -0400
+Received: by mail-ua0-x235.google.com with SMTP id w45so131456048uac.5
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 20:53:43 -0700 (PDT)
+MIME-Version: 1.0
+From: lampahome <pahome.chen@mirlab.org>
+Date: Thu, 27 Jul 2017 11:53:41 +0800
+Message-ID: <CAB3eZfszxeKpkXHfm-EVtfeZCL1Spz0z2x2vS5KbVezLPjwfXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] why marking qcow2 img as corrupted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, seabios@seabios.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-I just realized what we need in order to test QEMU better. We need a =
-list of people who
-are willing to support a certain operating system.=20
+I tried take snapshots on a demo.qcow2 10 times.
+cmd is below:
 
-The list would probably be located here: =
-http://wiki.qemu.org/Testing/Windows
-
-It would look like this:
+> qemu-img snapshots -c tag_1 demo.qcow2
 
 
-Operating system	Tester
+when I take snapshots 7 times and console shows:
 
-Windows 3.1		<email address of a tester>, <email address of =
-another tester>, ...
-Windows NT 3.1		<email address of a tester>, <email address of =
-another tester>, ...
-Windows NT 3.5		<email address of a tester>, <email address of =
-another tester>, ...
-Windows 95		<email address of a tester>, <email address of =
-another tester>, ...
-Windows NT 4.0		<email address of a tester>, <email address of =
-another tester>, ...
-Windows 98		<email address of a tester>, <email address of =
-another tester>, ...
-Windows ME		<email address of a tester>, <email address of =
-another tester>, ...
-Windows 2000		<email address of a tester>, <email address of =
-another tester>, ...
-Windows XP		<email address of a tester>, <email address of =
-another tester>, ...
-Windows Vista		<email address of a tester>, <email address of =
-another tester>, ...
-Windows 7		<email address of a tester>, <email address of =
-another tester>, ...
-Windows 8		<email address of a tester>, <email address of =
-another tester>, ...
-Windows 10		<email address of a tester>, <email address of =
-another tester>, ...
-ReactOS			<email address of a tester>, <email address of =
-another tester>, ...
+> mark image as corrupted and preventing from invalid write
 
 
-If someone has a patch that makes a change to the qemu-system-i386 =
-emulator,
-the patch maker can consult the list of people who might be willing to =
-help test the patch.=20
-There are many people who work on QEMU with certain versions of Windows =
-at their
-disposal. With this knowledge compatibility testing can become more =
-thorough.
-Thoughts? Ideas?=
+and I can't take snapshots anymore then.
+Can I avoid this situation or remove the limit?
