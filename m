@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dacSa-0004W5-Oe
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 02:39:49 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dacSl-0004dt-7a
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 02:40:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dacSX-0000o2-K8
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 02:39:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dacSk-00011R-Af
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 02:39:59 -0400
 References: <20170727024224.22900-1-f4bug@amsat.org>
-	<20170727024224.22900-15-f4bug@amsat.org>
+	<20170727024224.22900-13-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <5cd7f2d6-04e7-52a5-c045-973b9ef0d365@vivier.eu>
-Date: Thu, 27 Jul 2017 08:39:21 +0200
+Message-ID: <d95e5790-09c5-1075-0cd9-4f33daedd566@vivier.eu>
+Date: Thu, 27 Jul 2017 08:39:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170727024224.22900-15-f4bug@amsat.org>
+In-Reply-To: <20170727024224.22900-13-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 14/20] syscall: check inotify()
- and eventfd() return value
+Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 12/20] syscall: fix dereference
+ of undefined pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,9 +29,9 @@ To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <pe
 Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 Le 27/07/2017 à 04:42, Philippe Mathieu-Daudé a écrit :
-> linux-user/syscall.c:555:25: warning: Out of bound memory access (accessed memory precedes memory block)
->     target_fd_trans[fd] = trans;
->     ~~~~~~~~~~~~~~~~~~~~^~~~~~~
+> linux-user/syscall.c:5581:9: warning: Dereference of undefined pointer value
+>     if (*host_rt_dev_ptr != 0) {
+>         ^~~~~~~~~~~~~~~~
 > 
 > Reported-by: Clang Static Analyzer
 > Suggested-by: Laurent Vivier <lvivier@redhat.com>
@@ -40,55 +40,19 @@ Le 27/07/2017 à 04:42, Philippe Mathieu-Daudé a écrit :
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 > ---
->  linux-user/syscall.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+>  linux-user/syscall.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 81f52f7483..dfc1301e63 100644
+> index 003943b736..71d45a9963 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -11742,7 +11742,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->  #if defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)
->      case TARGET_NR_inotify_init:
->          ret = get_errno(sys_inotify_init());
-> -        fd_trans_register(ret, &target_inotify_trans);
-> +        if (ret >= 0) {
-> +            fd_trans_register(ret, &target_inotify_trans);
-> +        }
->          break;
->  #endif
->  #ifdef CONFIG_INOTIFY1
-> @@ -11750,7 +11752,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_inotify_init1:
->          ret = get_errno(sys_inotify_init1(target_to_host_bitmask(arg1,
->                                            fcntl_flags_tbl)));
-> -        fd_trans_register(ret, &target_inotify_trans);
-> +        if (ret >= 0) {
-> +            fd_trans_register(ret, &target_inotify_trans);
-> +        }
->          break;
->  #endif
->  #endif
-> @@ -11916,7 +11920,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->  #if defined(TARGET_NR_eventfd)
->      case TARGET_NR_eventfd:
->          ret = get_errno(eventfd(arg1, 0));
-> -        fd_trans_register(ret, &target_eventfd_trans);
-> +        if (ret >= 0) {
-> +            fd_trans_register(ret, &target_eventfd_trans);
-> +        }
->          break;
->  #endif
->  #if defined(TARGET_NR_eventfd2)
-> @@ -11930,7 +11936,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->              host_flags |= O_CLOEXEC;
->          }
->          ret = get_errno(eventfd(arg1, host_flags));
-> -        fd_trans_register(ret, &target_eventfd_trans);
-> +        if (ret >= 0) {
-> +            fd_trans_register(ret, &target_eventfd_trans);
-> +        }
->          break;
+> @@ -5573,6 +5573,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
+>                                      field_types, THUNK_HOST);
 >      }
->  #endif
+>      unlock_user(argptr, arg, 0);
+> +    assert(host_rt_dev_ptr);
+>  
+>      ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+>      if (*host_rt_dev_ptr != 0) {
 > 
