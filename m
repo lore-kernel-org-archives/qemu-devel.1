@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4D-0008Pa-Cm
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:14 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4d-0000Mc-Pg
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4A-0006cN-6A
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4a-0006zY-IV
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dal4a-0006xY-5K
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:36 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 27 Jul 2017 17:45:37 +0200
-Message-Id: <20170727154537.15303-1-marcandre.lureau@redhat.com>
+Date: Thu, 27 Jul 2017 17:41:01 +0200
+Message-Id: <20170727154126.11339-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tests: test-netfilter && pxe-test require slirp
+Subject: [Qemu-devel] [PATCH 01/26] qapi: fix type_seen key error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +28,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-If slirp is disabled, it will fail with:
+The type_seen member can be of a different type than the 'qtype' being
+checked, since a string create several conflicts. Lookup the real
+conflicting type in the conflict set, that one must be present in
+type_seen.
 
-qemu-system-x86_64: -netdev user,id=3Dqtest-bn0: Parameter 'type' expects=
- a netdev backend type
+This fixes the following error, reproducible with the modified test:
+
+Traceback (most recent call last):
+  File "/home/elmarco/src/qq/tests/qapi-schema/test-qapi.py", line 56, in=
+ <module>
+    schema =3D QAPISchema(sys.argv[1])
+  File "/home/elmarco/src/qq/scripts/qapi.py", line 1470, in __init__
+    self.exprs =3D check_exprs(parser.exprs)
+  File "/home/elmarco/src/qq/scripts/qapi.py", line 959, in check_exprs
+    check_alternate(expr, info)
+  File "/home/elmarco/src/qq/scripts/qapi.py", line 831, in check_alterna=
+te
+    % (name, key, types_seen[qtype]))
+KeyError: 'QTYPE_QSTRING'
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/Makefile.include | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/qapi.py                                  | 4 +++-
+ tests/qapi-schema/alternate-conflict-string.json | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 7af278db55..98387d3a51 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -219,7 +219,7 @@ gcov-files-i386-y +=3D hw/block/hd-geometry.c
- check-qtest-i386-y +=3D tests/boot-order-test$(EXESUF)
- check-qtest-i386-y +=3D tests/bios-tables-test$(EXESUF)
- check-qtest-i386-y +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-i386-y +=3D tests/pxe-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
- check-qtest-i386-y +=3D tests/rtc-test$(EXESUF)
- check-qtest-i386-y +=3D tests/ipmi-kcs-test$(EXESUF)
- check-qtest-i386-y +=3D tests/ipmi-bt-test$(EXESUF)
-@@ -259,7 +259,7 @@ check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D t=
-ests/vhost-user-test$(EXESUF)
- ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
- check-qtest-x86_64-$(CONFIG_VHOST_NET_TEST_x86_64) +=3D tests/vhost-user=
--test$(EXESUF)
- endif
--check-qtest-i386-y +=3D tests/test-netfilter$(EXESUF)
-+check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
- check-qtest-i386-y +=3D tests/test-filter-mirror$(EXESUF)
- check-qtest-i386-y +=3D tests/test-filter-redirector$(EXESUF)
- check-qtest-i386-y +=3D tests/postcopy-test$(EXESUF)
-@@ -293,7 +293,7 @@ check-qtest-ppc64-y +=3D tests/drive_del-test$(EXESUF=
-)
- check-qtest-ppc64-y +=3D tests/postcopy-test$(EXESUF)
- check-qtest-ppc64-y +=3D tests/boot-serial-test$(EXESUF)
- check-qtest-ppc64-y +=3D tests/rtas-test$(EXESUF)
--check-qtest-ppc64-y +=3D tests/pxe-test$(EXESUF)
-+check-qtest-ppc64-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
- check-qtest-ppc64-y +=3D tests/usb-hcd-ohci-test$(EXESUF)
- gcov-files-ppc64-y +=3D hw/usb/hcd-ohci.c
- check-qtest-ppc64-y +=3D tests/usb-hcd-uhci-test$(EXESUF)
-@@ -301,7 +301,7 @@ gcov-files-ppc64-y +=3D hw/usb/hcd-uhci.c
- check-qtest-ppc64-y +=3D tests/usb-hcd-xhci-test$(EXESUF)
- gcov-files-ppc64-y +=3D hw/usb/hcd-xhci.c
- check-qtest-ppc64-y +=3D $(check-qtest-virtio-y)
--check-qtest-ppc64-y +=3D tests/test-netfilter$(EXESUF)
-+check-qtest-ppc64-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
- check-qtest-ppc64-y +=3D tests/test-filter-mirror$(EXESUF)
- check-qtest-ppc64-y +=3D tests/test-filter-redirector$(EXESUF)
- check-qtest-ppc64-y +=3D tests/display-vga-test$(EXESUF)
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 8aa2775f12..4ecc19e944 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -825,7 +825,9 @@ def check_alternate(expr, info):
+             else:
+                 conflicting.add('QTYPE_QNUM')
+                 conflicting.add('QTYPE_QBOOL')
+-        if conflicting & set(types_seen):
++        conflict =3D conflicting & set(types_seen)
++        if conflict:
++            qtype =3D list(conflict)[0]
+             raise QAPISemError(info, "Alternate '%s' member '%s' can't "
+                                "be distinguished from member '%s'"
+                                % (name, key, types_seen[qtype]))
+diff --git a/tests/qapi-schema/alternate-conflict-string.json b/tests/qap=
+i-schema/alternate-conflict-string.json
+index 85adbd4adc..bb2702978e 100644
+--- a/tests/qapi-schema/alternate-conflict-string.json
++++ b/tests/qapi-schema/alternate-conflict-string.json
+@@ -1,4 +1,4 @@
+ # alternate branches of 'str' type conflict with all scalar types
+ { 'alternate': 'Alt',
+-  'data': { 'one': 'str',
+-            'two': 'int' } }
++  'data': { 'one': 'int',
++            'two': 'str' } }
 --=20
 2.14.0.rc0.1.g40ca67566
