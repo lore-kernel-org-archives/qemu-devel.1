@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dagDg-00066S-Vm
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:40:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1dagGC-0006gi-N7
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:43:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dagDg-0003gk-6F
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:40:41 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:37187)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dagDf-0003gB-Q3
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:40:40 -0400
-Received: by mail-wr0-x232.google.com with SMTP id 33so85388373wrz.4
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 03:40:39 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170727103253.GE10129@stefanha-x1.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1dagG8-0005Dg-JW
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:43:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dagG8-0005DQ-Ad
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:43:12 -0400
+Date: Thu, 27 Jul 2017 11:43:02 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170727104302.GI2555@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
 	<20170725131931.GC23343@stefanha-x1.localdomain>
 	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-	<87o9s88sb4.fsf@frigg.lan>
-	<20170726112210.GD18489@stefanha-x1.localdomain>
-	<871sp34bbc.fsf@frigg.lan>
-	<20170727103253.GE10129@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Jul 2017 11:40:17 +0100
-Message-ID: <CAFEAcA-Da7ZV7SL41TShqiy=icgo_nJXJxBqRr=RO+M23JsrGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	<20170726112633.GE18489@stefanha-x1.localdomain>
+	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
  instrumentation
 List-Id: <qemu-devel.nongnu.org>
@@ -36,47 +32,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, =?utf-8?B?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 27 July 2017 at 11:32, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Wed, Jul 26, 2017 at 03:44:39PM +0300, Llu=C3=ADs Vilanova wrote:
->> And why exactly is this a threat? Because it can be used to "extend" QEM=
-U
->> without touching its sources? Is this a realistic threat? (it's a rather=
- brittle
->> way to do it, so I'm not sure it's practical)
->
-> Unfortunately it is a problem.  I recently came across a product that
-> was using LD_PRELOAD=3D to "integrate" with QEMU.  People really abuse
-> these interfaces instead of integrating their features cleanly into
-> QEMU.
+On Wed, Jul 26, 2017 at 12:49:00PM +0100, Peter Maydell wrote:
+> On 26 July 2017 at 12:26, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > On Tue, Jul 25, 2017 at 02:30:06PM +0100, Peter Maydell wrote:
+> >> Is your proposal that my-instrumentation.c gets compiled into
+> >> QEMU at this point? That doesn't seem like a great idea to
+> >> me, because it means you can only use this tracing if you
+> >> build QEMU yourself, and distros won't enable it and so
+> >> lots of our users won't have convenient access to it.
+> >> I'd much rather see a cleanly designed plugin interface
+> >> (which we should be able to implement in a manner that doesn't
+> >> let the plugin monkey patch arbitrary parts of QEMU beyond
+> >> what can already be achieved via LD_PRELOAD).
+> >
+> > Trace events are not a stable public API.  They change between releases
+> > and need to be interpreted together with the QEMU source code.
+> >
+> > It doesn't make sense to be doing instrumentation inside the QEMU
+> > process but not want to compile QEMU.
+> >
+> > What is the use case?
+> 
+> I want the continuous stream of people who come along
+> and want to do interesting things (or even just straightforward
+> things like "show me all the memory accesses") with tracing
+> their guest binary to be able to do so without having to
+> rebuild QEMU. We don't require people to rebuild QEMU
+> themselves to attach gdb to it, and tracing of guest
+> behaviour is a similar "I just want to introspect what
+> my guest is doing" use case.
+> 
+> I think this is distinct from use of the trace API
+> for qemu-internal events as used in a lot of the C
+> code.
+> 
+> Some simple use cases:
+>  * a plugin which prints out instruction execution traces
+> by hooking into "insn executed" and printing something
+> helpful (you can extend this into producing traces
+> in whatever standard format some other program wants
+> to inhale, but at a minimum it would be something we
+> could point people at that makes more sense than our
+> current "only print insns at translate time" debug);
+> it's also easy to add bells and whistles for "start
+> tracing at time T" and so on
+>  * a plugin that make cachegrind-style guesses about
+> cache usage by tracking memory accesses and simulating
+> cache effects
+>  * a plugin that prints all the system calls the
+> guest makes (by hooking into "insn executed" and
+> printing info when the insn is an SVC)
+>  * trivial statistics like "count executed instructions
+> and branches taken"
 
-...if people who want to do this kind of thing already can and
-do use LD_PRELOAD for it, I don't think we should worry too much
-about trying to make the instrumentation plugin API bulletproof
-against similar abuse.
+Maybe I'm missing something, but aren't all these things
+already possible via either the statically defined tracepoints
+QEMU exposes, or by placing dynamic tracepoints on arbitrary
+code locations using dtrace/systemtap/lttng-ust. 
 
-> I see the use cases that Peter has been describing and am sure we can
-> come up with good solutions.  What I care about is that it doesn't allow
-> loading a .so that connects to arbitrary trace events.
-
-That said, I agree that we don't really need an arbitrary-trace-event
-setup here, and we should probably design our API so that it isn't
-handing the trace plugin hooks pointers into QEMU's internals.
-We want an API that makes it easy for people to do things based on
-changes of the guest binary's state (registers, insns, etc etc)
-and which makes it hard for them to accidentally trip themselves up
-(eg by prodding around in QEMU internal data structures).
-This will have the secondary benefit that it's unlikely that future
-changes to QEMU will break plugin code.
-
->> As a side note, I find instrumentation to be most useful for guest code =
-events,
->> which mostly contain non-pointer values (except for the CPUState*).
-
-For instance we definitely should not be passing a CPUState* to
-any plugin function.
-
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
