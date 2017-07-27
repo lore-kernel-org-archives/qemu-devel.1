@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dajDn-0004zd-HQ
+	(envelope-from <berrange@redhat.com>) id 1dajDn-0004zp-TW
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dajDk-0004h1-Be
+	(envelope-from <berrange@redhat.com>) id 1dajDk-0004hC-Pb
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:59 -0400
-Resent-Message-Id: <E1dajDk-0004h1-Be@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dajDk-0004gE-2K
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:52:56 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150116355202.114.5993594182133841519@5d477a5b5989>
-In-Reply-To: <150113848793.25904.12006041120076726256.stgit@frigg.lan>
+Date: Thu, 27 Jul 2017 14:52:51 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170727135251.GN2555@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAOE=1Z0VzZv5bstq+bZpnLMZx5sj-KUQMO3hQjM=R+17TiUOBA@mail.gmail.com>
+	<20170727104705.GJ2555@redhat.com>
+	<CAOE=1Z02yvArAxqtPoTHgLu01xS+K7ZPCXvwA8SG2hYVb7rA1w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Jul 2017 06:52:32 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v6 0/5] hypertrace: Lightweight
- guest-to-QEMU trace channel
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z02yvArAxqtPoTHgLu01xS+K7ZPCXvwA8SG2hYVb7rA1w@mail.gmail.com>
+Subject: Re: [Qemu-devel] For unix domain socket,
+ will only one client could connect to this socket?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vilanova@ac.upc.edu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, lcapitulino@redhat.com
+To: Sam <batmanustc@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjYgMC81XSBoeXBlcnRyYWNlOiBMaWdodHdlaWdo
-dCBndWVzdC10by1RRU1VIHRyYWNlIGNoYW5uZWwKTWVzc2FnZS1pZDogMTUwMTEzODQ4NzkzLjI1
-OTA0LjEyMDA2MDQxMTIwMDc2NzI2MjU2LnN0Z2l0QGZyaWdnLmxhbgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
-bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-OWIwY2I2MSBoeXBlcnRyYWNlOiBBZGQgZ3Vlc3Qtc2lkZSB1c2VyLWxldmVsIGxpYnJhcnkKZjAw
-NmE1NiBoeXBlcnRyYWNlOiBbc29mdG1tdV0gQWRkIFFFTVUtc2lkZSBwcm94eSB0byAiZ3Vlc3Rf
-aHlwZXJ0cmFjZSIgZXZlbnQKMDliYmI1MSBoeXBlcnRyYWNlOiBbKi11c2VyXSBBZGQgUUVNVS1z
-aWRlIHByb3h5IHRvICJndWVzdF9oeXBlcnRyYWNlIiBldmVudAo2YWJhYTA2IGh5cGVydHJhY2U6
-IEFkZCB0cmFjaW5nIGV2ZW50ICJndWVzdF9oeXBlcnRyYWNlIgo5ODQxMWVhIGh5cGVydHJhY2U6
-IEFkZCBkb2N1bWVudGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzU6IGh5cGVydHJhY2U6IEFkZCBkb2N1bWVudGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIvNTog
-aHlwZXJ0cmFjZTogQWRkIHRyYWNpbmcgZXZlbnQgImd1ZXN0X2h5cGVydHJhY2UiLi4uCkNoZWNr
-aW5nIFBBVENIIDMvNTogaHlwZXJ0cmFjZTogWyotdXNlcl0gQWRkIFFFTVUtc2lkZSBwcm94eSB0
-byAiZ3Vlc3RfaHlwZXJ0cmFjZSIgZXZlbnQuLi4KRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3Vs
-ZCBub3QgY29udGFpbiBuZXdsaW5lcwojOTE6IEZJTEU6IGJzZC11c2VyL21haW4uYzo5OTE6Cisg
-ICAgICAgIGVycm9yX3JlcG9ydCgiZXJyb3I6IGF0ZXhpdDogJXNcbiIsIHN0cmVycm9yKGVycm5v
-KSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjk1OiBGSUxFOiBoeXBlcnRy
-YWNlL2NvbW1vbi5jOjMwOgorICAgIC8qIFdlIG5lZWQgdHdpY2UgdGhlIG51bWJlciBvZiBjbGll
-bnRzICgqaW4gcGFnZXMqKSBmb3IgdGhlIGRvdWJsZS1mYXVsdCBwcm90b2NvbCAqLwoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ1NDogRklMRTogaHlwZXJ0cmFjZS91c2VyLmM6
-OTc6CisgICAgICAgIGVycm9yX3JlcG9ydCgiZXJyb3I6IC1oeXBlcnRyYWNlIG1heC1jbGllbnRz
-IGV4cGVjdHMgYSBwb3NpdGl2ZSBudW1iZXIiKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFm
-dGVyIHRoYXQgJyonIChjdHg6QnhXKQojNTA5OiBGSUxFOiBoeXBlcnRyYWNlL3VzZXIuYzoxNTI6
-Cit0eXBlZGVmIHZvaWQgKCogc2lnYWN0aW9uX3QpKGludCwgc2lnaW5mb190ICosIHZvaWQgKik7
-CiAgICAgICAgICAgICAgIF4KCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRh
-aW4gbmV3bGluZXMKIzkyNTogRklMRTogbGludXgtdXNlci9tYWluLmM6NDQ3MzoKKyAgICAgICAg
-ZXJyb3JfcmVwb3J0KCJlcnJvcjogYXRleGl0OiAlc1xuIiwgc3RyZXJyb3IoZXJybm8pKTsKCnRv
-dGFsOiAzIGVycm9ycywgMiB3YXJuaW5ncywgOTc2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNTogaHlwZXJ0cmFj
-ZTogW3NvZnRtbXVdIEFkZCBRRU1VLXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVydHJhY2UiIGV2
-ZW50Li4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNDogRklM
-RTogaHlwZXJ0cmFjZS9zb2Z0bW11LmM6ODU6CiteSWFib3J0KCk7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYzOiBGSUxFOiBoeXBlcnRyYWNlL3NvZnRtbXUu
-YzoxMjQ6CiteSWFib3J0KCk7JAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTkgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggNS81OiBoeXBlcnRyYWNlOiBBZGQgZ3Vlc3Qtc2lkZSB1c2VyLWxldmVsIGxpYnJh
-cnkuLi4KV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2
-b2lkZWQKIzE3MTogRklMRTogaHlwZXJ0cmFjZS9ndWVzdC9jb21tb24uYzo4NDoKKyNpZiAhZGVm
-aW5lZChDT05GSUdfVVNFUl9PTkxZKSAmJiBkZWZpbmVkKF9fbGludXhfXykKCkVSUk9SOiBjb25z
-aWRlciB1c2luZyBxZW11X3N0cnRvdWxsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzE5MTog
-RklMRTogaHlwZXJ0cmFjZS9ndWVzdC9jb21tb24uYzoxMDQ6CisgICAgdWludDY0X3QgdnYgPSBz
-dHJ0b3VsbCh2LCAmcmVzLCAxNik7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDQzMiBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
-T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
-Lm9yZw==
+On Thu, Jul 27, 2017 at 07:58:06PM +0800, Sam wrote:
+> Thank you, I think another process connect this socket, so I hanged here.
+
+Yes, if another process has it open, you would see a hang if you tried
+to connect to it, because the kernel will have queued the incoming
+connection, but QEMU will not call accept() on it until the first client
+has gone.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
