@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dadpP-0004uY-JT
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:07:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1dadsp-0006XU-Ok
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dadpM-0002GI-7D
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:07:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dadpM-0002Fw-19
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:07:24 -0400
-Date: Thu, 27 Jul 2017 10:07:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170727100719.564d2a72@gondolin>
-In-Reply-To: <08f16288223244deeccbdc6e4d2fced5d379504d.1501084908.git.alistair.francis@xilinx.com>
-References: <cover.1501084908.git.alistair.francis@xilinx.com>
-	<08f16288223244deeccbdc6e4d2fced5d379504d.1501084908.git.alistair.francis@xilinx.com>
+	(envelope-from <bounces@canonical.com>) id 1dadsm-0004Fi-De
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:10:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56617)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dadsm-0004Ec-8v
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:10:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dadsl-00056U-D9
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:10:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 55B232E80C7
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:10:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] Convert remaining error_report() to
- warn_report()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Jul 2017 08:02:04 -0000
+From: Thomas Huth <1706866@bugs.launchpad.net>
+Reply-To: Bug 1706866 <1706866@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150113818340.31767.9409806903366726521.malonedeb@gac.canonical.com>
+Message-Id: <150114252470.20282.1580933145741684540.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1706866] Re: migrate:  add tls option in virsh,
+ migrate failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +37,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com
+To: qemu-devel@nongnu.org
 
-On Wed, 26 Jul 2017 09:07:52 -0700
-Alistair Francis <alistair.francis@xilinx.com> wrote:
+But then please follow this recommendation from
+http://www.qemu.org/contribute/report-a-bug/ :
 
-> In a previous patch (3dc6f8693694a649a9c83f1e2746565b47683923) we
-> converted uses of error_report("warning:"... to use warn_report()
-> instead. This was to help standardise on a single method of printing
-> warnings to the user.
-> 
-> There appears to have been some cases that slipped through in patch sets
-> applied around the same time, this patch catches the few remaining
-> cases.
-> 
-> All of the warnings were changed using this command:
->   find ./* -type f -exec sed -i \
->     's|error_report(".*warning[,:] |warn_report("|Ig' {} +
-> 
-> Indentation fixed up manually afterwards.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+"Reproduce the problem directly with a QEMU command-line. Avoid
+frontends and management stacks, to ensure that the bug is in QEMU
+itself and not in a frontend."
 
-Hm, the automatic cc:ing does not seem to have worked.
+So can you reproduce the problem by starting QEMU directly from the
+command line?
 
-> ---
-> 
->  block/qcow2.c      | 10 +++++-----
->  target/s390x/kvm.c |  4 ++--
->  trace/control.c    |  4 ++--
->  3 files changed, 9 insertions(+), 9 deletions(-)
-> 
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index c4c5791d27..1084923adb 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -222,8 +222,8 @@ static void kvm_s390_enable_cmma(void)
->      };
->  
->      if (mem_path) {
-> -        error_report("Warning: CMM will not be enabled because it is not "
-> -                     "compatible to hugetlbfs.");
-> +        warn_report("CMM will not be enabled because it is not "
-> +                    "compatible to hugetlbfs.");
->          return;
->      }
->      rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+-- =
 
-s390x part:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706866
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Title:
+  migrate:  add tls option in virsh, migrate failed
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  version:
+      libvirt-3.4.0 + qemu-2.9.90(latest)
+
+  domain:
+      any
+
+  step:
+      1. generate tls certificate in /etc/pki/libvirt-migrate
+      2. start vm
+      3. migrate vm, cmdline:
+         virsh migrate rh7.1-3 --live --undefinesource --persistent --verbo=
+se --tls qemu+ssh://IP/system
+      4. then migrate failed and reported:
+   Migration: [ 64 %]error: internal error: qemu unexpectedly closed the mo=
+nitor: Domain pid=3D5288, libvirtd pid=3D49634
+   kvm: warning: CPU(s) not present in any NUMA nodes: 2 3 4 5 6 7 8 9 10 1=
+1 12 13 14 15 16 17 18 19 20 21 22 23
+   kvm: warning: All CPU(s) up to maxcpus should be described in NUMA config
+   kvm: error while loading state section id 2(ram)
+   kvm: load of migration failed: Input/output error
+
+  other:
+      Analysis qemu code and debug:
+  #0  ram_save_page (f=3D0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=
+=3Dfalse, bytes_transferred=3D0x55ca885ec1d8) =
+
+  #1  0x000055ca87b00b21 in ram_save_target_page (ms=3D0x55ca885b8d80, f=3D=
+0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
+=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
+  #2  0x000055ca87b00bda in ram_save_host_page (ms=3D0x55ca885b8d80, f=3D0x=
+55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
+=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
+  #3  0x000055ca87b00d39 in ram_find_and_save_block (f=3D0x55ca8be370e0, la=
+st_stage=3Dfalse, bytes_transferred=3D0x55ca885ec1d8)
+  #4  0x000055ca87b020b8 in ram_save_iterate (f=3D0x55ca8be370e0, opaque=3D=
+0x0)
+  #5  0x000055ca87b07a9a in qemu_savevm_state_iterate (f=3D0x55ca8be370e0, =
+postcopy=3Dfalse) =
+
+  #6  0x000055ca87e404e5 in migration_thread (opaque=3D0x55ca885b8d80)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706866/+subscriptions
