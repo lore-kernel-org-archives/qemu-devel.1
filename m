@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dakyy-0003K3-72
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:45:49 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal09-000480-DC
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dakyu-0002UQ-PV
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:45:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31783)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal06-0003FM-2E
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:47:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dakyu-0002Tz-Fd
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:45:44 -0400
-Date: Thu, 27 Jul 2017 16:45:35 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170727154535.GY2555@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-	<20170725131931.GC23343@stefanha-x1.localdomain>
-	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-	<20170726112633.GE18489@stefanha-x1.localdomain>
-	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-	<20170727104302.GI2555@redhat.com>
-	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
-	<20170727152137.GW2555@redhat.com>
-	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dal05-0003C9-OR
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:46:57 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 94A8DA0C05
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 15:41:39 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 27 Jul 2017 17:41:03 +0200
+Message-Id: <20170727154126.11339-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 03/26] qboject: add literal qobject type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +33,447 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, =?utf-8?B?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Jul 27, 2017 at 04:33:01PM +0100, Peter Maydell wrote:
-> On 27 July 2017 at 16:21, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > On Thu, Jul 27, 2017 at 11:54:29AM +0100, Peter Maydell wrote:
-> >> That said, yes, I was going to ask if we could do this via
-> >> leveraging the tracepoint infrastructure and whatever scripting
-> >> facilities it provides. Are there any good worked examples of
-> >> this sort of thing? Can you do it as an ordinary non-root user?
-> >
-> > Do you have a particular thing you'd like to see an example of ?
-> >
-> > To dynamically probe a function which doesn't have a tracepoint
-> > defined you can do:
-> >
-> > probe process("/usr/bin/qemu-x86_64").function("helper_syscall") {
-> >   printf("syscall stasrt\n")
-> > }
-> >
-> > but getting access to the function args is not as easy as with
-> > pre-defined tracepoints.
-> 
-> How do I go about actually running that script? What I
-> have in mind by "worked example" is something like a blog
-> post that says "ok, here's a problem, we want to find out
-> what QEMU is doing in situation X, here's how you do this
-> with $TRACING_THINGY" and generally steps you through how
-> it works assuming you know nothing at all about whatever
-> the tracing facility you're using is.
+Promote LiteralQObject from tests/check-qjson.c to qobject/qlit.c,
+allowing to statically declare complex qobjects.
 
-Ok, so something like this example that I wrote for libvirt a
-while back then
+Add a helper qobject_from_qlit() to instantiate a literal qobject to a
+real QObject. Add some simple test.
 
-  https://www.berrange.com/posts/2011/11/30/watching-the-libvirt-rpc-protocol-using-systemtap/
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qapi/qmp/qlit.h | 53 ++++++++++++++++++++++++++++++++++++
+ qobject/qlit.c          | 53 ++++++++++++++++++++++++++++++++++++
+ tests/check-qjson.c     | 72 +++++++++++++++++--------------------------=
+------
+ tests/check-qlit.c      | 52 +++++++++++++++++++++++++++++++++++
+ qobject/Makefile.objs   |  2 +-
+ tests/Makefile.include  |  5 +++-
+ 6 files changed, 187 insertions(+), 50 deletions(-)
+ create mode 100644 include/qapi/qmp/qlit.h
+ create mode 100644 qobject/qlit.c
+ create mode 100644 tests/check-qlit.c
 
-
-> > You can't typically run this as root,
-> 
-> Do you mean "non-root" ?
-
-Sigh, yes, of course.
-
-> > however, I don't think that's a
-> > huge issue, because most QEMU deployments are not running as your own
-> > user account anyway, so you can't directly interact with them no
-> > matter what.
-> 
-> It is important, because almost all uses of TCG QEMU are
-> running it from the command line as non-root normal users,
-> especially if they're trying to debug what's going on with a
-> guest binary. So any tracing solution for this kind of usecase
-> must work without requiring root access, I think.
-
-None of the Linux integrated tracing tools allow direct non-root access
-afaik. systemtap has ability to launch probes as non-root, via a privileged
-daemon, but it is restricted to probe scripts that the administrator has
-pre-defined.
-
-That pretty much leaves re-building QEMU, LD_PRELOADS, or something
-ptrace(), or qemu's built-in simpletrace feature, as the remaining
-options.  We have a scripts/simpletrace.py that lets you load a
-trace file into python and process it, but as written that's aimed
-as post-processing a tracefile you've previously collected.
-
-It would be desirable to write a more advanced simpletrace python
-module that could collect & process the trace data live, and also
-interact with the qemu monitor to change what events are enabled
-dynamically.  Basically we'd need a way for the simpletrace backend
-to output its data to a fifo, instead of creating an file on disk,
-then you could dynanically consume it.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
+new file mode 100644
+index 0000000000..fd6bfc3e69
+--- /dev/null
++++ b/include/qapi/qmp/qlit.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright IBM, Corp. 2009
++ * Copyright (c) 2013, 2015 Red Hat Inc.
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Markus Armbruster <armbru@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++#ifndef QLIT_H_
++#define QLIT_H_
++
++#include "qapi-types.h"
++#include "qobject.h"
++
++typedef struct QLitDictEntry QLitDictEntry;
++typedef struct QLitObject QLitObject;
++
++struct QLitObject {
++    int type;
++    union {
++        bool qbool;
++        int64_t qnum;
++        const char *qstr;
++        QLitDictEntry *qdict;
++        QLitObject *qlist;
++    } value;
++};
++
++struct QLitDictEntry {
++    const char *key;
++    QLitObject value;
++};
++
++#define QLIT_QNULL \
++    { .type =3D QTYPE_QNULL }
++#define QLIT_QBOOL(val) \
++    { .type =3D QTYPE_QBOOL, .value.qbool =3D (val) }
++#define QLIT_QNUM(val) \
++    { .type =3D QTYPE_QNUM, .value.qnum =3D (val) }
++#define QLIT_QSTR(val) \
++    { .type =3D QTYPE_QSTRING, .value.qstr =3D (val) }
++#define QLIT_QDICT(val) \
++    { .type =3D QTYPE_QDICT, .value.qdict =3D (val) }
++#define QLIT_QLIST(val) \
++    { .type =3D QTYPE_QLIST, .value.qlist =3D (val) }
++
++QObject *qobject_from_qlit(const QLitObject *qlit);
++
++#endif /* QLIT_H_ */
+diff --git a/qobject/qlit.c b/qobject/qlit.c
+new file mode 100644
+index 0000000000..d7407b4b34
+--- /dev/null
++++ b/qobject/qlit.c
+@@ -0,0 +1,53 @@
++/*
++ * QLit literal qobject
++ *
++ * Copyright (C) 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "qapi/qmp/qlit.h"
++#include "qapi/qmp/types.h"
++
++QObject *qobject_from_qlit(const QLitObject *qlit)
++{
++    int i;
++
++    switch (qlit->type) {
++    case QTYPE_QNULL:
++        return QOBJECT(qnull());
++    case QTYPE_QNUM:
++        return QOBJECT(qnum_from_int(qlit->value.qnum));
++    case QTYPE_QSTRING:
++        return QOBJECT(qstring_from_str(qlit->value.qstr));
++    case QTYPE_QDICT: {
++        QDict *qdict =3D qdict_new();
++        for (i =3D 0; qlit->value.qdict[i].value.type !=3D QTYPE_NONE; i=
+++) {
++            QLitDictEntry *e =3D &qlit->value.qdict[i];
++
++            qdict_put_obj(qdict, e->key, qobject_from_qlit(&e->value));
++        }
++        return QOBJECT(qdict);
++    }
++    case QTYPE_QLIST: {
++        QList *qlist =3D qlist_new();
++
++        for (i =3D 0; qlit->value.qlist[i].type !=3D QTYPE_NONE; i++) {
++            qlist_append_obj(qlist, qobject_from_qlit(&qlit->value.qlist=
+[i]));
++        }
++        return QOBJECT(qlist);
++    }
++    case QTYPE_QBOOL:
++        return QOBJECT(qbool_from_bool(qlit->value.qbool));
++    case QTYPE_NONE:
++        assert(0);
++    }
++
++    return NULL;
++}
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 9c42a46b7d..1a95aff2ba 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -16,6 +16,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/types.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qlit.h"
+ #include "qemu-common.h"
+=20
+ static void escaped_string(void)
+@@ -1059,39 +1060,14 @@ static void keyword_literal(void)
+     QDECREF(null);
+ }
+=20
+-typedef struct LiteralQDictEntry LiteralQDictEntry;
+-typedef struct LiteralQObject LiteralQObject;
+-
+-struct LiteralQObject
+-{
+-    int type;
+-    union {
+-        int64_t qnum;
+-        const char *qstr;
+-        LiteralQDictEntry *qdict;
+-        LiteralQObject *qlist;
+-    } value;
+-};
+-
+-struct LiteralQDictEntry
+-{
+-    const char *key;
+-    LiteralQObject value;
+-};
+-
+-#define QLIT_QNUM(val) (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnu=
+m =3D (val)}
+-#define QLIT_QSTR(val) (LiteralQObject){.type =3D QTYPE_QSTRING, .value.=
+qstr =3D (val)}
+-#define QLIT_QDICT(val) (LiteralQObject){.type =3D QTYPE_QDICT, .value.q=
+dict =3D (val)}
+-#define QLIT_QLIST(val) (LiteralQObject){.type =3D QTYPE_QLIST, .value.q=
+list =3D (val)}
+-
+ typedef struct QListCompareHelper
+ {
+     int index;
+-    LiteralQObject *objs;
++    QLitObject *objs;
+     int result;
+ } QListCompareHelper;
+=20
+-static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
++static int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs);
+=20
+ static void compare_helper(QObject *obj, void *opaque)
+ {
+@@ -1109,7 +1085,7 @@ static void compare_helper(QObject *obj, void *opaq=
+ue)
+     helper->result =3D compare_litqobj_to_qobj(&helper->objs[helper->ind=
+ex++], obj);
+ }
+=20
+-static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
++static int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs)
+ {
+     int64_t val;
+=20
+@@ -1159,23 +1135,23 @@ static void simple_dict(void)
+     int i;
+     struct {
+         const char *encoded;
+-        LiteralQObject decoded;
++        QLitObject decoded;
+     } test_cases[] =3D {
+         {
+             .encoded =3D "{\"foo\": 42, \"bar\": \"hello world\"}",
+-            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
++            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
+                         { "foo", QLIT_QNUM(42) },
+                         { "bar", QLIT_QSTR("hello world") },
+                         { }
+                     })),
+         }, {
+             .encoded =3D "{}",
+-            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
++            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
+                         { }
+                     })),
+         }, {
+             .encoded =3D "{\"foo\": 43}",
+-            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
++            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
+                         { "foo", QLIT_QNUM(43) },
+                         { }
+                     })),
+@@ -1257,11 +1233,11 @@ static void simple_list(void)
+     int i;
+     struct {
+         const char *encoded;
+-        LiteralQObject decoded;
++        QLitObject decoded;
+     } test_cases[] =3D {
+         {
+             .encoded =3D "[43,42]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(43),
+                         QLIT_QNUM(42),
+                         { }
+@@ -1269,21 +1245,21 @@ static void simple_list(void)
+         },
+         {
+             .encoded =3D "[43]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(43),
+                         { }
+                     })),
+         },
+         {
+             .encoded =3D "[]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
+                         { }
+                     })),
+         },
+         {
+             .encoded =3D "[{}]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+-                        QLIT_QDICT(((LiteralQDictEntry[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
++                        QLIT_QDICT(((QLitDictEntry[]){
+                                     {},
+                                         })),
+                         {},
+@@ -1314,11 +1290,11 @@ static void simple_whitespace(void)
+     int i;
+     struct {
+         const char *encoded;
+-        LiteralQObject decoded;
++        QLitObject decoded;
+     } test_cases[] =3D {
+         {
+             .encoded =3D " [ 43 , 42 ]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(43),
+                         QLIT_QNUM(42),
+                         { }
+@@ -1326,12 +1302,12 @@ static void simple_whitespace(void)
+         },
+         {
+             .encoded =3D " [ 43 , { 'h' : 'b' }, [ ], 42 ]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(43),
+-                        QLIT_QDICT(((LiteralQDictEntry[]){
++                        QLIT_QDICT(((QLitDictEntry[]){
+                                     { "h", QLIT_QSTR("b") },
+                                     { }})),
+-                        QLIT_QLIST(((LiteralQObject[]){
++                        QLIT_QLIST(((QLitObject[]){
+                                     { }})),
+                         QLIT_QNUM(42),
+                         { }
+@@ -1339,13 +1315,13 @@ static void simple_whitespace(void)
+         },
+         {
+             .encoded =3D " [ 43 , { 'h' : 'b' , 'a' : 32 }, [ ], 42 ]",
+-            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
++            .decoded =3D QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(43),
+-                        QLIT_QDICT(((LiteralQDictEntry[]){
++                        QLIT_QDICT(((QLitDictEntry[]){
+                                     { "h", QLIT_QSTR("b") },
+                                     { "a", QLIT_QNUM(32) },
+                                     { }})),
+-                        QLIT_QLIST(((LiteralQObject[]){
++                        QLIT_QLIST(((QLitObject[]){
+                                     { }})),
+                         QLIT_QNUM(42),
+                         { }
+@@ -1393,10 +1369,10 @@ static void simple_varargs(void)
+ {
+     QObject *embedded_obj;
+     QObject *obj;
+-    LiteralQObject decoded =3D QLIT_QLIST(((LiteralQObject[]){
++    QLitObject decoded =3D QLIT_QLIST(((QLitObject[]){
+             QLIT_QNUM(1),
+             QLIT_QNUM(2),
+-            QLIT_QLIST(((LiteralQObject[]){
++            QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(32),
+                         QLIT_QNUM(42),
+                         {}})),
+diff --git a/tests/check-qlit.c b/tests/check-qlit.c
+new file mode 100644
+index 0000000000..cda4620f92
+--- /dev/null
++++ b/tests/check-qlit.c
+@@ -0,0 +1,52 @@
++/*
++ * QLit unit-tests.
++ *
++ * Copyright (C) 2017 Red Hat Inc.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "qapi/qmp/qlit.h"
++
++static void qobject_from_qlit_test(void)
++{
++    char *str;
++    QObject *qobj =3D NULL;
++    QLitObject qlit =3D QLIT_QDICT((
++        (QLitDictEntry[]) {
++            { "foo", QLIT_QNUM(42) },
++            { "bar", QLIT_QSTR("hello world") },
++            { "baz", QLIT_QNULL },
++            { "bee", QLIT_QLIST((
++                (QLitObject[]) {
++                    QLIT_QNUM(43),
++                    QLIT_QNUM(44),
++                    QLIT_QBOOL(true),
++                    { },
++                }))
++            },
++            { },
++        }));
++
++    qobj =3D qobject_from_qlit(&qlit);
++
++    str =3D qobject_to_string(qobj);
++    g_assert_cmpstr(str, =3D=3D,
++                    "bee:\n    [0]: 43\n    [1]: 44\n    [2]: true\n"   =
+\
++                    "baz: null\nbar: hello world\nfoo: 42\n");
++
++    g_free(str);
++    qobject_decref(qobj);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/qlit/qobject_from_qlit", qobject_from_qlit_test);
++
++    return g_test_run();
++}
+diff --git a/qobject/Makefile.objs b/qobject/Makefile.objs
+index fc8885c9a4..002d25873a 100644
+--- a/qobject/Makefile.objs
++++ b/qobject/Makefile.objs
+@@ -1,2 +1,2 @@
+-util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o
++util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o qlit.o
+ util-obj-y +=3D qjson.o qobject.o json-lexer.o json-streamer.o json-pars=
+er.o
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 7af278db55..960ab8c6dd 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -12,6 +12,8 @@ check-unit-y +=3D tests/test-char$(EXESUF)
+ gcov-files-check-qdict-y =3D chardev/char.c
+ check-unit-y +=3D tests/check-qnum$(EXESUF)
+ gcov-files-check-qnum-y =3D qobject/qnum.c
++check-unit-y +=3D tests/check-qlit$(EXESUF)
++gcov-files-check-qlit-y =3D qobject/qlit.c
+ check-unit-y +=3D tests/check-qstring$(EXESUF)
+ gcov-files-check-qstring-y =3D qobject/qstring.c
+ check-unit-y +=3D tests/check-qlist$(EXESUF)
+@@ -523,7 +525,7 @@ test-obj-y =3D tests/check-qnum.o tests/check-qstring=
+.o tests/check-qdict.o \
+ 	tests/rcutorture.o tests/test-rcu-list.o \
+ 	tests/test-qdist.o tests/test-shift128.o \
+ 	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
+-	tests/atomic_add-bench.o
++	tests/atomic_add-bench.o tests/check-qlit.o
+=20
+ $(test-obj-y): QEMU_INCLUDES +=3D -Itests
+ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+@@ -541,6 +543,7 @@ test-io-obj-y =3D $(io-obj-y) $(test-crypto-obj-y)
+ test-block-obj-y =3D $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+=20
+ tests/check-qnum$(EXESUF): tests/check-qnum.o $(test-util-obj-y)
++tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
+ tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
+ tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
+ tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
+--=20
+2.14.0.rc0.1.g40ca67566
