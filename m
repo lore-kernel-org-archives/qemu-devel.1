@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dajht-00041X-R8
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:24:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dajkV-0005Qx-Ei
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dajhs-0000LF-UK
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:24:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36594)
+	(envelope-from <pbonzini@redhat.com>) id 1dajkS-0002H1-Bh
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:26:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dajhs-0000Kw-OU
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:24:04 -0400
-Date: Thu, 27 Jul 2017 16:24:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170727162400.4a3fd483@gondolin>
-In-Reply-To: <8f101d44-4d7d-9a13-8d0c-ebb830010847@linux.vnet.ibm.com>
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170727102636.43d6a789@gondolin>
-	<f05dcd54-dad7-8939-e87b-e39346cc986c@linux.vnet.ibm.com>
-	<20170727154005.0c99521b@gondolin>
-	<8f101d44-4d7d-9a13-8d0c-ebb830010847@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dajkS-0002Ga-2N
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:26:44 -0400
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
+	<20170724153521.GD2127@work-vm>
+	<9cea170f-90eb-78e5-6b52-8dd882efd160@redhat.com>
+	<20170724190331.GH2127@work-vm>
+	<a05bf0cb-77a3-c372-5b9d-d9c15a8bd8a1@redhat.com>
+	<20170725191542.GD2820@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <005f7387-d62d-3d51-4289-91184f084255@redhat.com>
+Date: Thu, 27 Jul 2017 16:26:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170725191542.GD2820@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] ccw interpretation AR compliance
- improvements
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jay Zhou <jianjay.zhou@huawei.com>, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Thu, 27 Jul 2017 15:52:23 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 25/07/2017 21:15, Dr. David Alan Gilbert wrote:
+> * Paolo Bonzini (pbonzini@redhat.com) wrote:
+>> On 24/07/2017 21:03, Dr. David Alan Gilbert wrote:
+>>>> I don't like having such a long-lived mutex (it seems like a recipe for
+>>>> deadlocks with the BQL), plus memory_region_transaction_commit (the
+>>>> expensive part of memory_global_dirty_log_stop) needs to be under the
+>>>> BQL itself because it calls MemoryListeners.
+>>>>
+>>>> Maybe memory_global_dirty_log_stop can delay itself to the next vm_start
+>>>> if it's called while runstate_running() returns false (which should be
+>>>> always the case)?
+>>>>
+>>>> It could even be entirely enclosed within memory.c if you do it with a
+>>>> VMChangeStateHandler.
+>>> This still causes the BQL to be held for quite a while; albeit at a less
+>>> critical point.
+>>>
+>>> In this and the existing case we don't actually need efficiency - what we need is just
+>>> not to be holding onto the BQL for so long;  could we do a less
+>>> efficient commit here, removing one region at a time, yielding the lock
+>>> and retaking it?
+>>
+>> I'm worried that if you release the lock and retake it you open a window
+>> where someone else could start a commit, and
+>> memory_global_dirty_log_stop's commit would use outdated information.
+>>
+>> The problem is that a coarse lock, such as the BQL, is very hard to
+>> break into another lock with long critical sections (a "memory map
+>> commit lock" in this case).  It's obviously very easy to say "the new
+>> lock nests inside the BQL"... but then, because you created the lock to
+>> move things out of the BQL, any callback inside the new lock cannot take
+>> the memory map commit lock, and you need to make entire subsystems
+>> thread-safe.  If the new lock nests outside the BQL instead, it's
+>> simpler to avoid deadlocks, but you need to be careful about releasing
+>> the BQL and any reentrancy implications of doing that.
+>>
+>> One strategy that worked well so far has been to use two locks, one of
+>> them being the BQL, where you can take either lock for reads and both
+>> for writes.
+> 
+> I guess you could say that in the event someone wants to do something
+> with the memory map they have to wait for the cleanup to complete?
 
-> On 07/27/2017 03:40 PM, Cornelia Huck wrote:
-> > On Thu, 27 Jul 2017 15:18:01 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> [Re-posting my previous reply because I've accidentally
-> >> dropped almost all addresses.]
-> >>
-> >> On 07/27/2017 10:26 AM, Cornelia Huck wrote:  
-> >>> On Wed, 26 Jul 2017 00:44:40 +0200
-> >>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:  
-> >   
-> >>>> Regarding testing: did not do much more than a simple smoke test
-> >>>> with virtio-ccw.    
-> >>>
-> >>> I think we need a way to throw random channel programs at a channel
-> >>> device...
-> >>>     
-> >>
-> >> By random do you mean random random, or do you mean carefully crafted
-> >> to provoke (and verify) certain responses. If it's more like the second
-> >> case I've actually wrote something (a kernel driver) for 'internal use'
-> >> but at the moment it's limited to indirect data access support (no test
-> >> cases for invalid invalid channel programs).  
-> > 
-> > That's what I've been thinking of. Standalone guest code would be even
-> > better (can be integrated into automatic testing), but it's certainly
-> > useful.
-> >   
-> >> The 'internal guys' say it
-> >> probably ain't interesting for the rest of the world make this external,
-> >> but if you are interested I could send you the patch these days.  
-> > 
-> > Would be great if you could make this available. It is especially
-> > interesting for me, but possibly for other folks working on s390 as well.  
-> 
-> It is very wip and I don't feel comfortable with sharing it
-> with the world yet. But I'm definitely interested in making this
-> available. I haven't figured out what would be the best way to make
-> it available, and I hope you can help me with that.
+Yes, you could take pending "invisible" changes (well, toggling dirty
+bitmap status is the only invisible change to the guest I guess) and
+push those to a separate thread.  That optimization would be in the KVM
+memory listener.
 
-Do you have a git tree somewhere you can dump it?
-
-> 
-> > 
-> > Might be good together with an "eat this" channel device in qemu.
-> >   
-> 
-> If course I do have a qemu counterpart.
-
-And of course I'd love to see that as well :)
-
-> 
-> To sum it up, one I'm done with the next iteration I'm gonna send
-> you with the patches unless you say otherwise.
-> 
-> Regards,
-> Halil
-> 
+Paolo
