@@ -1,41 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dal6S-0001tF-3J
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:53:33 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dalRY-0007ma-7M
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 12:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dal6O-0007yi-RN
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:53:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46938)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dalRU-0006Ku-0a
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 12:15:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42944)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dal6O-0007yN-Gx
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:53:28 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dalRT-0006JU-NZ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 12:15:15 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6RFrKUZ053145
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 11:53:27 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2byg509vtt-1
+	v6RGEsu1147224
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:14 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2byjs72dj0-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 11:53:24 -0400
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:14 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 27 Jul 2017 09:52:39 -0600
-Content-Type: text/plain; charset="utf-8"
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 27 Jul 2017 17:15:11 +0100
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+	<20170727135910.27d9e42e@gondolin>
+	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
+	<20170727161457.58b3c7d1@gondolin>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 27 Jul 2017 18:15:07 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170726163227.3d6647a4@bahia.lan>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100568549.27487.11903027800624299907.stgit@bahia>
-	<0d1e2a57-14cb-4c4d-d8f7-915cd94c2eba@ozlabs.ru>
-	<20170726163227.3d6647a4@bahia.lan>
-Date: Thu, 27 Jul 2017 10:52:32 -0500
-Message-Id: <150117075295.26979.13464389338949102104@loki>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 16/26] spapr: enable
- PHB hotplug for pseries-2.11
+In-Reply-To: <20170727161457.58b3c7d1@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
+ initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,143 +46,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
 
-Quoting Greg Kurz (2017-07-26 09:32:27)
-> On Wed, 26 Jul 2017 14:42:23 +1000
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> =
 
-> > On 26/07/17 04:01, Greg Kurz wrote:
-> > > From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > =
 
-> > > The 'dr_phb_enabled' field of that class can be set as
-> > > part of machine-specific init code, and is then propagated
-> > > to sPAPREnvironment to conditionally enable creation of DRC
-> > > objects and device-tree description to facilitate hotplug
-> > > of PHBs.
-> > > =
+On 07/27/2017 04:14 PM, Cornelia Huck wrote:
+> On Thu, 27 Jul 2017 15:37:08 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 07/27/2017 01:59 PM, Cornelia Huck wrote:
+>>> On Thu, 27 Jul 2017 03:54:18 +0200
+>>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+>>>   
+>>>> When a channel path is hot plugged into a CSS, we should generate
+>>>> a channel path initialized CRW (channel report word). The current
+>>>> code does not do that, instead it puts a stub function with a TODO
+>>>> reminder there.
+>>>>
+>>>> This implements the css_generate_chp_crws() function by:
+>>>> 1. refactor the existing code.
+>>>> 2. add an @add parameter to provide future callers with the
+>>>>    capability of generating channel path permanent error with
+>>>>    facility not initialized CRW.
+>>>> 3. add a @hotplugged parameter, so to opt out generating initialized
+>>>>    CRWs for predefined channel paths.  
+>>>
+>>> I'm not 100% sure whether the logic is correct here. Let me elaborate:
+>>>
+>>> The current code flow when hotplugging a device is:
+>>> - Generate the schib.
+>>> - Check if any of the chpids refers to a not yet existing channel path;
+>>>   generate it if that is the case.
+>>> - Post a crw for the subchannel.
+>>>
+>>> The second step is where the current code seems to be not quite correct
+>>> already. It is fine for coldplugged devices, but I really think we need
+>>> to make sure that all referenced channel paths are in place before we
+>>> hotplug a new device. It was not really relevant when we just had one
+>>> very virtual channel path, and 3270 is experimental so it is not a
+>>> problem in practice.  
+>>
+>> What do you mean by not quite correct?  Are we somewhere in conflict with
+>> the AR (if yes could you give me a pointer)? Or is it a modeling concern?
+>> Or is it about the user interface design? Or any combination of these?
+> 
+> Modeling. Conceptually, you need at least one channel path to access a
+> device; the subchannel is more or less a followup.
+> 
+> As up to now, we only had a dummy channel path simply to satisfy the
+> architecture, it did not really matter when it was 'created'. As it is
+> always 'there' from beginning, there was no need for any CRW either. If
+> there's now a need for real channel path modeling, we unfortunately
+> have to give this some thought :)
+> 
 
-> > > Since we can't migrate this state to older machine types,
-> > > default the option to true and disable it for older machine
-> > > types.
-> > > =
+We have considered this 'always there' internally. Was my train of thought
+to but then I came to the conclusion it ain't necessarily true. One can
+IPL with initrd and end up with a guest with no ccw devices whatsoever
+(IMHO; the default net can be disabled -net none).
 
-> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > > Changes since RFC:
-> > > - rebased against ppc-for-2.10
-> > > - updated changelog and title
-> > > - set default to true and disable for 2.10 and older
-> > > ---
-> > >  hw/ppc/spapr.c         |    6 ++++++
-> > >  include/hw/ppc/spapr.h |    3 +++
-> > >  2 files changed, 9 insertions(+)
-> > > =
+>>
+>>>
+>>> This, of course, implies we need deeper changes. We need to create the
+>>> channel paths before the subchannel is created and refuse hotplug of a
+>>> device if not all channel paths it needs are defined. This means we
+>>> need some things before we can claim real channel path support:
+>>> - Have a way to specify channel paths on the command line resp. when
+>>>   hotplugging. This implies they need to be real objects.
+>>> - Have a way to specify which channel paths belong to a subchannel in
+>>>   the same context. Keep existing device types working with the current
+>>>   method.
+>>> - Give channel paths states: Defined, configured. The right time for a
+>>>   CRW is the transition between those states.
+>>> - Only queue a 'device come' CRW for a subchannel if at least one of
+>>>   its channel paths is in the configured state. Detach or make not
+>>>   operational a subchannel if all of its paths are deconfigured.
+>>>   
+>>
+>> AFAIU in your opinion our model is to simple and needs to get more
+>> complex. What benefits do we expect from the added complexity? I mean
+>> our current model works (and I'm not sure what limitations do we
+>> want to get rid of, or even what are the relevant limitations we have.)
+> 
+> I was under the impression that we want to support multiple, 'real'
+> channel paths for vfio-ccw. Did I misunderstand?
+> 
 
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 277daa4f9645..8dc505343c0f 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2382,6 +2382,8 @@ static void ppc_spapr_init(MachineState *machin=
-e)
-> > >      /* We always have at least the nvram device on VIO */
-> > >      spapr_create_nvram(spapr);
-> > >  =
+You assumed correctly. I've asked Dong Jia a very similar question when
+this first popped up as a part of his channel path virtualization work
+(he is referring to at the beginning of this cover letter).
 
-> > > +    spapr->dr_phb_enabled =3D smc->dr_phb_enabled;
-> > > +
-> > >      /* Set up PCI */
-> > >      spapr_pci_rtas_init();
-> > >  =
+Unfortunately that question is still unanswered. I've speculated maybe you
+were involved in the decision of opting for 'real' channel paths, so this
+is why I asked.
 
-> > > @@ -3482,6 +3484,7 @@ static void spapr_machine_class_init(ObjectClas=
-s *oc, void *data)
-> > >       * in which LMBs are represented and hot-added
-> > >       */
-> > >      mc->numa_mem_align_shift =3D 28;
-> > > +    smc->dr_phb_enabled =3D true;
-> > >  }
-> > >  =
+So my intention was to ask: What benefits do we expect from these 'real'
+virtual channel paths? 
 
-> > >  static const TypeInfo spapr_machine_info =3D {
-> > > @@ -3558,8 +3561,11 @@ static void spapr_machine_2_10_instance_option=
-s(MachineState *machine)
-> > >  =
+(I believe models make sense (and can be judged) only in a context of a
+problem. So before voting for a more complex model, I would like too
+understand the problem.)
 
-> > >  static void spapr_machine_2_10_class_options(MachineClass *mc)
-> > >  {
-> > > +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > > +
-> > >      spapr_machine_2_11_class_options(mc);
-> > >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_10);
-> > > +    smc->dr_phb_enabled =3D false;
-> > >  }
-> > >  =
+Regards,
+Halil
 
-> > >  DEFINE_SPAPR_MACHINE(2_10, "2.10", false);
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index 2a303a705c17..8004d9c2ab2c 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -59,6 +59,7 @@ struct sPAPRMachineClass {
-> > >  =
-
-> > >      /*< public >*/
-> > >      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of=
- LMBs */
-> > > +    bool dr_phb_enabled;       /* enable dynamic-reconfig/hotplug of=
- PHBs */
-> > >      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-> > >      const char *tcg_default_cpu; /* which (TCG) CPU to simulate by d=
-efault */
-> > >      bool pre_2_10_has_unused_icps;
-> > > @@ -122,6 +123,8 @@ struct sPAPRMachineState {
-> > >       * occurs during the unplug process. */
-> > >      QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
-> > >  =
-
-> > > +    bool dr_phb_enabled; /* hotplug / dynamic-reconfiguration of PHB=
-s */  =
-
-> > =
-
-> > The one in the class seems sufficient unless we are going to allow
-> > disabling this via the command line.
-> > =
-
-> =
-
-> I kept the original patch but you're right indeed. I don't see why
-> someone would want to disable this from the cmdline, so I guess I
-> should just drop the per-instance flag.
-> =
-
-> Mike, any thoughts ?
-
-Not sure why I did it like that originally, and can't think of a good reason
-we'd want to disable it specifically either, so I agree we should probably
-just drop it.
-
-> =
-
-> > =
-
-> > =
-
-> > > +
-> > >      /*< public >*/
-> > >      char *kvm_type;
-> > >      MemoryHotplugState hotplug_memory;
-> > > =
-
-> > >   =
-
-> > =
-
-> > =
-
->=20
+>>
+>>> Something along those lines also matches better what I've seen on z/VM
+>>> or LPAR. I realize that it's not easy :(
+>>>
+>>> tl;dr: I don't think we want chp crws until after we have a good chp
+>>> model.  
+>>
+>> I fully agree with this point.
+> 
+> Great.
+> 
