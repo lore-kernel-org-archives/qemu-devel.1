@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dafnV-0003nt-G3
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:13:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dag3D-0001fR-2i
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dafnU-0003Na-J9
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:13:37 -0400
-Date: Thu, 27 Jul 2017 11:13:20 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170727101320.GH2555@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170726130337.24102-1-stefanha@redhat.com>
-	<20170726130913.GM7620@redhat.com>
-	<20170727101235.GD10129@stefanha-x1.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1dag3C-0007dL-8E
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:29:51 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:35470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dag3C-0007cH-1l
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:29:50 -0400
+Received: by mail-wr0-x229.google.com with SMTP id k71so88274094wrc.2
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 03:29:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170727101235.GD10129@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3] docs: add qemu-block-drivers(7) man page
+In-Reply-To: <20170726184421.1315.42536.stgit@gimli.home>
+References: <20170726184421.1315.42536.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Jul 2017 11:29:28 +0100
+Message-ID: <CAFEAcA8=VUjj4+Rk+ooG1RYrRmOAxeueA21Ew9rcQC7_RkdDJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] VFIO fixes for v2.10-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, el13635@mail.ntua.gr
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jul 27, 2017 at 11:12:35AM +0100, Stefan Hajnoczi wrote:
-> On Wed, Jul 26, 2017 at 02:09:13PM +0100, Daniel P. Berrange wrote:
-> > On Wed, Jul 26, 2017 at 02:03:37PM +0100, Stefan Hajnoczi wrote:
-> > > Block driver documentation is available in qemu-doc.html.  It would be
-> > > convenient to have documentation for formats, protocols, and filter
-> > > drivers in a man page.
-> > > 
-> > > Extract the relevant part of qemu-doc.html into a new file called
-> > > docs/qemu-block-drivers.texi.  This file can also be built as a
-> > > stand-alone document (man, html, etc).
-> > 
-> > Is there perhaps benefit it taking it further and creating one
-> > man page per block driver. Many of the block drivers are optional
-> > and can be turned off, so this would let us leave out the docs
-> > for disabled block drivers too.
-> 
-> That's a great idea - especially in the world of modular block drivers
-> (they can be installed after the core QEMU package).
-> 
-> Can we leave that for later when also documenting the open parameters?
-> We can still make use of a qemu-block-drivers(7) index for
-> discoverability - a introductory man page with references to all
-> possible block drivers (some of which may not be installed).  This is a
-> common man page idiom for programs with subcommands, like git(1).
+On 26 July 2017 at 19:45, Alex Williamson <alex.williamson@redhat.com> wrot=
+e:
+> The following changes since commit 522fd24ca030c27c591dafedd65c1dfd51e404=
+50:
+>
+>   Update version for v2.10.0-rc0 release (2017-07-25 17:13:09 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-fixes-20170726.0
+>
+> for you to fetch changes up to 96d2c2c57452f8b6bc3decae71435e7230f3432e:
+>
+>   vfio/pci: fix use of freed memory (2017-07-26 11:38:18 -0600)
+>
+> ----------------------------------------------------------------
+> VFIO fixes 2017-07-26
+>
+>  - Error path use after free bug fixes (Philippe Mathieu-Daud=C3=A9)
+>
+> ----------------------------------------------------------------
+> Philippe Mathieu-Daud=C3=A9 (2):
+>       vfio/platform: fix use of freed memory
+>       vfio/pci: fix use of freed memory
 
-Sure, fine with me.
+Applied, thanks.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
