@@ -1,39 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daqcT-00059d-M3
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:46:58 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1daquK-0004Wk-7Q
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daqcQ-0008Vz-FL
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:46:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35611)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1daqcQ-0008VT-5A
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:46:54 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6RLinsK082036
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 17:46:52 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bykvyuarn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 17:46:52 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 27 Jul 2017 17:46:51 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <paolo.bonzini@gmail.com>) id 1daquH-0005ds-Jp
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:05:24 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1daquH-0005bS-DN
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:05:21 -0400
+Received: by mail-wm0-x242.google.com with SMTP id y206so2271731wmd.5
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 15:05:19 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-5-f4bug@amsat.org>
+	<87d18pudy9.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5a21e44f-b313-8214-0c04-0b161b68236f@redhat.com>
+Date: Fri, 28 Jul 2017 00:05:15 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170726214010.420-4-f4bug@amsat.org>
-References: <20170726214010.420-1-f4bug@amsat.org>
-	<20170726214010.420-4-f4bug@amsat.org>
-Date: Thu, 27 Jul 2017 16:43:36 -0500
-Message-Id: <150119181625.29297.6660999538265637711@loki>
-Subject: Re: [Qemu-devel] [PATCH for 2.10 3/4] fdt: probe for v1.4.2 using
- fdt_setprop_inplace_namelen_partial()
+In-Reply-To: <87d18pudy9.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 04/35] ivshmem: fix incorrect
+ error handling in ivshmem_recv_msg()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,41 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, John Arbuckle <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: James Hogan <james.hogan@imgtec.com>, Juan Quintela <quintela@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-26 16:40:09)
-> instead of fdt_first_subnode() which is v1.4.0
-> =
+On 25/07/2017 10:18, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> If qemu_chr_fe_read_all() returns -EINTR the do {} statement continues and the
+>> n accumulator used to complete reads upto sizeof(msg) is decremented by 4 (the
+>> value of EINTR on Linux).
+>> To avoid that, use simpler if() statements and continue if EINTR occured.
+>>
+>> hw/misc/ivshmem.c:650:14: warning: Loss of sign in implicit conversion
+>>     } while (n < sizeof(msg));
+>>              ^
+>>
+> 
+> Let's add "Screwed up in commit 3a55fc0f, v2.6.0."
+> 
+>> Reported-by: Clang Static Analyzer
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> get_maintainer.pl: No maintainers found!
+>>
+>>  hw/misc/ivshmem.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+>> index a58f9ee579..47a015f072 100644
+>> --- a/hw/misc/ivshmem.c
+>> +++ b/hw/misc/ivshmem.c
+>> @@ -642,7 +642,10 @@ static int64_t ivshmem_recv_msg(IVShmemState *s, int *pfd, Error **errp)
+>>      do {
+>>          ret = qemu_chr_fe_read_all(&s->server_chr, (uint8_t *)&msg + n,
+>>                                     sizeof(msg) - n);
+>> -        if (ret < 0 && ret != -EINTR) {
+>> +        if (ret < 0) {
+>> +            if (ret == -EINTR) {
+>> +                continue;
+>> +            }
+>>              error_setg_errno(errp, -ret, "read from server failed");
+>>              return INT64_MIN;
+>>          }
+> 
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+> Paolo, you taking this through your miscellaneous queue would save me
+> (and possibly Peter) a bit of work.  Only if you have something queued
+> already.  Let me know.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Fair enough, I'll pick this up.
 
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-> ---
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> =
-
-> diff --git a/configure b/configure
-> index 0d5bdb3ae9..2d803d6a77 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3565,7 +3565,10 @@ if test "$fdt" !=3D "no" ; then
->    cat > $TMPC << EOF
->  #include <libfdt.h>
->  #include <libfdt_env.h>
-> -int main(void) { fdt_first_subnode(0, 0); return 0; }
-> +int main(void) {
-> +    fdt_setprop_inplace_namelen_partial(0, 0, 0, 0, 0, 0, 0);
-> +    return 0;
-> +}
->  EOF
->    if compile_prog "" "$fdt_libs" ; then
->      # system DTC is good - use it
-> -- =
-
-> 2.13.3
-> =
-
->=20
+Paolo
