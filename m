@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dams9-0007O3-M4
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:46:55 -0400
+	(envelope-from <lersek@redhat.com>) id 1damsE-0007PB-7e
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:46:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dams4-0002RH-V6
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:46:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50048)
+	(envelope-from <lersek@redhat.com>) id 1damsD-0002WR-8Q
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:46:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37146)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dams4-0002QI-OZ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:46:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE443C0D473F
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 17:46:47 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 27 Jul 2017 18:46:40 +0100
-Message-Id: <20170727174640.30359-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] ui: correctly detect spice PAUSE scancode
- sequence
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1damsC-0002VX-Vy
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:46:57 -0400
+References: <CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
+	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
+	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
+	<a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
+	<20170725220150.GA2891@morn.lan>
+	<8ce79be9-5512-148d-f2d4-3bb8c04d6eda@redhat.com>
+	<20170726191252.GA8769@morn.lan>
+	<1419439438.19249924.1501100483485.JavaMail.zimbra@redhat.com>
+	<20170727145929.GA14721@morn.lan>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <70092179-8b4b-8f6d-50bc-df95ad2649be@redhat.com>
+Date: Thu, 27 Jul 2017 19:46:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170727145929.GA14721@morn.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [SeaBIOS] Commit
+ 77af8a2b95b79699de650965d5228772743efe84 breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Kevin O'Connor <kevin@koconnor.net>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Phil Dennis-Jordan <phil@philjordan.eu>, seabios@seabios.org, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-The SPICE input code is currently detcting 0xe1 0x1d 0x45 as
-the PAUSE key make sequence and 0xe1 0x9d 0xc5 as the break
-sequence. This is incorrect, because all 6 scancodes together
-are the make sequence, and there is no break sequence.
+On 07/27/17 16:59, Kevin O'Connor wrote:
+> On Wed, Jul 26, 2017 at 04:21:23PM -0400, Paolo Bonzini wrote:
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- ui/spice-input.c | 32 +++++++++++++-------------------
- 1 file changed, 13 insertions(+), 19 deletions(-)
+>>> C - We'd be introducing "shared ownership" of the acpi tables.  Some
+>>>     of the tables would be produced by QEMU and some of them by
+>>>     SeaBIOS.  Explaining when and why to future developers would be
+>>>     a challenge.
+>>
+>> The advantage is that the same shared ownership is already present in
+>> OVMF.  The RSDP/RSDT/XSDT are entirely created by the firmware in
+>> OVMF. (The rev1 FADT isn't but that's just missing code; the table
+>> manager in general would be ready for that).  In any case this
+>> doesn't seem like something that cannot be solved by code comments.
+>
+> I'd argue that the shared ownership in the EDK2 code was a poor design
+> choice.
 
-diff --git a/ui/spice-input.c b/ui/spice-input.c
-index cda9976469..3d41aa1831 100644
---- a/ui/spice-input.c
-+++ b/ui/spice-input.c
-@@ -50,6 +50,7 @@ static const SpiceKbdInterface kbd_interface = {
- 
- static void kbd_push_key(SpiceKbdInstance *sin, uint8_t scancode)
- {
-+    static const uint8_t pauseseq[] = { 0xe1, 0x1d, 0x45, 0xe1, 0x9d, 0xc5 };
-     QemuSpiceKbd *kbd = container_of(sin, QemuSpiceKbd, sin);
-     int keycode;
-     bool up;
-@@ -58,32 +59,25 @@ static void kbd_push_key(SpiceKbdInstance *sin, uint8_t scancode)
-         kbd->emul0 = true;
-         return;
-     }
--    keycode = scancode & ~SCANCODE_UP;
--    up = scancode & SCANCODE_UP;
--    if (kbd->emul0) {
--        kbd->emul0 = false;
--        keycode |= SCANCODE_GREY;
--    }
- 
--    if (scancode == SCANCODE_EMUL1) {
-+    if (scancode == pauseseq[kbd->pauseseq]) {
-         kbd->pauseseq++;
--        return;
--    } else if (kbd->pauseseq == 1) {
--        if (keycode == 0x1d) {
--            kbd->pauseseq++;
--            return;
--        } else {
--            kbd->pauseseq = 0;
--        }
--    } else if (kbd->pauseseq == 2) {
--        if (keycode == 0x45) {
--            qemu_input_event_send_key_qcode(NULL, Q_KEY_CODE_PAUSE, !up);
-+        if (kbd->pauseseq == G_N_ELEMENTS(pauseseq)) {
-+            qemu_input_event_send_key_qcode(NULL, Q_KEY_CODE_PAUSE, true);
-             kbd->pauseseq = 0;
--            return;
-         }
-+        return;
-+    } else {
-         kbd->pauseseq = 0;
-     }
- 
-+    keycode = scancode & ~SCANCODE_UP;
-+    up = scancode & SCANCODE_UP;
-+    if (kbd->emul0) {
-+        kbd->emul0 = false;
-+        keycode |= SCANCODE_GREY;
-+    }
-+
-     qemu_input_event_send_key_number(NULL, keycode, !up);
- }
- 
--- 
-2.13.3
+The reason we can't just exclude the reference implementation of
+EFI_ACPI_TABLE_PROTOCOL from OVMF whole-sale, and reimplement the ACPI
+linker/loader from scratch, is that some other (independent) edk2
+modules will want to use EFI_ACPI_TABLE_PROTOCOL for installing their
+own (one-off) tables, such as IBFT, BGRT and so on, *in addition to*
+QEMU's. Given that these ACPI tables mostly do *not* describe hardware
+(but software features and/or configuration), it's hard to claim that
+they should also be generated by QEMU.
+
+Therefore the dual origin for ACPI tables looks unavoidable in UEFI,
+it's just that there should be a lot more flexible "connect" from QEMU's
+linker/loader to the installed ACPI tables than EFI_ACPI_TABLE_PROTOCOL.
+
+Basically this is a fight over ownership. Each of QEMU's ACPI
+linker/loader and EFI_ACPI_TABLE_PROTOCOL thinks that it fully owns the
+root of the table tree. :(
+
+> Case in point - we're only having this conversation because of its
+> limitations - SeaBIOS is capable of deploying the acpi tables in the
+> proposed layout without any code changes today.
+
+Yes.
+
+But let's not forget that SeaBIOS is capable of delegating the full
+low-level construction of the table tree to QEMU because no independent
+/ 3rd party BIOS-level code wants to install its own tables (again,
+IBFT, BGRT, ...) This is not true of UEFI, where the guiding principle
+of the standardized interfaces is to enable cooperation between
+independent, binary-only modules. (So, for example, if you shove a new
+PCI add-on card in your motherboard, the UEFI driver in that oprom could
+install a separate ACPI table, by looking up and calling
+EFI_ACPI_TABLE_PROTOCOL.)
+
+> I'm not against changing SeaBIOS, but it's a priority for me that we
+> continue to make it possible to deploy future ACPI table changes (no
+> matter how quirky) in a way that does not require future SeaBIOS
+> releases.
+
+It's a good goal.
+
+I apologize for forgetting the context, but what exactly was the
+argument against:
+
+- splitting modern ACPI generation from ancient ACPI generation (so that
+we can assign separate maintainers to ancient vs. modern),
+
+- restricting ancient ACPI generation to old machine types?
+
+Thanks,
+Laszlo
