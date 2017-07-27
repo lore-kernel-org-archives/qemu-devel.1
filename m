@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1daWAT-00077N-4r
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:56:42 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1daWgc-00017F-Sl
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1daWAR-0003fg-U3
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 19:56:41 -0400
-Date: Thu, 27 Jul 2017 01:56:30 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170726235630.7yca74jlrjfap2hc@aurel32.net>
-References: <20170721041952.45950-1-aik@ozlabs.ru>
-	<b3ed544c-a576-7a74-b7b0-8067873cf11e@amsat.org>
-	<c7cc6429-fe77-2b47-d08b-f4266524407e@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
+	(envelope-from <changpeng.liu@intel.com>) id 1daWgY-0001Gs-QX
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:29:54 -0400
+Received: from mga14.intel.com ([192.55.52.115]:11335)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1daWgY-0001FZ-Fm
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:29:50 -0400
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+Date: Thu, 27 Jul 2017 00:29:45 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B59C79E@SHSMSX103.ccr.corp.intel.com>
+References: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
+	<1501120851-4314-2-git-send-email-changpeng.liu@intel.com>
+	<20170726103513.GB18489@stefanha-x1.localdomain>
+In-Reply-To: <20170726103513.GB18489@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <c7cc6429-fe77-2b47-d08b-f4266524407e@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu] Revert "elf-loader: warn about
- invalid endianness"
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/2] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +31,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Paul Burton <paul.burton@imgtec.com>, Alistair Francis <alistair.francis@xilinx.com>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "mst@redhat.com" <mst@redhat.com>
 
-On 2017-07-21 17:30, Alexey Kardashevskiy wrote:
-> On 21/07/17 16:48, Philippe Mathieu-Daud=E9 wrote:
-> > Hi Alexey,
-> >=20
-> > On 07/21/2017 01:19 AM, Alexey Kardashevskiy wrote:
-> >> This reverts c8e1158cf611 "elf-loader: warn about invalid endianness"
-> >> as it produces a useless message every time an LE kernel image is
-> >> passed via -kernel on a ppc64-pseries machine. The pseries machine
-> >> already checks for ELF_LOAD_WRONG_ENDIAN and tries with big_endian=3D0.
-> >>
-> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >> ---
-> >>   hw/core/loader.c | 1 -
-> >>   1 file changed, 1 deletion(-)
-> >>
-> >> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> >> index c17ace0a2e..e5e8cbb638 100644
-> >> --- a/hw/core/loader.c
-> >> +++ b/hw/core/loader.c
-> >> @@ -480,7 +480,6 @@ int load_elf_ram(const char *filename,
-> >>       }
-> >>         if (target_data_order !=3D e_ident[EI_DATA]) {
-> >> -        fprintf(stderr, "%s: wrong endianness\n", filename);
-> >>           ret =3D ELF_LOAD_WRONG_ENDIAN;
-> >>           goto fail;
-> >>       }
-> >>
-> >=20
-> > I submitted this patch because I spent some time debugging while QEMU w=
-as
-> > failing silently using a MIPS kernel image which used to work, after
-> > realizing I was in an incorrect build_dir using qemu-system-mipsel to l=
-oad
-> > a big endian image and felt stupid [1]. This dumb error can happen to o=
-ther
-> > people so I added this warning here.
+
+
+> -----Original Message-----
+> From: Stefan Hajnoczi [mailto:stefanha@redhat.com]
+> Sent: Wednesday, July 26, 2017 6:35 PM
+> To: Liu, Changpeng <changpeng.liu@intel.com>
+> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; felipe@nutanix.com;
+> mst@redhat.com
+> Subject: Re: [PATCH 1/2] vhost-user-blk: introduce a new vhost-user-blk h=
+ost
+> device
 >=20
-> Been there too. This is why we try loading images twice in pseries.
-
-Indeed. For a better understanding of the issue, it should be noted that
-the pseries platform can dynamically change its endianness at runtime
-and thus can load both little and big endian kernel. This is done by
-calling load_elf twice with both endianness. Therefore the fact that the
-endianness *does not* match is not an issue in that case.
-
-> > I was not aware of the ELF_LOAD_WRONG_ENDIAN related code, and at least=
- the
-> > MIPS arch is not using it.
-> > As I can see in MAINTAINERS, sPAPR is "Supported" meaning "Someone is
-> > actually paid to look after this", while there is no such paid person f=
-or
-> > the MIPS part.
-> > It seems each arch had a different way to load images and hw/core/loade=
-r.c
-> > was an effort to merge common code but mostly "Supported" arch are usin=
-g it.
+> On Thu, Jul 27, 2017 at 10:00:50AM +0800, Changpeng Liu wrote:
+> > +static void vhost_user_blk_set_config(VirtIODevice *vdev, const uint8_=
+t
+> *config)
+> > +{
+> > +    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+> > +    struct virtio_blk_config blkcfg;
+> > +
+> > +    memcpy(&blkcfg, config, sizeof(blkcfg));
+> > +
+> > +    if (blkcfg.wce !=3D s->config_wce) {
+> > +        error_report("vhost-user-blk: does not support the operation")=
+;
 >=20
-> afaict MIPS calls load_elf() in 4 places, each checks for the return value
-> and already prints the message, how come that that message is not enough?
-> What would probably make sense here is if MIPS also printed the return co=
-de
-> from load_elf() but in any case it is easily visible from gdb.
-
-It display an error message, but this message doesn't display why the
-ELF kernel failed to be loaded.
-=20
-> > While your revert does fixes your sPAPR warning issue, looking at the
-> > problem roots I think the correct fix is to improve the MIPS port and
-> > eventually the less loved archs to unify the loader.c calls and avoid s=
-uch
-> > problems.
-> > I don't object reverting this patch for 2.10 and improve the loader.c u=
-sage
-> > during 2.11 cycle, I only wonder if this is another corporate/hobbyist>=
- conflict of interest with corporate crushing on hobbyist instead of
+> If vhost-user-blk doesn't support the operation then please remove the
+> VIRTIO_BLK_F_CONFIG_WCE feature bit.  That way the guest knows it cannot
+> modify this field.
 >=20
-> Come on mate...
-
-I would not call it a conflict, but it's definitely a corporte/hobbyist
-issue. The corporate people designed a nice load_elf_strerror function
-to report error and the hobbyist people failed to use it.
-
-Anyway I have just sent a simple patch series improving the MIPS error
-reporting. That should make everybody happy.
-
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+> > +static void vhost_user_blk_device_realize(DeviceState *dev, Error **er=
+rp)
+> > +{
+> > +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> > +    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+> > +    int ret;
+> > +    uint64_t size;
+> > +
+> > +    if (!s->chardev.chr) {
+> > +        error_setg(errp, "vhost-user-blk: chardev is mandatary");
+>=20
+> mandatory
+>=20
+> > +        return;
+> > +    }
+> > +
+> > +    if (!s->num_queues) {
+> > +        error_setg(errp, "vhost-user-blk: invalid number of IO queues"=
+);
+> > +        return;
+> > +    }
+> > +
+> > +    if (!s->queue_size) {
+> > +        error_setg(errp, "vhost-user-blk: invalid count of the IO queu=
+e");
+>=20
+> "count of the IO queue" sounds like number of queues.  I suggest saying
+> "queue size must be non-zero".
+>=20
+> > +        return;
+> > +    }
+> > +
+> > +    if (!s->size) {
+> > +        error_setg(errp, "vhost-user-blk: block capacity must be assig=
+ned,"
+> > +                  "size can be specified by GiB or MiB");
+> > +        return;
+> > +    }
+> > +
+> > +    ret =3D qemu_strtosz_MiB(s->size, NULL, &size);
+> > +    if (ret < 0) {
+> > +        error_setg(errp, "vhost-user-blk: invalid size %s in GiB/MiB",=
+ s->size);
+> > +        return;
+> > +    }
+> > +    s->capacity =3D size / 512;
+> > +
+> > +    /* block size with default 512 Bytes */
+> > +    if (!s->blkcfg.logical_block_size) {
+> > +        s->blkcfg.logical_block_size =3D 512;
+> > +    }
+> > +
+> > +    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+> > +                sizeof(struct virtio_blk_config));
+> > +    virtio_add_queue(vdev, s->queue_size, vhost_user_blk_handle_output=
+);
+> > +
+> > +    s->dev.nvqs =3D s->num_queues;
+> > +    s->dev.vqs =3D g_new(struct vhost_virtqueue, s->dev.nvqs);
+>=20
+> Please test multi-queue, it's currently broken.  virtio_add_queue() must
+> be called for each queue.
+Yes, should move virtio_add_queue into loop.
+>=20
+> > +    s->dev.vq_index =3D 0;
+> > +    s->dev.backend_features =3D 0;
+> > +
+> > +    ret =3D vhost_dev_init(&s->dev, (void *)&s->chardev,
+>=20
+> The compiler automatically converts any pointer type to void * without a
+> warning in C.  (This is different from C++!)
+>=20
+> The (void *) cast can be dropped.
+>=20
+> > +                         VHOST_BACKEND_TYPE_USER, 0);
+> > +    if (ret < 0) {
+> > +        error_setg(errp, "vhost-user-blk: vhost initialization failed:=
+ %s",
+> > +                   strerror(-ret));
+>=20
+> If realize fails unrealize() will not be called.  Cleanup must be
+> performed here.
+>=20
+> > +        return;
+> > +    }
+> > +}
+> > +
+> > +static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **=
+errp)
+> > +{
+> > +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> > +    VHostUserBlk *s =3D VHOST_USER_BLK(dev);
+> > +
+> > +    vhost_user_blk_set_status(vdev, 0);
+> > +    vhost_dev_cleanup(&s->dev);
+> > +    g_free(s->dev.vqs);
+> > +    virtio_cleanup(vdev);
+> > +}
+> > +
+> > +static void vhost_user_blk_instance_init(Object *obj)
+> > +{
+> > +    VHostUserBlk *s =3D VHOST_USER_BLK(obj);
+> > +
+> > +    device_add_bootindex_property(obj, &s->bootindex, "bootindex",
+> > +                                  "/disk@0,0", DEVICE(obj), NULL);
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_vhost_user_blk =3D {
+> > +    .name =3D "vhost-user-blk",
+> > +    .minimum_version_id =3D 2,
+> > +    .version_id =3D 2,
+>=20
+> Why is version_id 2?  There has never been a vhost-user-blk device in
+> qemu.git before, so I would expect version to be 1.
+>=20
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_VIRTIO_DEVICE,
+> > +        VMSTATE_END_OF_LIST()
+> > +    },
+> > +};
+> > +
+> > +static Property vhost_user_blk_properties[] =3D {
+> > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
+> > +    DEFINE_BLOCK_PROPERTIES(VHostUserBlk, blkcfg),
+>=20
+> DEFINE_BLOCK_PROPERTIES cannot be used directly because it includes the
+> 'drive' (blkcfg.blk) parameter.  The command-line should not allow a
+> drive=3D parameter.
+>=20
+> Also, parameters like the discard granularity, optimal I/O size, logical
+> block size, etc can be initialized to sensible defaults by QEMU's block
+> layer when drive=3D is used.  Since you are bypassing QEMU's block layer
+> there is no way for QEMU to set good defaults.
+>=20
+> Are you relying on the managment tools populating these parameters with
+> the correct values from the vhost-user-blk process?  Or did you have
+> some other mechanism in mind?
+Actually for this part and your comments about block resize, I think maybe =
+add several
+additional vhost user messages such like: VHOST_USER_GET_BLK_CFG/VHOST_USER=
+_SET_BLK_CFG
+makes the code more clear, I'm okay to add such messages.
+>=20
+> > +    DEFINE_BLOCK_CHS_PROPERTIES(VHostUserBlk, blkcfg),
+> > +    DEFINE_PROP_STRING("size", VHostUserBlk, size),
+>=20
+> virtio-blk supports online resize.  QEMU and the vhost-user-blk process
+> need a way to exchange disk capacity information for online resize.
+>=20
+> Please add the necessary vhost-user protocol messages now so size
+> information can be automatically exchanged and updated for resize.
+>=20
+> > +typedef struct VHostUserBlk {
+> > +    VirtIODevice parent_obj;
+> > +    CharBackend chardev;
+> > +    Error *migration_blocker;
+>=20
+> This field is unused, please drop it.
