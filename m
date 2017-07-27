@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54465)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daYlG-0005Jg-1e
+	id 1daYlF-0005JF-K2
 	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:42:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daYlF-0007lb-AG
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:42:50 -0400
+	id 1daYlC-0007io-1h
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:42:49 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 26 Jul 2017 23:42:10 -0300
-Message-Id: <20170727024224.22900-6-f4bug@amsat.org>
+Date: Wed, 26 Jul 2017 23:42:09 -0300
+Message-Id: <20170727024224.22900-5-f4bug@amsat.org>
 In-Reply-To: <20170727024224.22900-1-f4bug@amsat.org>
 References: <20170727024224.22900-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.10 v2 05/20] qcow2: fix null pointer
- dereference
+Subject: [Qemu-devel] [PATCH for 2.10 v2 04/20] nbd: fix memory leak in
+ nbd_opt_go()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +28,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
 
-It seems this assert() was somehow misplaced.
-
-block/qcow2-refcount.c:2193:42: warning: Array access (from variable 'on_disk_reftable') results in a null pointer dereference
-        on_disk_reftable[refblock_index] = refblock_offset;
-        ~~~~~~~~~~~~~~~~                 ^
+nbd/client.c:385:12: warning: Potential leak of memory pointed to by 'buf'
 
 Reported-by: Clang Static Analyzer
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-refcount.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ nbd/client.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index c9b0dcb4f3..168fc32e7b 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2189,6 +2189,8 @@ write_refblocks:
-              * this will leak that range, but we can easily fix that by running
-              * a leak-fixing check after this rebuild operation */
-             reftable_offset = -1;
-+        } else {
-+            assert(on_disk_reftable);
-         }
-         on_disk_reftable[refblock_index] = refblock_offset;
- 
-@@ -2258,8 +2260,6 @@ write_refblocks:
-         goto write_refblocks;
+diff --git a/nbd/client.c b/nbd/client.c
+index 509ed5e4ba..0a17de80b5 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -376,9 +376,11 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+     if (info->request_sizes) {
+         stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
+     }
+-    if (nbd_send_option_request(ioc, NBD_OPT_GO,
+-                                4 + len + 2 + 2 * info->request_sizes, buf,
+-                                errp) < 0) {
++    error = nbd_send_option_request(ioc, NBD_OPT_GO,
++                                    4 + len + 2 + 2 * info->request_sizes,
++                                    buf, errp);
++    g_free(buf);
++    if (error < 0) {
+         return -1;
      }
  
--    assert(on_disk_reftable);
--
-     for (refblock_index = 0; refblock_index < reftable_size; refblock_index++) {
-         cpu_to_be64s(&on_disk_reftable[refblock_index]);
-     }
 -- 
 2.13.3
