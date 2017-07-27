@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dafN8-00038w-Hr
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:46:23 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dafPT-0005K4-1l
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dafN5-0001DL-Vj
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:46:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42686)
+	(envelope-from <stefanha@redhat.com>) id 1dafPP-0002Ge-Tp
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:48:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dafN5-0001Cx-Mq
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:46:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A5A76C0BFD17
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:46:18 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 27 Jul 2017 11:46:14 +0200
-Message-Id: <1501148776-16890-2-git-send-email-armbru@redhat.com>
-In-Reply-To: <1501148776-16890-1-git-send-email-armbru@redhat.com>
-References: <1501148776-16890-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] xbzrle: Drop unused cache_resize()
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dafPP-0002G0-K9
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:48:43 -0400
+Date: Thu, 27 Jul 2017 10:48:36 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170727094836.GB10129@stefanha-x1.localdomain>
+References: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
+	<1501120851-4314-2-git-send-email-changpeng.liu@intel.com>
+	<20170726103513.GB18489@stefanha-x1.localdomain>
+	<FF7FC980937D6342B9D289F5F3C7C2625B59C79E@SHSMSX103.ccr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
+Content-Disposition: inline
+In-Reply-To: <FF7FC980937D6342B9D289F5F3C7C2625B59C79E@SHSMSX103.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Liu, Changpeng" <changpeng.liu@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "mst@redhat.com" <mst@redhat.com>
 
-Unused since commit fd8cec XBZRLE: Fix qemu crash when resize the
-xbzrle cache.
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Amit Shah <amit.shah@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- migration/page_cache.c | 56 --------------------------------------------------
- migration/page_cache.h | 11 ----------
- 2 files changed, 67 deletions(-)
+--H+4ONPRPur6+Ovig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/migration/page_cache.c b/migration/page_cache.c
-index 5f85787..ba984c4 100644
---- a/migration/page_cache.c
-+++ b/migration/page_cache.c
-@@ -178,59 +178,3 @@ int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
- 
-     return 0;
- }
--
--int64_t cache_resize(PageCache *cache, int64_t new_num_pages)
--{
--    PageCache *new_cache;
--    int64_t i;
--
--    CacheItem *old_it, *new_it;
--
--    g_assert(cache);
--
--    /* cache was not inited */
--    if (cache->page_cache == NULL) {
--        return -1;
--    }
--
--    /* same size */
--    if (pow2floor(new_num_pages) == cache->max_num_items) {
--        return cache->max_num_items;
--    }
--
--    new_cache = cache_init(new_num_pages, cache->page_size);
--    if (!(new_cache)) {
--        DPRINTF("Error creating new cache\n");
--        return -1;
--    }
--
--    /* move all data from old cache */
--    for (i = 0; i < cache->max_num_items; i++) {
--        old_it = &cache->page_cache[i];
--        if (old_it->it_addr != -1) {
--            /* check for collision, if there is, keep MRU page */
--            new_it = cache_get_by_addr(new_cache, old_it->it_addr);
--            if (new_it->it_data && new_it->it_age >= old_it->it_age) {
--                /* keep the MRU page */
--                g_free(old_it->it_data);
--            } else {
--                if (!new_it->it_data) {
--                    new_cache->num_items++;
--                }
--                g_free(new_it->it_data);
--                new_it->it_data = old_it->it_data;
--                new_it->it_age = old_it->it_age;
--                new_it->it_addr = old_it->it_addr;
--            }
--        }
--    }
--
--    g_free(cache->page_cache);
--    cache->page_cache = new_cache->page_cache;
--    cache->max_num_items = new_cache->max_num_items;
--    cache->num_items = new_cache->num_items;
--
--    g_free(new_cache);
--
--    return cache->max_num_items;
--}
-diff --git a/migration/page_cache.h b/migration/page_cache.h
-index 10ed532..4fadd0c 100644
---- a/migration/page_cache.h
-+++ b/migration/page_cache.h
-@@ -72,15 +72,4 @@ uint8_t *get_cached_data(const PageCache *cache, uint64_t addr);
- int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
-                  uint64_t current_age);
- 
--/**
-- * cache_resize: resize the page cache. In case of size reduction the extra
-- * pages will be freed
-- *
-- * Returns -1 on error new cache size on success
-- *
-- * @cache pointer to the PageCache struct
-- * @num_pages: new page cache size (in pages)
-- */
--int64_t cache_resize(PageCache *cache, int64_t num_pages);
--
- #endif
--- 
-2.7.5
+On Thu, Jul 27, 2017 at 12:29:45AM +0000, Liu, Changpeng wrote:
+> > > +    .fields =3D (VMStateField[]) {
+> > > +        VMSTATE_VIRTIO_DEVICE,
+> > > +        VMSTATE_END_OF_LIST()
+> > > +    },
+> > > +};
+> > > +
+> > > +static Property vhost_user_blk_properties[] =3D {
+> > > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
+> > > +    DEFINE_BLOCK_PROPERTIES(VHostUserBlk, blkcfg),
+> >=20
+> > DEFINE_BLOCK_PROPERTIES cannot be used directly because it includes the
+> > 'drive' (blkcfg.blk) parameter.  The command-line should not allow a
+> > drive=3D parameter.
+> >=20
+> > Also, parameters like the discard granularity, optimal I/O size, logical
+> > block size, etc can be initialized to sensible defaults by QEMU's block
+> > layer when drive=3D is used.  Since you are bypassing QEMU's block layer
+> > there is no way for QEMU to set good defaults.
+> >=20
+> > Are you relying on the managment tools populating these parameters with
+> > the correct values from the vhost-user-blk process?  Or did you have
+> > some other mechanism in mind?
+> Actually for this part and your comments about block resize, I think mayb=
+e add several
+> additional vhost user messages such like: VHOST_USER_GET_BLK_CFG/VHOST_US=
+ER_SET_BLK_CFG
+> makes the code more clear, I'm okay to add such messages.
+
+New messages for virtio config space read/write might be useful for
+other devices besides virtio-blk.
+
+It's worth checking how virtio config space is live migrated and how to
+do that consistently if the vhost-user process is involved.
+
+Stefan
+
+--H+4ONPRPur6+Ovig
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZebb0AAoJEJykq7OBq3PI+3MH/RdAqf+b7oDfu/UttvR7GVRV
+Ao/fi4XZ8dnIx/XQu9dg/rk8mD5knOfjWtMM1x+hUgkD2zel/Jck2nhjCG9kDkuY
+6+TZ1vAz+Bcx41b9FpYXADqHj1DtCIaKBqYcDlfWxpOzQ9iGGChDi8pe3oUTbrsR
+GyryQzoMoaMPYJZZFE6hCG1mRido3veLZtuX06gklvDm8dbxU9L8CRLMNABRnp+3
+FP/IfzTA1Zn1a6QG7PnDUg+uZETx+ol4fqAlE1cUPDKb75wJI/v46zL0ZfuACpME
+Qxw663khTZe5Mvsa87ZCc47Jq4I8xn1wHZjIV+I2IuLsPlbmudWPV3mhVn+iYVE=
+=NVpC
+-----END PGP SIGNATURE-----
+
+--H+4ONPRPur6+Ovig--
