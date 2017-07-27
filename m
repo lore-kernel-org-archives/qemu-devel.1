@@ -1,36 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daXei-0002st-UE
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:32:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1daXiN-0005zM-Bw
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daXed-00088a-W9
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:32:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40950
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1daXiI-00029a-FT
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:35:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36491)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1daXed-00088D-Rh
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:31:55 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6R1Siqm049105
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:31:55 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bxyxvgmkg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:31:55 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 26 Jul 2017 19:31:54 -0600
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 26 Jul 2017 20:30:55 -0500
-In-Reply-To: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1501119055-4060-4-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH for-2.10 3/3] qdev: defer DEVICE_DEL event
- until instance_finalize()
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1daXiI-000291-AZ
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:35:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1daXiG-0005Wh-Em
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 01:35:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 60A0F2E80CD
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 01:35:40 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Jul 2017 01:21:42 -0000
+From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
+Reply-To: Bug 1706825 <1706825@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150111850209.31878.14522576992993433144.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1706825] [NEW] qemu-user fails to run wineserver
+ on ppc64el host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,91 +37,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, berrange@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, groug@kaod.org, armbru@redhat.com
 
-DEVICE_DEL is currently emitted when a Device is unparented, as
-opposed to when it is finalized. The main design motivation for this
-seems to be that after unparent()/unrealize(), the Device is no
-longer visible to the guest, and thus the operation is complete
-from the perspective of management.
+Public bug reported:
 
-However, there are cases where remaining host-side cleanup is also
-pertinent to management. The is generally handled by treating these
-resources as aspects of the "backend", which can be managed via
-separate interfaces/events, such as blockdev_add/del, netdev_add/del,
-object_add/del, etc, but some devices do not have this level of
-compartmentalization, namely vfio-pci, and possibly to lend themselves
-well to it.
+When attempting to run wineserver on a 64-bit ppc64el host via QEMU's
+user-mode i386 emulation, a file locking operation fails.
 
-In the case of vfio-pci, the "backend" cleanup happens as part of
-the finalization of the vfio-pci device itself, in particular the
-cleanup of the VFIO group FD. Failing to wait for this cleanup can
-result in tools like libvirt attempting to rebind the device to
-the host while it's still being used by VFIO, which can result in
-host crashes or other misbehavior depending on the host driver.
+Command line:
+qemu-i386-static /usr/lib/wine-development/wineserver32
 
-Deferring DEVICE_DEL still affords us the ability to manage backends
-explicitly, while also addressing cases like vfio-pci's, so we
-implement that approach here.
+Output:
+wineserver: fcntl /tmp/.wine-0/server-17-14d21bf/lock: Invalid argument
 
-An alternative proposal involving having VFIO emit a separate event
-to denote completion of host-side cleanup was discussed, but the
-prevailing opinion seems to be that it is not worth the added
-complexity, and leaves the issue open for other Device implementations
-solve in the future.
+Relevant portion of strace:
+fcntl(6, F_SETLK64, 0x3fffe8802218) =3D -1 EINVAL (Invalid argument)
 
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- hw/core/qdev.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 08c4061..d14acba 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -1067,7 +1067,6 @@ static void device_finalize(Object *obj)
-     NamedGPIOList *ngl, *next;
- 
-     DeviceState *dev = DEVICE(obj);
--    qemu_opts_del(dev->opts);
- 
-     QLIST_FOREACH_SAFE(ngl, &dev->gpios, node, next) {
-         QLIST_REMOVE(ngl, node);
-@@ -1078,6 +1077,18 @@ static void device_finalize(Object *obj)
-          * here
-          */
-     }
-+
-+    /* Only send event if the device had been completely realized */
-+    if (dev->pending_deleted_event) {
-+        g_assert(dev->canonical_path);
-+
-+        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canonical_path,
-+                                       &error_abort);
-+        g_free(dev->canonical_path);
-+        dev->canonical_path = NULL;
-+    }
-+
-+    qemu_opts_del(dev->opts);
- }
- 
- static void device_class_base_init(ObjectClass *class, void *data)
-@@ -1107,16 +1118,6 @@ static void device_unparent(Object *obj)
-         object_unref(OBJECT(dev->parent_bus));
-         dev->parent_bus = NULL;
-     }
--
--    /* Only send event if the device had been completely realized */
--    if (dev->pending_deleted_event) {
--        g_assert(dev->canonical_path);
--
--        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canonical_path,
--                                       &error_abort);
--        g_free(dev->canonical_path);
--        dev->canonical_path = NULL;
--    }
- }
- 
- static void device_class_init(ObjectClass *class, void *data)
--- 
-2.7.4
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706825
+
+Title:
+  qemu-user fails to run wineserver on ppc64el host
+
+Status in QEMU:
+  New
+
+Bug description:
+  When attempting to run wineserver on a 64-bit ppc64el host via QEMU's
+  user-mode i386 emulation, a file locking operation fails.
+
+  Command line:
+  qemu-i386-static /usr/lib/wine-development/wineserver32
+
+  Output:
+  wineserver: fcntl /tmp/.wine-0/server-17-14d21bf/lock: Invalid argument
+
+  Relevant portion of strace:
+  fcntl(6, F_SETLK64, 0x3fffe8802218) =3D -1 EINVAL (Invalid argument)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706825/+subscriptions
