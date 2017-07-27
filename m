@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dadvQ-0007B1-DS
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:13:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1dadwu-0000HQ-L5
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dadvN-0005wa-LU
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:13:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41398)
+	(envelope-from <armbru@redhat.com>) id 1dadwr-0007QV-UM
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:15:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43696)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dadvN-0005v7-Bn
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:13:37 -0400
-Date: Thu, 27 Jul 2017 10:13:32 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170727101332.0db01084@gondolin>
-In-Reply-To: <44655faac8ff8a48e1ed7a50ad0ac66bfd70975b.1501084908.git.alistair.francis@xilinx.com>
-References: <cover.1501084908.git.alistair.francis@xilinx.com>
-	<44655faac8ff8a48e1ed7a50ad0ac66bfd70975b.1501084908.git.alistair.francis@xilinx.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dadwr-0007Pn-L3
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:15:09 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87o9so1hl7.fsf@dusky.pond.sub.org>
+	<20170717103308.GI7163@stefanha-x1.localdomain>
+	<8760epr9vw.fsf@dusky.pond.sub.org>
+	<20170721153331.GL18014@stefanha-x1.localdomain>
+	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
+	<8760eiuxu5.fsf@dusky.pond.sub.org>
+	<9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com>
+Date: Thu, 27 Jul 2017 10:14:58 +0200
+In-Reply-To: <9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com> (Cleber Rosa's
+	message of "Tue, 25 Jul 2017 21:21:13 -0400")
+Message-ID: <871sp2gut9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] Convert multi-line fprintf() to
- warn_report()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Improving QMP test coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,150 +32,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com
+To: Cleber Rosa <crosa@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
 
-On Wed, 26 Jul 2017 09:07:57 -0700
-Alistair Francis <alistair.francis@xilinx.com> wrote:
+Cleber Rosa <crosa@redhat.com> writes:
 
-> Convert all the multi-line uses of fprintf(stderr, "warning:"..."\n"...
-> to use warn_report() instead. This helps standardise on a single
-> method of printing warnings to the user.
-> 
-> All of the warnings were changed using these commands:
->   find ./* -type f -exec sed -i \
->     'N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N;N {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig}' \
->     {} +
-> 
-> Indentation fixed up manually afterwards.
-> 
-> Some of the lines were manually edited to reduce the line length to below
-> 80 charecters. Some of the lines with newlines in the middle of the
-> string were also manually edit to avoid checkpatch errrors.
-> 
-> The #include lines were manually updated to allow the code to compile.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> I couldn't figure out any nice way (it is possible with some more logic
-> inside the sed apparently) to do this is one command, so I had to use
-> all of the commands above.
-> 
->  accel/kvm/kvm-all.c         |  7 +++----
->  block/vvfat.c               |  4 ++--
->  hw/acpi/core.c              |  7 +++----
->  hw/arm/vexpress.c           |  4 ++--
->  hw/i386/xen/xen-mapcache.c  |  4 ++--
->  hw/mips/mips_malta.c        |  4 ++--
->  hw/mips/mips_r4k.c          |  7 ++++---
->  hw/s390x/s390-virtio.c      | 16 ++++++++--------
->  net/hub.c                   |  9 ++++-----
->  net/net.c                   | 14 +++++++-------
->  target/i386/cpu.c           | 12 ++++++------
->  target/i386/hax-mem.c       |  6 +++---
->  target/ppc/translate_init.c | 18 +++++++++---------
->  ui/keymaps.c                |  9 +++++----
->  util/main-loop.c            |  6 +++---
->  15 files changed, 63 insertions(+), 64 deletions(-)
-> 
+> On 07/24/2017 02:56 AM, Markus Armbruster wrote:
+>> Test code language is orthogonal to verification method (with code
+>> vs. with diff).  Except verifying with shell code would be obviously
+>> nuts[*].
+>> 
+>> The existing iotests written in Python verify with code, and the ones
+>> written in shell verify with diff.  Doesn't mean that we have to port
+>> from Python to shell to gain "verify with diff".
+>> 
+>
+> The fact that they are still subject to "verify with diff" is
+> interesting.  IMO, exit status makes a lot more sense.
+>
+> I only raised this point, and gave my opinion, because:
+>
+> 1) Shell based tests *with* output check has a lot of use cases and
+> proven value
+> 2) Python based tests *without* output check also have use cases and value
+>
+> To me, this shows that language flexibility is a must, and output check
+> can be an unnecessary burden.  If at all possible, it should be optional.
+>
+> Implementation-wise, this seems pretty simple.  Tests based on any
+> language can communicate the basic success/failure by exit status code
+> and/or by recorded output.  If the ".out" file exists, let's use it, if
+> not, fallback to exit status (or the other way around, as long as it's
+> predictable).  For instance, the current implementation of
+> iotests.main() discards the exit status that could be one of the
+> PASS/FAIL criteria.
 
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index d682f0a9dc..04801f3136 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -1227,8 +1227,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
->  
->      switch (s->fat_type) {
->      case 32:
-> -            fprintf(stderr, "Big fat greek warning: FAT32 has not been tested. "
-> -                "You are welcome to do so!\n");
+I think we basically agree.
 
-Kind of sad to see this one go...
+"Verify output with diff" is great when it fits the test, but it doesn't
+fit all tests.
 
-> +        warn_report("FAT32 has not been tested. "
-> +                    "You are welcome to do so!");
->          break;
->      case 16:
->      case 12:
+A test program terminating unsuccessfully should be treated as test
+failure, regardless of any output checking the test harness may do.
 
-> diff --git a/hw/s390x/s390-virtio.c b/hw/s390x/s390-virtio.c
-> index afa4148e6b..964df517b4 100644
-> --- a/hw/s390x/s390-virtio.c
-> +++ b/hw/s390x/s390-virtio.c
-> @@ -146,9 +146,9 @@ void gtod_save(QEMUFile *f, void *opaque)
->  
->      r = s390_get_clock(&tod_high, &tod_low);
->      if (r) {
-> -        fprintf(stderr, "WARNING: Unable to get guest clock for migration. "
-> -                        "Error code %d. Guest clock will not be migrated "
-> -                        "which could cause the guest to hang.\n", r);
-> +        warn_report("Unable to get guest clock for migration. "
-> +                    "Error code %d. Guest clock will not be migrated "
-> +                    "which could cause the guest to hang.", r);
->          qemu_put_byte(f, S390_TOD_CLOCK_VALUE_MISSING);
->          return;
->      }
-> @@ -165,8 +165,8 @@ int gtod_load(QEMUFile *f, void *opaque, int version_id)
->      int r;
->  
->      if (qemu_get_byte(f) == S390_TOD_CLOCK_VALUE_MISSING) {
-> -        fprintf(stderr, "WARNING: Guest clock was not migrated. This could "
-> -                        "cause the guest to hang.\n");
-> +        warn_report("Guest clock was not migrated. This could "
-> +                    "cause the guest to hang.");
->          return 0;
->      }
->  
-> @@ -175,9 +175,9 @@ int gtod_load(QEMUFile *f, void *opaque, int version_id)
->  
->      r = s390_set_clock(&tod_high, &tod_low);
->      if (r) {
-> -        fprintf(stderr, "WARNING: Unable to set guest clock value. "
-> -                        "s390_get_clock returned error %d. This could cause "
-> -                        "the guest to hang.\n", r);
-> +        warn_report("Unable to set guest clock value. "
-> +                    "s390_get_clock returned error %d. This could cause "
-> +                    "the guest to hang.", r);
->      }
->  
->      return 0;
+>> I don't doubt that featureful test frameworks like Avocado provide
+>> adequate tools to debug tests.  The lure of the shell is its perceived
+>> simplicity: everybody knows (well, should know) how to write and debug
+>> simple shell scripts.  Of course, the simplicity evaporates when the
+>> scripts grow beyond "simple".  Scare quotes, because what's simple for
+>> Alice may not be so simple for Bob.
+>> 
+>
+> Agreed.  That's why I avoided "simple" and "complex" in my previous
+> messages.  A statement such as "tool XYZ usually scales better" has
+> bigger chances of being agreed upon by both Alice and Bob.
 
-s390x part:
+Of course, "scales better" is actually better only if you need it to
+scale :)
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+>>> BTW, I'll defer the discussion of using an external tool to check the
+>>> output and determine test success/failure, because it is IMO a
+>>> complementary topic, and I believe I understand its use cases.
+>> 
+>> Yes.  Regardless, I want to tell you *now* how tired of writing code to
+>> verify test output I am.  Even of reading it.  Output text is easier to
+>> read than code that tries to verify output text.  Diffs are easier to
+>> read than stack backtraces.
+>> 
+>
+> Point taken.  And truth be told: the current shell based qemu-iotests
+> excel at this, with its simple and effective "run_qemu <<<QMP_INPUT"
+> pattern.  The cons are:
+>
+> 1) Some use cases do not fall so nicely in this pattern, and end up
+> requiring workarounds (such as filters)
+
+Output filtering is just fine as long as it's reasonably simple, and you
+have to mess with it only rarely.  You can almost ignore it in actual
+testing work then.
+
+> 2) The expected output is not readily accessible
+
+Expected output would be in git, readily accessible, so that can't be
+what you mean.  What do you mean?
+
+> Considering that for the specific case of tests targeting QMP, most of
+> the action comes down to the message exchanges (commands sent, response
+> received), how would you feel about a descriptive approach to the
+> communication?  Something along these lines:
+>
+> """
+> -> { "execute": "change",
+>      "arguments": { "device": "ide1-cd0",
+>                     "target": "/srv/images/Fedora-12-x86_64-DVD.iso" } }
+> <- { "return": {} }
+> """
+>
+> If this looks familiar, that's because it is a snippet from the
+> qapi-schema.json file.  It's documentation, so it should mean that's
+> easy to read, *but*, there's no reason this can not be treated as code too.
+>
+> This approach is similar to Python's doctest[1], in which a docstring
+> contains snippets of Python code to be evaluated, and the expected
+> outcome.  Example:
+>
+> def factorial(n):
+>     """Return the factorial of n, an exact integer >= 0.
+>
+>     If the result is small enough to fit in an int, return an int.
+>     Else return a long.
+>
+>     >>> [factorial(n) for n in range(6)]
+>     [1, 1, 2, 6, 24, 120]
+>     """
+>
+> The lines that match the interpreter input will be evaluated, and the
+> subsequent lines are the expected output.
+
+Executable examples in documentation are a really, really good idea,
+because they greatly improve the chances the examples reflect reality.
+
+But as you remark below, they can't be the one source of tests, because
+(1) it would clutter documentation too much, and (2) it would limit what
+tests can do.
+
+An executable example provides QMP input and output, no more.  What if
+we need to run QEMU a certain way to make the example work?  We'd have
+to add that information to the example.  Might even be an improvement.
+
+More seriously, executable examples make the test case *data*.  Good,
+because data is better than code.  Until it isn't.  Sometimes you just
+need a loop, a timeout, or want to print a bit of extra information that
+isn't QMP output.
+
+> I don't think all QMP tests can be modeled like this, inside literal
+> strings, but having blocks that can be used when it makes sense seems
+> logical to me.  Pseudo code:
+>
+> test_change() {
+>
+>   init_qemu()
+>   failUnless(fileExists('/srv/images/Fedora-12-x86_64-DVD.iso'))
+>
+>   qmp("""
+> -> { "execute": "change",
+>      "arguments": { "device": "ide1-cd0",
+>                     "target": "/srv/images/Fedora-12-x86_64-DVD.iso" } }
+> <- { "return": {} }
+> """)
+>
+>   check_qemu_has_fd_open_for_iso()
+> }
+>
+> IMO, the qmp() function can provide similar quality of readability to diff.
+>
+> How does it sound?  As with previous interactions, if people see value
+> in this, I can certainly follow up with a PoC.
+
+This brings some advantages of "verify output with diff" to tests that
+verify with code.  Improvement if it simplifies the verification code.
+
+I'd still prefer *no* verification code (by delegating the job to diff)
+for tests where I can get away wit it.
+
+>>> [1] -
+>>> http://avocado-framework.readthedocs.io/en/52.0/api/utils/avocado.utils.html#avocado.utils.process.run
+>>> [2] -
+>>> http://avocado-framework.readthedocs.io/en/52.0/WritingTests.html#advanced-logging-capabilities
+>>> [3] - https://www.youtube.com/watch?v=htUbOsh8MZI
+>> 
+>> [*] Very many nutty things are more obviously nuts in shell.  It's an
+>> advantage of sorts ;)
+>> 
+>
+> We all know a number of amazing software that gets written using the
+> most improbable tools and languages.  It makes the world a much more
+> interesting place!
+>
+> [1] - https://docs.python.org/2/library/doctest.html
