@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dafH9-0001NP-H0
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:40:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dafMy-000346-Bu
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:46:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dafH5-0006Nc-It
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:40:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55352)
+	(envelope-from <cohuck@redhat.com>) id 1dafMv-0001B6-6C
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:46:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dafH5-0006MV-9k
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:40:07 -0400
-References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-	<20170726215625-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
-	<20170727022103-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f210b52b-b7ea-b27e-cca8-9f11a4b4f353@redhat.com>
-Date: Thu, 27 Jul 2017 12:39:54 +0300
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dafMu-0001Ab-Sq
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:46:09 -0400
+Date: Thu, 27 Jul 2017 11:46:03 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170727114603.77b801e2@gondolin>
+In-Reply-To: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170727022103-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/6] hw/pci: introduce bridge-only
- vendor-specific capability to provide some hints to firmware
+Subject: Re: [Qemu-devel] [PATCH 0/3] Channel Path realted CRW generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,185 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-On 27/07/2017 2:28, Michael S. Tsirkin wrote:
-> On Thu, Jul 27, 2017 at 12:54:07AM +0300, Alexander Bezzubikov wrote:
->> 2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
->>> On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
->>>> On PCI init PCI bridges may need some
->>>> extra info about bus number to reserve, IO, memory and
->>>> prefetchable memory limits. QEMU can provide this
->>>> with special
->>>
->>> with a special
->>>
->>>> vendor-specific PCI capability.
->>>>
->>>> Sizes of limits match ones from
->>>> PCI Type 1 Configuration Space Header,
->>>> number of buses to reserve occupies only 1 byte
->>>> since it is the size of Subordinate Bus Number register.
->>>>
->>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>>> ---
->>>>   hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
->>>>   include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
->>>>   2 files changed, 45 insertions(+)
->>>>
->>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->>>> index 720119b..8ec6c2c 100644
->>>> --- a/hw/pci/pci_bridge.c
->>>> +++ b/hw/pci/pci_bridge.c
->>>> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->>>>       br->bus_name = bus_name;
->>>>   }
->>>>
->>>> +
->>>> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
->>>
->>> help? should be qemu_cap_init?
->>>
->>>> +                              uint8_t bus_reserve, uint32_t io_limit,
->>>> +                              uint16_t mem_limit, uint64_t pref_limit,
->>>> +                              Error **errp)
->>>> +{
->>>> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
->>>> +    PCIBridgeQemuCap cap;
->>>
->>> This leaks info to guest. You want to init all fields here:
->>>
->>> cap = {
->>>   .len = ....
->>> };
->>
->> I surely can do this for len field, but as Laszlo proposed
->> we can use mutually exclusive fields,
->> e.g. pref_32 and pref_64, the only way I have left
->> is to use ternary operator (if we surely need this
->> big initializer). Keeping some if's would look better,
->> I think.
->>
->>>
->>>> +
->>>> +    cap.len = cap_len;
->>>> +    cap.bus_res = bus_reserve;
->>>> +    cap.io_lim = io_limit & 0xFF;
->>>> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
->>>> +    cap.mem_lim = mem_limit;
->>>> +    cap.pref_lim = pref_limit & 0xFFFF;
->>>> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
->>>
->>> Please use pci_set_word etc or cpu_to_leXX.
->>>
->>
->> Since now we've decided to avoid fields separation into <field> + <field_upper>,
->> this bitmask along with pci_set_word are no longer needed.
->>
->>> I think it's easiest to replace struct with a set of macros then
->>> pci_set_word does the work for you.
->>>
->>
->> I don't really want to use macros here because structure
->> show us the whole capability layout and this can
->> decrease documenting efforts. More than that,
->> memcpy usage is very convenient here, and I wouldn't like
->> to lose it.
->>
->>>
->>>> +
->>>> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
->>>> +                                    cap_offset, cap_len, errp);
->>>> +    if (offset < 0) {
->>>> +        return offset;
->>>> +    }
->>>> +
->>>> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
->>>
->>> +2 is yacky. See how virtio does it:
->>>
->>>      memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
->>>             cap->cap_len - PCI_CAP_FLAGS);
->>>
->>>
->>
->> OK.
->>
->>>> +    return 0;
->>>> +}
->>>> +
->>>>   static const TypeInfo pci_bridge_type_info = {
->>>>       .name = TYPE_PCI_BRIDGE,
->>>>       .parent = TYPE_PCI_DEVICE,
->>>> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
->>>> index ff7cbaa..c9f642c 100644
->>>> --- a/include/hw/pci/pci_bridge.h
->>>> +++ b/include/hw/pci/pci_bridge.h
->>>> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
->>>>   #define  PCI_BRIDGE_CTL_DISCARD_STATUS       0x400   /* Discard timer status */
->>>>   #define  PCI_BRIDGE_CTL_DISCARD_SERR 0x800   /* Discard timer SERR# enable */
->>>>
->>>> +typedef struct PCIBridgeQemuCap {
->>>> +    uint8_t id;     /* Standard PCI capability header field */
->>>> +    uint8_t next;   /* Standard PCI capability header field */
->>>> +    uint8_t len;    /* Standard PCI vendor-specific capability header field */
->>>> +    uint8_t bus_res;
->>>> +    uint32_t pref_lim_upper;
->>>
->>> Big endian? Ugh.
->>>
->>
->> Agreed, and this's gonna to disappear with
->> the new layout.
->>
->>>> +    uint16_t pref_lim;
->>>> +    uint16_t mem_lim;
->>>
->>> I'd say we need 64 bit for memory.
->>>
->>
->> Why? Non-prefetchable MEMORY_LIMIT register is 16 bits long.
-> 
-> Hmm ok, but e.g. for io there are bridges that have extra registers
-> to specify non-standard non-aligned registers.
-> 
->>>> +    uint16_t io_lim_upper;
->>>> +    uint8_t io_lim;
->>>> +    uint8_t padding;
->>>
->>> IMHO each type should have a special "don't care" flag
->>> that would mean "I don't know".
->>>
->>>
->>
->> Don't know what? Now 0 is an indicator to do nothing with this field.
-> 
-> In that case how do you say "don't allocate any memory"?
-> 
+On Thu, 27 Jul 2017 03:54:15 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-We can keep the MEM/Limit registers read-only for such cases,
-as they are optional registers.
+> This series is trying to:
+> 1. clear up CRW related code.
+> 2. generate the right channel path related CRW at the right time.
+> 
+> I did this mainly because it's a requirement from my current work, that is I'm
+> in preparation of a group of patch for channel path virtualization. I can use
+> the inerface that provided by this series later, so as to, for vfio-ccw
+> devices, notify the guest with channel path status vary that happens on the
+> host side.
 
-Thanks,
-Marcel
+Sounds cool.
 
 > 
->>>> +} PCIBridgeQemuCap;
->>>
->>> You don't really need this struct in the header. And pls document all fields.
->>>
->>>> +
->>>> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
->>>> +                              uint8_t bus_reserve, uint32_t io_limit,
->>>> +                              uint16_t mem_limit, uint64_t pref_limit,
->>>> +                              Error **errp);
->>>> +
->>>>   #endif /* QEMU_PCI_BRIDGE_H */
->>>> --
->>>> 2.7.4
->>
->>
->>
->> --
->> Alexander Bezzubikov
+> During an internal discussion, Halil and Pierre pointed out that for path
+> hotplug, generating a CRW seems logical, but how is it covered by the AR is not
+> clear - we have problem in understanding some grammar ambiguous paragraphs.
+> While certain parts of the AR is not available outside, but I'm still wondering
+> if the author ;) could give us some clue... BTW, we know that, in Linux kernel
+> we had code that handles un-solicited chp crw, so we tend to believe it's right
+> to generate channel path initialized CRW for path hotplug. It's just we can not
+> find the reason from the document.
+
+I always found path notifications to be a bit odd. They depend on
+various things:
+- whether you're running under LPAR or under z/VM
+- whether it's a hardware condition (path failure) or something
+  triggered by the admin (path vary on/off)
+- if it's admin triggered, where it was done (on the SE, by one of
+  several mechanisms in CP, via SCLP)
+
+You're bound to get different kinds of notifications: via a CRW with
+source channel path, via event information retrievable via CHSC
+(indicated by a CRW with source CSS), via a PNO indication, or nothing
+at all.
+
+[Reminds me of a case where we got path gone CRWs under LPAR when a
+path was deactivated at the SE (which we would notice via PNO anyway),
+but no CRW when the path was reactivated - not very useful. When trying
+to report this as an issue, we got the answer that we of course need to
+use the OS interface to vary off the path beforehand. Silly penguins.]
+
+My recommendation would be to generate a fitting CRW if the wording
+allows to do so. I would hope that getting as many useful indications
+as possible is most helpful to the OS. (I had added the path-come CRW
+handling in Linux back then and afterwards wondered why we did not get
+it - I must have interpreted the PoP in the same way as you did.)
+
+I'll double check with how I'd interpret the PoP today.
+
+> 
+> Pierre also suggested to add an @erc param for css_generate_chp_crws() in patch3,
+> while others have a different opinion. This is for your consideration.
+> 
+> Best regards!
+> 
+> Dong Jia Shi (3):
+>   s390x/css: use macro for event-information pending error recover code
+>   s390x/css: generate solicited crw for rchp completion signaling
+>   s390x/css: generate channel path initialized CRW for channel path
+>     hotplug
+> 
+>  hw/s390x/3270-ccw.c       |  3 ++-
+>  hw/s390x/css.c            | 66 +++++++++++++++++++++++++++++++++++------------
+>  hw/s390x/s390-ccw.c       |  2 +-
+>  hw/s390x/virtio-ccw.c     |  3 ++-
+>  include/hw/s390x/css.h    | 10 ++++---
+>  include/hw/s390x/ioinst.h |  6 +++--
+>  6 files changed, 64 insertions(+), 26 deletions(-)
+> 
