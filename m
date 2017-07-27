@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dai2F-0003QF-4R
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:36:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dai74-000591-QM
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dai2E-0001gv-Fk
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:36:59 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dai2E-0001fz-AQ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:36:58 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id c184so103924561wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 05:36:58 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1dai74-00057n-26
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:41:58 -0400
+Date: Thu, 27 Jul 2017 14:41:48 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170727124148.GE4767@localhost.localdomain>
+References: <20170724153952.26510-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170717133010.12784-1-f4bug@amsat.org>
-References: <20170717133010.12784-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Jul 2017 13:36:36 +0100
-Message-ID: <CAFEAcA_rhoCup57nYYW4HN6Qsz3sp-cxY-OwsK-x=fYtfJ31aQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/arm: use defined type name instead of
- hard-coded string
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170724153952.26510-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] Test for bug fixes from
+ byte-based block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +23,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Rob Herring <robh@kernel.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 17 July 2017 at 14:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->
-> Hi Peter, this patch is waiting the IDE queue to enters since it depends =
-of
-> commit de09efcc7b67ada3593354711b12a03dea23a9d0 to fix AHCI includes.
+Am 24.07.2017 um 17:39 hat Eric Blake geschrieben:
+> Kevin is correct, and I need tests of my recent bug fixes :)
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07235.html
 
-There's no commit with that hash in master -- do you have
-a commit subject or something that I can use to find out
-whether it's landed or not?
+Thanks, applied to the block branch.
 
-thanks
--- PMM
+Kevin
