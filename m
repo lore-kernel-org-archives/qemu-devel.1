@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dakBz-0005WV-KJ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dakC1-0005Xw-Nj
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dakBv-00062i-Ns
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34494)
+	(envelope-from <eblake@redhat.com>) id 1dakC0-00069s-G4
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dakBv-0005yM-I8
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:07 -0400
-Date: Thu, 27 Jul 2017 15:54:48 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170727145448.GV2555@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dakC0-00068n-38
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:55:12 -0400
 References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5c3214a0-196d-fa81-dbf8-237034b445de@redhat.com>
+Date: Thu, 27 Jul 2017 09:55:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 In-Reply-To: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3"
 Subject: Re: [Qemu-devel] [PATCH 1/2] Add more function keys to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,47 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Programmingkid <programmingkidx@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Thu, Jul 27, 2017 at 10:51:33AM -0400, Programmingkid wrote:
-> There are now keyboards that have 19 function keys. This patch extends
-> QEMU so these function keys can be used. 
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3
+From: Eric Blake <eblake@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+Message-ID: <5c3214a0-196d-fa81-dbf8-237034b445de@redhat.com>
+Subject: Re: [PATCH 1/2] Add more function keys to QEMU
+References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
+In-Reply-To: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/27/2017 09:51 AM, Programmingkid wrote:
+
+You forgot in-reply-to: and references: headers, meaning this was not
+threaded with your 0/2 patch.
+
+> There are now keyboards that have 19 function keys. This patch extends =
+QEMU so these function keys can be used.=20
+>=20
 > Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 > ---
 >  qapi-schema.json  | 6 +++++-
 >  ui/input-keymap.c | 4 ++++
 >  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 9c6c3e1..a051820 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -4842,6 +4842,10 @@
->  # @hiragana: since 2.9
->  # @henkan: since 2.9
->  # @yen: since 2.9
-> +# @f16: since 2.10
-> +# @f17: since 2.10
-> +# @f18: since 2.10
-> +# @f19: since 2.10
->  #
->  # Since: 1.3.0
->  #
-> @@ -4864,7 +4868,7 @@
->              'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
->              'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
->              'ro', 'hiragana', 'henkan', 'yen',
-> -            'kp_comma', 'kp_equals', 'power' ] }
-> +            'kp_comma', 'kp_equals', 'power', 'f16', 'f17', 'f18', 'f19'] }
 
-Linux and AT set 1 go all the way to F24, and OS-X goes to F20, so don't
-arbitrarily stop short at F19
+Conflicts with Gerd's pending UI pull; so you'll need to rebase.
+Furthermore, while Gerd added keys after softfreeze (necessary to fix a
+regression), your additions seem to be a new feature rather than a bug
+fix, and may therefore be more appropriate for 2.11.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll5/s0ACgkQp6FrSiUn
+Q2rLcgf/ahctkTF9tHmjYBkz5R9vWZ/ZtUsrw/9SeN6IvgY1vkOSHJa2E+VNGEte
+1tVdLehY0bCxY739+PGIGfs5I2Eo0+zEQuOH+GshBUyzg+wSn1gwrgO95GXftM0G
+rrWD9L2I1BOwE0RhQ8x94oamI7Nm7HCpc+blcl40Gy3ILIFDcEuyUGSn7HWKIfE1
+uIyUUtLmSt17gTXnp7KsjtC1/r8ay3Ezr41f8ZDdGhVYX3KHlsq/5rbeJA6w9Gwa
+YZiols5iQ5s/LURYAiJ/AnNb+dHWoWdSebzT1xKpkgNE6ks+FqvDVxSjE1fXjq73
+tBiWloFQSi6J4Cz8KdF5DdrNfYolRw==
+=/I+H
+-----END PGP SIGNATURE-----
+
+--53TdFjB6jDsnH2b8PKEs7FEur0CXqStr3--
