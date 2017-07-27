@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dafjh-0000qC-Se
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:09:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1dafkK-0001G6-Jk
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dafjd-0000hH-RG
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:09:41 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 27 Jul 2017 12:09:34 +0200
-Message-Id: <1501150174-19431-1-git-send-email-thuth@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dafkG-0001LK-Gr
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dafkG-0001Ki-9g
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:16 -0400
+Date: Thu, 27 Jul 2017 11:09:58 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170727100958.GG2555@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <87o9so1hl7.fsf@dusky.pond.sub.org>
+	<20170717103308.GI7163@stefanha-x1.localdomain>
+	<8760epr9vw.fsf@dusky.pond.sub.org>
+	<20170721153331.GL18014@stefanha-x1.localdomain>
+	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
+	<8760eiuxu5.fsf@dusky.pond.sub.org>
+	<9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com>
+	<871sp2gut9.fsf@dusky.pond.sub.org>
+	<20170727091957.GC5117@lemon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: Improve the NetBSD regex pattern
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170727091957.GC5117@lemon.lan>
+Subject: Re: [Qemu-devel] Improving QMP test coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +35,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <kamil@netbsd.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <cleber@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-Currently get_maintainers.pl claims that the configure script is
-maintained by Kamil:
+On Thu, Jul 27, 2017 at 05:19:57PM +0800, Fam Zheng wrote:
+> On Thu, 07/27 10:14, Markus Armbruster wrote:
+> > This brings some advantages of "verify output with diff" to tests that
+> > verify with code.  Improvement if it simplifies the verification code.
+> > 
+> > I'd still prefer *no* verification code (by delegating the job to diff)
+> > for tests where I can get away wit it.
+> 
+> Python based iotests can be (re)done in such a way that they print actual logs
+> (interactions with qtest/monitor, stdout/stderr of QEMU, etc) instead of the
+> current dot dot dot summary, then we automatically have diff based verification,
+> no?
 
- $ scripts/get_maintainer.pl -f configure
- Kamil Rytarowski <kamil@netbsd.org> (maintainer:NETBSD)
- qemu-devel@nongnu.org (open list:All patches CC here)
+The python test 149 that I wrote does exactly that. There's no reason why
+the others couldn't do the same.
 
-This happens because the regex pattern for the NETBSD entry triggers
-on everything that contains the keyword "NetBSD". Ease the situation
-a little bit by restricting this to "Subject:" lines only, like
-we do it in the "trivial patches" section already.
+> One thing I feel painful with bash iotests is how harder it is to write
+> complicated test scenarios such as migration, incremental backup, etc.
 
-Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes, shell is an awful language if you need non-trivial control
+logic or data structures
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ce2341a..ccee28b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -353,7 +353,7 @@ NETBSD
- L: qemu-devel@nongnu.org
- M: Kamil Rytarowski <kamil@netbsd.org>
- S: Maintained
--K: (?i)NetBSD
-+K: ^Subject:.*(?i)NetBSD
-=20
- W32, W64
- L: qemu-devel@nongnu.org
---=20
-1.8.3.1
+> On the other hand the iotests are more difficult to debug when things go wrong
+> because it eats the output which, if done with shell, should be very easy to
+> get.
+
+Even if the python tests are not doing verify-by-diff, it should be fairly
+easy to wire up an env variable IOTESTS_DEBUG=1 which would force them
+to propagate stdout/err of all commands run (or at least save it to a
+log file somewhere).
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
