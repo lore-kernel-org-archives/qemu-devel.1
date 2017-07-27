@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1daYUk-00064N-Dl
+	(envelope-from <peng.hao2@zte.com.cn>) id 1daYUk-00064O-EO
 	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1daYUf-0005ws-8s
+	(envelope-from <peng.hao2@zte.com.cn>) id 1daYUh-0005yT-QQ
 	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:46 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:61182)
+Received: from mxhk.zte.com.cn ([63.217.80.70]:60465)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1daYUe-0005uw-SB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:41 -0400
-From: Jiang Biao <jiang.biao2@zte.com.cn>
-Date: Thu, 27 Jul 2017 10:36:23 +0800
-Message-Id: <1501122983-20801-1-git-send-email-jiang.biao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] tcg/README: fix a description error.
+	(envelope-from <peng.hao2@zte.com.cn>) id 1daYUg-0005wp-N9
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:43 -0400
+Date: Thu, 27 Jul 2017 10:25:34 +0800 (CST)
+Message-ID: <201707271025341558926@zte.com.cn>
+References: 201707260928202175266@zte.com.cn,
+	c0295459-5ff2-3efc-412d-a564d8bf980d@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V3=5D_rtc=3A_fix_a_infinite_loop?=
+ =?utf-8?q?_inwindowsvmstartup?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,29 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, jiang.yong5@zte.com.cn, jiang.biao2@zte.com.cn, shi.zhongbing@zte.com.cn
+To: pbonzini@redhat.com
+Cc: liu.yi24@zte.com.cn, qemu-devel@nongnu.org, mst@redhat.com
 
-The atomics.txt is not in the docs directory but in docs/devel/
-instead.
-
-Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
----
- tcg/README | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tcg/README b/tcg/README
-index bf49e82..03bfb6a 100644
---- a/tcg/README
-+++ b/tcg/README
-@@ -446,7 +446,7 @@ when MTTCG is enabled.
- The guest translators should generate this opcode for all guest instructions
- which have ordering side effects.
- 
--Please see docs/atomics.txt for more information on memory barriers.
-+Please see docs/devel/atomics.txt for more information on memory barriers.
- 
- ********* 64-bit guest on 32-bit host support
- 
--- 
-2.7.4
+PiBPbiAyNi8wNy8yMDE3IDAzOjI4LCBwZW5nLmhhbzJAenRlLmNvbS5jbiB3cm90ZToNCg0KDQoN
+Cg0KPiA+IA0KPiA+IA0KPiA+IHdoZW4gdGhlIHByb2JsZW0gaGFwcGVucyAsIHdpbmRvd3Mga2Vy
+bmVsIGlzIGNoZWNraW5nICB3aGV0aGVyIFJFR19BX1VJUCBpcyANCj4gPiBjaGFuZ2luZyBhZnRl
+ciBwZXJpb2RpYyB0aW1lciBoYXMgc3RvcHBlZC4gd2luZG93cyBrZXJuZWwgYWNjZXNzIFJFR19B
+DQo+ID4gYWNjb3JkaW5nIHRvIElOQiBpbnN0cnVuY3Rpb24gYW5kIGl0IHdpbGwgc3BlbmQgc2V2
+ZXJhbCBtaWNyb3NlY29uZHMgYmVjYXVzZQ0KPiA+IG9mIFZNX0VYSVQuIA0KDQo+IEEgdm1leGl0
+IHRvIHRoZSBSVEMgdGltZXIgc2hvdWxkIGJlIGFyb3VuZCAxMC4wMDAgY2xvY2sgY3ljbGVzLCB3
+aGljaCBpcw0KPiBsZXNzIHRoYW4gYSBtaWNyb3NlY29uZC4NCkkgdXNlIHBlcmYgdG9vbHMgZ2V0
+dGluZyBkYXRhKHdpbmRvd3MgVk0pDQoNCklPIFBvcnQgICBBY2Nlc3MgICAgU2FtcGxlcyAgU2Ft
+cGxlcyUgICAgIFRpbWUlICAgTWluIFRpbWUgICBNYXggVGltZSAgICAgICAgIEF2ZyB0aW1lIA0K
+DQoweDcxOiAgICAgIFBJTiAgICAgICAgICAgMTI2ICAgICAgICAgNTYuNzYlICAgICAgIDMyLjYy
+JSAgICAgICAgMXVzICAgICAgICAgMnVzICAgICAgICAgICAgICAxLjgzdXMgKCArLSAgIDAuNjIl
+ICkNCg0KDQoweDcwOiAgICBQT1VUICAgICAgICAgNjMgICAgICAgICAgMjguMzglICAgICAgICA1
+MS41NiUgICAgICAgIDR1cyAgICAgICAgIDE1dXMgICAgICAgICAgICAgNS43OHVzICggKy0gICAz
+LjEyJSApDQoNCkJ1dCBJJ20gbm90IHN1cmUgaXQgaXMgYWNjdXJhdGUuDQoNCj4gPiB1cGRhdGUg
+dGltZXIgaGFzIGNoYW5nZWQgdG8gYSBsb25nIGV4cGlyZSB0aW1lIChhcyBhbGFybSB0aW1lcilv
+biB0aGUNCj4gPiBvbmUgaGFuZC4NCj4gPiANCj4gPiBvbiB0aGUgb3RoZXIgaGFuZCAgMjQ0IG1p
+Y3Jvc2Vjb25kcyBpbiBvbmUgc2Vjb25kIGlzIHRvbyBzaG9ydCB0byBoaXQNCj4gPiB0aGUgcmVn
+aW9uLg0KPiA+IA0KPiA+IHdpbmRvd3Mga2VybmVsIG1heSBjaGVjayBSRUdfQV9VSVAgd2hlbiBj
+b25zaWRlcmluZyBSVEMgc29tZXRoaW5nIHdyb25nLg0KPiA+IG1hbnkgd2luZG93cyBWTSByZWJv
+b3QgYXQgdGhlIHNhbWUgdGltZSBhbmQgcnRjIHBlcmlvZGljIHRpbWVyIG1heSBkZWxheQ0KPiA+
+IGJhZGx5Li4NCg0KPiBEb2VzIFdpbmRvd3MgZG8gdGhpcyB0ZXN0IHdoZW4gSHlwZXItViBlbmds
+aWdodGVubWVudHMgYXJlIGVuYWJsZWQNCj4gKGVzcGVjaWFsbHkgaHYtcmVsYXhlZCk/DQp5ZXMg
+LEkgZW5hYmxlIGh2LXJlbGF4ZWQuaW4gbXkgd2luZG93cyBWTS5CdXQgSSdtIG5vdCBzdXJlIHRo
+ZSBpbnRlcmNvbm5lY3Rpb24gYmV0d2VlbiB0aGVtLg0KDQo+IEl0IHNlZW1zIHRvIGJlIGEgV2lu
+ZG93cyBpc3N1ZSB0byBtZS4gIEknbSBub3Qgc3VyZSBhZGRpbmcgaGFja3MgdG8gdGhlDQoNCj4g
+ZGV2aWNlIG1vZGVsIGlzIHRoZSByaWdodCB0aGluZyB0byBkbywgZXNwZWNpYWxseSBiZWNhdXNl
+IEkgZG9uJ3QNCj4gdW5kZXJzdGFuZCB3aHkgeW91ciBmaXggd29ya2VkLg0KDQoxLiBndWVzdCBj
+bG9zZXMgcGVyaW9kaWMgdGltZXLvvIxmcm9tIHRoZW4gb24gcnRjIGRvbid0IHNlbmQgaW50ZXJy
+dXB0IGFueW1vcmUgYW5kIG5vIHJ0YyBoYW5kbGVyIGNhbiBydW4gdG8gcmVhZA0KDQoNCiAgIFJU
+Q19SRUdfQ++8iHRoaXMgcmVhZCBzZXQgUlRDX1JFR19DID0gMCwgY2xlYXIgUkVHX0NfVUYpDQoN
+Cg0KMi4gdXBkYXRlIHRpbWVyIGV4cGlyZXMsIHJ0Y191cGRhdGVfdGltZXIgY2xlYXJzIFJFR19B
+X1VJUCwgYW5kIHNldCBSRUdfQ19VRg0KDQoNCjMuIGJlY2F1c2UgUkVHX0NfVUYgaXMgc2V0dGVk
+LCBjaGVja191cGRhdGVfdGltZXIgc2V0cyB1cGRhdGVfdGltZXIncyBleHBpcmUgdGltZSB0byBu
+ZXh0X2FsYXJtX3RpbWUsIHdoaWNoIGlzIA0KDQoNCiAgIG92ZXIgdGVuIGhvdXJzDQoNCg0KNC4g
+Z3Vlc3QgY2hlY2tzIHRoYXQgUkVHX0FfVUlQIGNoYW5nZXMgZnJvbSAwIHRvIDEgaW4gYSBpbmZp
+bnRlIGxvb3AgKHdlIGRvbid0IGtub3cgd2h5IHdpbmRvd3Mga2VybmVsIGRvZXMgdGhpcykgYnkg
+cmVhZCBSVENfUkVHX0ENCg0KDQo1LiB1cGRhdGVfaW5fcHJvZ3Jlc3MgY2FsbGVkIGZyb20gY21v
+c19pb3BvcnRfcmVhZA0KDQoNCjYuIGJlYXVzZSB1cGRhdGVfdGltZXIgaXMgc3dpdGNoZWQgdG8g
+YWxhcm0gdGltZXIsIHdoaWNoIGhhcyBhIHRvbyBiaWcgZXhwaXJlIHRpbWUgdG8gc2F0aXNmZXMg
+dGhlIGZvd2xsb3dpbmcgY29uZGl0aW9uOg0KDQoNCglpZiAocWVtdV9jbG9ja19nZXRfbnMocnRj
+X2Nsb2NrKSA+PQ0KDQoNCiAgICAgICAgICAgIChuZXh0X3VwZGF0ZV90aW1lIC0gVUlQX0hPTERf
+TEVOR1RIKSkgew0KDQoNCiAgICAgICAgICAgIHMtPmNtb3NfZGF0YVtSVENfUkVHX0FdIHw9IFJF
+R19BX1VJUA0KDQoNCiAgICAgICAgICAgIHJldHVybiAxDQoNCg0KICAgICAgICB9DQoNCg0KNy4g
+dXBkYXRlX2luX3Byb2dyZXNzJ3Mgc2Vjb25kIGNvbmRpdGlvbiBkb24ndCBzYXRpc2ZlczoNCg0K
+DQoJaWYgKChndWVzdF9uc2VjICUgTkFOT1NFQ09ORFNfUEVSX1NFQ09ORCkgPj0NCg0KDQogICAg
+ICAgIChOQU5PU0VDT05EU19QRVJfU0VDT05EIC0gVUlQX0hPTERfTEVOR1RIKSkgew0KDQoNCiAg
+ICAgICAgcmV0dXJuIDENCg0KDQogICAgfQ0KDQoNCiAgIGJlY2F1c2Ugd2hlbiBtYW55IHZtcyBz
+dGFydHVwLCBpbmIgaW5zdHJ1Y3Rpb24gd2FzdGVzIG11Y2ggbW9yZSB0aW1lIHRoYW4gbm9ybWFs
+IHNpdHVhdGlvbiBhbmQgDQoNCg0KICAgZ3Vlc3RfbnNlYyAlIE5BTk9TRUNPTkRTX1BFUl9TRUNP
+TkQgaXMgbmVhcmx5IDwgTkFOT1NFQ09ORFNfUEVSX1NFQ09ORCAtIFVJUF9IT0xEX0xFTkdUSCBh
+bHdheXMuDQoNCg0KOC4gZmluYWxseSwgUkVHX0FfVUlQIGlzIGFsd2F5cyBjbGVhcmVkLCBSRUdf
+Q19VRiBpcyBhbHdheXMgc2V0LCB1cGRhdGVfdGltZXIgaXMgYWx3YXlzIGFsYXJtIHRpbWVyLCAN
+Cg0KDQogICBndWVzdCBpcyBhbHdheXMgY2hlY2tpbmcgUkVHX0FfVUlQLCBhbmQgZ3Vlc3QgaHVu
+ZyB1cC4=
