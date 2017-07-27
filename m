@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1daiUf-00006f-1z
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:06:22 -0400
+	(envelope-from <groug@kaod.org>) id 1daiXQ-00017M-Pr
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:09:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1daiUb-0000h3-QS
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:06:21 -0400
-Resent-Message-Id: <E1daiUb-0000h3-QS@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150116076330.114.13671731807618011950@5d477a5b5989>
-In-Reply-To: <1500649820-30450-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1daiXN-0004cL-IM
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:09:12 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:50905)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1daiXN-0004b2-BI
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:09:09 -0400
+Received: from player759.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id F182A8923B
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 15:09:06 +0200 (CEST)
+Date: Thu, 27 Jul 2017 15:09:03 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170727150903.7b906977@bahia.lan>
+In-Reply-To: <1501115502-15185-1-git-send-email-lu.zhipeng@zte.com.cn>
+References: <1501115502-15185-1-git-send-email-lu.zhipeng@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Jul 2017 06:06:04 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Avoid unnecessary sleeps
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/Uw6sW/3_PjteLajJmWhZEu6";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] fsdev: fix memory leak in main()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHFlbXUtaW90ZXN0czogQXZvaWQgdW5uZWNlc3Nh
-cnkgc2xlZXBzCk1lc3NhZ2UtaWQ6IDE1MDA2NDk4MjAtMzA0NTAtMS1naXQtc2VuZC1lbWFpbC1r
-d29sZkByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4ZDVlMTE0IHFlbXUtaW90ZXN0czogQXZv
-aWQgdW5uZWNlc3Nhcnkgc2xlZXBzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzE6IHFlbXUtaW90ZXN0czogQXZvaWQgdW5uZWNlc3Nhcnkgc2xlZXBzLi4uCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTgxOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvaW90
-ZXN0cy5weTozNzI6CisgICAgICAgICAgICAgICAgICAgIGlmIGpvYlsnZGV2aWNlJ10gPT0gam9i
-X2lkIGFuZCBqb2JbJ3BhdXNlZCddID09IFRydWUgYW5kIGpvYlsnYnVzeSddID09IEZhbHNlOgoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+--Sig_/Uw6sW/3_PjteLajJmWhZEu6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 27 Jul 2017 08:31:42 +0800
+ZhiPeng Lu <lu.zhipeng@zte.com.cn> wrote:
+> @rpath and @ sock_name are not freed and leaked.
+>=20
+
+The leak is harmless since the process is expected to terminate when main()
+returns. So, even if I fully agree that we should always take care of alloc=
+ated
+memory, I will push it to my 9p-next branch and wait for 2.11 before pushin=
+g it
+upstream.
+
+> Signed-off-by: Zhipeng Lu lu.zhipeng@zte.com.cn
+> ---
+>  fsdev/virtfs-proxy-helper.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+> index 6c066ec..8e48500 100644
+> --- a/fsdev/virtfs-proxy-helper.c
+> +++ b/fsdev/virtfs-proxy-helper.c
+> @@ -1162,6 +1162,8 @@ int main(int argc, char **argv)
+> =20
+>      process_requests(sock);
+>  error:
+> +    g_free(rpath);
+> +    g_free(sock_name);
+>      do_log(LOG_INFO, "Done\n");
+>      closelog();
+>      return 0;
+
+
+--Sig_/Uw6sW/3_PjteLajJmWhZEu6
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEUEARECAAYFAll55e8ACgkQAvw66wEB28LcAACaAhOSJXpKAXLgOZl8ycqgeIGV
+DysAl1Kz0D+8sNaSvP0FOPHoGllRcdY=
+=tfC6
+-----END PGP SIGNATURE-----
+
+--Sig_/Uw6sW/3_PjteLajJmWhZEu6--
