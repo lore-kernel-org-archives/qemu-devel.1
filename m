@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53518)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daaWI-0004x5-3L
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:35:31 -0400
+	id 1daaam-00072M-R0
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daaWH-00066e-8f
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:35:30 -0400
+	id 1daaaj-0000hx-KA
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:40:08 -0400
+Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:38009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daaaj-0000hB-FU
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:40:05 -0400
+Received: by mail-qt0-x22c.google.com with SMTP id t37so61572106qtg.5
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:40:05 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170727024224.22900-1-f4bug@amsat.org>
-	<20170727024224.22900-19-f4bug@amsat.org>
-	<20170727034304.GJ8978@umbus.fritz.box>
+References: <20170726214010.420-1-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <299bd55b-5192-69d8-f15f-c55518fdeefe@amsat.org>
-Date: Thu, 27 Jul 2017 01:35:14 -0300
+Message-ID: <db600f68-d269-8ff2-96f0-0f41e8173b31@amsat.org>
+Date: Thu, 27 Jul 2017 01:39:59 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170727034304.GJ8978@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20170726214010.420-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 19/20] spapr_vio: fix overflow
- of qdevs in spapr_dt_vdevice()
+Subject: Re: [Qemu-devel] [PATCH for 2.10 0/4] check dtc submodule is
+ outdated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +35,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: John Arbuckle <programmingkidx@gmail.com>, Yongbok Kim <yongbok.kim@imgtec.com>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-On 07/27/2017 12:43 AM, David Gibson wrote:
-> On Wed, Jul 26, 2017 at 11:42:23PM -0300, Philippe Mathieu-Daudé wrote:
->> sizeof(ptr) was used instead of sizeof(struct)...
->>
->> also use g_malloc_n() which take care of possible type overflow.
->>
->> hw/ppc/spapr_vio.c:641:22: warning: The code calls sizeof() on a pointer type. This can produce an unexpected result
->>      qdevs = g_malloc(sizeof(qdev) * num);
->>                       ^     ~~~~~~
->> hw/ppc/spapr_vio.c:648:23: warning: The code calls sizeof() on a pointer type. This can produce an unexpected result
->>      qsort(qdevs, num, sizeof(qdev), compare_reg);
->>                        ^     ~~~~~~
->>
->> Reported-by: Clang Static Analyzer
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 07/26/2017 06:40 PM, Philippe Mathieu-DaudÃ© wrote:> patch 4: if no 
+system libdtc and submodule present, compile the dtc submodule
+> and verify it is at least v1.4.2. Prefixed RFC because I'm not sure about
+> these 3 lines:
 > 
-> Nack.
+> +    make -C dtc 1>/dev/null
+
+which can leads to:
+
+/bin/sh: 1: cannot create libfdt/fdt_sw.d: Read-only file system
+	 DEP libfdt/fdt_wip.c
+
+so the libdtc build should be handle more seriously :(
+
 > 
-> Have a closer look, what's going in the array really is pointers, not
-> structures.  This is a false warning from clang, we need to find a
-> different way to suppress it.
-
-Something was bothering me with that patch, wondering why it never 
-explode previously, now I see/understand.
-
->> ---
->>   hw/ppc/spapr_vio.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->> index ea3bc8bd9e..9991b44c9f 100644
->> --- a/hw/ppc/spapr_vio.c
->> +++ b/hw/ppc/spapr_vio.c
->> @@ -638,14 +638,14 @@ void spapr_dt_vdevice(VIOsPAPRBus *bus, void *fdt)
->>       }
->>   
->>       /* Copy out into an array of pointers */
-
-/ashamed the comment was in front of me...
-
-Thank you David for the review!
-
-Phil.
-
->> -    qdevs = g_malloc(sizeof(qdev) * num);
->> +    qdevs = g_malloc_n(num, sizeof(*qdev));
->>       num = 0;
->>       QTAILQ_FOREACH(kid, &bus->bus.children, sibling) {
->>           qdevs[num++] = kid->child;
->>       }
->>   
->>       /* Sort the array */
->> -    qsort(qdevs, num, sizeof(qdev), compare_reg);
->> +    qsort(qdevs, num, sizeof(*qdev), compare_reg);
->>   
->>       /* Hack alert. Give the devices to libfdt in reverse order, we happen
->>        * to know that will mean they are in forward order in the tree. */
+> yes, we need to build the libdtc to be able to run the compile_prog link step
 > 
+> +    fdt_cflags="-I${source_path}/dtc/libfdt"
+> 
+> $source_path seems ok...
+> 
+> +    fdt_libs="-L$(pwd)/dtc/libfdt $fdt_libs"
+> 
+> maybe there is a better option than `pwd`
