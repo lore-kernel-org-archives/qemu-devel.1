@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db5Gs-0002Oi-Fc
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:25:39 -0400
+	(envelope-from <crosa@redhat.com>) id 1db5Lc-0004eG-KC
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db5Go-0000i2-JA
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:25:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43670)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1db5Go-0000hA-Cn
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:25:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 06E5220699A
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 13:25:33 +0000 (UTC)
-Date: Fri, 28 Jul 2017 14:25:26 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170728132526.GO31495@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170728125935.18167-1-kraxel@redhat.com>
-	<1501248049.10943.16.camel@redhat.com>
+	(envelope-from <crosa@redhat.com>) id 1db5LZ-0005P3-K6
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:30:32 -0400
+References: <20170727120210.6943-1-crosa@redhat.com>
+	<20170727120210.6943-2-crosa@redhat.com>
+	<CAFEAcA-CzG=JYjajJqMRL+pcMC2_06HTm1_xhD=ca=AReXHmTA@mail.gmail.com>
+	<e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <3367822b-da85-7032-f7c0-c488153a6e07@redhat.com>
+Date: Thu, 27 Jul 2017 09:47:11 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1501248049.10943.16.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/3] Ui 20170728 patches
+In-Reply-To: <e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i"
+Subject: Re: [Qemu-devel] [PATCH 1/5] configure: remove duplicate single
+ quotes on config.log header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jul 28, 2017 at 03:20:49PM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > ui: more keymap fixes for 2.10
-> 
-> Rushing things a bit, because I'm about to disappear into my summer
-> vacation, so I want get the fixes out of the door.
-> 
-> This is just incremental fixes to yesterdays (somewhat rushed too) pull
-> request, so I don't expect more problems.  Should that not be the case:
->  Daniel, can you take care while I'm offline?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i
+From: Cleber Rosa <crosa@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <3367822b-da85-7032-f7c0-c488153a6e07@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] configure: remove duplicate single
+ quotes on config.log header
+References: <20170727120210.6943-1-crosa@redhat.com>
+ <20170727120210.6943-2-crosa@redhat.com>
+ <CAFEAcA-CzG=JYjajJqMRL+pcMC2_06HTm1_xhD=ca=AReXHmTA@mail.gmail.com>
+ <e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
+In-Reply-To: <e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sure, happy to look after any further release critical keymap or ui issues
-while you're out.  NB, i'll be off from Aug 16th too though for the USA
-Eclipse :-)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+On 07/27/2017 08:24 AM, Eric Blake wrote:
+> On 07/27/2017 07:15 AM, Peter Maydell wrote:
+>> On 27 July 2017 at 13:02, Cleber Rosa <crosa@redhat.com> wrote:
+>>> The generation of the informational header on config.log contains two=
+
+>>> pairs of single quotes, which seems unintentional, and looks like
+>>> this:
+>>>
+>>>   # QEMU configure log Thu Jul 26 08:17:15 EDT 2017
+>>>   # Configured with: './configure' '--target-list=3Dx86_64-softmmu'
+>>
+>> I think this is deliberate. The idea is that the string is a
+>> validly shell-quoted string that you can cut and paste
+>> into a shell prompt if you want to.
+>=20
+> It IS deliberate.  If you want, you could improve the code to only emit=
+
+> '' around arguments that require it rather than all arguments, but that=
+
+> requires more shell code (it's easier to quote everywhere, even when it=
+
+> looks strange because the quotes weren't necessary).
+>=20
+>> ...and note in particular how the '--cc=3Dccache gcc' argument
+>> is printed.
+>=20
+> Yes, that's a case where the quotes are necessary.
+>=20
+
+Right, now I can see why.  Thanks for the review!
+
+--=20
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+
+
+--6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZee7iAAoJEGV+jTOl8gnz/84P/A5BOim4htHWgCTenPoQkvfE
+3Nqw258/JOCFQBWZUiynid4PvkBORz7KS0wECIkW1BYpGZ4cA6xKoZVK6UFcOMhg
+PzdtKo4SmvmuUQT2CUSz+UWHJsWCequFzrooKZon1scItBTaxo3CExidVBqmSFts
+nmt2cDo/N7hqsot3Bj9cc1vzp29lex1nadlADbaBr9Xy6/E5qPbCnLcdzxJrUem4
+9dbzl0sK04RV3PghA756FcAhN+mV7ZPvIcz8pcorgauYIMHSYzowBiK8bvu8SlyK
+YraEflIWFmdQMwa70AkgdYm8wgjYkDuAlAKhoInvYrDmJ7ywOQ9K3QOp/JKZ6GHy
+zb5DDtip8KbMwoVMl0FxUBNZyE6f70aRQ3L3zBeirgElPauNdwPUD0fSgfoUCugf
+W8eKlM7ZtcqcPtfpCKNh4wLBIMVO5iyBFk2LJnum0TwUGwc+1P0Hcu3FsJWyeAhF
+eQ1D7cz2NOtbgXeEsOwkjqBlRMZzzpeRHExjv0s/d5aLg5nFv8X6IOIsd1XTbUc9
+XSXbkEu1ee697OuaCaFkXxmCmGpfizJNYxBLhe/HRRl4RKyAJ3OhR3k5GQEj0Fgv
+s4xG6nbK6kprLwzNE/LnaMDAyvad5iYOvvFTVx7RP8n0q+kVWMaOznxQeyFPZGls
+9uoOd39w7ezlnYKkP+6N
+=WWRg
+-----END PGP SIGNATURE-----
+
+--6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i--
