@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1daj2O-0007ju-1S
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:41:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1daj6e-0001kn-9L
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1daj2N-000475-0o
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:41:12 -0400
-Date: Thu, 27 Jul 2017 14:41:01 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170727134101.GG10129@stefanha-x1.localdomain>
-References: <20170721034730.25612-1-crosa@redhat.com>
-	<20170721123325.GC18014@stefanha-x1.localdomain>
-	<20170721140155.GQ17693@redhat.com>
-	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
-	<20170725154921.GS23343@stefanha-x1.localdomain>
-	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
-	<20170726175808.GD3600@stefanha-x1.localdomain>
-	<ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1daj6a-00086T-V0
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:45:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1daj6a-000867-OS
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:45:32 -0400
+Date: Thu, 27 Jul 2017 15:45:28 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170727154528.705f4fd2@gondolin>
+In-Reply-To: <195c50a3-e99e-5928-af49-912746dc076d@linux.vnet.ibm.com>
+References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
+	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
+	<20170727100138.74ad2ad4@gondolin>
+	<195c50a3-e99e-5928-af49-912746dc076d@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xs+9IvWevLaxKUtW"
-Content-Disposition: inline
-In-Reply-To: <ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
- conditional (qemu-io)test skip
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
+ for TIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
+On Thu, 27 Jul 2017 15:40:33 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
---xs+9IvWevLaxKUtW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jul 26, 2017 at 02:24:02PM -0400, Cleber Rosa wrote:
->=20
->=20
-> On 07/26/2017 01:58 PM, Stefan Hajnoczi wrote:
-> > On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
-> >> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
-> >>> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
-> >>>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
-> >>>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
-> >>>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
-> >>>> Without the static capabilities defined, the dynamic check would be
-> >>>> influenced by the run time environment.  It would really mean "qemu-=
-io
-> >>>> running on this environment (filesystem?) can do native aio".  Again,
-> >>>> that's not the best type of information to depend on when writing te=
-sts.
-> >>>
-> >>> Can you explain this more?
-> >>>
-> >>> It seems logical to me that if qemu-io in this environment cannot do
-> >>> aio=3Dnative then we must skip those tests.
-> >>>
-> >>> Stefan
-> >>>
+> [Re-posting my previous reply because I've accidentally
+> dropped almost all addressees.]
+> 
+> On 07/27/2017 10:01 AM, Cornelia Huck wrote:
+> > On Wed, 26 Jul 2017 00:44:42 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
+> >> contain zeros.  Bits 0-3 are already covered by cmd_code validity
+> >> checking, and bit 32 is covered by the CCW address checking.
 > >>
-> >> OK, let's abstract a bit more.  Let's take this part of your statement:
+> >> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
+> >> check for the absence of certain flags.  Let's fix this.
 > >>
-> >>  "if qemu-io in this environment cannot do aio=3Dnative"
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> ---
+> >>  hw/s390x/css.c | 3 ++-
+> >>  1 file changed, 2 insertions(+), 1 deletion(-)
 > >>
-> >> Let's call that a feature check.  Depending on how the *feature check*
-> >> is written, a negative result may hide a test failure, because it would
-> >> now be skipped.
-> >=20
-> > You are saying a pass->skip transition can hide a failure but ./check
-> > tracks skipped tests.  See tests/qemu-iotests/check.log for a
-> > pass/fail/skip history.
-> >=20
->=20
-> You're not focusing on the problem here.  The problem is that a test
-> that *was not* supposed to be skipped, would be skipped.
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index d17e21b7af..1f04ce4a1b 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+> >>              ret = -EINVAL;
+> >>              break;
+> >>          }
+> >> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
+> >> +        if (ccw.flags || ccw.count) {
+> >> +            /* We have already sanitized these if fmt 0. */  
+> > 
+> > I'd tweak that to
+> > 
+> > /* We have already sanitized these if converted from fmt 0. */
+> >   
+> 
+> Fine with me.
+> 
+> > Seems less confusing.
+> >   
+> >>              ret = -EINVAL;
+> >>              break;
+> >>          }  
+> > 
+> > I'm inclined to pick this as a 2.10 bugfix. Patch 1 still needs work
+> > from what I've seen.
+> >   
+> 
+> Hm. The commit message becomes inaccurate if this goes in before
+> patch 1. We still have must be zero bits which should be handled
+> by the address (ccw.cda) checking. I think I can fix patch 1 today.
+> 
 
-As Daniel Berrange mentioned, ./configure has the same problem.  You
-cannot just run it blindly because it silently disables features.
+It's probably a bit much for now.
 
-What I'm saying is that in addition to watching ./configure closely, you
-also need to look at the skipped tests that ./check reports.  If you do
-that then you can be sure the expected set of tests is passing.
-
-> > It is the job of the CI system to flag up pass/fail/skip transitions.
-> > You're no worse off using feature tests.
-> >=20
-> > Stefan
-> >=20
->=20
-> What I'm trying to help us achieve here is a reliable and predictable
-> way for the same test job execution to be comparable across
-> environments.  From the individual developer workstation, CI, QA etc.
-
-1. Use ./configure --enable-foo options for all desired features.
-2. Run the ./check command-line and there should be no unexpected skips
-   like this:
-
-087         [not run] missing aio=3Dnative support
-
-To me this seems to address the problem.
-
-I have mentioned the issues with the build flags solution: it creates a
-dependency on the build environment and forces test feature checks to
-duplicate build dependency logic.  This is why I think feature tests are
-a cleaner solution.
-
-Stefan
-
---xs+9IvWevLaxKUtW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZee1tAAoJEJykq7OBq3PIGh8IAIFWHnV/W0jUbCv3C27L9pEa
-eK+WhxkCGHJDQWUqGIxgkpWu4gdvk3q74rHX22/htmsFc5cukYi/pzHR7oY4d5E7
-Pn8JHLhrpzkKK8OLDT6LR80aFu/w4NlmarbqkzW+X15A/AmdP8CnGDWO43RA7TZ5
-hvsiEU+SbmWXOgyn7Rt5ESOE7QGRha62r2YWPFy0HindiJrHXZhiyYO0JeTUvJbn
-tzAiMIO0hZmtMOy/11mVo06m9JM1d1bfROh9bKr+UfO64Rml6Lr74/gmUNzsofZW
-6yDTVo1QYRGzwt+dpv/7rNJLScqTsrSvWi+uBQOzlJUEjBOLe19mqJZbQjXBEOg=
-=6urF
------END PGP SIGNATURE-----
-
---xs+9IvWevLaxKUtW--
+Can you rather suggest a better commit message?
