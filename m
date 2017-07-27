@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1daBLM-0002oE-G3
+	(envelope-from <changpeng.liu@intel.com>) id 1daBLL-0002o6-Ix
 	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1daBLK-0007QN-7b
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:32 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1daBLH-0007Ns-Bn
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:31 -0400
 Received: from mga05.intel.com ([192.55.52.43]:48394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1daBLJ-0007Ky-Pb
-	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:30 -0400
+	id 1daBLG-0007Ky-VV
+	for qemu-devel@nongnu.org; Tue, 25 Jul 2017 21:42:27 -0400
 From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Thu, 27 Jul 2017 10:00:51 +0800
-Message-Id: <1501120851-4314-3-git-send-email-changpeng.liu@intel.com>
+Date: Thu, 27 Jul 2017 10:00:50 +0800
+Message-Id: <1501120851-4314-2-git-send-email-changpeng.liu@intel.com>
 In-Reply-To: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
 References: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH 2/2] vhost-user-blk: introduce a vhost-user-blk
- sample application
+Subject: [Qemu-devel] [PATCH 1/2] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,781 +28,629 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, stefanha@redhat.com, felipe@nutanix.com, mst@redhat.com
 
-This commit introcudes a vhost-user-blk backend device, it uses
-UNIX domain socket to communicate with Qemu. The vhost-user-blk
-sample application should be used with Qemu vhost-user-blk-pci
-device.
+This commit introduces a vhost-user device for block, it uses a
+chardev to connect to the backend, Same with virito_blk, Guest
+OS still uses the virtio_blk frontend driver.
 
-To use it, complie with:
-make vhost-user-blk
+To use it, start Qemu with command line like this:
 
-and start like this:
-vhost-user-blk -b /dev/sdb -s /path/vhost.socket
+qemu-system-x86_64 \
+    -chardev socket,id=char0,path=/path/vhost.socket \
+    -device vhost-user-blk-pci,chardev=char0,size=10G, \
+            logical_block_size=...
+
+Different with exist Qemu virtio_blk host device, it makes more easy
+for users to implement their own I/O processing logic, such as all
+user space I/O stack against hardware block device. However, due to
+exist vhost-user messages, Qemu can't get the parameters such as
+capacity of the backend block device, users need to append such
+parameters when start Qemu.
 
 Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 ---
- .gitignore                              |   1 +
- Makefile                                |   3 +
- Makefile.objs                           |   2 +
- contrib/vhost-user-blk/Makefile.objs    |   1 +
- contrib/vhost-user-blk/vhost-user-blk.c | 695 ++++++++++++++++++++++++++++++++
- 5 files changed, 702 insertions(+)
- create mode 100644 contrib/vhost-user-blk/Makefile.objs
- create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+ configure                          |  11 ++
+ hw/block/Makefile.objs             |   3 +
+ hw/block/vhost-user-blk.c          | 352 +++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c             |  55 ++++++
+ hw/virtio/virtio-pci.h             |  18 ++
+ include/hw/virtio/vhost-user-blk.h |  46 +++++
+ 6 files changed, 485 insertions(+)
+ create mode 100644 hw/block/vhost-user-blk.c
+ create mode 100644 include/hw/virtio/vhost-user-blk.h
 
-diff --git a/.gitignore b/.gitignore
-index cf65316..dbe5c13 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -51,6 +51,7 @@
- /module_block.h
- /vscclient
- /vhost-user-scsi
-+/vhost-user-blk
- /fsdev/virtfs-proxy-helper
- *.[1-9]
- *.a
-diff --git a/Makefile b/Makefile
-index ef72148..4dfbf44 100644
---- a/Makefile
-+++ b/Makefile
-@@ -270,6 +270,7 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-server-obj-y \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-+                vhost-user-blk-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -478,6 +479,8 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- endif
- vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y)
- 	$(call LINK, $^)
-+vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y)
-+	$(call LINK, $^)
+diff --git a/configure b/configure
+index 987f59b..466b3b4 100755
+--- a/configure
++++ b/configure
+@@ -305,6 +305,7 @@ tcg="yes"
  
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index 24a4ea0..6b81548 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -114,6 +114,8 @@ vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
- vhost-user-scsi-obj-y += contrib/libvhost-user/libvhost-user.o
-+vhost-user-blk-obj-y = contrib/vhost-user-blk/
-+vhost-user-blk-obj-y += contrib/libvhost-user/libvhost-user.o
+ vhost_net="no"
+ vhost_scsi="no"
++vhost_user_blk="no"
+ vhost_vsock="no"
+ kvm="no"
+ hax="no"
+@@ -778,6 +779,7 @@ Linux)
+   kvm="yes"
+   vhost_net="yes"
+   vhost_scsi="yes"
++  vhost_user_blk="yes"
+   vhost_vsock="yes"
+   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+   supported_os="yes"
+@@ -1135,6 +1137,10 @@ for opt do
+   ;;
+   --enable-vhost-scsi) vhost_scsi="yes"
+   ;;
++  --disable-vhost-user-blk) vhost_user_blk="no"
++  ;;
++  --enable-vhost-user-blk) vhost_user_blk="yes"
++  ;;
+   --disable-vhost-vsock) vhost_vsock="no"
+   ;;
+   --enable-vhost-vsock) vhost_vsock="yes"
+@@ -1489,6 +1495,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   cap-ng          libcap-ng support
+   attr            attr and xattr support
+   vhost-net       vhost-net acceleration support
++  vhost-user-blk  VM virtio-blk acceleration in user space
+   spice           spice
+   rbd             rados block device (rbd)
+   libiscsi        iscsi support
+@@ -5347,6 +5354,7 @@ echo "posix_madvise     $posix_madvise"
+ echo "libcap-ng support $cap_ng"
+ echo "vhost-net support $vhost_net"
+ echo "vhost-scsi support $vhost_scsi"
++echo "vhost-user-blk support $vhost_user_blk"
+ echo "vhost-vsock support $vhost_vsock"
+ echo "Trace backends    $trace_backends"
+ if have_backend "simple"; then
+@@ -5757,6 +5765,9 @@ fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
++if test "$vhost_user_blk" = "yes" ; then
++  echo "CONFIG_VHOST_USER_BLK=y" >> $config_host_mak
++fi
+ if test "$vhost_net" = "yes" ; then
+   echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
+ fi
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index e0ed980..4c19a58 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -13,3 +13,6 @@ obj-$(CONFIG_SH4) += tc58128.o
  
- ######################################################################
- trace-events-subdirs =
-diff --git a/contrib/vhost-user-blk/Makefile.objs b/contrib/vhost-user-blk/Makefile.objs
+ obj-$(CONFIG_VIRTIO) += virtio-blk.o
+ obj-$(CONFIG_VIRTIO) += dataplane/
++ifeq ($(CONFIG_VIRTIO),y)
++obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
++endif
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
 new file mode 100644
-index 0000000..72e2cdc
+index 0000000..38d7855
 --- /dev/null
-+++ b/contrib/vhost-user-blk/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-blk-obj-y = vhost-user-blk.o
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-new file mode 100644
-index 0000000..00826f5
---- /dev/null
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -0,0 +1,695 @@
++++ b/hw/block/vhost-user-blk.c
+@@ -0,0 +1,352 @@
 +/*
-+ * vhost-user-blk sample application
++ * vhost-user-blk host device
 + *
-+ * Copyright IBM, Corp. 2007
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ * Copyright (c) 2017 Intel Corporation. All rights reserved.
++ * Copyright IBM, Corp. 2011
++ * Copyright(C) 2017 Intel Corporation.
 + *
-+ * Author:
-+ *  Anthony Liguori <aliguori@us.ibm.com>
-+ *  Felipe Franciosi <felipe@nutanix.com>
++ * Authors:
++ *  Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
 + *  Changpeng Liu <changpeng.liu@intel.com>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 only.
-+ * See the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/virtio/virtio-blk.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
++#include "migration/vmstate.h"
++#include "migration/migration.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "qemu/typedefs.h"
++#include "qemu/cutils.h"
++#include "qom/object.h"
++#include "hw/qdev-core.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-user-blk.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-bus.h"
++#include "hw/virtio/virtio-access.h"
 +
-+#include <glib.h>
-+
-+/* Small compat shim from glib 2.32 */
-+#ifndef G_SOURCE_CONTINUE
-+#define G_SOURCE_CONTINUE TRUE
-+#endif
-+#ifndef G_SOURCE_REMOVE
-+#define G_SOURCE_REMOVE FALSE
-+#endif
-+
-+/* 1 IO queue with 128 entries */
-+#define VIRTIO_BLK_QUEUE_NUM 128
-+/* And this is the final byte of request*/
-+#define VIRTIO_BLK_S_OK 0
-+#define VIRTIO_BLK_S_IOERR 1
-+#define VIRTIO_BLK_S_UNSUPP 2
-+
-+struct vhost_blk_dev {
-+    VuDev vu_dev;
-+    int server_sock;
-+    int blk_fd;
-+    char *blk_name;
-+    GMainLoop *loop;
-+    GTree *fdmap;   /* fd -> gsource context id */
++static const int user_feature_bits[] = {
++    VIRTIO_BLK_F_SIZE_MAX,
++    VIRTIO_BLK_F_SEG_MAX,
++    VIRTIO_BLK_F_GEOMETRY,
++    VIRTIO_BLK_F_BLK_SIZE,
++    VIRTIO_BLK_F_TOPOLOGY,
++    VIRTIO_BLK_F_SCSI,
++    VIRTIO_BLK_F_MQ,
++    VIRTIO_BLK_F_RO,
++    VIRTIO_BLK_F_FLUSH,
++    VIRTIO_BLK_F_BARRIER,
++    VIRTIO_BLK_F_CONFIG_WCE,
++    VIRTIO_F_VERSION_1,
++    VIRTIO_RING_F_INDIRECT_DESC,
++    VIRTIO_RING_F_EVENT_IDX,
++    VIRTIO_F_NOTIFY_ON_EMPTY,
++    VHOST_INVALID_FEATURE_BIT
 +};
 +
-+struct vhost_blk_request {
-+    VuVirtqElement *elem;
-+    int64_t sector_num;
-+    size_t size;
-+    struct virtio_blk_inhdr *in;
-+    struct virtio_blk_outhdr *out;
-+    struct vhost_blk_dev *vdev_blk;
-+    struct VuVirtq *vq;
-+};
-+
-+/**  refer util/iov.c  **/
-+static size_t vu_blk_iov_size(const struct iovec *iov,
-+                              const unsigned int iov_cnt)
++static void vhost_user_blk_update_config(VirtIODevice *vdev, uint8_t *config)
 +{
-+    size_t len;
-+    unsigned int i;
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    int blk_size = s->blkcfg.logical_block_size;
++    struct virtio_blk_config blkcfg;
 +
-+    len = 0;
-+    for (i = 0; i < iov_cnt; i++) {
-+        len += iov[i].iov_len;
-+    }
-+    return len;
++    memset(&blkcfg, 0, sizeof(blkcfg));
++
++    virtio_stq_p(vdev, &blkcfg.capacity, s->capacity);
++    virtio_stl_p(vdev, &blkcfg.seg_max, s->max_segment_num - 2);
++    virtio_stl_p(vdev, &blkcfg.size_max, s->max_segment_size);
++    virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
++    virtio_stw_p(vdev, &blkcfg.min_io_size, s->blkcfg.min_io_size / blk_size);
++    virtio_stl_p(vdev, &blkcfg.opt_io_size, s->blkcfg.opt_io_size / blk_size);
++    virtio_stw_p(vdev, &blkcfg.num_queues, s->num_queues);
++    virtio_stw_p(vdev, &blkcfg.geometry.cylinders,
++                 s->blkcfg.cyls);
++    blkcfg.geometry.heads = s->blkcfg.heads;
++    blkcfg.geometry.sectors = s->blkcfg.secs;
++    blkcfg.physical_block_exp = get_physical_block_exp(&s->blkcfg);
++    blkcfg.alignment_offset = 0;
++    blkcfg.wce = s->config_wce;
++
++    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
 +}
 +
-+/** glib event loop integration for libvhost-user and misc callbacks **/
-+
-+QEMU_BUILD_BUG_ON((int)G_IO_IN != (int)VU_WATCH_IN);
-+QEMU_BUILD_BUG_ON((int)G_IO_OUT != (int)VU_WATCH_OUT);
-+QEMU_BUILD_BUG_ON((int)G_IO_PRI != (int)VU_WATCH_PRI);
-+QEMU_BUILD_BUG_ON((int)G_IO_ERR != (int)VU_WATCH_ERR);
-+QEMU_BUILD_BUG_ON((int)G_IO_HUP != (int)VU_WATCH_HUP);
-+
-+typedef struct vu_blk_gsrc {
-+    GSource parent;
-+    struct vhost_blk_dev *vdev_blk;
-+    GPollFD gfd;
-+    vu_watch_cb vu_cb;
-+} vu_blk_gsrc_t;
-+
-+static gint vu_blk_fdmap_compare(gconstpointer a, gconstpointer b)
++static void vhost_user_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
 +{
-+    return (b > a) - (b < a);
-+}
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    struct virtio_blk_config blkcfg;
 +
-+static gboolean vu_blk_gsrc_prepare(GSource *src, gint *timeout)
-+{
-+    assert(timeout);
++    memcpy(&blkcfg, config, sizeof(blkcfg));
 +
-+    *timeout = -1;
-+    return FALSE;
-+}
-+
-+static gboolean vu_blk_gsrc_check(GSource *src)
-+{
-+    vu_blk_gsrc_t *vu_blk_src = (vu_blk_gsrc_t *)src;
-+
-+    assert(vu_blk_src);
-+
-+    return vu_blk_src->gfd.revents & vu_blk_src->gfd.events;
-+}
-+
-+static gboolean vu_blk_gsrc_dispatch(GSource *src,
-+                                     GSourceFunc cb, gpointer data)
-+{
-+    struct vhost_blk_dev *vdev_blk;
-+    vu_blk_gsrc_t *vu_blk_src = (vu_blk_gsrc_t *)src;
-+
-+    assert(vu_blk_src);
-+    assert(!(vu_blk_src->vu_cb && cb));
-+
-+    vdev_blk = vu_blk_src->vdev_blk;
-+
-+    assert(vdev_blk);
-+
-+    if (cb) {
-+        return cb(data);
-+    }
-+    if (vu_blk_src->vu_cb) {
-+        vu_blk_src->vu_cb(&vdev_blk->vu_dev, vu_blk_src->gfd.revents, data);
-+    }
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static GSourceFuncs vu_blk_gsrc_funcs = {
-+    vu_blk_gsrc_prepare,
-+    vu_blk_gsrc_check,
-+    vu_blk_gsrc_dispatch,
-+    NULL
-+};
-+
-+static int vu_blk_gsrc_new(struct vhost_blk_dev *vdev_blk, int fd,
-+                           GIOCondition cond, vu_watch_cb vu_cb,
-+                           GSourceFunc gsrc_cb, gpointer data)
-+{
-+    GSource *vu_blk_gsrc;
-+    vu_blk_gsrc_t *vu_blk_src;
-+    guint id;
-+
-+    assert(vdev_blk);
-+    assert(fd >= 0);
-+    assert(vu_cb || gsrc_cb);
-+    assert(!(vu_cb && gsrc_cb));
-+
-+    vu_blk_gsrc = g_source_new(&vu_blk_gsrc_funcs, sizeof(vu_blk_gsrc_t));
-+    if (!vu_blk_gsrc) {
-+        fprintf(stderr, "Error creating GSource for new watch\n");
-+        return -1;
-+    }
-+    vu_blk_src = (vu_blk_gsrc_t *)vu_blk_gsrc;
-+
-+    vu_blk_src->vdev_blk = vdev_blk;
-+    vu_blk_src->gfd.fd = fd;
-+    vu_blk_src->gfd.events = cond;
-+    vu_blk_src->vu_cb = vu_cb;
-+
-+    g_source_add_poll(vu_blk_gsrc, &vu_blk_src->gfd);
-+    g_source_set_callback(vu_blk_gsrc, gsrc_cb, data, NULL);
-+    id = g_source_attach(vu_blk_gsrc, NULL);
-+    assert(id);
-+    g_source_unref(vu_blk_gsrc);
-+
-+    g_tree_insert(vdev_blk->fdmap, (gpointer)(uintptr_t)fd,
-+                                    (gpointer)(uintptr_t)id);
-+
-+    return 0;
-+}
-+
-+static void vu_blk_panic_cb(VuDev *vu_dev, const char *buf)
-+{
-+    struct vhost_blk_dev *vdev_blk;
-+
-+    assert(vu_dev);
-+
-+    vdev_blk = (struct vhost_blk_dev *)((uintptr_t)vu_dev -
-+               offsetof(struct vhost_blk_dev, vu_dev));
-+
-+    if (buf) {
-+        fprintf(stderr, "vu_blk_panic_cb: %s\n", buf);
-+    }
-+
-+    if (vdev_blk) {
-+        assert(vdev_blk->loop);
-+        g_main_loop_quit(vdev_blk->loop);
++    if (blkcfg.wce != s->config_wce) {
++        error_report("vhost-user-blk: does not support the operation");
 +    }
 +}
 +
-+static void vu_blk_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt,
-+                                vu_watch_cb cb, void *pvt) {
-+    struct vhost_blk_dev *vdev_blk;
-+    guint id;
++static void vhost_user_blk_start(VirtIODevice *vdev)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
++    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
++    int i, ret;
 +
-+    assert(vu_dev);
-+    assert(fd >= 0);
-+    assert(cb);
-+
-+    vdev_blk = (struct vhost_blk_dev *)((uintptr_t)vu_dev -
-+                offsetof(struct vhost_blk_dev, vu_dev));
-+    if (!vdev_blk) {
-+        vu_blk_panic_cb(vu_dev, NULL);
++    if (!k->set_guest_notifiers) {
++        error_report("binding does not support guest notifiers");
 +        return;
 +    }
 +
-+    id = (guint)(uintptr_t)g_tree_lookup(vdev_blk->fdmap,
-+                                         (gpointer)(uintptr_t)fd);
-+    if (id) {
-+        GSource *vu_blk_src = g_main_context_find_source_by_id(NULL, id);
-+        assert(vu_blk_src);
-+        g_source_destroy(vu_blk_src);
-+        (void)g_tree_remove(vdev_blk->fdmap, (gpointer)(uintptr_t)fd);
-+    }
-+
-+    if (vu_blk_gsrc_new(vdev_blk, fd, vu_evt, cb, NULL, pvt)) {
-+        vu_blk_panic_cb(vu_dev, NULL);
-+    }
-+}
-+
-+static void vu_blk_del_watch_cb(VuDev *vu_dev, int fd)
-+{
-+    struct vhost_blk_dev *vdev_blk;
-+    guint id;
-+
-+    assert(vu_dev);
-+    assert(fd >= 0);
-+
-+    vdev_blk = (struct vhost_blk_dev *)((uintptr_t)vu_dev -
-+               offsetof(struct vhost_blk_dev, vu_dev));
-+    if (!vdev_blk) {
-+        vu_blk_panic_cb(vu_dev, NULL);
++    ret = vhost_dev_enable_notifiers(&s->dev, vdev);
++    if (ret < 0) {
++        error_report("Error enabling host notifiers: %d", -ret);
 +        return;
 +    }
 +
-+    id = (guint)(uintptr_t)g_tree_lookup(vdev_blk->fdmap,
-+                                         (gpointer)(uintptr_t)fd);
-+    if (id) {
-+        GSource *vu_blk_src = g_main_context_find_source_by_id(NULL, id);
-+        assert(vu_blk_src);
-+        g_source_destroy(vu_blk_src);
-+        (void)g_tree_remove(vdev_blk->fdmap, (gpointer)(uintptr_t)fd);
++    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
++    if (ret < 0) {
++        error_report("Error binding guest notifier: %d", -ret);
++        goto err_host_notifiers;
 +    }
++
++    s->dev.acked_features = vdev->guest_features;
++    ret = vhost_dev_start(&s->dev, vdev);
++    if (ret < 0) {
++        error_report("Error starting vhost: %d", -ret);
++        goto err_guest_notifiers;
++    }
++
++    /* guest_notifier_mask/pending not used yet, so just unmask
++     * everything here. virtio-pci will do the right thing by
++     * enabling/disabling irqfd.
++     */
++    for (i = 0; i < s->dev.nvqs; i++) {
++        vhost_virtqueue_mask(&s->dev, vdev, i, false);
++    }
++
++    return;
++
++err_guest_notifiers:
++    k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
++err_host_notifiers:
++    vhost_dev_disable_notifiers(&s->dev, vdev);
 +}
 +
-+static void vu_blk_req_complete(struct vhost_blk_request *req)
++static void vhost_user_blk_stop(VirtIODevice *vdev)
 +{
-+    VuDev *vu_dev = &req->vdev_blk->vu_dev;
-+
-+    /* IO size with 1 extra status byte */
-+    vu_queue_push(vu_dev, req->vq, req->elem,
-+                  req->size + 1);
-+    vu_queue_notify(vu_dev, req->vq);
-+
-+    if (req->elem) {
-+        free(req->elem);
-+    }
-+    if (req) {
-+        free(req);
-+    }
-+}
-+
-+static int vu_blk_open(const char *file_name)
-+{
-+    int fd;
-+
-+    fd = open(file_name, O_RDWR | O_DIRECT);
-+    if (fd < 0) {
-+        fprintf(stderr, "Cannot open file %s, %s\n", file_name,
-+                strerror(errno));
-+        return -1;
-+    }
-+
-+    return fd;
-+}
-+
-+static void vu_blk_close(int fd)
-+{
-+    if (fd >= 0) {
-+        close(fd);
-+    }
-+}
-+
-+static ssize_t
-+vu_blk_readv(struct vhost_blk_request *req, struct iovec *iov, uint32_t iovcnt)
-+{
-+    struct vhost_blk_dev *vdev_blk = req->vdev_blk;
-+    ssize_t rc;
-+
-+    req->size = vu_blk_iov_size(iov, iovcnt);
-+    rc = preadv(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512);
-+    if (rc < 0) {
-+        fprintf(stderr, "Block %s, Sector %"PRIu64", Size %lu Read Failed\n",
-+                vdev_blk->blk_name, req->sector_num, req->size);
-+        return -1;
-+    }
-+
-+    return rc;
-+}
-+
-+static ssize_t
-+vu_blk_writev(struct vhost_blk_request *req, struct iovec *iov, uint32_t iovcnt)
-+{
-+    struct vhost_blk_dev *vdev_blk = req->vdev_blk;
-+    ssize_t rc;
-+
-+    req->size = vu_blk_iov_size(iov, iovcnt);
-+    rc = pwritev(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512);
-+    if (rc < 0) {
-+        fprintf(stderr, "Block %s, Sector %"PRIu64", Size %lu Write Failed\n",
-+                vdev_blk->blk_name, req->sector_num, req->size);
-+        return -1;
-+    }
-+
-+    return rc;
-+}
-+
-+static void
-+vu_blk_flush(struct vhost_blk_request *req)
-+{
-+    struct vhost_blk_dev *vdev_blk = req->vdev_blk;
-+
-+    if (vdev_blk->blk_fd) {
-+        fsync(vdev_blk->blk_fd);
-+    }
-+}
-+
-+
-+static int vu_virtio_blk_process_req(struct vhost_blk_dev *vdev_blk,
-+                                     VuVirtq *vq)
-+{
-+    VuVirtqElement *elem;
-+    uint32_t type;
-+    unsigned in_num;
-+    unsigned out_num;
-+    struct vhost_blk_request *req;
-+
-+    elem = vu_queue_pop(&vdev_blk->vu_dev, vq, sizeof(VuVirtqElement));
-+    if (!elem) {
-+        return -1;
-+    }
-+
-+    /* refer virtio_blk.c */
-+    if (elem->out_num < 1 || elem->in_num < 1) {
-+        fprintf(stderr, "Invalid descriptor\n");
-+        return -1;
-+    }
-+
-+    req = calloc(1, sizeof(*req));
-+    assert(req);
-+    req->vdev_blk = vdev_blk;
-+    req->vq = vq;
-+    req->elem = elem;
-+
-+    in_num = elem->in_num;
-+    out_num = elem->out_num;
-+
-+    if (elem->out_sg[0].iov_len < sizeof(struct virtio_blk_outhdr)) {
-+        fprintf(stderr, "Invalid outhdr size\n");
-+        free(req);
-+        return -1;
-+    }
-+    req->out = (struct virtio_blk_outhdr *)elem->out_sg[0].iov_base;
-+    out_num--;
-+
-+    if (elem->in_sg[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
-+        fprintf(stderr, "Invalid inhdr size\n");
-+        free(req);
-+        return -1;
-+    }
-+    req->in = (struct virtio_blk_inhdr *)elem->in_sg[in_num - 1].iov_base;
-+    in_num--;
-+
-+    type = le32_to_cpu(req->out->type);
-+    switch (type & ~(VIRTIO_BLK_T_OUT | VIRTIO_BLK_T_BARRIER)) {
-+        case VIRTIO_BLK_T_IN: {
-+            ssize_t ret = 0;
-+            bool is_write = type & VIRTIO_BLK_T_OUT;
-+            req->sector_num = le64_to_cpu(req->out->sector);
-+            if (is_write) {
-+                assert(out_num != 0);
-+                ret  = vu_blk_writev(req, &elem->out_sg[1], out_num);
-+            } else {
-+                assert(in_num != 0);
-+                ret = vu_blk_readv(req, &elem->in_sg[0], in_num);
-+            }
-+            if (ret >= 0) {
-+                req->in->status = VIRTIO_BLK_S_OK;
-+            } else {
-+                req->in->status = VIRTIO_BLK_S_IOERR;
-+            }
-+            vu_blk_req_complete(req);
-+            break;
-+        }
-+        case VIRTIO_BLK_T_FLUSH: {
-+            vu_blk_flush(req);
-+            req->in->status = VIRTIO_BLK_S_OK;
-+            vu_blk_req_complete(req);
-+            break;
-+        }
-+        case VIRTIO_BLK_T_GET_ID: {
-+            size_t size = MIN(vu_blk_iov_size(&elem->in_sg[0], in_num),
-+                              VIRTIO_BLK_ID_BYTES);
-+            snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk");
-+            req->in->status = VIRTIO_BLK_S_OK;
-+            req->size = elem->in_sg[0].iov_len;
-+            vu_blk_req_complete(req);
-+            break;
-+        }
-+        default: {
-+            req->in->status = VIRTIO_BLK_S_UNSUPP;
-+            vu_blk_req_complete(req);
-+            break;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static void vu_blk_process_vq(VuDev *vu_dev, int idx)
-+{
-+    struct vhost_blk_dev *vdev_blk;
-+    VuVirtq *vq;
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
++    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
 +    int ret;
 +
-+    if ((idx < 0) || (idx >= VHOST_MAX_NR_VIRTQUEUE)) {
-+        fprintf(stderr, "VQ Index out of range: %d\n", idx);
-+        vu_blk_panic_cb(vu_dev, NULL);
++    if (!k->set_guest_notifiers) {
 +        return;
 +    }
 +
++    vhost_dev_stop(&s->dev, vdev);
 +
-+    vdev_blk = (struct vhost_blk_dev *)((uintptr_t)vu_dev -
-+                offsetof(struct vhost_blk_dev, vu_dev));
-+    assert(vdev_blk);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    assert(vq);
-+
-+    while (1) {
-+        ret = vu_virtio_blk_process_req(vdev_blk, vq);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+}
-+
-+static void vu_blk_queue_set_started(VuDev *vu_dev, int idx, bool started)
-+{
-+    VuVirtq *vq;
-+
-+    assert(vu_dev);
-+
-+    if ((idx < 0) || (idx >= VHOST_MAX_NR_VIRTQUEUE)) {
-+        fprintf(stderr, "VQ Index out of range: %d\n", idx);
-+        vu_blk_panic_cb(vu_dev, NULL);
++    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
++    if (ret < 0) {
++        error_report("vhost guest notifier cleanup failed: %d", ret);
 +        return;
 +    }
 +
-+    vq = vu_get_queue(vu_dev, idx);
-+    vu_set_queue_handler(vu_dev, vq, started ? vu_blk_process_vq : NULL);
++    vhost_dev_disable_notifiers(&s->dev, vdev);
 +}
 +
-+static uint64_t
-+vu_blk_get_features(VuDev *dev)
++static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
 +{
-+    return 1ull << VIRTIO_BLK_F_SIZE_MAX |
-+           1ull << VIRTIO_BLK_F_SEG_MAX |
-+           1ull << VIRTIO_BLK_F_TOPOLOGY |
-+           1ull << VIRTIO_BLK_F_BLK_SIZE |
-+           1ull << VIRTIO_F_VERSION_1 |
-+           1ull << VHOST_USER_F_PROTOCOL_FEATURES;
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
++
++    if (!vdev->vm_running) {
++        should_start = false;
++    }
++
++    if (s->dev.started == should_start) {
++        return;
++    }
++
++    if (should_start) {
++        vhost_user_blk_start(vdev);
++    } else {
++        vhost_user_blk_stop(vdev);
++    }
++
 +}
 +
-+static const VuDevIface vu_blk_iface = {
-+    .get_features = vu_blk_get_features,
-+    .queue_set_started = vu_blk_queue_set_started,
++static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
++                                            uint64_t features,
++                                            Error **errp)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    uint64_t get_features;
++
++    /* Turn on pre-defined features */
++    features |= s->host_features;
++
++    get_features = vhost_get_features(&s->dev, user_feature_bits, features);
++
++    return get_features;
++}
++
++static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
++{
++
++}
++
++static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    int ret;
++    uint64_t size;
++
++    if (!s->chardev.chr) {
++        error_setg(errp, "vhost-user-blk: chardev is mandatary");
++        return;
++    }
++
++    if (!s->num_queues) {
++        error_setg(errp, "vhost-user-blk: invalid number of IO queues");
++        return;
++    }
++
++    if (!s->queue_size) {
++        error_setg(errp, "vhost-user-blk: invalid count of the IO queue");
++        return;
++    }
++
++    if (!s->size) {
++        error_setg(errp, "vhost-user-blk: block capacity must be assigned,"
++                  "size can be specified by GiB or MiB");
++        return;
++    }
++
++    ret = qemu_strtosz_MiB(s->size, NULL, &size);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-blk: invalid size %s in GiB/MiB", s->size);
++        return;
++    }
++    s->capacity = size / 512;
++
++    /* block size with default 512 Bytes */
++    if (!s->blkcfg.logical_block_size) {
++        s->blkcfg.logical_block_size = 512;
++    }
++
++    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
++                sizeof(struct virtio_blk_config));
++    virtio_add_queue(vdev, s->queue_size, vhost_user_blk_handle_output);
++
++    s->dev.nvqs = s->num_queues;
++    s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
++    s->dev.vq_index = 0;
++    s->dev.backend_features = 0;
++
++    ret = vhost_dev_init(&s->dev, (void *)&s->chardev,
++                         VHOST_BACKEND_TYPE_USER, 0);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
++                   strerror(-ret));
++        return;
++    }
++}
++
++static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserBlk *s = VHOST_USER_BLK(dev);
++
++    vhost_user_blk_set_status(vdev, 0);
++    vhost_dev_cleanup(&s->dev);
++    g_free(s->dev.vqs);
++    virtio_cleanup(vdev);
++}
++
++static void vhost_user_blk_instance_init(Object *obj)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(obj);
++
++    device_add_bootindex_property(obj, &s->bootindex, "bootindex",
++                                  "/disk@0,0", DEVICE(obj), NULL);
++}
++
++static const VMStateDescription vmstate_vhost_user_blk = {
++    .name = "vhost-user-blk",
++    .minimum_version_id = 2,
++    .version_id = 2,
++    .fields = (VMStateField[]) {
++        VMSTATE_VIRTIO_DEVICE,
++        VMSTATE_END_OF_LIST()
++    },
 +};
 +
-+static gboolean vu_blk_vhost_cb(gpointer data)
++static Property vhost_user_blk_properties[] = {
++    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
++    DEFINE_BLOCK_PROPERTIES(VHostUserBlk, blkcfg),
++    DEFINE_BLOCK_CHS_PROPERTIES(VHostUserBlk, blkcfg),
++    DEFINE_PROP_STRING("size", VHostUserBlk, size),
++    DEFINE_PROP_UINT16("num_queues", VHostUserBlk, num_queues, 1),
++    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue_size, 128),
++    DEFINE_PROP_UINT32("max_segment_size", VHostUserBlk, max_segment_size,
++                       131072),
++    DEFINE_PROP_UINT32("max_segment_num", VHostUserBlk, max_segment_num, 34),
++    DEFINE_PROP_BIT("config_wce", VHostUserBlk, config_wce, 0, false),
++    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SIZE_MAX, true),
++    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SIZE_MAX, true),
++    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SEG_MAX, true),
++    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_GEOMETRY, true),
++    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_RO, false),
++    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_BLK_SIZE, true),
++    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_TOPOLOGY, true),
++    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_MQ, true),
++    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_FLUSH, true),
++    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_BARRIER, false),
++    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SCSI, false),
++    DEFINE_PROP_BIT64("f_writecache", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_CONFIG_WCE, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
 +{
-+    VuDev *vu_dev = (VuDev *)data;
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
 +
-+    assert(vu_dev);
-+
-+    if (!vu_dispatch(vu_dev) != 0) {
-+        fprintf(stderr, "Error processing vhost message\n");
-+        vu_blk_panic_cb(vu_dev, NULL);
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    return G_SOURCE_CONTINUE;
++    dc->props = vhost_user_blk_properties;
++    dc->vmsd = &vmstate_vhost_user_blk;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    vdc->realize = vhost_user_blk_device_realize;
++    vdc->unrealize = vhost_user_blk_device_unrealize;
++    vdc->get_config = vhost_user_blk_update_config;
++    vdc->set_config = vhost_user_blk_set_config;
++    vdc->get_features = vhost_user_blk_get_features;
++    vdc->set_status = vhost_user_blk_set_status;
 +}
 +
-+static int unix_sock_new(char *unix_fn)
++static const TypeInfo vhost_user_blk_info = {
++    .name = TYPE_VHOST_USER_BLK,
++    .parent = TYPE_VIRTIO_DEVICE,
++    .instance_size = sizeof(VHostUserBlk),
++    .instance_init = vhost_user_blk_instance_init,
++    .class_init = vhost_user_blk_class_init,
++};
++
++static void virtio_register_types(void)
 +{
-+    int sock;
-+    struct sockaddr_un un;
-+    size_t len;
-+
-+    assert(unix_fn);
-+
-+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock <= 0) {
-+        perror("socket");
-+        return -1;
-+    }
-+
-+    un.sun_family = AF_UNIX;
-+    (void)snprintf(un.sun_path, sizeof(un.sun_path), "%s", unix_fn);
-+    len = sizeof(un.sun_family) + strlen(un.sun_path);
-+
-+    (void)unlink(unix_fn);
-+    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-+        perror("bind");
-+        goto fail;
-+    }
-+
-+    if (listen(sock, 1) < 0) {
-+        perror("listen");
-+        goto fail;
-+    }
-+
-+    return sock;
-+
-+fail:
-+    (void)close(sock);
-+
-+    return -1;
++    type_register_static(&vhost_user_blk_info);
 +}
 +
-+static int vdev_blk_run(struct vhost_blk_dev *vdev_blk)
++type_init(virtio_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5d14bd6..0cff259 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2012,6 +2012,58 @@ static const TypeInfo virtio_blk_pci_info = {
+     .class_init    = virtio_blk_pci_class_init,
+ };
+ 
++#ifdef CONFIG_VHOST_USER_BLK
++/* vhost-user-blk */
++
++static Property vhost_user_blk_pci_properties[] = {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    int cli_sock;
-+    int ret = 0;
++    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
 +
-+    assert(vdev_blk);
-+    assert(vdev_blk->server_sock >= 0);
-+    assert(vdev_blk->loop);
-+
-+    cli_sock = accept(vdev_blk->server_sock, (void *)0, (void *)0);
-+    if (cli_sock < 0) {
-+        perror("accept");
-+        return -1;
-+    }
-+
-+    vu_init(&vdev_blk->vu_dev,
-+            cli_sock,
-+            vu_blk_panic_cb,
-+            vu_blk_add_watch_cb,
-+            vu_blk_del_watch_cb,
-+            &vu_blk_iface);
-+
-+    if (vu_blk_gsrc_new(vdev_blk, cli_sock, G_IO_IN, NULL, vu_blk_vhost_cb,
-+                     &vdev_blk->vu_dev)) {
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    g_main_loop_run(vdev_blk->loop);
-+
-+out:
-+    vu_deinit(&vdev_blk->vu_dev);
-+    return ret;
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
-+static void vdev_blk_deinit(struct vhost_blk_dev *vdev_blk)
++static void vhost_user_blk_pci_class_init(ObjectClass *klass, void *data)
 +{
-+    if (!vdev_blk) {
-+        return;
-+    }
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
 +
-+    if (vdev_blk->server_sock >= 0) {
-+        struct sockaddr_storage ss;
-+        socklen_t sslen = sizeof(ss);
-+
-+        if (getsockname(vdev_blk->server_sock, (struct sockaddr *)&ss,
-+                        &sslen) == 0) {
-+            struct sockaddr_un *su = (struct sockaddr_un *)&ss;
-+            (void)unlink(su->sun_path);
-+        }
-+
-+        (void)close(vdev_blk->server_sock);
-+        vdev_blk->server_sock = -1;
-+    }
-+
-+    if (vdev_blk->loop) {
-+        g_main_loop_unref(vdev_blk->loop);
-+        vdev_blk->loop = NULL;
-+    }
-+
-+    if (vdev_blk->blk_fd) {
-+        vu_blk_close(vdev_blk->blk_fd);
-+    }
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_user_blk_pci_properties;
++    k->realize = vhost_user_blk_pci_realize;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
 +}
 +
-+static struct vhost_blk_dev *
-+vdev_blk_new(char *unix_fn, char *blk_file)
++static void vhost_user_blk_pci_instance_init(Object *obj)
 +{
-+    struct vhost_blk_dev *vdev_blk = NULL;
++    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(obj);
 +
-+    vdev_blk = calloc(1, sizeof(struct vhost_blk_dev));
-+    if (!vdev_blk) {
-+        fprintf(stderr, "calloc: %s", strerror(errno));
-+        return NULL;
-+    }
-+
-+    vdev_blk->server_sock = unix_sock_new(unix_fn);
-+    if (vdev_blk->server_sock < 0) {
-+        goto err;
-+    }
-+
-+    vdev_blk->loop = g_main_loop_new(NULL, FALSE);
-+    if (!vdev_blk->loop) {
-+        fprintf(stderr, "Error creating glib event loop");
-+        goto err;
-+    }
-+
-+    vdev_blk->fdmap = g_tree_new(vu_blk_fdmap_compare);
-+    if (!vdev_blk->fdmap) {
-+        fprintf(stderr, "Error creating glib tree for fdmap");
-+        goto err;
-+    }
-+
-+    vdev_blk->blk_fd = vu_blk_open(blk_file);
-+    if (vdev_blk->blk_fd  < 0) {
-+        fprintf(stderr, "Error open block device %s\n", blk_file);
-+        goto err;
-+    }
-+    vdev_blk->blk_name = blk_file;
-+
-+    return vdev_blk;
-+
-+err:
-+    vdev_blk_deinit(vdev_blk);
-+    free(vdev_blk);
-+
-+    return NULL;
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_BLK);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
 +}
 +
-+int main(int argc, char **argv)
-+{
-+    int opt;
-+    char *unix_socket = NULL;
-+    char *blk_file = NULL;
-+    struct vhost_blk_dev *vdev_blk = NULL;
++static const TypeInfo vhost_user_blk_pci_info = {
++    .name           = TYPE_VHOST_USER_BLK_PCI,
++    .parent         = TYPE_VIRTIO_PCI,
++    .instance_size  = sizeof(VHostUserBlkPCI),
++    .instance_init  = vhost_user_blk_pci_instance_init,
++    .class_init     = vhost_user_blk_pci_class_init,
++};
++#endif
 +
-+    while ((opt = getopt(argc, argv, "b:h:s:")) != -1) {
-+        switch (opt) {
-+        case 'b':
-+            blk_file = strdup(optarg);
-+            break;
-+        case 's':
-+            unix_socket = strdup(optarg);
-+            break;
-+        case 'h':
-+        default:
-+            printf("Usage: %s [-b block device or file, -s UNIX domain socket]"
-+                   " | [ -h ]\n", argv[0]);
-+            break;
-+        }
-+    }
+ /* virtio-scsi-pci */
+ 
+ static Property virtio_scsi_pci_properties[] = {
+@@ -2658,6 +2710,9 @@ static void virtio_pci_register_types(void)
+     type_register_static(&virtio_9p_pci_info);
+ #endif
+     type_register_static(&virtio_blk_pci_info);
++#ifdef CONFIG_VHOST_USER_BLK
++    type_register_static(&vhost_user_blk_pci_info);
++#endif
+     type_register_static(&virtio_scsi_pci_info);
+     type_register_static(&virtio_balloon_pci_info);
+     type_register_static(&virtio_serial_pci_info);
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 69f5959..19a0d01 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -27,6 +27,9 @@
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
+ #include "hw/virtio/vhost-user-scsi.h"
++#ifdef CONFIG_VHOST_USER_BLK
++#include "hw/virtio/vhost-user-blk.h"
++#endif
+ 
+ #ifdef CONFIG_VIRTFS
+ #include "hw/9pfs/virtio-9p.h"
+@@ -46,6 +49,7 @@ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
++typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+@@ -241,6 +245,20 @@ struct VHostUserSCSIPCI {
+     VHostUserSCSI vdev;
+ };
+ 
++#ifdef CONFIG_VHOST_USER_BLK
++/*
++ * vhost-user-blk-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci"
++#define VHOST_USER_BLK_PCI(obj) \
++        OBJECT_CHECK(VHostUserBlkPCI, (obj), TYPE_VHOST_USER_BLK_PCI)
 +
-+    if (!unix_socket || !blk_file) {
-+        printf("Usage: %s [-b block device or file, -s UNIX domain socket] |"
-+               " [ -h ]\n", argv[0]);
-+        return -1;
-+    }
++struct VHostUserBlkPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserBlk vdev;
++};
++#endif
 +
-+    vdev_blk = vdev_blk_new(unix_socket, blk_file);
-+    if (!vdev_blk) {
-+        goto err;
-+    }
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+new file mode 100644
+index 0000000..1d0079c
+--- /dev/null
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -0,0 +1,46 @@
++/*
++ * vhost-user-blk host device
++ * Copyright IBM, Corp. 2011
++ * Copyright(C) 2017 Intel Corporation.
++ *
++ * Authors:
++ *  Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
++ *  Changpeng Liu <changpeng.liu@intel.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
 +
-+    if (vdev_blk_run(vdev_blk) != 0) {
-+        goto err;
-+    }
++#ifndef VHOST_USER_BLK_H
++#define VHOST_USER_BLK_H
 +
-+err:
-+    if (vdev_blk) {
-+        vdev_blk_deinit(vdev_blk);
-+        free(vdev_blk);
-+    }
-+    if (unix_socket) {
-+        free(unix_socket);
-+    }
-+    if (blk_file) {
-+        free(blk_file);
-+    }
++#include "standard-headers/linux/virtio_blk.h"
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/block/block.h"
++#include "chardev/char-fe.h"
++#include "hw/virtio/vhost.h"
 +
-+    return 0;
-+}
++#define TYPE_VHOST_USER_BLK "vhost-user-blk"
++#define VHOST_USER_BLK(obj) \
++        OBJECT_CHECK(VHostUserBlk, (obj), TYPE_VHOST_USER_BLK)
 +
++typedef struct VHostUserBlk {
++    VirtIODevice parent_obj;
++    CharBackend chardev;
++    Error *migration_blocker;
++    int32_t bootindex;
++    uint64_t host_features;
++    BlockConf blkcfg;
++    uint64_t capacity;
++    char *size;
++    uint32_t max_segment_size;
++    uint32_t max_segment_num;
++    uint16_t num_queues;
++    uint32_t queue_size;
++    uint32_t config_wce;
++    struct vhost_dev dev;
++} VHostUserBlk;
++
++#endif
 -- 
 1.9.3
