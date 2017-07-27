@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dajhE-0003IU-Uq
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:23:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dajht-00041X-R8
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dajhB-0008J6-R2
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:23:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60056)
+	(envelope-from <cohuck@redhat.com>) id 1dajhs-0000LF-UK
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:24:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dajhB-0008Ib-HM
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:23:21 -0400
-References: <20170726165326.10327-1-anthony.perard@citrix.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a740b47-19e2-4cfb-b72f-9e883c57a4b8@redhat.com>
-Date: Thu, 27 Jul 2017 16:23:17 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dajhs-0000Kw-OU
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:24:04 -0400
+Date: Thu, 27 Jul 2017 16:24:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170727162400.4a3fd483@gondolin>
+In-Reply-To: <8f101d44-4d7d-9a13-8d0c-ebb830010847@linux.vnet.ibm.com>
+References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
+	<20170727102636.43d6a789@gondolin>
+	<f05dcd54-dad7-8939-e87b-e39346cc986c@linux.vnet.ibm.com>
+	<20170727154005.0c99521b@gondolin>
+	<8f101d44-4d7d-9a13-8d0c-ebb830010847@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170726165326.10327-1-anthony.perard@citrix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10] exec: Add lock parameter to
- qemu_ram_ptr_length
+Subject: Re: [Qemu-devel] [PATCH 0/2] ccw interpretation AR compliance
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 26/07/2017 18:53, Anthony PERARD wrote:
-> Commit 04bf2526ce87f21b32c9acba1c5518708c243ad0 (exec: use
-> qemu_ram_ptr_length to access guest ram) start using qemu_ram_ptr_length
-> instead of qemu_map_ram_ptr, but when used with Xen, the behavior of
-> both function is different. They both call xen_map_cache, but one with
-> "lock", meaning the mapping of guest memory is never released
-> implicitly, and the second one without, which means, mapping can be
-> release later, when needed.
-> 
-> In the context of address_space_{read,write}_continue, the ptr to those
-> mapping should not be locked because it is used immediatly and never
-> used again.
-> 
-> The lock parameter make it explicit in which context qemu_ram_ptr_length
-> is called.
-> 
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-> ---
->  exec.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 01ac21e3cd..63508cd35e 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2203,7 +2203,7 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
->   * Called within RCU critical section.
->   */
->  static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
-> -                                 hwaddr *size)
-> +                                 hwaddr *size, bool lock)
->  {
->      RAMBlock *block = ram_block;
->      if (*size == 0) {
-> @@ -2222,10 +2222,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
->           * In that case just map the requested area.
->           */
->          if (block->offset == 0) {
-> -            return xen_map_cache(addr, *size, 1, true);
-> +            return xen_map_cache(addr, *size, lock ? 1 : 0, lock);
->          }
->  
-> -        block->host = xen_map_cache(block->offset, block->max_length, 1, true);
-> +        block->host = xen_map_cache(block->offset, block->max_length, 1, lock);
->      }
->  
->      return ramblock_ptr(block, addr);
-> @@ -2947,7 +2947,7 @@ static MemTxResult address_space_write_continue(AddressSpace *as, hwaddr addr,
->              }
->          } else {
->              /* RAM case */
-> -            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l);
-> +            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
->              memcpy(ptr, buf, l);
->              invalidate_and_set_dirty(mr, addr1, l);
->          }
-> @@ -3038,7 +3038,7 @@ MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
->              }
->          } else {
->              /* RAM case */
-> -            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l);
-> +            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
->              memcpy(buf, ptr, l);
->          }
->  
-> @@ -3349,7 +3349,7 @@ void *address_space_map(AddressSpace *as,
->  
->      memory_region_ref(mr);
->      *plen = address_space_extend_translation(as, addr, len, mr, xlat, l, is_write);
-> -    ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen);
-> +    ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
->      rcu_read_unlock();
->  
->      return ptr;
-> 
+On Thu, 27 Jul 2017 15:52:23 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-Queued, thanks.
+> On 07/27/2017 03:40 PM, Cornelia Huck wrote:
+> > On Thu, 27 Jul 2017 15:18:01 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> [Re-posting my previous reply because I've accidentally
+> >> dropped almost all addresses.]
+> >>
+> >> On 07/27/2017 10:26 AM, Cornelia Huck wrote:  
+> >>> On Wed, 26 Jul 2017 00:44:40 +0200
+> >>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:  
+> >   
+> >>>> Regarding testing: did not do much more than a simple smoke test
+> >>>> with virtio-ccw.    
+> >>>
+> >>> I think we need a way to throw random channel programs at a channel
+> >>> device...
+> >>>     
+> >>
+> >> By random do you mean random random, or do you mean carefully crafted
+> >> to provoke (and verify) certain responses. If it's more like the second
+> >> case I've actually wrote something (a kernel driver) for 'internal use'
+> >> but at the moment it's limited to indirect data access support (no test
+> >> cases for invalid invalid channel programs).  
+> > 
+> > That's what I've been thinking of. Standalone guest code would be even
+> > better (can be integrated into automatic testing), but it's certainly
+> > useful.
+> >   
+> >> The 'internal guys' say it
+> >> probably ain't interesting for the rest of the world make this external,
+> >> but if you are interested I could send you the patch these days.  
+> > 
+> > Would be great if you could make this available. It is especially
+> > interesting for me, but possibly for other folks working on s390 as well.  
+> 
+> It is very wip and I don't feel comfortable with sharing it
+> with the world yet. But I'm definitely interested in making this
+> available. I haven't figured out what would be the best way to make
+> it available, and I hope you can help me with that.
 
-Paolo
+Do you have a git tree somewhere you can dump it?
+
+> 
+> > 
+> > Might be good together with an "eat this" channel device in qemu.
+> >   
+> 
+> If course I do have a qemu counterpart.
+
+And of course I'd love to see that as well :)
+
+> 
+> To sum it up, one I'm done with the next iteration I'm gonna send
+> you with the patches unless you say otherwise.
+> 
+> Regards,
+> Halil
+> 
