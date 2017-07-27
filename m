@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dalzz-0005NG-VA
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 12:50:57 -0400
+	(envelope-from <groug@kaod.org>) id 1damIf-0003iv-Nw
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:10:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dalzx-0005Vj-BK
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 12:50:56 -0400
-Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:52034)
+	(envelope-from <groug@kaod.org>) id 1damIb-0000jv-E1
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:10:13 -0400
+Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:52949)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dalzx-0005VI-2K
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 12:50:53 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1damIb-0000ht-4F
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:10:09 -0400
 Received: from player759.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 858C685E59
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 18:50:51 +0200 (CEST)
-Date: Thu, 27 Jul 2017 18:50:42 +0200
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3AAD0890DE
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 19:10:07 +0200 (CEST)
+Date: Thu, 27 Jul 2017 19:09:55 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170727185042.14889377@bahia.lan>
-In-Reply-To: <20170726052443.GF8978@umbus.fritz.box>
+Message-ID: <20170727190955.2792d785@bahia.lan>
+In-Reply-To: <ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100564746.27487.5195312465666688402.stgit@bahia>
-	<20170726052443.GF8978@umbus.fritz.box>
+	<150105840463.12000.9666180368681199673.stgit@bahia>
+	<ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/V=h2L962gkxQvi5f89e0MR5";
+	boundary="Sig_/LnuHF12y7hb.6zY+XTNDK+5";
 	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 13/26] qdev: store DeviceState's
- canonical path to use when unparenting
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 26/26] spapr: add hotplug hooks
+ for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,149 +33,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
---Sig_/V=h2L962gkxQvi5f89e0MR5
+--Sig_/LnuHF12y7hb.6zY+XTNDK+5
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Jul 2017 15:24:43 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, 27 Jul 2017 14:41:31 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-> On Tue, Jul 25, 2017 at 08:00:47PM +0200, Greg Kurz wrote:
-> > From: Michael Roth <mdroth@linux.vnet.ibm.com>
+> On 26/07/17 18:40, Greg Kurz wrote:
+> > Hotplugging PHBs is a machine-level operation, but PHBs reside on the
+> > main system bus, so we register spapr machine as the handler for the
+> > main system bus.
 > >=20
-> > device_unparent(dev, ...) is called when a device is unparented,
-> > either directly, or as a result of a parent device being
-> > finalized, and handles some final cleanup for the device. Part
-> > of this includes emiting a DEVICE_DELETED QMP event to notify
-> > management, which includes the device's path in the composition
-> > tree as provided by object_get_canonical_path().
-> >=20
-> > object_get_canonical_path() assumes the device is still connected
-> > to the machine/root container, and will assert otherwise, but
-> > in some situations this isn't the case:
-> >=20
-> > If the parent is finalized as a result of object_unparent(), it
-> > will still be attached to the composition tree at the time any
-> > children are unparented as a result of that same call to
-> > object_unparent(). However, in some cases, object_unparent()
-> > will complete without finalizing the parent device, due to
-> > lingering references that won't be released till some time later.
-> > One such example is if the parent has MemoryRegion children (which
-> > take a ref on their parent), who in turn have AddressSpace's (which
-> > take a ref on their regions), since those AddressSpaces get cleaned
-> > up asynchronously by the RCU thread.
-> >=20
-> > In this case qdev:device_unparent() may be called for a child Device
-> > that no longer has a path to the root/machine container, causing
-> > object_get_canonical_path() to assert.
-> >=20
-> > Fix this by storing the canonical path during realize() so the
-> > information will still be available for device_unparent() in such
-> > cases. =20
->=20
-> Hm.  I'm no expert on the QOM model, but I'm not sure this is the
-> right approach.
->=20
-> I would have thought the right time to emit the DEVICE_DELETED message
-> would be when the device leaves the main composition tree, even if it
-> could be finalized later.
->=20
-> If we made that the case, does this problem go away?
->=20
-
-I'm no expert either and I confess I took this patch simply because it was
-in Michael's original patchset. :)
-
-But according to Michael's answer, it seems that the issue has a broader
-scope than just PHB hotplug...=20
-
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 > > Signed-off-by: Greg Kurz <groug@kaod.org>
 > > ---
-> > Changes since RFC:
 > > - rebased against ppc-for-2.10
+> > - converted to unplug_request
+> > - handle drc_id at pre-plug
+> > - reset hotplugged PHB at plug
+> > - compatibility with older machine types
 > > ---
-> >  hw/core/qdev.c         |   15 ++++++++++++---
-> >  include/hw/qdev-core.h |    1 +
-> >  2 files changed, 13 insertions(+), 3 deletions(-)
+> >  hw/ppc/spapr.c              |  114 +++++++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/ppc/spapr_drc.c          |    1=20
+> >  hw/ppc/spapr_pci.c          |    2 -
+> >  include/hw/pci-host/spapr.h |    2 +
+> >  include/hw/ppc/spapr.h      |    1=20
+> >  5 files changed, 118 insertions(+), 2 deletions(-)
 > >=20
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 606ab53c42cd..a64b35c16251 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -928,6 +928,12 @@ static void device_set_realized(Object *obj, bool =
-value, Error **errp)
-> >              goto post_realize_fail;
-> >          }
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 90485054c2e7..589f76ef9fb8 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2540,6 +2540,10 @@ static void ppc_spapr_init(MachineState *machine)
+> >      register_savevm_live(NULL, "spapr/htab", -1, 1,
+> >                           &savevm_htab_handlers, spapr);
 > > =20
-> > +        /* always re-initialize since we clean up in device_unparent()=
- instead
-> > +         * of unrealize()
-> > +         */
-> > +        g_free(dev->canonical_path);
-> > +        dev->canonical_path =3D object_get_canonical_path(OBJECT(dev));
+> > +    if (spapr->dr_phb_enabled) {
+> > +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machine)=
+, NULL);
+> > +    }
 > > +
-> >          if (qdev_get_vmsd(dev)) {
-> >              if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(=
-dev), dev,
-> >                                                 dev->instance_id_alias,
-> > @@ -984,6 +990,7 @@ child_realize_fail:
+> >      qemu_register_boot_set(spapr_boot_set, spapr);
+> > =20
+> >      if (kvm_enabled()) {
+> > @@ -3238,6 +3242,103 @@ out:
+> >      error_propagate(errp, local_err);
+> >  }
+> > =20
+> > +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceStat=
+e *dev,
+> > +                               Error **errp)
+> > +{
+> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> > +
+> > +    if (sphb->drc_id =3D=3D (uint32_t)-1) {
+> > +        sphb->drc_id =3D sphb->index;
+> > +    }
+> > +
+> > +    if (sphb->drc_id >=3D SPAPR_DRC_MAX_PHB) {
+> > +        error_setg(errp, "PHB id %d out of range", sphb->drc_id);
+> > +    } =20
+>=20
+>=20
+> sphb->index in considered 16bits in the existing code (even though it is
+> defined as 32bit) and SPAPR_DRC_MAX_PHB is just 256. I'd suggest using the
+> same limit for both, either 256 or 65536 is fine for me.
+>=20
+> It is actually a bit weird - it is possible to completely configure few
+> PHBs in the command line so they will have index=3D=3D-1 but PCI hotplug =
+code -
+> spapr_phb_get_pci_func_drc() and spapr_phb_realize() - does not check for
+> this and just does (sphb->index << 16).
+
+You're right and this looks like a bug... I'll try to come up with a fix.
+
+> May be just ditch drc_id, enforce index not to be -1 and use it as drc_id?
+>=20
+
+This was how Mike did it in the original patchset but David suggested
+to introduce drc_id (to preserve existing setups I guess):
+
+http://patchwork.ozlabs.org/patch/466262/
+
+>=20
+>=20
+> > +}
+> > +
+> > +static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *d=
+ev,
+> > +                           Error **errp)
+> > +{
+> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> > +    void *fdt =3D NULL;
+> > +    int fdt_start_offset;
+> > +    int fdt_size;
+> > +    Error *local_err =3D NULL;
+> > +    sPAPRDRConnector *drc;
+> > +    uint32_t phandle;
+> > +    int ret;
+> > +    bool hotplugged =3D spapr_drc_hotplugged(dev);
+> > +
+> > +    if (!spapr->dr_phb_enabled) {
+> > +        return;
+> > +    }
+> > +
+> > +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->drc_id);
+> > +    /* hotplug hooks should check it's enabled before getting this far=
+ */
+> > +    g_assert(drc);
+> > +
+> > +    if (hotplugged) {
+> > +        if (spapr->xics_phandle =3D=3D UINT32_MAX) {
+> > +            error_setg(&local_err,
+> > +                       "SLOF didn't update the XICS phandle. PHB hotpl=
+ug cancelled");
+> > +            goto out;
+> > +        }
+> > +        phandle =3D spapr->xics_phandle;
+> > +
+> > +        spapr_phb_reset(dev); =20
+>=20
+>=20
+> It could be DEVICE_GET_CLASS(dev)->reset(dev) without exporting
+> spapr_phb_reset. Not sure how this fits into the current QEMU coding style
+> though.
+>=20
+>=20
+>=20
+> > +    } else {
+> > +        phandle =3D PHANDLE_XICP;
+> > +    }
+> > +
+> > +    fdt =3D create_device_tree(&fdt_size);
+> > +    ret =3D spapr_populate_pci_dt(sphb, phandle, fdt, &fdt_start_offse=
+t);
+> > +    if (ret < 0) {
+> > +        error_setg(&local_err, "unable to create FDT for %sPHB",
+> > +                   dev->hotplugged ? "hotplugged " : "");
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (hotplugged) {
+> > +        /* generally SLOF creates these, for hotplug it's up to QEMU */
+> > +        _FDT(fdt_setprop_string(fdt, fdt_start_offset, "name", "pci"));
+> > +    }
+> > +
+> > +    spapr_drc_attach(drc, DEVICE(dev), fdt, fdt_start_offset, &local_e=
+rr);
+> > +out:
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        g_free(fdt);
+> > +        return;
+> > +    }
+> > +
+> > +    if (hotplugged) {
+> > +        spapr_hotplug_req_add_by_index(drc);
+> > +    } else if (drc) {
+> > +        spapr_drc_reset(drc);
+> > +    }
+> > +}
+> > +
+> > +void spapr_phb_release(DeviceState *dev)
+> > +{
+> > +    object_unparent(OBJECT(dev));
+> > +}
+> > +
+> > +static void spapr_phb_unplug_request(HotplugHandler *hotplug_dev,
+> > +                                     DeviceState *dev, Error **errp)
+> > +{
+> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> > +    sPAPRDRConnector *drc;
+> > +
+> > +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->drc_id);
+> > +    g_assert(drc);
+> > +
+> > +    if (!spapr_drc_unplug_requested(drc)) {
+> > +        spapr_drc_detach(drc);
+> > +        spapr_hotplug_req_remove_by_index(drc);
+> > +    }
+> > +}
+> > +
+> >  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+> >                                        DeviceState *dev, Error **errp)
+> >  {
+> > @@ -3284,6 +3385,8 @@ static void spapr_machine_device_plug(HotplugHand=
+ler *hotplug_dev,
+> >          spapr_memory_plug(hotplug_dev, dev, node, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> >          spapr_core_plug(hotplug_dev, dev, errp);
+> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BR=
+IDGE)) {
+> > +        spapr_phb_plug(hotplug_dev, dev, errp);
 > >      }
+> >  }
 > > =20
-> >  post_realize_fail:
-> > +    g_free(dev->canonical_path);
-> >      if (dc->unrealize) {
-> >          dc->unrealize(dev, NULL);
+> > @@ -3311,6 +3414,12 @@ static void spapr_machine_device_unplug_request(=
+HotplugHandler *hotplug_dev,
+> >              return;
+> >          }
+> >          spapr_core_unplug_request(hotplug_dev, dev, errp);
+> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BR=
+IDGE)) {
+> > +        if (sms->dr_phb_enabled) {
+> > +            spapr_phb_unplug_request(hotplug_dev, dev, errp);
+> > +        } else {
+> > +            error_setg(errp, "PHB hot unplug not supported on this mac=
+hine");
+> > +        }
 > >      }
-> > @@ -1102,10 +1109,12 @@ static void device_unparent(Object *obj)
+> >  }
 > > =20
-> >      /* Only send event if the device had been completely realized */
-> >      if (dev->pending_deleted_event) {
-> > -        gchar *path =3D object_get_canonical_path(OBJECT(dev));
-> > +        g_assert(dev->canonical_path);
-> > =20
-> > -        qapi_event_send_device_deleted(!!dev->id, dev->id, path, &erro=
-r_abort);
-> > -        g_free(path);
-> > +        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canoni=
-cal_path,
-> > +                                       &error_abort);
-> > +        g_free(dev->canonical_path);
-> > +        dev->canonical_path =3D NULL;
+> > @@ -3321,6 +3430,8 @@ static void spapr_machine_device_pre_plug(Hotplug=
+Handler *hotplug_dev,
+> >          spapr_memory_pre_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> >          spapr_core_pre_plug(hotplug_dev, dev, errp);
+> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BR=
+IDGE)) {
+> > +        spapr_phb_pre_plug(hotplug_dev, dev, errp);
 > >      }
+> >  }
 > > =20
-> >      qemu_opts_del(dev->opts);
-> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> > index ae317286a480..9237b6849ff3 100644
-> > --- a/include/hw/qdev-core.h
-> > +++ b/include/hw/qdev-core.h
-> > @@ -153,6 +153,7 @@ struct DeviceState {
-> >      /*< public >*/
+> > @@ -3328,7 +3439,8 @@ static HotplugHandler *spapr_get_hotplug_handler(=
+MachineState *machine,
+> >                                                   DeviceState *dev)
+> >  {
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+> > -        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> > +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE) ||
+> > +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+> >          return HOTPLUG_HANDLER(machine);
+> >      }
+> >      return NULL;
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index 2e1049ce61c7..845fcf70b932 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -704,6 +704,7 @@ static void spapr_drc_phb_class_init(ObjectClass *k=
+, void *data)
+> >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
+> >      drck->typename =3D "PHB";
+> >      drck->drc_name_prefix =3D "PHB ";
+> > +    drck->release =3D spapr_phb_release;
+> >  }
 > > =20
-> >      const char *id;
-> > +    char *canonical_path;
-> >      bool realized;
-> >      bool pending_deleted_event;
-> >      QemuOpts *opts;
+> >  static const TypeInfo spapr_dr_connector_info =3D {
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 157867af8178..c12f71ae3e2d 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1833,7 +1833,7 @@ void spapr_phb_dma_reset(sPAPRPHBState *sphb)
+> >                             sphb->dma_win_size >> SPAPR_TCE_PAGE_SHIFT);
+> >  }
+> > =20
+> > -static void spapr_phb_reset(DeviceState *qdev)
+> > +void spapr_phb_reset(DeviceState *qdev)
+> >  {
+> >      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(qdev);
+> > =20
+> > diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> > index 7837fb0b1110..15799cee4280 100644
+> > --- a/include/hw/pci-host/spapr.h
+> > +++ b/include/hw/pci-host/spapr.h
+> > @@ -120,6 +120,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+> > =20
+> >  void spapr_pci_rtas_init(void);
+> > =20
+> > +void spapr_phb_reset(DeviceState *qdev);
+> > +
+> >  sPAPRPHBState *spapr_pci_find_phb(sPAPRMachineState *spapr, uint64_t b=
+uid);
+> >  PCIDevice *spapr_pci_find_dev(sPAPRMachineState *spapr, uint64_t buid,
+> >                                uint32_t config_addr);
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index f09c54d5bb94..a2f6782bdbbf 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -673,6 +673,7 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr,=
+ int shift,
+> >  /* CPU and LMB DRC release callbacks. */
+> >  void spapr_core_release(DeviceState *dev);
+> >  void spapr_lmb_release(DeviceState *dev);
+> > +void spapr_phb_release(DeviceState *dev);
+> > =20
+> >  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+> >  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+> >=20
 > >  =20
+>=20
 >=20
 
 
---Sig_/V=h2L962gkxQvi5f89e0MR5
+--Sig_/LnuHF12y7hb.6zY+XTNDK+5
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAll6GeIACgkQAvw66wEB28JMJACfUM+TaNJsxU6q4GAqemb24qpy
-DzkAn3JcCKXjHooi2v1+/w2ryo1/+6Ey
-=XhzP
+iEYEARECAAYFAll6HmMACgkQAvw66wEB28LZjACggRSOJt66GvZC+v/JBmmsvfOz
+W+QAni9heCvWVlD0PUYpWvkILHakE0Hh
+=iNzD
 -----END PGP SIGNATURE-----
 
---Sig_/V=h2L962gkxQvi5f89e0MR5--
+--Sig_/LnuHF12y7hb.6zY+XTNDK+5--
