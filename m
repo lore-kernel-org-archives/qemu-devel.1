@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daff6-00061s-J7
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:04:57 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dafiC-0007Xo-AW
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1daff2-0004ws-Ox
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:04:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1daff2-0004uv-GB
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:04:52 -0400
-Date: Thu, 27 Jul 2017 11:04:42 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170727100442.GF2555@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <87o9so1hl7.fsf@dusky.pond.sub.org>
-	<20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
-	<20170721153331.GL18014@stefanha-x1.localdomain>
-	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
-	<8760eiuxu5.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@redhat.com>) id 1dafiB-0007pn-9j
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:08:08 -0400
+Date: Thu, 27 Jul 2017 11:07:55 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170727100755.GC10129@stefanha-x1.localdomain>
+References: <20170726141924.qaqclberxsup5cdm@postretch>
+	<20170726151221.GA3600@stefanha-x1.localdomain>
+	<20170726182320.cnqx3y64c7nmhvp3@postretch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="f+W+jCU1fRNres8c"
 Content-Disposition: inline
-In-Reply-To: <8760eiuxu5.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+In-Reply-To: <20170726182320.cnqx3y64c7nmhvp3@postretch>
+Subject: Re: [Qemu-devel] [RFC] block-insert-node and block-job-delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On Mon, Jul 24, 2017 at 08:56:50AM +0200, Markus Armbruster wrote:
-> Cleber Rosa <crosa@redhat.com> writes:
-> 
-> > On 07/21/2017 11:33 AM, Stefan Hajnoczi wrote:
-> >>> Output testing style delegates checking ouput to diff.  I rather like it
-> >>> when text output is readily available.  It is when testing QMP.  A
-> >>> non-trivial example using this style could be useful, as discussing
-> >>> ideas tends to be more productive when they come with patches.
-> >> 
-> >> Yes, I was considering how many of the Python iotests could be rewritten
-> >> comfortably in shell.  It is nice when the test simply executes commands
-> >> and the output file shows the entire history of what happened.  Great
-> >> for debugging.
-> >> 
-> >> Stefan
-> >> 
-> > I'd like to have a better understanding of the major pain points here.
-> >
-> > Although this can be seen as a matter of taste, style preferences and
-> > even religion, I guess it's safe to say that Python can scale better
-> > than shell.  The upside of shell based tests is the "automatic" and
-> > complete logging, right?  Running "bash -x /path/to/test.sh" will give
-> > much more *useful* information than "python -v /path/to/test.py" will, fact.
-> >
-> > I believe this has to do with how *generic* Python code is written, and
-> > how builtin functions and most of the standard Python libraries work as
-> > they do.  Now, when writing code aimed at testing, making use of testing
-> > oriented libraries and tools, one would expect much more useful and
-> > readily available debug information.
-> >
-> > I'm biased, for sure, but that's what you get when you write basic tests
-> > using the Avocado libraries.  For instance, when using process.run()[1]
-> > within a test, you can choose to see its command output quite easily
-> > with a command such as "avocado --show=avocado.test.stdout run test.py".
-> >
-> > Using other custom logging channels is also trivial (for instance for
-> > specific QMP communication)[2][3].
-> >
-> > I wonder if such logging capabilities fill in the gap of what you
-> > describe as "[when the] output file shows the entire history of what
-> > happened".
-> 
-> Test code language is orthogonal to verification method (with code
-> vs. with diff).  Except verifying with shell code would be obviously
-> nuts[*].
-> 
-> The existing iotests written in Python verify with code, and the ones
-> written in shell verify with diff.  Doesn't mean that we have to port
-> from Python to shell to gain "verify with diff".
 
-Nb, not all the python tests verify with code. The LUKS test 149 that
-I wrote in python verifies  with diff. I chose python because shell is
-an awful programming language if the code needs conditionals, non-scalar
-data structures, or is more than 10 lines long in total :-)
+--f+W+jCU1fRNres8c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Wed, Jul 26, 2017 at 09:23:20PM +0300, Manos Pitsidianakis wrote:
+> On Wed, Jul 26, 2017 at 04:12:21PM +0100, Stefan Hajnoczi wrote:
+> > On Wed, Jul 26, 2017 at 05:19:24PM +0300, Manos Pitsidianakis wrote:
+> > > This proposal follows a discussion we had with Kevin and Stefan on fi=
+lter
+> > > node management.
+> > >=20
+> > > With block filter drivers arises a need to configure filter nodes on =
+runtime
+> > > with QMP on live graphs. A problem with doing live graph modification=
+s is
+> > > that some block jobs modify the graph when they are done and don't op=
+erate
+> > > under any synchronisation, resulting in a race condition if we try to=
+ insert
+> > > a filter node in the place of an existing edge.
+> >=20
+> > But maybe you are thinking about higher level race conditions between
+> > QMP commands.  Can you give an example of the race?
+>=20
+> Exactly, synchronisation between the QMP/user actions. Here's an example,
+> correct me if I'm wrong:
+>=20
+> User issues a block-commit to this tree to commit A onto B:
+>    BB -> A -> B
+>=20
+> This inserts the dummy mirror node at the top since this is a mirror job
+> (active commit)
+>    BB -> dummy -> A -> B
+>=20
+> User wants to add a filter node F below the BB. First we create the node:
+>    BB -> dummy -> A -> B
+>       F /
+>=20
+> Commit finishes before we do block-insert-node, dummy and A is removed fr=
+om
+> the BB's chain, mirror_exit calls bdrv_replace_node()
+>=20
+>    BB ------------> B
+>                F -> /
+>=20
+> Now inserting F under BB will error since dummy does not exist any more.
+
+I see the diagrams but the flow isn't clear without the user's QMP
+commands.
+
+F is created using blockdev-add?  What are the parameters and how does
+it know about dummy?  I think this is an interesting question in itself
+because dummy is a transient internal node that QMP users don't
+necessarily know about.
+
+What is the full block-insert-node command?
+
+> The proposal doesn't guard against the following:
+> User issues a block-commit to this tree to commit B onto C:
+>    BB -> A -> B -> C
+>=20
+> The dummy node (commit's top bs is A):
+>    BB -> A -> dummy -> B -> C
+>=20
+> blockdev-add of a filter we wish to eventually be between A and C:
+>    BB -> A -> dummy -> B -> C
+>             F/
+>=20
+> if commit finishes before we issue block-insert-node (commit_complete()
+> calls bdrv_set_backing_hd() which only touches A)
+>    BB -> A --------------> C
+>           F -> dummy -> B /
+>    resulting in error when issuing block-insert-node,
+>=20
+> else if we set the job to manual-delete and insert F:
+>    BB -> A -> F -> dummy -> B -> C
+> deleting the job will result in F being lost since the job's top bs wasn't
+> updated.
+
+manual-delete is a solution for block jobs.  The write threshold feature
+is a plain QMP command that in the future will create a transient
+internal node (before write notifier).
+
+I'm not sure it makes sense to turn the write threshold feature into a
+block job.  I guess it could work, but it seems a little unnatural and
+maybe there will be other features that use transient internal nodes.
+
+What I'm getting at is that there might be alternative to manual-delete
+that work in the general case.  For example, if blockdev-add +
+block-insert-node are part of a QMP 'transaction' command, can we lock
+the graph to protect it against modifications?
+
+--f+W+jCU1fRNres8c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZebt7AAoJEJykq7OBq3PIyCAH/2ZrMCe80tc2zcaNonq5Ayd+
+AaDHbhdFLl3IK8gBTyuH0LzGEvsu7xf4MPLM4XrDcSvWxCS0eN9Eg+cUmNGwQP88
+jaghg9C30FReaDaSSlI2Gvliaz9UjDyCykFD2/X4eIsz6TMscr+2WcdilrxSfTyI
+6b866CaqN8F3ZxQ8Rs1HiO+kLMuLFLTvQUytMc9Jr24PiADwYY8l44dfDkm3eFW+
+thhCYH15O4c1FAyc60mnfBT9zKAL7E/RyhFhNpSzrDVEokCQVh8sR12OJA48yZeg
+UrDXs0YZEZURBYOGnEdEEmEINBs8ybphfurty8RfL+tYlUguK8MellgT5dBg2ng=
+=j/FP
+-----END PGP SIGNATURE-----
+
+--f+W+jCU1fRNres8c--
