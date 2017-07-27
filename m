@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1daf45-0004WK-SP
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:26:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1daf8W-0006RN-DA
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1daf40-0007Q5-U0
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:26:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1daf40-0007Om-NT
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:26:36 -0400
-Date: Thu, 27 Jul 2017 17:19:57 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170727091957.GC5117@lemon.lan>
-References: <87o9so1hl7.fsf@dusky.pond.sub.org>
-	<20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
-	<20170721153331.GL18014@stefanha-x1.localdomain>
-	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
-	<8760eiuxu5.fsf@dusky.pond.sub.org>
-	<9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com>
-	<871sp2gut9.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1daf8S-0001ko-E4
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:31:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1daf8S-0001kU-87
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:31:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1daf8Q-0006UH-Tw
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:31:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C14A92E80CF
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:31:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <871sp2gut9.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Jul 2017 09:20:31 -0000
+From: chan <1706866@bugs.launchpad.net>
+Reply-To: Bug 1706866 <1706866@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150113818340.31767.9409806903366726521.malonedeb@gac.canonical.com>
+Message-Id: <150114723195.19652.17068694703775358457.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1706866] Re: migrate:  add tls option in virsh,
+ migrate failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, 07/27 10:14, Markus Armbruster wrote:
-> This brings some advantages of "verify output with diff" to tests that
-> verify with code.  Improvement if it simplifies the verification code.
-> 
-> I'd still prefer *no* verification code (by delegating the job to diff)
-> for tests where I can get away wit it.
+ok, thank you!
 
-Python based iotests can be (re)done in such a way that they print actual logs
-(interactions with qtest/monitor, stdout/stderr of QEMU, etc) instead of the
-current dot dot dot summary, then we automatically have diff based verification,
-no?
+-- =
 
-One thing I feel painful with bash iotests is how harder it is to write
-complicated test scenarios such as migration, incremental backup, etc.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706866
 
-On the other hand the iotests are more difficult to debug when things go wrong
-because it eats the output which, if done with shell, should be very easy to
-get.
+Title:
+  migrate:  add tls option in virsh, migrate failed
 
-Fam
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  version:
+      libvirt-3.4.0 + qemu-2.9.90(latest)
+
+  domain:
+      any
+
+  step:
+      1. generate tls certificate in /etc/pki/libvirt-migrate
+      2. start vm
+      3. migrate vm, cmdline:
+         virsh migrate rh7.1-3 --live --undefinesource --persistent --verbo=
+se --tls qemu+ssh://IP/system
+      4. then migrate failed and reported:
+   Migration: [ 64 %]error: internal error: qemu unexpectedly closed the mo=
+nitor: Domain pid=3D5288, libvirtd pid=3D49634
+   kvm: warning: CPU(s) not present in any NUMA nodes: 2 3 4 5 6 7 8 9 10 1=
+1 12 13 14 15 16 17 18 19 20 21 22 23
+   kvm: warning: All CPU(s) up to maxcpus should be described in NUMA config
+   kvm: error while loading state section id 2(ram)
+   kvm: load of migration failed: Input/output error
+
+  other:
+      Analysis qemu code and debug:
+  #0  ram_save_page (f=3D0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=
+=3Dfalse, bytes_transferred=3D0x55ca885ec1d8) =
+
+  #1  0x000055ca87b00b21 in ram_save_target_page (ms=3D0x55ca885b8d80, f=3D=
+0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
+=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
+  #2  0x000055ca87b00bda in ram_save_host_page (ms=3D0x55ca885b8d80, f=3D0x=
+55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
+=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
+  #3  0x000055ca87b00d39 in ram_find_and_save_block (f=3D0x55ca8be370e0, la=
+st_stage=3Dfalse, bytes_transferred=3D0x55ca885ec1d8)
+  #4  0x000055ca87b020b8 in ram_save_iterate (f=3D0x55ca8be370e0, opaque=3D=
+0x0)
+  #5  0x000055ca87b07a9a in qemu_savevm_state_iterate (f=3D0x55ca8be370e0, =
+postcopy=3Dfalse) =
+
+  #6  0x000055ca87e404e5 in migration_thread (opaque=3D0x55ca885b8d80)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706866/+subscriptions
