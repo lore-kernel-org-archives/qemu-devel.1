@@ -1,36 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1daX4G-0000Tp-MJ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:54:21 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daXDZ-0003gK-R4
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1daX4F-0006sh-NE
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:54:20 -0400
-Received: from mail-yw0-x22a.google.com ([2607:f8b0:4002:c05::22a]:32788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1daX4F-0006s6-FB
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:54:19 -0400
-Received: by mail-yw0-x22a.google.com with SMTP id x125so97736886ywa.0
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 17:54:19 -0700 (PDT)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daXDW-0005Aa-LH
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:03:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50795
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1daXDW-0005AE-Fj
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:03:54 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6R13rgk028880
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:03:53 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2by2jwg7sy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:03:53 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 26 Jul 2017 21:03:52 -0400
+Date: Thu, 27 Jul 2017 09:03:46 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
+	<20170725224442.13383-2-pasic@linux.vnet.ibm.com>
+	<20170726033121.GP7483@bjsdjshi@linux.vnet.ibm.com>
+	<af44463e-9a90-d769-32d7-53e43852cb89@linux.vnet.ibm.com>
+	<7067811a-825b-adbb-78a9-5d06083f50ec@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1501112787.4073.49.camel@redhat.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-	<1501016375.26846.21.camel@redhat.com>
-	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-	<1501104453.26846.45.camel@redhat.com>
-	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
-	<1501112787.4073.49.camel@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Wed, 26 Jul 2017 17:54:17 -0700
-Message-ID: <CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7067811a-825b-adbb-78a9-5d06083f50ec@linux.vnet.ibm.com>
+Message-Id: <20170727010346.GT7483@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/css: check ccw address validity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,56 +45,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rik van Riel <riel@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jul 26, 2017 at 4:46 PM, Rik van Riel <riel@redhat.com> wrote:
-> On Wed, 2017-07-26 at 14:40 -0700, Dan Williams wrote:
->> On Wed, Jul 26, 2017 at 2:27 PM, Rik van Riel <riel@redhat.com>
->> wrote:
->> > On Wed, 2017-07-26 at 09:47 -0400, Pankaj Gupta wrote:
->> > > >
->> > >
->> > > Just want to summarize here(high level):
->> > >
->> > > This will require implementing new 'virtio-pmem' device which
->> > > presents
->> > > a DAX address range(like pmem) to guest with read/write(direct
->> > > access)
->> > > & device flush functionality. Also, qemu should implement
->> > > corresponding
->> > > support for flush using virtio.
->> > >
->> >
->> > Alternatively, the existing pmem code, with
->> > a flush-only block device on the side, which
->> > is somehow associated with the pmem device.
->> >
->> > I wonder which alternative leads to the least
->> > code duplication, and the least maintenance
->> > hassle going forward.
->>
->> I'd much prefer to have another driver. I.e. a driver that refactors
->> out some common pmem details into a shared object and can attach to
->> ND_DEVICE_NAMESPACE_{IO,PMEM}. A control device on the side seems
->> like
->> a recipe for confusion.
->
-> At that point, would it make sense to expose these special
-> virtio-pmem areas to the guest in a slightly different way,
-> so the regions that need virtio flushing are not bound by
-> the regular driver, and the regular driver can continue to
-> work for memory regions that are backed by actual pmem in
-> the host?
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-26 18:45:34 +0200]:
 
-Hmm, yes that could be feasible especially if it uses the ACPI NFIT
-mechanism. It would basically involve defining a new SPA (System
-Phyiscal Address) range GUID type, and then teaching libnvdimm to
-treat that as a new pmem device type.
+[...]
 
-See usage of UUID_PERSISTENT_MEMORY in drivers/acpi/nfit/ and the
-eventual region description sent to nvdimm_pmem_region_create(). We
-would then need to plumb a new flag so that nd_region_to_nstype() in
-libnvdimm returns a different namespace type number for this virtio
-use case, but otherwise the rest of libnvdimm should treat the region
-as pmem.
+> >>> @@ -946,6 +953,17 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
+> >>>          suspend_allowed = true;
+> >>>      }
+> >>>      sch->last_cmd_valid = false;
+> >>> +    if (sch->channel_prog & (CCW1_ADDR_MASK |
+> >>> +                             sch->ccw_fmt_1 ? 0 : 0xff000000)) {
+> >> I have problem in recognizing the operator precedence here:
+> >>     (CCW1_ADDR_MASK | sch->ccw_fmt_1 ? 0 : 0xff000000)
+> >>
+> >> Bitwise '|' has higher precedence than '?:', so the above equals to:
+> >>     (CCW1_ADDR_MASK | sch->ccw_fmt_1) ? 0 : 0xff000000
+> >>
+> >> So you will always get a '0', no?
+> >>
+> > 
+> > I'm afraid you are right. Good catch! This was supposed to be
+> > (CCW1_ADDR_MASK | (sch->ccw_fmt_1 ? 0 : 0xff000000))
+> > 
+> > 
+> >>> +            /* generate channel program check */
+> >>> +            s->ctrl &= ~SCSW_ACTL_START_PEND;
+> >>> +            s->cstat = SCSW_CSTAT_PROG_CHECK;
+> >>> +            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
+> >>> +            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+> >>> +                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+> >>> +            s->cpa = sch->channel_prog + 8;
+> >>> +            return;
+> >>> +    }
+> >> I think you could let css_interpret_ccw() do the sanity check on its
+> >> @ccw_addr parameter when (sch->last_cmd_valid == false), to reuse the
+> >> code of generating channel program check.
+> >>
+> > 
+> > I'm working on factoring out the code manipulating SCSW (among others). If we
+> > do that this will look nicer. What you propose is certainly viable, althoug
+> > maybe little less straight forward.
+> > 
+> > Yet another option would be to use a label and jump into the loop (AFAIR that
+> > would be also valid).
+> > 
+> > Let us see what is Connie's opinion.
+> > 
+> 
+> After re-examining the PoP I'm inclined to say we have to check this on every
+> iteration because of how "main-storage location is unavailable" is defined in
+> this context: the definition depends on the ccw format.
+Sounds natural!
+
+> There is nothing about this in the ccw chaining section of the pop but
+> it can be found in the I/O interrupts chapter.
+> 
+> I think I will have to redo this patch :/
+Ok.
+
+> 
+> Regards,
+> Halil
+> 
+> > 
+> >>>      do {
+> >>>          ret = css_interpret_ccw(sch, sch->channel_prog, suspend_allowed);
+> >>>          switch (ret) {
+> >>> -- 
+> >>> 2.11.2
+> >>>
+> >>
+> > 
+> > 
+> 
+> 
+
+-- 
+Dong Jia Shi
