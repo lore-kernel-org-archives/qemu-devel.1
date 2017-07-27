@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dapMO-0002Iz-AV
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:26:17 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dapMf-0002SM-Qr
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dapMN-0004mW-CY
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:26:16 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dapMe-000561-Pr
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:26:33 -0400
 References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
 	<1499633493-19865-3-git-send-email-eric.auger@redhat.com>
-	<448765a4-1ffc-f27b-fcb1-61445fd785d4@semihalf.com>
+	<04b06baa-75d8-291b-ef6e-89bbb89b3fd1@semihalf.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <eb6021f4-b0c1-22c2-dddf-e30f331abcbc@redhat.com>
-Date: Thu, 27 Jul 2017 22:25:53 +0200
+Message-ID: <9a41e0b1-0519-2c93-70b4-30e0a38a2405@redhat.com>
+Date: Thu, 27 Jul 2017 22:26:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <448765a4-1ffc-f27b-fcb1-61445fd785d4@semihalf.com>
+In-Reply-To: <04b06baa-75d8-291b-ef6e-89bbb89b3fd1@semihalf.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [RFC v5 2/8] hw/arm/smmuv3: smmuv3 emulation model
@@ -29,7 +29,7 @@ Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.c
 
 Hi Tomasz,
 
-On 13/07/2017 14:57, Tomasz Nowicki wrote:
+On 13/07/2017 14:00, Tomasz Nowicki wrote:
 > Hi Eric,
 > 
 > On 09.07.2017 22:51, Eric Auger wrote:
@@ -54,40 +54,45 @@ On 13/07/2017 14:57, Tomasz Nowicki wrote:
 > [...]
 > 
 >> +
->> +static void smmu_update_qreg(SMMUV3State *s, SMMUQueue *q, hwaddr reg,
->> +                             uint32_t off, uint64_t val, unsigned size)
+>> +/*****************************
+>> + *  Register Access Primitives
+>> + *****************************/
+>> +
+>> +static inline void smmu_write64_reg(SMMUV3State *s, uint32_t addr,
+>> uint64_t val)
 >> +{
->> +   if (size == 8 && off == 0) {
->> +        smmu_write64_reg(s, reg, val);
+>> +    addr >>= 2;
+>> +    s->regs[addr] = val & 0xFFFFFFFFULL;
+>> +    s->regs[addr + 1] = val & ~0xFFFFFFFFULL;
+>> +}
+>> +
+>> +static inline void smmu_write_reg(SMMUV3State *s, uint32_t addr,
+>> uint64_t val)
+>> +{
+>> +    s->regs[addr >> 2] = val;
+>> +}
+>> +
+>> +static inline uint32_t smmu_read_reg(SMMUV3State *s, uint32_t addr)
+>> +{
+>> +    return s->regs[addr >> 2];
+>> +}
+>> +
+>> +static inline uint64_t smmu_read64_reg(SMMUV3State *s, uint32_t addr)
+>> +{
+>> +    addr >>= 2;
+>> +    return s->regs[addr] | (s->regs[addr + 1] << 32);
 > 
-> Based on my observation we never get here.
+> To be consistent with smmu_write64_reg() we should not shift here second
+> half of register, instead simply:
 > 
-> If I read the code correctly,
-> memory_region_dispatch_{write|read}()->memory_region_{write|read}_accessor()
-> will cut all 8-bytes accesses into 4-bytes slices. However, this makes
-> my SMMUv3 register handling happy:
-> 
->  static const MemoryRegionOps smmu_mem_ops = {
->      .read = smmu_read_mmio,
->      .write = smmu_write_mmio,
->      .endianness = DEVICE_LITTLE_ENDIAN,
->      .valid = {
->          .min_access_size = 4,
->          .max_access_size = 8,
->      },
-> +    .impl = {
-> +        .min_access_size = 4,
-> +    .max_access_size = 8,
-> +    },
-Yes indeed: without the .impl setting, only 4byte accesses are performed
-by access_with_adjusted_size() which sets access_size_max to 4.
+> return s->regs[addr] | s->regs[addr + 1];
 
-Thanks a lot.
+Thanks for spotting this. I think regs should be uint32_t instead and
+extract64() could be used on write64 and shift would stay on read64().
 
-Best regards
+Regards
 
 Eric
->  };
 > 
 > Thanks,
 > Tomasz
