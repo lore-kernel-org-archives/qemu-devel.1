@@ -1,32 +1,56 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dagmt-00063C-4n
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:17:04 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dagq3-0007kl-6I
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:20:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dagmp-00072n-Q2
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:17:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dagmp-00071N-JA
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:16:59 -0400
-Date: Thu, 27 Jul 2017 19:16:52 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170727111652.GI5117@lemon.lan>
-References: <87o9so1hl7.fsf@dusky.pond.sub.org>
-	<20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
-	<20170721153331.GL18014@stefanha-x1.localdomain>
-	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
-	<8760eiuxu5.fsf@dusky.pond.sub.org>
-	<9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com>
-	<871sp2gut9.fsf@dusky.pond.sub.org>
-	<20170727091957.GC5117@lemon.lan>
-	<20170727100958.GG2555@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dagpz-00013E-SI
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:20:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58188
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dagpz-000122-Mc
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:20:15 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6RBJuxm178584
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:20:14 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bycygeej2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:20:13 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 27 Jul 2017 12:18:53 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+	[9.149.105.59])
+	by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id v6RBIos538797328
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 11:18:50 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D79C7A4053
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:55 +0100 (BST)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BE41AA4051
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:55 +0100 (BST)
+Received: from oc3836556865.ibm.com (unknown [9.152.224.141])
+	by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 12:15:55 +0100 (BST)
+References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
+	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
+	<20170727100138.74ad2ad4@gondolin>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 27 Jul 2017 13:18:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170727100958.GG2555@redhat.com>
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+In-Reply-To: <20170727100138.74ad2ad4@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <fc4e9602-64ad-f010-b5f8-a0b2d19732a6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
+ for TIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +59,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <cleber@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, 07/27 11:09, Daniel P. Berrange wrote:
-> On Thu, Jul 27, 2017 at 05:19:57PM +0800, Fam Zheng wrote:
-> > On Thu, 07/27 10:14, Markus Armbruster wrote:
-> > > This brings some advantages of "verify output with diff" to tests that
-> > > verify with code.  Improvement if it simplifies the verification code.
-> > > 
-> > > I'd still prefer *no* verification code (by delegating the job to diff)
-> > > for tests where I can get away wit it.
-> > 
-> > Python based iotests can be (re)done in such a way that they print actual logs
-> > (interactions with qtest/monitor, stdout/stderr of QEMU, etc) instead of the
-> > current dot dot dot summary, then we automatically have diff based verification,
-> > no?
-> 
-> The python test 149 that I wrote does exactly that. There's no reason why
-> the others couldn't do the same.
 
-Yes, and IMO it should be the default and recommended way.
 
+On 07/27/2017 10:01 AM, Cornelia Huck wrote:
+> On Wed, 26 Jul 2017 00:44:42 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> > One thing I feel painful with bash iotests is how harder it is to write
-> > complicated test scenarios such as migration, incremental backup, etc.
+>> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
+>> contain zeros.  Bits 0-3 are already covered by cmd_code validity
+>> checking, and bit 32 is covered by the CCW address checking.
+>>
+>> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
+>> check for the absence of certain flags.  Let's fix this.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/css.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>> index d17e21b7af..1f04ce4a1b 100644
+>> --- a/hw/s390x/css.c
+>> +++ b/hw/s390x/css.c
+>> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+>>              ret = -EINVAL;
+>>              break;
+>>          }
+>> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
+>> +        if (ccw.flags || ccw.count) {
+>> +            /* We have already sanitized these if fmt 0. */
 > 
-> Yes, shell is an awful language if you need non-trivial control
-> logic or data structures
+> I'd tweak that to
 > 
-> > On the other hand the iotests are more difficult to debug when things go wrong
-> > because it eats the output which, if done with shell, should be very easy to
-> > get.
+> /* We have already sanitized these if converted from fmt 0. */
 > 
-> Even if the python tests are not doing verify-by-diff, it should be fairly
-> easy to wire up an env variable IOTESTS_DEBUG=1 which would force them
-> to propagate stdout/err of all commands run (or at least save it to a
-> log file somewhere).
 
-Good point. Maybe we should extend the -d option of ./check for more log, if the
-above "full output" still isn't enough.
+Fine with me.
 
-Fam
+> Seems less confusing.
+> 
+>>              ret = -EINVAL;
+>>              break;
+>>          }
+> 
+> I'm inclined to pick this as a 2.10 bugfix. Patch 1 still needs work
+> from what I've seen.
+> 
+
+Hm. The commit message becomes inaccurate if this goes in before
+patch 1. We still have must be zero bits which should be handled
+by the address (ccw.cda) checking. I think I can fix patch 1 today.
