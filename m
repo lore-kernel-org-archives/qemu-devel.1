@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1daj7e-0002Iv-02
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:46:39 -0400
+	(envelope-from <groug@kaod.org>) id 1daj70-0001vf-Pl
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:45:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1daj7a-0000Vq-GG
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:46:37 -0400
-Resent-Message-Id: <E1daj7a-0000Vq-GG@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150116313088.114.5400262602178482259@5d477a5b5989>
-In-Reply-To: <20170726171444.32218-1-el13635@mail.ntua.gr>
+	(envelope-from <groug@kaod.org>) id 1daj6z-0008J9-7S
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:45:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39585)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1daj6y-0008Ib-Us
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 09:45:57 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6RDj6oq116844
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:45:55 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2byewm7c76-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 09:45:55 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 27 Jul 2017 14:45:51 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 27 Jul 2017 15:45:47 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Jul 2017 06:45:31 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] add throttle block driver filter
+Content-Transfer-Encoding: 7bit
+Message-Id: <150116311662.21142.16740109690791414399.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [for-2.10 PATCH] spapr_drc: fix realize and unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: el13635@mail.ntua.gr
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSBhZGQgdGhyb3R0bGUgYmxvY2sgZHJp
-dmVyIGZpbHRlcgpNZXNzYWdlLWlkOiAyMDE3MDcyNjE3MTQ0NC4zMjIxOC0xLWVsMTM2MzVAbWFp
-bC5udHVhLmdyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0ZmY0MWNmIGJsb2NrOiBhZGQgdGhyb3R0bGUgYmxv
-Y2sgZmlsdGVyIGRyaXZlciBpbnRlcmZhY2UgdGVzdHMKY2NmMjI5NCBibG9jazogYWRkIEJsb2Nr
-RGV2T3B0aW9uc1Rocm90dGxlIHRvIFFBUEkKYzAwZGEzOSBibG9jazogYWRkIHRocm90dGxlIGJs
-b2NrIGZpbHRlciBkcml2ZXIKYzIxNmRiOCBibG9jazogY29udmVydCBUaHJvdHRsZUdyb3VwIHRv
-IG9iamVjdCB3aXRoIFFPTQo5MmUxMzE2IGJsb2NrOiB0aWR5IFRocm90dGxlR3JvdXBNZW1iZXIg
-aW5pdGlhbGl6YXRpb25zCmEzZjhiZjMgYmxvY2s6IGFkZCBhaW9fY29udGV4dCBmaWVsZCBpbiBU
-aHJvdHRsZUdyb3VwTWVtYmVyCjg4ZjM3ZGEgYmxvY2s6IG1vdmUgVGhyb3R0bGVHcm91cCBtZW1i
-ZXJzaGlwIHRvIFRocm90dGxlR3JvdXBNZW1iZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvNzogYmxvY2s6IG1vdmUgVGhyb3R0bGVHcm91cCBtZW1iZXJzaGlwIHRvIFRo
-cm90dGxlR3JvdXBNZW1iZXIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc5
-OiBGSUxFOiBibG9jay9ibG9jay1iYWNrZW5kLmM6OTkyOgorICAgICAgICB0aHJvdHRsZV9ncm91
-cF9jb19pb19saW1pdHNfaW50ZXJjZXB0KCZibGstPnB1YmxpYy50aHJvdHRsZV9ncm91cF9tZW1i
-ZXIsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTM6IEZJTEU6IGJsb2NrL2Js
-b2NrLWJhY2tlbmQuYzoxMDE4OgorICAgICAgICB0aHJvdHRsZV9ncm91cF9jb19pb19saW1pdHNf
-aW50ZXJjZXB0KCZibGstPnB1YmxpYy50aHJvdHRsZV9ncm91cF9tZW1iZXIsCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTY5OiBGSUxFOiBibG9jay9ibG9jay1iYWNrZW5kLmM6
-MTk2NjoKKyAgICBpZiAoYXRvbWljX2ZldGNoX2luYygmYmxrLT5wdWJsaWMudGhyb3R0bGVfZ3Jv
-dXBfbWVtYmVyLmlvX2xpbWl0c19kaXNhYmxlZCkgPT0gMCkgewoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzQ0NDogRklMRTogYmxvY2svdGhyb3R0bGUtZ3JvdXBzLmM6Mjc0Ogor
-c3RhdGljIGJvb2wgY29yb3V0aW5lX2ZuIHRocm90dGxlX2dyb3VwX2NvX3Jlc3RhcnRfcXVldWUo
-VGhyb3R0bGVHcm91cE1lbWJlciAqdGdtLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzUxMzogRklMRTogYmxvY2svdGhyb3R0bGUtZ3JvdXBzLmM6MzMzOgordm9pZCBjb3JvdXRp
-bmVfZm4gdGhyb3R0bGVfZ3JvdXBfY29faW9fbGltaXRzX2ludGVyY2VwdChUaHJvdHRsZUdyb3Vw
-TWVtYmVyICp0Z20sCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTkzOiBGSUxF
-OiBibG9jay90aHJvdHRsZS1ncm91cHMuYzozOTI6CitzdGF0aWMgdm9pZCB0aHJvdHRsZV9ncm91
-cF9yZXN0YXJ0X3F1ZXVlKFRocm90dGxlR3JvdXBNZW1iZXIgKnRnbSwgYm9vbCBpc193cml0ZSkK
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4Njg6IEZJTEU6IGluY2x1ZGUvYmxv
-Y2svdGhyb3R0bGUtZ3JvdXBzLmg6Njg6Cit2b2lkIGNvcm91dGluZV9mbiB0aHJvdHRsZV9ncm91
-cF9jb19pb19saW1pdHNfaW50ZXJjZXB0KFRocm90dGxlR3JvdXBNZW1iZXIgKnRnbSwKCnRvdGFs
-OiAwIGVycm9ycywgNyB3YXJuaW5ncywgOTE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi83OiBibG9jazogYWRkIGFp
-b19jb250ZXh0IGZpZWxkIGluIFRocm90dGxlR3JvdXBNZW1iZXIuLi4KRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiM0NzogRklMRTogYmxvY2svYmxvY2stYmFja2VuZC5jOjE5MzA6Cisg
-ICAgdGhyb3R0bGVfZ3JvdXBfcmVnaXN0ZXJfdGdtKCZibGstPnB1YmxpYy50aHJvdHRsZV9ncm91
-cF9tZW1iZXIsIGdyb3VwLCBibGtfZ2V0X2Fpb19jb250ZXh0KGJsaykpOwoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAzMDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy83OiBibG9jazogdGlkeSBUaHJvdHRs
-ZUdyb3VwTWVtYmVyIGluaXRpYWxpemF0aW9ucy4uLgpDaGVja2luZyBQQVRDSCA0Lzc6IGJsb2Nr
-OiBjb252ZXJ0IFRocm90dGxlR3JvdXAgdG8gb2JqZWN0IHdpdGggUU9NLi4uCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MzQ6IEZJTEU6IGluY2x1ZGUvYmxvY2svdGhyb3R0bGUt
-Z3JvdXBzLmg6NTc6CisjZGVmaW5lIFRIUk9UVExFX0dST1VQKG9iaikgT0JKRUNUX0NIRUNLKFRo
-cm90dGxlR3JvdXAsIChvYmopLCBUWVBFX1RIUk9UVExFX0dST1VQKQoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzY3NTogRklMRTogaW5jbHVkZS9xZW11L3Rocm90dGxlLmg6MTU3
-Ogordm9pZCB0aHJvdHRsZV9jb25maWdfdG9fdGhyb3R0bGVfbGltaXRzKFRocm90dGxlQ29uZmln
-ICpjZmcsIFRocm90dGxlTGltaXRzICp2YXIpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzgxMTogRklMRTogdXRpbC90aHJvdHRsZS5jOjU1OToKKyAgICAgICAgY2ZnLT5idWNr
-ZXRzW1RIUk9UVExFX0JQU19UT1RBTF0uYnVyc3RfbGVuZ3RoID0gYXJnLT5icHNfdG90YWxfbWF4
-X2xlbmd0aDsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4Mjc6IEZJTEU6IHV0
-aWwvdGhyb3R0bGUuYzo1NzU6CisgICAgICAgIGNmZy0+YnVja2V0c1tUSFJPVFRMRV9CUFNfV1JJ
-VEVdLmJ1cnN0X2xlbmd0aCA9IGFyZy0+YnBzX3dyaXRlX21heF9sZW5ndGg7CgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojODM1OiBGSUxFOiB1dGlsL3Rocm90dGxlLmM6NTgzOgor
-ICAgICAgICBjZmctPmJ1Y2tldHNbVEhST1RUTEVfT1BTX1RPVEFMXS5idXJzdF9sZW5ndGggPSBh
-cmctPmlvcHNfdG90YWxfbWF4X2xlbmd0aDsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM4NDM6IEZJTEU6IHV0aWwvdGhyb3R0bGUuYzo1OTE6CisgICAgICAgIGNmZy0+YnVja2V0
-c1tUSFJPVFRMRV9PUFNfUkVBRF0uYnVyc3RfbGVuZ3RoID0gYXJnLT5pb3BzX3JlYWRfbWF4X2xl
-bmd0aDsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4NTE6IEZJTEU6IHV0aWwv
-dGhyb3R0bGUuYzo1OTk6CisgICAgICAgIGNmZy0+YnVja2V0c1tUSFJPVFRMRV9PUFNfV1JJVEVd
-LmJ1cnN0X2xlbmd0aCA9IGFyZy0+aW9wc193cml0ZV9tYXhfbGVuZ3RoOwoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg2NjogRklMRTogdXRpbC90aHJvdHRsZS5jOjYxNDoKK3Zv
-aWQgdGhyb3R0bGVfY29uZmlnX3RvX3Rocm90dGxlX2xpbWl0cyhUaHJvdHRsZUNvbmZpZyAqY2Zn
-LCBUaHJvdHRsZUxpbWl0cyAqdmFyKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-Izg4MDogRklMRTogdXRpbC90aHJvdHRsZS5jOjYyODoKKyAgICB2YXItPmJwc190b3RhbF9tYXhf
-bGVuZ3RoICAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX0JQU19UT1RBTF0uYnVyc3RfbGVuZ3Ro
-OwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg4MjogRklMRTogdXRpbC90aHJv
-dHRsZS5jOjYzMDoKKyAgICB2YXItPmJwc193cml0ZV9tYXhfbGVuZ3RoICAgID0gY2ZnLT5idWNr
-ZXRzW1RIUk9UVExFX0JQU19XUklURV0uYnVyc3RfbGVuZ3RoOwoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzg4MzogRklMRTogdXRpbC90aHJvdHRsZS5jOjYzMToKKyAgICB2YXIt
-PmlvcHNfdG90YWxfbWF4X2xlbmd0aCAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX09QU19UT1RB
-TF0uYnVyc3RfbGVuZ3RoOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg4NTog
-RklMRTogdXRpbC90aHJvdHRsZS5jOjYzMzoKKyAgICB2YXItPmlvcHNfd3JpdGVfbWF4X2xlbmd0
-aCAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX09QU19XUklURV0uYnVyc3RfbGVuZ3RoOwoKdG90
-YWw6IDAgZXJyb3JzLCAxMiB3YXJuaW5ncywgODEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBibG9jazogYWRk
-IHRocm90dGxlIGJsb2NrIGZpbHRlciBkcml2ZXIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzE4MzogRklMRTogYmxvY2svdGhyb3R0bGUuYzoxNDM6CisgICAgaWYgKHFlbXVf
-b3B0X2dldChvcHRzLCBUSFJPVFRMRV9PUFRfUFJFRklYIFFFTVVfT1BUX0lPUFNfVE9UQUxfTUFY
-X0xFTkdUSCkpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMDc6IEZJTEU6
-IGJsb2NrL3Rocm90dGxlLmM6MTY3OgorICAgIGlmIChxZW11X29wdF9nZXQob3B0cywgVEhST1RU
-TEVfT1BUX1BSRUZJWCBRRU1VX09QVF9JT1BTX1dSSVRFX01BWF9MRU5HVEgpKSB7CgpXQVJOSU5H
-OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDE4OiBGSUxFOiBibG9jay90aHJvdHRsZS5jOjM3
-ODoKKyAgICAuYmRydl9yZWN1cnNlX2lzX2ZpcnN0X25vbl9maWx0ZXIgICA9ICAgdGhyb3R0bGVf
-cmVjdXJzZV9pc19maXJzdF9ub25fZmlsdGVyLAoKdG90YWw6IDAgZXJyb3JzLCAzIHdhcm5pbmdz
-LCA0MDkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgpDaGVja2luZyBQQVRDSCA2Lzc6IGJsb2NrOiBhZGQgQmxvY2tEZXZPcHRpb25zVGhyb3R0bGUg
-dG8gUUFQSS4uLgpDaGVja2luZyBQQVRDSCA3Lzc6IGJsb2NrOiBhZGQgdGhyb3R0bGUgYmxvY2sg
-ZmlsdGVyIGRyaXZlciBpbnRlcmZhY2UgdGVzdHMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+If object_property_add_alias() returns an error in realize(), we should
+propagate it to the caller and certainly not unref the DRC.
+
+Same thing goes for unrealize(). Since object_property_del() is the last
+call, we can even get rid of the intermediate Error *.
+
+And finally, unrealize() should undo all registrations performed by
+realize().
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+
+David,
+
+As agreed on the list, here's the version of the fix for 2.10. I'll respin
+my PHB hotplug series on top of it.
+
+Cheers,
+
+--
+Greg
+
+ hw/ppc/spapr_drc.c |   15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 15bae5c216a9..47d94e782ac2 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -506,11 +506,11 @@ static void realize(DeviceState *d, Error **errp)
+     trace_spapr_drc_realize_child(spapr_drc_index(drc), child_name);
+     object_property_add_alias(root_container, link_name,
+                               drc->owner, child_name, &err);
++    g_free(child_name);
+     if (err) {
+-        error_report_err(err);
+-        object_unref(OBJECT(drc));
++        error_propagate(errp, err);
++        return;
+     }
+-    g_free(child_name);
+     vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
+                      drc);
+     qemu_register_reset(drc_reset, drc);
+@@ -522,16 +522,13 @@ static void unrealize(DeviceState *d, Error **errp)
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
+     Object *root_container;
+     char name[256];
+-    Error *err = NULL;
+ 
+     trace_spapr_drc_unrealize(spapr_drc_index(drc));
++    qemu_unregister_reset(drc_reset, drc);
++    vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
+     root_container = container_get(object_get_root(), DRC_CONTAINER_PATH);
+     snprintf(name, sizeof(name), "%x", spapr_drc_index(drc));
+-    object_property_del(root_container, name, &err);
+-    if (err) {
+-        error_report_err(err);
+-        object_unref(OBJECT(drc));
+-    }
++    object_property_del(root_container, name, errp);
+ }
+ 
+ sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
