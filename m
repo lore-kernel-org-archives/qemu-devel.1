@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daa2F-00057q-Sf
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:04:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1daa2I-00057x-FT
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1daa2E-0006Wl-I8
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:04:27 -0400
-Date: Thu, 27 Jul 2017 13:44:02 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1daa2E-0006WD-Eh
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 00:04:30 -0400
+Date: Thu, 27 Jul 2017 13:43:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170727034402.GK8978@umbus.fritz.box>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100557147.27487.5031800506520955290.stgit@bahia>
-	<20170726040459.GT8978@umbus.fritz.box>
-	<20170726113643.63fb2c89@bahia.lan>
+Message-ID: <20170727034304.GJ8978@umbus.fritz.box>
+References: <20170727024224.22900-1-f4bug@amsat.org>
+	<20170727024224.22900-19-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YRGgq4HRInt36X2w"
+	protocol="application/pgp-signature"; boundary="IdGNrZu1oYcejyEu"
 Content-Disposition: inline
-In-Reply-To: <20170726113643.63fb2c89@bahia.lan>
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 07/26] spapr_drc: fix realize and
- unrealize
+In-Reply-To: <20170727024224.22900-19-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 19/20] spapr_vio: fix overflow
+ of qdevs in spapr_dt_vdevice()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
 
 
---YRGgq4HRInt36X2w
-Content-Type: text/plain; charset=us-ascii
+--IdGNrZu1oYcejyEu
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 26, 2017 at 11:36:43AM +0200, Greg Kurz wrote:
-> On Wed, 26 Jul 2017 14:04:59 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Wed, Jul 26, 2017 at 11:42:23PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> sizeof(ptr) was used instead of sizeof(struct)...
 >=20
-> > On Tue, Jul 25, 2017 at 07:59:31PM +0200, Greg Kurz wrote:
-> > > If object_property_add_alias() returns an error in realize(), we shou=
-ld
-> > > propagate it to the caller and certainly not unref the DRC.
-> > >=20
-> > > Same thing goes for unrealize(). Since object_property_del() is the l=
-ast
-> > > call, we can even get rid of the intermediate Error *.
-> > >=20
-> > > And finally, unrealize() should undo all registrations performed by
-> > > realize().
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> > I've applied this to ppc-for-2.11, but this looks like it could be a
-> > real bug fix.  So I'm wondering if I should push it for 2.10 (we're in
-> > hard freeze, but bugfixes can still be applied).
-> >=20
+> also use g_malloc_n() which take care of possible type overflow.
 >=20
-> Yeah I guess it should also be merged in 2.10 but it has a dependency
-> with patch 4 (spapr_drc: use g_strdup_printf() instead  of snprintf()).
-> If you prefer, maybe I can repost this as a standalone fix for 2.10
-> ?
-
-Yes, that would be helpful, thank you.
-
+> hw/ppc/spapr_vio.c:641:22: warning: The code calls sizeof() on a pointer =
+type. This can produce an unexpected result
+>     qdevs =3D g_malloc(sizeof(qdev) * num);
+>                      ^     ~~~~~~
+> hw/ppc/spapr_vio.c:648:23: warning: The code calls sizeof() on a pointer =
+type. This can produce an unexpected result
+>     qsort(qdevs, num, sizeof(qdev), compare_reg);
+>                       ^     ~~~~~~
 >=20
-> > > ---
-> > >  hw/ppc/spapr_drc.c |   15 ++++++---------
-> > >  1 file changed, 6 insertions(+), 9 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > > index e4e8383ec7b5..d72453bcb42f 100644
-> > > --- a/hw/ppc/spapr_drc.c
-> > > +++ b/hw/ppc/spapr_drc.c
-> > > @@ -506,12 +506,12 @@ static void realize(DeviceState *d, Error **err=
-p)
-> > >      trace_spapr_drc_realize_child(spapr_drc_index(drc), child_name);
-> > >      object_property_add_alias(root_container, link_name,
-> > >                                drc->owner, child_name, &err);
-> > > +    g_free(child_name);
-> > >      g_free(link_name);
-> > >      if (err) {
-> > > -        error_report_err(err);
-> > > -        object_unref(OBJECT(drc));
-> > > +        error_propagate(errp, err);
-> > > +        return;
-> > >      }
-> > > -    g_free(child_name);
-> > >      vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spa=
-pr_drc,
-> > >                       drc);
-> > >      qemu_register_reset(drc_reset, drc);
-> > > @@ -523,17 +523,14 @@ static void unrealize(DeviceState *d, Error **e=
-rrp)
-> > >      sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(d);
-> > >      Object *root_container;
-> > >      gchar *name;
-> > > -    Error *err =3D NULL;
-> > > =20
-> > >      trace_spapr_drc_unrealize(spapr_drc_index(drc));
-> > > +    qemu_unregister_reset(drc_reset, drc);
-> > > +    vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
-> > >      root_container =3D container_get(object_get_root(), DRC_CONTAINE=
-R_PATH);
-> > >      name =3D g_strdup_printf("%x", spapr_drc_index(drc));
-> > > -    object_property_del(root_container, name, &err);
-> > > +    object_property_del(root_container, name, errp);
-> > >      g_free(name);
-> > > -    if (err) {
-> > > -        error_report_err(err);
-> > > -        object_unref(OBJECT(drc));
-> > > -    }
-> > >  }
-> > > =20
-> > >  sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *=
-type,
-> > >  =20
-> >=20
+> Reported-by: Clang Static Analyzer
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+
+Nack.
+
+Have a closer look, what's going in the array really is pointers, not
+structures.  This is a false warning from clang, we need to find a
+different way to suppress it.
+
+> ---
+>  hw/ppc/spapr_vio.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-
-
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index ea3bc8bd9e..9991b44c9f 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -638,14 +638,14 @@ void spapr_dt_vdevice(VIOsPAPRBus *bus, void *fdt)
+>      }
+> =20
+>      /* Copy out into an array of pointers */
+> -    qdevs =3D g_malloc(sizeof(qdev) * num);
+> +    qdevs =3D g_malloc_n(num, sizeof(*qdev));
+>      num =3D 0;
+>      QTAILQ_FOREACH(kid, &bus->bus.children, sibling) {
+>          qdevs[num++] =3D kid->child;
+>      }
+> =20
+>      /* Sort the array */
+> -    qsort(qdevs, num, sizeof(qdev), compare_reg);
+> +    qsort(qdevs, num, sizeof(*qdev), compare_reg);
+> =20
+>      /* Hack alert. Give the devices to libfdt in reverse order, we happen
+>       * to know that will mean they are in forward order in the tree. */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -129,24 +89,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YRGgq4HRInt36X2w
+--IdGNrZu1oYcejyEu
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll5YYIACgkQbDjKyiDZ
-s5LZpQ//ceefHoOpJqutjwIwSvqfzQI36YvqemeCvUA/bhhr01muXA5c0WlJmpvM
-RImLhSnMsIarLeolLBHMKoY9P6siOr8J19ip2miZ9Bf+Lurq4TMLeEyCJEURl4/N
-a7ecbM62G+1299/na4mL1w9CFRInrQpY7K5sMeunEF1bO8xuzG0QMcVlnvIn1h3C
-5PgTpOU8sPD080Nm1bs6AIpoogs7eSCR98mc9HcNcJ0PYg46d41xjjEOEdTcbHh+
-objpwGYBK6p9QT1iKo3F489zfcEll4VfHEcF+uxJhrN6m8UkLEyPg9wIVb2JFsVD
-hCLe4ophPM+qnto7YxoPEBZ43ucfxMzYblXrODepg6quwxM4kjn2GihQgmHQrbUw
-j/xdncejWNJxkKZa3rULyOr9mes+GcOZTFUHrXuhWGWosPR0f0NjvH9juDQR8o+6
-uFsyohzx9D9JkCWchVuX4ZJFzekVQgJDwD3l/26hAgupmmF6qP3E+srOigtOLXxP
-LpaOUl240V5xlv0jDj1WbUXsnh8if631NB3XXl78K9gdIQXt221ImecnjvdkGbmc
-nQ9L1UxEpoHUkTQjgAg3n4Z5oDISy5e6L1oj3AREHXQUIM0uZdFMkgoyqoOKatHc
-ilwvz5J45TvK28P0WpURG0G0GczIcPoKqxcpIjUETcAcc6IIZ/M=
-=+Nvc
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll5YUUACgkQbDjKyiDZ
+s5KdqA/+Me5dX6ibxNQB//oGlcHoOmebpds2r6kFoa4RmZ62BCVknjEOIZlbfdIP
+Nhch9u7dSNalGOkaI2FhrooEAxegKif7lHh5y0q7ZvEuhj9HLkuzP7Oz9MAkxTT9
+mfvGBembblTO9HU1geCopg5O14JEWvSTPRnrZJtHVo5QfoLcl6WAiEBCUjffg3Y+
+pk0HQ4gcHC/H+13BVtr5YxoPHQSDy9c/YMhYMzp+A5ntiXkoWNLrL764RhN7n0Eq
+YluCQwAA9xTFXPx9kGgqHsx+sbZ6uAdS7lyzJme1zRNaNfWvxPJDiim7WdfWe/yK
+8QiJwD9IFnvbQ5j7Cn/Sy6c1M+a/DrfHixx7X+CPKGcoFpXmMLtnmLTeuPHaiwnu
+mXYXFZoNbPSpvEAUV/spzwANyOROEwK2dlEOO2dVM9CqFXtLEK6FZAckzGBfy2Kf
+K+4zTUGc/cSB9Z4siBOH1+vMpToPyKW97AIHkYBBwYUHW0t1/6hdRXIp05rsuzvq
+qviDnK/TIKY9TChgKKu7+rtv24dimamzLzpPcO7YozLHw2Ejf/w6H7WIDCQj0Da0
+KC7BpgpLOynkyh9KrFEbTBGa4wulPE0Ly3ScEObF+vLGR+ReWKuo//A5GWhA1SlV
+8FyPWFb635p2W+e0bwmz9/rlzxQGIUpTiUFGD34CwbA76SmO+Lc=
+=5mGs
 -----END PGP SIGNATURE-----
 
---YRGgq4HRInt36X2w--
+--IdGNrZu1oYcejyEu--
