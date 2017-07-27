@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1daYem-0001sS-32
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:36:09 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1daYh6-00036o-0o
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1daYei-0003AM-3o
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:36:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50180)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1daYeh-00039t-QH
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:36:04 -0400
-Date: Thu, 27 Jul 2017 10:35:38 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170727023538.GO1595@pxdev.xzpeter.org>
-References: <1500533554-5779-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170720065249eucas1p2cc3e779e2cde2125f90ae25ff03ac646@eucas1p2.samsung.com>
-	<1500533554-5779-4-git-send-email-a.perevalov@samsung.com>
-	<20170726014921.GK1595@pxdev.xzpeter.org>
-	<19a15ce5-5427-c85b-f194-c3eb6740aef3@samsung.com>
-	<20170726084323.GL1595@pxdev.xzpeter.org>
-	<fd5bc5a7-d3fe-a0fc-2e27-0ba3389c2c11@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <fd5bc5a7-d3fe-a0fc-2e27-0ba3389c2c11@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v8 3/3] migration: add bitmap for received
- page
+	(envelope-from <programmingkidx@gmail.com>) id 1daYh2-0004mr-1F
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:32 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:37484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1daYh1-0004lu-SZ
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:27 -0400
+Received: by mail-io0-x244.google.com with SMTP id c74so3920533iod.4
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 19:38:26 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <mailman.86860.1501079288.22738.qemu-devel@nongnu.org>
+Date: Wed, 26 Jul 2017 22:38:23 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <BE3B497E-BA22-463D-A619-162797D96826@gmail.com>
+References: <mailman.86860.1501079288.22738.qemu-devel@nongnu.org>
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, quintela@redhat.com, heetae82.ahn@samsung.com, dgilbert@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael	S. Tsirkin" <mst@redhat.com>
 
-On Wed, Jul 26, 2017 at 06:24:11PM +0300, Alexey Perevalov wrote:
-> On 07/26/2017 11:43 AM, Peter Xu wrote:
-> >On Wed, Jul 26, 2017 at 11:07:17AM +0300, Alexey Perevalov wrote:
-> >>On 07/26/2017 04:49 AM, Peter Xu wrote:
-> >>>On Thu, Jul 20, 2017 at 09:52:34AM +0300, Alexey Perevalov wrote:
-> >>>>This patch adds ability to track down already received
-> >>>>pages, it's necessary for calculation vCPU block time in
-> >>>>postcopy migration feature, maybe for restore after
-> >>>>postcopy migration failure.
-> >>>>Also it's necessary to solve shared memory issue in
-> >>>>postcopy livemigration. Information about received pages
-> >>>>will be transferred to the software virtual bridge
-> >>>>(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-> >>>>already received pages. fallocate syscall is required for
-> >>>>remmaped shared memory, due to remmaping itself blocks
-> >>>>ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-> >>>>error (struct page is exists after remmap).
-> >>>>
-> >>>>Bitmap is placed into RAMBlock as another postcopy/precopy
-> >>>>related bitmaps.
-> >>>>
-> >>>>Reviewed-by: Peter Xu <peterx@redhat.com>
-> >>>>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> >>>>---
-> >>>[...]
-> >>>
-> >>>>  static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-> >>>>-        void *from_addr, uint64_t pagesize)
-> >>>>+                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
-> >>>>  {
-> >>>>+    int ret;
-> >>>>      if (from_addr) {
-> >>>>          struct uffdio_copy copy_struct;
-> >>>>          copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
-> >>>>          copy_struct.src = (uint64_t)(uintptr_t)from_addr;
-> >>>>          copy_struct.len = pagesize;
-> >>>>          copy_struct.mode = 0;
-> >>>>-        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> >>>>+        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> >>>>      } else {
-> >>>>          struct uffdio_zeropage zero_struct;
-> >>>>          zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
-> >>>>          zero_struct.range.len = pagesize;
-> >>>>          zero_struct.mode = 0;
-> >>>>-        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> >>>>+        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> >>>>+    }
-> >>>>+    if (!ret) {
-> >>>>+        ramblock_recv_bitmap_set(host_addr, rb);
-> >>>Wait...
-> >>>
-> >>>Now we are using 4k-page/bit bitmap, do we need to take care of the
-> >>>huge pages here?  Looks like we are only setting the first bit of it
-> >>>if it is a huge page?
-> >>First version was per ramblock page size, IOW bitmap was smaller in
-> >>case of hugepages.
-> >Yes, but this is not the first version any more. :)
-> >
-> >This patch is using:
-> >
-> >   bitmap_new(rb->max_length >> TARGET_PAGE_BITS);
-> >
-> >to allocate bitmap, so it is using small pages always for bitmap,
-> >right? (I should not really say "4k" pages, here I think the size is
-> >host page size, which is the thing returned from getpagesize()).
-> >
-> >>
-> >>You mentioned that TARGET_PAGE_SIZE is reasonable for precopy case,
-> >>in "Re: [Qemu-devel] [PATCH v1 2/2] migration: add bitmap for copied page"
-> >>I though TARGET_PAGE_SIZE as transmition unit, is using in precopy even
-> >>hugepage case.
-> >>But it's not so logically, page being marked as dirty, should be sent as a
-> >>whole page.
-> >Sorry if I misunderstood, but I didn't see anything wrong - we are
-> >sending pages in small pages, but when postcopy is there, we do
-> >UFFDIO_COPY in huge page, so everything is fine?
-> I think yes, we chose TARGET_PAGE_SIZE because of wider
-> use case ranges.
 
-So... are you going to post another version? IIUC we just need to use
-a bitmap_set() to replace the ramblock_recv_bitmap_set(), while set
-the size with "pagesize / TARGET_PAGE_SIZE"?
+> On Jul 26, 2017, at 10:28 AM, qemu-devel-request@nongnu.org wrote:
+>=20
+> Message: 3
+> Date: Wed, 26 Jul 2017 15:30:20 +0200
+> From: Igor Mammedov <imammedo@redhat.com>
+> To: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan
+> 	<lists@philjordan.eu>, "Daniel P. Berrange" =
+<berrange@redhat.com>,
+> 	Phil	Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com,
+> 	"qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
+> 	Programmingkid	<programmingkidx@gmail.com>, Richard Henderson
+> 	<rth@twiddle.net>, "Michael	S. Tsirkin" <mst@redhat.com>
+> Subject: Re: [Qemu-devel] Commit
+> 	77af8a2b95b79699de650965d5228772743efe84 breaks Windows 2000 =
+support
+> Message-ID: <20170726153020.4c20b279@nial.brq.redhat.com>
+> Content-Type: text/plain; charset=3DUS-ASCII
+>=20
+> On Wed, 26 Jul 2017 15:10:40 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+>> On 26/07/2017 15:08, Igor Mammedov wrote:
+>>> On Tue, 25 Jul 2017 18:23:22 +0200
+>>> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>=20
+>>>> On 25/07/2017 18:14, Laszlo Ersek wrote: =20
+>>>>>  "No regressions became apparent in tests with a range of Windows
+>>>>>   (XP-10)"
+>>>>>=20
+>>>>> In theory, w2k falls within that range.   =20
+>>>>=20
+>>>> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
+>>>>=20
+>>>> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 =
+FADT
+>>>> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT =
+itself,
+>>>> patching the RSDT to point to it.
+>>>>=20
+>>>> It's a hack, but it's the only place I see to make it "just work".  =
+And
+>>>> it could be extended nicely in the future.
+>>>>=20
+>>>> All QEMU would have to do is to provide an XSDT _instead_ of an =
+RSDT. =20
+>>> I'd support it, however it would break migrated guests with old BIOS
+>>> image in RAM on reboot. =20
+>>=20
+>> Why?  Shouldn't the old ACPI tables get migrated together with the =
+old
+>> BIOS?  Or are they rebuilt after reset?
+> they are rebuild on reset, but I've been wrong
+> Looking at SeaBIOS something similar to your suggestion also should =
+work,
+> if=20
+>    RsdpAddr =3D find_acpi_rsdp();
+> fails, current SeaBIOS falls back to its own ACPI tables.
+>=20
+> but it seems that we don't even need to go to that extent,
+> all user have to do is to use "-no-acpi" CLI option with QEMU
+> for any SeaBIOS to fallback to embedded legacy ACPI tables.
+>=20
+> Maybe we should just fix wiki
+>  http://wiki.qemu.org/Windows2000
+> to recommend using '-no-acpi' option when running w2k and
+> leave PC machine at rev3 and mention it in release notes.
+>=20
+> Opinions?
 
-(I think I was wrong when saying getpagesize() above: the small page
- should be target page size, while the huge page should be the host's)
-
--- 
-Peter Xu
+I just tried booting Windows 2000 using '-no-acpi' and ended up in a =
+restart loop.
+Windows would look like its booting up properly then the screen is =
+blanked.
+Seabios text would appear on the screen for a fraction of a=20
+second then be replaced by the Windows startup screen again. This =
+repeats over and
+over.
