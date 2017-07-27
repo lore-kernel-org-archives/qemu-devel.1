@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dagVq-0006N4-43
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:59:26 -0400
+	(envelope-from <famz@redhat.com>) id 1dagZo-00016C-02
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dagVp-0000QZ-C7
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:59:26 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Jul 2017 11:59:06 +0100
-Message-Id: <1501153150-19984-2-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
-References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.10 1/5] target/arm: Don't do MPU lookups
- for addresses in M profile PPB region
+	(envelope-from <famz@redhat.com>) id 1dagZj-0003NS-UH
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:03:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dagZj-0003Mm-PA
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 07:03:27 -0400
+Date: Thu, 27 Jul 2017 19:03:24 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170727110324.GG5117@lemon.lan>
+References: <20170717063521.GA7393@lemon>
+	<20170717090531.GA7163@stefanha-x1.localdomain>
+	<CAFEAcA8kt71pbxggfLdP3-WCc8u8v5iijZBksMSq6Yss2ydgiw@mail.gmail.com>
+	<20170717093944.GA18516@lemon>
+	<CAFEAcA-hzAq=fP6Pndre3b4truxJFV3go0C91d702pMsLGZRrg@mail.gmail.com>
+	<20170717102607.GI3640@redhat.com>
+	<CAFEAcA8pH6+aTNznDS7hTDTfNniuSBWgORCaiSm=vkAbukpcLw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8pH6+aTNznDS7hTDTfNniuSBWgORCaiSm=vkAbukpcLw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,54 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-The M profile PMSAv7 specification says that if the address being looked
-up is in the PPB region (0xe0000000 - 0xe00fffff) then we do not use
-the MPU regions but always use the default memory map. Implement this
-(we were previously behaving like an R profile PMSAv7, which does not
-special case this).
+On Tue, 07/25 10:58, Peter Maydell wrote:
+> For patchew, I basically ignore patchew compile failure emails
+> because it is too painful to get to the bottom of the email
+> where the actual error message is because of the pages and
+> pages and pages of useless progress output :-(
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+Isn't it very easy to go to the bottom with a shortcut key and start looking
+from there? That's why I thought including the full log in the email isn't a
+problem, while not everyone likes web interface when it comes to working on a
+long log (I personally find travis web page annoyingly inefficient).
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 4ed32c5..ceef225 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8244,6 +8244,13 @@ static bool pmsav7_use_background_region(ARMCPU *cpu,
-     }
- }
- 
-+static inline bool is_ppb_region(CPUARMState *env, uint32_t address)
-+{
-+    /* True if address is in the M profile PPB region 0xe0000000 - 0xe00fffff */
-+    return arm_feature(env, ARM_FEATURE_M) &&
-+        extract32(address, 20, 12) == 0xe00;
-+}
-+
- static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
-                                  int access_type, ARMMMUIdx mmu_idx,
-                                  hwaddr *phys_ptr, int *prot, uint32_t *fsr)
-@@ -8255,7 +8262,15 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
-     *phys_ptr = address;
-     *prot = 0;
- 
--    if (regime_translation_disabled(env, mmu_idx)) { /* MPU disabled */
-+    if (regime_translation_disabled(env, mmu_idx) ||
-+        is_ppb_region(env, address)) {
-+        /* MPU disabled or M profile PPB access: use default memory map.
-+         * The other case which uses the default memory map in the
-+         * v7M ARM ARM pseudocode is exception vector reads from the vector
-+         * table. In QEMU those accesses are done in arm_v7m_load_vector(),
-+         * which always does a direct read using address_space_ldl(), rather
-+         * than going via this function, so we don't need to check that here.
-+         */
-         get_phys_addr_pmsav7_default(env, mmu_idx, address, prot);
-     } else { /* MPU enabled */
-         for (n = (int)cpu->pmsav7_dregion - 1; n >= 0; n--) {
--- 
-2.7.4
+Fam
