@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1daoFA-0005Jt-90
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:14:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daoIY-0006h1-2T
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1daoF7-0006YS-JX
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:14:44 -0400
-Resent-Message-Id: <E1daoF7-0006YS-JX@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1daoF7-0006Xf-AE
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:14:41 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150118286385.114.1968237577155737251@5d477a5b5989>
-In-Reply-To: <20170727191013.53517-1-anatol.pomozov@gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daoIV-0000zi-FR
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:18:14 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170727024224.22900-1-f4bug@amsat.org>
+	<20170727024224.22900-18-f4bug@amsat.org>
+	<20170727134005.76e74eb6@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <96837087-e5a3-3c8c-63f3-fab1f821274a@amsat.org>
+Date: Thu, 27 Jul 2017 16:18:07 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Jul 2017 12:14:24 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] multiboot: Change multiboot_info from
- array of bytes to a C struct
+In-Reply-To: <20170727134005.76e74eb6@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for 2.10 v2 18/20] 9pfs:
+ avoid sign conversion error simplifying the code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: anatol.pomozov@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, vlad.lungu@windriver.com
+To: Greg Kurz <groug@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, "Aneesh Kumar K . V" <aneesh.kumar@linux.vnet.ibm.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIG11bHRpYm9vdDogQ2hhbmdlIG11bHRpYm9vdF9p
-bmZvIGZyb20gYXJyYXkgb2YgYnl0ZXMgdG8gYSBDIHN0cnVjdApNZXNzYWdlLWlkOiAyMDE3MDcy
-NzE5MTAxMy41MzUxNy0xLWFuYXRvbC5wb21vem92QGdtYWlsLmNvbQoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
-bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzA3MjcxOTEwMTMu
-NTM1MTctMS1hbmF0b2wucG9tb3pvdkBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE3MDcyNzE5MTAx
-My41MzUxNy0xLWFuYXRvbC5wb21vem92QGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjIwMjk2OGEgbXVsdGlib290OiBDaGFuZ2UgbXVsdGlib290X2luZm8gZnJvbSBh
-cnJheSBvZiBieXRlcyB0byBhIEMgc3RydWN0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzE6IG11bHRpYm9vdDogQ2hhbmdlIG11bHRpYm9vdF9pbmZvIGZyb20gYXJyYXkg
-b2YgYnl0ZXMgdG8gYSBDIHN0cnVjdC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojNzc6IEZJTEU6IGh3L2kzODYvbXVsdGlib290LmM6MTA1OgorICAgIG1vZCA9IHMtPm1iX2J1
-ZiArIHMtPm9mZnNldF9tYmluZm8gKyBzaXplb2YobXVsdGlib290X21vZHVsZV90KSAqIHMtPm1i
-X21vZHNfY291bnQ7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE5MzogRklMRTog
-aHcvaTM4Ni9tdWx0aWJvb3QuYzoyNjA6CisgICAgbWJzLm9mZnNldF9jbWRsaW5lcyAgID0gbWJz
-Lm9mZnNldF9tYmluZm8gKyBtYnMubWJfbW9kc19hdmFpbCAqIHNpemVvZihtdWx0aWJvb3RfbW9k
-dWxlX3QpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI2MzogRklMRTogaHcv
-aTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6MTc6CisgKiAgREVWRUxPUEVSIE9SIERJU1RSSUJVVE9S
-IEJFIExJQUJMRSBGT1IgQU5ZIENMQUlNLCBEQU1BR0VTIE9SIE9USEVSIExJQUJJTElUWSwKCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNjU6IEZJTEU6IGh3L2kzODYvbXVsdGli
-b290X2hlYWRlci5oOjE5OgorICogIElOIENPTk5FQ1RJT04gV0lUSCBUSEUgU09GVFdBUkUgT1Ig
-VEhFIFVTRSBPUiBPVEhFUiBERUFMSU5HUyBJTiBUSEUgU09GVFdBUkUuCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNzI6IEZJTEU6IGh3L2kzODYvbXVsdGlib290
-X2hlYWRlci5oOjI2OgorI2RlZmluZSBNVUxUSUJPT1RfU0VBUkNIXkleSV5JODE5MiQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI3MzogRklMRTogaHcvaTM4Ni9t
-dWx0aWJvb3RfaGVhZGVyLmg6Mjc6CisjZGVmaW5lIE1VTFRJQk9PVF9IRUFERVJfQUxJR05eSV5J
-Xkk0JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjc2OiBGSUxF
-OiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDozMDoKKyNkZWZpbmUgTVVMVElCT09UX0hFQURF
-Ul9NQUdJQ15JXkleSTB4MUJBREIwMDIkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiMyNzk6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjMzOgorI2Rl
-ZmluZSBNVUxUSUJPT1RfQk9PVExPQURFUl9NQUdJQ15JXkkweDJCQURCMDAyJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjgyOiBGSUxFOiBody9pMzg2L211bHRp
-Ym9vdF9oZWFkZXIuaDozNjoKKyNkZWZpbmUgTVVMVElCT09UX01PRF9BTElHTl5JXkleSTB4MDAw
-MDEwMDAkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyODU6IEZJ
-TEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjM5OgorI2RlZmluZSBNVUxUSUJPT1RfSU5G
-T19BTElHTl5JXkleSTB4MDAwMDAwMDQkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiMyOTA6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjQ0OgorI2Rl
-ZmluZSBNVUxUSUJPT1RfUEFHRV9BTElHTl5JXkleSTB4MDAwMDAwMDEkCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyOTM6IEZJTEU6IGh3L2kzODYvbXVsdGlib290
-X2hlYWRlci5oOjQ3OgorI2RlZmluZSBNVUxUSUJPT1RfTUVNT1JZX0lORk9eSV5JXkkweDAwMDAw
-MDAyJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjk2OiBGSUxF
-OiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDo1MDoKKyNkZWZpbmUgTVVMVElCT09UX1ZJREVP
-X01PREVeSV5JXkkweDAwMDAwMDA0JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMjk5OiBGSUxFOiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDo1MzoKKyNkZWZp
-bmUgTVVMVElCT09UX0FPVVRfS0xVREdFXkleSV5JMHgwMDAxMDAwMCQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwNDogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3Rf
-aGVhZGVyLmg6NTg6CisjZGVmaW5lIE1VTFRJQk9PVF9JTkZPX01FTU9SWV5JXkleSTB4MDAwMDAw
-MDEkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMDY6IEZJTEU6
-IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjYwOgorI2RlZmluZSBNVUxUSUJPT1RfSU5GT19C
-T09UREVWXkleSV5JMHgwMDAwMDAwMiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzMwODogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6NjI6CisjZGVm
-aW5lIE1VTFRJQk9PVF9JTkZPX0NNRExJTkVeSV5JXkkweDAwMDAwMDA0JAoKRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzEwOiBGSUxFOiBody9pMzg2L211bHRpYm9v
-dF9oZWFkZXIuaDo2NDoKKyNkZWZpbmUgTVVMVElCT09UX0lORk9fTU9EU15JXkleSTB4MDAwMDAw
-MDgkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTU6IEZJTEU6
-IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjY5OgorI2RlZmluZSBNVUxUSUJPT1RfSU5GT19B
-T1VUX1NZTVNeSV5JMHgwMDAwMDAxMCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzMxNzogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6NzE6CisjZGVm
-aW5lIE1VTFRJQk9PVF9JTkZPX0VMRl9TSERSXkleSV5JMFgwMDAwMDAyMCQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMyMDogRklMRTogaHcvaTM4Ni9tdWx0aWJv
-b3RfaGVhZGVyLmg6NzQ6CisjZGVmaW5lIE1VTFRJQk9PVF9JTkZPX01FTV9NQVBeSV5JXkkweDAw
-MDAwMDQwJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzIzOiBG
-SUxFOiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDo3NzoKKyNkZWZpbmUgTVVMVElCT09UX0lO
-Rk9fRFJJVkVfSU5GT15JXkkweDAwMDAwMDgwJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
-ZXZlciB1c2UgdGFicwojMzI2OiBGSUxFOiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDo4MDoK
-KyNkZWZpbmUgTVVMVElCT09UX0lORk9fQ09ORklHX1RBQkxFXkleSTB4MDAwMDAxMDAkCgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMjk6IEZJTEU6IGh3L2kzODYv
-bXVsdGlib290X2hlYWRlci5oOjgzOgorI2RlZmluZSBNVUxUSUJPT1RfSU5GT19CT09UX0xPQURF
-Ul9OQU1FXkleSTB4MDAwMDAyMDAkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMzMzI6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjg2OgorI2RlZmlu
-ZSBNVUxUSUJPT1RfSU5GT19BUE1fVEFCTEVeSV5JMHgwMDAwMDQwMCQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMzNTogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3Rf
-aGVhZGVyLmg6ODk6CisjZGVmaW5lIE1VTFRJQk9PVF9JTkZPX1ZCRV9JTkZPXkleSSAgICAgICAg
-MHgwMDAwMDgwMCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMz
-NjogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6OTA6CisjZGVmaW5lIE1VTFRJQk9P
-VF9JTkZPX0ZSQU1FQlVGRkVSX0lORk9eSSAgICAgICAgMHgwMDAwMTAwMCQKCkVSUk9SOiBvcGVu
-IGJyYWNlICd7JyBmb2xsb3dpbmcgc3RydWN0IGdvIG9uIHRoZSBzYW1lIGxpbmUKIzMzOTogRklM
-RTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6OTM6CitzdHJ1Y3QgbXVsdGlib290X2hlYWRl
-cgorewoKRVJST1I6IG9wZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBzdHJ1Y3QgZ28gb24gdGhlIHNh
-bWUgbGluZQojMzY1OiBGSUxFOiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDoxMTk6CitzdHJ1
-Y3QgbXVsdGlib290X2FvdXRfc3ltYm9sX3RhYmxlCit7CgpFUlJPUjogb3BlbiBicmFjZSAneycg
-Zm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiMzNzU6IEZJTEU6IGh3L2kzODYv
-bXVsdGlib290X2hlYWRlci5oOjEyOToKK3N0cnVjdCBtdWx0aWJvb3RfZWxmX3NlY3Rpb25faGVh
-ZGVyX3RhYmxlCit7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzgxOiBGSUxF
-OiBody9pMzg2L211bHRpYm9vdF9oZWFkZXIuaDoxMzU6Cit0eXBlZGVmIHN0cnVjdCBtdWx0aWJv
-b3RfZWxmX3NlY3Rpb25faGVhZGVyX3RhYmxlIG11bHRpYm9vdF9lbGZfc2VjdGlvbl9oZWFkZXJf
-dGFibGVfdDsKCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgc3RydWN0IGdvIG9uIHRo
-ZSBzYW1lIGxpbmUKIzM4NDogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6MTM4Ogor
-c3RydWN0IG11bHRpYm9vdF9pbmZvCit7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5n
-IHVuaW9uIGdvIG9uIHRoZSBzYW1lIGxpbmUKIzQwMzogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3Rf
-aGVhZGVyLmg6MTU3OgorICB1bmlvbgorICB7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiM0NDA6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjE5NDoK
-KyNkZWZpbmUgTVVMVElCT09UX0ZSQU1FQlVGRkVSX1RZUEVfRUdBX1RFWFReSTIkCgpFUlJPUjog
-b3BlbiBicmFjZSAneycgZm9sbG93aW5nIHVuaW9uIGdvIG9uIHRoZSBzYW1lIGxpbmUKIzQ0Mzog
-RklMRTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6MTk3OgorICB1bmlvbgorICB7CgpFUlJP
-Ujogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiM0
-NDU6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjE5OToKKyAgICBzdHJ1Y3QKKyAg
-ICB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2Ft
-ZSBsaW5lCiM0NTA6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjIwNDoKKyAgICBz
-dHJ1Y3QKKyAgICB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBv
-biB0aGUgc2FtZSBsaW5lCiM0NjM6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hlYWRlci5oOjIx
-NzoKK3N0cnVjdCBtdWx0aWJvb3RfY29sb3IKK3sKCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xs
-b3dpbmcgc3RydWN0IGdvIG9uIHRoZSBzYW1lIGxpbmUKIzQ3MDogRklMRTogaHcvaTM4Ni9tdWx0
-aWJvb3RfaGVhZGVyLmg6MjI0Ogorc3RydWN0IG11bHRpYm9vdF9tbWFwX2VudHJ5Cit7CgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NzQ6IEZJTEU6IGh3L2kzODYv
-bXVsdGlib290X2hlYWRlci5oOjIyODoKKyNkZWZpbmUgTVVMVElCT09UX01FTU9SWV9BVkFJTEFC
-TEVeSV5JMSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ3NTog
-RklMRTogaHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6MjI5OgorI2RlZmluZSBNVUxUSUJPT1Rf
-TUVNT1JZX1JFU0VSVkVEXkleSTIkCgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0
-cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiM0ODQ6IEZJTEU6IGh3L2kzODYvbXVsdGlib290X2hl
-YWRlci5oOjIzODoKK3N0cnVjdCBtdWx0aWJvb3RfbW9kX2xpc3QKK3sKCkVSUk9SOiBvcGVuIGJy
-YWNlICd7JyBmb2xsb3dpbmcgc3RydWN0IGdvIG9uIHRoZSBzYW1lIGxpbmUKIzQ5OTogRklMRTog
-aHcvaTM4Ni9tdWx0aWJvb3RfaGVhZGVyLmg6MjUzOgorc3RydWN0IG11bHRpYm9vdF9hcG1faW5m
-bworewoKRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDQwIGVy
-cm9ycywgNCB3YXJuaW5ncywgNDc5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 07/27/2017 08:40 AM, Greg Kurz wrote:
+> On Wed, 26 Jul 2017 23:42:22 -0300
+> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> 
+> Now, I'm not sure this can be merged during hard freeze since it is
+> more code cleanup than actual bug fixing...
+
+Hmm the commit message is probably not enough.
+The problem is this code can send broken packets, see inlined:
+
+> 
+>>   hw/9pfs/9p.c | 6 ++----
+>>   1 file changed, 2 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+>> index 333dbb6f8e..0a37c8bd13 100644
+>> --- a/hw/9pfs/9p.c
+>> +++ b/hw/9pfs/9p.c
+>> @@ -945,7 +945,6 @@ static void coroutine_fn v9fs_version(void *opaque)
+>>       v9fs_string_init(&version);
+>>       err = pdu_unmarshal(pdu, offset, "ds", &s->msize, &version);
+>>       if (err < 0) {
+
+if err == -1
+
+>> -        offset = err;
+
+here this sets offset = (size_t)(-1) = SIZE_MAX
+
+>>           goto out;
+>>       }
+>>       trace_v9fs_version(pdu->tag, pdu->id, s->msize, version.data);
+>> @@ -962,13 +961,12 @@ static void coroutine_fn v9fs_version(void *opaque)
+>>   
+>>       err = pdu_marshal(pdu, offset, "ds", s->msize, &version);
+>>       if (err < 0) {
+>> -        offset = err;
+>>           goto out;
+>>       }
+>> -    offset += err;
+
+here offset += SIZE_MAX which wraps, so this equivs to offset -= 1
+
+>> +    err += offset;
+>>       trace_v9fs_version_return(pdu->tag, pdu->id, s->msize, version.data);
+>>   out:
+>> -    pdu_complete(pdu, offset);
+
+now we have offset = 7 - 1 = 6, since 6 > 0 pdu_complete() does not 
+marshal the error code but 6 bytes of crap from pdu?
+
+Maybe I missed something.
+
+>> +    pdu_complete(pdu, err);
+>>       v9fs_string_free(&version);
+>>   }
+>>   
+
+Regards,
+
+Phil.
