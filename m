@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1daYh6-00036o-0o
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:33 -0400
+	(envelope-from <jianjay.zhou@huawei.com>) id 1daYhG-0003QD-Up
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1daYh2-0004mr-1F
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:32 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:37484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1daYh1-0004lu-SZ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:27 -0400
-Received: by mail-io0-x244.google.com with SMTP id c74so3920533iod.4
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 19:38:26 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.86860.1501079288.22738.qemu-devel@nongnu.org>
-Date: Wed, 26 Jul 2017 22:38:23 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <BE3B497E-BA22-463D-A619-162797D96826@gmail.com>
-References: <mailman.86860.1501079288.22738.qemu-devel@nongnu.org>
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+	(envelope-from <jianjay.zhou@huawei.com>) id 1daYhC-0004sZ-Vm
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:43 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:4347)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1daYhC-0004pi-DC
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:38:38 -0400
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Thu, 27 Jul 2017 10:36:14 +0800
+Message-ID: <1501122974-18860-1-git-send-email-jianjay.zhou@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +23,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan <lists@philjordan.eu>, "Daniel P. Berrange" <berrange@redhat.com>, Phil Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com, Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael	S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, dgilbert@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, xiaoguangrong@tencent.com, jdenemar@redhat.com, huangzhichao@huawei.com, Jay Zhou <jianjay.zhou@huawei.com>
 
+Qemu_savevm_state_cleanup takes about 300ms in my ram migration tests
+with a 8U24G vm(20G is really occupied), the main cost comes from
+KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
+kvm_set_user_memory_region. In kmod, the main cost is
+kvm_zap_obsolete_pages, which traverses the active_mmu_pages list to
+zap the unsync sptes.
 
-> On Jul 26, 2017, at 10:28 AM, qemu-devel-request@nongnu.org wrote:
->=20
-> Message: 3
-> Date: Wed, 26 Jul 2017 15:30:20 +0200
-> From: Igor Mammedov <imammedo@redhat.com>
-> To: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>, Phil Dennis-Jordan
-> 	<lists@philjordan.eu>, "Daniel P. Berrange" =
-<berrange@redhat.com>,
-> 	Phil	Dennis-Jordan <phil@philjordan.eu>, ehabkost@redhat.com,
-> 	"qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
-> 	Programmingkid	<programmingkidx@gmail.com>, Richard Henderson
-> 	<rth@twiddle.net>, "Michael	S. Tsirkin" <mst@redhat.com>
-> Subject: Re: [Qemu-devel] Commit
-> 	77af8a2b95b79699de650965d5228772743efe84 breaks Windows 2000 =
-support
-> Message-ID: <20170726153020.4c20b279@nial.brq.redhat.com>
-> Content-Type: text/plain; charset=3DUS-ASCII
->=20
-> On Wed, 26 Jul 2017 15:10:40 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
->> On 26/07/2017 15:08, Igor Mammedov wrote:
->>> On Tue, 25 Jul 2017 18:23:22 +0200
->>> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>=20
->>>> On 25/07/2017 18:14, Laszlo Ersek wrote: =20
->>>>>  "No regressions became apparent in tests with a range of Windows
->>>>>   (XP-10)"
->>>>>=20
->>>>> In theory, w2k falls within that range.   =20
->>>>=20
->>>> Nope, Windows 2000 is like NT 5.0, XP is like NT 5.1. :(
->>>>=20
->>>> One possibility is to fix it in SeaBIOS instead: if you get a 2.0 =
-FADT
->>>> and an XSDT and no RSDT, it can build an RSDT and a 1.0 FADT =
-itself,
->>>> patching the RSDT to point to it.
->>>>=20
->>>> It's a hack, but it's the only place I see to make it "just work".  =
-And
->>>> it could be extended nicely in the future.
->>>>=20
->>>> All QEMU would have to do is to provide an XSDT _instead_ of an =
-RSDT. =20
->>> I'd support it, however it would break migrated guests with old BIOS
->>> image in RAM on reboot. =20
->>=20
->> Why?  Shouldn't the old ACPI tables get migrated together with the =
-old
->> BIOS?  Or are they rebuilt after reset?
-> they are rebuild on reset, but I've been wrong
-> Looking at SeaBIOS something similar to your suggestion also should =
-work,
-> if=20
->    RsdpAddr =3D find_acpi_rsdp();
-> fails, current SeaBIOS falls back to its own ACPI tables.
->=20
-> but it seems that we don't even need to go to that extent,
-> all user have to do is to use "-no-acpi" CLI option with QEMU
-> for any SeaBIOS to fallback to embedded legacy ACPI tables.
->=20
-> Maybe we should just fix wiki
->  http://wiki.qemu.org/Windows2000
-> to recommend using '-no-acpi' option when running w2k and
-> leave PC machine at rev3 and mention it in release notes.
->=20
-> Opinions?
+It can be optimized by delaying memory_global_dirty_log_stop to the next
+vm_start.
 
-I just tried booting Windows 2000 using '-no-acpi' and ended up in a =
-restart loop.
-Windows would look like its booting up properly then the screen is =
-blanked.
-Seabios text would appear on the screen for a fraction of a=20
-second then be replaced by the Windows startup screen again. This =
-repeats over and
-over.
+Changes v1->v2:
+ - create a VMChangeStateHandler in memory.c to reduce the coupling [Paolo]
+
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+ memory.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/memory.c b/memory.c
+index a7bc70a..4c22b7e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2357,8 +2357,14 @@ void memory_global_dirty_log_sync(void)
+     }
+ }
+ 
++static VMChangeStateEntry *vmstate_change;
++
+ void memory_global_dirty_log_start(void)
+ {
++    if (vmstate_change) {
++        qemu_del_vm_change_state_handler(vmstate_change);
++    }
++
+     global_dirty_log = true;
+ 
+     MEMORY_LISTENER_CALL_GLOBAL(log_global_start, Forward);
+@@ -2369,7 +2375,7 @@ void memory_global_dirty_log_start(void)
+     memory_region_transaction_commit();
+ }
+ 
+-void memory_global_dirty_log_stop(void)
++static void memory_global_dirty_log_do_stop(void)
+ {
+     global_dirty_log = false;
+ 
+@@ -2381,6 +2387,25 @@ void memory_global_dirty_log_stop(void)
+     MEMORY_LISTENER_CALL_GLOBAL(log_global_stop, Reverse);
+ }
+ 
++static void memory_vm_change_state_handler(void *opaque, int running,
++                                           RunState state)
++{
++    if (running) {
++        memory_global_dirty_log_do_stop();
++    }
++}
++
++void memory_global_dirty_log_stop(void)
++{
++    if (!runstate_is_running()) {
++        vmstate_change = qemu_add_vm_change_state_handler(
++                                memory_vm_change_state_handler, NULL);
++        return;
++    }
++
++    memory_global_dirty_log_do_stop();
++}
++
+ static void listener_add_address_space(MemoryListener *listener,
+                                        AddressSpace *as)
+ {
+-- 
+1.8.3.1
