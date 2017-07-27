@@ -1,36 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dahru-0008Nv-SX
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:26:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dahtq-0000d1-Jg
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:28:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dahrr-0001kv-OO
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:26:18 -0400
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:34113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dahrr-0001ja-Ig
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:26:15 -0400
-Received: by mail-wm0-f42.google.com with SMTP id t138so2428448wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 05:26:15 -0700 (PDT)
-References: <CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-	<CAGCz3vvBDC0cYY_kmgoCn1D1j9RLAda646n_NTuVq6PQF1qNmw@mail.gmail.com>
-	<9767baed-582d-8aab-f9a6-0d04d7ec9d23@redhat.com>
-	<165445ef-c2fb-f49e-8185-2a8af0e27bf2@redhat.com>
-	<a92581c5-87b8-26d0-15d3-33ea6e87d442@redhat.com>
-	<20170725220150.GA2891@morn.lan>
-	<8ce79be9-5512-148d-f2d4-3bb8c04d6eda@redhat.com>
-	<20170726191252.GA8769@morn.lan>
-	<1419439438.19249924.1501100483485.JavaMail.zimbra@redhat.com>
-	<1501144750.27172.1.camel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c6a21247-5d09-84fd-b6c5-bf5dc9b47e6e@redhat.com>
-Date: Thu, 27 Jul 2017 14:26:08 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dahtp-00037n-Om
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:28:18 -0400
+Date: Thu, 27 Jul 2017 14:28:02 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170727122802.GD4767@localhost.localdomain>
+References: <20170725153645.26412-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1501144750.27172.1.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [SeaBIOS] Commit
- 77af8a2b95b79699de650965d5228772743efe84 breaks Windows 2000 support
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170725153645.26412-1-stefanha@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,24 +23,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Kevin O'Connor <kevin@koconnor.net>
-Cc: Phil Dennis-Jordan <phil@philjordan.eu>, seabios@seabios.org, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Programmingkid <programmingkidx@gmail.com>, Phil Dennis-Jordan <lists@philjordan.eu>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, eblake@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-On 27/07/2017 10:39, Gerd Hoffmann wrote:
->>> C - We'd be introducing "shared ownership" of the acpi
->>> tables.  Some
->>>     of the tables would be produced by QEMU and some of them by
->>>     SeaBIOS.  Explaining when and why to future developers would be
->>> a
->>>     challenge.
->>
->> The advantage is that the same shared ownership is already present in
->> OVMF.  The RSDP/RSDT/XSDT are entirely created by the firmware in
->> OVMF.
-> 
-> Hmm, seabios could do the same then, and we would not need a lockstep
-> update?
+Am 25.07.2017 um 17:36 hat Stefan Hajnoczi geschrieben:
+> There is not much getting started documentation for qemu-iotests.  This
+> patch explains how to create a new test and covers the overall testing
+> approach.
+>=20
+> Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-That's fine by me too.  I'll try to make a patch.
+Do you want to address the late v1 comments from Peter (needs to be run
+from build tree) and Jeff (mention common.qemu next to Python tests)?
 
-Paolo
+Kevin
