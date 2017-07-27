@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1daXiN-0005zM-Bw
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:35:48 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daY0c-0004WD-Vv
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1daXiI-00029a-FT
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:35:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36491)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daY0Z-0005r9-4a
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:54:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59607)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1daXiI-000291-AZ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:35:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1daXiG-0005Wh-Em
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 01:35:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 60A0F2E80CD
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 01:35:40 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Jul 2017 01:21:42 -0000
-From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
-Reply-To: Bug 1706825 <1706825@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150111850209.31878.14522576992993433144.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706825] [NEW] qemu-user fails to run wineserver
- on ppc64el host
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1daY0Y-0005qL-Qh
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:54:35 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6R1rvCG057892
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:54:32 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2by6fg934d-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:54:31 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 26 Jul 2017 21:54:30 -0400
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Date: Thu, 27 Jul 2017 03:54:15 +0200
+Message-Id: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/3] Channel Path realted CRW generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +36,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, bjsdjshi@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-Public bug reported:
+This series is trying to:
+1. clear up CRW related code.
+2. generate the right channel path related CRW at the right time.
 
-When attempting to run wineserver on a 64-bit ppc64el host via QEMU's
-user-mode i386 emulation, a file locking operation fails.
+I did this mainly because it's a requirement from my current work, that is I'm
+in preparation of a group of patch for channel path virtualization. I can use
+the inerface that provided by this series later, so as to, for vfio-ccw
+devices, notify the guest with channel path status vary that happens on the
+host side.
 
-Command line:
-qemu-i386-static /usr/lib/wine-development/wineserver32
+During an internal discussion, Halil and Pierre pointed out that for path
+hotplug, generating a CRW seems logical, but how is it covered by the AR is not
+clear - we have problem in understanding some grammar ambiguous paragraphs.
+While certain parts of the AR is not available outside, but I'm still wondering
+if the author ;) could give us some clue... BTW, we know that, in Linux kernel
+we had code that handles un-solicited chp crw, so we tend to believe it's right
+to generate channel path initialized CRW for path hotplug. It's just we can not
+find the reason from the document.
 
-Output:
-wineserver: fcntl /tmp/.wine-0/server-17-14d21bf/lock: Invalid argument
+Pierre also suggested to add an @erc param for css_generate_chp_crws() in patch3,
+while others have a different opinion. This is for your consideration.
 
-Relevant portion of strace:
-fcntl(6, F_SETLK64, 0x3fffe8802218) =3D -1 EINVAL (Invalid argument)
+Best regards!
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Dong Jia Shi (3):
+  s390x/css: use macro for event-information pending error recover code
+  s390x/css: generate solicited crw for rchp completion signaling
+  s390x/css: generate channel path initialized CRW for channel path
+    hotplug
 
--- =
+ hw/s390x/3270-ccw.c       |  3 ++-
+ hw/s390x/css.c            | 66 +++++++++++++++++++++++++++++++++++------------
+ hw/s390x/s390-ccw.c       |  2 +-
+ hw/s390x/virtio-ccw.c     |  3 ++-
+ include/hw/s390x/css.h    | 10 ++++---
+ include/hw/s390x/ioinst.h |  6 +++--
+ 6 files changed, 64 insertions(+), 26 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706825
-
-Title:
-  qemu-user fails to run wineserver on ppc64el host
-
-Status in QEMU:
-  New
-
-Bug description:
-  When attempting to run wineserver on a 64-bit ppc64el host via QEMU's
-  user-mode i386 emulation, a file locking operation fails.
-
-  Command line:
-  qemu-i386-static /usr/lib/wine-development/wineserver32
-
-  Output:
-  wineserver: fcntl /tmp/.wine-0/server-17-14d21bf/lock: Invalid argument
-
-  Relevant portion of strace:
-  fcntl(6, F_SETLK64, 0x3fffe8802218) =3D -1 EINVAL (Invalid argument)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706825/+subscriptions
+-- 
+2.11.2
