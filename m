@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1daeGG-0001p8-RB
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:35:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1daeHb-0002fM-Rs
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1daeGC-0002Jz-MQ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:35:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1daeGC-0002IF-HK
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:35:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1daeGB-0002vk-Dm
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:35:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 669D72E80CC
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:35:07 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1daeHX-00035m-Ls
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:36:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1daeHX-00034f-CN
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:36:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 32E72C085EF8
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:36:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1500645206-13559-1-git-send-email-armbru@redhat.com>
+	<1500645206-13559-10-git-send-email-armbru@redhat.com>
+	<c7a634ae-bdd9-3690-c87e-349888736ffc@redhat.com>
+Date: Thu, 27 Jul 2017 10:36:27 +0200
+In-Reply-To: <c7a634ae-bdd9-3690-c87e-349888736ffc@redhat.com> (Eric Blake's
+	message of "Fri, 21 Jul 2017 10:04:42 -0500")
+Message-ID: <87bmo6ff90.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Jul 2017 08:17:42 -0000
-From: Thomas Huth <1354727@bugs.launchpad.net>
-Reply-To: Bug 1354727 <1354727@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140809174131.28398.99617.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150114346256.31767.16547649761890243412.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1354727] Re: build error with GCC 4.9
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 9/9] tests/libqtest: Enable compile-time
+ format string checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU?
+Eric Blake <eblake@redhat.com> writes:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+> On 07/21/2017 08:53 AM, Markus Armbruster wrote:
+>> qtest_qmp() & friends pass their format string and variable arguments
+>> to qobject_from_jsonv().  Unlike qobject_from_jsonv(), they aren't
+>> decorated with GCC_FMT_ATTR().  Fix that to get compile-time format
+>> string checking.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  tests/libqtest.h | 40 ++++++++++++++++++++++++----------------
+>>  1 file changed, 24 insertions(+), 16 deletions(-)
+>
+> Don't know how much of this to merge with my fixed version of 2/9.  But
+> matches what I had locally after my version 1, before I ripped it all
+> back out again prior to posting my v2 when dealing with gcc fallout,
+> that you've now corrected.
+>
+>> @@ -65,7 +66,8 @@ void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
+>>   *
+>>   * Sends a QMP message to QEMU and returns the response.
+>>   */
+>> -QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
+>> +QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
+>> +    GCC_FMT_ATTR(2, 3);
+>
+> This would fit on one line; any reason we need the line wrap?
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1354727
-
-Title:
-  build error with GCC 4.9
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  % gcc --version
-  gcc (GCC) 4.9.1
-
-  latest development version on git
-
-  xen-hvm.c: In function =E2=80=98xen_hvm_init=E2=80=99:
-  xen-hvm.c:1008:41: error: =E2=80=98HVM_PARAM_IOREQ_PFN=E2=80=99 undeclare=
-d (first use in this function)
-       xc_get_hvm_param(xen_xc, xen_domid, HVM_PARAM_IOREQ_PFN, &ioreq_pfn);
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1354727/+subscriptions
+Pretty sure I didn't have reasons.  But I can make some up after the
+fact!  Putting the attribute on a separate line can be a bit more
+legible.  It can also confuse simple tools to recognize a definition
+instead of a declaration.  Anyway, I don't really care about this line
+break.
