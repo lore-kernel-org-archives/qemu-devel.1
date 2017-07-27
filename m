@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1damIf-0003iv-Nw
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:10:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1damqw-0006qz-N3
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1damIb-0000jv-E1
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:10:13 -0400
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:52949)
+	(envelope-from <berrange@redhat.com>) id 1damqs-00017I-OG
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:45:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1damIb-0000ht-4F
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:10:09 -0400
-Received: from player759.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3AAD0890DE
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 19:10:07 +0200 (CEST)
-Date: Thu, 27 Jul 2017 19:09:55 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170727190955.2792d785@bahia.lan>
-In-Reply-To: <ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150105840463.12000.9666180368681199673.stgit@bahia>
-	<ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1damqs-00016N-Ex
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 13:45:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6B9ED47BF
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 17:45:32 +0000 (UTC)
+Date: Thu, 27 Jul 2017 18:45:22 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170727174522.GA29600@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170727140025.392-1-kraxel@redhat.com>
+	<20170727140025.392-5-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/LnuHF12y7hb.6zY+XTNDK+5";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 26/26] spapr: add hotplug hooks
- for PHB hotplug
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170727140025.392-5-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 4/7] ui: add multimedia keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,314 +34,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
---Sig_/LnuHF12y7hb.6zY+XTNDK+5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 27, 2017 at 04:00:22PM +0200, Gerd Hoffmann wrote:
+> Add multimedia keys to QKeyCodes and to the keymaps.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Message-id: 20170726152918.11995-5-kraxel@redhat.com
+> ---
+>  ui/input-keymap.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  qapi-schema.json  | 28 +++++++++++++++++++++++++++-
+>  2 files changed, 71 insertions(+), 1 deletion(-)
+> 
+> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+> index 7461e1edde..ae781beae9 100644
+> --- a/ui/input-keymap.c
+> +++ b/ui/input-keymap.c
+> @@ -116,6 +116,28 @@ static int linux_to_qcode[KEY_CNT] = {
+>      [KEY_LEFTMETA]       = Q_KEY_CODE_META_L,
+>      [KEY_RIGHTMETA]      = Q_KEY_CODE_META_R,
+>      [KEY_MENU]           = Q_KEY_CODE_MENU,
+> +
+> +    [KEY_SLEEP]          = Q_KEY_CODE_SLEEP,
+> +    [KEY_WAKEUP]         = Q_KEY_CODE_WAKE,
+> +    [KEY_CALC]           = Q_KEY_CODE_CALCULATOR,
+> +    [KEY_MAIL]           = Q_KEY_CODE_MAIL,
+> +    [KEY_COMPUTER]       = Q_KEY_CODE_COMPUTER,
+> +
+> +    [KEY_STOP]           = Q_KEY_CODE_AC_STOP,
 
-On Thu, 27 Jul 2017 14:41:31 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+We already have a Q_KEY_CODE_STOP that I think is the correct mapping
+for KEY_STOP, so this new Q_KEY_CODE_AC_STOP looks like a dupe.
 
-> On 26/07/17 18:40, Greg Kurz wrote:
-> > Hotplugging PHBs is a machine-level operation, but PHBs reside on the
-> > main system bus, so we register spapr machine as the handler for the
-> > main system bus.
-> >=20
-> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > - rebased against ppc-for-2.10
-> > - converted to unplug_request
-> > - handle drc_id at pre-plug
-> > - reset hotplugged PHB at plug
-> > - compatibility with older machine types
-> > ---
-> >  hw/ppc/spapr.c              |  114 +++++++++++++++++++++++++++++++++++=
-++++++++
-> >  hw/ppc/spapr_drc.c          |    1=20
-> >  hw/ppc/spapr_pci.c          |    2 -
-> >  include/hw/pci-host/spapr.h |    2 +
-> >  include/hw/ppc/spapr.h      |    1=20
-> >  5 files changed, 118 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 90485054c2e7..589f76ef9fb8 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2540,6 +2540,10 @@ static void ppc_spapr_init(MachineState *machine)
-> >      register_savevm_live(NULL, "spapr/htab", -1, 1,
-> >                           &savevm_htab_handlers, spapr);
-> > =20
-> > +    if (spapr->dr_phb_enabled) {
-> > +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machine)=
-, NULL);
-> > +    }
-> > +
-> >      qemu_register_boot_set(spapr_boot_set, spapr);
-> > =20
-> >      if (kvm_enabled()) {
-> > @@ -3238,6 +3242,103 @@ out:
-> >      error_propagate(errp, local_err);
-> >  }
-> > =20
-> > +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceStat=
-e *dev,
-> > +                               Error **errp)
-> > +{
-> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
-> > +
-> > +    if (sphb->drc_id =3D=3D (uint32_t)-1) {
-> > +        sphb->drc_id =3D sphb->index;
-> > +    }
-> > +
-> > +    if (sphb->drc_id >=3D SPAPR_DRC_MAX_PHB) {
-> > +        error_setg(errp, "PHB id %d out of range", sphb->drc_id);
-> > +    } =20
->=20
->=20
-> sphb->index in considered 16bits in the existing code (even though it is
-> defined as 32bit) and SPAPR_DRC_MAX_PHB is just 256. I'd suggest using the
-> same limit for both, either 256 or 65536 is fine for me.
->=20
-> It is actually a bit weird - it is possible to completely configure few
-> PHBs in the command line so they will have index=3D=3D-1 but PCI hotplug =
-code -
-> spapr_phb_get_pci_func_drc() and spapr_phb_realize() - does not check for
-> this and just does (sphb->index << 16).
+> +    [KEY_BOOKMARKS]      = Q_KEY_CODE_AC_BOOKMARKS,
+> +    [KEY_BACK]           = Q_KEY_CODE_AC_BACK,
+> +    [KEY_FORWARD]        = Q_KEY_CODE_AC_FORWARD,
+> +    [KEY_HOMEPAGE]       = Q_KEY_CODE_AC_HOME,
+> +    [KEY_REFRESH]        = Q_KEY_CODE_AC_REFRESH,
+> +    [KEY_FIND]           = Q_KEY_CODE_AC_SEARCH,
 
-You're right and this looks like a bug... I'll try to come up with a fix.
+Similarly we already have a Q_KEY_CODE_FIND that should map to
+KEY_FIND, so this Q_KEY_CODE_AC_SEARCH is another dup AFAICT.
 
-> May be just ditch drc_id, enforce index not to be -1 and use it as drc_id?
->=20
+I'm curious what the 'AC_' prefix on all these is indicating ?
+Do we actually need it ?
 
-This was how Mike did it in the original patchset but David suggested
-to introduce drc_id (to preserve existing setups I guess):
+> +
+> +    [KEY_NEXTSONG]       = Q_KEY_CODE_AUDIONEXT,
+> +    [KEY_PREVIOUSSONG]   = Q_KEY_CODE_AUDIOPREV,
+> +    [KEY_STOPCD]         = Q_KEY_CODE_AUDIOSTOP,
+> +    [KEY_PLAYCD]         = Q_KEY_CODE_AUDIOPLAY,
+> +    [KEY_MUTE]           = Q_KEY_CODE_AUDIOMUTE,
+> +    [KEY_VOLUMEDOWN]     = Q_KEY_CODE_VOLUMEDOWN,
+> +    [KEY_VOLUMEUP]       = Q_KEY_CODE_VOLUMEUP,
 
-http://patchwork.ozlabs.org/patch/466262/
+Missing Q_KEY_CODE_MEDIASELECT entry - presumably it was supposed
+to map to  KEY_MEDIA
 
->=20
->=20
-> > +}
-> > +
-> > +static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *d=
-ev,
-> > +                           Error **errp)
-> > +{
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
-> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
-> > +    void *fdt =3D NULL;
-> > +    int fdt_start_offset;
-> > +    int fdt_size;
-> > +    Error *local_err =3D NULL;
-> > +    sPAPRDRConnector *drc;
-> > +    uint32_t phandle;
-> > +    int ret;
-> > +    bool hotplugged =3D spapr_drc_hotplugged(dev);
-> > +
-> > +    if (!spapr->dr_phb_enabled) {
-> > +        return;
-> > +    }
-> > +
-> > +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->drc_id);
-> > +    /* hotplug hooks should check it's enabled before getting this far=
- */
-> > +    g_assert(drc);
-> > +
-> > +    if (hotplugged) {
-> > +        if (spapr->xics_phandle =3D=3D UINT32_MAX) {
-> > +            error_setg(&local_err,
-> > +                       "SLOF didn't update the XICS phandle. PHB hotpl=
-ug cancelled");
-> > +            goto out;
-> > +        }
-> > +        phandle =3D spapr->xics_phandle;
-> > +
-> > +        spapr_phb_reset(dev); =20
->=20
->=20
-> It could be DEVICE_GET_CLASS(dev)->reset(dev) without exporting
-> spapr_phb_reset. Not sure how this fits into the current QEMU coding style
-> though.
->=20
->=20
->=20
-> > +    } else {
-> > +        phandle =3D PHANDLE_XICP;
-> > +    }
-> > +
-> > +    fdt =3D create_device_tree(&fdt_size);
-> > +    ret =3D spapr_populate_pci_dt(sphb, phandle, fdt, &fdt_start_offse=
-t);
-> > +    if (ret < 0) {
-> > +        error_setg(&local_err, "unable to create FDT for %sPHB",
-> > +                   dev->hotplugged ? "hotplugged " : "");
-> > +        goto out;
-> > +    }
-> > +
-> > +    if (hotplugged) {
-> > +        /* generally SLOF creates these, for hotplug it's up to QEMU */
-> > +        _FDT(fdt_setprop_string(fdt, fdt_start_offset, "name", "pci"));
-> > +    }
-> > +
-> > +    spapr_drc_attach(drc, DEVICE(dev), fdt, fdt_start_offset, &local_e=
-rr);
-> > +out:
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        g_free(fdt);
-> > +        return;
-> > +    }
-> > +
-> > +    if (hotplugged) {
-> > +        spapr_hotplug_req_add_by_index(drc);
-> > +    } else if (drc) {
-> > +        spapr_drc_reset(drc);
-> > +    }
-> > +}
-> > +
-> > +void spapr_phb_release(DeviceState *dev)
-> > +{
-> > +    object_unparent(OBJECT(dev));
-> > +}
-> > +
-> > +static void spapr_phb_unplug_request(HotplugHandler *hotplug_dev,
-> > +                                     DeviceState *dev, Error **errp)
-> > +{
-> > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
-> > +    sPAPRDRConnector *drc;
-> > +
-> > +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->drc_id);
-> > +    g_assert(drc);
-> > +
-> > +    if (!spapr_drc_unplug_requested(drc)) {
-> > +        spapr_drc_detach(drc);
-> > +        spapr_hotplug_req_remove_by_index(drc);
-> > +    }
-> > +}
-> > +
-> >  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-> >                                        DeviceState *dev, Error **errp)
-> >  {
-> > @@ -3284,6 +3385,8 @@ static void spapr_machine_device_plug(HotplugHand=
-ler *hotplug_dev,
-> >          spapr_memory_plug(hotplug_dev, dev, node, errp);
-> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
-> >          spapr_core_plug(hotplug_dev, dev, errp);
-> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BR=
-IDGE)) {
-> > +        spapr_phb_plug(hotplug_dev, dev, errp);
-> >      }
-> >  }
-> > =20
-> > @@ -3311,6 +3414,12 @@ static void spapr_machine_device_unplug_request(=
-HotplugHandler *hotplug_dev,
-> >              return;
-> >          }
-> >          spapr_core_unplug_request(hotplug_dev, dev, errp);
-> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BR=
-IDGE)) {
-> > +        if (sms->dr_phb_enabled) {
-> > +            spapr_phb_unplug_request(hotplug_dev, dev, errp);
-> > +        } else {
-> > +            error_setg(errp, "PHB hot unplug not supported on this mac=
-hine");
-> > +        }
-> >      }
-> >  }
-> > =20
-> > @@ -3321,6 +3430,8 @@ static void spapr_machine_device_pre_plug(Hotplug=
-Handler *hotplug_dev,
-> >          spapr_memory_pre_plug(hotplug_dev, dev, errp);
-> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
-> >          spapr_core_pre_plug(hotplug_dev, dev, errp);
-> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BR=
-IDGE)) {
-> > +        spapr_phb_pre_plug(hotplug_dev, dev, errp);
-> >      }
-> >  }
-> > =20
-> > @@ -3328,7 +3439,8 @@ static HotplugHandler *spapr_get_hotplug_handler(=
-MachineState *machine,
-> >                                                   DeviceState *dev)
-> >  {
-> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-> > -        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
-> > +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE) ||
-> > +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
-> >          return HOTPLUG_HANDLER(machine);
-> >      }
-> >      return NULL;
-> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > index 2e1049ce61c7..845fcf70b932 100644
-> > --- a/hw/ppc/spapr_drc.c
-> > +++ b/hw/ppc/spapr_drc.c
-> > @@ -704,6 +704,7 @@ static void spapr_drc_phb_class_init(ObjectClass *k=
-, void *data)
-> >      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
-> >      drck->typename =3D "PHB";
-> >      drck->drc_name_prefix =3D "PHB ";
-> > +    drck->release =3D spapr_phb_release;
-> >  }
-> > =20
-> >  static const TypeInfo spapr_dr_connector_info =3D {
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 157867af8178..c12f71ae3e2d 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1833,7 +1833,7 @@ void spapr_phb_dma_reset(sPAPRPHBState *sphb)
-> >                             sphb->dma_win_size >> SPAPR_TCE_PAGE_SHIFT);
-> >  }
-> > =20
-> > -static void spapr_phb_reset(DeviceState *qdev)
-> > +void spapr_phb_reset(DeviceState *qdev)
-> >  {
-> >      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(qdev);
-> > =20
-> > diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> > index 7837fb0b1110..15799cee4280 100644
-> > --- a/include/hw/pci-host/spapr.h
-> > +++ b/include/hw/pci-host/spapr.h
-> > @@ -120,6 +120,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-> > =20
-> >  void spapr_pci_rtas_init(void);
-> > =20
-> > +void spapr_phb_reset(DeviceState *qdev);
-> > +
-> >  sPAPRPHBState *spapr_pci_find_phb(sPAPRMachineState *spapr, uint64_t b=
-uid);
-> >  PCIDevice *spapr_pci_find_dev(sPAPRMachineState *spapr, uint64_t buid,
-> >                                uint32_t config_addr);
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index f09c54d5bb94..a2f6782bdbbf 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -673,6 +673,7 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr,=
- int shift,
-> >  /* CPU and LMB DRC release callbacks. */
-> >  void spapr_core_release(DeviceState *dev);
-> >  void spapr_lmb_release(DeviceState *dev);
-> > +void spapr_phb_release(DeviceState *dev);
-> > =20
-> >  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
-> >  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
-> >=20
-> >  =20
->=20
->=20
+>  };
+>  
+>  static const int qcode_to_number[] = {
+> @@ -252,6 +274,28 @@ static const int qcode_to_number[] = {
+>      [Q_KEY_CODE_YEN] = 0x7d,
+>      [Q_KEY_CODE_KP_COMMA] = 0x7e,
+>  
+> +    [Q_KEY_CODE_SLEEP] = 0xdf,
+> +    [Q_KEY_CODE_WAKE] = 0xe3,
+> +    [Q_KEY_CODE_CALCULATOR] = 0xa1,
+> +    [Q_KEY_CODE_MAIL] = 0xec,
+> +    [Q_KEY_CODE_COMPUTER] = 0xeb,
+> +
+> +    [Q_KEY_CODE_AC_STOP] = 0xe8,
+> +    [Q_KEY_CODE_AC_BOOKMARKS] = 0xe6,
+> +    [Q_KEY_CODE_AC_BACK] = 0xea,
+> +    [Q_KEY_CODE_AC_FORWARD] = 0xe9,
+> +    [Q_KEY_CODE_AC_HOME] = 0xb2,
+> +    [Q_KEY_CODE_AC_REFRESH] = 0xe7,
+> +    [Q_KEY_CODE_AC_SEARCH] = 0xe5,
+> +
+> +    [Q_KEY_CODE_AUDIONEXT] = 0x99,
+> +    [Q_KEY_CODE_AUDIOPREV] = 0x90,
+> +    [Q_KEY_CODE_AUDIOSTOP] = 0xa4,
+> +    [Q_KEY_CODE_AUDIOPLAY] = 0xa2,
+> +    [Q_KEY_CODE_AUDIOMUTE] = 0xa0,
+> +    [Q_KEY_CODE_VOLUMEDOWN] = 0xae,
+> +    [Q_KEY_CODE_VOLUMEUP] = 0xb0,
 
+Again no MEDIASELECT entry
 
---Sig_/LnuHF12y7hb.6zY+XTNDK+5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> +
+>      [Q_KEY_CODE__MAX] = 0,
+>  };
+>  
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 9c6c3e1a53..9cb15092a7 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -4843,6 +4843,27 @@
+>  # @henkan: since 2.9
+>  # @yen: since 2.9
+>  #
+> +# @sleep: since 2.10
+> +# @wake: since 2.10
+> +# @audionext: since 2.10
+> +# @audioprev: since 2.10
+> +# @audiostop: since 2.10
+> +# @audioplay: since 2.10
+> +# @audiomute: since 2.10
+> +# @volumeup: since 2.10
+> +# @volumedown: since 2.10
+> +# @mediaselect: since 2.10
+> +# @mail: since 2.10
+> +# @calculator: since 2.10
+> +# @computer: since 2.10
+> +# @ac_search: since 2.10
+> +# @ac_home: since 2.10
+> +# @ac_back: since 2.10
+> +# @ac_forward: since 2.10
+> +# @ac_stop: since 2.10
+> +# @ac_refresh: since 2.10
+> +# @ac_bookmarks: since 2.10
+> +#
+>  # Since: 1.3.0
+>  #
+>  ##
+> @@ -4864,7 +4885,12 @@
+>              'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
+>              'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
+>              'ro', 'hiragana', 'henkan', 'yen',
+> -            'kp_comma', 'kp_equals', 'power' ] }
+> +            'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
+> +            'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
+> +            'volumeup', 'volumedown', 'mediaselect',
+> +            'mail', 'calculator', 'computer',
+> +            'ac_search', 'ac_home', 'ac_back', 'ac_forward', 'ac_stop',
+> +            'ac_refresh', 'ac_bookmarks' ] }
+>  
+>  ##
+>  # @KeyValue:
+> -- 
+> 2.9.3
+> 
+> 
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAll6HmMACgkQAvw66wEB28LZjACggRSOJt66GvZC+v/JBmmsvfOz
-W+QAni9heCvWVlD0PUYpWvkILHakE0Hh
-=iNzD
------END PGP SIGNATURE-----
-
---Sig_/LnuHF12y7hb.6zY+XTNDK+5--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
