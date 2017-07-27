@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dagRQ-0004cC-1I
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:54:52 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dagVm-0006HZ-2U
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:59:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dagRP-0004Tw-BF
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:54:52 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:34964)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dagRP-0004Sv-1q
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:54:51 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id c184so101629791wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 03:54:50 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170727104302.GI2555@redhat.com>
-References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
-	<20170725131931.GC23343@stefanha-x1.localdomain>
-	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-	<20170726112633.GE18489@stefanha-x1.localdomain>
-	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-	<20170727104302.GI2555@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1dagVl-0000Fb-6q
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:59:22 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Jul 2017 11:54:29 +0100
-Message-ID: <CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+Date: Thu, 27 Jul 2017 11:59:05 +0100
+Message-Id: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.10 0/5] M profile MPU bugfixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +17,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 27 July 2017 at 11:43, Daniel P. Berrange <berrange@redhat.com> wrote:
-> Maybe I'm missing something, but aren't all these things
-> already possible via either the statically defined tracepoints
-> QEMU exposes, or by placing dynamic tracepoints on arbitrary
-> code locations using dtrace/systemtap/lttng-ust.
+This patchset fixes some bugs in the M profile MPU code:
+ * the guest shouldn't be able to make system space executable
+ * PPB region accesses should not be subject to MPU lookups
+ * we were not resetting the PMSAv7 MPU state for M profile CPUs
+ * we weren't migrating the MPU_RNR state
 
-Last time I looked we didn't have tracepoints on most of
-the events you'd be interested in.
-
-That said, yes, I was going to ask if we could do this via
-leveraging the tracepoint infrastructure and whatever scripting
-facilities it provides. Are there any good worked examples of
-this sort of thing? Can you do it as an ordinary non-root user?
+The renaming from cp15.c6_rgnr to pmsav7.rnr is not strictly
+necessary for 2.10, but it doesn't affect many places in the code
+and it restores the invariant that no mutable M profile CPU
+state is stored in env->cp15.something fields.
 
 thanks
 -- PMM
+
+Peter Maydell (5):
+  target/arm: Don't do MPU lookups for addresses in M profile PPB region
+  target/arm: Don't allow guest to make System space executable for M
+    profile
+  target/arm: Rename cp15.c6_rgnr to pmsav7.rnr
+  target/arm: Move PMSAv7 reset into arm_cpu_reset() so M profile MPUs
+    get reset
+  target/arm: Migrate MPU_RNR register state for M profile cores
+
+ hw/intc/armv7m_nvic.c | 14 +++++------
+ target/arm/cpu.c      | 14 +++++++++++
+ target/arm/cpu.h      |  3 +--
+ target/arm/helper.c   | 67 +++++++++++++++++++++++++++++++++++----------------
+ target/arm/machine.c  | 30 ++++++++++++++++++++++-
+ 5 files changed, 97 insertions(+), 31 deletions(-)
+
+-- 
+2.7.4
