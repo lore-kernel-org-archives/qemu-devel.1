@@ -1,26 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1daYUk-00064O-EO
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:47 -0400
+	(envelope-from <peterx@redhat.com>) id 1daYVh-0006Vh-VX
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1daYUh-0005yT-QQ
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:46 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:60465)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1daYUg-0005wp-N9
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:25:43 -0400
-Date: Thu, 27 Jul 2017 10:25:34 +0800 (CST)
-Message-ID: <201707271025341558926@zte.com.cn>
-References: 201707260928202175266@zte.com.cn,
-	c0295459-5ff2-3efc-412d-a564d8bf980d@redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V3=5D_rtc=3A_fix_a_infinite_loop?=
- =?utf-8?q?_inwindowsvmstartup?=
+	(envelope-from <peterx@redhat.com>) id 1daYVc-0006Mk-VV
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:26:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1daYVc-0006M8-MB
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 22:26:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E097D69A2
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 02:26:32 +0000 (UTC)
+Date: Thu, 27 Jul 2017 10:19:17 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170727021917.GN1595@pxdev.xzpeter.org>
+References: <1499847223-8078-1-git-send-email-peterx@redhat.com>
+	<1499847223-8078-5-git-send-email-peterx@redhat.com>
+	<0850f338-98a2-614a-c8bd-3407c9b5a485@redhat.com>
+	<20170714043241.GK27284@pxdev.xzpeter.org>
+	<14784c80-2b88-1994-9d50-7d39dc72a808@redhat.com>
+	<20170717015327.GQ27284@pxdev.xzpeter.org>
+	<20170726233613-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170726233613-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] intel_iommu: implement mru list for
+ iotlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +40,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: liu.yi24@zte.com.cn, qemu-devel@nongnu.org, mst@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-PiBPbiAyNi8wNy8yMDE3IDAzOjI4LCBwZW5nLmhhbzJAenRlLmNvbS5jbiB3cm90ZToNCg0KDQoN
-Cg0KPiA+IA0KPiA+IA0KPiA+IHdoZW4gdGhlIHByb2JsZW0gaGFwcGVucyAsIHdpbmRvd3Mga2Vy
-bmVsIGlzIGNoZWNraW5nICB3aGV0aGVyIFJFR19BX1VJUCBpcyANCj4gPiBjaGFuZ2luZyBhZnRl
-ciBwZXJpb2RpYyB0aW1lciBoYXMgc3RvcHBlZC4gd2luZG93cyBrZXJuZWwgYWNjZXNzIFJFR19B
-DQo+ID4gYWNjb3JkaW5nIHRvIElOQiBpbnN0cnVuY3Rpb24gYW5kIGl0IHdpbGwgc3BlbmQgc2V2
-ZXJhbCBtaWNyb3NlY29uZHMgYmVjYXVzZQ0KPiA+IG9mIFZNX0VYSVQuIA0KDQo+IEEgdm1leGl0
-IHRvIHRoZSBSVEMgdGltZXIgc2hvdWxkIGJlIGFyb3VuZCAxMC4wMDAgY2xvY2sgY3ljbGVzLCB3
-aGljaCBpcw0KPiBsZXNzIHRoYW4gYSBtaWNyb3NlY29uZC4NCkkgdXNlIHBlcmYgdG9vbHMgZ2V0
-dGluZyBkYXRhKHdpbmRvd3MgVk0pDQoNCklPIFBvcnQgICBBY2Nlc3MgICAgU2FtcGxlcyAgU2Ft
-cGxlcyUgICAgIFRpbWUlICAgTWluIFRpbWUgICBNYXggVGltZSAgICAgICAgIEF2ZyB0aW1lIA0K
-DQoweDcxOiAgICAgIFBJTiAgICAgICAgICAgMTI2ICAgICAgICAgNTYuNzYlICAgICAgIDMyLjYy
-JSAgICAgICAgMXVzICAgICAgICAgMnVzICAgICAgICAgICAgICAxLjgzdXMgKCArLSAgIDAuNjIl
-ICkNCg0KDQoweDcwOiAgICBQT1VUICAgICAgICAgNjMgICAgICAgICAgMjguMzglICAgICAgICA1
-MS41NiUgICAgICAgIDR1cyAgICAgICAgIDE1dXMgICAgICAgICAgICAgNS43OHVzICggKy0gICAz
-LjEyJSApDQoNCkJ1dCBJJ20gbm90IHN1cmUgaXQgaXMgYWNjdXJhdGUuDQoNCj4gPiB1cGRhdGUg
-dGltZXIgaGFzIGNoYW5nZWQgdG8gYSBsb25nIGV4cGlyZSB0aW1lIChhcyBhbGFybSB0aW1lcilv
-biB0aGUNCj4gPiBvbmUgaGFuZC4NCj4gPiANCj4gPiBvbiB0aGUgb3RoZXIgaGFuZCAgMjQ0IG1p
-Y3Jvc2Vjb25kcyBpbiBvbmUgc2Vjb25kIGlzIHRvbyBzaG9ydCB0byBoaXQNCj4gPiB0aGUgcmVn
-aW9uLg0KPiA+IA0KPiA+IHdpbmRvd3Mga2VybmVsIG1heSBjaGVjayBSRUdfQV9VSVAgd2hlbiBj
-b25zaWRlcmluZyBSVEMgc29tZXRoaW5nIHdyb25nLg0KPiA+IG1hbnkgd2luZG93cyBWTSByZWJv
-b3QgYXQgdGhlIHNhbWUgdGltZSBhbmQgcnRjIHBlcmlvZGljIHRpbWVyIG1heSBkZWxheQ0KPiA+
-IGJhZGx5Li4NCg0KPiBEb2VzIFdpbmRvd3MgZG8gdGhpcyB0ZXN0IHdoZW4gSHlwZXItViBlbmds
-aWdodGVubWVudHMgYXJlIGVuYWJsZWQNCj4gKGVzcGVjaWFsbHkgaHYtcmVsYXhlZCk/DQp5ZXMg
-LEkgZW5hYmxlIGh2LXJlbGF4ZWQuaW4gbXkgd2luZG93cyBWTS5CdXQgSSdtIG5vdCBzdXJlIHRo
-ZSBpbnRlcmNvbm5lY3Rpb24gYmV0d2VlbiB0aGVtLg0KDQo+IEl0IHNlZW1zIHRvIGJlIGEgV2lu
-ZG93cyBpc3N1ZSB0byBtZS4gIEknbSBub3Qgc3VyZSBhZGRpbmcgaGFja3MgdG8gdGhlDQoNCj4g
-ZGV2aWNlIG1vZGVsIGlzIHRoZSByaWdodCB0aGluZyB0byBkbywgZXNwZWNpYWxseSBiZWNhdXNl
-IEkgZG9uJ3QNCj4gdW5kZXJzdGFuZCB3aHkgeW91ciBmaXggd29ya2VkLg0KDQoxLiBndWVzdCBj
-bG9zZXMgcGVyaW9kaWMgdGltZXLvvIxmcm9tIHRoZW4gb24gcnRjIGRvbid0IHNlbmQgaW50ZXJy
-dXB0IGFueW1vcmUgYW5kIG5vIHJ0YyBoYW5kbGVyIGNhbiBydW4gdG8gcmVhZA0KDQoNCiAgIFJU
-Q19SRUdfQ++8iHRoaXMgcmVhZCBzZXQgUlRDX1JFR19DID0gMCwgY2xlYXIgUkVHX0NfVUYpDQoN
-Cg0KMi4gdXBkYXRlIHRpbWVyIGV4cGlyZXMsIHJ0Y191cGRhdGVfdGltZXIgY2xlYXJzIFJFR19B
-X1VJUCwgYW5kIHNldCBSRUdfQ19VRg0KDQoNCjMuIGJlY2F1c2UgUkVHX0NfVUYgaXMgc2V0dGVk
-LCBjaGVja191cGRhdGVfdGltZXIgc2V0cyB1cGRhdGVfdGltZXIncyBleHBpcmUgdGltZSB0byBu
-ZXh0X2FsYXJtX3RpbWUsIHdoaWNoIGlzIA0KDQoNCiAgIG92ZXIgdGVuIGhvdXJzDQoNCg0KNC4g
-Z3Vlc3QgY2hlY2tzIHRoYXQgUkVHX0FfVUlQIGNoYW5nZXMgZnJvbSAwIHRvIDEgaW4gYSBpbmZp
-bnRlIGxvb3AgKHdlIGRvbid0IGtub3cgd2h5IHdpbmRvd3Mga2VybmVsIGRvZXMgdGhpcykgYnkg
-cmVhZCBSVENfUkVHX0ENCg0KDQo1LiB1cGRhdGVfaW5fcHJvZ3Jlc3MgY2FsbGVkIGZyb20gY21v
-c19pb3BvcnRfcmVhZA0KDQoNCjYuIGJlYXVzZSB1cGRhdGVfdGltZXIgaXMgc3dpdGNoZWQgdG8g
-YWxhcm0gdGltZXIsIHdoaWNoIGhhcyBhIHRvbyBiaWcgZXhwaXJlIHRpbWUgdG8gc2F0aXNmZXMg
-dGhlIGZvd2xsb3dpbmcgY29uZGl0aW9uOg0KDQoNCglpZiAocWVtdV9jbG9ja19nZXRfbnMocnRj
-X2Nsb2NrKSA+PQ0KDQoNCiAgICAgICAgICAgIChuZXh0X3VwZGF0ZV90aW1lIC0gVUlQX0hPTERf
-TEVOR1RIKSkgew0KDQoNCiAgICAgICAgICAgIHMtPmNtb3NfZGF0YVtSVENfUkVHX0FdIHw9IFJF
-R19BX1VJUA0KDQoNCiAgICAgICAgICAgIHJldHVybiAxDQoNCg0KICAgICAgICB9DQoNCg0KNy4g
-dXBkYXRlX2luX3Byb2dyZXNzJ3Mgc2Vjb25kIGNvbmRpdGlvbiBkb24ndCBzYXRpc2ZlczoNCg0K
-DQoJaWYgKChndWVzdF9uc2VjICUgTkFOT1NFQ09ORFNfUEVSX1NFQ09ORCkgPj0NCg0KDQogICAg
-ICAgIChOQU5PU0VDT05EU19QRVJfU0VDT05EIC0gVUlQX0hPTERfTEVOR1RIKSkgew0KDQoNCiAg
-ICAgICAgcmV0dXJuIDENCg0KDQogICAgfQ0KDQoNCiAgIGJlY2F1c2Ugd2hlbiBtYW55IHZtcyBz
-dGFydHVwLCBpbmIgaW5zdHJ1Y3Rpb24gd2FzdGVzIG11Y2ggbW9yZSB0aW1lIHRoYW4gbm9ybWFs
-IHNpdHVhdGlvbiBhbmQgDQoNCg0KICAgZ3Vlc3RfbnNlYyAlIE5BTk9TRUNPTkRTX1BFUl9TRUNP
-TkQgaXMgbmVhcmx5IDwgTkFOT1NFQ09ORFNfUEVSX1NFQ09ORCAtIFVJUF9IT0xEX0xFTkdUSCBh
-bHdheXMuDQoNCg0KOC4gZmluYWxseSwgUkVHX0FfVUlQIGlzIGFsd2F5cyBjbGVhcmVkLCBSRUdf
-Q19VRiBpcyBhbHdheXMgc2V0LCB1cGRhdGVfdGltZXIgaXMgYWx3YXlzIGFsYXJtIHRpbWVyLCAN
-Cg0KDQogICBndWVzdCBpcyBhbHdheXMgY2hlY2tpbmcgUkVHX0FfVUlQLCBhbmQgZ3Vlc3QgaHVu
-ZyB1cC4=
+On Wed, Jul 26, 2017 at 11:37:13PM +0300, Michael S. Tsirkin wrote:
+> On Mon, Jul 17, 2017 at 09:53:27AM +0800, Peter Xu wrote:
+> > On Fri, Jul 14, 2017 at 03:28:09PM +0800, Jason Wang wrote:
+> > >=20
+> > >=20
+> > > On 2017=E5=B9=B407=E6=9C=8814=E6=97=A5 12:32, Peter Xu wrote:
+> > > >On Thu, Jul 13, 2017 at 04:48:42PM +0800, Jason Wang wrote:
+> > > >>
+> > > >>On 2017=E5=B9=B407=E6=9C=8812=E6=97=A5 16:13, Peter Xu wrote:
+> > > >>>It is not wise to disgard all the IOTLB cache when cache size re=
+aches
+> > > >>>max, but that's what we do now. A slightly better (but still sim=
+ple) way
+> > > >>>to do this is, we just throw away the least recent used cache en=
+try.
+> > > >>>
+> > > >>>This patch implemented MRU list algorithm for VT-d IOTLB. The ma=
+in logic
+> > > >>>is to maintain a Most Recently Used list for the IOTLB entries. =
+The hash
+> > > >>>table is still used for lookup, though a new list field is added=
+ to each
+> > > >>>IOTLB entry for a iotlb MRU list. For each active IOTLB entry, i=
+t's both
+> > > >>>in the hash table in s->iotlb, and also linked into the MRU list=
+ of
+> > > >>>s->iotlb_head. The hash helps in fast lookup, and the MRU list h=
+elps in
+> > > >>>knowing whether the cache is still hot.
+> > > >>>
+> > > >>>After we have such a MRU list, replacing all the iterators of IO=
+TLB
+> > > >>>entries by using list iterations rather than hash table iteratio=
+ns.
+> > > >>Any reason of doing this, I thought hashtable was even a little b=
+it faster?
+> > > >Could I ask why?
+> > > >
+> > > >I thought they are merely the same (when iterating all the items)?
+> > > >
+> > >=20
+> > > Ok, looks like I was wrong, but it they are merely the same, why bo=
+ther?
+> >=20
+> > Because imho looping over list needs fewer LOCs and is also more
+> > direct. E.g., for domain flush, hash needs this:
+> >=20
+> > static gboolean vtd_hash_remove_by_domain(gpointer key, gpointer valu=
+e,
+> >                                           gpointer user_data)
+> > {
+> >     VTDIOTLBEntry *entry =3D (VTDIOTLBEntry *)value;
+> >     uint16_t domain_id =3D *(uint16_t *)user_data;
+> >     return entry->domain_id =3D=3D domain_id;
+> > }
+> >=20
+> > Then:
+> >=20
+> >     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
+> >                                 &domain_id);
+> >=20
+> > For list it is only:
+> >=20
+> >     FOREACH_IOTLB_SAFE(entry, s, entry_n) {
+> >         if (entry->domain_id =3D=3D domain_id) {
+> >             vtd_iotlb_remove_entry(s, entry);
+> >         }
+> >     }
+> >=20
+> > Thanks,
+>=20
+> Well the LOC seems to have gone up with this patch.
+> If we are trying to simplify code, please state this
+> in commit log.
+
+Ok. I can split the patch into two (one to introduce MRU list, one to
+replace the iterations of hash tables) if it will be needed in the
+future. Currently since we don't have plan to merge it, I'll put it
+aside for now. Thanks.
+
+--=20
+Peter Xu
