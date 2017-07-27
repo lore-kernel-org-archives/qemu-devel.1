@@ -1,28 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1daWgc-00017F-Sl
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:29:56 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daWs0-0004ly-AU
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1daWgY-0001Gs-QX
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:29:54 -0400
-Received: from mga14.intel.com ([192.55.52.115]:11335)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1daWgY-0001FZ-Fm
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:29:50 -0400
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Thu, 27 Jul 2017 00:29:45 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B59C79E@SHSMSX103.ccr.corp.intel.com>
-References: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
-	<1501120851-4314-2-git-send-email-changpeng.liu@intel.com>
-	<20170726103513.GB18489@stefanha-x1.localdomain>
-In-Reply-To: <20170726103513.GB18489@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1daWrv-0008Et-EE
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:41:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38792)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1daWrv-0008Dd-4O
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 20:41:35 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6R0fVJc054747
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 20:41:33 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxy1xa8ju-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 20:41:33 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 26 Jul 2017 20:41:31 -0400
+Date: Thu, 27 Jul 2017 08:41:26 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
+	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
+	<20170726030125.GO7483@bjsdjshi@linux.vnet.ibm.com>
+	<cf37838e-d92e-408e-2cc1-662ad5c89b29@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] vhost-user-blk: introduce a new
- vhost-user-blk host device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf37838e-d92e-408e-2cc1-662ad5c89b29@linux.vnet.ibm.com>
+Message-Id: <20170727004126.GS7483@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
+ for TIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,194 +44,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "mst@redhat.com" <mst@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-26 13:38:33 +0200]:
 
+> 
+> 
+> On 07/26/2017 05:01 AM, Dong Jia Shi wrote:
+> > Hello Halil,
+> > 
+> > * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-26 00:44:42 +0200]:
+> > 
+> >> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
+> >> contain zeros.  Bits 0-3 are already covered by cmd_code validity
+> >> checking, and bit 32 is covered by the CCW address checking.
+> >>
+> >> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
+> >> check for the absence of certain flags.  Let's fix this.
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> ---
+> >>  hw/s390x/css.c | 3 ++-
+> >>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index d17e21b7af..1f04ce4a1b 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+> >>              ret = -EINVAL;
+> >>              break;
+> >>          }
+> >> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
+> >> +        if (ccw.flags || ccw.count) {
+> >> +            /* We have already sanitized these if fmt 0. */
+> > ccw0 does not have the same restrictions as ccw1. We don't sanitize
+> > these for ccw0.
+> > 
+> 
+> Yes you have misunderstood. For fmt 1 these bits have to be zero
+> otherwise a program-check condition is to be recognized. Thus we don't
+> sanitize for fmt 1.
+> 
+> For fmt 0 these bits are ignored. We sanitize them in
+> for some time now by setting them to zero when making a CCW1
+> out of an CCW0. If we would recognize a program-check for
+> fmt 0 that would be wrong.
+Yup, I know this.
 
-> -----Original Message-----
-> From: Stefan Hajnoczi [mailto:stefanha@redhat.com]
-> Sent: Wednesday, July 26, 2017 6:35 PM
-> To: Liu, Changpeng <changpeng.liu@intel.com>
-> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; felipe@nutanix.com;
-> mst@redhat.com
-> Subject: Re: [PATCH 1/2] vhost-user-blk: introduce a new vhost-user-blk h=
-ost
-> device
->=20
-> On Thu, Jul 27, 2017 at 10:00:50AM +0800, Changpeng Liu wrote:
-> > +static void vhost_user_blk_set_config(VirtIODevice *vdev, const uint8_=
-t
-> *config)
-> > +{
-> > +    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> > +    struct virtio_blk_config blkcfg;
-> > +
-> > +    memcpy(&blkcfg, config, sizeof(blkcfg));
-> > +
-> > +    if (blkcfg.wce !=3D s->config_wce) {
-> > +        error_report("vhost-user-blk: does not support the operation")=
-;
->=20
-> If vhost-user-blk doesn't support the operation then please remove the
-> VIRTIO_BLK_F_CONFIG_WCE feature bit.  That way the guest knows it cannot
-> modify this field.
->=20
-> > +static void vhost_user_blk_device_realize(DeviceState *dev, Error **er=
-rp)
-> > +{
-> > +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> > +    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> > +    int ret;
-> > +    uint64_t size;
-> > +
-> > +    if (!s->chardev.chr) {
-> > +        error_setg(errp, "vhost-user-blk: chardev is mandatary");
->=20
-> mandatory
->=20
-> > +        return;
-> > +    }
-> > +
-> > +    if (!s->num_queues) {
-> > +        error_setg(errp, "vhost-user-blk: invalid number of IO queues"=
-);
-> > +        return;
-> > +    }
-> > +
-> > +    if (!s->queue_size) {
-> > +        error_setg(errp, "vhost-user-blk: invalid count of the IO queu=
-e");
->=20
-> "count of the IO queue" sounds like number of queues.  I suggest saying
-> "queue size must be non-zero".
->=20
-> > +        return;
-> > +    }
-> > +
-> > +    if (!s->size) {
-> > +        error_setg(errp, "vhost-user-blk: block capacity must be assig=
-ned,"
-> > +                  "size can be specified by GiB or MiB");
-> > +        return;
-> > +    }
-> > +
-> > +    ret =3D qemu_strtosz_MiB(s->size, NULL, &size);
-> > +    if (ret < 0) {
-> > +        error_setg(errp, "vhost-user-blk: invalid size %s in GiB/MiB",=
- s->size);
-> > +        return;
-> > +    }
-> > +    s->capacity =3D size / 512;
-> > +
-> > +    /* block size with default 512 Bytes */
-> > +    if (!s->blkcfg.logical_block_size) {
-> > +        s->blkcfg.logical_block_size =3D 512;
-> > +    }
-> > +
-> > +    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-> > +                sizeof(struct virtio_blk_config));
-> > +    virtio_add_queue(vdev, s->queue_size, vhost_user_blk_handle_output=
-);
-> > +
-> > +    s->dev.nvqs =3D s->num_queues;
-> > +    s->dev.vqs =3D g_new(struct vhost_virtqueue, s->dev.nvqs);
->=20
-> Please test multi-queue, it's currently broken.  virtio_add_queue() must
-> be called for each queue.
-Yes, should move virtio_add_queue into loop.
->=20
-> > +    s->dev.vq_index =3D 0;
-> > +    s->dev.backend_features =3D 0;
-> > +
-> > +    ret =3D vhost_dev_init(&s->dev, (void *)&s->chardev,
->=20
-> The compiler automatically converts any pointer type to void * without a
-> warning in C.  (This is different from C++!)
->=20
-> The (void *) cast can be dropped.
->=20
-> > +                         VHOST_BACKEND_TYPE_USER, 0);
-> > +    if (ret < 0) {
-> > +        error_setg(errp, "vhost-user-blk: vhost initialization failed:=
- %s",
-> > +                   strerror(-ret));
->=20
-> If realize fails unrealize() will not be called.  Cleanup must be
-> performed here.
->=20
-> > +        return;
-> > +    }
-> > +}
-> > +
-> > +static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **=
-errp)
-> > +{
-> > +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> > +    VHostUserBlk *s =3D VHOST_USER_BLK(dev);
-> > +
-> > +    vhost_user_blk_set_status(vdev, 0);
-> > +    vhost_dev_cleanup(&s->dev);
-> > +    g_free(s->dev.vqs);
-> > +    virtio_cleanup(vdev);
-> > +}
-> > +
-> > +static void vhost_user_blk_instance_init(Object *obj)
-> > +{
-> > +    VHostUserBlk *s =3D VHOST_USER_BLK(obj);
-> > +
-> > +    device_add_bootindex_property(obj, &s->bootindex, "bootindex",
-> > +                                  "/disk@0,0", DEVICE(obj), NULL);
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_vhost_user_blk =3D {
-> > +    .name =3D "vhost-user-blk",
-> > +    .minimum_version_id =3D 2,
-> > +    .version_id =3D 2,
->=20
-> Why is version_id 2?  There has never been a vhost-user-blk device in
-> qemu.git before, so I would expect version to be 1.
->=20
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_VIRTIO_DEVICE,
-> > +        VMSTATE_END_OF_LIST()
-> > +    },
-> > +};
-> > +
-> > +static Property vhost_user_blk_properties[] =3D {
-> > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
-> > +    DEFINE_BLOCK_PROPERTIES(VHostUserBlk, blkcfg),
->=20
-> DEFINE_BLOCK_PROPERTIES cannot be used directly because it includes the
-> 'drive' (blkcfg.blk) parameter.  The command-line should not allow a
-> drive=3D parameter.
->=20
-> Also, parameters like the discard granularity, optimal I/O size, logical
-> block size, etc can be initialized to sensible defaults by QEMU's block
-> layer when drive=3D is used.  Since you are bypassing QEMU's block layer
-> there is no way for QEMU to set good defaults.
->=20
-> Are you relying on the managment tools populating these parameters with
-> the correct values from the vhost-user-blk process?  Or did you have
-> some other mechanism in mind?
-Actually for this part and your comments about block resize, I think maybe =
-add several
-additional vhost user messages such like: VHOST_USER_GET_BLK_CFG/VHOST_USER=
-_SET_BLK_CFG
-makes the code more clear, I'm okay to add such messages.
->=20
-> > +    DEFINE_BLOCK_CHS_PROPERTIES(VHostUserBlk, blkcfg),
-> > +    DEFINE_PROP_STRING("size", VHostUserBlk, size),
->=20
-> virtio-blk supports online resize.  QEMU and the vhost-user-blk process
-> need a way to exchange disk capacity information for online resize.
->=20
-> Please add the necessary vhost-user protocol messages now so size
-> information can be automatically exchanged and updated for resize.
->=20
-> > +typedef struct VHostUserBlk {
-> > +    VirtIODevice parent_obj;
-> > +    CharBackend chardev;
-> > +    Error *migration_blocker;
->=20
-> This field is unused, please drop it.
+> 
+> The comment tells us why this code is good for CCW0 too,
+> and why can we omit sch->ccw_fmt_1 from the conditon.
+Ahh, I see the point now. Yes, I misunderstood.
+
+Another point is we have translated ccw0 to ccw1. So here we only focus
+on handling ccw1 stuff. Mentioning ccw0 seems a little redundant.
+
+Anyway, I will leave this to you to decide. No problem from my side now.
+
+> 
+> Regards,
+> Halil
+> 
+> > (This comment is still here. Did I misunderstand things? :)
+> > 
+> >>              ret = -EINVAL;
+> >>              break;
+> >>          }
+> >> -- 
+> >> 2.11.2
+> >>
+> > 
+> > With the comment removed:
+> > Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > 
+> 
+> 
+
+-- 
+Dong Jia Shi
