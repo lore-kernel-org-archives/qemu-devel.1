@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dakTB-0005aS-M2
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:12:58 -0400
+	(envelope-from <asegundo@redhat.com>) id 1dakWD-0006tJ-Kn
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dakT8-0003f8-Ef
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:12:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dakT8-0003dS-5M
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:12:54 -0400
-Date: Thu, 27 Jul 2017 17:12:45 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170727171245.37bb506c@nial.brq.redhat.com>
-In-Reply-To: <20170726175010.GH20793@localhost.localdomain>
-References: <1501049917-4701-1-git-send-email-wang.yi59@zte.com.cn>
-	<1501049917-4701-2-git-send-email-wang.yi59@zte.com.cn>
-	<20170726140114.GF20793@localhost.localdomain>
-	<20170726162754.2e445d9a@nial.brq.redhat.com>
-	<20170726175010.GH20793@localhost.localdomain>
+	(envelope-from <asegundo@redhat.com>) id 1dakW9-00060N-7N
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:16:05 -0400
+Received: from mail-io0-f173.google.com ([209.85.223.173]:38858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dakW9-0005zw-2K
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:16:01 -0400
+Received: by mail-io0-f173.google.com with SMTP id g13so80104487ioj.5
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:16:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hmp: dump ids including socket-id,
- core-id and so on for 'info registers'
+In-Reply-To: <CALAZnb0+=cYExGKszgROeA1TrpXc8zbXP_=+90jCWA70xMHHyw@mail.gmail.com>
+References: <20170724124438.27344-1-apahim@redhat.com>
+	<20170724124438.27344-2-apahim@redhat.com>
+	<20170725133708.GE23343@stefanha-x1.localdomain>
+	<fe45a297-3f65-e212-90fc-33dd6d48a2f0@redhat.com>
+	<20170726173543.GC3600@stefanha-x1.localdomain>
+	<CALAZnb0+=cYExGKszgROeA1TrpXc8zbXP_=+90jCWA70xMHHyw@mail.gmail.com>
+From: Amador Pahim <apahim@redhat.com>
+Date: Thu, 27 Jul 2017 17:15:59 +0200
+Message-ID: <CALAZnb2x4uPQEj2chmebFVDMQO-n7adzAK-0e1rFFMwE3cWb-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu.py: make 'args' public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Yi Wang <wang.yi59@zte.com.cn>, dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Wed, 26 Jul 2017 14:50:10 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Wed, Jul 26, 2017 at 04:27:54PM +0200, Igor Mammedov wrote:
-> > On Wed, 26 Jul 2017 11:01:14 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Wed, Jul 26, 2017 at 02:18:36AM -0400, Yi Wang wrote:  
-> > > > This patch add output of CPUs' socket-id, core-id, thread-id and
-> > > > apic-id for 'info registers', which can be used for querying other
-> > > > hmp commands.
-> > > > 
-> > > > Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> > > > Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
-> > > > ---
-> > > >  target/i386/helper.c | 8 ++++++++
-> > > >  1 file changed, 8 insertions(+)
-> > > > 
-> > > > diff --git a/target/i386/helper.c b/target/i386/helper.c
-> > > > index f63eb3d..a52f300 100644
-> > > > --- a/target/i386/helper.c
-> > > > +++ b/target/i386/helper.c
-> > > > @@ -416,6 +416,14 @@ void x86_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-> > > >      int eflags, i, nb;
-> > > >      char cc_op_name[32];
-> > > >      static const char *seg_name[6] = { "ES", "CS", "SS", "DS", "FS", "GS" };
-> > > > +    APICCommonState *s = APIC_COMMON(cpu->apic_state);
-> > > > +
-> > > > +    if (!s) {
-> > > > +        cpu_fprintf(f, "local apic state not available\n");
-> > > > +        return;
-> > > > +    }   
-> > > 
-> > > This breaks "info registers" on 486:
-> > > 
-> > >   $ ./x86_64-softmmu/qemu-system-x86_64 -cpu 486 -display none -monitor stdio
-> > >   QEMU 2.9.90 monitor - type 'help' for more information
-> > >   (qemu) info registers
-> > >   local apic state not available
-> > >   (qemu)
-> > > 
-> > > You can simply use X86CPU::apic_id.  The field is set to a consistent value
-> > > even if there's no guest-visible APIC, because we use it as a VCPU identifier
-> > > internally.
-> > > 
-> > > However, I'm not sure "info registers" is the right place to print this info.
-> > > I think "info cpus" would be a more obvious place, but it would probably make
-> > > its output too long.
-> > > We could implement something like "info cpus -v", but: the "apic-id" info would
-> > > be redundant as soon as we replace "CPU #<cpu_index>" with "CPU #<arch_id>",  
-> > lets do it in 'info registers' for now, it looks like obvious place to display
-> > yet another cpu register.  
-> 
-> I think the APIC ID is useful to be printed by "info cpus" and
-> "info registers", but socket/core/thread IDs don't belong to
-> "info registers" and can be printed by "info qtree".
-> 
-> But I don't see a point in adding APIC ID temporarily to "info
-> registers" if it will be made redundant before the next release
-> (hopefully) when we start using arch_id on the "CPU #%d" lines.
-> (It is already too late for 2.10.)
-we can't switch to arch_id unless it's done for all related commands in one go.
-
-> 
-> > 
-> >   
-> > > and other details like socket/core/thread could just appear on "info qtree".  
-> > cpus are not displayed in 'info qtree'  
-> 
-> We can fix that.
-qtree is based on qdev bus hierarchy and CPUs (at least for i386 are bus-less),
-not sure I'd like to back and tie them to some 'bus' again
+On Thu, Jul 27, 2017 at 9:39 AM, Amador Pahim <apahim@redhat.com> wrote:
+> On Wed, Jul 26, 2017 at 7:35 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Tue, Jul 25, 2017 at 11:30:16AM -0400, Cleber Rosa wrote:
+>>> On 07/25/2017 09:37 AM, Stefan Hajnoczi wrote:
+>>> > On Mon, Jul 24, 2017 at 02:44:37PM +0200, Amador Pahim wrote:
+>>> >> Signed-off-by: Amador Pahim <apahim@redhat.com>
+>>> >> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>> >> ---
+>>> >>  scripts/qemu.py               | 10 +++++-----
+>>> >>  tests/qemu-iotests/iotests.py | 18 +++++++++---------
+>>> >>  2 files changed, 14 insertions(+), 14 deletions(-)
+>>> >
+>>> > Please don't do this, it encourages code duplication.  Now arbitrary
+>>> > users can start accessing the public field directly instead of adding a
+>>> > reusable interfaces like add_monitor_telnet(), add_fd(), etc.
+>>> >
+>>>
+>>> Judging from tests/qemu-iotests/iotests.py:VM and your comment above, I
+>>> assume you see value in simple wrappers such as:
+>>>
+>>>    def add_device(self, opts):
+>>>         self._args.append('-device')
+>>>         self._args.append(opts)
+>>>         return self
+>>>
+>>> I honestly do not see any value here.  I do see value in other wrappers,
+>>> such as add_drive(), in which default values are there for convenience,
+>>> and a drive count is kept.  In the end, my point is that the there are
+>>> cases when a wrapper is just an annoyance and provides nothing more than
+>>>  the illusion of a better design.
+>>
+>> I don't see much value in simple wrappers either besides method chaining
+>> (more on that below).
+>>
+>> Getting back to this patch, I can only review patches in the context of
+>> the current code base.  I don't know future plans you may have.  The
+>> change may make sense together with other new changes that use a public
+>> args field in a useful way - it just doesn't make sense the way it has
+>> been presented in isolation.
+>
+> We disagree on that. The current patch makes sense by itself. It
+> contains the changes in iotests.py, which has an instance of
+> QEMUMachine and is using the self._args.
+> My point mentioning the work to come is to provide yet another use case.
+Actually taking another look to the iotests.py, it is not
+instantiating the QEMUMachine, but subclassing it. So yes, this path
+will wait till a valid use case for it. Thanks.
+>
+>>
+>> About method chaining, the current code seems to be written with method
+>> chaining in mind:
+>>
+>> https://en.wikipedia.org/wiki/Method_chaining#Python
+>>
+>> If all arguments are methods then everything can be chained:
+>>
+>>   (vm.add_fd(fd.fileno(), 1, 'image0')
+>>      .add_drive('fd:image0', interface='none')
+>>      .add_device('virtio-blk-pci,drive=drive0'))
+>>
+>> So I guess there is a small value in having add_device().  That said,
+>> tests don't take advantage of method chaining much.
