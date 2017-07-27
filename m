@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1daoED-0004Aj-Pj
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:13:47 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1daoEi-0004yK-AL
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:14:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1daoEA-0005la-Gq
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:13:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38762)
+	(envelope-from <sstabellini@kernel.org>) id 1daoEf-0006Bq-NB
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:14:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1daoEA-0005kq-7v
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:13:42 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAFEAcA9Odi+ZtT1FmDoD8pjk=cgHS54BOVwopqXRi+TTf4PA8g@mail.gmail.com>
-	(Peter Maydell's message of "Fri, 21 Jul 2017 10:29:10 +0100")
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-	<20170717185830.GD31820@work-vm>
-	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
-	<20170720100232.GA2456@work-vm>
-	<408f467d-08dc-bb3e-0bfc-9825ca07107c@adacore.com>
-	<20170721091337.GA2133@work-vm>
-	<CAFEAcA9Odi+ZtT1FmDoD8pjk=cgHS54BOVwopqXRi+TTf4PA8g@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 27 Jul 2017 21:13:40 +0200
-Message-ID: <87shhh7kwr.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1daoEf-00068X-HH
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 15:14:13 -0400
+Date: Thu, 27 Jul 2017 12:14:10 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170727060241.GA9327@aepfle.de>
+Message-ID: <alpine.DEB.2.10.1707271204500.22381@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1706271456310.24648@sstabellini-ThinkPad-X260>
+	<1498601083-11799-1-git-send-email-sstabellini@kernel.org>
+	<1498601083-11799-3-git-send-email-sstabellini@kernel.org>
+	<20170727060241.GA9327@aepfle.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Xen-devel] [PULL 3/3] xen-disk: add support for
+ multi-page shared rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, KONRAD Frederic <frederic.konrad@adacore.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Olaf Hering <olaf@aepfle.de>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, peter.maydell@linaro.org, stefanha@gmail.com, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 21 July 2017 at 10:13, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->> I don't fully understand the way memory_region_do_invalidate_mmio_ptr
->> works; I see it dropping the memory region; if that's also dropping
->> the RAMBlock then it will upset migration.   Even if the CPU is stopped
->> I dont think that stops the migration thread walking through the list of
->> RAMBlocks.
->
-> memory_region_do_invalidate_mmio_ptr() calls memory_region_unref(),
-> which will eventually result in memory_region_finalize() being
-> called, which will call the MR destructor, which in this case is
-> memory_region_destructor_ram(), which calls qemu_ram_free() on
-> the RAMBlock, which removes the RAMBlock from the list (after
-> taking the ramlist lock).
->
->> Even then, the problem is migration keeps a 'dirty_pages' count which is
->> calculated at the start of migration and updated as we dirty and send
->> pages; if we add/remove a RAMBlock then that dirty_pages count is wrong
->> and we either never finish migration (since dirty_pages never reaches
->> zero) or finish early with some unsent data.
->> And then there's the 'received' bitmap currently being added for
->> postcopy which tracks each page that's been received (that's not in yet
->> though).
->
-> It sounds like we really need to make migration robust against
-> RAMBlock changes -- in the hotplug case it's certainly possible
-> for RAMBlocks to be newly created or destroyed while migration
-> is in progress.
+On Thu, 27 Jul 2017, Olaf Hering wrote:
+> On Tue, Jun 27, Stefano Stabellini wrote:
+> 
+> > From: Paul Durrant <paul.durrant@citrix.com>
+> > The blkif protocol has had provision for negotiation of multi-page shared
+> > rings for some time now and many guest OS have support in their frontend
+> > drivers.
+> 
+> > +++ b/hw/block/xen_disk.c
+> 
+> > +    domids = g_malloc0_n(blkdev->nr_ring_ref, sizeof(uint32_t));
+> 
+> According to [1] g_malloc0_n requires at least glib-2.24. As a result
+> compilation of qemu-2.10 fails in SLE11, which has just glib-2.22.
+> 
+> Olaf
+> 
+> [1] https://developer.gnome.org/glib/stable/glib-Memory-Allocation.html
 
-There is code to disable hotplug while we are migrating.  For 2.10 we
-disabled *all* hotplug/unplug.  If there are things that are safe, we
-can add them as we do them.
-
-The problem with ramblocks is that we do the equivalent of:
-
-foreach ramblock
-  for each page in this ramblock
-     if page is dirty, send page
-
-But we could take a lot of time/rounds sending a single ramblock,
-because we go back/forth with top level migration functions/loops.
-
-Later, Juan.
+It looks like QEMU supports glib 2.22, so this ought to work. In fact
+the only user of g_malloc0_n is xen_disk.c. I would be happy to take a
+patch that replaces g_malloc0_n with g_malloc0.
