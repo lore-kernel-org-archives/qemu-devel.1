@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dafkK-0001G6-Jk
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:21 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dafkN-0001Hu-Kl
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dafkG-0001LK-Gr
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40310)
+	(envelope-from <cohuck@redhat.com>) id 1dafkM-0001Oe-OD
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dafkG-0001Ki-9g
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:16 -0400
-Date: Thu, 27 Jul 2017 11:09:58 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170727100958.GG2555@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <87o9so1hl7.fsf@dusky.pond.sub.org>
-	<20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
-	<20170721153331.GL18014@stefanha-x1.localdomain>
-	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
-	<8760eiuxu5.fsf@dusky.pond.sub.org>
-	<9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com>
-	<871sp2gut9.fsf@dusky.pond.sub.org>
-	<20170727091957.GC5117@lemon.lan>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dafkM-0001O9-H1
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:10:22 -0400
+Date: Thu, 27 Jul 2017 12:10:17 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170727121017.3a655122@gondolin>
+In-Reply-To: <20170727015418.85407-2-bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-2-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170727091957.GC5117@lemon.lan>
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] s390x/css: use macro for
+ event-information pending error recover code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <cleber@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-On Thu, Jul 27, 2017 at 05:19:57PM +0800, Fam Zheng wrote:
-> On Thu, 07/27 10:14, Markus Armbruster wrote:
-> > This brings some advantages of "verify output with diff" to tests that
-> > verify with code.  Improvement if it simplifies the verification code.
-> > 
-> > I'd still prefer *no* verification code (by delegating the job to diff)
-> > for tests where I can get away wit it.
+On Thu, 27 Jul 2017 03:54:16 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> Let's use a macro for the ERC (error recover code) when generating a
+> Channel Subsystem Event-information pending CRW (channel report word).
+
+Sounds reasonable.
+
 > 
-> Python based iotests can be (re)done in such a way that they print actual logs
-> (interactions with qtest/monitor, stdout/stderr of QEMU, etc) instead of the
-> current dot dot dot summary, then we automatically have diff based verification,
-> no?
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/css.c            | 2 +-
+>  include/hw/s390x/ioinst.h | 5 +++--
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 6a42b95cee..5321ca016b 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -2103,7 +2103,7 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid)
+>  void css_generate_css_crws(uint8_t cssid)
+>  {
+>      if (!channel_subsys.sei_pending) {
+> -        css_queue_crw(CRW_RSC_CSS, 0, 0, cssid);
+> +        css_queue_crw(CRW_RSC_CSS, CRW_ERC_EVENT, 0, cssid);
+>      }
+>      channel_subsys.sei_pending = true;
+>  }
+> diff --git a/include/hw/s390x/ioinst.h b/include/hw/s390x/ioinst.h
+> index 92d15655e4..c1d1052279 100644
+> --- a/include/hw/s390x/ioinst.h
+> +++ b/include/hw/s390x/ioinst.h
+> @@ -201,8 +201,9 @@ typedef struct CRW {
+>  #define CRW_FLAGS_MASK_A 0x0080
+>  #define CRW_FLAGS_MASK_ERC 0x003f
+>  
+> -#define CRW_ERC_INIT 0x02
+> -#define CRW_ERC_IPI  0x04
+> +#define CRW_ERC_EVENT  0x00
 
-The python test 149 that I wrote does exactly that. There's no reason why
-the others couldn't do the same.
+OK, that matches the name the Linux kernel uses.
 
-> One thing I feel painful with bash iotests is how harder it is to write
-> complicated test scenarios such as migration, incremental backup, etc.
+Do we want to add all ERCs while we're at it?
 
-Yes, shell is an awful language if you need non-trivial control
-logic or data structures
-
-> On the other hand the iotests are more difficult to debug when things go wrong
-> because it eats the output which, if done with shell, should be very easy to
-> get.
-
-Even if the python tests are not doing verify-by-diff, it should be fairly
-easy to wire up an env variable IOTESTS_DEBUG=1 which would force them
-to propagate stdout/err of all commands run (or at least save it to a
-log file somewhere).
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +#define CRW_ERC_INIT   0x02
+> +#define CRW_ERC_IPI    0x04
+>  
+>  #define CRW_RSC_SUBCH 0x3
+>  #define CRW_RSC_CHP   0x4
