@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1daeq6-0007U1-Ap
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:12:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1daes9-0000Y0-Sd
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1daeq5-0005f7-Fb
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:12:14 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:38350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1daeq5-0005d0-9R
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:12:13 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id f21so84583999wrf.5
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 02:12:10 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1daes4-0006yL-TQ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:14:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1daes4-0006xZ-Kr
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 05:14:16 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
+	<1499952476-3454-7-git-send-email-armbru@redhat.com>
+	<20170717101906.GC5301@noname.redhat.com>
+	<87a842b9yo.fsf@dusky.pond.sub.org>
+	<87bmoauz2s.fsf@dusky.pond.sub.org>
+	<5b194736-15ba-7f62-cc8b-46cf03777644@redhat.com>
+	<87k22uffr1.fsf@dusky.pond.sub.org>
+	<20170727084544.GA4767@localhost.localdomain>
+Date: Thu, 27 Jul 2017 11:14:04 +0200
+In-Reply-To: <20170727084544.GA4767@localhost.localdomain> (Kevin Wolf's
+	message of "Thu, 27 Jul 2017 10:45:44 +0200")
+Message-ID: <87r2x2b5sz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Jul 2017 10:11:48 +0100
-Message-ID: <CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
- to avoid races with libvirt
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 6/9] Convert error_report() to warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Jeff Cody <jcody@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "An
+	eesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 27 July 2017 at 02:30, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
-> quiesced by vfio-pci's finalize() routine until up to 6s after the
-> DEVICE_DELETED was emitted, leading to detach-device on the libvirt side pretty
-> much always crashing the host.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-My initial naive thought is that if the host kernel can crash then
-this is a host kernel bug... shouldn't the host kernel refuse
-the subsequent libvirt rebind if it would cause a crash ?
+> Am 27.07.2017 um 10:25 hat Markus Armbruster geschrieben:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>> > On 24/07/2017 08:30, Markus Armbruster wrote:
+>> [...]
+>> >> What's the recommended way to run all iotests a build of QEMU can run?
+>> >
+>> > I use "path-to-srcdir/tests/check-block.sh".  It takes about 20 minutes.
+>> >
+>> > There are two issues with check-block:
+>> >
+>> > * tests that require QEMU are skipped (rationale: you might be building
+>> > without the x86_64-softmmu target).
+>> >
+>> > * it only runs the "quick" group, but I think we should reverse the
+>> > direction and mark slow tests specifically (that would cut about 10
+>> > minutes out of the 20).
+>> >
+>> > It's a pity that qemu-iotests doesn't parallelize.
+>> 
+>> Indeed.
+>> 
+>> >                                                     Maybe the harness
+>> > could be changed to something more standard.
+>> 
+>> Certainly not a "bite-sized task".  Could it be a fit for GSOC or
+>> Outreachy?
+>
+> I don't think deciding what the right "something more standard" is would
+> be a good GSoC/Outreachy project. Actually implementing it afterwards
+> may be, but that depends on what was decided.
 
-thanks
--- PMM
+Makes sense.
