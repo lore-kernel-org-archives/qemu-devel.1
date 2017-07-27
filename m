@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dajoP-0006wQ-68
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:30:50 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dajpV-0007tb-8b
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dajoK-0004k8-9Y
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:30:49 -0400
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Thu, 27 Jul 2017 16:30:40 +0200
-Message-Id: <20170727143040.7236-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-system-tricore: segfault when entering "x
- 0" on the monitor
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dajpU-0005ph-BJ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:31:57 -0400
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Thu, 27 Jul 2017 20:03:05 +0530
+Message-Id: <1501165990-28033-4-git-send-email-ashijeetacharya@gmail.com>
+In-Reply-To: <1501165990-28033-1-git-send-email-ashijeetacharya@gmail.com>
+References: <1501165990-28033-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v8 3/8] vmdk: Rename get_cluster_offset() to
+ vmdk_get_cluster_offset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,59 +20,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, thuth@redhat.com
+To: famz@redhat.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Starting Qemu with "qemu-system-tricore -nographic -M tricore_testboard -S"
-and entering "x 0" at the monitor prompt leads to Segmentation fault. This happens
-because tricore_cpu_get_phys_page_debug() is not implemented yet, this
-is a temporary workaround to avoid the crash.
+Rename the existing get_cluster_offset() to vmdk_get_cluster_offset()
+and update name in all the callers accordingly.
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- target/tricore/cpu.c | 10 ++++++++++
- target/tricore/cpu.h |  1 +
- 2 files changed, 11 insertions(+)
+ block/vmdk.c | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-index 08f50e2ba7..5ab5b56454 100644
---- a/target/tricore/cpu.c
-+++ b/target/tricore/cpu.c
-@@ -22,6 +22,15 @@
- #include "cpu.h"
- #include "qemu-common.h"
- #include "exec/exec-all.h"
-+#include "qemu/error-report.h"
-+
-+static hwaddr tricore_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr,
-+                                         MemTxAttrs *attrs)
-+{
-+    error_report("function cpu_get_phys_page_attrs_debug not "
-+                    "implemented, aborting");
-+    return -1;
-+}
- 
- static inline void set_feature(CPUTriCoreState *env, int feature)
- {
-@@ -176,6 +185,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
-     cc->dump_state = tricore_cpu_dump_state;
-     cc->set_pc = tricore_cpu_set_pc;
-     cc->synchronize_from_tb = tricore_cpu_synchronize_from_tb;
-+    cc->get_phys_page_attrs_debug = tricore_cpu_get_phys_page_attrs_debug;
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 73ae786..f403981 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1144,7 +1144,7 @@ static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
  }
  
- static void cpu_register(const TriCoreCPUInfo *info)
-diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-index a3493a123c..2663723955 100644
---- a/target/tricore/cpu.h
-+++ b/target/tricore/cpu.h
-@@ -224,6 +224,7 @@ static inline TriCoreCPU *tricore_env_get_cpu(CPUTriCoreState *env)
- #define ENV_OFFSET offsetof(TriCoreCPU, env)
+ /**
+- * get_cluster_offset
++ * vmdk_get_cluster_offset
+  *
+  * Look up cluster offset in extent file by sector number, and store in
+  * @cluster_offset.
+@@ -1163,14 +1163,14 @@ static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+  *          VMDK_UNALLOC if cluster is not mapped and @allocate is false.
+  *          VMDK_ERROR if failed.
+  */
+-static int get_cluster_offset(BlockDriverState *bs,
+-                              VmdkExtent *extent,
+-                              VmdkMetaData *m_data,
+-                              uint64_t offset,
+-                              bool allocate,
+-                              uint64_t *cluster_offset,
+-                              uint64_t skip_start_bytes,
+-                              uint64_t skip_end_bytes)
++static int vmdk_get_cluster_offset(BlockDriverState *bs,
++                                   VmdkExtent *extent,
++                                   VmdkMetaData *m_data,
++                                   uint64_t offset,
++                                   bool allocate,
++                                   uint64_t *cluster_offset,
++                                   uint64_t skip_start_bytes,
++                                   uint64_t skip_end_bytes)
+ {
+     unsigned int l1_index, l2_offset, l2_index;
+     int min_index, i, j;
+@@ -1304,9 +1304,9 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
+         return 0;
+     }
+     qemu_co_mutex_lock(&s->lock);
+-    ret = get_cluster_offset(bs, extent, NULL,
+-                             sector_num * 512, false, &offset,
+-                             0, 0);
++    ret = vmdk_get_cluster_offset(bs, extent, NULL,
++                                  sector_num * 512, false, &offset,
++                                  0, 0);
+     qemu_co_mutex_unlock(&s->lock);
  
- hwaddr tricore_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+
- void tricore_cpu_dump_state(CPUState *cpu, FILE *f,
-                             fprintf_function cpu_fprintf, int flags);
+     index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
+@@ -1497,8 +1497,8 @@ vmdk_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+             ret = -EIO;
+             goto fail;
+         }
+-        ret = get_cluster_offset(bs, extent, NULL,
+-                                 offset, false, &cluster_offset, 0, 0);
++        ret = vmdk_get_cluster_offset(bs, extent, NULL,
++                                      offset, false, &cluster_offset, 0, 0);
+         offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
  
+         n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
+@@ -1584,10 +1584,10 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+         n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
+                              - offset_in_cluster);
+ 
+-        ret = get_cluster_offset(bs, extent, &m_data, offset,
+-                                 !(extent->compressed || zeroed),
+-                                 &cluster_offset, offset_in_cluster,
+-                                 offset_in_cluster + n_bytes);
++        ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
++                                      !(extent->compressed || zeroed),
++                                      &cluster_offset, offset_in_cluster,
++                                      offset_in_cluster + n_bytes);
+         if (extent->compressed) {
+             if (ret == VMDK_OK) {
+                 /* Refuse write to allocated cluster for streamOptimized */
+@@ -1596,8 +1596,8 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+                 return -EIO;
+             } else {
+                 /* allocate */
+-                ret = get_cluster_offset(bs, extent, &m_data, offset,
+-                                         true, &cluster_offset, 0, 0);
++                ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
++                                              true, &cluster_offset, 0, 0);
+             }
+         }
+         if (ret == VMDK_ERROR) {
+@@ -2229,9 +2229,9 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
+                     sector_num);
+             break;
+         }
+-        ret = get_cluster_offset(bs, extent, NULL,
+-                                 sector_num << BDRV_SECTOR_BITS,
+-                                 false, &cluster_offset, 0, 0);
++        ret = vmdk_get_cluster_offset(bs, extent, NULL,
++                                      sector_num << BDRV_SECTOR_BITS,
++                                      false, &cluster_offset, 0, 0);
+         if (ret == VMDK_ERROR) {
+             fprintf(stderr,
+                     "ERROR: could not get cluster_offset for sector %"
 -- 
-2.13.3
+2.6.2
