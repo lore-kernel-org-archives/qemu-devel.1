@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4x-0000cu-Ke
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4x-0000cp-Je
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:52:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4u-0007Ll-Ek
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal4v-0007Ml-Cr
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41304)
+Received: from mx1.redhat.com ([209.132.183.28]:43944)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dal4u-0007KM-4y
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:56 -0400
+	id 1dal4v-0007Lc-3G
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:51:57 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 27 Jul 2017 17:41:11 +0200
-Message-Id: <20170727154126.11339-12-marcandre.lureau@redhat.com>
+Date: Thu, 27 Jul 2017 17:41:25 +0200
+Message-Id: <20170727154126.11339-26-marcandre.lureau@redhat.com>
 In-Reply-To: <20170727154126.11339-1-marcandre.lureau@redhat.com>
 References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/26] qapi: add 'if' condition on alternate
- variant
+Subject: [Qemu-devel] [PATCH 25/26] qapi: make query-cpu-model-expansion
+ depend on s390 or x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,165 +29,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi.py                               | 8 +++++++-
- scripts/qapi-introspect.py                    | 2 +-
- tests/Makefile.include                        | 1 +
- tests/qapi-schema/alternate-dict-invalid.err  | 1 +
- tests/qapi-schema/alternate-dict-invalid.exit | 1 +
- tests/qapi-schema/alternate-dict-invalid.json | 4 ++++
- tests/qapi-schema/alternate-dict-invalid.out  | 0
- tests/qapi-schema/qapi-schema-test.json       | 6 +++++-
- tests/qapi-schema/qapi-schema-test.out        | 8 +++++++-
- 9 files changed, 27 insertions(+), 4 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-dict-invalid.err
- create mode 100644 tests/qapi-schema/alternate-dict-invalid.exit
- create mode 100644 tests/qapi-schema/alternate-dict-invalid.json
- create mode 100644 tests/qapi-schema/alternate-dict-invalid.out
+ qapi-schema.json                       |  4 +++-
+ include/sysemu/arch_init.h             |  3 ---
+ monitor.c                              |  3 ---
+ qmp.c                                  |  7 -------
+ stubs/arch-query-cpu-model-expansion.c | 12 ------------
+ target/i386/cpu.c                      |  2 +-
+ target/s390x/cpu_models.c              |  3 ++-
+ stubs/Makefile.objs                    |  1 -
+ 8 files changed, 6 insertions(+), 29 deletions(-)
+ delete mode 100644 stubs/arch-query-cpu-model-expansion.c
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 333a5c0d1e..7f0d56fb01 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -829,6 +829,8 @@ def check_alternate(expr, info):
-         check_type(info, "Member '%s' of alternate '%s'" % (key, name),
-                    value,
-                    allow_metas=3D['built-in', 'union', 'struct', 'enum']=
-)
-+        if isinstance(value, dict):
-+            value =3D value['type']
-         qtype =3D find_alternate_member_qtype(value)
-         if not qtype:
-             raise QAPISemError(info, "Alternate '%s' member '%s' cannot =
-use "
-@@ -1643,7 +1645,11 @@ class QAPISchema(object):
-                          expr.get('if'))
+diff --git a/qapi-schema.json b/qapi-schema.json
+index a5c28bc9ad..f5e1acff83 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4535,7 +4535,9 @@
+ { 'command': 'query-cpu-model-expansion',
+   'data': { 'type': 'CpuModelExpansionType',
+             'model': 'CpuModelInfo' },
+-  'returns': 'CpuModelExpansionInfo' }
++  'returns': 'CpuModelExpansionInfo',
++  'if': ['defined(NEED_CPU_H)',
++         'defined(TARGET_S390X) || defined(TARGET_I386)']}
 =20
-     def _make_variant(self, case, typ):
--        return QAPISchemaObjectTypeVariant(case, typ)
-+        ifcond =3D None
-+        if isinstance(typ, dict):
-+            ifcond =3D typ.get('if')
-+            typ =3D typ['type']
-+        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
+ ##
+ # @CpuModelCompareResult:
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index e9f1ea0cca..fb3d20a1b8 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -32,8 +32,5 @@ int kvm_available(void);
+ int xen_available(void);
 =20
-     def _make_simple_variant(self, case, typ, info):
-         ifcond =3D None
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index a867ea5de1..cac5a6a392 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -162,7 +162,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
+-CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
+-                                                      CpuModelInfo *mode=
+,
+-                                                      Error **errp);
 =20
-     def visit_alternate_type(self, name, info, variants, ifcond):
-         self._gen_qlit(name, 'alternate',
--                       {'members': [{'type': self._use_type(m.type)}
-+                       {'members': [({'type': self._use_type(m.type)}, m=
-.ifcond)
-                                     for m in variants.variants]}, ifcond=
-)
+ #endif
+diff --git a/monitor.c b/monitor.c
+index 3bdae8d9d0..b134c39144 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -970,9 +970,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObjec=
+t **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#if !defined(TARGET_S390X) && !defined(TARGET_I386)
+-    qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
+-#endif
+ #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
+) \
+     && !defined(TARGET_S390X)
+     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
+diff --git a/qmp.c b/qmp.c
+index 7b6861846f..afa266ec1e 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -546,13 +546,6 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Err=
+or **errp)
+     return arch_query_cpu_definitions(errp);
+ }
 =20
-     def visit_command(self, name, info, arg_type, ret_type,
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 816cc5c5e3..9462deb02b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -351,6 +351,7 @@ qapi-schema +=3D alternate-conflict-dict.json
- qapi-schema +=3D alternate-conflict-enum-bool.json
- qapi-schema +=3D alternate-conflict-enum-int.json
- qapi-schema +=3D alternate-conflict-string.json
-+qapi-schema +=3D alternate-dict-invalid.json
- qapi-schema +=3D alternate-empty.json
- qapi-schema +=3D alternate-nested.json
- qapi-schema +=3D alternate-unknown.json
-diff --git a/tests/qapi-schema/alternate-dict-invalid.err b/tests/qapi-sc=
-hema/alternate-dict-invalid.err
-new file mode 100644
-index 0000000000..707c40f0f6
---- /dev/null
-+++ b/tests/qapi-schema/alternate-dict-invalid.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-dict-invalid.json:2: Member 'two' of alterna=
-te 'Alt' should be a type name
-diff --git a/tests/qapi-schema/alternate-dict-invalid.exit b/tests/qapi-s=
-chema/alternate-dict-invalid.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/alternate-dict-invalid.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-dict-invalid.json b/tests/qapi-s=
-chema/alternate-dict-invalid.json
-new file mode 100644
-index 0000000000..45f2c8ebef
---- /dev/null
-+++ b/tests/qapi-schema/alternate-dict-invalid.json
-@@ -0,0 +1,4 @@
-+# invalid field dictionnary, missing type
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'str',
-+            'two': { 'if': 'foo' } } }
-diff --git a/tests/qapi-schema/alternate-dict-invalid.out b/tests/qapi-sc=
-hema/alternate-dict-invalid.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 01f7db58dc..46a4d1c3e5 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -206,9 +206,13 @@
- { 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
-},
-   'if': 'defined(TEST_IF_UNION)' }
+-CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
+pe type,
+-                                                     CpuModelInfo *model=
+,
+-                                                     Error **errp)
+-{
+-    return arch_query_cpu_model_expansion(type, model, errp);
+-}
+-
+ void qmp_add_client(const char *protocol, const char *fdname,
+                     bool has_skipauth, bool skipauth, bool has_tls, bool=
+ tls,
+                     Error **errp)
+diff --git a/stubs/arch-query-cpu-model-expansion.c b/stubs/arch-query-cp=
+u-model-expansion.c
+deleted file mode 100644
+index ae7cf554d1..0000000000
+--- a/stubs/arch-query-cpu-model-expansion.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "sysemu/arch_init.h"
+-#include "qapi/qmp/qerror.h"
+-
+-CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
+-                                                      CpuModelInfo *mode=
+,
+-                                                      Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
+-    return NULL;
+-}
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ddc45abd70..d683e70a13 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2574,7 +2574,7 @@ out:
+ }
 =20
--{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
-+{ 'alternate': 'TestIfAlternate', 'data':
-+  { 'foo': 'int', 'alt_bar': { 'type': 'TestStruct', 'if': 'defined(TEST=
-_IF_ALT_BAR)'} },
-   'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
+ CpuModelExpansionInfo *
+-arch_query_cpu_model_expansion(CpuModelExpansionType type,
++qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+                                                       CpuModelInfo *mode=
+l,
+                                                       Error **errp)
+ {
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index cdff9cdd3b..863dce064f 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -22,6 +22,7 @@
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/arch_init.h"
+ #endif
++#include "qmp-commands.h"
 =20
-+{ 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
-nate' },
-+  'if': 'defined(TEST_IF_ALT)' }
-+
- { 'command': 'TestIfCmd', 'data':
-   { 'foo': 'TestIfStruct', 'bar': { 'type': 'TestIfEnum', 'if': 'TEST_IF=
-_CMD_BAR' } },
-   'if': 'defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)' }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 7908eed6fc..a51c6ac15c 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -55,8 +55,11 @@ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict=
-', 'qlist', 'qbool']
- alternate TestIfAlternate
-     tag type
-     case foo: int
--    case bar: TestStruct
-+    case alt_bar: TestStruct if=3Ddefined(TEST_IF_ALT_BAR)
-     if defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)
-+command TestIfAlternateCmd q_obj_TestIfAlternateCmd-arg -> None
-+   gen=3DTrue success_response=3DTrue boxed=3DFalse
-+    if defined(TEST_IF_ALT)
- command TestIfCmd q_obj_TestIfCmd-arg -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse
-     if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
-@@ -200,6 +203,9 @@ object q_obj_EVENT_D-arg
-     member b: str optional=3DFalse
-     member c: str optional=3DTrue
-     member enum3: EnumOne optional=3DTrue
-+object q_obj_TestIfAlternateCmd-arg
-+    member alt_cmd_arg: TestIfAlternate optional=3DFalse
-+    if defined(TEST_IF_ALT)
- object q_obj_TestIfCmd-arg
-     member foo: TestIfStruct optional=3DFalse
-     member bar: TestIfEnum optional=3DFalse if=3DTEST_IF_CMD_BAR
+ #define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc)=
+ \
+     {                                                                   =
+ \
+@@ -520,7 +521,7 @@ static void cpu_info_from_model(CpuModelInfo *info, c=
+onst S390CPUModel *model,
+     }
+ }
+=20
+-CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
++CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
+pe type,
+                                                       CpuModelInfo *mode=
+l,
+                                                       Error **errp)
+ {
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 049d389966..dcfe6f49f9 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,5 +1,4 @@
+ stub-obj-y +=3D arch-query-cpu-def.o
+-stub-obj-y +=3D arch-query-cpu-model-expansion.o
+ stub-obj-y +=3D bdrv-next-monitor-owned.o
+ stub-obj-y +=3D blk-commit-all.o
+ stub-obj-y +=3D blockdev-close-all-bdrv-states.o
 --=20
 2.14.0.rc0.1.g40ca67566
