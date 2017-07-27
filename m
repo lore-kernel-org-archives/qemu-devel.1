@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dajpQ-0007oH-3o
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:31:53 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dajpg-00081y-Se
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:32:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dajpL-0005fi-7a
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:31:52 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dajpf-0005zt-Ch
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:32:08 -0400
 From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Thu, 27 Jul 2017 20:03:02 +0530
-Message-Id: <1501165990-28033-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v8 0/8] Optimize VMDK I/O by allocating
- multiple clusters
+Date: Thu, 27 Jul 2017 20:03:08 +0530
+Message-Id: <1501165990-28033-7-git-send-email-ashijeetacharya@gmail.com>
+In-Reply-To: <1501165990-28033-1-git-send-email-ashijeetacharya@gmail.com>
+References: <1501165990-28033-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v8 6/8] vmdk: New functions to assist
+ allocating multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,100 +23,266 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: famz@redhat.com
 Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Previously posted series patches:
-v1 - http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg02044.html
-v2 - http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg05080.html
-v3 - http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg00074.html
-v4 - http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg03851.html
-v5 - http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg00929.html
-v6 - http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg00947.html
-v7 - http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg06600.html
+Introduce two new helper functions handle_alloc() and
+vmdk_alloc_cluster_offset(). handle_alloc() helps to allocate multiple
+clusters at once starting from a given offset on disk and performs COW
+if necessary for first and last allocated clusters.
+vmdk_alloc_cluster_offset() helps to return the offset of the first of
+the many newly allocated clusters. Also, provide proper documentation
+for both.
 
-This series helps to optimize the I/O performance of VMDK driver.
+Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+---
+ block/vmdk.c | 201 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 191 insertions(+), 10 deletions(-)
 
-Patch 1 helps us to move vmdk_find_offset_in_cluster.
-
-Patch 2 & 3 perform a simple function re-naming tasks.
-
-Patch 4 is used to factor out metadata loading code and implement it in separate
-functions. This will help us to avoid code duplication in future patches of this
-series.
-
-Patch 5 helps to set the upper limit of the bytes handled in one cycle.
-
-Patch 6 adds new functions to help us allocate multiple clusters according to
-the size requested, perform COW if required and return the offset of the first
-newly allocated cluster.
-
-Patch 7 changes the metadata update code to update the L2 tables for multiple
-clusters at once.
-
-Patch 8 helps us to finally change vmdk_get_cluster_offset() to find cluster
-offset only as cluster allocation task is now handled by vmdk_alloc_clusters()
-
-Optimization test results:
-
-This patch series improves 128 KB sequential write performance to an
-empty VMDK file by 54%
-
-Benchmark command: ./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f
-vmdk test.vmdk
-
-Changes in v8:
-- fix minor variable naming issue in patch 6
-
-Changes in v7:
-- comment the use of MIN() in calculating skip_end_bytes
-- use extent->cluster_sectors instead of 128
-- place check for m_data != NULL
-- use g_new0(VmdkMetaData, 1) instead of g_malloc0(sizeof(*m_data))
-
-Changes in v6:
-- rename total_alloc_clusters as alloc_clusters_counter (fam)
-
-Changes in v5:
-- fix commit message and comment in patch 4 (fam)
-- add vmdk_ prefix to handle_alloc() (fam)
-- fix alignment issue in patch 6 (fam)
-- use BDRV_SECTOR_BITS (fam)
-- fix endianness calculation in patch 7 (fam)
-
-Changes in v4:
-- fix commit message in patch 1 (fam)
-- drop size_to_clusters() function (fam)
-- fix grammatical errors in function documentations (fam)
-- factor out metadata loading coding in a separate patch (patch 4) (fam)
-- rename vmdk_alloc_cluster_offset() to vmdk_alloc_clusters() (fam)
-- break patch 4(in v3) into separate patches (patch 3 and 8) (fam)
-- rename extent_size to extent_end (fam)
-- use QEMU_ALIGN_UP instead of vmdk_align_offset. (fam)
-- drop next and simply do m_data = m_data->next (fam)
-
-Changes in v3:
-- move size_to_clusters() from patch 1 to 3 (fam)
-- use DIV_ROUND_UP in size_to_clusters (fam)
-- make patch 2 compilable (fam)
-- rename vmdk_L2update as vmdk_l2update and use UINT32_MAX (fam)
-- combine patch 3 and patch 4 (as in v2) to make them compilable (fam)
-- call bdrv_pwrite_sync() for batches of atmost 512 clusters at once (fam)
-
-Changes in v2:
-- segregate the ugly Patch 1 in v1 into 6 readable and sensible patches
-- include benchmark test results in v2
-
-Ashijeet Acharya (8):
-  vmdk: Move vmdk_find_offset_in_cluster() to the top
-  vmdk: Rename get_whole_cluster() to vmdk_perform_cow()
-  vmdk: Rename get_cluster_offset() to vmdk_get_cluster_offset()
-  vmdk: Factor out metadata loading code out of
-    vmdk_get_cluster_offset()
-  vmdk: Set maximum bytes allocated in one cycle
-  vmdk: New functions to assist allocating multiple clusters
-  vmdk: Update metadata for multiple clusters
-  vmdk: Make vmdk_get_cluster_offset() return cluster offset only
-
- block/vmdk.c | 538 +++++++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 416 insertions(+), 122 deletions(-)
-
+diff --git a/block/vmdk.c b/block/vmdk.c
+index fe2046b..5f27dbb 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -136,6 +136,7 @@ typedef struct VmdkMetaData {
+     unsigned int l2_offset;
+     int valid;
+     uint32_t *l2_cache_entry;
++    uint32_t nb_clusters;
+ } VmdkMetaData;
+ 
+ typedef struct VmdkGrainMarker {
+@@ -1242,6 +1243,183 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
+     return VMDK_OK;
+ }
+ 
++/*
++ * vmdk_handle_alloc
++ *
++ * Allocate new clusters for an area that either is yet unallocated or needs a
++ * copy on write.
++ *
++ * Returns:
++ *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
++ *                  the new allocation doesn't cover all of the requested area.
++ *                  *cluster_offset is updated to contain the offset of the
++ *                  first newly allocated cluster.
++ *
++ *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
++ *                  unchanged.
++ *
++ *   VMDK_ERROR:    in error cases
++ */
++static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
++                             uint64_t offset, uint64_t *cluster_offset,
++                             int64_t *bytes, VmdkMetaData *m_data,
++                             bool allocate, uint32_t *alloc_clusters_counter)
++{
++    int l1_index, l2_offset, l2_index;
++    uint32_t *l2_table;
++    uint32_t cluster_sector;
++    uint32_t nb_clusters;
++    bool zeroed = false;
++    uint64_t skip_start_bytes, skip_end_bytes;
++    int ret;
++
++    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
++                            &l2_index, &l2_table);
++    if (ret < 0) {
++        return ret;
++    }
++
++    cluster_sector = le32_to_cpu(l2_table[l2_index]);
++
++    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
++    /* Calculate the number of clusters to look for. Here we truncate the last
++     * cluster, i.e. 1 less than the actual value calculated as we may need to
++     * perform COW for the last one. */
++    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
++                               extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
++
++    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
++    assert(nb_clusters <= INT_MAX);
++
++    /* update bytes according to final nb_clusters value */
++    if (nb_clusters != 0) {
++        *bytes = ((nb_clusters * extent->cluster_sectors) << BDRV_SECTOR_BITS)
++                 - skip_start_bytes;
++    } else {
++        nb_clusters = 1;
++    }
++    *alloc_clusters_counter += nb_clusters;
++
++    /* we need to use MIN() for basically 3 cases that arise :
++     * 1. alloc very first cluster : here skip_start_bytes >= 0 and
++     *    *bytes <= cluster_size.
++     * 2. alloc middle clusters : here *bytes is a perfect multiple of
++     *    cluster_size and skip_start_bytes is 0.
++     * 3. alloc very last cluster : here *bytes <= cluster_size and
++     *    skip_start_bytes is 0
++     */
++    skip_end_bytes = skip_start_bytes + MIN(*bytes,
++                     extent->cluster_sectors * BDRV_SECTOR_SIZE
++                                    - skip_start_bytes);
++
++    if (extent->has_zero_grain && cluster_sector == VMDK_GTE_ZEROED) {
++        zeroed = true;
++    }
++
++    if (!cluster_sector || zeroed) {
++        if (!allocate) {
++            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
++        }
++
++        cluster_sector = extent->next_cluster_sector;
++        extent->next_cluster_sector += extent->cluster_sectors
++                                                * nb_clusters;
++
++        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
++                               offset, skip_start_bytes,
++                               skip_end_bytes);
++        if (ret < 0) {
++            return ret;
++        }
++        if (m_data) {
++            m_data->valid = 1;
++            m_data->l1_index = l1_index;
++            m_data->l2_index = l2_index;
++            m_data->l2_offset = l2_offset;
++            m_data->l2_cache_entry = &l2_table[l2_index];
++            m_data->nb_clusters = nb_clusters;
++        }
++    }
++    *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
++    return VMDK_OK;
++}
++
++/*
++ * vmdk_alloc_clusters
++ *
++ * For a given offset on the virtual disk, find the cluster offset in vmdk
++ * file. If the offset is not found, allocate a new cluster.
++ *
++ * If the cluster is newly allocated, m_data->nb_clusters is set to the number
++ * of contiguous clusters that have been allocated. In this case, the other
++ * fields of m_data are valid and contain information about the first allocated
++ * cluster.
++ *
++ * Returns:
++ *
++ *   VMDK_OK:           on success and @cluster_offset was set
++ *
++ *   VMDK_UNALLOC:      if no clusters were allocated and @cluster_offset is
++ *                      set to zero
++ *
++ *   VMDK_ERROR:        in error cases
++ */
++static int vmdk_alloc_clusters(BlockDriverState *bs,
++                               VmdkExtent *extent,
++                               VmdkMetaData *m_data, uint64_t offset,
++                               bool allocate, uint64_t *cluster_offset,
++                               int64_t bytes,
++                               uint32_t *alloc_clusters_counter)
++{
++    uint64_t start, remaining;
++    uint64_t new_cluster_offset;
++    int64_t n_bytes;
++    int ret;
++
++    if (extent->flat) {
++        *cluster_offset = extent->flat_start_offset;
++        return VMDK_OK;
++    }
++
++    start = offset;
++    remaining = bytes;
++    new_cluster_offset = 0;
++    *cluster_offset = 0;
++    n_bytes = 0;
++    if (m_data) {
++        m_data->valid = 0;
++    }
++
++    /* due to L2 table margins all bytes may not get allocated at once */
++    while (true) {
++
++        if (!*cluster_offset) {
++            *cluster_offset = new_cluster_offset;
++        }
++
++        start              += n_bytes;
++        remaining          -= n_bytes;
++        new_cluster_offset += n_bytes;
++
++        if (remaining == 0) {
++            break;
++        }
++
++        n_bytes = remaining;
++
++        ret = vmdk_handle_alloc(bs, extent, start, &new_cluster_offset,
++                                &n_bytes, m_data, allocate,
++                                alloc_clusters_counter);
++
++        if (ret < 0) {
++            return ret;
++
++        }
++    }
++
++    return VMDK_OK;
++}
++
+ /**
+  * vmdk_get_cluster_offset
+  *
+@@ -1625,6 +1803,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+     uint64_t bytes_done = 0;
+     VmdkMetaData m_data;
+     uint64_t extent_end;
++    uint32_t alloc_clusters_counter = 0;
+ 
+     if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
+         error_report("Wrong offset: offset=0x%" PRIx64
+@@ -1650,10 +1829,10 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+             n_bytes = MIN(bytes, extent_end - offset);
+         }
+ 
+-        ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
+-                                      !(extent->compressed || zeroed),
+-                                      &cluster_offset, offset_in_cluster,
+-                                      offset_in_cluster + n_bytes);
++        ret = vmdk_alloc_clusters(bs, extent, &m_data, offset,
++                                  !(extent->compressed || zeroed),
++                                  &cluster_offset, n_bytes,
++                                  &alloc_clusters_counter);
+         if (extent->compressed) {
+             if (ret == VMDK_OK) {
+                 /* Refuse write to allocated cluster for streamOptimized */
+@@ -1662,8 +1841,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+                 return -EIO;
+             } else {
+                 /* allocate */
+-                ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
+-                                              true, &cluster_offset, 0, 0);
++                ret = vmdk_alloc_clusters(bs, extent, &m_data, offset,
++                                          true, &cluster_offset, n_bytes,
++                                          &alloc_clusters_counter);
+             }
+         }
+         if (ret == VMDK_ERROR) {
+@@ -1671,10 +1851,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+         }
+         if (zeroed) {
+             /* Do zeroed write, buf is ignored */
+-            if (extent->has_zero_grain &&
+-                    offset_in_cluster == 0 &&
+-                    n_bytes >= extent->cluster_sectors * BDRV_SECTOR_SIZE) {
+-                n_bytes = extent->cluster_sectors * BDRV_SECTOR_SIZE;
++            if (extent->has_zero_grain && offset_in_cluster == 0 &&
++                    n_bytes >= extent->cluster_sectors * BDRV_SECTOR_SIZE *
++                        alloc_clusters_counter) {
++                n_bytes = extent->cluster_sectors * BDRV_SECTOR_SIZE *
++                                        alloc_clusters_counter;
+                 if (!zero_dry_run) {
+                     /* update L2 tables */
+                     if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
 -- 
 2.6.2
