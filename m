@@ -1,51 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1daXEf-0004BY-Mw
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:05:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daXRC-0006xE-Jz
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1daXEc-0006P4-Gl
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:05:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59980
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dongdwdw@linux.vnet.ibm.com>)
-	id 1daXEc-0006Ou-BS
-	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:05:02 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6R13wD1134904
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:05:01 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bxyymqfkx-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 21:05:01 -0400
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <dongdwdw@linux.vnet.ibm.com>;
-	Thu, 27 Jul 2017 11:04:58 +1000
-Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
-	by d23relay09.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v6R13e5f31195332
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 11:03:40 +1000
-Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
-	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v6R13cRB010022
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 11:03:39 +1000
-References: <f7206d1d-addb-1f69-1a77-dc83c1b50e36@linux.vnet.ibm.com>
-	<f462bb68-fc63-baec-235c-726066e25d44@gmail.com>
-	<20170710124025.GE14195@stefanha-x1.localdomain>
-	<5fd4160d-87ca-6cb1-1a32-1d4debf34d76@linux.vnet.ibm.com>
-	<20170714132503.GB17616@stefanha-x1.localdomain>
-From: Wang Dong <dongdwdw@linux.vnet.ibm.com>
-Date: Thu, 27 Jul 2017 09:03:38 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daXR9-0007IP-Es
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:18:02 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36206)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1daXR9-0007IG-9E
+	for qemu-devel@nongnu.org; Wed, 26 Jul 2017 21:17:59 -0400
+Received: by mail-qt0-x241.google.com with SMTP id c15so3349253qta.3
+	for <qemu-devel@nongnu.org>; Wed, 26 Jul 2017 18:17:59 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170726235614.14687-1-aurelien@aurel32.net>
+	<20170726235614.14687-2-aurelien@aurel32.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9b508f8d-21dd-1372-6aaa-d72a0d27ba45@amsat.org>
+Date: Wed, 26 Jul 2017 22:17:55 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170714132503.GB17616@stefanha-x1.localdomain>
+In-Reply-To: <20170726235614.14687-2-aurelien@aurel32.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <5ff587b0-03a4-101c-bc28-1d0f30641684@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] About the trace framework
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 1/2] hw/mips: load_elf_strerror to
+ report kernel loading failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,98 +36,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
+On 07/26/2017 08:56 PM, Aurelien Jarno wrote:
+> Emulated MIPS boards bail out with a simple "could not load kernel" when
+> a kernel could not be load, without specifying the underlying reason.
+> Fix that by calling load_elf_strerror.
+> 
+> At the same time use error_report to report the error instead of
+> fprintf.
+> 
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 
+Thank you Aurelien :)
 
-On 07/14/2017 09:25 PM, Stefan Hajnoczi wrote:
-> On Thu, Jul 13, 2017 at 04:01:09PM +0800, Wang Dong wrote:
->> On 07/10/2017 08:40 PM, Stefan Hajnoczi wrote:
->>> On Mon, Jul 10, 2017 at 01:24:23PM +0800, Xie Changlong wrote:
->>>> =E5=9C=A8 7/9/2017 5:57 PM, Wang Dong =E5=86=99=E9=81=93:
->>>>> Hi,
->>>>>
->>>>> I am new to QEMU. But I got some problem so that  I want to figure =
-it out.
->>>>>
->>>>> So I try to debug qemu to see what happened.
->>>>>
->>>>> And I found trace framework. I think this will help me understand t=
-he
->>>>> point.
->>>>>
->>>>> So I compiled qemu with option:
->>>>>
->>>>> ## *--enable-trace-backends=3Dsimple*
->>>>>
->>>>> And did as the docs/tracing.txt tell. But when I execute the exampl=
-e
->>>>> command in it, nothing just happens.
->>>>>
->>>>> *./scripts/simpletrace.py trace-events-all trace-xxxxxx(my trace fi=
-le
->>>>> produced by qemu)
->>>>> I am not sure what happened. Just ask this.
->>>>> Any clue will be appreciated. Thanks in advance.
->>>>> *
->>>>>
->>>> Did you set *trace-event*? I've encountered this issue in the past :=
-)
->>>> (qemu) help trace-event
->>>> trace-event name on|off -- changes status of a specific trace event
->>>> (qemu) info trace-events
->>> Yes, you need to enable specific trace events that you are interested
->>> in.  'trace-event' does that from the QEMU monitor at runtime.  If yo=
-u'd
->>> rather keep a file with a list of events to enable:
->>>
->>>     $ echo bdrv_aio_readv   > /tmp/events
->>>     $ echo bdrv_aio_writev >> /tmp/events
->>>     $ qemu -trace events=3D/tmp/events ... # your normal QEMU invocat=
-ion
->>>
->>> It's hard to know what is missing without seeing your QEMU command-li=
-ne
->>> and monitor commands you used.
->>>
->>> Stefan
->> I thought the example in doc was enabled by default.
->>
->> Thanks for your reply. Below is my command:
->> When to compile:
->>
->> ./configure --enable-debug --enable-trace-backends=3Dsimple
->>
->> $ echo bdrv_aio_readv   > /tmp/events
->> $ echo bdrv_aio_writev >> /tmp/events
->>
->>
->> qemu [...]
->>
->> -chardev socket,id=3Dmon1,host=3Dlocalhost,port=3D7777,server,nowait \
->> -mon chardev=3Dmon1,mode=3Dcontrol,pretty=3Don \
->> -trace events=3D/tmp/events
->>
->>
->> Did I miss something?
-> Recent QEMU versions do not have bdrv_aio_readv/bdrv_aio_writev trace
-> events, so you may not get any output.
->
-> Which events do you actually want to trace?
->
-> I will update the example in docs/devel/tracing.txt with trace events
-> that are more likely to be triggered.
->
-> Stefan
-Hi Stefan,
-     Thanks for the reply and your patch.
-     I just want to learn qemu with debugging.
-     I think it will be easier for me to learn the detail with this=20
-trace framework.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-     So I just tried it. I will try it again with your updated.
-
-
---=20
-Best regards. Wang Dong
+> ---
+>   hw/mips/mips_fulong2e.c | 15 +++++++++------
+>   hw/mips/mips_malta.c    | 14 ++++++++------
+>   hw/mips/mips_mipssim.c  |  5 +++--
+>   hw/mips/mips_r4k.c      |  6 ++++--
+>   4 files changed, 24 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index 3f3cb32651..3532399a13 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -110,16 +110,19 @@ static int64_t load_kernel (CPUMIPSState *env)
+>   {
+>       int64_t kernel_entry, kernel_low, kernel_high;
+>       int index = 0;
+> -    long initrd_size;
+> +    long kernel_size, initrd_size;
+>       ram_addr_t initrd_offset;
+>       uint32_t *prom_buf;
+>       long prom_size;
+>   
+> -    if (load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys, NULL,
+> -                 (uint64_t *)&kernel_entry, (uint64_t *)&kernel_low,
+> -                 (uint64_t *)&kernel_high, 0, EM_MIPS, 1, 0) < 0) {
+> -        fprintf(stderr, "qemu: could not load kernel '%s'\n",
+> -                loaderparams.kernel_filename);
+> +    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
+> +                           NULL, (uint64_t *)&kernel_entry,
+> +                           (uint64_t *)&kernel_low, (uint64_t *)&kernel_high,
+> +                           0, EM_MIPS, 1, 0);
+> +    if (kernel_size < 0) {
+> +        error_report("qemu: could not load kernel '%s': %s",
+> +                     loaderparams.kernel_filename,
+> +                     load_elf_strerror(kernel_size));
+>           exit(1);
+>       }
+>   
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 3487d16f61..8ecd544baa 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -794,7 +794,7 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
+>   static int64_t load_kernel (void)
+>   {
+>       int64_t kernel_entry, kernel_high;
+> -    long initrd_size;
+> +    long kernel_size, initrd_size;
+>       ram_addr_t initrd_offset;
+>       int big_endian;
+>       uint32_t *prom_buf;
+> @@ -808,11 +808,13 @@ static int64_t load_kernel (void)
+>       big_endian = 0;
+>   #endif
+>   
+> -    if (load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys, NULL,
+> -                 (uint64_t *)&kernel_entry, NULL, (uint64_t *)&kernel_high,
+> -                 big_endian, EM_MIPS, 1, 0) < 0) {
+> -        fprintf(stderr, "qemu: could not load kernel '%s'\n",
+> -                loaderparams.kernel_filename);
+> +    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
+> +                           NULL, (uint64_t *)&kernel_entry, NULL,
+> +                           (uint64_t *)&kernel_high, big_endian, EM_MIPS, 1, 0);
+> +    if (kernel_size < 0) {
+> +        error_report("qemu: could not load kernel '%s': %s",
+> +                     loaderparams.kernel_filename,
+> +                     load_elf_strerror(kernel_size));
+>           exit(1);
+>       }
+>   
+> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+> index 6990b1b0dd..07fc4c2300 100644
+> --- a/hw/mips/mips_mipssim.c
+> +++ b/hw/mips/mips_mipssim.c
+> @@ -78,8 +78,9 @@ static int64_t load_kernel(void)
+>           if ((entry & ~0x7fffffffULL) == 0x80000000)
+>               entry = (int32_t)entry;
+>       } else {
+> -        fprintf(stderr, "qemu: could not load kernel '%s'\n",
+> -                loaderparams.kernel_filename);
+> +        error_report("qemu: could not load kernel '%s': %s",
+> +                     loaderparams.kernel_filename,
+> +                     load_elf_strerror(kernel_size));
+>           exit(1);
+>       }
+>   
+> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+> index 690874be2b..2f5ced7409 100644
+> --- a/hw/mips/mips_r4k.c
+> +++ b/hw/mips/mips_r4k.c
+> @@ -31,6 +31,7 @@
+>   #include "sysemu/block-backend.h"
+>   #include "exec/address-spaces.h"
+>   #include "sysemu/qtest.h"
+> +#include "qemu/error-report.h"
+>   
+>   #define MAX_IDE_BUS 2
+>   
+> @@ -96,8 +97,9 @@ static int64_t load_kernel(void)
+>           if ((entry & ~0x7fffffffULL) == 0x80000000)
+>               entry = (int32_t)entry;
+>       } else {
+> -        fprintf(stderr, "qemu: could not load kernel '%s'\n",
+> -                loaderparams.kernel_filename);
+> +        error_report("qemu: could not load kernel '%s': %s",
+> +                     loaderparams.kernel_filename,
+> +                     load_elf_strerror(kernel_size));
+>           exit(1);
+>       }
+>   
+> 
