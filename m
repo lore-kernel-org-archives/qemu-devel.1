@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dadjx-0002xk-5H
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:01:53 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dadpP-0004uY-JT
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dadjt-0006c9-Tx
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:01:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33926)
+	(envelope-from <cohuck@redhat.com>) id 1dadpM-0002GI-7D
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:07:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dadjt-0006ag-OC
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:01:45 -0400
-Date: Thu, 27 Jul 2017 10:01:38 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dadpM-0002Fw-19
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:07:24 -0400
+Date: Thu, 27 Jul 2017 10:07:19 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170727100138.74ad2ad4@gondolin>
-In-Reply-To: <20170725224442.13383-3-pasic@linux.vnet.ibm.com>
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
+Message-ID: <20170727100719.564d2a72@gondolin>
+In-Reply-To: <08f16288223244deeccbdc6e4d2fced5d379504d.1501084908.git.alistair.francis@xilinx.com>
+References: <cover.1501084908.git.alistair.francis@xilinx.com>
+	<08f16288223244deeccbdc6e4d2fced5d379504d.1501084908.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
- for TIC
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] Convert remaining error_report() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, alistair23@gmail.com
 
-On Wed, 26 Jul 2017 00:44:42 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On Wed, 26 Jul 2017 09:07:52 -0700
+Alistair Francis <alistair.francis@xilinx.com> wrote:
 
-> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
-> contain zeros.  Bits 0-3 are already covered by cmd_code validity
-> checking, and bit 32 is covered by the CCW address checking.
+> In a previous patch (3dc6f8693694a649a9c83f1e2746565b47683923) we
+> converted uses of error_report("warning:"... to use warn_report()
+> instead. This was to help standardise on a single method of printing
+> warnings to the user.
 > 
-> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
-> check for the absence of certain flags.  Let's fix this.
+> There appears to have been some cases that slipped through in patch sets
+> applied around the same time, this patch catches the few remaining
+> cases.
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> All of the warnings were changed using this command:
+>   find ./* -type f -exec sed -i \
+>     's|error_report(".*warning[,:] |warn_report("|Ig' {} +
+> 
+> Indentation fixed up manually afterwards.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+
+Hm, the automatic cc:ing does not seem to have worked.
+
 > ---
->  hw/s390x/css.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index d17e21b7af..1f04ce4a1b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->              ret = -EINVAL;
->              break;
->          }
-> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
-> +        if (ccw.flags || ccw.count) {
-> +            /* We have already sanitized these if fmt 0. */
+>  block/qcow2.c      | 10 +++++-----
+>  target/s390x/kvm.c |  4 ++--
+>  trace/control.c    |  4 ++--
+>  3 files changed, 9 insertions(+), 9 deletions(-)
+> 
 
-I'd tweak that to
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index c4c5791d27..1084923adb 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -222,8 +222,8 @@ static void kvm_s390_enable_cmma(void)
+>      };
+>  
+>      if (mem_path) {
+> -        error_report("Warning: CMM will not be enabled because it is not "
+> -                     "compatible to hugetlbfs.");
+> +        warn_report("CMM will not be enabled because it is not "
+> +                    "compatible to hugetlbfs.");
+>          return;
+>      }
+>      rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
 
-/* We have already sanitized these if converted from fmt 0. */
+s390x part:
 
-Seems less confusing.
-
->              ret = -EINVAL;
->              break;
->          }
-
-I'm inclined to pick this as a 2.10 bugfix. Patch 1 still needs work
-from what I've seen.
+Acked-by: Cornelia Huck <cohuck@redhat.com>
