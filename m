@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dajXD-0005np-MK
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:13:04 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dajZ9-00089r-TY
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dajXA-0001kY-Uo
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:13:03 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33686)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dajXA-0001k2-Nt
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:13:00 -0400
-Received: by mail-wm0-x243.google.com with SMTP id q189so12753786wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:13:00 -0700 (PDT)
-Date: Thu, 27 Jul 2017 15:12:57 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170727141257.GI10129@stefanha-x1.localdomain>
-References: <20170725171014.25193-1-apahim@redhat.com>
-	<20170725171014.25193-4-apahim@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1dajZ8-0003Pp-OT
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:15:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dajZ8-0003No-Ef
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:15:02 -0400
+Date: Thu, 27 Jul 2017 16:14:57 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170727161457.58b3c7d1@gondolin>
+In-Reply-To: <316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+	<20170727135910.27d9e42e@gondolin>
+	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dCSxeJc5W8HZXZrD"
-Content-Disposition: inline
-In-Reply-To: <20170725171014.25193-4-apahim@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] qemu.py: cleanup message on
- negative exit code
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
+ initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
 
+On Thu, 27 Jul 2017 15:37:08 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
---dCSxeJc5W8HZXZrD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 07/27/2017 01:59 PM, Cornelia Huck wrote:
+> > On Thu, 27 Jul 2017 03:54:18 +0200
+> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> >   
+> >> When a channel path is hot plugged into a CSS, we should generate
+> >> a channel path initialized CRW (channel report word). The current
+> >> code does not do that, instead it puts a stub function with a TODO
+> >> reminder there.
+> >>
+> >> This implements the css_generate_chp_crws() function by:
+> >> 1. refactor the existing code.
+> >> 2. add an @add parameter to provide future callers with the
+> >>    capability of generating channel path permanent error with
+> >>    facility not initialized CRW.
+> >> 3. add a @hotplugged parameter, so to opt out generating initialized
+> >>    CRWs for predefined channel paths.  
+> > 
+> > I'm not 100% sure whether the logic is correct here. Let me elaborate:
+> > 
+> > The current code flow when hotplugging a device is:
+> > - Generate the schib.
+> > - Check if any of the chpids refers to a not yet existing channel path;
+> >   generate it if that is the case.
+> > - Post a crw for the subchannel.
+> > 
+> > The second step is where the current code seems to be not quite correct
+> > already. It is fine for coldplugged devices, but I really think we need
+> > to make sure that all referenced channel paths are in place before we
+> > hotplug a new device. It was not really relevant when we just had one
+> > very virtual channel path, and 3270 is experimental so it is not a
+> > problem in practice.  
+> 
+> What do you mean by not quite correct?  Are we somewhere in conflict with
+> the AR (if yes could you give me a pointer)? Or is it a modeling concern?
+> Or is it about the user interface design? Or any combination of these?
 
-On Tue, Jul 25, 2017 at 07:10:11PM +0200, Amador Pahim wrote:
-> The message contains the self._args, which has only part of the
-> options used in the qemu command line and is not representative
-> enough to figure out what happened to the process.
->=20
-> This patch drops the self._args part of the message.
->=20
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
-> ---
->  scripts/qemu.py | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+Modeling. Conceptually, you need at least one channel path to access a
+device; the subchannel is more or less a followup.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+As up to now, we only had a dummy channel path simply to satisfy the
+architecture, it did not really matter when it was 'created'. As it is
+always 'there' from beginning, there was no need for any CRW either. If
+there's now a need for real channel path modeling, we unfortunately
+have to give this some thought :)
 
---dCSxeJc5W8HZXZrD
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> > 
+> > This, of course, implies we need deeper changes. We need to create the
+> > channel paths before the subchannel is created and refuse hotplug of a
+> > device if not all channel paths it needs are defined. This means we
+> > need some things before we can claim real channel path support:
+> > - Have a way to specify channel paths on the command line resp. when
+> >   hotplugging. This implies they need to be real objects.
+> > - Have a way to specify which channel paths belong to a subchannel in
+> >   the same context. Keep existing device types working with the current
+> >   method.
+> > - Give channel paths states: Defined, configured. The right time for a
+> >   CRW is the transition between those states.
+> > - Only queue a 'device come' CRW for a subchannel if at least one of
+> >   its channel paths is in the configured state. Detach or make not
+> >   operational a subchannel if all of its paths are deconfigured.
+> >   
+> 
+> AFAIU in your opinion our model is to simple and needs to get more
+> complex. What benefits do we expect from the added complexity? I mean
+> our current model works (and I'm not sure what limitations do we
+> want to get rid of, or even what are the relevant limitations we have.)
 
------BEGIN PGP SIGNATURE-----
+I was under the impression that we want to support multiple, 'real'
+channel paths for vfio-ccw. Did I misunderstand?
 
-iQEcBAEBAgAGBQJZefTpAAoJEJykq7OBq3PIGFMH/3RCjyRB+jc6h3tWAIDMxRH0
-sWaQwvXhJJaOPjDNM4LlVIZLgln1GGp8/UzNZ1cgqcL1vhE4uCBapzgkK+d1w9Ik
-2qicEmeR6cddQjzgXQ73lWqbit0p0/t/mluSqjF12ypdTaxhVRGN6m16kZSn/HuD
-JCYGOPbzgjCI9/wlhAYsR1qLxLFqwYJ6K6dV58yh9AkNQ3asFgtyIC3s7lmWtqiQ
-FcB0mF3cLyFFWg346z6A1UsfrQ4YooGsOP9QL06TXNwPSK1ZFFfX7HGp++WJSJ+E
-JjFYzxXsXsO8mzTGvgHJ1wsuxPfj9e8k312XwfRGIaPd5zxNm3t7Af641OJWvGs=
-=2Wfc
------END PGP SIGNATURE-----
+> 
+> > Something along those lines also matches better what I've seen on z/VM
+> > or LPAR. I realize that it's not easy :(
+> > 
+> > tl;dr: I don't think we want chp crws until after we have a good chp
+> > model.  
+> 
+> I fully agree with this point.
 
---dCSxeJc5W8HZXZrD--
+Great.
