@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dajui-0004iD-8B
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:37:21 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dak4i-0000d1-JJ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dajud-0002y1-Da
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:37:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58297)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dajud-0002xJ-8N
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:37:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dajua-0008OB-Nt
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 14:37:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B5D1D2E80D1
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 14:37:11 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1dak4e-0000gE-Kd
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:47:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dak4e-0000fr-Ef
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:47:36 -0400
+Date: Thu, 27 Jul 2017 08:47:33 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170727084733.43038922@w520.home>
+In-Reply-To: <20170727105348.GG7970@umbus.fritz.box>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
+	<20170727105348.GG7970@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Jul 2017 14:20:07 -0000
-From: Michal Suchanek <hramrach@gmail.com>
-Reply-To: Bug 1096714 <1096714@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130107012337.1165.80927.malonedeb@gac.canonical.com>
-Message-Id: <150116520795.25059.1231686519771551025.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1096714] Re: qemu 1.3.0: usb devices shouldn't
- have same vendor/product ID and same serial
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-I see no option in Xorg.conf to match serial. Maybe there is. It is
-mostly undocumented, especially for some random ancient X11 snapshot the
-distro has.
+On Thu, 27 Jul 2017 20:53:48 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-That said the VM happens to be configured in such a way it works -
-keyboard and mouse are in same order on USB bus and in Xorg.conf
+> On Thu, Jul 27, 2017 at 10:11:48AM +0100, Peter Maydell wrote:
+> > On 27 July 2017 at 02:30, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:  
+> > > In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
+> > > quiesced by vfio-pci's finalize() routine until up to 6s after the
+> > > DEVICE_DELETED was emitted, leading to detach-device on the libvirt side pretty
+> > > much always crashing the host.  
+> > 
+> > My initial naive thought is that if the host kernel can crash then
+> > this is a host kernel bug... shouldn't the host kernel refuse
+> > the subsequent libvirt rebind if it would cause a crash ?  
+> 
+> I think so too, but I haven't been able to convince Alex.  Nor
+> find time to fix it in the kernel myself.
 
--- =
+It's not me you need to convince, it's GregKH[1].  That interpretation
+is that the user bind request is a mandate and we'll fall over
+ourselves to try to do as they ask.  I think the best I might be able
+to do is to kill the QEMU process to avoid compromising the kernel
+rather than killing the kernel after the isolation compromise has
+occurred.  Messing with driver binding is a privileged operation, and
+the kernel believes you get to keep all the pieces when it fails.
+Sorry.  Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1096714
+Alex
 
-Title:
-  qemu 1.3.0: usb devices shouldn't have same vendor/product ID and same
-  serial
-
-Status in QEMU:
-  New
-
-Bug description:
-  Boot Windows XP with
-  ./qemu-system-i386 -device pci-ohci -device usb-tablet
-  and then with
-  ./qemu-system-i386 -device pci-ohci -device usb-kbd
-
-  and you will notice, that the usb keyboard is not detected. In fact,
-  Windows XP detects the usb tablet and loads the driver for the tablet
-  instead of the driver for the keyboard.
-
-  The problem seems to be, that vendor and product ID and even the
-  seriel of both the usb tablet and the usb keyboard are the same as an
-  lsusb reveiles. Hence, Windows XP doesn't detect when you replace the
-  tablet by a keyboard and vice versa. I didn't check other USB devices,
-  but it seems a bad idea to me to have devices with the same
-  vendor/product Id. I'm not aware, whether it is sufficient to change
-  the seriel numbers of the devices.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1096714/+subscriptions
+[1] https://lkml.org/lkml/2017/7/10/728
