@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dahVh-0004rQ-KX
+	(envelope-from <crosa@redhat.com>) id 1dahVg-0004qC-IK
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dahVZ-0001m4-CJ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:17 -0400
+	(envelope-from <crosa@redhat.com>) id 1dahVW-0001kN-LA
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 08:03:16 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 27 Jul 2017 08:02:08 -0400
-Message-Id: <20170727120210.6943-4-crosa@redhat.com>
+Date: Thu, 27 Jul 2017 08:02:06 -0400
+Message-Id: <20170727120210.6943-2-crosa@redhat.com>
 In-Reply-To: <20170727120210.6943-1-crosa@redhat.com>
 References: <20170727120210.6943-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] qemu-iotests: remove commented out
- variables
+Subject: [Qemu-devel] [PATCH 1/5] configure: remove duplicate single quotes
+ on config.log header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-trivial@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-The variables FULL_MKFS_OPTIONS and FULL_MOUNT_OPTIONS are commented
-out, never used, and even refer to functions that do exist.  The last
-time these were touched was around 8 years ago, so I guess it's safe
-to assume outputting such information on test execution is still on the
-radar.
+The generation of the informational header on config.log contains two
+pairs of single quotes, which seems unintentional, and looks like
+this:
+
+  # QEMU configure log Thu Jul 26 08:17:15 EDT 2017
+  # Configured with: './configure' '--target-list=x86_64-softmmu'
+
+With this change, the quotes comprehend the entire command line:
+
+  # QEMU configure log Mon Jul 26 08:17:35 EDT 2017
+  # Configured with: './configure --target-list=x86_64-softmmu'
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/qemu-iotests/check | 4 ----
- 1 file changed, 4 deletions(-)
+ configure | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 7a2e0d0..437ef65 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -229,8 +229,6 @@ rm -f check.full
+diff --git a/configure b/configure
+index 987f59b..344d6d2 100755
+--- a/configure
++++ b/configure
+@@ -35,9 +35,7 @@ rm -f config.log
  
- FULL_IMGFMT_DETAILS=`_full_imgfmt_details`
- FULL_HOST_DETAILS=`_full_platform_details`
--#FULL_MKFS_OPTIONS=`_scratch_mkfs_options`
--#FULL_MOUNT_OPTIONS=`_scratch_mount_options`
+ # Print a helpful header at the top of config.log
+ echo "# QEMU configure log $(date)" >> config.log
+-printf "# Configured with:" >> config.log
+-printf " '%s'" "$0" "$@" >> config.log
+-echo >> config.log
++echo "# Configured with: '$0 $@'" >> config.log
+ echo "#" >> config.log
  
- cat <<EOF
- QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
-@@ -244,8 +242,6 @@ TEST_DIR      -- $TEST_DIR
- SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
- 
- EOF
--#MKFS_OPTIONS  -- $FULL_MKFS_OPTIONS
--#MOUNT_OPTIONS -- $FULL_MOUNT_OPTIONS
- 
- seq="check"
- 
+ print_error() {
 -- 
 2.9.4
