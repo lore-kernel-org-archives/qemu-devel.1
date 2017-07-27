@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dajcA-0001dy-UB
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:18:11 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dajhE-0003IU-Uq
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:23:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dajc7-0004lW-RF
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:18:10 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dajc7-0004lM-KM
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:18:07 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r77so10816350wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:18:07 -0700 (PDT)
-Date: Thu, 27 Jul 2017 15:18:04 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170727141804.GJ10129@stefanha-x1.localdomain>
-References: <20170725171014.25193-1-apahim@redhat.com>
-	<20170725171014.25193-2-apahim@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dajhB-0008J6-R2
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:23:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dajhB-0008Ib-HM
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:23:21 -0400
+References: <20170726165326.10327-1-anthony.perard@citrix.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a740b47-19e2-4cfb-b72f-9e883c57a4b8@redhat.com>
+Date: Thu, 27 Jul 2017 16:23:17 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YZVh52eu0Ophig4D"
-Content-Disposition: inline
-In-Reply-To: <20170725171014.25193-2-apahim@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] qemu.py: make 'args' public
+In-Reply-To: <20170726165326.10327-1-anthony.perard@citrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10] exec: Add lock parameter to
+ qemu_ram_ptr_length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
+To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-
---YZVh52eu0Ophig4D
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jul 25, 2017 at 07:10:09PM +0200, Amador Pahim wrote:
-> Let's make args public so users can extend it in instances
-> without feeling like abusing the internal API.
->=20
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
+On 26/07/2017 18:53, Anthony PERARD wrote:
+> Commit 04bf2526ce87f21b32c9acba1c5518708c243ad0 (exec: use
+> qemu_ram_ptr_length to access guest ram) start using qemu_ram_ptr_length
+> instead of qemu_map_ram_ptr, but when used with Xen, the behavior of
+> both function is different. They both call xen_map_cache, but one with
+> "lock", meaning the mapping of guest memory is never released
+> implicitly, and the second one without, which means, mapping can be
+> release later, when needed.
+> 
+> In the context of address_space_{read,write}_continue, the ptr to those
+> mapping should not be locked because it is used immediatly and never
+> used again.
+> 
+> The lock parameter make it explicit in which context qemu_ram_ptr_length
+> is called.
+> 
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 > ---
->  scripts/qemu.py               | 14 +++++++-------
->  tests/qemu-iotests/iotests.py | 18 +++++++++---------
->  2 files changed, 16 insertions(+), 16 deletions(-)
+>  exec.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 01ac21e3cd..63508cd35e 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2203,7 +2203,7 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
+>   * Called within RCU critical section.
+>   */
+>  static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+> -                                 hwaddr *size)
+> +                                 hwaddr *size, bool lock)
+>  {
+>      RAMBlock *block = ram_block;
+>      if (*size == 0) {
+> @@ -2222,10 +2222,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+>           * In that case just map the requested area.
+>           */
+>          if (block->offset == 0) {
+> -            return xen_map_cache(addr, *size, 1, true);
+> +            return xen_map_cache(addr, *size, lock ? 1 : 0, lock);
+>          }
+>  
+> -        block->host = xen_map_cache(block->offset, block->max_length, 1, true);
+> +        block->host = xen_map_cache(block->offset, block->max_length, 1, lock);
+>      }
+>  
+>      return ramblock_ptr(block, addr);
+> @@ -2947,7 +2947,7 @@ static MemTxResult address_space_write_continue(AddressSpace *as, hwaddr addr,
+>              }
+>          } else {
+>              /* RAM case */
+> -            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l);
+> +            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+>              memcpy(ptr, buf, l);
+>              invalidate_and_set_dirty(mr, addr1, l);
+>          }
+> @@ -3038,7 +3038,7 @@ MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
+>              }
+>          } else {
+>              /* RAM case */
+> -            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l);
+> +            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+>              memcpy(buf, ptr, l);
+>          }
+>  
+> @@ -3349,7 +3349,7 @@ void *address_space_map(AddressSpace *as,
+>  
+>      memory_region_ref(mr);
+>      *plen = address_space_extend_translation(as, addr, len, mr, xlat, l, is_write);
+> -    ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen);
+> +    ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
+>      rcu_read_unlock();
+>  
+>      return ptr;
+> 
 
-As discussed in the previous revision, I don't think this patch is
-justified because all current users just need a protected field.  There
-are no users who need the field to be public so this change is
-premature.
+Queued, thanks.
 
-Stefan
-
---YZVh52eu0Ophig4D
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEbBAEBAgAGBQJZefYcAAoJEJykq7OBq3PIdJ0H93nCUweWxZVSvdQzy4uKsrUL
-FQFhjbPE9eXvn3W31pZeLYdbJd3R6PzUHaCXzIH7DfLFe12LT7OGJ5wr/gaO0sTq
-Cqc+z7ADfLf75qpKwI7S/DtY/pvOXSAMa8NxhA2DPKDfigDOAFXCcoogIBX3Y3in
-QfPfvC50HGoV5seNxBNIW7h5uBOvWonPzJJAiKHi+yBTH6dlcr2tT3tegBFeMSs0
-GnINXjJjBD/Fs++TTwg5X4djiOmjgHBob1ATz7ua0TfuFIjh5sK6H3APWbVSrhN4
-VWSqiMeCHJ0UF55x8E+P3luUdol286rsEVtPtOOkoEZKeH7cRpiUxESAPzG77A==
-=Dvyw
------END PGP SIGNATURE-----
-
---YZVh52eu0Ophig4D--
+Paolo
