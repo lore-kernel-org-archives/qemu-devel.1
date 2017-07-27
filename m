@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1darXk-0000vG-JU
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:46:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1darbo-0001ki-TG
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1darXh-0001xC-Ry
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:46:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34799
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1darXh-0001wu-Lw
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:46:05 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6RMdPnw098532
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 18:46:05 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2byp6qq7ud-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 18:46:04 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 27 Jul 2017 18:46:04 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1darbm-00057b-8m
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:50:20 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
+	<1501153150-19984-6-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1c5fa88b-5945-ae88-69b3-9663739b906f@amsat.org>
+Date: Thu, 27 Jul 2017 19:50:13 -0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <150119181625.29297.6660999538265637711@loki>
-References: <20170726214010.420-1-f4bug@amsat.org>
-	<20170726214010.420-4-f4bug@amsat.org>
-	<150119181625.29297.6660999538265637711@loki>
-Date: Thu, 27 Jul 2017 17:45:53 -0500
-Message-Id: <150119555360.29297.17510166454299981899@loki>
-Subject: Re: [Qemu-devel] [PATCH for 2.10 3/4] fdt: probe for v1.4.2 using
- fdt_setprop_inplace_namelen_partial()
+In-Reply-To: <1501153150-19984-6-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.10 5/5] target/arm:
+ Migrate MPU_RNR register state for M profile cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,53 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, John Arbuckle <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: James Hogan <james.hogan@imgtec.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Quoting Michael Roth (2017-07-27 16:43:36)
-> Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-26 16:40:09)
-> > instead of fdt_first_subnode() which is v1.4.0
-> > =
+On 07/27/2017 07:59 AM, Peter Maydell wrote:
+> The PMSAv7 region number register is migrated for R profile
+> cores using the cpreg scheme, but M profile doesn't use
+> cpregs, and so we weren't migrating the MPU_RNR register state
+> at all. Fix that by adding a migration subsection for the
+> M profile case.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> =
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-Doh, please ignore that. I meant:
-
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-> =
-
-> > ---
-> >  configure | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > =
-
-> > diff --git a/configure b/configure
-> > index 0d5bdb3ae9..2d803d6a77 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -3565,7 +3565,10 @@ if test "$fdt" !=3D "no" ; then
-> >    cat > $TMPC << EOF
-> >  #include <libfdt.h>
-> >  #include <libfdt_env.h>
-> > -int main(void) { fdt_first_subnode(0, 0); return 0; }
-> > +int main(void) {
-> > +    fdt_setprop_inplace_namelen_partial(0, 0, 0, 0, 0, 0, 0);
-> > +    return 0;
-> > +}
-> >  EOF
-> >    if compile_prog "" "$fdt_libs" ; then
-> >      # system DTC is good - use it
-> > -- =
-
-> > 2.13.3
-> > =
-
-> > =
-
-> =
-
->=20
+> ---
+>   target/arm/machine.c | 28 ++++++++++++++++++++++++++++
+>   1 file changed, 28 insertions(+)
+> 
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index 93c1a78..1f66da4 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -171,6 +171,29 @@ static const VMStateDescription vmstate_pmsav7 = {
+>       }
+>   };
+>   
+> +static bool pmsav7_rnr_needed(void *opaque)
+> +{
+> +    ARMCPU *cpu = opaque;
+> +    CPUARMState *env = &cpu->env;
+> +
+> +    /* For R profile cores pmsav7.rnr is migrated via the cpreg
+> +     * "RGNR" definition in helper.h. For M profile we have to
+> +     * migrate it separately.
+> +     */
+> +    return arm_feature(env, ARM_FEATURE_M);
+> +}
+> +
+> +static const VMStateDescription vmstate_pmsav7_rnr = {
+> +    .name = "cpu/pmsav7-rnr",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = pmsav7_rnr_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(env.pmsav7.rnr, ARMCPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>   static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
+>                       VMStateField *field)
+>   {
+> @@ -377,6 +400,11 @@ const VMStateDescription vmstate_arm_cpu = {
+>           &vmstate_iwmmxt,
+>           &vmstate_m,
+>           &vmstate_thumb2ee,
+> +        /* pmsav7_rnr must come before pmsav7 so that we have the
+> +         * region number before we test it in the VMSTATE_VALIDATE
+> +         * in vmstate_pmsav7.
+> +         */
+> +        &vmstate_pmsav7_rnr,
+>           &vmstate_pmsav7,
+>           NULL
+>       }
+> 
