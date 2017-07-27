@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1daeDT-0008SF-MJ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:32:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1daeGG-0001p7-Qk
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1daeDS-0008LS-Vc
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:32:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1daeDS-0008L3-QQ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:32:18 -0400
-Date: Thu, 27 Jul 2017 10:32:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170727103214.3b3070b2@gondolin>
-In-Reply-To: <20170725224442.13383-3-pasic@linux.vnet.ibm.com>
-References: <20170725224442.13383-1-pasic@linux.vnet.ibm.com>
-	<20170725224442.13383-3-pasic@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1daeGC-0002KE-Vy
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:35:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36856)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1daeGC-0002Ir-PX
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 04:35:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1daeGB-0002vr-Vp
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:35:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EBF222E80CC
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 08:35:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/css: fix bits must be zero check
- for TIC
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Jul 2017 08:22:12 -0000
+From: Gerd Hoffmann <1096714@bugs.launchpad.net>
+Reply-To: Bug 1096714 <1096714@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130107012337.1165.80927.malonedeb@gac.canonical.com>
+Message-Id: <150114373233.31693.11556062340537331908.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1096714] Re: qemu 1.3.0: usb devices shouldn't
+ have same vendor/product ID and same serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, 26 Jul 2017 00:44:42 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Try "-device usb-tablet,serial=3D1234"
 
-> According to the PoP bit positions 0-3 and 8-32 of the format-1 CCW must
-> contain zeros.  Bits 0-3 are already covered by cmd_code validity
-> checking, and bit 32 is covered by the CCW address checking.
-> 
-> Bits 8-31 correspond to CCW1.flags and CCW1.count.  Currently we only
-> check for the absence of certain flags.  Let's fix this.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  hw/s390x/css.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index d17e21b7af..1f04ce4a1b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -884,7 +884,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->              ret = -EINVAL;
->              break;
->          }
-> -        if (ccw.flags & (CCW_FLAG_CC | CCW_FLAG_DC)) {
-> +        if (ccw.flags || ccw.count) {
-> +            /* We have already sanitized these if fmt 0. */
->              ret = -EINVAL;
->              break;
->          }
+-- =
 
-Thanks, applied (with tweaked comment).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1096714
 
-Dong Jia: I've added your R-b, please let me know if that's not ok.
+Title:
+  qemu 1.3.0: usb devices shouldn't have same vendor/product ID and same
+  serial
+
+Status in QEMU:
+  New
+
+Bug description:
+  Boot Windows XP with
+  ./qemu-system-i386 -device pci-ohci -device usb-tablet
+  and then with
+  ./qemu-system-i386 -device pci-ohci -device usb-kbd
+
+  and you will notice, that the usb keyboard is not detected. In fact,
+  Windows XP detects the usb tablet and loads the driver for the tablet
+  instead of the driver for the keyboard.
+
+  The problem seems to be, that vendor and product ID and even the
+  seriel of both the usb tablet and the usb keyboard are the same as an
+  lsusb reveiles. Hence, Windows XP doesn't detect when you replace the
+  tablet by a keyboard and vice versa. I didn't check other USB devices,
+  but it seems a bad idea to me to have devices with the same
+  vendor/product Id. I'm not aware, whether it is sufficient to change
+  the seriel numbers of the devices.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1096714/+subscriptions
