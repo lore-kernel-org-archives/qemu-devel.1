@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dadG0-0007ag-CA
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 03:30:53 -0400
+	(envelope-from <yu.chen@h3c.com>) id 1dadHm-00088y-5u
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 03:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dadFx-0006lu-OP
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 03:30:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50767)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dadFx-0006lD-I9
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 03:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dadFv-0003lz-8M
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 222972E80C9
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 07:30:47 +0000 (UTC)
+	(envelope-from <yu.chen@h3c.com>) id 1dadHj-0007wG-Hy
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 03:32:42 -0400
+Received: from smtp.h3c.com ([60.191.123.56]:53138 helo=h3cmg01-ex.h3c.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yu.chen@h3c.com>) id 1dadHi-0007ua-Ef
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 03:32:39 -0400
+From: Yuchen <yu.chen@h3c.com>
+Date: Thu, 27 Jul 2017 07:31:47 +0000
+Message-ID: <C25843086C0E6B4ABD8D1A14B0094D46C09D8A43@H3CMLB12-EX.srv.huawei-3com.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Jul 2017 07:21:19 -0000
-From: Thomas Huth <1706866@bugs.launchpad.net>
-Reply-To: Bug 1706866 <1706866@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150113818340.31767.9409806903366726521.malonedeb@gac.canonical.com>
-Message-Id: <150114007965.25678.1629105859703753667.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706866] Re: migrate:  add tls option in virsh,
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel]  [Bug 1706866] [NEW]migrate: add tls option in virsh,
  migrate failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,67 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is the qemu bug tracker here. Please report libvirt bugs to the
-libvirt project instead (see http://libvirt.org/bugs.html). Thanks!
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706866
-
-Title:
-  migrate:  add tls option in virsh, migrate failed
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  version:
-      libvirt-3.4.0 + qemu-2.9.90(latest)
-
-  domain:
-      any
-
-  step:
-      1. generate tls certificate in /etc/pki/libvirt-migrate
-      2. start vm
-      3. migrate vm, cmdline:
-         virsh migrate rh7.1-3 --live --undefinesource --persistent --verbo=
-se --tls qemu+ssh://IP/system
-      4. then migrate failed and reported:
-   Migration: [ 64 %]error: internal error: qemu unexpectedly closed the mo=
-nitor: Domain pid=3D5288, libvirtd pid=3D49634
-   kvm: warning: CPU(s) not present in any NUMA nodes: 2 3 4 5 6 7 8 9 10 1=
-1 12 13 14 15 16 17 18 19 20 21 22 23
-   kvm: warning: All CPU(s) up to maxcpus should be described in NUMA config
-   kvm: error while loading state section id 2(ram)
-   kvm: load of migration failed: Input/output error
-
-  other:
-      Analysis qemu code and debug:
-  #0  ram_save_page (f=3D0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=
-=3Dfalse, bytes_transferred=3D0x55ca885ec1d8) =
-
-  #1  0x000055ca87b00b21 in ram_save_target_page (ms=3D0x55ca885b8d80, f=3D=
-0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
-=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
-  #2  0x000055ca87b00bda in ram_save_host_page (ms=3D0x55ca885b8d80, f=3D0x=
-55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
-=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
-  #3  0x000055ca87b00d39 in ram_find_and_save_block (f=3D0x55ca8be370e0, la=
-st_stage=3Dfalse, bytes_transferred=3D0x55ca885ec1d8)
-  #4  0x000055ca87b020b8 in ram_save_iterate (f=3D0x55ca8be370e0, opaque=3D=
-0x0)
-  #5  0x000055ca87b07a9a in qemu_savevm_state_iterate (f=3D0x55ca8be370e0, =
-postcopy=3Dfalse) =
-
-  #6  0x000055ca87e404e5 in migration_thread (opaque=3D0x55ca885b8d80)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706866/+subscriptions
+QnVnIERlc2NyaXB0aW9uDQp2ZXJzaW9uOg0KICAgIGxpYnZpcnQtMy40LjAgKyBxZW11LTIuOS45
+MChsYXRlc3QpDQpkb21haW46DQogICAgYW55DQpzdGVwOg0KICAgIDEuIGdlbmVyYXRlIHRscyBj
+ZXJ0aWZpY2F0ZSBpbiAvZXRjL3BraS9saWJ2aXJ0LW1pZ3JhdGUNCiAgICAyLiBzdGFydCB2bQ0K
+ICAgIDMuIG1pZ3JhdGUgdm0sIGNtZGxpbmU6DQogICAgICAgdmlyc2ggbWlncmF0ZSByaDcuMS0z
+IC0tbGl2ZSAtLXVuZGVmaW5lc291cmNlIC0tcGVyc2lzdGVudCAtLXZlcmJvc2UgLS10bHMgcWVt
+dStzc2g6Ly9JUC9zeXN0ZW0NCiAgICA0LiB0aGVuIG1pZ3JhdGUgZmFpbGVkIGFuZCByZXBvcnRl
+ZDoNCiBNaWdyYXRpb246IFsgNjQgJV1lcnJvcjogaW50ZXJuYWwgZXJyb3I6IHFlbXUgdW5leHBl
+Y3RlZGx5IGNsb3NlZCB0aGUgbW9uaXRvcjogRG9tYWluIHBpZD01Mjg4LCBsaWJ2aXJ0ZCBwaWQ9
+NDk2MzQNCiBrdm06IHdhcm5pbmc6IENQVShzKSBub3QgcHJlc2VudCBpbiBhbnkgTlVNQSBub2Rl
+czogMiAzIDQgNSA2IDcgOCA5IDEwIDExIDEyIDEzIDE0IDE1IDE2IDE3IDE4IDE5IDIwIDIxIDIy
+IDIzDQoga3ZtOiB3YXJuaW5nOiBBbGwgQ1BVKHMpIHVwIHRvIG1heGNwdXMgc2hvdWxkIGJlIGRl
+c2NyaWJlZCBpbiBOVU1BIGNvbmZpZw0KIGt2bTogZXJyb3Igd2hpbGUgbG9hZGluZyBzdGF0ZSBz
+ZWN0aW9uIGlkIDIocmFtKQ0KIGt2bTogbG9hZCBvZiBtaWdyYXRpb24gZmFpbGVkOiBJbnB1dC9v
+dXRwdXQgZXJyb3INCm90aGVyOg0KICAgIEFuYWx5c2lzIHFlbXUgY29kZSBhbmQgZGVidWc6DQoj
+MCByYW1fc2F2ZV9wYWdlIChmPTB4NTVjYThiZTM3MGUwLCBwc3M9MHg3ZmVmZGZjN2I5YTAsIGxh
+c3Rfc3RhZ2U9ZmFsc2UsIGJ5dGVzX3RyYW5zZmVycmVkPTB4NTVjYTg4NWVjMWQ4KQ0KIzEgMHgw
+MDAwNTVjYTg3YjAwYjIxIGluIHJhbV9zYXZlX3RhcmdldF9wYWdlIChtcz0weDU1Y2E4ODViOGQ4
+MCwgZj0weDU1Y2E4YmUzNzBlMCwgcHNzPTB4N2ZlZmRmYzdiOWEwLCBsYXN0X3N0YWdlPWZhbHNl
+LCBieXRlc190cmFuc2ZlcnJlZD0weDU1Y2E4ODVlYzFkOCwgZGlydHlfcmFtX2Ficz0wKQ0KIzIg
+MHgwMDAwNTVjYTg3YjAwYmRhIGluIHJhbV9zYXZlX2hvc3RfcGFnZSAobXM9MHg1NWNhODg1Yjhk
+ODAsIGY9MHg1NWNhOGJlMzcwZTAsIHBzcz0weDdmZWZkZmM3YjlhMCwgbGFzdF9zdGFnZT1mYWxz
+ZSwgYnl0ZXNfdHJhbnNmZXJyZWQ9MHg1NWNhODg1ZWMxZDgsIGRpcnR5X3JhbV9hYnM9MCkNCiMz
+IDB4MDAwMDU1Y2E4N2IwMGQzOSBpbiByYW1fZmluZF9hbmRfc2F2ZV9ibG9jayAoZj0weDU1Y2E4
+YmUzNzBlMCwgbGFzdF9zdGFnZT1mYWxzZSwgYnl0ZXNfdHJhbnNmZXJyZWQ9MHg1NWNhODg1ZWMx
+ZDgpDQojNCAweDAwMDA1NWNhODdiMDIwYjggaW4gcmFtX3NhdmVfaXRlcmF0ZSAoZj0weDU1Y2E4
+YmUzNzBlMCwgb3BhcXVlPTB4MCkNCiM1IDB4MDAwMDU1Y2E4N2IwN2E5YSBpbiBxZW11X3NhdmV2
+bV9zdGF0ZV9pdGVyYXRlIChmPTB4NTVjYThiZTM3MGUwLCBwb3N0Y29weT1mYWxzZSkNCiM2IDB4
+MDAwMDU1Y2E4N2U0MDRlNSBpbiBtaWdyYXRpb25fdGhyZWFkIChvcGFxdWU9MHg1NWNhODg1Yjhk
+ODApDQoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCuacrOmCruS7tuWPiuWFtumZhOS7tuWQq+acieaW
+sOWNjuS4ieaKgOacr+aciemZkOWFrOWPuOeahOS/neWvhuS/oeaBr++8jOS7hemZkOS6juWPkemA
+gee7meS4iumdouWcsOWdgOS4reWIl+WHug0K55qE5Liq5Lq65oiW576k57uE44CC56aB5q2i5Lu7
+5L2V5YW25LuW5Lq65Lul5Lu75L2V5b2i5byP5L2/55So77yI5YyF5ous5L2G5LiN6ZmQ5LqO5YWo
+6YOo5oiW6YOo5YiG5Zyw5rOE6Zyy44CB5aSN5Yi244CBDQrmiJbmlaPlj5HvvInmnKzpgq7ku7bk
+uK3nmoTkv6Hmga/jgILlpoLmnpzmgqjplJnmlLbkuobmnKzpgq7ku7bvvIzor7fmgqjnq4vljbPn
+lLXor53miJbpgq7ku7bpgJrnn6Xlj5Hku7bkurrlubbliKDpmaTmnKwNCumCruS7tu+8gQ0KVGhp
+cyBlLW1haWwgYW5kIGl0cyBhdHRhY2htZW50cyBjb250YWluIGNvbmZpZGVudGlhbCBpbmZvcm1h
+dGlvbiBmcm9tIE5ldyBIM0MsIHdoaWNoIGlzDQppbnRlbmRlZCBvbmx5IGZvciB0aGUgcGVyc29u
+IG9yIGVudGl0eSB3aG9zZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92ZS4gQW55IHVzZSBvZiB0aGUN
+CmluZm9ybWF0aW9uIGNvbnRhaW5lZCBoZXJlaW4gaW4gYW55IHdheSAoaW5jbHVkaW5nLCBidXQg
+bm90IGxpbWl0ZWQgdG8sIHRvdGFsIG9yIHBhcnRpYWwNCmRpc2Nsb3N1cmUsIHJlcHJvZHVjdGlv
+biwgb3IgZGlzc2VtaW5hdGlvbikgYnkgcGVyc29ucyBvdGhlciB0aGFuIHRoZSBpbnRlbmRlZA0K
+cmVjaXBpZW50KHMpIGlzIHByb2hpYml0ZWQuIElmIHlvdSByZWNlaXZlIHRoaXMgZS1tYWlsIGlu
+IGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXINCmJ5IHBob25lIG9yIGVtYWlsIGltbWVk
+aWF0ZWx5IGFuZCBkZWxldGUgaXQhDQo=
