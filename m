@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1dapQk-0005Cr-M1
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:30:48 -0400
+	(envelope-from <kevin@koconnor.net>) id 1dapab-0000Cl-UF
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1dapQf-0008O8-Mb
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:30:46 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37910)
+	(envelope-from <kevin@koconnor.net>) id 1dapaX-0006J8-0m
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:40:57 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33522)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1dapQf-0008NK-DM
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:30:41 -0400
-Received: by mail-pf0-x243.google.com with SMTP id e3so1403330pfc.5
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 13:30:41 -0700 (PDT)
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Thu, 27 Jul 2017 13:30:34 -0700
-Message-Id: <20170727203034.67780-1-anatol.pomozov@gmail.com>
-In-Reply-To: <150118286385.114.1968237577155737251@5d477a5b5989>
-References: <150118286385.114.1968237577155737251@5d477a5b5989>
-Subject: [Qemu-devel] [PATCH] multiboot: Change multiboot_info from array of
- bytes to a C struct
+	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1dapaW-0006IW-MM
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:40:52 -0400
+Received: by mail-qt0-x243.google.com with SMTP id u19so8405564qtc.0
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 13:40:52 -0700 (PDT)
+Date: Thu, 27 Jul 2017 16:40:50 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+Message-ID: <20170727204050.GA10211@morn.lan>
+References: <20170726093136.13627-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170726093136.13627-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [qemu PATCH for 2.10] i386: acpi: provide an XSDT
+ instead of an RSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,510 +29,410 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: vlad.lungu@windriver.com, kwolf@redhat.com, Anatol Pomozov <anatol.pomozov@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, seabios@seabios.org, lersek@redhat.com, lists@philjordan.eu, imammedo@redhat.com, mst@redhat.com, phil@philjordan.eu, programmingkidx@gmail.com, kraxel@redhat.com
 
-Using C structs makes the code more readable and prevents type conversion
-errors.
+On Wed, Jul 26, 2017 at 11:31:36AM +0200, Paolo Bonzini wrote:
+> The tables that QEMU provides are not ACPI 1.0 compatible since commit
+> 77af8a2b95 ("hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve
+> guest OS support.", 2017-05-03).  This is visible with Windows 2000,
+> which refuses to parse the rev3 FADT and fails to boot.
+> 
+> The recommended solution in this case is to build two FADTs, v1 being
+> pointed to by the RSDT and v3 by the XSDT.  However, we leave this task
+> to the firmware.  This patch simply switches the RSDT to the XSDT, which
+> is valid for all ACPI 2.0-friendly operating systems and also leaves
+> SeaBIOS the freedom to build an RSDT that points to the compatibility
+> FADT.
 
-Borrow multiboot1 header from GRUB project.
+Another possible solution to this issue would be for QEMU to instruct
+the firmware to build both rev1 and rev3 FADTs, but be clear which
+links are for legacy purposes only.  This could be done with a new
+ADD_LEGACY_POINTER linker loader command.  Existing firmwares should
+ignore the new ADD_LEGACY_POINTER command and new versions of SeaBIOS
+could be extended to honor it.
 
-Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
----
- hw/i386/multiboot.c        | 124 +++++++++-------------
- hw/i386/multiboot_header.h | 254 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 304 insertions(+), 74 deletions(-)
- create mode 100644 hw/i386/multiboot_header.h
+I proto-typed it (but haven't done significant testing).  Admittedly,
+it is a pretty ugly hack.
 
-diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-index f13e23139b..19113c0fce 100644
---- a/hw/i386/multiboot.c
-+++ b/hw/i386/multiboot.c
-@@ -28,6 +28,7 @@
- #include "hw/hw.h"
- #include "hw/nvram/fw_cfg.h"
- #include "multiboot.h"
-+#include "multiboot_header.h"
- #include "hw/loader.h"
- #include "elf.h"
- #include "sysemu/sysemu.h"
-@@ -47,39 +48,9 @@
- #error multiboot struct needs to fit in 16 bit real mode
- #endif
+-Kevin
+
+
+====================== SeaBIOS patch =======================
+
+--- a/src/fw/romfile_loader.c
++++ b/src/fw/romfile_loader.c
+@@ -234,6 +234,7 @@ int romfile_loader_execute(const char *name)
+         case ROMFILE_LOADER_COMMAND_ALLOCATE:
+             romfile_loader_allocate(entry, files);
+             break;
++        case ROMFILE_LOADER_COMMAND_ADD_LEGACY_POINTER:
+         case ROMFILE_LOADER_COMMAND_ADD_POINTER:
+             romfile_loader_add_pointer(entry, files);
+             break;
+diff --git a/src/fw/romfile_loader.h b/src/fw/romfile_loader.h
+index fcd4ab2..4e266e8 100644
+--- a/src/fw/romfile_loader.h
++++ b/src/fw/romfile_loader.h
+@@ -77,6 +77,7 @@ enum {
+     ROMFILE_LOADER_COMMAND_ADD_POINTER        = 0x2,
+     ROMFILE_LOADER_COMMAND_ADD_CHECKSUM       = 0x3,
+     ROMFILE_LOADER_COMMAND_WRITE_POINTER      = 0x4,
++    ROMFILE_LOADER_COMMAND_ADD_LEGACY_POINTER = 0x5,
+ };
  
--enum {
--    /* Multiboot info */
--    MBI_FLAGS       = 0,
--    MBI_MEM_LOWER   = 4,
--    MBI_MEM_UPPER   = 8,
--    MBI_BOOT_DEVICE = 12,
--    MBI_CMDLINE     = 16,
--    MBI_MODS_COUNT  = 20,
--    MBI_MODS_ADDR   = 24,
--    MBI_MMAP_ADDR   = 48,
--    MBI_BOOTLOADER  = 64,
--
--    MBI_SIZE        = 88,
--
--    /* Multiboot modules */
--    MB_MOD_START    = 0,
--    MB_MOD_END      = 4,
--    MB_MOD_CMDLINE  = 8,
--
--    MB_MOD_SIZE     = 16,
--
--    /* Region offsets */
--    ADDR_E820_MAP = MULTIBOOT_STRUCT_ADDR + 0,
--    ADDR_MBI      = ADDR_E820_MAP + 0x500,
--
--    /* Multiboot flags */
--    MULTIBOOT_FLAGS_MEMORY      = 1 << 0,
--    MULTIBOOT_FLAGS_BOOT_DEVICE = 1 << 1,
--    MULTIBOOT_FLAGS_CMDLINE     = 1 << 2,
--    MULTIBOOT_FLAGS_MODULES     = 1 << 3,
--    MULTIBOOT_FLAGS_MMAP        = 1 << 6,
--    MULTIBOOT_FLAGS_BOOTLOADER  = 1 << 9,
--};
-+/* Region offsets */
-+#define ADDR_E820_MAP MULTIBOOT_STRUCT_ADDR
-+#define ADDR_MBI      (ADDR_E820_MAP + 0x500)
- 
- typedef struct {
-     /* buffer holding kernel, cmdlines and mb_infos */
-@@ -128,14 +99,15 @@ static void mb_add_mod(MultibootState *s,
-                        hwaddr start, hwaddr end,
-                        hwaddr cmdline_phys)
+ enum {
+
+
+====================== QEMU patch =======================
+
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 36a6cc4..eed1a2c 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1576,7 +1576,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+ /* Build rsdt table */
+ void
+ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+-           const char *oem_id, const char *oem_table_id)
++           const char *oem_id, const char *oem_table_id, unsigned fadt)
  {
--    char *p;
-+    multiboot_module_t *mod;
-     assert(s->mb_mods_count < s->mb_mods_avail);
+     int i;
+     unsigned rsdt_entries_offset;
+@@ -1587,12 +1587,15 @@ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
  
--    p = (char *)s->mb_buf + s->offset_mbinfo + MB_MOD_SIZE * s->mb_mods_count;
-+    mod = s->mb_buf + s->offset_mbinfo +
-+          sizeof(multiboot_module_t) * s->mb_mods_count;
+     rsdt = acpi_data_push(table_data, rsdt_len);
+     rsdt_entries_offset = (char *)rsdt->table_offset_entry - table_data->data;
+-    for (i = 0; i < table_offsets->len; ++i) {
++    bios_linker_loader_add_legacy_pointer(linker,
++        ACPI_BUILD_TABLE_FILE, rsdt_entries_offset, rsdt_entry_size,
++        ACPI_BUILD_TABLE_FILE, fadt);
++    for (i = 1; i < table_offsets->len; ++i) {
+         uint32_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
+         uint32_t rsdt_entry_offset = rsdt_entries_offset + rsdt_entry_size * i;
  
--    stl_p(p + MB_MOD_START,   start);
--    stl_p(p + MB_MOD_END,     end);
--    stl_p(p + MB_MOD_CMDLINE, cmdline_phys);
-+    stl_p(&mod->mod_start, start);
-+    stl_p(&mod->mod_end,   end);
-+    stl_p(&mod->cmdline,   cmdline_phys);
+         /* rsdt->table_offset_entry to be filled by Guest linker */
+-        bios_linker_loader_add_pointer(linker,
++        bios_linker_loader_add_legacy_pointer(linker,
+             ACPI_BUILD_TABLE_FILE, rsdt_entry_offset, rsdt_entry_size,
+             ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
+     }
+diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+index 046183a..3be6ac4 100644
+--- a/hw/acpi/bios-linker-loader.c
++++ b/hw/acpi/bios-linker-loader.c
+@@ -100,10 +100,11 @@ struct BiosLinkerLoaderEntry {
+ typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
  
-     mb_debug("mod%02d: "TARGET_FMT_plx" - "TARGET_FMT_plx"\n",
-              s->mb_mods_count, start, end);
-@@ -151,26 +123,29 @@ int load_multiboot(FWCfgState *fw_cfg,
-                    int kernel_file_size,
-                    uint8_t *header)
+ enum {
+-    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
+-    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
++    BIOS_LINKER_LOADER_COMMAND_ALLOCATE           = 0x1,
++    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER        = 0x2,
++    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM       = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER      = 0x4,
++    BIOS_LINKER_LOADER_COMMAND_ADD_LEGACY_POINTER = 0x5,
+ };
+ 
+ enum {
+@@ -243,28 +244,13 @@ void bios_linker_loader_add_checksum(BIOSLinker *linker, const char *file_name,
+     g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+ }
+ 
+-/*
+- * bios_linker_loader_add_pointer: ask guest to patch address in
+- * destination file with a pointer to source file
+- *
+- * @linker: linker object instance
+- * @dest_file: destination file that must be changed
+- * @dst_patched_offset: location within destination file blob to be patched
+- *                      with the pointer to @src_file+@src_offset (i.e. source
+- *                      blob allocated in guest memory + @src_offset), in bytes
+- * @dst_patched_offset_size: size of the pointer to be patched
+- *                      at @dst_patched_offset in @dest_file blob, in bytes
+- * @src_file: source file who's address must be taken
+- * @src_offset: location within source file blob to which
+- *              @dest_file+@dst_patched_offset will point to after
+- *              firmware's executed ADD_POINTER command
+- */
+-void bios_linker_loader_add_pointer(BIOSLinker *linker,
+-                                    const char *dest_file,
+-                                    uint32_t dst_patched_offset,
+-                                    uint8_t dst_patched_size,
+-                                    const char *src_file,
+-                                    uint32_t src_offset)
++static void add_pointer(BIOSLinker *linker,
++                        const char *dest_file,
++                        uint32_t dst_patched_offset,
++                        uint8_t dst_patched_size,
++                        const char *src_file,
++                        uint32_t src_offset,
++                        uint32_t command)
  {
--    int i, is_multiboot = 0;
-+    int i;
-+    bool is_multiboot = false;
-     uint32_t flags = 0;
-     uint32_t mh_entry_addr;
-     uint32_t mh_load_addr;
-     uint32_t mb_kernel_size;
-     MultibootState mbs;
--    uint8_t bootinfo[MBI_SIZE];
-+    multiboot_info_t bootinfo;
-     uint8_t *mb_bootinfo_data;
-     uint32_t cmdline_len;
-+    struct multiboot_header *multiboot_header;
+     uint64_t le_src_offset;
+     BiosLinkerLoaderEntry entry;
+@@ -282,7 +268,7 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+             sizeof entry.pointer.dest_file - 1);
+     strncpy(entry.pointer.src_file, src_file,
+             sizeof entry.pointer.src_file - 1);
+-    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_ADD_POINTER);
++    entry.command = cpu_to_le32(command);
+     entry.pointer.offset = cpu_to_le32(dst_patched_offset);
+     entry.pointer.size = dst_patched_size;
+     assert(dst_patched_size == 1 || dst_patched_size == 2 ||
+@@ -296,6 +282,61 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+ }
  
-     /* Ok, let's see if it is a multiboot image.
-        The header is 12x32bit long, so the latest entry may be 8192 - 48. */
-     for (i = 0; i < (8192 - 48); i += 4) {
--        if (ldl_p(header+i) == 0x1BADB002) {
--            uint32_t checksum = ldl_p(header+i+8);
--            flags = ldl_p(header+i+4);
-+        multiboot_header = (struct multiboot_header *)(header + i);
-+        if (ldl_p(&multiboot_header->magic) == MULTIBOOT_HEADER_MAGIC) {
-+            uint32_t checksum = ldl_p(&multiboot_header->checksum);
-+            flags = ldl_p(&multiboot_header->flags);
-             checksum += flags;
--            checksum += (uint32_t)0x1BADB002;
-+            checksum += (uint32_t)MULTIBOOT_HEADER_MAGIC;
-             if (!checksum) {
--                is_multiboot = 1;
-+                is_multiboot = true;
-                 break;
-             }
-         }
-@@ -180,13 +155,13 @@ int load_multiboot(FWCfgState *fw_cfg,
-         return 0; /* no multiboot */
- 
-     mb_debug("qemu: I believe we found a multiboot image!\n");
--    memset(bootinfo, 0, sizeof(bootinfo));
-+    memset(&bootinfo, 0, sizeof(bootinfo));
-     memset(&mbs, 0, sizeof(mbs));
- 
--    if (flags & 0x00000004) { /* MULTIBOOT_HEADER_HAS_VBE */
-+    if (flags & MULTIBOOT_VIDEO_MODE) {
-         fprintf(stderr, "qemu: multiboot knows VBE. we don't.\n");
-     }
--    if (!(flags & 0x00010000)) { /* MULTIBOOT_HEADER_HAS_ADDR */
-+    if (!(flags & MULTIBOOT_AOUT_KLUDGE)) {
-         uint64_t elf_entry;
-         uint64_t elf_low, elf_high;
-         int kernel_size;
-@@ -217,14 +192,14 @@ int load_multiboot(FWCfgState *fw_cfg,
-         mb_debug("qemu: loading multiboot-elf kernel (%#x bytes) with entry %#zx\n",
-                   mb_kernel_size, (size_t)mh_entry_addr);
-     } else {
--        /* Valid if mh_flags sets MULTIBOOT_HEADER_HAS_ADDR. */
--        uint32_t mh_header_addr = ldl_p(header+i+12);
--        uint32_t mh_load_end_addr = ldl_p(header+i+20);
--        uint32_t mh_bss_end_addr = ldl_p(header+i+24);
--        mh_load_addr = ldl_p(header+i+16);
-+        /* Valid if mh_flags sets MULTIBOOT_AOUT_KLUDGE. */
-+        uint32_t mh_header_addr = ldl_p(&multiboot_header->header_addr);
-+        uint32_t mh_load_end_addr = ldl_p(&multiboot_header->load_end_addr);
-+        uint32_t mh_bss_end_addr = ldl_p(&multiboot_header->bss_end_addr);
-+        mh_load_addr = ldl_p(&multiboot_header->load_addr);
-         uint32_t mb_kernel_text_offset = i - (mh_header_addr - mh_load_addr);
-         uint32_t mb_load_size = 0;
--        mh_entry_addr = ldl_p(header+i+28);
-+        mh_entry_addr = ldl_p(&multiboot_header->entry_addr);
- 
-         if (mh_load_end_addr) {
-             mb_kernel_size = mh_bss_end_addr - mh_load_addr;
-@@ -234,11 +209,11 @@ int load_multiboot(FWCfgState *fw_cfg,
-             mb_load_size = mb_kernel_size;
-         }
- 
--        /* Valid if mh_flags sets MULTIBOOT_HEADER_HAS_VBE.
--        uint32_t mh_mode_type = ldl_p(header+i+32);
--        uint32_t mh_width = ldl_p(header+i+36);
--        uint32_t mh_height = ldl_p(header+i+40);
--        uint32_t mh_depth = ldl_p(header+i+44); */
-+        /* Valid if mh_flags sets MULTIBOOT_VIDEO_MODE.
-+        uint32_t mh_mode_type = ldl_p(&multiboot_header->mode_type);
-+        uint32_t mh_width = ldl_p(&multiboot_header->width);
-+        uint32_t mh_height = ldl_p(&multiboot_header->height);
-+        uint32_t mh_depth = ldl_p(&multiboot_header->depth); */
- 
-         mb_debug("multiboot: mh_header_addr = %#x\n", mh_header_addr);
-         mb_debug("multiboot: mh_load_addr = %#x\n", mh_load_addr);
-@@ -276,14 +251,15 @@ int load_multiboot(FWCfgState *fw_cfg,
-     }
- 
-     mbs.mb_buf_size += cmdline_len;
--    mbs.mb_buf_size += MB_MOD_SIZE * mbs.mb_mods_avail;
-+    mbs.mb_buf_size += sizeof(multiboot_module_t) * mbs.mb_mods_avail;
-     mbs.mb_buf_size += strlen(bootloader_name) + 1;
- 
-     mbs.mb_buf_size = TARGET_PAGE_ALIGN(mbs.mb_buf_size);
- 
-     /* enlarge mb_buf to hold cmdlines, bootloader, mb-info structs */
-     mbs.mb_buf            = g_realloc(mbs.mb_buf, mbs.mb_buf_size);
--    mbs.offset_cmdlines   = mbs.offset_mbinfo + mbs.mb_mods_avail * MB_MOD_SIZE;
-+    mbs.offset_cmdlines   = mbs.offset_mbinfo +
-+        mbs.mb_mods_avail * sizeof(multiboot_module_t);
-     mbs.offset_bootloader = mbs.offset_cmdlines + cmdline_len;
- 
-     if (initrd_filename) {
-@@ -329,22 +305,22 @@ int load_multiboot(FWCfgState *fw_cfg,
-     char kcmdline[strlen(kernel_filename) + strlen(kernel_cmdline) + 2];
-     snprintf(kcmdline, sizeof(kcmdline), "%s %s",
-              kernel_filename, kernel_cmdline);
--    stl_p(bootinfo + MBI_CMDLINE, mb_add_cmdline(&mbs, kcmdline));
-+    stl_p(&bootinfo.cmdline, mb_add_cmdline(&mbs, kcmdline));
- 
--    stl_p(bootinfo + MBI_BOOTLOADER, mb_add_bootloader(&mbs, bootloader_name));
-+    stl_p(&bootinfo.boot_loader_name, mb_add_bootloader(&mbs, bootloader_name));
- 
--    stl_p(bootinfo + MBI_MODS_ADDR,  mbs.mb_buf_phys + mbs.offset_mbinfo);
--    stl_p(bootinfo + MBI_MODS_COUNT, mbs.mb_mods_count); /* mods_count */
-+    stl_p(&bootinfo.mods_addr,  mbs.mb_buf_phys + mbs.offset_mbinfo);
-+    stl_p(&bootinfo.mods_count, mbs.mb_mods_count); /* mods_count */
- 
-     /* the kernel is where we want it to be now */
--    stl_p(bootinfo + MBI_FLAGS, MULTIBOOT_FLAGS_MEMORY
--                                | MULTIBOOT_FLAGS_BOOT_DEVICE
--                                | MULTIBOOT_FLAGS_CMDLINE
--                                | MULTIBOOT_FLAGS_MODULES
--                                | MULTIBOOT_FLAGS_MMAP
--                                | MULTIBOOT_FLAGS_BOOTLOADER);
--    stl_p(bootinfo + MBI_BOOT_DEVICE, 0x8000ffff); /* XXX: use the -boot switch? */
--    stl_p(bootinfo + MBI_MMAP_ADDR,   ADDR_E820_MAP);
-+    stl_p(&bootinfo.flags, MULTIBOOT_INFO_MEMORY
-+                           | MULTIBOOT_INFO_BOOTDEV
-+                           | MULTIBOOT_INFO_CMDLINE
-+                           | MULTIBOOT_INFO_MODS
-+                           | MULTIBOOT_INFO_MEM_MAP
-+                           | MULTIBOOT_INFO_BOOT_LOADER_NAME);
-+    stl_p(&bootinfo.boot_device, 0x8000ffff); /* XXX: use the -boot switch? */
-+    stl_p(&bootinfo.mmap_addr,   ADDR_E820_MAP);
- 
-     mb_debug("multiboot: mh_entry_addr = %#x\n", mh_entry_addr);
-     mb_debug("           mb_buf_phys   = "TARGET_FMT_plx"\n", mbs.mb_buf_phys);
-@@ -353,7 +329,7 @@ int load_multiboot(FWCfgState *fw_cfg,
- 
-     /* save bootinfo off the stack */
-     mb_bootinfo_data = g_malloc(sizeof(bootinfo));
--    memcpy(mb_bootinfo_data, bootinfo, sizeof(bootinfo));
-+    memcpy(mb_bootinfo_data, &bootinfo, sizeof(bootinfo));
- 
-     /* Pass variables to option rom */
-     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, mh_entry_addr);
-diff --git a/hw/i386/multiboot_header.h b/hw/i386/multiboot_header.h
-new file mode 100644
-index 0000000000..2ed407060b
---- /dev/null
-+++ b/hw/i386/multiboot_header.h
-@@ -0,0 +1,254 @@
-+/* multiboot.h - Multiboot header file.  */
-+/* Copyright (C) 1999,2003,2007,2008,2009,2010  Free Software Foundation, Inc.
+ /*
++ * bios_linker_loader_add_pointer: ask guest to patch address in
++ * destination file with a pointer to source file
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to
-+ * deal in the Software without restriction, including without limitation the
-+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-+ * sell copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL ANY
-+ * DEVELOPER OR DISTRIBUTOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
-+ * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ * @linker: linker object instance
++ * @dest_file: destination file that must be changed
++ * @dst_patched_offset: location within destination file blob to be patched
++ *                      with the pointer to @src_file+@src_offset (i.e. source
++ *                      blob allocated in guest memory + @src_offset), in bytes
++ * @dst_patched_offset_size: size of the pointer to be patched
++ *                      at @dst_patched_offset in @dest_file blob, in bytes
++ * @src_file: source file who's address must be taken
++ * @src_offset: location within source file blob to which
++ *              @dest_file+@dst_patched_offset will point to after
++ *              firmware's executed ADD_POINTER command
 + */
++void bios_linker_loader_add_pointer(BIOSLinker *linker,
++                                    const char *dest_file,
++                                    uint32_t dst_patched_offset,
++                                    uint8_t dst_patched_size,
++                                    const char *src_file,
++                                    uint32_t src_offset)
++{
++    add_pointer(linker, dest_file, dst_patched_offset, dst_patched_size,
++                src_file, src_offset, BIOS_LINKER_LOADER_COMMAND_ADD_POINTER);
++}
 +
-+#ifndef MULTIBOOT_HEADER
-+#define MULTIBOOT_HEADER 1
++/*
++ * bios_linker_loader_add_legacy_pointer: ask guest to patch address in
++ * destination file with a pointer to a legacy acpi table in source file
++ *
++ * @linker: linker object instance
++ * @dest_file: destination file that must be changed
++ * @dst_patched_offset: location within destination file blob to be patched
++ *                      with the pointer to @src_file+@src_offset (i.e. source
++ *                      blob allocated in guest memory + @src_offset), in bytes
++ * @dst_patched_offset_size: size of the pointer to be patched
++ *                      at @dst_patched_offset in @dest_file blob, in bytes
++ * @src_file: source file who's address must be taken
++ * @src_offset: location within source file blob to which
++ *              @dest_file+@dst_patched_offset will point to after
++ *              firmware's executed ADD_POINTER command
++ */
++void bios_linker_loader_add_legacy_pointer(BIOSLinker *linker,
++                                           const char *dest_file,
++                                           uint32_t dst_patched_offset,
++                                           uint8_t dst_patched_size,
++                                           const char *src_file,
++                                           uint32_t src_offset)
++{
++    add_pointer(linker, dest_file, dst_patched_offset, dst_patched_size,
++                src_file, src_offset,
++                BIOS_LINKER_LOADER_COMMAND_ADD_LEGACY_POINTER);
++}
 +
-+/* How many bytes from the start of the file we search for the header.  */
-+#define MULTIBOOT_SEARCH      8192
-+#define MULTIBOOT_HEADER_ALIGN      4
++/*
+  * bios_linker_loader_write_pointer: ask guest to write a pointer to the
+  * source file into the destination file, and write it back to QEMU via
+  * fw_cfg DMA.
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 6b7bade..6c83ba8 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
+ }
+ 
+ /* Load chipset information in FADT */
+-static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
++static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm, int rev)
+ {
+     fadt->model = 1;
+     fadt->reserved1 = 0;
+@@ -305,6 +305,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+     }
+     fadt->century = RTC_CENTURY;
+ 
++    if (rev < 3)
++        return;
 +
-+/* The magic field should contain this.  */
-+#define MULTIBOOT_HEADER_MAGIC      0x1BADB002
+     fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+     fadt->reset_value = 0xf;
+     fadt->reset_register.space_id = AML_SYSTEM_IO;
+@@ -334,9 +337,34 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+ 
+ /* FADT */
+ static void
+-build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+-           unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
+-           const char *oem_id, const char *oem_table_id)
++build_fadt1(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
++            unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
++            const char *oem_id, const char *oem_table_id)
++{
++    unsigned fadt_length = offsetof(AcpiFadtDescriptorRev3, boot_flags);
++    AcpiFadtDescriptorRev3 *fadt = acpi_data_push(table_data, fadt_length);
++    unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
++    unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
 +
-+/* This should be in %eax.  */
-+#define MULTIBOOT_BOOTLOADER_MAGIC    0x2BADB002
++    /* FACS address to be filled by Guest linker */
++    bios_linker_loader_add_pointer(linker,
++        ACPI_BUILD_TABLE_FILE, fw_ctrl_offset, sizeof(fadt->firmware_ctrl),
++        ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
 +
-+/* Alignment of multiboot modules.  */
-+#define MULTIBOOT_MOD_ALIGN      0x00001000
++    /* DSDT address to be filled by Guest linker */
++    fadt_setup(fadt, pm, 1);
++    bios_linker_loader_add_pointer(linker,
++        ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
++        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
 +
-+/* Alignment of the multiboot info structure.  */
-+#define MULTIBOOT_INFO_ALIGN      0x00000004
++    build_header(linker, table_data,
++                 (void *)fadt, "FACP", fadt_length, 1, oem_id, oem_table_id);
++}
 +
-+/* Flags set in the 'flags' member of the multiboot header.  */
++static void
++build_fadt3(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
++            unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
++            const char *oem_id, const char *oem_table_id)
+ {
+     AcpiFadtDescriptorRev3 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+     unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+@@ -349,7 +377,7 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+         ACPI_BUILD_TABLE_FILE, facs_tbl_offset);
+ 
+     /* DSDT address to be filled by Guest linker */
+-    fadt_setup(fadt, pm);
++    fadt_setup(fadt, pm, 3);
+     bios_linker_loader_add_pointer(linker,
+         ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+@@ -2557,27 +2585,40 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+ }
+ 
+ static GArray *
+-build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
++build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset,
++           unsigned xsdt_tbl_offset)
+ {
+     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+     unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
+     unsigned rsdt_pa_offset =
+         (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
++    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
++    unsigned xsdt_pa_offset =
++        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
+ 
+     bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
+                              true /* fseg memory */);
+ 
+     memcpy(&rsdp->signature, "RSD PTR ", 8);
+     memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
++    rsdp->length = cpu_to_le32(sizeof(*rsdp));
++    rsdp->revision = 0x02;
 +
-+/* Align all boot modules on i386 page (4KB) boundaries.  */
-+#define MULTIBOOT_PAGE_ALIGN      0x00000001
+     /* Address to be filled by Guest linker */
+-    bios_linker_loader_add_pointer(linker,
++    bios_linker_loader_add_legacy_pointer(linker,
+         ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
+         ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
++    bios_linker_loader_add_pointer(linker,
++        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
++        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+ 
+     /* Checksum to be filled by Guest linker */
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
++        (char *)rsdp - rsdp_table->data, offsetof(AcpiRsdpDescriptor, length),
+         (char *)&rsdp->checksum - rsdp_table->data);
++    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
++        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
++        (char *)&rsdp->extended_checksum - rsdp_table->data);
+ 
+     return rsdp_table;
+ }
+@@ -2621,7 +2662,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     PCMachineState *pcms = PC_MACHINE(machine);
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     GArray *table_offsets;
+-    unsigned facs, dsdt, rsdt, fadt;
++    unsigned facs, dsdt, rsdt, xsdt, fadt1;
+     AcpiPmInfo pm;
+     AcpiMiscInfo misc;
+     AcpiMcfgInfo mcfg;
+@@ -2665,11 +2706,14 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     aml_len += tables_blob->len - dsdt;
+ 
+     /* ACPI tables pointed to by RSDT */
+-    fadt = tables_blob->len;
++    fadt1 = tables_blob->len;
++    build_fadt1(tables_blob, tables->linker, &pm, facs, dsdt,
++                slic_oem.id, slic_oem.table_id);
++    aml_len += tables_blob->len - fadt1;
 +
-+/* Must pass memory information to OS.  */
-+#define MULTIBOOT_MEMORY_INFO      0x00000002
+     acpi_add_table(table_offsets, tables_blob);
+-    build_fadt(tables_blob, tables->linker, &pm, facs, dsdt,
+-               slic_oem.id, slic_oem.table_id);
+-    aml_len += tables_blob->len - fadt;
++    build_fadt3(tables_blob, tables->linker, &pm, facs, dsdt,
++                slic_oem.id, slic_oem.table_id);
+ 
+     acpi_add_table(table_offsets, tables_blob);
+     build_madt(tables_blob, tables->linker, pcms);
+@@ -2729,13 +2773,16 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+         g_array_append_vals(tables_blob, u, len);
+     }
+ 
+-    /* RSDT is pointed to by RSDP */
++    /* RSDT and XSDT is pointed to by RSDP */
+     rsdt = tables_blob->len;
+     build_rsdt(tables_blob, tables->linker, table_offsets,
++               slic_oem.id, slic_oem.table_id, fadt1);
++    xsdt = tables_blob->len;
++    build_xsdt(tables_blob, tables->linker, table_offsets,
+                slic_oem.id, slic_oem.table_id);
+ 
+     /* RSDP is in FSEG memory, so allocate it separately */
+-    build_rsdp(tables->rsdp, tables->linker, rsdt);
++    build_rsdp(tables->rsdp, tables->linker, rsdt, xsdt);
+ 
+     /* We'll expose it all to Guest so we want to reduce
+      * chance of size changes.
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 88d0738..9afaa34 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -380,7 +380,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables);
+ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+ void
+ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+-           const char *oem_id, const char *oem_table_id);
++           const char *oem_id, const char *oem_table_id, unsigned fadt);
+ void
+ build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+            const char *oem_id, const char *oem_table_id);
+diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
+index efe17b0..ccff3e7 100644
+--- a/include/hw/acpi/bios-linker-loader.h
++++ b/include/hw/acpi/bios-linker-loader.h
+@@ -26,6 +26,13 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+                                     const char *src_file,
+                                     uint32_t src_offset);
+ 
++void bios_linker_loader_add_legacy_pointer(BIOSLinker *linker,
++                                           const char *dest_file,
++                                           uint32_t dst_patched_offset,
++                                           uint8_t dst_patched_size,
++                                           const char *src_file,
++                                           uint32_t src_offset);
 +
-+/* Must pass video information to OS.  */
-+#define MULTIBOOT_VIDEO_MODE      0x00000004
-+
-+/* This flag indicates the use of the address fields in the header.  */
-+#define MULTIBOOT_AOUT_KLUDGE      0x00010000
-+
-+/* Flags to be set in the 'flags' member of the multiboot info structure.  */
-+
-+/* is there basic lower/upper memory information? */
-+#define MULTIBOOT_INFO_MEMORY      0x00000001
-+/* is there a boot device set? */
-+#define MULTIBOOT_INFO_BOOTDEV      0x00000002
-+/* is the command-line defined? */
-+#define MULTIBOOT_INFO_CMDLINE      0x00000004
-+/* are there modules to do something with? */
-+#define MULTIBOOT_INFO_MODS      0x00000008
-+
-+/* These next two are mutually exclusive */
-+
-+/* is there a symbol table loaded? */
-+#define MULTIBOOT_INFO_AOUT_SYMS    0x00000010
-+/* is there an ELF section header table? */
-+#define MULTIBOOT_INFO_ELF_SHDR      0X00000020
-+
-+/* is there a full memory map? */
-+#define MULTIBOOT_INFO_MEM_MAP      0x00000040
-+
-+/* Is there drive info?  */
-+#define MULTIBOOT_INFO_DRIVE_INFO    0x00000080
-+
-+/* Is there a config table?  */
-+#define MULTIBOOT_INFO_CONFIG_TABLE    0x00000100
-+
-+/* Is there a boot loader name?  */
-+#define MULTIBOOT_INFO_BOOT_LOADER_NAME    0x00000200
-+
-+/* Is there a APM table?  */
-+#define MULTIBOOT_INFO_APM_TABLE    0x00000400
-+
-+/* Is there video information?  */
-+#define MULTIBOOT_INFO_VBE_INFO            0x00000800
-+#define MULTIBOOT_INFO_FRAMEBUFFER_INFO          0x00001000
-+
-+struct multiboot_header {
-+  /* Must be MULTIBOOT_MAGIC - see above.  */
-+  uint32_t magic;
-+
-+  /* Feature flags.  */
-+  uint32_t flags;
-+
-+  /* The above fields plus this one must equal 0 mod 2^32. */
-+  uint32_t checksum;
-+
-+  /* These are only valid if MULTIBOOT_AOUT_KLUDGE is set.  */
-+  uint32_t header_addr;
-+  uint32_t load_addr;
-+  uint32_t load_end_addr;
-+  uint32_t bss_end_addr;
-+  uint32_t entry_addr;
-+
-+  /* These are only valid if MULTIBOOT_VIDEO_MODE is set.  */
-+  uint32_t mode_type;
-+  uint32_t width;
-+  uint32_t height;
-+  uint32_t depth;
-+};
-+
-+/* The symbol table for a.out.  */
-+struct multiboot_aout_symbol_table {
-+  uint32_t tabsize;
-+  uint32_t strsize;
-+  uint32_t addr;
-+  uint32_t reserved;
-+};
-+typedef struct multiboot_aout_symbol_table multiboot_aout_symbol_table_t;
-+
-+/* The section header table for ELF.  */
-+struct multiboot_elf_section_header_table {
-+  uint32_t num;
-+  uint32_t size;
-+  uint32_t addr;
-+  uint32_t shndx;
-+};
-+typedef struct multiboot_elf_section_header_table
-+   multiboot_elf_section_header_table_t;
-+
-+struct multiboot_info {
-+  /* Multiboot info version number */
-+  uint32_t flags;
-+
-+  /* Available memory from BIOS */
-+  uint32_t mem_lower;
-+  uint32_t mem_upper;
-+
-+  /* "root" partition */
-+  uint32_t boot_device;
-+
-+  /* Kernel command line */
-+  uint32_t cmdline;
-+
-+  /* Boot-Module list */
-+  uint32_t mods_count;
-+  uint32_t mods_addr;
-+
-+  union {
-+    multiboot_aout_symbol_table_t aout_sym;
-+    multiboot_elf_section_header_table_t elf_sec;
-+  } u;
-+
-+  /* Memory Mapping buffer */
-+  uint32_t mmap_length;
-+  uint32_t mmap_addr;
-+
-+  /* Drive Info buffer */
-+  uint32_t drives_length;
-+  uint32_t drives_addr;
-+
-+  /* ROM configuration table */
-+  uint32_t config_table;
-+
-+  /* Boot Loader Name */
-+  uint32_t boot_loader_name;
-+
-+  /* APM table */
-+  uint32_t apm_table;
-+
-+  /* Video */
-+  uint32_t vbe_control_info;
-+  uint32_t vbe_mode_info;
-+  uint16_t vbe_mode;
-+  uint16_t vbe_interface_seg;
-+  uint16_t vbe_interface_off;
-+  uint16_t vbe_interface_len;
-+
-+  uint64_t framebuffer_addr;
-+  uint32_t framebuffer_pitch;
-+  uint32_t framebuffer_width;
-+  uint32_t framebuffer_height;
-+  uint8_t framebuffer_bpp;
-+#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED   0
-+#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB       1
-+#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT  2
-+  uint8_t framebuffer_type;
-+  union {
-+    struct {
-+      uint32_t framebuffer_palette_addr;
-+      uint16_t framebuffer_palette_num_colors;
-+    };
-+    struct {
-+      uint8_t framebuffer_red_field_position;
-+      uint8_t framebuffer_red_mask_size;
-+      uint8_t framebuffer_green_field_position;
-+      uint8_t framebuffer_green_mask_size;
-+      uint8_t framebuffer_blue_field_position;
-+      uint8_t framebuffer_blue_mask_size;
-+    };
-+  };
-+};
-+typedef struct multiboot_info multiboot_info_t;
-+
-+struct multiboot_color {
-+  uint8_t red;
-+  uint8_t green;
-+  uint8_t blue;
-+};
-+
-+struct multiboot_mmap_entry {
-+  uint32_t size;
-+  uint64_t addr;
-+  uint64_t len;
-+#define MULTIBOOT_MEMORY_AVAILABLE         1
-+#define MULTIBOOT_MEMORY_RESERVED          2
-+#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE  3
-+#define MULTIBOOT_MEMORY_NVS               4
-+#define MULTIBOOT_MEMORY_BADRAM            5
-+  uint32_t type;
-+} QEMU_PACKED;
-+typedef struct multiboot_mmap_entry multiboot_memory_map_t;
-+
-+struct multiboot_mod_list {
-+  /* the memory used goes from bytes 'mod_start' to 'mod_end-1' inclusive */
-+  uint32_t mod_start;
-+  uint32_t mod_end;
-+
-+  /* Module command line */
-+  uint32_t cmdline;
-+
-+  /* padding to take it to 16 bytes (must be zero) */
-+  uint32_t pad;
-+};
-+typedef struct multiboot_mod_list multiboot_module_t;
-+
-+/* APM BIOS info.  */
-+struct multiboot_apm_info {
-+  uint16_t version;
-+  uint16_t cseg;
-+  uint32_t offset;
-+  uint16_t cseg_16;
-+  uint16_t dseg;
-+  uint16_t flags;
-+  uint16_t cseg_len;
-+  uint16_t cseg_16_len;
-+  uint16_t dseg_len;
-+};
-+
-+#endif /* ! MULTIBOOT_HEADER */
--- 
-2.14.0.rc0.400.g1c36432dff-goog
+ void bios_linker_loader_write_pointer(BIOSLinker *linker,
+                                       const char *dest_file,
+                                       uint32_t dst_patched_offset,
