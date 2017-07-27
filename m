@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1daqFy-0006Hw-6Z
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:23:43 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daqcQ-00059J-Nk
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:46:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1daqFw-00010x-S1
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:23:42 -0400
-References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
-	<20170606162652.112122-2-vsementsov@virtuozzo.com>
-	<50f19b1d-9736-b8b3-5616-67c3393336f3@redhat.com>
-	<7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-Date: Thu, 27 Jul 2017 17:23:25 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1daqcN-0008V0-HE
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:46:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48924
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1daqcN-0008Uk-C9
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 17:46:51 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6RLhmAY085232
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 17:46:50 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2byktnbsq1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 17:46:50 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 27 Jul 2017 17:46:49 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: add
- bdrv_get_format_alloc_stat format interface
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170726214010.420-3-f4bug@amsat.org>
+References: <20170726214010.420-1-f4bug@amsat.org>
+	<20170726214010.420-3-f4bug@amsat.org>
+Date: Thu, 27 Jul 2017 16:46:40 -0500
+Message-Id: <150119200092.22858.16636453463604434143@loki>
+Subject: Re: [Qemu-devel] [PATCH for 2.10 2/4] fdt: check fdt_required
+ condition can be satisfied _after_ testing libfdt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,149 +43,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, John Arbuckle <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: James Hogan <james.hogan@imgtec.com>, Juan Quintela <quintela@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
+Quoting Philippe Mathieu-Daud=C3=A9 (2017-07-26 16:40:08)
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
+Previously we failed if fdt_required and the user had built with
+--disable-fdt.  For anything other than --disable-fdt, we'd force
+the compile check afterward, and then fail if it's not available.
 
-On 07/12/2017 11:18 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 30.06.2017 03:27, John Snow wrote:
->>
->> On 06/06/2017 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> The function should collect statistics, about used/unused by top-level
->>> format driver space (in its .file) and allocation status
->>> (data/zero/discarded/after-eof) of corresponding areas in this .file.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>   block.c                   | 16 ++++++++++++++
->>>   include/block/block.h     |  3 +++
->>>   include/block/block_int.h |  2 ++
->>>   qapi/block-core.json      | 55 
->>> +++++++++++++++++++++++++++++++++++++++++++++++
->>>   4 files changed, 76 insertions(+)
->>>
->>> diff --git a/block.c b/block.c
->>> index 50ba264143..7d720ae0c2 100644
->>> --- a/block.c
->>> +++ b/block.c
->>> @@ -3407,6 +3407,22 @@ int64_t 
->>> bdrv_get_allocated_file_size(BlockDriverState *bs)
->>>   }
->>>   /**
->>> + * Collect format allocation info. See BlockFormatAllocInfo 
->>> definition in
->>> + * qapi/block-core.json.
->>> + */
->>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs, 
->>> BlockFormatAllocInfo *bfai)
->>> +{
->>> +    BlockDriver *drv = bs->drv;
->>> +    if (!drv) {
->>> +        return -ENOMEDIUM;
->>> +    }
->>> +    if (drv->bdrv_get_format_alloc_stat) {
->>> +        return drv->bdrv_get_format_alloc_stat(bs, bfai);
->>> +    }
->>> +    return -ENOTSUP;
->>> +}
->>> +
->>> +/**
->>>    * Return number of sectors on success, -errno on error.
->>>    */
->>>   int64_t bdrv_nb_sectors(BlockDriverState *bs)
->>> diff --git a/include/block/block.h b/include/block/block.h
->>> index 9b355e92d8..646376a772 100644
->>> --- a/include/block/block.h
->>> +++ b/include/block/block.h
->>> @@ -335,6 +335,9 @@ typedef enum {
->>>   int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, 
->>> BdrvCheckMode fix);
->>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs,
->>> +                               BlockFormatAllocInfo *bfai);
->>> +
->>>   /* The units of offset and total_work_size may be chosen 
->>> arbitrarily by the
->>>    * block driver; total_work_size may change during the course of 
->>> the amendment
->>>    * operation */
->>> diff --git a/include/block/block_int.h b/include/block/block_int.h
->>> index 8d3724cce6..458c715e99 100644
->>> --- a/include/block/block_int.h
->>> +++ b/include/block/block_int.h
->>> @@ -208,6 +208,8 @@ struct BlockDriver {
->>>       int64_t (*bdrv_getlength)(BlockDriverState *bs);
->>>       bool has_variable_length;
->>>       int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
->>> +    int (*bdrv_get_format_alloc_stat)(BlockDriverState *bs,
->>> +                                      BlockFormatAllocInfo *bfai);
->>>       int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState 
->>> *bs,
->>>           uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index ea0b3e8b13..fd7b52bd69 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -139,6 +139,61 @@
->>>              '*format-specific': 'ImageInfoSpecific' } }
->>>   ##
->>> +# @BlockFormatAllocInfo:
->>> +#
->>> +#
->>> +# Allocation relations between format file and underlying protocol 
->>> file.
->>> +# All fields are in bytes.
->>> +#
->> I guess this is a relation in the sense that the format differentiates
->> between used-unused and the protocol differentiates between
->> data-zero-trim which gives us the 2D matrix, showing a relation between
->> "two" files.
->>
->> I find the use of the word "file" here a bit of a misdirection, though,
->> as qcow2 (or any other format) in this sense is not a file but rather a
->> schema used for interpreting data, and the file itself belongs solely to
->> the protocol.
->>
->> I might suggest phrasing this as ...
->>
->> "Allocation information of an underlying protocol file, as partitioned
->> by a format driver's utilization of said allocations."
->>
->> Maybe that's too wordy. Eric?
->>
->>> +# There are two types of the format file portions: 'used' and 
->>> 'unused'. It's up
->>> +# to the format how to interpret these types. For now the only 
->>> format supporting
->> "format file" seems misleading for similar reasons to my objection
->> above, which is that the format doesn't have a file, exactly. It's an
->> abstract schema.
->>
->> "It's up to the format how to interpret these types" is also a bit too
->> vague to help inform readers what the types mean, IMO.
->>
->> Here's an attempt:
->>
->> "Allocations may be considered either used or unused by the format
->> driver interpreting those allocations. It is at the discretion of the
->> format driver (e.g. qcow2) which regions of its backing storage are
->> considered in-use or not."
-> 
-> So we are saying about "allocations". But unallocated data may be 
-> used/unused too, so,
-> can we call unallocated areas "allocations"?
-> 
+With this patch, we now probe libfdt if --disable-fdt isn't
+specified, regardless of whether or not it's required by the
+build. It still seems to behave correctly, but I'm not sure
+what bug this re-arrangement fixes. Was there some other case
+that was missed prior to this patch?
 
-You're right, "allocation" may imply something that is extant, but these 
-are more like regions ...
+Also, with patch 4 applied on top of this, if they happen to have
+a dtc submodule checked out that doesn't build, they will get a
+configure error even if they are building a target where where
+fdt_required=3D"no".
 
-Uh;
+> ---
+>  configure | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> =
 
-"Regions" may be considered either used or unused?
+> diff --git a/configure b/configure
+> index 063de32773..0d5bdb3ae9 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3558,15 +3558,6 @@ for target in $target_list; do
+>    esac
+>  done
+> =
 
-or
+> -if test "$fdt_required" =3D "yes"; then
+> -  if test "$fdt" =3D "no"; then
+> -    error_exit "fdt disabled but some requested targets require it." \
+> -      "You can turn off fdt only if you also disable all the system emul=
+ation" \
+> -      "targets which need it (by specifying a cut down --target-list)."
+> -  fi
+> -  fdt=3Dyes
+> -fi
+> -
+>  if test "$fdt" !=3D "no" ; then
+>    fdt_libs=3D"-lfdt"
+>    # explicitly check for libfdt_env.h as it is missing in some stable in=
+stalls
+> @@ -3603,6 +3594,15 @@ EOF
+>    fi
+>  fi
+> =
 
-"Regions of the underlying protocol file may be considered used or 
-unused by the format driver interpreting these regions."
+> +if test "$fdt_required" =3D "yes"; then
+> +  if test "$fdt" =3D "no"; then
+> +    error_exit "fdt disabled but some requested targets require it." \
+> +      "You can turn off fdt only if you also disable all the system emul=
+ation" \
+> +      "targets which need it (by specifying a cut down --target-list)."
+> +  fi
+> +  fdt=3Dyes
+> +fi
+> +
+>  libs_softmmu=3D"$libs_softmmu $fdt_libs"
+> =
 
-Something along these lines, perhaps?
+>  ##########################################
+> -- =
+
+> 2.13.3
+> =
+
+>=20
