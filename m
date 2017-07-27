@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49086)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1darbo-0001ki-TG
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:50:21 -0400
+	id 1darjw-0007Le-4D
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1darbm-00057b-8m
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:50:20 -0400
+	id 1darjt-0002C3-GD
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 18:58:44 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
-	<1501153150-19984-6-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1c5fa88b-5945-ae88-69b3-9663739b906f@amsat.org>
-Date: Thu, 27 Jul 2017 19:50:13 -0300
+References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
+	<1501153150-19984-4-git-send-email-peter.maydell@linaro.org>
+	<5aff6da7-4ad1-64af-6445-98b8d7520b4c@amsat.org>
+Message-ID: <122bfaa5-7192-056b-541c-b5f37f871bfc@amsat.org>
+Date: Thu, 27 Jul 2017 19:58:36 -0300
 MIME-Version: 1.0
-In-Reply-To: <1501153150-19984-6-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <5aff6da7-4ad1-64af-6445-98b8d7520b4c@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.10 5/5] target/arm:
- Migrate MPU_RNR register state for M profile cores
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.10 3/5] target/arm: Rename
+ cp15.c6_rgnr to pmsav7.rnr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +33,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-On 07/27/2017 07:59 AM, Peter Maydell wrote:
-> The PMSAv7 region number register is migrated for R profile
-> cores using the cpreg scheme, but M profile doesn't use
-> cpregs, and so we weren't migrating the MPU_RNR register state
-> at all. Fix that by adding a migration subsection for the
-> M profile case.
+On 07/27/2017 07:43 PM, Philippe Mathieu-Daudé wrote:
+> On 07/27/2017 07:59 AM, Peter Maydell wrote:
+[...]
+>> -    u32p += env->cp15.c6_rgnr;
+>> +    u32p += env->pmsav7.rnr;
+>>       tlb_flush(CPU(cpu)); /* Mappings may have changed - purge! */
+>>       *u32p = value;
+>>   }
+>> @@ -2447,7 +2447,7 @@ static const ARMCPRegInfo pmsav7_cp_reginfo[] = {
+>>         .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = 
+>> pmsav7_reset },
+>>       { .name = "RGNR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 2, .opc2 
+>> = 0,
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> "RGNR" -> "RNR"
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Ah "RGNR" for -R and "RNR" for -M hmmm... still better keep the name 
+matching the field, "rnr".
 
-> ---
->   target/arm/machine.c | 28 ++++++++++++++++++++++++++++
->   1 file changed, 28 insertions(+)
 > 
-> diff --git a/target/arm/machine.c b/target/arm/machine.c
-> index 93c1a78..1f66da4 100644
-> --- a/target/arm/machine.c
-> +++ b/target/arm/machine.c
-> @@ -171,6 +171,29 @@ static const VMStateDescription vmstate_pmsav7 = {
->       }
->   };
->   
-> +static bool pmsav7_rnr_needed(void *opaque)
-> +{
-> +    ARMCPU *cpu = opaque;
-> +    CPUARMState *env = &cpu->env;
-> +
-> +    /* For R profile cores pmsav7.rnr is migrated via the cpreg
-> +     * "RGNR" definition in helper.h. For M profile we have to
-> +     * migrate it separately.
-> +     */
-> +    return arm_feature(env, ARM_FEATURE_M);
-> +}
-> +
-> +static const VMStateDescription vmstate_pmsav7_rnr = {
-> +    .name = "cpu/pmsav7-rnr",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = pmsav7_rnr_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(env.pmsav7.rnr, ARMCPU),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->   static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
->                       VMStateField *field)
->   {
-> @@ -377,6 +400,11 @@ const VMStateDescription vmstate_arm_cpu = {
->           &vmstate_iwmmxt,
->           &vmstate_m,
->           &vmstate_thumb2ee,
-> +        /* pmsav7_rnr must come before pmsav7 so that we have the
-> +         * region number before we test it in the VMSTATE_VALIDATE
-> +         * in vmstate_pmsav7.
-> +         */
-> +        &vmstate_pmsav7_rnr,
->           &vmstate_pmsav7,
->           NULL
->       }
+>>         .access = PL1_RW,
+>> -      .fieldoffset = offsetof(CPUARMState, cp15.c6_rgnr),
+>> +      .fieldoffset = offsetof(CPUARMState, pmsav7.rnr),
+>>         .writefn = pmsav7_rgnr_write },
 > 
+> pmsav7_rnr_write
+> 
+>>       REGINFO_SENTINEL
+>>   };
+>> diff --git a/target/arm/machine.c b/target/arm/machine.c
+>> index 1a40469..93c1a78 100644
+>> --- a/target/arm/machine.c
+>> +++ b/target/arm/machine.c
+>> @@ -151,7 +151,7 @@ static bool pmsav7_rgnr_vmstate_validate(void 
+>> *opaque, int version_id)
+> 
+> pmsav7_rnr_vmstate_validate()
+> 
+>>   {
+>>       ARMCPU *cpu = opaque;
+>> -    return cpu->env.cp15.c6_rgnr < cpu->pmsav7_dregion;
+>> +    return cpu->env.pmsav7.rnr < cpu->pmsav7_dregion;
+>>   }
+>>   static const VMStateDescription vmstate_pmsav7 = {
+>>
+> [...]
+>          VMSTATE_VALIDATE("rgnr is valid", pmsav7_rgnr_vmstate_validate),
+> 
+> also this one "rnr is valid" ^^^
+> 
+> once fixed:
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
