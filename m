@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dagVo-0006J6-13
+	(envelope-from <pm215@archaic.org.uk>) id 1dagVo-0006Jp-Qp
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dagVn-0000Lc-1e
+	(envelope-from <pm215@archaic.org.uk>) id 1dagVn-0000N2-LO
 	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 06:59:24 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Jul 2017 11:59:09 +0100
-Message-Id: <1501153150-19984-5-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 27 Jul 2017 11:59:08 +0100
+Message-Id: <1501153150-19984-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
 References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.10 4/5] target/arm: Move PMSAv7 reset
- into arm_cpu_reset() so M profile MPUs get reset
+Subject: [Qemu-devel] [PATCH for-2.10 3/5] target/arm: Rename cp15.c6_rgnr
+ to pmsav7.rnr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +23,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-When the PMSAv7 implementation was originally added it was for R profile
-CPUs only, and reset was handled using the cpreg .resetfn hooks.
-Unfortunately for M profile cores this doesn't work, because they do
-not register any cpregs. Move the reset handling into arm_cpu_reset(),
-where it will work for both R profile and M profile cores.
+Almost all of the PMSAv7 state is in the pmsav7 substruct of
+the ARM CPU state structure. The exception is the region
+number register, which is in cp15.c6_rgnr. This exception
+is a bit odd for M profile, which otherwise generally does
+not store state in the cp15 substruct.
+
+Rename cp15.c6_rgnr to pmsav7.rnr accordingly.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.c    | 14 ++++++++++++++
- target/arm/helper.c | 28 ++++++++++++----------------
- 2 files changed, 26 insertions(+), 16 deletions(-)
+ hw/intc/armv7m_nvic.c | 14 +++++++-------
+ target/arm/cpu.h      |  3 +--
+ target/arm/helper.c   |  6 +++---
+ target/arm/machine.c  |  2 +-
+ 4 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 96d1f84..05c038b 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -232,6 +232,20 @@ static void arm_cpu_reset(CPUState *s)
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 26a4b2d..323e2d4 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -536,13 +536,13 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
+     case 0xd94: /* MPU_CTRL */
+         return cpu->env.v7m.mpu_ctrl;
+     case 0xd98: /* MPU_RNR */
+-        return cpu->env.cp15.c6_rgnr;
++        return cpu->env.pmsav7.rnr;
+     case 0xd9c: /* MPU_RBAR */
+     case 0xda4: /* MPU_RBAR_A1 */
+     case 0xdac: /* MPU_RBAR_A2 */
+     case 0xdb4: /* MPU_RBAR_A3 */
+     {
+-        int region = cpu->env.cp15.c6_rgnr;
++        int region = cpu->env.pmsav7.rnr;
  
-     env->vfp.xregs[ARM_VFP_FPEXC] = 0;
- #endif
-+
-+    if (arm_feature(env, ARM_FEATURE_PMSA) &&
-+        arm_feature(env, ARM_FEATURE_V7)) {
-+        if (cpu->pmsav7_dregion > 0) {
-+            memset(env->pmsav7.drbar, 0,
-+                   sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
-+            memset(env->pmsav7.drsr, 0,
-+                   sizeof(*env->pmsav7.drsr) * cpu->pmsav7_dregion);
-+            memset(env->pmsav7.dracr, 0,
-+                   sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
-+        }
-+        env->pmsav7.rnr = 0;
-+    }
-+
-     set_flush_to_zero(1, &env->vfp.standard_fp_status);
-     set_flush_inputs_to_zero(1, &env->vfp.standard_fp_status);
-     set_default_nan_mode(1, &env->vfp.standard_fp_status);
+         if (region >= cpu->pmsav7_dregion) {
+             return 0;
+@@ -554,7 +554,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
+     case 0xdb0: /* MPU_RASR_A2 */
+     case 0xdb8: /* MPU_RASR_A3 */
+     {
+-        int region = cpu->env.cp15.c6_rgnr;
++        int region = cpu->env.pmsav7.rnr;
+ 
+         if (region >= cpu->pmsav7_dregion) {
+             return 0;
+@@ -681,7 +681,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+                           PRIu32 "/%" PRIu32 "\n",
+                           value, cpu->pmsav7_dregion);
+         } else {
+-            cpu->env.cp15.c6_rgnr = value;
++            cpu->env.pmsav7.rnr = value;
+         }
+         break;
+     case 0xd9c: /* MPU_RBAR */
+@@ -702,9 +702,9 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+                               region, cpu->pmsav7_dregion);
+                 return;
+             }
+-            cpu->env.cp15.c6_rgnr = region;
++            cpu->env.pmsav7.rnr = region;
+         } else {
+-            region = cpu->env.cp15.c6_rgnr;
++            region = cpu->env.pmsav7.rnr;
+         }
+ 
+         if (region >= cpu->pmsav7_dregion) {
+@@ -720,7 +720,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+     case 0xdb0: /* MPU_RASR_A2 */
+     case 0xdb8: /* MPU_RASR_A3 */
+     {
+-        int region = cpu->env.cp15.c6_rgnr;
++        int region = cpu->env.pmsav7.rnr;
+ 
+         if (region >= cpu->pmsav7_dregion) {
+             return;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 102c58a..b39d64a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -305,8 +305,6 @@ typedef struct CPUARMState {
+             uint64_t par_el[4];
+         };
+ 
+-        uint32_t c6_rgnr;
+-
+         uint32_t c9_insn; /* Cache lockdown registers.  */
+         uint32_t c9_data;
+         uint64_t c9_pmcr; /* performance monitor control register */
+@@ -519,6 +517,7 @@ typedef struct CPUARMState {
+         uint32_t *drbar;
+         uint32_t *drsr;
+         uint32_t *dracr;
++        uint32_t rnr;
+     } pmsav7;
+ 
+     void *nvic;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 63187de..a9247e9 100644
+index 169c361..63187de 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -2404,18 +2404,6 @@ static void pmsav7_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -2385,7 +2385,7 @@ static uint64_t pmsav7_read(CPUARMState *env, const ARMCPRegInfo *ri)
+         return 0;
+     }
+ 
+-    u32p += env->cp15.c6_rgnr;
++    u32p += env->pmsav7.rnr;
+     return *u32p;
+ }
+ 
+@@ -2399,7 +2399,7 @@ static void pmsav7_write(CPUARMState *env, const ARMCPRegInfo *ri,
+         return;
+     }
+ 
+-    u32p += env->cp15.c6_rgnr;
++    u32p += env->pmsav7.rnr;
+     tlb_flush(CPU(cpu)); /* Mappings may have changed - purge! */
      *u32p = value;
  }
- 
--static void pmsav7_reset(CPUARMState *env, const ARMCPRegInfo *ri)
--{
--    ARMCPU *cpu = arm_env_get_cpu(env);
--    uint32_t *u32p = *(uint32_t **)raw_ptr(env, ri);
--
--    if (!u32p) {
--        return;
--    }
--
--    memset(u32p, 0, sizeof(*u32p) * cpu->pmsav7_dregion);
--}
--
- static void pmsav7_rgnr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                               uint64_t value)
- {
-@@ -2433,22 +2421,30 @@ static void pmsav7_rgnr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- }
- 
- static const ARMCPRegInfo pmsav7_cp_reginfo[] = {
-+    /* Reset for all these registers is handled in arm_cpu_reset(),
-+     * because the PMSAv7 is also used by M-profile CPUs, which do
-+     * not register cpregs but still need the state to be reset.
-+     */
-     { .name = "DRBAR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 1, .opc2 = 0,
-       .access = PL1_RW, .type = ARM_CP_NO_RAW,
-       .fieldoffset = offsetof(CPUARMState, pmsav7.drbar),
--      .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
-+      .readfn = pmsav7_read, .writefn = pmsav7_write,
-+      .resetfn = arm_cp_reset_ignore },
-     { .name = "DRSR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 1, .opc2 = 2,
-       .access = PL1_RW, .type = ARM_CP_NO_RAW,
-       .fieldoffset = offsetof(CPUARMState, pmsav7.drsr),
--      .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
-+      .readfn = pmsav7_read, .writefn = pmsav7_write,
-+      .resetfn = arm_cp_reset_ignore },
-     { .name = "DRACR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 1, .opc2 = 4,
-       .access = PL1_RW, .type = ARM_CP_NO_RAW,
-       .fieldoffset = offsetof(CPUARMState, pmsav7.dracr),
--      .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
-+      .readfn = pmsav7_read, .writefn = pmsav7_write,
-+      .resetfn = arm_cp_reset_ignore },
+@@ -2447,7 +2447,7 @@ static const ARMCPRegInfo pmsav7_cp_reginfo[] = {
+       .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
      { .name = "RGNR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 2, .opc2 = 0,
        .access = PL1_RW,
-       .fieldoffset = offsetof(CPUARMState, pmsav7.rnr),
--      .writefn = pmsav7_rgnr_write },
-+      .writefn = pmsav7_rgnr_write,
-+      .resetfn = arm_cp_reset_ignore },
+-      .fieldoffset = offsetof(CPUARMState, cp15.c6_rgnr),
++      .fieldoffset = offsetof(CPUARMState, pmsav7.rnr),
+       .writefn = pmsav7_rgnr_write },
      REGINFO_SENTINEL
  };
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 1a40469..93c1a78 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -151,7 +151,7 @@ static bool pmsav7_rgnr_vmstate_validate(void *opaque, int version_id)
+ {
+     ARMCPU *cpu = opaque;
  
+-    return cpu->env.cp15.c6_rgnr < cpu->pmsav7_dregion;
++    return cpu->env.pmsav7.rnr < cpu->pmsav7_dregion;
+ }
+ 
+ static const VMStateDescription vmstate_pmsav7 = {
 -- 
 2.7.4
