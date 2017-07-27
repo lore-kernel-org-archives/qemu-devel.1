@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dajMu-0004cl-Ee
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:02:36 -0400
+	(envelope-from <quintela@redhat.com>) id 1dajQT-0008Kh-Qi
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dajMd-0002kN-81
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:02:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43150)
+	(envelope-from <quintela@redhat.com>) id 1dajQR-00058f-6O
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:06:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42222)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dajMc-0002jr-UK
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:02:07 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dajQQ-00055x-UF
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 10:06:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DE439DCA28
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 14:02:05 +0000 (UTC)
-Date: Thu, 27 Jul 2017 15:02:02 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170727140202.GP2555@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170727140025.392-1-kraxel@redhat.com>
-	<20170727140025.392-8-kraxel@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id B5D00C0BB281
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 13:57:34 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1501148776-16890-2-git-send-email-armbru@redhat.com> (Markus
+	Armbruster's message of "Thu, 27 Jul 2017 11:46:14 +0200")
+References: <1501148776-16890-1-git-send-email-armbru@redhat.com>
+	<1501148776-16890-2-git-send-email-armbru@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 27 Jul 2017 15:57:32 +0200
+Message-ID: <8760eehtir.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170727140025.392-8-kraxel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 7/7] ps2: fix sending of PAUSE/BREAK
- scancodes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] xbzrle: Drop unused cache_resize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,124 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Jul 27, 2017 at 04:00:25PM +0200, Gerd Hoffmann wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> The processing of the scancodes for PAUSE/BREAK  has been broken since
-> the conversion to qcodes in:
->=20
->   commit 8c10e0baf0260b59a4e984744462a18016662e3e
->   Author: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
->   Date:   Thu Sep 15 22:06:26 2016 +0200
->=20
->     ps2: use QEMU qcodes instead of scancodes
->=20
-> When using a VNC client, with the raw scancode extension, the client
-> will send a scancode of 0xc6 for both PAUSE and BREAK. There is mistake=
-nly
-> no entry in the qcode_to_number table for this scancode, so
-> ps2_keyboard_event() just generates a log message and discards the
-> scancode
->=20
-> When using a SPICE client, it will also send 0xc6 for BREAK, but
-> will send 0xe1 0x1d 0x45 0xe1 0x9d 0xc5 for PAUSE. There is no
-> entry in the qcode_to_number table for the scancode 0xe1 because
-> it is a special XT keyboard prefix not mapping to any QKeyCode.
-> Again ps2_keyboard_event() just generates a log message and discards
-> the scancode. The following 0x1d, 0x45, 0x9d, 0xc5 scancodes get
-> handled correctly. Rather than trying to handle 3 byte sequences
-> of scancodes in the PS/2 driver, special case the SPICE input
-> code so that it captures the 3 byte pause sequence and turns it
-> into a Pause QKeyCode.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-id: 20170727113243.23991-1-berrange@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Markus Armbruster <armbru@redhat.com> wrote:
+> Unused since commit fd8cec XBZRLE: Fix qemu crash when resize the
+> xbzrle cache.
+>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Amit Shah <amit.shah@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+Included for next PULL.  thanks.
+
 > ---
->  ui/keymaps.h      |  1 +
->  ui/input-keymap.c |  1 +
->  ui/spice-input.c  | 20 ++++++++++++++++++++
->  3 files changed, 22 insertions(+)
->=20
-> diff --git a/ui/keymaps.h b/ui/keymaps.h
-> index 47d061343e..8757465529 100644
-> --- a/ui/keymaps.h
-> +++ b/ui/keymaps.h
-> @@ -59,6 +59,7 @@ typedef struct {
->  /* "grey" keys will usually need a 0xe0 prefix */
->  #define SCANCODE_GREY   0x80
->  #define SCANCODE_EMUL0  0xE0
-> +#define SCANCODE_EMUL1  0xE1
->  /* "up" flag */
->  #define SCANCODE_UP     0x80
-> =20
-> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-> index f96adf4165..0d9ddde9c9 100644
-> --- a/ui/input-keymap.c
-> +++ b/ui/input-keymap.c
-> @@ -233,6 +233,7 @@ static const int qcode_to_number[] =3D {
->      [Q_KEY_CODE_KP_ENTER] =3D 0x9c,
->      [Q_KEY_CODE_KP_DECIMAL] =3D 0x53,
->      [Q_KEY_CODE_SYSRQ] =3D 0x54,
-> +    [Q_KEY_CODE_PAUSE] =3D 0xc6,
-> =20
->      [Q_KEY_CODE_KP_0] =3D 0x52,
->      [Q_KEY_CODE_KP_1] =3D 0x4f,
-> diff --git a/ui/spice-input.c b/ui/spice-input.c
-> index 918580239d..cda9976469 100644
-> --- a/ui/spice-input.c
-> +++ b/ui/spice-input.c
-> @@ -32,6 +32,7 @@ typedef struct QemuSpiceKbd {
->      SpiceKbdInstance sin;
->      int ledstate;
->      bool emul0;
-> +    size_t pauseseq;
->  } QemuSpiceKbd;
-> =20
->  static void kbd_push_key(SpiceKbdInstance *sin, uint8_t frag);
-> @@ -64,6 +65,25 @@ static void kbd_push_key(SpiceKbdInstance *sin, uint=
-8_t scancode)
->          keycode |=3D SCANCODE_GREY;
->      }
-> =20
-> +    if (scancode =3D=3D SCANCODE_EMUL1) {
-> +        kbd->pauseseq++;
-> +        return;
-> +    } else if (kbd->pauseseq =3D=3D 1) {
-> +        if (keycode =3D=3D 0x1d) {
-> +            kbd->pauseseq++;
-> +            return;
-> +        } else {
-> +            kbd->pauseseq =3D 0;
-> +        }
-> +    } else if (kbd->pauseseq =3D=3D 2) {
-> +        if (keycode =3D=3D 0x45) {
-> +            qemu_input_event_send_key_qcode(NULL, Q_KEY_CODE_PAUSE, !u=
-p);
-> +            kbd->pauseseq =3D 0;
-> +            return;
-> +        }
-> +        kbd->pauseseq =3D 0;
-> +    }
-> +
->      qemu_input_event_send_key_number(NULL, keycode, !up);
+>  migration/page_cache.c | 56 --------------------------------------------------
+>  migration/page_cache.h | 11 ----------
+>  2 files changed, 67 deletions(-)
+>
+> diff --git a/migration/page_cache.c b/migration/page_cache.c
+> index 5f85787..ba984c4 100644
+> --- a/migration/page_cache.c
+> +++ b/migration/page_cache.c
+> @@ -178,59 +178,3 @@ int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
+>  
+>      return 0;
 >  }
-
-Self-NACK.
-
-This impl is unfortunately wrong because it sends two Q_KEY_CODE_PAUSE
-events, because it mistakenly considered the make + break codes as
-separate sequences.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> -
+> -int64_t cache_resize(PageCache *cache, int64_t new_num_pages)
+> -{
+> -    PageCache *new_cache;
+> -    int64_t i;
+> -
+> -    CacheItem *old_it, *new_it;
+> -
+> -    g_assert(cache);
+> -
+> -    /* cache was not inited */
+> -    if (cache->page_cache == NULL) {
+> -        return -1;
+> -    }
+> -
+> -    /* same size */
+> -    if (pow2floor(new_num_pages) == cache->max_num_items) {
+> -        return cache->max_num_items;
+> -    }
+> -
+> -    new_cache = cache_init(new_num_pages, cache->page_size);
+> -    if (!(new_cache)) {
+> -        DPRINTF("Error creating new cache\n");
+> -        return -1;
+> -    }
+> -
+> -    /* move all data from old cache */
+> -    for (i = 0; i < cache->max_num_items; i++) {
+> -        old_it = &cache->page_cache[i];
+> -        if (old_it->it_addr != -1) {
+> -            /* check for collision, if there is, keep MRU page */
+> -            new_it = cache_get_by_addr(new_cache, old_it->it_addr);
+> -            if (new_it->it_data && new_it->it_age >= old_it->it_age) {
+> -                /* keep the MRU page */
+> -                g_free(old_it->it_data);
+> -            } else {
+> -                if (!new_it->it_data) {
+> -                    new_cache->num_items++;
+> -                }
+> -                g_free(new_it->it_data);
+> -                new_it->it_data = old_it->it_data;
+> -                new_it->it_age = old_it->it_age;
+> -                new_it->it_addr = old_it->it_addr;
+> -            }
+> -        }
+> -    }
+> -
+> -    g_free(cache->page_cache);
+> -    cache->page_cache = new_cache->page_cache;
+> -    cache->max_num_items = new_cache->max_num_items;
+> -    cache->num_items = new_cache->num_items;
+> -
+> -    g_free(new_cache);
+> -
+> -    return cache->max_num_items;
+> -}
+> diff --git a/migration/page_cache.h b/migration/page_cache.h
+> index 10ed532..4fadd0c 100644
+> --- a/migration/page_cache.h
+> +++ b/migration/page_cache.h
+> @@ -72,15 +72,4 @@ uint8_t *get_cached_data(const PageCache *cache, uint64_t addr);
+>  int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
+>                   uint64_t current_age);
+>  
+> -/**
+> - * cache_resize: resize the page cache. In case of size reduction the extra
+> - * pages will be freed
+> - *
+> - * Returns -1 on error new cache size on success
+> - *
+> - * @cache pointer to the PageCache struct
+> - * @num_pages: new page cache size (in pages)
+> - */
+> -int64_t cache_resize(PageCache *cache, int64_t num_pages);
+> -
+>  #endif
