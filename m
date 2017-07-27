@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dal23-0005nT-Cy
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:49:01 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal2K-0006Ag-V6
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dal20-0004cw-8D
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:48:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52436)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dal2K-0005BZ-4E
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:49:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dal1z-0004cP-VP
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:48:56 -0400
+	id 1dal2J-0005BC-UI
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 11:49:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2D5BA883D6
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 15:42:42 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 27 Jul 2017 17:41:08 +0200
-Message-Id: <20170727154126.11339-9-marcandre.lureau@redhat.com>
+Date: Thu, 27 Jul 2017 17:41:24 +0200
+Message-Id: <20170727154126.11339-25-marcandre.lureau@redhat.com>
 In-Reply-To: <20170727154126.11339-1-marcandre.lureau@redhat.com>
 References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 08/26] qapi: add 'if' condition on enum member
- values
+Subject: [Qemu-devel] [PATCH 24/26] qapi: make query-gic-capabilities depend
+ on TARGET_ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,351 +35,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi.py                                 | 39 +++++++++++++++++++=
-++----
- tests/Makefile.include                          |  2 ++
- tests/qapi-schema/enum-dict-member-invalid.err  |  1 +
- tests/qapi-schema/enum-dict-member-invalid.exit |  1 +
- tests/qapi-schema/enum-dict-member-invalid.json |  2 ++
- tests/qapi-schema/enum-dict-member-invalid.out  |  0
- tests/qapi-schema/enum-dict-member.err          |  1 -
- tests/qapi-schema/enum-dict-member.exit         |  2 +-
- tests/qapi-schema/enum-dict-member.json         |  3 +-
- tests/qapi-schema/enum-dict-member.out          |  4 +++
- tests/qapi-schema/enum-if-invalid.err           |  1 +
- tests/qapi-schema/enum-if-invalid.exit          |  1 +
- tests/qapi-schema/enum-if-invalid.json          |  3 ++
- tests/qapi-schema/enum-if-invalid.out           |  0
- tests/qapi-schema/qapi-schema-test.json         |  5 ++--
- tests/qapi-schema/qapi-schema-test.out          |  3 +-
- tests/qapi-schema/test-qapi.py                  |  4 ++-
- 17 files changed, 58 insertions(+), 14 deletions(-)
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.err
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.exit
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.json
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.out
- create mode 100644 tests/qapi-schema/enum-if-invalid.err
- create mode 100644 tests/qapi-schema/enum-if-invalid.exit
- create mode 100644 tests/qapi-schema/enum-if-invalid.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.out
+ qapi-schema.json |  3 ++-
+ monitor.c        | 11 -----------
+ 2 files changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 79ba1e93da..93d07283e6 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -729,6 +729,10 @@ def check_event(expr, info):
-                allow_metas=3Dmeta)
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 278d7e2aa3..a5c28bc9ad 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -6437,7 +6437,8 @@
+ #                 { "version": 3, "emulated": false, "kernel": true } ] =
+}
+ #
+ ##
+-{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'] }
++{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
++  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_ARM)']}
 =20
+ ##
+ # @CpuInstanceProperties:
+diff --git a/monitor.c b/monitor.c
+index 505ee5c58d..3bdae8d9d0 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -970,9 +970,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObjec=
+t **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#ifndef TARGET_ARM
+-    qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
+-#endif
+ #if !defined(TARGET_S390X) && !defined(TARGET_I386)
+     qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
+ #endif
+@@ -4141,14 +4138,6 @@ QemuOptsList qemu_mon_opts =3D {
+     },
+ };
 =20
-+def enum_get_values(expr):
-+    return [e if isinstance(e, str) else e['name'] for e in expr['data']=
-]
-+
-+
- def check_union(expr, info):
-     name =3D expr['union']
-     base =3D expr.get('base')
-@@ -788,7 +792,7 @@ def check_union(expr, info):
-         # If the discriminator names an enum type, then all members
-         # of 'data' must also be members of the enum type.
-         if enum_define:
--            if key not in enum_define['data']:
-+            if key not in enum_get_values(enum_define):
-                 raise QAPISemError(info,
-                                    "Discriminator value '%s' is not foun=
-d in "
-                                    "enum '%s'"
-@@ -796,7 +800,7 @@ def check_union(expr, info):
-=20
-     # If discriminator is user-defined, ensure all values are covered
-     if enum_define:
--        for value in enum_define['data']:
-+        for value in enum_get_values(enum_define):
-             if value not in members.keys():
-                 raise QAPISemError(info, "Union '%s' data missing '%s' b=
-ranch"
-                                    % (name, value))
-@@ -827,7 +831,7 @@ def check_alternate(expr, info):
-         if qtype =3D=3D 'QTYPE_QSTRING':
-             enum_expr =3D enum_types.get(value)
-             if enum_expr:
--                for v in enum_expr['data']:
-+                for v in enum_get_values(enum_expr):
-                     if v in ['on', 'off']:
-                         conflicting.add('QTYPE_QBOOL')
-                     if re.match(r'[-+0-9.]', v): # lazy, could be tighte=
-ned
-@@ -857,6 +861,12 @@ def check_enum(expr, info):
-         raise QAPISemError(info,
-                            "Enum '%s' requires a string for 'prefix'" % =
-name)
-     for member in members:
-+        if isinstance(member, dict):
-+            if not 'name' in member:
-+                raise QAPISemError(info, "Dictionary member of enum '%s'=
- must "
-+                                   "have a 'name' key" % name)
-+            check_if(member, info)
-+            member =3D member['name']
-         check_name(info, "Member of enum '%s'" % name, member,
-                    enum_member=3DTrue)
-=20
-@@ -1148,12 +1158,15 @@ class QAPISchemaEnumType(QAPISchemaType):
-     def member_names(self):
-         return [v.name for v in self.values]
-=20
-+    def members(self):
-+        return [(v.name, v.ifcond) for v in self.values]
-+
-     def json_type(self):
-         return 'string'
-=20
-     def visit(self, visitor):
-         visitor.visit_enum_type(self.name, self.info,
--                                self.member_names(), self.prefix, self.i=
-fcond)
-+                                self.members(), self.prefix, self.ifcond=
-)
-=20
-=20
- class QAPISchemaArrayType(QAPISchemaType):
-@@ -1275,9 +1288,11 @@ class QAPISchemaObjectType(QAPISchemaType):
- class QAPISchemaMember(object):
-     role =3D 'member'
-=20
--    def __init__(self, name):
-+    def __init__(self, name, ifcond=3DNone):
-         assert isinstance(name, str)
-+        assert ifcond is None or isinstance(ifcond, str)
-         self.name =3D name
-+        self.ifcond =3D ifcond
-         self.owner =3D None
-=20
-     def set_owner(self, name):
-@@ -1556,7 +1571,9 @@ class QAPISchema(object):
-                                             qtype_values, 'QTYPE'))
-=20
-     def _make_enum_members(self, values):
--        return [QAPISchemaMember(v) for v in values]
-+        return [QAPISchemaMember(v['name'], v.get('if')) if isinstance(v=
-, dict)
-+                else QAPISchemaMember(v)
-+                for v in values]
-=20
-     def _make_implicit_enum_type(self, name, info, values, ifcond):
-         # See also QAPISchemaObjectTypeMember._pretty_owner()
-@@ -1942,11 +1959,16 @@ const char *const %(c_name)s_lookup[] =3D {
- ''',
-                 c_name=3Dc_name(name))
-     for value in values:
-+        ifcond =3D None
-+        if isinstance(value, tuple):
-+            value, ifcond =3D value
-+        ret +=3D gen_if(ifcond)
-         index =3D c_enum_const(name, value, prefix)
-         ret +=3D mcgen('''
-     [%(index)s] =3D "%(value)s",
- ''',
-                      index=3Dindex, value=3Dvalue)
-+        ret +=3D gen_endif(ifcond)
-=20
-     max_index =3D c_enum_const(name, '_MAX', prefix)
-     ret +=3D mcgen('''
-@@ -1969,12 +1991,17 @@ typedef enum %(c_name)s {
-=20
-     i =3D 0
-     for value in enum_values:
-+        ifcond =3D None
-+        if isinstance(value, tuple):
-+            value, ifcond =3D value
-+        ret +=3D gen_if(ifcond)
-         ret +=3D mcgen('''
-     %(c_enum)s =3D %(i)d,
- ''',
-                      c_enum=3Dc_enum_const(name, value, prefix),
-                      i=3Di)
-         i +=3D 1
-+        ret +=3D gen_endif(ifcond)
-=20
-     ret +=3D mcgen('''
- } %(c_name)s;
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 0fc7088b2c..cb5daf0009 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -413,6 +413,8 @@ qapi-schema +=3D enum-bad-name.json
- qapi-schema +=3D enum-bad-prefix.json
- qapi-schema +=3D enum-clash-member.json
- qapi-schema +=3D enum-dict-member.json
-+qapi-schema +=3D enum-dict-member-invalid.json
-+qapi-schema +=3D enum-if-invalid.json
- qapi-schema +=3D enum-int-member.json
- qapi-schema +=3D enum-member-case.json
- qapi-schema +=3D enum-missing-data.json
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.err b/tests/qapi-=
-schema/enum-dict-member-invalid.err
-new file mode 100644
-index 0000000000..d12cca0df3
---- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/enum-dict-member-invalid.json:2: Dictionary member of =
-enum 'MyEnum' must have a 'name' key
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.exit b/tests/qapi=
--schema/enum-dict-member-invalid.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.json b/tests/qapi=
--schema/enum-dict-member-invalid.json
-new file mode 100644
-index 0000000000..9cf8406867
---- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid.json
-@@ -0,0 +1,2 @@
-+# we reject any enum member that is not a string or a dict with 'name'
-+{ 'enum': 'MyEnum', 'data': [ { 'value': 'str' } ] }
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.out b/tests/qapi-=
-schema/enum-dict-member-invalid.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/enum-dict-member.err b/tests/qapi-schema/e=
-num-dict-member.err
-index 8ca146ea59..e69de29bb2 100644
---- a/tests/qapi-schema/enum-dict-member.err
-+++ b/tests/qapi-schema/enum-dict-member.err
-@@ -1 +0,0 @@
--tests/qapi-schema/enum-dict-member.json:2: Member of enum 'MyEnum' requi=
-res a string name
-diff --git a/tests/qapi-schema/enum-dict-member.exit b/tests/qapi-schema/=
-enum-dict-member.exit
-index d00491fd7e..573541ac97 100644
---- a/tests/qapi-schema/enum-dict-member.exit
-+++ b/tests/qapi-schema/enum-dict-member.exit
-@@ -1 +1 @@
--1
-+0
-diff --git a/tests/qapi-schema/enum-dict-member.json b/tests/qapi-schema/=
-enum-dict-member.json
-index 79672e0f09..b09a83061c 100644
---- a/tests/qapi-schema/enum-dict-member.json
-+++ b/tests/qapi-schema/enum-dict-member.json
-@@ -1,2 +1 @@
--# we reject any enum member that is not a string
--{ 'enum': 'MyEnum', 'data': [ { 'value': 'str' } ] }
-+{ 'enum': 'TestEnum', 'data': [ { 'name': 'foo' }, { 'name': 'bar' } ]}
-diff --git a/tests/qapi-schema/enum-dict-member.out b/tests/qapi-schema/e=
-num-dict-member.out
-index e69de29bb2..cf8e3cce2b 100644
---- a/tests/qapi-schema/enum-dict-member.out
-+++ b/tests/qapi-schema/enum-dict-member.out
-@@ -0,0 +1,4 @@
-+enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+    prefix QTYPE
-+enum TestEnum ['foo', 'bar']
-+object q_empty
-diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
-um-if-invalid.err
-new file mode 100644
-index 0000000000..236b703e88
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/enum-if-invalid.json:2: 'if' condition requires a stri=
-ng or a list of string
-diff --git a/tests/qapi-schema/enum-if-invalid.exit b/tests/qapi-schema/e=
-num-if-invalid.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/enum-if-invalid.json b/tests/qapi-schema/e=
-num-if-invalid.json
-new file mode 100644
-index 0000000000..60bd0ef1d7
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.json
-@@ -0,0 +1,3 @@
-+# check invalid 'if' type
-+{ 'enum': 'TestIfEnum', 'data':
-+  [ 'foo', { 'name' : 'bar', 'if': { 'val': 'foo' } } ] }
-diff --git a/tests/qapi-schema/enum-if-invalid.out b/tests/qapi-schema/en=
-um-if-invalid.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index dc2c444fc1..ad2b405d83 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -194,7 +194,8 @@
- { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-   'if': 'defined(TEST_IF_STRUCT)' }
-=20
--{ 'enum': 'TestIfEnum', 'data': [ 'foo', 'bar' ],
-+{ 'enum': 'TestIfEnum', 'data':
-+  [ 'foo', { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ],
-   'if': 'defined(TEST_IF_ENUM)' }
-=20
- { 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
-@@ -203,7 +204,7 @@
- { 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
-   'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
-=20
--{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct' },
-+{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct', 'bar': 'TestI=
-fEnum' },
-   'if': 'defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)' }
-=20
- { 'event': 'TestIfEvent', 'data': { 'foo': 'TestIfStruct' },
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index fc5fd25f1b..211c367632 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -60,7 +60,7 @@ alternate TestIfAlternate
- command TestIfCmd q_obj_TestIfCmd-arg -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse
-     if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
--enum TestIfEnum ['foo', 'bar']
-+enum TestIfEnum ['foo', ('bar', 'defined(TEST_IF_ENUM_BAR)')]
-     if defined(TEST_IF_ENUM)
- event TestIfEvent q_obj_TestIfEvent-arg
-    boxed=3DFalse
-@@ -197,6 +197,7 @@ object q_obj_EVENT_D-arg
-     member enum3: EnumOne optional=3DTrue
- object q_obj_TestIfCmd-arg
-     member foo: TestIfStruct optional=3DFalse
-+    member bar: TestIfEnum optional=3DFalse
-     if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
- object q_obj_TestIfEvent-arg
-     member foo: TestIfStruct optional=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index 17fd975812..70054848f0 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -18,7 +18,9 @@ import sys
-=20
- class QAPISchemaTestVisitor(QAPISchemaVisitor):
-     def visit_enum_type(self, name, info, values, prefix, ifcond):
--        print 'enum %s %s' % (name, values)
-+        values =3D ', '.join(["'%s'" % v[0] if not v[1] else str(v)
-+                            for v in values])
-+        print 'enum %s [%s]' % (name, values)
-         if prefix:
-             print '    prefix %s' % prefix
-         self._print_if(ifcond)
+-#ifndef TARGET_ARM
+-GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-gic-capabilities");
+-    return NULL;
+-}
+-#endif
+-
+ HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
+ {
+     MachineState *ms =3D MACHINE(qdev_get_machine());
 --=20
 2.14.0.rc0.1.g40ca67566
