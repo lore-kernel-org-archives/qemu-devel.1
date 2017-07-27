@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dapMf-0002SM-Qr
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:26:34 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dapPC-0004WE-VB
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dapMe-000561-Pr
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:26:33 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dapPB-00070f-Lu
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 16:29:10 -0400
 References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
-	<1499633493-19865-3-git-send-email-eric.auger@redhat.com>
-	<04b06baa-75d8-291b-ef6e-89bbb89b3fd1@semihalf.com>
+	<1499633493-19865-2-git-send-email-eric.auger@redhat.com>
+	<66fca1dd-b731-c97f-b21b-af4ea75dcb47@semihalf.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <9a41e0b1-0519-2c93-70b4-30e0a38a2405@redhat.com>
-Date: Thu, 27 Jul 2017 22:26:11 +0200
+Message-ID: <b14389ac-c2c4-2185-8205-50a045e4e3ea@redhat.com>
+Date: Thu, 27 Jul 2017 22:28:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <04b06baa-75d8-291b-ef6e-89bbb89b3fd1@semihalf.com>
+In-Reply-To: <66fca1dd-b731-c97f-b21b-af4ea75dcb47@semihalf.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v5 2/8] hw/arm/smmuv3: smmuv3 emulation model
+Subject: Re: [Qemu-devel] [RFC v5 1/8] hw/arm/smmu-common: smmu base class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +29,190 @@ Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.c
 
 Hi Tomasz,
 
-On 13/07/2017 14:00, Tomasz Nowicki wrote:
+On 25/07/2017 14:12, Tomasz Nowicki wrote:
 > Hi Eric,
 > 
+> I found out what is going on regarding vhost-net outgoing packet's
+> payload corruption. My packets were corrupted because of inconsistent
+> IOVA to HVA translation in IOTLB. Please see below.
+> 
 > On 09.07.2017 22:51, Eric Auger wrote:
->> From: Prem Mallappa <prem.mallappa@broadcom.com>
+>> Introduces the base device and class for the ARM smmu.
+>> Implements VMSAv8-64 table lookup and translation. VMSAv8-32
+>> is not implemented.
 >>
->> Introduces the SMMUv3 derived model. This is based on
->> System MMUv3 specification (v17).
->>
->> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 >>
 >> ---
->> v4 -> v5:
->> - change smmuv3_translate proto (IOMMUAccessFlags flag)
->> - has_stagex replaced by is_ste_stagex
->> - smmu_cfg_populate removed
->> - added smmuv3_decode_config and reworked error management
->> - remwork the naming of IOMMU mrs
->> - fix SMMU_CMDQ_CONS offset
->>
 > 
 > [...]
 > 
 >> +
->> +/*****************************
->> + *  Register Access Primitives
->> + *****************************/
->> +
->> +static inline void smmu_write64_reg(SMMUV3State *s, uint32_t addr,
->> uint64_t val)
+>> +/**
+>> + * smmu_page_walk_level_64 - Walk an IOVA range from a specific level
+>> + * @baseaddr: table base address corresponding to @level
+>> + * @level: level
+>> + * @cfg: translation config
+>> + * @start: end of the IOVA range
+>> + * @end: end of the IOVA range
+>> + * @hook_fn: the hook that to be called for each detected area
+>> + * @private: private data for the hook function
+>> + * @read: whether parent level has read permission
+>> + * @write: whether parent level has write permission
+>> + * @nofail: indicates whether each iova of the range
+>> + *  must be translated or whether failure is allowed
+>> + * @notify_unmap: whether we should notify invalid entries
+>> + *
+>> + * Return 0 on success, < 0 on errors not related to translation
+>> + * process, > 1 on errors related to translation process (only
+>> + * if nofail is set)
+>> + */
+>> +static int
+>> +smmu_page_walk_level_64(dma_addr_t baseaddr, int level,
+>> +                        SMMUTransCfg *cfg, uint64_t start, uint64_t end,
+>> +                        smmu_page_walk_hook hook_fn, void *private,
+>> +                        bool read, bool write, bool nofail,
+>> +                        bool notify_unmap)
 >> +{
->> +    addr >>= 2;
->> +    s->regs[addr] = val & 0xFFFFFFFFULL;
->> +    s->regs[addr + 1] = val & ~0xFFFFFFFFULL;
->> +}
+>> +    uint64_t subpage_size, subpage_mask, pte, iova = start;
+>> +    bool read_cur, write_cur, entry_valid;
+>> +    int ret, granule_sz, stage;
+>> +    IOMMUTLBEntry entry;
 >> +
->> +static inline void smmu_write_reg(SMMUV3State *s, uint32_t addr,
->> uint64_t val)
->> +{
->> +    s->regs[addr >> 2] = val;
->> +}
+>> +    granule_sz = cfg->granule_sz;
+>> +    stage = cfg->stage;
+>> +    subpage_size = 1ULL << level_shift(level, granule_sz);
+>> +    subpage_mask = level_page_mask(level, granule_sz);
 >> +
->> +static inline uint32_t smmu_read_reg(SMMUV3State *s, uint32_t addr)
->> +{
->> +    return s->regs[addr >> 2];
->> +}
+>> +    trace_smmu_page_walk_level_in(level, baseaddr, granule_sz,
+>> +                                  start, end, subpage_size);
 >> +
->> +static inline uint64_t smmu_read64_reg(SMMUV3State *s, uint32_t addr)
->> +{
->> +    addr >>= 2;
->> +    return s->regs[addr] | (s->regs[addr + 1] << 32);
+>> +    while (iova < end) {
+>> +        dma_addr_t next_table_baseaddr;
+>> +        uint64_t iova_next, pte_addr;
+>> +        uint32_t offset;
+>> +
+>> +        iova_next = (iova & subpage_mask) + subpage_size;
+>> +        offset = iova_level_offset(iova, level, granule_sz);
+>> +        pte_addr = baseaddr + offset * sizeof(pte);
+>> +        pte = get_pte(baseaddr, offset);
+>> +
+>> +        trace_smmu_page_walk_level(level, iova, subpage_size,
+>> +                                   baseaddr, offset, pte);
+>> +
+>> +        if (pte == (uint64_t)-1) {
+>> +            if (nofail) {
+>> +                return SMMU_TRANS_ERR_WALK_EXT_ABRT;
+>> +            }
+>> +            goto next;
+>> +        }
+>> +        if (is_invalid_pte(pte) || is_reserved_pte(pte, level)) {
+>> +            trace_smmu_page_walk_level_res_invalid_pte(stage, level,
+>> baseaddr,
+>> +                                                       pte_addr,
+>> offset, pte);
+>> +            if (nofail) {
+>> +                return SMMU_TRANS_ERR_WALK_EXT_ABRT;
+>> +            }
+>> +            goto next;
+>> +        }
 > 
-> To be consistent with smmu_write64_reg() we should not shift here second
-> half of register, instead simply:
 > 
-> return s->regs[addr] | s->regs[addr + 1];
+> vhost maintains its IOTLB cache and when there is no IOVA->HVA
+> translation, it asks QEMU for help. However, IOTLB entries invalidations
+> are guest initiative so for any DMA unmap at guest side we trap to SMMU
+> emulation code and call:
+> smmu_notify_all -> smmuv3_replay_single -> smmu_page_walk_64 ->
+> smmu_page_walk_level_64 -> smmuv3_replay_hook -> vhost_iommu_unmap_notify
+> 
+> The thing is that smmuv3_replay_hook() is never called because guest
+> zeros PTE before we trap to QEMU so that smmu_page_walk_level_64() fails
+> on ^^^ is_invalid_pte(pte) check. This way we keep old IOTLB entry in
+> vhost and subsequent translations may be broken.
 
-Thanks for spotting this. I think regs should be uint32_t instead and
-extract64() could be used on write64 and shift would stay on read64().
+Thank you for the time you spent on this. I will work on this vhost use
+case asap and will let you know.
 
-Regards
+Thanks
 
 Eric
+> 
+>> +
+>> +        read_cur = read; /* TODO */
+>> +        write_cur = write; /* TODO */
+>> +        entry_valid = read_cur | write_cur; /* TODO */
+>> +
+>> +        if (is_page_pte(pte, level)) {
+>> +            uint64_t gpa = get_page_pte_address(pte, granule_sz);
+>> +            int perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>> +
+>> +            trace_smmu_page_walk_level_page_pte(stage, level,
+>> entry.iova,
+>> +                                                baseaddr, pte_addr,
+>> pte, gpa);
+>> +            if (!entry_valid && !notify_unmap) {
+>> +                printf("%s entry_valid=%d notify_unmap=%d\n", __func__,
+>> +                       entry_valid, notify_unmap);
+>> +                goto next;
+>> +            }
+>> +            ret = call_entry_hook(iova, subpage_mask, gpa, perm,
+>> +                                  hook_fn, private);
+>> +            if (ret) {
+>> +                return ret;
+>> +            }
+>> +            goto next;
+>> +        }
+>> +        if (is_block_pte(pte, level)) {
+>> +            uint64_t block_size;
+>> +            hwaddr gpa = get_block_pte_address(pte, level, granule_sz,
+>> +                                               &block_size);
+>> +            int perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>> +
+>> +            if (gpa == -1) {
+>> +                if (nofail) {
+>> +                    return SMMU_TRANS_ERR_WALK_EXT_ABRT;
+>> +                } else {
+>> +                    goto next;
+>> +                }
+>> +            }
+>> +            trace_smmu_page_walk_level_block_pte(stage, level, baseaddr,
+>> +                                                 pte_addr, pte, iova,
+>> gpa,
+>> +                                                 (int)(block_size >>
+>> 20));
+>> +
+>> +            ret = call_entry_hook(iova, subpage_mask, gpa, perm,
+>> +                                  hook_fn, private);
+>> +            if (ret) {
+>> +                return ret;
+>> +            }
+>> +            goto next;
+>> +        }
+>> +        if (level  == 3) {
+>> +            goto next;
+>> +        }
+>> +        /* table pte */
+>> +        next_table_baseaddr = get_table_pte_address(pte, granule_sz);
+>> +        trace_smmu_page_walk_level_table_pte(stage, level, baseaddr,
+>> pte_addr,
+>> +                                             pte, next_table_baseaddr);
+>> +        ret = smmu_page_walk_level_64(next_table_baseaddr, level + 1,
+>> cfg,
+>> +                                      iova, MIN(iova_next, end),
+>> +                                      hook_fn, private, read_cur,
+>> write_cur,
+>> +                                      nofail, notify_unmap);
+>> +        if (!ret) {
+>> +            return ret;
+>> +        }
+>> +
+>> +next:
+>> +        iova = iova_next;
+>> +    }
+>> +
+>> +    return SMMU_TRANS_ERR_NONE;
+>> +}
 > 
 > Thanks,
 > Tomasz
