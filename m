@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dbBCt-0003A2-Gl
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:45:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1dbBJf-0006l9-KT
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dbBCo-00075t-KZ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:45:55 -0400
-Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:36442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dbBCo-00073Y-En
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:45:50 -0400
-Received: by mail-io0-x233.google.com with SMTP id g35so60869689ioi.3
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:45:48 -0700 (PDT)
-Received: from [192.168.0.5] (d199-74-164-53.col.wideopenwest.com.
-	[74.199.53.164]) by smtp.gmail.com with ESMTPSA id
-	c11sm1632711iof.74.2017.07.28.12.45.47 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 28 Jul 2017 12:45:47 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-Id: <374E3394-46D9-4459-AE2E-059F8EEC7406@gmail.com>
-Date: Fri, 28 Jul 2017 15:45:46 -0400
-Subject: [Qemu-devel] Call for testers for various versions of Windows
+	(envelope-from <eblake@redhat.com>) id 1dbBJb-0003uu-Hz
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:52:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39088)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dbBJb-0003sq-84
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:52:51 -0400
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-48-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <319ee394-c1e2-894b-4f0c-980b1000587d@redhat.com>
+Date: Fri, 28 Jul 2017 14:52:48 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170728053610.15770-48-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OdNenUWp3dCGcIXRUDldLSRT74SGuIBdM"
+Subject: Re: [Qemu-devel] [RFC PATCH 47/47] script to find outdated entry in
+ MAINTAINERS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-I have made a page that keeps track of anyone who wishes to be a tester =
-for a particular version of Windows. Here is the page: =
-http://wiki.qemu.org/Testing/Windows
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OdNenUWp3dCGcIXRUDldLSRT74SGuIBdM
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+Message-ID: <319ee394-c1e2-894b-4f0c-980b1000587d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 47/47] script to find outdated entry in
+ MAINTAINERS
+References: <20170728053610.15770-1-f4bug@amsat.org>
+ <20170728053610.15770-48-f4bug@amsat.org>
+In-Reply-To: <20170728053610.15770-48-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If there is a version of Window you would like to help test in QEMU, =
-please contact me with the email address you wish to use and the version =
-of Windows you wish to support. Your information will be added to this =
-list. With this list someone who makes a patch may need your help =
-ensuring the patch is compatible with your supported version of Windows.=20=
+On 07/28/2017 12:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  scripts/check_maintainer.sh | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>  create mode 100755 scripts/check_maintainer.sh
+>=20
+
+> +echo "Incorrect MAINTAINERS paths:" 1>&2
+> +egrep ^F: MAINTAINERS | cut -d\  -f2 | while read p; do
+> +    ls -ld $p 1>/dev/null
+> +done
+
+Ah, you uses this in a cover letter of your other series, where I
+responded without thinking it was going into git.  But now that I see we
+are trying to commit it, I really think that one 'ls -l >/dev/null' per
+filename is inefficient; this should be
+
+egrep ^F: MAINTAINERS | cut -d\  -f2 | xargs ls -d >/dev/null
+
+if we really like the side effect of ls writing to stdout as the way to
+identify globs that no longer map anywhere, or even something like:
+
+for glob in $(egrep ... | cut ...); do
+    set - $glob
+    if test -n "$2" && ! test -e "$1"; then
+        echo "glob $glob no longer resolves" 2>&1
+    fi
+done
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Here are all the versions of Windows I have up so far:
+--OdNenUWp3dCGcIXRUDldLSRT74SGuIBdM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Windows 3.1
-Windows NT 3.1
-Windows NT 3.5
-Windows 95
-Windows NT 4.0
-Windows 98
-Windows ME
-Windows 2000
-Windows XP
-Windows Vista
-Windows 7
-Windows 8
-Windows 10
-ReactOS=
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7lhAACgkQp6FrSiUn
+Q2rteAf/crPN3PErlDBL4mF3CLN3LegrFUv54QCkY8F61rCZrbdeoaQKjsW/Tjml
+f+9fcYuIoUBu9OLFgLecQ/fmZSTf4lz4Oy4+qys1yQglqsF6l47X6crsx2DROTmU
+41x3TibNyr8oT/3+21Q7chWOg54UDimLqTYEH3BtKxsh8Ins4tNYB7AN5CnX7X4y
+/6WTE6RznxTuCUYbrLapguZjJnwE2xQlS8wZ0uoDsDhcILQCvQobcQrEgchCVKPw
+PBX0K23HW4n9n6rE+UtLlwkz2HHbo2mzSXVc6m8hQ4h0qV0pNwCiGGiW/rCIgV10
+KRlkBcrPy6AyYNu2hlUilSecErVazA==
+=BrRI
+-----END PGP SIGNATURE-----
+
+--OdNenUWp3dCGcIXRUDldLSRT74SGuIBdM--
