@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1db1PR-0003pl-Jm
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:18:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1db1Pq-0004E2-Ny
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1db1PQ-0004n2-9h
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:18:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1db1Pp-00051x-UY
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:18:38 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:37119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1db1Pp-0004zi-ON
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:18:37 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id 33so96185444wrz.4
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 02:18:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170728053610.15770-31-f4bug@amsat.org>
-References: <20170728053610.15770-1-f4bug@amsat.org>
-	<20170728053610.15770-31-f4bug@amsat.org>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 28 Jul 2017 11:17:49 +0200
-Message-ID: <CACXAS8BfLgi5X1rKHDm05RmvE7WMWUtOqQ=roRUtzRQ22yCqmw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	<20170717185830.GD31820@work-vm>
+	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Jul 2017 10:18:14 +0100
+Message-ID: <CAFEAcA_38JueOfxmgB_w=Pcy9suaX7y+bfunDTvdMwFpZy+jsg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 30/47] MAINTAINERS: add missing SPARC entry
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>, qemu-trivial@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, Juan Quintela <quintela@redhat.com>
 
-On Fri, Jul 28, 2017 at 7:35 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
-
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
+On 20 July 2017 at 10:42, Peter Maydell <peter.maydell@linaro.org> wrote:
+> OK, so what should we do for 2.10 ?
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index bb1cb1fc1c..e363a18631 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -245,6 +245,7 @@ F: target/sparc/
->  F: hw/sparc/
->  F: hw/sparc64/
->  F: disas/sparc.c
-> +F: default-configs/sparc*-softmmu.mak
+> We could:
+>  * implement the changes you suggest above, and mark only
+>    vmstate_register_ram'd blocks as migratable
+>    (would probably need to fix some places which buggily
+>    don't call vmstate_register_ram)
+>  * implement the changes above, but special case mmio-interface
+>    so only its ramblock is marked unmigratable
+>  * postpone the changes above until 2.11, and for 2.10 register
+>    a migration-blocker in mmio-interface so that we at least
+>    give the user a useful error rather than having it fail
+>    obscurely on vmload (and release note this)
 >
->  UniCore32
->  M: Guan Xuetao <gxt@mprc.pku.edu.cn>
-> --
-> 2.13.3
->
+> (Or something else?)
 
+Talking to David about this on IRC, even "don't allow
+migration" is a bit tricky, because you can't register
+a migration-blocker if a migration is already in progress.
+Two further options:
+ * disable this mmio-exec-in-place entirely for 2.10 as
+   being not completely baked yet, and fix it properly
+   in 2.11
+ * ditto, but allow the device to have an x-enable-exec-in-place
+   property which turned on the not-baked feature (the
+   property would go away in 2.11, which is OK because
+   of the x- experimental prefix)
 
+I'm leaning towards disable-entirely at the moment...
 
---=20
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+thanks
+-- PMM
