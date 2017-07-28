@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dat5c-0002lh-8a
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:25:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dau2N-0002Pp-PN
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dat5Y-0001qf-Em
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:25:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dat5Y-0001oM-5i
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:25:08 -0400
-Date: Fri, 28 Jul 2017 08:25:01 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170728002501.GM5117@lemon.lan>
-References: <201707250902596770211@zte.com.cn>
-	<f53aa34f-5ca0-c38e-a303-4688698a2d42@cn.fujitsu.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dau2K-0001x5-Fb
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:25:55 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 27 Jul 2017 22:25:34 -0300
+Message-Id: <20170728012542.29975-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f53aa34f-5ca0-c38e-a303-4688698a2d42@cn.fujitsu.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCHv2 02/04] colo-compare: Processpactkets in
- the IOThreadofthe primary
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for 2.10 0/8] docs: fix broken paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Cc: wang.yong155@zte.com.cn, pbonzini@redhat.com, lizhijian@cn.fujitsu.com, wang.guang55@zte.com.cn, jasowang@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@gmail.com, stefanha@redhat.com, zhang.zhanghailiang@huawei.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Eric Blake <eblake@redhat.com>
 
-On Thu, 07/27 15:47, Zhang Chen wrote:
-> CC. Fam and David.
->=20
-> Any idea about it?
+Hi, following Cleber Rosa example I cleaned more invalid references.
 
-Is it possible to use g_main_context_{push,pop}_thread_default to "move" =
-chardev
-GSources to IOThread's context, then use g_main_context_query like main t=
-hread
-and poll the fds in aio_poll?
+Eric said this can wait 2.11, however these patches don't change any code
+generated, I think the 2.10 users deserve an up-to-date doc :p
 
-Fam
+I used the following command (and consider include it in some CI test job):
 
->=20
->=20
-> Thanks
->=20
-> Zhang Chen
->=20
->=20
-> On 07/25/2017 09:02 AM, wang.yong155@zte.com.cn wrote:
-> >=20
-> > >On 24/07/2017 12:38, wang.yong155@zte.com.cn wrote:
-> >=20
-> > >> finally use g_main_loop_run to replace aio_poll  in the
-> >=20
-> > >> iothread_run function.
-> >=20
-> > >
-> >=20
-> > >That would make the performance of virtio-blk with iothreads worse,
-> >=20
-> > >unfortunately.  aio_poll is much more optimized than g_main_loop_run=
-.
-> >=20
-> > Hi Paolo,
-> >=20
-> > Any other good idea to achieve this?
-> >=20
-> >=20
-> > Thanks
-> >=20
-> >=20
-> > >
-> >=20
-> > >Paolo
-> >=20
-> > >
-> >=20
-> > >> After that IOThread
-> >=20
-> > >> runs the GMainContext event loop,chardev and IOThread can work
-> > together.
-> >=20
-> > >>
-> >=20
-> > >> How about it? If feasible, I will try to submit
-> >=20
-> >=20
-> >=20
-> >=20
-> > =E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6
-> > *=E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A*<pbonzini@redhat.com>;
-> > *=E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A*=E7=8E=8B=E5=8B=8710170530;<ste=
-fanha@redhat.com>;<jasowang@redhat.com>;<marcandre.lureau@gmail.com>;
-> > *=E6=8A=84=E9=80=81=E4=BA=BA=EF=BC=9A*<zhang.zhanghailiang@huawei.com=
->;<zhangchen.fnst@cn.fujitsu.com>;<lizhijian@cn.fujitsu.com>;<qemu-devel@=
-nongnu.org>;=E7=8E=8B=E5=B9=BF10165992;
-> > *=E6=97=A5 =E6=9C=9F =EF=BC=9A*2017=E5=B9=B407=E6=9C=8824=E6=97=A5 19=
-:59
-> > *=E4=B8=BB =E9=A2=98 =EF=BC=9A**Re: [PATCHv2 02/04] colo-compare: Pro=
-cesspactkets in the
-> > IOThreadofthe primary*
-> >=20
-> >=20
-> > On 24/07/2017 12:38, wang.yong155@zte.com.cn wrote:
-> > > finally use g_main_loop_run to replace aio_poll  in the
-> > > iothread_run function.
-> >=20
-> > That would make the performance of virtio-blk with iothreads worse,
-> > unfortunately.  aio_poll is much more optimized than g_main_loop_run.
-> >=20
-> > Paolo
-> >=20
-> > > After that IOThread
-> > > runs the GMainContext event loop,chardev and IOThread can work toge=
-ther.
-> > >
-> > > How about it? If feasible, I will try to submit a patch.
-> >=20
-> >=20
-> >=20
->=20
-> --=20
-> Thanks
-> Zhang Chen
->=20
->=20
->=20
->=20
+$ git grep docs/ \
+      | sed -ne "s/.* \(docs[^ :)}\"\']*\).*/\1/p" \
+      | sed -e 's/\(.*\)\.$/\1/p' | sort -u | while read p;do
+    ls -ld $p 1>/dev/null
+  done
+
+Regards,
+
+Phil.
+
+Cleber Rosa (1):
+  docs: fix broken paths to docs/interop dir
+
+Philippe Mathieu-Daudé (7):
+  docs: fix broken paths to docs/interop/qcow2.txt
+  docs: fix broken paths to docs/devel/qapi-code-gen.txt
+  docs: fix broken paths to docs/devel/atomics.txt
+  docs: fix broken paths to docs/devel/tracing.txt
+  docs: fix broken paths to docs/config/ich9-ehci-uhci.cfg
+  docs: fix broken paths to docs/specs/ivshmem-spec.txt
+  docs: fix broken paths to docs/spin/
+
+ audio/trace-events                  | 2 +-
+ block/trace-events                  | 2 +-
+ chardev/trace-events                | 2 +-
+ crypto/trace-events                 | 2 +-
+ docs/devel/lockcnt.txt              | 2 +-
+ docs/devel/writing-qmp-commands.txt | 4 ++--
+ docs/qcow2-cache.txt                | 2 +-
+ docs/specs/pci-ids.txt              | 2 +-
+ docs/spin/aio_notify.promela        | 6 +++---
+ docs/spin/aio_notify_accept.promela | 4 ++--
+ docs/spin/aio_notify_bug.promela    | 4 ++--
+ docs/spin/tcg-exclusive.promela     | 2 +-
+ docs/usb2.txt                       | 2 +-
+ hw/9pfs/trace-events                | 2 +-
+ hw/acpi/trace-events                | 2 +-
+ hw/alpha/trace-events               | 2 +-
+ hw/arm/trace-events                 | 2 +-
+ hw/audio/trace-events               | 2 +-
+ hw/block/dataplane/trace-events     | 2 +-
+ hw/block/trace-events               | 2 +-
+ hw/char/trace-events                | 2 +-
+ hw/display/trace-events             | 2 +-
+ hw/dma/trace-events                 | 2 +-
+ hw/i386/trace-events                | 2 +-
+ hw/input/trace-events               | 2 +-
+ hw/intc/trace-events                | 2 +-
+ hw/isa/trace-events                 | 2 +-
+ hw/mem/trace-events                 | 2 +-
+ hw/misc/trace-events                | 2 +-
+ hw/net/trace-events                 | 2 +-
+ hw/nvram/trace-events               | 2 +-
+ hw/pci/trace-events                 | 2 +-
+ hw/ppc/trace-events                 | 2 +-
+ hw/s390x/trace-events               | 2 +-
+ hw/scsi/trace-events                | 2 +-
+ hw/sd/trace-events                  | 2 +-
+ hw/sparc/trace-events               | 2 +-
+ hw/timer/trace-events               | 2 +-
+ hw/usb/trace-events                 | 2 +-
+ hw/vfio/trace-events                | 2 +-
+ hw/virtio/trace-events              | 2 +-
+ hw/xen/trace-events                 | 2 +-
+ include/block/aio.h                 | 2 +-
+ include/qapi/visitor.h              | 2 +-
+ include/qemu/atomic.h               | 4 ++--
+ io/trace-events                     | 2 +-
+ linux-user/trace-events             | 2 +-
+ migration/trace-events              | 2 +-
+ net/trace-events                    | 2 +-
+ qapi-schema.json                    | 4 ++--
+ qapi/introspect.json                | 2 +-
+ qapi/qapi-util.c                    | 2 +-
+ qom/trace-events                    | 2 +-
+ scripts/qapi2texi.py                | 2 +-
+ scripts/simpletrace.py              | 2 +-
+ target/arm/trace-events             | 2 +-
+ target/i386/trace-events            | 2 +-
+ target/mips/trace-events            | 2 +-
+ target/ppc/trace-events             | 2 +-
+ target/s390x/trace-events           | 2 +-
+ target/sparc/trace-events           | 2 +-
+ tcg/README                          | 2 +-
+ ui/trace-events                     | 2 +-
+ util/trace-events                   | 2 +-
+ 64 files changed, 71 insertions(+), 71 deletions(-)
+
+-- 
+2.13.3
