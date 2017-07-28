@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db3xS-0005yh-DK
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:01:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1db41E-0000fF-0G
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db3xR-0004fy-EU
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1db3xR-0004eG-5v
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:01:29 -0400
-References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
-	<5c3214a0-196d-fa81-dbf8-237034b445de@redhat.com>
-	<CEC77EA1-ED7E-4D46-96DE-38A92DEF0F17@gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1db41C-0007rU-Kq
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:23 -0400
+References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
+	<20170606162652.112122-2-vsementsov@virtuozzo.com>
+	<50f19b1d-9736-b8b3-5616-67c3393336f3@redhat.com>
+	<7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
+	<26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <53277b1d-7414-26d1-9815-978aab5aef9c@redhat.com>
-Date: Fri, 28 Jul 2017 07:01:23 -0500
+Message-ID: <499609a4-79d4-f990-c312-048fd1f78ab8@redhat.com>
+Date: Fri, 28 Jul 2017 07:05:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <CEC77EA1-ED7E-4D46-96DE-38A92DEF0F17@gmail.com>
+In-Reply-To: <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="KxFpD79OUhE73StbMsoD6tbXUhavFlbvc"
-Subject: Re: [Qemu-devel] [PATCH 1/2] Add more function keys to QEMU
+	boundary="jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: add
+ bdrv_get_format_alloc_stat format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KxFpD79OUhE73StbMsoD6tbXUhavFlbvc
+--jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa
 From: Eric Blake <eblake@redhat.com>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
-Message-ID: <53277b1d-7414-26d1-9815-978aab5aef9c@redhat.com>
-Subject: Re: [PATCH 1/2] Add more function keys to QEMU
-References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
- <5c3214a0-196d-fa81-dbf8-237034b445de@redhat.com>
- <CEC77EA1-ED7E-4D46-96DE-38A92DEF0F17@gmail.com>
-In-Reply-To: <CEC77EA1-ED7E-4D46-96DE-38A92DEF0F17@gmail.com>
+To: John Snow <jsnow@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Message-ID: <499609a4-79d4-f990-c312-048fd1f78ab8@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v3 1/3] block: add bdrv_get_format_alloc_stat
+ format interface
+References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
+ <20170606162652.112122-2-vsementsov@virtuozzo.com>
+ <50f19b1d-9736-b8b3-5616-67c3393336f3@redhat.com>
+ <7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
+ <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
+In-Reply-To: <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/27/2017 09:37 PM, Programmingkid wrote:
->=20
->> On Jul 27, 2017, at 10:55 AM, Eric Blake <eblake@redhat.com> wrote:
->>
->> On 07/27/2017 09:51 AM, Programmingkid wrote:
->>
->> You forgot in-reply-to: and references: headers, meaning this was not
->> threaded with your 0/2 patch.
->=20
-> Git send-email doesn't work for me. It complains about missing Perl mod=
-ules.=20
+On 07/27/2017 04:23 PM, John Snow wrote:
 
-Then install those modules.  Need help? Pasting the actual error message
-(or googling for it) will probably speed you up.
+>>>
+>>> "Allocations may be considered either used or unused by the format
+>>> driver interpreting those allocations. It is at the discretion of the=
+
+>>> format driver (e.g. qcow2) which regions of its backing storage are
+>>> considered in-use or not."
+>>
+>> So we are saying about "allocations". But unallocated data may be
+>> used/unused too, so,
+>> can we call unallocated areas "allocations"?
+>>
+>=20
+> You're right, "allocation" may imply something that is extant, but thes=
+e
+> are more like regions ...
+
+Even 'extent' might have a connotation of something reserved; other
+related words like 'block' are bad (a block of a block device?).
+
+>=20
+> Uh;
+>=20
+> "Regions" may be considered either used or unused?
+>=20
+> or
+>=20
+> "Regions of the underlying protocol file may be considered used or
+> unused by the format driver interpreting these regions."
+
+So this is one of the better variations I've seen, and works for me.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -69,7 +89,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---KxFpD79OUhE73StbMsoD6tbXUhavFlbvc
+--jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -78,14 +98,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7J5MACgkQp6FrSiUn
-Q2rqYgf/TN/9Bkr25GaagSZwYpLRBV33odHQsOKiMWgm5nKK+/c2+82pMRTFba9f
-2CgwWQRVq9gEh3iENGe7lIcvrZB0Jvzgom2I77sIpIPMHN2Ocs0R6GCsWwPi2K/7
-plC2i3BYDK/TN4OedL2O9TNFG2mDyaXUsbBDd7KRILQD5AlatZ8DyMUruYgpySaI
-5jP2323MaBpakaT8O/NWRiOwSbRZOYPGmNgYnLrHonXVfGSlhMDZEIi6+rL967L3
-jOoJ0rfCfwcB5RoEk87cJK2lV31eYJTD1NpeO1XcsanfconhqY6/npgd/PHLPIt5
-OJFEN1gk51olM4Qy1Pq1YiFIc9RGhQ==
-=Eeou
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7KHUACgkQp6FrSiUn
+Q2qKTwgAh2j7AYtC4iPU1XQUjiRH+X0OIAWu2bU66oA5uduJjDxahfte1srHA9El
+4qDEaMe/V2WIcJHPvgtCcxnuqYSd6EDgRUsLfh87SXm8bYOQVdcgpljpPd+roxmz
+IXZFKo017PkL3LGF68TUDREaWRBV05KSIvfR0hffwOrKg61aGZL18zkIHq4vmrZn
+ekl2uNYwoEA197hXx3uOHH1vFn75hPj7tTPKxtxEM+9WhVFhCu8XbMUTr97b+GJb
+r7CvYzUHWNRmPpglM2kIsdP/ptDyNukMcRdjTvQTuVTN45Oq/XRd3qLdoPGKyRSQ
+g8Ny4txVvT0qv3puv0sb+CItsaadIg==
+=xIRZ
 -----END PGP SIGNATURE-----
 
---KxFpD79OUhE73StbMsoD6tbXUhavFlbvc--
+--jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa--
