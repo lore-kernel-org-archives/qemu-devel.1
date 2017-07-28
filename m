@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dayeB-0007uW-G8
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 02:21:16 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dayeq-0008F4-0b
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 02:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1daye8-00029b-1i
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 02:21:15 -0400
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100578691.27487.8944448515009831240.stgit@bahia>
-	<20170728040257.GI3098@umbus.fritz.box>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c3750e7d-47af-4cd4-9121-73d8d8d0f81e@redhat.com>
-Date: Fri, 28 Jul 2017 08:20:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170728040257.GI3098@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="OSSVwh8nTSbhd8I7x8K9emKvFC5Kmjh48"
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to
- update the XICS phandle
+	(envelope-from <kraxel@redhat.com>) id 1dayem-0002Ta-IZ
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 02:21:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dayem-0002Su-AB
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 02:21:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 082567CD92
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 06:21:51 +0000 (UTC)
+Message-ID: <1501222909.10943.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 28 Jul 2017 08:21:49 +0200
+In-Reply-To: <20170727174522.GA29600@redhat.com>
+References: <20170727140025.392-1-kraxel@redhat.com>
+	<20170727140025.392-5-kraxel@redhat.com>
+	<20170727174522.GA29600@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 4/7] ui: add multimedia keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +34,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OSSVwh8nTSbhd8I7x8K9emKvFC5Kmjh48
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 28.07.2017 06:02, David Gibson wrote:
-> On Tue, Jul 25, 2017 at 08:03:06PM +0200, Greg Kurz wrote:
->> The "phandle" property of the XICS node is referenced by the "interrup=
-t-map"
->> property of each PHB node. This is used by the guest OS to setup IRQs =
-for
->> all PCI devices.
->>
->> QEMU uses an arbitrary value (0x1111) for this phandle, but SLOF conve=
-rts
->> this value to a SLOF specific one, which is then presented to the gues=
-t OS.
->>
->> This patches introduces the new KVMPPC_H_UPDATE_PHANDLE hcall, which i=
-s used
->> by SLOF to communicate the patched phandle value back to QEMU. This va=
-lue
->> is then cached and preserved accross migration until machine reset.
->>
->> This is required to be able to support PHB hotplug.
->>
->> Note, that SLOF already has some code to call KVMPPC_H_RTAS_UPDATE, so=
- we
->> have to introduce its number even if QEMU currently doesn't implement =
-it.
->>
->> Suggested-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Thu, 2017-07-27 at 18:45 +0100, Daniel P. Berrange wrote:
+> On Thu, Jul 27, 2017 at 04:00:22PM +0200, Gerd Hoffmann wrote:
+> > Add multimedia keys to QKeyCodes and to the keymaps.
+> >=20
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Message-id: 20170726152918.11995-5-kraxel@redhat.com
+> > ---
+> > =C2=A0ui/input-keymap.c | 44
+> > ++++++++++++++++++++++++++++++++++++++++++++
+> > =C2=A0qapi-schema.json=C2=A0=C2=A0| 28 +++++++++++++++++++++++++++-
+> > =C2=A02 files changed, 71 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+> > index 7461e1edde..ae781beae9 100644
+> > --- a/ui/input-keymap.c
+> > +++ b/ui/input-keymap.c
+> > @@ -116,6 +116,28 @@ static int linux_to_qcode[KEY_CNT] =3D {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[KEY_LEFTMETA]=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=3D Q_KEY_CODE_META_L,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[KEY_RIGHTMETA]=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=3D Q_KEY_CODE_META_R,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[KEY_MENU]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_MENU,
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_SLEEP]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_SLEEP,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_WAKEUP]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_WAKE,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_CALC]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_CALCULATOR,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_MAIL]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_MAIL,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_COMPUTER]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=3D Q_KEY_CODE_COMPUTER,
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_STOP]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_AC_STOP,
 >=20
-> Ugh.  I really, really hope we can avoid this, though I don't
-> immediately see how.  Having to have two way communication between
-> qemu and SLOF about the device tree contents just seems like opening
-> the door to endless complexities.
+> We already have a Q_KEY_CODE_STOP that I think is the correct mapping
+> for KEY_STOP, so this new Q_KEY_CODE_AC_STOP looks like a dupe.
+
+Oops, missed that indeed.
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_BOOKMARKS]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=3D Q_KEY_CODE_AC_BOOKMARKS,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_BACK]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_AC_BACK,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_FORWARD]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=3D Q_KEY_CODE_AC_FORWARD,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_HOMEPAGE]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=3D Q_KEY_CODE_AC_HOME,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_REFRESH]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=3D Q_KEY_CODE_AC_REFRESH,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0[KEY_FIND]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D Q_KEY_CODE_AC_SEARCH,
 >=20
-> This is basically a consequence of the fact that both qemu and partly
-> responsible for constructing the device tree for the guest, and that's
-> not easy to avoid.
->=20
-> Hrm.. Thomas, I know it's not really the OF way, but would it be
-> feasible to change SLOF to use the phandles as supplied by qemu rather
-> than creating its own?
+> Similarly we already have a Q_KEY_CODE_FIND that should map to
+> KEY_FIND, so this Q_KEY_CODE_AC_SEARCH is another dup AFAICT.
 
-I don't see a way to do this in an easy, clean, reasonable way. SLOF
-uses pointers to internal structures as phandles all over the place. You
-likely can't replace that so easily without rewriting half of the whole
-device tree related code in SLOF, I guess...
+Yes.
 
- Thomas
+> I'm curious what the 'AC_' prefix on all these is indicating ?
+> Do we actually need it ?
 
+Seems to stand for "application control".
 
---OSSVwh8nTSbhd8I7x8K9emKvFC5Kmjh48
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+# grep " AC " include/standard-headers/linux/input-event-codes.h=C2=A0
+=C2=A0* AC - Application Control
+#define KEY_STOP=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0128=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/=
+* AC Stop */
+#define KEY_PROPS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0130=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* AC P=
+roperties */
+#define KEY_UNDO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0131=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/=
+* AC Undo */
+[ ... ]
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
+I think it is better to keep it, even if it is inconsistent because we
+already have stop + find without prefix.   Just dropping the ac_ prefix
+will not work for some keys, ac_home for example.
 
-iQIcBAEBAgAGBQJZetfOAAoJEC7Z13T+cC21ZFAQAKLTlGf+zmlBDpSvrJ62T4ua
-Og5L02Umxg72f/A89qNKVOzQsMFTd5AxE+qwyiPNg2Gne4SLwQTVQvnkJt2j6dxj
-4Uk/J9X0557QwiKR3Hc4JzUrPms2czF1mCiiic/QUs/U9mnJHzMNvSUX1m9Py4fN
-0KCBri+pO3irsg8NrxwklItVEJ6kQnhi59OX4sj6OiU2gWd1dKEiFwsiSQNdFCmO
-E11/NGNpRCCdI80WyJJveUud/ku48+DYuTVkLq9hV95NLXkVK7GGzx1zeLz9Db67
-BG1Cl7lj4VrI/T54BbeRMlW+gE+4im72dJibxwmIUOOUW/RqUwvgLz0yVose6W2+
-KcgW/6feoJyY380j/FMiL7LlYuGpWw5ODvYyvMLnYMe8eWFFrHKyz0xm8MCDR4I3
-doaW9/AdgMgod85a4KnGqDYCpFMqb900YQTMfwIW8Hvofy4nnu63cqmxDhHRGsLK
-8HupQ3aHS3fcJdNQGbkZEymK6Knub7lASALFBcjCQf5sFB9GuwvjOCYH3u7r+9AS
-LaAszPMZgVnI64qCPuovONrTBZ1SoBLXCdMDKAVQFI064+qHjaLQ7m0M9dCMYGMf
-anhMozMKjbMtre0ARDR5w+6ny4lsZzAVtcUByZUunUQscPoJheYek9eDfCeUeHOz
-+txpFnfztHnqBzUESkI8
-=fG03
------END PGP SIGNATURE-----
+> Missing Q_KEY_CODE_MEDIASELECT entry - presumably it was supposed
+> to map to=C2=A0=C2=A0KEY_MEDIA
 
---OSSVwh8nTSbhd8I7x8K9emKvFC5Kmjh48--
+There is KEY_SELECT too, but not KEY_MEDIASELECT.  Hmm.
+
+cheers,
+  Gerd
