@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1db2kS-0007ck-Jh
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:44:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1db2l9-00080R-Kh
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1db2kP-000716-Tw
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:44:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1db2kP-0006yY-Kb
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:43:57 -0400
-Date: Fri, 28 Jul 2017 06:38:04 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <141699272.61445461.1501238284350.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1501206653-10704-1-git-send-email-wangyunjian@huawei.com>
-References: <1501206653-10704-1-git-send-email-wangyunjian@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1db2l8-0007yZ-SW
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:44:43 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:38280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1db2l8-0007xT-LG
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:44:42 -0400
+Received: by mail-wr0-x234.google.com with SMTP id f21so97138512wrf.5
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 03:44:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] vhost-user: fix watcher need be removed
- when vhost-user hotplug
+In-Reply-To: <20170728092000.19216-1-cohuck@redhat.com>
+References: <20170728092000.19216-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Jul 2017 11:44:20 +0100
+Message-ID: <CAFEAcA_f-atHctLiBnQuq6MkUU-_09jTMxACr7gH+FTA4mf8dw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-2.10 0/4] s390x: more fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: w00273186 <wangyunjian@huawei.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, mst@redhat.com, caihe@huawei.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
+On 28 July 2017 at 10:19, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit e01151de165070c25a1b202e9e2392950bd7c8da:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20170727-pull-request' into staging (2017-07-27 15:27:06 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20170728
+>
+> for you to fetch changes up to 4add0da64942d83e0564147c0876b01074bde9cb:
+>
+>   s390x/css: fix bits must be zero check for TIC (2017-07-28 10:06:25 +0200)
+>
+> ----------------------------------------------------------------
+> More s390x fixes: Correct ilen, and ccw checking.
+>
+> ----------------------------------------------------------------
+>
+> David Hildenbrand (2):
+>   target/s390x: fix pgm irq ilen for stsi
+>   target/s390x: fix pgm irq ilen in translate_pages()
+>
+> Halil Pasic (2):
+>   s390x/css: check ccw address validity
+>   s390x/css: fix bits must be zero check for TIC
+>
+>  hw/s390x/css.c             | 7 ++++++-
+>  target/s390x/misc_helper.c | 2 +-
+>  target/s390x/mmu_helper.c  | 2 +-
+>  3 files changed, 8 insertions(+), 3 deletions(-)
 
+Applied, thanks.
 
------ Original Message -----
-> From: Yunjian Wang <wangyunjian@huawei.com>
->=20
-> "nc" is freed after hotplug vhost-user, but the watcher is not removed.
-> The QEMU crash when the watcher access the "nc" when socket disconnects.
->=20
->     Program received signal SIGSEGV, Segmentation fault.
->     #0  object_get_class (obj=3Dobj@entry=3D0x2) at qom/object.c:750
->     #1  0x00007f9bb4180da1 in qemu_chr_fe_disconnect (be=3D<optimized out=
->) at
->     chardev/char-fe.c:372
->     #2  0x00007f9bb40d1100 in net_vhost_user_watch (chan=3D<optimized out=
->,
->     cond=3D<optimized out>, opaque=3D<optimized out>) at net/vhost-user.c=
-:188
->     #3  0x00007f9baf97f99a in g_main_context_dispatch () from
->     /usr/lib64/libglib-2.0.so.0
->     #4  0x00007f9bb41d7ebc in glib_pollfds_poll () at util/main-loop.c:21=
-3
->     #5  os_host_main_loop_wait (timeout=3D<optimized out>) at
->     util/main-loop.c:261
->     #6  main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at
->     util/main-loop.c:515
->     #7  0x00007f9bb3e266a7 in main_loop () at vl.c:1917
->     #8  main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<opt=
-imized
->     out>) at vl.c:4786
->=20
-> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
-> v3:
->  -fix conflicts with current master.
->=20
-> v2:
->  -move the chunk before deinit.
->=20
-> ps:
->  reproduce steps:
->     1. virsh attach-device vm0 vhost-user.xml
->     2. virsh detach-device vm0 vhost-user.xml
->     3. virsh attach-device vm0 vhost-user.xml
->     4. service openvswitch restart
->     5. repeat step 2~4
->=20
->  the vhost-user xml:
->     <interface type=3D'vhostuser'>
->       <mac address=3D'00:01:01:00:10:41'/>
->       <source type=3D'unix' path=3D'/var/run/vhost-user/tap1' mode=3D'cli=
-ent'/>
->       <model type=3D'virtio'/>
->       <driver queues=3D'8'/>
->     </interface>
-> ---
->  net/vhost-user.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/net/vhost-user.c b/net/vhost-user.c
-> index 36f32a2..c23927c 100644
-> --- a/net/vhost-user.c
-> +++ b/net/vhost-user.c
-> @@ -151,6 +151,10 @@ static void vhost_user_cleanup(NetClientState *nc)
->          s->vhost_net =3D NULL;
->      }
->      if (nc->queue_index =3D=3D 0) {
-> +        if (s->watch) {
-> +            g_source_remove(s->watch);
-> +            s->watch =3D 0;
-> +        }
->          qemu_chr_fe_deinit(&s->chr, true);
->      }
-> =20
-> --
-> 1.8.3.1
->=20
->=20
->=20
+-- PMM
