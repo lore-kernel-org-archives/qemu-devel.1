@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dbEcC-00048M-Vr
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:24:18 -0400
+	(envelope-from <mst@redhat.com>) id 1dbEe8-00050B-2U
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dbEc8-0006pq-Pt
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:24:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36292)
+	(envelope-from <mst@redhat.com>) id 1dbEe3-0008SB-UP
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:26:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43462)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dbEc8-0006oh-Gr
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:24:12 -0400
-Date: Sat, 29 Jul 2017 02:24:06 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dbEe3-0008RP-LQ
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:26:11 -0400
+Date: Sat, 29 Jul 2017 02:26:03 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170729021537-mutt-send-email-mst@kernel.org>
+Message-ID: <20170729022454-mutt-send-email-mst@kernel.org>
 References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
 	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
 	<20170723055006-mutt-send-email-mst@kernel.org>
 	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
-	<20170724234353-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAs8Ru-wuuHXK-mHir0_Hj8NenoKxuXyDqVt1YXOZUHAw@mail.gmail.com>
-	<20170725005027-mutt-send-email-mst@kernel.org>
-	<b36116e5-15fe-ffdd-7e4f-0f35078f95e9@redhat.com>
+	<20170723173111-mutt-send-email-mst@kernel.org>
+	<CAKSfGUBP8oH2YymDnCA+Q=ngmyyVRYTVujwfOLRgdBQ82qgivg@mail.gmail.com>
+	<20170725165213-mutt-send-email-mst@kernel.org>
+	<CAKSfGUDiJ9GVNepiX7nGHtPf5=OqUaZgyPwwwDUDWuwnAND-Ew@mail.gmail.com>
+	<a16dcefb-8abd-cf24-762c-82e26a0f9ec4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b36116e5-15fe-ffdd-7e4f-0f35078f95e9@redhat.com>
+In-Reply-To: <a16dcefb-8abd-cf24-762c-82e26a0f9ec4@redhat.com>
 Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
  property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
@@ -37,171 +38,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Marcel Apfelbaum <marcel@redhat.com>
 Cc: Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
 
-On Tue, Jul 25, 2017 at 02:49:49PM +0300, Marcel Apfelbaum wrote:
-> On 25/07/2017 0:58, Michael S. Tsirkin wrote:
-> > On Tue, Jul 25, 2017 at 12:41:12AM +0300, Alexander Bezzubikov wrote:
-> > > 2017-07-24 23:46 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
-> > > > On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
-> > > > > On 23/07/2017 15:22, Michael S. Tsirkin wrote:
-> > > > > > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
-> > > > > > > To enable hotplugging of a newly created pcie-pci-bridge,
-> > > > > > > we need to tell firmware (SeaBIOS in this case)
+On Tue, Jul 25, 2017 at 07:10:33PM +0300, Marcel Apfelbaum wrote:
+> On 25/07/2017 17:09, Alexander Bezzubikov wrote:
+> > 2017-07-25 16:53 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> > > On Tue, Jul 25, 2017 at 04:50:49PM +0300, Alexander Bezzubikov wrote:
+> > > > 2017-07-25 16:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> > > > > On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
+> > > > > > On 23/07/2017 15:22, Michael S. Tsirkin wrote:
+> > > > > > > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
+> > > > > > > > To enable hotplugging of a newly created pcie-pci-bridge,
+> > > > > > > > we need to tell firmware (SeaBIOS in this case)
+> > > > > > > 
 > > > > > > 
-> > > > > 
-> > > > > Hi Michael,
-> > > > > 
-> > > > > > Presumably, EFI would need to support this too?
+> > > > > > Hi Michael,
 > > > > > > 
-> > > > > 
-> > > > > Sure, Eduardo added to CC, but he is in PTO now.
-> > > > > 
-> > > > > > > to reserve
-> > > > > > > additional buses for pcie-root-port, that allows us to
-> > > > > > > hotplug pcie-pci-bridge into this root port.
-> > > > > > > The number of buses to reserve is provided to the device via a corresponding
-> > > > > > > property, and to the firmware via new PCI capability (next patch).
-> > > > > > > The property's default value is 1 as we want to hotplug at least 1 bridge.
+> > > > > > > Presumably, EFI would need to support this too?
+> > > > > > > 
 > > > > > > 
-> > > > > > If so you should just teach firmware to allocate one bus #
-> > > > > > unconditionally.
+> > > > > > Sure, Eduardo added to CC, but he is in PTO now.
 > > > > > > 
-> > > > > 
-> > > > > That would be a problem for the PCIe machines, since each PCIe
-> > > > > devices is plugged in a different bus and we are already
-> > > > > limited to 256 PCIe devices. Allocating an extra-bus always
-> > > > > would really limit the PCIe devices we can use.
-> > > > 
-> > > > But this is exactly what this patch does as the property is added to all
-> > > > buses and default to 1 (1 extra bus).
-> > > > 
-> > > > > > But why would that be so? What's wrong with a device
-> > > > > > directly in the root port?
+> > > > > > > > to reserve
+> > > > > > > > additional buses for pcie-root-port, that allows us to
+> > > > > > > > hotplug pcie-pci-bridge into this root port.
+> > > > > > > > The number of buses to reserve is provided to the device via a corresponding
+> > > > > > > > property, and to the firmware via new PCI capability (next patch).
+> > > > > > > > The property's default value is 1 as we want to hotplug at least 1 bridge.
+> > > > > > > 
+> > > > > > > If so you should just teach firmware to allocate one bus #
+> > > > > > > unconditionally.
+> > > > > > > 
 > > > > > > 
+> > > > > > That would be a problem for the PCIe machines, since each PCIe
+> > > > > > devices is plugged in a different bus and we are already
+> > > > > > limited to 256 PCIe devices. Allocating an extra-bus always
+> > > > > > would really limit the PCIe devices we can use.
 > > > > > 
-> > > > > First, plugging a legacy PCI device into a PCIe Root Port
-> > > > > looks strange at least, and it can;t be done on real HW anyway.
-> > > > > (incompatible slots)
+> > > > > One of the declared advantages of PCIe is easy support for multiple roots.
+> > > > > We really should look at that IMHO so we do not need to pile up hacks.
+> > > > > 
+> > > > > > > But why would that be so? What's wrong with a device
+> > > > > > > directly in the root port?
+> > > > > > > 
+> > > > > 
+> > > > > To clarify, my point is we might be wasting bus numbers by reservation
+> > > > > since someone might just want to put pcie devices there.
 > > > > 
-> > > > You can still plug in PCIe devices there.
-> > > > 
-> > > > > Second (and more important), if we want 2 or more PCI
-> > > > > devices we would loose both IO ports space and bus numbers.
-> > > > 
-> > > > What I am saying is maybe default should not be 1.
+> > > > I think, changing default value to 0 can help us avoid this,
+> > > > as no bus reservation by default. If one's surely wants
+> > > > to hotplug pcie-pci-bridge into this root port in future,
+> > > > the property gives him such an opportunity.
+> > > > So, sure need pcie-pci-bridge hotplug -> creating a root port with
+> > > > bus_reserve > 0. Otherwise (and default) - just as now, no changes
+> > > > in bus topology.
 > > > 
-> 
-> Hi Michael, Alexander
-> 
-> > > The only sensible variant left is 0.
-> > > But as we want pcie-pci-bridge to be used for every legacy PCI device
-> > > on q35 machine, every time one hotplugs the bridge into the root port,
-> > > he must be sure rp's prop value >0 (for Linux). I'm not sure
-> > > that it is a very convenient way to utilize the bridge - always remember
-> > > to set property.
+> > > I guess 0 should mean "do not reserve any buses".  So I think we also
+> > > need a flag to just avoid the capability altogether.  Maybe -1?  *That*
+> > > should be the default.
+> > 
+> > -1 might be useful if any limit value 0 is legal, but is it?
+> > If not, we can set every field to 0 and
+> > this is a sign of avoiding capability since none legal
+> > values are provided.
 > > 
 > 
-> Is not for Linux only, is for all guest OSes.
-> I also think setting the property is OK, libvirt can always
-> add a single PCIe Root Port port with this property set,
-> while upper layers can create flavors (if the feature needed
-> or not for the current setup)
-
-If you are going to always do this, it kind of looks like
-Laszlo's idea of always cold-plugging a pci bridge.
-
-> > That's what I'm saying then - if in your opinion default is >0 anyway,
-> > tweak firmware to do it by default.
-> > 
+> As Gerd suggested, this value is not a "delta" but the number
+> of buses to be reserved behind the bridge. If I got it right,
+> 0 is not a valid value, since the bridge by definition
+> has a list one bus behind.
 > 
-> Default should be 0 for sure - because of the hard limitation
-> on the number of PCIe devices for single PCI domain (the same
-> as the number of buses, 256).
-> 
-> For a positive value we will should add a property "buses-reserve = x".
-
-So value here is borderline but if it includes other resources
-then value seems clearer.
-
-> > > Another way - we can set this to 0 by default, and to 1 for pcie-root-port,
-> > > and recommend to use it for hotplugging of the pcie-pci-bridge itself.
-> > 
-> > I wonder about something: imagine hotplugging a hierarchy of bridges
-> > below a root port. It seems that nothing prevents guest from finding a
-> > free range of buses to cover this hierarchy and setting that as
-> > secondary/subordinate bus for this bridge.
-> >  > This does need support on QEMU side to hotplug a hierarchy at once,
-> > and might need some fixes in Linux, on the plus side you can defer
-> > management decision on how many are needed until you are actually
-> > adding something, and you don't need vendor specific patches.
-> > 
-> 
-> We can teach Linux kernel, that's for sure (OK, almost sure...)
-> but what we don't want is to be dependent on specific guest Operating
-> Systems. For example, most configurations are not supported
-> by Windows guests.
-
-If you fix Linux then windows will not want to be left behind
-and will implement this too.
-
-> Also is a great opportunity adding PCI IO resources hints
-> to guest FW, something we wanted to do for some time.
+> Michael, would you be OK with that?
 > 
 > Thanks,
 > Marcel
 
-I agree, it's a good reason to add this capability.
+IMHO we want an encoding that works for IO and memory too.
 
-> > 
+
+> > > 
+> > > > > 
+> > > > > > First, plugging a legacy PCI device into a PCIe Root Port
+> > > > > > looks strange at least, and it can;t be done on real HW anyway.
+> > > > > > (incompatible slots)
+> > > > > > 
+> > > > > > Second (and more important), if we want 2 or more PCI
+> > > > > > devices we would loose both IO ports space and bus numbers.
+> > > > > > 
+> > > > > > > 
+> > > > > > > > 
+> > > > > > > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > > > > > > > ---
+> > > > > > > >    hw/pci-bridge/pcie_root_port.c | 1 +
+> > > > > > > >    include/hw/pci/pcie_port.h     | 3 +++
+> > > > > > > >    2 files changed, 4 insertions(+)
+> > > > > > > > 
+> > > > > > > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> > > > > > > > index 4d588cb..b0e49e1 100644
+> > > > > > > > --- a/hw/pci-bridge/pcie_root_port.c
+> > > > > > > > +++ b/hw/pci-bridge/pcie_root_port.c
+> > > > > > > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+> > > > > > > >    static Property rp_props[] = {
+> > > > > > > >        DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> > > > > > > >                        QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> > > > > > > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+> > > > > > > >        DEFINE_PROP_END_OF_LIST()
+> > > > > > > >    };
+> > > > > > > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> > > > > > > > index 1333266..1b2dd1f 100644
+> > > > > > > > --- a/include/hw/pci/pcie_port.h
+> > > > > > > > +++ b/include/hw/pci/pcie_port.h
+> > > > > > > > @@ -34,6 +34,9 @@ struct PCIEPort {
+> > > > > > > >        /* pci express switch port */
+> > > > > > > >        uint8_t     port;
+> > > > > > > > +
+> > > > > > > > +    /* additional buses to reserve on firmware init */
+> > > > > > > > +    uint8_t     bus_reserve;
+> > > > > > > >    };
+> > > > > > > >    void pcie_port_init_reg(PCIDevice *d);
+> > > > > > > 
+> > > > > > > So here is a property and it does not do anything.
+> > > > > > > It makes it easier to work on series maybe, but review
+> > > > > > > is harder since we do not see what it does at all.
+> > > > > > > Please do not split up patches like this - you can maintain
+> > > > > > > it split up in your branch if you like and merge before sending.
+> > > > > > > 
+> > > > > > 
+> > > > > > Agreed, Alexandr please merge patches 4-5-6 for your next submission.
+> > > > > > 
+> > > > > > Thanks,
+> > > > > > Marcel
+> > > > > > 
+> > > > > > 
+> > > > > > > > --
+> > > > > > > > 2.7.4
 > > > > 
-> > > > > > 
-> > > > > > > 
-> > > > > > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> > > > > > > ---
-> > > > > > >    hw/pci-bridge/pcie_root_port.c | 1 +
-> > > > > > >    include/hw/pci/pcie_port.h     | 3 +++
-> > > > > > >    2 files changed, 4 insertions(+)
-> > > > > > > 
-> > > > > > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> > > > > > > index 4d588cb..b0e49e1 100644
-> > > > > > > --- a/hw/pci-bridge/pcie_root_port.c
-> > > > > > > +++ b/hw/pci-bridge/pcie_root_port.c
-> > > > > > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
-> > > > > > >    static Property rp_props[] = {
-> > > > > > >        DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
-> > > > > > >                        QEMU_PCIE_SLTCAP_PCP_BITNR, true),
-> > > > > > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
-> > > > > > >        DEFINE_PROP_END_OF_LIST()
-> > > > > > >    };
-> > > > > > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> > > > > > > index 1333266..1b2dd1f 100644
-> > > > > > > --- a/include/hw/pci/pcie_port.h
-> > > > > > > +++ b/include/hw/pci/pcie_port.h
-> > > > > > > @@ -34,6 +34,9 @@ struct PCIEPort {
-> > > > > > >        /* pci express switch port */
-> > > > > > >        uint8_t     port;
-> > > > > > > +
-> > > > > > > +    /* additional buses to reserve on firmware init */
-> > > > > > > +    uint8_t     bus_reserve;
-> > > > > > >    };
-> > > > > > >    void pcie_port_init_reg(PCIDevice *d);
-> > > > > > 
-> > > > > > So here is a property and it does not do anything.
-> > > > > > It makes it easier to work on series maybe, but review
-> > > > > > is harder since we do not see what it does at all.
-> > > > > > Please do not split up patches like this - you can maintain
-> > > > > > it split up in your branch if you like and merge before sending.
-> > > > > > 
-> > > > > 
-> > > > > Agreed, Alexandr please merge patches 4-5-6 for your next submission.
-> > > > > 
-> > > > > Thanks,
-> > > > > Marcel
-> > > > > 
-> > > > > 
-> > > > > > > --
-> > > > > > > 2.7.4
-> > > 
-> > > 
-> > > 
-> > > -- 
-> > > Alexander Bezzubikov
+> > > > 
+> > > > 
+> > > > --
+> > > > Alexander Bezzubikov
+> > 
+> > 
+> > 
