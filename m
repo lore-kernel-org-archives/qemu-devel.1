@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1db4n9-0008A1-Eh
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:54:56 -0400
+	(envelope-from <stefanha@gmail.com>) id 1db4qD-0003HW-I1
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1db4n8-0004Fl-NB
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:54:55 -0400
-Date: Fri, 28 Jul 2017 14:54:46 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170728125446.GE3983@localhost.localdomain>
-References: <20170709170614.24967-1-peter.maydell@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1db4qA-0006qR-O0
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:58:05 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1db4qA-0006pd-IK
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:58:02 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id e199so19334044wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:58:02 -0700 (PDT)
+Date: Fri, 28 Jul 2017 13:57:59 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170728125759.GO12364@stefanha-x1.localdomain>
+References: <20170725211523.3998-1-eblake@redhat.com>
+	<20170725211523.3998-8-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FrxVhwK/bNRjN48l"
 Content-Disposition: inline
-In-Reply-To: <20170709170614.24967-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] block/vmdk: Report failures in
- vmdk_read_cid()
+In-Reply-To: <20170725211523.3998-8-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 07/12] qtest: Add a new helper qmp_cmd()
+ and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com
 
-Am 09.07.2017 um 19:06 hat Peter Maydell geschrieben:
-> The function vmdk_read_cid() can fail if the read on the underlying
-> block device fails, or if there's a format error in the VMDK file.
-> However its API doesn't provide a mechanism to report these errors,
-> and in some cases we were returning a CID of 0 and in some cases a
-> CID of 0xffffffff, either of which might potentially be valid values.
-> 
-> Change the function to return 0 on success or a negative errno, and
-> return the CID via a uint32_t* argument. Update the callsites to
-> handle and propagate the error appropriately.
-> 
-> This fixes in passing a Coverity-spotted issue (CID 1350038) where
-> we weren't checking the return value from sscanf().
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Fam, this is the commit that introduced the qemu-iotests 059 failure for
-vmdk. I think what's happening is that we use an image produced by a
-fuzzer, and with the additional checks introduced in this patch, we now
-fail earlier and don't test the condition any more that we wanted to
-test.
+--FrxVhwK/bNRjN48l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-So do we need a new version of sample_images/afl9.vmdk.bz2 that has a
-valid CID?
+On Tue, Jul 25, 2017 at 04:15:18PM -0500, Eric Blake wrote:
+> +QDict *qtest_qmp_cmd(QTestState *s, const char *cmd, QObject *args)
+> +{
+> +    QDict *dict = qdict_new();
+> +
+> +    qdict_put_str(dict, "execute", cmd);
+> +    if (args) {
+> +        qdict_put_obj(dict, "arguments", args);
+> +    }
+> +    return qtest_qmp(s, "%p", QOBJECT(dict));
+> +}
 
-Kevin
+qtest_qmp(s, "%p", QOBJECT(dict)) takes ownership of dict?
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--FrxVhwK/bNRjN48l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZezTXAAoJEJykq7OBq3PIhVsH/jLOGmUaEwvf7xx5HxGeczAZ
+HTOvKYkQ6xFzAaYZ69c3BDQa1Y9AGRoB5/z98WK3wvPSRgSBbJWRPNZXU5E0KAK2
+FhToQsjA1OM4Vv9skOzgQmH41mmJwsbNBGgZAHVcUAfovJdLXgkAz00knz9Moi+4
+ZuWpqxZo7dfgAyPWjb4qeVykuNK3q+uYS+DyPr4Mo43I/YLg2viOjtN590gf7O93
+4SqZROpP08/e358/rWN9h8NeDsvBz/wOh8pxDSO/hQEq3B7jiuYOJmLquelHr1F6
+MSNhytx00Rq75LbVoOqC2v4AAqe9mm3pXN2RcJft+P0WZBBWP51DuOnSigA/epk=
+=IAiC
+-----END PGP SIGNATURE-----
+
+--FrxVhwK/bNRjN48l--
