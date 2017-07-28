@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1db7Uv-0001jv-V5
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:48:19 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1db7XW-00046d-79
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:50:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1db7Us-0001uS-DF
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:48:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1db7Us-0001tC-3q
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:48:14 -0400
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<0a7cd2a8-45ff-11d1-ddb5-036ce36af163@redhat.com>
-	<CAPcyv4iYdEAv7wqun5L1C-gT7fMDpO+M918or-bg5XiWLnM3=w@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d5a1f1d2-f7c8-cacc-3267-ed6f7d2507ca@redhat.com>
-Date: Fri, 28 Jul 2017 17:48:07 +0200
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1db7XT-00050k-09
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:50:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36768
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1db7XS-0004zj-QX
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:50:54 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6SFn2MF103515
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 11:50:54 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2c01s2qs7n-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 11:50:53 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Fri, 28 Jul 2017 11:50:53 -0400
+Date: Fri, 28 Jul 2017 23:50:48 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727114603.77b801e2@gondolin>
+	<20170728092108.GE15504@bjsdjshi@linux.vnet.ibm.com>
+	<20170728135301.0b510793@gondolin>
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4iYdEAv7wqun5L1C-gT7fMDpO+M918or-bg5XiWLnM3=w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170728135301.0b510793@gondolin>
+Message-Id: <20170728155048.GB5874@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] Channel Path realted CRW generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +44,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "Michael S. Tsirkin" <mst@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Rik van Riel <riel@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-On 28.07.2017 17:16, Dan Williams wrote:
-> On Fri, Jul 28, 2017 at 4:09 AM, David Hildenbrand <david@redhat.com> wrote:
->> Btw, I am thinking about the following addition to the concept:
->>
->> 1. Add a type to each virtio-mem device.
->>
->> This describes the type of the memory region we expose to the guest.
->> Initially, we could have RAM and RAM_HUGE. The latter one would be
->> interesting, because the guest would know that this memory is based on
->> huge pages in case we would ever want to expose different RAM types to a
->> guest (the guest could conclude that this memory might be faster and
->> would also best be used with huge pages in the guest). But we could also
->> simply start only with RAM.
+* Cornelia Huck <cohuck@redhat.com> [2017-07-28 13:53:01 +0200]:
+
+[...]
+
+> > > > During an internal discussion, Halil and Pierre pointed out that for path
+> > > > hotplug, generating a CRW seems logical, but how is it covered by the AR is not
+> > > > clear - we have problem in understanding some grammar ambiguous paragraphs.
+> > > > While certain parts of the AR is not available outside, but I'm still wondering
+> > > > if the author ;) could give us some clue... BTW, we know that, in Linux kernel
+> > > > we had code that handles un-solicited chp crw, so we tend to believe it's right
+> > > > to generate channel path initialized CRW for path hotplug. It's just we can not
+> > > > find the reason from the document.  
+> > > 
+> > > I always found path notifications to be a bit odd. They depend on
+> > > various things:
+> > > - whether you're running under LPAR or under z/VM
+> > > - whether it's a hardware condition (path failure) or something
+> > >   triggered by the admin (path vary on/off)
+> > > - if it's admin triggered, where it was done (on the SE, by one of
+> > >   several mechanisms in CP, via SCLP)  
+> > These are clear.
+> > 
+> > During the internnal discussion, we wished to get the resources to test
+> > all of these cases to verify. For the z/VM and SE stuff, it seems a bit
+> > difficult. So we decided to go with a shortcut -- to ask you.
 > 
-> I think it's up to the hypervisor to manage whether the guest is
-> getting huge pages or not and the guest need not know. As for
-> communicating differentiated memory media performance we have the ACPI
-> HMAT (Heterogeneous Memory Attributes Table) for that.
+> Unfortunately, my memory is not perfect
+Still a very efficient shortcut for me. ;)
 
-Yes, in the world of ACPI I agree.
-
-> 
->> 2. Adding also a guest -> host command queue.
->>
->> That can be used to request/notify the host about something. As written
->> in the original proposal, for ordinary RAM this could be used to request
->> more/less memory out of the guest.
-> 
-> I would hope that where possible we minimize paravirtualized
-> interfaces and just use standardized interfaces. In the case of memory
-> hotplug, ACPI already defines that interface.
-
-I partly agree in the world of ACPI. If you just want to add/remove
-memory in the form of DIMMs, yes. This already works just fine. For
-other approaches in the context of virtualization (e.g. ballooners that
-XEN or Hyper-V use, or also what virtio-mem tries to achieve), this is
-not enough. They need a different way of memory hotplug (as e.g. XEN and
-Hyper-V already have).
-
-Especially when trying to standardize stuff in form of virtio - binding
-it to a technology specific to a handful of architectures is not
-desired. Until now (as far as I remember), all but 2 virtio types
-(virtio-balloon and virtio-iommu) operate on their own system resources
-only, not on some resources exposed/detected via different interfaces.
+> - and I've seen changes in behaviour between different versions of the
+> hardware etc. as well...
+...
 
 > 
->> This might come in handy for other memory regions we just want to expose
->> to the guest via a paravirtualized interface. The resize features
->> (adding/removing memory) might not apply to these, but we can simply
->> restrict that to certain types.
->>
->> E.g. if we want to expose PMEM memory region to a guest using a
->> paravirtualized interface (or anything else that can be mapped into
->> guest memory in the form of memory regions), we could use this. The
->> guest->host control queue can be used for tasks that typically cannot be
->> done if moddeling something like this using ordinary ACPI DIMMs
->> (flushing etc).
->>
->> CCing a couple of people that just thought about something like this in
->> the concept of fake DAX.
+> > 
+> > > 
+> > > You're bound to get different kinds of notifications: via a CRW with
+> > > source channel path, via event information retrievable via CHSC
+> > > (indicated by a CRW with source CSS),  
+> > Ha, I was not awre of this one before!
 > 
-> I'm not convinced that there is a use case for paravirtualized PMEM
-> commands beyond this "fake-DAX" use case. Everything would seem to
-> have a path through the standard ACPI platform communication
-> mechanisms.
+> That's the 'link incident' and 'resource accessibility' stuff.
+My focus was trying to have the minimum stuff to make a Linux guest
+working well -- basically, my working on prototype targeted to make the
+output lschp and lscss corect and uptodate. I
 
-I don't know about further commands, most likely not really many more in
-this scenario. I just pinged you guys to have a look when I heard the
-term virtio-pmem.
+I will dig this and see if I need to do more stuff.
 
-In general, a paravirtualized interface (for detection of PMEM regions)
-might have one big advantage: not limited to certain architectures.
+> 
+> > 
+> > > via a PNO indication, or nothing at all.
+> > > 
+> > > [Reminds me of a case where we got path gone CRWs under LPAR when a
+> > > path was deactivated at the SE (which we would notice via PNO anyway),
+> > > but no CRW when the path was reactivated - not very useful. When trying
+> > > to report this as an issue, we got the answer that we of course need to
+> > > use the OS interface to vary off the path beforehand. Silly penguins.]  
+> > ... ...
+> > 
+> > > 
+> > > My recommendation would be to generate a fitting CRW if the wording
+> > > allows to do so.  
+> > Nod. I'm trying this already.
+> > 
+> > > I would hope that getting as many useful indications as possible is
+> > > most helpful to the OS.  
+> > Nod. Trying this too.
+> > My prototype work tries to sync the belowing information from host
+> > kernel to qemu:
+> > 1. the real SCHIB, so stsch from guest could get the updated path masks.
+> 
+> How far do you want to go with mirroring? I think you need to modify at
+> least the devno in the pmcw, no?
+I didn't think this very deep. For now, I only sync the PIM, POM, PAM
+and CHPIDs lazily.
 
-With a paravirtualized interface, we can even support* fake DAX on
-architectures that don't provide a "real HW" interface for it. I think
-this sounds interesting.
+For devno... I need to think more. If the qemu command has a given
+"devno" for the vfio-ccw device, maybe we should not override its dev_id
+with the real one "device number".
 
-*quite some effort will most likely be necessary for other architectures.
+> 
+> > 2. the Store Subchannel Description information,
+Ref. chp_ssd_get_mask().
+I can get the valid CHPIDs for those channel paths defined for the
+device associated with the specified subchannel.
+
+> > and with the new added support for the SCLP read channel path
+> > information command, guest could get the configure status of the
+> > path.
+> 
+> That's also a chsc, right?
+Right.
+
+> 
+> > 3. still working on support CHSC store channel path description command.
+> 
+> I'm currently wondering how many of those chscs are optional. OTOH, if
+> a modern Linux guest cannot work properly without them, it makes no
+> sense to leave them out.
+Nod.
+
+But I think I need to define the criteria for "work properly". For
+example, with the current code, a Linux guest with a passed through
+device works, while lschp shows the Cfg. as 3 (not recognized), and the
+Shared and PCHID as "-". For this case, do you think it "work properly"?
+
+> 
+> > 
+> > > (I had added the path-come CRW handling in Linux back then and
+> > > afterwards wondered why we did not get it - I must have interpreted
+> > > the PoP in the same way as you did.)  
+> > I've a bugfix patch in the kernel side, and it has been accepted by the
+> > s390 maintainers. May be this could be a clue? Post it here:
+> > 
+> > When channel path is identified as the report source code (RSC)
+> > of a CRW, and initialized (CRW_ERC_INIT) is recognized as the
+> > error recovery code (ERC) by the channel subsystem, it indicates
+> > a "path has come" event.
+> > 
+> > Let's handle this case in chp_process_crw().
+> > 
+> > diff --git a/drivers/s390/cio/chp.c b/drivers/s390/cio/chp.c
+> > index 7e0d4f724dda..432fc40990bd 100644
+> > --- a/drivers/s390/cio/chp.c
+> > +++ b/drivers/s390/cio/chp.c
+> > @@ -559,6 +559,7 @@ static void chp_process_crw(struct crw *crw0, struct
+> > crw *crw1,
+> >         chpid.id = crw0->rsid;
+> >         switch (crw0->erc) {
+> >         case CRW_ERC_IPARM: /* Path has come. */
+> > +       case CRW_ERC_INIT:
+> >                 if (!chp_is_registered(chpid))
+> >                         chp_new(chpid);
+> >                 chsc_chp_online(chpid);
+> > 
+> > Notice:
+> > At the very beginning, I replaced CRW_ERC_IPARM with CRW_ERC_INIT. But
+> > Sebstian Ott suggested:
+> > "I don't know of a machine that actually implements a CRW
+> > at all when a chpid is configured online on the SE/HMC.
+> > 
+> > Because of potential regressions I don't want to remove CRW_ERC_IPARM
+> > here. I'm good with adding CRW_ERC_INIT though."
+> 
+> Yeah, that makes sense, especially with the confusing state channel
+> path machine check handling is in from the architecture side.
+> 
+> > 
+> > > 
+> > > I'll double check with how I'd interpret the PoP today.
+> > >   
+> > Thanks.
+> 
+> I have read through the PoP and the outcome is a bit disappointing.
+> Much of it is a bit vague. I still think that you can err on the side
+> of overindication, though.
+> 
+I agree. Unless somebody tells me it's forbidden by the PoP explicitly,
+or it will break Linux guest from working properly, I will would this as
+the way to go.
 
 -- 
-
-Thanks,
-
-David
+Dong Jia Shi
