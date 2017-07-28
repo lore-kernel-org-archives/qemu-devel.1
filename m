@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db5Rb-0007VF-Mg
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:36:44 -0400
+	(envelope-from <berrange@redhat.com>) id 1db5Rz-0007hl-Vi
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:37:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db5RY-00023l-ML
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:36:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55342)
+	(envelope-from <berrange@redhat.com>) id 1db5Rx-0002NJ-0C
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:37:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56342)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1db5RY-00022w-Fw
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:36:40 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1db5Rw-0002MI-Lo
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:37:04 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6304A333A1E
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 13:36:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A3953CE388
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 13:37:03 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 28 Jul 2017 14:36:31 +0100
-Message-Id: <20170728133631.5449-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.10] trace: ensure .stp files are rebuilt
- if trace tool source changes
+Date: Fri, 28 Jul 2017 14:36:57 +0100
+Message-Id: <20170728133657.5525-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.10] trace: ensure unique function /
+ variable names per .stp file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +31,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The make rules for generating the .stp files forgot to add a dep
-on $(tracetool-y) to trigger a rebuild if the trace tool source
-changes.
+The simpletrace compatibility code for systemtap creates a
+function and some global variables for mapping to event ID
+numbers. We generate multiple -simpletrace.stp files though,
+one per target and systemtap considers functions & variables
+to be globally scoped, not per file. So if trying to use the
+simpletrace compat probes, systemtap will complain:
+
+ # stap -e 'probe qemu.system.arm.simpletrace.visit_type_str { print( "hello")}'
+ semantic error: conflicting global variables: identifier 'event_name_to_id_map' at /usr/share/systemtap/tapset/qemu-aarch64-simpletrace.stp:3:8
+        source: global event_name_to_id_map
+                       ^
+ identifier 'event_name_to_id_map' at /usr/share/systemtap/tapset/qemu-system-arm-simpletrace.stp:3:8
+        source: global event_name_to_id_map
+                       ^
+
+ WARNING: cross-file global variable reference to identifier 'event_name_to_id_map' at /usr/share/systemtap/tapset/qemu-system-arm-simpletrace.stp:3:8 from: identifier 'event_name_to_id_map' at /usr/share/systemtap/tapset/qemu-aarch64-simpletrace.stp:8:21
+ source:     if (!([name] in event_name_to_id_map)) {
+                             ^
+ WARNING: cross-file global variable reference to identifier 'event_next_id' at /usr/share/systemtap/tapset/qemu-system-arm-simpletrace.stp:4:8 from: identifier 'event_next_id' at :9:38
+ source:         event_name_to_id_map[name] = event_next_id
+                                              ^
+
+We already have a string used to prefix probe names, so just
+replace '.' with '_' to get a function / variable name prefix
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- Makefile.target | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ scripts/tracetool/format/simpletrace_stap.py | 29 ++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 2baec9252f..7f42c45db8 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -48,7 +48,10 @@ else
- TARGET_TYPE=system
- endif
+diff --git a/scripts/tracetool/format/simpletrace_stap.py b/scripts/tracetool/format/simpletrace_stap.py
+index c35e662e00..144b704bcd 100644
+--- a/scripts/tracetool/format/simpletrace_stap.py
++++ b/scripts/tracetool/format/simpletrace_stap.py
+@@ -18,29 +18,37 @@ from tracetool.backend.dtrace import binary, probeprefix
+ from tracetool.backend.simple import is_string
+ from tracetool.format.stap import stap_escape
  
--$(QEMU_PROG).stp-installed: $(BUILD_DIR)/trace-events-all
-+tracetool-y = $(SRC_PATH)/scripts/tracetool.py
-+tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
-+
-+$(QEMU_PROG).stp-installed: $(BUILD_DIR)/trace-events-all $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
- 		--group=all \
- 		--format=stap \
-@@ -58,7 +61,7 @@ $(QEMU_PROG).stp-installed: $(BUILD_DIR)/trace-events-all
- 		--target-type=$(TARGET_TYPE) \
- 		$< > $@,"GEN","$(TARGET_DIR)$(QEMU_PROG).stp-installed")
++def global_var_name(name):
++    return probeprefix().replace(".", "_") + "_" + name
  
--$(QEMU_PROG).stp: $(BUILD_DIR)/trace-events-all
-+$(QEMU_PROG).stp: $(BUILD_DIR)/trace-events-all $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
- 		--group=all \
- 		--format=stap \
-@@ -68,7 +71,7 @@ $(QEMU_PROG).stp: $(BUILD_DIR)/trace-events-all
- 		--target-type=$(TARGET_TYPE) \
- 		$< > $@,"GEN","$(TARGET_DIR)$(QEMU_PROG).stp")
+ def generate(events, backend, group):
++    id_map = global_var_name("event_name_to_id_map")
++    next_id = global_var_name("event_next_id")
++    map_func = global_var_name("simple_trace_map_event")
+     out('/* This file is autogenerated by tracetool, do not edit. */',
+         '',
+-        'global event_name_to_id_map',
+-        'global event_next_id',
+-        'function simple_trace_map_event(name)',
++        'global %(id_map)s',
++        'global %(next_id)s',
++        'function %(map_func)s(name)',
+         '',
+         '{',
+-        '    if (!([name] in event_name_to_id_map)) {',
+-        '        event_name_to_id_map[name] = event_next_id',
++        '    if (!([name] in %(id_map)s)) {',
++        '        %(id_map)s[name] = %(next_id)s',
+         '        name_len = strlen(name)',
+         '        printf("%%8b%%8b%%4b%%.*s", 0, ',
+-        '               event_next_id, name_len, name_len, name)',
+-        '        event_next_id = event_next_id + 1',
++        '               %(next_id)s, name_len, name_len, name)',
++        '        %(next_id)s = %(next_id)s + 1',
+         '    }',
+-        '    return event_name_to_id_map[name]',
++        '    return %(id_map)s[name]',
+         '}',
+         'probe begin',
+         '{',
+         '    printf("%%8b%%8b%%8b", 0xffffffffffffffff, 0xf2b177cb0aa429b4, 4)',
+         '}',
+-        '')
++        '',
++        id_map=id_map,
++        next_id=next_id,
++        map_func=map_func)
  
--$(QEMU_PROG)-simpletrace.stp: $(BUILD_DIR)/trace-events-all
-+$(QEMU_PROG)-simpletrace.stp: $(BUILD_DIR)/trace-events-all $(tracetool-y)
- 	$(call quiet-command,$(TRACETOOL) \
- 		--group=all \
- 		--format=simpletrace-stap \
+     for event_id, e in enumerate(events):
+         if 'disable' in e.properties:
+@@ -48,8 +56,9 @@ def generate(events, backend, group):
+ 
+         out('probe %(probeprefix)s.simpletrace.%(name)s = %(probeprefix)s.%(name)s ?',
+             '{',
+-            '    id = simple_trace_map_event("%(name)s")',
++            '    id = %(map_func)s("%(name)s")',
+             probeprefix=probeprefix(),
++            map_func=map_func,
+             name=e.name)
+ 
+         # Calculate record size
 -- 
 2.13.3
