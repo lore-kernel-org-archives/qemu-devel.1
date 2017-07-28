@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1db47j-0006UO-De
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:12:08 -0400
+	(envelope-from <cohuck@redhat.com>) id 1db49Z-0000hn-1x
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1db47i-0004JT-HM
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:12:07 -0400
-Date: Fri, 28 Jul 2017 13:11:56 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170728121156.GG12364@stefanha-x1.localdomain>
-References: <20170728012542.29975-1-f4bug@amsat.org>
-	<20170728012542.29975-6-f4bug@amsat.org>
+	(envelope-from <cohuck@redhat.com>) id 1db49W-0005lw-5E
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:14:01 -0400
+Date: Fri, 28 Jul 2017 14:13:53 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170728141353.3b8382be@gondolin>
+In-Reply-To: <3abbfa87-d882-39ab-b4ab-66f3e68a2fb4@redhat.com>
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-6-f4bug@amsat.org>
+	<a7fdc125-9a1b-bec3-915f-e8f764816b0d@redhat.com>
+	<c44770f5-df9d-2340-5dba-2f5db7acd046@redhat.com>
+	<20170728135614.3f14e3ad@gondolin>
+	<3abbfa87-d882-39ab-b4ab-66f3e68a2fb4@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TmwHKJoIRFM7Mu/A"
-Content-Disposition: inline
-In-Reply-To: <20170728012542.29975-6-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH for 2.10 5/8] docs: fix broken paths to
- docs/devel/tracing.txt
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/47] MAINTAINERS: add missing KVM entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVk?= =?UTF-8?B?w6k=?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
+On Fri, 28 Jul 2017 13:59:08 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
---TmwHKJoIRFM7Mu/A
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 28/07/2017 13:56, Cornelia Huck wrote:
+> > On Fri, 28 Jul 2017 13:51:14 +0200
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >  =20
+> >> On 28/07/2017 09:00, Thomas Huth wrote: =20
+> >>> On 28.07.2017 07:35, Philippe Mathieu-Daud=C3=A9 wrote:   =20
+> >>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>>> ---
+> >>>>  MAINTAINERS | 1 +
+> >>>>  1 file changed, 1 insertion(+)
+> >>>>
+> >>>> diff --git a/MAINTAINERS b/MAINTAINERS
+> >>>> index 3b472d7a09..ece02522be 100644
+> >>>> --- a/MAINTAINERS
+> >>>> +++ b/MAINTAINERS
+> >>>> @@ -278,6 +278,7 @@ S: Supported
+> >>>>  F: */kvm.*
+> >>>>  F: accel/kvm/
+> >>>>  F: include/sysemu/kvm*.h
+> >>>> +F: linux-headers/asm-*/kvm*.h   =20
+> >>>
+> >>> The linux-headers are not really maintained by the QEMU project - so I
+> >>> guess we do not need an entry for these?   =20
+> >>
+> >> Actually I agree with the patch.  I'd like to be CCed on
+> >> update-linux-headers patches, and this achieves it. :) =20
+> >=20
+> > But would it not a better idea to add an entry for all headers touched
+> > by update-linux-headers, then? =20
+>=20
+> One thing doesn't exclude the other.  That entry would also list the
+> script itself and linux-headers.  KVM, VFIO and virtio patterns can only
+> list the files they care about.  Migration could list userfaultfd,
+> possibly.  And there's also include/standard-headers/, which includes
+> PCI and input subsystem files...  It has to be perfected, but it's a
+> good idea.
 
-On Thu, Jul 27, 2017 at 10:25:39PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  audio/trace-events              | 2 +-
->  block/trace-events              | 2 +-
->  chardev/trace-events            | 2 +-
->  crypto/trace-events             | 2 +-
->  hw/9pfs/trace-events            | 2 +-
->  hw/acpi/trace-events            | 2 +-
->  hw/alpha/trace-events           | 2 +-
->  hw/arm/trace-events             | 2 +-
->  hw/audio/trace-events           | 2 +-
->  hw/block/dataplane/trace-events | 2 +-
->  hw/block/trace-events           | 2 +-
->  hw/char/trace-events            | 2 +-
->  hw/display/trace-events         | 2 +-
->  hw/dma/trace-events             | 2 +-
->  hw/i386/trace-events            | 2 +-
->  hw/input/trace-events           | 2 +-
->  hw/intc/trace-events            | 2 +-
->  hw/isa/trace-events             | 2 +-
->  hw/mem/trace-events             | 2 +-
->  hw/misc/trace-events            | 2 +-
->  hw/net/trace-events             | 2 +-
->  hw/nvram/trace-events           | 2 +-
->  hw/pci/trace-events             | 2 +-
->  hw/ppc/trace-events             | 2 +-
->  hw/s390x/trace-events           | 2 +-
->  hw/scsi/trace-events            | 2 +-
->  hw/sd/trace-events              | 2 +-
->  hw/sparc/trace-events           | 2 +-
->  hw/timer/trace-events           | 2 +-
->  hw/usb/trace-events             | 2 +-
->  hw/vfio/trace-events            | 2 +-
->  hw/virtio/trace-events          | 2 +-
->  hw/xen/trace-events             | 2 +-
->  io/trace-events                 | 2 +-
->  linux-user/trace-events         | 2 +-
->  migration/trace-events          | 2 +-
->  net/trace-events                | 2 +-
->  qom/trace-events                | 2 +-
->  scripts/simpletrace.py          | 2 +-
->  target/arm/trace-events         | 2 +-
->  target/i386/trace-events        | 2 +-
->  target/mips/trace-events        | 2 +-
->  target/ppc/trace-events         | 2 +-
->  target/s390x/trace-events       | 2 +-
->  target/sparc/trace-events       | 2 +-
->  ui/trace-events                 | 2 +-
->  util/trace-events               | 2 +-
->  47 files changed, 47 insertions(+), 47 deletions(-)
-
-Thank you!
-
-301 Moved Permanently :)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---TmwHKJoIRFM7Mu/A
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZeyoMAAoJEJykq7OBq3PIz84H/1T1TgPN2VmasG9mRekfOIVm
-jIT6NyigfudjMtI2XTtx7PeIQqHej2xg0PiFzj+WWXzui2iBzD35US8C7o/QCIEz
-7qYoZn9GfwSF4SdnBCmwXfpEChYrDb21fyfOeMQhwob4j1girzfaE2pmHnkBiP7X
-5JGDf2JujoGVAL2du1BkRxILfPNjKzqERfZ0hfpn+yTg4GzY4hqSEeBKF0dbNmEe
-zdp5oyLvc91iXVVyhj4Nn/5JjEfg9NJ8IdVUBxAxsxFFdpl3URVlhOcIWKFAFUhk
-n/suCuNfSTutf+xYYfX/JQ/RcjSJT97G2R3hySgFnzVHnQyBLvCklr/lQ+i04/E=
-=QPjd
------END PGP SIGNATURE-----
-
---TmwHKJoIRFM7Mu/A--
+Personally, I'm not really a fan. If something is changed in one of the
+headers, it implies that either it has already been changed in the
+original headers in Linux (and I will have seen it then), or that
+someone is sending a preliminary patch (and I should hope that I'm
+already cc:ed for the changes that this headers change is for then). It
+does not really hurt, but it feels wrong.
