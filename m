@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1davyQ-00054L-DO
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 23:29:59 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dawr7-0003EZ-Do
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1davyL-0006yj-SZ
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 23:29:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44808)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1davyL-0006wy-Lz
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 23:29:53 -0400
-References: <cover.1501052660.git.maozy.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <99e3f246-46c9-f440-9767-b0578995b190@redhat.com>
-Date: Fri, 28 Jul 2017 11:29:33 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dawr6-0007q1-DW
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:29 -0400
+Date: Fri, 28 Jul 2017 13:46:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170728034642.GE3098@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100569817.27487.947951250042841104.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <cover.1501052660.git.maozy.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] Remove dead error handling and
- convert to realize
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="zjcmjzIkjQU2rmur"
+Content-Disposition: inline
+In-Reply-To: <150100569817.27487.947951250042841104.stgit@bahia>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 17/26] spapr_pci: introduce drc_id
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: jiri@resnulli.us, armbru@redhat.com, f4bug@amsat.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
 
+--zjcmjzIkjQU2rmur
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B407=E6=9C=8826=E6=97=A5 16:13, Mao Zhongyi wrote:
-> This series mainly implements the conversion of rocker to realize,
-> also remove the dead error handling and rename the unusual macro
-> name.
->
-> v6:
->
-> I posted another patch(commit 4cee3cf3) after patch1 of this series but
-> before patch1 be merged, they changed the same function caused this
-> series not to be applied cleanly on HEAD. so resend v6 to fix it.
->
-> Because there is no change on the patch content, so still add the R-B.
->
-> Cc: jasowang@redhat.com
-> Cc: jiri@resnulli.us
-> Cc: armbru@redhat.com
-> Cc: f4bug@amsat.org
->
-> Mao Zhongyi (4):
->    net/rocker: Remove the dead error handling
->    net/rocker: Plug memory leak in pci_rocker_init()
->    net/rocker: Convert to realize()
->    net/rocker: Fix the unusual macro name
->
->   hw/net/rocker/rocker.c        | 94 +++++++++++-----------------------=
----------
->   hw/net/rocker/rocker_desc.c   | 10 -----
->   hw/net/rocker/rocker_fp.c     |  4 --
->   hw/net/rocker/rocker_of_dpa.c | 20 ---------
->   hw/net/rocker/rocker_world.c  | 12 +++---
->   5 files changed, 28 insertions(+), 112 deletions(-)
->
+On Tue, Jul 25, 2017 at 08:01:38PM +0200, Greg Kurz wrote:
+> With the addition of PHB hotplug, we have a static number of DRCs
+> that can be used to handle hotplug/unplug operations on our PHBs,
+> and need a consistent way to map PHBs to these connectors, and
+> assign a unique identifiers for the connectors.
+>=20
+> This patch adds a drc_id property for that purpose.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied.
+I'd prefer to see this folded into the patch that actually uses this
+property.
 
-Thanks
+> ---
+>  hw/ppc/spapr_pci.c          |    1 +
+>  include/hw/pci-host/spapr.h |    2 ++
+>  2 files changed, 3 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 994d2f36105f..54533d8a3841 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1878,6 +1878,7 @@ static Property spapr_phb_properties[] =3D {
+>                       pre_2_8_migration, false),
+>      DEFINE_PROP_BOOL("pcie-extended-configuration-space", sPAPRPHBState,
+>                       pcie_ecs, true),
+> +    DEFINE_PROP_UINT32("drc_id", sPAPRPHBState, drc_id, -1),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> index 5a4e9686d562..31bae68167f2 100644
+> --- a/include/hw/pci-host/spapr.h
+> +++ b/include/hw/pci-host/spapr.h
+> @@ -82,6 +82,8 @@ struct sPAPRPHBState {
+> =20
+>      bool pcie_ecs; /* Allow access to PCIe extended config space? */
+> =20
+> +    uint32_t drc_id;
+> +
+>      /* Fields for migration compatibility hacks */
+>      bool pre_2_8_migration;
+>      uint32_t mig_liobn;
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--zjcmjzIkjQU2rmur
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll6s6IACgkQbDjKyiDZ
+s5IQhhAAko+bEfztcr+IjeA/MnwEMfAtes2wDbVuN9cauze6Babv9AeXwePAyfAI
+SmzOh6eSLS9gRk4yCeFa3feD0L+NwMCKWgZtiBnv0fOZqSUVwSyvtT+evdAHaymX
+e+78d9dex6wg2Gwr4Ql8/HGIv/lNY0sFKRjbUFkJNsWwMj39rB3cIW8zNO66fHMd
+R6muWa4d7m1TDuX2PPdia6XVV29hJEowtGw28Eg/NUnJlWOkovX9I4mYBgGz46iO
+WkyWlwYTHF2qDOjLPI8IrT3Pqz2s9CBPVKGPHeR8MAE/3fqMJDPsJUSfp9k109fv
+W17XUqpStVtjNPm0smXfJ886laTbkmwrywL3kTBCX0AFCnv+t1sTEuCiXFlKyeQx
+hwpGC08xAyPpgLTj8oEM0tNwKtT/oQh/Ny0TFmcCvcxYzfqtXV4Bx+x8JqCh2eba
+H3SfLqH7jb8xyl2xFTiShBABSyDJAWw1RRaOUMofY1OB+ilCkeMCigMgXvae/RFO
+kO0Im1I7Rxfyk7/ZsWBSZzikGHAYk3jHAWqOwvNj6LB0oUOIdvsRS/iq2hrfo6cc
+d2bgrFo8OwzZ6pM1cYZlyBo8P6SK1KjL0fF0sJu++a64+dvCuW95ncJjdn4qkjW6
+vtAcqWDIQXThvjJMCBZKXnLaPJapqZ202u3RGQnY2nH42hr/Aqo=
+=6G0u
+-----END PGP SIGNATURE-----
+
+--zjcmjzIkjQU2rmur--
