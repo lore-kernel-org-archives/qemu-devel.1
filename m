@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1db9d8-0002SR-LT
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:04:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1db9fz-0003Ax-P6
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1db9d3-00050y-Ri
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:04:54 -0400
-Received: from mga06.intel.com ([134.134.136.31]:19129)
+	(envelope-from <eblake@redhat.com>) id 1db9fv-0006xD-4T
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:07:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
-	id 1db9d3-0004zl-Jk
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:04:49 -0400
-Date: Fri, 28 Jul 2017 12:04:46 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-Message-ID: <20170728180446.GA31104@linux.intel.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1db9fu-0006wO-RY
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:07:47 -0400
+References: <1501249552-788-1-git-send-email-armbru@redhat.com>
+	<1501249552-788-3-git-send-email-armbru@redhat.com>
+	<20170728171731.GB3008@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c246b4bf-cb19-3348-9bdc-83409162abfc@redhat.com>
+Date: Fri, 28 Jul 2017 13:07:43 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] QEMU NVDIMM as type 7 in e820 table
+In-Reply-To: <20170728171731.GB3008@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JlxNvQHoQEB3ahw9rECQ2al5Jm3AE0pn7"
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Define COLOMode without QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, linux-nvdimm@lists.01.org
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-I've been using the virtualized NVDIMM support in QEMU for testing, and I
-noticed that the physical addresses used by the virtual NVDIMMs aren't present
-in the guest's e820 table.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JlxNvQHoQEB3ahw9rECQ2al5Jm3AE0pn7
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>
+Message-ID: <c246b4bf-cb19-3348-9bdc-83409162abfc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Define COLOMode without QAPI
+References: <1501249552-788-1-git-send-email-armbru@redhat.com>
+ <1501249552-788-3-git-send-email-armbru@redhat.com>
+ <20170728171731.GB3008@work-vm>
+In-Reply-To: <20170728171731.GB3008@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Here is the e820 table on my QEMU instance where I have one 32 GiB virtual
-NVDIMM:
+On 07/28/2017 12:17 PM, Dr. David Alan Gilbert wrote:
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> COLOMode is defined in the QAPI schema, but not used there.  Of the
+>> stuff QAPI generates for it only the typedef is actually used.  Use of=
 
-[    0.000000] e820: BIOS-provided physical RAM map:
-[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdefff] usable
-[    0.000000] BIOS-e820: [mem 0x00000000bffdf000-0x00000000bfffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
+>> QAPI is pointless and only complicates things, so don't.
+>=20
+> Hmm, in one of the old COLO worlds I have, there's code to emit an even=
+t
+> on exiting from COLO and that event includes the mode it was in.
+>=20
+> If the intent is to bring that or similar back then it would be worth
+> keeping.
 
-The physical addresses used by the virtual NVDIMM are 0x240000000-0xA40000000.
-You can see this by looking at ndctl and the values we get from the NFIT:
+We can always revert the removal once there is a user.
 
-# ndctl list -R 
-{
-  "dev":"region0",
-  "size":34359738368,
-  "available_size":0,
-  "type":"pmem"
-}
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-# grep . /sys/bus/nd/devices/region0/{resource,size}
-region0/resource:0x240000000
-region0/size:34359738368
 
-Or you can see the same info by using iasl to dump
-/sys/firmware/acpi/tables/NFIT:
+--JlxNvQHoQEB3ahw9rECQ2al5Jm3AE0pn7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-[028h 0040   2]                Subtable Type : 0000 [System Physical Address Range]
-[02Ah 0042   2]                       Length : 0038
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-[02Ch 0044   2]                  Range Index : 0002
-[02Eh 0046   2]        Flags (decoded below) : 0003
-                   Add/Online Operation Only : 1
-                      Proximity Domain Valid : 1
-[030h 0048   4]                     Reserved : 00000000
-[034h 0052   4]             Proximity Domain : 00000000
-[038h 0056  16]           Address Range GUID : 66F0D379-B4F3-4074-AC43-0D3318B78CDB
-[048h 0072   8]           Address Range Base : 0000000240000000
-[050h 0080   8]         Address Range Length : 0000000800000000
-[058h 0088   8]         Memory Map Attribute : 0000000000008008
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7fW8ACgkQp6FrSiUn
+Q2pq8Af/bUzS4IKiJ4I0Sry/7M7BV6D8jhYrqQXLZzJKeVHmTHC8A6vRO6VaibgD
+cF81IJuRD4jMWkrIJYKsowlOU2RdUcrH/1zDh9yjPzzXuhviFHtCa2LyqU7I5xwT
+dpV1Ta63lcSbIHgU49bPNkNp+HC6dnBjbDFmCkDQ6MWGSi0GCsX2FrzrAKkEvVrJ
+Qjcow+P9TWLJre9QHDDoCgkFpSW3c9OzNXNBb7Ix/QPvmPrEYRDyEgr6t5ZP5TBf
+iXqZL+wdV+/FQ4+gtEMlUih3Mbe+b0sWQnvghh8yWJMZv4f3eMgHRnJG8DEam6RA
+l4d0iLRjTldOP8tm4VwmqkjVOY4uWg==
+=ZEPn
+-----END PGP SIGNATURE-----
 
-I expected to see a type 7 region for the NVDIMM physical address range in the
-e820 table, so something like:
-
-[    0.000000] e820: BIOS-provided physical RAM map:
-[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdefff] usable
-[    0.000000] BIOS-e820: [mem 0x00000000bffdf000-0x00000000bfffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
-[    0.000000] BIOS-e820: [mem 0x0000000240000000-0x0000000A40000000] persistent (type 7)
-
-Thanks,
-- Ross
+--JlxNvQHoQEB3ahw9rECQ2al5Jm3AE0pn7--
