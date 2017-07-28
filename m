@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1db4Ct-0003vx-SD
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:17:28 -0400
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1db4D7-00047u-DI
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1db4Cp-0001YO-Ci
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:17:27 -0400
-Date: Fri, 28 Jul 2017 13:17:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170728121720.GJ12364@stefanha-x1.localdomain>
-References: <20170727120210.6943-1-crosa@redhat.com>
-	<20170727120210.6943-6-crosa@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6THr7QwYWIbrk6Kt"
-Content-Disposition: inline
-In-Reply-To: <20170727120210.6943-6-crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] docs: fix broken paths to docs/interop
- dir
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1db4D2-0001gf-Rq
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:17:41 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vadim.galitsyn@profitbricks.com>)
+	id 1db4D2-0001gN-Li
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:17:36 -0400
+Received: by mail-wm0-x235.google.com with SMTP id e199so18488210wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:17:36 -0700 (PDT)
+From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+Date: Fri, 28 Jul 2017 14:10:41 +0200
+Message-Id: <20170728121044.15488-1-vadim.galitsyn@profitbricks.com>
+Subject: Re: [Qemu-devel] [PATCH v4] hmp,
+ qmp: introduce memory-size-summary commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 
+Hi Guys,
 
---6THr7QwYWIbrk6Kt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This thread is a continuation of discussion from:
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg01565.html
 
-On Thu, Jul 27, 2017 at 08:02:10AM -0400, Cleber Rosa wrote:
-> With the move of some docs to docs/interop on d59157e, a couple of
-> references where not updated.
->=20
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  docs/devel/writing-qmp-commands.txt | 2 +-
->  qapi-schema.json                    | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+I will post changes list here in cover letter.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+v5:
+ * hmp: Updated description and '.help' message for
+   'info memory-size-summary' command.
 
---6THr7QwYWIbrk6Kt
-Content-Type: application/pgp-signature; name="signature.asc"
+ * hmp: Removed '-' characters from
+   'info memory-size-summary' output.
 
------BEGIN PGP SIGNATURE-----
+ * Dropped ballooned memory information.
 
-iQEcBAEBAgAGBQJZeytQAAoJEJykq7OBq3PIlogH/0D6483jONvntkvTJDb/iwnU
-Zcc5N33koqvSFq9cv9/H+NWhtIxrtw6iglqfNWHMxsJX/uJWo2ttAkgK2It6Vu5M
-Ggu5lJgCP+dBXvsPMhvpAnw7VKD8LNN8G1Z8S1OJVjo6/6ozbPMdwloLGJxYrCFO
-rh1psZR2UxtGN/h+V5A+MXtbBhCFBklFSuK8gqhph96AKX7+JWm6f0XDISJiWyIG
-jyqOsa6dsPmEEP5vRqPVkOQH7cA1jXpOpojg84rIRMhRcE8DS9T7ceg6D/vGlCBb
-COXs8J4G7QWRR108I61epknfsFm1jrxxytZER83nC1MPMVeoqUOe0OMK6RxIZJQ=
-=vDcG
------END PGP SIGNATURE-----
+ * get_existing_hotpluggable_memory_size() assumed
+   to never fail; routine now has no arguments and
+   returns uint64_t; in case if target does not support
+   memory hotplug, (uint64_t)-1 is returned.
 
---6THr7QwYWIbrk6Kt--
+ * MemoryInfo structure:
+   * Removed @balloon-actual-memory field.
+   * Field @hotpluggable-memory renamed
+     to @hotunpluggable-memory.
+   * Updated description for fields.
+
+ * qmp: Updated description for
+   query-memory-size-summary.
+
+ * Patch v4 splitted into series.
+
+v4:
+ * Commands "info memory" and "query-memory" were renamed
+   to "info memory-size-summary" and "query-memory-size-summary"
+   correspondingly.
+ * Descriptions for both commands as well as MemoryInfo structure
+   fields were updated/renamed according to
+   http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05972.html.
+ * In MemoryInfo structure following fields are now optional:
+   hotpluggable-memory and balloon-actual-memory.
+ * Field "hotpluggable-memory" now not displayed in HMP if target
+   has no CONFIG_MEM_HOTPLUG enabled.
+ * Field "balloon-actual-memory" now not displayed in HMP if
+   ballooning not enabled.
+ * qapi_free_MemoryInfo() used in order to free corresponding memory
+   instead of g_free().
+ * #ifdef CONFIG_MEM_HOTPLUG was removed and replaced with stubs/ approach.
+   get_exiting_hotpluggable_memory_size() function was introduced in
+   hw/mem/pc-dimm.c (available for all targets which have CONFIG_MEM_HOTPLUG
+   enabled). For other targets, there is a stub in stubs/qmp_pc_dimm.c.
+   In addition, stubs/qmp_pc_dimm_device_list.c was renamed to
+   stubs/qmp_pc_dimm.c in order to reflect actual source file content.
+ * Commit message was updated in order to reflect what was changed.
+
+v3:
+ * Use PRIu64 instead of 'lu' when printing results via HMP.
+ * Report zero hot-plugged memory instead of reporting error
+   when target architecture has no CONFIG_MEM_HOTPLUG enabled.
+
+v2:
+ * Fixed build for targets which do not have CONFIG_MEM_HOTPLUG
+   enabled.
+
+Best regards,
+Vadim
