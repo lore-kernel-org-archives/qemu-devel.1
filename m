@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1db4sP-0006Bb-EA
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:00:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1db4sy-0006aY-5M
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1db4sL-0000iC-Dw
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:00:21 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1db4sL-0000h1-6a
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:00:17 -0400
-Received: by mail-wr0-x230.google.com with SMTP id k71so101283540wrc.2
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 06:00:16 -0700 (PDT)
-References: <20170720150426.12393-1-alex.bennee@linaro.org>
-	<20170720150426.12393-13-alex.bennee@linaro.org>
-	<4d6ac494-d606-ebaf-6498-7c526467ac62@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <4d6ac494-d606-ebaf-6498-7c526467ac62@twiddle.net>
-Date: Fri, 28 Jul 2017 14:00:13 +0100
-Message-ID: <87y3r8d8de.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1db4sx-0001R1-7K
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:00:56 -0400
+References: <20170728123127.27921-1-olaf@aepfle.de>
+	<d8aca223-4007-6524-9876-fe32fd81e893@redhat.com>
+	<20170728124832.GP8603@aepfle.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4264ad8d-d988-463d-728f-20ac77db39e9@redhat.com>
+Date: Fri, 28 Jul 2017 08:00:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.11 12/23]
- target/arm/translate-a64.c: add FP16 FAGCT to AdvSIMD 3 Same
+In-Reply-To: <20170728124832.GP8603@aepfle.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xn9OfCA4IJhfCIfeIwwuG1lWmaOAihgQ4"
+Subject: Re: [Qemu-devel] [PATCH] xen-disk: use g_malloc0 to fix build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Olaf Hering <olaf@aepfle.de>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:Block layer core" <qemu-block@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xn9OfCA4IJhfCIfeIwwuG1lWmaOAihgQ4
+From: Eric Blake <eblake@redhat.com>
+To: Olaf Hering <olaf@aepfle.de>
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, "open list:X86"
+ <xen-devel@lists.xenproject.org>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
+Message-ID: <4264ad8d-d988-463d-728f-20ac77db39e9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] xen-disk: use g_malloc0 to fix build
+References: <20170728123127.27921-1-olaf@aepfle.de>
+ <d8aca223-4007-6524-9876-fe32fd81e893@redhat.com>
+ <20170728124832.GP8603@aepfle.de>
+In-Reply-To: <20170728124832.GP8603@aepfle.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/28/2017 07:48 AM, Olaf Hering wrote:
+> On Fri, Jul 28, Eric Blake wrote:
+>=20
+>> This version is prone to multiplication overflow (well, maybe not, but=
+
+>> you have to audit for that).  Wouldn't it be better to use:
+>=20
+> What could go wrong?
+> qemu will die either way, I think.
+
+Dying immediately due to provable multiplication overflow is MUCH better
+than successfully allocating too-little and then having who-knows-what
+go wrong down the road because you didn't check for overflow.  The
+latter can sometimes be exploited into CVEs.  And maybe you can't
+overflow, but having to do a non-local audit to prove that is more time
+spent than just using the right interface from the get-go.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Richard Henderson <rth@twiddle.net> writes:
+--xn9OfCA4IJhfCIfeIwwuG1lWmaOAihgQ4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On 07/20/2017 05:04 AM, Alex Bennée wrote:
->> +static softfloat_flags softfloat_mapping_table[] = {
->> +    { float_flag_inexact  , softfloat_flag_inexact },
->> +    { float_flag_underflow, softfloat_flag_underflow },
->> +    { float_flag_overflow , softfloat_flag_overflow },
->> +    { float_flag_invalid  , softfloat_flag_invalid },
->> +};
->> +/* FIXME: 2a has no infinite flag */
->> +
->> +static uint8_t sync_softfloat_flags_from_2a(float_status *flags2a)
->> +{
->> +    uint8_t flags = flags2a->float_exception_flags;
->> +    int i;
->> +    if (flags) {
->> +        for (i = 0; i < ARRAY_SIZE(softfloat_mapping_table); i++) {
->> +            struct softfloat_flags *map = &softfloat_mapping_table[i];
->> +            if (flags & map->float2a_flag) {
->> +                softfloat_raiseFlags(map->float3c_flag);
->> +            }
->> +        }
->> +    } else {
->> +        softfloat_exceptionFlags = 0;
->> +    }
->> +
->> +    return softfloat_exceptionFlags;
->> +}
->> +
->
-> For conversions like this IMO it's better to make the compiler do the
-> work. C.f. target/alpha/fpu_helper.c and CONVERT_BIT.
->
-> BTW, I think these TLS variables that softfloat3a are using are going
-> to be a real problem.  It's one thing to do it temporarily like you
-> are here, coordinating between 2a and 3c, but later, when the front
-> end is fully converted?  That's just nonsense.
->
-> Is it going to be worthwhile to significantly hack up the incoming sources?
->
-> If so, then we might do something like this:  Given a 3c function foo,
->
->   T foo_st(T, T, float3a_status *) { ... }
->   T foo(T x, T y) { return foo_st(x, y, &tls_status); }
->
-> And of course pack all of the relevant state into a struct then
->
->   #define softfloat_exceptionFlags tls_status.exceptionflags
->
-> etc, instead of having individual tls variables.  This feels like
-> something that we could push back upstream, assuming that upstream is
-> active.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Another option which might be less invasive to the API (although
-arguably a bit side-effecty) would be to make:
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7NXwACgkQp6FrSiUn
+Q2pHfAf/Y8uL8EhzLZHNqrT1SzBI6n+PPGACDZWHbgQbWE8uL7aFAe6UJKhaRyFO
+nLWd86K+sHrgOQlLlrbplGYzSZRZYlUMKbTiZhaAojiM4rUnctGcmh54by3wMAAA
+0sktP9DhaTQAwSyQ3WpzMNaW8d6ka0IiadJ6ibv+ez99IVWTmAGE3qRo+bPQja73
+9ZUB4/DdVKMYlyMbbU2e5AG5siolM3Ejs4XVYTIIGbc5mwV2uLRtM6cv1zj6LoBY
+D8h/gFGtufcYxXz+8SIMJa9jnv+Hii1dHHnHI5sKtgxr304Rypiwg4B5Qp8OrXCH
+pqPN4eISdyl9O+C7Mg43Dkh48FdOhw==
+=8BNK
+-----END PGP SIGNATURE-----
 
-THREAD_LOCAL uint_fast8_t *softfloat_exceptionFlags;
-
-And add a helper to de-reference softfloat_exceptionFlags when setting
-them so that all the:
-
-  softfloat_exceptionFlags |= softfloat_flag_inexact;
-
-Become:
-
-  softfloat_raiseException(softfloat_flag_inexect);
-
-With something like:
-
-void softfloat_raiseException(uint_fast8_t new)
-{
-        assert(softfloat_exceptionFlags);
-        *softfloat_exceptionFlags |= new;
-}
-
-So new helpers could just do:
-
-uint32_t HELPER(advsimd_foo)(uint32_t a, uint32_t b, void *fpstp)
-{
-    uint_fast8_t *old_fpst = softfloat_exceptionFlags;
-    softfloat_exceptionFlags = (uint_fast8t *) fpstp;
-
-    /* Do stuff */
-
-    softfloat_exceptionFlags = old_fpst;
-}
-
-Unless there is code that directly fiddles the fpst bits in TCG I think
-that should work well enough as any vCPU can only be doing one sort of
-float at a time.
-
-Anyway I guess this is all moot until we get an answer as to there being
-an active upstream to push stuff back up to. I reached out yesterday
-(https://github.com/ucb-bar/berkeley-softfloat-3/issues/5) so we'll see
-if we get any feedback. Otherwise I'm minded to stick with 2a and just
-implement the half-precision stuff there.
-
-
---
-Alex Bennée
+--xn9OfCA4IJhfCIfeIwwuG1lWmaOAihgQ4--
