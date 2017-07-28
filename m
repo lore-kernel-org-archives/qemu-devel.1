@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1db0aY-00041V-RN
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:25:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1db0dS-0006X3-4q
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1db0aT-0007bl-OW
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:25:38 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:26510 helo=relay.sw.ru)
+	(envelope-from <berrange@redhat.com>) id 1db0dO-0001yt-5V
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:28:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1db0aT-0007a2-7b
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:25:33 -0400
-References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
-	<20170606162652.112122-2-vsementsov@virtuozzo.com>
-	<50f19b1d-9736-b8b3-5616-67c3393336f3@redhat.com>
-	<7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
-	<26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <9aca0fd4-2916-2d41-8070-f53ae64f9357@virtuozzo.com>
-Date: Fri, 28 Jul 2017 11:25:18 +0300
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1db0dN-0001xb-SV
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:28:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAE0D22759
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 08:28:32 +0000 (UTC)
+Date: Fri, 28 Jul 2017 09:28:26 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170728082826.GE31495@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170727140025.392-1-kraxel@redhat.com>
+	<20170727140025.392-5-kraxel@redhat.com>
+	<20170727174522.GA29600@redhat.com>
+	<1501222909.10943.1.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: add
- bdrv_get_format_alloc_stat format interface
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1501222909.10943.1.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 4/7] ui: add multimedia keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,159 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-28.07.2017 00:23, John Snow wrote:
->
->
-> On 07/12/2017 11:18 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 30.06.2017 03:27, John Snow wrote:
->>>
->>> On 06/06/2017 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> The function should collect statistics, about used/unused by top-level
->>>> format driver space (in its .file) and allocation status
->>>> (data/zero/discarded/after-eof) of corresponding areas in this .file.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>   block.c                   | 16 ++++++++++++++
->>>>   include/block/block.h     |  3 +++
->>>>   include/block/block_int.h |  2 ++
->>>>   qapi/block-core.json      | 55 
->>>> +++++++++++++++++++++++++++++++++++++++++++++++
->>>>   4 files changed, 76 insertions(+)
->>>>
->>>> diff --git a/block.c b/block.c
->>>> index 50ba264143..7d720ae0c2 100644
->>>> --- a/block.c
->>>> +++ b/block.c
->>>> @@ -3407,6 +3407,22 @@ int64_t 
->>>> bdrv_get_allocated_file_size(BlockDriverState *bs)
->>>>   }
->>>>   /**
->>>> + * Collect format allocation info. See BlockFormatAllocInfo 
->>>> definition in
->>>> + * qapi/block-core.json.
->>>> + */
->>>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs, 
->>>> BlockFormatAllocInfo *bfai)
->>>> +{
->>>> +    BlockDriver *drv = bs->drv;
->>>> +    if (!drv) {
->>>> +        return -ENOMEDIUM;
->>>> +    }
->>>> +    if (drv->bdrv_get_format_alloc_stat) {
->>>> +        return drv->bdrv_get_format_alloc_stat(bs, bfai);
->>>> +    }
->>>> +    return -ENOTSUP;
->>>> +}
->>>> +
->>>> +/**
->>>>    * Return number of sectors on success, -errno on error.
->>>>    */
->>>>   int64_t bdrv_nb_sectors(BlockDriverState *bs)
->>>> diff --git a/include/block/block.h b/include/block/block.h
->>>> index 9b355e92d8..646376a772 100644
->>>> --- a/include/block/block.h
->>>> +++ b/include/block/block.h
->>>> @@ -335,6 +335,9 @@ typedef enum {
->>>>   int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, 
->>>> BdrvCheckMode fix);
->>>> +int bdrv_get_format_alloc_stat(BlockDriverState *bs,
->>>> +                               BlockFormatAllocInfo *bfai);
->>>> +
->>>>   /* The units of offset and total_work_size may be chosen 
->>>> arbitrarily by the
->>>>    * block driver; total_work_size may change during the course of 
->>>> the amendment
->>>>    * operation */
->>>> diff --git a/include/block/block_int.h b/include/block/block_int.h
->>>> index 8d3724cce6..458c715e99 100644
->>>> --- a/include/block/block_int.h
->>>> +++ b/include/block/block_int.h
->>>> @@ -208,6 +208,8 @@ struct BlockDriver {
->>>>       int64_t (*bdrv_getlength)(BlockDriverState *bs);
->>>>       bool has_variable_length;
->>>>       int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
->>>> +    int (*bdrv_get_format_alloc_stat)(BlockDriverState *bs,
->>>> +                                      BlockFormatAllocInfo *bfai);
->>>>       int coroutine_fn 
->>>> (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
->>>>           uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
->>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>>> index ea0b3e8b13..fd7b52bd69 100644
->>>> --- a/qapi/block-core.json
->>>> +++ b/qapi/block-core.json
->>>> @@ -139,6 +139,61 @@
->>>>              '*format-specific': 'ImageInfoSpecific' } }
->>>>   ##
->>>> +# @BlockFormatAllocInfo:
->>>> +#
->>>> +#
->>>> +# Allocation relations between format file and underlying protocol 
->>>> file.
->>>> +# All fields are in bytes.
->>>> +#
->>> I guess this is a relation in the sense that the format differentiates
->>> between used-unused and the protocol differentiates between
->>> data-zero-trim which gives us the 2D matrix, showing a relation between
->>> "two" files.
->>>
->>> I find the use of the word "file" here a bit of a misdirection, though,
->>> as qcow2 (or any other format) in this sense is not a file but rather a
->>> schema used for interpreting data, and the file itself belongs 
->>> solely to
->>> the protocol.
->>>
->>> I might suggest phrasing this as ...
->>>
->>> "Allocation information of an underlying protocol file, as partitioned
->>> by a format driver's utilization of said allocations."
->>>
->>> Maybe that's too wordy. Eric?
->>>
->>>> +# There are two types of the format file portions: 'used' and 
->>>> 'unused'. It's up
->>>> +# to the format how to interpret these types. For now the only 
->>>> format supporting
->>> "format file" seems misleading for similar reasons to my objection
->>> above, which is that the format doesn't have a file, exactly. It's an
->>> abstract schema.
->>>
->>> "It's up to the format how to interpret these types" is also a bit too
->>> vague to help inform readers what the types mean, IMO.
->>>
->>> Here's an attempt:
->>>
->>> "Allocations may be considered either used or unused by the format
->>> driver interpreting those allocations. It is at the discretion of the
->>> format driver (e.g. qcow2) which regions of its backing storage are
->>> considered in-use or not."
->>
->> So we are saying about "allocations". But unallocated data may be 
->> used/unused too, so,
->> can we call unallocated areas "allocations"?
->>
->
-> You're right, "allocation" may imply something that is extant, but 
-> these are more like regions ...
->
-> Uh;
->
-> "Regions" may be considered either used or unused?
->
-> or
->
-> "Regions of the underlying protocol file may be considered used or 
-> unused by the format driver interpreting these regions."
->
-> Something along these lines, perhaps?
+On Fri, Jul 28, 2017 at 08:21:49AM +0200, Gerd Hoffmann wrote:
+> On Thu, 2017-07-27 at 18:45 +0100, Daniel P. Berrange wrote:
+> > On Thu, Jul 27, 2017 at 04:00:22PM +0200, Gerd Hoffmann wrote:
+> > > Add multimedia keys to QKeyCodes and to the keymaps.
+> > >=20
+> > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > > Message-id: 20170726152918.11995-5-kraxel@redhat.com
+> > > ---
+> > > =C2=A0ui/input-keymap.c | 44
+> > > ++++++++++++++++++++++++++++++++++++++++++++
+> > > =C2=A0qapi-schema.json=C2=A0=C2=A0| 28 +++++++++++++++++++++++++++-
+> > > =C2=A02 files changed, 71 insertions(+), 1 deletion(-)
+> > >=20
 
-This is OK I think.
+> > I'm curious what the 'AC_' prefix on all these is indicating ?
+> > Do we actually need it ?
+>=20
+> Seems to stand for "application control".
+>=20
+> # grep " AC " include/standard-headers/linux/input-event-codes.h=C2=A0
+> =C2=A0* AC - Application Control
+> #define KEY_STOP=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0128=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/=
+* AC Stop */
+> #define KEY_PROPS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0130=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* A=
+C Properties */
+> #define KEY_UNDO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0131=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/=
+* AC Undo */
+> [ ... ]
+>=20
+> I think it is better to keep it, even if it is inconsistent because we
+> already have stop + find without prefix.   Just dropping the ac_ prefix
+> will not work for some keys, ac_home for example.
 
+Ok
 
+>=20
+> > Missing Q_KEY_CODE_MEDIASELECT entry - presumably it was supposed
+> > to map to=C2=A0=C2=A0KEY_MEDIA
+>=20
+> There is KEY_SELECT too, but not KEY_MEDIASELECT.  Hmm.
 
--- 
-Best regards,
-Vladimir
+I found a keyboard with a key labelled "Media"  and when pressed
+it generates Linux key 171  / AT set1  0xe0 0x01 which is KEY_CONFIG
+and GNOME pops up the control panel when pressed !
+
+Would be interested to know results of "showkey" and "showkey -s" for
+any other keyboards with a key labelled "Media", since I don't entirely
+trust this particular one to be representative of general usage.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
