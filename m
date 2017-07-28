@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1db7c9-0007Cs-Eq
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:55:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1db7dF-0007jX-He
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1db7c6-00007l-Al
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:55:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45104)
+	(envelope-from <stefanha@redhat.com>) id 1db7dE-0000wS-Lm
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:56:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1db7c6-00006f-01
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:55:42 -0400
-References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
-	<20170714182012.4595-3-marcandre.lureau@redhat.com>
-	<20170714222023-mutt-send-email-mst@kernel.org>
-	<5d31f22d-e0ae-92f4-ea17-690419f72944@redhat.com>
-	<20170714230852-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJW1pCqJMN3JmGunFKswNnR=J74+Z_m5Lj5WYT2Z1ZoPQ@mail.gmail.com>
-	<20170715012551-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJP2DSo-khn+do0YG_ALDXrqBi6wEPH=m+W59rPfRTuiA@mail.gmail.com>
-	<20170715023159-mutt-send-email-mst@kernel.org>
-	<CAJ+F1C+F+HjHxzrq0usibfYUidpBW8DQUS72pDAv7xC6O14t3Q@mail.gmail.com>
-	<20170726195844-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CLH6R7jfQNsTdeUyDB8JsNjvpK1eAcpviiLMwZtr07M_g@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <dba81848-4827-9491-e5cd-cba276527dfa@redhat.com>
-Date: Fri, 28 Jul 2017 17:55:32 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1db7dE-0000vp-Bf
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:56:52 -0400
+Date: Fri, 28 Jul 2017 16:56:49 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170728155649.GA15534@stefanha-x1.localdomain>
+References: <20170728092053.10122-1-stefanha@redhat.com>
+	<20170728092053.10122-3-stefanha@redhat.com>
+	<20170728110544.GL31495@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLH6R7jfQNsTdeUyDB8JsNjvpK1eAcpviiLMwZtr07M_g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/8] acpi: add vmcoreinfo device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
+Content-Disposition: inline
+In-Reply-To: <20170728110544.GL31495@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] trace: check backend dstate in
+ trace_event_get_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,62 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Dave Anderson <anderson@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
 
-On 07/28/17 16:52, Marc-Andr=C3=A9 Lureau wrote:
-> Hi Dave
->=20
-> On Wed, Jul 26, 2017 at 10:21 AM, Michael S. Tsirkin <mst@redhat.com> w=
-rote:
->> On Sat, Jul 15, 2017 at 01:47:50AM +0200, Marc-Andr=C3=A9 Lureau wrote=
-:
->>>>
->>>> There's more info scattered in other places.
->>>>
->>>> Why do you get to document it? Because you are the one exposing it
->>>> across the hypervisor/vm boundary where it will need to be
->>>> understood by people/tools not running within guest.
->>>>
->>>> So "just read the script in qemu source" is not how an interface
->>>> should be documented.
->>>
->>> I don't understand the issue, it's a kernel ELF note that qemu passes
->>> for dump/crash tools in the dump headers/sections.
->>
->> The way it looks to me, this patchset is exposing an internal kernel
->> detail and making it part of ABI maybe it already is, my point was 1.
->> should we get a confirmation from upstream it's not going to change? 2=
-.
->> if it's ABI let's document what do we expect to be there.
->=20
->=20
-> Could you help explain the expectations and stability guarantees of
-> vmcoreinfo ELF note ?
->=20
-> I am a bit stuck here, after all, vmcoreinfo is mostly used by crash
-> so I thought you could help.
->=20
-> The only thing qemu does with it is try to get NUMBER(phys_base)=3D
-> field to update the phys_base used in the various dump headers. (this
-> could be dropped, and qemu ignoring the note content, if the debug
-> tools take vmcoreinfo values  with higher priority than other header
-> fields)
 
-I agree; if "crash" guarantees that the vmcoreinfo note will override
-whatever phys_base value QEMU may have guessed otherwise (from other
-places) and written to some dedicated phys_base header fields, then in
-QEMU we don't have to propagate phys_base from the vmcoreinfo note to
-said other fields -- we can treat the vmcoreinfo note entirely opaquely.
+--+HP7ph2BbKc20aGI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks
-Laszlo
+On Fri, Jul 28, 2017 at 12:05:44PM +0100, Daniel P. Berrange wrote:
+> On Fri, Jul 28, 2017 at 10:20:53AM +0100, Stefan Hajnoczi wrote:
+> > Code that checks dstate is unaware of SystemTap and LTTng UST dstate, so
+> > the following trace event will not fire when solely enabled by SystemTap
+> > or LTTng UST:
+> >=20
+> >   if (trace_event_get_state(TRACE_MY_EVENT)) {
+> >       str =3D g_strdup_printf("Expensive string to generate ...",
+> >                             ...);
+> >       trace_my_event(str);
+> >       g_free(str);
+> >   }
+> >=20
+> > Most users of trace_event_get_state() want to know both QEMU and backend
+> > dstate for the event.  Update the macro to include backend dstate.
+> >=20
+> > Introduce trace_event_get_state_qemu() for those callers who really only
+> > want QEMU dstate.  This includes the trace backends (like 'log') which
+> > should only trigger when event are enabled via QEMU.
+>=20
+> I'm not convinced this is quite right as is.
+>=20
+> The QEMU state for an event is set via cli flags to -trace and that
+> is intended for use with with things like simpletrace or log which
+> have no other way to filter which events are turned on at runtime.
+> For these calling trace_event_get_state_dynamic_by_id() is right.
+>=20
+> For DTrace / LTT-NG, and event is active if the kernel has turned
+> on the dynamic probe location.  Any command line args like -trace
+> should not influence this at all, so we should *not* involve QEMU
+> state at all - only the backend state. So for these we should only
+> be calling the backend specific test and ignoring
+> trace_event_get_state_dynamic_by_id() entirely. Your patch though
+> makes it consider both.
 
->=20
->> But again since there's not a whole lot of documentation here
->> that you provided, I might be misunderstanding completely.
->=20
-> Because there isn't much available in the kernel either, except
-> Documentation/ABI/testing/sysfs-kernel-vmcoreinfo.
->=20
->=20
+I think you're referring to this:
+
+  #define trace_event_get_state(id)                       \
+      ((id ##_ENABLED) && (trace_event_get_state_dynamic_by_id(id) || \
+                           id ##_BACKEND_DSTATE()))
+
+We could change it to:
+
+  #define trace_event_get_state(id)                       \
+      ((id ##_ENABLED) && id ##_BACKEND_DSTATE())
+
+and modify the log, syslog, ftrace, etc backends to emit
+trace_event_get_state_dynamic_by_id(id) as their backend dstate.
+
+However, in the multi-backend case with ./configure
+--enable-trace-backends=3Dlog,syslog this expands to:
+
+  ((id ##_ENABLED) && (trace_event_get_state_dynamic_by_id(id) || \
+                       trace_event_get_state_dynamic_by_id(id) || \
+		       false))
+
+I couldn't bring myself to have multiple calls to
+trace_event_get_state_dynamic_by_id() :).
+
+What do you think?
+
+--+HP7ph2BbKc20aGI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZe17BAAoJEJykq7OBq3PIM6EIAMVHGOd+3kTWn9pABbN4Qlux
+sjT2xbsH3yY3xwrp5uPP5i+JcYVILxUZ+bOk5NgQfN5BDXQcDXkI0gpA+ZLaQlpK
+KimLubV/+Cleq7B7MMu5Jssl+r74hU8n0joJnXQBP+fXa1h8Xx5NqqQD2gIe8TvH
+npLj7132h8QyREuyS9wZIRWtpM+90ldCIZ370AyGfWa9/Qcad6HXTeVoWOGJ75xz
+me3l4BEI7UTuP3RtesWMZ0LjKADn4usnCG3CkzaPmZEYb+JYmsaYuMHlOfApF5+2
+rEnUYhfGq99rfyw+3yHbg1tBG+xb9t4FAe6Oi30EonRg6MMGQkUbBySAdKmVV9M=
+=VwXk
+-----END PGP SIGNATURE-----
+
+--+HP7ph2BbKc20aGI--
