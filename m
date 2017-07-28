@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1db9Up-00052P-Cl
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:56:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1db9V0-00057g-K2
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1db9Uo-00087O-ES
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:56:19 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:36413)
+	(envelope-from <peter.maydell@linaro.org>) id 1db9Uz-0008A8-NU
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:56:30 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1db9Uo-00086e-78
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:56:18 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id y43so157761883wrd.3
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:56:18 -0700 (PDT)
+	id 1db9Uz-00089h-Gq
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:56:29 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id m85so28196282wma.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:56:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170728170255.13270-1-eblake@redhat.com>
-References: <20170728170255.13270-1-eblake@redhat.com>
+In-Reply-To: <1501247265-22367-1-git-send-email-yongbok.kim@imgtec.com>
+References: <1501247265-22367-1-git-send-email-yongbok.kim@imgtec.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 28 Jul 2017 18:55:56 +0100
-Message-ID: <CAFEAcA-Y_rWtKPCAqMAtgJ2=YQQNJWsF3j0NiacEVte4ZJgCRQ@mail.gmail.com>
+Date: Fri, 28 Jul 2017 18:56:07 +0100
+Message-ID: <CAFEAcA92dPp9LFEU3PS_W61XV4=YBOagMMfz93F5WtC3js4+ew@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL for-2.10 0/1] NBD changes for 2.10-rc1
+Subject: Re: [Qemu-devel] [PULL 0/2] target-mips queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
+To: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 28 July 2017 at 18:02, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 3aabfec2c83da500ae52fc87ff3a0a60718022=
-db:
+On 28 July 2017 at 14:07, Yongbok Kim <yongbok.kim@imgtec.com> wrote:
+> The following changes since commit 871a0f7ad2b9560c5f7d640125c5be95ca23ca7f:
 >
->   Merge remote-tracking branch 'remotes/yongbok/tags/mips-20170728' into =
-staging (2017-07-28 15:32:44 +0100)
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170728' into staging (2017-07-28 10:35:02 +0100)
 >
 > are available in the git repository at:
 >
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-07-28
+>   git://github.com/yongbok/upstream-qemu.git tags/mips-20170728
 >
-> for you to fetch changes up to 158b9aa568eabe614d37882dddc2eea534edc7ae:
+> for you to fetch changes up to 665df9010aa40d1e028d6ad5d3bdb4d9b0a3294c:
 >
->   nbd: fix memory leak in nbd_opt_go() (2017-07-28 11:58:20 -0500)
->
-> ----------------------------------------------------------------
-> nbd patches for 2017-07-28
->
-> - Philippe Mathieu-Daud=C3=A9 - nbd: fix memory leak in nbd_opt_go()
+>   Revert "elf-loader: warn about invalid endianness" (2017-07-28 13:32:32 +0100)
 >
 > ----------------------------------------------------------------
-> Philippe Mathieu-Daud=C3=A9 (1):
->       nbd: fix memory leak in nbd_opt_go()
+> MIPS patches 2017-07-28
 >
->  nbd/client.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> Changes:
+> * Improve ths MIPS board kernel load error reporting
+> * Revert unnecessary warning messages
+>
+> ----------------------------------------------------------------
+>
+> Alexey Kardashevskiy (1):
+>   Revert "elf-loader: warn about invalid endianness"
+>
+> Aurelien Jarno (1):
+>   hw/mips: load_elf_strerror to report kernel loading failure
+>
 
 Applied, thanks.
 
