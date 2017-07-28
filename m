@@ -1,46 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1db4RK-0002EY-Ft
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:24 -0400
+	(envelope-from <stefanha@gmail.com>) id 1db4Rl-0002Wm-GO
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1db4RG-0008JL-QZ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41727
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1db4RG-0008Io-L3
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:18 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6SCTpRg095186
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 08:32:17 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c035vqh6g-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 08:32:17 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 28 Jul 2017 13:32:15 +0100
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
-	<20170727135910.27d9e42e@gondolin>
-	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
-	<20170727161457.58b3c7d1@gondolin>
-	<abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
-	<20170728121101.2a85216a@gondolin>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 28 Jul 2017 14:32:11 +0200
+	(envelope-from <stefanha@gmail.com>) id 1db4Rh-0000K4-Uo
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:49 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1db4Rh-0000JT-Ni
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:45 -0400
+Received: by mail-wm0-x243.google.com with SMTP id 184so27254373wmo.3
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:32:45 -0700 (PDT)
+Date: Fri, 28 Jul 2017 13:32:42 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170728123242.GM12364@stefanha-x1.localdomain>
+References: <20170725211523.3998-1-eblake@redhat.com>
+	<20170725211523.3998-6-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170728121101.2a85216a@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <f183e2d8-4f75-2981-e148-02c88014a4b1@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
- initialized CRW for channel path hotplug
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="lbQeYSs6J2ITmUo7"
+Content-Disposition: inline
+In-Reply-To: <20170725211523.3998-6-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 05/12] tests: Clean up string
+ interpolation into QMP input (simple cases)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,149 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com
 
 
+--lbQeYSs6J2ITmUo7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 07/28/2017 12:11 PM, Cornelia Huck wrote:
-> On Thu, 27 Jul 2017 18:15:07 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> On 07/27/2017 04:14 PM, Cornelia Huck wrote:
->>> On Thu, 27 Jul 2017 15:37:08 +0200
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>   
->>>> On 07/27/2017 01:59 PM, Cornelia Huck wrote:  
->>>>> On Thu, 27 Jul 2017 03:54:18 +0200
->>>>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
->>>>>     
->>>>>> When a channel path is hot plugged into a CSS, we should generate
->>>>>> a channel path initialized CRW (channel report word). The current
->>>>>> code does not do that, instead it puts a stub function with a TODO
->>>>>> reminder there.
->>>>>>
->>>>>> This implements the css_generate_chp_crws() function by:
->>>>>> 1. refactor the existing code.
->>>>>> 2. add an @add parameter to provide future callers with the
->>>>>>    capability of generating channel path permanent error with
->>>>>>    facility not initialized CRW.
->>>>>> 3. add a @hotplugged parameter, so to opt out generating initialized
->>>>>>    CRWs for predefined channel paths.    
->>>>>
->>>>> I'm not 100% sure whether the logic is correct here. Let me elaborate:
->>>>>
->>>>> The current code flow when hotplugging a device is:
->>>>> - Generate the schib.
->>>>> - Check if any of the chpids refers to a not yet existing channel path;
->>>>>   generate it if that is the case.
->>>>> - Post a crw for the subchannel.
->>>>>
->>>>> The second step is where the current code seems to be not quite correct
->>>>> already. It is fine for coldplugged devices, but I really think we need
->>>>> to make sure that all referenced channel paths are in place before we
->>>>> hotplug a new device. It was not really relevant when we just had one
->>>>> very virtual channel path, and 3270 is experimental so it is not a
->>>>> problem in practice.    
->>>>
->>>> What do you mean by not quite correct?  Are we somewhere in conflict with
->>>> the AR (if yes could you give me a pointer)? Or is it a modeling concern?
->>>> Or is it about the user interface design? Or any combination of these?  
->>>
->>> Modeling. Conceptually, you need at least one channel path to access a
->>> device; the subchannel is more or less a followup.
->>>
->>> As up to now, we only had a dummy channel path simply to satisfy the
->>> architecture, it did not really matter when it was 'created'. As it is
->>> always 'there' from beginning, there was no need for any CRW either. If
->>> there's now a need for real channel path modeling, we unfortunately
->>> have to give this some thought :)
->>>   
->>
->> We have considered this 'always there' internally. Was my train of thought
->> to but then I came to the conclusion it ain't necessarily true. One can
->> IPL with initrd and end up with a guest with no ccw devices whatsoever
->> (IMHO; the default net can be disabled -net none).
-> 
-> Yes. But this is an edge case that was never relevant. We should do it
-> correctly, of course; but it isn't a problem in practice.
-> 
-> (If I'm not mistaken, Linux scans for chpids it does not know yet on
-> device hotplug anyway, due to the reasons I outlined in my other mail.)
-> 
+On Tue, Jul 25, 2017 at 04:15:16PM -0500, Eric Blake wrote:
+> From: Markus Armbruster <armbru@redhat.com>
+>=20
+> When you build QMP input manually like this
+>=20
+>     cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
+>                           "'arguments': { 'uri': '%s' } }",
+>                           uri);
+>     rsp =3D qmp(cmd);
+>     g_free(cmd);
+>=20
+> you're responsible for escaping the interpolated values for JSON.  Not
+> done here, and therefore works only for sufficiently nice @uri.  For
+> instance, if @uri contained a single "'", qobject_from_jsonv() would
+> fail, qmp_fd_sendv() would misinterpret the failure as empty input and
+> do nothing, and the test would hang waiting for a response that never
+> comes.
+>=20
+> Leaving interpolation into JSON to qmp() is more robust:
+>=20
+>     rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }", u=
+ri);
+>=20
+> It's also more concise.
+>=20
+> Clean up the simple cases where we interpolate exactly a JSON value.
+>=20
+> Bonus: gets rid of non-literal format strings.  A step towards
+> compile-time format string checking without triggering
+> -Wformat-nonliteral.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Message-Id: <1500645206-13559-5-git-send-email-armbru@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqos/libqos.c   |  16 +----
+>  tests/libqos/pci-pc.c   |   9 +--
+>  tests/postcopy-test.c   |   8 +--
+>  tests/test-qga.c        | 160 +++++++++++++++++++++---------------------=
+------
+>  tests/vhost-user-test.c |   6 +-
+>  5 files changed, 77 insertions(+), 122 deletions(-)
 
-Yes, I have tested the scenario described yesterday and it worked with
-no problem.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->>
->>>>  
->>>>>
->>>>> This, of course, implies we need deeper changes. We need to create the
->>>>> channel paths before the subchannel is created and refuse hotplug of a
->>>>> device if not all channel paths it needs are defined. This means we
->>>>> need some things before we can claim real channel path support:
->>>>> - Have a way to specify channel paths on the command line resp. when
->>>>>   hotplugging. This implies they need to be real objects.
->>>>> - Have a way to specify which channel paths belong to a subchannel in
->>>>>   the same context. Keep existing device types working with the current
->>>>>   method.
->>>>> - Give channel paths states: Defined, configured. The right time for a
->>>>>   CRW is the transition between those states.
->>>>> - Only queue a 'device come' CRW for a subchannel if at least one of
->>>>>   its channel paths is in the configured state. Detach or make not
->>>>>   operational a subchannel if all of its paths are deconfigured.
->>>>>     
->>>>
->>>> AFAIU in your opinion our model is to simple and needs to get more
->>>> complex. What benefits do we expect from the added complexity? I mean
->>>> our current model works (and I'm not sure what limitations do we
->>>> want to get rid of, or even what are the relevant limitations we have.)  
->>>
->>> I was under the impression that we want to support multiple, 'real'
->>> channel paths for vfio-ccw. Did I misunderstand?
->>>   
->>
->> You assumed correctly. I've asked Dong Jia a very similar question when
->> this first popped up as a part of his channel path virtualization work
->> (he is referring to at the beginning of this cover letter).
->>
->> Unfortunately that question is still unanswered. I've speculated maybe you
->> were involved in the decision of opting for 'real' channel paths, so this
->> is why I asked.
->>
->> So my intention was to ask: What benefits do we expect from these 'real'
->> virtual channel paths? 
-> 
-> Path grouping and friends come to mind. This depends on whether you
-> want to pass-through channel paths to the guest, of course, but you
-> really need management to deal with things like reserve/release on ECKD
-> correctly.
+--lbQeYSs6J2ITmUo7
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Pass-through means dedicated in this case (that is the passed trough paths
-are not used by the host -- correct me if my understanding is wrong).
+-----BEGIN PGP SIGNATURE-----
 
-This whole multipath/grouping stuff is currently a gray spot for me. I've
-tired to revisit the corresponding parts of the AR, but there ain't much
-on it in the documents I have.
+iQEcBAEBAgAGBQJZey7qAAoJEJykq7OBq3PI5u0H/jT60iEfHe2LzwLSkAejspVU
+A1X9VAMfizmwr294rLDP/NZs/okLzbcQwZoOwYb+ZR7mQgwuasCYXNolymTtxguv
+FOvlus/4nOqQ7VrIZkO68wfRPfh7EOgQ7X8vNmW9kFWEsxYMuXjDS950vXkiM9ug
+Rk6Ejydpb5bf6aMsV+r2GY77cEszaPyOhqQW+gPPimuO+qGfDKDiXIHEelE3ldWQ
++CKkv79BocJ2QBwcxXfPPnM0CgRcSqt36Kid7rjw1cFscoGsgVNS72sKRUSVd1Tx
+iTno9uhuDh6/tF8OIo1983FqDypuH3vgTE4osF3O17cotlyFOVKH8q9NqPUc2MU=
+=NBBd
+-----END PGP SIGNATURE-----
 
-Is the protocol for managing multipath equipment (device, maybe also CU)
-dependent? The PoP (and the IO AR) talk about set-multipath-mode type
-of command and similar (disband, resign) but how this type of command
-looks like -- no idea. From the kernel code one can learn more details,
-but that's just an implementation.
-
-Can you recommend me a publication where the controls you talk about
-are specified?
-
-> Also failover etc. Preferred channel paths are not relevant
-> on modern hardware anymore, fortunately (AFAIK).
->
-
-If I understand you correctly it ain't possible to handle these
-in the host (and let the guest a simple 'non-real' virtual
-channel path whose reliability depends on what the host does),
-or?
-
-Thanks for the explanations!
-
-Halil
+--lbQeYSs6J2ITmUo7--
