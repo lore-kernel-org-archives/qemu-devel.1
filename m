@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dbEGW-0000IO-4i
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:01:53 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dbEGj-0000Oe-Pu
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:02:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dbEGT-0006oO-J9
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:01:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dbEGT-0006lP-E4
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:01:49 -0400
-Date: Sat, 29 Jul 2017 02:01:35 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170729020006-mutt-send-email-mst@kernel.org>
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
-	<597AF4EF.4020705@intel.com>
+	(envelope-from <alistair23@gmail.com>) id 1dbEGi-00076E-Dm
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:02:05 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36226)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dbEGi-00075j-5p
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:02:04 -0400
+Received: by mail-wm0-x234.google.com with SMTP id t201so136522989wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 16:02:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <597AF4EF.4020705@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
+Sender: alistair23@gmail.com
+In-Reply-To: <150128145346.27.14634021385878041710@93e45bedd699>
+References: <cover.1501280035.git.alistair.francis@xilinx.com>
+	<150128145346.27.14634021385878041710@93e45bedd699>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 28 Jul 2017 16:01:32 -0700
+Message-ID: <CAKmqyKMi4M2XMnd0rYqtbe4=OunjvrVBCRMCh=JK=2TdhpBrRA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] More warning reporting fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, mhocko@kernel.org, willy@infradead.org, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
 
-On Fri, Jul 28, 2017 at 04:25:19PM +0800, Wei Wang wrote:
-> On 07/12/2017 08:40 PM, Wei Wang wrote:
-> > Add a new feature, VIRTIO_BALLOON_F_SG, which enables to
-> > transfer a chunk of ballooned (i.e. inflated/deflated) pages using
-> > scatter-gather lists to the host.
-> > 
-> > The implementation of the previous virtio-balloon is not very
-> > efficient, because the balloon pages are transferred to the
-> > host one by one. Here is the breakdown of the time in percentage
-> > spent on each step of the balloon inflating process (inflating
-> > 7GB of an 8GB idle guest).
-> > 
-> > 1) allocating pages (6.5%)
-> > 2) sending PFNs to host (68.3%)
-> > 3) address translation (6.1%)
-> > 4) madvise (19%)
-> > 
-> > It takes about 4126ms for the inflating process to complete.
-> > The above profiling shows that the bottlenecks are stage 2)
-> > and stage 4).
-> > 
-> > This patch optimizes step 2) by transferring pages to the host in
-> > sgs. An sg describes a chunk of guest physically continuous pages.
-> > With this mechanism, step 4) can also be optimized by doing address
-> > translation and madvise() in chunks rather than page by page.
-> > 
-> > With this new feature, the above ballooning process takes ~491ms
-> > resulting in an improvement of ~88%.
-> > 
-> 
-> 
-> I found a recent mm patch, bb01b64cfab7c22f3848cb73dc0c2b46b8d38499
-> , zeros all the ballooned pages, which is very time consuming.
-> 
-> Tests show that the time to balloon 7G pages is increased from ~491 ms to
-> 2.8 seconds with the above patch.
+On Fri, Jul 28, 2017 at 3:37 PM,  <no-reply@patchew.org> wrote:
+> Hi,
+>
+> This series failed automatic build test. Please find the testing commands=
+ and
+> their output below. If you have docker installed, you can probably reprod=
+uce it
+> locally.
+>
+> Subject: [Qemu-devel] [PATCH v2 0/5]  More warning reporting fixed
+> Message-id: cover.1501280035.git.alistair.francis@xilinx.com
+> Type: series
+>
 
-Sounds like it should be reverted. Post a revert pls and
-we'll discuss.
+...
 
-> How about moving the zero operation to the hypervisor? In this way, we
-> will have a much faster balloon process.
-> 
-> 
-> Best,
-> Wei
+>   CC      stubs/machine-init-done.o
+>   CC      stubs/migr-blocker.o
+>   CC      stubs/monitor.o
+>   CC      stubs/notify-event.o
+>   CC      stubs/qtest.o
+>   CC      stubs/replay.o
+>   CC      stubs/runstate-check.o
+>   CC      stubs/set-fd-handler.o
+> /tmp/qemu-test/src/trace/simple.c: In function 'st_init':
+> /tmp/qemu-test/src/trace/simple.c:408:9: error: implicit declaration of f=
+unction 'warn_report' [-Werror=3Dimplicit-function-declaration]
+>          warn_report("unable to initialize simple trace backend");
+>          ^~~~~~~~~~~
+> /tmp/qemu-test/src/trace/simple.c:408:9: error: nested extern declaration=
+ of 'warn_report' [-Werror=3Dnested-externs]
 
-Or in other words hypervisors should not be stupid and
-should not try to run ksm on DONTNEED pages.
+Good catch, I'll fix this in the next version.
 
--- 
-MST
+Thanks,
+Alistair
+
+> cc1: all warnings being treated as errors
+> /tmp/qemu-test/src/rules.mak:66: recipe for target 'trace/simple.o' faile=
+d
+> make: *** [trace/simple.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 382, in <module>
+>     sys.exit(main())
+>   File "./tests/docker/docker.py", line 379, in main
+>     return args.cmdobj.run(args, argv)
+>   File "./tests/docker/docker.py", line 237, in run
+>     return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
+>   File "./tests/docker/docker.py", line 205, in run
+>     quiet=3Dquiet)
+>   File "./tests/docker/docker.py", line 123, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com=
+.qemu.instance.uuid=3D3884d72473e511e7970e52540069c830', '-u', '0', '-t', '=
+--rm', '--net=3Dnone', '-e', 'TARGET_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=
+=3D', '-e', 'V=3D', '-e', 'J=3D8', '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', =
+'-e', 'CCACHE_DIR=3D/var/tmp/ccache', '-v', '/var/tmp/patchew-tester-tmp-wa=
+i3q1k5/src/docker-src.2017-07-28-18.36.35.7058:/var/tmp/qemu:z,ro', '-v', '=
+/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:fedora', '/var/tm=
+p/qemu/run', 'test-mingw']' returned non-zero exit status 2
+> make[1]: *** [tests/docker/Makefile.include:139: docker-run] Error 1
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-wai3q1k5/src'
+> make: *** [tests/docker/Makefile.include:168: docker-run-test-mingw@fedor=
+a] Error 2
+>
+> real    0m57.793s
+> user    0m4.996s
+> sys     0m1.037s
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>
+> Test command exited with code: 2
+>
+>
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
