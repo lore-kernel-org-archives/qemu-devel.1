@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1db4LQ-0005Ld-Jq
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:26:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1db4OC-0008Ru-Ey
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1db4LM-0001Vy-5B
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:26:16 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1db4LL-0001VG-UT
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:26:12 -0400
-Received: by mail-wm0-x242.google.com with SMTP id x64so2917428wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:26:11 -0700 (PDT)
-Date: Fri, 28 Jul 2017 13:26:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170728122608.GL12364@stefanha-x1.localdomain>
-References: <20170725211523.3998-1-eblake@redhat.com>
-	<20170725211523.3998-4-eblake@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1db4O7-0004Ng-Vs
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:29:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1db4O7-0004LH-Ms
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:29:03 -0400
+Date: Fri, 28 Jul 2017 14:28:57 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170728142857.4fe29a6f@nial.brq.redhat.com>
+In-Reply-To: <20170726231754-mutt-send-email-mst@kernel.org>
+References: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
+	<20170725163315-mutt-send-email-mst@kernel.org>
+	<20170726160937.74e18968@nial.brq.redhat.com>
+	<20170726231754-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2OzUYMsT4j3Kc+NU"
-Content-Disposition: inline
-In-Reply-To: <20170725211523.3998-4-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 03/12] qtest: Document calling
- conventions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx
+ based machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
 
+On Wed, 26 Jul 2017 23:18:01 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
---2OzUYMsT4j3Kc+NU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Wed, Jul 26, 2017 at 04:09:37PM +0200, Igor Mammedov wrote:
+> > On Tue, 25 Jul 2017 16:36:06 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Mon, Jul 24, 2017 at 03:50:20PM +0200, Igor Mammedov wrote:  
+> > > > w2k used to boot on QEMU until revision of FADT has
+> > > > been bumped to rev3
+> > > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
+> > > > 
+> > > > Keep PC machine at rev1 to remain compatible and Q35
+> > > > at rev3 where w2k isn't supported anyway so OSX could
+> > > > run as well.
+> > > > 
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > > v2:
+> > > >    - make pc rev1 and q35 rev3.
+> > > >        "Michael S. Tsirkin" <mst@redhat.com>
+> > > > 
+> > > > PS:
+> > > > Only compile tested.
+> > > > 
+> > > > 
+> > > > CC: Programmingkid <programmingkidx@gmail.com>
+> > > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
+> > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
+> > > > 
+> > > > ---
+> > > >  hw/i386/acpi-build.c | 22 ++++++++++++++++++----
+> > > >  1 file changed, 18 insertions(+), 4 deletions(-)
+> > > > 
+> > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > index 6b7bade..b9c245c 100644
+> > > > --- a/hw/i386/acpi-build.c
+> > > > +++ b/hw/i386/acpi-build.c
+> > > > @@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
+> > > >  } AcpiMcfgInfo;
+> > > >  
+> > > >  typedef struct AcpiPmInfo {
+> > > > +    bool force_rev1_fadt;
+> > > >      bool s3_disabled;
+> > > >      bool s4_disabled;
+> > > >      bool pcihp_bridge_en;
+> > > > @@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+> > > >      Object *obj = NULL;
+> > > >      QObject *o;
+> > > >  
+> > > > +    pm->force_rev1_fadt = false;
+> > > >      pm->cpu_hp_io_base = 0;
+> > > >      pm->pcihp_io_base = 0;
+> > > >      pm->pcihp_io_len = 0;
+> > > >      if (piix) {
+> > > > +        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+> > > > +        pm->force_rev1_fadt = true;
+> > > >          obj = piix;
+> > > >          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+> > > >          pm->pcihp_io_base =
+> > > > @@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+> > > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+> > > >      }
+> > > >      fadt->century = RTC_CENTURY;
+> > > > +    if (pm->force_rev1_fadt) {
+> > > > +        return;
+> > > > +    }
+> > > >  
+> > > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
+> > > >      fadt->reset_value = 0xf;
+> > > > @@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+> > > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
+> > > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+> > > > +    int fadt_size = sizeof(*fadt);
+> > > > +    int rev = 3;
+> > > >  
+> > > >      /* FACS address to be filled by Guest linker */
+> > > >      bios_linker_loader_add_pointer(linker,
+> > > > @@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+> > > >      bios_linker_loader_add_pointer(linker,
+> > > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+> > > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > > -    bios_linker_loader_add_pointer(linker,
+> > > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+> > > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+> > > > +    if (pm->force_rev1_fadt) {
+> > > > +        rev = 1;
+> > > > +        fadt_size = offsetof(typeof(*fadt), reset_register);    
+> > > 
+> > > I don't really like it that we are using structs to format fields - I
+> > > would prefer build_append_int_noprefix based APIs - but since we do,
+> > > let's add a proper structure for FADT rev 1 instead of this hack. 
+ 
+Michael,
 
-On Tue, Jul 25, 2017 at 04:15:14PM -0500, Eric Blake wrote:
-> We have two flavors of vararg usage in qtest; make it clear that
-> qmp() has different semantics than hmp(), and let the compiler
-> enforce that hmp() is used correctly. However, qmp() (and friends)
-> only accept a subset of printf flags look-alikes (namely, those
-> that our JSON parser understands), and what is worse, qmp("true")
-> (the JSON keyword 'true') is different from qmp("%s", "true")
-> (the JSON string '"true"'), and we have some intermediate cleanup
-> patches to do before we can mark those as printf-like.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> ---
-> v3: restore lost attributes, add comments on va_list forms, tweak
-> commit message to mention upcoming qmp cleanups
-> v2: several comment tweaks, explain why qmp() can't be marked
-> ---
->  tests/libqtest.h | 40 +++++++++++++++++++++++++---------------
->  1 file changed, 25 insertions(+), 15 deletions(-)
+I've tried to switch FADT to build_append_int_noprefix APIs,
+but it turned out into quite a bit of re-factoring including
+clean-ups and adding new APIs to pack all the stuff in FADT.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+It's too much for hard freeze, lets not rush it and go with
+this patch for 2.10 to put out fire.
 
---2OzUYMsT4j3Kc+NU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZey1gAAoJEJykq7OBq3PIAN4H/2enF8L+De4JwWaE9foPLzkb
-BvkKrCnr3uu9LRVBCrBWxCQqFh17pIyYDzgPa43l2t3gr9weW88qD5hox65zO/z9
-JWMLkM0651RU6eo2fbVO6XU9H4qfhqlgZrrylRGeM1aetbLGVlGeXPG8P7W0iUjL
-UXl0VA1/DNgTqzhc/BpSq1IeRzeUE7DLyXZC+Tn8RR5hXLuGbu+iVkCVLd9TUIcl
-jOCN4hpE0qPnzBJDPSGwNp403GDAgD94Hz34YgGs4Xx/if/e6WpoDBHlS2FBedJi
-bF2zsMShK9i8zn8OysUqewYU/IPfO/2iFavnCkI5JqBlSnJvooXfj4zbjVKH5Og=
-=oJs1
------END PGP SIGNATURE-----
-
---2OzUYMsT4j3Kc+NU--
+When 2.11 merge window is open I'll rebase/post FADTv1/3
+conversion to build_append_int_noprefix API.
