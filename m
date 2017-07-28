@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1db1SC-00077Z-BS
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:21:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1db1SE-00078z-H7
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1db1SB-00075e-B6
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:21:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44488)
+	(envelope-from <stefanha@redhat.com>) id 1db1SD-00076n-AI
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:21:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1db1SB-00074e-21
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:21:03 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1db1SD-00076I-06
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 05:21:05 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 28 Jul 2017 10:20:52 +0100
-Message-Id: <20170728092053.10122-2-stefanha@redhat.com>
+Date: Fri, 28 Jul 2017 10:20:53 +0100
+Message-Id: <20170728092053.10122-3-stefanha@redhat.com>
 In-Reply-To: <20170728092053.10122-1-stefanha@redhat.com>
 References: <20170728092053.10122-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] trace: add TRACE_<event>_BACKEND_DSTATE()
+Subject: [Qemu-devel] [PATCH 2/2] trace: check backend dstate in
+ trace_event_get_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +27,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Denis V. Lunev" <den@openvz.org>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
 
-QEMU keeps track of trace event enabled/disabled state and provides
-monitor commands to inspect and modify the "dstate".  SystemTap and
-LTTng UST maintain independent enabled/disabled states for each trace
-event.
+Code that checks dstate is unaware of SystemTap and LTTng UST dstate, so
+the following trace event will not fire when solely enabled by SystemTap
+or LTTng UST:
 
-Introduce a new per-event macro that combines backend-specific dstate
-like this:
+  if (trace_event_get_state(TRACE_MY_EVENT)) {
+      str = g_strdup_printf("Expensive string to generate ...",
+                            ...);
+      trace_my_event(str);
+      g_free(str);
+  }
 
-  #define TRACE_MY_EVENT_BACKEND_DSTATE() ( \
-      QEMU_MY_EVENT_ENABLED() || /* SystemTap */ \
-      tracepoint_enabled(qemu, my_event) /* LTTng UST */ || \
-      false)
+Most users of trace_event_get_state() want to know both QEMU and backend
+dstate for the event.  Update the macro to include backend dstate.
 
-This will be used to extend trace_event_get_state() in the next patch.
+Introduce trace_event_get_state_qemu() for those callers who really only
+want QEMU dstate.  This includes the trace backends (like 'log') which
+should only trigger when event are enabled via QEMU.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- scripts/tracetool/__init__.py         |  1 +
- scripts/tracetool/backend/__init__.py |  3 +++
- scripts/tracetool/backend/dtrace.py   | 12 ++++++++++++
- scripts/tracetool/backend/ust.py      |  5 +++++
- scripts/tracetool/format/h.py         | 10 ++++++++++
- 5 files changed, 31 insertions(+)
+ trace/control.h                     | 20 ++++++++++++++++++--
+ scripts/tracetool/backend/ftrace.py |  2 +-
+ scripts/tracetool/backend/log.py    |  3 ++-
+ scripts/tracetool/backend/simple.py |  2 +-
+ scripts/tracetool/backend/syslog.py |  3 ++-
+ 5 files changed, 24 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index d4c204a472..0670ec17d5 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -271,6 +271,7 @@ class Event(object):
-     QEMU_TRACE_NOCHECK       = "_nocheck__" + QEMU_TRACE
-     QEMU_TRACE_TCG           = QEMU_TRACE + "_tcg"
-     QEMU_DSTATE              = "_TRACE_%(NAME)s_DSTATE"
-+    QEMU_BACKEND_DSTATE      = "TRACE_%(NAME)s_BACKEND_DSTATE"
-     QEMU_EVENT               = "_TRACE_%(NAME)s_EVENT"
+diff --git a/trace/control.h b/trace/control.h
+index b931824d60..b996c34c08 100644
+--- a/trace/control.h
++++ b/trace/control.h
+@@ -93,16 +93,32 @@ static bool trace_event_is_vcpu(TraceEvent *ev);
+ static const char * trace_event_get_name(TraceEvent *ev);
  
-     def api(self, fmt=None):
-diff --git a/scripts/tracetool/backend/__init__.py b/scripts/tracetool/backend/__init__.py
-index f735a259c0..259c6a6531 100644
---- a/scripts/tracetool/backend/__init__.py
-+++ b/scripts/tracetool/backend/__init__.py
-@@ -119,5 +119,8 @@ class Wrapper:
-     def generate(self, event, group):
-         self._run_function("generate_%s", event, group)
+ /**
++ * trace_event_get_state_qemu:
++ * @id: Event identifier name.
++ *
++ * Get the tracing state of an event, both static and the QEMU dynamic state.
++ * Note that some backends maintain their own dynamic state, use
++ * trace_event_get_state() instead if you wish to include it.
++ *
++ * If the event has the disabled property, the check will have no performance
++ * impact.
++ */
++#define trace_event_get_state_qemu(id)                       \
++    ((id ##_ENABLED) && trace_event_get_state_dynamic_by_id(id))
++
++/**
+  * trace_event_get_state:
+  * @id: Event identifier name.
+  *
+- * Get the tracing state of an event (both static and dynamic).
++ * Get the tracing state of an event (both static and dynamic).  Both QEMU and
++ * backend-specific dynamic state are included.
+  *
+  * If the event has the disabled property, the check will have no performance
+  * impact.
+  */
+ #define trace_event_get_state(id)                       \
+-    ((id ##_ENABLED) && trace_event_get_state_dynamic_by_id(id))
++    ((id ##_ENABLED) && (trace_event_get_state_dynamic_by_id(id) || \
++                         id ##_BACKEND_DSTATE()))
  
-+    def generate_backend_dstate(self, event, group):
-+        self._run_function("generate_%s_backend_dstate", event, group)
-+
-     def generate_end(self, events, group):
-         self._run_function("generate_%s_end", events, group)
-diff --git a/scripts/tracetool/backend/dtrace.py b/scripts/tracetool/backend/dtrace.py
-index c6812b70a2..17f902cc62 100644
---- a/scripts/tracetool/backend/dtrace.py
-+++ b/scripts/tracetool/backend/dtrace.py
-@@ -44,8 +44,20 @@ def generate_h_begin(events, group):
-     out('#include "%s"' % header,
-         '')
+ /**
+  * trace_event_get_vcpu_state:
+diff --git a/scripts/tracetool/backend/ftrace.py b/scripts/tracetool/backend/ftrace.py
+index dd0eda4441..fba637b376 100644
+--- a/scripts/tracetool/backend/ftrace.py
++++ b/scripts/tracetool/backend/ftrace.py
+@@ -33,7 +33,7 @@ def generate_h(event, group):
+         '        char ftrace_buf[MAX_TRACE_STRLEN];',
+         '        int unused __attribute__ ((unused));',
+         '        int trlen;',
+-        '        if (trace_event_get_state(%(event_id)s)) {',
++        '        if (trace_event_get_state_qemu(%(event_id)s)) {',
+         '            trlen = snprintf(ftrace_buf, MAX_TRACE_STRLEN,',
+         '                             "%(name)s " %(fmt)s "\\n" %(argnames)s);',
+         '            trlen = MIN(trlen, MAX_TRACE_STRLEN - 1);',
+diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/log.py
+index 54f0a69886..4562b9d12d 100644
+--- a/scripts/tracetool/backend/log.py
++++ b/scripts/tracetool/backend/log.py
+@@ -33,7 +33,8 @@ def generate_h(event, group):
+         # already checked on the generic format code
+         cond = "true"
+     else:
+-        cond = "trace_event_get_state(%s)" % ("TRACE_" + event.name.upper())
++        cond = "trace_event_get_state_qemu(%s)" % \
++               ("TRACE_" + event.name.upper())
  
-+    # SystemTap defines <provider>_<name>_ENABLED() but other DTrace
-+    # implementations might not.
-+    for e in events:
-+        out('#ifndef QEMU_%(uppername)s_ENABLED',
-+            '#define QEMU_%(uppername)s_ENABLED() false',
-+            '#endif',
-+            uppername=e.name.upper())
+     out('    if (%(cond)s) {',
+         '        struct timeval _now;',
+diff --git a/scripts/tracetool/backend/simple.py b/scripts/tracetool/backend/simple.py
+index f983670ee1..a39bbdc5c6 100644
+--- a/scripts/tracetool/backend/simple.py
++++ b/scripts/tracetool/backend/simple.py
+@@ -73,7 +73,7 @@ def generate_c(event, group):
+         # already checked on the generic format code
+         cond = "true"
+     else:
+-        cond = "trace_event_get_state(%s)" % event_id
++        cond = "trace_event_get_state_qemu(%s)" % event_id
  
- def generate_h(event, group):
-     out('    QEMU_%(uppername)s(%(argnames)s);',
-         uppername=event.name.upper(),
-         argnames=", ".join(event.args.names()))
-+
-+
-+def generate_h_backend_dstate(event, group):
-+    out('    QEMU_%(uppername)s_ENABLED() || \\',
-+        uppername=event.name.upper())
-diff --git a/scripts/tracetool/backend/ust.py b/scripts/tracetool/backend/ust.py
-index 2adaf548d5..412592b8e0 100644
---- a/scripts/tracetool/backend/ust.py
-+++ b/scripts/tracetool/backend/ust.py
-@@ -38,3 +38,8 @@ def generate_h(event, group):
-     out('    tracepoint(qemu, %(name)s%(tp_args)s);',
-         name=event.name,
-         tp_args=argnames)
-+
-+
-+def generate_h_backend_dstate(event, group):
-+    out('    tracepoint_enabled(qemu, %(name)s) || \\',
-+        name=event.name)
-diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.py
-index aecf249d66..e06f0f27c5 100644
---- a/scripts/tracetool/format/h.py
-+++ b/scripts/tracetool/format/h.py
-@@ -49,6 +49,16 @@ def generate(events, backend, group):
-     backend.generate_begin(events, group)
+     out('',
+         '    if (!%(cond)s) {',
+diff --git a/scripts/tracetool/backend/syslog.py b/scripts/tracetool/backend/syslog.py
+index 1ce627f0fc..3ee07bf7fd 100644
+--- a/scripts/tracetool/backend/syslog.py
++++ b/scripts/tracetool/backend/syslog.py
+@@ -33,7 +33,8 @@ def generate_h(event, group):
+         # already checked on the generic format code
+         cond = "true"
+     else:
+-        cond = "trace_event_get_state(%s)" % ("TRACE_" + event.name.upper())
++        cond = "trace_event_get_state_qemu(%s)" % \
++               ("TRACE_" + event.name.upper())
  
-     for e in events:
-+        # tracer-specific dstate
-+        out('',
-+            '#define %(api)s() ( \\',
-+            api=e.api(e.QEMU_BACKEND_DSTATE))
-+
-+        if "disable" not in e.properties:
-+            backend.generate_backend_dstate(e, group)
-+
-+        out('    false)')
-+
-         # tracer without checks
-         out('',
-             'static inline void %(api)s(%(args)s)',
+     out('    if (%(cond)s) {',
+         '        syslog(LOG_INFO, "%(name)s " %(fmt)s %(argnames)s);',
 -- 
 2.13.3
