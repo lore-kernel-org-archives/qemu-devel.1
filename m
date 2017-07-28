@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1db5Lc-0004eG-KC
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:30:33 -0400
+	(envelope-from <stefanha@redhat.com>) id 1db5PZ-0005li-Gm
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1db5LZ-0005P3-K6
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:30:32 -0400
-References: <20170727120210.6943-1-crosa@redhat.com>
-	<20170727120210.6943-2-crosa@redhat.com>
-	<CAFEAcA-CzG=JYjajJqMRL+pcMC2_06HTm1_xhD=ca=AReXHmTA@mail.gmail.com>
-	<e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <3367822b-da85-7032-f7c0-c488153a6e07@redhat.com>
-Date: Thu, 27 Jul 2017 09:47:11 -0400
+	(envelope-from <stefanha@redhat.com>) id 1db5PW-0000MT-G2
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:34:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1db5PW-0000Lh-67
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:34:34 -0400
+Date: Fri, 28 Jul 2017 14:34:30 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170728133430.GS12364@stefanha-x1.localdomain>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+	<20170725131931.GC23343@stefanha-x1.localdomain>
+	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
+	<20170726112633.GE18489@stefanha-x1.localdomain>
+	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
+	<20170727104302.GI2555@redhat.com>
+	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
+	<20170727152137.GW2555@redhat.com>
+	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
+	<20170727154535.GY2555@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i"
-Subject: Re: [Qemu-devel] [PATCH 1/5] configure: remove duplicate single
- quotes on config.log header
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="lCKkSrrNUaKEhaIQ"
+Content-Disposition: inline
+In-Reply-To: <20170727154535.GY2555@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +37,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i
-From: Cleber Rosa <crosa@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <3367822b-da85-7032-f7c0-c488153a6e07@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] configure: remove duplicate single
- quotes on config.log header
-References: <20170727120210.6943-1-crosa@redhat.com>
- <20170727120210.6943-2-crosa@redhat.com>
- <CAFEAcA-CzG=JYjajJqMRL+pcMC2_06HTm1_xhD=ca=AReXHmTA@mail.gmail.com>
- <e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
-In-Reply-To: <e6978405-6492-1124-d6e4-4a6a5b124c48@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--lCKkSrrNUaKEhaIQ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-
-
-On 07/27/2017 08:24 AM, Eric Blake wrote:
-> On 07/27/2017 07:15 AM, Peter Maydell wrote:
->> On 27 July 2017 at 13:02, Cleber Rosa <crosa@redhat.com> wrote:
->>> The generation of the informational header on config.log contains two=
-
->>> pairs of single quotes, which seems unintentional, and looks like
->>> this:
->>>
->>>   # QEMU configure log Thu Jul 26 08:17:15 EDT 2017
->>>   # Configured with: './configure' '--target-list=3Dx86_64-softmmu'
->>
->> I think this is deliberate. The idea is that the string is a
->> validly shell-quoted string that you can cut and paste
->> into a shell prompt if you want to.
+On Thu, Jul 27, 2017 at 04:45:35PM +0100, Daniel P. Berrange wrote:
+> On Thu, Jul 27, 2017 at 04:33:01PM +0100, Peter Maydell wrote:
+> > On 27 July 2017 at 16:21, Daniel P. Berrange <berrange@redhat.com> wrot=
+e:
+> > > On Thu, Jul 27, 2017 at 11:54:29AM +0100, Peter Maydell wrote:
+> > >> That said, yes, I was going to ask if we could do this via
+> > >> leveraging the tracepoint infrastructure and whatever scripting
+> > >> facilities it provides. Are there any good worked examples of
+> > >> this sort of thing? Can you do it as an ordinary non-root user?
+> > >
+> > > Do you have a particular thing you'd like to see an example of ?
+> > >
+> > > To dynamically probe a function which doesn't have a tracepoint
+> > > defined you can do:
+> > >
+> > > probe process("/usr/bin/qemu-x86_64").function("helper_syscall") {
+> > >   printf("syscall stasrt\n")
+> > > }
+> > >
+> > > but getting access to the function args is not as easy as with
+> > > pre-defined tracepoints.
+> >=20
+> > How do I go about actually running that script? What I
+> > have in mind by "worked example" is something like a blog
+> > post that says "ok, here's a problem, we want to find out
+> > what QEMU is doing in situation X, here's how you do this
+> > with $TRACING_THINGY" and generally steps you through how
+> > it works assuming you know nothing at all about whatever
+> > the tracing facility you're using is.
 >=20
-> It IS deliberate.  If you want, you could improve the code to only emit=
-
-> '' around arguments that require it rather than all arguments, but that=
-
-> requires more shell code (it's easier to quote everywhere, even when it=
-
-> looks strange because the quotes weren't necessary).
+> Ok, so something like this example that I wrote for libvirt a
+> while back then
 >=20
->> ...and note in particular how the '--cc=3Dccache gcc' argument
->> is printed.
+>   https://www.berrange.com/posts/2011/11/30/watching-the-libvirt-rpc-prot=
+ocol-using-systemtap/
 >=20
-> Yes, that's a case where the quotes are necessary.
 >=20
+> > > You can't typically run this as root,
+> >=20
+> > Do you mean "non-root" ?
+>=20
+> Sigh, yes, of course.
+>=20
+> > > however, I don't think that's a
+> > > huge issue, because most QEMU deployments are not running as your own
+> > > user account anyway, so you can't directly interact with them no
+> > > matter what.
+> >=20
+> > It is important, because almost all uses of TCG QEMU are
+> > running it from the command line as non-root normal users,
+> > especially if they're trying to debug what's going on with a
+> > guest binary. So any tracing solution for this kind of usecase
+> > must work without requiring root access, I think.
+>=20
+> None of the Linux integrated tracing tools allow direct non-root access
+> afaik. systemtap has ability to launch probes as non-root, via a privileg=
+ed
+> daemon, but it is restricted to probe scripts that the administrator has
+> pre-defined.
 
-Right, now I can see why.  Thanks for the review!
+One exception is gdb's static userspace probes support.  If you can run
+gdb on QEMU then you can trace the same events as SystemTap.  I have
+never tried this GDB feature:
 
---=20
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+  https://sourceware.org/gdb/onlinedocs/gdb/Static-Probe-Points.html
 
+It should work out of the box if your distro builds QEMU with the
+'dtrace' backend enabled.
 
---6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i
+> That pretty much leaves re-building QEMU, LD_PRELOADS, or something
+> ptrace(), or qemu's built-in simpletrace feature, as the remaining
+> options.  We have a scripts/simpletrace.py that lets you load a
+> trace file into python and process it, but as written that's aimed
+> as post-processing a tracefile you've previously collected.
+>=20
+> It would be desirable to write a more advanced simpletrace python
+> module that could collect & process the trace data live, and also
+> interact with the qemu monitor to change what events are enabled
+> dynamically.  Basically we'd need a way for the simpletrace backend
+> to output its data to a fifo, instead of creating an file on disk,
+> then you could dynanically consume it.
+
+That would be interesting, I know Alex Bennee has wrangled with large
+(~10 GB?) simpletrace files and it's not a pleasant experience :).
+
+Llu=EDs/Peter: What are the requirements for instrumentation code
+interacting with the running QEMU instance?  simpletrace is
+asynchronous, meaning it does not wait for anyone handle the trace event
+before continuing execution, and is therefore not suitable for
+SystemTap-style scripts that can interact with the program while
+handling a trace event.
+
+Stefan
+
+--lCKkSrrNUaKEhaIQ
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZee7iAAoJEGV+jTOl8gnz/84P/A5BOim4htHWgCTenPoQkvfE
-3Nqw258/JOCFQBWZUiynid4PvkBORz7KS0wECIkW1BYpGZ4cA6xKoZVK6UFcOMhg
-PzdtKo4SmvmuUQT2CUSz+UWHJsWCequFzrooKZon1scItBTaxo3CExidVBqmSFts
-nmt2cDo/N7hqsot3Bj9cc1vzp29lex1nadlADbaBr9Xy6/E5qPbCnLcdzxJrUem4
-9dbzl0sK04RV3PghA756FcAhN+mV7ZPvIcz8pcorgauYIMHSYzowBiK8bvu8SlyK
-YraEflIWFmdQMwa70AkgdYm8wgjYkDuAlAKhoInvYrDmJ7ywOQ9K3QOp/JKZ6GHy
-zb5DDtip8KbMwoVMl0FxUBNZyE6f70aRQ3L3zBeirgElPauNdwPUD0fSgfoUCugf
-W8eKlM7ZtcqcPtfpCKNh4wLBIMVO5iyBFk2LJnum0TwUGwc+1P0Hcu3FsJWyeAhF
-eQ1D7cz2NOtbgXeEsOwkjqBlRMZzzpeRHExjv0s/d5aLg5nFv8X6IOIsd1XTbUc9
-XSXbkEu1ee697OuaCaFkXxmCmGpfizJNYxBLhe/HRRl4RKyAJ3OhR3k5GQEj0Fgv
-s4xG6nbK6kprLwzNE/LnaMDAyvad5iYOvvFTVx7RP8n0q+kVWMaOznxQeyFPZGls
-9uoOd39w7ezlnYKkP+6N
-=WWRg
+iQEcBAEBAgAGBQJZez1mAAoJEJykq7OBq3PIFkUH/R/Q+SNCISwT9xdevM8I+Vl5
+Ivf5qnHfQ5QqJRsczNwN8rFoYs3gUNBPj3jxlE3cR+lw4oUbXBfRD/Nk8ElWNGBv
+EgH5yHndZnEhug/jPxmz2hltQnajGJ2zIBM1L6YBH2hzTb+B9H40enl4QkQGdt3c
+Q7IuwatFDFjvcHkNjQHhv+Ci6a/SIpGOkrzDE++B1uGMR/6eJfvmlLRAKdoDlcwN
+7zueJQepRYFcqrhGQis8T113GY3Sn6OLXYlCbCGzaQ/Y+NLR0OfyeyxEFdjzcl7a
+zEsij1NqBBlaaopICzDo/MRLjWQJA/Mx74KNs1OR5C2YddWdTHiQXrpK7ZztWlk=
+=0XnP
 -----END PGP SIGNATURE-----
 
---6KVaNAhSlT2DIIDCsX26UTIaQuxdrSg6i--
+--lCKkSrrNUaKEhaIQ--
