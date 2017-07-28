@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dasjW-0003YI-0r
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:02:23 -0400
+	(envelope-from <famz@redhat.com>) id 1dat5c-0002lh-8a
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dasjR-0004Qr-7O
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:02:22 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
-	<1501153150-19984-5-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <241902a8-5942-9ae5-8ac8-41cf08da08ae@amsat.org>
-Date: Thu, 27 Jul 2017 21:02:12 -0300
+	(envelope-from <famz@redhat.com>) id 1dat5Y-0001qf-Em
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:25:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dat5Y-0001oM-5i
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 20:25:08 -0400
+Date: Fri, 28 Jul 2017 08:25:01 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170728002501.GM5117@lemon.lan>
+References: <201707250902596770211@zte.com.cn>
+	<f53aa34f-5ca0-c38e-a303-4688698a2d42@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <1501153150-19984-5-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.10 4/5] target/arm: Move
- PMSAv7 reset into arm_cpu_reset() so M profile MPUs get reset
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f53aa34f-5ca0-c38e-a303-4688698a2d42@cn.fujitsu.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv2 02/04] colo-compare: Processpactkets in
+ the IOThreadofthe primary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: wang.yong155@zte.com.cn, pbonzini@redhat.com, lizhijian@cn.fujitsu.com, wang.guang55@zte.com.cn, jasowang@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@gmail.com, stefanha@redhat.com, zhang.zhanghailiang@huawei.com
 
-On 07/27/2017 07:59 AM, Peter Maydell wrote:
-> When the PMSAv7 implementation was originally added it was for R profile
-> CPUs only, and reset was handled using the cpreg .resetfn hooks.
-> Unfortunately for M profile cores this doesn't work, because they do
-> not register any cpregs. Move the reset handling into arm_cpu_reset(),
-> where it will work for both R profile and M profile cores.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Thu, 07/27 15:47, Zhang Chen wrote:
+> CC. Fam and David.
+>=20
+> Any idea about it?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Is it possible to use g_main_context_{push,pop}_thread_default to "move" =
+chardev
+GSources to IOThread's context, then use g_main_context_query like main t=
+hread
+and poll the fds in aio_poll?
 
-> ---
->   target/arm/cpu.c    | 14 ++++++++++++++
->   target/arm/helper.c | 28 ++++++++++++----------------
->   2 files changed, 26 insertions(+), 16 deletions(-)
-> 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 96d1f84..05c038b 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -232,6 +232,20 @@ static void arm_cpu_reset(CPUState *s)
->   
->       env->vfp.xregs[ARM_VFP_FPEXC] = 0;
->   #endif
-> +
-> +    if (arm_feature(env, ARM_FEATURE_PMSA) &&
-> +        arm_feature(env, ARM_FEATURE_V7)) {
-> +        if (cpu->pmsav7_dregion > 0) {
-> +            memset(env->pmsav7.drbar, 0,
-> +                   sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
-> +            memset(env->pmsav7.drsr, 0,
-> +                   sizeof(*env->pmsav7.drsr) * cpu->pmsav7_dregion);
-> +            memset(env->pmsav7.dracr, 0,
-> +                   sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
-> +        }
-> +        env->pmsav7.rnr = 0;
-> +    }
-> +
->       set_flush_to_zero(1, &env->vfp.standard_fp_status);
->       set_flush_inputs_to_zero(1, &env->vfp.standard_fp_status);
->       set_default_nan_mode(1, &env->vfp.standard_fp_status);
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 63187de..a9247e9 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2404,18 +2404,6 @@ static void pmsav7_write(CPUARMState *env, const ARMCPRegInfo *ri,
->       *u32p = value;
->   }
->   
-> -static void pmsav7_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-> -{
-> -    ARMCPU *cpu = arm_env_get_cpu(env);
-> -    uint32_t *u32p = *(uint32_t **)raw_ptr(env, ri);
-> -
-> -    if (!u32p) {
-> -        return;
-> -    }
-> -
-> -    memset(u32p, 0, sizeof(*u32p) * cpu->pmsav7_dregion);
-> -}
-> -
->   static void pmsav7_rgnr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->                                 uint64_t value)
->   {
-> @@ -2433,22 +2421,30 @@ static void pmsav7_rgnr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->   }
->   
->   static const ARMCPRegInfo pmsav7_cp_reginfo[] = {
-> +    /* Reset for all these registers is handled in arm_cpu_reset(),
-> +     * because the PMSAv7 is also used by M-profile CPUs, which do
-> +     * not register cpregs but still need the state to be reset.
-> +     */
->       { .name = "DRBAR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 1, .opc2 = 0,
->         .access = PL1_RW, .type = ARM_CP_NO_RAW,
->         .fieldoffset = offsetof(CPUARMState, pmsav7.drbar),
-> -      .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
-> +      .readfn = pmsav7_read, .writefn = pmsav7_write,
-> +      .resetfn = arm_cp_reset_ignore },
->       { .name = "DRSR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 1, .opc2 = 2,
->         .access = PL1_RW, .type = ARM_CP_NO_RAW,
->         .fieldoffset = offsetof(CPUARMState, pmsav7.drsr),
-> -      .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
-> +      .readfn = pmsav7_read, .writefn = pmsav7_write,
-> +      .resetfn = arm_cp_reset_ignore },
->       { .name = "DRACR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 1, .opc2 = 4,
->         .access = PL1_RW, .type = ARM_CP_NO_RAW,
->         .fieldoffset = offsetof(CPUARMState, pmsav7.dracr),
-> -      .readfn = pmsav7_read, .writefn = pmsav7_write, .resetfn = pmsav7_reset },
-> +      .readfn = pmsav7_read, .writefn = pmsav7_write,
-> +      .resetfn = arm_cp_reset_ignore },
->       { .name = "RGNR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 2, .opc2 = 0,
->         .access = PL1_RW,
->         .fieldoffset = offsetof(CPUARMState, pmsav7.rnr),
-> -      .writefn = pmsav7_rgnr_write },
-> +      .writefn = pmsav7_rgnr_write,
-> +      .resetfn = arm_cp_reset_ignore },
->       REGINFO_SENTINEL
->   };
->   
-> 
+Fam
+
+>=20
+>=20
+> Thanks
+>=20
+> Zhang Chen
+>=20
+>=20
+> On 07/25/2017 09:02 AM, wang.yong155@zte.com.cn wrote:
+> >=20
+> > >On 24/07/2017 12:38, wang.yong155@zte.com.cn wrote:
+> >=20
+> > >> finally use g_main_loop_run to replace aio_poll  in the
+> >=20
+> > >> iothread_run function.
+> >=20
+> > >
+> >=20
+> > >That would make the performance of virtio-blk with iothreads worse,
+> >=20
+> > >unfortunately.  aio_poll is much more optimized than g_main_loop_run=
+.
+> >=20
+> > Hi Paolo,
+> >=20
+> > Any other good idea to achieve this?
+> >=20
+> >=20
+> > Thanks
+> >=20
+> >=20
+> > >
+> >=20
+> > >Paolo
+> >=20
+> > >
+> >=20
+> > >> After that IOThread
+> >=20
+> > >> runs the GMainContext event loop,chardev and IOThread can work
+> > together.
+> >=20
+> > >>
+> >=20
+> > >> How about it? If feasible, I will try to submit
+> >=20
+> >=20
+> >=20
+> >=20
+> > =E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6
+> > *=E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A*<pbonzini@redhat.com>;
+> > *=E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A*=E7=8E=8B=E5=8B=8710170530;<ste=
+fanha@redhat.com>;<jasowang@redhat.com>;<marcandre.lureau@gmail.com>;
+> > *=E6=8A=84=E9=80=81=E4=BA=BA=EF=BC=9A*<zhang.zhanghailiang@huawei.com=
+>;<zhangchen.fnst@cn.fujitsu.com>;<lizhijian@cn.fujitsu.com>;<qemu-devel@=
+nongnu.org>;=E7=8E=8B=E5=B9=BF10165992;
+> > *=E6=97=A5 =E6=9C=9F =EF=BC=9A*2017=E5=B9=B407=E6=9C=8824=E6=97=A5 19=
+:59
+> > *=E4=B8=BB =E9=A2=98 =EF=BC=9A**Re: [PATCHv2 02/04] colo-compare: Pro=
+cesspactkets in the
+> > IOThreadofthe primary*
+> >=20
+> >=20
+> > On 24/07/2017 12:38, wang.yong155@zte.com.cn wrote:
+> > > finally use g_main_loop_run to replace aio_poll  in the
+> > > iothread_run function.
+> >=20
+> > That would make the performance of virtio-blk with iothreads worse,
+> > unfortunately.  aio_poll is much more optimized than g_main_loop_run.
+> >=20
+> > Paolo
+> >=20
+> > > After that IOThread
+> > > runs the GMainContext event loop,chardev and IOThread can work toge=
+ther.
+> > >
+> > > How about it? If feasible, I will try to submit a patch.
+> >=20
+> >=20
+> >=20
+>=20
+> --=20
+> Thanks
+> Zhang Chen
+>=20
+>=20
+>=20
+>=20
