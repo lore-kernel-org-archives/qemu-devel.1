@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db8fE-0000XA-Fd
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:03:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1db8fH-0000Zq-DW
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db8fD-0002Id-J4
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:03:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54223)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1db8fD-0002Hb-DO
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:02:59 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 545EFA962A
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 17:02:58 +0000 (UTC)
-Received: from red.redhat.com (ovpn-120-22.rdu2.redhat.com [10.10.120.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EC30F6F44B
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 17:02:57 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1db8fG-0002L3-L8
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:03:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 28 Jul 2017 12:02:53 -0500
-Message-Id: <20170728170255.13270-1-eblake@redhat.com>
+Date: Fri, 28 Jul 2017 12:02:54 -0500
+Message-Id: <20170728170255.13270-2-eblake@redhat.com>
+In-Reply-To: <20170728170255.13270-1-eblake@redhat.com>
+References: <20170728170255.13270-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-2.10 0/1] NBD changes for 2.10-rc1
+Subject: [Qemu-devel] [PULL 1/1] nbd: fix memory leak in nbd_opt_go()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +23,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The following changes since commit 3aabfec2c83da500ae52fc87ff3a0a60718022=
-db:
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-  Merge remote-tracking branch 'remotes/yongbok/tags/mips-20170728' into =
-staging (2017-07-28 15:32:44 +0100)
+nbd/client.c:385:12: warning: Potential leak of memory pointed to by 'buf=
+'
 
-are available in the git repository at:
-
-  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-07-28
-
-for you to fetch changes up to 158b9aa568eabe614d37882dddc2eea534edc7ae:
-
-  nbd: fix memory leak in nbd_opt_go() (2017-07-28 11:58:20 -0500)
-
-----------------------------------------------------------------
-nbd patches for 2017-07-28
-
-- Philippe Mathieu-Daud=C3=A9 - nbd: fix memory leak in nbd_opt_go()
-
-----------------------------------------------------------------
-Philippe Mathieu-Daud=C3=A9 (1):
-      nbd: fix memory leak in nbd_opt_go()
-
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20170727024224.22900-5-f4bug@amsat.org>
+[introduced in commit 8ecaeae8]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
  nbd/client.c | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/nbd/client.c b/nbd/client.c
+index 509ed5e4ba..0a17de80b5 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -376,9 +376,11 @@ static int nbd_opt_go(QIOChannel *ioc, const char *w=
+antname,
+     if (info->request_sizes) {
+         stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
+     }
+-    if (nbd_send_option_request(ioc, NBD_OPT_GO,
+-                                4 + len + 2 + 2 * info->request_sizes, b=
+uf,
+-                                errp) < 0) {
++    error =3D nbd_send_option_request(ioc, NBD_OPT_GO,
++                                    4 + len + 2 + 2 * info->request_size=
+s,
++                                    buf, errp);
++    g_free(buf);
++    if (error < 0) {
+         return -1;
+     }
 
 --=20
 2.13.3
