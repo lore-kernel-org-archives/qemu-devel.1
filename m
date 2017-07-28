@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db4EK-0005d7-Gc
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:18:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1db4Ff-0007Tm-OJ
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:20:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db4EJ-0002bL-KG
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:18:56 -0400
-References: <20170728053610.15770-1-f4bug@amsat.org>
-	<20170728053610.15770-47-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e17ab1d2-3ee8-3a5e-b91f-fdd7d44e1783@redhat.com>
-Date: Fri, 28 Jul 2017 07:18:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1db4Fe-00049L-Us
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:20:19 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:38335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1db4Fe-00048Q-NO
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:20:18 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id m85so116045896wma.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:20:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170728053610.15770-47-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="s4Ujwo1tEfExk72AHB7PRWkmA6aEPlJ60"
-Subject: Re: [Qemu-devel] [RFC PATCH 46/47] MAINTAINERS: add missing entries
- for Coccinelle scripts
+In-Reply-To: <06a9ae13-4279-1210-0664-0faf5f55f830@redhat.com>
+References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
+	<CAFEAcA_9_YVyDC5jbLT=YXT64MFkxOrpxV7eydCEK_Lc4oSY5g@mail.gmail.com>
+	<06a9ae13-4279-1210-0664-0faf5f55f830@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Jul 2017 13:19:57 +0100
+Message-ID: <CAFEAcA-oowaaK9Amn2Achj4a7X-HGOYgNF_7M=rmdOzbick3JA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s4Ujwo1tEfExk72AHB7PRWkmA6aEPlJ60
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster
- <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Message-ID: <e17ab1d2-3ee8-3a5e-b91f-fdd7d44e1783@redhat.com>
-Subject: Re: [RFC PATCH 46/47] MAINTAINERS: add missing entries for Coccinelle
- scripts
-References: <20170728053610.15770-1-f4bug@amsat.org>
- <20170728053610.15770-47-f4bug@amsat.org>
-In-Reply-To: <20170728053610.15770-47-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 28 July 2017 at 13:08, Eric Blake <eblake@redhat.com> wrote:
+> On 07/28/2017 04:04 AM, Peter Maydell wrote:
+>> On 28 July 2017 at 09:55, Vladimir Sementsov-Ogievskiy
+>> <vsementsov@virtuozzo.com> wrote:
+>>> To make logs more readable prefix all hex values with '0x' mark.
+>>> This is needed for consistency too, as a lot of hex values are already
+>>> prefixed with '0x'. Also, bring all hex outputs to the common form -
+>>> use '%#', not '0x%'.
+>>>
+>>> This patch is done by two commands:
+>>> find . -name trace-events | \
+>>>  xargs sed -i 's/%\([-+ *.0-9]*\([hljztL]\|ll\|hh\)\?\(x\|X\|"\s*PRIx\)\)/%#\1/g'
+>
+> Why PRIx32 but not PRIX32?
 
-On 07/28/2017 12:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> and voluntary myself as reviewer
+As it happens none of our trace-events files use PRIX...
 
-s/voluntary/volunteer/
-
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->=20
-> I'm not a Coccinelle specialist but willing to learn and help!
->=20
-
-I'm not sure adding an orphan-only section helps; and some of the
-particular scripts have specific maintainers (qobject.cocci).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---s4Ujwo1tEfExk72AHB7PRWkmA6aEPlJ60
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7K6kACgkQp6FrSiUn
-Q2rAPAf9ERacisn5Tl1N45wveBDWN08gODdMJMaXo0Fpst53SM0yof80VT6OeVIK
-IDKqmGo0TEodi1b7wWoK4/4od3pP9r0Lm4SV2hFCx3JWlmmKPwCpnkSsYOtuPbpM
-P98pE1YtInD73Yg6jRxmavs5yd+sbhirpg9Vmef537JVuyK9Wbto/7EaCGxTLabe
-hwEhacC1LxPpc7Jv28ZAXe+FvXuMsRTwR4v0M15e9/Ka4gSWj+RbOkaPIiplK24m
-ZR5gb3nSxe/lpUt9NkQIg0EIL8eBVWWONUkdBWx80BXCnxYe5vnMfZH/HHus59ew
-PqzcAg0lzYfZnU+TK3C+ORWa0xqBeg==
-=lmJz
------END PGP SIGNATURE-----
-
---s4Ujwo1tEfExk72AHB7PRWkmA6aEPlJ60--
+thanks
+-- PMM
