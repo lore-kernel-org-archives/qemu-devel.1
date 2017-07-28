@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1db8Qc-0004ZB-1C
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:47:56 -0400
+	(envelope-from <alistair23@gmail.com>) id 1db8R5-0004ql-Rh
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1db8Qb-0002eY-9Y
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:47:54 -0400
+	(envelope-from <alistair23@gmail.com>) id 1db8R5-00035n-2R
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:48:23 -0400
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170728053610.15770-46-f4bug@amsat.org>
+In-Reply-To: <d35b1732-e970-8f52-b09d-9b9e004be39f@redhat.com>
 References: <20170728053610.15770-1-f4bug@amsat.org>
-	<20170728053610.15770-46-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 28 Jul 2017 09:47:16 -0700
-Message-ID: <CAKmqyKNdP8aHTWo1XdAqjQt4tXXNOn4ORaXgcZKa=+zxSY-CVg@mail.gmail.com>
+	<20170728053610.15770-4-f4bug@amsat.org>
+	<d35b1732-e970-8f52-b09d-9b9e004be39f@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 28 Jul 2017 09:47:49 -0700
+Message-ID: <CAKmqyKPxJwBJ9kh1r3pEzectwjEmDV3LqFRqQRSetN2-J+=tfw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 45/47] MAINTAINERS: add missing entries
- for loader
+Subject: Re: [Qemu-devel] [PATCH 03/47] MAINTAINERS: add missing STM32 entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Thu, Jul 27, 2017 at 10:36 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->
-> RFC because I'm not sure 'loader' is the same goal than 'generic-loader'
+On Thu, Jul 27, 2017 at 11:58 PM, Thomas Huth <thuth@redhat.com> wrote:
+> On 28.07.2017 07:35, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-loader.c is not the same, it is the core loading framework for QEMU
-while generic-loader is just something that uses it. This greatly
-increases the amount on maintainership here.
-
-In saying that if no one else wants it I can maintain it.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Thanks,
 Alistair
 
+>> ---
+>>  MAINTAINERS | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 795f89f709..f10252c292 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -556,6 +556,7 @@ F: hw/char/stm32f2xx_usart.c
+>>  F: hw/timer/stm32f2xx_timer.c
+>>  F: hw/adc/*
+>>  F: hw/ssi/stm32f2xx_spi.c
+>> +F: include/hw/*/stm32*.h
+>>
+>>  Netduino 2
+>>  M: Alistair Francis <alistair@alistair23.me>
+>>
 >
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index dc1a69051c..224890643d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1196,6 +1196,8 @@ M: Alistair Francis <alistair.francis@xilinx.com>
->  S: Maintained
->  F: hw/core/generic-loader.c
->  F: include/hw/core/generic-loader.h
-> +F: docs/generic-loader.txt
-> +F: hw/core/loader.c
->
->  CHRP NVRAM
->  M: Thomas Huth <thuth@redhat.com>
-> --
-> 2.13.3
->
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 >
