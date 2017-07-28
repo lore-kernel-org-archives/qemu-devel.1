@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1db0yL-0005ub-Qx
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:50:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1db106-0006wF-Aq
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1db0yK-0001qs-RS
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:50:13 -0400
-Date: Fri, 28 Jul 2017 11:49:53 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170728084953.rpo5ohpf6gibchi2@postretch>
-References: <20170726141924.qaqclberxsup5cdm@postretch>
-	<20170726151221.GA3600@stefanha-x1.localdomain>
-	<20170726182320.cnqx3y64c7nmhvp3@postretch>
-	<11af0732-e024-6651-5b65-07eb98d8bb17@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1db105-0003R8-B9
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:52:02 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34795)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1db105-0003Qf-4L
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:52:01 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id 12so152655833wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 01:52:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ltccw6m5exvkwjks"
-Content-Disposition: inline
-In-Reply-To: <11af0732-e024-6651-5b65-07eb98d8bb17@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] block-insert-node and block-job-delete
+In-Reply-To: <7834a272-4106-f076-a62b-9cff45f4ae42@amsat.org>
+References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
+	<1501153150-19984-3-git-send-email-peter.maydell@linaro.org>
+	<7834a272-4106-f076-a62b-9cff45f4ae42@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Jul 2017 09:51:39 +0100
+Message-ID: <CAFEAcA8pSnin+c90RAutxckifw1HTpeZ75OUMwC3kBurSpVBjg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.10 2/5] target/arm: Don't
+ allow guest to make System space executable for M profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,151 +32,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Jeff Cody <jcody@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-
---ltccw6m5exvkwjks
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jul 27, 2017 at 06:09:04PM -0400, John Snow wrote:
+On 28 July 2017 at 00:59, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> Hi Peter,
 >
->
->On 07/26/2017 02:23 PM, Manos Pitsidianakis wrote:
->>On Wed, Jul 26, 2017 at 04:12:21PM +0100, Stefan Hajnoczi wrote:
->>>On Wed, Jul 26, 2017 at 05:19:24PM +0300, Manos Pitsidianakis wrote:
->>>>This proposal follows a discussion we had with Kevin and Stefan=20
->>>>on filter
->>>>node management.
->>>>
->>>>With block filter drivers arises a need to configure filter=20
->>>>nodes on runtime
->>>>with QMP on live graphs. A problem with doing live graph=20
->>>>modifications is
->>>>that some block jobs modify the graph when they are done and=20
->>>>don't operate
->>>>under any synchronisation, resulting in a race condition if we=20
->>>>try to insert
->>>>a filter node in the place of an existing edge.
->>>
->>>But maybe you are thinking about higher level race conditions between
->>>QMP commands.  Can you give an example of the race?
+> On 07/27/2017 07:59 AM, Peter Maydell wrote:
 >>
->>Exactly, synchronisation between the QMP/user actions. Here's an=20
->>example, correct me if I'm wrong:
+>> For an M profile v7PMSA, the system space (0xe0000000 - 0xffffffff) can
+>> never be executable, even if the guest tries to set the MPU registers
+>> up that way. Enforce this restriction.
 >>
->>User issues a block-commit to this tree to commit A onto B:
->>    BB -> A -> B
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>   target/arm/helper.c | 16 +++++++++++++++-
+>>   1 file changed, 15 insertions(+), 1 deletion(-)
 >>
->>This inserts the dummy mirror node at the top since this is a mirror=20
->>job (active commit)
->>    BB -> dummy -> A -> B
->>
->>User wants to add a filter node F below the BB. First we create the node:
->>    BB -> dummy -> A -> B
->>       F /
->>
->>Commit finishes before we do block-insert-node, dummy and A is=20
->>removed from the BB's chain, mirror_exit calls bdrv_replace_node()
->>
->>    BB ------------> B
->>                F -> /
->>
->>Now inserting F under BB will error since dummy does not exist any more.
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index ceef225..169c361 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -8251,6 +8251,14 @@ static inline bool is_ppb_region(CPUARMState *env=
+,
+>> uint32_t address)
+>>           extract32(address, 20, 12) =3D=3D 0xe00;
+>>   }
 >>
 >
->Exactly how much of a problem is this? You, the user, have instructed=20
->QEMU to do two conflicting things:
 >
->(1) Squash A down into B, and
->(2) Insert a filter above A
->
->Shame on you for deleting the node you were trying to reference, no?=20
->And as an added bonus, QEMU will even error out on your command=20
->instead of trying to do something and getting it wrong.
->
->Is this a problem?
+> I wonder if these should renamed pmsav7_is_ppb_region() and
+> pmsav7_is_system_region().
 
+Yeah, perhaps better; I'm never quite sure how much disambiguation
+to put in to file-local function names. Maybe m_is_ppb_region()?
+PPB and system region are M profile concepts, not PMSAv7 ones.
+That doesn't seem any clearer than where we started though :-(
 
+>> +static inline bool is_system_region(CPUARMState *env, uint32_t address)
+>> +{
+>> +    /* True if address is in the M profile system region
+>> +     * 0xe0000000 - 0xffffffff
+>> +     */
+>> +    return arm_feature(env, ARM_FEATURE_M) && extract32(address, 29, 3)
+>> =3D=3D 0x7;
+>> +}
+>> +
+>>   static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
+>>                                    int access_type, ARMMMUIdx mmu_idx,
+>>                                    hwaddr *phys_ptr, int *prot, uint32_t
+>> *fsr)
+>> @@ -8354,6 +8362,12 @@ static bool get_phys_addr_pmsav7(CPUARMState *env=
+,
+>> uint32_t address,
+>>               get_phys_addr_pmsav7_default(env, mmu_idx, address, prot);
+>>           } else { /* a MPU hit! */
+>>               uint32_t ap =3D extract32(env->pmsav7.dracr[n], 8, 3);
 >
->>The proposal doesn't guard against the following:
->>User issues a block-commit to this tree to commit B onto C:
->>    BB -> A -> B -> C
+>
+> Maybe names access_perms/execute_never are easier to read..
+
+Following existing practice in the LPAE code, we use the
+field names that the architecture spec uses.
+
+>> +            uint32_t xn =3D extract32(env->pmsav7.dracr[n], 12, 1);
+>> +
+>
+>
+> clear MemManage exceptions:
+>
+>                *fsr &=3D ~0xff;
+
+>> +            if (is_system_region(env, address)) {
+>> +                /* System space is always execute never */
+>> +                xn =3D 1;
+>
+>
+>                } else {
+>                    xn =3D extract32(env->pmsav7.dracr[n], 12, 1);
+>
+>> +            }
+>>                 if (is_user) { /* User mode AP bit decoding */
+>>                   switch (ap) {
+>> @@ -8394,7 +8408,7 @@ static bool get_phys_addr_pmsav7(CPUARMState *env,
+>> uint32_t address,
+>>               }
+>>                 /* execute never */
+>> -            if (env->pmsav7.dracr[n] & (1 << 12)) {
+>> +            if (xn) {
+>>                   *prot &=3D ~PAGE_EXEC;
+>
+>
+> and here we now can set eXecuteNever violation:
+>
+>                     *fsr |=3D R_V7M_CFSR_IACCVIOL_MASK;
+
+No, *fsr is not an M profile CFSR, it's an A/R profile short
+descriptor format fault status value (because on R profile
+that's what it will be used as, and M profile is using the
+same MPU handling code here). We do the conversion in
+arm_v7m_cpu_do_interrupt(), where we look at the exception_index
+and the exception.fsr to identify what CFSR bits to set.
+
+>>               }
+>>           }
 >>
->>The dummy node (commit's top bs is A):
->>    BB -> A -> dummy -> B -> C
->>
->>blockdev-add of a filter we wish to eventually be between A and C:
->>    BB -> A -> dummy -> B -> C
->>             F/
->>
->>if commit finishes before we issue block-insert-node (commit_complete()
->>calls bdrv_set_backing_hd() which only touches A)
->>    BB -> A --------------> C
->>           F -> dummy -> B /
->>    resulting in error when issuing block-insert-node,
+>     }
+>     *fsr =3D 0x00d; /* Permission fault */
 >
->Because "B" and "dummy" have already actually been deleted, I assume.=20
->(The diagram is confusing.)
-
-because we have an edge (A, C) and C is not a child of F, so we cannot=20
-insert it as a child to A.  (I rotated the usual ascii art by 90 deg to=20
-save me from handling whitespace, but I might have done it worse)
->>
->>else if we set the job to manual-delete and insert F:
->>    BB -> A -> F -> dummy -> B -> C
->>deleting the job will result in F being lost since the job's top bs=20
->>wasn't updated.
->>
+> I don't understand this mask, I don't have bit [2] defined in my datashit=
+,
+> maybe it was expected to turn on exception Entry/Return which I have defi=
+ned
+> as bits 4 and 3 respectively, so I'd rather see here:
 >
->Seems like a fairly good reason not to pursue this avenue then, yes?
+>     *fsr |=3D R_V7M_CFSR_MUNSTKERR_MASK | R_V7M_CFSR_MSTKERR_MASK;
 
-I think this is just a different problem, not a race but of broadcasting=20
-graph operations to affected parties (block jobs).
->
->I think I agree with Stefan's concerns that this is more of a=20
->temporary workaround for the benefit of jobs, but that there may well=20
->be other reasons (especially in the future) where graph manipulations=20
->may occur invisibly to the user.
->
->Do you have any use cases for failure here that don't involve the user=20
->themselves asking for two conflicting things? That is, QEMU doing some=20
->graph reorganization without the user's knowledge coupled with the=20
->user asking for a new filter node?
->
->Are there any failures that result in anything more dangerous or bad=20
->than a "404: node not found" style error where we simply reject the=20
->premise of what the user was attempting to accomplish?
->
+See above, *fsr isn't a v7m CFSR.
 
-I couldn't come up with a case that caused catastrophic failure, no=20
-(though I lack familiarity with block jobs). If this isn't a problem=20
-after all, good news.
-
-block-insert-node needs to work with no dangerous conflicts to other=20
-graph operations, basically. Is there a case where there's not just an=20
-error and we can't recover?
-
---ltccw6m5exvkwjks
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAll6+rEACgkQc2J8L2kN
-9xCQ1hAAhjKrgFBnh4TwSUZ+eATumVpft9Yiy12PpUbxiijNi+8v4R9SLWQHCHkl
-xvnlhzUXRGPlQ7Xhf0btqT0DChZVDIEaMhzzmsBol3G6slZRSFNN6aap6vMeBWzr
-1cC8yx6NhD4AQIZ1+Z2JHIFO8/RAbEFrQapweK4N732Q06sXbpMUDafj+BbExPQs
-b0HCF1wR6r64xWzItkIXuXyqV6+fgaRiOOt6bl5HSBvCnNNS3eBXQInfiZXV1iZt
-dIllF1ylTbAEoI/3c1Q5i9trv35YbjoWY/Ig3z19Q32uFwlQsy4LwP9IV5avKJpq
-wtG6hPAC+cexIsK6VWStzqDuESrWxA2AcNoewBLCTDsjg7rfabwoQ0+Z/2UbKciL
-YCuYTS/0IFcxayOv/syIkb5PZLQHLqrsoSIQw5XW/kUwBl1AahCf1jJUGeBuYema
-fgrXk+JokiVUfhW2g9yAotsdS5ui4ACzhtH+B8a1/dJAmkPRGIdMhMdeQYEaPKFb
-YxpjdlOhaCJIfN7eG4rXTW3hEl5wmIB5PkGtIbBKIxkDO/5MHpT/AJuPg1gk1wys
-amzNkQTlJNnJem65DPKPNaEFn9BNvoRa1RfAUmXdFYtreP4D6Hp/4jHLIim96YD7
-e4VdXdkLBaag50KfhkkETEzRvY0SqJl1l81D+Zdqxz1oRcvbeh4=
-=q0Kj
------END PGP SIGNATURE-----
-
---ltccw6m5exvkwjks--
+thanks
+-- PMM
