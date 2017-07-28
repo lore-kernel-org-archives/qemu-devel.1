@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1db8da-0007sr-Og
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:01:19 -0400
+	(envelope-from <alistair23@gmail.com>) id 1db8f4-0000Qh-26
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1db8dW-0000fa-MU
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:01:18 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1501153150-19984-1-git-send-email-peter.maydell@linaro.org>
-	<1501153150-19984-3-git-send-email-peter.maydell@linaro.org>
-	<7834a272-4106-f076-a62b-9cff45f4ae42@amsat.org>
-	<CAFEAcA8pSnin+c90RAutxckifw1HTpeZ75OUMwC3kBurSpVBjg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3952e0dd-fefd-cd05-70c6-51b614e47fbb@amsat.org>
-Date: Fri, 28 Jul 2017 14:01:10 -0300
+	(envelope-from <alistair23@gmail.com>) id 1db8f3-00028o-9x
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:02:50 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1db8f2-00027z-Sm
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:02:49 -0400
+Received: by mail-wr0-x244.google.com with SMTP id 12so18950402wrb.4
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:02:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8pSnin+c90RAutxckifw1HTpeZ75OUMwC3kBurSpVBjg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-2.10 2/5] target/arm: Don't
- allow guest to make System space executable for M profile
+In-Reply-To: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
+References: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 28 Jul 2017 10:02:17 -0700
+Message-ID: <CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: include <linux/limits.h> for
+ XATTR_SIZE_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Patrick Steinhardt <ps@pks.im>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 07/28/2017 05:51 AM, Peter Maydell wrote:
-> On 28 July 2017 at 00:59, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Hi Peter,
->>
->> On 07/27/2017 07:59 AM, Peter Maydell wrote:
->>>
->>> For an M profile v7PMSA, the system space (0xe0000000 - 0xffffffff) can
->>> never be executable, even if the guest tries to set the MPU registers
->>> up that way. Enforce this restriction.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>> ---
->>>    target/arm/helper.c | 16 +++++++++++++++-
->>>    1 file changed, 15 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/target/arm/helper.c b/target/arm/helper.c
->>> index ceef225..169c361 100644
->>> --- a/target/arm/helper.c
->>> +++ b/target/arm/helper.c
->>> @@ -8251,6 +8251,14 @@ static inline bool is_ppb_region(CPUARMState *env,
->>> uint32_t address)
->>>            extract32(address, 20, 12) == 0xe00;
->>>    }
->>>
->>
->>
->> I wonder if these should renamed pmsav7_is_ppb_region() and
->> pmsav7_is_system_region().
-> 
-> Yeah, perhaps better; I'm never quite sure how much disambiguation
-> to put in to file-local function names. Maybe m_is_ppb_region()?
-> PPB and system region are M profile concepts, not PMSAv7 ones.
-> That doesn't seem any clearer than where we started though :-(
+On Mon, Jun 26, 2017 at 12:20 PM, Patrick Steinhardt <ps@pks.im> wrote:
+> The function `v9fs_xattrcreate` makes use of the define `XATTR_SIZE_MAX`
+> to reject attempts of creating xattrs with an invalid size, which is
+> defined in <linux/limits.h>. On glibc-based systems, this header is
+> indirectly included via <limits.h>, <bits/posix1_lim.h>,
+> <bitts/local_lim.h>, but on other platforms this is not guaranteed due
+> to not being part of the POSIX standard. One examples are systems based
+> on musl libc, which do not include the <linux/limits.h> indirectly,
+> which leads to `XATTR_SIZE_MAX` being undefined.
+>
+> Fix this error by directly include <linux/limits.h>. As the 9P fs code
+> is being Linux-based either way, we can simply do so without breaking
+> other platforms. This enables building 9pfs on musl-based systems.
+>
+> Signed-off-by: Patrick Steinhardt <ps@pks.im>
 
-m_is_ppb_region() isn't bad.
+Ping!
 
-> 
->>> +static inline bool is_system_region(CPUARMState *env, uint32_t address)
->>> +{
->>> +    /* True if address is in the M profile system region
->>> +     * 0xe0000000 - 0xffffffff
->>> +     */
->>> +    return arm_feature(env, ARM_FEATURE_M) && extract32(address, 29, 3)
->>> == 0x7;
->>> +}
->>> +
->>>    static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->>>                                     int access_type, ARMMMUIdx mmu_idx,
->>>                                     hwaddr *phys_ptr, int *prot, uint32_t
->>> *fsr)
->>> @@ -8354,6 +8362,12 @@ static bool get_phys_addr_pmsav7(CPUARMState *env,
->>> uint32_t address,
->>>                get_phys_addr_pmsav7_default(env, mmu_idx, address, prot);
->>>            } else { /* a MPU hit! */
->>>                uint32_t ap = extract32(env->pmsav7.dracr[n], 8, 3);
->>
->>
->> Maybe names access_perms/execute_never are easier to read..
-> 
-> Following existing practice in the LPAE code, we use the
-> field names that the architecture spec uses.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-I see, but below xn has an helpful comment /* execute never */ that 
-eases code review, maybe add both comment on declaration.
+Thanks,
+Alistair
 
-> 
->>> +            uint32_t xn = extract32(env->pmsav7.dracr[n], 12, 1);
->>> +
->>
->>
->> clear MemManage exceptions:
->>
->>                 *fsr &= ~0xff;
-> 
->>> +            if (is_system_region(env, address)) {
->>> +                /* System space is always execute never */
->>> +                xn = 1;
->>
->>
->>                 } else {
->>                     xn = extract32(env->pmsav7.dracr[n], 12, 1);
->>
->>> +            }
->>>                  if (is_user) { /* User mode AP bit decoding */
->>>                    switch (ap) {
->>> @@ -8394,7 +8408,7 @@ static bool get_phys_addr_pmsav7(CPUARMState *env,
->>> uint32_t address,
->>>                }
->>>                  /* execute never */
->>> -            if (env->pmsav7.dracr[n] & (1 << 12)) {
->>> +            if (xn) {
->>>                    *prot &= ~PAGE_EXEC;
->>
->>
->> and here we now can set eXecuteNever violation:
->>
->>                      *fsr |= R_V7M_CFSR_IACCVIOL_MASK;
-> 
-> No, *fsr is not an M profile CFSR, it's an A/R profile short
-> descriptor format fault status value (because on R profile
-> that's what it will be used as, and M profile is using the
-> same MPU handling code here). We do the conversion in
-> arm_v7m_cpu_do_interrupt(), where we look at the exception_index
-> and the exception.fsr to identify what CFSR bits to set.
-> 
 
-Ok I missed that, thank for correcting me.
-
->>>                }
->>>            }
->>>
->>      }
->>      *fsr = 0x00d; /* Permission fault */
->>
->> I don't understand this mask, I don't have bit [2] defined in my datashit,
->> maybe it was expected to turn on exception Entry/Return which I have defined
->> as bits 4 and 3 respectively, so I'd rather see here:
->>
->>      *fsr |= R_V7M_CFSR_MUNSTKERR_MASK | R_V7M_CFSR_MSTKERR_MASK;
-> 
-> See above, *fsr isn't a v7m CFSR.
-
-Yes, 0x00d is Permission fault using short-descriptor translation.
-
-So:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> 
-> thanks
-> -- PMM
-> 
+> ---
+>  hw/9pfs/9p.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 96d2683348..48cd558e96 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -13,6 +13,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include <glib/gprintf.h>
+> +#include <linux/limits.h>
+>  #include "hw/virtio/virtio.h"
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+> --
+> 2.13.2
+>
+>
