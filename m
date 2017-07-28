@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1db7uf-0002hn-1H
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:14:54 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1db80x-0005j9-Q4
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1db7uZ-0000Bq-V9
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:14:52 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:58199)
+	(envelope-from <vilanova@ac.upc.edu>) id 1db80s-0007UT-Ek
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:21:22 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:47358)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1db7uZ-0000Al-IE
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:14:47 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1db80s-0007SG-1I
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 12:21:18 -0400
 From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <20170725131931.GC23343@stefanha-x1.localdomain>
+References: <150091574424.30739.4131793221953168474.stgit@frigg.lan>
+	<20170725131931.GC23343@stefanha-x1.localdomain>
 	<CAFEAcA_pmFYZ_y9E5D0c70G2oA62vb+KBXnxbp_Sg39kuNeREA@mail.gmail.com>
-	<20170726112633.GE18489@stefanha-x1.localdomain>
-	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-	<20170727104302.GI2555@redhat.com>
-	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
-	<20170727152137.GW2555@redhat.com>
-	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
-	<20170727154535.GY2555@redhat.com>
-	<20170728133430.GS12364@stefanha-x1.localdomain>
-	<20170728135241.GP31495@redhat.com>
-Date: Fri, 28 Jul 2017 19:14:33 +0300
-In-Reply-To: <20170728135241.GP31495@redhat.com> (Daniel P. Berrange's message
-	of "Fri, 28 Jul 2017 14:52:41 +0100")
-Message-ID: <87pockles6.fsf@frigg.lan>
+	<87o9s88sb4.fsf@frigg.lan>
+	<20170726112210.GD18489@stefanha-x1.localdomain>
+	<871sp34bbc.fsf@frigg.lan>
+	<20170727103253.GE10129@stefanha-x1.localdomain>
+	<CAFEAcA-Da7ZV7SL41TShqiy=icgo_nJXJxBqRr=RO+M23JsrGg@mail.gmail.com>
+	<20170728134218.GT12364@stefanha-x1.localdomain>
+Date: Fri, 28 Jul 2017 19:21:04 +0300
+In-Reply-To: <20170728134218.GT12364@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Fri, 28 Jul 2017 14:42:18 +0100")
+Message-ID: <877eyslehb.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
  instrumentation
 List-Id: <qemu-devel.nongnu.org>
@@ -37,87 +36,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Daniel P Berrange writes:
+Stefan Hajnoczi writes:
 
-> On Fri, Jul 28, 2017 at 02:34:30PM +0100, Stefan Hajnoczi wrote:
->> On Thu, Jul 27, 2017 at 04:45:35PM +0100, Daniel P. Berrange wrote:
->> > On Thu, Jul 27, 2017 at 04:33:01PM +0100, Peter Maydell wrote:
->> > > On 27 July 2017 at 16:21, Daniel P. Berrange <berrange@redhat.com> wrote:
->> > > > On Thu, Jul 27, 2017 at 11:54:29AM +0100, Peter Maydell wrote:
->> > > >> That said, yes, I was going to ask if we could do this via
->> > > >> leveraging the tracepoint infrastructure and whatever scripting
->> > > >> facilities it provides. Are there any good worked examples of
->> > > >> this sort of thing? Can you do it as an ordinary non-root user?
->> > > >
->> > > > Do you have a particular thing you'd like to see an example of ?
->> > > >
->> > > > To dynamically probe a function which doesn't have a tracepoint
->> > > > defined you can do:
->> > > >
->> > > > probe process("/usr/bin/qemu-x86_64").function("helper_syscall") {
->> > > >   printf("syscall stasrt\n")
->> > > > }
->> > > >
->> > > > but getting access to the function args is not as easy as with
->> > > > pre-defined tracepoints.
->> > > 
->> > > How do I go about actually running that script? What I
->> > > have in mind by "worked example" is something like a blog
->> > > post that says "ok, here's a problem, we want to find out
->> > > what QEMU is doing in situation X, here's how you do this
->> > > with $TRACING_THINGY" and generally steps you through how
->> > > it works assuming you know nothing at all about whatever
->> > > the tracing facility you're using is.
->> > 
->> > Ok, so something like this example that I wrote for libvirt a
->> > while back then
->> > 
->> >   https://www.berrange.com/posts/2011/11/30/watching-the-libvirt-rpc-protocol-using-systemtap/
->> > 
->> > 
->> > > > You can't typically run this as root,
->> > > 
->> > > Do you mean "non-root" ?
->> > 
->> > Sigh, yes, of course.
->> > 
->> > > > however, I don't think that's a
->> > > > huge issue, because most QEMU deployments are not running as your own
->> > > > user account anyway, so you can't directly interact with them no
->> > > > matter what.
->> > > 
->> > > It is important, because almost all uses of TCG QEMU are
->> > > running it from the command line as non-root normal users,
->> > > especially if they're trying to debug what's going on with a
->> > > guest binary. So any tracing solution for this kind of usecase
->> > > must work without requiring root access, I think.
->> > 
->> > None of the Linux integrated tracing tools allow direct non-root access
->> > afaik. systemtap has ability to launch probes as non-root, via a privileged
->> > daemon, but it is restricted to probe scripts that the administrator has
->> > pre-defined.
->> 
->> One exception is gdb's static userspace probes support.  If you can run
->> gdb on QEMU then you can trace the same events as SystemTap.  I have
->> never tried this GDB feature:
->> 
->> https://sourceware.org/gdb/onlinedocs/gdb/Static-Probe-Points.html
->> 
->> It should work out of the box if your distro builds QEMU with the
->> 'dtrace' backend enabled.
+> On Thu, Jul 27, 2017 at 11:40:17AM +0100, Peter Maydell wrote:
+>> On 27 July 2017 at 11:32, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>> > On Wed, Jul 26, 2017 at 03:44:39PM +0300, Llu=C3=ADs Vilanova wrote:
+>> >> And why exactly is this a threat? Because it can be used to "extend" =
+QEMU
+>> >> without touching its sources? Is this a realistic threat? (it's a rat=
+her brittle
+>> >> way to do it, so I'm not sure it's practical)
+>> >
+>> > Unfortunately it is a problem.  I recently came across a product that
+>> > was using LD_PRELOAD=3D to "integrate" with QEMU.  People really abuse
+>> > these interfaces instead of integrating their features cleanly into
+>> > QEMU.
+>>=20
+>> ...if people who want to do this kind of thing already can and
+>> do use LD_PRELOAD for it, I don't think we should worry too much
+>> about trying to make the instrumentation plugin API bulletproof
+>> against similar abuse.
+>>=20
+>> > I see the use cases that Peter has been describing and am sure we can
+>> > come up with good solutions.  What I care about is that it doesn't all=
+ow
+>> > loading a .so that connects to arbitrary trace events.
+>>=20
+>> That said, I agree that we don't really need an arbitrary-trace-event
+>> setup here, and we should probably design our API so that it isn't
+>> handing the trace plugin hooks pointers into QEMU's internals.
+>> We want an API that makes it easy for people to do things based on
+>> changes of the guest binary's state (registers, insns, etc etc)
+>> and which makes it hard for them to accidentally trip themselves up
+>> (eg by prodding around in QEMU internal data structures).
+>> This will have the secondary benefit that it's unlikely that future
+>> changes to QEMU will break plugin code.
+>>=20
+>> >> As a side note, I find instrumentation to be most useful for guest co=
+de events,
+>> >> which mostly contain non-pointer values (except for the CPUState*).
+>>=20
+>> For instance we definitely should not be passing a CPUState* to
+>> any plugin function.
 
-> Wow, that's great to learn about. It does indeed work !
+> The gdbstub protocol has relevant features for accessing guest memory,
+> registers, etc.  Perhaps a set of QEMU-specific events can be added
+> (e.g. tb generated) so it's possible to instrument and control the
+> guest from an instrumentation program (written in any language).
 
-> If you knew alot about ptrace() you could probably build something
-> that use ptrace() and these probe points to call your dynamic
-> instrumentation code with reasonable low overheads.
+> Perhaps there is a fundamental reason why this isn't possible due to the
+> protocol design, because using gdbstub halts all vcpus, etc.  I don't
+> know.
 
-I don't think so. Ptrace traps into the kernel and stops the process while a
-separate process decides what to do. That's between 3 and 4 orders of magnitude
-slower than calling an instrumentor function.
+> Do you think this is an interesting direction?  It definitely seems like
+> a powerful approach though performance would be less than running native
+> code inside the QEMU process.
+
+That's the same approach someone else dubbed as using a fifo with "synchron=
+ous"
+events, right? I have some measurements on this using a pipe, and overheads=
+ are
+1000x to 2300x for each communication event (compared to a function call, a=
+nd
+depending on whether each process/thread is pinned to the same or different
+CPU).
 
 
 Cheers,
