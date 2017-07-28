@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60981)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dbE1W-00056B-Lf
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:23 -0400
+	id 1dbE1Z-00057i-D8
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dbE1V-0002CI-Ns
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:22 -0400
+	id 1dbE1Y-0002El-96
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:25 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 28 Jul 2017 19:46:00 -0300
-Message-Id: <20170728224608.3598-1-f4bug@amsat.org>
+Date: Fri, 28 Jul 2017 19:46:03 -0300
+Message-Id: <20170728224608.3598-4-f4bug@amsat.org>
+In-Reply-To: <20170728224608.3598-1-f4bug@amsat.org>
+References: <20170728224608.3598-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 for 2.10 0/8] docs: fix broken paths
+Subject: [Qemu-devel] [PATCH v2 for 2.10 3/8] docs: fix broken paths to
+ docs/devel/qapi-code-gen.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Hi Michael, you already applied this series to -trivial, however I updated the
-commits message, not requested but not a heavy task to do neither. Since you
-didn't not sent PR yet, if you mind can you take those instead? Else it's not
-a big deal. Thanks!
+With the move of some docs to docs/interop on ac06724a71, a couple of references
+were not updated.
 
-v2:
-- fixed what I misunderstood Eric said,
-- fixed shell command using Eric feedback,
-- added commit id of the change that introduce the invalid reference in the
-  commit message.
-
-following Cleber Rosa example I cleaned more invalid references.
-
-Eric said "this doesn't change code and doc updates are find during freeze,
-so this is a GOOD candidate for 2.10; but if it misses 2.10, slipping to 2.11
-doesn't hurt." and I agree :)
-
-I used the following command (improved by Eric) which I consider to include
-in some CI test job:
-
-$ git grep docs/ \
-    | sed -ne "s/.* \(docs[^ :)}\"\']*\).*/\1/p" \
-    | sed -e 's/\(.*\)\.$/\1/p' \
-    | sort -u \
-    | xargs ls -d >/dev/null
-
-Regards,
-
-Phil.
-
-Cleber Rosa (1):
-  docs: fix broken paths to docs/interop dir
-
-Philippe Mathieu-Daudé (7):
-  docs: fix broken paths to docs/interop/qcow2.txt
-  docs: fix broken paths to docs/devel/qapi-code-gen.txt
-  docs: fix broken paths to docs/devel/atomics.txt
-  docs: fix broken paths to docs/devel/tracing.txt
-  docs: fix broken paths to docs/config/ich9-ehci-uhci.cfg
-  docs: fix broken paths to docs/specs/ivshmem-spec.txt
-  docs: fix broken paths to docs/spin/
-
- audio/trace-events                  | 2 +-
- block/trace-events                  | 2 +-
- chardev/trace-events                | 2 +-
- crypto/trace-events                 | 2 +-
- docs/devel/lockcnt.txt              | 2 +-
- docs/devel/writing-qmp-commands.txt | 4 ++--
- docs/qcow2-cache.txt                | 2 +-
- docs/specs/pci-ids.txt              | 2 +-
- docs/spin/aio_notify.promela        | 6 +++---
- docs/spin/aio_notify_accept.promela | 4 ++--
- docs/spin/aio_notify_bug.promela    | 4 ++--
- docs/spin/tcg-exclusive.promela     | 2 +-
- docs/usb2.txt                       | 2 +-
- hw/9pfs/trace-events                | 2 +-
- hw/acpi/trace-events                | 2 +-
- hw/alpha/trace-events               | 2 +-
- hw/arm/trace-events                 | 2 +-
- hw/audio/trace-events               | 2 +-
- hw/block/dataplane/trace-events     | 2 +-
- hw/block/trace-events               | 2 +-
- hw/char/trace-events                | 2 +-
- hw/display/trace-events             | 2 +-
- hw/dma/trace-events                 | 2 +-
- hw/i386/trace-events                | 2 +-
- hw/input/trace-events               | 2 +-
- hw/intc/trace-events                | 2 +-
- hw/isa/trace-events                 | 2 +-
- hw/mem/trace-events                 | 2 +-
- hw/misc/trace-events                | 2 +-
- hw/net/trace-events                 | 2 +-
- hw/nvram/trace-events               | 2 +-
- hw/pci/trace-events                 | 2 +-
- hw/ppc/trace-events                 | 2 +-
- hw/s390x/trace-events               | 2 +-
- hw/scsi/trace-events                | 2 +-
- hw/sd/trace-events                  | 2 +-
- hw/sparc/trace-events               | 2 +-
- hw/timer/trace-events               | 2 +-
- hw/usb/trace-events                 | 2 +-
- hw/vfio/trace-events                | 2 +-
- hw/virtio/trace-events              | 2 +-
- hw/xen/trace-events                 | 2 +-
- include/block/aio.h                 | 2 +-
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ docs/devel/writing-qmp-commands.txt | 2 +-
  include/qapi/visitor.h              | 2 +-
- include/qemu/atomic.h               | 4 ++--
- io/trace-events                     | 2 +-
- linux-user/trace-events             | 2 +-
- migration/trace-events              | 2 +-
- net/trace-events                    | 2 +-
- qapi-schema.json                    | 4 ++--
  qapi/introspect.json                | 2 +-
  qapi/qapi-util.c                    | 2 +-
- qom/trace-events                    | 2 +-
  scripts/qapi2texi.py                | 2 +-
- scripts/simpletrace.py              | 2 +-
- target/arm/trace-events             | 2 +-
- target/i386/trace-events            | 2 +-
- target/mips/trace-events            | 2 +-
- target/ppc/trace-events             | 2 +-
- target/s390x/trace-events           | 2 +-
- target/sparc/trace-events           | 2 +-
- tcg/README                          | 2 +-
- ui/trace-events                     | 2 +-
- util/trace-events                   | 2 +-
- 64 files changed, 71 insertions(+), 71 deletions(-)
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp-commands.txt
+index 69793e320e..4f5b24c0c4 100644
+--- a/docs/devel/writing-qmp-commands.txt
++++ b/docs/devel/writing-qmp-commands.txt
+@@ -7,7 +7,7 @@ This document doesn't discuss QMP protocol level details, nor does it dive
+ into the QAPI framework implementation.
+ 
+ For an in-depth introduction to the QAPI framework, please refer to
+-docs/qapi-code-gen.txt. For documentation about the QMP protocol,
++docs/devel/qapi-code-gen.txt. For documentation about the QMP protocol,
+ start with docs/interop/qmp-intro.txt.
+ 
+ == Overview ==
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index fe9faf469f..0f3b8cb459 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -36,7 +36,7 @@
+  * QemuOpts, and clone visitors have some implementation limitations;
+  * see the documentation for each visitor for more details on what it
+  * supports.  Also, see visitor-impl.h for the callback contracts
+- * implemented by each visitor, and docs/qapi-code-gen.txt for more
++ * implemented by each visitor, and docs/devel/qapi-code-gen.txt for more
+  * about the QAPI code generator.
+  *
+  * All of the visitors are created via:
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index 1dbaef56eb..cf77ff0669 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -226,7 +226,7 @@
+ #
+ # @members: the alternate type's members, in no particular order.
+ #           The members' wire encoding is distinct, see
+-#           docs/qapi-code-gen.txt section Alternate types.
++#           docs/devel/qapi-code-gen.txt section Alternate types.
+ #
+ # On the wire, this can be any of the members.
+ #
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index e28dbd0ac3..46eda7d196 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -40,7 +40,7 @@ int qapi_enum_parse(const char * const lookup[], const char *buf,
+  * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
+  * may contain only letters, digits, hyphen and period.
+  * The special exception for enumeration names is not implemented.
+- * See docs/qapi-code-gen.txt for more on QAPI naming rules.
++ * See docs/devel/qapi-code-gen.txt for more on QAPI naming rules.
+  * Keep this consistent with scripts/qapi.py!
+  * If @complete, the parse fails unless it consumes @str completely.
+  * Return its length on success, -1 on failure.
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index 9e015002ef..a317526e51 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -91,7 +91,7 @@ def texi_format(doc):
+         # doesn't.
+         #
+         # Make sure to update section "Documentation markup" in
+-        # docs/qapi-code-gen.txt when fixing this.
++        # docs/devel/qapi-code-gen.txt when fixing this.
+         if line.startswith('| '):
+             line = EXAMPLE_FMT(code=line[2:])
+         elif line.startswith('= '):
 -- 
 2.13.3
