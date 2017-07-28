@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1db4rw-0005mm-BN
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:57 -0400
+	(envelope-from <kraxel@redhat.com>) id 1db4rw-0005ml-Av
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1db4rm-0008Lb-CV
+	(envelope-from <kraxel@redhat.com>) id 1db4rl-0008Ku-Eu
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54864)
+Received: from mx1.redhat.com ([209.132.183.28]:35050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1db4rm-0008Kj-0L
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1db4rl-0008KD-5j
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D7C848E386
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:59:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3F81ADA1F
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:59:39 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 28 Jul 2017 14:59:34 +0200
-Message-Id: <20170728125935.18167-3-kraxel@redhat.com>
+Date: Fri, 28 Jul 2017 14:59:33 +0200
+Message-Id: <20170728125935.18167-2-kraxel@redhat.com>
 In-Reply-To: <20170728125935.18167-1-kraxel@redhat.com>
 References: <20170728125935.18167-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] ui: drop ac_search and ac_stop
+Subject: [Qemu-devel] [PULL 1/3] ui: correctly detect spice PAUSE scancode
+ sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +31,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-Both keys exist already: "ac_search" is "find" and "ac_stop" is "stop".
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Fixes: 37810e80553c19f0dac3644924895a9bf5c70785
+The SPICE input code is currently detcting 0xe1 0x1d 0x45 as
+the PAUSE key make sequence and 0xe1 0x9d 0xc5 as the break
+sequence. This is incorrect, because all 6 scancodes together
+are the make sequence, and there is no break sequence.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170727174640.30359-1-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170728063415.27480-1-kraxel@redhat.com
 ---
- hw/input/ps2.c    | 8 ++++----
- ui/input-keymap.c | 8 ++++----
- qapi-schema.json  | 5 +----
- 3 files changed, 9 insertions(+), 12 deletions(-)
+ ui/spice-input.c | 32 +++++++++++++-------------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 9f057e46ea..77906d5f46 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -239,11 +239,11 @@ static const uint16_t qcode_to_keycode_set1[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_MAIL] = 0xe06c,
-     [Q_KEY_CODE_CALCULATOR] = 0xe021,
-     [Q_KEY_CODE_COMPUTER] = 0xe06b,
--    [Q_KEY_CODE_AC_SEARCH] = 0xe065,
-+    [Q_KEY_CODE_FIND] = 0xe065,
-     [Q_KEY_CODE_AC_HOME] = 0xe032,
-     [Q_KEY_CODE_AC_BACK] = 0xe06a,
-     [Q_KEY_CODE_AC_FORWARD] = 0xe069,
--    [Q_KEY_CODE_AC_STOP] = 0xe068,
-+    [Q_KEY_CODE_STOP] = 0xe068,
-     [Q_KEY_CODE_AC_REFRESH] = 0xe067,
-     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe066,
+diff --git a/ui/spice-input.c b/ui/spice-input.c
+index cda9976469..3d41aa1831 100644
+--- a/ui/spice-input.c
++++ b/ui/spice-input.c
+@@ -50,6 +50,7 @@ static const SpiceKbdInterface kbd_interface = {
  
-@@ -379,11 +379,11 @@ static const uint16_t qcode_to_keycode_set2[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_MAIL] = 0xe048,
-     [Q_KEY_CODE_CALCULATOR] = 0xe02b,
-     [Q_KEY_CODE_COMPUTER] = 0xe040,
--    [Q_KEY_CODE_AC_SEARCH] = 0xe010,
-+    [Q_KEY_CODE_FIND] = 0xe010,
-     [Q_KEY_CODE_AC_HOME] = 0xe03a,
-     [Q_KEY_CODE_AC_BACK] = 0xe038,
-     [Q_KEY_CODE_AC_FORWARD] = 0xe030,
--    [Q_KEY_CODE_AC_STOP] = 0xe028,
-+    [Q_KEY_CODE_STOP] = 0xe028,
-     [Q_KEY_CODE_AC_REFRESH] = 0xe020,
-     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe018,
+ static void kbd_push_key(SpiceKbdInstance *sin, uint8_t scancode)
+ {
++    static const uint8_t pauseseq[] = { 0xe1, 0x1d, 0x45, 0xe1, 0x9d, 0xc5 };
+     QemuSpiceKbd *kbd = container_of(sin, QemuSpiceKbd, sin);
+     int keycode;
+     bool up;
+@@ -58,6 +59,18 @@ static void kbd_push_key(SpiceKbdInstance *sin, uint8_t scancode)
+         kbd->emul0 = true;
+         return;
+     }
++
++    if (scancode == pauseseq[kbd->pauseseq]) {
++        kbd->pauseseq++;
++        if (kbd->pauseseq == G_N_ELEMENTS(pauseseq)) {
++            qemu_input_event_send_key_qcode(NULL, Q_KEY_CODE_PAUSE, true);
++            kbd->pauseseq = 0;
++        }
++        return;
++    } else {
++        kbd->pauseseq = 0;
++    }
++
+     keycode = scancode & ~SCANCODE_UP;
+     up = scancode & SCANCODE_UP;
+     if (kbd->emul0) {
+@@ -65,25 +78,6 @@ static void kbd_push_key(SpiceKbdInstance *sin, uint8_t scancode)
+         keycode |= SCANCODE_GREY;
+     }
  
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index 0d9ddde9c9..cdad5652d3 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -123,13 +123,13 @@ static int linux_to_qcode[KEY_CNT] = {
-     [KEY_MAIL]           = Q_KEY_CODE_MAIL,
-     [KEY_COMPUTER]       = Q_KEY_CODE_COMPUTER,
+-    if (scancode == SCANCODE_EMUL1) {
+-        kbd->pauseseq++;
+-        return;
+-    } else if (kbd->pauseseq == 1) {
+-        if (keycode == 0x1d) {
+-            kbd->pauseseq++;
+-            return;
+-        } else {
+-            kbd->pauseseq = 0;
+-        }
+-    } else if (kbd->pauseseq == 2) {
+-        if (keycode == 0x45) {
+-            qemu_input_event_send_key_qcode(NULL, Q_KEY_CODE_PAUSE, !up);
+-            kbd->pauseseq = 0;
+-            return;
+-        }
+-        kbd->pauseseq = 0;
+-    }
+-
+     qemu_input_event_send_key_number(NULL, keycode, !up);
+ }
  
--    [KEY_STOP]           = Q_KEY_CODE_AC_STOP,
-+    [KEY_STOP]           = Q_KEY_CODE_STOP,
-     [KEY_BOOKMARKS]      = Q_KEY_CODE_AC_BOOKMARKS,
-     [KEY_BACK]           = Q_KEY_CODE_AC_BACK,
-     [KEY_FORWARD]        = Q_KEY_CODE_AC_FORWARD,
-     [KEY_HOMEPAGE]       = Q_KEY_CODE_AC_HOME,
-     [KEY_REFRESH]        = Q_KEY_CODE_AC_REFRESH,
--    [KEY_FIND]           = Q_KEY_CODE_AC_SEARCH,
-+    [KEY_FIND]           = Q_KEY_CODE_FIND,
- 
-     [KEY_NEXTSONG]       = Q_KEY_CODE_AUDIONEXT,
-     [KEY_PREVIOUSSONG]   = Q_KEY_CODE_AUDIOPREV,
-@@ -279,13 +279,13 @@ static const int qcode_to_number[] = {
-     [Q_KEY_CODE_MAIL] = 0xec,
-     [Q_KEY_CODE_COMPUTER] = 0xeb,
- 
--    [Q_KEY_CODE_AC_STOP] = 0xe8,
-+    [Q_KEY_CODE_STOP] = 0xe8,
-     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe6,
-     [Q_KEY_CODE_AC_BACK] = 0xea,
-     [Q_KEY_CODE_AC_FORWARD] = 0xe9,
-     [Q_KEY_CODE_AC_HOME] = 0xb2,
-     [Q_KEY_CODE_AC_REFRESH] = 0xe7,
--    [Q_KEY_CODE_AC_SEARCH] = 0xe5,
-+    [Q_KEY_CODE_FIND] = 0xe5,
- 
-     [Q_KEY_CODE_AUDIONEXT] = 0x99,
-     [Q_KEY_CODE_AUDIOPREV] = 0x90,
-diff --git a/qapi-schema.json b/qapi-schema.json
-index dcc12c83a9..c96f0a26f6 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4856,11 +4856,9 @@
- # @mail: since 2.10
- # @calculator: since 2.10
- # @computer: since 2.10
--# @ac_search: since 2.10
- # @ac_home: since 2.10
- # @ac_back: since 2.10
- # @ac_forward: since 2.10
--# @ac_stop: since 2.10
- # @ac_refresh: since 2.10
- # @ac_bookmarks: since 2.10
- # altgr, altgr_r: dropped in 2.10
-@@ -4890,8 +4888,7 @@
-             'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
-             'volumeup', 'volumedown', 'mediaselect',
-             'mail', 'calculator', 'computer',
--            'ac_search', 'ac_home', 'ac_back', 'ac_forward', 'ac_stop',
--            'ac_refresh', 'ac_bookmarks' ] }
-+            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks' ] }
- 
- ##
- # @KeyValue:
 -- 
 2.9.3
