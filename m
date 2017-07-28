@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1db2Eh-00028o-48
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:11:12 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1db2GP-0002rp-Ki
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:12:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1db2Ec-0004x2-SZ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:11:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1db2Ec-0004w2-Jf
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:11:06 -0400
-Date: Fri, 28 Jul 2017 12:11:01 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170728121101.2a85216a@gondolin>
-In-Reply-To: <abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
-	<20170727135910.27d9e42e@gondolin>
-	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
-	<20170727161457.58b3c7d1@gondolin>
-	<abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
- initialized CRW for channel path hotplug
+	(envelope-from <pm215@archaic.org.uk>) id 1db2GO-0006HW-QO
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:12:57 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1db2GO-0006Ft-JL
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:12:56 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Jul 2017 11:12:49 +0100
+Message-Id: <1501236769-1766-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.10] exec: Disable "execute from MMIO
+ memory region" feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,135 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, Juan Quintela <quintela@redhat.com>
 
-On Thu, 27 Jul 2017 18:15:07 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Unfortunately it turns out that the implementation of the "execute
+from MMIO memory region" feature does not interact well with
+migration: it creates and destroys RAMBlocks on the fly, but
+migration assumes that the set of RAMBlocks is fixed while migration
+is in progress.  The effect is that migration will either fail (if
+the on-the-fly RAMBlock exists already when migration starts) or may
+behave strangely (if the RAMBlock is created or destroyed while a
+migration is in progress).
 
-> On 07/27/2017 04:14 PM, Cornelia Huck wrote:
-> > On Thu, 27 Jul 2017 15:37:08 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> On 07/27/2017 01:59 PM, Cornelia Huck wrote:  
-> >>> On Thu, 27 Jul 2017 03:54:18 +0200
-> >>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> >>>     
-> >>>> When a channel path is hot plugged into a CSS, we should generate
-> >>>> a channel path initialized CRW (channel report word). The current
-> >>>> code does not do that, instead it puts a stub function with a TODO
-> >>>> reminder there.
-> >>>>
-> >>>> This implements the css_generate_chp_crws() function by:
-> >>>> 1. refactor the existing code.
-> >>>> 2. add an @add parameter to provide future callers with the
-> >>>>    capability of generating channel path permanent error with
-> >>>>    facility not initialized CRW.
-> >>>> 3. add a @hotplugged parameter, so to opt out generating initialized
-> >>>>    CRWs for predefined channel paths.    
-> >>>
-> >>> I'm not 100% sure whether the logic is correct here. Let me elaborate:
-> >>>
-> >>> The current code flow when hotplugging a device is:
-> >>> - Generate the schib.
-> >>> - Check if any of the chpids refers to a not yet existing channel path;
-> >>>   generate it if that is the case.
-> >>> - Post a crw for the subchannel.
-> >>>
-> >>> The second step is where the current code seems to be not quite correct
-> >>> already. It is fine for coldplugged devices, but I really think we need
-> >>> to make sure that all referenced channel paths are in place before we
-> >>> hotplug a new device. It was not really relevant when we just had one
-> >>> very virtual channel path, and 3270 is experimental so it is not a
-> >>> problem in practice.    
-> >>
-> >> What do you mean by not quite correct?  Are we somewhere in conflict with
-> >> the AR (if yes could you give me a pointer)? Or is it a modeling concern?
-> >> Or is it about the user interface design? Or any combination of these?  
-> > 
-> > Modeling. Conceptually, you need at least one channel path to access a
-> > device; the subchannel is more or less a followup.
-> > 
-> > As up to now, we only had a dummy channel path simply to satisfy the
-> > architecture, it did not really matter when it was 'created'. As it is
-> > always 'there' from beginning, there was no need for any CRW either. If
-> > there's now a need for real channel path modeling, we unfortunately
-> > have to give this some thought :)
-> >   
-> 
-> We have considered this 'always there' internally. Was my train of thought
-> to but then I came to the conclusion it ain't necessarily true. One can
-> IPL with initrd and end up with a guest with no ccw devices whatsoever
-> (IMHO; the default net can be disabled -net none).
+This is too complicated to try to fix in 2.10, so for this release,
+simply disable the new feature.  We can reenable and fix or redesign
+it in 2.11.
 
-Yes. But this is an edge case that was never relevant. We should do it
-correctly, of course; but it isn't a problem in practice.
+This commit simply removes the code in get_page_addr_code() which
+would trigger the execute-from-MMIO, and leaves the bulk of the code
+(and the implementation of the per-device code in the xilinx-spips
+device) in place, unused.
 
-(If I'm not mistaken, Linux scans for chpids it does not know yet on
-device hotplug anyway, due to the reasons I outlined in my other mail.)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is a very blunt hammer approach to the problem.  There may be
+slightly more surgical approaches possible, but we're getting close
+to 2.10 release, so this is just the minimal "make sure we don't have
+a problem in 2.10" change, so we can do the right thing in 2.11.
+If somebody who has a more immediate requirement for the feature
+wants to propose something else, that would be OK too, but they
+need to write the patch...
 
-> 
-> >>  
-> >>>
-> >>> This, of course, implies we need deeper changes. We need to create the
-> >>> channel paths before the subchannel is created and refuse hotplug of a
-> >>> device if not all channel paths it needs are defined. This means we
-> >>> need some things before we can claim real channel path support:
-> >>> - Have a way to specify channel paths on the command line resp. when
-> >>>   hotplugging. This implies they need to be real objects.
-> >>> - Have a way to specify which channel paths belong to a subchannel in
-> >>>   the same context. Keep existing device types working with the current
-> >>>   method.
-> >>> - Give channel paths states: Defined, configured. The right time for a
-> >>>   CRW is the transition between those states.
-> >>> - Only queue a 'device come' CRW for a subchannel if at least one of
-> >>>   its channel paths is in the configured state. Detach or make not
-> >>>   operational a subchannel if all of its paths are deconfigured.
-> >>>     
-> >>
-> >> AFAIU in your opinion our model is to simple and needs to get more
-> >> complex. What benefits do we expect from the added complexity? I mean
-> >> our current model works (and I'm not sure what limitations do we
-> >> want to get rid of, or even what are the relevant limitations we have.)  
-> > 
-> > I was under the impression that we want to support multiple, 'real'
-> > channel paths for vfio-ccw. Did I misunderstand?
-> >   
-> 
-> You assumed correctly. I've asked Dong Jia a very similar question when
-> this first popped up as a part of his channel path virtualization work
-> (he is referring to at the beginning of this cover letter).
-> 
-> Unfortunately that question is still unanswered. I've speculated maybe you
-> were involved in the decision of opting for 'real' channel paths, so this
-> is why I asked.
-> 
-> So my intention was to ask: What benefits do we expect from these 'real'
-> virtual channel paths? 
+ accel/tcg/cputlb.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-Path grouping and friends come to mind. This depends on whether you
-want to pass-through channel paths to the guest, of course, but you
-really need management to deal with things like reserve/release on ECKD
-correctly. Also failover etc. Preferred channel paths are not relevant
-on modern hardware anymore, fortunately (AFAIK).
-
-> 
-> (I believe models make sense (and can be judged) only in a context of a
-> problem. So before voting for a more complex model, I would like too
-> understand the problem.)
-> 
-> Regards,
-> Halil
-> 
-> >>  
-> >>> Something along those lines also matches better what I've seen on z/VM
-> >>> or LPAR. I realize that it's not easy :(
-> >>>
-> >>> tl;dr: I don't think we want chp crws until after we have a good chp
-> >>> model.    
-> >>
-> >> I fully agree with this point.  
-> > 
-> > Great.
-> >   
-> 
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 85635ae..64f9600 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -858,16 +858,6 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
+     mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
+     if (memory_region_is_unassigned(mr)) {
+-        qemu_mutex_lock_iothread();
+-        if (memory_region_request_mmio_ptr(mr, addr)) {
+-            qemu_mutex_unlock_iothread();
+-            /* A MemoryRegion is potentially added so re-run the
+-             * get_page_addr_code.
+-             */
+-            return get_page_addr_code(env, addr);
+-        }
+-        qemu_mutex_unlock_iothread();
+-
+         cpu_unassigned_access(cpu, addr, false, true, 0, 4);
+         /* The CPU's unassigned access hook might have longjumped out
+          * with an exception. If it didn't (or there was no hook) then
+-- 
+2.7.4
