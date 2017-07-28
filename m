@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1db4W5-0006bb-Mv
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:37:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1db4Z2-00017X-1F
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:40:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1db4W2-0004N0-64
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:37:17 -0400
-Date: Fri, 28 Jul 2017 14:37:09 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170728143709.5bfee839@gondolin>
-In-Reply-To: <3a4f3a2a-cebc-e730-4a63-2616a17f5f2b@redhat.com>
-References: <20170728053610.15770-1-f4bug@amsat.org>
-	<20170728053610.15770-6-f4bug@amsat.org>
-	<a7fdc125-9a1b-bec3-915f-e8f764816b0d@redhat.com>
-	<c44770f5-df9d-2340-5dba-2f5db7acd046@redhat.com>
-	<20170728135614.3f14e3ad@gondolin>
-	<3abbfa87-d882-39ab-b4ab-66f3e68a2fb4@redhat.com>
-	<20170728141353.3b8382be@gondolin>
-	<3a4f3a2a-cebc-e730-4a63-2616a17f5f2b@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1db4Yy-0006zY-BX
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:40:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1db4Yy-0006yi-2N
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:40:16 -0400
+References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
+	<CAFEAcA_9_YVyDC5jbLT=YXT64MFkxOrpxV7eydCEK_Lc4oSY5g@mail.gmail.com>
+	<06a9ae13-4279-1210-0664-0faf5f55f830@redhat.com>
+	<CAFEAcA-oowaaK9Amn2Achj4a7X-HGOYgNF_7M=rmdOzbick3JA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ffae613e-92cf-6702-39c3-13b05f378687@redhat.com>
+Date: Fri, 28 Jul 2017 07:40:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/47] MAINTAINERS: add missing KVM entry
+In-Reply-To: <CAFEAcA-oowaaK9Amn2Achj4a7X-HGOYgNF_7M=rmdOzbick3JA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2FGPq5UIKBXfu9vN00m6e7e5HN44a6Fuk"
+Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVk?= =?UTF-8?B?w6k=?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Fri, 28 Jul 2017 14:25:08 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2FGPq5UIKBXfu9vN00m6e7e5HN44a6Fuk
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <ffae613e-92cf-6702-39c3-13b05f378687@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
+References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
+ <CAFEAcA_9_YVyDC5jbLT=YXT64MFkxOrpxV7eydCEK_Lc4oSY5g@mail.gmail.com>
+ <06a9ae13-4279-1210-0664-0faf5f55f830@redhat.com>
+ <CAFEAcA-oowaaK9Amn2Achj4a7X-HGOYgNF_7M=rmdOzbick3JA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-oowaaK9Amn2Achj4a7X-HGOYgNF_7M=rmdOzbick3JA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Sometime people pull changes too early, or otherwise I want to comment
-> on the timing of the change...
+On 07/28/2017 07:19 AM, Peter Maydell wrote:
+> On 28 July 2017 at 13:08, Eric Blake <eblake@redhat.com> wrote:
+>> On 07/28/2017 04:04 AM, Peter Maydell wrote:
+>>> On 28 July 2017 at 09:55, Vladimir Sementsov-Ogievskiy
+>>> <vsementsov@virtuozzo.com> wrote:
+>>>> To make logs more readable prefix all hex values with '0x' mark.
+>>>> This is needed for consistency too, as a lot of hex values are alrea=
+dy
+>>>> prefixed with '0x'. Also, bring all hex outputs to the common form -=
 
-Might be helpful to add magic to checkpatch to verify that any headers
-change is done via running the script against a specified Linux
-version. (This is beyond my non-existing perl skills, unfortunately.)
+>>>> use '%#', not '0x%'.
+>>>>
+>>>> This patch is done by two commands:
+>>>> find . -name trace-events | \
+>>>>  xargs sed -i 's/%\([-+ *.0-9]*\([hljztL]\|ll\|hh\)\?\(x\|X\|"\s*PRI=
+x\)\)/%#\1/g'
+>>
+>> Why PRIx32 but not PRIX32?
+>=20
+> As it happens none of our trace-events files use PRIX...
 
-> I don't know, I already get too much
-> qemu-devel email. :)
+True for now, but if we're going to add a checkpatch.pl rule to enforce
+things, then the regex should cover it for future additions.
 
-I can certainly agree with that statement :)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2FGPq5UIKBXfu9vN00m6e7e5HN44a6Fuk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7MKEACgkQp6FrSiUn
+Q2oP8gf/fdbSB7wMuTWLnB7a1yeZOwMv0WlbyHbZ8XUy8Tv3fM96U7g7jK9uB9yF
+QjRmbiS5uZkjTZbs/BvHsTwUsj/ncaOhSIePBQ9K9817fkqh/n2Y1iQSuo/kNIqz
+ePeoO3GWgoBA8oSKID3mL5YQ00EhL+LVx0IOFSA3aFJoCm6wnO0D5y3O5LWasaK/
+wtirucFp9tX86aKdGTmt6lCkUgtrtMpSOwxzIYOJ0JShrrSozgay/bntx9/rKtqq
+c05ALEI8Ingl7V5JcHBMFFHkNhkkoELWtQpSmg+qoSUUoPXfPpamGvwAgX2W9FjC
+wdtK0JfAlVHx5S6jSNPEfuYsHlIUzQ==
+=orhE
+-----END PGP SIGNATURE-----
+
+--2FGPq5UIKBXfu9vN00m6e7e5HN44a6Fuk--
