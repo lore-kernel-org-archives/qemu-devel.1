@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db0dS-0006X3-4q
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:28:39 -0400
+	(envelope-from <groug@kaod.org>) id 1db0oW-0000wp-34
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db0dO-0001yt-5V
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:28:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43760)
+	(envelope-from <groug@kaod.org>) id 1db0oS-0002ri-2C
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:40:04 -0400
+Received: from 8.mo7.mail-out.ovh.net ([46.105.77.114]:49773)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1db0dN-0001xb-SV
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:28:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAE0D22759
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 08:28:32 +0000 (UTC)
-Date: Fri, 28 Jul 2017 09:28:26 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170728082826.GE31495@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170727140025.392-1-kraxel@redhat.com>
-	<20170727140025.392-5-kraxel@redhat.com>
-	<20170727174522.GA29600@redhat.com>
-	<1501222909.10943.1.camel@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1db0oR-0002qg-P9
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:40:00 -0400
+Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 45087657EE
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:39:58 +0200 (CEST)
+Date: Fri, 28 Jul 2017 10:39:45 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170728103945.3ad4713f@bahia.lan>
+In-Reply-To: <cd9ef0ba-c329-bac2-6b94-a8397d7b45cc@kaod.org>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<07a10650-f216-99ea-fb48-286887279bf1@linux.vnet.ibm.com>
+	<20170727183926.246b5beb@bahia.lan>
+	<20bc63c9-0649-5b82-5042-61e7313cf833@ozlabs.ru>
+	<20170728034042.GD3098@umbus.fritz.box>
+	<cd9ef0ba-c329-bac2-6b94-a8397d7b45cc@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1501222909.10943.1.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 4/7] ui: add multimedia keys
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/85hzzIK/jSZ.jfI2eXQQ4GH";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 00/26] spapr: add
+ support for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +36,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Jul 28, 2017 at 08:21:49AM +0200, Gerd Hoffmann wrote:
-> On Thu, 2017-07-27 at 18:45 +0100, Daniel P. Berrange wrote:
-> > On Thu, Jul 27, 2017 at 04:00:22PM +0200, Gerd Hoffmann wrote:
-> > > Add multimedia keys to QKeyCodes and to the keymaps.
-> > >=20
-> > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > > Message-id: 20170726152918.11995-5-kraxel@redhat.com
-> > > ---
-> > > =C2=A0ui/input-keymap.c | 44
-> > > ++++++++++++++++++++++++++++++++++++++++++++
-> > > =C2=A0qapi-schema.json=C2=A0=C2=A0| 28 +++++++++++++++++++++++++++-
-> > > =C2=A02 files changed, 71 insertions(+), 1 deletion(-)
-> > >=20
+--Sig_/85hzzIK/jSZ.jfI2eXQQ4GH
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> > I'm curious what the 'AC_' prefix on all these is indicating ?
-> > Do we actually need it ?
+On Fri, 28 Jul 2017 07:35:34 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> On 07/28/2017 05:40 AM, David Gibson wrote:
+> > On Fri, Jul 28, 2017 at 01:27:05PM +1000, Alexey Kardashevskiy wrote: =
+=20
+> >> On 28/07/17 02:39, Greg Kurz wrote: =20
+> >>> On Wed, 26 Jul 2017 17:31:17 -0300
+> >>> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
+> >>> =20
+> >>>> I've tested the patch set using Greg's Github branch. It worked fine=
+ in=20
+> >>>> my tests
+> >>>> using a Fedora 26 and an Ubuntu 17.04 guests. I have two observations
+> >>>> though:
+> >>>>
+> >>>> 1 - This is not related to this patch set per se because it is=20
+> >>>> reproducible on master, but
+> >>>> I think it is interfering with this new feature.  There is a=20
+> >>>> warning/error message in
+> >>>> the kernel right after SLOF that goes:
+> >>>>
+> >>>> (...) =20
+> >>>>   -> smp_release_cpus()   =20
+> >>>> spinning_secondaries =3D 0
+> >>>>   <- smp_release_cpus()
+> >>>> Linux ppc64le
+> >>>> #1 SMP Mon Jul 1[    0.030450] pci 0000:00:02.0: of_irq_parse_pci:=20
+> >>>> failed with rc=3D-22
+> >>>> [    0.030552] pci 0000:00:0f.0: of_irq_parse_pci: failed with rc=3D=
+-22
+> >>>> [  OK  ] Started Security Auditing Service.
+> >>>> (...)
+> >>>> =20
+> >>>
+> >>> This is a regression in QEMU master introduced by this commit:
+> >>>
+> >>> commit b87680427e8a3ff682f66514e99a8344e7437247
+> >>> Author: C=C3=A9dric Le Goater <clg@kaod.org>
+> >>> Date:   Wed Jul 5 19:13:15 2017 +0200
+> >>>
+> >>>     spapr: populate device tree depending on XIVE_EXPLOIT option
+> >>>    =20
+> >>>     When XIVE is supported, the device tree should be populated
+> >>>     accordingly and the XIVE memory regions mapped to activate MMIOs.
+> >>>    =20
+> >>>     Depending on the design we choose, we could also allocate differe=
+nt
+> >>>     ICS and ICP objects, or switch between objects. This needs to be
+> >>>     discussed.
+> >>>    =20
+> >>>     Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> >>>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>
+> >>> It is very similar to the issue that motivated the new KVMPPC_H_UPDAT=
+E_PHANDLE
+> >>> hcall (see patch 24 and 26 in this series):
+> >>>
+> >>> - QEMU creates an "interrupt-controller" node with a phandle property
+> >>>   with the value 0x1111
+> >>> - QEMU passes the FDT to SLOF
+> >>> - SLOF converts all references to the phandle to an SLOF internal val=
+ue
+> >>> =20
+> >>> =3D> from now on (ie, until the next machine reset), the guest only k=
+nows =20
+> >>>    the OF phandle.
+> >>>
+> >>> - during CAS, if we go XICS, we send back an updated FDT with the
+> >>>   phandle of the "interrupt-controller" node reverted to 0x1111
+> >>> =20
+> >>> =3D> the guest complains because all cold-plugged devices nodes refer=
+ =20
+> >>>    to the OF phandle, not 0x1111
+> >>>
+> >>> A solution is to use the value set by KVMPPC_H_UPDATE_PHANDLE during =
+CAS
+> >>> instead of 0x1111. I could verify it makes the guest warning disappea=
+r.
+> >>>
+> >>> I'll send a dedicated patchset to fix this in 2.10. =20
+> >>
+> >>
+> >> The SLOF I pushed for 2.10 does not have it though. And the rest of XI=
+VE is
+> >> not targeted for 2.10 anyway. So imho the solution is reverting "spapr:
+> >> populate device tree depending on XIVE_EXPLOIT option" for 2.10. =20
+> >=20
+> > I agree, I've applied the revert to ppc-for-2.10 now. =20
 >=20
-> Seems to stand for "application control".
+> Sure.=20
 >=20
-> # grep " AC " include/standard-headers/linux/input-event-codes.h=C2=A0
-> =C2=A0* AC - Application Control
-> #define KEY_STOP=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0128=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/=
-* AC Stop */
-> #define KEY_PROPS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0130=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* A=
-C Properties */
-> #define KEY_UNDO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0131=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/=
-* AC Undo */
-> [ ... ]
+> Greg, have you found a solution to get around this problem or do we need
+> to populate the device tree with the interrupt controller node for SLOF ?=
+=20
 >=20
-> I think it is better to keep it, even if it is inconsistent because we
-> already have stop + find without prefix.   Just dropping the ac_ prefix
-> will not work for some keys, ac_home for example.
 
-Ok
+With commit b87680427e8a, spapr_dt_xics() is called twice actually: first
+time during machine reset and a second time during CAS.
 
+The first call means we start in XICS mode by default. But I don't understa=
+nd
+why it is also called during CAS: if the guest didn't advertise XIVE, then
+we don't have anything to do, do we ?
+
+Cheers,
+
+--
+Greg
+
+> Thanks,
 >=20
-> > Missing Q_KEY_CODE_MEDIASELECT entry - presumably it was supposed
-> > to map to=C2=A0=C2=A0KEY_MEDIA
+> C. =20
 >=20
-> There is KEY_SELECT too, but not KEY_MEDIASELECT.  Hmm.
 
-I found a keyboard with a key labelled "Media"  and when pressed
-it generates Linux key 171  / AT set1  0xe0 0x01 which is KEY_CONFIG
-and GNOME pops up the control panel when pressed !
 
-Would be interested to know results of "showkey" and "showkey -s" for
-any other keyboards with a key labelled "Media", since I don't entirely
-trust this particular one to be representative of general usage.
+--Sig_/85hzzIK/jSZ.jfI2eXQQ4GH
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAll6+FEACgkQAvw66wEB28KvXgCfaiv7meIOZgeqMo6WO1xW0pCG
+l2QAn0n+trpl5FVsN9/9OSpqiGh5BNr5
+=unDM
+-----END PGP SIGNATURE-----
+
+--Sig_/85hzzIK/jSZ.jfI2eXQQ4GH--
