@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db25C-00046Z-1l
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:01:23 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1db25C-000472-Sl
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1db256-000431-CE
+	(envelope-from <vsementsov@virtuozzo.com>) id 1db258-00044p-N1
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:01:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53648)
+Received: from mailhub.sw.ru ([195.214.232.25]:6896 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1db256-000421-6t
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:01:16 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 052E7A2920
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:01:15 +0000 (UTC)
-Date: Fri, 28 Jul 2017 11:01:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170728100107.GJ31495@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170727140025.392-1-kraxel@redhat.com>
-	<20170727140025.392-5-kraxel@redhat.com>
-	<20170727174522.GA29600@redhat.com>
-	<1501222909.10943.1.camel@redhat.com>
-	<20170728082826.GE31495@redhat.com>
-	<1501235829.10943.11.camel@redhat.com>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1db258-00042z-7e
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:01:18 -0400
+References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
+	<20170728114159.519eacf4@gondolin>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <f4ae26f2-fd4f-1b38-e20a-1d6ff4844b64@virtuozzo.com>
+Date: Fri, 28 Jul 2017 13:01:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1501235829.10943.11.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 4/7] ui: add multimedia keys
+In-Reply-To: <20170728114159.519eacf4@gondolin>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +29,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-On Fri, Jul 28, 2017 at 11:57:09AM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> > > > Missing Q_KEY_CODE_MEDIASELECT entry - presumably it was supposed
-> > > > to map to=C2=A0=C2=A0KEY_MEDIA
-> > >=20
-> > > There is KEY_SELECT too, but not KEY_MEDIASELECT.=C2=A0=C2=A0Hmm.
-> >=20
-> > I found a keyboard with a key labelled "Media"=C2=A0=C2=A0and when pr=
-essed
-> > it generates Linux key 171=C2=A0=C2=A0/ AT set1=C2=A0=C2=A00xe0 0x01 =
-which is KEY_CONFIG
-> > and GNOME pops up the control panel when pressed !
->=20
-> Oh joy!
->=20
-> I guess we should just leave that unmapped for 2.10 and sort it later
-> when switching to keycodemapdb ...
+28.07.2017 12:41, Cornelia Huck wrote:
+> On Fri, 28 Jul 2017 11:55:47 +0300
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+>
+>> To make logs more readable prefix all hex values with '0x' mark.
+>> This is needed for consistency too, as a lot of hex values are already
+>> prefixed with '0x'. Also, bring all hex outputs to the common form -
+>> use '%#', not '0x%'.
+> This is problematic if you try to match up things in the trace with
+> things that don't have the leading 0x elsewhere. See my comments on the
+> s390x changes below.
 
-Ok, I found a reference
+Hmm, not so easy..
 
-  http://www.computer-engineering.org/ps2keyboard/scancodes1.html
+All your remarks satisfy the following criteria (and it seems logical 
+anyway):
 
-Lists 'Media select' as generating 0xe0 0x6d, which corresponds
-to KEY_MEDIA in Linux.
+hex numbers grouped into patterns like NUM.NUM.NUM (several numbers 
+splitted by period) are allowed to be printed without 0x prefixes.
 
-So that confirms my keyboard is simply incorrectly labelled or
-wired up, as suspected.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>
+>> This patch is done by two commands:
+>> find . -name trace-events | \
+>>   xargs sed -i 's/%\([-+ *.0-9]*\([hljztL]\|ll\|hh\)\?\(x\|X\|"\s*PRIx\)\)/%#\1/g'
+>> find . -name trace-events | xargs sed -i 's/0x%#/%#/g'
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>> diff --git a/hw/s390x/trace-events b/hw/s390x/trace-events
+>> index f07e974678..a18679c5cf 100644
+>> --- a/hw/s390x/trace-events
+>> +++ b/hw/s390x/trace-events
+>> @@ -2,15 +2,15 @@
+>>   
+>>   # hw/s390x/css.c
+>>   css_enable_facility(const char *facility) "CSS: enable %s"
+>> -css_crw(uint8_t rsc, uint8_t erc, uint16_t rsid, const char *chained) "CSS: queueing crw: rsc=%x, erc=%x, rsid=%x %s"
+>> -css_chpid_add(uint8_t cssid, uint8_t chpid, uint8_t type) "CSS: add chpid %x.%02x (type %02x)"
+>> -css_new_image(uint8_t cssid, const char *default_cssid) "CSS: add css image %02x %s"
+>> -css_assign_subch(const char *do_assign, uint8_t cssid, uint8_t ssid, uint16_t schid, uint16_t devno) "CSS: %s %x.%x.%04x (devno %04x)"
+>> -css_io_interrupt(int cssid, int ssid, int schid, uint32_t intparm, uint8_t isc, const char *conditional) "CSS: I/O interrupt on sch %x.%x.%04x (intparm %08x, isc %x) %s"
+>> -css_adapter_interrupt(uint8_t isc) "CSS: adapter I/O interrupt (isc %x)"
+>> -css_do_sic(uint16_t mode, uint8_t isc) "CSS: set interruption mode %x on isc %x"
+>> +css_crw(uint8_t rsc, uint8_t erc, uint16_t rsid, const char *chained) "CSS: queueing crw: rsc=%#x, erc=%#x, rsid=%#x %s"
+> ok
+>
+>> +css_chpid_add(uint8_t cssid, uint8_t chpid, uint8_t type) "CSS: add chpid %#x.%#02x (type %#02x)"
+> Not ok. This is supposed to mimic the identifier used in the Linux
+> kernel (sysfs and elsewhere), which is of the form 0.42. (Changing type
+> is fine.)
+>
+>> +css_new_image(uint8_t cssid, const char *default_cssid) "CSS: add css image %#02x %s"
+> ok
+>
+>> +css_assign_subch(const char *do_assign, uint8_t cssid, uint8_t ssid, uint16_t schid, uint16_t devno) "CSS: %s %#x.%#x.%#04x (devno %#04x)"
+> Again, not ok. This is a bus id, which uses the form fe.1.4711 and is
+> used both on the command line and in the Linux kernel. Changing devno
+> is debatable.
+>
+>> +css_io_interrupt(int cssid, int ssid, int schid, uint32_t intparm, uint8_t isc, const char *conditional) "CSS: I/O interrupt on sch %#x.%#x.%#04x (intparm %#08x, isc %#x) %s"
+> Again x.y.zzzz bus id. intparm is ok, isc is a value in the 0..7 range,
+> so not really useful, but does not hurt.
+>
+>> +css_adapter_interrupt(uint8_t isc) "CSS: adapter I/O interrupt (isc %#x)"
+> Dito on the isc, but does not really hurt.
+>
+>> +css_do_sic(uint16_t mode, uint8_t isc) "CSS: set interruption mode %#x on isc %#x"
+> Dito on the isc, mode is fine.
+>
+>>   
+>>   # hw/s390x/virtio-ccw.c
+>> -virtio_ccw_interpret_ccw(int cssid, int ssid, int schid, int cmd_code) "VIRTIO-CCW: %x.%x.%04x: interpret command %x"
+>> -virtio_ccw_new_device(int cssid, int ssid, int schid, int devno, const char *devno_mode) "VIRTIO-CCW: add subchannel %x.%x.%04x, devno %04x (%s)"
+>> -virtio_ccw_set_ind(uint64_t ind_loc, uint8_t ind_old, uint8_t ind_new) "VIRTIO-CCW: indicator at %" PRIu64 ": %x->%x"
+>> +virtio_ccw_interpret_ccw(int cssid, int ssid, int schid, int cmd_code) "VIRTIO-CCW: %#x.%#x.%#04x: interpret command %#x"
+> x.y.zzzz bus id, cmd_code is ok
+>
+>> +virtio_ccw_new_device(int cssid, int ssid, int schid, int devno, const char *devno_mode) "VIRTIO-CCW: add subchannel %#x.%#x.%#04x, devno %#04x (%s)"
+> x.y.zzzz bus id, devno debatable
+>
+>> +virtio_ccw_set_ind(uint64_t ind_loc, uint8_t ind_old, uint8_t ind_new) "VIRTIO-CCW: indicator at %" PRIu64 ": %#x->%#x"
+> ok
+>
+>> diff --git a/target/s390x/trace-events b/target/s390x/trace-events
+>> index 1574033e31..95a19ecf75 100644
+>> --- a/target/s390x/trace-events
+>> +++ b/target/s390x/trace-events
+>> @@ -6,9 +6,9 @@ set_skeys_nonzero(int rc) "SKEY: Call to set_skeys unexpectedly returned %d"
+>>   
+>>   # target/s390x/ioinst.c
+>>   ioinst(const char *insn) "IOINST: %s"
+>> -ioinst_sch_id(const char *insn, int cssid, int ssid, int schid) "IOINST: %s (%x.%x.%04x)"
+>> -ioinst_chp_id(const char *insn, int cssid, int chpid) "IOINST: %s (%x.%02x)"
+>> -ioinst_chsc_cmd(uint16_t cmd, uint16_t len) "IOINST: chsc command %04x, len %04x"
+>> +ioinst_sch_id(const char *insn, int cssid, int ssid, int schid) "IOINST: %s (%#x.%#x.%#04x)"
+> x.y.zzzz bus id
+>
+>> +ioinst_chp_id(const char *insn, int cssid, int chpid) "IOINST: %s (%#x.%#02x)"
+> m.nn bus id
+>
+>> +ioinst_chsc_cmd(uint16_t cmd, uint16_t len) "IOINST: chsc command %#04x, len %#04x"
+> ok
+>
+>>   
+>>   # target/s390x/kvm.c
+>>   kvm_enable_cmma(int rc) "CMMA: enabling with result code %d"
+
+
+-- 
+Best regards,
+Vladimir
