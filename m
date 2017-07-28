@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dbAcd-0006Rf-NJ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:08:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dbAgZ-0000dF-Lz
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:12:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dbAcc-0006rk-Ir
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:08:27 -0400
-References: <20170725211523.3998-1-eblake@redhat.com>
-	<20170725211523.3998-9-eblake@redhat.com>
-	<87k22sjsu4.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <176555af-931f-213e-c8f5-190d4e03bb13@redhat.com>
-Date: Fri, 28 Jul 2017 14:08:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dbAgW-0001Kq-HW
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:12:29 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:38529)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dbAgW-0001K9-A5
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 15:12:28 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id f21so101971957wrf.5
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:12:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87k22sjsu4.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0HvUDrEpvtD3EcPXMcWMjh13aTJNJID2x"
-Subject: Re: [Qemu-devel] [PATCH v3 08/12] qtests: convert tests to use
- qmp_cmd
+In-Reply-To: <1500906730-26467-5-git-send-email-kwolf@redhat.com>
+References: <1500906730-26467-1-git-send-email-kwolf@redhat.com>
+	<1500906730-26467-5-git-send-email-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Jul 2017 20:12:06 +0100
+Message-ID: <CAFEAcA-Zvk_m4JLVNXzBOizBWEwAMAAFaDLoR7+s=8MnKBsSQw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 4/5] block: Skip implicit nodes in
+ query-block/blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,136 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>, stefanha@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0HvUDrEpvtD3EcPXMcWMjh13aTJNJID2x
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>,
- John Snow <jsnow@redhat.com>, stefanha@redhat.com
-Message-ID: <176555af-931f-213e-c8f5-190d4e03bb13@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/12] qtests: convert tests to use
- qmp_cmd
-References: <20170725211523.3998-1-eblake@redhat.com>
- <20170725211523.3998-9-eblake@redhat.com> <87k22sjsu4.fsf@dusky.pond.sub.org>
-In-Reply-To: <87k22sjsu4.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 24 July 2017 at 15:32, Kevin Wolf <kwolf@redhat.com> wrote:
+> Commits 0db832f and 6cdbceb introduced the automatic insertion of filter
+> nodes above the top layer of mirror and commit block jobs. The
+> assumption made there was that since libvirt doesn't do node-level
+> management of the block layer yet, it shouldn't be affected by added
+> nodes.
+>
+> This is true as far as commands issued by libvirt are concerned. It only
+> uses BlockBackend names to address nodes, so any operations it performs
+> still operate on the root of the tree as intended.
+>
+> However, the assumption breaks down when you consider query commands,
+> which return data for the wrong node now. These commands also return
+> information on some child nodes (bs->file and/or bs->backing), which
+> libvirt does make use of, and which refer to the wrong nodes, too.
+>
+> One of the consequences is that oVirt gets wrong information about the
+> image size and stops the VM in response as long as a mirror or commit
+> job is running:
+>
+> https://bugzilla.redhat.com/show_bug.cgi?id=1470634
+>
+> This patch fixes the problem by hiding the implicit nodes created
+> automatically by the mirror and commit block jobs in the output of
+> query-block and BlockBackend-based query-blockstats as long as the user
+> doesn't indicate that they are aware of those nodes by providing a node
+> name for them in the QMP command to start the block job.
 
-On 07/28/2017 01:53 PM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> Now that we have the qmp_cmd() helper, we can further simplify
->> some of the tests by using it.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
+Hi -- Coverity complains about dereference-after-NULL-check
+for this change (CID 1378275).
 
->>      }
->> -    resp =3D qmp("{'execute': 'qom-list-types',"
->> -               " 'arguments': %p }", args);
->> +    resp =3D qmp_cmd("qom-list-types", QOBJECT(args));
->=20
-> This one's a clear win.
+> --- a/block/qapi.c
+> +++ b/block/qapi.c
+> @@ -64,7 +64,6 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>          info->backing_file = g_strdup(bs->backing_file);
+>      }
+>
+> -    info->backing_file_depth = bdrv_get_backing_file_depth(bs);
+>      info->detect_zeroes = bs->detect_zeroes;
+>
+>      if (blk && blk_get_public(blk)->throttle_state) {
+> @@ -125,6 +124,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>
+>      bs0 = bs;
+>      p_image_info = &info->image;
+> +    info->backing_file_depth = 0;
+>      while (1) {
+>          Error *local_err = NULL;
+>          bdrv_query_image_info(bs0, p_image_info, &local_err);
+> @@ -133,13 +133,21 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>              qapi_free_BlockDeviceInfo(info);
+>              return NULL;
+>          }
+> +
+>          if (bs0->drv && bs0->backing) {
+> +            info->backing_file_depth++;
+>              bs0 = bs0->backing->bs;
+>              (*p_image_info)->has_backing_image = true;
+>              p_image_info = &((*p_image_info)->backing_image);
+>          } else {
+>              break;
+>          }
+> +
+> +        /* Skip automatically inserted nodes that the user isn't aware of for
+> +         * query-block (blk != NULL), but not for query-named-block-nodes */
+> +        while (blk && bs0 && bs0->drv && bs0->implicit) {
+> +            bs0 = backing_bs(bs0);
+> +        }
+>      }
 
-Well, it'd be even NICER if I could pass QDict instead of QObject around.=
+The analysis is a bit confusing because it involves a loop, but
+this while loop at the bottom of the "while (1)" implies that
+bs0 could be NULL here, in which case we'll stop iterating through
+this while(), which will cause us to go up to the top of the while(1),
+where we call bdrv_query_image_info(bs0, ...), which assumes that
+bs0 is non-NULL.
 
+Either we need to handle bs0 == NULL in some way other than
+crashing in the call to bdrv_query_image_info(), or bs0
+can't ever be NULL here in which case it's an unnecessary
+test in the while condition.
 
-
->> +++ b/tests/ide-test.c
->> @@ -651,7 +651,7 @@ static void test_retry_flush(const char *machine)
->>      qmp_eventwait("STOP");
->>
->>      /* Complete the command */
->> -    qmp_discard_response("{'execute':'cont' }");
->> +    qmp_cmd_discard_response("cont", NULL);
->=20
-> This one isn't.
-
-Fair enough.
-
->> @@ -86,7 +87,7 @@ void set_context(QOSState *s)
->>
->>  static QDict *qmp_execute(const char *command)
->>  {
->> -    return qmp("{ 'execute': %s }", command);
->> +    return qmp_cmd(command, NULL);
->=20
-> Marginal.
->=20
->>  }
->>
->>  void migrate(QOSState *from, QOSState *to, const char *uri)
->> @@ -106,7 +107,7 @@ void migrate(QOSState *from, QOSState *to, const c=
-har *uri)
->>      QDECREF(rsp);
->>
->>      /* Issue the migrate command. */
->> -    rsp =3D qmp("{ 'execute': 'migrate', 'arguments': { 'uri': %s } }=
-", uri);
->> +    rsp =3D qmp_cmd("migrate", qobject_from_jsonf("{ 'uri': %s }", ur=
-i));
->=20
-> Not a simplification.  The opposite, I'm afraid.
->=20
-> I could become one if qmp_cmd() worked like this:
->=20
->        rsp =3D qmp_cmd("migrate", "{ 'uri': %s }", uri));
-
-Oh, nice. But it makes qmp_cmd become varargs, at which point...
-
->=20
-> Even better if qmp_cmd("cont", "") just works.  Hmm, unles gcc whines
-> about the empty format string.
-
-yeah, we'd have to figure out a way to shut up gcc when no arguments are
-wanted.  Here's a compromise that does the best for all three categories
-you pointed out above:
-
-qmp_cmd("cont");
-qmp_cmd_args("migrate", "{ 'uri': %s  }", uri);
-qmp_cmd_dict("qom-list-types", args);
-
-Sounds like I have a plan of attack!  Also, since I'm somewhat churning
-on the stuff you did in a previous patch, should we reorder any of this
-series (add the helper first, then a single fix the callers that benefit
-from the helpers; instead of fixing callers twice in three patches)?
-
->=20
->>      g_assert(qdict_haskey(rsp, "return"));
->>      QDECREF(rsp);
->>
-> [More of the same snipped...]
->=20
-
-And, as I said in the cover letter, there's probably a lot more we could
-touch in the testsuite if we like the new pattern.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---0HvUDrEpvtD3EcPXMcWMjh13aTJNJID2x
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7i5wACgkQp6FrSiUn
-Q2p7OAf/fuJgsoJafBd3As/rxXoXBWBay6SCJiK9qMGq/MsiP81nHOE8E/ygWrIf
-faN+jEV2blrEjacp93gEO6LdiSWyCBOtyGpQ8Yw+kG9GlVoIJn98yBtx7aDBkqd5
-iZEFwfGy+qZD/6XCQyvHD4BBCyZR0jGp/lpQFGnO3Urcw4K3eQLHsG7sm6KEaFr+
-A6FF8OFuyfr+fjbS4Mk1H0ZRS6QMJBZL7H6Lpr271u1uNzBwL6BOpMxiGeYc01Fr
-BPNYmWP2Q8vY12aJ6H+JVygHmAg9LPHZhibFtXLgVddXITaVYr3WVMxBHSwelQp1
-KuwZghE+MrZKKKySU9MIIBGtTon43A==
-=Z1Hu
------END PGP SIGNATURE-----
-
---0HvUDrEpvtD3EcPXMcWMjh13aTJNJID2x--
+thanks
+-- PMM
