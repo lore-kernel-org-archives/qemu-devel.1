@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1db4OC-0008Ru-Ey
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:29:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1db4Py-0001aA-EH
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1db4O7-0004Ng-Vs
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:29:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60784)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1db4O7-0004LH-Ms
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:29:03 -0400
-Date: Fri, 28 Jul 2017 14:28:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170728142857.4fe29a6f@nial.brq.redhat.com>
-In-Reply-To: <20170726231754-mutt-send-email-mst@kernel.org>
-References: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
-	<20170725163315-mutt-send-email-mst@kernel.org>
-	<20170726160937.74e18968@nial.brq.redhat.com>
-	<20170726231754-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1db4Pu-0006Qp-RS
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:30:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1db4Pu-0006PS-L8
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1db4Ps-0001Pr-LN
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:30:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 995A12E80CB
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:30:52 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx
- based machine types
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 28 Jul 2017 12:24:48 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1706866 <1706866@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150113818340.31767.9409806903366726521.malonedeb@gac.canonical.com>
+Message-Id: <150124468873.13617.7184428463498981346.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1706866] Re: migrate:  add tls option in virsh,
+ migrate failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
+To: qemu-devel@nongnu.org
 
-On Wed, 26 Jul 2017 23:18:01 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+chan: The backtrace you show there - how did you capture that? Was that
+from a core dump  ?  If so then please do a   bt full  to get more
+detail.
 
-> On Wed, Jul 26, 2017 at 04:09:37PM +0200, Igor Mammedov wrote:
-> > On Tue, 25 Jul 2017 16:36:06 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Mon, Jul 24, 2017 at 03:50:20PM +0200, Igor Mammedov wrote:  
-> > > > w2k used to boot on QEMU until revision of FADT has
-> > > > been bumped to rev3
-> > > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
-> > > > 
-> > > > Keep PC machine at rev1 to remain compatible and Q35
-> > > > at rev3 where w2k isn't supported anyway so OSX could
-> > > > run as well.
-> > > > 
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > ---
-> > > > v2:
-> > > >    - make pc rev1 and q35 rev3.
-> > > >        "Michael S. Tsirkin" <mst@redhat.com>
-> > > > 
-> > > > PS:
-> > > > Only compile tested.
-> > > > 
-> > > > 
-> > > > CC: Programmingkid <programmingkidx@gmail.com>
-> > > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > 
-> > > > ---
-> > > >  hw/i386/acpi-build.c | 22 ++++++++++++++++++----
-> > > >  1 file changed, 18 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > index 6b7bade..b9c245c 100644
-> > > > --- a/hw/i386/acpi-build.c
-> > > > +++ b/hw/i386/acpi-build.c
-> > > > @@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
-> > > >  } AcpiMcfgInfo;
-> > > >  
-> > > >  typedef struct AcpiPmInfo {
-> > > > +    bool force_rev1_fadt;
-> > > >      bool s3_disabled;
-> > > >      bool s4_disabled;
-> > > >      bool pcihp_bridge_en;
-> > > > @@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-> > > >      Object *obj = NULL;
-> > > >      QObject *o;
-> > > >  
-> > > > +    pm->force_rev1_fadt = false;
-> > > >      pm->cpu_hp_io_base = 0;
-> > > >      pm->pcihp_io_base = 0;
-> > > >      pm->pcihp_io_len = 0;
-> > > >      if (piix) {
-> > > > +        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
-> > > > +        pm->force_rev1_fadt = true;
-> > > >          obj = piix;
-> > > >          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-> > > >          pm->pcihp_io_base =
-> > > > @@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-> > > >      }
-> > > >      fadt->century = RTC_CENTURY;
-> > > > +    if (pm->force_rev1_fadt) {
-> > > > +        return;
-> > > > +    }
-> > > >  
-> > > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-> > > >      fadt->reset_value = 0xf;
-> > > > @@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-> > > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-> > > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> > > > +    int fadt_size = sizeof(*fadt);
-> > > > +    int rev = 3;
-> > > >  
-> > > >      /* FACS address to be filled by Guest linker */
-> > > >      bios_linker_loader_add_pointer(linker,
-> > > > @@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > >      bios_linker_loader_add_pointer(linker,
-> > > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> > > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > -    bios_linker_loader_add_pointer(linker,
-> > > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > +    if (pm->force_rev1_fadt) {
-> > > > +        rev = 1;
-> > > > +        fadt_size = offsetof(typeof(*fadt), reset_register);    
-> > > 
-> > > I don't really like it that we are using structs to format fields - I
-> > > would prefer build_append_int_noprefix based APIs - but since we do,
-> > > let's add a proper structure for FADT rev 1 instead of this hack. 
- 
-Michael,
+Even if you can't reproduce it with qemu without libvirt I'd be
+interested to debug it - but the libvirt logs from
+/var/log/libvirt/qemu/.... on both the source and the destination would
+help.
 
-I've tried to switch FADT to build_append_int_noprefix APIs,
-but it turned out into quite a bit of re-factoring including
-clean-ups and adding new APIs to pack all the stuff in FADT.
+-- =
 
-It's too much for hard freeze, lets not rush it and go with
-this patch for 2.10 to put out fire.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706866
 
-When 2.11 merge window is open I'll rebase/post FADTv1/3
-conversion to build_append_int_noprefix API.
+Title:
+  migrate:  add tls option in virsh, migrate failed
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  version:
+      libvirt-3.4.0 + qemu-2.9.90(latest)
+
+  domain:
+      any
+
+  step:
+      1. generate tls certificate in /etc/pki/libvirt-migrate
+      2. start vm
+      3. migrate vm, cmdline:
+         virsh migrate rh7.1-3 --live --undefinesource --persistent --verbo=
+se --tls qemu+ssh://IP/system
+      4. then migrate failed and reported:
+   Migration: [ 64 %]error: internal error: qemu unexpectedly closed the mo=
+nitor: Domain pid=3D5288, libvirtd pid=3D49634
+   kvm: warning: CPU(s) not present in any NUMA nodes: 2 3 4 5 6 7 8 9 10 1=
+1 12 13 14 15 16 17 18 19 20 21 22 23
+   kvm: warning: All CPU(s) up to maxcpus should be described in NUMA config
+   kvm: error while loading state section id 2(ram)
+   kvm: load of migration failed: Input/output error
+
+  other:
+      Analysis qemu code and debug:
+  #0  ram_save_page (f=3D0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=
+=3Dfalse, bytes_transferred=3D0x55ca885ec1d8) =
+
+  #1  0x000055ca87b00b21 in ram_save_target_page (ms=3D0x55ca885b8d80, f=3D=
+0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
+=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
+  #2  0x000055ca87b00bda in ram_save_host_page (ms=3D0x55ca885b8d80, f=3D0x=
+55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
+=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
+  #3  0x000055ca87b00d39 in ram_find_and_save_block (f=3D0x55ca8be370e0, la=
+st_stage=3Dfalse, bytes_transferred=3D0x55ca885ec1d8)
+  #4  0x000055ca87b020b8 in ram_save_iterate (f=3D0x55ca8be370e0, opaque=3D=
+0x0)
+  #5  0x000055ca87b07a9a in qemu_savevm_state_iterate (f=3D0x55ca8be370e0, =
+postcopy=3Dfalse) =
+
+  #6  0x000055ca87e404e5 in migration_thread (opaque=3D0x55ca885b8d80)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706866/+subscriptions
