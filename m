@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60936)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dbE1W-000561-2d
+	id 1dbE1W-00056B-Lf
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dbE1V-0002Bt-BA
+	id 1dbE1V-0002CI-Ns
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:22 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 28 Jul 2017 19:46:02 -0300
-Message-Id: <20170728224608.3598-3-f4bug@amsat.org>
-In-Reply-To: <20170728224608.3598-1-f4bug@amsat.org>
-References: <20170728224608.3598-1-f4bug@amsat.org>
+Date: Fri, 28 Jul 2017 19:46:00 -0300
+Message-Id: <20170728224608.3598-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 for 2.10 2/8] docs: fix broken paths to
- docs/interop/qcow2.txt
+Subject: [Qemu-devel] [PATCH v2 for 2.10 0/8] docs: fix broken paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +24,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-With the move of some docs to docs/interop on d59157ea05, a reference path
-was not updated.
+Hi Michael, you already applied this series to -trivial, however I updated the
+commits message, not requested but not a heavy task to do neither. Since you
+didn't not sent PR yet, if you mind can you take those instead? Else it's not
+a big deal. Thanks!
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
----
- docs/qcow2-cache.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2:
+- fixed what I misunderstood Eric said,
+- fixed shell command using Eric feedback,
+- added commit id of the change that introduce the invalid reference in the
+  commit message.
 
-diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index 1fdd6f9ce7..b0571de4b8 100644
---- a/docs/qcow2-cache.txt
-+++ b/docs/qcow2-cache.txt
-@@ -15,7 +15,7 @@ not a straightforward operation.
- This document attempts to give an overview of the L2 and refcount
- caches, and how to configure them.
- 
--Please refer to the docs/specs/qcow2.txt file for an in-depth
-+Please refer to the docs/interop/qcow2.txt file for an in-depth
- technical description of the qcow2 file format.
- 
- 
+following Cleber Rosa example I cleaned more invalid references.
+
+Eric said "this doesn't change code and doc updates are find during freeze,
+so this is a GOOD candidate for 2.10; but if it misses 2.10, slipping to 2.11
+doesn't hurt." and I agree :)
+
+I used the following command (improved by Eric) which I consider to include
+in some CI test job:
+
+$ git grep docs/ \
+    | sed -ne "s/.* \(docs[^ :)}\"\']*\).*/\1/p" \
+    | sed -e 's/\(.*\)\.$/\1/p' \
+    | sort -u \
+    | xargs ls -d >/dev/null
+
+Regards,
+
+Phil.
+
+Cleber Rosa (1):
+  docs: fix broken paths to docs/interop dir
+
+Philippe Mathieu-Daudé (7):
+  docs: fix broken paths to docs/interop/qcow2.txt
+  docs: fix broken paths to docs/devel/qapi-code-gen.txt
+  docs: fix broken paths to docs/devel/atomics.txt
+  docs: fix broken paths to docs/devel/tracing.txt
+  docs: fix broken paths to docs/config/ich9-ehci-uhci.cfg
+  docs: fix broken paths to docs/specs/ivshmem-spec.txt
+  docs: fix broken paths to docs/spin/
+
+ audio/trace-events                  | 2 +-
+ block/trace-events                  | 2 +-
+ chardev/trace-events                | 2 +-
+ crypto/trace-events                 | 2 +-
+ docs/devel/lockcnt.txt              | 2 +-
+ docs/devel/writing-qmp-commands.txt | 4 ++--
+ docs/qcow2-cache.txt                | 2 +-
+ docs/specs/pci-ids.txt              | 2 +-
+ docs/spin/aio_notify.promela        | 6 +++---
+ docs/spin/aio_notify_accept.promela | 4 ++--
+ docs/spin/aio_notify_bug.promela    | 4 ++--
+ docs/spin/tcg-exclusive.promela     | 2 +-
+ docs/usb2.txt                       | 2 +-
+ hw/9pfs/trace-events                | 2 +-
+ hw/acpi/trace-events                | 2 +-
+ hw/alpha/trace-events               | 2 +-
+ hw/arm/trace-events                 | 2 +-
+ hw/audio/trace-events               | 2 +-
+ hw/block/dataplane/trace-events     | 2 +-
+ hw/block/trace-events               | 2 +-
+ hw/char/trace-events                | 2 +-
+ hw/display/trace-events             | 2 +-
+ hw/dma/trace-events                 | 2 +-
+ hw/i386/trace-events                | 2 +-
+ hw/input/trace-events               | 2 +-
+ hw/intc/trace-events                | 2 +-
+ hw/isa/trace-events                 | 2 +-
+ hw/mem/trace-events                 | 2 +-
+ hw/misc/trace-events                | 2 +-
+ hw/net/trace-events                 | 2 +-
+ hw/nvram/trace-events               | 2 +-
+ hw/pci/trace-events                 | 2 +-
+ hw/ppc/trace-events                 | 2 +-
+ hw/s390x/trace-events               | 2 +-
+ hw/scsi/trace-events                | 2 +-
+ hw/sd/trace-events                  | 2 +-
+ hw/sparc/trace-events               | 2 +-
+ hw/timer/trace-events               | 2 +-
+ hw/usb/trace-events                 | 2 +-
+ hw/vfio/trace-events                | 2 +-
+ hw/virtio/trace-events              | 2 +-
+ hw/xen/trace-events                 | 2 +-
+ include/block/aio.h                 | 2 +-
+ include/qapi/visitor.h              | 2 +-
+ include/qemu/atomic.h               | 4 ++--
+ io/trace-events                     | 2 +-
+ linux-user/trace-events             | 2 +-
+ migration/trace-events              | 2 +-
+ net/trace-events                    | 2 +-
+ qapi-schema.json                    | 4 ++--
+ qapi/introspect.json                | 2 +-
+ qapi/qapi-util.c                    | 2 +-
+ qom/trace-events                    | 2 +-
+ scripts/qapi2texi.py                | 2 +-
+ scripts/simpletrace.py              | 2 +-
+ target/arm/trace-events             | 2 +-
+ target/i386/trace-events            | 2 +-
+ target/mips/trace-events            | 2 +-
+ target/ppc/trace-events             | 2 +-
+ target/s390x/trace-events           | 2 +-
+ target/sparc/trace-events           | 2 +-
+ tcg/README                          | 2 +-
+ ui/trace-events                     | 2 +-
+ util/trace-events                   | 2 +-
+ 64 files changed, 71 insertions(+), 71 deletions(-)
+
 -- 
 2.13.3
