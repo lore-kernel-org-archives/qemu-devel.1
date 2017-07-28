@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1db3Kx-0008Cy-Da
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 07:21:44 -0400
+	(envelope-from <cohuck@redhat.com>) id 1db3Tk-00048N-Es
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 07:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1db3Ku-0001WJ-KN
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 07:21:43 -0400
-References: <20170727143040.7236-1-otubo@redhat.com>
-	<9858302e-566c-2ce8-45a1-29a5551bc367@msgid.tls.msk.ru>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <df7e23a4-540d-fa1c-86e5-a527503d3247@mail.uni-paderborn.de>
-Date: Fri, 28 Jul 2017 13:20:41 +0200
+	(envelope-from <cohuck@redhat.com>) id 1db3Tf-0008FM-Qm
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 07:30:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1db3Tf-0008Ej-F3
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 07:30:43 -0400
+Date: Fri, 28 Jul 2017 13:30:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170728133035.4eb78e5a@gondolin>
+In-Reply-To: <f4ae26f2-fd4f-1b38-e20a-1d6ff4844b64@virtuozzo.com>
+References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
+	<20170728114159.519eacf4@gondolin>
+	<f4ae26f2-fd4f-1b38-e20a-1d6ff4844b64@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <9858302e-566c-2ce8-45a1-29a5551bc367@msgid.tls.msk.ru>
-Content-Type: text/plain; charset=windows-1251
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qemu-system-tricore: segfault when entering "x 0"
- on the monitor
+Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, Eduardo Otubo <otubo@redhat.com>, qemu-trivial@nongnu.org
-Cc: thuth@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-On 07/28/2017 01:19 PM, Michael Tokarev wrote:
-> 27.07.2017 17:30, Eduardo Otubo wrote:
->> Starting Qemu with "qemu-system-tricore -nographic -M tricore_testboard -S"
->> and entering "x 0" at the monitor prompt leads to Segmentation fault. This happens
->> because tricore_cpu_get_phys_page_debug() is not implemented yet, this
->> is a temporary workaround to avoid the crash.
-> 
-> Applied to -trivial, without the extra newline in target/tricore/cpu.h
-> 
-> /mjt
-> 
+On Fri, 28 Jul 2017 13:01:15 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-Thanks for picking this up :)
+> 28.07.2017 12:41, Cornelia Huck wrote:
+> > On Fri, 28 Jul 2017 11:55:47 +0300
+> > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> >  
+> >> To make logs more readable prefix all hex values with '0x' mark.
+> >> This is needed for consistency too, as a lot of hex values are already
+> >> prefixed with '0x'. Also, bring all hex outputs to the common form -
+> >> use '%#', not '0x%'.  
+> > This is problematic if you try to match up things in the trace with
+> > things that don't have the leading 0x elsewhere. See my comments on the
+> > s390x changes below.  
+> 
+> Hmm, not so easy..
+> 
+> All your remarks satisfy the following criteria (and it seems logical 
+> anyway):
+> 
+> hex numbers grouped into patterns like NUM.NUM.NUM (several numbers 
+> splitted by period) are allowed to be printed without 0x prefixes.
 
-Cheers,
-Bastian
+Works for me. There might be other similar patterns, though.
