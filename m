@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1db8wb-0004L1-IU
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:20:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1db9Hg-00053S-N0
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1db8wY-0004pE-8U
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:20:57 -0400
-Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:37305)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1db8wY-0004p3-4I
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:20:54 -0400
-Received: by mail-ua0-x244.google.com with SMTP id 80so20215203uas.4
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:20:54 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
-	<CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cf854184-8bc0-4a9c-b97f-8274abf538bc@amsat.org>
-Date: Fri, 28 Jul 2017 14:20:49 -0300
+	(envelope-from <armbru@redhat.com>) id 1db9Hf-000897-Uo
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:42:44 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170725211523.3998-1-eblake@redhat.com>
+	<20170725211523.3998-10-eblake@redhat.com>
+	<20170728130538.GQ12364@stefanha-x1.localdomain>
+Date: Fri, 28 Jul 2017 19:42:33 +0200
+In-Reply-To: <20170728130538.GQ12364@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Fri, 28 Jul 2017 14:05:38 +0100")
+Message-ID: <87eft0lapi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: include <linux/limits.h> for
- XATTR_SIZE_MAX
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 09/12] tests/libqos/pci: Clean up string
+ interpolation into QMP input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>, Patrick Steinhardt <ps@pks.im>, Kamil Rytarowski <kamil@netbsd.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, stefanha@redhat.com, qemu-devel@nongnu.org, "open list:virtio-blk" <qemu-block@nongnu.org>
 
-> On Mon, Jun 26, 2017 at 12:20 PM, Patrick Steinhardt <ps@pks.im> wrote:
->> The function `v9fs_xattrcreate` makes use of the define `XATTR_SIZE_MAX`
->> to reject attempts of creating xattrs with an invalid size, which is
->> defined in <linux/limits.h>. On glibc-based systems, this header is
->> indirectly included via <limits.h>, <bits/posix1_lim.h>,
->> <bitts/local_lim.h>, but on other platforms this is not guaranteed due
->> to not being part of the POSIX standard. One examples are systems based
->> on musl libc, which do not include the <linux/limits.h> indirectly,
->> which leads to `XATTR_SIZE_MAX` being undefined.
->>
->> Fix this error by directly include <linux/limits.h>. As the 9P fs code
->> is being Linux-based either way, we can simply do so without breaking
->> other platforms. This enables building 9pfs on musl-based systems.
->>
->> Signed-off-by: Patrick Steinhardt <ps@pks.im>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>   hw/9pfs/9p.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
->> index 96d2683348..48cd558e96 100644
->> --- a/hw/9pfs/9p.c
->> +++ b/hw/9pfs/9p.c
->> @@ -13,6 +13,7 @@
->>
->>   #include "qemu/osdep.h"
->>   #include <glib/gprintf.h>
+Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-This is likely to break on BSD, but now than patchew has a NetBSD job 
-you can trigger a build RESENDing this patch.
+> On Tue, Jul 25, 2017 at 04:15:20PM -0500, Eric Blake wrote:
+>> @@ -419,19 +420,18 @@ static void test_ivshmem_server_irq(void)
+>>  static void test_ivshmem_hotplug(void)
+>>  {
+>>      const char *arch = qtest_get_arch();
+>> -    gchar *opts;
+>> +    QObject *extra_args = qobject_from_jsonf("{ 'shm': '%s', 'size': '1M' }",
+>> +                                             tmpshm);
+>
+> Is there a difference between:
+>
+>   qobject_from_jsonf("{ 'shm': '%s' }", tmpshm);
+>
+> and:
+>
+>   qobject_from_jsonf("{ 'shm': %s }", tmpshm);
+>
+> ?
+>
+> Below you use %s instead of '%s'.
 
-This should probably work:
-
-#ifdef __linux__
-
->> +#include <linux/limits.h>
-
-#endif
-
->>   #include "hw/virtio/virtio.h"
->>   #include "qapi/error.h"
->>   #include "qemu/error-report.h"
->> --
->> 2.13.2
-
-Regards,
-
-Phil.
+Yes.  %s interpolates a JSON string, enclosed in quotes, funny
+characters quoted.  Thus, the former is wrong.  I screwed up the
+conversion from g_strdup_printf().  Good catch!
