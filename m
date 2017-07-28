@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1db2Sm-0008Ka-8H
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:25:45 -0400
+	(envelope-from <jianjay.zhou@huawei.com>) id 1db2Wr-0002Hl-Hr
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1db2Si-00010N-KH
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:25:44 -0400
-Received: from mail-he1eur01on0101.outbound.protection.outlook.com
-	([104.47.0.101]:18976
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1db2Sh-0000vY-AM
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:25:40 -0400
-References: <20170728092053.10122-1-stefanha@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <0ffcc283-7a2d-43fc-e6b2-7cfb90de439e@openvz.org>
-Date: Fri, 28 Jul 2017 13:25:26 +0300
+	(envelope-from <jianjay.zhou@huawei.com>) id 1db2Wm-0004fa-S9
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:29:57 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1db2Wm-0004cy-8q
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 06:29:52 -0400
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Fri, 28 Jul 2017 18:28:53 +0800
+Message-ID: <1501237733-2736-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170728092053.10122-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/2] trace: fix trace_event_get_state() for
- SystemTap and LTTng UST
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, dgilbert@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, xiaoguangrong@tencent.com, jdenemar@redhat.com, huangzhichao@huawei.com, Jay Zhou <jianjay.zhou@huawei.com>
 
-On 07/28/2017 12:20 PM, Stefan Hajnoczi wrote:
-> Trace events that compute their arguments can affect performance.  The
-> following idom can be used to avoid computing arguments when the trace event is
-> disabled:
->
->   if (trace_event_get_state(TRACE_MY_EVENT)) {
->       char *str = g_strdup_printf("Expensive string ...", ...);
->       trace_my_event(str);
->       g_free(str);
->   }
->
-> Unfortunately this breaks the trace event for SystemTap and LTTng UST since
-> those tracers manage their own enabled/disabled state.
->
-> These patches add per-backend dstate to trace_event_get_state() so that the
-> trace event fires as expected when enabled via SystemTap or LTTng UST.
->
-> Stefan Hajnoczi (2):
->   trace: add TRACE_<event>_BACKEND_DSTATE()
->   trace: check backend dstate in trace_event_get_state()
->
->  trace/control.h                       | 20 ++++++++++++++++++--
->  scripts/tracetool/__init__.py         |  1 +
->  scripts/tracetool/backend/__init__.py |  3 +++
->  scripts/tracetool/backend/dtrace.py   | 12 ++++++++++++
->  scripts/tracetool/backend/ftrace.py   |  2 +-
->  scripts/tracetool/backend/log.py      |  3 ++-
->  scripts/tracetool/backend/simple.py   |  2 +-
->  scripts/tracetool/backend/syslog.py   |  3 ++-
->  scripts/tracetool/backend/ust.py      |  5 +++++
->  scripts/tracetool/format/h.py         | 10 ++++++++++
->  10 files changed, 55 insertions(+), 6 deletions(-)
->
-looks good to me!
+Qemu_savevm_state_cleanup takes about 300ms in my ram migration tests
+with a 8U24G vm(20G is really occupied), the main cost comes from
+KVM_SET_USER_MEMORY_REGION ioctl when mem.memory_size = 0 in
+kvm_set_user_memory_region. In kmod, the main cost is
+kvm_zap_obsolete_pages, which traverses the active_mmu_pages list to
+zap the unsync sptes.
 
-This also fixes the same issue not only in my code, but in
+It can be optimized by delaying memory_global_dirty_log_stop to the next
+vm_start.
 
-static void ohci_td_pkt(const char *msg, const uint8_t *buf, size_t len)
-and in colo code.
+Changes v2->v3:
+ - NULL VMChangeStateHandler if it is deleted and protect the scenario
+   of nested invocations of memory_global_dirty_log_start/stop [Paolo]
 
-Reviewed-by: Denis V. Lunev <den@openvz.org>
+Changes v1->v2:
+ - create a VMChangeStateHandler in memory.c to reduce the coupling [Paolo]
+
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+ memory.c | 36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/memory.c b/memory.c
+index a7bc70a..c0adc35 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2357,8 +2357,15 @@ void memory_global_dirty_log_sync(void)
+     }
+ }
+ 
++static VMChangeStateEntry *vmstate_change;
++
+ void memory_global_dirty_log_start(void)
+ {
++    if (vmstate_change) {
++        qemu_del_vm_change_state_handler(vmstate_change);
++        vmstate_change = NULL;
++    }
++
+     global_dirty_log = true;
+ 
+     MEMORY_LISTENER_CALL_GLOBAL(log_global_start, Forward);
+@@ -2369,7 +2376,7 @@ void memory_global_dirty_log_start(void)
+     memory_region_transaction_commit();
+ }
+ 
+-void memory_global_dirty_log_stop(void)
++static void memory_global_dirty_log_do_stop(void)
+ {
+     global_dirty_log = false;
+ 
+@@ -2381,6 +2388,33 @@ void memory_global_dirty_log_stop(void)
+     MEMORY_LISTENER_CALL_GLOBAL(log_global_stop, Reverse);
+ }
+ 
++static void memory_vm_change_state_handler(void *opaque, int running,
++                                           RunState state)
++{
++    if (running) {
++        memory_global_dirty_log_do_stop();
++
++        if (vmstate_change) {
++            qemu_del_vm_change_state_handler(vmstate_change);
++            vmstate_change = NULL;
++        }
++    }
++}
++
++void memory_global_dirty_log_stop(void)
++{
++    if (!runstate_is_running()) {
++        if (vmstate_change) {
++            return;
++        }
++        vmstate_change = qemu_add_vm_change_state_handler(
++                                memory_vm_change_state_handler, NULL);
++        return;
++    }
++
++    memory_global_dirty_log_do_stop();
++}
++
+ static void listener_add_address_space(MemoryListener *listener,
+                                        AddressSpace *as)
+ {
+-- 
+1.8.3.1
