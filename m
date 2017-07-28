@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dawrD-0003FC-1D
+	(envelope-from <dgibson@ozlabs.org>) id 1dawrD-0003F8-0s
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dawr9-0007sT-9t
+	(envelope-from <dgibson@ozlabs.org>) id 1dawr6-0007q0-DW
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:32 -0400
-Date: Fri, 28 Jul 2017 14:24:03 +1000
+Date: Fri, 28 Jul 2017 14:09:13 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170728042403.GK3098@umbus.fritz.box>
+Message-ID: <20170728040913.GJ3098@umbus.fritz.box>
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150105840463.12000.9666180368681199673.stgit@bahia>
-	<ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
-	<20170727190955.2792d785@bahia.lan>
+	<150100580191.27487.17612552307249886496.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tKtFalx5NIx0HZ72"
+	protocol="application/pgp-signature"; boundary="9Q2l3mYpK16UQ/iv"
 Content-Disposition: inline
-In-Reply-To: <20170727190955.2792d785@bahia.lan>
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 26/26] spapr: add hotplug hooks
- for PHB hotplug
+In-Reply-To: <150100580191.27487.17612552307249886496.stgit@bahia>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 25/26] spapr_pci: drop abusive
+ sanity check when migrating the LSI table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +26,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Greg Kurz <groug@kaod.org>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
 
---tKtFalx5NIx0HZ72
+--9Q2l3mYpK16UQ/iv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 27, 2017 at 07:09:55PM +0200, Greg Kurz wrote:
-> On Thu, 27 Jul 2017 14:41:31 +1000
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Tue, Jul 25, 2017 at 08:03:21PM +0200, Greg Kurz wrote:
+> The guest can allocate blocks of IRQs when calling the ibm,change-msi
+> RTAS call. This has an impact on the IRQ numbers returned by subsequent
+> calls to spapr_ics_alloc_block().
 >=20
-> > On 26/07/17 18:40, Greg Kurz wrote:
-> > > Hotplugging PHBs is a machine-level operation, but PHBs reside on the
-> > > main system bus, so we register spapr machine as the handler for the
-> > > main system bus.
-> > >=20
-> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > > - rebased against ppc-for-2.10
-> > > - converted to unplug_request
-> > > - handle drc_id at pre-plug
-> > > - reset hotplugged PHB at plug
-> > > - compatibility with older machine types
-> > > ---
-> > >  hw/ppc/spapr.c              |  114 +++++++++++++++++++++++++++++++++=
-++++++++++
-> > >  hw/ppc/spapr_drc.c          |    1=20
-> > >  hw/ppc/spapr_pci.c          |    2 -
-> > >  include/hw/pci-host/spapr.h |    2 +
-> > >  include/hw/ppc/spapr.h      |    1=20
-> > >  5 files changed, 118 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 90485054c2e7..589f76ef9fb8 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2540,6 +2540,10 @@ static void ppc_spapr_init(MachineState *machi=
-ne)
-> > >      register_savevm_live(NULL, "spapr/htab", -1, 1,
-> > >                           &savevm_htab_handlers, spapr);
-> > > =20
-> > > +    if (spapr->dr_phb_enabled) {
-> > > +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machin=
-e), NULL);
-> > > +    }
-> > > +
-> > >      qemu_register_boot_set(spapr_boot_set, spapr);
-> > > =20
-> > >      if (kvm_enabled()) {
-> > > @@ -3238,6 +3242,103 @@ out:
-> > >      error_propagate(errp, local_err);
-> > >  }
-> > > =20
-> > > +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceSt=
-ate *dev,
-> > > +                               Error **errp)
-> > > +{
-> > > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
-> > > +
-> > > +    if (sphb->drc_id =3D=3D (uint32_t)-1) {
-> > > +        sphb->drc_id =3D sphb->index;
-> > > +    }
-> > > +
-> > > +    if (sphb->drc_id >=3D SPAPR_DRC_MAX_PHB) {
-> > > +        error_setg(errp, "PHB id %d out of range", sphb->drc_id);
-> > > +    } =20
-> >=20
-> >=20
-> > sphb->index in considered 16bits in the existing code (even though it is
-> > defined as 32bit) and SPAPR_DRC_MAX_PHB is just 256. I'd suggest using =
-the
-> > same limit for both, either 256 or 65536 is fine for me.
-> >=20
-> > It is actually a bit weird - it is possible to completely configure few
-> > PHBs in the command line so they will have index=3D=3D-1 but PCI hotplu=
-g code -
-> > spapr_phb_get_pci_func_drc() and spapr_phb_realize() - does not check f=
-or
-> > this and just does (sphb->index << 16).
+> It doesn't cause any problem right now because PHB are cold plugged and
+> the LSI table have the same numbers at the destination and the source.
 >=20
-> You're right and this looks like a bug... I'll try to come up with a fix.
+> But this won't be the case anymore when we support PHB hotplug. In this
+> case the IRQ numbers in the LSI table are state that we should migrate.
 >=20
-> > May be just ditch drc_id, enforce index not to be -1 and use it as drc_=
-id?
-> >=20
+> This patch hence changes the destination to always accept the LSI table
+> from the migration stream, like it is already done for MSIs. No effort
+> is made to preserve the current behavior of failing migration when LSI
+> numbers are different with older machine types, for simplicity.
 >=20
-> This was how Mike did it in the original patchset but David suggested
-> to introduce drc_id (to preserve existing setups I guess):
->=20
-> http://patchwork.ozlabs.org/patch/466262/
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Huh.  So I did.  But.. sorry, I've changed my mind.
+Urgh.  So, yes, there's a real problem here.  But fundamentally it's
+because we're dynamically allocating the LSIs from a pool, rather than
+having a fixed mapping (mea culpa, I did this in a bunch of places
+before I knew better and it's come to bite us several times since).
 
-The fact that needing a DRC forces us to have a reasonable small id
-for each PHB seems like a good excuse to make index mandatory - I'm
-not convinced anyone was actually creating PHBs without index, and
-this does allow us to simplify a bunch of things.
+Migrating the value like this will fix the problem, but I'm going to
+have to think if it's the best way.  If we really do need an allocator
+or something like it, then we'll have to migrate something - although
+the fact that the LSIs will depend on the order you hotplug things is
+kinda nasty still.
 
-I'd like to see that done as a preliminary cleanup patch, though.
+Making the LSIs fixed will address several other oddities in this
+area, but will obviously been a wider ranging rework of the irq
+assignment in the machine (and some machine version compatibility
+cruft, of course).
+
+> ---
+>  hw/ppc/spapr_pci.c |    3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 58406a1b7e93..157867af8178 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1887,8 +1887,7 @@ static const VMStateDescription vmstate_spapr_pci_l=
+si =3D {
+>      .version_id =3D 1,
+>      .minimum_version_id =3D 1,
+>      .fields =3D (VMStateField[]) {
+> -        VMSTATE_UINT32_EQUAL(irq, struct spapr_pci_lsi, NULL),
+> -
+> +        VMSTATE_UINT32(irq, struct spapr_pci_lsi),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -136,24 +95,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---tKtFalx5NIx0HZ72
+--9Q2l3mYpK16UQ/iv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll6vGAACgkQbDjKyiDZ
-s5LQAQ/9EPrHlZ5yIHpQIAoPEl5WLcpy4s1LL2Soo8oXe5HCZGtgRwMIlDc/I9m3
-tAT7AVcWNdNo6/p0X+gS9zjXDoVgdeex/U7UEi2NsUW4lmgUSC5h/gOPA2vtbJQO
-jQmh8esepr/OCj22pN8k7/T8mJjQRY9/klj71KQX4MOQXaE8vtARSUsGu3G6dCG1
-e28kzV8es8pktjM7GqFyVWwvT6ycOu+oXjkR6X1IfqOIQU0qVbX17uKIMGUNiCXI
-B4CGQHxe9onvs78dL+rNvWCnpDppn+LTBn96BxyBmg5HqImcbNvknByf1IQcDu/E
-CeRXZizM4XzD+/sZd0wcFPFlURPttkRvSUy0jX5AUBvV3F1EBDvOaxLAmIX7tzf/
-07+YdDdkL2fANQIw65rFmwnC4Gc9SDtB7tMk3nl53NhvRphjfAVl9FPQgwOP5JOe
-uqjH3aBZ2e5JfYA69UPRlHCd9D3RAtrCqqvsEXxixJXE+K9iOlB4C64FU2pMPwCp
-9dmyIUBp/r5Gf7zVX3cb/EH5tr2hDjnCFZDfV/9UajWqqLM4pEpUpN8l7bKBsqwG
-x8zo/33pEHZhZD04EAdLgTUksh/ZAj1+KbtIMxJgiaF0BjDgg5egSNYSjJonYU1h
-goyMR06DOa+wL56A/0mWzjx+4Z+uYYWkLK6Dvi07TqzIq3CFUmE=
-=pHIA
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll6uOkACgkQbDjKyiDZ
+s5ISUw/+Pe2izh/onoZ1D227NBZpYMzv4tqaR6hYi+ZMMtta+SkYnuED2ZzPYpJ2
+EaXzC5MHQcx0QS0JG8vqq6I0A31hHfqX/9Dmw2iGUav6Jb7IAU2zCABF/IfismRR
+eE29hw27Ii6DdQSr0rq8oQFDE/13fBBhyGjkYyyu9Mz1zEfMTaF24khDz0ODc2Mh
+CGi6/BJGUxr1tLhPkSGlVNrPeRjlSSFbqfmG/dw8+3XcPvWg/G1nKPbI2X8TjAWM
+I+WiaL9eGrJoQbZvKzfMFV4RWNd5iZApVaOAjC+STxAj50z0p+6nBTrJZaBjq7kU
+keJhCtrYr/l9GyXLJrpEF3hdmmRWqu17N5Mlr5+BdzhTzEPCHbeYcYEgt4sGIVPA
+xet4IbC4RNQ71OOhuQNuSc/eGSeTPvQGfcpw23iZ2kRs5P3hDaLoyH8uTfS5PSWm
+pZoLDz+Osi4gZyyJoTufMBuWxh+wIf4m2stuwGC9bLXEcmbzHjiQ0Q+gGo410rHa
+ZbFSaNnJa5PDhmA8cdteVMslTFvImA9CSMrwkFOdSEomZT6JjAuFEBUAhEuup9M8
+4ekGezRm4qN3oNDOPLZooGAi7ByZIToW5usM0/S7Byvzb3Q6zLA2w6VDO8BPC8Bh
+s5EiOhtPe8N2vnjtZYuXqCFjP/PMrEa4KcWsHT+dihDp0mJsqVw=
+=eebH
 -----END PGP SIGNATURE-----
 
---tKtFalx5NIx0HZ72--
+--9Q2l3mYpK16UQ/iv--
