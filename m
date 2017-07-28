@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1db0IQ-0000TS-9L
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:06:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1db0IS-0000Tm-Q3
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1db0IP-0000pX-BG
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:06:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38130)
+	(envelope-from <peterx@redhat.com>) id 1db0IR-0000qo-UG
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:06:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55155)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1db0IP-0000pC-51
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:06:53 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1db0IR-0000qP-Nv
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:06:55 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 28 Jul 2017 16:06:10 +0800
-Message-Id: <1501229198-30588-2-git-send-email-peterx@redhat.com>
+Date: Fri, 28 Jul 2017 16:06:11 +0800
+Message-Id: <1501229198-30588-3-git-send-email-peterx@redhat.com>
 In-Reply-To: <1501229198-30588-1-git-send-email-peterx@redhat.com>
 References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC 01/29] migration: fix incorrect postcopy
- recved_bitmap
+Subject: [Qemu-devel] [RFC 02/29] migration: fix comment disorder in RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +26,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-The bitmap setup during postcopy is incorrectly when the pgaes are huge
-pages. Fix it.
+Comments for "migration_dirty_pages" and "bitmap_mutex" are switched.
+Fix it.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/postcopy-ram.c | 2 +-
- migration/ram.c          | 8 ++++++++
- migration/ram.h          | 2 ++
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ migration/ram.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 276ce12..952b73a 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -578,7 +578,7 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-         ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-     }
-     if (!ret) {
--        ramblock_recv_bitmap_set(host_addr, rb);
-+        ramblock_recv_bitmap_set_range(rb, host_addr, pagesize / getpagesize());
-     }
-     return ret;
- }
 diff --git a/migration/ram.c b/migration/ram.c
-index 107ee9d..c93973c 100644
+index c93973c..c12358d 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -168,6 +168,14 @@ void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb)
-     set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
- }
- 
-+void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-+                                    size_t len)
-+{
-+    bitmap_set(rb->receivedmap,
-+               ramblock_recv_bitmap_offset(host_addr, rb),
-+               len);
-+}
-+
- void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb)
- {
-     clear_bit(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
-diff --git a/migration/ram.h b/migration/ram.h
-index b711552..84e8623 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -55,6 +55,8 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
- 
- int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb);
- void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
-+void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-+                                    size_t len);
- void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
- 
- #endif
+@@ -222,9 +222,9 @@ struct RAMState {
+     uint64_t iterations_prev;
+     /* Iterations since start */
+     uint64_t iterations;
+-    /* protects modification of the bitmap */
+-    uint64_t migration_dirty_pages;
+     /* number of dirty bits in the bitmap */
++    uint64_t migration_dirty_pages;
++    /* protects modification of the bitmap */
+     QemuMutex bitmap_mutex;
+     /* The RAMBlock used in the last src_page_requests */
+     RAMBlock *last_req_rb;
 -- 
 2.7.4
