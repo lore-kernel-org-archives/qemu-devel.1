@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1db570-0001SL-Po
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:15:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1db572-0001Uy-Pq
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1db56z-0007hF-UJ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:15:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1db571-0007k0-V9
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 09:15:28 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 28 Jul 2017 15:14:45 +0200
-Message-Id: <20170728131452.15316-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 0/7] qemu-iotests: Fix leaked
- temporary file fixes
+Date: Fri, 28 Jul 2017 15:14:49 +0200
+Message-Id: <20170728131452.15316-5-kwolf@redhat.com>
+In-Reply-To: <20170728131452.15316-1-kwolf@redhat.com>
+References: <20170728131452.15316-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 4/7] qemu-iotests/153: Fix leaked
+ scratch images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,30 +23,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This fixes leaked temporary files that are created during successful
-runs of qemu-iotests for qcow2, raw and vmdk. More file leaks exist for
-failing or interrupted tests, but this is something for another day.
+qemu-iotests 153 left t.qcow2.c behind in the scratch directory. Make
+sure to clean it up after completing the tests.
 
-Kevin Wolf (7):
-  qemu-iotests/041: Fix leaked scratch images
-  qemu-iotests: Remove blkdebug.conf after tests
-  qemu-iotests/141: Fix image cleanup
-  qemu-iotests/153: Fix leaked scratch images
-  qemu-iotests/162: Fix leaked temporary files
-  qemu-iotests/063: Fix leaked image
-  qemu-iotests/059: Fix leaked image files
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/153 | 1 +
+ 1 file changed, 1 insertion(+)
 
- tests/qemu-iotests/041       |  4 +++-
- tests/qemu-iotests/059       |  9 +++++++++
- tests/qemu-iotests/059.out   | 22 +++++++++++-----------
- tests/qemu-iotests/063       |  4 +---
- tests/qemu-iotests/074       |  1 +
- tests/qemu-iotests/141       |  2 +-
- tests/qemu-iotests/153       |  1 +
- tests/qemu-iotests/162       |  7 +++++++
- tests/qemu-iotests/179       |  1 +
- tests/qemu-iotests/common.rc |  3 +++
- 10 files changed, 38 insertions(+), 16 deletions(-)
-
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index 0b45d78ea3..fa25eb24bd 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -35,6 +35,7 @@ _cleanup()
+     rm -f "${TEST_IMG}.convert"
+     rm -f "${TEST_IMG}.a"
+     rm -f "${TEST_IMG}.b"
++    rm -f "${TEST_IMG}.c"
+     rm -f "${TEST_IMG}.lnk"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
 -- 
 2.13.3
