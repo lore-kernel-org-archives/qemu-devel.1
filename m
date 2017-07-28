@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1db46W-0005S2-OJ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:10:55 -0400
+	(envelope-from <otubo@redhat.com>) id 1db46Z-0005Uc-Mo
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1db46V-0003gf-E8
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:10:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54900)
+	(envelope-from <otubo@redhat.com>) id 1db46X-0003hU-05
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:10:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1db46V-0003g4-4w
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:10:51 -0400
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1db46W-0003h2-Nl
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:10:52 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2A378220F3
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:10:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD278C17985A
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:10:51 +0000 (UTC)
 From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri, 28 Jul 2017 14:10:38 +0200
-Message-Id: <20170728121040.631-5-otubo@redhat.com>
+Date: Fri, 28 Jul 2017 14:10:39 +0200
+Message-Id: <20170728121040.631-6-otubo@redhat.com>
 In-Reply-To: <20170728121040.631-1-otubo@redhat.com>
 References: <20170728121040.631-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/6] seccomp: add spawn argument to command
- line
+Subject: [Qemu-devel] [PATCH v3 5/6] seccomp: add resourcecontrol argument
+ to command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,120 +33,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, berrange@redhat.com, pbonzini@redhat.com
 
-This patch adds [,spawn=deny] argument to `-sandbox on' option. It
-blacklists fork and execve system calls, avoiding Qemu to spawn new
-threads or processes.
+This patch adds [,resourcecontrol=deny] to `-sandbox on' option. It
+blacklists all process affinity and scheduler priority system calls to
+avoid any bigger of the process.
 
 Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 ---
  include/sysemu/seccomp.h |  1 +
  qemu-options.hx          |  9 ++++++---
- qemu-seccomp.c           | 19 +++++++++++++++++++
+ qemu-seccomp.c           | 28 ++++++++++++++++++++++++++++
  vl.c                     | 11 +++++++++++
- 4 files changed, 37 insertions(+), 3 deletions(-)
+ 4 files changed, 46 insertions(+), 3 deletions(-)
 
 diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index e6e78d85ce..f1614d6514 100644
+index f1614d6514..c7003dd197 100644
 --- a/include/sysemu/seccomp.h
 +++ b/include/sysemu/seccomp.h
-@@ -17,6 +17,7 @@
- 
+@@ -18,6 +18,7 @@
  #define OBSOLETE    0x0001
  #define PRIVILEGED  0x0010
-+#define SPAWN       0x0100
+ #define SPAWN       0x0100
++#define RESOURCECTL 0x1000
  
  #include <seccomp.h>
  
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 34d33a812e..3d612f0fd1 100644
+index 3d612f0fd1..7192236dee 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -4004,12 +4004,13 @@ Old param mode (ARM only).
+@@ -4004,13 +4004,14 @@ Old param mode (ARM only).
  ETEXI
  
  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
--    "-sandbox on[,obsolete=allow][,elevateprivileges=allow|deny|children]  Enable seccomp mode 2 system call filter (default 'off').\n" \
-+    "-sandbox on[,obsolete=allow][,elevateprivileges=allow|deny|children][,spawn=deny]  Enable seccomp mode 2 system call filter (default 'off').\n" \
+-    "-sandbox on[,obsolete=allow][,elevateprivileges=allow|deny|children][,spawn=deny]  Enable seccomp mode 2 system call filter (default 'off').\n" \
++    "-sandbox on[,obsolete=allow][,elevateprivileges=allow|deny|children][,spawn=deny][,resourcecontrol=deny]  Enable seccomp mode 2 system call filter (default 'off').\n" \
      "                obsolete: Allow obsolete system calls\n"
--    "                elevateprivileges: allows or denies Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls. 'children' will deny set*uid|gid system calls for main Qemu process but will allow forks and execves to run unprivileged\n",
-+    "                elevateprivileges: allows or denies Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls. 'children' will deny set*uid|gid system calls for main Qemu process but will allow forks and execves to run unprivileged\n"
-+    "                spawn: avoids Qemu to spawn new threads or processes by blacklisting *fork and execve\n",
+     "                elevateprivileges: allows or denies Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls. 'children' will deny set*uid|gid system calls for main Qemu process but will allow forks and execves to run unprivileged\n"
+-    "                spawn: avoids Qemu to spawn new threads or processes by blacklisting *fork and execve\n",
++    "                spawn: avoids Qemu to spawn new threads or processes by blacklisting *fork and execve\n"
++    "                resourcecontrol: disable process affinity and schedular priority\n",
      QEMU_ARCH_ALL)
  STEXI
--@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}]
-+@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}]
+-@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}]
++@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}][,resourcecontrol=@var{string}]
  @findex -sandbox
  Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
  disable it.  The default is 'off'.
-@@ -4018,6 +4019,8 @@ disable it.  The default is 'off'.
- Enable Obsolete system calls
- @item elevateprivileges=@var{string}
+@@ -4021,6 +4022,8 @@ Enable Obsolete system calls
  Disable set*uid|gid systema calls
-+@item spawn=@var{string}
-+Disable *fork and execve
+ @item spawn=@var{string}
+ Disable *fork and execve
++@item resourcecontrol=@var{string}
++Disable process affinity and schedular priority
  @end table
  ETEXI
  
 diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 6caa513edd..22a093ca1b 100644
+index 22a093ca1b..95c8e31d1a 100644
 --- a/qemu-seccomp.c
 +++ b/qemu-seccomp.c
-@@ -31,6 +31,12 @@ struct QemuSeccompSyscall {
+@@ -31,6 +31,19 @@ struct QemuSeccompSyscall {
      uint8_t priority;
  };
  
-+static const struct QemuSeccompSyscall spawn_syscalls[] = {
-+    { SCMP_SYS(fork), 255 },
-+    { SCMP_SYS(vfork), 255 },
-+    { SCMP_SYS(execve), 255 },
++static const struct QemuSeccompSyscall resourcecontrol_syscalls[] = {
++    { SCMP_SYS(getpriority), 255 },
++    { SCMP_SYS(setpriority), 255 },
++    { SCMP_SYS(sched_setparam), 255 },
++    { SCMP_SYS(sched_getparam), 255 },
++    { SCMP_SYS(sched_setscheduler), 255 },
++    { SCMP_SYS(sched_getscheduler), 255 },
++    { SCMP_SYS(sched_setaffinity), 255 },
++    { SCMP_SYS(sched_getaffinity), 255 },
++    { SCMP_SYS(sched_get_priority_max), 255 },
++    { SCMP_SYS(sched_get_priority_min), 255 },
 +};
 +
- static const struct QemuSeccompSyscall privileged_syscalls[] = {
-     { SCMP_SYS(setuid), 255 },
-     { SCMP_SYS(setgid), 255 },
-@@ -138,6 +144,19 @@ int seccomp_start(uint8_t seccomp_opts)
+ static const struct QemuSeccompSyscall spawn_syscalls[] = {
+     { SCMP_SYS(fork), 255 },
+     { SCMP_SYS(vfork), 255 },
+@@ -158,6 +171,21 @@ int seccomp_start(uint8_t seccomp_opts)
          }
      }
  
-+    if (seccomp_opts & SPAWN) {
-+        for (i = 0; i < ARRAY_SIZE(spawn_syscalls); i++) {
-+            rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, spawn_syscalls[i].num, 0);
++    if (seccomp_opts & RESOURCECTL) {
++        for (i = 0; i < ARRAY_SIZE(resourcecontrol_syscalls); i++) {
++            rc = seccomp_rule_add(ctx, SCMP_ACT_KILL,
++                                          resourcecontrol_syscalls[i].num, 0);
 +            if (rc < 0) {
 +                goto seccomp_return;
 +            }
-+            rc = seccomp_syscall_priority(ctx, spawn_syscalls[i].num,
-+                                          spawn_syscalls[i].priority);
++            rc = seccomp_syscall_priority(ctx, resourcecontrol_syscalls[i].num,
++                                          resourcecontrol_syscalls[i].priority);
 +            if (rc < 0) {
 +                goto seccomp_return;
 +            }
 +        }
 +    }
- 
++
      rc = seccomp_load(ctx);
  
+   seccomp_return:
 diff --git a/vl.c b/vl.c
-index 800e2b573d..e3a59ef1b5 100644
+index e3a59ef1b5..c09d6dde49 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -280,6 +280,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "elevateprivileges",
+@@ -284,6 +284,10 @@ static QemuOptsList qemu_sandbox_opts = {
+             .name = "spawn",
              .type = QEMU_OPT_STRING,
          },
 +        {
-+            .name = "spawn",
++            .name = "resourcecontrol",
 +            .type = QEMU_OPT_STRING,
 +        },
          { /* end of list */ }
      },
  };
-@@ -1068,6 +1072,13 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+@@ -1079,6 +1083,13 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
              }
          }
  
-+        value = qemu_opt_get(opts, "spawn");
++        value = qemu_opt_get(opts, "resourcecontrol");
 +        if (value) {
 +            if (strcmp(value, "deny") == 0) {
-+                seccomp_opts |= SPAWN;
++                seccomp_opts |= RESOURCECTL;
 +            }
 +        }
 +
