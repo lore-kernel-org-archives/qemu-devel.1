@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1db9bX-0000AE-E9
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:03:17 -0400
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1db9d8-0002SR-LT
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:04:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1db9bS-0003Mr-Cv
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:03:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41780)
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1db9d3-00050y-Ri
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:04:54 -0400
+Received: from mga06.intel.com ([134.134.136.31]:19129)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1db9bS-0003LU-3U
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:03:10 -0400
-Date: Fri, 28 Jul 2017 19:02:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170728180255.GF2560@work-vm>
-References: <20170719004721-mutt-send-email-mst@kernel.org>
-	<20170719105549.GB3500@work-vm>
-	<20170725165915-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
+	id 1db9d3-0004zl-Jk
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 14:04:49 -0400
+Date: Fri, 28 Jul 2017 12:04:46 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Message-ID: <20170728180446.GA31104@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170725165915-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] host side todo list for virtio rdma
+Subject: [Qemu-devel] QEMU NVDIMM as type 7 in e820 table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,232 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio@lists.oasis-open.org, virtio-dev@lists.oasis-open.org, linux-rdma@vger.kernel.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.a@redhat.com>
+To: qemu-devel@nongnu.org, linux-nvdimm@lists.01.org
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Wed, Jul 19, 2017 at 11:55:50AM +0100, Dr. David Alan Gilbert wrote:
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > Here are some thoughts on bits that are still missing to get a working
-> > > virtio-rdma, with some suggestions. These are very preliminary but I
-> > > feel I kept these in my head (and discussed offline) for too long. All
-> > > of the below is just my personal humble opinion.
-> > > 
-> > > Feature Requirements:
-> > > 
-> > > The basic requirement is to be able to do RDMA to/from
-> > > VM memory, with support for VM migration and/or memory
-> > > overcommit and/or autonuma and/or THP.
-> > > Why are migration/overcommit/autonuma required?
-> > > Without these, you can do RDMA with device passthrough,
-> > > with likely better performance.
-> > 
-> > Is this solution usable on a system without host-RDMA hardware?
-> > i.e. just to run RDMA between two VMs on the same host
-> > without using something like SoftROCE on the host?
-> 
-> Hacks could be implemented to enable this. But IMHO this
-> is yes another thing that should be a follow-up.
-> Just like e.g. KVM, let's focus on capable hardware
-> as the 1st step.
+I've been using the virtualized NVDIMM support in QEMU for testing, and I
+noticed that the physical addresses used by the virtual NVDIMMs aren't present
+in the guest's e820 table.
 
-OK, it's an interesting question whether if you have got the hardware
-whether it's better to use the hardware or the CPU to do inter-VM on
-the same host RDMA.
+Here is the e820 table on my QEMU instance where I have one 32 GiB virtual
+NVDIMM:
 
-> 
-> > > Feature Non-requirements:
-> > > 
-> > > It's not a requirement to support RDMA without VM exits,
-> > > e.g. like with device passthrough. While avoiding exits improves
-> > > performance, it would be handy to more than RDMA,
-> > > so there seems no reason to require it from RDMA when we
-> > > do not have it for e.g. network.
-> > > 
-> > > Assumptions:
-> > > 
-> > > It's OK to assume specific hardware capabilities at least initially.
-> > > 
-> > > High level architecture:
-> > > 
-> > > Follows the same lines as most other virtio devices:
-> > > 
-> > > +-----------------------------------
-> > > + 
-> > > + guest kernel
-> > > +             ^
-> > > +-------------|----------------------
-> > > +             v
-> > > + host kernel (kvm, vhost)
-> > > + 
-> > > +             ^
-> > > +-------------|----------------------
-> > > +             v
-> > > + 
-> > > + host userspace (QEMU, vhost-user)
-> > > + 
-> > > +-----------------------------------
-> > > 
-> > > Each request is forwarded by host kernel to QEMU,
-> > > that executes it using the ibverbs library.
-> > 
-> > Should that be 'forwarded by guest kernel' ?
-> 
-> No I really mean the host: we get requests from guest, they land in host
-> kernel same as any exit.
+[    0.000000] e820: BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdefff] usable
+[    0.000000] BIOS-e820: [mem 0x00000000bffdf000-0x00000000bfffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
 
-OK, does it seem silly for a message to go all the way to the host
-kernel to then have to go back down to QEMU to be turned back into verbs
-to go back upto the host kernel?
+The physical addresses used by the virtual NVDIMM are 0x240000000-0xA40000000.
+You can see this by looking at ndctl and the values we get from the NFIT:
 
-> > Is there a guest-userspace here as well - most of the
-> > RDMA NICs seem to have a userspace component.
-> 
-> Good point, I think you are right, there is. Bypassing
-> guest kernel for data path requests seems like a reasonable
-> requirement to add.
-> 
-> 
-> > > Most of this should be implementable host-side using existing
-> > > software. However, several issues remain and would need
-> > > infrastructure changes, as outlined below.
-> > > 
-> > > Host-side todo list for virtio-rdma support:
-> > > 
-> > > - Memory registration for guest userspace.
-> > > 
-> > >   Register memory region verb accepts a single virtual address,
-> > >   which supplies both the on-wire key for access and the
-> > >   range of memory to access. Guest kernel turns this into a
-> > >   list of pages (e.g. by get_user_pages); when forwarded to host this
-> > >   turns into a s/g list of virtual addresses in QEMU address space.
-> > > 
-> > >   Suggestion: add a new verb, along the lines of ibv_register_physical,
-> > >   which splits these two parameters, accepting the on-wire VA key
-> > >   and separately a list of userspace virtual address/size pairs.
-> > > 
-> > > - Memory registration for guest kernels.
-> > > 
-> > >   Another ability used by some in-kernel users is registering all of memory.
-> > >   Ranges not actually present are never accessed - this is OK as
-> > >   kernel users are trusted. Memory hotplug changes which ranges
-> > >   are present.
-> > > 
-> > >   Suggestion: add some throw-away memory and map all
-> > >   non-present ranges there. Add ibv_reregister_physical_mr or similar
-> > >   API to update mappings on guest memory hotplug/unplug.
-> > > 
-> > > - Memory overcommit/autonuma/THP.
-> > > 
-> > >   This includes techniques such as swap,KSM,COW, page migration.
-> > >   All these rely on ability to move pages around without
-> > >   breaking hardware access.
-> > > 
-> > >   Suggestion: for hardware that supports it,
-> > >   enabling on-demand paging for all registered memory seems
-> > >   to address the issue more or less transparently to guests.
-> > >   This isn't supported by all hardware but might be
-> > >   at least a reasonable first step.
-> > > 
-> > > - Migration: memory tracking.
-> > > 
-> > >   Migration requires detecting hardware access to pages
-> > >   either on write (pre-copy) or any access (post-copy).
-> > >   Post copy just requires ODP support to work with
-> > >   userfaultfd properly.
-> > 
-> > Can you explain what ODP support is?
-> 
-> On demand paging. grep for odp and ODP in libibverbs sources.
+# ndctl list -R 
+{
+  "dev":"region0",
+  "size":34359738368,
+  "available_size":0,
+  "type":"pmem"
+}
 
-OK, that sounds like another chunk of work needed for postcopy
-but OK.
+# grep . /sys/bus/nd/devices/region0/{resource,size}
+region0/resource:0x240000000
+region0/size:34359738368
 
-Dave
+Or you can see the same info by using iasl to dump
+/sys/firmware/acpi/tables/NFIT:
 
-> > >   Pre-copy would require a write-tracking API along
-> > >   the lines of one exposed by KVM or vhost.
-> > >   Each tracked page would be write-protected (causing faults on
-> > >   hardware access) on hardware write fault is generated
-> > >   and recorded, page is made writeable.
-> > 
-> > Can you write-protect like that from the RDMA hardware?
-> > I'd be surprised if the hardware was happy with that.
-> 
-> With ODP capable hardware I think you should be able to.
-> 
-> > > - Migration: moving QP numbers.
-> > > 
-> > >   QP numbers are exposed on the wire and so must move together
-> > >   with the VM.
-> > > 
-> > >   Suggestion: allow specifying QP number when creating a QP.
-> > >   To avoid conflicts between multiple users, initial version can limit
-> > >   library to a single user per device. Multiple VMs can simply
-> > >   attach to distinct VFs.
-> > > 
-> > > - Migration: moving QP state.
-> > > 
-> > >   When migrating the VM, a QP has to be torn down
-> > >   on source and created on destination.
-> > >   We have to migrate e.g. the current PSN - but what
-> > >   should happen when a new packet arrives on source
-> > >   after QP has been torn down?
-> > > 
-> > >   Suggestion 1: move QP to a special state "suspended" and ignore
-> > >   packets, or cause source to retransmit with e.g. an out of
-> > >   resources error. Retransmit counter might need to be
-> > >   adjusted compared to what guest requested to account
-> > >   for the extra need to retransmit.
-> > >   Is there a good existing QP state that does this?
-> > > 
-> > >   Suggestion 2: forward packets to destination somehow.
-> > >   Might overload the fabric as we are crossing e.g.
-> > >   pci bus multiple times.
-> > > 
-> > > - Migration: network update
-> > > 
-> > >   ROCE v1 and infiniband seem to tie connections to
-> > >   hardware specific GIDs which can not be moved by software.
-> > > 
-> > >   Suggestion: limit migration to RoCE v2 initially.
-> > > 
-> > > - Migration: packet loss recovery.
-> > > 
-> > >   As a RoCE address moves across the network, network has
-> > >   to be updated which takes time, meanwhile packet loss seems
-> > >   to be hard to avoid.
-> > > 
-> > >   Suggestion: limit initial support to hardware that is
-> > >   able to recover from occasional packet drops, with
-> > >   some slowdown.
-> > > 
-> > > - Migration: suspend/resume API?
-> > >   It might be easier to pack up state of all resources
-> > >   such as all QP numbers and state of all QPs etc
-> > >   in a single memory buffer, migrate then unpack on destination.
-> > > 
-> > >   Removes need for 2 separate APIs for suspended state and
-> > >   for specifying QPN on creation.
-> > > 
-> > >   This creates a format for serialization that will have to
-> > >   be maintained in a compatible way - it is not clear that
-> > >   the maintainance overhead is worth the potential
-> > >   simplification, if any.
-> > > 
-> > > 
-> > > That's it - I hope this helps, feel free to discuss, preferably copying
-> > > virtio-dev (subscription required for now, people are looking into
-> > > fixing this, sorry about that).
-> > 
-> > Dave
-> > 
-> > > Thanks!
-> > > 
-> > > -- 
-> > > MST
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+[028h 0040   2]                Subtable Type : 0000 [System Physical Address Range]
+[02Ah 0042   2]                       Length : 0038
+
+[02Ch 0044   2]                  Range Index : 0002
+[02Eh 0046   2]        Flags (decoded below) : 0003
+                   Add/Online Operation Only : 1
+                      Proximity Domain Valid : 1
+[030h 0048   4]                     Reserved : 00000000
+[034h 0052   4]             Proximity Domain : 00000000
+[038h 0056  16]           Address Range GUID : 66F0D379-B4F3-4074-AC43-0D3318B78CDB
+[048h 0072   8]           Address Range Base : 0000000240000000
+[050h 0080   8]         Address Range Length : 0000000800000000
+[058h 0088   8]         Memory Map Attribute : 0000000000008008
+
+I expected to see a type 7 region for the NVDIMM physical address range in the
+e820 table, so something like:
+
+[    0.000000] e820: BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdefff] usable
+[    0.000000] BIOS-e820: [mem 0x00000000bffdf000-0x00000000bfffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
+[    0.000000] BIOS-e820: [mem 0x0000000240000000-0x0000000A40000000] persistent (type 7)
+
+Thanks,
+- Ross
