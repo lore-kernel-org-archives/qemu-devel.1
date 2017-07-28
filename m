@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dbEpY-0004AM-Lr
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:38:05 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dbEpb-0004DD-IF
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dbEpX-0002QK-F5
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:38:04 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33692)
+	(envelope-from <zuban32s@gmail.com>) id 1dbEpZ-0002RU-CL
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:38:07 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:33692)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dbEpX-0002Pb-5S
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:38:03 -0400
-Received: by mail-lf0-x241.google.com with SMTP id 65so7022429lfa.0
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 16:38:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dbEpZ-0002Qq-4C
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:38:05 -0400
+Received: by mail-lf0-x243.google.com with SMTP id 65so7022457lfa.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 16:38:04 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Sat, 29 Jul 2017 02:37:51 +0300
-Message-Id: <1501285073-2215-4-git-send-email-zuban32s@gmail.com>
+Date: Sat, 29 Jul 2017 02:37:52 +0300
+Message-Id: <1501285073-2215-5-git-send-email-zuban32s@gmail.com>
 In-Reply-To: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
 References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 3/5] hw/pci: introduce bridge-only
- vendor-specific capability to provide some hints to firmware
+Subject: [Qemu-devel] [PATCH v3 4/5] hw/pci: add QEMU-specific PCI
+ capability to Generic PCI Express Root Port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +27,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com, kevin@koconnor.net, lersek@redhat.com, seabios@seabios.org, kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: marcel@redhat.com, mst@redhat.com, kevin@koconnor.net, lersek@redhat.com, seabios@seabios.org, kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Aleksandr Bezzubikov <abezzubikov@ispras.ru>, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-On PCI init PCI bridges may need some
-extra info about bus number to reserve, IO, memory and
-prefetchable memory limits. QEMU can provide this
-with a special vendor-specific PCI capability.
+From: Aleksandr Bezzubikov <abezzubikov@ispras.ru>
+
+To enable hotplugging of a newly created pcie-pci-bridge,
+we need to tell firmware (SeaBIOS in this case) to reserve
+additional buses for pcie-root-port, that allows us to
+hotplug pcie-pci-bridge into this root port.
+The number of buses to reserve is provided to the device via a corresponding
+property, and to the firmware via new PCI capability.
+The property's default value is 0 to keep default behavior unchanged.
 
 Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
 ---
- hw/pci/pci_bridge.c         | 37 +++++++++++++++++++++++++++++++++++++
- include/hw/pci/pci_bridge.h | 28 ++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ hw/pci-bridge/gen_pcie_root_port.c | 23 +++++++++++++++++++++++
+ hw/pci-bridge/pcie_root_port.c     |  2 +-
+ include/hw/pci/pcie_port.h         |  2 ++
+ 3 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 720119b..e9f12d6 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -408,6 +408,43 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
-     br->bus_name = bus_name;
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index cb694d6..da3caa1 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -16,6 +16,8 @@
+ #include "hw/pci/pcie_port.h"
+ 
+ #define TYPE_GEN_PCIE_ROOT_PORT                "pcie-root-port"
++#define GEN_PCIE_ROOT_PORT(obj) \
++        OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
+ 
+ #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
+ #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
+@@ -26,6 +28,9 @@ typedef struct GenPCIERootPort {
+     /*< public >*/
+ 
+     bool migrate_msix;
++
++    /* additional buses to reserve on firmware init */
++    uint8_t bus_reserve;
+ } GenPCIERootPort;
+ 
+ static uint8_t gen_rp_aer_vector(const PCIDevice *d)
+@@ -60,6 +65,21 @@ static bool gen_rp_test_migrate_msix(void *opaque, int version_id)
+     return rp->migrate_msix;
  }
  
-+
-+int pci_bridge_qemu_cap_init(PCIDevice *dev, int cap_offset,
-+                              uint8_t bus_reserve, uint32_t io_reserve,
-+                              uint16_t non_pref_reserve, uint64_t pref_reserve,
-+                              Error **errp)
++static void gen_rp_realize(PCIDevice *d, Error **errp)
 +{
-+    size_t cap_len = sizeof(PCIBridgeQemuCap);
-+    PCIBridgeQemuCap cap = {
-+            .len = cap_len,
-+            .type = REDHAT_PCI_CAP_QEMU,
-+            .bus_res = bus_reserve,
-+            .non_pref_16 = non_pref_reserve
-+    };
++    rp_realize(d, errp);
++    PCIESlot *s = PCIE_SLOT(d);
++    GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
 +
-+    if ((uint8_t)io_reserve == io_reserve) {
-+        cap.io_8 = io_reserve;
-+    } else {
-+        cap.io_32 = io_reserve;
++    int rc = pci_bridge_qemu_cap_init(d, 0, grp->bus_reserve, 0, 0, 0, errp);
++    if (rc < 0) {
++        pcie_chassis_del_slot(s);
++        pcie_cap_exit(d);
++        gen_rp_interrupts_uninit(d);
++        pci_bridge_exitfn(d);
 +    }
-+    if ((uint16_t)pref_reserve == pref_reserve) {
-+        cap.pref_32 = pref_reserve;
-+    } else {
-+        cap.pref_64 = pref_reserve;
-+    }
-+
-+    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
-+                                    cap_offset, cap_len, errp);
-+    if (offset < 0) {
-+        return offset;
-+    }
-+
-+    memcpy(dev->config + offset + PCI_CAP_FLAGS,
-+            (char *)&cap + PCI_CAP_FLAGS,
-+            cap_len - PCI_CAP_FLAGS);
-+    return 0;
 +}
 +
- static const TypeInfo pci_bridge_type_info = {
-     .name = TYPE_PCI_BRIDGE,
-     .parent = TYPE_PCI_DEVICE,
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index ff7cbaa..e9b7cf4 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -67,4 +67,32 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
- #define  PCI_BRIDGE_CTL_DISCARD_STATUS	0x400	/* Discard timer status */
- #define  PCI_BRIDGE_CTL_DISCARD_SERR	0x800	/* Discard timer SERR# enable */
+ static const VMStateDescription vmstate_rp_dev = {
+     .name = "pcie-root-port",
+     .version_id = 1,
+@@ -78,6 +98,7 @@ static const VMStateDescription vmstate_rp_dev = {
  
-+typedef struct PCIBridgeQemuCap {
-+    uint8_t id;     /* Standard PCI capability header field */
-+    uint8_t next;   /* Standard PCI capability header field */
-+    uint8_t len;    /* Standard PCI vendor-specific capability header field */
-+    uint8_t type;   /* Red Hat vendor-specific capability type.
-+                       Types are defined with REDHAT_PCI_CAP_ prefix */
+ static Property gen_rp_props[] = {
+     DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
++    DEFINE_PROP_UINT8("bus-reserve", GenPCIERootPort, bus_reserve, 0),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+@@ -89,6 +110,8 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
+ 
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_RP;
++    k->realize = gen_rp_realize;
 +
-+    uint16_t non_pref_16;   /* Non-prefetchable memory limit */
-+    uint8_t bus_res;        /* Minimum number of buses to reserve */
-+    uint8_t io_8;           /* IO space limit in case of 8-bit value */
-+    uint32_t io_32;         /* IO space limit in case of 32-bit value
-+                               This 2 values are mutually exclusive,
-+                               i.e. they can't be  >0 both*/
-+    uint32_t pref_32;       /* Prefetchable memory limit
-+                               in case of 32-bit value */
-+    uint64_t pref_64;       /* Prefetchable memory limit
-+                               in case of 64-bit value
-+                               This 2 values are mutually exclusive (just as
-+                               IO limit), i.e. they can't be  >0 both */
-+} PCIBridgeQemuCap;
+     dc->desc = "PCI Express Root Port";
+     dc->vmsd = &vmstate_rp_dev;
+     dc->props = gen_rp_props;
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index 4d588cb..2f3bcb1 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -52,7 +52,7 @@ static void rp_reset(DeviceState *qdev)
+     pci_bridge_disable_base_limit(d);
+ }
+ 
+-static void rp_realize(PCIDevice *d, Error **errp)
++void rp_realize(PCIDevice *d, Error **errp)
+ {
+     PCIEPort *p = PCIE_PORT(d);
+     PCIESlot *s = PCIE_SLOT(d);
+diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+index 1333266..febd96a 100644
+--- a/include/hw/pci/pcie_port.h
++++ b/include/hw/pci/pcie_port.h
+@@ -63,6 +63,8 @@ void pcie_chassis_del_slot(PCIESlot *s);
+ #define PCIE_ROOT_PORT_GET_CLASS(obj) \
+      OBJECT_GET_CLASS(PCIERootPortClass, (obj), TYPE_PCIE_ROOT_PORT)
+ 
++void rp_realize(PCIDevice *d, Error **errp);
 +
-+#define REDHAT_PCI_CAP_QEMU     1
-+
-+int pci_bridge_qemu_cap_init(PCIDevice *dev, int cap_offset,
-+                              uint8_t bus_reserve, uint32_t io_reserve,
-+                              uint16_t mem_reserve, uint64_t pref_reserve,
-+                              Error **errp);
-+
- #endif /* QEMU_PCI_BRIDGE_H */
+ typedef struct PCIERootPortClass {
+     PCIDeviceClass parent_class;
+ 
 -- 
 2.7.4
