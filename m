@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47301)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxwo-0003sA-T6
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:36:28 -0400
+	id 1daxwq-0003tG-SP
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxwl-0002mZ-JH
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:36:26 -0400
+	id 1daxwp-0002ra-Uz
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:36:28 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 28 Jul 2017 02:35:23 -0300
-Message-Id: <20170728053610.15770-1-f4bug@amsat.org>
+Date: Fri, 28 Jul 2017 02:35:25 -0300
+Message-Id: <20170728053610.15770-3-f4bug@amsat.org>
+In-Reply-To: <20170728053610.15770-1-f4bug@amsat.org>
+References: <20170728053610.15770-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/47] add missing entries in MAINTAINERS
+Subject: [Qemu-devel] [PATCH 02/47] MAINTAINERS: add missing ARM entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-Hi,
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-I first prepared this series thinking about 2.10 but then realized if someone
-is calling ./scripts/get_maintainer.pl he better is using an updated git
-clone :)
-
-Distribs do provide docs/ files in /usr/share/doc/qemu* but not the
-MAINTAINERS file so no hurry for this series.
-
-I provided the script I used in the last patch, I plan to improve it so
-patchew/travis can start to use it: if a new file is added to the repository
-without being covered in MAINTAINERS the script remember the submitter about
-it and eventually he'll resend his patch, I think this is a good practice and
-help the next contributors (anyway this is a valuable experience to look at a
-file history to see who has been hacking around when there is no MAINTAINERS
-entry).
-
-I don't want to overburden current maintainers, so the last patches add
-Orphans entries but I tried to select relevant commiters and include them in
-each patch.
-
-The criteria I used is "If I change this file, who should I notify? Who would
-be interested?"
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (47):
-  MAINTAINERS: add missing entry for documentation
-  MAINTAINERS: add missing ARM entries
-  MAINTAINERS: add missing STM32 entry
-  MAINTAINERS: add missing USB entry
-  MAINTAINERS: add missing KVM entry
-  MAINTAINERS: add missing entry for vhost
-  MAINTAINERS: add missing entry for vfio/ccw
-  MAINTAINERS: add missing entry for virtio
-  MAINTAINERS: add missing entry for virtio/9p
-  MAINTAINERS: add missing entry for virtio/blk
-  MAINTAINERS: add missing entry for virtio/ccw
-  MAINTAINERS: add missing entry for virtio/input
-  MAINTAINERS: add missing entry for virtio/rng
-  MAINTAINERS: add missing entry for virtio/crypto
-  MAINTAINERS: add missing VMWare entry
-  MAINTAINERS: add missing entry for gdb
-  MAINTAINERS: add missing guest-agent entries
-  MAINTAINERS: add missing TCG entry
-  MAINTAINERS: add missing qcow2 entry
-  MAINTAINERS: add missing PCI entries
-  MAINTAINERS: add missing CRIS entry
-  MAINTAINERS: add missing M68k entry
-  MAINTAINERS: add missing LM32 entry
-  MAINTAINERS: add missing MicroBlaze entry
-  MAINTAINERS: add missing MIPS entry
-  MAINTAINERS: add missing NiosII entry
-  MAINTAINERS: add missing OpenRISC entry
-  MAINTAINERS: add missing PowerPC entry
-  MAINTAINERS: add missing SH-4 entry
-  MAINTAINERS: add missing SPARC entry
-  MAINTAINERS: add missing TriCore entry
-  MAINTAINERS: add missing UniCore32 entry
-  MAINTAINERS: add missing Xtensa entry
-  MAINTAINERS: add missing X86 entries
-  MAINTAINERS: add missing entries for throttling infra
-  MAINTAINERS: add missing entry test for megasas
-  MAINTAINERS: update docs/devel/ entries
-  MAINTAINERS: update docs/interop/ entries
-  RFC MAINTAINERS: add missing SSI entries
-  RFC MAINTAINERS: add missing entry for AIO
-  RFC MAINTAINERS: add missing I2C entries
-  RFC MAINTAINERS: add missing Bluetooth entries
-  RFC MAINTAINERS: add missing TPM entries
-  RFC MAINTAINERS: add missing entry for tilegx
-  RFC MAINTAINERS: add missing entries for loader
-  RFC MAINTAINERS: add missing entries for Coccinelle scripts
-  MAINTAINERS: script to find outdated entry
-
- MAINTAINERS                 | 102 ++++++++++++++++++++++++++++++++++++++++----
- scripts/check_maintainer.sh |  21 +++++++++
- 2 files changed, 114 insertions(+), 9 deletions(-)
- create mode 100755 scripts/check_maintainer.sh
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 972118e70b..795f89f709 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -120,6 +120,8 @@ F: include/hw/cpu/a*mpcore.h
+ F: disas/arm.c
+ F: disas/arm-a64.cc
+ F: disas/libvixl/
++F: default-configs/arm-softmmu.mak
++F: default-configs/aarch64-softmmu.mak
+ 
+ CRIS
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+@@ -380,6 +382,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: hw/char/pl011.c
++F: include/hw/char/pl011.h
+ F: hw/display/pl110*
+ F: hw/dma/pl080.c
+ F: hw/dma/pl330.c
+@@ -402,14 +405,19 @@ F: hw/intc/arm*
+ F: hw/intc/gic_internal.h
+ F: hw/misc/a9scu.c
+ F: hw/misc/arm11scu.c
++F: hw/misc/arm_sysctl.c
+ F: hw/timer/a9gtimer*
+ F: hw/timer/arm_*
++F: hw/timer/armv7m_systick.c
+ F: include/hw/arm/arm.h
++F: include/hw/arm/armv7m*.h
+ F: include/hw/intc/arm*
+ F: include/hw/misc/a9scu.h
+ F: include/hw/misc/arm11scu.h
+ F: include/hw/timer/a9gtimer.h
+ F: include/hw/timer/arm_mptimer.h
++F: include/hw/timer/armv7m_systick.h
++F: tests/test-arm-mptimer.c
+ 
+ Exynos
+ M: Igor Mitsyanko <i.mitsyanko@gmail.com>
 -- 
 2.13.3
