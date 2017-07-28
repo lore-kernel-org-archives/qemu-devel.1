@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dax3k-0003oZ-B7
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:39:33 -0400
+	(envelope-from <xiong.y.zhang@intel.com>) id 1daxF5-00071D-NP
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dax3g-0007Fi-B5
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:39:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40386)
+	(envelope-from <xiong.y.zhang@intel.com>) id 1daxF2-0005oM-G8
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:51:15 -0400
+Received: from mga09.intel.com ([134.134.136.24]:26611)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dax3g-0007Ep-5x
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:39:28 -0400
-Date: Fri, 28 Jul 2017 12:39:22 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170728043922.GN5117@lemon.lan>
-References: <20170725094026.5376-1-cohuck@redhat.com>
-	<150097670624.105.11799417719809984169@5d477a5b5989>
-	<20170725121918.7c3f1d56@gondolin>
+	(Exim 4.71) (envelope-from <xiong.y.zhang@intel.com>)
+	id 1daxF2-0005nD-8D
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:51:12 -0400
+From: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Date: Fri, 28 Jul 2017 04:51:03 +0000
+Message-ID: <8082FF9BCB2B054996454E47167FF4EC1C572AF2@SHSMSX104.ccr.corp.intel.com>
+References: <20170724120729.24350-1-dmitry@daynix.com>
+	<20170725093148.3898b2da@w520.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C56E3CC@SHSMSX104.ccr.corp.intel.com>
+	<751A50FA-0C7D-433F-B511-F4B13EC67DCC@daynix.com>
+In-Reply-To: <751A50FA-0C7D-433F-B511-F4B13EC67DCC@daynix.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170725121918.7c3f1d56@gondolin>
-Subject: Re: [Qemu-devel] [PULL for-2.10 00/14] A set of s390x patches
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks: Set non-zero GMS memory
+ size for IGD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,17 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: no-reply@patchew.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
+To: Dmitry Fleytman <dmitry@daynix.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
 
-On Tue, 07/25 12:19, Cornelia Huck wrote:
-> > Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> > fatal: unable to access 'https://github.com/patchew-project/qemu/': OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to github.com:443 
-> 
-> Hm... connection issues?
+> > On 26 Jul 2017, at 08:22 AM, Zhang, Xiong Y <xiong.y.zhang@intel.com>
+> wrote:
+> >
+> > Sorry, we indeed found Intel windows guest graphic driver couldn't be b=
+ind
+> when GMS memory size is zero. And we have fixed it and the next intel
+> windows driver release will contain this fix.
+> > So currently please use x-igd-gms in legacy mode to work around this.
+> >
+> > BTW, how did you know window driver allocate extra ~4G memory when
+> GMS size set to 0 ?
+>=20
+> We noticed that with new IGD driver memory usage on VMs raised by around
+> 4G.
+>=20
+> Then we examined memory allocations with poolmon
+> (https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/poolm
+> on)
+> and saw that around 4G of memory is allocated with IGD driver pool tag.
+> Additionally we noticed that on VMs with less than 5G of memory IGD drive=
+r
+> does not load and system does fallback to standard VGA driver.
+>=20
+[Zhang, Xiong Y]  I tried our internal driver and didn't found the above tw=
+o issues, please wait for the next intel graphic driver release.
 
-Yes, patchew still doesn't have the ability to distinguish env/network issue
-from real failures. This one should be easy to add because it happens in the
-preparation phase, maybe it's a good idea for the next thing to work on.
-
-Fam
+thanks
