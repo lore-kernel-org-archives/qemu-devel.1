@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1db4qZ-0003S4-Au
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:58:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1db4rw-0005mm-BN
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1db4qW-000793-Gs
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:58:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51594)
+	(envelope-from <kraxel@redhat.com>) id 1db4rm-0008Lb-CV
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1db4qW-000780-7u
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:58:24 -0400
-Date: Fri, 28 Jul 2017 14:58:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170728145819.2dd0e608@gondolin>
-In-Reply-To: <f183e2d8-4f75-2981-e148-02c88014a4b1@linux.vnet.ibm.com>
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
-	<20170727135910.27d9e42e@gondolin>
-	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
-	<20170727161457.58b3c7d1@gondolin>
-	<abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
-	<20170728121101.2a85216a@gondolin>
-	<f183e2d8-4f75-2981-e148-02c88014a4b1@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
- initialized CRW for channel path hotplug
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1db4rm-0008Kj-0L
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:59:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D7C848E386
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:59:40 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 28 Jul 2017 14:59:34 +0200
+Message-Id: <20170728125935.18167-3-kraxel@redhat.com>
+In-Reply-To: <20170728125935.18167-1-kraxel@redhat.com>
+References: <20170728125935.18167-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 2/3] ui: drop ac_search and ac_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,76 +29,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 28 Jul 2017 14:32:11 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Both keys exist already: "ac_search" is "find" and "ac_stop" is "stop".
 
-> On 07/28/2017 12:11 PM, Cornelia Huck wrote:
-> > On Thu, 27 Jul 2017 18:15:07 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Fixes: 37810e80553c19f0dac3644924895a9bf5c70785
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170728063415.27480-1-kraxel@redhat.com
+---
+ hw/input/ps2.c    | 8 ++++----
+ ui/input-keymap.c | 8 ++++----
+ qapi-schema.json  | 5 +----
+ 3 files changed, 9 insertions(+), 12 deletions(-)
 
-> >> So my intention was to ask: What benefits do we expect from these 'real'
-> >> virtual channel paths?   
-> > 
-> > Path grouping and friends come to mind. This depends on whether you
-> > want to pass-through channel paths to the guest, of course, but you
-> > really need management to deal with things like reserve/release on ECKD
-> > correctly.  
-> 
-> Pass-through means dedicated in this case (that is the passed trough paths
-> are not used by the host -- correct me if my understanding is wrong).
-
-There's nothing that speaks against path sharing, I think. Especially
-as e.g. SetPGID is "first one gets to set it".
-
-> 
-> This whole multipath/grouping stuff is currently a gray spot for me. I've
-> tired to revisit the corresponding parts of the AR, but there ain't much
-> on it in the documents I have.
-> 
-> Is the protocol for managing multipath equipment (device, maybe also CU)
-> dependent? The PoP (and the IO AR) talk about set-multipath-mode type
-> of command and similar (disband, resign) but how this type of command
-> looks like -- no idea. From the kernel code one can learn more details,
-> but that's just an implementation.
-
-Path selection and friends should all be in the base I/O documentation
-(maybe something in the common I/O device commands, as well.) Path
-grouping is device-specific.
-
-> 
-> Can you recommend me a publication where the controls you talk about
-> are specified?
-
-For SetPGID etc., I'd recommend the DASD documentation (the one
-specifying the channel commands supported). Don't have the publication
-number handy, sorry.
-
-> 
-> > Also failover etc. Preferred channel paths are not relevant
-> > on modern hardware anymore, fortunately (AFAIK).
-> >  
-> 
-> If I understand you correctly it ain't possible to handle these
-> in the host (and let the guest a simple 'non-real' virtual
-> channel path whose reliability depends on what the host does),
-> or?
-
-It is possible. Mapping to a virtual channel path or not is basically a
-design decision (IIRC, z/VM supports both).
-
-Mapping everything to a virtual chpid basically concentrates all
-path-related handling in the hypervisor. This allows for a dumb guest
-OS, but can make errors really hard to debug from the guest side.
-
-Exposing real channel paths to the guest means that the guest OS needs
-to be able to deal with path-related things, but OTOH it has more
-control. As I don't think we'll ever want to support a guest OS that
-does not also run under LPAR, I'd prefer that way.
-
-> 
-> Thanks for the explanations!
-
-You're welcome!
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 9f057e46ea..77906d5f46 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -239,11 +239,11 @@ static const uint16_t qcode_to_keycode_set1[Q_KEY_CODE__MAX] = {
+     [Q_KEY_CODE_MAIL] = 0xe06c,
+     [Q_KEY_CODE_CALCULATOR] = 0xe021,
+     [Q_KEY_CODE_COMPUTER] = 0xe06b,
+-    [Q_KEY_CODE_AC_SEARCH] = 0xe065,
++    [Q_KEY_CODE_FIND] = 0xe065,
+     [Q_KEY_CODE_AC_HOME] = 0xe032,
+     [Q_KEY_CODE_AC_BACK] = 0xe06a,
+     [Q_KEY_CODE_AC_FORWARD] = 0xe069,
+-    [Q_KEY_CODE_AC_STOP] = 0xe068,
++    [Q_KEY_CODE_STOP] = 0xe068,
+     [Q_KEY_CODE_AC_REFRESH] = 0xe067,
+     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe066,
+ 
+@@ -379,11 +379,11 @@ static const uint16_t qcode_to_keycode_set2[Q_KEY_CODE__MAX] = {
+     [Q_KEY_CODE_MAIL] = 0xe048,
+     [Q_KEY_CODE_CALCULATOR] = 0xe02b,
+     [Q_KEY_CODE_COMPUTER] = 0xe040,
+-    [Q_KEY_CODE_AC_SEARCH] = 0xe010,
++    [Q_KEY_CODE_FIND] = 0xe010,
+     [Q_KEY_CODE_AC_HOME] = 0xe03a,
+     [Q_KEY_CODE_AC_BACK] = 0xe038,
+     [Q_KEY_CODE_AC_FORWARD] = 0xe030,
+-    [Q_KEY_CODE_AC_STOP] = 0xe028,
++    [Q_KEY_CODE_STOP] = 0xe028,
+     [Q_KEY_CODE_AC_REFRESH] = 0xe020,
+     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe018,
+ 
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index 0d9ddde9c9..cdad5652d3 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -123,13 +123,13 @@ static int linux_to_qcode[KEY_CNT] = {
+     [KEY_MAIL]           = Q_KEY_CODE_MAIL,
+     [KEY_COMPUTER]       = Q_KEY_CODE_COMPUTER,
+ 
+-    [KEY_STOP]           = Q_KEY_CODE_AC_STOP,
++    [KEY_STOP]           = Q_KEY_CODE_STOP,
+     [KEY_BOOKMARKS]      = Q_KEY_CODE_AC_BOOKMARKS,
+     [KEY_BACK]           = Q_KEY_CODE_AC_BACK,
+     [KEY_FORWARD]        = Q_KEY_CODE_AC_FORWARD,
+     [KEY_HOMEPAGE]       = Q_KEY_CODE_AC_HOME,
+     [KEY_REFRESH]        = Q_KEY_CODE_AC_REFRESH,
+-    [KEY_FIND]           = Q_KEY_CODE_AC_SEARCH,
++    [KEY_FIND]           = Q_KEY_CODE_FIND,
+ 
+     [KEY_NEXTSONG]       = Q_KEY_CODE_AUDIONEXT,
+     [KEY_PREVIOUSSONG]   = Q_KEY_CODE_AUDIOPREV,
+@@ -279,13 +279,13 @@ static const int qcode_to_number[] = {
+     [Q_KEY_CODE_MAIL] = 0xec,
+     [Q_KEY_CODE_COMPUTER] = 0xeb,
+ 
+-    [Q_KEY_CODE_AC_STOP] = 0xe8,
++    [Q_KEY_CODE_STOP] = 0xe8,
+     [Q_KEY_CODE_AC_BOOKMARKS] = 0xe6,
+     [Q_KEY_CODE_AC_BACK] = 0xea,
+     [Q_KEY_CODE_AC_FORWARD] = 0xe9,
+     [Q_KEY_CODE_AC_HOME] = 0xb2,
+     [Q_KEY_CODE_AC_REFRESH] = 0xe7,
+-    [Q_KEY_CODE_AC_SEARCH] = 0xe5,
++    [Q_KEY_CODE_FIND] = 0xe5,
+ 
+     [Q_KEY_CODE_AUDIONEXT] = 0x99,
+     [Q_KEY_CODE_AUDIOPREV] = 0x90,
+diff --git a/qapi-schema.json b/qapi-schema.json
+index dcc12c83a9..c96f0a26f6 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4856,11 +4856,9 @@
+ # @mail: since 2.10
+ # @calculator: since 2.10
+ # @computer: since 2.10
+-# @ac_search: since 2.10
+ # @ac_home: since 2.10
+ # @ac_back: since 2.10
+ # @ac_forward: since 2.10
+-# @ac_stop: since 2.10
+ # @ac_refresh: since 2.10
+ # @ac_bookmarks: since 2.10
+ # altgr, altgr_r: dropped in 2.10
+@@ -4890,8 +4888,7 @@
+             'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
+             'volumeup', 'volumedown', 'mediaselect',
+             'mail', 'calculator', 'computer',
+-            'ac_search', 'ac_home', 'ac_back', 'ac_forward', 'ac_stop',
+-            'ac_refresh', 'ac_bookmarks' ] }
++            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks' ] }
+ 
+ ##
+ # @KeyValue:
+-- 
+2.9.3
