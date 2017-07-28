@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60920)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dbE1U-00055S-Gs
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:21 -0400
+	id 1dbE1W-000561-2d
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dbE1S-00028i-GJ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:20 -0400
+	id 1dbE1V-0002Bt-BA
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 18:46:22 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 28 Jul 2017 19:46:01 -0300
-Message-Id: <20170728224608.3598-2-f4bug@amsat.org>
+Date: Fri, 28 Jul 2017 19:46:02 -0300
+Message-Id: <20170728224608.3598-3-f4bug@amsat.org>
 In-Reply-To: <20170728224608.3598-1-f4bug@amsat.org>
 References: <20170728224608.3598-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 for 2.10 1/8] docs: fix broken paths to
- docs/interop dir
+Subject: [Qemu-devel] [PATCH v2 for 2.10 2/8] docs: fix broken paths to
+ docs/interop/qcow2.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
 
-From: Cleber Rosa <crosa@redhat.com>
+With the move of some docs to docs/interop on d59157ea05, a reference path
+was not updated.
 
-With the move of some docs to docs/interop on d59157e, a couple of
-references were not updated.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-[PMD: fixed a typo and another reference of docs/interop/qmp-spec.txt]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- docs/devel/writing-qmp-commands.txt | 2 +-
- qapi-schema.json                    | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ docs/qcow2-cache.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp-commands.txt
-index 1e6375495b..69793e320e 100644
---- a/docs/devel/writing-qmp-commands.txt
-+++ b/docs/devel/writing-qmp-commands.txt
-@@ -8,7 +8,7 @@ into the QAPI framework implementation.
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index 1fdd6f9ce7..b0571de4b8 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -15,7 +15,7 @@ not a straightforward operation.
+ This document attempts to give an overview of the L2 and refcount
+ caches, and how to configure them.
  
- For an in-depth introduction to the QAPI framework, please refer to
- docs/qapi-code-gen.txt. For documentation about the QMP protocol,
--start with docs/qmp-intro.txt.
-+start with docs/interop/qmp-intro.txt.
+-Please refer to the docs/specs/qcow2.txt file for an in-depth
++Please refer to the docs/interop/qcow2.txt file for an in-depth
+ technical description of the qcow2 file format.
  
- == Overview ==
  
-diff --git a/qapi-schema.json b/qapi-schema.json
-index c96f0a26f6..802ea53d00 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -23,7 +23,7 @@
- # | -> data issued by the Client
- # | <- Server data response
- #
--# Please, refer to the QMP specification (docs/qmp-spec.txt) for
-+# Please, refer to the QMP specification (docs/interop/qmp-spec.txt) for
- # detailed information on the Server command and response formats.
- #
- # = Stability Considerations
-@@ -108,7 +108,7 @@
- #
- # Notes: This command is valid exactly when first connecting: it must be
- # issued before any other command will be accepted, and will fail once the
--# monitor is accepting other commands. (see qemu docs/qmp-spec.txt)
-+# monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt)
- #
- # Since: 0.13
- #
 -- 
 2.13.3
