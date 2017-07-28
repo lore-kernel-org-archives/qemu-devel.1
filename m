@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1db0Xu-0000Zh-Bp
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:22:55 -0400
+	(envelope-from <groug@kaod.org>) id 1db0Y4-0000iV-Az
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1db0Xt-0003rO-0N
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:22:54 -0400
-Received: from mga01.intel.com ([192.55.52.88]:46470)
+	(envelope-from <groug@kaod.org>) id 1db0Xz-0003xN-9u
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:23:04 -0400
+Received: from 4.mo7.mail-out.ovh.net ([178.32.122.254]:52880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1db0Xs-0003jr-MJ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:22:52 -0400
-Message-ID: <597AF4EF.4020705@intel.com>
-Date: Fri, 28 Jul 2017 16:25:19 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1db0Xz-0003vq-3H
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:22:59 -0400
+Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id A6F1266D07
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:22:57 +0200 (CEST)
+Date: Fri, 28 Jul 2017 10:22:53 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170728102253.3872842f@bahia.lan>
+In-Reply-To: <20170728053610.15770-10-f4bug@amsat.org>
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-10-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/pmTKLw_myNSr..ZFMVTmkmW";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 09/47] MAINTAINERS: add missing entry for
+ virtio/9p
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, mhocko@kernel.org, willy@infradead.org
-Cc: virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: "Aneesh Kumar K . V" <aneesh.kumar@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 07/12/2017 08:40 PM, Wei Wang wrote:
-> Add a new feature, VIRTIO_BALLOON_F_SG, which enables to
-> transfer a chunk of ballooned (i.e. inflated/deflated) pages using
-> scatter-gather lists to the host.
->
-> The implementation of the previous virtio-balloon is not very
-> efficient, because the balloon pages are transferred to the
-> host one by one. Here is the breakdown of the time in percentage
-> spent on each step of the balloon inflating process (inflating
-> 7GB of an 8GB idle guest).
->
-> 1) allocating pages (6.5%)
-> 2) sending PFNs to host (68.3%)
-> 3) address translation (6.1%)
-> 4) madvise (19%)
->
-> It takes about 4126ms for the inflating process to complete.
-> The above profiling shows that the bottlenecks are stage 2)
-> and stage 4).
->
-> This patch optimizes step 2) by transferring pages to the host in
-> sgs. An sg describes a chunk of guest physically continuous pages.
-> With this mechanism, step 4) can also be optimized by doing address
-> translation and madvise() in chunks rather than page by page.
->
-> With this new feature, the above ballooning process takes ~491ms
-> resulting in an improvement of ~88%.
->
+--Sig_/pmTKLw_myNSr..ZFMVTmkmW
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 28 Jul 2017 02:35:32 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-I found a recent mm patch, bb01b64cfab7c22f3848cb73dc0c2b46b8d38499
-, zeros all the ballooned pages, which is very time consuming.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 6da3264d4e..4f9ce6e686 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1056,6 +1056,7 @@ S: Supported
+>  F: hw/9pfs/
+>  F: fsdev/
+>  F: tests/virtio-9p-test.c
+> +F: include/standard-headers/linux/virtio_9p.h
 
-Tests show that the time to balloon 7G pages is increased from ~491 ms to
-2.8 seconds with the above patch.
+I don't really know what to do here... I see no other standard headers in
+the MAINTAINERS file.
 
-How about moving the zero operation to the hypervisor? In this way, we
-will have a much faster balloon process.
+>  T: git git://github.com/kvaneesh/QEMU.git
+>  T: git git://github.com/gkurz/qemu.git 9p-next
+> =20
 
 
-Best,
-Wei
+--Sig_/pmTKLw_myNSr..ZFMVTmkmW
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAll69F0ACgkQAvw66wEB28KXbgCdGVE5sHWMdh/Lq8hIZDn+EKtL
+yx0AmwQLf/XfP/fW4XTagn6TpDVfxNm+
+=oIFv
+-----END PGP SIGNATURE-----
+
+--Sig_/pmTKLw_myNSr..ZFMVTmkmW--
