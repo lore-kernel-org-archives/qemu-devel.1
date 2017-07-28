@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dbEmR-0000aw-GV
+	(envelope-from <zuban32s@gmail.com>) id 1dbEmR-0000ax-JU
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dbEmP-0007eU-J9
+	(envelope-from <zuban32s@gmail.com>) id 1dbEmQ-0007g4-KI
 	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:34:51 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36722)
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:38803)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dbEmP-0007bo-8i
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:34:49 -0400
-Received: by mail-lf0-x244.google.com with SMTP id t128so10842274lff.3
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 16:34:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dbEmQ-0007eJ-Ct
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:34:50 -0400
+Received: by mail-lf0-x241.google.com with SMTP id y15so11398907lfd.5
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 16:34:50 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Sat, 29 Jul 2017 02:34:30 +0300
-Message-Id: <1501284872-2078-2-git-send-email-zuban32s@gmail.com>
+Date: Sat, 29 Jul 2017 02:34:32 +0300
+Message-Id: <1501284872-2078-4-git-send-email-zuban32s@gmail.com>
 In-Reply-To: <1501284872-2078-1-git-send-email-zuban32s@gmail.com>
 References: <1501284872-2078-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] pci: refactor pci_find_capapibilty to
- get bdf as the first argument instead of the whole pci_device
+Subject: [Qemu-devel] [PATCH v3 3/3] pci: enable RedHat PCI bridges to
+ reserve additional buses on PCI init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +29,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: seabios@seabios.org
 Cc: marcel@redhat.com, mst@redhat.com, kevin@koconnor.net, lersek@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-Refactor pci_find_capability function to get bdf instead of
-a whole pci_device* as the only necessary field for this function
-is still bdf.
-
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+In case of Red Hat Generic PCIE Root Port reserve additional buses,
+which number is provided in a vendor-specific capability.
 
 Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
 ---
- src/fw/pciinit.c    |  4 ++--
- src/hw/pci.c        | 25 +++++++++++++++++++++++++
- src/hw/pci.h        |  1 +
- src/hw/pcidevice.c  | 24 ------------------------
- src/hw/pcidevice.h  |  1 -
- src/hw/virtio-pci.c |  6 +++---
- 6 files changed, 31 insertions(+), 30 deletions(-)
+ src/fw/pciinit.c | 37 +++++++++++++++++++++++++++++++++++--
+ src/hw/pci_ids.h |  3 +++
+ src/types.h      |  2 ++
+ 3 files changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
-index 08221e6..864954f 100644
+index 864954f..a302a85 100644
 --- a/src/fw/pciinit.c
 +++ b/src/fw/pciinit.c
-@@ -762,7 +762,7 @@ static int pci_bus_hotplug_support(struct pci_bus *bus, u8 pcie_cap)
-         return downstream_port && slot_implemented;
-     }
- 
--    shpc_cap = pci_find_capability(bus->bus_dev, PCI_CAP_ID_SHPC, 0);
-+    shpc_cap = pci_find_capability(bus->bus_dev->bdf, PCI_CAP_ID_SHPC, 0);
-     return !!shpc_cap;
- }
- 
-@@ -844,7 +844,7 @@ static int pci_bios_check_devices(struct pci_bus *busses)
-              */
-             parent = &busses[0];
-         int type;
--        u8 pcie_cap = pci_find_capability(s->bus_dev, PCI_CAP_ID_EXP, 0);
-+        u8 pcie_cap = pci_find_capability(s->bus_dev->bdf, PCI_CAP_ID_EXP, 0);
-         int hotplug_support = pci_bus_hotplug_support(s, pcie_cap);
-         for (type = 0; type < PCI_REGION_TYPE_COUNT; type++) {
-             u64 align = (type == PCI_REGION_TYPE_IO) ?
-diff --git a/src/hw/pci.c b/src/hw/pci.c
-index 8e3d617..50d9d2d 100644
---- a/src/hw/pci.c
-+++ b/src/hw/pci.c
-@@ -58,6 +58,30 @@ pci_config_maskw(u16 bdf, u32 addr, u16 off, u16 on)
-     pci_config_writew(bdf, addr, val);
- }
- 
-+u8 pci_find_capability(u16 bdf, u8 cap_id, u8 cap)
-+{
-+    int i;
-+    u16 status = pci_config_readw(bdf, PCI_STATUS);
-+
-+    if (!(status & PCI_STATUS_CAP_LIST))
-+        return 0;
-+
-+    if (cap == 0) {
-+        /* find first */
-+        cap = pci_config_readb(bdf, PCI_CAPABILITY_LIST);
-+    } else {
-+        /* find next */
-+        cap = pci_config_readb(bdf, cap + PCI_CAP_LIST_NEXT);
-+    }
-+    for (i = 0; cap && i <= 0xff; i++) {
-+        if (pci_config_readb(bdf, cap + PCI_CAP_LIST_ID) == cap_id)
-+            return cap;
-+        cap = pci_config_readb(bdf, cap + PCI_CAP_LIST_NEXT);
-+    }
-+
-+    return 0;
-+}
-+
- // Helper function for foreachbdf() macro - return next device
- int
- pci_next(int bdf, int bus)
-@@ -107,3 +131,4 @@ pci_reboot(void)
-     outb(v|6, PORT_PCI_REBOOT); /* Actually do the reset */
-     udelay(50);
- }
-+
-diff --git a/src/hw/pci.h b/src/hw/pci.h
-index ee6e196..2e30e28 100644
---- a/src/hw/pci.h
-+++ b/src/hw/pci.h
-@@ -39,6 +39,7 @@ u32 pci_config_readl(u16 bdf, u32 addr);
- u16 pci_config_readw(u16 bdf, u32 addr);
- u8 pci_config_readb(u16 bdf, u32 addr);
- void pci_config_maskw(u16 bdf, u32 addr, u16 off, u16 on);
-+u8 pci_find_capability(u16 bdf, u8 cap_id, u8 cap);
- int pci_next(int bdf, int bus);
- int pci_probe_host(void);
- void pci_reboot(void);
-diff --git a/src/hw/pcidevice.c b/src/hw/pcidevice.c
-index cfebf66..8853cf7 100644
---- a/src/hw/pcidevice.c
-+++ b/src/hw/pcidevice.c
-@@ -134,30 +134,6 @@ pci_find_init_device(const struct pci_device_id *ids, void *arg)
-     return NULL;
- }
- 
--u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap)
--{
--    int i;
--    u16 status = pci_config_readw(pci->bdf, PCI_STATUS);
--
--    if (!(status & PCI_STATUS_CAP_LIST))
--        return 0;
--
--    if (cap == 0) {
--        /* find first */
--        cap = pci_config_readb(pci->bdf, PCI_CAPABILITY_LIST);
--    } else {
--        /* find next */
--        cap = pci_config_readb(pci->bdf, cap + PCI_CAP_LIST_NEXT);
--    }
--    for (i = 0; cap && i <= 0xff; i++) {
--        if (pci_config_readb(pci->bdf, cap + PCI_CAP_LIST_ID) == cap_id)
--            return cap;
--        cap = pci_config_readb(pci->bdf, cap + PCI_CAP_LIST_NEXT);
--    }
--
--    return 0;
--}
--
- // Enable PCI bus-mastering (ie, DMA) support on a pci device
- void
- pci_enable_busmaster(struct pci_device *pci)
-diff --git a/src/hw/pcidevice.h b/src/hw/pcidevice.h
-index 354b549..225d545 100644
---- a/src/hw/pcidevice.h
-+++ b/src/hw/pcidevice.h
-@@ -69,7 +69,6 @@ int pci_init_device(const struct pci_device_id *ids
-                     , struct pci_device *pci, void *arg);
- struct pci_device *pci_find_init_device(const struct pci_device_id *ids
-                                         , void *arg);
--u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap);
- void pci_enable_busmaster(struct pci_device *pci);
- u16 pci_enable_iobar(struct pci_device *pci, u32 addr);
- void *pci_enable_membar(struct pci_device *pci, u32 addr);
-diff --git a/src/hw/virtio-pci.c b/src/hw/virtio-pci.c
-index e5c2c33..96f9c6b 100644
---- a/src/hw/virtio-pci.c
-+++ b/src/hw/virtio-pci.c
-@@ -19,7 +19,7 @@
+@@ -15,6 +15,7 @@
+ #include "hw/pcidevice.h" // pci_probe_devices
+ #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
+ #include "hw/pci_regs.h" // PCI_COMMAND
++#include "fw/dev-pci.h" // qemu_pci_cap
+ #include "list.h" // struct hlist_node
  #include "malloc.h" // free
  #include "output.h" // dprintf
- #include "pci.h" // pci_config_readl
--#include "pcidevice.h" // pci_find_capability
-+#include "pcidevice.h" // struct pci_device
- #include "pci_regs.h" // PCI_BASE_ADDRESS_0
- #include "string.h" // memset
- #include "virtio-pci.h"
-@@ -381,7 +381,7 @@ fail:
+@@ -578,9 +579,41 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
+         pci_bios_init_bus_rec(secbus, pci_bus);
  
- void vp_init_simple(struct vp_device *vp, struct pci_device *pci)
- {
--    u8 cap = pci_find_capability(pci, PCI_CAP_ID_VNDR, 0);
-+    u8 cap = pci_find_capability(pci->bdf, PCI_CAP_ID_VNDR, 0);
-     struct vp_cap *vp_cap;
-     const char *mode;
-     u32 offset, base, mul;
-@@ -479,7 +479,7 @@ void vp_init_simple(struct vp_device *vp, struct pci_device *pci)
-                     vp_cap->cap, type, vp_cap->bar, addr, offset, mode);
+         if (subbus != *pci_bus) {
++            u8 res_bus = 0;
++            if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
++                    pci_config_readw(bdf, PCI_DEVICE_ID) ==
++                            PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
++                u8 cap;
++                do {
++                    cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
++                } while (cap &&
++                         pci_config_readb(bdf, cap + PCI_CAP_VNDR_SPEC_TYPE) !=
++                                REDHAT_CAP_TYPE_QEMU);
++                if (cap) {
++                    u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
++                    if (cap_len != QEMU_PCI_CAP_SIZE) {
++                        dprintf(1, "PCI: QEMU cap length %d is invalid\n",
++                                cap_len);
++                    } else {
++                        res_bus = pci_config_readb(bdf,
++                                                   cap + QEMU_PCI_CAP_BUS_RES);
++                        if ((u8)(res_bus + secbus) < secbus ||
++                            (u8)(res_bus + secbus) < res_bus) {
++                            dprintf(1, "PCI: bus_reserve value %d is invalid\n",
++                                    res_bus);
++                            res_bus = 0;
++                        } else {
++                            dprintf(1, "PCI: QEMU cap is found, value = %u\n",
++                                    res_bus);
++                        }
++                    }
++                }
++                res_bus = MAX(*pci_bus, secbus + res_bus);
++            }
+             dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
+-                    subbus, *pci_bus);
+-            subbus = *pci_bus;
++                    subbus, res_bus);
++            subbus = res_bus;
++            *pci_bus = res_bus;
+         } else {
+             dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
          }
+diff --git a/src/hw/pci_ids.h b/src/hw/pci_ids.h
+index 4ac73b4..38fa2ca 100644
+--- a/src/hw/pci_ids.h
++++ b/src/hw/pci_ids.h
+@@ -2263,6 +2263,9 @@
+ #define PCI_DEVICE_ID_KORENIX_JETCARDF0	0x1600
+ #define PCI_DEVICE_ID_KORENIX_JETCARDF1	0x16ff
  
--        cap = pci_find_capability(pci, PCI_CAP_ID_VNDR, cap);
-+        cap = pci_find_capability(pci->bdf, PCI_CAP_ID_VNDR, cap);
-     }
++#define PCI_VENDOR_ID_REDHAT		0x1b36
++#define PCI_DEVICE_ID_REDHAT_ROOT_PORT	0x000C
++
+ #define PCI_VENDOR_ID_TEKRAM		0x1de1
+ #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
  
-     if (vp->common.cap && vp->notify.cap && vp->isr.cap && vp->device.cap) {
+diff --git a/src/types.h b/src/types.h
+index 19d9f6c..75d9108 100644
+--- a/src/types.h
++++ b/src/types.h
+@@ -122,6 +122,8 @@ extern void __force_link_error__only_in_16bit(void) __noreturn;
+             typeof(divisor) __divisor = divisor;        \
+             (((x) + ((__divisor) / 2)) / (__divisor));  \
+         })
++#define MIN(a, b) (((a) < (b)) ? (a) : (b))
++#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+ #define ALIGN(x,a)              __ALIGN_MASK(x,(typeof(x))(a)-1)
+ #define __ALIGN_MASK(x,mask)    (((x)+(mask))&~(mask))
+ #define ALIGN_DOWN(x,a)         ((x) & ~((typeof(x))(a)-1))
 -- 
 2.7.4
