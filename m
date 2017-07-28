@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dawr7-0003Ea-Gh
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dawrD-0003FC-1D
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dawr6-0007ps-Cy
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:29 -0400
-Date: Fri, 28 Jul 2017 13:40:42 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dawr9-0007sT-9t
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 00:26:32 -0400
+Date: Fri, 28 Jul 2017 14:24:03 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170728034042.GD3098@umbus.fritz.box>
+Message-ID: <20170728042403.GK3098@umbus.fritz.box>
 References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<07a10650-f216-99ea-fb48-286887279bf1@linux.vnet.ibm.com>
-	<20170727183926.246b5beb@bahia.lan>
-	<20bc63c9-0649-5b82-5042-61e7313cf833@ozlabs.ru>
+	<150105840463.12000.9666180368681199673.stgit@bahia>
+	<ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
+	<20170727190955.2792d785@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EY/WZ/HvNxOox07X"
+	protocol="application/pgp-signature"; boundary="tKtFalx5NIx0HZ72"
 Content-Disposition: inline
-In-Reply-To: <20bc63c9-0649-5b82-5042-61e7313cf833@ozlabs.ru>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 00/26] spapr: add
- support for PHB hotplug
+In-Reply-To: <20170727190955.2792d785@bahia.lan>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 26/26] spapr: add hotplug hooks
+ for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +27,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
 
---EY/WZ/HvNxOox07X
-Content-Type: text/plain; charset=iso-8859-1
+--tKtFalx5NIx0HZ72
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 28, 2017 at 01:27:05PM +1000, Alexey Kardashevskiy wrote:
-> On 28/07/17 02:39, Greg Kurz wrote:
-> > On Wed, 26 Jul 2017 17:31:17 -0300
-> > Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
-> >=20
-> >> I've tested the patch set using Greg's Github branch. It worked fine i=
-n=20
-> >> my tests
-> >> using a Fedora 26 and an Ubuntu 17.04 guests. I have two observations
-> >> though:
-> >>
-> >> 1 - This is not related to this patch set per se because it is=20
-> >> reproducible on master, but
-> >> I think it is interfering with this new feature.  There is a=20
-> >> warning/error message in
-> >> the kernel right after SLOF that goes:
-> >>
-> >> (...)
-> >>   -> smp_release_cpus() =20
-> >> spinning_secondaries =3D 0
-> >>   <- smp_release_cpus()
-> >> Linux ppc64le
-> >> #1 SMP Mon Jul 1[    0.030450] pci 0000:00:02.0: of_irq_parse_pci:=20
-> >> failed with rc=3D-22
-> >> [    0.030552] pci 0000:00:0f.0: of_irq_parse_pci: failed with rc=3D-22
-> >> [  OK  ] Started Security Auditing Service.
-> >> (...)
-> >>
-> >=20
-> > This is a regression in QEMU master introduced by this commit:
-> >=20
-> > commit b87680427e8a3ff682f66514e99a8344e7437247
-> > Author: C=E9dric Le Goater <clg@kaod.org>
-> > Date:   Wed Jul 5 19:13:15 2017 +0200
-> >=20
-> >     spapr: populate device tree depending on XIVE_EXPLOIT option
-> >    =20
-> >     When XIVE is supported, the device tree should be populated
-> >     accordingly and the XIVE memory regions mapped to activate MMIOs.
-> >    =20
-> >     Depending on the design we choose, we could also allocate different
-> >     ICS and ICP objects, or switch between objects. This needs to be
-> >     discussed.
-> >    =20
-> >     Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
-> > It is very similar to the issue that motivated the new KVMPPC_H_UPDATE_=
-PHANDLE
-> > hcall (see patch 24 and 26 in this series):
-> >=20
-> > - QEMU creates an "interrupt-controller" node with a phandle property
-> >   with the value 0x1111
-> > - QEMU passes the FDT to SLOF
-> > - SLOF converts all references to the phandle to an SLOF internal value
-> >=20
-> > =3D> from now on (ie, until the next machine reset), the guest only kno=
-ws
-> >    the OF phandle.
-> >=20
-> > - during CAS, if we go XICS, we send back an updated FDT with the
-> >   phandle of the "interrupt-controller" node reverted to 0x1111
-> >=20
-> > =3D> the guest complains because all cold-plugged devices nodes refer
-> >    to the OF phandle, not 0x1111
-> >=20
-> > A solution is to use the value set by KVMPPC_H_UPDATE_PHANDLE during CAS
-> > instead of 0x1111. I could verify it makes the guest warning disappear.
-> >=20
-> > I'll send a dedicated patchset to fix this in 2.10.
+On Thu, Jul 27, 2017 at 07:09:55PM +0200, Greg Kurz wrote:
+> On Thu, 27 Jul 2017 14:41:31 +1000
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 >=20
+> > On 26/07/17 18:40, Greg Kurz wrote:
+> > > Hotplugging PHBs is a machine-level operation, but PHBs reside on the
+> > > main system bus, so we register spapr machine as the handler for the
+> > > main system bus.
+> > >=20
+> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > > - rebased against ppc-for-2.10
+> > > - converted to unplug_request
+> > > - handle drc_id at pre-plug
+> > > - reset hotplugged PHB at plug
+> > > - compatibility with older machine types
+> > > ---
+> > >  hw/ppc/spapr.c              |  114 +++++++++++++++++++++++++++++++++=
+++++++++++
+> > >  hw/ppc/spapr_drc.c          |    1=20
+> > >  hw/ppc/spapr_pci.c          |    2 -
+> > >  include/hw/pci-host/spapr.h |    2 +
+> > >  include/hw/ppc/spapr.h      |    1=20
+> > >  5 files changed, 118 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 90485054c2e7..589f76ef9fb8 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -2540,6 +2540,10 @@ static void ppc_spapr_init(MachineState *machi=
+ne)
+> > >      register_savevm_live(NULL, "spapr/htab", -1, 1,
+> > >                           &savevm_htab_handlers, spapr);
+> > > =20
+> > > +    if (spapr->dr_phb_enabled) {
+> > > +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machin=
+e), NULL);
+> > > +    }
+> > > +
+> > >      qemu_register_boot_set(spapr_boot_set, spapr);
+> > > =20
+> > >      if (kvm_enabled()) {
+> > > @@ -3238,6 +3242,103 @@ out:
+> > >      error_propagate(errp, local_err);
+> > >  }
+> > > =20
+> > > +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceSt=
+ate *dev,
+> > > +                               Error **errp)
+> > > +{
+> > > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> > > +
+> > > +    if (sphb->drc_id =3D=3D (uint32_t)-1) {
+> > > +        sphb->drc_id =3D sphb->index;
+> > > +    }
+> > > +
+> > > +    if (sphb->drc_id >=3D SPAPR_DRC_MAX_PHB) {
+> > > +        error_setg(errp, "PHB id %d out of range", sphb->drc_id);
+> > > +    } =20
+> >=20
+> >=20
+> > sphb->index in considered 16bits in the existing code (even though it is
+> > defined as 32bit) and SPAPR_DRC_MAX_PHB is just 256. I'd suggest using =
+the
+> > same limit for both, either 256 or 65536 is fine for me.
+> >=20
+> > It is actually a bit weird - it is possible to completely configure few
+> > PHBs in the command line so they will have index=3D=3D-1 but PCI hotplu=
+g code -
+> > spapr_phb_get_pci_func_drc() and spapr_phb_realize() - does not check f=
+or
+> > this and just does (sphb->index << 16).
 >=20
-> The SLOF I pushed for 2.10 does not have it though. And the rest of XIVE =
-is
-> not targeted for 2.10 anyway. So imho the solution is reverting "spapr:
-> populate device tree depending on XIVE_EXPLOIT option" for 2.10.
+> You're right and this looks like a bug... I'll try to come up with a fix.
+>=20
+> > May be just ditch drc_id, enforce index not to be -1 and use it as drc_=
+id?
+> >=20
+>=20
+> This was how Mike did it in the original patchset but David suggested
+> to introduce drc_id (to preserve existing setups I guess):
+>=20
+> http://patchwork.ozlabs.org/patch/466262/
 
-I agree, I've applied the revert to ppc-for-2.10 now.
+Huh.  So I did.  But.. sorry, I've changed my mind.
+
+The fact that needing a DRC forces us to have a reasonable small id
+for each PHB seems like a good excuse to make index mandatory - I'm
+not convinced anyone was actually creating PHBs without index, and
+this does allow us to simplify a bunch of things.
+
+I'd like to see that done as a preliminary cleanup patch, though.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -121,24 +136,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---EY/WZ/HvNxOox07X
+--tKtFalx5NIx0HZ72
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll6sjcACgkQbDjKyiDZ
-s5KRMxAAy/QfbtJSrn4bGo7EJyxNjeMU8Etv+kEdbA8gt52U7v0Dyg8fPme0tCuR
-BuzOQN3v2KEcs6XVqUnBR2GjoB2PLgFXowWOjtjXaLnPtlUAiakNnNuX7qks/h2L
-kFINTMzgzjNPh2dpjaCDVqOW7aPMAepZoTPS5rIsxeElL67ETuFJiORide6Xw74N
-xqZOfN1hmXrmICZ9UIhJYYEzswbv1HFBQWsfzD1aeJmHM9jRA2a6onMhdyq4Tx4Q
-OYkBLi9iHJ7yKOHHcXYnUMk3bGUfK6H64GB2oKiJbJQjx8MGb9dlOjHumqL+Fjjj
-3RFtHm75rFsfG0/ut7aBWX+NwdHFSlp//hX04TJfOxfgLIA4zIkQEZuhoa/eIxtO
-m43bnOKDiVJXQ80Kw0QORWViaI3cUtMjladViO7tEchRQdhM/8Exhv/UDj6tXiy/
-KDW7oRn4M1giKYbzIJAPeHMCN9YMaWMQqNtraiBFMnV1rC9QJ6b7udWooayEFThZ
-2MK86D3jEdoNgWx4MrZRCtUFfNTqbk/lpStp+U2e9k2ga8PPcKLjSHFKFEqp/zW7
-jaiO/r4/ZD8GUZGPP2dpAgBPfyGGUkxxNn8tEG/YyjJcWlJHWoU9IPJDWgv/0QY0
-jCdvPxkrC3/RSO9qBw12ue4hzHb/McIfVS5h9TGC8Acmk6240Rs=
-=Rfei
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll6vGAACgkQbDjKyiDZ
+s5LQAQ/9EPrHlZ5yIHpQIAoPEl5WLcpy4s1LL2Soo8oXe5HCZGtgRwMIlDc/I9m3
+tAT7AVcWNdNo6/p0X+gS9zjXDoVgdeex/U7UEi2NsUW4lmgUSC5h/gOPA2vtbJQO
+jQmh8esepr/OCj22pN8k7/T8mJjQRY9/klj71KQX4MOQXaE8vtARSUsGu3G6dCG1
+e28kzV8es8pktjM7GqFyVWwvT6ycOu+oXjkR6X1IfqOIQU0qVbX17uKIMGUNiCXI
+B4CGQHxe9onvs78dL+rNvWCnpDppn+LTBn96BxyBmg5HqImcbNvknByf1IQcDu/E
+CeRXZizM4XzD+/sZd0wcFPFlURPttkRvSUy0jX5AUBvV3F1EBDvOaxLAmIX7tzf/
+07+YdDdkL2fANQIw65rFmwnC4Gc9SDtB7tMk3nl53NhvRphjfAVl9FPQgwOP5JOe
+uqjH3aBZ2e5JfYA69UPRlHCd9D3RAtrCqqvsEXxixJXE+K9iOlB4C64FU2pMPwCp
+9dmyIUBp/r5Gf7zVX3cb/EH5tr2hDjnCFZDfV/9UajWqqLM4pEpUpN8l7bKBsqwG
+x8zo/33pEHZhZD04EAdLgTUksh/ZAj1+KbtIMxJgiaF0BjDgg5egSNYSjJonYU1h
+goyMR06DOa+wL56A/0mWzjx+4Z+uYYWkLK6Dvi07TqzIq3CFUmE=
+=pHIA
 -----END PGP SIGNATURE-----
 
---EY/WZ/HvNxOox07X--
+--tKtFalx5NIx0HZ72--
