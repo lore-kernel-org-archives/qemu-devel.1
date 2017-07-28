@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dbC8p-0006Pt-28
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 16:45:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dbCCS-0000WQ-3h
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 16:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dbC8l-0008N5-1n
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 16:45:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58801)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dbC8k-0008L9-Re
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 16:45:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dbC8j-0001OE-N3
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 20:45:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9B5C32E80CF
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 20:45:41 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dbCCR-000210-9m
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 16:49:32 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170728131151.4802-1-olaf@aepfle.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a965a76e-3a63-e69c-18f1-dbfdc569cafd@amsat.org>
+Date: Fri, 28 Jul 2017 17:49:21 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Jul 2017 20:34:11 -0000
-From: John Florian <1707297@bugs.launchpad.net>
-Reply-To: Bug 1707297 <1707297@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150127405114.4205.4905957472648540492.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1707297] [NEW] qemu became more picky parsing -m
- option
+In-Reply-To: <20170728131151.4802-1-olaf@aepfle.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] xen-disk: use g_new0 to fix build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Olaf Hering <olaf@aepfle.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Public bug reported:
+Hi Olaf,
 
-With qemu-kvm-2.9.0-3.fc26.x86_64 I am no longer to specify the memory
-size using something like "-m 1.00000GiB" but with qemu-
-kvm-2.7.1-7.fc25.x86_64 I could without any problem.  I now get an error
-message like:
+On 07/28/2017 10:11 AM, Olaf Hering wrote:
+> g_malloc0_n is available since glib-2.24. To allow build with older glib
+> versions use the generic g_new0, which is already used in many other
+> places in the code.
 
-qemu-system-x86_64: -m 1.00000GiB: Parameter 'size' expects a non-negative =
-number below 2^64
-Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
-and exabytes, respectively.
+Can you provide information about which 
+distrib/release/version/[packages?] you used? So we might add the same 
+setup in QEMU continuous integration system.
 
+Thank,
 
-Is this expected or a regression?
+Phil.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1707297
-
-Title:
-  qemu became more picky parsing -m option
-
-Status in QEMU:
-  New
-
-Bug description:
-  With qemu-kvm-2.9.0-3.fc26.x86_64 I am no longer to specify the memory
-  size using something like "-m 1.00000GiB" but with qemu-
-  kvm-2.7.1-7.fc25.x86_64 I could without any problem.  I now get an
-  error message like:
-
-  qemu-system-x86_64: -m 1.00000GiB: Parameter 'size' expects a non-negativ=
-e number below 2^64
-  Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
-  and exabytes, respectively.
-
-  =
-
-  Is this expected or a regression?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1707297/+subscriptions
+> 
+> Fixes commit 3284fad728 ("xen-disk: add support for multi-page shared rings")
+> 
+> Signed-off-by: Olaf Hering <olaf@aepfle.de>
+> ---
+>   hw/block/xen_disk.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index d42ed7070d..536e2ee735 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -1232,7 +1232,7 @@ static int blk_connect(struct XenDevice *xendev)
+>           return -1;
+>       }
+>   
+> -    domids = g_malloc0_n(blkdev->nr_ring_ref, sizeof(uint32_t));
+> +    domids = g_new0(uint32_t, blkdev->nr_ring_ref);
+>       for (i = 0; i < blkdev->nr_ring_ref; i++) {
+>           domids[i] = blkdev->xendev.dom;
+>       }
+> 
