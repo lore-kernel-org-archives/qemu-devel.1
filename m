@@ -1,26 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1db69P-0007x4-Aj
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 10:22:01 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1db6Gb-0003Ka-An
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 10:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1db69M-00027W-6P
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 10:21:59 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:52479)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1db69K-00024E-Id
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 10:21:56 -0400
-Date: Fri, 28 Jul 2017 22:21:46 +0800 (CST)
-Message-ID: <201707282221460323641@zte.com.cn>
-References: 1500813971-82408-1-git-send-email-peng.hao2@zte.com.cn,
-	20170728111918.33a1dee8@nial.brq.redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V2=5D_vhost=3A_fix_a_migration_f?=
- =?utf-8?q?ailed_becauseof_vhost_region_merge?=
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1db6GY-000830-9z
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 10:29:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1db6GY-00082D-0I
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 10:29:22 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6SEQSCV023218
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:29:20 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2c0466uns2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:29:20 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 28 Jul 2017 15:29:18 +0100
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+	<20170727135910.27d9e42e@gondolin>
+	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
+	<20170727161457.58b3c7d1@gondolin>
+	<abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
+	<20170728121101.2a85216a@gondolin>
+	<f183e2d8-4f75-2981-e148-02c88014a4b1@linux.vnet.ibm.com>
+	<20170728145819.2dd0e608@gondolin>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 28 Jul 2017 16:29:14 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170728145819.2dd0e608@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <62b7ba7d-a8a8-df9c-2b35-0d8fe3e5fcd0@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
+ initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +50,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: imammedo@redhat.com
-Cc: mst@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
 
-Pk9uIFdlZCwgMjYgSnVsIDIwMTcgMTk6MDE6MzkgKzAzMDANCg0KDQoNCg0KDQo+Ik1pY2hhZWwg
-Uy4gVHNpcmtpbiIgPG1zdEByZWRoYXQuY29tPiB3cm90ZToNCg0KPj4gT24gV2VkLCBKdWwgMjYs
-IDIwMTcgYXQgMDQ6MDU6NDNQTSArMDIwMCwgSWdvciBNYW1tZWRvdiB3cm90ZToNCj4+ID4gT24g
-VHVlLCAyNSBKdWwgMjAxNyAyMjo0NzoxOCArMDMwMA0KPj4gPiAiTWljaGFlbCBTLiBUc2lya2lu
-IiA8bXN0QHJlZGhhdC5jb20+IHdyb3RlOg0KPj4gPiAgIA0KPj4gPiA+IE9uIFR1ZSwgSnVsIDI1
-LCAyMDE3IGF0IDEwOjQ0OjM4QU0gKzAyMDAsIElnb3IgTWFtbWVkb3Ygd3JvdGU6ICANCj4+ID4g
-PiA+IE9uIE1vbiwgMjQgSnVsIDIwMTcgMjM6NTA6MDAgKzAzMDANCj4+ID4gPiA+ICJNaWNoYWVs
-IFMuIFRzaXJraW4iIDxtc3RAcmVkaGF0LmNvbT4gd3JvdGU6DQo+PiA+ID4gPiAgICAgDQo+PiA+
-ID4gPiA+IE9uIE1vbiwgSnVsIDI0LCAyMDE3IGF0IDExOjE0OjE5QU0gKzAyMDAsIElnb3IgTWFt
-bWVkb3Ygd3JvdGU6ICAgIA0KPj4gPiA+ID4gPiA+IE9uIFN1biwgMjMgSnVsIDIwMTcgMjA6NDY6
-MTEgKzA4MDANCj4+ID4gPiA+ID4gPiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20uY24+IHdy
-b3RlOg0KPj4gPiA+ID4gPiA+ICAgICAgIA0KPj4gPiA+ID4gPiA+ID4gV2hlbiBhIGd1ZXN0IHRo
-YXQgaGFzIHNldmVyYWwgaG90cGx1Z2dlZCBkaW1tcyBpcyBtaWdyYXRlZCwgb24NCj4+ID4gPiA+
-ID4gPiA+IGRlc3RpbmF0aW9uIGl0IHdpbGwgZmFpbCB0byByZXN1bWUuIEJlY2F1c2UgcmVnaW9u
-cyBvbiBzb3VyY2UNCj4+ID4gPiA+ID4gPiA+IGFyZSBtZXJnZWQgYW5kIG9uIGRlc3RpbmF0aW9u
-IHRoZSBvcmRlciBvZiByZWFsaXppbmcgZGV2aWNlcw0KPj4gPiA+ID4gPiA+ID4gaXMgZGlmZmVy
-ZW50IGZyb20gb24gc291cmNlIHdpdGggZGltbXMsIHNvIHdoZW4gcGFydCBvZiBkZXZpY2VzDQo+
-PiA+ID4gPiA+ID4gPiBhcmUgcmVhbGl6ZCBzb21lIHJlZ2lvbiBjYW4gbm90IGJlIG1lcmdlZC5U
-aGF0IG1heSBiZSBtb3JlIHRoYW4NCj4+ID4gPiA+ID4gPiA+IHZob3N0IHNsb3QgbGltaXQuDQo+
-PiA+ID4gPiA+ID4gPiANCj4+ID4gPiA+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxw
-ZW5nLmhhbzJAenRlLmNvbS5jbj4NCj4+ID4gPiA+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IFdhbmcg
-WWVjaGFvIDx3YW5nLnllY2hhbzI1NUB6dGUuY29tLmNuPg0KPj4gPiA+ID4gPiA+ID4gLS0tDQo+
-PiA+ID4gPiA+ID4gPiAgaHcvbWVtL3BjLWRpbW0uYyAgICAgICAgfCAyICstDQo+PiA+ID4gPiA+
-ID4gPiAgaW5jbHVkZS9zeXNlbXUvc3lzZW11LmggfCAxICsNCj4+ID4gPiA+ID4gPiA+ICB2bC5j
-ICAgICAgICAgICAgICAgICAgICB8IDUgKysrKysNCj4+ID4gPiA+ID4gPiA+ICAzIGZpbGVzIGNo
-YW5nZWQsIDcgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPj4gPiA+ID4gPiA+ID4gDQo+
-PiA+ID4gPiA+ID4gPiBkaWZmIC0tZ2l0IGEvaHcvbWVtL3BjLWRpbW0uYyBiL2h3L21lbS9wYy1k
-aW1tLmMNCj4+ID4gPiA+ID4gPiA+IGluZGV4IGVhNjdiNDYuLjEzZjNkYjUgMTAwNjQ0DQo+PiA+
-ID4gPiA+ID4gPiAtLS0gYS9ody9tZW0vcGMtZGltbS5jDQo+PiA+ID4gPiA+ID4gPiArKysgYi9o
-dy9tZW0vcGMtZGltbS5jDQo+PiA+ID4gPiA+ID4gPiBAQCAtMTAxLDcgKzEwMSw3IEBAIHZvaWQg
-cGNfZGltbV9tZW1vcnlfcGx1ZyhEZXZpY2VTdGF0ZSAqZGV2LCBNZW1vcnlIb3RwbHVnU3RhdGUg
-KmhwbXMsDQo+PiA+ID4gPiA+ID4gPiAgICAgICAgICBnb3RvIG91dA0KPj4gPiA+ID4gPiA+ID4g
-ICAgICB9DQo+PiA+ID4gPiA+ID4gPiAgDQo+PiA+ID4gPiA+ID4gPiAtICAgIGlmICghdmhvc3Rf
-aGFzX2ZyZWVfc2xvdCgpKSB7DQo+PiA+ID4gPiA+ID4gPiArICAgIGlmICghdmhvc3RfaGFzX2Zy
-ZWVfc2xvdCgpICYmIHFlbXVfaXNfbWFjaGluZV9pbml0X2RvbmUoKSkgew0KPj4gPiA+ID4gPiA+
-ID4gICAgICAgICAgZXJyb3Jfc2V0ZygmbG9jYWxfZXJyLCAiYSB1c2VkIHZob3N0IGJhY2tlbmQg
-aGFzIG5vIGZyZWUiDQo+PiA+ID4gPiA+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICIgbWVtb3J5IHNsb3RzIGxlZnQiKSAgICAgIA0KPj4gPiA+ID4gPiA+IHRoYXQgZG9lc24n
-dCBmaXggaXNzdWUsDQo+PiA+ID4gPiA+ID4gICAgMXN0OiBudW1iZXIgb2YgdXNlZCBlbnRyaWVz
-IGlzIGNoYW5naW5nIGFmdGVyIG1hY2hpbmVfaW5pdF9kb25lKCkgaXMgY2FsbGVkDQo+PiA+ID4g
-PiA+ID4gICAgICAgICBhcyByZWdpb25zIGNvbnRpbnVlIHRvIG1hcHBlZC91bm1hcHBlZCBkdXJp
-bmcgcnVudGltZSAgICAgIA0KPj4gPiA+ID4gPiANCj4+ID4gPiA+ID4gQnV0IHRoYXQncyBmaW5l
-LCB3ZSB3YW50IGhvdHBsdWcgdG8gZmFpbCBpZiB3ZSBjYW4gbm90IGd1YXJhbnRlZSB2aG9zdA0K
-Pj4gPiA+ID4gPiB3aWxsIHdvcmsuICAgIA0KPj4gPiA+ID4gZG9uJ3Qgd2Ugd2FudCBndWFyYW50
-ZWUgdGhhdCB2aG9zdCB3aWxsIHdvcmsgd2l0aCBkaW1tIGRldmljZXMgYXQgc3RhcnR1cA0KPj4g
-PiA+ID4gaWYgaXQgd2VyZSByZXF1ZXN0ZWQgb24gQ0xJIG9yIGZhaWwgc3RhcnR1cCBjbGVhbmx5
-IGlmIGl0IGNhbid0PyAgICANCj4+ID4gPiANCj4+ID4gPiBZZXMuIEFuZCBmYWlsdXJlIHRvIHN0
-YXJ0IHZob3N0IHdpbGwgYWNoaWV2ZSB0aGlzIHdpdGhvdXQgbmVlZCB0byBtdWNoIHdpdGgNCj4+
-ID4gPiBESU1Ncy4gVGhlIGlzc3VlIGlzIG9ubHkgd2l0aCBESU1NIGhvdHBsdWcgd2hlbiB2aG9z
-dCBpcyBhbHJlYWR5IHJ1bm5pbmcsDQo+PiA+ID4gc3BlY2lmaWNhbGx5IGJlY2F1c2Ugbm90aWZp
-ZXJzIGhhdmUgbm8gd2F5IHRvIHJlcG9ydCBvciBoYW5kbGUgZXJyb3JzLg0KPj4gPiA+ICAgDQog
-DQo+PiA+ID4gPiA+ID4gICAgMm5kOiBpdCBicmluZ3MgcmVncmVzc2lvbiBhbmQgYWxsb3dzIHRv
-IHN0YXJ0IFFFTVUgd2l0aCBudW1iZXIgbWVtb3J5DQo+PiA+ID4gPiA+ID4gICAgICAgICByZWdp
-b25zIG1vcmUgdGhhbiBzdXBwb3J0ZWQgYnkgYmFja2VuZCwgd2hpY2ggY29tYmluZWQgd2l0aCBt
-aXNzaW5nDQo+PiA+ID4gPiA+ID4gICAgICAgICBlcnJvciBoYW5kbGluZyBpbiB2aG9zdCB3aWxs
-IGxlYWQgdG8gcWVtdSBjcmFzaGVzIG9yIG9ic2N1cmUgYnVncyBpbg0KPj4gPiA+ID4gPiA+ICAg
-ICAgICAgZ3Vlc3QgYnJlYWtpbmcgdmhvc3QgZW5hYmxlZCBkcml2ZXJzLg0KPj4gPiA+ID4gPiA+
-ICAgICAgICAgaS5lLiBwYXRjaCB1bmRvZXMgd2hhdCB3ZXJlIGZpeGVkIGJ5DQo+PiA+ID4gPiA+
-ID4gICAgICAgICBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwv
-MjAxNS0xMC9tc2cwMDc4OS5odG1sICAgICAgDQo+PiA+ID4gPiA+IA0KPj4gPiA+ID4gPiBXaHkg
-ZG9lcyBpdD8gVGhlIGlzc3VlIHlvdSBmaXhlZCB0aGVyZSBpcyBob3RwbHVnLCBhbmQgdGhhdCBt
-ZWFucw0KPj4gPiA+ID4gPiBwY19kaW1tX21lbW9yeV9wbHVnIGNhbGxlZCBhZnRlciBtYWNoaW5l
-IGRvbmUuICAgIA0KPj4gPiA+ID4gSSB3YXNuJ3QgYWJsZSB0byBjcmFzaCBmYzI0IGd1ZXN0IHdp
-dGggY3VycmVudCBxZW11L3JoZW43IGtlcm5lbCwNCj4+ID4gPiA+IGl0IGZhbGxiYWNrcyBiYWNr
-IHRvIHZpcnRpbyBhbmQgc3dpdGNoZXMgb2ZmIHZob3N0LiAgICAgDQo+PiA+ID4gDQo+PiA+ID4g
-SSB0aGluayB2aG9zdGZvcmNlIHNob3VsZCBtYWtlIHZob3N0IGZhaWwgYW5kIG5vdCBmYWxsIGJh
-Y2ssDQo+PiA+ID4gYnV0IHRoYXQgaXMgYW5vdGhlciBidWcuICANCj4+ID4gY3VycmVudGx5IHZo
-b3N0Zm9yY2UgaXMgYnJva2VuLCBxZW11IGNvbnRpbnVlcyB0byBoYXBwaWx5IHJ1biB3aXRoIHRo
-aXMgcGF0Y2gNCj4+ID4gYW5kIHdpdGhvdXQgcGF0Y2ggaXQgZmFpbHMgdG8gc3RhcnQgdXAgc28g
-SSdkIGp1c3QgTkFDSyB0aGlzIHBhdGNoDQo+PiA+IG9uIHRoaXMgYmVoYXZpb3JhbCBjaGFuZ2Ug
-YW5kIGFzayB0byBmaXggYm90aCBpc3N1ZXMgaW4gdGhlIHNhbWUgc2VyaWVzLiAgDQo+PiANCj4+
-IFBsZWFzZSBkbyBub3Qgc2VuZCBuYWNrcy4gVGhleSBhcmUgbm90IHJlYWxseSBoZWxwZnVsLg0K
-Pj4gDQo+PiBBY2sgaXMgbGlrZSArMS4gWW91IHNhdmUgc29tZSBzcGFjZSBzaW5jZSBhbGwgeW91
-IGFyZSBzYXlpbmcgaXMgImFsbCdzDQo+PiB3ZWxsIi4gQnV0IGlmIHRoZXJlJ3MgYW4gaXNzdWUg
-eW91IHdhbnQgdG8gZXhwbGFpbiB3aGF0IGl0IGlzIDk5JSBvZiB0aGUNCj4+IHRpbWUuIFNvIG5h
-Y2sgZG9lcyBub3Qgc2F2ZSBhbnkgc3BhY2UgYW5kIGp1c3QgcHVzaGVzIGNvbnRyaWJ1dG9ycyBh
-d2F5Lg0KPj4gRXNwZWNpYWxseSBpZiBpdCdzIGluIGFsbCBjYXBzLCB0aGF0J3MganVzdCBhZ2Fp
-bnN0IG5ldGlxdWV0dGUuDQo+SSdtIHNvcnJ5IHRvIHRoZSBhdXRob3IgaWYgaXQgd2VyZSB0YWtl
-biBhcyBvZmZlbnNlLA0KPmFuIGludGVudCB3YXMgdG8gc2F5IHRoYXQgYnkgaXRzZWxmIHBhdGNo
-IGFsbG93cyB0byBzdGFydCBRRU1VIGluIGludmFsaWQNCj5jb25maWd1cmF0aW9uIGFuZCB0aGF0
-IGl0IHNob3VsZCBiZSBmaXhlZCBhcyB3ZWxsLg0KDQo+QW55d2F5IEkndmUganVzdCBwb3N0ZWQg
-YW4gYWx0ZXJuYXRpdmUgcGF0Y2ggdGhhdCBzaG91bGQgd29ya2Fyb3VuZCBpc3N1ZQ0KPmF0IHRo
-ZSBoYW5kIHdoaWxlIG5vdCByZW1vdmluZyBjaGVjazoNCj5bUEFUQ0ggZm9yIDIuMTBdIHBjOiBt
-YWtlICdwYy5yb20nIHJlYWRvbmx5IHdoZW4gbWFjaGluZSBoYXMgUENJIGVuYWJsZWQNCg0KPlBl
-bmcgSGFvLA0KPmNvdWxkIHlvdSBjaGVjayBpZiBpdCBzb2x2ZXMgdGhlIHByb2JsZW0gZm9yIHlv
-dQ0KDQp5ZXMsaXQgd29ya3MuIEkgbmV2ZXIgdGhpbmsgb2YgaXQgYmVmb3JlLg0KDQpUaGFua3Mu
-ICAgTXN0LHRvby4NCg0KLg==
+
+
+On 07/28/2017 02:58 PM, Cornelia Huck wrote:
+> On Fri, 28 Jul 2017 14:32:11 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 07/28/2017 12:11 PM, Cornelia Huck wrote:
+>>> On Thu, 27 Jul 2017 18:15:07 +0200
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>>>> So my intention was to ask: What benefits do we expect from these 'real'
+>>>> virtual channel paths?   
+>>>
+>>> Path grouping and friends come to mind. This depends on whether you
+>>> want to pass-through channel paths to the guest, of course, but you
+>>> really need management to deal with things like reserve/release on ECKD
+>>> correctly.  
+>>
+>> Pass-through means dedicated in this case (that is the passed trough paths
+>> are not used by the host -- correct me if my understanding is wrong).
+> 
+> There's nothing that speaks against path sharing, I think.
+
+That is a nice to hear. I could not form an opinion on this
+myself yet. Theoretically we speak about shared physical resources here,
+and in such situations I'm wary of interference. A quick look into
+the AR documents was not conclusive.
+
+I'm still trying to figure out this whole channel path handling,
+and frankly you are a big help right now.
+
+> Especially as e.g. SetPGID is "first one gets to set it".
+
+Hm, I don't understand this. (I've found a description of SETPGID
+in "IBM 3880 Storage Control Models ... " but could not get your
+point based no that.)
+
+> 
+>>
+>> This whole multipath/grouping stuff is currently a gray spot for me. I've
+>> tired to revisit the corresponding parts of the AR, but there ain't much
+>> on it in the documents I have.
+>>
+>> Is the protocol for managing multipath equipment (device, maybe also CU)
+>> dependent? The PoP (and the IO AR) talk about set-multipath-mode type
+>> of command and similar (disband, resign) but how this type of command
+>> looks like -- no idea. From the kernel code one can learn more details,
+>> but that's just an implementation.
+> 
+> Path selection and friends should all be in the base I/O documentation
+> (maybe something in the common I/O device commands, as well.) Path
+> grouping is device-specific.
+> 
+
+Nod.
+
+>>
+>> Can you recommend me a publication where the controls you talk about
+>> are specified?
+> 
+> For SetPGID etc., I'd recommend the DASD documentation (the one
+> specifying the channel commands supported). Don't have the publication
+> number handy, sorry.
+> 
+
+Thanks, based on your input I've found the pub mentioned above.
+
+>>
+>>> Also failover etc. Preferred channel paths are not relevant
+>>> on modern hardware anymore, fortunately (AFAIK).
+>>>  
+>>
+>> If I understand you correctly it ain't possible to handle these
+>> in the host (and let the guest a simple 'non-real' virtual
+>> channel path whose reliability depends on what the host does),
+>> or?
+> 
+> It is possible. Mapping to a virtual channel path or not is basically a
+> design decision (IIRC, z/VM supports both).
+> 
+> Mapping everything to a virtual chpid basically concentrates all
+> path-related handling in the hypervisor. This allows for a dumb guest
+> OS, but can make errors really hard to debug from the guest side.
+> 
+
+IMHO the same is true for virtio for example (the abstraction
+hides the backend and the backing: if there is a problem there it's
+hard to debug from the guest side).
+
+Because of my lack of understanding, this option appeared simpler to
+me: clear ownership, and probably also less places where things can
+go wrong.
+
+> Exposing real channel paths to the guest means that the guest OS needs
+> to be able to deal with path-related things, but OTOH it has more
+> control. As I don't think we'll ever want to support a guest OS that
+> does not also run under LPAR, I'd prefer that way.
+
+Nod. And this makes a full circle, namely the question of benefit of
+having more control. But since we did one full circle I'm much smarter
+now than at the beginning.
+
+Thank you very much for all the background information and for your
+patience.
+
+Regards,
+Halil
