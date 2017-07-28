@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1db4Ff-0007Tm-OJ
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:20:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1db4KU-0004bJ-B3
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1db4Fe-00049L-Us
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:20:19 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:38335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1db4Fe-00048Q-NO
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:20:18 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id m85so116045896wma.1
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:20:18 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1db4KP-0000Ho-JQ
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:25:18 -0400
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-6-f4bug@amsat.org>
+	<a7fdc125-9a1b-bec3-915f-e8f764816b0d@redhat.com>
+	<c44770f5-df9d-2340-5dba-2f5db7acd046@redhat.com>
+	<20170728135614.3f14e3ad@gondolin>
+	<3abbfa87-d882-39ab-b4ab-66f3e68a2fb4@redhat.com>
+	<20170728141353.3b8382be@gondolin>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a4f3a2a-cebc-e730-4a63-2616a17f5f2b@redhat.com>
+Date: Fri, 28 Jul 2017 14:25:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <06a9ae13-4279-1210-0664-0faf5f55f830@redhat.com>
-References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
-	<CAFEAcA_9_YVyDC5jbLT=YXT64MFkxOrpxV7eydCEK_Lc4oSY5g@mail.gmail.com>
-	<06a9ae13-4279-1210-0664-0faf5f55f830@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 28 Jul 2017 13:19:57 +0100
-Message-ID: <CAFEAcA-oowaaK9Amn2Achj4a7X-HGOYgNF_7M=rmdOzbick3JA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
+In-Reply-To: <20170728141353.3b8382be@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/47] MAINTAINERS: add missing KVM entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On 28 July 2017 at 13:08, Eric Blake <eblake@redhat.com> wrote:
-> On 07/28/2017 04:04 AM, Peter Maydell wrote:
->> On 28 July 2017 at 09:55, Vladimir Sementsov-Ogievskiy
->> <vsementsov@virtuozzo.com> wrote:
->>> To make logs more readable prefix all hex values with '0x' mark.
->>> This is needed for consistency too, as a lot of hex values are already
->>> prefixed with '0x'. Also, bring all hex outputs to the common form -
->>> use '%#', not '0x%'.
->>>
->>> This patch is done by two commands:
->>> find . -name trace-events | \
->>>  xargs sed -i 's/%\([-+ *.0-9]*\([hljztL]\|ll\|hh\)\?\(x\|X\|"\s*PRIx\)\)/%#\1/g'
->
-> Why PRIx32 but not PRIX32?
+On 28/07/2017 14:13, Cornelia Huck wrote:
+>>> But would it not a better idea to add an entry for all headers touched
+>>> by update-linux-headers, then?  
+>>
+>> One thing doesn't exclude the other.  That entry would also list the
+>> script itself and linux-headers.  KVM, VFIO and virtio patterns can only
+>> list the files they care about.  Migration could list userfaultfd,
+>> possibly.  And there's also include/standard-headers/, which includes
+>> PCI and input subsystem files...  It has to be perfected, but it's a
+>> good idea.
+> 
+> Personally, I'm not really a fan. If something is changed in one of the
+> headers, it implies that either it has already been changed in the
+> original headers in Linux (and I will have seen it then), or that
+> someone is sending a preliminary patch (and I should hope that I'm
+> already cc:ed for the changes that this headers change is for then). It
+> does not really hurt, but it feels wrong.
 
-As it happens none of our trace-events files use PRIX...
+Sometime people pull changes too early, or otherwise I want to comment
+on the timing of the change... I don't know, I already get too much
+qemu-devel email. :)
 
-thanks
--- PMM
+Paolo
