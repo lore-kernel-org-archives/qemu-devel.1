@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1db8tX-000114-0b
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:17:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1db8wb-0004L1-IU
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1db8tP-0001xL-Si
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:17:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49982)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1db8tP-0001uK-Mt
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:17:39 -0400
-Date: Fri, 28 Jul 2017 18:17:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170728171731.GB3008@work-vm>
-References: <1501249552-788-1-git-send-email-armbru@redhat.com>
-	<1501249552-788-3-git-send-email-armbru@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1db8wY-0004pE-8U
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:20:57 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:37305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1db8wY-0004p3-4I
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 13:20:54 -0400
+Received: by mail-ua0-x244.google.com with SMTP id 80so20215203uas.4
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 10:20:54 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
+	<CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cf854184-8bc0-4a9c-b97f-8274abf538bc@amsat.org>
+Date: Fri, 28 Jul 2017 14:20:49 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501249552-788-3-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Define COLOMode without QAPI
+In-Reply-To: <CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: include <linux/limits.h> for
+ XATTR_SIZE_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Alistair Francis <alistair23@gmail.com>, Patrick Steinhardt <ps@pks.im>, Kamil Rytarowski <kamil@netbsd.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> COLOMode is defined in the QAPI schema, but not used there.  Of the
-> stuff QAPI generates for it only the typedef is actually used.  Use of
-> QAPI is pointless and only complicates things, so don't.
+> On Mon, Jun 26, 2017 at 12:20 PM, Patrick Steinhardt <ps@pks.im> wrote:
+>> The function `v9fs_xattrcreate` makes use of the define `XATTR_SIZE_MAX`
+>> to reject attempts of creating xattrs with an invalid size, which is
+>> defined in <linux/limits.h>. On glibc-based systems, this header is
+>> indirectly included via <limits.h>, <bits/posix1_lim.h>,
+>> <bitts/local_lim.h>, but on other platforms this is not guaranteed due
+>> to not being part of the POSIX standard. One examples are systems based
+>> on musl libc, which do not include the <linux/limits.h> indirectly,
+>> which leads to `XATTR_SIZE_MAX` being undefined.
+>>
+>> Fix this error by directly include <linux/limits.h>. As the 9P fs code
+>> is being Linux-based either way, we can simply do so without breaking
+>> other platforms. This enables building 9pfs on musl-based systems.
+>>
+>> Signed-off-by: Patrick Steinhardt <ps@pks.im>
+> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>   hw/9pfs/9p.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+>> index 96d2683348..48cd558e96 100644
+>> --- a/hw/9pfs/9p.c
+>> +++ b/hw/9pfs/9p.c
+>> @@ -13,6 +13,7 @@
+>>
+>>   #include "qemu/osdep.h"
+>>   #include <glib/gprintf.h>
 
-Hmm, in one of the old COLO worlds I have, there's code to emit an event
-on exiting from COLO and that event includes the mode it was in.
+This is likely to break on BSD, but now than patchew has a NetBSD job 
+you can trigger a build RESENDing this patch.
 
-If the intent is to bring that or similar back then it would be worth
-keeping.
+This should probably work:
 
-Dave
+#ifdef __linux__
 
-> Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/migration/colo.h |  6 ++++++
->  qapi-schema.json         | 16 ----------------
->  2 files changed, 6 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/migration/colo.h b/include/migration/colo.h
-> index ff9874e..5d7c500 100644
-> --- a/include/migration/colo.h
-> +++ b/include/migration/colo.h
-> @@ -26,6 +26,12 @@ void migration_incoming_exit_colo(void);
->  void *colo_process_incoming_thread(void *opaque);
->  bool migration_incoming_in_colo_state(void);
->  
-> +typedef enum {
-> +    COLO_MODE_UNKNOWN,
-> +    COLO_MODE_PRIMARY,
-> +    COLO_MODE_SECONDARY,
-> +} COLOMode;
-> +
->  COLOMode get_colo_mode(void);
->  
->  /* failover */
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 9b6f6cb..3f0eb05 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1304,22 +1304,6 @@
->              'vmstate-loaded' ] }
->  
->  ##
-> -# @COLOMode:
-> -#
-> -# The colo mode
-> -#
-> -# @unknown: unknown mode
-> -#
-> -# @primary: master side
-> -#
-> -# @secondary: slave side
-> -#
-> -# Since: 2.8
-> -##
-> -{ 'enum': 'COLOMode',
-> -  'data': [ 'unknown', 'primary', 'secondary'] }
-> -
-> -##
->  # @FailoverStatus:
->  #
->  # An enumeration of COLO failover status
-> -- 
-> 2.7.5
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> +#include <linux/limits.h>
+
+#endif
+
+>>   #include "hw/virtio/virtio.h"
+>>   #include "qapi/error.h"
+>>   #include "qemu/error-report.h"
+>> --
+>> 2.13.2
+
+Regards,
+
+Phil.
