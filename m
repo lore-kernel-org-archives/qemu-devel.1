@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35357)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dau2N-0002Pp-PN
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:25:56 -0400
+	id 1dau2O-0002Pq-3z
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dau2K-0001x5-Fb
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:25:55 -0400
+	id 1dau2N-0001zY-6I
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:25:56 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 27 Jul 2017 22:25:34 -0300
-Message-Id: <20170728012542.29975-1-f4bug@amsat.org>
+Date: Thu, 27 Jul 2017 22:25:35 -0300
+Message-Id: <20170728012542.29975-2-f4bug@amsat.org>
+In-Reply-To: <20170728012542.29975-1-f4bug@amsat.org>
+References: <20170728012542.29975-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.10 0/8] docs: fix broken paths
+Subject: [Qemu-devel] [PATCH for 2.10 1/8] docs: fix broken paths to
+ docs/interop dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Hi, following Cleber Rosa example I cleaned more invalid references.
+From: Cleber Rosa <crosa@redhat.com>
 
-Eric said this can wait 2.11, however these patches don't change any code
-generated, I think the 2.10 users deserve an up-to-date doc :p
+With the move of some docs to docs/interop on d59157e, a couple of
+references where not updated.
 
-I used the following command (and consider include it in some CI test job):
-
-$ git grep docs/ \
-      | sed -ne "s/.* \(docs[^ :)}\"\']*\).*/\1/p" \
-      | sed -e 's/\(.*\)\.$/\1/p' | sort -u | while read p;do
-    ls -ld $p 1>/dev/null
-  done
-
-Regards,
-
-Phil.
-
-Cleber Rosa (1):
-  docs: fix broken paths to docs/interop dir
-
-Philippe Mathieu-Daudé (7):
-  docs: fix broken paths to docs/interop/qcow2.txt
-  docs: fix broken paths to docs/devel/qapi-code-gen.txt
-  docs: fix broken paths to docs/devel/atomics.txt
-  docs: fix broken paths to docs/devel/tracing.txt
-  docs: fix broken paths to docs/config/ich9-ehci-uhci.cfg
-  docs: fix broken paths to docs/specs/ivshmem-spec.txt
-  docs: fix broken paths to docs/spin/
-
- audio/trace-events                  | 2 +-
- block/trace-events                  | 2 +-
- chardev/trace-events                | 2 +-
- crypto/trace-events                 | 2 +-
- docs/devel/lockcnt.txt              | 2 +-
- docs/devel/writing-qmp-commands.txt | 4 ++--
- docs/qcow2-cache.txt                | 2 +-
- docs/specs/pci-ids.txt              | 2 +-
- docs/spin/aio_notify.promela        | 6 +++---
- docs/spin/aio_notify_accept.promela | 4 ++--
- docs/spin/aio_notify_bug.promela    | 4 ++--
- docs/spin/tcg-exclusive.promela     | 2 +-
- docs/usb2.txt                       | 2 +-
- hw/9pfs/trace-events                | 2 +-
- hw/acpi/trace-events                | 2 +-
- hw/alpha/trace-events               | 2 +-
- hw/arm/trace-events                 | 2 +-
- hw/audio/trace-events               | 2 +-
- hw/block/dataplane/trace-events     | 2 +-
- hw/block/trace-events               | 2 +-
- hw/char/trace-events                | 2 +-
- hw/display/trace-events             | 2 +-
- hw/dma/trace-events                 | 2 +-
- hw/i386/trace-events                | 2 +-
- hw/input/trace-events               | 2 +-
- hw/intc/trace-events                | 2 +-
- hw/isa/trace-events                 | 2 +-
- hw/mem/trace-events                 | 2 +-
- hw/misc/trace-events                | 2 +-
- hw/net/trace-events                 | 2 +-
- hw/nvram/trace-events               | 2 +-
- hw/pci/trace-events                 | 2 +-
- hw/ppc/trace-events                 | 2 +-
- hw/s390x/trace-events               | 2 +-
- hw/scsi/trace-events                | 2 +-
- hw/sd/trace-events                  | 2 +-
- hw/sparc/trace-events               | 2 +-
- hw/timer/trace-events               | 2 +-
- hw/usb/trace-events                 | 2 +-
- hw/vfio/trace-events                | 2 +-
- hw/virtio/trace-events              | 2 +-
- hw/xen/trace-events                 | 2 +-
- include/block/aio.h                 | 2 +-
- include/qapi/visitor.h              | 2 +-
- include/qemu/atomic.h               | 4 ++--
- io/trace-events                     | 2 +-
- linux-user/trace-events             | 2 +-
- migration/trace-events              | 2 +-
- net/trace-events                    | 2 +-
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+[PMD: fixed another reference in docs/interop/qmp-spec.txt]
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ docs/devel/writing-qmp-commands.txt | 2 +-
  qapi-schema.json                    | 4 ++--
- qapi/introspect.json                | 2 +-
- qapi/qapi-util.c                    | 2 +-
- qom/trace-events                    | 2 +-
- scripts/qapi2texi.py                | 2 +-
- scripts/simpletrace.py              | 2 +-
- target/arm/trace-events             | 2 +-
- target/i386/trace-events            | 2 +-
- target/mips/trace-events            | 2 +-
- target/ppc/trace-events             | 2 +-
- target/s390x/trace-events           | 2 +-
- target/sparc/trace-events           | 2 +-
- tcg/README                          | 2 +-
- ui/trace-events                     | 2 +-
- util/trace-events                   | 2 +-
- 64 files changed, 71 insertions(+), 71 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp-commands.txt
+index 1e6375495b..69793e320e 100644
+--- a/docs/devel/writing-qmp-commands.txt
++++ b/docs/devel/writing-qmp-commands.txt
+@@ -8,7 +8,7 @@ into the QAPI framework implementation.
+ 
+ For an in-depth introduction to the QAPI framework, please refer to
+ docs/qapi-code-gen.txt. For documentation about the QMP protocol,
+-start with docs/qmp-intro.txt.
++start with docs/interop/qmp-intro.txt.
+ 
+ == Overview ==
+ 
+diff --git a/qapi-schema.json b/qapi-schema.json
+index dcc12c83a9..5fda5fa4d2 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -23,7 +23,7 @@
+ # | -> data issued by the Client
+ # | <- Server data response
+ #
+-# Please, refer to the QMP specification (docs/qmp-spec.txt) for
++# Please, refer to the QMP specification (docs/interop/qmp-spec.txt) for
+ # detailed information on the Server command and response formats.
+ #
+ # = Stability Considerations
+@@ -108,7 +108,7 @@
+ #
+ # Notes: This command is valid exactly when first connecting: it must be
+ # issued before any other command will be accepted, and will fail once the
+-# monitor is accepting other commands. (see qemu docs/qmp-spec.txt)
++# monitor is accepting other commands. (see qemu docs/interop/qmp-spec.txt)
+ #
+ # Since: 0.13
+ #
 -- 
 2.13.3
