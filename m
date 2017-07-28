@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxP8-0001i2-K4
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:01:39 -0400
+	(envelope-from <dmitry@daynix.com>) id 1daxjg-0007fm-Sd
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxP6-0005f4-1I
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:01:38 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:37542)
+	(envelope-from <dmitry@daynix.com>) id 1daxjc-0006ah-NI
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:22:52 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxP5-0005ek-Rs
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:01:35 -0400
-Received: by mail-qt0-x244.google.com with SMTP id d10so10573254qtb.4
-	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 22:01:35 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170718163437.18001-1-marcandre.lureau@redhat.com>
-	<20170726203933-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <89be4d2c-1b7e-2a12-b4e4-5f279cb88a91@amsat.org>
-Date: Fri, 28 Jul 2017 02:01:31 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170726203933-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] build-sys: add --disable-vhost-user
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1daxjc-0006YL-Ay
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:22:48 -0400
+Received: by mail-wm0-x244.google.com with SMTP id t138so7174123wmt.4
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 22:22:46 -0700 (PDT)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Message-Id: <9F33156D-CBD0-4F16-BB2B-055501A2BA60@daynix.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Fri, 28 Jul 2017 08:22:45 +0300
+In-Reply-To: <8082FF9BCB2B054996454E47167FF4EC1C572AF2@SHSMSX104.ccr.corp.intel.com>
+References: <20170724120729.24350-1-dmitry@daynix.com>
+	<20170725093148.3898b2da@w520.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C56E3CC@SHSMSX104.ccr.corp.intel.com>
+	<751A50FA-0C7D-433F-B511-F4B13EC67DCC@daynix.com>
+	<8082FF9BCB2B054996454E47167FF4EC1C572AF2@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks: Set non-zero GMS memory
+ size for IGD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
-
-On 07/26/2017 02:52 PM, Michael S. Tsirkin wrote:
-> On Tue, Jul 18, 2017 at 06:34:37PM +0200, Marc-André Lureau wrote:
-...
->> In the future, we may want to hide vhost-user from QAPI/introspection
->> with conditional compilation, although the design of this hasn't been
->> fully fleshed out yet and shouldn't prevent this patch from being
->> applied.
->>
->> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> After an offline discussion, looks like the idea is to be able to ship a
-> cut down binary with less features (and e.g. smaller attack surface?).
-
-I think it deserves it own thread, there will be many ideas about it.
-
-I liked this idea a first because it speeds up compilation time (so the 
-CI build system can run more tests, cover more of less code...) but then 
-we have this unreadable unmanageable ifdefery very hard to maintain, you 
-end up not compiling this piece of code, then move things around, 
-refactor a bit, change some API and zombie code survives around until 
-someone who has this lib try to compile the obsolete code.
-
-This is also why I now prefer to build via docker images (the 
-qemu:debian-amd64 try to come with as many dev packages as possible to 
-increase code coverage).
-
-There is some dream about having one monolithic QEMU binary able to run 
-all cpus/machines/devices. I think this way do reduce attack surface by 
-exposing all the surface. This is a bit what is happening during release 
-candidate testing when /master is closed, people start to use QEMU 
-[differently than while adding features], more surface is stressed, then 
-many issues appear and get resolved.
-
-Thomas Huth did some effort adding more poisoned macros and move common 
-objects to common-obj, we can do more here, we may need to split more 
-sources to move more common code.
+To: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
-Another experience is I'm trying to model a 32-bit big endian ARM board 
-then got bugged with 64-bit code this board will never use, or issue 
-with PCI and AHCI, so I started to comment those objects using 
-obj-$(CONFIG_X) but then CONFIG_X also depends of CONFIG_Y and so, then 
-it become hardly scalable, see [1]:
+> On 28 Jul 2017, at 07:51 AM, Zhang, Xiong Y <xiong.y.zhang@intel.com> =
+wrote:
+>=20
+>>> On 26 Jul 2017, at 08:22 AM, Zhang, Xiong Y =
+<xiong.y.zhang@intel.com>
+>> wrote:
+>>>=20
+>>> Sorry, we indeed found Intel windows guest graphic driver couldn't =
+be bind
+>> when GMS memory size is zero. And we have fixed it and the next intel
+>> windows driver release will contain this fix.
+>>> So currently please use x-igd-gms in legacy mode to work around =
+this.
+>>>=20
+>>> BTW, how did you know window driver allocate extra ~4G memory when
+>> GMS size set to 0 ?
+>>=20
+>> We noticed that with new IGD driver memory usage on VMs raised by =
+around
+>> 4G.
+>>=20
+>> Then we examined memory allocations with poolmon
+>> =
+(https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/poolm
+>> on)
+>> and saw that around 4G of memory is allocated with IGD driver pool =
+tag.
+>> Additionally we noticed that on VMs with less than 5G of memory IGD =
+driver
+>> does not load and system does fallback to standard VGA driver.
+>>=20
+> [Zhang, Xiong Y]  I tried our internal driver and didn't found the =
+above two issues, please wait for the next intel graphic driver release.
 
-+CONFIG_LAN9118=$(or 
-$(CONFIG_REALVIEW),$(CONFIG_EXYNOS4),$(CONFIG_FSL_IMX31))
-+CONFIG_SMC91C111=$(or 
-$(CONFIG_PXA2XX),$(CONFIG_MAINSTONE),$(CONFIG_REALVIEW))
-+CONFIG_ARM_MPTIMER=$(or 
-$(CONFIG_A9MPCORE),$(CONFIG_ARM11MPCORE),$(CONFIG_A15MPCORE))
-+CONFIG_HIGHBANK=$(and $(CONFIG_A9MPCORE),$(CONFIG_A15MPCORE))
+Thanks!
 
-we already have:
-
-crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += 
-hmac-glib.o
-crypto/Makefile.objs:23:crypto-obj-$(if $(CONFIG_GCRYPT),n,$(if 
-$(CONFIG_GNUTLS_RND),n,y)) += random-platform.o
-
-I ended dropping this branch, I was thinking about using kconfig to 
-manage dependencies... The obj-$(CONFIG_XYZ) is useful when kept tiny, 
-at most 1 bitwise operation.
-
-I wanted to share my experience and thoughts about it, I hope it's still 
-understandable because it's very late :S
-
-Regards,
-
-Phil.
-
- > Besides failing build on freebsd, this patch has too much ifdefery for
- > my taste. How about we patch just net/net.c?
-
-[1] 
-https://github.com/philmd/qemu/commit/2c1c515345d626f47d0968821980f9389d4588b2#diff-6006132695caf8d409e781fbf3d4401f
+>=20
+> thanks
