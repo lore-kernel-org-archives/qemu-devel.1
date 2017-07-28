@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48200)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxxX-0004VD-8F
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:37:12 -0400
+	id 1daxxZ-0004XO-Bt
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1daxxT-0003hM-Vx
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:37:11 -0400
+	id 1daxxY-0003mM-Ka
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 01:37:13 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 28 Jul 2017 02:35:42 -0300
-Message-Id: <20170728053610.15770-20-f4bug@amsat.org>
+Date: Fri, 28 Jul 2017 02:35:44 -0300
+Message-Id: <20170728053610.15770-22-f4bug@amsat.org>
 In-Reply-To: <20170728053610.15770-1-f4bug@amsat.org>
 References: <20170728053610.15770-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 19/47] MAINTAINERS: add missing qcow2 entry
+Subject: [Qemu-devel] [PATCH 21/47] MAINTAINERS: add missing CRIS entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +26,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
+To: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
@@ -35,16 +35,16 @@ Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 6b83dac812..2dcdda4cd5 100644
+index 286ff7e509..14109f4513 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1856,6 +1856,7 @@ M: Max Reitz <mreitz@redhat.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/qcow2*
-+F: docs/interop/qcow2.txt
+@@ -131,6 +131,7 @@ F: hw/cris/
+ F: include/hw/cris/
+ F: tests/tcg/cris/
+ F: disas/cris.c
++F: default-configs/cris-softmmu.mak
  
- qcow
- M: Kevin Wolf <kwolf@redhat.com>
+ HPPA (PA-RISC)
+ M: Richard Henderson <rth@twiddle.net>
 -- 
 2.13.3
