@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db41E-0000fF-0G
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:25 -0400
+	(envelope-from <stefanha@gmail.com>) id 1db41h-0000wB-2g
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db41C-0007rU-Kq
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:23 -0400
-References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
-	<20170606162652.112122-2-vsementsov@virtuozzo.com>
-	<50f19b1d-9736-b8b3-5616-67c3393336f3@redhat.com>
-	<7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
-	<26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <499609a4-79d4-f990-c312-048fd1f78ab8@redhat.com>
-Date: Fri, 28 Jul 2017 07:05:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1db41e-0008G4-61
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:53 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1db41d-0008Cp-W8
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:05:50 -0400
+Received: by mail-wm0-x243.google.com with SMTP id y206so4134271wmd.5
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 05:05:48 -0700 (PDT)
+Date: Fri, 28 Jul 2017 13:05:45 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170728120545.GA12364@stefanha-x1.localdomain>
+References: <20170728085547.13947-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: add
- bdrv_get_format_alloc_stat format interface
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
+Content-Disposition: inline
+In-Reply-To: <20170728085547.13947-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] trace-events: print 0x before hex numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
-Message-ID: <499609a4-79d4-f990-c312-048fd1f78ab8@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v3 1/3] block: add bdrv_get_format_alloc_stat
- format interface
-References: <20170606162652.112122-1-vsementsov@virtuozzo.com>
- <20170606162652.112122-2-vsementsov@virtuozzo.com>
- <50f19b1d-9736-b8b3-5616-67c3393336f3@redhat.com>
- <7c610bc7-a4f7-e6d6-2464-7bbb1b24002b@virtuozzo.com>
- <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-In-Reply-To: <26ba2b60-5135-d509-b3bc-392152a8bf0a@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--zYM0uCDKw75PZbzx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/27/2017 04:23 PM, John Snow wrote:
-
->>>
->>> "Allocations may be considered either used or unused by the format
->>> driver interpreting those allocations. It is at the discretion of the=
-
->>> format driver (e.g. qcow2) which regions of its backing storage are
->>> considered in-use or not."
->>
->> So we are saying about "allocations". But unallocated data may be
->> used/unused too, so,
->> can we call unallocated areas "allocations"?
->>
+On Fri, Jul 28, 2017 at 11:55:47AM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> To make logs more readable prefix all hex values with '0x' mark.
+> This is needed for consistency too, as a lot of hex values are already
+> prefixed with '0x'. Also, bring all hex outputs to the common form -
+> use '%#', not '0x%'.
 >=20
-> You're right, "allocation" may imply something that is extant, but thes=
-e
-> are more like regions ...
-
-Even 'extent' might have a connotation of something reserved; other
-related words like 'block' are bad (a block of a block device?).
-
+> This patch is done by two commands:
+> find . -name trace-events | \
+>  xargs sed -i 's/%\([-+ *.0-9]*\([hljztL]\|ll\|hh\)\?\(x\|X\|"\s*PRIx\)\)=
+/%#\1/g'
+> find . -name trace-events | xargs sed -i 's/0x%#/%#/g'
 >=20
-> Uh;
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 >=20
-> "Regions" may be considered either used or unused?
+> Hi all!
 >=20
-> or
->=20
-> "Regions of the underlying protocol file may be considered used or
-> unused by the format driver interpreting these regions."
+> It is hard to read logs, when there are hex and dec numbers in one line, =
+when
+> hex number doesn't contain any letters and don't have '0x' prefix. Hope I=
+'m
+> not alone who is not comfortable with it, so, what about a patch like thi=
+s?
+> May be regexp's should be improved but, I think, the common idea is clear.
 
-So this is one of the better variations I've seen, and works for me.
+Thanks, this looks useful.  Will review v2.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Stefan
 
-
---jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa
+--zYM0uCDKw75PZbzx
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7KHUACgkQp6FrSiUn
-Q2qKTwgAh2j7AYtC4iPU1XQUjiRH+X0OIAWu2bU66oA5uduJjDxahfte1srHA9El
-4qDEaMe/V2WIcJHPvgtCcxnuqYSd6EDgRUsLfh87SXm8bYOQVdcgpljpPd+roxmz
-IXZFKo017PkL3LGF68TUDREaWRBV05KSIvfR0hffwOrKg61aGZL18zkIHq4vmrZn
-ekl2uNYwoEA197hXx3uOHH1vFn75hPj7tTPKxtxEM+9WhVFhCu8XbMUTr97b+GJb
-r7CvYzUHWNRmPpglM2kIsdP/ptDyNukMcRdjTvQTuVTN45Oq/XRd3qLdoPGKyRSQ
-g8Ny4txVvT0qv3puv0sb+CItsaadIg==
-=xIRZ
+iQEcBAEBAgAGBQJZeyiZAAoJEJykq7OBq3PIdJ4H/Rtypedw72wAMc5VTnqQ1eIW
+vK0tn0q515FVJPu1TTasGkf6AfHndGQDu9UXYd7goW7W6hhHrDqu9giSlZF57AkK
+iBk/2pQpbrCVhfZ8J1ybDLJFcTjXUYWN5fRVyvVjuolfUsE+HL3+9glXyWaHB+8W
+2R6huhQ893WGTWQEss3Rtb+cTsNGvr/riFqklJmNlrXeLTmhhulEi+20CqDAQDtj
+fg/fdaJH3h5r18Pz8V7XoLe7aSBz8XafNZysUftYKTPzTcP7bRV86EYLYC3oDOMO
+x3qkJwRPX5Zn9xumfBJhh203Wlrr3MGhcyEB8UwFURacYhzty2pkA7vxKUO+3ic=
+=8aob
 -----END PGP SIGNATURE-----
 
---jdG7ju20cxsPCve3R0viOkFBt8TFjBhDa--
+--zYM0uCDKw75PZbzx--
