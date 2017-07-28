@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dbCNk-00074a-00
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 17:01:14 -0400
+	(envelope-from <jcody@redhat.com>) id 1dbCQn-0002H0-9z
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 17:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dbCNj-0000TS-4m
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 17:01:12 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37749)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dbCNi-0000Sv-Uq
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 17:01:11 -0400
-Received: by mail-wm0-x232.google.com with SMTP id t201so5647521wmt.0
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 14:01:10 -0700 (PDT)
+	(envelope-from <jcody@redhat.com>) id 1dbCQm-0002Qx-JU
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 17:04:21 -0400
+Date: Fri, 28 Jul 2017 17:04:14 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170728210414.GD5109@localhost.localdomain>
+References: <20170728131452.15316-1-kwolf@redhat.com>
+	<20170728131452.15316-4-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a965a76e-3a63-e69c-18f1-dbfdc569cafd@amsat.org>
-References: <20170728131151.4802-1-olaf@aepfle.de>
-	<a965a76e-3a63-e69c-18f1-dbfdc569cafd@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 28 Jul 2017 22:00:49 +0100
-Message-ID: <CAFEAcA_+ELUt-aeeQv6yUXqFXcBb1RbXmvhPMBzW+meahD+pig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] xen-disk: use g_new0 to fix build
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170728131452.15316-4-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/7] qemu-iotests/141: Fix image
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Olaf Hering <olaf@aepfle.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 28 July 2017 at 21:49, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Hi Olaf,
->
-> On 07/28/2017 10:11 AM, Olaf Hering wrote:
->>
->> g_malloc0_n is available since glib-2.24. To allow build with older glib
->> versions use the generic g_new0, which is already used in many other
->> places in the code.
->
->
-> Can you provide information about which distrib/release/version/[packages=
-?]
-> you used? So we might add the same setup in QEMU continuous integration
-> system.
+On Fri, Jul 28, 2017 at 03:14:48PM +0200, Kevin Wolf wrote:
+> qemu-iotests 141 attempted to use brace expansion to remove all images
+> with a single command. However, for this to work, the braces shouldn't
+> be quoted.
+> 
+> With this fix, the tests correctly cleans up its scratch images.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/141 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
+> index 40a3405968..2f9d7b9bc2 100755
+> --- a/tests/qemu-iotests/141
+> +++ b/tests/qemu-iotests/141
+> @@ -31,7 +31,7 @@ _cleanup()
+>  {
+>      _cleanup_qemu
+>      _cleanup_test_img
+> -    rm -f "$TEST_DIR/{b,m,o}.$IMGFMT"
+> +    rm -f "$TEST_DIR"/{b,m,o}.$IMGFMT
+>  }
+>  trap "_cleanup; exit \$status" 0 1 2 3 15
+>  
+> -- 
+> 2.13.3
+> 
+> 
 
-I do have a build system with our oldest supported glib
-version (it's my OSX box), and I have a feeling one of the
-patchew centos configs does this too, but I guess neither
-of them have the Xen headers to enable the Xen code,
-which is why this one slipped through.
-
-thanks
--- PMM
+Reviewed-by: Jeff Cody <jcody@redhat.com>
