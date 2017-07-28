@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db4CK-0003U0-LE
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:16:53 -0400
+	(envelope-from <stefanha@gmail.com>) id 1db4Bw-00039u-If
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:16:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1db4CG-0000y5-C9
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:16:52 -0400
-References: <20170728053610.15770-1-f4bug@amsat.org>
-	<20170728053610.15770-38-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3013cc2c-32c6-cd55-cb5c-a9982370e190@redhat.com>
-Date: Fri, 28 Jul 2017 07:16:45 -0500
+	(envelope-from <stefanha@gmail.com>) id 1db4Bv-0000RE-ON
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:16:28 -0400
+Date: Fri, 28 Jul 2017 13:16:24 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170728121624.GI12364@stefanha-x1.localdomain>
+References: <20170727120210.6943-1-crosa@redhat.com>
+	<20170727120210.6943-5-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170728053610.15770-38-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rk4gHXCsn3Prtnkt2jVjir7Qhcl9xNm8k"
-Subject: Re: [Qemu-devel] [PATCH 37/47] MAINTAINERS: update docs/devel/
- entries
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/8E7gjuj425jZz9t"
+Content-Disposition: inline
+In-Reply-To: <20170727120210.6943-5-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/5] qemu-iotests: remove comment about
+ root privileges requirement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Cleber Rosa <crosa@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rk4gHXCsn3Prtnkt2jVjir7Qhcl9xNm8k
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Message-ID: <3013cc2c-32c6-cd55-cb5c-a9982370e190@redhat.com>
-Subject: Re: [PATCH 37/47] MAINTAINERS: update docs/devel/ entries
-References: <20170728053610.15770-1-f4bug@amsat.org>
- <20170728053610.15770-38-f4bug@amsat.org>
-In-Reply-To: <20170728053610.15770-38-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
+
+--/8E7gjuj425jZz9t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/28/2017 12:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Might be useful to point to the commit id that moved locations of the doc=
-s.
-
+On Thu, Jul 27, 2017 at 08:02:09AM -0400, Cleber Rosa wrote:
+> The check script contains a commented out root user requirement,
+> probably because of its xfstests heritage.  This requirement doesn't
+> apply to qemu-iotests, so it better be gone.
+>=20
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  MAINTAINERS | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>  tests/qemu-iotests/check | 6 ------
+>  1 file changed, 6 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rk4gHXCsn3Prtnkt2jVjir7Qhcl9xNm8k
+--/8E7gjuj425jZz9t
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7Ky0ACgkQp6FrSiUn
-Q2pHdAf8DSEu3CJiWzdcBfpDc+8yyAKcZYUD9sWMCH4HO/g3onDbmQl7EAC3YTmO
-XcamA94nBto9CZSFKfByPRZ6A7IsTbKlNN16lPFH8JP59XB6mu2cmnjA7+FSbtya
-g0GByFYVNl9OVRlFEpzo6onhd5kA83GpmBa+pJuMBhoYrkIKNtkC8wVP4Lv1/pqJ
-5JXt/IXMe4tKR0tWZj6/ufzHqvR4C9wb15kdA7wrqViiwbB40rJv1jK/2+u73CBt
-TB8/EUUbkuWsCoFBmPtmK7P06/E6H8jemQL4UrAFDVn8lwCdXeZagp3YSham7zYN
-Yrxi8c4YeKoskTlGmrz80S0c+YwFfw==
-=WfQ4
+iQEcBAEBAgAGBQJZeysYAAoJEJykq7OBq3PItJMIAMmAZx6hIExO8Sgow/fE0AjS
+W7GOqGH/0Jxgiyf1npo2sQKXEl1BcBu9vpprGgjaeqYi13antu5qVRAkhhQJzUDD
+M7R6+74Yv3b3kWQovK8Of+6oH6TFxNZwoFLP8hEMQfPviupyJ4163qrxBUfHXUrh
+NuYE5EnMSDdJVyZZtyaqifhlPOqxgrllKl5FmbAKpMPVsIbWqFuhhpAuGqzVUvXW
+hVcUerUARY7Tx1MWPbB1l1p76a60qZAWpza0RUlhIj3EOMzM1+1KSPzMkbGl79Dz
+MrX0UjOAx7zuPQLPO/3DfFZp3UDWT0Fz0KJiK97Sd7O3ZUvOcdFn1Sq7GN73Oso=
+=hpNq
 -----END PGP SIGNATURE-----
 
---rk4gHXCsn3Prtnkt2jVjir7Qhcl9xNm8k--
+--/8E7gjuj425jZz9t--
