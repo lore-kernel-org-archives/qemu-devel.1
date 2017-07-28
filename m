@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1db7dF-0007jX-He
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:56:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1db7dy-00085T-IY
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1db7dE-0000wS-Lm
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:56:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42910)
+	(envelope-from <eblake@redhat.com>) id 1db7dx-0001OS-LB
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:57:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27665)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1db7dE-0000vp-Bf
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:56:52 -0400
-Date: Fri, 28 Jul 2017 16:56:49 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170728155649.GA15534@stefanha-x1.localdomain>
-References: <20170728092053.10122-1-stefanha@redhat.com>
-	<20170728092053.10122-3-stefanha@redhat.com>
-	<20170728110544.GL31495@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1db7dx-0001OB-Bj
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 11:57:37 -0400
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-17-git-send-email-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9cd34bf7-b744-f04d-a91b-26442a648b2d@redhat.com>
+Date: Fri, 28 Jul 2017 10:57:12 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
-Content-Disposition: inline
-In-Reply-To: <20170728110544.GL31495@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] trace: check backend dstate in
- trace_event_get_state()
+In-Reply-To: <1501229198-30588-17-git-send-email-peterx@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jmmnFO3nWlmwUECO2PdqGUUxiBM8KAb0e"
+Subject: Re: [Qemu-devel] [RFC 16/29] qmp: hmp: add migrate "resume" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-
---+HP7ph2BbKc20aGI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jmmnFO3nWlmwUECO2PdqGUUxiBM8KAb0e
+From: Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Alexey Perevalov <a.perevalov@samsung.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <9cd34bf7-b744-f04d-a91b-26442a648b2d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 16/29] qmp: hmp: add migrate "resume" option
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+ <1501229198-30588-17-git-send-email-peterx@redhat.com>
+In-Reply-To: <1501229198-30588-17-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 28, 2017 at 12:05:44PM +0100, Daniel P. Berrange wrote:
-> On Fri, Jul 28, 2017 at 10:20:53AM +0100, Stefan Hajnoczi wrote:
-> > Code that checks dstate is unaware of SystemTap and LTTng UST dstate, so
-> > the following trace event will not fire when solely enabled by SystemTap
-> > or LTTng UST:
-> >=20
-> >   if (trace_event_get_state(TRACE_MY_EVENT)) {
-> >       str =3D g_strdup_printf("Expensive string to generate ...",
-> >                             ...);
-> >       trace_my_event(str);
-> >       g_free(str);
-> >   }
-> >=20
-> > Most users of trace_event_get_state() want to know both QEMU and backend
-> > dstate for the event.  Update the macro to include backend dstate.
-> >=20
-> > Introduce trace_event_get_state_qemu() for those callers who really only
-> > want QEMU dstate.  This includes the trace backends (like 'log') which
-> > should only trigger when event are enabled via QEMU.
+On 07/28/2017 03:06 AM, Peter Xu wrote:
+> It will be used when we want to resume one paused migration.
 >=20
-> I'm not convinced this is quite right as is.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hmp-commands.hx       | 7 ++++---
+>  hmp.c                 | 4 +++-
+>  migration/migration.c | 2 +-
+>  qapi-schema.json      | 5 ++++-
+>  4 files changed, 12 insertions(+), 6 deletions(-)
 >=20
-> The QEMU state for an event is set via cli flags to -trace and that
-> is intended for use with with things like simpletrace or log which
-> have no other way to filter which events are turned on at runtime.
-> For these calling trace_event_get_state_dynamic_by_id() is right.
->=20
-> For DTrace / LTT-NG, and event is active if the kernel has turned
-> on the dynamic probe location.  Any command line args like -trace
-> should not influence this at all, so we should *not* involve QEMU
-> state at all - only the backend state. So for these we should only
-> be calling the backend specific test and ignoring
-> trace_event_get_state_dynamic_by_id() entirely. Your patch though
-> makes it consider both.
 
-I think you're referring to this:
+> +++ b/qapi-schema.json
+> @@ -3208,6 +3208,8 @@
+>  # @detach: this argument exists only for compatibility reasons and
+>  #          is ignored by QEMU
+>  #
+> +# @resume: resume one paused migration
 
-  #define trace_event_get_state(id)                       \
-      ((id ##_ENABLED) && (trace_event_get_state_dynamic_by_id(id) || \
-                           id ##_BACKEND_DSTATE()))
+Mention default false, and that it is since 2.11.
 
-We could change it to:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  #define trace_event_get_state(id)                       \
-      ((id ##_ENABLED) && id ##_BACKEND_DSTATE())
 
-and modify the log, syslog, ftrace, etc backends to emit
-trace_event_get_state_dynamic_by_id(id) as their backend dstate.
-
-However, in the multi-backend case with ./configure
---enable-trace-backends=3Dlog,syslog this expands to:
-
-  ((id ##_ENABLED) && (trace_event_get_state_dynamic_by_id(id) || \
-                       trace_event_get_state_dynamic_by_id(id) || \
-		       false))
-
-I couldn't bring myself to have multiple calls to
-trace_event_get_state_dynamic_by_id() :).
-
-What do you think?
-
---+HP7ph2BbKc20aGI
+--jmmnFO3nWlmwUECO2PdqGUUxiBM8KAb0e
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZe17BAAoJEJykq7OBq3PIM6EIAMVHGOd+3kTWn9pABbN4Qlux
-sjT2xbsH3yY3xwrp5uPP5i+JcYVILxUZ+bOk5NgQfN5BDXQcDXkI0gpA+ZLaQlpK
-KimLubV/+Cleq7B7MMu5Jssl+r74hU8n0joJnXQBP+fXa1h8Xx5NqqQD2gIe8TvH
-npLj7132h8QyREuyS9wZIRWtpM+90ldCIZ370AyGfWa9/Qcad6HXTeVoWOGJ75xz
-me3l4BEI7UTuP3RtesWMZ0LjKADn4usnCG3CkzaPmZEYb+JYmsaYuMHlOfApF5+2
-rEnUYhfGq99rfyw+3yHbg1tBG+xb9t4FAe6Oi30EonRg6MMGQkUbBySAdKmVV9M=
-=VwXk
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll7XtgACgkQp6FrSiUn
+Q2qVCggAozH/QQhz2y2zF7djUotJhQY04uWOnw9QViyNPEsIgoQ/IW846f8YasoH
+7gqg7P8jw1J5diwCPjHBWCzCIDuAdGn+TPr49Yi2LHSOz9poQb3sgqoSLdWyqobU
+9x4Y6uJtFJ3HUoRhk86x39iAJ/ZD8svQX+IogPqLBZrnpDRGkIyIJiIHYGAKutYs
+aHk1GvvGpJvpYGuOElc8tHl7IVlX0HiALPnbD2R4Q1TUINQtSdRVwQT5obFHWuRE
+ceC6oTEyHYGUl0Lilojej3h3w/kWfiN6PEwRcsliIK5jg9OpU7F5xfH4/m4xxJi0
+tJp5VpDg9sQhvyoFYTu4P+aDido65g==
+=ZXt4
 -----END PGP SIGNATURE-----
 
---+HP7ph2BbKc20aGI--
+--jmmnFO3nWlmwUECO2PdqGUUxiBM8KAb0e--
