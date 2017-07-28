@@ -1,34 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1db4Py-0001aA-EH
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:31:00 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1db4RK-0002EY-Ft
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1db4Pu-0006Qp-RS
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:30:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51499)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1db4RG-0008JL-QZ
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41727
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1db4Pu-0006PS-L8
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:30:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1db4Ps-0001Pr-LN
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:30:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 995A12E80CB
-	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 12:30:52 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1db4RG-0008Io-L3
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 08:32:18 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6SCTpRg095186
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 08:32:17 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2c035vqh6g-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 28 Jul 2017 08:32:17 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 28 Jul 2017 13:32:15 +0100
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+	<20170727135910.27d9e42e@gondolin>
+	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
+	<20170727161457.58b3c7d1@gondolin>
+	<abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
+	<20170728121101.2a85216a@gondolin>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 28 Jul 2017 14:32:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Jul 2017 12:24:48 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1706866 <1706866@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150113818340.31767.9409806903366726521.malonedeb@gac.canonical.com>
-Message-Id: <150124468873.13617.7184428463498981346.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706866] Re: migrate:  add tls option in virsh,
- migrate failed
+In-Reply-To: <20170728121101.2a85216a@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <f183e2d8-4f75-2981-e148-02c88014a4b1@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
+ initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +49,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
 
-chan: The backtrace you show there - how did you capture that? Was that
-from a core dump  ?  If so then please do a   bt full  to get more
-detail.
 
-Even if you can't reproduce it with qemu without libvirt I'd be
-interested to debug it - but the libvirt logs from
-/var/log/libvirt/qemu/.... on both the source and the destination would
-help.
 
--- =
+On 07/28/2017 12:11 PM, Cornelia Huck wrote:
+> On Thu, 27 Jul 2017 18:15:07 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 07/27/2017 04:14 PM, Cornelia Huck wrote:
+>>> On Thu, 27 Jul 2017 15:37:08 +0200
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>>   
+>>>> On 07/27/2017 01:59 PM, Cornelia Huck wrote:  
+>>>>> On Thu, 27 Jul 2017 03:54:18 +0200
+>>>>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+>>>>>     
+>>>>>> When a channel path is hot plugged into a CSS, we should generate
+>>>>>> a channel path initialized CRW (channel report word). The current
+>>>>>> code does not do that, instead it puts a stub function with a TODO
+>>>>>> reminder there.
+>>>>>>
+>>>>>> This implements the css_generate_chp_crws() function by:
+>>>>>> 1. refactor the existing code.
+>>>>>> 2. add an @add parameter to provide future callers with the
+>>>>>>    capability of generating channel path permanent error with
+>>>>>>    facility not initialized CRW.
+>>>>>> 3. add a @hotplugged parameter, so to opt out generating initialized
+>>>>>>    CRWs for predefined channel paths.    
+>>>>>
+>>>>> I'm not 100% sure whether the logic is correct here. Let me elaborate:
+>>>>>
+>>>>> The current code flow when hotplugging a device is:
+>>>>> - Generate the schib.
+>>>>> - Check if any of the chpids refers to a not yet existing channel path;
+>>>>>   generate it if that is the case.
+>>>>> - Post a crw for the subchannel.
+>>>>>
+>>>>> The second step is where the current code seems to be not quite correct
+>>>>> already. It is fine for coldplugged devices, but I really think we need
+>>>>> to make sure that all referenced channel paths are in place before we
+>>>>> hotplug a new device. It was not really relevant when we just had one
+>>>>> very virtual channel path, and 3270 is experimental so it is not a
+>>>>> problem in practice.    
+>>>>
+>>>> What do you mean by not quite correct?  Are we somewhere in conflict with
+>>>> the AR (if yes could you give me a pointer)? Or is it a modeling concern?
+>>>> Or is it about the user interface design? Or any combination of these?  
+>>>
+>>> Modeling. Conceptually, you need at least one channel path to access a
+>>> device; the subchannel is more or less a followup.
+>>>
+>>> As up to now, we only had a dummy channel path simply to satisfy the
+>>> architecture, it did not really matter when it was 'created'. As it is
+>>> always 'there' from beginning, there was no need for any CRW either. If
+>>> there's now a need for real channel path modeling, we unfortunately
+>>> have to give this some thought :)
+>>>   
+>>
+>> We have considered this 'always there' internally. Was my train of thought
+>> to but then I came to the conclusion it ain't necessarily true. One can
+>> IPL with initrd and end up with a guest with no ccw devices whatsoever
+>> (IMHO; the default net can be disabled -net none).
+> 
+> Yes. But this is an edge case that was never relevant. We should do it
+> correctly, of course; but it isn't a problem in practice.
+> 
+> (If I'm not mistaken, Linux scans for chpids it does not know yet on
+> device hotplug anyway, due to the reasons I outlined in my other mail.)
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706866
+Yes, I have tested the scenario described yesterday and it worked with
+no problem.
 
-Title:
-  migrate:  add tls option in virsh, migrate failed
+>>
+>>>>  
+>>>>>
+>>>>> This, of course, implies we need deeper changes. We need to create the
+>>>>> channel paths before the subchannel is created and refuse hotplug of a
+>>>>> device if not all channel paths it needs are defined. This means we
+>>>>> need some things before we can claim real channel path support:
+>>>>> - Have a way to specify channel paths on the command line resp. when
+>>>>>   hotplugging. This implies they need to be real objects.
+>>>>> - Have a way to specify which channel paths belong to a subchannel in
+>>>>>   the same context. Keep existing device types working with the current
+>>>>>   method.
+>>>>> - Give channel paths states: Defined, configured. The right time for a
+>>>>>   CRW is the transition between those states.
+>>>>> - Only queue a 'device come' CRW for a subchannel if at least one of
+>>>>>   its channel paths is in the configured state. Detach or make not
+>>>>>   operational a subchannel if all of its paths are deconfigured.
+>>>>>     
+>>>>
+>>>> AFAIU in your opinion our model is to simple and needs to get more
+>>>> complex. What benefits do we expect from the added complexity? I mean
+>>>> our current model works (and I'm not sure what limitations do we
+>>>> want to get rid of, or even what are the relevant limitations we have.)  
+>>>
+>>> I was under the impression that we want to support multiple, 'real'
+>>> channel paths for vfio-ccw. Did I misunderstand?
+>>>   
+>>
+>> You assumed correctly. I've asked Dong Jia a very similar question when
+>> this first popped up as a part of his channel path virtualization work
+>> (he is referring to at the beginning of this cover letter).
+>>
+>> Unfortunately that question is still unanswered. I've speculated maybe you
+>> were involved in the decision of opting for 'real' channel paths, so this
+>> is why I asked.
+>>
+>> So my intention was to ask: What benefits do we expect from these 'real'
+>> virtual channel paths? 
+> 
+> Path grouping and friends come to mind. This depends on whether you
+> want to pass-through channel paths to the guest, of course, but you
+> really need management to deal with things like reserve/release on ECKD
+> correctly.
 
-Status in QEMU:
-  Incomplete
+Pass-through means dedicated in this case (that is the passed trough paths
+are not used by the host -- correct me if my understanding is wrong).
 
-Bug description:
-  version:
-      libvirt-3.4.0 + qemu-2.9.90(latest)
+This whole multipath/grouping stuff is currently a gray spot for me. I've
+tired to revisit the corresponding parts of the AR, but there ain't much
+on it in the documents I have.
 
-  domain:
-      any
+Is the protocol for managing multipath equipment (device, maybe also CU)
+dependent? The PoP (and the IO AR) talk about set-multipath-mode type
+of command and similar (disband, resign) but how this type of command
+looks like -- no idea. From the kernel code one can learn more details,
+but that's just an implementation.
 
-  step:
-      1. generate tls certificate in /etc/pki/libvirt-migrate
-      2. start vm
-      3. migrate vm, cmdline:
-         virsh migrate rh7.1-3 --live --undefinesource --persistent --verbo=
-se --tls qemu+ssh://IP/system
-      4. then migrate failed and reported:
-   Migration: [ 64 %]error: internal error: qemu unexpectedly closed the mo=
-nitor: Domain pid=3D5288, libvirtd pid=3D49634
-   kvm: warning: CPU(s) not present in any NUMA nodes: 2 3 4 5 6 7 8 9 10 1=
-1 12 13 14 15 16 17 18 19 20 21 22 23
-   kvm: warning: All CPU(s) up to maxcpus should be described in NUMA config
-   kvm: error while loading state section id 2(ram)
-   kvm: load of migration failed: Input/output error
+Can you recommend me a publication where the controls you talk about
+are specified?
 
-  other:
-      Analysis qemu code and debug:
-  #0  ram_save_page (f=3D0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=
-=3Dfalse, bytes_transferred=3D0x55ca885ec1d8) =
+> Also failover etc. Preferred channel paths are not relevant
+> on modern hardware anymore, fortunately (AFAIK).
+>
 
-  #1  0x000055ca87b00b21 in ram_save_target_page (ms=3D0x55ca885b8d80, f=3D=
-0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
-=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
-  #2  0x000055ca87b00bda in ram_save_host_page (ms=3D0x55ca885b8d80, f=3D0x=
-55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
-=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
-  #3  0x000055ca87b00d39 in ram_find_and_save_block (f=3D0x55ca8be370e0, la=
-st_stage=3Dfalse, bytes_transferred=3D0x55ca885ec1d8)
-  #4  0x000055ca87b020b8 in ram_save_iterate (f=3D0x55ca8be370e0, opaque=3D=
-0x0)
-  #5  0x000055ca87b07a9a in qemu_savevm_state_iterate (f=3D0x55ca8be370e0, =
-postcopy=3Dfalse) =
+If I understand you correctly it ain't possible to handle these
+in the host (and let the guest a simple 'non-real' virtual
+channel path whose reliability depends on what the host does),
+or?
 
-  #6  0x000055ca87e404e5 in migration_thread (opaque=3D0x55ca885b8d80)
+Thanks for the explanations!
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706866/+subscriptions
+Halil
