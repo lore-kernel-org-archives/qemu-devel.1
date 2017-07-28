@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dbETW-0008Fe-1N
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:15:19 -0400
+	(envelope-from <mst@redhat.com>) id 1dbEcC-00048M-Vr
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dbETT-0000Zp-B2
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:15:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44462)
+	(envelope-from <mst@redhat.com>) id 1dbEc8-0006pq-Pt
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:24:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dbETT-0000Ys-1S
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:15:15 -0400
-Date: Sat, 29 Jul 2017 02:15:06 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dbEc8-0006oh-Gr
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 19:24:12 -0400
+Date: Sat, 29 Jul 2017 02:24:06 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170729021229-mutt-send-email-mst@kernel.org>
+Message-ID: <20170729021537-mutt-send-email-mst@kernel.org>
 References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
-	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
-	<20170726215625-mutt-send-email-mst@kernel.org>
-	<CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
-	<20170727022103-mutt-send-email-mst@kernel.org>
-	<f210b52b-b7ea-b27e-cca8-9f11a4b4f353@redhat.com>
-	<98048fb7-34e7-d92f-cbe5-90f39c9fcb46@redhat.com>
+	<1500761743-1669-6-git-send-email-zuban32s@gmail.com>
+	<20170723055006-mutt-send-email-mst@kernel.org>
+	<b566a69d-a977-bf9f-d567-b742d400b288@redhat.com>
+	<20170724234353-mutt-send-email-mst@kernel.org>
+	<CAKSfGUAs8Ru-wuuHXK-mHir0_Hj8NenoKxuXyDqVt1YXOZUHAw@mail.gmail.com>
+	<20170725005027-mutt-send-email-mst@kernel.org>
+	<b36116e5-15fe-ffdd-7e4f-0f35078f95e9@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <98048fb7-34e7-d92f-cbe5-90f39c9fcb46@redhat.com>
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC PATCH v2 4/6] hw/pci: introduce
- bridge-only vendor-specific capability to provide some hints to firmware
+In-Reply-To: <b36116e5-15fe-ffdd-7e4f-0f35078f95e9@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 5/6] hw/pci: add bus_reserve
+ property to pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,196 +34,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, rth@twiddle.net
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
 
-On Thu, Jul 27, 2017 at 03:58:58PM +0200, Laszlo Ersek wrote:
-> On 07/27/17 11:39, Marcel Apfelbaum wrote:
-> > On 27/07/2017 2:28, Michael S. Tsirkin wrote:
-> >> On Thu, Jul 27, 2017 at 12:54:07AM +0300, Alexander Bezzubikov wrote:
-> >>> 2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
-> >>>> On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
-> >>>>> On PCI init PCI bridges may need some
-> >>>>> extra info about bus number to reserve, IO, memory and
-> >>>>> prefetchable memory limits. QEMU can provide this
-> >>>>> with special
-> >>>>
-> >>>> with a special
-> >>>>
-> >>>>> vendor-specific PCI capability.
-> >>>>>
-> >>>>> Sizes of limits match ones from
-> >>>>> PCI Type 1 Configuration Space Header,
-> >>>>> number of buses to reserve occupies only 1 byte
-> >>>>> since it is the size of Subordinate Bus Number register.
-> >>>>>
-> >>>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> >>>>> ---
-> >>>>>   hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
-> >>>>>   include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
-> >>>>>   2 files changed, 45 insertions(+)
-> >>>>>
-> >>>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> >>>>> index 720119b..8ec6c2c 100644
-> >>>>> --- a/hw/pci/pci_bridge.c
-> >>>>> +++ b/hw/pci/pci_bridge.c
-> >>>>> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const
-> >>>>> char* bus_name,
-> >>>>>       br->bus_name = bus_name;
-> >>>>>   }
-> >>>>>
-> >>>>> +
-> >>>>> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
-> >>>>
-> >>>> help? should be qemu_cap_init?
-> >>>>
-> >>>>> +                              uint8_t bus_reserve, uint32_t io_limit,
-> >>>>> +                              uint16_t mem_limit, uint64_t
-> >>>>> pref_limit,
-> >>>>> +                              Error **errp)
-> >>>>> +{
-> >>>>> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
-> >>>>> +    PCIBridgeQemuCap cap;
-> >>>>
-> >>>> This leaks info to guest. You want to init all fields here:
-> >>>>
-> >>>> cap = {
-> >>>>   .len = ....
-> >>>> };
-> >>>
-> >>> I surely can do this for len field, but as Laszlo proposed
-> >>> we can use mutually exclusive fields,
-> >>> e.g. pref_32 and pref_64, the only way I have left
-> >>> is to use ternary operator (if we surely need this
-> >>> big initializer). Keeping some if's would look better,
-> >>> I think.
-> >>>
-> >>>>
-> >>>>> +
-> >>>>> +    cap.len = cap_len;
-> >>>>> +    cap.bus_res = bus_reserve;
-> >>>>> +    cap.io_lim = io_limit & 0xFF;
-> >>>>> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
-> >>>>> +    cap.mem_lim = mem_limit;
-> >>>>> +    cap.pref_lim = pref_limit & 0xFFFF;
-> >>>>> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
-> >>>>
-> >>>> Please use pci_set_word etc or cpu_to_leXX.
-> >>>>
-> >>>
-> >>> Since now we've decided to avoid fields separation into <field> +
-> >>> <field_upper>,
-> >>> this bitmask along with pci_set_word are no longer needed.
-> >>>
-> >>>> I think it's easiest to replace struct with a set of macros then
-> >>>> pci_set_word does the work for you.
-> >>>>
-> >>>
-> >>> I don't really want to use macros here because structure
-> >>> show us the whole capability layout and this can
-> >>> decrease documenting efforts. More than that,
-> >>> memcpy usage is very convenient here, and I wouldn't like
-> >>> to lose it.
-> >>>
-> >>>>
-> >>>>> +
-> >>>>> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
-> >>>>> +                                    cap_offset, cap_len, errp);
-> >>>>> +    if (offset < 0) {
-> >>>>> +        return offset;
-> >>>>> +    }
-> >>>>> +
-> >>>>> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
-> >>>>
-> >>>> +2 is yacky. See how virtio does it:
-> >>>>
-> >>>>      memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
-> >>>>             cap->cap_len - PCI_CAP_FLAGS);
-> >>>>
-> >>>>
-> >>>
-> >>> OK.
-> >>>
-> >>>>> +    return 0;
-> >>>>> +}
-> >>>>> +
-> >>>>>   static const TypeInfo pci_bridge_type_info = {
-> >>>>>       .name = TYPE_PCI_BRIDGE,
-> >>>>>       .parent = TYPE_PCI_DEVICE,
-> >>>>> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-> >>>>> index ff7cbaa..c9f642c 100644
-> >>>>> --- a/include/hw/pci/pci_bridge.h
-> >>>>> +++ b/include/hw/pci/pci_bridge.h
-> >>>>> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const
-> >>>>> char* bus_name,
-> >>>>>   #define  PCI_BRIDGE_CTL_DISCARD_STATUS       0x400   /* Discard
-> >>>>> timer status */
-> >>>>>   #define  PCI_BRIDGE_CTL_DISCARD_SERR 0x800   /* Discard timer
-> >>>>> SERR# enable */
-> >>>>>
-> >>>>> +typedef struct PCIBridgeQemuCap {
-> >>>>> +    uint8_t id;     /* Standard PCI capability header field */
-> >>>>> +    uint8_t next;   /* Standard PCI capability header field */
-> >>>>> +    uint8_t len;    /* Standard PCI vendor-specific capability
-> >>>>> header field */
-> >>>>> +    uint8_t bus_res;
-> >>>>> +    uint32_t pref_lim_upper;
-> >>>>
-> >>>> Big endian? Ugh.
-> >>>>
-> >>>
-> >>> Agreed, and this's gonna to disappear with
-> >>> the new layout.
-> >>>
-> >>>>> +    uint16_t pref_lim;
-> >>>>> +    uint16_t mem_lim;
-> >>>>
-> >>>> I'd say we need 64 bit for memory.
-> >>>>
-> >>>
-> >>> Why? Non-prefetchable MEMORY_LIMIT register is 16 bits long.
-> >>
-> >> Hmm ok, but e.g. for io there are bridges that have extra registers
-> >> to specify non-standard non-aligned registers.
-> >>
-> >>>>> +    uint16_t io_lim_upper;
-> >>>>> +    uint8_t io_lim;
-> >>>>> +    uint8_t padding;
-> >>>>
-> >>>> IMHO each type should have a special "don't care" flag
-> >>>> that would mean "I don't know".
-> >>>>
-> >>>>
-> >>>
-> >>> Don't know what? Now 0 is an indicator to do nothing with this field.
-> >>
-> >> In that case how do you say "don't allocate any memory"?
-> >>
+On Tue, Jul 25, 2017 at 02:49:49PM +0300, Marcel Apfelbaum wrote:
+> On 25/07/2017 0:58, Michael S. Tsirkin wrote:
+> > On Tue, Jul 25, 2017 at 12:41:12AM +0300, Alexander Bezzubikov wrote:
+> > > 2017-07-24 23:46 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> > > > On Sun, Jul 23, 2017 at 05:13:11PM +0300, Marcel Apfelbaum wrote:
+> > > > > On 23/07/2017 15:22, Michael S. Tsirkin wrote:
+> > > > > > On Sun, Jul 23, 2017 at 01:15:42AM +0300, Aleksandr Bezzubikov wrote:
+> > > > > > > To enable hotplugging of a newly created pcie-pci-bridge,
+> > > > > > > we need to tell firmware (SeaBIOS in this case)
+> > > > > > 
+> > > > > 
+> > > > > Hi Michael,
+> > > > > 
+> > > > > > Presumably, EFI would need to support this too?
+> > > > > > 
+> > > > > 
+> > > > > Sure, Eduardo added to CC, but he is in PTO now.
+> > > > > 
+> > > > > > > to reserve
+> > > > > > > additional buses for pcie-root-port, that allows us to
+> > > > > > > hotplug pcie-pci-bridge into this root port.
+> > > > > > > The number of buses to reserve is provided to the device via a corresponding
+> > > > > > > property, and to the firmware via new PCI capability (next patch).
+> > > > > > > The property's default value is 1 as we want to hotplug at least 1 bridge.
+> > > > > > 
+> > > > > > If so you should just teach firmware to allocate one bus #
+> > > > > > unconditionally.
+> > > > > > 
+> > > > > 
+> > > > > That would be a problem for the PCIe machines, since each PCIe
+> > > > > devices is plugged in a different bus and we are already
+> > > > > limited to 256 PCIe devices. Allocating an extra-bus always
+> > > > > would really limit the PCIe devices we can use.
+> > > > 
+> > > > But this is exactly what this patch does as the property is added to all
+> > > > buses and default to 1 (1 extra bus).
+> > > > 
+> > > > > > But why would that be so? What's wrong with a device
+> > > > > > directly in the root port?
+> > > > > > 
+> > > > > 
+> > > > > First, plugging a legacy PCI device into a PCIe Root Port
+> > > > > looks strange at least, and it can;t be done on real HW anyway.
+> > > > > (incompatible slots)
+> > > > 
+> > > > You can still plug in PCIe devices there.
+> > > > 
+> > > > > Second (and more important), if we want 2 or more PCI
+> > > > > devices we would loose both IO ports space and bus numbers.
+> > > > 
+> > > > What I am saying is maybe default should not be 1.
+> > > 
+> 
+> Hi Michael, Alexander
+> 
+> > > The only sensible variant left is 0.
+> > > But as we want pcie-pci-bridge to be used for every legacy PCI device
+> > > on q35 machine, every time one hotplugs the bridge into the root port,
+> > > he must be sure rp's prop value >0 (for Linux). I'm not sure
+> > > that it is a very convenient way to utilize the bridge - always remember
+> > > to set property.
 > > 
-> > We can keep the MEM/Limit registers read-only for such cases,
-> > as they are optional registers.
 > 
-> For OVMF, it would be really nice if OVMF could gather the reservation
-> numbers with
-> - read-only accesses
-> - to the one exact hotplug controller (root port, bridge, etc) that's
->   being queried for reservation.
-> 
-> Deciding whether some registers in config space are r/o would require
-> OVMF to attempt a write and check the result (and if it succeeded, to
-> restore the original value). I'm not too attracted to doing this in a
-> platform hook, while PciBusDxe is in the middle of enumerating /
-> configuring the PCI(e) hierarchy :)
-> 
-> Thanks
-> Laszlo
+> Is not for Linux only, is for all guest OSes.
+> I also think setting the property is OK, libvirt can always
+> add a single PCIe Root Port port with this property set,
+> while upper layers can create flavors (if the feature needed
+> or not for the current setup)
 
-Well that's the PCI spec, I don't think there's a choice for
-regular bridges. If we have this capability this is a possible
-optimization.
-But without it, if you assign ranges without checking whether they are
-available they won't have any effect practically.
-It's mostly harmless, but you are going to waste resources.
+If you are going to always do this, it kind of looks like
+Laszlo's idea of always cold-plugging a pci bridge.
 
--- 
-MST
+> > That's what I'm saying then - if in your opinion default is >0 anyway,
+> > tweak firmware to do it by default.
+> > 
+> 
+> Default should be 0 for sure - because of the hard limitation
+> on the number of PCIe devices for single PCI domain (the same
+> as the number of buses, 256).
+> 
+> For a positive value we will should add a property "buses-reserve = x".
+
+So value here is borderline but if it includes other resources
+then value seems clearer.
+
+> > > Another way - we can set this to 0 by default, and to 1 for pcie-root-port,
+> > > and recommend to use it for hotplugging of the pcie-pci-bridge itself.
+> > 
+> > I wonder about something: imagine hotplugging a hierarchy of bridges
+> > below a root port. It seems that nothing prevents guest from finding a
+> > free range of buses to cover this hierarchy and setting that as
+> > secondary/subordinate bus for this bridge.
+> >  > This does need support on QEMU side to hotplug a hierarchy at once,
+> > and might need some fixes in Linux, on the plus side you can defer
+> > management decision on how many are needed until you are actually
+> > adding something, and you don't need vendor specific patches.
+> > 
+> 
+> We can teach Linux kernel, that's for sure (OK, almost sure...)
+> but what we don't want is to be dependent on specific guest Operating
+> Systems. For example, most configurations are not supported
+> by Windows guests.
+
+If you fix Linux then windows will not want to be left behind
+and will implement this too.
+
+> Also is a great opportunity adding PCI IO resources hints
+> to guest FW, something we wanted to do for some time.
+> 
+> Thanks,
+> Marcel
+
+I agree, it's a good reason to add this capability.
+
+> > 
+> > > > 
+> > > > > > 
+> > > > > > > 
+> > > > > > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > > > > > > ---
+> > > > > > >    hw/pci-bridge/pcie_root_port.c | 1 +
+> > > > > > >    include/hw/pci/pcie_port.h     | 3 +++
+> > > > > > >    2 files changed, 4 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> > > > > > > index 4d588cb..b0e49e1 100644
+> > > > > > > --- a/hw/pci-bridge/pcie_root_port.c
+> > > > > > > +++ b/hw/pci-bridge/pcie_root_port.c
+> > > > > > > @@ -137,6 +137,7 @@ static void rp_exit(PCIDevice *d)
+> > > > > > >    static Property rp_props[] = {
+> > > > > > >        DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> > > > > > >                        QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> > > > > > > +    DEFINE_PROP_UINT8("bus_reserve", PCIEPort, bus_reserve, 1),
+> > > > > > >        DEFINE_PROP_END_OF_LIST()
+> > > > > > >    };
+> > > > > > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> > > > > > > index 1333266..1b2dd1f 100644
+> > > > > > > --- a/include/hw/pci/pcie_port.h
+> > > > > > > +++ b/include/hw/pci/pcie_port.h
+> > > > > > > @@ -34,6 +34,9 @@ struct PCIEPort {
+> > > > > > >        /* pci express switch port */
+> > > > > > >        uint8_t     port;
+> > > > > > > +
+> > > > > > > +    /* additional buses to reserve on firmware init */
+> > > > > > > +    uint8_t     bus_reserve;
+> > > > > > >    };
+> > > > > > >    void pcie_port_init_reg(PCIDevice *d);
+> > > > > > 
+> > > > > > So here is a property and it does not do anything.
+> > > > > > It makes it easier to work on series maybe, but review
+> > > > > > is harder since we do not see what it does at all.
+> > > > > > Please do not split up patches like this - you can maintain
+> > > > > > it split up in your branch if you like and merge before sending.
+> > > > > > 
+> > > > > 
+> > > > > Agreed, Alexandr please merge patches 4-5-6 for your next submission.
+> > > > > 
+> > > > > Thanks,
+> > > > > Marcel
+> > > > > 
+> > > > > 
+> > > > > > > --
+> > > > > > > 2.7.4
+> > > 
+> > > 
+> > > 
+> > > -- 
+> > > Alexander Bezzubikov
