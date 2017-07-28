@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1db0Jf-0001Rp-R5
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:08:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1db0Jh-0001Ts-Ui
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1db0Je-0001bu-DX
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:08:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42252)
+	(envelope-from <peterx@redhat.com>) id 1db0Jg-0001dR-Tb
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:08:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1db0Je-0001bF-4n
-	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:08:10 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1db0Jg-0001cz-KX
+	for qemu-devel@nongnu.org; Fri, 28 Jul 2017 04:08:12 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 28 Jul 2017 16:06:31 +0800
-Message-Id: <1501229198-30588-23-git-send-email-peterx@redhat.com>
+Date: Fri, 28 Jul 2017 16:06:32 +0800
+Message-Id: <1501229198-30588-24-git-send-email-peterx@redhat.com>
 In-Reply-To: <1501229198-30588-1-git-send-email-peterx@redhat.com>
 References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC 22/29] migration: new message
- MIG_RP_MSG_RECV_BITMAP
+Subject: [Qemu-devel] [RFC 23/29] migration: new cmd MIG_CMD_POSTCOPY_RESUME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,275 +26,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Introducing new return path message MIG_RP_MSG_RECV_BITMAP to send
-received bitmap of ramblock back to source.
-
-This is the reply message of MIG_CMD_RECV_BITMAP, it contains not only
-the header (including the ramblock name), and it was appended with the
-whole ramblock received bitmap on the destination side.
-
-When the source receives such a reply message (MIG_RP_MSG_RECV_BITMAP),
-it parses it, convert it to the dirty bitmap by reverting the bits.
+Introducing this new command to be sent when the source VM is ready to
+resume the paused migration.  What the destination does here is
+basically release the fault thread to continue service page faults.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c  | 62 ++++++++++++++++++++++++++++++++++++++++++
- migration/migration.h  |  2 ++
- migration/ram.c        | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
- migration/ram.h        |  2 ++
- migration/savevm.c     |  2 +-
- migration/trace-events |  2 ++
- 6 files changed, 143 insertions(+), 1 deletion(-)
+ migration/savevm.c     | 27 +++++++++++++++++++++++++++
+ migration/savevm.h     |  1 +
+ migration/trace-events |  1 +
+ 3 files changed, 29 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index e498fa4..c2b85ac 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -92,6 +92,7 @@ enum mig_rp_message_type {
- 
-     MIG_RP_MSG_REQ_PAGES_ID, /* data (start: be64, len: be32, id: string) */
-     MIG_RP_MSG_REQ_PAGES,    /* data (start: be64, len: be32) */
-+    MIG_RP_MSG_RECV_BITMAP,  /* send recved_bitmap back to source */
- 
-     MIG_RP_MSG_MAX
- };
-@@ -450,6 +451,39 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
-     migrate_send_rp_message(mis, MIG_RP_MSG_PONG, sizeof(buf), &buf);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index def9213..2e330bc 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -77,6 +77,7 @@ enum qemu_vm_cmd {
+     MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
+                                       were previously sent during
+                                       precopy but are dirty. */
++    MIG_CMD_POSTCOPY_RESUME,       /* resume postcopy on dest */
+     MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
+     MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
+     MIG_CMD_MAX
+@@ -95,6 +96,7 @@ static struct mig_cmd_args {
+     [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
+     [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+                                    .len = -1, .name = "POSTCOPY_RAM_DISCARD" },
++    [MIG_CMD_POSTCOPY_RESUME]  = { .len =  0, .name = "POSTCOPY_RESUME" },
+     [MIG_CMD_PACKAGED]         = { .len =  4, .name = "PACKAGED" },
+     [MIG_CMD_RECV_BITMAP]      = { .len = -1, .name = "RECV_BITMAP" },
+     [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+@@ -931,6 +933,12 @@ void qemu_savevm_send_postcopy_run(QEMUFile *f)
+     qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RUN, 0, NULL);
  }
  
-+void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
-+                                 char *block_name)
++void qemu_savevm_send_postcopy_resume(QEMUFile *f)
 +{
-+    char buf[512];
-+    int len;
-+    int64_t res;
-+
-+    /*
-+     * First, we send the header part. It contains only the len of
-+     * idstr, and the idstr itself.
-+     */
-+    len = strlen(block_name);
-+    buf[0] = len;
-+    memcpy(buf + 1, block_name, len);
-+
-+    migrate_send_rp_message(mis, MIG_RP_MSG_RECV_BITMAP, len + 1, buf);
-+
-+    /*
-+     * Next, we dump the received bitmap to the stream.
-+     *
-+     * TODO: currently we are safe since we are the only one that is
-+     * using the to_src_file handle (fault thread is still paused),
-+     * and it's ok even not taking the mutex. However the best way is
-+     * to take the lock before sending the message header, and release
-+     * the lock after sending the bitmap.
-+     */
-+    qemu_mutex_lock(&mis->rp_mutex);
-+    res = ramblock_recv_bitmap_send(mis->to_src_file, block_name);
-+    qemu_mutex_unlock(&mis->rp_mutex);
-+
-+    trace_migrate_send_rp_recv_bitmap(block_name, res);
++    trace_savevm_send_postcopy_resume();
++    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RESUME, 0, NULL);
 +}
 +
- MigrationCapabilityStatusList *qmp_query_migrate_capabilities(Error **errp)
+ void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name)
  {
-     MigrationCapabilityStatusList *head = NULL;
-@@ -1560,6 +1594,7 @@ static struct rp_cmd_args {
-     [MIG_RP_MSG_PONG]           = { .len =  4, .name = "PONG" },
-     [MIG_RP_MSG_REQ_PAGES]      = { .len = 12, .name = "REQ_PAGES" },
-     [MIG_RP_MSG_REQ_PAGES_ID]   = { .len = -1, .name = "REQ_PAGES_ID" },
-+    [MIG_RP_MSG_RECV_BITMAP]    = { .len = -1, .name = "RECV_BITMAP" },
-     [MIG_RP_MSG_MAX]            = { .len = -1, .name = "MAX" },
- };
- 
-@@ -1604,6 +1639,19 @@ static bool postcopy_pause_return_path_thread(MigrationState *s)
-     return true;
+     size_t len;
+@@ -1671,6 +1679,22 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+     return LOADVM_QUIT;
  }
  
-+static int migrate_handle_rp_recv_bitmap(MigrationState *s, char *block_name)
++static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
 +{
-+    RAMBlock *block = qemu_ram_block_by_name(block_name);
-+
-+    if (!block) {
-+        error_report("%s: invalid block name '%s'", __func__, block_name);
-+        return -EINVAL;
-+    }
-+
-+    /* Fetch the received bitmap and refresh the dirty bitmap */
-+    return ram_dirty_bitmap_reload(s, block);
-+}
-+
- /*
-  * Handles messages sent on the return path towards the source VM
-  *
-@@ -1709,6 +1757,20 @@ retry:
-             migrate_handle_rp_req_pages(ms, (char *)&buf[13], start, len);
-             break;
- 
-+        case MIG_RP_MSG_RECV_BITMAP:
-+            if (header_len < 1) {
-+                error_report("%s: missing block name", __func__);
-+                mark_source_rp_bad(ms);
-+                goto out;
-+            }
-+            /* Format: len (1B) + idstr (<255B). This ends the idstr. */
-+            buf[buf[0] + 1] = '\0';
-+            if (migrate_handle_rp_recv_bitmap(ms, (char *)(buf + 1))) {
-+                mark_source_rp_bad(ms);
-+                goto out;
-+            }
-+            break;
-+
-         default:
-             break;
-         }
-diff --git a/migration/migration.h b/migration/migration.h
-index 574fedd..4d38308 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -204,5 +204,7 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
-                           uint32_t value);
- int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
-                               ram_addr_t start, size_t len);
-+void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
-+                                 char *block_name);
- 
- #endif
-diff --git a/migration/ram.c b/migration/ram.c
-index 7f4cb0f..d543483 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -182,6 +182,32 @@ void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb)
- }
- 
- /*
-+ * Format: bitmap_size (8 bytes) + whole_bitmap (N bytes).
-+ *
-+ * Returns >0 if success with sent bytes, or <0 if error.
-+ */
-+int64_t ramblock_recv_bitmap_send(QEMUFile *file, char *block_name)
-+{
-+    RAMBlock *block = qemu_ram_block_by_name(block_name);
-+    uint64_t size;
-+
-+    /* We should have made sure that the block exists */
-+    assert(block);
-+
-+    /* Size of the bitmap, in bytes */
-+    size = (block->max_length >> TARGET_PAGE_BITS) / 8;
-+    qemu_put_be64(file, size);
-+    qemu_put_buffer(file, (const uint8_t *)block->receivedmap, size);
-+    qemu_fflush(file);
-+
-+    if (qemu_file_get_error(file)) {
-+        return qemu_file_get_error(file);
-+    }
-+
-+    return sizeof(size) + size;
-+}
-+
-+/*
-  * An outstanding page request, on the source, having been received
-  * and queued
-  */
-@@ -2705,6 +2731,54 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     return ret;
- }
- 
-+/*
-+ * Read the received bitmap, revert it as the initial dirty bitmap.
-+ * This is only used when the postcopy migration is paused but wants
-+ * to resume from a middle point.
-+ */
-+int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
-+{
-+    QEMUFile *file = s->rp_state.from_dst_file;
-+    uint64_t local_size = (block->max_length >> TARGET_PAGE_BITS) / 8;
-+    uint64_t size;
-+
-+    if (s->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
-+        error_report("%s: incorrect state %s", __func__,
-+                     MigrationStatus_lookup[s->state]);
-+        return -EINVAL;
-+    }
-+
-+    size = qemu_get_be64(file);
-+
-+    /* The size of the bitmap should match with our ramblock */
-+    if (size != local_size) {
-+        error_report("%s: ramblock '%s' bitmap size mismatch "
-+                     "(0x%lx != 0x%lx)", __func__, block->idstr,
-+                     size, local_size);
-+        return -EINVAL;
-+    }
-+
 +    /*
-+     * We are still during migration (though paused). The dirty bitmap
-+     * won't change.  We can directly modify it.
++     * This means source VM is ready to resume the postcopy migration.
++     * It's time to switch state and release the fault thread to
++     * continue service page faults.
 +     */
-+    size = qemu_get_buffer(file, (uint8_t *)block->bmap, local_size);
++    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
++                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
++    qemu_sem_post(&mis->postcopy_pause_sem_fault);
 +
-+    if (qemu_file_get_error(file)) {
-+        return qemu_file_get_error(file);
-+    }
-+
-+    /*
-+     * What we received is "received bitmap". Revert it as the initial
-+     * dirty bitmap for this ramblock.
-+     */
-+    bitmap_invert(block->bmap, block->max_length >> TARGET_PAGE_BITS);
-+
-+    trace_ram_dirty_bitmap_reload(block->idstr);
++    /* TODO: Tell source that "we are ready" */
 +
 +    return 0;
 +}
 +
- static SaveVMHandlers savevm_ram_handlers = {
-     .save_setup = ram_save_setup,
-     .save_live_iterate = ram_save_iterate,
-diff --git a/migration/ram.h b/migration/ram.h
-index 84e8623..86eb973 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -58,5 +58,7 @@ void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
- void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-                                     size_t len);
- void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
-+int64_t ramblock_recv_bitmap_send(QEMUFile *file, char *block_name);
-+int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *rb);
+ /**
+  * Immediately following this command is a blob of data containing an embedded
+  * chunk of migration stream; read it and load it.
+@@ -1834,6 +1858,9 @@ static int loadvm_process_command(QEMUFile *f)
+     case MIG_CMD_POSTCOPY_RAM_DISCARD:
+         return loadvm_postcopy_ram_handle_discard(mis, len);
  
- #endif
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 0ab13c0..def9213 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1755,7 +1755,7 @@ static int loadvm_handle_recv_bitmap(MigrationIncomingState *mis,
-         return -EINVAL;
++    case MIG_CMD_POSTCOPY_RESUME:
++        return loadvm_postcopy_handle_resume(mis);
++
+     case MIG_CMD_RECV_BITMAP:
+         return loadvm_handle_recv_bitmap(mis, len);
      }
+diff --git a/migration/savevm.h b/migration/savevm.h
+index 8126b1c..a5f3879 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -46,6 +46,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
+ void qemu_savevm_send_postcopy_advise(QEMUFile *f);
+ void qemu_savevm_send_postcopy_listen(QEMUFile *f);
+ void qemu_savevm_send_postcopy_run(QEMUFile *f);
++void qemu_savevm_send_postcopy_resume(QEMUFile *f);
+ void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name);
  
--    /* TODO: send the bitmap back to source */
-+    migrate_send_rp_recv_bitmap(mis, block_name);
- 
-     return 0;
- }
+ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
 diff --git a/migration/trace-events b/migration/trace-events
-index ca7b43f..ed69551 100644
+index ed69551..04dd9d8 100644
 --- a/migration/trace-events
 +++ b/migration/trace-events
-@@ -77,6 +77,7 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
- ram_postcopy_send_discard_bitmap(void) ""
- ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: %" PRIx64 " host: %p"
- ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
-+ram_dirty_bitmap_reload(char *str) "%s"
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
-@@ -88,6 +89,7 @@ migrate_fd_cancel(void) ""
- migrate_handle_rp_req_pages(const char *rbname, size_t start, size_t len) "in %s at %zx len %zx"
- migrate_pending(uint64_t size, uint64_t max, uint64_t post, uint64_t nonpost) "pending size %" PRIu64 " max %" PRIu64 " (post=%" PRIu64 " nonpost=%" PRIu64 ")"
- migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
-+migrate_send_rp_recv_bitmap(char *name, int64_t size) "block '%s' size 0x%"PRIi64
- migration_completion_file_err(void) ""
- migration_completion_postcopy_end(void) ""
- migration_completion_postcopy_end_after_complete(void) ""
+@@ -34,6 +34,7 @@ savevm_send_open_return_path(void) ""
+ savevm_send_ping(uint32_t val) "%x"
+ savevm_send_postcopy_listen(void) ""
+ savevm_send_postcopy_run(void) ""
++savevm_send_postcopy_resume(void) ""
+ savevm_send_recv_bitmap(char *name) "%s"
+ savevm_state_setup(void) ""
+ savevm_state_header(void) ""
 -- 
 2.7.4
