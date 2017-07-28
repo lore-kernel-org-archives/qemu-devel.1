@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangyunjian@huawei.com>) id 1dauRF-0007RE-RU
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:51:38 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dav8J-00043I-Tt
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 22:36:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangyunjian@huawei.com>) id 1dauRB-00057Y-OW
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:51:37 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:4406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <wangyunjian@huawei.com>) id 1dauRB-000553-4b
-	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 21:51:33 -0400
-From: w00273186 <wangyunjian@huawei.com>
-Date: Fri, 28 Jul 2017 09:50:53 +0800
-Message-ID: <1501206653-10704-1-git-send-email-wangyunjian@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] vhost-user: fix watcher need be removed
- when vhost-user hotplug
+	(envelope-from <programmingkidx@gmail.com>) id 1dav8G-00062N-RZ
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 22:36:07 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:38136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dav8G-00061z-MU
+	for qemu-devel@nongnu.org; Thu, 27 Jul 2017 22:36:04 -0400
+Received: by mail-it0-x241.google.com with SMTP id h199so9778695ith.5
+	for <qemu-devel@nongnu.org>; Thu, 27 Jul 2017 19:36:04 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170727145448.GV2555@redhat.com>
+Date: Thu, 27 Jul 2017 22:36:02 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <6FD43B48-E475-422A-A7F9-38B5589D051B@gmail.com>
+References: <1920BE03-56F6-4E44-B9D2-0638A86FACB2@gmail.com>
+	<20170727145448.GV2555@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] Add more function keys to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, caihe@huawei.com, Yunjian Wang <wangyunjian@huawei.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-From: Yunjian Wang <wangyunjian@huawei.com>
 
-"nc" is freed after hotplug vhost-user, but the watcher is not removed.
-The QEMU crash when the watcher access the "nc" when socket disconnects.
+> On Jul 27, 2017, at 10:54 AM, Daniel P. Berrange <berrange@redhat.com> =
+wrote:
+>=20
+> On Thu, Jul 27, 2017 at 10:51:33AM -0400, Programmingkid wrote:
+>> There are now keyboards that have 19 function keys. This patch =
+extends
+>> QEMU so these function keys can be used.=20
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>> qapi-schema.json  | 6 +++++-
+>> ui/input-keymap.c | 4 ++++
+>> 2 files changed, 9 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 9c6c3e1..a051820 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -4842,6 +4842,10 @@
+>> # @hiragana: since 2.9
+>> # @henkan: since 2.9
+>> # @yen: since 2.9
+>> +# @f16: since 2.10
+>> +# @f17: since 2.10
+>> +# @f18: since 2.10
+>> +# @f19: since 2.10
+>> #
+>> # Since: 1.3.0
+>> #
+>> @@ -4864,7 +4868,7 @@
+>>             'props', 'undo', 'front', 'copy', 'open', 'paste', =
+'find', 'cut',
+>>             'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
+>>             'ro', 'hiragana', 'henkan', 'yen',
+>> -            'kp_comma', 'kp_equals', 'power' ] }
+>> +            'kp_comma', 'kp_equals', 'power', 'f16', 'f17', 'f18', =
+'f19'] }
+>=20
+> Linux and AT set 1 go all the way to F24, and OS-X goes to F20, so =
+don't
+> arbitrarily stop short at F19
+>=20
+> Regards,
+> Daniel
 
-    Program received signal SIGSEGV, Segmentation fault.
-    #0  object_get_class (obj=obj@entry=0x2) at qom/object.c:750
-    #1  0x00007f9bb4180da1 in qemu_chr_fe_disconnect (be=<optimized out>) at chardev/char-fe.c:372
-    #2  0x00007f9bb40d1100 in net_vhost_user_watch (chan=<optimized out>, cond=<optimized out>, opaque=<optimized out>) at net/vhost-user.c:188
-    #3  0x00007f9baf97f99a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-    #4  0x00007f9bb41d7ebc in glib_pollfds_poll () at util/main-loop.c:213
-    #5  os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:261
-    #6  main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:515
-    #7  0x00007f9bb3e266a7 in main_loop () at vl.c:1917
-    #8  main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4786
-
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
----
-v3:
- -fix conflicts with current master.
-
-v2:
- -move the chunk before deinit.
-
-ps:
- reproduce steps:
-    1. virsh attach-device vm0 vhost-user.xml
-    2. virsh detach-device vm0 vhost-user.xml
-    3. virsh attach-device vm0 vhost-user.xml
-    4. service openvswitch restart
-    5. repeat step 2~4
-
- the vhost-user xml:
-    <interface type='vhostuser'>
-      <mac address='00:01:01:00:10:41'/>
-      <source type='unix' path='/var/run/vhost-user/tap1' mode='client'/>
-      <model type='virtio'/>
-      <driver queues='8'/>
-    </interface>
----
- net/vhost-user.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 36f32a2..c23927c 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -151,6 +151,10 @@ static void vhost_user_cleanup(NetClientState *nc)
-         s->vhost_net = NULL;
-     }
-     if (nc->queue_index == 0) {
-+        if (s->watch) {
-+            g_source_remove(s->watch);
-+            s->watch = 0;
-+        }
-         qemu_chr_fe_deinit(&s->chr, true);
-     }
- 
--- 
-1.8.3.1
+I think I will future-proof this patch by going all the way to F30.=20=
