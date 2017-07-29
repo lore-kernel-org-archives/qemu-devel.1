@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1dbLa6-0005EF-DL
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 02:50:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dbNyh-0000G8-Im
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 05:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1dbLa2-0007f1-HE
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 02:50:34 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4475)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1dbLa1-0007UZ-RP
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 02:50:30 -0400
-References: <1501249552-788-1-git-send-email-armbru@redhat.com>
-	<1501249552-788-3-git-send-email-armbru@redhat.com>
-	<20170728171731.GB3008@work-vm>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <597C2FFE.5020405@huawei.com>
-Date: Sat, 29 Jul 2017 14:49:34 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1dbNyg-0005XM-8A
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 05:24:07 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dbNyg-0005Ut-1N
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 05:24:06 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id m85so38651015wma.0
+	for <qemu-devel@nongnu.org>; Sat, 29 Jul 2017 02:24:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170728171731.GB3008@work-vm>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Define COLOMode without QAPI
+In-Reply-To: <20170729003327.GA16954@flamenco>
+References: <20170729003327.GA16954@flamenco>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 29 Jul 2017 10:23:42 +0100
+Message-ID: <CAFEAcA9M88wdV+pR5pSCRbt=NT=OKL+Z88hOjsb_v3q-AcL4fA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] tb_invalidate_phys_range and
+ tb_invalidate_phys_page_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
-On 2017/7/29 1:17, Dr. David Alan Gilbert wrote:
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> COLOMode is defined in the QAPI schema, but not used there.  Of the
->> stuff QAPI generates for it only the typedef is actually used.  Use of
->> QAPI is pointless and only complicates things, so don't.
-> Hmm, in one of the old COLO worlds I have, there's code to emit an event
-> on exiting from COLO and that event includes the mode it was in.
-
-Yes, we need it in the later series.
-
-> If the intent is to bring that or similar back then it would be worth
-> keeping.
-
-Agreed.  ;)
-
-> Dave
+On 29 July 2017 at 01:33, Emilio G. Cota <cota@braap.org> wrote:
+> While working on the removal of tb_lock, I stumbled upon the following.
 >
->> Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   include/migration/colo.h |  6 ++++++
->>   qapi-schema.json         | 16 ----------------
->>   2 files changed, 6 insertions(+), 16 deletions(-)
->>
->> diff --git a/include/migration/colo.h b/include/migration/colo.h
->> index ff9874e..5d7c500 100644
->> --- a/include/migration/colo.h
->> +++ b/include/migration/colo.h
->> @@ -26,6 +26,12 @@ void migration_incoming_exit_colo(void);
->>   void *colo_process_incoming_thread(void *opaque);
->>   bool migration_incoming_in_colo_state(void);
->>   
->> +typedef enum {
->> +    COLO_MODE_UNKNOWN,
->> +    COLO_MODE_PRIMARY,
->> +    COLO_MODE_SECONDARY,
->> +} COLOMode;
->> +
->>   COLOMode get_colo_mode(void);
->>   
->>   /* failover */
->> diff --git a/qapi-schema.json b/qapi-schema.json
->> index 9b6f6cb..3f0eb05 100644
->> --- a/qapi-schema.json
->> +++ b/qapi-schema.json
->> @@ -1304,22 +1304,6 @@
->>               'vmstate-loaded' ] }
->>   
->>   ##
->> -# @COLOMode:
->> -#
->> -# The colo mode
->> -#
->> -# @unknown: unknown mode
->> -#
->> -# @primary: master side
->> -#
->> -# @secondary: slave side
->> -#
->> -# Since: 2.8
->> -##
->> -{ 'enum': 'COLOMode',
->> -  'data': [ 'unknown', 'primary', 'secondary'] }
->> -
->> -##
->>   # @FailoverStatus:
->>   #
->>   # An enumeration of COLO failover status
->> -- 
->> 2.7.5
->>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Commit 77a8f1a51 ("linux-user: Fix stale tbs after mmap") introduced
+> tb_invalidate_phys_range(), which we now have in accel/tcg/translate-all.c
+> [ patchwork thread here: https://patchwork.ozlabs.org/patch/158556/ ]
 >
-> .
+> This function calls
+> tb_invalidate_phys_page_range(). As the name suggests, the latter
+> function expects the range to be within the same page.
+> The former does not have this requirement, as stated in the comment
+> above the function (which I confirmed running some linux-user code):
 >
+> +/*
+> + * invalidate all TBs which intersect with the target physical pages
+> + * starting in range [start;end[. NOTE: start and end may refer to
+> + * different physical pages. 'is_cpu_write_access' should be true if called
+> + * from a real cpu write access: the virtual CPU will exit the current
+> + * TB if code is modified inside this TB.
+> + */
+> +void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end,
+> +                              int is_cpu_write_access)
+> +{
+> +    while (start < end) {
+> +        tb_invalidate_phys_page_range(start, end, is_cpu_write_access);
+> +        start &= TARGET_PAGE_MASK;
+> +        start += TARGET_PAGE_SIZE;
+> +    }
+> +}
+>
+> What I find puzzling is that here we pass 'end' unmodified, instead of
+> making sure the range passed is within a page.
+>
+> Is this a bug, or am I missing something?
+
+It's a bit odd, but looking at the code I think it doesn't matter.
+The only thing that tb_invalidate_phys_page_range() uses 'end'
+for is when it does the "does this TB I've found overlap the
+range we're flushing" check with
+ if (!(tb_end <= start || tb_start >= end))
+
+If we pass an 'end' value that's larger than it would be if
+we confined it to the page, this is safe because at worst
+we'll invalidate more TBs than we needed to (and in practice
+if the TB we've found is within the full range that
+tb_invalidate_phys_range() is checking we need to invalidate
+it anyway). I haven't quite worked it through but I rather
+suspect that you can't have a TB that's in the list for
+the PageDesc for 'start' and which overlaps in the
+"full" [start-end) range but which wouldn't overlap
+in a truncated [start-(end rounded down to end of page))
+range.
+
+Basically the reason for the "same page" restriction
+is that tb_invalidate_phys_page_range() only does
+a single page_find() for the 'start' address. So
+as long as we call it once per page in the range
+it doesn't matter that we pass an overly pessimistic
+end. This is kind of bordering on "happens to work"
+territory though, so maybe we could improve it...
+
+thanks
+-- PMM
