@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dbRXR-0005Hq-2q
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dbRXR-0005Ho-21
 	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 09:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dbRXN-00067Q-Qp
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dbRXN-00067e-Te
 	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 09:12:13 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:45660 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:25079 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dbRXN-00062f-Fc
+	id 1dbRXN-00062e-IE
 	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 09:12:09 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Jul 2017 16:11:56 +0300
-Message-Id: <20170729131159.24949-2-vsementsov@virtuozzo.com>
+Date: Sat, 29 Jul 2017 16:11:58 +0300
+Message-Id: <20170729131159.24949-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20170729131159.24949-1-vsementsov@virtuozzo.com>
 References: <20170729131159.24949-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] coding_style: add point about 0x in
- trace-events
+Subject: [Qemu-devel] [PATCH v2 3/4] checkpatch: check trace-events code
+ style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, stefanha@gmail.com, peter.maydell@linaro.org, berrange@redhat.com
 
+Accordingly to CODING_STYLE, check that in trace-events:
+1. hex numbers are prefixed with '0x'
+2. '#' flag of printf is not used
+3. The exclusion from 1. are period-separated groups of numbers
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- CODING_STYLE | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ scripts/checkpatch.pl | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/CODING_STYLE b/CODING_STYLE
-index 2fa0c0b65b..2e6a0507be 100644
---- a/CODING_STYLE
-+++ b/CODING_STYLE
-@@ -123,3 +123,26 @@ We use traditional C-style /* */ comments and avoid // comments.
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 4e91122813..fa478074b8 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1337,6 +1337,25 @@ sub process {
+ 			$rpt_cleaners = 1;
+ 		}
  
- Rationale: The // form is valid in C99, so this is purely a matter of
- consistency of style. The checkpatch script will warn you about this.
++# checks for trace-events files
++		if ($realfile =~ /trace-events$/ && $line =~ /^\+/) {
++			if ($rawline =~ /%[-+ 0]*#/) {
++				ERROR("Don't use '#' flag of printf format ('%#') in " .
++				      "trace-events, use '0x' prefix instead\n" . $herecurr);
++			} else {
++				my $hex =
++					qr/%[-+ *.0-9]*([hljztL]|ll|hh)?(x|X|"\s*PRI[xX][^"]*"?)/;
 +
-+8. trace-events style
++				# don't consider groups splitted by [.:/ ], like 2A.20:12ab
++				my $tmpline = $rawline =~ s/($hex[.:\/ ])+$hex//gr;
 +
-+In trace-events files use '0x' prefix to specify hex numbers, as in:
++				if ($tmpline =~ /(?<!0x)$hex/) {
++					ERROR("Hex numbers must be prefixed with '0x'\n" .
++					      $herecurr);
++				}
++			}
++		}
 +
-+some_trace(unsigned x, uint64_t y) "x 0x%x y 0x" PRIx64
-+
-+The exclusion is a group of numbers, separated by symbols '.', '/', ':', ' ':
-+
-+some_other_trace(unsigned a, unsigned b, unsigned c) "num %x.%x.%x"
-+
-+However, you can use '0x' for such groups if you want. Anyway, be sure that
-+it is obvious that numbers are in hex, ex.:
-+
-+data_dump(uint8_t c1, uint8_t c2, uint8_t c3) "bytes (in hex): %02x %02x %02x"
-+
-+For consistency do not use printf flag '#', like '%#x'.
-+
-+Rationale: hex numbers are hard to read in logs when there no 0x prefix,
-+especially when (occasionally) the representation doesn't contain any letters
-+and especially in one line with other decimal numbers. Number groups are
-+allowed to not use '0x' because for some things notations like %x.%x.%x are
-+used not only in Qemu. Also dumping raw data bytes with '0x' is less readable.
+ # check we are in a valid source file if not then ignore this hunk
+ 		next if ($realfile !~ /\.(h|c|cpp|s|S|pl|py|sh)$/);
+ 
 -- 
 2.11.1
