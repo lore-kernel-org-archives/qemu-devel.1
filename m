@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40806)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <ps@pks.im>)
-	id 1dbS8o-00025B-HJ
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 09:50:51 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37663)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dbUnx-0005xb-QZ
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 12:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ps@pks.im>) id 1dbS8l-0006TF-ES
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 09:50:50 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56797)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dbUnu-00012J-MC
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 12:41:29 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:47693 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ps@pks.im>) id 1dbS8l-0006RF-8i
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 09:50:47 -0400
-Date: Sat, 29 Jul 2017 15:50:42 +0200
-From: Patrick Steinhardt <ps@pks.im>
-Message-ID: <20170729135042.GA1139@pks-xps>
-References: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
-	<CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
-	<cf854184-8bc0-4a9c-b97f-8274abf538bc@amsat.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="T4sUOijqQbZv57TR"
-Content-Disposition: inline
-In-Reply-To: <cf854184-8bc0-4a9c-b97f-8274abf538bc@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: include <linux/limits.h> for
- XATTR_SIZE_MAX
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dbUnu-00011O-6H
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 12:41:26 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Sat, 29 Jul 2017 19:41:03 +0300
+Message-Id: <20170729164104.29537-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170729164104.29537-1-vsementsov@virtuozzo.com>
+References: <20170729164104.29537-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 2/3] qcow2: add .bdrv_get_format_alloc_stat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +24,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair23@gmail.com>, Kamil Rytarowski <kamil@netbsd.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
+Realize .bdrv_get_format_alloc_stat interface.
 
---T4sUOijqQbZv57TR
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2-refcount.c | 152 +++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |   2 +
+ block/qcow2.h          |   2 +
+ 3 files changed, 156 insertions(+)
 
-On Fri, Jul 28, 2017 at 02:20:49PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> > On Mon, Jun 26, 2017 at 12:20 PM, Patrick Steinhardt <ps@pks.im> wrote:
-> >> The function `v9fs_xattrcreate` makes use of the define `XATTR_SIZE_MA=
-X`
-> >> to reject attempts of creating xattrs with an invalid size, which is
-> >> defined in <linux/limits.h>. On glibc-based systems, this header is
-> >> indirectly included via <limits.h>, <bits/posix1_lim.h>,
-> >> <bitts/local_lim.h>, but on other platforms this is not guaranteed due
-> >> to not being part of the POSIX standard. One examples are systems based
-> >> on musl libc, which do not include the <linux/limits.h> indirectly,
-> >> which leads to `XATTR_SIZE_MAX` being undefined.
-> >>
-> >> Fix this error by directly include <linux/limits.h>. As the 9P fs code
-> >> is being Linux-based either way, we can simply do so without breaking
-> >> other platforms. This enables building 9pfs on musl-based systems.
-> >>
-> >> Signed-off-by: Patrick Steinhardt <ps@pks.im>
-> > Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-> >> ---
-> >>   hw/9pfs/9p.c | 1 +
-> >>   1 file changed, 1 insertion(+)
-> >>
-> >> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> >> index 96d2683348..48cd558e96 100644
-> >> --- a/hw/9pfs/9p.c
-> >> +++ b/hw/9pfs/9p.c
-> >> @@ -13,6 +13,7 @@
-> >>
-> >>   #include "qemu/osdep.h"
-> >>   #include <glib/gprintf.h>
->=20
-> This is likely to break on BSD, but now than patchew has a NetBSD job=20
-> you can trigger a build RESENDing this patch.
->=20
-> This should probably work:
->=20
-> #ifdef __linux__
->=20
-> >> +#include <linux/limits.h>
->=20
-> #endif
->=20
-> >>   #include "hw/virtio/virtio.h"
-> >>   #include "qapi/error.h"
-> >>   #include "qemu/error-report.h"
-> >> --
-> >> 2.13.2
->=20
-> Regards,
->=20
-> Phil.
-
-Thanks for the feedback! Is this really relevant in this context,
-though? Both 9p-local.c and 9p-handle.c already include linux
-headers, especially <linux/fs.h> is included without any ifdef
-around. As such, I simply assumed that this code is being built
-on Linux systems, only.
-
-Regards
-Patrick
-
---T4sUOijqQbZv57TR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEtmscHsieVjl9VyNUEXxntp6r8SwFAll8krIACgkQEXxntp6r
-8Sz1TQ/+JWom4KIelP/KOfAYHEpHdjs8jA2gMNskOC16ftwyrVH/xAfKvb1/LDU7
-+ByK4DQC7NTQb5fTvQDRcvc68m3LjWwde6Qblc8ykIxsO/8e6jLlaI9aAdOMCA5w
-GoW5gjTKXE0AdE2lh+1Ja3caPb5fkkwcLBq+mkelySfUujVT7POZ1rYVPP/irYCT
-jv4Bk97tNM9GKbI7jKwAmsMxEXx44blViw/Gxo61Yj1b5ilpBZM5fFGrZ65qvang
-6HYn49SlONYiT4ZFmK2S+dOvH9SVxEeZxj/ui7lXTNqWPYSsFlTm03sZ7I0GWfX0
-o2mNyMKlzTd0D8oppERc/sjN8NLn51iF8Kuuolr2A5+Gdnog0kwx1WVGhvZQAYKj
-RFhn0yf47H64ct/FOQv34U8Cd+nmxudmiaancjXy1cFyABqd+tJTXRk/QwUynoWn
-3wlme503GL1lK9+JXARs9tHvGRbUgDhJ+b746UrWWtnX5O4HPOOSLnz6EGqCvrlc
-AY1GM1v5GmItxoU6ZMt7TYvWKOuWiBR8ToJRbbWtCPx3SOmNOjUVivMThlzTQJUY
-bfDBP0oaQuYM/FIzgIhRmteFWpUs0625MaYXMaArBdRVlrwSEZzhgyXX5LBGbJ5p
-cYgrPYKIeFmRh/9fn1NEBQ6uWNOlF2LidVdAcxhcJGrcLNNF/ns=
-=i1Ft
------END PGP SIGNATURE-----
-
---T4sUOijqQbZv57TR--
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 7c06061aae..fd6027f0c2 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2931,3 +2931,155 @@ done:
+     qemu_vfree(new_refblock);
+     return ret;
+ }
++
++typedef struct FormatAllocStatCo {
++    BlockDriverState *bs;
++    BlockFormatAllocInfo *bfai;
++    int64_t ret;
++} FormatAllocStatCo;
++
++static void coroutine_fn qcow2_get_format_alloc_stat_entry(void *opaque)
++{
++    int ret = 0;
++    FormatAllocStatCo *nbco = opaque;
++    BlockDriverState *bs = nbco->bs;
++    BDRVQcow2State *s = bs->opaque;
++    BlockFormatAllocInfo *bfai = nbco->bfai;
++    int64_t cluster, file_sectors, sector;
++    int refcount_block_offset;
++    uint32_t i;
++    bool used = false, f_data = false, f_zero = false;
++    int dif, num = 0, f_num = 0;
++
++    memset(bfai, 0, sizeof(*bfai));
++
++    file_sectors = bdrv_nb_sectors(bs->file->bs);
++    if (file_sectors < 0) {
++        nbco->ret = file_sectors;
++        return;
++    }
++
++    qemu_co_mutex_lock(&s->lock);
++
++    for (sector = 0; sector < file_sectors; sector += dif) {
++        if (f_num == 0) {
++            BlockDriverState *file;
++            ret = bdrv_get_block_status(bs->file->bs, sector,
++                                        file_sectors - sector, &f_num, &file);
++            if (ret < 0) {
++                goto fail;
++            }
++            f_data = ret & BDRV_BLOCK_DATA;
++            f_zero = ret & BDRV_BLOCK_ZERO;
++        }
++
++        if (num == 0) {
++            uint64_t refcount;
++            assert(((sector << BDRV_SECTOR_BITS) & (s->cluster_size - 1)) == 0);
++            ret = qcow2_get_refcount(
++                bs, (sector << BDRV_SECTOR_BITS) >> s->cluster_bits, &refcount);
++            if (ret < 0) {
++                goto fail;
++            }
++            used = refcount > 0;
++            num = s->cluster_size >> BDRV_SECTOR_BITS;
++        }
++
++        dif = MIN(f_num, MIN(num, file_sectors - sector));
++        if (used) {
++            if (f_data) {
++                bfai->used_data += dif;
++            } else if (f_zero) {
++                bfai->used_zero += dif;
++            } else {
++                bfai->used_discarded += dif;
++            }
++        } else {
++            if (f_data) {
++                bfai->unused_data += dif;
++            } else if (f_zero) {
++                bfai->unused_zero += dif;
++            } else {
++                bfai->unused_discarded += dif;
++            }
++        }
++        f_num -= dif;
++        num -= dif;
++    }
++
++    assert(f_num == 0);
++
++    if (used) {
++        bfai->used_overrun += num;
++    }
++
++    cluster = size_to_clusters(s, sector << BDRV_SECTOR_BITS);
++    refcount_block_offset = cluster & (s->refcount_block_size - 1);
++    for (i = cluster >> s->refcount_block_bits;
++         i <= s->max_refcount_table_index; i++)
++    {
++        int j;
++
++        if (!(s->refcount_table[i] & REFT_OFFSET_MASK)) {
++            refcount_block_offset = 0;
++            continue;
++        }
++
++        for (j = refcount_block_offset; j < s->refcount_block_size; j++) {
++            uint64_t refcount;
++            cluster = (i << s->refcount_block_bits) + j;
++
++            ret = qcow2_get_refcount(bs, cluster, &refcount);
++            if (ret < 0) {
++                goto fail;
++            }
++            if (refcount > 0) {
++                bfai->used_overrun++;
++            }
++        }
++
++        refcount_block_offset = 0;
++    }
++
++    qemu_co_mutex_unlock(&s->lock);
++
++    bfai->used_data = bfai->used_data << BDRV_SECTOR_BITS;
++    bfai->used_zero = bfai->used_zero << BDRV_SECTOR_BITS;
++    bfai->used_discarded = bfai->used_discarded << BDRV_SECTOR_BITS;
++    bfai->used_overrun = bfai->used_overrun << BDRV_SECTOR_BITS;
++
++    bfai->unused_data = bfai->unused_data << BDRV_SECTOR_BITS;
++    bfai->unused_zero = bfai->unused_zero << BDRV_SECTOR_BITS;
++    bfai->unused_discarded = bfai->unused_discarded << BDRV_SECTOR_BITS;
++
++    nbco->ret = 0;
++    return;
++
++fail:
++    nbco->ret = ret;
++    qemu_co_mutex_unlock(&s->lock);
++}
++
++/* qcow2_get_format_alloc_stat()
++ * Fills @bfai struct. In case of failure @bfai content is unpredicted.
++ */
++int qcow2_get_format_alloc_stat(BlockDriverState *bs,
++                                BlockFormatAllocInfo *bfai)
++{
++    FormatAllocStatCo nbco = {
++        .bs = bs,
++        .bfai = bfai,
++        .ret = -EINPROGRESS
++    };
++
++    if (qemu_in_coroutine()) {
++        qcow2_get_format_alloc_stat_entry(&nbco);
++    } else {
++        Coroutine *co =
++            qemu_coroutine_create(qcow2_get_format_alloc_stat_entry, &nbco);
++        qemu_coroutine_enter(co);
++        BDRV_POLL_WHILE(bs, nbco.ret == -EINPROGRESS);
++    }
++
++    return nbco.ret;
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a8d61f0981..0e26b548fd 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3469,6 +3469,8 @@ BlockDriver bdrv_qcow2 = {
+ 
+     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
+     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
++
++    .bdrv_get_format_alloc_stat = qcow2_get_format_alloc_stat,
+ };
+ 
+ static void bdrv_qcow2_init(void)
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1801dc30dc..16d31a8624 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -598,4 +598,6 @@ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+     void **table);
+ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
+ 
++int qcow2_get_format_alloc_stat(BlockDriverState *bs,
++                                BlockFormatAllocInfo *bfai);
+ #endif
+-- 
+2.11.1
