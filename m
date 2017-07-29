@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dbXVh-0003Vj-24
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 15:34:49 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dbYI2-0001U5-N9
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 16:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dbXVg-0003yr-4O
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 15:34:49 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dbXVf-0003yG-SL
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 15:34:48 -0400
-Received: by mail-wr0-x231.google.com with SMTP id 12so165777191wrb.1
-	for <qemu-devel@nongnu.org>; Sat, 29 Jul 2017 12:34:47 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170729135042.GA1139@pks-xps>
-References: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
-	<CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
-	<cf854184-8bc0-4a9c-b97f-8274abf538bc@amsat.org>
-	<20170729135042.GA1139@pks-xps>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 29 Jul 2017 20:34:26 +0100
-Message-ID: <CAFEAcA_gG=pukiHmhW5kMDu0sUxRL8Yp5H5=XA0gKbTSVuNBpQ@mail.gmail.com>
+	(envelope-from <knut.omang@oracle.com>) id 1dbYHz-0003Q9-Iz
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 16:24:46 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:25472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1dbYHz-0003N8-8V
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 16:24:43 -0400
+Message-ID: <1501359875.2819.69.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Sat, 29 Jul 2017 22:24:35 +0200
+In-Reply-To: <20170725093824.GJ26394@redhat.com>
+References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
+	<ee5cd7796873b061804bf6f8546759109473000b.1500709594.git-series.knut.omang@oracle.com>
+	<20170725093824.GJ26394@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: include <linux/limits.h> for
- XATTR_SIZE_MAX
+Mime-Version: 1.0
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] sockets: factor out
+ create_fast_reuse_socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Patrick Steinhardt <ps@pks.im>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>, Kamil Rytarowski <kamil@netbsd.org>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 29 July 2017 at 14:50, Patrick Steinhardt <ps@pks.im> wrote:
-> On Fri, Jul 28, 2017 at 02:20:49PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> This is likely to break on BSD, but now than patchew has a NetBSD job
->> you can trigger a build RESENDing this patch.
-
-> Thanks for the feedback! Is this really relevant in this context,
-> though? Both 9p-local.c and 9p-handle.c already include linux
-> headers, especially <linux/fs.h> is included without any ifdef
-> around. As such, I simply assumed that this code is being built
-> on Linux systems, only.
-
-Yes; hw/Makefile.objs only includes the 9pfs directory
-if CONFIG_VIRTFS is defined, and configure only sets that
-on Linux hosts which have libpcap and libattr available.
-
-thanks
--- PMM
+T24gVHVlLCAyMDE3LTA3LTI1IGF0IDEwOjM4ICswMTAwLCBEYW5pZWwgUC4gQmVycmFuZ2Ugd3Jv
+dGU6Cj4gT24gU2F0LCBKdWwgMjIsIDIwMTcgYXQgMDk6NDk6MzFBTSArMDIwMCwgS251dCBPbWFu
+ZyB3cm90ZToKPiA+IEZpcnN0IHJlZmFjdG9yaW5nIHN0ZXAgdG8gcHJlcGFyZSBmb3IgZml4aW5n
+IHRoZSBwcm9ibGVtCj4gPiBleHBvc2VkIHdpdGggdGhlIHRlc3QtbGlzdGVuIHRlc3QgaW4gdGhl
+IHByZXZpb3VzIGNvbW1pdAo+ID7CoAo+ID4gU2lnbmVkLW9mZi1ieTogS251dCBPbWFuZyA8a251
+dC5vbWFuZ0BvcmFjbGUuY29tPgo+ID4gLS0tCj4gPsKgwqB1dGlsL3FlbXUtc29ja2V0cy5jIHwg
+MjQgKysrKysrKysrKysrKysrKystLS0tLS0tCj4gPsKgwqAxIGZpbGUgY2hhbmdlZCwgMTcgaW5z
+ZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKPiA+wqAKPiA+IGRpZmYgLS1naXQgYS91dGlsL3Fl
+bXUtc29ja2V0cy5jIGIvdXRpbC9xZW11LXNvY2tldHMuYwo+ID4gaW5kZXggMTM1OGM4MS4uNTc4
+ZjI1YiAxMDA2NDQKPiA+IC0tLSBhL3V0aWwvcWVtdS1zb2NrZXRzLmMKPiA+ICsrKyBiL3V0aWwv
+cWVtdS1zb2NrZXRzLmMKPiA+IEBAIC0xNDksNiArMTQ5LDIwIEBAIGludCBpbmV0X2FpX2ZhbWls
+eV9mcm9tX2FkZHJlc3MoSW5ldFNvY2tldEFkZHJlc3MgKmFkZHIsCj4gPsKgwqDCoMKgwqDCoHJl
+dHVybiBQRl9VTlNQRUM7Cj4gPsKgwqB9Cj4gPsKgwqAKPiA+ICtzdGF0aWMgaW50IGNyZWF0ZV9m
+YXN0X3JldXNlX3NvY2tldChzdHJ1Y3QgYWRkcmluZm8gKmUsIEVycm9yICoqZXJycCkKPiA+ICt7
+Cj4gPiArwqDCoMKgwqBpbnQgc2xpc3RlbiA9IHFlbXVfc29ja2V0KGUtPmFpX2ZhbWlseSwgZS0+
+YWlfc29ja3R5cGUsIGUtPmFpX3Byb3RvY29sKTsKPiA+ICvCoMKgwqDCoGlmIChzbGlzdGVuIDwg
+MCkgewo+ID4gK8KgwqDCoMKgwqDCoMKgwqBpZiAoIWUtPmFpX25leHQpIHsKPiA+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqBlcnJvcl9zZXRnX2Vycm5vKGVycnAsIGVycm5vLCAiRmFpbGVkIHRv
+IGNyZWF0ZSBzb2NrZXQiKTsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgfQo+ID4gK8KgwqDCoMKgwqDC
+oMKgwqByZXR1cm4gLTE7Cj4gPiArwqDCoMKgwqB9Cj4gPiArCj4gPiArwqDCoMKgwqBzb2NrZXRf
+c2V0X2Zhc3RfcmV1c2Uoc2xpc3Rlbik7Cj4gPiArwqDCoMKgwqByZXR1cm4gc2xpc3RlbjsKPiA+
+ICt9Cj4gCj4gQXMgbWVudGlvbmVkIGluIHRoZSBwcmV2aW91cyByZXZpZXcsIEkgZG9uJ3QgdGhp
+bmsgd2Ugc2hvdWxkIGhhdmUKPiBtZXRob2RzIGxpa2UgdGhpcyB3aGljaCBzb21ldGltZXMgcmVw
+b3J0IGFuIGVycm9yIG9uIGZhaWx1cmUsIGFuZAo+IHNvbWV0aW1lcyBkb24ndCByZXBvcnQgYW4g
+ZXJyb3IuIEl0IG1ha2VzIGl0IGhhcmQgdG8gcmV2aWV3IHRoZQo+IGNhbGxlcnMgZm9yIGNvcnJl
+Y3RuZXNzIG9mIGVycm9yIGhhbmRsaW5nLsKgCgpTb3JyeSwgc29tZWhvdyB0aGlzIG9uZSBzbGlw
+cGVkIHRocm91Z2guLgoKPiAKPiA+ICsKPiA+wqDCoHN0YXRpYyBpbnQgaW5ldF9saXN0ZW5fc2Fk
+ZHIoSW5ldFNvY2tldEFkZHJlc3MgKnNhZGRyLAo+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGludCBwb3J0X29mZnNldCwKPiA+
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqBib29sIHVwZGF0ZV9hZGRyLAo+ID4gQEAgLTIxMCwyMSArMjI0LDE3IEBAIHN0YXRpYyBp
+bnQgaW5ldF9saXN0ZW5fc2FkZHIoSW5ldFNvY2tldEFkZHJlc3MgKnNhZGRyLAo+ID7CoMKgwqDC
+oMKgwqDCoMKgwqDCoHJldHVybiAtMTsKPiA+wqDCoMKgwqDCoMKgfQo+ID7CoMKgCj4gPiAtwqDC
+oMKgwqAvKiBjcmVhdGUgc29ja2V0ICsgYmluZCAqLwo+ID4gK8KgwqDCoMKgLyogY3JlYXRlIHNv
+Y2tldCArIGJpbmQvbGlzdGVuICovCj4gPsKgwqDCoMKgwqDCoGZvciAoZSA9IHJlczsgZSAhPSBO
+VUxMOyBlID0gZS0+YWlfbmV4dCkgewo+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoGdldG5hbWVpbmZv
+KChzdHJ1Y3Qgc29ja2FkZHIqKWUtPmFpX2FkZHIsZS0+YWlfYWRkcmxlbiwKPiA+wqDCoAkJwqDC
+oMKgwqDCoMKgwqDCoHVhZGRyLElORVQ2X0FERFJTVFJMRU4sdXBvcnQsMzIsCj4gPsKgwqAJCcKg
+wqDCoMKgwqDCoMKgwqBOSV9OVU1FUklDSE9TVCB8IE5JX05VTUVSSUNTRVJWKTsKPiA+IC3CoMKg
+wqDCoMKgwqDCoMKgc2xpc3RlbiA9IHFlbXVfc29ja2V0KGUtPmFpX2ZhbWlseSwgZS0+YWlfc29j
+a3R5cGUsIGUtPmFpX3Byb3RvY29sKTsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgc2xpc3Rl
+biA9IGNyZWF0ZV9mYXN0X3JldXNlX3NvY2tldChlLCAmZXJyKTsKPiA+wqDCoMKgwqDCoMKgwqDC
+oMKgwqBpZiAoc2xpc3RlbiA8IDApIHsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAo
+IWUtPmFpX25leHQpIHsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGVycm9y
+X3NldGdfZXJybm8oZXJycCwgZXJybm8sICJGYWlsZWQgdG8gY3JlYXRlIHNvY2tldCIpOwo+ID4g
+LcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KPiAKPiBTbyBwbGVhc2UgbGVhdmUgdGhpcyBoZXJl
+LgoKU2luY2Ugd2UgYXJlIGFscmVhZHkgb3V0c2lkZSBvZiB0aGUgc2NvcGUgb2YgdGhlIG9yaWdp
+bmFsIHBhdGNoLMKgCmxldCBtZSBzdWdnZXN0OgoKQXMgZmFyIGFzIEkgY2FuIHNlZSB0aGVyZSdz
+IG5vIGdvb2QgcmVhc29uIHRvIGhhdmUgCmRpZmZlcmVudCBiZWhhdmlvciBpZiBjcmVhdGluZyBz
+b2NrZXRzIG9uIHRoZSBsYXN0ICdzdHJ1Y3QgYWRkcmluZm8nCmluIHRoZSBsaXN0IGZhaWxzIHRo
+YW4gaWYgYW4gaW50ZXJtZWRpYXRlIGFkZHJpbmZvIGZhaWxzIGFuZCB0aGUgbmV4dCAKYWRkcmlu
+Zm8gaW4gdGhlIGxpc3QganVzdCBoYXBwZW5lZCB0byBoYXZlIG5vIGZyZWUgcG9ydHMuCgpBcyBm
+YXIgYXMgSSBjYW4gc2VlIHRoZSAnRmFpbGVkIHRvIGNyZWF0ZSBzb2NrZXQnIG1lc3NhZ2Ugd2ls
+bCBiZQptb3N0IHVzZWZ1bCB0byB0aGXCoHVzZXIgaWYgY3JlYXRpbmcgYSBzb2NrZXQgZmFpbHMg
+b24gYWxswqAKZWxlbWVudHMgaW4gdGhlIGxpc3QsIHRvIGRldGVjdCBpc3N1ZXMgd2l0aCB0aGUg
+bmV0d29yayBzZXR1cC4KCkkgaGF2ZSBpbXBsZW1lbnRlZCB0aGlzIHNlbWFudGljcyBpbiB2NiAt
+IGl0IHNob3VsZCBiZSBhbiBlbmhhbmNlbWVudCB3aGlsZcKgCmFsc28gc2ltcGxpZnlpbmcgdGhl
+IGNvZGUgaW5zaWRlIHRoZSBmb3IgbG9vcHMsIGdldHRpbmcgcmlkwqDCoApvZiB0aGUgY29uZGl0
+aW9uYWwgZXJyb3Igc2V0dGluZ8KgYW5kIGF2b2lkIGNvZGUgZHVwbGljYXRpb24gYnnCoApoYW5k
+bGluZyB0aGUgc2FtZSBlcnJvciB0d2ljZSBpbiBwcm94aW1pdHkuCgpUaGFua3MsCktudXQKCj4g
+Cj4gPsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjb250aW51ZTsKPiA+wqDCoMKgwqDCoMKg
+wqDCoMKgwqB9Cj4gPsKgwqAKPiA+IC3CoMKgwqDCoMKgwqDCoMKgc29ja2V0X3NldF9mYXN0X3Jl
+dXNlKHNsaXN0ZW4pOwo+ID4gLQo+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoHBvcnRfbWluID0gaW5l
+dF9nZXRwb3J0KGUpOwo+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoHBvcnRfbWF4ID0gc2FkZHItPmhh
+c190byA/IHNhZGRyLT50byArIHBvcnRfb2Zmc2V0IDogcG9ydF9taW47Cj4gPsKgwqDCoMKgwqDC
+oMKgwqDCoMKgZm9yIChwID0gcG9ydF9taW47IHAgPD0gcG9ydF9tYXg7IHArKykgewo+IAo+IAo+
+IFJlZ2FyZHMsCj4gRGFuaWVs
