@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dbYIB-0001Vm-66
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 16:24:56 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1dbZ8C-0003XY-UR
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dbYI7-0003aC-Vw
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 16:24:55 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:34121)
+	(envelope-from <knut.omang@oracle.com>) id 1dbZ86-0001KM-HG
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:40 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:25586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dbYI7-0003Z5-I5
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 16:24:51 -0400
-Message-ID: <1501359885.2819.70.camel@oracle.com>
+	id 1dbZ86-0001Hq-6f
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:34 -0400
 From: Knut Omang <knut.omang@oracle.com>
-Date: Sat, 29 Jul 2017 22:24:45 +0200
-In-Reply-To: <20170725095435.GL26394@redhat.com>
-References: <cover.28627297ce9b47260986349ac22bf2de37bb9be6.1500709594.git-series.knut.omang@oracle.com>
-	<ec9baca1bcdf385ea4b3e27fdbe2d35b6b0f687d.1500709594.git-series.knut.omang@oracle.com>
-	<20170725095435.GL26394@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] sockets: Handle race condition
- between binds to the same port
+Date: Sat, 29 Jul 2017 23:18:14 +0200
+Message-Id: <cover.14d7e60ae019b1418a70bacc4e7d240fadf9c96c.1501362828.git-series.knut.omang@oracle.com>
+Subject: [Qemu-devel] [PATCH v6 0/4] Unit test+fix for problem with QEMU
+ handling of multiple bind()s to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
 
-T24gVHVlLCAyMDE3LTA3LTI1IGF0IDEwOjU0ICswMTAwLCBEYW5pZWwgUC4gQmVycmFuZ2Ugd3Jv
-dGU6Cj4gT24gU2F0LCBKdWwgMjIsIDIwMTcgYXQgMDk6NDk6MzNBTSArMDIwMCwgS251dCBPbWFu
-ZyB3cm90ZToKPiA+IElmIGFuIG9mZnNldCBvZiBwb3J0cyBpcyBzcGVjaWZpZWQgdG8gdGhlIGlu
-ZXRfbGlzdGVuX3NhZGRyIGZ1bmN0aW9uKCksCj4gPiBhbmQgdHdvIG9yIG1vcmUgcHJvY2Vzc2Vz
-IHRyaWVzIHRvIGJpbmQgZnJvbSB0aGVzZSBwb3J0cyBhdCB0aGUgc2FtZSB0aW1lLAo+ID4gb2Nj
-YXNpb25hbGx5IG1vcmUgdGhhbiBvbmUgcHJvY2VzcyBtYXkgYmUgYWJsZSB0byBiaW5kIHRvIHRo
-ZSBzYW1lCj4gPiBwb3J0LiBUaGUgY29uZGl0aW9uIGlzIGRldGVjdGVkIGJ5IGxpc3RlbigpIGJ1
-dCB0b28gbGF0ZSB0byBhdm9pZCBhIGZhaWx1cmUuCj4gPsKgCj4gPiBUaGlzIGZ1bmN0aW9uIGlz
-IGNhbGxlZCBieSBzb2NrZXRfbGlzdGVuKCkgYW5kIHVzZWQKPiA+IGJ5IGFsbCBzb2NrZXQgbGlz
-dGVuaW5nIGNvZGUgaW4gUUVNVSwgc28gYWxsIGNhc2VzIHdoZXJlIGFueSBmb3JtIG9mIGR5bmFt
-aWMKPiA+IHBvcnQgc2VsZWN0aW9uIGlzIHVzZWQgc2hvdWxkIGJlIHN1YmplY3QgdG8gdGhpcyBp
-c3N1ZS4KPiA+wqAKPiA+IEFkZCBjb2RlIHRvIGNsb3NlIGFuZCByZS1lc3RhYmxpc2ggdGhlIHNv
-Y2tldCB3aGVuIHRoaXMKPiA+IGNvbmRpdGlvbiBpcyBvYnNlcnZlZCwgaGlkaW5nIHRoZSByYWNl
-IGNvbmRpdGlvbiBmcm9tIHRoZSB1c2VyLgo+ID7CoAo+ID4gQWxzbyBjbGVhbiB1cCBzb21lIGlz
-c3VlcyB3aXRoIGVycm9yIGhhbmRsaW5nIHRvIGFsbG93IG1vcmUKPiA+IGFjY3VyYXRlIHJlcG9y
-dGluZyBvZiB0aGUgY2F1c2Ugb2YgYW4gZXJyb3IuCj4gPsKgCj4gPiBUaGlzIGhhcyBiZWVuIGRl
-dmVsb3BlZCBhbmQgdGVzdGVkIGJ5IG1lYW5zIG9mIHRoZQo+ID4gdGVzdC1saXN0ZW4gdW5pdCB0
-ZXN0IGluIHRoZSBwcmV2aW91cyBjb21taXQuCj4gPiBFbmFibGUgdGhlIHRlc3QgZm9yIG1ha2Ug
-Y2hlY2sgbm93IHRoYXQgaXQgcGFzc2VzLgo+ID7CoAo+ID4gU2lnbmVkLW9mZi1ieTogS251dCBP
-bWFuZyA8a251dC5vbWFuZ0BvcmFjbGUuY29tPgo+ID4gUmV2aWV3ZWQtYnk6IEJoYXZlc2ggRGF2
-ZGEgPGJoYXZlc2guZGF2ZGFAb3JhY2xlLmNvbT4KPiA+IFJldmlld2VkLWJ5OiBZdXZhbCBTaGFp
-YSA8eXV2YWwuc2hhaWFAb3JhY2xlLmNvbT4KPiA+IFJldmlld2VkLWJ5OiBHaXJpc2ggTW9vZGFs
-YmFpbCA8Z2lyaXNoLm1vb2RhbGJhaWxAb3JhY2xlLmNvbT4KPiA+IFNpZ25lZC1vZmYtYnk6IEtu
-dXQgT21hbmcgPGtudXQub21hbmdAb3JhY2xlLmNvbT4KPiA+IC0tLQo+ID7CoMKgdGVzdHMvTWFr
-ZWZpbGUuaW5jbHVkZSB8wqDCoDIgKy0KPiA+wqDCoHV0aWwvcWVtdS1zb2NrZXRzLmPCoMKgwqDC
-oHwgNTEgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQo+ID7CoMKg
-MiBmaWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkKPiA+wqAK
-PiA+IGRpZmYgLS1naXQgYS90ZXN0cy9NYWtlZmlsZS5pbmNsdWRlIGIvdGVzdHMvTWFrZWZpbGUu
-aW5jbHVkZQo+ID4gaW5kZXggYjM3YzBjOC4uOWQyMTMxZCAxMDA2NDQKPiA+IC0tLSBhL3Rlc3Rz
-L01ha2VmaWxlLmluY2x1ZGUKPiA+ICsrKyBiL3Rlc3RzL01ha2VmaWxlLmluY2x1ZGUKPiA+IEBA
-IC0xMjgsNyArMTI4LDcgQEAgY2hlY2stdW5pdC15ICs9IHRlc3RzL3Rlc3QtYnVmZmVyaXN6ZXJv
-JChFWEVTVUYpCj4gPsKgwqBnY292LWZpbGVzLWNoZWNrLWJ1ZmZlcmlzemVyby15ID0gdXRpbC9i
-dWZmZXJpc3plcm8uYwo+ID7CoMKgY2hlY2stdW5pdC15ICs9IHRlc3RzL3Rlc3QtdXVpZCQoRVhF
-U1VGKQo+ID7CoMKgY2hlY2stdW5pdC15ICs9IHRlc3RzL3B0aW1lci10ZXN0JChFWEVTVUYpCj4g
-PiAtI2NoZWNrLXVuaXQteSArPSB0ZXN0cy90ZXN0LWxpc3RlbiQoRVhFU1VGKQo+ID4gK2NoZWNr
-LXVuaXQteSArPSB0ZXN0cy90ZXN0LWxpc3RlbiQoRVhFU1VGKQo+ID7CoMKgZ2Nvdi1maWxlcy1w
-dGltZXItdGVzdC15ID0gaHcvY29yZS9wdGltZXIuYwo+ID7CoMKgY2hlY2stdW5pdC15ICs9IHRl
-c3RzL3Rlc3QtcWFwaS11dGlsJChFWEVTVUYpCj4gPsKgwqBnY292LWZpbGVzLXRlc3QtcWFwaS11
-dGlsLXkgPSBxYXBpL3FhcGktdXRpbC5jCj4gPiBkaWZmIC0tZ2l0IGEvdXRpbC9xZW11LXNvY2tl
-dHMuYyBiL3V0aWwvcWVtdS1zb2NrZXRzLmMKPiA+IGluZGV4IDM5ZjIwN2MuLjhjYTNiYTYgMTAw
-NjQ0Cj4gPiAtLS0gYS91dGlsL3FlbXUtc29ja2V0cy5jCj4gPiArKysgYi91dGlsL3FlbXUtc29j
-a2V0cy5jCj4gPiBAQCAtMjEwLDcgKzIxMCw5IEBAIHN0YXRpYyBpbnQgaW5ldF9saXN0ZW5fc2Fk
-ZHIoSW5ldFNvY2tldEFkZHJlc3MgKnNhZGRyLAo+ID7CoMKgwqDCoMKgwqBjaGFyIHBvcnRbMzNd
-Owo+ID7CoMKgwqDCoMKgwqBjaGFyIHVhZGRyW0lORVQ2X0FERFJTVFJMRU4rMV07Cj4gPsKgwqDC
-oMKgwqDCoGNoYXIgdXBvcnRbMzNdOwo+ID4gLcKgwqDCoMKgaW50IHNsaXN0ZW4sIHJjLCBwb3J0
-X21pbiwgcG9ydF9tYXgsIHA7Cj4gPiArwqDCoMKgwqBpbnQgcmMsIHBvcnRfbWluLCBwb3J0X21h
-eCwgcDsKPiA+ICvCoMKgwqDCoGludCBzbGlzdGVuID0gMDsKPiA+ICvCoMKgwqDCoGludCBzYXZl
-ZF9lcnJubyA9IDA7Cj4gPsKgwqDCoMKgwqDCoEVycm9yICplcnIgPSBOVUxMOwo+ID7CoMKgCj4g
-PsKgwqDCoMKgwqDCoG1lbXNldCgmYWksMCwgc2l6ZW9mKGFpKSk7Cj4gPiBAQCAtMjc3LDI3ICsy
-NzksNTAgQEAgc3RhdGljIGludCBpbmV0X2xpc3Rlbl9zYWRkcihJbmV0U29ja2V0QWRkcmVzcyAq
-c2FkZHIsCj4gPsKgwqDCoMKgwqDCoMKgwqDCoMKgcG9ydF9tYXggPSBzYWRkci0+aGFzX3RvID8g
-c2FkZHItPnRvICsgcG9ydF9vZmZzZXQgOiBwb3J0X21pbjsKPiA+wqDCoMKgwqDCoMKgwqDCoMKg
-wqBmb3IgKHAgPSBwb3J0X21pbjsgcCA8PSBwb3J0X21heDsgcCsrKSB7Cj4gPsKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqBpbmV0X3NldHBvcnQoZSwgcCk7Cj4gPiAtwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgaWYgKHRyeV9iaW5kKHNsaXN0ZW4sIHNhZGRyLCBlKSA+PSAwKSB7Cj4gPiAtwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIGxpc3RlbjsKPiA+IC3CoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqB9Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHAgPT0gcG9y
-dF9tYXgpIHsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmICghZS0+YWlf
-bmV4dCkgewo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJjID0gdHJ5X2JpbmQoc2xpc3Rl
-biwgc2FkZHIsIGUpOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChyYykgewo+ID4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKGVycm5vID09IEVBRERSSU5VU0Up
-IHsKPiAKPiBBZGQgaW7CoMKgJyYmIGUtPmFpX25leHQnIGhlcmUsIHNvIHdlIHRyaWdnZXIgdGhl
-IGVycm9yIGhhbmRsaW5nCj4gb24gdGhlIGVsc2UgYnJhbmNoIGlmIHRoaXMgd2FzIHRoZSBsYXN0
-IGFkZHJlc3Mgd2UgaGFkLgoKU2VlIG15IGNvbW1lbnQgb24gcGF0Y2ggMiAtIHdpdGggdGhhdCBy
-ZXBvcnRpbmcgc2VtYW50aWNzLCBpbmFiaWxpdHkgdG8KY3JlYXRlIGEgc29ja2V0IHdpbGwgb25s
-eSBiZSByZXBvcnRlZCBpZiBub25lIG9mIHRoZSBhZGRyaW5mbyBzdHJ1Y3RzCmFsbG93ZWQgc29j
-a2V0IGNyZWF0aW9uIHNvIHRoaXMgcmVwb3J0aW5nIGNhc2UgZ29lcyBhd2F5LgoKPiA+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY29udGludWU7Cj4gPiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9IGVsc2Ugewo+ID7CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGVycm9yX3NldGdfZXJybm8oZXJycCwgZXJybm8sICJG
-YWlsZWQgdG8gYmluZCBzb2NrZXQiKTsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgZ290byBsaXN0ZW5fZmFpbGVkOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgfQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqByYyA9IGxpc3RlbihzbGlzdGVuLCAxKTsKPiA+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqBpZiAoIXJjKSB7Cj4gCj4gQXNzaWduaW5nIHRvIHJjIHNlZW1zIHJlZHVu
-ZGFudCBoZXJlLgoKcmVtb3ZlZC4KCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqBnb3RvIGxpc3Rlbl9vazsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9IGVsc2UgaWYg
-KGVycm5vID09IEVBRERSSU5VU0UpIHsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoC8qIFNvbWVvbmUgZWxzZSBtYW5hZ2VkIHRvIGJpbmQgdG8gdGhlIHNhbWUgcG9ydCBhbmQg
-YmVhdCB1cwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAqIHRvIGxpc3Rl
-biBvbiBpdCEgU29ja2V0IHNlbWFudGljcyBkb2VzIG5vdCBhbGxvdyB1cyB0bwo+ID4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAqIHJlY292ZXIgZnJvbSB0aGlzIHNpdHVhdGlv
-biwgc28gd2UgbmVlZCB0byByZWNyZWF0ZSB0aGUKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgKiBzb2NrZXQgdG8gYWxsb3cgYmluZCBhdHRlbXB0cyBmb3Igc3Vic2VxdWVu
-dCBwb3J0czoKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgKi8KPiA+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGNsb3Nlc29ja2V0KHNsaXN0ZW4pOwo+ID4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc2xpc3RlbiA9IGNyZWF0ZV9mYXN0X3Jl
-dXNlX3NvY2tldChlLCBlcnJwKTsKPiAKPiBjcmVhdGVfZmFzdF9yZXVzZV9zb2NrZXQgbWF5IHJl
-cG9ydCBhbiBlcnJvciBoZXJlCj4gCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqBpZiAoc2xpc3RlbiA+PSAwKSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoGNvbnRpbnVlOwo+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqB9Cj4gPsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9Cj4gPiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCBlcnJubywgIkZhaWxlZCB0byBsaXN0ZW4g
-b24gc29ja2V0Iik7Cj4gCj4gYXQgd2hpY2ggcG9pbnQgeW91IHJlcG9ydCBhbm90aGVyIGVycm9y
-IG9uIHRvcCBvZiBpdCB3aXRoIGEgc3RhbGUKPiBlcnJubyB2YWx1ZSBoZXJlLiBUaGlzIGJ1ZyB3
-b3VsZCBiZSBtb3JlIG9idmlvdXMgaWYgZXJyb3IgcmVwb3J0aW5nCj4gd2FzIHB1bGxlZCBvdXQg
-b2YgY3JlYXRlX2Zhc3RfcmV1c2Vfc29ja2V0KCkgYXMgZGVzY3JpYmVkIGluIHRoZQo+IGVhcmxp
-ZXIgcGF0Y2guCj4gCj4gSSB0aGluayBpdCdkIGJlIGNsZWFyZXIgaWYgd2UgcmVkdWNlZCB0aGUg
-bmVzdGluZyBoZXJlLiBlZwo+IAo+IMKgwqDCoMKgwqBpZiAobGlzdGVuKCkgPT0gMCkgewo+IMKg
-wqDCoMKgwqDCoMKgwqBnb3RvIGxpc3Rlbl9vazsKPiDCoMKgwqDCoMKgfQo+IMKgwqDCoMKgwqBp
-ZiAoZXJybm8gIT0gRUFERFJJTlVTRSkgewo+IMKgwqDCoMKgwqDCoMKgwqDCoGVycm9yX3NldGdf
-ZXJyb3IoZXJycCwgZXJybm8sICIuLi4uIik7Cj4gCSBnb3RvIGxpc3Rlbl9mYWlsZWQ7Cj4gwqDC
-oMKgwqDCoH0KPiDCoMKgwqDCoMKgY2xvc2Vzb2NrZXQobGlzdGVuKTsKPiDCoMKgwqDCoMKgc2xp
-c3RlbiA9IGNyZWF0ZV9mYXN0X3JldXNlX3NvY2tldChlKTsKPiDCoMKgwqDCoMKgaWYgKHNsaXN0
-ZW4gPCAwICYmICFlLT5haV9uZXh0KSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgZXJyb3Jfc2V0Z19l
-cnJvcihlcnJwLCBlcnJubywgIi4uLi4iKTsKPiAJIGdvdG8gbGlzdGVuX2ZhaWxlZDsKPiDCoMKg
-wqDCoMKgfQoKR29vZCBpZGVhIHRvIHB1c2ggdGhlICE9IGNhc2UgdXAsIGRvbmUhCgo+ID4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gbGlzdGVuX2ZhaWxlZDsKPiA+wqDCoMKgwqDCoMKg
-wqDCoMKgwqB9Cj4gPiArwqDCoMKgwqB9Cj4gPiArwqDCoMKgwqBpZiAoZXJyKSB7Cj4gPiArwqDC
-oMKgwqDCoMKgwqDCoGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOwo+ID4gK8KgwqDCoMKgfSBl
-bHNlIHsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCBlcnJubywg
-IkZhaWxlZCB0byBmaW5kIGFuIGF2YWlsYWJsZSBwb3J0Iik7Cj4gPiArwqDCoMKgwqB9Cj4gCj4g
-aWYgd2UgdGlkaWVkIHVwIHRoZSBmaXJzdCBjYWxsIHRvIGNyZWF0ZV9mYXN0X3JldXNlX3NvY2tl
-dCgpIHRvbywgaXQgd291bGQKPiByZW1vdmUgdGhlIG5lZWQgZm9yIHRoaXMuCgpJIHRoaW5rIHY2
-IG5vdyBzb2x2ZXMgdGhpcyBpbiBhIGJldHRlciB3YXkgYnkgc2VwYXJhdGluZyBiZXR3ZWVuwqAK
-d2hldGhlciBvbmUgb3IgbW9yZSBwb3J0cyBoYXZlIGFjdHVhbGx5IGJlZW4gdHJpZWQgYW5kIHRo
-ZSBjYXNlIHdoZXJlIG5vIAp2YWxpZC93b3JraW5nIGFkZHJpbmZvIHJlY29yZHMgaGF2ZSBiZWVu
-IHN1cHBsaWVkLgoKVGhhbmtzLApLbnV0Cj4gCj4gPiArCj4gPiArbGlzdGVuX2ZhaWxlZDoKPiA+
-ICvCoMKgwqDCoHNhdmVkX2Vycm5vID0gZXJybm87Cj4gPiArwqDCoMKgwqBpZiAoc2xpc3RlbiA+
-PSAwKSB7Cj4gPsKgwqDCoMKgwqDCoMKgwqDCoMKgY2xvc2Vzb2NrZXQoc2xpc3Rlbik7Cj4gPsKg
-wqDCoMKgwqDCoH0KPiA+wqDCoMKgwqDCoMKgZnJlZWFkZHJpbmZvKHJlcyk7Cj4gPiArwqDCoMKg
-wqBlcnJubyA9IHNhdmVkX2Vycm5vOwo+ID7CoMKgwqDCoMKgwqByZXR1cm4gLTE7Cj4gPsKgwqAK
-PiA+IC1saXN0ZW46Cj4gPiAtwqDCoMKgwqBpZiAobGlzdGVuKHNsaXN0ZW4sMSkgIT0gMCkgewo+
-ID4gLcKgwqDCoMKgwqDCoMKgwqBlcnJvcl9zZXRnX2Vycm5vKGVycnAsIGVycm5vLCAiRmFpbGVk
-IHRvIGxpc3RlbiBvbiBzb2NrZXQiKTsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgY2xvc2Vzb2NrZXQo
-c2xpc3Rlbik7Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoGZyZWVhZGRyaW5mbyhyZXMpOwo+ID4gLcKg
-wqDCoMKgwqDCoMKgwqByZXR1cm4gLTE7Cj4gPiAtwqDCoMKgwqB9Cj4gPiArbGlzdGVuX29rOgo+
-ID7CoMKgwqDCoMKgwqBpZiAodXBkYXRlX2FkZHIpIHsKPiA+wqDCoMKgwqDCoMKgwqDCoMKgwqBn
-X2ZyZWUoc2FkZHItPmhvc3QpOwo+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoHNhZGRyLT5ob3N0ID0g
-Z19zdHJkdXAodWFkZHIpOwo+IAo+IFJlZ2FyZHMsCj4gRGFuaWVs
+This series contains:
+* a unit test that exposes a race condition which causes QEMU to fail
+  to find a port even when there is plenty of available ports.
+* a refactor of the qemu-sockets inet_listen_saddr() function
+  to better handle this situation.
+
+Changes from v5:
+* Also move setting of error from socket creation out
+  into the main double for loop.
+* Simplify and enhance reporting if socket creation fails:
+  Only report failure to create sockets if none of the
+  provided addrinfo list elements allows creation of a
+  socket, otherwise report failure to find an available port.
+* Further simplify if's within the for loops and make sure
+  failure to recreate a socket gets distinctively reported.
+* Rebased to current master.
+
+Changes from v4:
+* Move the complexity of recreating a socket and setting the error pointer
+  into the main for loop, eliminating the try_bind_listen() function
+  again. Cleaning up and improving error handling in the process.
+
+Changes from v3:
+* Test changes: Add missing license
+  Add subtests for ipv4, ipv6 and both
+  Various g_* usage improvements
+* Split patch into 3 patches with two refactoring patches ahead
+  of the actual fix.
+
+Changes from v2:
+* Non-trivial rebase + further abstraction
+  on top of 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
+  'tests: add functional test validating ipv4/ipv6 address flag handling'
+
+Changes from v1:
+* Fix potential uninitialized variable only detected by optimize.
+* Improve unexpected error detection in test-listen to give more
+  details about why the test fails unexpectedly.
+* Fix some line length style issues.
+
+Thanks,
+Knut
+
+Knut Omang (4):
+  tests: Add test-listen - a stress test for QEMU socket listen
+  sockets: factor out a new try_bind() function
+  sockets: factor out create_fast_reuse_socket
+  sockets: Handle race condition between binds to the same port
+
+ tests/Makefile.include |   2 +-
+ tests/test-listen.c    | 253 ++++++++++++++++++++++++++++++++++++++++++-
+ util/qemu-sockets.c    | 138 +++++++++++++++--------
+ 3 files changed, 345 insertions(+), 48 deletions(-)
+ create mode 100644 tests/test-listen.c
+
+base-commit: a588c4985eff363154d65aee8607d0a4601655f7
+-- 
+git-series 0.9.1
