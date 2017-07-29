@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dbZ8D-0003aJ-VO
+	(envelope-from <knut.omang@oracle.com>) id 1dbZ8E-0003bq-Er
 	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1dbZ88-0001OG-HE
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:41 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:34337)
+	(envelope-from <knut.omang@oracle.com>) id 1dbZ8A-0001Rh-1w
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:42 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:25607)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1dbZ88-0001Ky-6q
-	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:36 -0400
+	id 1dbZ89-0001P2-MZ
+	for qemu-devel@nongnu.org; Sat, 29 Jul 2017 17:18:37 -0400
 From: Knut Omang <knut.omang@oracle.com>
-Date: Sat, 29 Jul 2017 23:18:16 +0200
-Message-Id: <02163a5a845bfc6cd34089aa3d5c3585b0321261.1501362828.git-series.knut.omang@oracle.com>
+Date: Sat, 29 Jul 2017 23:18:18 +0200
+Message-Id: <76cb37b3decd6d6c1c9bac72e21a06fabf7579be.1501362828.git-series.knut.omang@oracle.com>
 In-Reply-To: <cover.14d7e60ae019b1418a70bacc4e7d240fadf9c96c.1501362828.git-series.knut.omang@oracle.com>
 References: <cover.14d7e60ae019b1418a70bacc4e7d240fadf9c96c.1501362828.git-series.knut.omang@oracle.com>
-Subject: [Qemu-devel] [PATCH v6 2/4] sockets: factor out a new try_bind()
- function
+Subject: [Qemu-devel] [PATCH v6 4/4] sockets: Handle race condition between
+ binds to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +28,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, Knut Omang <knut.omang@oracle.com>
 
-A refactoring step to prepare for the problem
-exposed by the test-listen test in the previous commit.
+If an offset of ports is specified to the inet_listen_saddr function(),
+and two or more processes tries to bind from these ports at the same time,
+occasionally more than one process may be able to bind to the same
+port. The condition is detected by listen() but too late to avoid a failure.
 
-Simplify and reorganize the IPv6 specific extra
-measures and move it out of the for loop to increase
-code readability. No semantic changes.
+This function is called by socket_listen() and used
+by all socket listening code in QEMU, so all cases where any form of dynamic
+port selection is used should be subject to this issue.
 
+Add code to close and re-establish the socket when this
+condition is observed, hiding the race condition from the user.
+
+Also clean up some issues with error handling to allow more
+accurate reporting of the cause of an error.
+
+This has been developed and tested by means of the
+test-listen unit test in the previous commit.
+Enable the test for make check now that it passes.
+
+Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
 Signed-off-by: Knut Omang <knut.omang@oracle.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- util/qemu-sockets.c | 69 ++++++++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 30 deletions(-)
+ tests/Makefile.include |  2 +-
+ util/qemu-sockets.c    | 58 ++++++++++++++++++++++++++++++-------------
+ 2 files changed, 42 insertions(+), 18 deletions(-)
 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b37c0c8..9d2131d 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -128,7 +128,7 @@ check-unit-y += tests/test-bufferiszero$(EXESUF)
+ gcov-files-check-bufferiszero-y = util/bufferiszero.c
+ check-unit-y += tests/test-uuid$(EXESUF)
+ check-unit-y += tests/ptimer-test$(EXESUF)
+-#check-unit-y += tests/test-listen$(EXESUF)
++check-unit-y += tests/test-listen$(EXESUF)
+ gcov-files-ptimer-test-y = hw/core/ptimer.c
+ check-unit-y += tests/test-qapi-util$(EXESUF)
+ gcov-files-test-qapi-util-y = qapi/qapi-util.c
 diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 1358c81..b4a2f24 100644
+index d0d2047..6a511fb 100644
 --- a/util/qemu-sockets.c
 +++ b/util/qemu-sockets.c
-@@ -149,6 +149,44 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
-     return PF_UNSPEC;
- }
+@@ -206,7 +206,10 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+     char port[33];
+     char uaddr[INET6_ADDRSTRLEN+1];
+     char uport[33];
+-    int slisten, rc, port_min, port_max, p;
++    int rc, port_min, port_max, p;
++    int slisten = 0;
++    int saved_errno = 0;
++    bool socket_created = false;
+     Error *err = NULL;
  
-+static int try_bind(int socket, InetSocketAddress *saddr, struct addrinfo *e)
-+{
-+#ifndef IPV6_V6ONLY
-+    return bind(socket, e->ai_addr, e->ai_addrlen);
-+#else
-+    /*
-+     * Deals with first & last cases in matrix in comment
-+     * for inet_ai_family_from_address().
-+     */
-+    int v6only =
-+        ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
-+         (saddr->has_ipv4 && saddr->ipv4 &&
-+          saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
-+    int stat;
-+
-+ rebind:
-+    if (e->ai_family == PF_INET6) {
-+        qemu_setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
-+                        sizeof(v6only));
-+    }
-+
-+    stat = bind(socket, e->ai_addr, e->ai_addrlen);
-+    if (!stat) {
-+        return 0;
-+    }
-+
-+    /* If we got EADDRINUSE from an IPv6 bind & v6only is unset,
-+     * it could be that the IPv4 port is already claimed, so retry
-+     * with v6only set
-+     */
-+    if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
-+        v6only = 1;
-+        goto rebind;
-+    }
-+    return stat;
-+#endif
-+}
-+
- static int inet_listen_saddr(InetSocketAddress *saddr,
-                              int port_offset,
-                              bool update_addr,
-@@ -228,39 +266,10 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+     memset(&ai,0, sizeof(ai));
+@@ -258,7 +261,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+         return -1;
+     }
+ 
+-    /* create socket + bind */
++    /* create socket + bind/listen */
+     for (e = res; e != NULL; e = e->ai_next) {
+         getnameinfo((struct sockaddr*)e->ai_addr,e->ai_addrlen,
+ 		        uaddr,INET6_ADDRSTRLEN,uport,32,
+@@ -266,37 +269,58 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+ 
+         slisten = create_fast_reuse_socket(e);
+         if (slisten < 0) {
+-            if (!e->ai_next) {
+-                error_setg_errno(errp, errno, "Failed to create socket");
+-            }
+             continue;
+         }
+ 
++        socket_created = true;
          port_min = inet_getport(e);
          port_max = saddr->has_to ? saddr->to + port_offset : port_min;
          for (p = port_min; p <= port_max; p++) {
--#ifdef IPV6_V6ONLY
--            /*
--             * Deals with first & last cases in matrix in comment
--             * for inet_ai_family_from_address().
--             */
--            int v6only =
--                ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
--                 (saddr->has_ipv4 && saddr->ipv4 &&
--                  saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
--#endif
              inet_setport(e, p);
--#ifdef IPV6_V6ONLY
--        rebind:
--            if (e->ai_family == PF_INET6) {
--                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
--                                sizeof(v6only));
+-            if (try_bind(slisten, saddr, e) >= 0) {
+-                goto listen;
 -            }
--#endif
--            if (bind(slisten, e->ai_addr, e->ai_addrlen) == 0) {
-+            if (try_bind(slisten, saddr, e) >= 0) {
-                 goto listen;
-             }
--
--#ifdef IPV6_V6ONLY
--            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
--             * it could be that the IPv4 port is already claimed, so retry
--             * with V6ONLY set
--             */
--            if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
--                v6only = 1;
--                goto rebind;
--            }
--#endif
--
-             if (p == port_max) {
-                 if (!e->ai_next) {
+-            if (p == port_max) {
+-                if (!e->ai_next) {
++            rc = try_bind(slisten, saddr, e);
++            if (rc) {
++                if (errno == EADDRINUSE) {
++                    continue;
++                } else {
                      error_setg_errno(errp, errno, "Failed to bind socket");
++                    goto listen_failed;
+                 }
+             }
++            if (!listen(slisten, 1)) {
++                goto listen_ok;
++            }
++            if (errno != EADDRINUSE) {
++                error_setg_errno(errp, errno, "Failed to listen on socket");
++                goto listen_failed;
++            }
++            /* Someone else managed to bind to the same port and beat us
++             * to listen on it! Socket semantics does not allow us to
++             * recover from this situation, so we need to recreate the
++             * socket to allow bind attempts for subsequent ports:
++             */
++            closesocket(slisten);
++            slisten = create_fast_reuse_socket(e);
++            if (slisten < 0) {
++                error_setg_errno(errp, errno,
++                                 "Failed to recreate failed listening socket");
++                goto listen_failed;
++            }
+         }
++    }
++    error_setg_errno(errp, errno,
++                     socket_created ?
++                     "Failed to find an available port" :
++                     "Failed to create a socket");
++listen_failed:
++    saved_errno = errno;
++    if (slisten >= 0) {
+         closesocket(slisten);
+     }
+     freeaddrinfo(res);
++    errno = saved_errno;
+     return -1;
+ 
+-listen:
+-    if (listen(slisten,1) != 0) {
+-        error_setg_errno(errp, errno, "Failed to listen on socket");
+-        closesocket(slisten);
+-        freeaddrinfo(res);
+-        return -1;
+-    }
++listen_ok:
+     if (update_addr) {
+         g_free(saddr->host);
+         saddr->host = g_strdup(uaddr);
 -- 
 git-series 0.9.1
