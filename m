@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dbp96-0003Ep-8V
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:24:41 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dbpD0-0004Ey-69
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dbp91-0005ox-9W
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:24:40 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:50858 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dbpCv-0008Gx-6D
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:28:42 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:39147 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dbp90-0005oW-Or
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:24:35 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dbpCu-0008GY-HK
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:28:37 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Sun, 30 Jul 2017 17:24:27 +0300
-Message-Id: <150142466702.12995.15612967210180105490.stgit@frigg.lan>
+Date: Sun, 30 Jul 2017 17:28:29 +0300
+Message-Id: <150142490895.12995.3325911628559120907.stgit@frigg.lan>
 In-Reply-To: <150142369849.12995.11229612194223213120.stgit@frigg.lan>
 References: <150142369849.12995.11229612194223213120.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 4/5] hypertrace: [softmmu] Add QEMU-side
- proxy to "guest_hypertrace" event
+Subject: [Qemu-devel] [PATCH v8 5/5] hypertrace: Add guest-side user-level
+ library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +28,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Uses a virtual device to trigger the hypertrace channel event.
+Provides guest library "libqemu-hypertrace-guest.a" to abstract access
+to the hypertrace channel.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- hypertrace/Makefile.objs |    4 +
- hypertrace/softmmu.c     |  237 ++++++++++++++++++++++++++++++++++++++++=
+ Makefile                           |    5 +
+ configure                          |    2=20
+ hypertrace/guest/Makefile          |   30 ++++
+ hypertrace/guest/common.c          |  301 ++++++++++++++++++++++++++++++=
 ++++++
- include/hw/pci/pci.h     |    2=20
- 3 files changed, 243 insertions(+)
- create mode 100644 hypertrace/softmmu.c
+ hypertrace/guest/qemu-hypertrace.h |   80 ++++++++++
+ 5 files changed, 418 insertions(+)
+ create mode 100644 hypertrace/guest/Makefile
+ create mode 100644 hypertrace/guest/common.c
+ create mode 100644 hypertrace/guest/qemu-hypertrace.h
 
-diff --git a/hypertrace/Makefile.objs b/hypertrace/Makefile.objs
-index 177230fe1d..2ec1f04e79 100644
---- a/hypertrace/Makefile.objs
-+++ b/hypertrace/Makefile.objs
-@@ -1,10 +1,14 @@
- # -*- mode: makefile -*-
+diff --git a/Makefile b/Makefile
+index f08f498f79..523885a0a5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -602,8 +602,13 @@ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+ endif
+ endif
 =20
- target-obj-$(CONFIG_USER_ONLY) +=3D user.o
-+ifdef CONFIG_PCI
-+target-obj-$(CONFIG_SOFTMMU) +=3D softmmu.o
-+endif
- target-obj-y +=3D common.o
++install-hypertrace:
++	$(INSTALL_DIR) "$(DESTDIR)$(includedir)"
++	$(INSTALL_DATA) "$(SRC_PATH)/hypertrace/guest/qemu-hypertrace.h" "$(DES=
+TDIR)$(includedir)/"
++
 =20
- $(obj)/user.o: $(obj)/emit.c
- $(obj)/common.o: $(obj)/emit.c
-+$(obj)/softmmu.o: $(obj)/emit.c
+ install: all $(if $(BUILD_DOCS),install-doc) install-datadir install-loc=
+alstatedir
++install: install-hypertrace
+ ifneq ($(TOOLS),)
+ 	$(call install-prog,$(subst qemu-ga,qemu-ga$(EXESUF),$(TOOLS)),$(DESTDI=
+R)$(bindir))
+ endif
+diff --git a/configure b/configure
+index e6f752c242..9c7358d0b4 100755
+--- a/configure
++++ b/configure
+@@ -6286,6 +6286,8 @@ if [ "$TARGET_BASE_ARCH" =3D "" ]; then
+ fi
 =20
- $(obj)/emit.c: $(obj)/emit.c-timestamp $(BUILD_DIR)/config-host.mak
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
-diff --git a/hypertrace/softmmu.c b/hypertrace/softmmu.c
+ symlink "$source_path/Makefile.target" "$target_dir/Makefile"
++mkdir -p $target_dir/hypertrace/guest
++symlink $source_path/hypertrace/guest/Makefile $target_dir/hypertrace/gu=
+est/Makefile
+=20
+ upper() {
+     echo "$@"| LC_ALL=3DC tr '[a-z]' '[A-Z]'
+diff --git a/hypertrace/guest/Makefile b/hypertrace/guest/Makefile
 new file mode 100644
-index 0000000000..4048c7e0ef
+index 0000000000..cbc956bde1
 --- /dev/null
-+++ b/hypertrace/softmmu.c
-@@ -0,0 +1,237 @@
++++ b/hypertrace/guest/Makefile
+@@ -0,0 +1,30 @@
++include ../../../config-host.mak
++include ../../config-target.mak
++include $(SRC_PATH)/rules.mak
++
++vpath % $(SRC_PATH)/hypertrace/guest
++
++# do not use QEMU's per-host cflags when building guest code
++QEMU_CFLAGS  =3D -Werror -Wall
++
++QEMU_CFLAGS +=3D $(GLIB_CFLAGS)
++QEMU_CFLAGS +=3D -I$(SRC_PATH)/include
++QEMU_CFLAGS +=3D -I../../../linux-headers
++QEMU_CFLAGS +=3D -I../../../
++QEMU_CFLAGS +=3D -I../../
++
++ifdef CONFIG_SOFTMMU
++QEMU_CFLAGS +=3D -DNEED_CPU_H
++QEMU_CFLAGS +=3D -I$(SRC_PATH)/target-$(TARGET_BASE_ARCH)
++endif
++
++QEMU_CFLAGS +=3D -g -O2
++
++obj-y =3D common.o
++
++libqemu-hypertrace-guest.a: $(obj-y)
++
++all: libqemu-hypertrace-guest.a
++
++clean:
++	rm -f $(obj-y) libqemu-hypertrace-guest.a
+diff --git a/hypertrace/guest/common.c b/hypertrace/guest/common.c
+new file mode 100644
+index 0000000000..96ae4464bc
+--- /dev/null
++++ b/hypertrace/guest/common.c
+@@ -0,0 +1,301 @@
 +/*
-+ * QEMU-side management of hypertrace in softmmu emulation.
++ * Guest-side management of hypertrace.
 + *
 + * Copyright (C) 2016-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 + *
@@ -76,255 +133,398 @@ ter.
 + * See the COPYING file in the top-level directory.
 + */
 +
-+/*
-+ * Implementation details
-+ * =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ *
-+ * There are 3 channels, each a BAR of a virtual device that can be used=
- through
-+ * MMIO.
-+ *
-+ *
-+ * - Configuration channel: Exposes configuration parameters.
-+ *
-+ * - Data channel: Lets guests write argument values. Each guest client =
-should
-+ *   use a different offset to avoid concurrency problems.
-+ *
-+ * - Control channel: Triggers the hypertrace event on a write, providin=
-g the
-+ *   first argument. Offset in the control channel sets the offset in th=
-e data
-+ *   channel.
-+ */
++#include "qemu-hypertrace.h"
 +
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <pthread.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
++#include <glob.h>
++
++#include "config-host.h"
++#include "config-target.h"
++#if defined(CONFIG_SOFTMMU)
 +#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "hypertrace/common.h"
-+#include "hypertrace/trace.h"
 +#include "hw/pci/pci.h"
-+#include "migration/blocker.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
++#endif
++#include "hypertrace/common.h"
++
++static pthread_mutex_t init_mutex =3D PTHREAD_MUTEX_INITIALIZER;
++
++static char *config_path;
++static int config_fd =3D -1;
++static uint64_t *config_addr;
++static struct hypertrace_config *config;
++
++static char *data_path;
++static int data_fd =3D -1;
++static uint64_t *data_addr;
++
++static char *control_path;
++static int control_fd =3D -1;
++#if defined(CONFIG_USER_ONLY)
++static __thread uint64_t *control_addr;
++static __thread uint64_t *control_addr_1;
++#else
++static uint64_t *control_addr;
++#endif
++
++static int page_size;
 +
 +
-+typedef struct HypertraceState {
-+    PCIDevice dev;
-+
-+    uint64_t max_clients;
-+    struct hypertrace_config hconfig;
-+
-+    MemoryRegion config;
-+    void *config_ptr;
-+    MemoryRegion data;
-+    void *data_ptr;
-+    MemoryRegion control;
-+    void *control_ptr;
-+
-+    Error *migration_blocker;
-+} HypertraceState;
-+
-+
-+static uint64_t hypertrace_control_io_read(void *opaque, hwaddr addr,
-+                                           unsigned size)
++static int init_channel_file(const char *base, const char *suffix, size_=
+t size,
++                             char **path, int *fd, uint64_t **addr, bool=
+ write)
 +{
-+    uint64_t res;
-+    HypertraceState *s =3D opaque;
-+    char *mem =3D &((char *)s->control_ptr)[addr];
++    int prot;
 +
-+    switch (size) {
-+    case 1:
-+    {
-+        res =3D ((uint8_t *)mem)[0];
++    *path =3D malloc(strlen(base) + strlen(suffix) + 1);
++    sprintf(*path, "%s%s", base, suffix);
++
++    prot =3D O_RDONLY;
++    if (write) {
++        prot =3D O_RDWR;
++    }
++    *fd =3D open(*path, prot);
++    if (*fd =3D=3D -1) {
++        return -1;
++    }
++
++    prot =3D PROT_READ;
++    if (write) {
++        prot |=3D PROT_WRITE;
++    }
++    *addr =3D mmap(NULL, size, prot, MAP_SHARED, *fd, 0);
++    if (*addr =3D=3D MAP_FAILED) {
++        return -1;
++    }
++    return 0;
++}
++
++#if !defined(CONFIG_USER_ONLY) && defined(__linux__)
++static int check_device_id(const char *base, const char *name, uint64_t =
+value)
++{
++    char tmp[1024];
++    sprintf(tmp, "%s/%s", base, name);
++
++    int fd =3D open(tmp, O_RDONLY);
++    if (fd < 0) {
++        return -1;
++    }
++
++    char v[1024];
++    ssize_t s =3D read(fd, v, sizeof(v));
++    if (s < 0) {
++        close(fd);
++        return -1;
++    }
++    v[s] =3D '\0';
++
++    char *res;
++    uint64_t vv =3D strtoull(v, &res, 16);
++    if (*res =3D=3D '\n' && vv =3D=3D value) {
++        return 0;
++    } else {
++        return -1;
++    }
++}
++
++static char *find_device(void)
++{
++    static char tmp[1024];
++    char *res =3D NULL;
++
++    glob_t g;
++    if (glob("/sys/devices/pci*/*", GLOB_NOSORT, NULL, &g) !=3D 0) {
++        return NULL;
++    }
++
++
++    int i;
++    for (i =3D 0; i < g.gl_pathc; i++) {
++        char *path =3D g.gl_pathv[i];
++
++        if (check_device_id(path, "vendor",
++                            PCI_VENDOR_ID_REDHAT_QUMRANET) < 0) {
++            continue;
++        }
++        if (check_device_id(path, "device",
++                            PCI_DEVICE_ID_HYPERTRACE) < 0) {
++            continue;
++        }
++
++        sprintf(tmp, "%s", path);
++        res =3D tmp;
 +        break;
 +    }
-+    case 2:
-+    {
-+        res =3D ((uint16_t *)mem)[0];
-+        break;
-+    }
-+    case 4:
-+    {
-+        res =3D ((uint32_t *)mem)[0];
-+        break;
-+    }
-+    case 8:
-+    {
-+        res =3D ((uint64_t *)mem)[0];
-+        break;
-+    }
-+    default:
-+        error_report("error: hypertrace: Unexpected read of size %d", si=
-ze);
-+        abort();
-+    }
++
++    globfree(&g);
 +
 +    return res;
 +}
++#endif
 +
-+static void hypertrace_control_io_write(void *opaque, hwaddr addr,
-+                                        uint64_t data, unsigned size)
++int qemu_hypertrace_init(const char *base)
 +{
-+    HypertraceState *s =3D opaque;
-+    char *mem =3D &((char *)s->control_ptr)[addr];
++#if defined(CONFIG_USER_ONLY)
++    const char *config_suff =3D "-config";
++    const char *data_suff =3D "-data";
++    const char *control_suff =3D "-control";
++#elif defined(__linux__)
++    const char *config_suff =3D "/resource0";
++    const char *data_suff =3D "/resource1";
++    const char *control_suff =3D "/resource2";
++#else
++#error Unsupported OS
++#endif
 +
-+    switch (size) {
-+    case 1:
-+    {
-+        uint8_t *res =3D (uint8_t *)mem;
-+        *res =3D (uint8_t)data;
-+        break;
++#if defined(CONFIG_USER_ONLY)
++    if (base =3D=3D NULL) {
++        errno =3D ENOENT;
++        return -1;
 +    }
-+    case 2:
-+    {
-+        uint16_t *res =3D (uint16_t *)mem;
-+        *res =3D (uint16_t)data;
-+        break;
++#elif defined(__linux__)
++    if (base =3D=3D NULL) {
++        /* try to guess the base path */
++        base =3D find_device();
++        if (base =3D=3D NULL) {
++            errno =3D ENOENT;
++            return -1;
++        }
 +    }
-+    case 4:
-+    {
-+        uint32_t *res =3D (uint32_t *)mem;
-+        *res =3D (uint32_t)data;
-+        break;
-+    }
-+    case 8:
-+    {
-+        uint64_t *res =3D (uint64_t *)mem;
-+        *res =3D (uint64_t)data;
-+        break;
-+    }
-+    default:
-+        error_report("error: hypertrace: Unexpected write of size %d", s=
-ize);
-+        abort();
-+    }
++#endif
 +
-+    if ((addr + size) % sizeof(uint64_t) =3D=3D 0) {
-+        uint64_t client =3D addr / sizeof(uint64_t);
-+        uint64_t vcontrol =3D ((uint64_t *)s->control_ptr)[client];
-+        uint64_t *data_ptr =3D (uint64_t *)s->data_ptr;
-+        data_ptr =3D &data_ptr[client * s->hconfig.client_data_size];
-+        hypertrace_emit(current_cpu, vcontrol, data_ptr);
-+    }
-+}
++    if (config_addr =3D=3D NULL) {
++        int res;
 +
-+static const MemoryRegionOps hypertrace_control_ops =3D {
-+    .read =3D &hypertrace_control_io_read,
-+    .write =3D &hypertrace_control_io_write,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+};
++        if (pthread_mutex_lock(&init_mutex)) {
++            return -1;
++        }
 +
++        page_size =3D getpagesize();
 +
-+static void hypertrace_realize(PCIDevice *dev, Error **errp)
-+{
-+    Error *local_err =3D NULL;
-+    struct hypertrace_config *config;
-+    HypertraceState *s =3D DO_UPCAST(HypertraceState, dev, dev);
-+    Error *err =3D NULL;
++        res =3D init_channel_file(base, config_suff, page_size,
++                                &config_path, &config_fd, &config_addr,
++                                false);
++        if (res !=3D 0) {
++            return res;
++        }
 +
-+    if (s->max_clients < 1) {
-+        error_setg(errp, "hypertrace: must have at least one client");
-+        return;
++        config =3D (struct hypertrace_config *)config_addr;
++
++        if (pthread_mutex_unlock(&init_mutex)) {
++            return -1;
++        }
 +    }
 +
-+    hypertrace_init_config(&s->hconfig, s->max_clients);
++    if (data_addr =3D=3D NULL) {
++        int res;
 +
-+    error_setg(&s->migration_blocker,
-+               "The 'hypertrace' device cannot be migrated");
-+    migrate_add_blocker(s->migration_blocker, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_free(s->migration_blocker);
-+        return;
++        if (pthread_mutex_lock(&init_mutex)) {
++            return -1;
++        }
++
++        res =3D init_channel_file(base, data_suff, config->data_size,
++                                &data_path, &data_fd, &data_addr,
++                                true);
++        if (res !=3D 0) {
++            return res;
++        }
++
++        if (pthread_mutex_unlock(&init_mutex)) {
++            return -1;
++        }
 +    }
 +
-+    pci_set_word(s->dev.config + PCI_COMMAND,
-+                 PCI_COMMAND_IO | PCI_COMMAND_MEMORY);
++    if (control_addr =3D=3D NULL) {
++        int res;
++        uint64_t control_size =3D config->control_size;
 +
-+    /* config channel */
-+    memory_region_init_ram(&s->config, OBJECT(s), "hypertrace.config",
-+                           TARGET_PAGE_SIZE, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
++        if (pthread_mutex_lock(&init_mutex)) {
++            return -1;
++        }
++
++        res =3D init_channel_file(base, control_suff, control_size,
++                                &control_path, &control_fd, &control_add=
+r,
++                                true);
++        if (res !=3D 0) {
++            return res;
++        }
++
++#if defined(CONFIG_USER_ONLY)
++        control_addr_1 =3D (uint64_t *)((char *)control_addr +
++                                      config->control_size / 2);
++#endif
++
++        if (pthread_mutex_unlock(&init_mutex)) {
++            return -1;
++        }
 +    }
-+    pci_register_bar(&s->dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->conf=
-ig);
-+    s->config_ptr =3D qemu_map_ram_ptr(s->config.ram_block, 0);
-+    config =3D s->config_ptr;
-+    config->max_clients =3D tswap64(s->hconfig.max_clients);
-+    config->client_args =3D tswap64(s->hconfig.client_args);
-+    config->client_data_size =3D tswap64(s->hconfig.client_data_size);
-+    config->control_size =3D tswap64(s->hconfig.control_size);
-+    config->data_size =3D tswap64(s->hconfig.data_size);
 +
-+    /* data channel */
-+    memory_region_init_ram(&s->data, OBJECT(s), "hypertrace.data",
-+                           s->hconfig.data_size, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    pci_register_bar(&s->dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->data=
-);
-+    s->data_ptr =3D qemu_map_ram_ptr(s->data.ram_block, 0);
-+
-+    /* control channel */
-+    memory_region_init_io(&s->control, OBJECT(s), &hypertrace_control_op=
-s, s,
-+                          "hypertrace.control", s->hconfig.control_size)=
-;
-+    pci_register_bar(&s->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->cont=
-rol);
-+    s->control_ptr =3D qemu_map_ram_ptr(s->control.ram_block, 0);
++    return 0;
 +}
 +
 +
-+static Property hypertrace_properties[] =3D {
-+    DEFINE_PROP_UINT64("max-clients", HypertraceState, max_clients, 1),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void hypertrace_class_init(ObjectClass *klass, void *data)
++static int fini_channel(int *fd, char **path)
 +{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-+
-+    k->realize =3D hypertrace_realize;
-+    k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    k->device_id =3D PCI_DEVICE_ID_HYPERTRACE;
-+    k->class_id =3D PCI_CLASS_MEMORY_RAM;
-+    dc->desc  =3D "Hypertrace communication channel",
-+    dc->props =3D hypertrace_properties;
++    if (*fd !=3D -1) {
++        if (close(*fd) =3D=3D -1) {
++            return -1;
++        }
++        *fd =3D -1;
++    }
++    if (*path !=3D NULL) {
++        free(*path);
++        *path =3D  NULL;
++    }
++    return 0;
 +}
 +
-+static TypeInfo hypertrace_info =3D {
-+    .name          =3D "hypertrace",
-+    .parent        =3D TYPE_PCI_DEVICE,
-+    .instance_size =3D sizeof(HypertraceState),
-+    .class_init    =3D hypertrace_class_init,
-+};
-+
-+static void hypertrace_register_types(void)
++int qemu_hypertrace_fini(void)
 +{
-+    type_register_static(&hypertrace_info);
++    if (fini_channel(&data_fd, &data_path) !=3D 0) {
++        return -1;
++    }
++    if (fini_channel(&control_fd, &control_path) !=3D 0) {
++        return -1;
++    }
++    return 0;
 +}
 +
-+type_init(hypertrace_register_types)
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e598b095eb..3910a9b89f 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -84,6 +84,8 @@
- #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
- #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
-=20
-+#define PCI_DEVICE_ID_HYPERTRACE         0x10f0
 +
- #define PCI_VENDOR_ID_REDHAT             0x1b36
- #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
- #define PCI_DEVICE_ID_REDHAT_SERIAL      0x0002
++uint64_t qemu_hypertrace_max_clients(void)
++{
++    return config->max_clients;
++}
++
++uint64_t qemu_hypertrace_num_args(void)
++{
++    return config->client_args;
++}
++
++uint64_t *qemu_hypertrace_data(uint64_t client)
++{
++    return &data_addr[client * CONFIG_HYPERTRACE_ARGS * sizeof(uint64_t)=
+];
++}
++
++void qemu_hypertrace(uint64_t client, uint64_t arg1)
++{
++    uint64_t offset;
++#if defined(CONFIG_USER_ONLY)
++    offset =3D client * page_size;
++#endif
++    *(uint64_t *)((char *)control_addr + offset) =3D arg1;
++#if defined(CONFIG_USER_ONLY)
++    /* QEMU in 'user' mode uses two faulting pages to detect invocations=
+ */
++    *(uint64_t *)((char *)control_addr_1 + offset) =3D arg1;
++#endif
++}
+diff --git a/hypertrace/guest/qemu-hypertrace.h b/hypertrace/guest/qemu-h=
+ypertrace.h
+new file mode 100644
+index 0000000000..7c7a17c64d
+--- /dev/null
++++ b/hypertrace/guest/qemu-hypertrace.h
+@@ -0,0 +1,80 @@
++/*
++ * Guest-side management of hypertrace.
++ *
++ * Copyright (C) 2016-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include <stdint.h>
++#include <sys/types.h>
++
++
++/**
++ * qemu_hypertrace_init:
++ * @base: Base path to the hypertrace channel.
++ *
++ * Initialize the hypertrace channel. The operation is idempotent, and m=
+ust be
++ * called once per thread if running in QEMU's "user" mode.
++ *
++ * The base path to the hypertrace channel depends on the type of QEMU t=
+arget:
++ *
++ * - User (single-application)
++ *   The base path provided when starting QEMU ("-hypertrace" commandlin=
+e
++ *   option).
++ *
++ * - System (OS-dependant)
++ *   + Linux
++ *     The base path to the hypertrace channel virtual device; on a defa=
+ult QEMU
++ *     device setup for x86 this is "/sys/devices/pci0000:00/0000:00:04.=
+0". If
++ *     NULL is provided, the hypertrace device will be automatically det=
+ected.
++ *
++ * Returns: Zero on success.
++ */
++int qemu_hypertrace_init(const char *base);
++
++/**
++ * qemu_hypertrace_fini:
++ *
++ * Deinitialize the hypertrace channel.
++ *
++ * Returns: Zero on success.
++ */
++int qemu_hypertrace_fini(void);
++
++/**
++ * qemu_hypertrace_max_clients:
++ *
++ * Maximum number of concurrent clients accepted by other calls.
++ */
++uint64_t qemu_hypertrace_max_clients(void);
++
++/**
++ * qemu_hypertrace_num_args:
++ *
++ * Number of uint64_t values read by each call to qemu_hypertrace().
++ */
++uint64_t qemu_hypertrace_num_args(void);
++
++/**
++ * qemu_hypertrace_data:
++ * @client: Client identifier.
++ *
++ * Pointer to the start of the data channel for the given client. Client=
+s must
++ * write their arguments there (all but the first one).
++ */
++uint64_t *qemu_hypertrace_data(uint64_t client);
++
++/**
++ * qemu_hypertrace:
++ * @client: Client identifier.
++ * @arg1: First argument of the hypertrace event.
++ *
++ * Emit a hypertrace event.
++ *
++ * Each of the clients (e.g., thread) must use a different client identi=
+fier to
++ * ensure they can work concurrently without using locks (i.e., each use=
+s a
++ * different portion of the data channel).
++ */
++void qemu_hypertrace(uint64_t client, uint64_t arg1);
