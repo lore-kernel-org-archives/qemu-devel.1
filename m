@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dbmwp-0007DU-CZ
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 08:03:52 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1dbnWK-0002vK-LP
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 08:40:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dbmwl-0007FF-1X
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 08:03:51 -0400
-Resent-Message-Id: <E1dbmwl-0007FF-1X@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dbmwk-0007E3-QQ
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 08:03:46 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <150141363372.9857.9055094189388759132.stgit@frigg.lan>
-Message-ID: <150141620909.27.18190663248638654358@93e45bedd699>
+	(envelope-from <kernellwp@gmail.com>) id 1dbnWJ-0004rG-BI
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 08:40:32 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36943)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1dbnWJ-0004pV-6e
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 08:40:31 -0400
+Received: by mail-oi0-x243.google.com with SMTP id j194so16116276oib.4
+	for <qemu-devel@nongnu.org>; Sun, 30 Jul 2017 05:40:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 30 Jul 2017 05:03:30 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] hypertrace: Lightweight
- guest-to-QEMU trace channel
+In-Reply-To: <1501444898-27668-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1501444898-27668-1-git-send-email-peng.hao2@zte.com.cn>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Sun, 30 Jul 2017 20:40:28 +0800
+Message-ID: <CANRm+Cw0KM45XGGNRzKosyG2jBmBObjhJnGSpm7YNNz1hXHByg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target-i386 : fix a race condition result
+ to lost INIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vilanova@ac.upc.edu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, lcapitulino@redhat.com
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm <kvm@vger.kernel.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2NyAwLzVdIGh5cGVydHJhY2U6IExpZ2h0d2VpZ2h0IGd1ZXN0LXRvLVFF
-TVUgdHJhY2UgY2hhbm5lbApNZXNzYWdlLWlkOiAxNTAxNDEzNjMzNzIuOTg1Ny45MDU1MDk0MTg5
-Mzg4NzU5MTMyLnN0Z2l0QGZyaWdnLmxhbgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
-b2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MDE0NDQ4OTgt
-Mjc2NjgtMS1naXQtc2VuZC1lbWFpbC1wZW5nLmhhbzJAenRlLmNvbS5jbiAtPiBwYXRjaGV3LzE1
-MDE0NDQ4OTgtMjc2NjgtMS1naXQtc2VuZC1lbWFpbC1wZW5nLmhhbzJAenRlLmNvbS5jbgpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjVkYWQ3YzkzZGUgaHlwZXJ0cmFjZTogQWRkIGd1
-ZXN0LXNpZGUgdXNlci1sZXZlbCBsaWJyYXJ5CmRjZjlkOWM3YzcgaHlwZXJ0cmFjZTogW3NvZnRt
-bXVdIEFkZCBRRU1VLXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVydHJhY2UiIGV2ZW50CjRjMDQx
-ZjcyNGQgaHlwZXJ0cmFjZTogWyotdXNlcl0gQWRkIFFFTVUtc2lkZSBwcm94eSB0byAiZ3Vlc3Rf
-aHlwZXJ0cmFjZSIgZXZlbnQKNzM3OTZhMzg4NSBoeXBlcnRyYWNlOiBBZGQgdHJhY2luZyBldmVu
-dCAiZ3Vlc3RfaHlwZXJ0cmFjZSIKNDNmZTdlMmUyZSBoeXBlcnRyYWNlOiBBZGQgZG9jdW1lbnRh
-dGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiBoeXBlcnRyYWNl
-OiBBZGQgZG9jdW1lbnRhdGlvbi4uLgpDaGVja2luZyBQQVRDSCAyLzU6IGh5cGVydHJhY2U6IEFk
-ZCB0cmFjaW5nIGV2ZW50ICJndWVzdF9oeXBlcnRyYWNlIi4uLgpDaGVja2luZyBQQVRDSCAzLzU6
-IGh5cGVydHJhY2U6IFsqLXVzZXJdIEFkZCBRRU1VLXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVy
-dHJhY2UiIGV2ZW50Li4uCkNoZWNraW5nIFBBVENIIDQvNTogaHlwZXJ0cmFjZTogW3NvZnRtbXVd
-IEFkZCBRRU1VLXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVydHJhY2UiIGV2ZW50Li4uCkNoZWNr
-aW5nIFBBVENIIDUvNTogaHlwZXJ0cmFjZTogQWRkIGd1ZXN0LXNpZGUgdXNlci1sZXZlbCBsaWJy
-YXJ5Li4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBh
-dm9pZGVkCiMxNzE6IEZJTEU6IGh5cGVydHJhY2UvZ3Vlc3QvY29tbW9uLmM6ODQ6CisjaWYgIWRl
-ZmluZWQoQ09ORklHX1VTRVJfT05MWSkgJiYgZGVmaW5lZChfX2xpbnV4X18pCgpFUlJPUjogY29u
-c2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvdWxsCiMxOTE6
-IEZJTEU6IGh5cGVydHJhY2UvZ3Vlc3QvY29tbW9uLmM6MTA0OgorICAgIHVpbnQ2NF90IHZ2ID0g
-c3RydG91bGwodiwgJnJlcywgMTYpOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MzIg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
-cy5vcmc=
+2017-07-31 4:01 GMT+08:00 Peng Hao <peng.hao2@zte.com.cn>:
+> when SMP VM start, AP may lost INIT because of receiving INIT between
+> kvm_vcpu_ioctl_x86_get/set_vcpu_events.
+>
+>    vcpu 0                             vcpu 1
+>                                kvm_vcpu_ioctl_x86_get_vcpu_events
+>                                        events->smi.latched_init=0
+>  send INIT to vcpu1
+>    set vcpu1's pending_events
+>                                kvm_vcpu_ioctl_x86_set_vcpu_events
+>                                     events->smi.latched_init == 0
+>                                       clear INIT in pending_events
+> considering migration, just at level >= KVM_PUT_RESET_STATE,
+> add KVM_VCPUEVENT_VALID_SMM in events.flags.I think it is better to
+> modify in qemu.
+
+Do it in qemu just avoids to trigger the bug instead of fixing it. Why
+we touch INIT pending if INIT is not latched in SMM?
+
+Regards,
+Wanpeng Li
+
+>
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  target/i386/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index a6613e1..be146cb 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2438,7 +2438,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+>          /* Stop SMI delivery on old machine types to avoid a reboot
+>           * on an inward migration of an old VM.
+>           */
+> -        if (!cpu->kvm_no_smi_migration) {
+> +        if (!cpu->kvm_no_smi_migration && (level >= KVM_PUT_RESET_STATE)) {
+>              events.flags |= KVM_VCPUEVENT_VALID_SMM;
+>          }
+>      }
+> --
+> 1.8.3.1
+>
+>
