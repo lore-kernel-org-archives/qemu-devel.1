@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dbpXQ-0006ce-A6
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:49:49 -0400
+	(envelope-from <mst@redhat.com>) id 1dbqvV-0005Vr-Uo
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 12:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dbpXN-00058P-7U
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:49:48 -0400
-Resent-Message-Id: <E1dbpXN-00058P-7U@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dbpXM-00057w-Vm
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 10:49:45 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <150142369849.12995.11229612194223213120.stgit@frigg.lan>
-Message-ID: <150142616677.27.8464753526031332719@93e45bedd699>
+	(envelope-from <mst@redhat.com>) id 1dbqvS-0004GM-Ri
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 12:18:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dbqvS-0004GE-I4
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 12:18:42 -0400
+Date: Sun, 30 Jul 2017 19:18:33 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170730191735-mutt-send-email-mst@kernel.org>
+References: <20170713210819-mutt-send-email-mst@kernel.org>
+	<59686EEB.8080805@intel.com>
+	<20170723044036-mutt-send-email-mst@kernel.org>
+	<59781119.8010200@intel.com>
+	<20170726155856-mutt-send-email-mst@kernel.org>
+	<597954E3.2070801@intel.com>
+	<20170729020231-mutt-send-email-mst@kernel.org>
+	<597C83CC.7060702@intel.com>
+	<20170730043922-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F739288D85@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 30 Jul 2017 07:49:27 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v8 0/5] hypertrace: Lightweight
- guest-to-QEMU trace channel
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F739288D85@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vilanova@ac.upc.edu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, lcapitulino@redhat.com
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2OCAwLzVdIGh5cGVydHJhY2U6IExpZ2h0d2VpZ2h0IGd1ZXN0LXRvLVFF
-TVUgdHJhY2UgY2hhbm5lbApNZXNzYWdlLWlkOiAxNTAxNDIzNjk4NDkuMTI5OTUuMTEyMjk2MTIx
-OTQyMjMyMTMxMjAuc3RnaXRAZnJpZ2cubGFuClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
-bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-YjcyNzkyNTgxNSBoeXBlcnRyYWNlOiBBZGQgZ3Vlc3Qtc2lkZSB1c2VyLWxldmVsIGxpYnJhcnkK
-YmI4Mzc2NmI2YyBoeXBlcnRyYWNlOiBbc29mdG1tdV0gQWRkIFFFTVUtc2lkZSBwcm94eSB0byAi
-Z3Vlc3RfaHlwZXJ0cmFjZSIgZXZlbnQKYjFlMDdhZDVhYSBoeXBlcnRyYWNlOiBbKi11c2VyXSBB
-ZGQgUUVNVS1zaWRlIHByb3h5IHRvICJndWVzdF9oeXBlcnRyYWNlIiBldmVudAphZGQwYjU0ZmMz
-IGh5cGVydHJhY2U6IEFkZCB0cmFjaW5nIGV2ZW50ICJndWVzdF9oeXBlcnRyYWNlIgpjZWNjZTFh
-NmQ1IGh5cGVydHJhY2U6IEFkZCBkb2N1bWVudGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzU6IGh5cGVydHJhY2U6IEFkZCBkb2N1bWVudGF0aW9uLi4uCkNoZWNr
-aW5nIFBBVENIIDIvNTogaHlwZXJ0cmFjZTogQWRkIHRyYWNpbmcgZXZlbnQgImd1ZXN0X2h5cGVy
-dHJhY2UiLi4uCkNoZWNraW5nIFBBVENIIDMvNTogaHlwZXJ0cmFjZTogWyotdXNlcl0gQWRkIFFF
-TVUtc2lkZSBwcm94eSB0byAiZ3Vlc3RfaHlwZXJ0cmFjZSIgZXZlbnQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNC81OiBoeXBlcnRyYWNlOiBbc29mdG1tdV0gQWRkIFFFTVUtc2lkZSBwcm94eSB0byAiZ3Vl
-c3RfaHlwZXJ0cmFjZSIgZXZlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggNS81OiBoeXBlcnRyYWNlOiBB
-ZGQgZ3Vlc3Qtc2lkZSB1c2VyLWxldmVsIGxpYnJhcnkuLi4KV0FSTklORzogYXJjaGl0ZWN0dXJl
-IHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzE3MTogRklMRTogaHlwZXJ0cmFj
-ZS9ndWVzdC9jb21tb24uYzo4NDoKKyNpZiAhZGVmaW5lZChDT05GSUdfVVNFUl9PTkxZKSAmJiBk
-ZWZpbmVkKF9fbGludXhfXykKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvdWxsIGlu
-IHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzE5MTogRklMRTogaHlwZXJ0cmFjZS9ndWVzdC9jb21t
-b24uYzoxMDQ6CisgICAgdWludDY0X3QgdnYgPSBzdHJ0b3VsbCh2LCAmcmVzLCAxNik7Cgp0b3Rh
-bDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDQzMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Sun, Jul 30, 2017 at 05:59:17AM +0000, Wang, Wei W wrote:
+> On Sunday, July 30, 2017 12:23 PM, Michael S. Tsirkin wrote:
+> > On Sat, Jul 29, 2017 at 08:47:08PM +0800, Wei Wang wrote:
+> > > On 07/29/2017 07:08 AM, Michael S. Tsirkin wrote:
+> > > > On Thu, Jul 27, 2017 at 10:50:11AM +0800, Wei Wang wrote:
+> > > > > > > > OK I thought this over. While we might need these new APIs
+> > > > > > > > in the future, I think that at the moment, there's a way to
+> > > > > > > > implement this feature that is significantly simpler. Just
+> > > > > > > > add each s/g as a separate input buffer.
+> > > > > > > Should it be an output buffer?
+> > > > > > Hypervisor overwrites these pages with zeroes. Therefore it is
+> > > > > > writeable by device: DMA_FROM_DEVICE.
+> > > > > Why would the hypervisor need to zero the buffer?
+> > > > The page is supplied to hypervisor and can lose the value that is
+> > > > there.  That is the definition of writeable by device.
+> > >
+> > > I think for the free pages, it should be clear that they will be added
+> > > as output buffer to the device, because (as we discussed) they are
+> > > just hints, and some of them may be used by the guest after the report_ API is
+> > invoked.
+> > > The device/hypervisor should not use or discard them.
+> > 
+> > Discarding contents is exactly what you propose doing if migration is going on,
+> > isn't it?
+> 
+> That's actually a different concept. Please let me explain it with this example:
+> 
+> The hypervisor receives the hint saying the guest PageX is a free page, but as we know, 
+> after that report_ API exits, the guest kernel may take PageX to use, so PageX is not free
+> page any more. At this time, if the hypervisor writes to the page, that would crash the guest.
+> So, I think the cornerstone of this work is that the hypervisor should not touch the
+> reported pages.
+> 
+> Best,
+> Wei    
+
+That's a hypervisor implementation detail. From guest point of view,
+discarding contents can not be distinguished from writing old contents.
