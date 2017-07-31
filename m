@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dcHV2-0004dO-BK
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:41:13 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dcHbZ-00069z-8S
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:47:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dcHUz-0007t2-8j
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:41:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55317)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dcHUz-0007st-3M
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:41:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dcHUx-0003q1-Q3
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 20:41:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BF5832E80CB
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 20:41:07 +0000 (UTC)
+	(envelope-from <rth7680@gmail.com>) id 1dcHbU-0002xW-Dr
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:47:57 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dcHbU-0002xA-7T
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:47:52 -0400
+Received: by mail-pf0-x243.google.com with SMTP id k72so24051428pfj.0
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 13:47:52 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <cover.6535001d6b9cd2357109d19b1060e3f6a2b958a7.1501506432.git-series.james.hogan@imgtec.com>
+	<ad80a5d3ff807996b3cdf70504cab7efd66c4295.1501506432.git-series.james.hogan@imgtec.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <93cb4cb7-842c-1a37-c2dd-a7c522076a1d@twiddle.net>
+Date: Mon, 31 Jul 2017 13:47:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Jul 2017 20:34:57 -0000
-From: Paolo Bonzini <bonzini@gnu.org>
-Reply-To: Bug 1706296 <1706296@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-Message-Id: <150153329746.13844.7002970004656627168.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
- /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
- (!qemu_mutex_iothread_locked())
+In-Reply-To: <ad80a5d3ff807996b3cdf70504cab7efd66c4295.1501506432.git-series.james.hogan@imgtec.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] mips: Add KVM T&E segment support for
+ TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,103 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: James Hogan <james.hogan@imgtec.com>, qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Aurelien Jarno <aurelien@aurel32.net>
 
-There are three possibilities:
+On 07/31/2017 06:09 AM, James Hogan wrote:
+> +static int mips_um_ksegs;
+> +
+>   uint64_t cpu_mips_kseg0_to_phys(void *opaque, uint64_t addr)
+>   {
+>       return addr & 0x1fffffffll;
+> @@ -38,3 +40,13 @@ uint64_t cpu_mips_kvm_um_phys_to_kseg0(void *opaque, uint64_t addr)
+>   {
+>       return addr | 0x40000000ll;
+>   }
+> +
+> +int mips_um_ksegs_enabled(void)
 
-1) push qemu_mutex_lock_iothread down to cc->do_interrupt
+bool?
 
-2) change the condition in io_readx/io_writex to mr->global_locking &&
-!qemu_mutex_iothread_locked()
+Otherwise,
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-3) both
 
-We can do (2) for 2.10 and later ponder on doing the first.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706296
-
-Title:
-  Booting NT 4 disk causes
-  /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion
-  failed: (!qemu_mutex_iothread_locked())
-
-Status in QEMU:
-  New
-
-Bug description:
-  Grab the NT 4 disk from
-  https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-0=
-75
-  -385_CD-KEY_419-1343253_1996
-
-  Try to boot it as follows:
-
-  qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Versi=
-on_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,=
-accel=3Dtcg
-  WARNING: Image format was not specified for 'disk.img' and probing guesse=
-d raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-  **
-  ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion=
- failed: (!qemu_mutex_iothread_locked())
-  Aborted (core dumped)
-
-  The stack trace in the failing thread is:
-
-  Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
-  #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
-  #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
-  #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so=
-.0
-  #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
-      at /lib64/libglib-2.0.so.0
-  #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
-      at /home/rjones/d/qemu/cpus.c:1580
-  #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, io=
-tlbentry=3D0x55555675b678, =
-
-      iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@=
-entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsiz=
-e@entry=3D4)
-      at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
-  #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D214=
-8532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
-      at /home/rjones/d/qemu/softmmu_template.h:265
-  #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x55555675=
-1400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized =
-out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/s=
-oftmmu_template.h:300
-  #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
-2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_lds=
-t_template.h:182
-  #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>=
-, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, int=
-no=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i=
-386/seg_helper.c:758
-  #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x555556749=
-170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, nex=
-t_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/ta=
-rget/i386/seg_helper.c:1252
-  #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
-      at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
-  #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>=
-, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
-  #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
-      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
-  #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
-      at /home/rjones/d/qemu/cpus.c:1270
-  #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
->)
-      at /home/rjones/d/qemu/cpus.c:1365
-  #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
-  #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706296/+subscriptions
+r~
