@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dcGck-0003HP-Vv
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 15:45:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1dcHV2-0004dO-BK
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dcGci-00059t-U2
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 15:45:07 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:37709)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dcGci-00059O-Px
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 15:45:04 -0400
-Received: by mail-io0-x243.google.com with SMTP id c74so5518iod.4
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 12:45:04 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Mon, 31 Jul 2017 15:44:37 -0400
-Message-Id: <20170731194437.4077-3-programmingkidx@gmail.com>
-In-Reply-To: <20170731194437.4077-1-programmingkidx@gmail.com>
-References: <20170731194437.4077-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] Add more function keys to cocoa.m
+	(envelope-from <bounces@canonical.com>) id 1dcHUz-0007t2-8j
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:41:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dcHUz-0007st-3M
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 16:41:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dcHUx-0003q1-Q3
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 20:41:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BF5832E80CB
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 20:41:07 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 31 Jul 2017 20:34:57 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 1706296 <1706296@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
+Message-Id: <150153329746.13844.7002970004656627168.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
+ /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
+ (!qemu_mutex_iothread_locked())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +38,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org, eblake@redhat.com, berrange@redhat.com
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: qemu-devel@nongnu.org
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
----
- ui/cocoa.m | 5 +++++
- 1 file changed, 5 insertions(+)
+There are three possibilities:
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 93e56d0518..edc7a65f7c 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -225,6 +225,11 @@
-     [kVK_F13] = Q_KEY_CODE_PRINT,
-     [kVK_F14] = Q_KEY_CODE_SCROLL_LOCK,
-     [kVK_F15] = Q_KEY_CODE_PAUSE,
-+    [kVK_F16] = Q_KEY_CODE_F16,
-+    [kVK_F17] = Q_KEY_CODE_F17,
-+    [kVK_F18] = Q_KEY_CODE_F18,
-+    [kVK_F19] = Q_KEY_CODE_F19,
-+    [kVK_F20] = Q_KEY_CODE_F20
- 
-     /*
-      * The eject and volume keys can't be used here because they are handled at
--- 
-2.11.0 (Apple Git-81)
+1) push qemu_mutex_lock_iothread down to cc->do_interrupt
+
+2) change the condition in io_readx/io_writex to mr->global_locking &&
+!qemu_mutex_iothread_locked()
+
+3) both
+
+We can do (2) for 2.10 and later ponder on doing the first.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706296
+
+Title:
+  Booting NT 4 disk causes
+  /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion
+  failed: (!qemu_mutex_iothread_locked())
+
+Status in QEMU:
+  New
+
+Bug description:
+  Grab the NT 4 disk from
+  https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-0=
+75
+  -385_CD-KEY_419-1343253_1996
+
+  Try to boot it as follows:
+
+  qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Versi=
+on_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,=
+accel=3Dtcg
+  WARNING: Image format was not specified for 'disk.img' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
+  **
+  ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion=
+ failed: (!qemu_mutex_iothread_locked())
+  Aborted (core dumped)
+
+  The stack trace in the failing thread is:
+
+  Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
+  #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
+  #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
+  #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so=
+.0
+  #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
+      at /lib64/libglib-2.0.so.0
+  #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
+      at /home/rjones/d/qemu/cpus.c:1580
+  #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, io=
+tlbentry=3D0x55555675b678, =
+
+      iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@=
+entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsiz=
+e@entry=3D4)
+      at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
+  #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D214=
+8532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
+      at /home/rjones/d/qemu/softmmu_template.h:265
+  #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x55555675=
+1400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized =
+out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/s=
+oftmmu_template.h:300
+  #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
+2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_lds=
+t_template.h:182
+  #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>=
+, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, int=
+no=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i=
+386/seg_helper.c:758
+  #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x555556749=
+170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, nex=
+t_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/ta=
+rget/i386/seg_helper.c:1252
+  #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
+      at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
+  #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>=
+, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
+  #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
+      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
+  #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
+      at /home/rjones/d/qemu/cpus.c:1270
+  #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
+>)
+      at /home/rjones/d/qemu/cpus.c:1365
+  #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
+  #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706296/+subscriptions
