@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcBw6-0002Aj-Sz
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:44:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dcC1a-0003BE-K8
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcBw3-0007xW-Nt
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:44:46 -0400
-References: <cover.1501508049.git.jcody@redhat.com>
-	<3064c6292e5771533bab598210f7cbb791faa384.1501508049.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9d9fbac9-b630-2bbc-3b9f-64cec1eedbf0@redhat.com>
-Date: Mon, 31 Jul 2017 09:44:13 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1dcC1X-0003BO-FV
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:50:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dcC1X-0003AP-6a
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:50:23 -0400
+Date: Mon, 31 Jul 2017 11:50:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170731145014.GA20793@localhost.localdomain>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-4-apahim@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3064c6292e5771533bab598210f7cbb791faa384.1501508049.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IBSwuwENntm9f9bjXtgEMW5xvPFKQLVLK"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 1/3] qemu-iotests: set TEST_DIR
- to a unique dir for each test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170731085110.1050-4-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 3/7] qemu.py: use python logging system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IBSwuwENntm9f9bjXtgEMW5xvPFKQLVLK
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com
-Message-ID: <9d9fbac9-b630-2bbc-3b9f-64cec1eedbf0@redhat.com>
-Subject: Re: [PATCH v2 for-2.11 1/3] qemu-iotests: set TEST_DIR to a unique
- dir for each test
-References: <cover.1501508049.git.jcody@redhat.com>
- <3064c6292e5771533bab598210f7cbb791faa384.1501508049.git.jcody@redhat.com>
-In-Reply-To: <3064c6292e5771533bab598210f7cbb791faa384.1501508049.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/31/2017 08:47 AM, Jeff Cody wrote:
-> Right now, all qemu-iotests output data into the same scratch directory=
-,
-> and so each tests needs to be responsible for cleanup up its own files.=
-
-
-s/cleanup up/cleaning up/
-
->=20
-> Have each test use 'scratch/$seq' as its temp directory, so the check
-> script can do simple cleanup of removing the whole temporary directory.=
-
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
+On Mon, Jul 31, 2017 at 10:51:06AM +0200, Amador Pahim wrote:
+> Let's provide extra control and flexibility by using python logging
+> system instead of print and/or sys.std*.write().
+> 
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
 > ---
->  tests/qemu-iotests/check | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
+>  scripts/qemu.py | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 77565eb092..e3ea534ec4 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -13,6 +13,7 @@
+>  #
+>  
+>  import errno
+> +import logging
+>  import string
+>  import os
+>  import sys
+> @@ -20,11 +21,19 @@ import subprocess
+>  import qmp.qmp
+>  
+>  
+> +logging.basicConfig()
 
-R-b stands (thanks for adding the && fix from v1).
+Please don't call logging.basicConfig() from a module, as this
+will break scripts that already use logging.basicConfig().
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This breaks the following:
+
+  $ ./scripts/device-crash-test --debug /usr/bin/qemu-system-x86_64
 
 
---IBSwuwENntm9f9bjXtgEMW5xvPFKQLVLK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> +LOG = logging.getLogger(__name__)
+> +
+> +
+>  class QEMUMachine(object):
+>      '''A QEMU VM'''
+>  
+>      def __init__(self, binary, args=[], wrapper=[], name=None, test_dir="/var/tmp",
+>                   monitor_address=None, socket_scm_helper=None, debug=False):
+> +        if debug:
+> +            LOG.setLevel(logging.DEBUG)
+> +        else:
+> +            LOG.setLevel(logging.INFO)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+This makes the debug argument for one QEMUMachine object affect
+other QEMUMachine objects.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/Qj0ACgkQp6FrSiUn
-Q2rmgwgAj1Bj3mJ2B5um1VoBnCDBhg9OLx+fxtsWgod/j9MR8iFnayPmGHul6Q1h
-9fiAvsJnOKu9x76kL6Kg8sZqMVaVVfelczueVP4Qf3qoza2NTI6/P5+TA9XVK7PL
-h6eiNIpIeJg+jS0D0PChpQphVI8QAfLcOyEEnvjjFUA45xx2vic9rglWwOnWU9hH
-FwrORwZWN03OW0wG8+dA/w8gE6x7Ud35ZNkF6ZcWbk9Azbf6QdXtZ+lt2OBVAPZ2
-JIvF6bTZ71KGgGxoKGOQ7j1mzpZy8wH80GZlrzYjICwHKb5q6f0gcitXV8O3ZxJ+
-GFnbOc69oKILw1i9QE9aSQ+rRvtGlw==
-=LJNv
------END PGP SIGNATURE-----
+What about:
+    self.logger = LOG.getChild(name)
+    self.logger.setLevel(...)
 
---IBSwuwENntm9f9bjXtgEMW5xvPFKQLVLK--
+But do we really need to support per-QEMUMachine verbosity
+levels?  We could simply eliminate the 'debug' argument and let
+scripts configure logging.
+
+>          if name is None:
+>              name = "qemu-%d" % os.getpid()
+>          if monitor_address is None:
+> @@ -62,10 +71,10 @@ class QEMUMachine(object):
+>          # In iotest.py, the qmp should always use unix socket.
+>          assert self._qmp.is_scm_available()
+>          if self._socket_scm_helper is None:
+> -            print >>sys.stderr, "No path to socket_scm_helper set"
+> +            LOG.error("No path to socket_scm_helper set")
+>              return -1
+>          if os.path.exists(self._socket_scm_helper) == False:
+> -            print >>sys.stderr, "%s does not exist" % self._socket_scm_helper
+> +            LOG.error("%s does not exist", self._socket_scm_helper)
+>              return -1
+>          fd_param = ["%s" % self._socket_scm_helper,
+>                      "%d" % self._qmp.get_sock_fd(),
+> @@ -154,7 +163,8 @@ class QEMUMachine(object):
+>  
+>              exitcode = self._popen.wait()
+>              if exitcode < 0:
+> -                sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode, ' '.join(self._args)))
+> +                LOG.error('qemu received signal %i: %s', -exitcode,
+> +                          ' '.join(self._args))
+>              self._load_io_log()
+>              self._post_shutdown()
+>  
+> -- 
+> 2.13.3
+> 
+
+-- 
+Eduardo
