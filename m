@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dcIMh-0004nu-QL
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 17:36:40 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dcJY5-0007oA-8l
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 18:52:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dcIMe-0007f4-MY
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 17:36:39 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:20531
-	helo=imgpgp01.kl.imgtec.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
-	id 1dcIMe-0007dW-DG
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 17:36:36 -0400
-Date: Mon, 31 Jul 2017 22:36:33 +0100
-From: James Hogan <james.hogan@imgtec.com>
-Message-ID: <20170731213633.GC6973@jhogan-linux.le.imgtec.org>
-References: <cover.6535001d6b9cd2357109d19b1060e3f6a2b958a7.1501506432.git-series.james.hogan@imgtec.com>
-	<ad80a5d3ff807996b3cdf70504cab7efd66c4295.1501506432.git-series.james.hogan@imgtec.com>
-	<93cb4cb7-842c-1a37-c2dd-a7c522076a1d@twiddle.net>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="iRQTiiVA1juStYAd"
-Content-Disposition: inline
-In-Reply-To: <93cb4cb7-842c-1a37-c2dd-a7c522076a1d@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 2/2] mips: Add KVM T&E segment support for
- TCG
+	(envelope-from <aurelien@aurel32.net>) id 1dcJY4-0006Mu-JT
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 18:52:29 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:58130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dcJY4-00065l-DK
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 18:52:28 -0400
+From: Aurelien Jarno <aurelien@aurel32.net>
+Date: Tue,  1 Aug 2017 00:52:10 +0200
+Message-Id: <20170731225210.7829-1-aurelien@aurel32.net>
+Subject: [Qemu-devel] [PATCH for 2.10] mips/malta: leave space for the
+ bootmap after the initrd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
---iRQTiiVA1juStYAd
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Since commit 9768e2abf7 the initrd is loaded at the end of the low
+memory to avoid clash for the kernel relocation when kaslr is used.
 
-On Mon, Jul 31, 2017 at 01:47:48PM -0700, Richard Henderson wrote:
-> On 07/31/2017 06:09 AM, James Hogan wrote:
-> > +static int mips_um_ksegs;
-> > +
-> >   uint64_t cpu_mips_kseg0_to_phys(void *opaque, uint64_t addr)
-> >   {
-> >       return addr & 0x1fffffffll;
-> > @@ -38,3 +40,13 @@ uint64_t cpu_mips_kvm_um_phys_to_kseg0(void *opaque,=
- uint64_t addr)
-> >   {
-> >       return addr | 0x40000000ll;
-> >   }
-> > +
-> > +int mips_um_ksegs_enabled(void)
->=20
-> bool?
+However this in turn conflicts with the bootmap memory that the kernel
+tries to place after initrd, but in low memory. The bootmap spans the
+whole usable physical address space. The machine can have at most 2GiB
+of memory, 256MiB of low memory mapped at 0x00000000, and 1792MiB of
+high memory mapped at 0x90000000. The biggest bootmap therefore
+corresponds to the adresses 0x00000000 -> 0xffffffff, which at 1 bit
+per 4kiB page corresponds to 128kiB in memory.
 
-Sure, I'll respin,
+Therefore reserve 128kiB after the initrd.
 
->=20
-> Otherwise,
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+---
+ hw/mips/mips_malta.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Thanks for the review!
-
-Cheers
-James
-
---iRQTiiVA1juStYAd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAll/otcACgkQbAtpk944
-dnrxFQ//cQAjWWW7cZPuy5AqmyFuHIHsMYVHBRlHBH2lUHT219MxtO3hCDirQezj
-djeFcLfBbHxfZSh9Bj86U0tTNaEYCZiVL+LeozUXOYSx5uNiUPGaarQ01zp/oi7j
-39g8aDBt9RWDjSjXYkdsG9q9WuTOr0RhdYS5fmbNUDzIijPISvlgsRUYlbhrGf6x
-aDIpxbhKVVIkO9AdGOTTQfoGT4dcSvaNxjB8/GlubWVGVV8rw0LaudpBONlYJr2E
-TfdSrjvraiighO5jHsRsFNNxor9l3cut62CT5W77xaXnuPb5KQAbZNWi0yPiuC5t
-zkPXSYa0lZrOP4mlVpoML19QgrZa8Yw2JnsH0Y+PVlkQb9K/uY+SFSk5SWeLBUrL
-9HiDYawKsvI6pOxhSkITgk1dBE3jXGWQHFYhz8jLNsCo4BOPsUyk5GQAxYvpv85C
-A69in732lQuP8KLV7qUU1ZO/eIdl9/3I7f9HG7kxduUXJxHN7Y6mN/92xOQTUKMI
-4nSluS0dFJcJ9vQ++Yji3IHNA0bvrucgxcPhJN9szi5sdKNWmgG8X36dUhAe2sUV
-mDJ5xuFHqKqyNG/iVC6QEfAOnTZrUfrNRqHFC97si0p18vWd5YQhoQlmvJDc6Fpp
-kutEh4FjNwOp2XRWaHuKNif3k1fw2KDkM8OovrKOfiJwaFN47H8=
-=p06B
------END PGP SIGNATURE-----
-
---iRQTiiVA1juStYAd--
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 8ecd544baa..9dcec27304 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -843,7 +843,10 @@ static int64_t load_kernel (void)
+     if (loaderparams.initrd_filename) {
+         initrd_size = get_image_size (loaderparams.initrd_filename);
+         if (initrd_size > 0) {
+-            initrd_offset = (loaderparams.ram_low_size - initrd_size
++            /* The kernel allocates the bootmap memory in the low memory after
++               the initrd.  It takes at most 128kiB for 2GB RAM and 4kiB
++               pages.  */
++            initrd_offset = (loaderparams.ram_low_size - initrd_size - 131072
+                              - ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
+             if (kernel_high >= initrd_offset) {
+                 fprintf(stderr,
+-- 
+2.13.2
