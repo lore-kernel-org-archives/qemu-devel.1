@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc7pe-00046w-0J
+	(envelope-from <mjt@tls.msk.ru>) id 1dc7pd-00046r-VI
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc7pa-00068a-Q8
+	(envelope-from <mjt@tls.msk.ru>) id 1dc7pb-00069L-B2
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:21:49 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 31 Jul 2017 13:21:25 +0300
-Message-Id: <b190f477e29c7cd03a8fee49c96d27f160e3f5b0.1501496349.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 31 Jul 2017 13:21:29 +0300
+Message-Id: <f80ac75d0e6e6e7481d61cdb86e5a741a442f100.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 06/25] qemu-system-tricore: segfault when
- entering "x 0" on the monitor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 10/25] qcow2: fix null pointer dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Otubo <otubo@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Eduardo Otubo <otubo@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Starting Qemu with "qemu-system-tricore -nographic -M tricore_testboard -S"
-and entering "x 0" at the monitor prompt leads to Segmentation fault.
-This happens because tricore_cpu_get_phys_page_debug() is not implemented
-yet, this is a temporary workaround to avoid the crash.
+It seems this assert() was somehow misplaced.
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
+block/qcow2-refcount.c:2193:42: warning: Array access (from variable 'on_=
+disk_reftable') results in a null pointer dereference
+        on_disk_reftable[refblock_index] =3D refblock_offset;
+        ~~~~~~~~~~~~~~~~                 ^
+
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- target/tricore/cpu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/qcow2-refcount.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-index 08f50e2ba7..5ab5b56454 100644
---- a/target/tricore/cpu.c
-+++ b/target/tricore/cpu.c
-@@ -22,6 +22,15 @@
- #include "cpu.h"
- #include "qemu-common.h"
- #include "exec/exec-all.h"
-+#include "qemu/error-report.h"
-+
-+static hwaddr tricore_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr,
-+                                         MemTxAttrs *attrs)
-+{
-+    error_report("function cpu_get_phys_page_attrs_debug not "
-+                    "implemented, aborting");
-+    return -1;
-+}
- 
- static inline void set_feature(CPUTriCoreState *env, int feature)
- {
-@@ -176,6 +185,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
-     cc->dump_state = tricore_cpu_dump_state;
-     cc->set_pc = tricore_cpu_set_pc;
-     cc->synchronize_from_tb = tricore_cpu_synchronize_from_tb;
-+    cc->get_phys_page_attrs_debug = tricore_cpu_get_phys_page_attrs_debug;
- }
- 
- static void cpu_register(const TriCoreCPUInfo *info)
--- 
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index c9b0dcb4f3..168fc32e7b 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2189,6 +2189,8 @@ write_refblocks:
+              * this will leak that range, but we can easily fix that by =
+running
+              * a leak-fixing check after this rebuild operation */
+             reftable_offset =3D -1;
++        } else {
++            assert(on_disk_reftable);
+         }
+         on_disk_reftable[refblock_index] =3D refblock_offset;
+=20
+@@ -2258,8 +2260,6 @@ write_refblocks:
+         goto write_refblocks;
+     }
+=20
+-    assert(on_disk_reftable);
+-
+     for (refblock_index =3D 0; refblock_index < reftable_size; refblock_=
+index++) {
+         cpu_to_be64s(&on_disk_reftable[refblock_index]);
+     }
+--=20
 2.11.0
