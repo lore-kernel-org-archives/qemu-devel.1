@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dcANg-0001vr-49
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:05:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1dcAP1-0002ov-MB
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dcANc-0008TU-1u
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:05:08 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:38132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dcANb-0008Rm-SN
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:05:03 -0400
-Received: by mail-pg0-x242.google.com with SMTP id 125so17223382pgi.5
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 06:05:02 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
-	<CAFEAcA8N_JyMVtLPdSFEUUgmJ0OG6AbHuD=5KhO8kv3fJDLwGw@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <19ee3dfd-dd1c-191d-14fb-a44058c8ccb6@twiddle.net>
-Date: Mon, 31 Jul 2017 06:04:59 -0700
+	(envelope-from <eblake@redhat.com>) id 1dcAOw-0000op-U1
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:06:31 -0400
+References: <20170731125111.28052-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0c81b100-89af-83ba-069c-88b962b8a472@redhat.com>
+Date: Mon, 31 Jul 2017 08:06:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8N_JyMVtLPdSFEUUgmJ0OG6AbHuD=5KhO8kv3fJDLwGw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
- for multiboot?
+In-Reply-To: <20170731125111.28052-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] block/qapi: Remove redundat NULL
+ check to silence Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 07/31/2017 01:50 AM, Peter Maydell wrote:
-> On 28 July 2017 at 22:28, Anatol Pomozov <anatol.pomozov@gmail.com> wrote:
->> So I need to perform 2 things:
->>
->>   - Load ELF section headers into target's memory. I did by appending
->> additional space to mbs.mb_buf and copying header data. Is it the best
->> way to do?
->>
->>   - Next I need to load other ELF sections such as symbols (e.g.
->> .shstrtab) that store section names. What is the best way to do in
->> multiboo.c code? Would it make sense to load all ELF sections?
-> 
-> This seems a bit odd, because in general an ELF loader should
-> not care at all about sections and the section header. It
-> should only need to look at the program header, which defines
-> which segments to load. If the guest binary needs some things
-> to be loaded then I would expect that it is the job of the linker
-> that produces the guest binary to make sure those things are in
-> segments which are marked as LOAD.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Message-ID: <0c81b100-89af-83ba-069c-88b962b8a472@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] block/qapi: Remove redundat NULL
+ check to silence Coverity
+References: <20170731125111.28052-1-kwolf@redhat.com>
+In-Reply-To: <20170731125111.28052-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Agreed.  If you're touching ELF sections, then I think you're missing the point 
-of the ELF program header entirely.  If you write your own linker script, you 
-have complete control of the ELF PHDR, and can arrange for anything you like to 
-be loaded.
+On 07/31/2017 07:51 AM, Kevin Wolf wrote:
+> When skipping implicit nodes in bdrv_block_device_info(), we know that
+> bs0 is always non-NULL; initially, because it's taken from a BdrvChild
+> and a BdrvChild never has a NULL bs, and after the first iteration
+> because implicit nodes always have a backing file.
+>=20
+> Remove the NULL check and add an assertion that the implicit node does
+> indeed have a backing file.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qapi.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/block/qapi.c b/block/qapi.c
+> index d2b18ee9df..5f1a71f5d2 100644
+> --- a/block/qapi.c
+> +++ b/block/qapi.c
+> @@ -145,8 +145,9 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBacken=
+d *blk,
+> =20
+>          /* Skip automatically inserted nodes that the user isn't aware=
+ of for
+>           * query-block (blk !=3D NULL), but not for query-named-block-=
+nodes */
+> -        while (blk && bs0 && bs0->drv && bs0->implicit) {
+> +        while (blk && bs0->drv && bs0->implicit) {
+>              bs0 =3D backing_bs(bs0);
+> +            assert(bs0);
+>          }
+>      }
+> =20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/K0oACgkQp6FrSiUn
+Q2oO4ggAq7efmSDBZki8aqHJ+DhqFGgqhnUZ83FvHxzjUMkpWwgFpRvKSHRGEVfa
+cYM2+fjZTR4gfqfLXuYupgNNlidOLjqcGf8nk7Yu7qmhz5CrBH1llqBr47dj6Bkw
+WPz1zmFuld/wsENitAfptekxm7Qq9N61po7cYlL/QT106jPME7z/c7RlHbxl6uon
+6Kr0KwmxE8PMfpZkryDSzbkmkqw3EFn+xZRqJC4VHknK3piu3N48GprxvZS06oTT
+yj9Aus6lhzjCoZ89y8mSMLsiuA+DCwXsXWN+FWcca/IX9FJHUF0VS6jtwrxZ7h3U
+Xo4dnMSGGsZ1/iiVvvBD/Q9/yYamvw==
+=fbaR
+-----END PGP SIGNATURE-----
+
+--Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5--
