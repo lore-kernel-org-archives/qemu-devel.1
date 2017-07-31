@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSj-0004nr-Bg
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:34 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSk-0004nw-JU
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSg-0005Ng-Er
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:33 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSi-0005Pb-UK
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:34 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 31 Jul 2017 19:21:53 +0300
-Message-Id: <1501518125-29851-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Mon, 31 Jul 2017 19:21:57 +0300
+Message-Id: <1501518125-29851-6-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1501518125-29851-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1501518125-29851-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 01/13] block: introduce BDRV_REQ_ALLOCATE
- flag
+Subject: [Qemu-devel] [PATCH v3 05/13] qcow2: preallocation at image expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +22,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-The flag is supposed to indicate that the region of the disk image has
-to be sufficiently allocated so it reads as zeroes. The call with the flag
-set has to return -ENOTSUP if allocation cannot be done efficiently
-(i.e. without falling back to writing actual buffers)
+From: "Denis V. Lunev" <den@openvz.org>
 
+This patch adds image preallocation at expand to provide better locality
+of QCOW2 image file and optimize this procedure for some distributed
+storage where this procedure is slow.
+
+Preallocation is not issued upon writing metadata clusters.
+
+Possible conflicts are resolved by the common block layer code since
+ALLOCATE requests are serialising.
+
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- include/block/block.h     |  6 +++++-
- include/block/block_int.h |  2 +-
- block/io.c                | 20 +++++++++++++++++---
- block/trace-events        |  1 +
- 4 files changed, 24 insertions(+), 5 deletions(-)
+ block/qcow2.h   |  3 +++
+ block/qcow2.c   | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ qemu-options.hx |  4 ++++
+ 3 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 34770bb..dbce3c9 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -65,9 +65,13 @@ typedef enum {
-     BDRV_REQ_NO_SERIALISING     = 0x8,
-     BDRV_REQ_FUA                = 0x10,
-     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
-+    /* The BDRV_REQ_ALLOCATE flag is used to indicate that the driver has to
-+     * efficiently allocate the space so it reads as zeroes, or return an error.
-+     */
-+    BDRV_REQ_ALLOCATE           = 0x40,
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 96a8d43..ebbb9cf 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -102,6 +102,7 @@
+ #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
+ #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
+ #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
++#define QCOW2_OPT_PREALLOC_SIZE "prealloc-size"
  
-     /* Mask of valid flags */
--    BDRV_REQ_MASK               = 0x3f,
-+    BDRV_REQ_MASK               = 0x7f,
- } BdrvRequestFlags;
+ typedef struct QCowHeader {
+     uint32_t magic;
+@@ -327,6 +328,8 @@ typedef struct BDRVQcow2State {
+      * override) */
+     char *image_backing_file;
+     char *image_backing_format;
++
++    uint64_t prealloc_size;
+ } BDRVQcow2State;
  
- typedef struct BlockSizes {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d4f4ea7..1883143 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -578,7 +578,7 @@ struct BlockDriverState {
-     /* Flags honored during pwrite (so far: BDRV_REQ_FUA) */
-     unsigned int supported_write_flags;
-     /* Flags honored during pwrite_zeroes (so far: BDRV_REQ_FUA,
--     * BDRV_REQ_MAY_UNMAP) */
-+     * BDRV_REQ_MAY_UNMAP, BDRV_REQ_ALLOCATE) */
-     unsigned int supported_zero_flags;
- 
-     /* the following member gives a name to every node on the bs graph. */
-diff --git a/block/io.c b/block/io.c
-index d9dc822..b3f9d61 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1275,7 +1275,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-             assert(!bs->supported_zero_flags);
-         }
- 
--        if (ret == -ENOTSUP) {
-+        if (ret == -ENOTSUP && !(flags & BDRV_REQ_ALLOCATE)) {
-             /* Fall back to bounce buffer if write zeroes is unsupported */
-             BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
- 
-@@ -1362,8 +1362,8 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     ret = notifier_with_return_list_notify(&bs->before_write_notifiers, req);
- 
-     if (!ret && bs->detect_zeroes != BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF &&
--        !(flags & BDRV_REQ_ZERO_WRITE) && drv->bdrv_co_pwrite_zeroes &&
--        qemu_iovec_is_zero(qiov)) {
-+        !(flags & BDRV_REQ_ZERO_WRITE) && !(flags & BDRV_REQ_ALLOCATE) &&
-+        drv->bdrv_co_pwrite_zeroes && qemu_iovec_is_zero(qiov)) {
-         flags |= BDRV_REQ_ZERO_WRITE;
-         if (bs->detect_zeroes == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP) {
-             flags |= BDRV_REQ_MAY_UNMAP;
-@@ -1441,6 +1441,9 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
- 
-     assert(flags & BDRV_REQ_ZERO_WRITE);
-     if (head_padding_bytes || tail_padding_bytes) {
-+        if (flags & BDRV_REQ_ALLOCATE) {
-+            return -ENOTSUP;
-+        }
-         buf = qemu_blockalign(bs, align);
-         iov = (struct iovec) {
-             .iov_base   = buf,
-@@ -1539,6 +1542,9 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         return ret;
+ typedef struct Qcow2COWRegion {
+diff --git a/block/qcow2.c b/block/qcow2.c
+index d7c600b..1939d9b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -674,6 +674,11 @@ static QemuOptsList qcow2_runtime_opts = {
+         },
+         BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",
+             "ID of secret providing qcow2 AES key or LUKS passphrase"),
++        {
++            .name = QCOW2_OPT_PREALLOC_SIZE,
++            .type = QEMU_OPT_SIZE,
++            .help = "Preallocation amount at image expand",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -1016,6 +1021,15 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+         goto fail;
      }
  
-+    /* allocation request with qiov provided doesn't make much sense */
-+    assert(!(qiov && flags & BDRV_REQ_ALLOCATE));
-+
-     bdrv_inc_in_flight(bs);
-     /*
-      * Align write if necessary by performing a read-modify-write cycle.
-@@ -1670,6 +1676,14 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
- {
-     trace_bdrv_co_pwrite_zeroes(child->bs, offset, bytes, flags);
- 
-+    assert(!(flags & BDRV_REQ_MAY_UNMAP && flags & BDRV_REQ_ALLOCATE));
-+
-+    if (flags & BDRV_REQ_ALLOCATE &&
-+        !(child->bs->supported_zero_flags & BDRV_REQ_ALLOCATE))
++    s->prealloc_size =
++        ROUND_UP(qemu_opt_get_size_del(opts, QCOW2_OPT_PREALLOC_SIZE, 0),
++                 s->cluster_size);
++    if (s->prealloc_size &&
++        !(bs->file->bs->supported_zero_flags & BDRV_REQ_ALLOCATE))
 +    {
-+        return -ENOTSUP;
++        s->prealloc_size = 0;
 +    }
 +
-     if (!(child->bs->open_flags & BDRV_O_UNMAP)) {
-         flags &= ~BDRV_REQ_MAY_UNMAP;
-     }
-diff --git a/block/trace-events b/block/trace-events
-index 8d10a82..b9746a7 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -12,6 +12,7 @@ blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flag
- bdrv_co_readv(void *bs, int64_t sector_num, int nb_sector) "bs %p sector_num %"PRId64" nb_sectors %d"
- bdrv_co_writev(void *bs, int64_t sector_num, int nb_sector) "bs %p sector_num %"PRId64" nb_sectors %d"
- bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags %#x"
-+bdrv_co_allocate(void *bs, int64_t offset, int count) "bs %p offset %"PRId64" count %d"
- bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %u"
+     ret = 0;
+ fail:
+     QDECREF(encryptopts);
+@@ -1895,6 +1909,43 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
+     return false;
+ }
  
- # block/stream.c
++/*
++ * If the specified area is beyond EOF, allocates it + prealloc_size
++ * bytes ahead.
++ */
++static void coroutine_fn handle_prealloc(BlockDriverState *bs,
++                                         const QCowL2Meta *m)
++{
++    BDRVQcow2State *s = bs->opaque;
++    uint64_t start = m->alloc_offset;
++    uint64_t end = start + m->nb_clusters * s->cluster_size;
++    int64_t flen = bdrv_getlength(bs->file->bs);
++
++    if (flen < 0) {
++        return;
++    }
++
++    if (end > flen) {
++        /* try to alloc host space in one chunk for better locality */
++        bdrv_co_pwrite_zeroes(bs->file, flen,
++                              QEMU_ALIGN_UP(end + s->prealloc_size - flen,
++                                            s->cluster_size),
++                              BDRV_REQ_ALLOCATE);
++    }
++}
++
++static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
++{
++    BDRVQcow2State *s = bs->opaque;
++    QCowL2Meta *m;
++
++    for (m = l2meta; m != NULL; m = m->next) {
++        if (s->prealloc_size) {
++            handle_prealloc(bs, m);
++        }
++    }
++}
++
+ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                                          uint64_t bytes, QEMUIOVector *qiov,
+                                          int flags)
+@@ -1979,24 +2030,31 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+             goto fail;
+         }
+ 
++        qemu_co_mutex_unlock(&s->lock);
++
++        if (bs->file->bs->supported_zero_flags & BDRV_REQ_ALLOCATE) {
++            handle_alloc_space(bs, l2meta);
++        }
++
+         /* If we need to do COW, check if it's possible to merge the
+          * writing of the guest data together with that of the COW regions.
+          * If it's not possible (or not necessary) then write the
+          * guest data now. */
+         if (!merge_cow(offset, cur_bytes, &hd_qiov, l2meta)) {
+-            qemu_co_mutex_unlock(&s->lock);
+             BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+             trace_qcow2_writev_data(qemu_coroutine_self(),
+                                     cluster_offset + offset_in_cluster);
+             ret = bdrv_co_pwritev(bs->file,
+                                   cluster_offset + offset_in_cluster,
+                                   cur_bytes, &hd_qiov, 0);
+-            qemu_co_mutex_lock(&s->lock);
+             if (ret < 0) {
++                qemu_co_mutex_lock(&s->lock);
+                 goto fail;
+             }
+         }
+ 
++        qemu_co_mutex_lock(&s->lock);
++
+         while (l2meta != NULL) {
+             QCowL2Meta *next;
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 746b5fa..ac29f74 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -758,6 +758,10 @@ occasions where a cluster gets freed (on/off; default: off)
+ Which overlap checks to perform for writes to the image
+ (none/constant/cached/all; default: cached). For details or finer
+ granularity control refer to the QAPI documentation of @code{blockdev-add}.
++
++@item prealloc-size
++The number of bytes that will be preallocated ahead at qcow2 file expansion
++(allocating a new cluster beyond the end of file).
+ @end table
+ 
+ Example 1:
 -- 
 2.7.4
