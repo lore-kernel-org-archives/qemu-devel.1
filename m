@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcAyo-0008Q0-UW
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:43:31 -0400
+	(envelope-from <jcody@redhat.com>) id 1dcB2r-0000zp-Lz
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcAyk-0003PR-8c
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:43:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcAyk-0003Ny-1y
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:43:26 -0400
-Date: Mon, 31 Jul 2017 14:33:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170731133354.GA3095@work-vm>
-References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
-	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
-	<20170724153521.GD2127@work-vm> <5976EE99.5050401@huawei.com>
-	<20170725103426.GC2099@work-vm> <597ED67B.4000904@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <597ED67B.4000904@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
+	(envelope-from <jcody@redhat.com>) id 1dcB2q-0006Sf-FD
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:47:41 -0400
+From: Jeff Cody <jcody@redhat.com>
+Date: Mon, 31 Jul 2017 09:47:22 -0400
+Message-Id: <cover.1501508049.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 for-2.11 0/3] qemu-iotests: place output in
+ unique dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +18,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>
-Cc: pbonzini@redhat.com, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, jdenemar@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com
 
-* Jay Zhou (jianjay.zhou@huawei.com) wrote:
-> Hi Dave,
-> 
-> On 2017/7/25 18:34, Dr. David Alan Gilbert wrote:
-> > > After checking the codes of the newest libvirt, I think it is the same
-> > > in the qemuMigrationWaitForCompletion function, which is used to poll
-> > > qemu every 50ms.
-> > 
-> > Checking with Jiri Denemark (added to cc), newer libvirt should use
-> > events when available - but that polling code is there to cope with
-> > older qemu's.  So with a newer qemu, i think it should spot the
-> > COMPLETED event.
-> > 
-> 
-> I do tests on the newest libvirt(v3.6.0) + newest qemu(v2.9.90,
-> v2.10.0-rc0-29-ga588c49-dirty). The log added indicates that the source
-> side libvirt spots the COMPLETE event after the cleanup of the source side
-> qemu, i.e. 300ms still exists.
 
-OK, thanks for trying it.
-I don't quite understand why in this case - migration_completion sets
-the state to COMPLETE and I think that's done outside the lock and that
-happens a bit before the retaking of the lock and then the call
-to the savevm_state_cleanup;  so yes, thanks for doing the test.
+Differences v1 -> v2:
 
-> BTW, I'm not very familiar with libvirt, if there is something special to
-> configure or I'm missing something, please let me know.
+Rebase on Kevin's block branch [Suggested-by Eric]
 
-I don't think you should need to.
+Patch 1:
+'check': Added && to the directory change so that the test cannot run if the
+         directory change fails  [Thanks Eric]
 
-Dave
+Patch 2: [Thanks Eric]
+058: Removed the _cleanup(), and just trap _cleanup_nbd()
+091: Preserve the _cleanup_qemu()
+182: Remove spurious _cleanup_qemu() added in v1
+190: New file
 
-> Thanks,
-> Jay
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+git-backport-diff -r kwolf/block.. -u 402fccc
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/3:[0004] [FC] 'qemu-iotests: set TEST_DIR to a unique dir for each test'
+002/3:[0022] [FC] 'qemu-iotests: remove file cleanup from bash tests'
+003/3:[----] [--] 'qemu-iotests: add option to save temp files on error'
+Do you want to view the diffs using meld? y/[n]:
+
+
+This series does 2 things:
+
+1.) Sets TEST_DIR to a unique subdirectory for each test
+2.) Has './check' be responsible for removing temporary files
+3.) Add option to './check' to retain temporary files in case of error
+
+A caveat is #3 is working currently only for Bash tests, as the Python tests
+still cleanup up after themselves.
+
+
+Jeff Cody (3):
+  qemu-iotests: set TEST_DIR to a unique dir for each test
+  qemu-iotests: remove file cleanup from bash tests
+  qemu-iotests: add option to save temp files on error
+
+ tests/qemu-iotests/001     |  6 ------
+ tests/qemu-iotests/002     |  6 ------
+ tests/qemu-iotests/003     |  6 ------
+ tests/qemu-iotests/004     |  6 ------
+ tests/qemu-iotests/005     |  6 ------
+ tests/qemu-iotests/007     |  7 -------
+ tests/qemu-iotests/008     |  6 ------
+ tests/qemu-iotests/009     |  6 ------
+ tests/qemu-iotests/010     |  6 ------
+ tests/qemu-iotests/011     |  6 ------
+ tests/qemu-iotests/012     |  6 ------
+ tests/qemu-iotests/013     |  6 ------
+ tests/qemu-iotests/014     |  6 ------
+ tests/qemu-iotests/015     |  7 -------
+ tests/qemu-iotests/017     |  6 ------
+ tests/qemu-iotests/018     |  6 ------
+ tests/qemu-iotests/019     |  8 --------
+ tests/qemu-iotests/020     |  8 --------
+ tests/qemu-iotests/021     |  6 ------
+ tests/qemu-iotests/022     |  6 ------
+ tests/qemu-iotests/023     |  6 ------
+ tests/qemu-iotests/024     |  8 --------
+ tests/qemu-iotests/025     |  6 ------
+ tests/qemu-iotests/026     |  7 -------
+ tests/qemu-iotests/027     |  6 ------
+ tests/qemu-iotests/028     |  8 --------
+ tests/qemu-iotests/029     |  7 -------
+ tests/qemu-iotests/031     |  6 ------
+ tests/qemu-iotests/032     |  6 ------
+ tests/qemu-iotests/033     |  6 ------
+ tests/qemu-iotests/034     |  6 ------
+ tests/qemu-iotests/035     |  6 ------
+ tests/qemu-iotests/036     |  6 ------
+ tests/qemu-iotests/037     |  6 ------
+ tests/qemu-iotests/038     |  6 ------
+ tests/qemu-iotests/039     |  6 ------
+ tests/qemu-iotests/042     |  6 ------
+ tests/qemu-iotests/043     |  7 -------
+ tests/qemu-iotests/046     |  6 ------
+ tests/qemu-iotests/047     |  6 ------
+ tests/qemu-iotests/048     |  8 --------
+ tests/qemu-iotests/048.out |  1 -
+ tests/qemu-iotests/049     |  6 ------
+ tests/qemu-iotests/050     |  8 --------
+ tests/qemu-iotests/051     |  6 ------
+ tests/qemu-iotests/052     |  6 ------
+ tests/qemu-iotests/053     |  7 -------
+ tests/qemu-iotests/054     |  6 ------
+ tests/qemu-iotests/058     |  8 +-------
+ tests/qemu-iotests/059     |  7 -------
+ tests/qemu-iotests/060     |  6 ------
+ tests/qemu-iotests/061     |  6 ------
+ tests/qemu-iotests/062     |  6 ------
+ tests/qemu-iotests/063     |  7 -------
+ tests/qemu-iotests/064     |  6 ------
+ tests/qemu-iotests/066     |  6 ------
+ tests/qemu-iotests/068     |  6 ------
+ tests/qemu-iotests/069     |  6 ------
+ tests/qemu-iotests/070     |  6 ------
+ tests/qemu-iotests/071     |  6 ------
+ tests/qemu-iotests/072     |  6 ------
+ tests/qemu-iotests/073     |  6 ------
+ tests/qemu-iotests/074     |  9 ---------
+ tests/qemu-iotests/074.out |  1 -
+ tests/qemu-iotests/075     |  6 ------
+ tests/qemu-iotests/076     |  6 ------
+ tests/qemu-iotests/077     |  6 ------
+ tests/qemu-iotests/078     |  6 ------
+ tests/qemu-iotests/079     |  6 ------
+ tests/qemu-iotests/080     |  7 -------
+ tests/qemu-iotests/081     |  8 --------
+ tests/qemu-iotests/082     |  6 ------
+ tests/qemu-iotests/084     |  6 ------
+ tests/qemu-iotests/085     | 13 +------------
+ tests/qemu-iotests/086     |  6 ------
+ tests/qemu-iotests/088     |  7 -------
+ tests/qemu-iotests/089     |  6 ------
+ tests/qemu-iotests/090     |  6 ------
+ tests/qemu-iotests/091     |  8 +-------
+ tests/qemu-iotests/092     |  7 -------
+ tests/qemu-iotests/094     |  9 +--------
+ tests/qemu-iotests/095     |  8 +-------
+ tests/qemu-iotests/097     |  7 -------
+ tests/qemu-iotests/098     |  7 -------
+ tests/qemu-iotests/099     |  6 ------
+ tests/qemu-iotests/101     |  6 ------
+ tests/qemu-iotests/102     |  7 +------
+ tests/qemu-iotests/103     |  6 ------
+ tests/qemu-iotests/104     |  2 --
+ tests/qemu-iotests/105     |  6 ------
+ tests/qemu-iotests/106     |  6 ------
+ tests/qemu-iotests/107     |  6 ------
+ tests/qemu-iotests/108     |  6 ------
+ tests/qemu-iotests/109     |  8 +-------
+ tests/qemu-iotests/110     |  6 ------
+ tests/qemu-iotests/111     |  6 ------
+ tests/qemu-iotests/112     |  6 ------
+ tests/qemu-iotests/113     |  6 ------
+ tests/qemu-iotests/114     |  6 ------
+ tests/qemu-iotests/115     |  6 ------
+ tests/qemu-iotests/116     |  6 ------
+ tests/qemu-iotests/117     |  7 +------
+ tests/qemu-iotests/119     |  6 ------
+ tests/qemu-iotests/120     |  6 ------
+ tests/qemu-iotests/121     |  6 ------
+ tests/qemu-iotests/122     |  7 -------
+ tests/qemu-iotests/123     |  7 -------
+ tests/qemu-iotests/125     |  6 ------
+ tests/qemu-iotests/130     |  7 +------
+ tests/qemu-iotests/131     |  6 ------
+ tests/qemu-iotests/133     |  6 ------
+ tests/qemu-iotests/134     |  6 ------
+ tests/qemu-iotests/135     |  6 ------
+ tests/qemu-iotests/137     |  6 ------
+ tests/qemu-iotests/138     |  6 ------
+ tests/qemu-iotests/140     |  8 +-------
+ tests/qemu-iotests/141     |  8 +-------
+ tests/qemu-iotests/142     |  7 -------
+ tests/qemu-iotests/143     |  7 +------
+ tests/qemu-iotests/144     |  8 +-------
+ tests/qemu-iotests/145     |  7 -------
+ tests/qemu-iotests/146     |  7 +------
+ tests/qemu-iotests/150     |  6 ------
+ tests/qemu-iotests/153     | 12 ------------
+ tests/qemu-iotests/154     |  6 ------
+ tests/qemu-iotests/156     |  7 +------
+ tests/qemu-iotests/157     |  6 ------
+ tests/qemu-iotests/158     |  6 ------
+ tests/qemu-iotests/159     |  7 -------
+ tests/qemu-iotests/160     |  7 -------
+ tests/qemu-iotests/162     |  7 -------
+ tests/qemu-iotests/170     |  7 -------
+ tests/qemu-iotests/171     |  6 ------
+ tests/qemu-iotests/172     |  8 --------
+ tests/qemu-iotests/173     |  8 +-------
+ tests/qemu-iotests/174     |  6 ------
+ tests/qemu-iotests/175     |  6 ------
+ tests/qemu-iotests/176     |  7 -------
+ tests/qemu-iotests/177     |  6 ------
+ tests/qemu-iotests/178     |  7 -------
+ tests/qemu-iotests/179     |  7 -------
+ tests/qemu-iotests/181     |  8 +-------
+ tests/qemu-iotests/182     |  6 ------
+ tests/qemu-iotests/183     |  9 +--------
+ tests/qemu-iotests/185     |  9 +--------
+ tests/qemu-iotests/186     |  6 ------
+ tests/qemu-iotests/188     |  6 ------
+ tests/qemu-iotests/189     |  6 ------
+ tests/qemu-iotests/190     |  7 -------
+ tests/qemu-iotests/check   | 24 ++++++++++++++++++++----
+ tests/qemu-iotests/common  |  6 ++++++
+ 151 files changed, 45 insertions(+), 955 deletions(-)
+
+-- 
+2.9.4
