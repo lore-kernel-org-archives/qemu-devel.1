@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1dcCwR-0005xK-8K
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:49:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dcCyJ-0006xw-SA
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1dcCwO-0001CL-MW
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:49:11 -0400
-Received: from mga11.intel.com ([192.55.52.93]:44771)
+	(envelope-from <imammedo@redhat.com>) id 1dcCyH-0002de-C8
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
-	id 1dcCwO-0001Aw-BW
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:49:08 -0400
-Date: Mon, 31 Jul 2017 09:48:08 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-Message-ID: <20170731154808.GA13791@linux.intel.com>
-References: <20170728180446.GA31104@linux.intel.com>
-	<CAPcyv4i5YWK6RHYEkH6C1oPWwhPLOD-atmkMVXDXc-qdv_0hgw@mail.gmail.com>
-	<20170728194543.GA20726@linux.intel.com>
-	<20170729104933.zlsn7asawltzlfbx@hz-desktop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170729104933.zlsn7asawltzlfbx@hz-desktop>
-Subject: Re: [Qemu-devel] QEMU NVDIMM as type 7 in e820 table
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dcCyH-0002dI-6g
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:05 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 614E724AF7
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 15:41:02 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 31 Jul 2017 17:40:49 +0200
+Message-Id: <1501515652-33372-3-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
+References: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 2/5] tests: acpi: init table
+ descriptor in test_dst_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Linda Knippers <linda.knippers@hpe.com>, "Kani, Toshimitsu" <toshi.kani@hpe.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Sat, Jul 29, 2017 at 06:49:33PM +0800, Haozhong Zhang wrote:
-> On 07/28/17 13:45 -0600, Ross Zwisler wrote:
-> > On Fri, Jul 28, 2017 at 11:11:10AM -0700, Dan Williams wrote:
-> > > On Fri, Jul 28, 2017 at 11:04 AM, Ross Zwisler
-> > > <ross.zwisler@linux.intel.com> wrote:
-> > > > I've been using the virtualized NVDIMM support in QEMU for testing, and I
-> > > > noticed that the physical addresses used by the virtual NVDIMMs aren't present
-> > > > in the guest's e820 table.
-> > > >
-> > > > Here is the e820 table on my QEMU instance where I have one 32 GiB virtual
-> > > > NVDIMM:
-> > > >
-> > > > [    0.000000] e820: BIOS-provided physical RAM map:
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-> > > > [    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdefff] usable
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000bffdf000-0x00000000bfffffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
-> > > >
-> > > > The physical addresses used by the virtual NVDIMM are 0x240000000-0xA40000000.
-> > > > You can see this by looking at ndctl and the values we get from the NFIT:
-> > > >
-> > > > # ndctl list -R
-> > > > {
-> > > >   "dev":"region0",
-> > > >   "size":34359738368,
-> > > >   "available_size":0,
-> > > >   "type":"pmem"
-> > > > }
-> > > >
-> > > > # grep . /sys/bus/nd/devices/region0/{resource,size}
-> > > > region0/resource:0x240000000
-> > > > region0/size:34359738368
-> > > >
-> > > > Or you can see the same info by using iasl to dump
-> > > > /sys/firmware/acpi/tables/NFIT:
-> > > >
-> > > > [028h 0040   2]                Subtable Type : 0000 [System Physical Address Range]
-> > > > [02Ah 0042   2]                       Length : 0038
-> > > >
-> > > > [02Ch 0044   2]                  Range Index : 0002
-> > > > [02Eh 0046   2]        Flags (decoded below) : 0003
-> > > >                    Add/Online Operation Only : 1
-> > > >                       Proximity Domain Valid : 1
-> > > > [030h 0048   4]                     Reserved : 00000000
-> > > > [034h 0052   4]             Proximity Domain : 00000000
-> > > > [038h 0056  16]           Address Range GUID : 66F0D379-B4F3-4074-AC43-0D3318B78CDB
-> > > > [048h 0072   8]           Address Range Base : 0000000240000000
-> > > > [050h 0080   8]         Address Range Length : 0000000800000000
-> > > > [058h 0088   8]         Memory Map Attribute : 0000000000008008
-> > > >
-> > > > I expected to see a type 7 region for the NVDIMM physical address range in the
-> > > > e820 table, so something like:
-> > > >
-> > > > [    0.000000] e820: BIOS-provided physical RAM map:
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-> > > > [    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdefff] usable
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000bffdf000-0x00000000bfffffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000023fffffff] usable
-> > > > [    0.000000] BIOS-e820: [mem 0x0000000240000000-0x0000000A40000000] persistent (type 7)
-> > > >
-> > > 
-> > > Do you need that informationin e820? Linux effectively ignores type-7.
-> > > As long as the range is treated as reserved it's not clear that you
-> > > need the e820 entry. We also infect the persistent type back into the
-> > > memory map when the NFIT driver loads. /proc/iomem should show the
-> > > right data.
-> > 
-> > [ Adding Linda & Toshi to see if they have an opinion. ]
-> > 
-> > I guess maybe we don't need it.  Yep, /proc/iomem looks good:
-> > 
-> >   # cat /proc/iomem
-> >   00000000-00000fff : Reserved
-> >   00001000-0009fbff : System RAM
-> >   ...
-> >   100000000-23fffffff : System RAM
-> >   240000000-a3fffffff : Persistent Memory
-> >     240000000-a3fffffff : namespace0.0
-> > 
-> > I was just worried that this was an inconsistency between the way that virtual
-> > NVDIMMs are presented vs the way that they will be presented on bare metal.  I
-> > at least look at the e820 table to get my bearings of how memory is laid out -
-> > maybe I just need to look at /proc/iomem instead?
-> 
-> Do any OS or applications rely on the E820 information or the
-> consistency between E820 and NFIT to properly work? If any, I can make
-> a QEMU patch to build type-7 e820 entries.
+remove code duplication and make sure that table descriptor
+passed in for initialization is in expected state.
 
-I don't know of any off hand, but IMO it would be good to have this
-consistency.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ tests/bios-tables-test.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index b72fa80..adbcc55 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -210,6 +210,7 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
+ {
+     uint8_t checksum;
+ 
++    memset(sdt_table, 0, sizeof(*sdt_table));
+     ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
+ 
+     sdt_table->aml_len = sdt_table->header.length - sizeof(AcpiTableHeader);
+@@ -228,8 +229,6 @@ static void test_acpi_dsdt_table(test_data *data)
+     AcpiSdtTable dsdt_table;
+     uint32_t addr = data->fadt_table.dsdt;
+ 
+-    memset(&dsdt_table, 0, sizeof(dsdt_table));
+-
+     test_dst_table(&dsdt_table, addr);
+     ACPI_ASSERT_CMP(dsdt_table.header.signature, "DSDT");
+ 
+@@ -245,7 +244,6 @@ static void test_acpi_tables(test_data *data)
+     for (i = 0; i < tables_nr; i++) {
+         AcpiSdtTable ssdt_table;
+ 
+-        memset(&ssdt_table, 0, sizeof(ssdt_table));
+         uint32_t addr = data->rsdt_tables_addr[i + 1]; /* fadt is first */
+         test_dst_table(&ssdt_table, addr);
+         g_array_append_val(data->tables, ssdt_table);
+-- 
+2.7.4
