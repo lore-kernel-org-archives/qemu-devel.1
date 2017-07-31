@@ -1,24 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dc1RO-0007fP-Rd
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 23:32:24 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dc1kC-0001ea-NA
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 23:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dc1RL-000859-KH
-	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 23:32:22 -0400
-Date: Mon, 31 Jul 2017 12:58:25 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170731025825.GC2652@umbus.fritz.box>
-References: <150100547373.27487.3154210751350595400.stgit@bahia>
-	<150100571083.27487.4628655387393519076.stgit@bahia>
-	<20170728034925.GF3098@umbus.fritz.box>
-	<20170728123035.70cdd434@bahia.lan>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dc1k9-0000WQ-Jn
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 23:51:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52860
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1dc1k9-0000WB-D1
+	for qemu-devel@nongnu.org; Sun, 30 Jul 2017 23:51:45 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6V3n1F7067570
+	for <qemu-devel@nongnu.org>; Sun, 30 Jul 2017 23:51:44 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2c1c24mbqf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 30 Jul 2017 23:51:44 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Sun, 30 Jul 2017 23:51:43 -0400
+Date: Mon, 31 Jul 2017 11:51:37 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+	<20170727135910.27d9e42e@gondolin>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170728123035.70cdd434@bahia.lan>
-Subject: Re: [Qemu-devel] [for-2.11 PATCH 18/26] spapr: create DR connectors
- for PHBs
+In-Reply-To: <20170727135910.27d9e42e@gondolin>
+Message-Id: <20170731035137.GB21572@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
+ initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,215 +44,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
+* Cornelia Huck <cohuck@redhat.com> [2017-07-27 13:59:10 +0200]:
 
---24zk1gE8NUlDmwG9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, 27 Jul 2017 03:54:18 +0200
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > When a channel path is hot plugged into a CSS, we should generate
+> > a channel path initialized CRW (channel report word). The current
+> > code does not do that, instead it puts a stub function with a TODO
+> > reminder there.
+> > 
+> > This implements the css_generate_chp_crws() function by:
+> > 1. refactor the existing code.
+> > 2. add an @add parameter to provide future callers with the
+> >    capability of generating channel path permanent error with
+> >    facility not initialized CRW.
+> > 3. add a @hotplugged parameter, so to opt out generating initialized
+> >    CRWs for predefined channel paths.
+> 
+> I'm not 100% sure whether the logic is correct here. Let me elaborate:
+> 
+> The current code flow when hotplugging a device is:
+> - Generate the schib.
+> - Check if any of the chpids refers to a not yet existing channel path;
+>   generate it if that is the case.
+> - Post a crw for the subchannel.
+> 
+> The second step is where the current code seems to be not quite correct
+> already. It is fine for coldplugged devices, but I really think we need
+> to make sure that all referenced channel paths are in place before we
+> hotplug a new device. It was not really relevant when we just had one
+> very virtual channel path, and 3270 is experimental so it is not a
+> problem in practice.
+vfio-ccw hotplug could also live with the current mechanism - just
+generate the chp according to its CHPIDs information. What the problem
+in practice for it then? Channel path status change could be synchronize
+by adding more MMIO regions and eventfd irq for vfio-ccw.
 
-On Fri, Jul 28, 2017 at 12:30:35PM +0200, Greg Kurz wrote:
-> On Fri, 28 Jul 2017 13:49:25 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, Jul 25, 2017 at 08:01:50PM +0200, Greg Kurz wrote:
-> > > From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > >=20
-> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> >=20
-> >=20
-> > > ---
-> > > Changes since RFC:
-> > > - rebased against ppc-for-2.10 (reset hooks registering already merge=
-d)
-> > > - added new DRC type for PHB
-> > > ---
-> > >  hw/ppc/spapr.c             |   15 +++++++++++++++
-> > >  hw/ppc/spapr_drc.c         |   17 +++++++++++++++++
-> > >  include/hw/ppc/spapr_drc.h |    8 ++++++++
-> > >  3 files changed, 40 insertions(+)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 8dc505343c0f..5950c009ab7e 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -98,6 +98,9 @@
-> > > =20
-> > >  #define PHANDLE_XICP            0x00001111
-> > > =20
-> > > +/* maximum number of hotpluggable PHBs */
-> > > +#define SPAPR_DRC_MAX_PHB       256 =20
-> >=20
-> > I wonder if we should actually make this a machine property.
-> >=20
->=20
-> It makes sense.
->=20
-> Also, if all PHBs are instanciated with index !=3D -1, we're limited to 3=
-1.
-> Maybe this could be the default value for the machine property instead of
-> 256 then ?
+> 
+> This, of course, implies we need deeper changes. We need to create the
+> channel paths before the subchannel is created and refuse hotplug of a
+> device if not all channel paths it needs are defined. This means we
+> need some things before we can claim real channel path support:
+> - Have a way to specify channel paths on the command line resp. when
+>   hotplugging. This implies they need to be real objects.
+> - Have a way to specify which channel paths belong to a subchannel in
+>   the same context. Keep existing device types working with the current
+>   method.
+If we want to adopt the unified modelling for all kinds of devices, then
+we require the user to define chps before define devices.
 
-Actually, if we're binding it back to index, which has a hard limit,
-then it no longer makes sense to have it as a property and we should
-go back to a constant (well, it could vary by machine type version).
+We could defaulty always have a virtio reserved chp 0 defined on each
+css, so we do not need to touch the current virtio devices command line.
+Defining more chps or changing chpid for virtio devices does not provide
+added values.
 
-> > >  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
-> > >                                    const char *type_ics,
-> > >                                    int nr_irqs, Error **errp)
-> > > @@ -2384,6 +2387,18 @@ static void ppc_spapr_init(MachineState *machi=
-ne)
-> > > =20
-> > >      spapr->dr_phb_enabled =3D smc->dr_phb_enabled;
-> > > =20
-> > > +    /* Setup hotplug / dynamic-reconfiguration connectors. top-level
-> > > +     * connectors (described in root DT node's "ibm,drc-types" prope=
-rty)
-> > > +     * are pre-initialized here. additional child connectors (such as
-> > > +     * connectors for a PHBs PCI slots) are added as needed during t=
-heir
-> > > +     * parent's realization.
-> > > +     */
-> > > +    if (spapr->dr_phb_enabled) {
-> > > +        for (i =3D 0; i < SPAPR_DRC_MAX_PHB; i++) {
-> > > +            spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_P=
-HB, i);
-> > > +        }
-> > > +    }
-> > > +
-> > >      /* Set up PCI */
-> > >      spapr_pci_rtas_init();
-> > > =20
-> > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > > index eb8024d37c54..2e1049ce61c7 100644
-> > > --- a/hw/ppc/spapr_drc.c
-> > > +++ b/hw/ppc/spapr_drc.c
-> > > @@ -697,6 +697,15 @@ static void spapr_drc_lmb_class_init(ObjectClass=
- *k, void *data)
-> > >      drck->release =3D spapr_lmb_release;
-> > >  }
-> > > =20
-> > > +static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
-> > > +{
-> > > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
-> > > +
-> > > +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
-> > > +    drck->typename =3D "PHB";
-> > > +    drck->drc_name_prefix =3D "PHB ";
-> > > +}
-> > > +
-> > >  static const TypeInfo spapr_dr_connector_info =3D {
-> > >      .name          =3D TYPE_SPAPR_DR_CONNECTOR,
-> > >      .parent        =3D TYPE_DEVICE,
-> > > @@ -740,6 +749,13 @@ static const TypeInfo spapr_drc_lmb_info =3D {
-> > >      .class_init    =3D spapr_drc_lmb_class_init,
-> > >  };
-> > > =20
-> > > +static const TypeInfo spapr_drc_phb_info =3D {
-> > > +    .name          =3D TYPE_SPAPR_DRC_PHB,
-> > > +    .parent        =3D TYPE_SPAPR_DRC_LOGICAL, =20
-> >=20
-> > I thought PHB DRCs were physical..
-> >=20
->=20
-> My understanding is that only PCI IOAs need a physical DRC.
->=20
-> From LoPAPR v1.1 (March 24, 2016):
->=20
-> 13.7 Logical Resource Dynamic Reconfiguration (LRDR)
->=20
-> The Logical Resource Dynamic Reconfiguration option allows a platform to =
-make available and recover platform re-
-> sources such as CPUs, Memory Regions, Processor Host Bridges, and I/O slo=
-ts to/from its operating OS image(s).
->=20
-> ...
->=20
-> The device tree contains logical resource DR connectors for the maximum n=
-umber of resources that the platform can
-> allocate to the specific OS. In some cases such as for processors and PHB=
-s...
->=20
-> and
->=20
-> Table 240. Currently Defined DR Connector Types
->=20
-> | PHB | Logical PCI Host Bridge |
+For emulated device, we can define chpids for use. E.g.:
+-device chp,cssid=fe,chpid=11 \
+-device chp,cssid=fe,chpid=22 \
+-chardev socket,id=terminal0,host=0.0.0.0,port=23,nowait,server,tn3270 \
+-device x-terminal3270,chardev=terminal0,id=terminal3270_0,devno=fe.0.000a,chpids=1122000000000000
 
-Ah, my mistake.
+Or, I think, we could let Qemu automatically find a free chp for them.
+Sine, the same as the virtio devices, defining more chps or changing
+chpid for emulated devices does provide added values either. In this
+case, we do not need to touch the emualted device command line too.
 
->=20
-> > > +    .instance_size =3D sizeof(sPAPRDRConnector),
-> > > +    .class_init    =3D spapr_drc_phb_class_init,
-> > > +};
-> > > +
-> > >  /* helper functions for external users */
-> > > =20
-> > >  sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
-> > > @@ -1179,6 +1195,7 @@ static void spapr_drc_register_types(void)
-> > >      type_register_static(&spapr_drc_cpu_info);
-> > >      type_register_static(&spapr_drc_pci_info);
-> > >      type_register_static(&spapr_drc_lmb_info);
-> > > +    type_register_static(&spapr_drc_phb_info);
-> > > =20
-> > >      spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
-> > >                          rtas_set_indicator);
-> > > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> > > index a7958d0a8d14..535fc61b98a8 100644
-> > > --- a/include/hw/ppc/spapr_drc.h
-> > > +++ b/include/hw/ppc/spapr_drc.h
-> > > @@ -69,6 +69,14 @@
-> > >  #define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
-> > >                                          TYPE_SPAPR_DRC_LMB)
-> > > =20
-> > > +#define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
-> > > +#define SPAPR_DRC_PHB_GET_CLASS(obj) \
-> > > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_=
-PHB)
-> > > +#define SPAPR_DRC_PHB_CLASS(klass) \
-> > > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_=
-DRC_PHB)
-> > > +#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
-> > > +                                        TYPE_SPAPR_DRC_PHB)
-> > > +
-> > >  /*
-> > >   * Various hotplug types managed by sPAPRDRConnector
-> > >   *
-> > >  =20
-> >=20
->=20
+When defining a vfio-ccw device, since the real subchannel implicitly
+indicates the chps it bound to, we grasp the CHPIDs from sysfs (or, with
+my current work, we could even retrieve these information from a new
+added MMIO region). In this case, defining some channel path devices
+separately does not make sense to me.
 
+After thinking quite a while, if we do want to add a real device object
+for a channel path, the most intractable problem (but not the only one)
+for me is to find a good way to map the real path with the virtual one.
+How would we retrieve the information from the real one? We'd need the
+host kernel to provide totally new interfaces for channel path
+information synchronization and notification machenism. I don't think in
+this case sysfs is the choice. Ioctls, vfio MMIO regions and eventfd
+could be a better choice. I think, this is like we are trying to
+passthru a channel path. So we'd need to have a new vfio device physical
+driver (e.g. vfio-chp) to handle this...
 
+And, if we finnaly find a way to solve the above problem, we may have
+some commandline as the follows, and there is still other problems. E.g.:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+lscss:
+MDEV                                  Subchan.  PIM PAM POM  CHPIDs
+------------------------------------------------------------------------------
+6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920  0.0.013f  f0  f0  ff   42434445 00000000
 
---24zk1gE8NUlDmwG9
-Content-Type: application/pgp-signature; name="signature.asc"
+lschp:
+CHPID  Vary  Cfg.  Type  Cmg  Shared  PCHID
+============================================
+0.42   1     1     1b    2    1       0158 
+0.43   1     1     1b    2    1       0159 
+0.44   1     1     1b    2    1       01a0 
+0.45   1     1     1b    2    1       01a1
 
------BEGIN PGP SIGNATURE-----
+Suppose we want to pass through the above mdev ($MDEV_CCW013f), we could
+have the following command line:
+-device vfio-chp,sysfsdev=$MDEV_CHP42,cssid=0,chpid=42 \
+-device vfio-chp,sysfsdev=$MDEV_CHP43,cssid=0,chpid=43 \
+-device vfio-chp,sysfsdev=$MDEV_CHP44,cssid=0,chpid=44 \
+-device vfio-chp,sysfsdev=$MDEV_CHP45,cssid=0,chpid=45 \
+-device vfio-ccw,sysfsdev=$MDEV_CCW013f,devno=0.0.1234,chpids=4243444500000000
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll+nM4ACgkQbDjKyiDZ
-s5JAxg//QawCrTl3Fmo5dWDxn9cAphpLK1LX2+k184fylFVQIpWnNxO7UWdY26pK
-x/SbCEzrUuyei77nUlmC5Xo6TcYGIhA4xJiW7s8fOjWj+auKj4G8rE4MbRLxKiqV
-tbl8KetOREbDrhL7YoIz8N3CnH0vz/hEMNhl5k4oj56Uset0r8egu8v5iBTGsCcc
-Qz1eDrd/EZFEyg3DKHmGCexb72MzJkuDDthfcdJ9WJW2GMbaRaxRa3JhBuu1cdcY
-eQyl2ufi5HY3ZOj+yWyyLjBAc71tJwoHHffesNIUHr3SVEjTCu0FfmHVG+D27xwr
-+u7abhb7rY3CPWbIu1LR3Q2AJB82KufqI06CKOe2SOm8IQySJz0o1QsuRCtR76qZ
-kVERY/ZkTGGRFVAkMt9my5Gsdn4AP6szDwU6ZNy+P/qzf7fMNw3i0GjwKx+E2uTB
-0cp0vv1i5dbwbkBfZwFSSJAYGLmryY++tPif01X595FvNwblQSa45mLIuXBSiNOJ
-E/8AnRztYz8MYtX1Q+W37fkYTo0nXDPOoXgSmSa12L8OuTLy6M0z31q78DSQ22la
-J4Yf5rUubZ482vN4ajKwvtOXkG2sV5Yj48D5s0yPMrdf3AIzkZzEVkH2pOC95MnS
-LdYtGGPCkgDkorrwugWhO6NNQCnBz1AEBO0ZXKVz44ozG/LBGZc=
-=aRcW
------END PGP SIGNATURE-----
+The above vfio-ccw devices can not use any other CHP besides the above
+4. Defining only some of the 4 CHPs for the vfio-ccw device does not
+sounds reasonable. So isn't it redundant to explicitly define all of the
+4 chps in command line for the vfio-ccw device? Since, itself already
+provides the CHPIDs information...
 
---24zk1gE8NUlDmwG9--
+> - Give channel paths states: Defined, configured. The right time for a
+>   CRW is the transition between those states.
+Sounds reasonable.
+
+> - Only queue a 'device come' CRW for a subchannel if at least one of
+>   its channel paths is in the configured state. Detach or make not
+>   operational a subchannel if all of its paths are deconfigured.
+Sounds reasonable too.
+
+> 
+> Something along those lines also matches better what I've seen on z/VM
+> or LPAR. I realize that it's not easy :(
+Yes... I don't find out a way that can satisfy all of the above
+requirements for now...
+
+> 
+> tl;dr: I don't think we want chp crws until after we have a good chp
+> model.
+I have to agree.
+
+> 
+> > 
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > ---
+> >  hw/s390x/3270-ccw.c       |  3 ++-
+> >  hw/s390x/css.c            | 55 ++++++++++++++++++++++++++++++++++++-----------
+> >  hw/s390x/s390-ccw.c       |  2 +-
+> >  hw/s390x/virtio-ccw.c     |  3 ++-
+> >  include/hw/s390x/css.h    |  8 ++++---
+> >  include/hw/s390x/ioinst.h |  1 +
+> >  6 files changed, 53 insertions(+), 19 deletions(-)
+> 
+
+-- 
+Dong Jia Shi
