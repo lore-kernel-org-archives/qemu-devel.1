@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dcCyJ-0006xv-Re
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:11 -0400
+	(envelope-from <groug@kaod.org>) id 1dcCz5-0007SO-1z
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dcCyH-0002dY-Ar
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56382)
+	(envelope-from <groug@kaod.org>) id 1dcCz2-00038y-BM
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:55 -0400
+Received: from 9.mo7.mail-out.ovh.net ([46.105.60.248]:45980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dcCyH-0002dJ-5W
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:05 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29DA027C39
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 15:41:06 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 31 Jul 2017 17:40:51 +0200
-Message-Id: <1501515652-33372-5-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
-References: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 4/5] tests: acpi: add comments to
- fetch_rsdt_referenced_tables/data->tables usage
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dcCz2-00037S-3q
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:51:52 -0400
+Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 8345766723
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 17:51:49 +0200 (CEST)
+Date: Mon, 31 Jul 2017 17:51:39 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170731175139.5d569df6@bahia.lan>
+In-Reply-To: <1501119055-4060-3-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<1501119055-4060-3-git-send-email-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_//IEilcbSdHapvCKH07Aecec";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/3] Revert "qdev: Free QemuOpts
+ when the QOM path goes away"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, berrange@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, armbru@redhat.com
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/bios-tables-test.c | 3 +++
- 1 file changed, 3 insertions(+)
+--Sig_//IEilcbSdHapvCKH07Aecec
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index ed32e9a..a2a90d7 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -251,6 +251,8 @@ static void fetch_rsdt_referenced_tables(test_data *data)
- 
-         uint32_t addr = data->rsdt_tables_addr[i + 1]; /* fadt is first */
-         fetch_table(&ssdt_table, addr);
-+
-+        /* Add table to ASL test tables list */
-         g_array_append_val(data->tables, ssdt_table);
-     }
- }
-@@ -425,6 +427,7 @@ try_again:
-     return exp_tables;
- }
- 
-+/* test the list of tables in @data->tables against reference tables */
- static void test_acpi_asl(test_data *data)
- {
-     int i;
--- 
-2.7.4
+On Wed, 26 Jul 2017 20:30:54 -0500
+Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+
+> This reverts commit abed886ec60cf239a03515cf0b30fb11fa964c44.
+>=20
+> This patch originally addressed an issue where a DEVICE_DELETED
+> event could be emitted (in device_unparent()) before a Device's
+> QemuOpts were cleaned up (in device_finalize()), leading to a
+> "duplicate ID" error if management attempted to immediately add
+> a device with the same ID in response to the DEVICE_DELETED event.
+>=20
+> An alternative will be implemented in a subsequent patch where we
+> defer the DEVICE_DELETED event until device_finalize(), which would
+> also prevent the race, so we revert the original fix in preparation.
+>=20
+
+Do you really need to revert abed886ec60cf239a03515cf0b30fb11fa964c44 ?
+
+IIUC, the purpose of this series is to fix/workaround the VFIO cleanup issu=
+e.
+Even if it also relates to when we emit DEVICE_DELETED, it isn't exactly the
+same problem here, is it ?
+
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> ---
+>  hw/core/qdev.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>=20
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index a64b35c..08c4061 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -1067,6 +1067,7 @@ static void device_finalize(Object *obj)
+>      NamedGPIOList *ngl, *next;
+> =20
+>      DeviceState *dev =3D DEVICE(obj);
+> +    qemu_opts_del(dev->opts);
+> =20
+>      QLIST_FOREACH_SAFE(ngl, &dev->gpios, node, next) {
+>          QLIST_REMOVE(ngl, node);
+> @@ -1116,9 +1117,6 @@ static void device_unparent(Object *obj)
+>          g_free(dev->canonical_path);
+>          dev->canonical_path =3D NULL;
+>      }
+> -
+> -    qemu_opts_del(dev->opts);
+> -    dev->opts =3D NULL;
+>  }
+> =20
+>  static void device_class_init(ObjectClass *class, void *data)
+
+
+--Sig_//IEilcbSdHapvCKH07Aecec
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEUEARECAAYFAll/UgsACgkQAvw66wEB28LnXwCfQp04bhSdnPpKH3SSPHiygQrY
+m4wAmJDmx+6QyXDAe9E/BuN1JrKSymk=
+=3nYH
+-----END PGP SIGNATURE-----
+
+--Sig_//IEilcbSdHapvCKH07Aecec--
