@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dcAYI-00005Y-OJ
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:07 -0400
+	(envelope-from <diana.craciun@nxp.com>) id 1dcAZ6-0000aa-5I
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dcAYF-0007mG-F2
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dcAYF-0007ku-8p
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dcAYC-0004YW-C5
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 13:16:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 89BCD2E8232
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 13:15:49 +0000 (UTC)
+	(envelope-from <diana.craciun@nxp.com>) id 1dcAZ0-0008Nd-OZ
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:56 -0400
+From: Diana Madalina Craciun <diana.craciun@nxp.com>
+Date: Mon, 31 Jul 2017 13:16:43 +0000
+Message-ID: <AM3PR04MB06168786DF6A6BA0FB70DD88FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
+	<CAFEAcA_Zd1kFdv11Pbh9=_Hu2uBvULxPHbk15ot-uKGpzw4s3A@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Jul 2017 13:09:20 -0000
-From: John Florian <1707297@bugs.launchpad.net>
-Reply-To: Bug 1707297 <1707297@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150127405114.4205.4905957472648540492.malonedeb@gac.canonical.com>
-Message-Id: <150150656034.3590.5339855182984610544.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1707297] Re: qemu became more picky parsing -m
- option
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +23,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, Mike Caraman <mike.caraman@nxp.com>, qemu-arm <qemu-arm@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer
+	Dall <christoffer.dall@linaro.org>, Laurentiu Tudor <laurentiu.tudor@nxp.com>
 
-Not sure why I can only see Markus' comment here as part of Eric's but
-anyway... the behavior change *is* expected.
+Hi Peter,
 
-Can qemu behave more like virsh then?  That would be ideal IMHO.  I
-prefer to specify my RAM in powers of 2 and disk in powers of 10 so that
-when I test virtually using qemu I more closely match the exact
-constraints of real hardware.  For the embedded work I do fitting in
-tight confines, it can make a significant difference.
+On 07/10/2017 08:10 PM, Peter Maydell wrote:
 
-(I actually to this with a wrapper I have around qemu, which is why you
-see a floating point value for GiB in my example above.  My wrapper
-behaves like virsh and takes any *B, *iB format and regurgitates it into
-something qemu accepts.)
+On 23 May 2017 at 12:12, Diana Craciun <diana.craciun@nxp.com><mailto:diana=
+.craciun@nxp.com> wrote:
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1707297
+The NXP DPAA2 is a hardware architecture designed for high-speeed network
+packet processing. The DPAA2 hardware components are managed by a hardware
+component called the Management Complex (or MC) which provides an
+object-base abstraction for software drivers to use the DPAA2 hardware.
+For more details you can see:
+https://emea01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgit.ke=
+rnel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git%2Ftree%2=
+Fdrivers%2Fstaging%2Ffsl-mc%2FREADME.txt%3Fh%3Dv4.10&data=3D01%7C01%7Cdiana=
+.craciun%40nxp.com%7C87a43122f7374dd4483008d4c7b68d10%7C686ea1d3bc2b4c6fa92=
+cd99c5c301635%7C0&sdata=3DRf9Uae7gxCeBSbLbRyAs24J9R6HUT1p4%2B4K46BgxqvM%3D&=
+reserved=3D0
 
-Title:
-  qemu became more picky parsing -m option
+The interrupts generated by the DPAA2 hardware components are MSIs. We will=
+ add
+support for direct assigning these DPAA2 components/objects to a virtual
+machine. However, this will add the need to expand the MSI usage in QEMU.
 
-Status in QEMU:
-  New
+Currently the MSIs in QEMU are pretty much tied to PCI. For ARM the
+GIC ITS is using a device ID for interrupt translation. Currently, for
+PCI, the requester ID is used as device ID. This will not work when
+we add another entity that needs also a device ID which is supposed to
+be unique across the system.
 
-Bug description:
-  With qemu-kvm-2.9.0-3.fc26.x86_64 I am no longer to specify the memory
-  size using something like "-m 1.00000GiB" but with qemu-
-  kvm-2.7.1-7.fc25.x86_64 I could without any problem.  I now get an
-  error message like:
+My proposal is to add a static allocation in the virt machine. I considered
+that this allocation is specific to each machine/platform. Currently only
+virt machine has it, but other implementations may use the same mechanism
+as well.
+So, I used a static allocation with this formula:
 
-  qemu-system-x86_64: -m 1.00000GiB: Parameter 'size' expects a non-negativ=
-e number below 2^64
-  Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
-  and exabytes, respectively.
+DeviceID =3D zero_extend( RequesterID[15:0] ) + 0x10000 * Constant
 
-  =
+This formula was taken from SBSA spec (Appendix I: DeviceID generation and
+ITS groups). In case of QEMU the constant will be different for each entity=
+.
+In this way a unique DeviceID will be generated and the device ID will be
+derived from a requesterID (in case of PCI) or other means in case of other
+entities.
 
-  Is this expected or a regression?
+The implementation is generic as there might be in the future other non-pci=
+ devices
+that are using MSIs or IOMMU. Any architecture can use it, though currently
+only the ARM architecture is using the function that retrieves the stream I=
+D. I
+did not change all the replacements of the pci_requester_id (with pci_strea=
+m_id)
+in the code (although if the constant is 0, the stream_id is equal with req=
+uester_id).
+The other architectures (e.g. intel iommu code) assume that the ID is the
+requester ID.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1707297/+subscriptions
+Tested on NXP LS2080 platform.
+
+
+
+So I'm still a bit confused about what this is for and what the
+relationship is with how the equivalent task would be performed
+in real hardware. Can you explain how that works, please?
+Would there be a system MMU involved somewhere that would be
+allocating these IDs somehow?
+
+Let's keep the discussion to MSIs for now (assuming that there is no SMMU a=
+s QEMU does not have currently an SMMU emulation integrated).
+Every device that sends MSIs has a deviceID associated with it. The deviceI=
+D is used by the GIC-ITS hardware for interrupt translation. The deviceID i=
+s assigned by the "system designer", so there is not an hardware entity tha=
+t generates/allocates the deviceIDs (the device ID can be programmed into t=
+he device by software).
+
+For PCI these IDs are specified in the device tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Doc=
+umentation/devicetree/bindings/pci/pci-msi.txt
+
+(msi-map property).
+
+
+
+The patchset also seems to be introducing a fair amount of
+mechanism without also implementing the actual use for it -- yes,
+if we had two PCI controllers in the virt board we would need to
+sort something out I guess, but we don't, we only have one.
+Evaluating whether the mechanism makes sense without its major
+user is always trickier.
+
+Right, we have only one PCI controller in the QEMU for now. We are in the p=
+rocess of implementing device pass-through for our non-PCI bus infrastructu=
+re which is using MSIs as well. As Mike pointed out, the mc-bus infrastruct=
+ure is on the point of getting out of staging:
+
+"
+The fsl-mc is a hardware resource manager that manages specialized hardware=
+ objects used in network-oriented packet processing applications. After the=
+ fsl-mc block is enabled, pools of hardware resources are available, such a=
+s queues, buffer pools, I/O interfaces. These resources are building blocks=
+ that can be used to create functional hardware objects such as network int=
+erfaces, crypto accelerator instances, or L2 switches.
+
+All the fsl-mc managed hardware resources/objects are represented in a phys=
+ical grouping mechanism called a 'container' or DPRC (data path resource co=
+ntainer).
+
+>From the point of view of an OS, a DPRC functions similar to a plug and pla=
+y bus. Using fsl-mc commands software can enumerate the contents of the DPR=
+C discovering the hardware objects present and binding them to drivers. Har=
+dware objects can be created and removed dynamically, providing hot pluggab=
+ility of the hardware objects.
+"
+
+After adding pass-through support, we will have two entities that are using=
+ MSIs and thus that are needing unique deviceIDs.
+PCI is making the assumption that the deviceID=3DrequesterID, so, theoretic=
+ally, we could allocate numbers bigger than the requesterID for our bus inf=
+rastructure. But I thought that this is more like an temporary workaround w=
+hich will not work in the future when: another PCI controller is added or a=
+nother platform device that is using MSIs is added.
+
+
+
+
+Essentially, I know very little about this use case, but my
+default position is that if in doubt we should aim to match
+how real hardware handles something. Virtualization-specific
+code, and especially something specific to a niche use case like
+this, is something I'd really prefer to avoid. The ideal is to
+have something like PCI device passthrough, where the guest can
+automatically probe for things and QEMU doesn't need to get
+involved.
+
+
+It is not automatically probed for PCI, either. In the current implementati=
+on an assumption is made:
+
+if the msi-map is missing from the device tree (property which specifies th=
+e translation between requesterID and deviceID) it is asummed that the devi=
+ceID is the same with the requesterID.
+
+
+
+I was hoping Eric would review this, since he's more up to speed
+on direct hardware passthrough than I am, but I think he's just
+gone off on holiday...
+
+thanks
+-- PMM
+
+
+
+Thanks,
+
+Diana
