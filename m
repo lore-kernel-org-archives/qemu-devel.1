@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1dcAmH-0005bh-9f
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:30:34 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcAsi-0007B1-4c
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1dcAmE-0000aV-71
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:30:33 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:35962)
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcAse-0006Kn-WD
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:37:12 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:7206)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1dcAmD-0000Zw-Nb
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:30:30 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <1501249552-788-1-git-send-email-armbru@redhat.com>	<1501249552-788-2-git-send-email-armbru@redhat.com>	<000901d309ca$9ee30c00$dca92400$@ru>
-	<87y3r43g2f.fsf@dusky.pond.sub.org>
-In-Reply-To: <87y3r43g2f.fsf@dusky.pond.sub.org>
-Date: Mon, 31 Jul 2017 16:30:13 +0300
-Message-ID: <001101d30a01$247886c0$6d699440$@ru>
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcAse-0006Ig-QV
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:37:08 -0400
+From: James Hogan <james.hogan@imgtec.com>
+Date: Mon, 31 Jul 2017 14:36:45 +0100
+Message-ID: <1b88a351b0c447a2a4045a7d6979f62b4af96604.1501508116.git-series.james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH 1/3] replay: Define ReplayMode without QAPI
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target-mips: Don't stop on [d]mtc0
+ DESAVE/KScratch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Markus Armbruster' <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+To: qemu-devel@nongnu.org
+Cc: James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-> From: Markus Armbruster [mailto:armbru@redhat.com]
-> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> writes:
-> 
-> >> From: Markus Armbruster [mailto:armbru@redhat.com]
-> >> ReplayMode is defined in the QAPI schema, but not used there.  Of the
-> >> stuff QAPI generates for it only the typedef is actually used.  Use of
-> >> QAPI is pointless and only complicates things, so don't.
-> >
-> > This a bit useless now, but we plan to add more patches that include
-> > QAPI commands for controlling and inspecting the record/replay process.
-> 
-> I assume YAGNI until proven otherwise.
-> 
-> Posting patches putting ReplayMode to use could serve as proof.
+Writing to the MIPS DESAVE register (and now the KScratch registers)
+will stop translation, supposedly due to risk of execution mode
+switches. However these registers are basically RW scratch registers
+with no side effects so there is no risk of them triggering execution
+mode changes.
 
-This is a sample of not yet included patch.
+Drop the bstate = BS_STOP for these registers for both mtc0 and dmtc0.
 
-https://lists.nongnu.org/archive/html/qemu-devel/2014-07/msg04278.html
+Fixes: 7a387fffce50 ("Add MIPS32R2 instructions, and generally straighten out the instruction decoding. This is also the first percent towards MIPS64 support.")
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+Changes in v2:
+- Resend based on v2.10.0-rc0
+---
+ target/mips/translate.c | 4 ----
+ 1 file changed, 0 insertions(+), 4 deletions(-)
 
-Pavel Dovgalyuk
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 51626aead32c..0bca700fb380 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -6386,8 +6386,6 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         default:
+             goto cp0_unimplemented;
+         }
+-        /* Stop translation as we may have switched the execution mode */
+-        ctx->bstate = BS_STOP;
+         break;
+     default:
+        goto cp0_unimplemented;
+@@ -7714,8 +7712,6 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         default:
+             goto cp0_unimplemented;
+         }
+-        /* Stop translation as we may have switched the execution mode */
+-        ctx->bstate = BS_STOP;
+         break;
+     default:
+         goto cp0_unimplemented;
+-- 
+git-series 0.8.10
