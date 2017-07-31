@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dcDXE-0000GH-JR
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:27:13 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcDdo-0005ox-2m
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dcDXD-0001CE-RE
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:27:12 -0400
-Date: Mon, 31 Jul 2017 17:27:01 +0100
+	(envelope-from <stefanha@redhat.com>) id 1dcDdl-0005wU-DQ
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dcDdl-0005w4-7Z
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:33:57 -0400
+Date: Mon, 31 Jul 2017 17:33:53 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170731162701.GK11830@stefanha-x1.localdomain>
-References: <20170725153645.26412-1-stefanha@redhat.com>
-	<20170727122802.GD4767@localhost.localdomain>
+Message-ID: <20170731163353.GA24783@stefanha-x1.localdomain>
+References: <20170731140718.22010-1-stefanha@redhat.com>
+	<20170731140718.22010-3-stefanha@redhat.com>
+	<87d18g3anv.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sdEQJo40s7ofW8iR"
+	protocol="application/pgp-signature"; boundary="6c2NcOVqGQ03X4Wi"
 Content-Disposition: inline
-In-Reply-To: <20170727122802.GD4767@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-iotests: add a "how to" to ./README
+In-Reply-To: <87d18g3anv.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] trace: add
+ trace_event_get_state_backends()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, eblake@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
 
---sdEQJo40s7ofW8iR
+--6c2NcOVqGQ03X4Wi
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 27, 2017 at 02:28:02PM +0200, Kevin Wolf wrote:
-> Am 25.07.2017 um 17:36 hat Stefan Hajnoczi geschrieben:
-> > There is not much getting started documentation for qemu-iotests.  This
-> > patch explains how to create a new test and covers the overall testing
-> > approach.
-> >=20
-> > Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Mon, Jul 31, 2017 at 06:09:56PM +0300, Llu=EDs Vilanova wrote:
+> Stefan Hajnoczi writes:
 >=20
-> Do you want to address the late v1 comments from Peter (needs to be run
-> from build tree) and Jeff (mention common.qemu next to Python tests)?
+> > Code that checks dstate is unaware of SystemTap and LTTng UST dstate, so
+> > the following trace event will not fire when solely enabled by SystemTap
+> > or LTTng UST:
+>=20
+> >   if (trace_event_get_state(TRACE_MY_EVENT)) {
+> >       str =3D g_strdup_printf("Expensive string to generate ...",
+> >                             ...);
+> >       trace_my_event(str);
+> >       g_free(str);
+> >   }
+>=20
+> I believe this should be trace_event_get_state_backends(). Same applies t=
+o the
+> cover letter.
 
-Done, I've sent v3!
+This instance and the cover letter are both showing the pattern in
+existing code.
+
+The description "event will not fire" is correct with
+trace_event_get_state().  If I change it to
+trace_event_get_state_backends() then the description is no longer
+correct :).
 
 Stefan
 
---sdEQJo40s7ofW8iR
+--6c2NcOVqGQ03X4Wi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZf1pVAAoJEJykq7OBq3PIFgkH/2c/ddv0CcuF0GDLrIWvGVzx
-H/YQXdffuxMjrH7hnxUm26w1k1V8rUTdUy4wMV/e85DH8U5K9Yvmo/5wivzkbtVJ
-e16ARNFQQvN5Hyi/GLXVsMevPMHXNfmrq16b+q3QcnGdkJp8Y3GVatyVHqnlSBZ6
-LKxLI7N4hIrtPT1yeUQuGD4UJlo/DloLK3Uq6wHqPQrJ7kLxBFsDsJYZoi24G+Hu
-zQ2T1/uDyludgMQDy5OOIt8fOchHq2t8oVObSUcoh9YDS20THwfo5GfHkfZp4BvM
-Nd5I+ViiZ1qDHffUA5whf7idRIWOX7XXKdWFiOyTyKxiNjkusPSKGNtIzr1iAOA=
-=qABa
+iQEcBAEBAgAGBQJZf1vxAAoJEJykq7OBq3PI7YcIAJP2Xxj8IxTgYD1VRtN/oDrT
+1h70D4RNgf30aNoImYowxLnv00XwXBW/F6Gt8aZEX7YIQZOeuSz5KXfRdRPOgQUm
+OlI8hvA9DZ5J5J4/BisFrVfu1vGW0XsiQIdqTLFiBBHade7vqNqoHAtU40L91ctI
+3R9M3DtkPWHVXhAldIfu900YAXWhnh9cZ+uS/AWy6Q6q54gf+ZtyV2JTCmnvY5ux
+LMup3rqPEbT6MW+YOaxtNbnXN10v8hFGFbz5PjPOVx7wBXkETXG79nefQm0K4KwD
+GHVzrmRhW3rw0lEpnJ5OuC974q+UtrqN9ifEs3DCIOBWGP9p84VRSPecuo28oNQ=
+=u6+g
 -----END PGP SIGNATURE-----
 
---sdEQJo40s7ofW8iR--
+--6c2NcOVqGQ03X4Wi--
