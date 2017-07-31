@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dcCMf-000639-Dp
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:17 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dcCMl-00063o-7J
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dcCMZ-0000ho-9c
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dcCMZ-0000fz-00
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:07 -0400
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<0a7cd2a8-45ff-11d1-ddb5-036ce36af163@redhat.com>
-	<CAPcyv4iYdEAv7wqun5L1C-gT7fMDpO+M918or-bg5XiWLnM3=w@mail.gmail.com>
-	<d5a1f1d2-f7c8-cacc-3267-ed6f7d2507ca@redhat.com>
-	<20170731162757-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <730c3076-6bfd-9a96-3851-42ea5c329891@redhat.com>
-Date: Mon, 31 Jul 2017 17:04:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170731162757-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+	(envelope-from <programmingkidx@gmail.com>) id 1dcCMg-0000lf-5X
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:19 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35255)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dcCMf-0000lK-Uc
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:14 -0400
+Received: by mail-it0-x244.google.com with SMTP id v127so19979296itd.2
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 08:12:13 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170731150609.GD21310@redhat.com>
+Date: Mon, 31 Jul 2017 11:12:11 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <30E55185-F35E-4C81-A928-6C45E1BAC6C6@gmail.com>
+References: <BCFCA0C8-8811-43C3-B65A-76B4470868FD@gmail.com>
+	<20170731094657.GE766@redhat.com>
+	<421095EC-3086-46A4-AA1E-653831EA746D@gmail.com>
+	<20170731131010.GB21310@redhat.com>
+	<8A5AD082-9A78-4535-BF44-1CBF31E52803@gmail.com>
+	<20170731150609.GD21310@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Add more function keys to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +34,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Rik van Riel <riel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-
-On 31.07.2017 16:12, Michael S. Tsirkin wrote:
-> On Fri, Jul 28, 2017 at 05:48:07PM +0200, David Hildenbrand wrote:
->> In general, a paravirtualized interface (for detection of PMEM regions)
->> might have one big advantage: not limited to certain architectures.
-> 
-> What follows is a generic rant, and slightly offtopic -sorry about that.
-> I thought it's worth replying to above since people sometimes propose
-> random PV devices and portability is often the argument. I'd claim if
-> its the only argument - its not a very good one.
-
-Very good point. Thanks for that comment. I totally agree, that we have
-to decide for which parts we really need a paravirtualized interface. We
-already paravirtualized quite a lot (starting with clocks and mmios,
-ending with network devices).
-
-Related to fake DAX, think about this example (cc'ing Christian, so I
-don't talk too much nonsense):
-
-s390x hardware cannot map anything into the address space. Not even PCI
-devices on s390x work that way. So the whole architecture (to this point
-I am aware of) is built on this fact. We can indicate "valid memory
-regions" to the guest via a standardized interface, but the guest will
-simply treat it like RAM.
-
-With virtualization, this is different. We can map whatever we want into
-the guest address space, but we have to tell the guest that this area is
-special. There is no ACPI on s390x to do that.
-
-This implies, that for s390x, we could not support fake DAX, just
-because we don't have ACPI. No fake DAX, no avoiding of page caches in
-the guest. Which is something we _could_ avoid quite easily.
-
-> 
-> One of the points of KVM is to try and reuse the infrastructure in Linux
-> that runs containers/bare metal anyway.  The more paravirtualized
-> interfaces you build, the more effort you get to spend to maintain
-> various aspects of the system. As optimizations force more and more
-> paravirtualization into the picture, our solution has been to try to
-> localize their effect, so you can mix and match paravirtualization and
-> emulation, as well as enable a subset of PV things that makes sense. For
-> example, virtio devices look more or less like PCI devices on systems
-> that have PCI.
-We make paravirtualized devices look like them, but what we (in most
-cases) don't do is the following: Detect and use devices via a
-!paravirtualized way and later on decide "oh, this device is special"
-and treat it suddenly like a paravirtualized device*.
-
-E.g. virtio-scsi, an unmodified guest will not simply detect and use,
-say, a virtio-scsi attached disk. (unless I am very wrong on that point ;) )
-
-*This might work for devices, where paravirtualization is e.g. just a
-way to speedup things. But if paravirtualization is part of the concept
-(fake DAX - we need that flush), this will not work.
-
-In the words of s390x: indicate fake DAX as ordinary ram. The guest will
-hotplug it and use it like ordinary ram. At that point, it is too late
-to convert it logically into a disk.
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
 
-What I think is the following: We need a way to advertise devices that
-are mapped into the address space via a paravirtualized way. This could
-e.g. be fake DAX devices or what virtio-mem's memory hotplug approach
-tries to solve.
+> On Jul 31, 2017, at 11:06 AM, Daniel P. Berrange <berrange@redhat.com> =
+wrote:
+>=20
+> On Mon, Jul 31, 2017 at 10:52:46AM -0400, Programmingkid wrote:
+>>=20
+>>> On Jul 31, 2017, at 9:10 AM, Daniel P. Berrange =
+<berrange@redhat.com> wrote:
+>>>=20
+>>> On Mon, Jul 31, 2017 at 08:46:56AM -0400, Programmingkid wrote:
+>>>>=20
+>>>>> On Jul 31, 2017, at 5:46 AM, Daniel P. Berrange =
+<berrange@redhat.com> wrote:
+>>>>>=20
+>>>>> On Sun, Jul 30, 2017 at 04:29:27PM -0400, Programmingkid wrote:
+>>>>>> There are now keyboards that have 19 function keys. This patch =
+extends QEMU so these function keys can be used.
+>>>>>>=20
+>>>>>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>>>>>> ---
+>>>>>> qapi-schema.json  | 12 +++++++++++-
+>>>>>> ui/input-keymap.c |  9 +++++++++
+>>>>>> 2 files changed, 20 insertions(+), 1 deletion(-)
+>>>>>>=20
+>>>>>> diff --git a/qapi-schema.json b/qapi-schema.json
+>>>>>> index c96f0a2..f1c989b 100644
+>>>>>> --- a/qapi-schema.json
+>>>>>> +++ b/qapi-schema.json
+>>>>>> @@ -4862,6 +4862,15 @@
+>>>>>> # @ac_refresh: since 2.10
+>>>>>> # @ac_bookmarks: since 2.10
+>>>>>> # altgr, altgr_r: dropped in 2.10
+>>>>>> +# @f16: since 2.11
+>>>>>> +# @f17: since 2.11
+>>>>>> +# @f18: since 2.11
+>>>>>> +# @f19: since 2.11
+>>>>>> +# @f20: since 2.11
+>>>>>> +# @f21: since 2.11
+>>>>>> +# @f22: since 2.11
+>>>>>> +# @f23: since 2.11
+>>>>>> +# @f24: since 2.11
+>>>>>> #
+>>>>>> # Since: 1.3.0
+>>>>>> #
+>>>>>> @@ -4888,7 +4897,8 @@
+>>>>>>           'audionext', 'audioprev', 'audiostop', 'audioplay', =
+'audiomute',
+>>>>>>           'volumeup', 'volumedown', 'mediaselect',
+>>>>>>           'mail', 'calculator', 'computer',
+>>>>>> -            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', =
+'ac_bookmarks' ] }
+>>>>>> +            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', =
+'ac_bookmarks',
+>>>>>> +            'f16', 'f17', 'f18', 'f19', 'f20', 'f21', 'f22', =
+'f23', 'f24'] }
+>>>>>>=20
+>>>>>> ##
+>>>>>> # @KeyValue:
+>>>>>=20
+>>>>> This bit looks fine.
+>>>>>=20
+>>>>>> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+>>>>>> index cf979c2..c0413e1 100644
+>>>>>> --- a/ui/input-keymap.c
+>>>>>> +++ b/ui/input-keymap.c
+>>>>>> @@ -251,6 +251,15 @@ static const int qcode_to_number[] =3D {
+>>>>>>=20
+>>>>>>   [Q_KEY_CODE_F11] =3D 0x57,
+>>>>>>   [Q_KEY_CODE_F12] =3D 0x58,
+>>>>>> +    [Q_KEY_CODE_F16] =3D 0x59,
+>>>>>> +    [Q_KEY_CODE_F17] =3D 0x5a,
+>>>>>> +    [Q_KEY_CODE_F18] =3D 0x5b,
+>>>>>> +    [Q_KEY_CODE_F19] =3D 0x5c,
+>>>>>> +    [Q_KEY_CODE_F20] =3D 0x5d,
+>>>>>> +    [Q_KEY_CODE_F21] =3D 0x5e,
+>>>>>> +    [Q_KEY_CODE_F22] =3D 0x5f,
+>>>>>> +    [Q_KEY_CODE_F23] =3D 0x60,
+>>>>>> +    [Q_KEY_CODE_F24] =3D 0x61,
+>>>>>=20
+>>>>> You've got a gap there F13, F14, F15 were all missing =
+(pre-existing bug in
+>>>>> QEMU), so you can't carry on just incrementing after F12.
+>>>>=20
+>>>> Actually F13, F14,and F15 are called Q_KEY_CODE_PRINT, =
+Q_KEY_CODE_SCROLL_LOCK,
+>>>> and Q_KEY_CODE_PAUSE respectively.
+>>>=20
+>>> Huh. That's not right. Print/Scroll/Pause are completely separate to =
+F13/14/15
+>>=20
+>> Actually it is how PC keyboards function keys F13 to F15 are =
+labelled. This
+>> picture should help. =20
+>=20
+> [snip]
+>=20
+>> The Print Screen, Scroll Lock, and Pause/Break keys correspond to =
+F13, F14,
+>> and F15 on this keyboard. It is the same way on older Macintosh =
+keyboards.
+>> As for keyboards of other systems there could be a difference. I'm =
+aware of
+>> a specific example but I suppose it is possible. I do know with the =
+current
+>> mapping of the Print Screen, Scroll Lock, and Pause/Break keys to the =
+F13
+>> to F15 keys Windows, Linux, and Mac OS guests seem to like it.
+>=20
+> If those keyboards are generating Print/ScrollLock/Pause scancodes =
+when
+> F13/F14/F15 are pressed, then that's simply a case of the key labels
+> diverging from the scancodes, which is not entirely unusual. The key
+> point is that the various key code sets we use, define separate =
+scancodes
+> for F13/F14/F15 vs Print/ScrollLock/Break, so we must match that. It =
+just
+> means that the keyboards you show happen to not generate these =
+particular
+> scan codes, but others will.
+>=20
+>> Did you want separate Q_KEY_CODE_F13, Q_KEY_CODE_F14, and =
+Q_KEY_CODE_F15
+>> constants added to QEMU?
+>=20
+> Yes.
 
-Basically what virtio-mem proposed: indicating devices in the form of
-memory regions that are special to the guest via a paravirtualized
-interface and providing paravirtualized features, that can (and even
-have to) be used along with these special devices.
-
-> 
-> It's not clear it applies here - memory overcommit on bare metal is
-> kind of different.
-
-Yes, there is no such thing as fine grained memory hot(un)plug on real
-hardware.
-
--- 
-
-Thanks,
-
-David
+Ok I will implement this change in its own patch.
