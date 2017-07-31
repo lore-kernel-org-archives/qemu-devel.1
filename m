@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dcA6B-0003mq-VP
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:47:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dcA7O-0004Rc-N9
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dcA67-0003wo-0T
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:47:04 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:37825)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dcA66-0003wN-Rb
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:46:58 -0400
-Received: by mail-io0-x243.google.com with SMTP id c74so10603874iod.4
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 05:46:58 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20170731094657.GE766@redhat.com>
-Date: Mon, 31 Jul 2017 08:46:56 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <421095EC-3086-46A4-AA1E-653831EA746D@gmail.com>
-References: <BCFCA0C8-8811-43C3-B65A-76B4470868FD@gmail.com>
-	<20170731094657.GE766@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] Add more function keys to QEMU
+	(envelope-from <eblake@redhat.com>) id 1dcA7K-0004Yc-Hm
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:48:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48012)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dcA7K-0004XX-8B
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:48:14 -0400
+References: <20170729131159.24949-1-vsementsov@virtuozzo.com>
+	<20170729131159.24949-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77d164e6-e0e7-2a7d-65e7-8bbb1eb0a44a@redhat.com>
+Date: Mon, 31 Jul 2017 07:48:08 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170729131159.24949-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1DseAeWcSG5ggvJk4q9OkWRaw8RIAeqbt"
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] trace-events: fix code style: %# ->
+ 0x%
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@gmail.com, peter.maydell@linaro.org, berrange@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1DseAeWcSG5ggvJk4q9OkWRaw8RIAeqbt
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org,
+ stefanha@gmail.com, peter.maydell@linaro.org, berrange@redhat.com
+Message-ID: <77d164e6-e0e7-2a7d-65e7-8bbb1eb0a44a@redhat.com>
+Subject: Re: [PATCH v2 2/4] trace-events: fix code style: %# -> 0x%
+References: <20170729131159.24949-1-vsementsov@virtuozzo.com>
+ <20170729131159.24949-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170729131159.24949-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/29/2017 08:11 AM, Vladimir Sementsov-Ogievskiy wrote:
+> In trace format '#' flag of printf is forbidden. Fix it to '0x%'.
+>=20
+> This patch is created by the following:
+>=20
+> check that we have a problem
+>> find . -name trace-events | xargs grep '%#' | wc -l
+> 56
+>=20
+> check that there are no cases with additional printf flags
+>> find . -name trace-events | xargs grep '%[-+ 0]+#' | wc -l
+> 0
+
+Missing a check for the ' flag required by POSIX (but not C99); although
+we don't use that either.
+
+>=20
+> check that there are no wrong usage of '#' and '0x' together
+>> find . -name trace-events | xargs grep '0x%#' | wc -l
+> 0
+>=20
+> fix the problem
+>> find . -name trace-events | xargs sed -i 's/%#/0x%/g'
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> On Jul 31, 2017, at 5:46 AM, Daniel P. Berrange <berrange@redhat.com> =
-wrote:
->=20
-> On Sun, Jul 30, 2017 at 04:29:27PM -0400, Programmingkid wrote:
->> There are now keyboards that have 19 function keys. This patch =
-extends QEMU so these function keys can be used.
->>=20
->> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->> ---
->> qapi-schema.json  | 12 +++++++++++-
->> ui/input-keymap.c |  9 +++++++++
->> 2 files changed, 20 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/qapi-schema.json b/qapi-schema.json
->> index c96f0a2..f1c989b 100644
->> --- a/qapi-schema.json
->> +++ b/qapi-schema.json
->> @@ -4862,6 +4862,15 @@
->> # @ac_refresh: since 2.10
->> # @ac_bookmarks: since 2.10
->> # altgr, altgr_r: dropped in 2.10
->> +# @f16: since 2.11
->> +# @f17: since 2.11
->> +# @f18: since 2.11
->> +# @f19: since 2.11
->> +# @f20: since 2.11
->> +# @f21: since 2.11
->> +# @f22: since 2.11
->> +# @f23: since 2.11
->> +# @f24: since 2.11
->> #
->> # Since: 1.3.0
->> #
->> @@ -4888,7 +4897,8 @@
->>             'audionext', 'audioprev', 'audiostop', 'audioplay', =
-'audiomute',
->>             'volumeup', 'volumedown', 'mediaselect',
->>             'mail', 'calculator', 'computer',
->> -            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', =
-'ac_bookmarks' ] }
->> +            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', =
-'ac_bookmarks',
->> +            'f16', 'f17', 'f18', 'f19', 'f20', 'f21', 'f22', 'f23', =
-'f24'] }
->>=20
->> ##
->> # @KeyValue:
->=20
-> This bit looks fine.
->=20
->> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
->> index cf979c2..c0413e1 100644
->> --- a/ui/input-keymap.c
->> +++ b/ui/input-keymap.c
->> @@ -251,6 +251,15 @@ static const int qcode_to_number[] =3D {
->>=20
->>     [Q_KEY_CODE_F11] =3D 0x57,
->>     [Q_KEY_CODE_F12] =3D 0x58,
->> +    [Q_KEY_CODE_F16] =3D 0x59,
->> +    [Q_KEY_CODE_F17] =3D 0x5a,
->> +    [Q_KEY_CODE_F18] =3D 0x5b,
->> +    [Q_KEY_CODE_F19] =3D 0x5c,
->> +    [Q_KEY_CODE_F20] =3D 0x5d,
->> +    [Q_KEY_CODE_F21] =3D 0x5e,
->> +    [Q_KEY_CODE_F22] =3D 0x5f,
->> +    [Q_KEY_CODE_F23] =3D 0x60,
->> +    [Q_KEY_CODE_F24] =3D 0x61,
->=20
-> You've got a gap there F13, F14, F15 were all missing (pre-existing =
-bug in
-> QEMU), so you can't carry on just incrementing after F12.
+--1DseAeWcSG5ggvJk4q9OkWRaw8RIAeqbt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Actually F13, F14,and F15 are called Q_KEY_CODE_PRINT, =
-Q_KEY_CODE_SCROLL_LOCK, and Q_KEY_CODE_PAUSE respectively.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-> Even if that were not the case, AT set1 scancodes are insane with no =
-logical
-> numbering scheme. So what we actually end up needing is
->=20
->    F13 =3D=3D  0x5d
->    F14 =3D=3D  0x5e
->    F15 =3D=3D  0x5f
->    F16 =3D=3D  0x55
->    F17 =3D=3D  0x83
->    F18 =3D=3D  0xf7
->    F19 =3D=3D  0x84
->    F20 =3D=3D  0x5a
->    F21 =3D=3D  0x74
->    F22 =3D=3D  0xf9
->    F23 =3D=3D  0x6d
->    F24 =3D=3D  0x6f
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/JwgACgkQp6FrSiUn
+Q2qXmQf/UUgBcElBo7VJL8Cz5tC5oJl0MV8mibnhO821Bw9O52fZPkf5vjzx9+Hk
+FWQOkwiltnYTnUa2yOvHxXAIc0PViihKtjH3kEpF+159si3drkyU51nZoCdesCUl
+X4BQRk7txLtkAtNCXPFW4cyc47GLyDOxvRtJRdRuzI2Lvxj/rod/3RgLH1XdJgDk
+uHx7BB8/Bz2OBX/I+HhingylmFCwl4CFa4UWUWHIkYxTQ/stdA49mBluc9sgOI+j
+boZNhtgAQs0i3q+Qj1lo3PHp41eYpRq9cFEMWHn+D2OqkkudGp/uskjJb+Qsaw/P
+FLsd7RbxqFtEiVvNl91RkN0CqawH/g==
+=o3+/
+-----END PGP SIGNATURE-----
 
-Ok. I can adapt this numbering scheme in my next patch. Thank you for =
-reviewing this patch set.=20=
+--1DseAeWcSG5ggvJk4q9OkWRaw8RIAeqbt--
