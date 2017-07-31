@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dc5se-0006Q7-RT
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:16:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1dc5vy-0007IO-P4
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dc5sb-0003B8-M8
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:16:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56482)
+	(envelope-from <armbru@redhat.com>) id 1dc5vv-0005Xk-Kf
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:20:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dc5sb-0003AL-DT
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:16:45 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dc5vv-0005Wv-BT
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:20:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52842D5972
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 08:20:10 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170725211523.3998-1-eblake@redhat.com>
-	<20170725211523.3998-8-eblake@redhat.com>
-	<20170728125759.GO12364@stefanha-x1.localdomain>
-	<eb01fea0-945e-d954-0737-dc3c748a7f94@redhat.com>
-	<7e291686-0242-5bd3-8f83-00145be9d9ee@redhat.com>
-Date: Mon, 31 Jul 2017 10:16:39 +0200
-In-Reply-To: <7e291686-0242-5bd3-8f83-00145be9d9ee@redhat.com> (Eric Blake's
-	message of "Fri, 28 Jul 2017 11:33:03 -0500")
-Message-ID: <871soxaumw.fsf@dusky.pond.sub.org>
+	<20170725211523.3998-4-eblake@redhat.com>
+	<87y3r8jtu5.fsf@dusky.pond.sub.org>
+	<fed09f84-2112-73e2-5541-603a77fe746d@redhat.com>
+Date: Mon, 31 Jul 2017 10:20:03 +0200
+In-Reply-To: <fed09f84-2112-73e2-5541-603a77fe746d@redhat.com> (Eric Blake's
+	message of "Fri, 28 Jul 2017 14:00:17 -0500")
+Message-ID: <87wp6p9fws.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 07/12] qtest: Add a new helper qmp_cmd()
- and friends
+Subject: Re: [Qemu-devel] [PATCH v3 03/12] qtest: Document calling
+ conventions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +37,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
 Eric Blake <eblake@redhat.com> writes:
 
-> On 07/28/2017 08:06 AM, Eric Blake wrote:
->> On 07/28/2017 07:57 AM, Stefan Hajnoczi wrote:
->>> On Tue, Jul 25, 2017 at 04:15:18PM -0500, Eric Blake wrote:
->>>> +QDict *qtest_qmp_cmd(QTestState *s, const char *cmd, QObject *args)
->>>> +{
->>>> +    QDict *dict = qdict_new();
->>>> +
->>>> +    qdict_put_str(dict, "execute", cmd);
->>>> +    if (args) {
->>>> +        qdict_put_obj(dict, "arguments", args);
->>>> +    }
->>>> +    return qtest_qmp(s, "%p", QOBJECT(dict));
->>>> +}
->>>
->>> qtest_qmp(s, "%p", QOBJECT(dict)) takes ownership of dict?
+> On 07/28/2017 01:32 PM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
 >> 
->> Hmm, I documented that for qtest_qmp_cmd(), but you have a good
->> question.  I need to double-check that it is true for
->> qobject_from_jsonf("%p", obj), but my recollection is that yes, wrapping
->> one object inside the other means freeing the outer object also reclaims
->> the inner (that is, qobject_from_jsonf wasn't increasing refcount).  At
->> any rate, I'll probably have to submit a followup patch (either to fix
->> the leak if I'm wrong, or to improve the documentation about %p
->> reference management if I'm right).
+>>> We have two flavors of vararg usage in qtest; make it clear that
+>>> qmp() has different semantics than hmp(), and let the compiler
+>>> enforce that hmp() is used correctly. However, qmp() (and friends)
+>>> only accept a subset of printf flags look-alikes (namely, those
+>>> that our JSON parser understands), and what is worse, qmp("true")
+>>> (the JSON keyword 'true') is different from qmp("%s", "true")
+>>> (the JSON string '"true"'), and we have some intermediate cleanup
+>>> patches to do before we can mark those as printf-like.
+>> 
+>> It's not "worse", it's just different :)
+>> 
+>> Suggest:
+>> 
+>>   We have two flavors of vararg usage in qtest: qtest_hmp() etc. work
+>>   like sprintf(), and qtest_qmp() etc. work like qobject_from_jsonf().
+>>   Spell that out in the comments.
+>> 
+>>   Also add GCC_FMT_ATTR() to qtest_hmp() etc. so that the compiler can
+>>   flag incorrect use.
+>> 
+>>   We have some cleanup work to do before we can do the same for
+>>   qtest_qmp() etc.  This will get us the same better-than-nothing
+>>   checking we already have for qobject_from_jsonf(): common incorrect
+>>   uses of supported conversion specifications will be flagged
+>>   (e.g. passing a double for %d), but use of unsupported ones won't.
 >
-> $ valgrind --leak-check=full ./tests/check-qjson
-> ...
-> ==10596== LEAK SUMMARY:
-> ==10596==    definitely lost: 0 bytes in 0 blocks
-> ...
-> $ grep -C5 %p tests/check-qjson.c
->             {}}));
->
->     embedded_obj = qobject_from_json("[32, 42]", &error_abort);
->     g_assert(embedded_obj != NULL);
->
->     obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
->     g_assert(compare_litqobj_to_qobj(&decoded, obj) == 1);
->
->     qobject_decref(obj);
-> }
->
-> So given the clean bill of health from valgrind, we definitely DO turn
-> over responsibility for freeing on object to its new wrapper, once it is
-> passed through %p.  Documentation could be improved to make that clear.
->
-> Eww, what happens if qobject_from_jsonf() can fail halfway through? If
-> you mix %p with other stuff, how do you know on failure whether the
-> reference was taken or not yet reached?  Maybe the testsuite needs an
-> enhancement.
+> "Mikey likes it" (no idea if that pop culture reference from my
+> childhood has broader range than the US)
 
-What we actually need is qobject_from_jsonf() behaving sanely failure!
-Either it takes over all references (just like on success) or none.
+'fraid I'm out of range :)
 
-It delegates the part of its job that's relevant here to json-parser.c.
-Looks like parse_escape() takes over the reference greedily.  If parsing
-fails, it's released along with all the refernces to objects the parser
-built.
+>>> @@ -134,19 +140,19 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+>>>  /**
+>>>   * qtest_hmp:
+>>>   * @s: #QTestState instance to operate on.
+>>> - * @fmt...: HMP command to send to QEMU
+>>> + * @fmt...: HMP command to send to QEMU, formats arguments like vsprintf().
+>> 
+>> Like sprintf().
+>
+> Hmm, you asked me to use vsprintf on the last one.  Oh, I finally see -
+> you're trying to get me to match: vsprintf if it is 'va_list', sprintf
+> if it is '...'.  Yeah, that makes sense.
 
-One way to do "none": delay taking over the reference until parsing
-succeeded.  Increment it in parse_escape(), decrement it in
-json_parser_parse_err().  Either hold %p arguments in JSONParserContext,
-so json_parser_parse_err() can find them easily, or iterate over @tokens
-and @ap again.
+Correct.  I should've explained that from the start.
 
-One way to do "all": on error, have json_parser_parse_err() iterate over
-remaining @tokens and @ap to consume references.
+>> With the comment fixed, and preferably with an improved commit message:
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>
+> Thanks for the reviews and suggestions.
+
+You're welcome!
