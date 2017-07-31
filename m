@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dcFoq-0006FP-KF
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:53:33 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dcFqE-0006wp-RM
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dcFol-00020J-Pl
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:53:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dcFol-0001zy-GG
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:53:27 -0400
-References: <374E3394-46D9-4459-AE2E-059F8EEC7406@gmail.com>
-	<c76ef5de-81a5-a98e-d598-161694248788@redhat.com>
-	<776EE91A-4857-4484-AAC1-3C5D67BA77F7@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <61a8c718-d211-cc92-f1ef-fc3cfe6d2c70@redhat.com>
-Date: Mon, 31 Jul 2017 14:53:25 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dcFqD-0002m4-OS
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:54:58 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33765)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dcFqD-0002lf-F9
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:54:57 -0400
+Received: by mail-pf0-x241.google.com with SMTP id k72so23829947pfj.0
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 11:54:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <776EE91A-4857-4484-AAC1-3C5D67BA77F7@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Call for testers for various versions of Windows
+In-Reply-To: <362df6d1-b5f8-fd37-13f4-836eb5e86da7@redhat.com>
+References: <1501284872-2078-1-git-send-email-zuban32s@gmail.com>
+	<1501284872-2078-3-git-send-email-zuban32s@gmail.com>
+	<20170731165717-mutt-send-email-mst@kernel.org>
+	<362df6d1-b5f8-fd37-13f4-836eb5e86da7@redhat.com>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Mon, 31 Jul 2017 21:54:55 +0300
+Message-ID: <CAKSfGUBdyy9p0S=TEEbOVcBaKXTyG9VNhWSfNUvirAus=Yi+Cg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] pci: add QEMU-specific PCI
+ capability structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +31,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-
-
-On 07/31/2017 02:05 PM, Programmingkid wrote:
-> 
->> On Jul 31, 2017, at 2:03 PM, John Snow <jsnow@redhat.com> wrote:
+2017-07-31 17:09 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+> On 31/07/2017 17:00, Michael S. Tsirkin wrote:
 >>
->>
->>
->> On 07/28/2017 03:45 PM, Programmingkid wrote:
->>> I have made a page that keeps track of anyone who wishes to be a tester for a particular version of Windows. Here is the page: http://wiki.qemu.org/Testing/Windows
+>> On Sat, Jul 29, 2017 at 02:34:31AM +0300, Aleksandr Bezzubikov wrote:
 >>>
->>
->> I think for this to be successful, you'd have to define exactly what the
->> required testing *is*.
->>
->> Are these simple installation smoketests? Installation and boot? How big
->> is the test matrix? What is considered a pass and what is not? Across
->> which machine types and which architectures?
->>
->> etc.
->>
->>> If there is a version of Window you would like to help test in QEMU, please contact me with the email address you wish to use and the version of Windows you wish to support. Your information will be added to this list. With this list someone who makes a patch may need your help ensuring the patch is compatible with your supported version of Windows. 
+>>> On PCI init PCI bridge devices may need some
+>>> extra info about bus number to reserve, IO, memory and
+>>> prefetchable memory limits. QEMU can provide this
+>>> with special vendor-specific PCI capability.
 >>>
->>> Here are all the versions of Windows I have up so far:
+>>> This capability is intended to be used only
+>>> for Red Hat PCI bridges, i.e. QEMU cooperation.
 >>>
->>> Windows 3.1
->>> Windows NT 3.1
->>> Windows NT 3.5
->>> Windows 95
->>> Windows NT 4.0
->>> Windows 98
->>> Windows ME
->>> Windows 2000
->>> Windows XP
->>> Windows Vista
->>> Windows 7
->>> Windows 8
->>> Windows 10
->>> ReactOS
+>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>>> ---
+>>>   src/fw/dev-pci.h | 62
+>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 62 insertions(+)
+>>>   create mode 100644 src/fw/dev-pci.h
 >>>
+>>> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
+>>> new file mode 100644
+>>> index 0000000..fbd49ed
+>>> --- /dev/null
+>>> +++ b/src/fw/dev-pci.h
+>>> @@ -0,0 +1,62 @@
+>>> +#ifndef _PCI_CAP_H
+>>> +#define _PCI_CAP_H
+>>> +
+>>> +#include "types.h"
+>>> +
+>>> +/*
+>>> +
+>>> +QEMU-specific vendor(Red Hat)-specific capability.
+>>> +It's intended to provide some hints for firmware to init PCI devices.
+>>> +
+>>> +Its is shown below:
+>>> +
+>>> +Header:
+>>> +
+>>> +u8 id;       Standard PCI Capability Header field
+>>> +u8 next;     Standard PCI Capability Header field
+>>> +u8 len;      Standard PCI Capability Header field
+>>> +u8 type;     Red Hat vendor-specific capability type:
+>>> +               now only REDHAT_QEMU_CAP 1 exists
+>>> +Data:
+>>> +
+>>> +u16 non_prefetchable_16;     non-prefetchable memory limit
+>>> +
+>>> +u8 bus_res;  minimum bus number to reserve;
+>>> +             this is necessary for PCI Express Root Ports
+>>> +             to support PCIE-to-PCI bridge hotplug
+>>> +
+>>> +u8 io_8;     IO limit in case of 8-bit limit value
+>>> +u32 io_32;   IO limit in case of 16-bit limit value
+>>> +             io_8 and io_16 are mutually exclusive, in other words,
+>>> +             they can't be non-zero simultaneously
+>>> +
+>>> +u32 prefetchable_32;         non-prefetchable memory limit
+>>> +                             in case of 32-bit limit value
+>>> +u64 prefetchable_64;         non-prefetchable memory limit
+>>> +                             in case of 64-bit limit value
+>>> +                             prefetachable_32 and prefetchable_64 are
+>>> +                             mutually exclusive, in other words,
+>>> +                             they can't be non-zero simultaneously
+>>> +If any field in Data section is 0,
+>>> +it means that such kind of reservation
+>>> +is not needed.
+
+I really don't like this 'mutually exclusive' fields approach because
+IMHO it increases confusion level when undertanding this capability structure.
+But - if we came to consensus on that, then IO fields should be used
+in the same way,
+because as I understand, this 'mutual exclusivity' serves to distinguish cases
+when we employ only *_LIMIT register and both *_LIMIT an UPPER_*_LIMIT
+registers.
+And this is how both IO and PREFETCHABLE works, isn't it?
+
 >>
->> There's probably people willing to at least do boot tests for some of
->> these, but I doubt there's much interest in doing anything more rigorous
->> than that.
-> 
-> Ok. I could add something like this:
-> 
-> Testing could include these categories:
-> - Booting
-> - Networking
-> - USB
-> - IDE/ATA
-> - Video
-> - Sound
-> - Input Devices
-> 
+>>
+>
+> Hi Michael,
+>
+>> We also want a way to say "no hint for this type".
+>>
+>> One way to achive this would be to have instead multiple
+>> vendor specific capabilities, one for each of
+>> bus#/io/mem/prefetch. 0 would mean do not reserve anything,
+>> absence of capability would mean "no info, up to firmware".
+>>
+>
+> First version of the series was implemented exactly like you propose,
+> however Gerd preferred only one capability with multiple fields.
+>
+> I personally like the simplicity of vendor cap per io/mem/bus,
+> even if it is on the expense of the limited PCI Config space.
+>
 
-These are areas of testing, but they are not themselves tests. You ought
-to define fairly rigidly what counts as a test, and what is required to
-pass. This way, when someone volunteers to "Test Windows 3.1," we'll
-know exactly what it means if it is "passing".
+Personally I agree with Marcel since all this fields express
+reservations of some objects.
 
-"Installation Test" should be fairly obvious, but should probably
-include a reference configuration that we expect the given OS to boot on
-(e.g., Q35 not working for Windows 3.11 is not a problem.) Expecting
-people to test a large number of configurations is likely a non-starter.
+> We need a consensus here :)
+>
 
-For simple installation/smoke tests, the architectures involved probably
-do not matter terribly much; but we should probably say that the target
-binary to test here is either i386 or x86_64 or both, and the host
-machine should be any x86 machine.
+Absolutely :)
 
-"Boot Test" should also be fairly simple; boot an existing image and
-confirm that process works, but we should take care to define the same
-criteria as above (which binaries? which boards? which devices? ETC)
+> Thanks,
+> Marcel
+>
+>
+>>
+>>> +
+>>> +*/
+>>> +
+>>> +/* Offset of vendor-specific capability type field */
+>>> +#define PCI_CAP_VNDR_SPEC_TYPE  3
+>>
+>>
+>> This is a QEMU specific thing. Please name it as such.
+>>
+>>> +
+>>> +/* List of valid Red Hat vendor-specific capability types */
+>>> +#define REDHAT_CAP_TYPE_QEMU    1
+>>> +
+>>> +
+>>> +/* Offsets of QEMU capability fields */
+>>> +#define QEMU_PCI_CAP_NON_PREF   4
+>>> +#define QEMU_PCI_CAP_BUS_RES    6
+>>> +#define QEMU_PCI_CAP_IO_8       7
+>>> +#define QEMU_PCI_CAP_IO_32      8
+>>> +#define QEMU_PCI_CAP_PREF_32    12
+>>> +#define QEMU_PCI_CAP_PREF_64    16
+>>> +#define QEMU_PCI_CAP_SIZE       24
+>>> +
+>>> +#endif /* _PCI_CAP_H */
+>>> --
+>>> 2.7.4
+>
+>
 
-"Networking" starts to need to get into more specifics. Which network
-device will we test for each OS? We only expect certain ones to work, of
-course. Some OSes may not have networking applications readily
-available. (Windows 3.11?)
 
-"USB" should test what, exactly? And there may not be USB drivers
-readily available for many of the pre-XP OSes here.
 
-"Video" -- I assume this can be confirmed by the installation test.
-
-IDE/ATA: Probably covered by installation for at least the earlier
-Windows OSes, but that may not cover all of the interesting/unusual
-cases that can arise. If corner cases are known they should be specified.
-
-Etc etc etc...
-
-> 
-> Thank you for the input.
-> 
+-- 
+Alexander Bezzubikov
