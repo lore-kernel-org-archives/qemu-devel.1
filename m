@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dc4je-0007zJ-4O
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 03:03:27 -0400
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dc4lH-0000Ug-JP
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 03:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dc4ja-0003C3-V3
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 03:03:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50162)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dc4ja-0003Bf-Ov
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 03:03:22 -0400
-Date: Mon, 31 Jul 2017 15:02:46 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170731070246.GC29971@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-12-git-send-email-peterx@redhat.com>
-	<2e01324b-73e2-ddb9-7df3-6ae3ec2a7222@redhat.com>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dc4lE-0004Qh-Db
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 03:05:07 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:4408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dc4lD-0004NX-Q9
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 03:05:04 -0400
+References: <1500522569-10760-1-git-send-email-jianjay.zhou@huawei.com>
+	<20170721094943.GC2133@work-vm> <5971F246.5080000@huawei.com>
+	<20170724153521.GD2127@work-vm> <5976EE99.5050401@huawei.com>
+	<20170725103426.GC2099@work-vm>
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Message-ID: <597ED67B.4000904@huawei.com>
+Date: Mon, 31 Jul 2017 15:04:27 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2e01324b-73e2-ddb9-7df3-6ae3ec2a7222@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 11/29] migration: new postcopy-pause state
+In-Reply-To: <20170725103426.GC2099@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration: optimize the downtime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: pbonzini@redhat.com, rkrcmar@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, aarcange@redhat.com, jdenemar@redhat.com
 
-On Fri, Jul 28, 2017 at 10:53:00AM -0500, Eric Blake wrote:
-> On 07/28/2017 03:06 AM, Peter Xu wrote:
-> > Introducing a new state "postcopy-paused", which can be used to pause a
-> > postcopy migration. It is targeted to support network failures during
-> > postcopy migration. Now when network down for postcopy, the source side
-> > will not fail the migration. Instead we convert the status into this new
-> > paused state, and we will try to wait for a rescue in the future.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> 
-> You might want to use scripts/git.orderfile to put .json changes early
-> in your diffs (interface before implementation makes for easier reviews).
+Hi Dave,
 
-Will do.
+On 2017/7/25 18:34, Dr. David Alan Gilbert wrote:
+>> After checking the codes of the newest libvirt, I think it is the same
+>> in the qemuMigrationWaitForCompletion function, which is used to poll
+>> qemu every 50ms.
+>
+> Checking with Jiri Denemark (added to cc), newer libvirt should use
+> events when available - but that polling code is there to cope with
+> older qemu's.  So with a newer qemu, i think it should spot the
+> COMPLETED event.
+>
 
-> 
-> > +++ b/qapi-schema.json
-> > @@ -667,6 +667,8 @@
-> >  #
-> >  # @postcopy-active: like active, but now in postcopy mode. (since 2.5)
-> >  #
-> > +# @postcopy-paused: during postcopy but paused. (since 2.10)
-> > +#
-> 
-> You've missed 2.10; this should be 2.11.
+I do tests on the newest libvirt(v3.6.0) + newest qemu(v2.9.90,
+v2.10.0-rc0-29-ga588c49-dirty). The log added indicates that the source
+side libvirt spots the COMPLETE event after the cleanup of the source side
+qemu, i.e. 300ms still exists.
 
-Definitely. It should be for 2.11.
-
-> Can this state occur without
-> any explicit request (ie. old clients may be confused by it), or do you
-> have to opt-in to a specific migration parameter to inform qemu that you
-> are aware of how to handle this state?
-
-Yes, it can occur automatically, without any operation from user's
-side. And it does not have a tunable to switch it on/off - it'll
-always be on (that's my plan, though), since IMHO holding at a paused
-state is always better than crashing the source directly (that's what
-we do now - when postcopy encountered network failure, the VM will
-crash and data will be lost).
+BTW, I'm not very familiar with libvirt, if there is something special to
+configure or I'm missing something, please let me know.
 
 Thanks,
-
--- 
-Peter Xu
+Jay
