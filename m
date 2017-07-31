@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dcDkX-0002TI-EV
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:40:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcDx7-0006ht-Uz
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dcDkU-0002Ku-Q4
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:40:57 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:30478 helo=relay.sw.ru)
+	(envelope-from <dgilbert@redhat.com>) id 1dcDx4-0005QE-SB
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:53:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dcDkU-0002JZ-E4
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:40:54 -0400
-References: <20170731160135.12101-1-vsementsov@virtuozzo.com>
-	<20170731160135.12101-3-vsementsov@virtuozzo.com>
-	<2af88b8d-9d59-72bf-bd25-b83fbba726f4@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <31288dd3-99ed-ab32-0fbf-b790b4a2b31d@virtuozzo.com>
-Date: Mon, 31 Jul 2017 19:40:44 +0300
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcDx4-0005OY-MD
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:53:54 -0400
+Date: Mon, 31 Jul 2017 17:53:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170731165339.GD2122@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-4-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2af88b8d-9d59-72bf-bd25-b83fbba726f4@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] trace-events: fix code style: %# ->
- 0x%
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501229198-30588-4-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 03/29] io: fix qio_channel_socket_accept err
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@gmail.com, peter.maydell@linaro.org, berrange@redhat.com, cohuck@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, berrange@redhat.com, stefanha@redhat.com
 
-31.07.2017 19:15, Eric Blake wrote:
-> On 07/31/2017 11:01 AM, Vladimir Sementsov-Ogievskiy wrote:
->> In trace format '#' flag of printf is forbidden. Fix it to '0x%'.
->>
->> This patch is created by the following:
->>
->> check that we have a problem
->>> find . -name trace-events | xargs grep '%#' | wc -l
->> 56
->>
->> check that there are no cases with additional printf flags before '#'
->>> find . -name trace-events | xargs grep '%[-+ 0'I]+#' | wc -l
-> That's not the actual command you used; maintainer can fix the typo by
-> using "%[-+ 0'I]+#" instead.
+* Peter Xu (peterx@redhat.com) wrote:
+> When accept failed, we should setup errp with the reason. More
+> importantly, the caller may assume errp be non-NULL when error happens,
+> and not setting the errp may crash QEMU.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  io/channel-socket.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/io/channel-socket.c b/io/channel-socket.c
+> index 53386b7..7bc308e 100644
+> --- a/io/channel-socket.c
+> +++ b/io/channel-socket.c
+> @@ -344,6 +344,7 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
+>          if (errno == EINTR) {
+>              goto retry;
+>          }
+> +        error_setg_errno(errp, errno, "Unable to accept connection");
+>          goto error;
 
-Aha yes, you are right. I've checked out the previous commit, checked it 
-by a command with "%[-+ 0'I]+#"
-and then separately fixed the commit message, forgotten to s/'/"/.
+OK, but this code actually has a bigger problem as well:
 
-Yes, if a new version will not be required, fix this inflight please.
+the original is:
 
->
->> 0
->>
->> check that there are no wrong usage of '#' and '0x' together
->>> find . -name trace-events | xargs grep '0x%#' | wc -l
->> 0
->>
->> fix the problem
->>> find . -name trace-events | xargs sed -i 's/%#/0x%/g'
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
+    cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
+                           &cioc->remoteAddrLen);
+    if (cioc->fd < 0) {
+        trace_qio_channel_socket_accept_fail(ioc);
+        if (errno == EINTR) {
+            goto retry;
+        }
+        goto error;
+    }
 
+Stefan confirmed that trace_ doesn't preserve errno; so the if
+following it is wrong.  It needs to preserve errno.
 
--- 
-Best regards,
-Vladimir
+(Again this patch can go on it's own)
+
+Dave
+
+>      }
+>  
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
