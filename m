@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcFVX-0006gS-EI
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:33:36 -0400
+	(envelope-from <mst@redhat.com>) id 1dcFYv-0008Op-77
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcFVW-0003w1-C1
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:33:35 -0400
-References: <20170725211523.3998-1-eblake@redhat.com>
-	<20170725211523.3998-10-eblake@redhat.com>
-	<20170728130538.GQ12364@stefanha-x1.localdomain>
-	<3c27944c-bb18-a501-39b5-139059a4aa85@redhat.com>
-	<307cae51-da45-4968-f6c9-4fa1ad4b22f8@redhat.com>
-	<878tj5awtc.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e063a047-d587-9d05-842d-acea8cd8ecde@redhat.com>
-Date: Mon, 31 Jul 2017 13:33:24 -0500
+	(envelope-from <mst@redhat.com>) id 1dcFYr-0006KW-VV
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:37:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcFYr-0006K5-L2
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:37:01 -0400
+Date: Mon, 31 Jul 2017 21:36:54 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170731213109-mutt-send-email-mst@kernel.org>
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
+	<20170726215625-mutt-send-email-mst@kernel.org>
+	<CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
+	<20170727022103-mutt-send-email-mst@kernel.org>
+	<f210b52b-b7ea-b27e-cca8-9f11a4b4f353@redhat.com>
+	<20170729020945-mutt-send-email-mst@kernel.org>
+	<e182ae9b-f87c-c80b-e4b0-fa3ef4cab69d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <878tj5awtc.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="buww42L24t9nB2FBtH23SbG4GoH29FTpX"
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] tests/libqos/pci: Clean up string
- interpolation into QMP input
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e182ae9b-f87c-c80b-e4b0-fa3ef4cab69d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/6] hw/pci: introduce bridge-only
+ vendor-specific capability to provide some hints to firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +34,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, stefanha@redhat.com, qemu-devel@nongnu.org, "open list:virtio-blk" <qemu-block@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---buww42L24t9nB2FBtH23SbG4GoH29FTpX
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, stefanha@redhat.com,
- qemu-devel@nongnu.org, "open list:virtio-blk" <qemu-block@nongnu.org>
-Message-ID: <e063a047-d587-9d05-842d-acea8cd8ecde@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] tests/libqos/pci: Clean up string
- interpolation into QMP input
-References: <20170725211523.3998-1-eblake@redhat.com>
- <20170725211523.3998-10-eblake@redhat.com>
- <20170728130538.GQ12364@stefanha-x1.localdomain>
- <3c27944c-bb18-a501-39b5-139059a4aa85@redhat.com>
- <307cae51-da45-4968-f6c9-4fa1ad4b22f8@redhat.com>
- <878tj5awtc.fsf@dusky.pond.sub.org>
-In-Reply-To: <878tj5awtc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jul 31, 2017 at 01:06:23PM +0300, Marcel Apfelbaum wrote:
+> On 29/07/2017 2:12, Michael S. Tsirkin wrote:
+> > On Thu, Jul 27, 2017 at 12:39:54PM +0300, Marcel Apfelbaum wrote:
+> > > On 27/07/2017 2:28, Michael S. Tsirkin wrote:
+> > > > On Thu, Jul 27, 2017 at 12:54:07AM +0300, Alexander Bezzubikov wrote:
+> > > > > 2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+> > > > > > On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
+> > > > > > > On PCI init PCI bridges may need some
+> > > > > > > extra info about bus number to reserve, IO, memory and
+> > > > > > > prefetchable memory limits. QEMU can provide this
+> > > > > > > with special
+> > > > > > 
+> > > > > > with a special
+> > > > > > 
+> > > > > > > vendor-specific PCI capability.
+> > > > > > > 
+> > > > > > > Sizes of limits match ones from
+> > > > > > > PCI Type 1 Configuration Space Header,
+> > > > > > > number of buses to reserve occupies only 1 byte
+> > > > > > > since it is the size of Subordinate Bus Number register.
+> > > > > > > 
+> > > > > > > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > > > > > > ---
+> > > > > > >    hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
+> > > > > > >    include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
+> > > > > > >    2 files changed, 45 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> > > > > > > index 720119b..8ec6c2c 100644
+> > > > > > > --- a/hw/pci/pci_bridge.c
+> > > > > > > +++ b/hw/pci/pci_bridge.c
+> > > > > > > @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
+> > > > > > >        br->bus_name = bus_name;
+> > > > > > >    }
+> > > > > > > 
+> > > > > > > +
+> > > > > > > +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
+> > > > > > 
+> > > > > > help? should be qemu_cap_init?
+> > > > > > 
+> > > > > > > +                              uint8_t bus_reserve, uint32_t io_limit,
+> > > > > > > +                              uint16_t mem_limit, uint64_t pref_limit,
+> > > > > > > +                              Error **errp)
+> > > > > > > +{
+> > > > > > > +    size_t cap_len = sizeof(PCIBridgeQemuCap);
+> > > > > > > +    PCIBridgeQemuCap cap;
+> > > > > > 
+> > > > > > This leaks info to guest. You want to init all fields here:
+> > > > > > 
+> > > > > > cap = {
+> > > > > >    .len = ....
+> > > > > > };
+> > > > > 
+> > > > > I surely can do this for len field, but as Laszlo proposed
+> > > > > we can use mutually exclusive fields,
+> > > > > e.g. pref_32 and pref_64, the only way I have left
+> > > > > is to use ternary operator (if we surely need this
+> > > > > big initializer). Keeping some if's would look better,
+> > > > > I think.
+> > > > > 
+> > > > > > 
+> > > > > > > +
+> > > > > > > +    cap.len = cap_len;
+> > > > > > > +    cap.bus_res = bus_reserve;
+> > > > > > > +    cap.io_lim = io_limit & 0xFF;
+> > > > > > > +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
+> > > > > > > +    cap.mem_lim = mem_limit;
+> > > > > > > +    cap.pref_lim = pref_limit & 0xFFFF;
+> > > > > > > +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
+> > > > > > 
+> > > > > > Please use pci_set_word etc or cpu_to_leXX.
+> > > > > > 
+> > > > > 
+> > > > > Since now we've decided to avoid fields separation into <field> + <field_upper>,
+> > > > > this bitmask along with pci_set_word are no longer needed.
+> > > > > 
+> > > > > > I think it's easiest to replace struct with a set of macros then
+> > > > > > pci_set_word does the work for you.
+> > > > > > 
+> > > > > 
+> > > > > I don't really want to use macros here because structure
+> > > > > show us the whole capability layout and this can
+> > > > > decrease documenting efforts. More than that,
+> > > > > memcpy usage is very convenient here, and I wouldn't like
+> > > > > to lose it.
+> > > > > 
+> > > > > > 
+> > > > > > > +
+> > > > > > > +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
+> > > > > > > +                                    cap_offset, cap_len, errp);
+> > > > > > > +    if (offset < 0) {
+> > > > > > > +        return offset;
+> > > > > > > +    }
+> > > > > > > +
+> > > > > > > +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
+> > > > > > 
+> > > > > > +2 is yacky. See how virtio does it:
+> > > > > > 
+> > > > > >       memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
+> > > > > >              cap->cap_len - PCI_CAP_FLAGS);
+> > > > > > 
+> > > > > > 
+> > > > > 
+> > > > > OK.
+> > > > > 
+> > > > > > > +    return 0;
+> > > > > > > +}
+> > > > > > > +
+> > > > > > >    static const TypeInfo pci_bridge_type_info = {
+> > > > > > >        .name = TYPE_PCI_BRIDGE,
+> > > > > > >        .parent = TYPE_PCI_DEVICE,
+> > > > > > > diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> > > > > > > index ff7cbaa..c9f642c 100644
+> > > > > > > --- a/include/hw/pci/pci_bridge.h
+> > > > > > > +++ b/include/hw/pci/pci_bridge.h
+> > > > > > > @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
+> > > > > > >    #define  PCI_BRIDGE_CTL_DISCARD_STATUS       0x400   /* Discard timer status */
+> > > > > > >    #define  PCI_BRIDGE_CTL_DISCARD_SERR 0x800   /* Discard timer SERR# enable */
+> > > > > > > 
+> > > > > > > +typedef struct PCIBridgeQemuCap {
+> > > > > > > +    uint8_t id;     /* Standard PCI capability header field */
+> > > > > > > +    uint8_t next;   /* Standard PCI capability header field */
+> > > > > > > +    uint8_t len;    /* Standard PCI vendor-specific capability header field */
+> > > > > > > +    uint8_t bus_res;
+> > > > > > > +    uint32_t pref_lim_upper;
+> > > > > > 
+> > > > > > Big endian? Ugh.
+> > > > > > 
+> > > > > 
+> > > > > Agreed, and this's gonna to disappear with
+> > > > > the new layout.
+> > > > > 
+> > > > > > > +    uint16_t pref_lim;
+> > > > > > > +    uint16_t mem_lim;
+> > > > > > 
+> > > > > > I'd say we need 64 bit for memory.
+> > > > > > 
+> > > > > 
+> > > > > Why? Non-prefetchable MEMORY_LIMIT register is 16 bits long.
+> > > > 
+> > > > Hmm ok, but e.g. for io there are bridges that have extra registers
+> > > > to specify non-standard non-aligned registers.
+> > > > 
+> > > > > > > +    uint16_t io_lim_upper;
+> > > > > > > +    uint8_t io_lim;
+> > > > > > > +    uint8_t padding;
+> > > > > > 
+> > > > > > IMHO each type should have a special "don't care" flag
+> > > > > > that would mean "I don't know".
+> > > > > > 
+> > > > > > 
+> > > > > 
+> > > > > Don't know what? Now 0 is an indicator to do nothing with this field.
+> > > > 
+> > > > In that case how do you say "don't allocate any memory"?
+> > > > 
+> > > 
+> > > We can keep the MEM/Limit registers read-only for such cases,
+> > > as they are optional registers.
+> > > 
+> > > Thanks,
+> > > Marcel
+> > 
+> 
+> Hi Michael,
+> 
+> 
+> > I don't believe they are - from the spec (1.2):
+> > 	The Memory Base and Memory Limit registers are both required registers
+> > 
+> > Rest of ranges are indeed optional.
+> > 
+> 
+> 
+> Oops, my mistake, I looked at prefetchable memory, sorry for the mix-up.
+> I wonder what would be the use case to disable IOMEM.
+> 
+> Anyway, we can have a "-1" default value giving the hint: do not reserve
+> anything, but in this case we should use it also for IO/prefetch mem.
+> The problem is, the guest OS can try to allocate IO space even if
+> the firmware didn't; Linux does it today.
+> Having IO-base/IO-limit registers read-only will solve the problem.
 
-On 07/31/2017 02:29 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> On 07/28/2017 11:35 AM, Eric Blake wrote:
->>>>> +    QObject *extra_args =3D qobject_from_jsonf("{ 'shm': '%s', 'si=
-ze': '1M' }",
->>>>> +                                             tmpshm);
->>>>
->>
->>> Passing '%s' through qobject_from_jsonf() is generally wrong (it woul=
-d
->>> produce ''...'' instead of the intended '...').
->>>
->>> Looks like something to fix on the next round.
->>>
->>
->> What's scary is that the testsuite didn't start failing.  That's not
->> good; we'll want to figure out why the bug didn't impact the test.
->=20
-> Good idea.
+Makes sense.
 
-The intended result: the created QDict would include
-"shm":"/qtest-11387-3641365368" (or comparable string).  The actual
-result: the created QDict includes "shm":"%s" - a literal 2-character
-string, because the lexer does not do interpolation inside strings.  And
-apparently, naming your ivshmem shared memory a literal "%s" (rather
-than a name beginning with "/") is not a semantic error, so the test pass=
-es.
+> What am I getting at is we would have now 2 ways to solve the same
+> problem and the hint would be inferior.
+> 
+> I would use the hint to reserve a specific range and read only registers
+> to disable the range. IOMEM cannot be disabled in this way, but
+> should not bother us.
+> 
+> Thanks,
+> Marcel
 
-In other words, qobject_from_jsonf() does NOT do % interpolation of
-anything embedded inside '', and basically blindly ignores the tmpshm
-vararg.  It would be neat if we could make qobject_from_jsonf() detect a
-mismatch in varargs, even though we don't (can't) require a NULL
-sentinel (we're limited to fitting in with -Wformat paradigms already).
-So while we can't flag it at compile time, I do think we can flag it at
-runtime: if, in qobject_from_jsonf() (but NOT in qobject_from_json()),
-we reject any JSON string from the lexer that contains "%" but not "%%",
-we will have caught all the places where gcc paired a % sequence with a
-vararg parameter even though our lexer did not make the same pairing.
-If we WANT a literal % in a string (rare, probably only in the
-testsuite), we write it as %% and then qobject_from_jsonf() interpolates
-it.  Then, since bare % is NOT valid JSON, we don't have to enhance the
-lexer to recognize anything new; our changes are limited to
-documentation and the vararg parser.  It still means we only get a
-runtime, rather than a compile-time, detection of misuse of % passed to
-the format argument, but it should be an easy enough proof of concept
-that such a runtime failure would have been enough to make ivshmem-test
-fail and flag the error during 'make check' rather than escaping review.
+I think Laszlo said that RO as an interface to indicate optional
+range is tricky to use.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---buww42L24t9nB2FBtH23SbG4GoH29FTpX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/d/QACgkQp6FrSiUn
-Q2rcQgf+OJbWrT8Sl7piUzGWdrM3hPyA7FPWEhEeIdnOngizeoR37yAJzxHUq/Tf
-fp5QMlHrUAc2lxOX7Yw6deU2zbmY9wqc6eDbdVJJZfK8ch9nvvpF6I6l1xdH/MDp
-j0jdmotR+p7WjH63JHlTtH7tg2zpV5mJin90uMw9tek57HVeiDyXfdVZj2f4u0PZ
-Y0KIwinpvaYJLjsAZs7+2WE43TzKsMBU24BA4en64sNsiJIDOvQhgBQtRb46UpUR
-eX2H4ztf20zEf4cXsb99eWMQTPg6SV0TJ3BT3cwYIwlv/s8mdoof5FTyATAMETrf
-jYMetSFCwP7+w8GELNyo9pzOq4DtxQ==
-=dHLv
------END PGP SIGNATURE-----
-
---buww42L24t9nB2FBtH23SbG4GoH29FTpX--
+> > 
+> > > > 
+> > > > > > > +} PCIBridgeQemuCap;
+> > > > > > 
+> > > > > > You don't really need this struct in the header. And pls document all fields.
+> > > > > > 
+> > > > > > > +
+> > > > > > > +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
+> > > > > > > +                              uint8_t bus_reserve, uint32_t io_limit,
+> > > > > > > +                              uint16_t mem_limit, uint64_t pref_limit,
+> > > > > > > +                              Error **errp);
+> > > > > > > +
+> > > > > > >    #endif /* QEMU_PCI_BRIDGE_H */
+> > > > > > > --
+> > > > > > > 2.7.4
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > --
+> > > > > Alexander Bezzubikov
