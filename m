@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSj-0004np-BB
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:34 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSl-0004oC-Bf
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSh-0005OA-2o
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:33 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcDSk-0005Qo-Cy
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:22:35 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 31 Jul 2017 19:21:54 +0300
-Message-Id: <1501518125-29851-3-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Mon, 31 Jul 2017 19:21:59 +0300
+Message-Id: <1501518125-29851-8-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1501518125-29851-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1501518125-29851-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 02/13] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Subject: [Qemu-devel] [PATCH v3 07/13] qcow2: truncate preallocated space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +22,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-The idea is that ALLOCATE requests may overlap with other requests.
-Reuse the existing block layer infrastructure for serialising requests.
-Use the following approach:
-  - mark ALLOCATE serialising, so subsequent requests to the area wait
-  - ALLOCATE request itself must never wait if another request is in flight
-    already. Return EAGAIN, let the caller reconsider.
+From: "Denis V. Lunev" <den@openvz.org>
 
+This could be done after calculation of the end of data and metadata in
+the qcow2 image.
+
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- block/io.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ block/qcow2.h          | 3 +++
+ block/qcow2-cluster.c  | 9 +++++++++
+ block/qcow2-refcount.c | 7 +++++++
+ block/qcow2.c          | 7 +++++++
+ 4 files changed, 26 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index b3f9d61..1b935d8 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -512,7 +512,8 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index ebbb9cf..595ed9c 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -330,6 +330,7 @@ typedef struct BDRVQcow2State {
+     char *image_backing_format;
  
--static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self,
-+                                                   bool nowait)
- {
-     BlockDriverState *bs = self->bs;
-     BdrvTrackedRequest *req;
-@@ -543,11 +544,14 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-                  * will wait for us as soon as it wakes up, then just go on
-                  * (instead of producing a deadlock in the former case). */
-                 if (!req->waiting_for) {
-+                    waited = true;
-+                    if (nowait) {
-+                        break;
-+                    }
-                     self->waiting_for = req;
-                     qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
-                     self->waiting_for = NULL;
-                     retry = true;
--                    waited = true;
-                     break;
-                 }
-             }
-@@ -1053,7 +1057,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-     }
+     uint64_t prealloc_size;
++    uint64_t data_end;
+ } BDRVQcow2State;
  
-     if (!(flags & BDRV_REQ_NO_SERIALISING)) {
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-     }
+ typedef struct Qcow2COWRegion {
+@@ -669,4 +670,6 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+                                           const char *name,
+                                           Error **errp);
  
-     if (flags & BDRV_REQ_COPY_ON_READ) {
-@@ -1352,7 +1356,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
-                                    align);
- 
--    waited = wait_serialising_requests(req);
-+    waited = wait_serialising_requests(req, flags & BDRV_REQ_ALLOCATE);
-+    if (waited && flags & BDRV_REQ_ALLOCATE) {
-+        return -EAGAIN;
-+    }
-     assert(!waited || !req->serialising);
-     assert(req->overlap_offset <= offset);
-     assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
-@@ -1456,7 +1463,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
- 
-         /* RMW the unaligned part before head. */
-         mark_request_serialising(req, align);
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
-         ret = bdrv_aligned_preadv(child, req, offset & ~(align - 1), align,
-                                   align, &local_qiov, 0);
-@@ -1476,6 +1483,10 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-         bytes -= zero_bytes;
-     }
- 
-+    if (flags & BDRV_REQ_ALLOCATE) {
-+        mark_request_serialising(req, align);
-+    }
++void qcow2_update_data_end(BlockDriverState *bs, uint64_t off);
 +
-     assert(!bytes || (offset & (align - 1)) == 0);
-     if (bytes >= align) {
-         /* Write the aligned part in the middle. */
-@@ -1494,7 +1505,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-         assert(align == tail_padding_bytes + bytes);
-         /* RMW the unaligned part after tail. */
-         mark_request_serialising(req, align);
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
-         ret = bdrv_aligned_preadv(child, req, offset, align,
-                                   align, &local_qiov, 0);
-@@ -1563,7 +1574,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         struct iovec head_iov;
+ #endif
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index f06c08f..f274daa 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -2014,3 +2014,12 @@ fail:
+     g_free(l1_table);
+     return ret;
+ }
++
++void qcow2_update_data_end(BlockDriverState *bs, uint64_t off)
++{
++    BDRVQcow2State *s = bs->opaque;
++
++    if (s->data_end < off) {
++        s->data_end = off;
++    }
++}
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 168fc32..69d2893 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -833,6 +833,9 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+             ret = alloc_refcount_block(bs, cluster_index, &refcount_block);
+             if (ret < 0) {
+                 goto fail;
++            } else {
++                qcow2_update_data_end(bs, s->refcount_table_offset +
++                        s->refcount_table_size * sizeof(uint64_t));
+             }
+         }
+         old_table_index = table_index;
+@@ -954,6 +957,8 @@ retry:
+         s->free_cluster_index - 1 > (INT64_MAX >> s->cluster_bits))
+     {
+         return -EFBIG;
++    } else {
++        qcow2_update_data_end(bs, s->free_cluster_index << s->cluster_bits);
+     }
  
-         mark_request_serialising(&req, align);
--        wait_serialising_requests(&req);
-+        wait_serialising_requests(&req, false);
+ #ifdef DEBUG_ALLOC2
+@@ -1018,6 +1023,8 @@ int64_t qcow2_alloc_clusters_at(BlockDriverState *bs, uint64_t offset,
  
-         head_buf = qemu_blockalign(bs, align);
-         head_iov = (struct iovec) {
-@@ -1604,7 +1615,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         bool waited;
+     if (ret < 0) {
+         return ret;
++    } else {
++        qcow2_update_data_end(bs, offset + (nb_clusters << s->cluster_bits));
+     }
  
-         mark_request_serialising(&req, align);
--        waited = wait_serialising_requests(&req);
-+        waited = wait_serialising_requests(&req, false);
-         assert(!waited || !use_local_qiov);
+     return i;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b11dc48..4eb17d3 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1498,6 +1498,8 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+         }
+     }
  
-         tail_buf = qemu_blockalign(bs, align);
++    s->data_end = bdrv_getlength(bs->file->bs);
++
+ #ifdef DEBUG_ALLOC
+     {
+         BdrvCheckResult result = {0};
+@@ -2135,6 +2137,11 @@ static int qcow2_inactivate(BlockDriverState *bs)
+ 
+     if (result == 0) {
+         qcow2_mark_clean(bs);
++
++        /* truncate preallocated space */
++        if (!bs->read_only && s->data_end < bdrv_getlength(bs->file->bs)) {
++            bdrv_truncate(bs->file, s->data_end, PREALLOC_MODE_OFF, NULL);
++        }
+         s->flags |= BDRV_O_INACTIVE;
+     }
+ 
 -- 
 2.7.4
