@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dcDWz-0008Ui-1V
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:26:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcDXE-0000GH-JR
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dcDWx-0000r0-IV
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:26:57 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcDXD-0001CE-RE
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:27:12 -0400
+Date: Mon, 31 Jul 2017 17:27:01 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 31 Jul 2017 17:26:41 +0100
-Message-Id: <20170731162641.24160-1-stefanha@redhat.com>
+Message-ID: <20170731162701.GK11830@stefanha-x1.localdomain>
+References: <20170725153645.26412-1-stefanha@redhat.com>
+	<20170727122802.GD4767@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] qemu-iotests: add a "how to" to ./README
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sdEQJo40s7ofW8iR"
+Content-Disposition: inline
+In-Reply-To: <20170727122802.GD4767@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,184 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, eblake@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, eblake@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-There is not much getting started documentation for qemu-iotests.  This
-patch explains how to create a new test and covers the overall testing
-approach.
 
-Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v3:
- * Explicitly mention source and build trees so that out-of-tree builds
-   work [Peter]
- * Mention common.qemu library for bash tests [Jeff]
-v2:
- * Added missing "touch <test-number>.out" step [Kevin]
- * Added reference to SubmitAPatch wiki page [Eric & Philippe]
----
- tests/qemu-iotests/README | 109 ++++++++++++++++++++++++++++++++++++++++=
-++++--
- 1 file changed, 106 insertions(+), 3 deletions(-)
+--sdEQJo40s7ofW8iR
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
-index 6079b401ae..6c71f9005c 100644
---- a/tests/qemu-iotests/README
-+++ b/tests/qemu-iotests/README
-@@ -10,12 +10,115 @@ but no actual block drivers like ide, scsi or virtio=
-.
-=20
- * Usage
-=20
--Just run ./check to run all tests for the raw image format, or ./check
---qcow2 to test the qcow2 image format.  The output of ./check -h explain=
-s
--additional options to test further image formats or I/O methods.
-+Just run ./check from the build tree to run all tests for the raw image =
-format,
-+or ./check -qcow2 to test the qcow2 image format.  The output of ./check=
- -h
-+explains additional options to test further image formats or I/O methods=
-.
-+
-+* Testing approach
-+
-+Each test is an executable file (usually a bash script) that is run by t=
-he
-+./check test harness.  Standard out and standard error are captured to a=
-n
-+output file.  If the output file differs from the "golden master" output=
- file
-+for the test then it fails.
-+
-+Tests are simply a sequence of commands that produce output and the test=
- itself
-+does not judge whether it passed or failed.  If you find yourself writin=
-g
-+checks to determine success or failure then you should rethink the test =
-and
-+rely on output diffing instead.
-+
-+** Filtering volatile output
-+
-+When output contains absolute file paths, timestamps, process IDs, hostn=
-ames,
-+or other volatile strings, the diff against golden master output will fa=
-il.
-+Such output must be filtered to replace volatile strings with fixed
-+placeholders.
-+
-+For example, the path to the temporary working directory changes between=
- test
-+runs so it must be filtered:
-+
-+  sed -e "s#$TEST_DIR/#TEST_DIR/#g"
-+
-+Commonly needed filters are available in ./common.filter.
-+
-+** Bash tests
-+
-+Tests are usually bash scripts that perform a sequence of qemu-img and q=
-emu-io
-+commands.
-+
-+If you wish to create a test in Bash that interacts with the QMP monitor=
-,
-+'common.qemu' provides functions for interacting with multiple QEMU
-+processes.
-+
-+** Python tests
-+
-+Most tests are implemented in bash but it is difficult to interact with =
-the QMP
-+monitor.  A Python module called 'iotests' is available for tests that r=
-equire
-+JSON and interacting with QEMU.
-+
-+* How to create a test
-+
-+1. Choose an unused test number
-+
-+Tests are identified by a unique number.  Look for the highest test case=
- number
-+by looking at the test files.  Then search the qemu-devel@nongnu.org mai=
-ling
-+list to check if anyone has already sent patches using the next availabl=
-e
-+number.  You may need to increment the number a few times to reach an un=
-used
-+number.
-+
-+2. Create the test file
-+
-+Copy an existing test (one that most closely resembles what you wish to =
-test)
-+to the new test number in the source tree:
-+
-+  cp 001 <test-number>
-+
-+3. Assign groups to the test
-+
-+Add your test to the ./group file.  This file is the index of tests and =
-assigns
-+them to functional groups like "rw" for read-write tests.  Most tests be=
-long to
-+the "rw" and "auto" groups.  "auto" means the test runs when ./check is =
-invoked
-+without a -g argument.
-+
-+Consider adding your test to the "quick" group if it executes quickly (<=
-1s).
-+This group is run by "make check-block" and is often included as part of=
- build
-+tests in continuous integration systems.
-+
-+4. Write the test
-+
-+Edit the test script.  Look at existing tests for examples.
-+
-+5. Generate the golden master file
-+
-+Create an empty golden master file in the source tree:
-+
-+  touch <test-number>.out
-+
-+Then run your test from the build tree:
-+
-+  ./check <test-number>
-+
-+You may need additional command-line options to use an image format or
-+protocol like -qcow2.
-+
-+The test will fail because there is no golden master yet.  Inspect the o=
-utput
-+that your test generated with "cat <test-number>.out.bad".
-+
-+Verify that the output is as expected and contains no volatile strings l=
-ike
-+timestamps.  You may need to add filters to your test to remove volatile
-+strings.
-+
-+Once you are happy with the test output it can be used as the golden mas=
-ter
-+with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to ve=
-rify
-+that it passes.
-+
-+Congratulations, you've created a new test!
-+
-+To contribute your test to qemu.git please follow the guidelines here:
-+http://wiki.qemu.org/Contribute/SubmitAPatch
-=20
- * Feedback and patches
-=20
- Please send improvements to the test suite, general feedback or just
- reports of failing tests cases to qemu-devel@nongnu.org with a CC:
- to qemu-block@nongnu.org.
-+
---=20
-2.13.3
+On Thu, Jul 27, 2017 at 02:28:02PM +0200, Kevin Wolf wrote:
+> Am 25.07.2017 um 17:36 hat Stefan Hajnoczi geschrieben:
+> > There is not much getting started documentation for qemu-iotests.  This
+> > patch explains how to create a new test and covers the overall testing
+> > approach.
+> >=20
+> > Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Do you want to address the late v1 comments from Peter (needs to be run
+> from build tree) and Jeff (mention common.qemu next to Python tests)?
+
+Done, I've sent v3!
+
+Stefan
+
+--sdEQJo40s7ofW8iR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZf1pVAAoJEJykq7OBq3PIFgkH/2c/ddv0CcuF0GDLrIWvGVzx
+H/YQXdffuxMjrH7hnxUm26w1k1V8rUTdUy4wMV/e85DH8U5K9Yvmo/5wivzkbtVJ
+e16ARNFQQvN5Hyi/GLXVsMevPMHXNfmrq16b+q3QcnGdkJp8Y3GVatyVHqnlSBZ6
+LKxLI7N4hIrtPT1yeUQuGD4UJlo/DloLK3Uq6wHqPQrJ7kLxBFsDsJYZoi24G+Hu
+zQ2T1/uDyludgMQDy5OOIt8fOchHq2t8oVObSUcoh9YDS20THwfo5GfHkfZp4BvM
+Nd5I+ViiZ1qDHffUA5whf7idRIWOX7XXKdWFiOyTyKxiNjkusPSKGNtIzr1iAOA=
+=qABa
+-----END PGP SIGNATURE-----
+
+--sdEQJo40s7ofW8iR--
