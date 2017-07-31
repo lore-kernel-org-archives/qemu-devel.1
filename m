@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcBR2-0003CS-NU
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:12:41 -0400
+	(envelope-from <famz@redhat.com>) id 1dcBbL-00054Q-3b
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcBQz-0004VR-IX
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:12:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23987)
+	(envelope-from <famz@redhat.com>) id 1dcBbG-0007sk-V5
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:23:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcBQz-0004To-CJ
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:12:37 -0400
-Date: Mon, 31 Jul 2017 17:12:24 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170731162757-mutt-send-email-mst@kernel.org>
-References: <547865a9-d6c2-7140-47e2-5af01e7d761d@redhat.com>
-	<0a7cd2a8-45ff-11d1-ddb5-036ce36af163@redhat.com>
-	<CAPcyv4iYdEAv7wqun5L1C-gT7fMDpO+M918or-bg5XiWLnM3=w@mail.gmail.com>
-	<d5a1f1d2-f7c8-cacc-3267-ed6f7d2507ca@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dcBbG-0007pS-O7
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:23:14 -0400
+Date: Mon, 31 Jul 2017 22:23:08 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170731142308.GB3206@lemon.lan>
+References: <07010a2ad79559c412949f0005dbe3cb03d8416e.1498504812.git.ps@pks.im>
+	<CAKmqyKPZ3+ohCvpzbw=MyLpgB5cFKQosBJNsaWcoT=yWp1c9Mw@mail.gmail.com>
+	<cf854184-8bc0-4a9c-b97f-8274abf538bc@amsat.org>
+	<20170729135042.GA1139@pks-xps>
+	<CAFEAcA_gG=pukiHmhW5kMDu0sUxRL8Yp5H5=XA0gKbTSVuNBpQ@mail.gmail.com>
+	<192810b2-02a2-fbbc-fc1e-7e9d3d80d7fa@gmx.com>
+	<CAFEAcA9dvAnkKhKq03VccO1MLgg-4g20Mt2=85TZ1jF9XxHPRw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <d5a1f1d2-f7c8-cacc-3267-ed6f7d2507ca@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] virtio-mem: paravirtualized memory
+In-Reply-To: <CAFEAcA9dvAnkKhKq03VccO1MLgg-4g20Mt2=85TZ1jF9XxHPRw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: include <linux/limits.h> for
+ XATTR_SIZE_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, KVM <kvm@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrea Arcangeli <aarcange@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Rik van Riel <riel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Kamil Rytarowski <n54@gmx.com>, Kamil Rytarowski <kamil@netbsd.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Patrick Steinhardt <ps@pks.im>, Alistair Francis <alistair23@gmail.com>
 
-On Fri, Jul 28, 2017 at 05:48:07PM +0200, David Hildenbrand wrote:
-> In general, a paravirtualized interface (for detection of PMEM regions)
-> might have one big advantage: not limited to certain architectures.
+On Sun, 07/30 19:23, Peter Maydell wrote:
+> On 30 July 2017 at 17:51, Kamil Rytarowski <n54@gmx.com> wrote:
+> > On 29.07.2017 21:34, Peter Maydell wrote:
+> >> On 29 July 2017 at 14:50, Patrick Steinhardt <ps@pks.im> wrote:
+> >>> On Fri, Jul 28, 2017 at 02:20:49PM -0300, Philippe Mathieu-Daud=E9 =
+wrote:
+> >>>> This is likely to break on BSD, but now than patchew has a NetBSD =
+job
+> >>>> you can trigger a build RESENDing this patch.
+> >>
+> >
+> > I just checked patchew, and there is FreeBSD job. How far are we from
+> > adding more BSDs?
+>=20
+> I now test OpenBSD and NetBSD as well in my pre-merge
+> test setup. Patchew could add them as well if desired.
+> (vm setup instructions at http://wiki.qemu.org/Hosts/BSD)
 
-What follows is a generic rant, and slightly offtopic -sorry about that.
-I thought it's worth replying to above since people sometimes propose
-random PV devices and portability is often the argument. I'd claim if
-its the only argument - its not a very good one.
+No objection to adding more BSDs to patchew as long as I can find a few m=
+ore
+gigabytes RAM to run the VM (BTW I'm also thinking about converting long =
+running
+VMs to boot/shutdown on demand, to support more types of guests). But sti=
+ll want
+to ask this: how likely it is for a patch to compile on one BSD flavor bu=
+t fail
+on the other?
 
-One of the points of KVM is to try and reuse the infrastructure in Linux
-that runs containers/bare metal anyway.  The more paravirtualized
-interfaces you build, the more effort you get to spend to maintain
-various aspects of the system. As optimizations force more and more
-paravirtualization into the picture, our solution has been to try to
-localize their effect, so you can mix and match paravirtualization and
-emulation, as well as enable a subset of PV things that makes sense. For
-example, virtio devices look more or less like PCI devices on systems
-that have PCI.
-
-It's not clear it applies here - memory overcommit on bare metal is
-kind of different.
-
--- 
-MST
+Fam
