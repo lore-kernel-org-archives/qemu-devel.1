@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dcCMl-00063o-7J
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:25 -0400
+	(envelope-from <diana.craciun@nxp.com>) id 1dcCNk-0006i1-1S
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dcCMg-0000lf-5X
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:19 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dcCMf-0000lK-Uc
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:12:14 -0400
-Received: by mail-it0-x244.google.com with SMTP id v127so19979296itd.2
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 08:12:13 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20170731150609.GD21310@redhat.com>
-Date: Mon, 31 Jul 2017 11:12:11 -0400
+	(envelope-from <diana.craciun@nxp.com>) id 1dcCNd-0001Ce-RE
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:13:20 -0400
+From: Diana Madalina Craciun <diana.craciun@nxp.com>
+Date: Mon, 31 Jul 2017 15:13:09 +0000
+Message-ID: <AM3PR04MB061656F255D688500AC8622BFFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
+	<20170525011034-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061619F6FDC53F7FD4C1DAE4FFF10@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170706023845-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB0616507B6F0989360D582F37FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170731170217-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <30E55185-F35E-4C81-A928-6C45E1BAC6C6@gmail.com>
-References: <BCFCA0C8-8811-43C3-B65A-76B4470868FD@gmail.com>
-	<20170731094657.GE766@redhat.com>
-	<421095EC-3086-46A4-AA1E-653831EA746D@gmail.com>
-	<20170731131010.GB21310@redhat.com>
-	<8A5AD082-9A78-4535-BF44-1CBF31E52803@gmail.com>
-	<20170731150609.GD21310@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] Add more function keys to QEMU
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,133 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marcel@redhat.com" <marcel@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Mike Caraman <mike.caraman@nxp.com>, Laurentiu
+	Tudor <laurentiu.tudor@nxp.com>
 
-
-> On Jul 31, 2017, at 11:06 AM, Daniel P. Berrange <berrange@redhat.com> =
-wrote:
->=20
-> On Mon, Jul 31, 2017 at 10:52:46AM -0400, Programmingkid wrote:
->>=20
->>> On Jul 31, 2017, at 9:10 AM, Daniel P. Berrange =
-<berrange@redhat.com> wrote:
->>>=20
->>> On Mon, Jul 31, 2017 at 08:46:56AM -0400, Programmingkid wrote:
->>>>=20
->>>>> On Jul 31, 2017, at 5:46 AM, Daniel P. Berrange =
-<berrange@redhat.com> wrote:
->>>>>=20
->>>>> On Sun, Jul 30, 2017 at 04:29:27PM -0400, Programmingkid wrote:
->>>>>> There are now keyboards that have 19 function keys. This patch =
-extends QEMU so these function keys can be used.
->>>>>>=20
->>>>>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->>>>>> ---
->>>>>> qapi-schema.json  | 12 +++++++++++-
->>>>>> ui/input-keymap.c |  9 +++++++++
->>>>>> 2 files changed, 20 insertions(+), 1 deletion(-)
->>>>>>=20
->>>>>> diff --git a/qapi-schema.json b/qapi-schema.json
->>>>>> index c96f0a2..f1c989b 100644
->>>>>> --- a/qapi-schema.json
->>>>>> +++ b/qapi-schema.json
->>>>>> @@ -4862,6 +4862,15 @@
->>>>>> # @ac_refresh: since 2.10
->>>>>> # @ac_bookmarks: since 2.10
->>>>>> # altgr, altgr_r: dropped in 2.10
->>>>>> +# @f16: since 2.11
->>>>>> +# @f17: since 2.11
->>>>>> +# @f18: since 2.11
->>>>>> +# @f19: since 2.11
->>>>>> +# @f20: since 2.11
->>>>>> +# @f21: since 2.11
->>>>>> +# @f22: since 2.11
->>>>>> +# @f23: since 2.11
->>>>>> +# @f24: since 2.11
->>>>>> #
->>>>>> # Since: 1.3.0
->>>>>> #
->>>>>> @@ -4888,7 +4897,8 @@
->>>>>>           'audionext', 'audioprev', 'audiostop', 'audioplay', =
-'audiomute',
->>>>>>           'volumeup', 'volumedown', 'mediaselect',
->>>>>>           'mail', 'calculator', 'computer',
->>>>>> -            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', =
-'ac_bookmarks' ] }
->>>>>> +            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', =
-'ac_bookmarks',
->>>>>> +            'f16', 'f17', 'f18', 'f19', 'f20', 'f21', 'f22', =
-'f23', 'f24'] }
->>>>>>=20
->>>>>> ##
->>>>>> # @KeyValue:
->>>>>=20
->>>>> This bit looks fine.
->>>>>=20
->>>>>> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
->>>>>> index cf979c2..c0413e1 100644
->>>>>> --- a/ui/input-keymap.c
->>>>>> +++ b/ui/input-keymap.c
->>>>>> @@ -251,6 +251,15 @@ static const int qcode_to_number[] =3D {
->>>>>>=20
->>>>>>   [Q_KEY_CODE_F11] =3D 0x57,
->>>>>>   [Q_KEY_CODE_F12] =3D 0x58,
->>>>>> +    [Q_KEY_CODE_F16] =3D 0x59,
->>>>>> +    [Q_KEY_CODE_F17] =3D 0x5a,
->>>>>> +    [Q_KEY_CODE_F18] =3D 0x5b,
->>>>>> +    [Q_KEY_CODE_F19] =3D 0x5c,
->>>>>> +    [Q_KEY_CODE_F20] =3D 0x5d,
->>>>>> +    [Q_KEY_CODE_F21] =3D 0x5e,
->>>>>> +    [Q_KEY_CODE_F22] =3D 0x5f,
->>>>>> +    [Q_KEY_CODE_F23] =3D 0x60,
->>>>>> +    [Q_KEY_CODE_F24] =3D 0x61,
->>>>>=20
->>>>> You've got a gap there F13, F14, F15 were all missing =
-(pre-existing bug in
->>>>> QEMU), so you can't carry on just incrementing after F12.
->>>>=20
->>>> Actually F13, F14,and F15 are called Q_KEY_CODE_PRINT, =
-Q_KEY_CODE_SCROLL_LOCK,
->>>> and Q_KEY_CODE_PAUSE respectively.
->>>=20
->>> Huh. That's not right. Print/Scroll/Pause are completely separate to =
-F13/14/15
->>=20
->> Actually it is how PC keyboards function keys F13 to F15 are =
-labelled. This
->> picture should help. =20
->=20
-> [snip]
->=20
->> The Print Screen, Scroll Lock, and Pause/Break keys correspond to =
-F13, F14,
->> and F15 on this keyboard. It is the same way on older Macintosh =
-keyboards.
->> As for keyboards of other systems there could be a difference. I'm =
-aware of
->> a specific example but I suppose it is possible. I do know with the =
-current
->> mapping of the Print Screen, Scroll Lock, and Pause/Break keys to the =
-F13
->> to F15 keys Windows, Linux, and Mac OS guests seem to like it.
->=20
-> If those keyboards are generating Print/ScrollLock/Pause scancodes =
-when
-> F13/F14/F15 are pressed, then that's simply a case of the key labels
-> diverging from the scancodes, which is not entirely unusual. The key
-> point is that the various key code sets we use, define separate =
-scancodes
-> for F13/F14/F15 vs Print/ScrollLock/Break, so we must match that. It =
-just
-> means that the keyboards you show happen to not generate these =
-particular
-> scan codes, but others will.
->=20
->> Did you want separate Q_KEY_CODE_F13, Q_KEY_CODE_F14, and =
-Q_KEY_CODE_F15
->> constants added to QEMU?
->=20
-> Yes.
-
-Ok I will implement this change in its own patch.
+On 07/31/2017 05:06 PM, Michael S. Tsirkin wrote:=0A=
+> On Mon, Jul 31, 2017 at 01:22:45PM +0000, Diana Madalina Craciun wrote:=
+=0A=
+>>>> If we are to use a value of 0 for the constant in case of PCI devices,=
+=0A=
+>>>> what happens if we have multiple PCI controllers?=0A=
+>>> I guess we'd use the PCI Segment number for that?=0A=
+>>>=0A=
+>>>=0A=
+>> Yes, we can use the PCI segment for this scenario. But this would mean=
+=0A=
+>> different solutions for the same problem. The main problem is that we=0A=
+>> can have multiple entities in the system that are using MSIs (for now=0A=
+>> PCI and NXP non-PCI bus infrastructure=0A=
+>> (https://emea01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flw=
+n.net%2FArticles%2F635905%2F&data=3D01%7C01%7Cdiana.craciun%40nxp.com%7C6b0=
+c6c879af64718a21908d4d81d534e%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0&sdata=
+=3DbpYMMqajWzgzdbdQgy%2FUYR7y%2BswyvwE%2BqFzs7wdIkkA%3D&reserved=3D0). I gu=
+ess that we may have other=0A=
+>> platform devices that are using MSIs in the future.=0A=
+>>=0A=
+>> Thanks,=0A=
+>> Diana=0A=
+>>=0A=
+>>=0A=
+> Don't have the time to explore NXP in depth, sorry - there's=0A=
+> a lot of complexity there.=0A=
+> Could you maybe stick some bits to specify bus type in there?=0A=
+> It just looks very wrong to push low level things like this=0A=
+> that users have no interest in up the stack.=0A=
+>=0A=
+Let's generalize the problem a little bit, the NXP details just does not=0A=
+matter much. The problem we have is the following:=0A=
+=0A=
+The GIC-ITS, the ARM MSI controller is using deviceIDs in order to remap=0A=
+the interrupts. Each device which is expected to send MSIs has a=0A=
+deviceID associated with it. These deviceIDs are configured into devices=0A=
+by software/firmware. There is support in the device tree to specify the=0A=
+correlation between requesterID and deviceID:=0A=
+=0A=
+"msi-map: Maps a Requester ID to an MSI controller and associated=0A=
+  msi-specifier data. The property is an arbitrary number of tuples of=0A=
+  (rid-base,msi-controller,msi-base,length)"=0A=
+(https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/devicetree/bindings/pci/pci-msi.txt)=0A=
+=0A=
+Our problem is that we have to allocate these deviceIDs in QEMU as well=0A=
+and we have to ensure that they are unique. Currently, for PCI, the=0A=
+assumption requesterID=3DdeviceID is made which will no longer be true in=
+=0A=
+case other devices are added. So we need a way (preferable a general=0A=
+one) to allocate these IDs to different devices in the system in a=0A=
+consistent way which will ensure that two devices do not share the same ID.=
+=0A=
+=0A=
+The reason I put this ID into the controller itself is because on real=0A=
+hardware is actually programmed into the controller. It is needed (for=0A=
+example) when the MSIs are sent.=0A=
+=0A=
+Thanks,=0A=
+=0A=
+Diana=0A=
+=0A=
+=0A=
