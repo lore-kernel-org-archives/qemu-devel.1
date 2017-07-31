@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dc49h-0005zn-A8
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dc4D5-0008VD-QQ
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dc49e-0007Ws-5h
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:17 -0400
-Received: from mga05.intel.com ([192.55.52.43]:6607)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1dc49d-0007Ui-RT
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:14 -0400
-From: Yulei Zhang <yulei.zhang@intel.com>
-Message-Id: <1494316727-15518-4-git-send-email-yulei.zhang@intel.com>
-In-Reply-To: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
-References: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC V2 3/4] vfio: Add struct vfio_vmstate_info to
- introduce put/get callback funtion for vfio device status save/restore
+	(envelope-from <dgibson@ozlabs.org>) id 1dc4D1-0000hq-HE
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:29:47 -0400
+Date: Mon, 31 Jul 2017 14:58:21 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170731045821.GE2652@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100578691.27487.8944448515009831240.stgit@bahia>
+	<20170728040257.GI3098@umbus.fritz.box>
+	<c3750e7d-47af-4cd4-9121-73d8d8d0f81e@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="OaZoDhBhXzo6bW1J"
+Content-Disposition: inline
+In-Reply-To: <c3750e7d-47af-4cd4-9121-73d8d8d0f81e@redhat.com>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to
+ update the XICS phandle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,196 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Mon, 31 Jul 2017 06:26:21 -0000
-To: qemu-devel@nongnu.org
-Cc: kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, xiao.zheng@intel.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Introduce vfio_device_put/vfio_device_get funtion for vfio device state
-save/restore usage.
 
-For VFIO pci device status migrate, on the source side with
-funtion vfio_device_put to save the following states
-1. pci configuration space addr0~addr5
-2. pci configuration space msi_addr msi_data
-3. pci device status fetch from device driver
+--OaZoDhBhXzo6bW1J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-And on the target side with funtion vfio_device_get to restore
-the same states
-1. re-setup the pci bar configuration
-2. re-setup the pci device msi configuration
-3. restore the pci device status
+On Fri, Jul 28, 2017 at 08:20:57AM +0200, Thomas Huth wrote:
+> On 28.07.2017 06:02, David Gibson wrote:
+> > On Tue, Jul 25, 2017 at 08:03:06PM +0200, Greg Kurz wrote:
+> >> The "phandle" property of the XICS node is referenced by the "interrup=
+t-map"
+> >> property of each PHB node. This is used by the guest OS to setup IRQs =
+for
+> >> all PCI devices.
+> >>
+> >> QEMU uses an arbitrary value (0x1111) for this phandle, but SLOF conve=
+rts
+> >> this value to a SLOF specific one, which is then presented to the gues=
+t OS.
+> >>
+> >> This patches introduces the new KVMPPC_H_UPDATE_PHANDLE hcall, which i=
+s used
+> >> by SLOF to communicate the patched phandle value back to QEMU. This va=
+lue
+> >> is then cached and preserved accross migration until machine reset.
+> >>
+> >> This is required to be able to support PHB hotplug.
+> >>
+> >> Note, that SLOF already has some code to call KVMPPC_H_RTAS_UPDATE, so=
+ we
+> >> have to introduce its number even if QEMU currently doesn't implement =
+it.
+> >>
+> >> Suggested-by: Thomas Huth <thuth@redhat.com>
+> >> Signed-off-by: Greg Kurz <groug@kaod.org>
+> >=20
+> > Ugh.  I really, really hope we can avoid this, though I don't
+> > immediately see how.  Having to have two way communication between
+> > qemu and SLOF about the device tree contents just seems like opening
+> > the door to endless complexities.
+> >=20
+> > This is basically a consequence of the fact that both qemu and partly
+> > responsible for constructing the device tree for the guest, and that's
+> > not easy to avoid.
+> >=20
+> > Hrm.. Thomas, I know it's not really the OF way, but would it be
+> > feasible to change SLOF to use the phandles as supplied by qemu rather
+> > than creating its own?
+>=20
+> I don't see a way to do this in an easy, clean, reasonable way. SLOF
+> uses pointers to internal structures as phandles all over the place. You
+> likely can't replace that so easily without rewriting half of the whole
+> device tree related code in SLOF, I guess...
 
-Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
----
- hw/vfio/pci.c              | 132 +++++++++++++++++++++++++++++++++++++++++++++
- linux-headers/linux/vfio.h |   2 +
- 2 files changed, 134 insertions(+)
+Dang, that's what I suspected.
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 753da80..c0fc1d2 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2959,6 +2959,118 @@ static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
-     vbasedev->device_state = dev_state;
- }
- 
-+static int vfio_device_put(QEMUFile *f, void *pv, size_t size, VMStateField *field,
-+                            QJSON *vmdesc)
-+{
-+    VFIOPCIDevice *vdev = pv;
-+    PCIDevice *pdev = &vdev->pdev;
-+    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
-+    uint8_t *buf = NULL;
-+    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
-+    bool msi_64bit;
-+
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i*4, 4);
-+        qemu_put_be32(f, bar_cfg);
-+    }
-+
-+    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
-+    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
-+
-+    msi_lo = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-+    qemu_put_be32(f, msi_lo);
-+
-+    if (msi_64bit) {
-+        msi_hi = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI, 4);
-+        qemu_put_be32(f, msi_hi);
-+    }
-+
-+    msi_data = pci_default_read_config(pdev,
-+                 pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32), 2);
-+    qemu_put_be32(f, msi_data);
-+
-+    buf = g_malloc(sz);
-+    if (buf == NULL) {
-+        error_report("vfio: Failed to allocate memory for migrate\n");
-+        goto exit;
-+    }
-+
-+    if (pread(vdev->vbasedev.fd, buf, sz,
-+              vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
-+        error_report("vfio: Failed to read Device State Region\n");
-+        goto exit;
-+    }
-+
-+    qemu_put_buffer(f, buf, sz);
-+
-+exit:
-+    if (buf)
-+        g_free(buf);
-+
-+    return 0;
-+}
-+
-+static int vfio_device_get(QEMUFile *f, void *pv, size_t size, VMStateField *field)
-+{
-+    VFIOPCIDevice *vdev = pv;
-+    PCIDevice *pdev = &vdev->pdev;
-+    int sz = vdev->device_state.size - VFIO_DEVICE_STATE_OFFSET;
-+    uint8_t *buf = NULL;
-+    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
-+    bool msi_64bit;
-+
-+    /* retore pci bar configuration */
-+    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
-+    vfio_pci_write_config(pdev, PCI_COMMAND,
-+                          ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        bar_cfg = qemu_get_be32(f);
-+        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i*4, bar_cfg, 4);
-+    }
-+    vfio_pci_write_config(pdev, PCI_COMMAND,
-+                          ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
-+
-+    /* restore msi configuration */
-+    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
-+    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
-+
-+    vfio_pci_write_config(&vdev->pdev,
-+                          pdev->msi_cap + PCI_MSI_FLAGS,
-+                          ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
-+
-+    msi_lo = qemu_get_be32(f);
-+    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
-+
-+    if (msi_64bit) {
-+        msi_hi = qemu_get_be32(f);
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI, msi_hi, 4);
-+    }
-+    msi_data = qemu_get_be32(f);
-+    vfio_pci_write_config(pdev,
-+                          pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-+                          msi_data, 2);
-+
-+    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                          ctl | PCI_MSI_FLAGS_ENABLE, 2);
-+
-+    buf = g_malloc(sz);
-+    if (buf == NULL) {
-+        error_report("vfio: Failed to allocate memory for migrate\n");
-+        return -1;
-+    }
-+
-+    qemu_get_buffer(f, buf, sz);
-+    if (pwrite(vdev->vbasedev.fd, buf, sz,
-+               vdev->device_state.offset + VFIO_DEVICE_STATE_OFFSET) != sz) {
-+        error_report("vfio: Failed to write Device State Region\n");
-+        return -1;
-+    }
-+
-+    if (buf)
-+	g_free(buf);
-+    return 0;
-+}
-+
- static void vfio_instance_init(Object *obj)
- {
-     PCIDevice *pci_dev = PCI_DEVICE(obj);
-@@ -3003,9 +3115,29 @@ static Property vfio_pci_dev_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static VMStateInfo vfio_vmstate_info = {
-+    .name = "vfio-state",
-+    .get = vfio_device_get,
-+    .put = vfio_device_put,
-+};
-+
- static VMStateDescription vfio_pci_vmstate = {
-     .name = "vfio-pci",
-     .unmigratable = 1,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        {
-+            .name         = "vfio dev",
-+            .version_id   = 0,
-+            .field_exists = NULL,
-+            .size         = 0,
-+            .info         = &vfio_vmstate_info,
-+            .flags        = VMS_SINGLE,
-+            .offset       = 0,
-+         },
-+        VMSTATE_END_OF_LIST()
-+    },
- };
- 
- static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index ae1b953..dbbe7e1 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -302,6 +302,8 @@ struct vfio_region_info_cap_type {
- #define VFIO_DEVICE_START	0
- #define VFIO_DEVICE_STOP	1
- 
-+#define VFIO_DEVICE_STATE_OFFSET       1
-+
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-  *				    struct vfio_irq_info)
--- 
-2.7.4
+Just to be clear the phandles are used directly as raw pointers?
+There's not even some lookup macro we could change?
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--OaZoDhBhXzo6bW1J
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAll+uOgACgkQbDjKyiDZ
+s5KvXg//VvEmfy5WkRPRWu3VAw1GfrZn24jUVAmUgeH9Guf9QLV9YNRcUm66vHc/
+LP4fl3augDWghWuJJU2/wyMqElW7gwJb+CmsLYwWaNoRDW9yNbQk3Ay6aG51do9I
+9YM8SoylYNvVNqIDcKPv6TRfoeEeKtW3XVx6kqydn7iWo+kdFE8qTEkZzzCrXTnL
+S2XXbQTIA8pFxNo21tK6NhIcW7zNhi06f1CC/9sKqIiAHj7a0ZoCNPFHeKIjqv0t
+n3//NFfnBBK9V+cxTAnMJARuacrVtDlSpzcl+7QJ8RtbU3tFGBkWBynoFLpRhJMD
+v/W+RKkemKkENnrkTxijUYnj+Lg1CGHkDesuI5ujl/wAYKGno46/ZjiwEeJt3rN1
+Td71fr0LV7x+XHsmY7aNGrtLrVXVzENI3l8dpDF4rYveTjlHl1WpIVyr0285a4+r
+PkpJj6X9cUodIcinO4COLE17y2P1U8xR3Zp9GZv0Y/3TBMTmL1QqVuVjFtMpFrpw
+OgeMLCezy5xjbUj1zTzMHXO572HImEjtKrNiYuKU2IYcnGtUWNWbnSo8YFFfjVik
+LHKv64EvEC0FUAFtqj3prw5E6JHbRBTnmoUGywqwTUracCkdc7BTEeLXmwS2By9Q
+ykTmNOiXH5TjardDo5VCme+s5VbTpGeMry13Es5k8YdCeKblACU=
+=7BO7
+-----END PGP SIGNATURE-----
+
+--OaZoDhBhXzo6bW1J--
