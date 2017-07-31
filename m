@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dcFJL-00032l-4b
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:21:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1dcFPM-0004nm-5F
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dcFJH-0003zb-5d
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:20:59 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dcFJH-0003zF-0h
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:20:55 -0400
-Received: by mail-qk0-x243.google.com with SMTP id a77so10033013qkb.2
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 11:20:54 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
-	<20170730214231.GC16400@localhost.localdomain>
-	<CAOMFOmUwi+jF4w7ve4iV_rrPt2uAqZDe6PMZ0r0W047yjFi-gw@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <f6024bcb-3dcb-609f-c2a7-3d425e738e33@twiddle.net>
-Date: Mon, 31 Jul 2017 11:20:50 -0700
+	(envelope-from <lersek@redhat.com>) id 1dcFPI-0008Jq-4t
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:27:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dcFPH-0008IZ-R9
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:27:08 -0400
+References: <1500761743-1669-1-git-send-email-zuban32s@gmail.com>
+	<1500761743-1669-5-git-send-email-zuban32s@gmail.com>
+	<20170726215625-mutt-send-email-mst@kernel.org>
+	<CAKSfGUAh_rqGy8uNJXThH4v1z5zbPdLhkBx77Tui8PL-N-7JXw@mail.gmail.com>
+	<20170727022103-mutt-send-email-mst@kernel.org>
+	<f210b52b-b7ea-b27e-cca8-9f11a4b4f353@redhat.com>
+	<98048fb7-34e7-d92f-cbe5-90f39c9fcb46@redhat.com>
+	<20170729021229-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <1761dcb9-420b-228f-f3d1-149b66e5ec4c@redhat.com>
+Date: Mon, 31 Jul 2017 20:16:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAOMFOmUwi+jF4w7ve4iV_rrPt2uAqZDe6PMZ0r0W047yjFi-gw@mail.gmail.com>
+In-Reply-To: <20170729021229-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-MW
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
- for multiboot?
+Subject: Re: [Qemu-devel] [SeaBIOS] [RFC PATCH v2 4/6] hw/pci: introduce
+ bridge-only vendor-specific capability to provide some hints to firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +35,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Kevin Wolf <kwolf@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, rth@twiddle.net
 
-On 07/31/2017 10:21 AM, Anatol Pomozov wrote:
-> ELF sections info is needed for an OS to map address space properly.
+On 07/29/17 01:15, Michael S. Tsirkin wrote:
+> On Thu, Jul 27, 2017 at 03:58:58PM +0200, Laszlo Ersek wrote:
+>> On 07/27/17 11:39, Marcel Apfelbaum wrote:
+>>> On 27/07/2017 2:28, Michael S. Tsirkin wrote:
+>>>> On Thu, Jul 27, 2017 at 12:54:07AM +0300, Alexander Bezzubikov wrote:
+>>>>> 2017-07-26 22:43 GMT+03:00 Michael S. Tsirkin <mst@redhat.com>:
+>>>>>> On Sun, Jul 23, 2017 at 01:15:41AM +0300, Aleksandr Bezzubikov wrote:
+>>>>>>> On PCI init PCI bridges may need some
+>>>>>>> extra info about bus number to reserve, IO, memory and
+>>>>>>> prefetchable memory limits. QEMU can provide this
+>>>>>>> with special
+>>>>>>
+>>>>>> with a special
+>>>>>>
+>>>>>>> vendor-specific PCI capability.
+>>>>>>>
+>>>>>>> Sizes of limits match ones from
+>>>>>>> PCI Type 1 Configuration Space Header,
+>>>>>>> number of buses to reserve occupies only 1 byte
+>>>>>>> since it is the size of Subordinate Bus Number register.
+>>>>>>>
+>>>>>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>>>>>>> ---
+>>>>>>>   hw/pci/pci_bridge.c         | 27 +++++++++++++++++++++++++++
+>>>>>>>   include/hw/pci/pci_bridge.h | 18 ++++++++++++++++++
+>>>>>>>   2 files changed, 45 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+>>>>>>> index 720119b..8ec6c2c 100644
+>>>>>>> --- a/hw/pci/pci_bridge.c
+>>>>>>> +++ b/hw/pci/pci_bridge.c
+>>>>>>> @@ -408,6 +408,33 @@ void pci_bridge_map_irq(PCIBridge *br, const
+>>>>>>> char* bus_name,
+>>>>>>>       br->bus_name = bus_name;
+>>>>>>>   }
+>>>>>>>
+>>>>>>> +
+>>>>>>> +int pci_bridge_help_cap_init(PCIDevice *dev, int cap_offset,
+>>>>>>
+>>>>>> help? should be qemu_cap_init?
+>>>>>>
+>>>>>>> +                              uint8_t bus_reserve, uint32_t io_limit,
+>>>>>>> +                              uint16_t mem_limit, uint64_t
+>>>>>>> pref_limit,
+>>>>>>> +                              Error **errp)
+>>>>>>> +{
+>>>>>>> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
+>>>>>>> +    PCIBridgeQemuCap cap;
+>>>>>>
+>>>>>> This leaks info to guest. You want to init all fields here:
+>>>>>>
+>>>>>> cap = {
+>>>>>>   .len = ....
+>>>>>> };
+>>>>>
+>>>>> I surely can do this for len field, but as Laszlo proposed
+>>>>> we can use mutually exclusive fields,
+>>>>> e.g. pref_32 and pref_64, the only way I have left
+>>>>> is to use ternary operator (if we surely need this
+>>>>> big initializer). Keeping some if's would look better,
+>>>>> I think.
+>>>>>
+>>>>>>
+>>>>>>> +
+>>>>>>> +    cap.len = cap_len;
+>>>>>>> +    cap.bus_res = bus_reserve;
+>>>>>>> +    cap.io_lim = io_limit & 0xFF;
+>>>>>>> +    cap.io_lim_upper = io_limit >> 8 & 0xFFFF;
+>>>>>>> +    cap.mem_lim = mem_limit;
+>>>>>>> +    cap.pref_lim = pref_limit & 0xFFFF;
+>>>>>>> +    cap.pref_lim_upper = pref_limit >> 16 & 0xFFFFFFFF;
+>>>>>>
+>>>>>> Please use pci_set_word etc or cpu_to_leXX.
+>>>>>>
+>>>>>
+>>>>> Since now we've decided to avoid fields separation into <field> +
+>>>>> <field_upper>,
+>>>>> this bitmask along with pci_set_word are no longer needed.
+>>>>>
+>>>>>> I think it's easiest to replace struct with a set of macros then
+>>>>>> pci_set_word does the work for you.
+>>>>>>
+>>>>>
+>>>>> I don't really want to use macros here because structure
+>>>>> show us the whole capability layout and this can
+>>>>> decrease documenting efforts. More than that,
+>>>>> memcpy usage is very convenient here, and I wouldn't like
+>>>>> to lose it.
+>>>>>
+>>>>>>
+>>>>>>> +
+>>>>>>> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
+>>>>>>> +                                    cap_offset, cap_len, errp);
+>>>>>>> +    if (offset < 0) {
+>>>>>>> +        return offset;
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>> +    memcpy(dev->config + offset + 2, (char *)&cap + 2, cap_len - 2);
+>>>>>>
+>>>>>> +2 is yacky. See how virtio does it:
+>>>>>>
+>>>>>>      memcpy(dev->config + offset + PCI_CAP_FLAGS, &cap->cap_len,
+>>>>>>             cap->cap_len - PCI_CAP_FLAGS);
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> OK.
+>>>>>
+>>>>>>> +    return 0;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>   static const TypeInfo pci_bridge_type_info = {
+>>>>>>>       .name = TYPE_PCI_BRIDGE,
+>>>>>>>       .parent = TYPE_PCI_DEVICE,
+>>>>>>> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+>>>>>>> index ff7cbaa..c9f642c 100644
+>>>>>>> --- a/include/hw/pci/pci_bridge.h
+>>>>>>> +++ b/include/hw/pci/pci_bridge.h
+>>>>>>> @@ -67,4 +67,22 @@ void pci_bridge_map_irq(PCIBridge *br, const
+>>>>>>> char* bus_name,
+>>>>>>>   #define  PCI_BRIDGE_CTL_DISCARD_STATUS       0x400   /* Discard
+>>>>>>> timer status */
+>>>>>>>   #define  PCI_BRIDGE_CTL_DISCARD_SERR 0x800   /* Discard timer
+>>>>>>> SERR# enable */
+>>>>>>>
+>>>>>>> +typedef struct PCIBridgeQemuCap {
+>>>>>>> +    uint8_t id;     /* Standard PCI capability header field */
+>>>>>>> +    uint8_t next;   /* Standard PCI capability header field */
+>>>>>>> +    uint8_t len;    /* Standard PCI vendor-specific capability
+>>>>>>> header field */
+>>>>>>> +    uint8_t bus_res;
+>>>>>>> +    uint32_t pref_lim_upper;
+>>>>>>
+>>>>>> Big endian? Ugh.
+>>>>>>
+>>>>>
+>>>>> Agreed, and this's gonna to disappear with
+>>>>> the new layout.
+>>>>>
+>>>>>>> +    uint16_t pref_lim;
+>>>>>>> +    uint16_t mem_lim;
+>>>>>>
+>>>>>> I'd say we need 64 bit for memory.
+>>>>>>
+>>>>>
+>>>>> Why? Non-prefetchable MEMORY_LIMIT register is 16 bits long.
+>>>>
+>>>> Hmm ok, but e.g. for io there are bridges that have extra registers
+>>>> to specify non-standard non-aligned registers.
+>>>>
+>>>>>>> +    uint16_t io_lim_upper;
+>>>>>>> +    uint8_t io_lim;
+>>>>>>> +    uint8_t padding;
+>>>>>>
+>>>>>> IMHO each type should have a special "don't care" flag
+>>>>>> that would mean "I don't know".
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> Don't know what? Now 0 is an indicator to do nothing with this field.
+>>>>
+>>>> In that case how do you say "don't allocate any memory"?
+>>>>
+>>>
+>>> We can keep the MEM/Limit registers read-only for such cases,
+>>> as they are optional registers.
+>>
+>> For OVMF, it would be really nice if OVMF could gather the reservation
+>> numbers with
+>> - read-only accesses
+>> - to the one exact hotplug controller (root port, bridge, etc) that's
+>>   being queried for reservation.
+>>
+>> Deciding whether some registers in config space are r/o would require
+>> OVMF to attempt a write and check the result (and if it succeeded, to
+>> restore the original value). I'm not too attracted to doing this in a
+>> platform hook, while PciBusDxe is in the middle of enumerating /
+>> configuring the PCI(e) hierarchy :)
+>>
+>> Thanks
+>> Laszlo
+> 
+> Well that's the PCI spec, I don't think there's a choice for
+> regular bridges. If we have this capability this is a possible
+> optimization.
+> But without it, if you assign ranges without checking whether they are
+> available they won't have any effect practically.
+> It's mostly harmless, but you are going to waste resources.
+> 
 
-No, ELF *program header* info is needed for an OS to map the address space
-properly.  For example:
+OK. If the proposed solution with the r/o mem base/limit registers is
+rooted in the spec (and I think it indeed must be; apparently this would
+be the same as what we're already planning for IO disablement), then
+that's a strong argument for PciBusDxe to accommodate this probing in
+the platform hook.
 
-$ readelf -hl vmlinux-4.9.0-3-5kc-malta
-
-Using a mips kernel binary I happend to have handy; it would be the same for
-x86_64, prior to being bundled in the (imo superfluous bzImage) format.
-
-ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
-  Class:                             ELF64
-  Data:                              2's complement, little endian
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V
-  ABI Version:                       0
-  Type:                              EXEC (Executable file)
-  Machine:                           MIPS R3000
-  Version:                           0x1
-  Entry point address:               0xffffffff806ed590
-  Start of program headers:          64 (bytes into file)
-  Start of section headers:          13351328 (bytes into file)
-  Flags:                             0x80000001, noreorder, mips64r2
-  Size of this header:               64 (bytes)
-  Size of program headers:           56 (bytes)
-  Number of program headers:         2
-  Size of section headers:           64 (bytes)
-  Number of section headers:         28
-  Section header string table index: 27
-
-The ELF file header, always at file offset 0.  The relevant info is the
-encoding (64-bit little-endian), cpu (mips), and start of program headers.
-
-Program Headers:
-  Type           Offset             VirtAddr           PhysAddr
-                 FileSiz            MemSiz              Flags  Align
-  LOAD           0x0000000000001000 0xffffffff80100000 0xffffffff80100000
-                 0x00000000009fefb4 0x0000000000a5a150  RWE    1000
-  NOTE           0x00000000005fecb0 0xffffffff806fdcb0 0xffffffff806fdcb0
-                 0x0000000000000024 0x0000000000000024  R      4
-
-The ELF program header.  There is one segment to be loaded, at a given physical
-address (which happens to match the virtual address, but that need not have
-been so).
-
-The segment consists of 0x9fefb4 bytes of data to be loaded from the file, and
-occupies 0xa5a150 in memory.  The difference between the two sizes is "bss",
-and should be zeroed.
-
-A proper ELF loader will process *all* LOAD segments, however many are required
-by the binary.  Though in practice there will probably only be 1 or 2.
-
-Section to Segment mapping:
-  Segment Sections...
-  00     .text __ex_table __dbe_table .notes .rodata .pci_fixup __ksymtab
-__ksymtab_gpl __kcrctab __kcrctab_gpl __ksymtab_strings __param __modver .data
-.data..page_aligned .init.text .init.data .exit.text .data.reloc .sbss .bss
-  01     __dbe_table .notes
-
-This mapping is provided by readelf for convenience, not actually present in
-the ELF file.  But it is handy when debugging a linker script.
-
-> Quoting Multiboot specification
-> https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
-
-I'm not sure why someone felt the need to re-invent the wheel, especially
-considering its introduction section talks about trying to stop reinventing the
-wheel...
-
-But... whatever.  I'm not sure why this is relevant to $SUBJECT, since it does
-not appear to have anything to do with ELF at all.
-
-
-r~
+Thanks
+Laszlo
