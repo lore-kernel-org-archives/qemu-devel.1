@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dc8dL-0002xU-KI
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 07:13:13 -0400
+	(envelope-from <marcel@redhat.com>) id 1dc8nZ-0004hQ-0Y
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 07:23:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dc8dI-0001Ps-8m
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 07:13:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55046)
+	(envelope-from <marcel@redhat.com>) id 1dc8nV-0000mz-Od
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 07:23:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dc8dH-0001Or-Vq
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 07:13:08 -0400
-Date: Mon, 31 Jul 2017 13:13:02 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170731131302.5bb2198c@gondolin>
-In-Reply-To: <20170731035137.GB21572@bjsdjshi@linux.vnet.ibm.com>
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
-	<20170727135910.27d9e42e@gondolin>
-	<20170731035137.GB21572@bjsdjshi@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dc8nV-0000mM-E9
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 07:23:41 -0400
+References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
+	<1501285073-2215-3-git-send-email-zuban32s@gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <e64320d2-6fa3-03cb-a96e-7c5ce508afdb@redhat.com>
+Date: Mon, 31 Jul 2017 14:23:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1501285073-2215-3-git-send-email-zuban32s@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
- initialized CRW for channel path hotplug
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] hw/pci: introduce pcie-pci-bridge
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,186 +29,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, kevin@koconnor.net, lersek@redhat.com, seabios@seabios.org, kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-On Mon, 31 Jul 2017 11:51:37 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-
-> * Cornelia Huck <cohuck@redhat.com> [2017-07-27 13:59:10 +0200]:
+On 29/07/2017 2:37, Aleksandr Bezzubikov wrote:
+> Introduce a new PCIExpress-to-PCI Bridge device,
+> which is a hot-pluggable PCI Express device and
+> supports devices hot-plug with SHPC.
 > 
-> > On Thu, 27 Jul 2017 03:54:18 +0200
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> >   
-> > > When a channel path is hot plugged into a CSS, we should generate
-> > > a channel path initialized CRW (channel report word). The current
-> > > code does not do that, instead it puts a stub function with a TODO
-> > > reminder there.
-> > > 
-> > > This implements the css_generate_chp_crws() function by:
-> > > 1. refactor the existing code.
-> > > 2. add an @add parameter to provide future callers with the
-> > >    capability of generating channel path permanent error with
-> > >    facility not initialized CRW.
-> > > 3. add a @hotplugged parameter, so to opt out generating initialized
-> > >    CRWs for predefined channel paths.  
-> > 
-> > I'm not 100% sure whether the logic is correct here. Let me elaborate:
-> > 
-> > The current code flow when hotplugging a device is:
-> > - Generate the schib.
-> > - Check if any of the chpids refers to a not yet existing channel path;
-> >   generate it if that is the case.
-> > - Post a crw for the subchannel.
-> > 
-> > The second step is where the current code seems to be not quite correct
-> > already. It is fine for coldplugged devices, but I really think we need
-> > to make sure that all referenced channel paths are in place before we
-> > hotplug a new device. It was not really relevant when we just had one
-> > very virtual channel path, and 3270 is experimental so it is not a
-> > problem in practice.  
-> vfio-ccw hotplug could also live with the current mechanism - just
-> generate the chp according to its CHPIDs information. What the problem
-> in practice for it then? Channel path status change could be synchronize
-> by adding more MMIO regions and eventfd irq for vfio-ccw.
-
-I'm not sure that there is a problem in practice (I suppose there
-isn't), but it feels weird. The user plugs a device, magically the
-paths are created.
-
+> This device is intended to replace the DMI-to-PCI
+> Bridge in an overwhelming majority of use-cases.
 > 
-> > 
-> > This, of course, implies we need deeper changes. We need to create the
-> > channel paths before the subchannel is created and refuse hotplug of a
-> > device if not all channel paths it needs are defined. This means we
-> > need some things before we can claim real channel path support:
-> > - Have a way to specify channel paths on the command line resp. when
-> >   hotplugging. This implies they need to be real objects.
-> > - Have a way to specify which channel paths belong to a subchannel in
-> >   the same context. Keep existing device types working with the current
-> >   method.  
-> If we want to adopt the unified modelling for all kinds of devices, then
-> we require the user to define chps before define devices.
-
-Yes.
-
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>   hw/pci-bridge/Makefile.objs     |   2 +-
+>   hw/pci-bridge/pcie_pci_bridge.c | 220 ++++++++++++++++++++++++++++++++++++++++
+>   include/hw/pci/pci.h            |   1 +
+>   3 files changed, 222 insertions(+), 1 deletion(-)
+>   create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
 > 
-> We could defaulty always have a virtio reserved chp 0 defined on each
-> css, so we do not need to touch the current virtio devices command line.
+> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+> index c4683cf..666db37 100644
+> --- a/hw/pci-bridge/Makefile.objs
+> +++ b/hw/pci-bridge/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -common-obj-y += pci_bridge_dev.o
+> +common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
+>   common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
+>   common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
+>   common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> new file mode 100644
+> index 0000000..c28f820
+> --- /dev/null
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -0,0 +1,220 @@
+> +/*
+> + * QEMU Generic PCIE-PCI Bridge
+> + *
+> + * Copyright (c) 2017 Aleksandr Bezzubikov
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bus.h"
+> +#include "hw/pci/pci_bridge.h"
+> +#include "hw/pci/msi.h"
+> +#include "hw/pci/shpc.h"
+> +#include "hw/pci/slotid_cap.h"
+> +
 
-I think that's even mandatory, or we break backwards compatibility.
+Hi Aleksander,
 
-> Defining more chps or changing chpid for virtio devices does not provide
-> added values.
+> +typedef struct PCIEPCIBridge {
+> +    /*< private >*/
+> +    PCIBridge parent_obj;
+> +
+> +    bool msi_enable;
 
-Agreed.
+Please rename the msi_enable property to "msi" in order
+to be aligned with the existent PCIBridgeDev and
+consider making it OnOffAuto for the same reason.
+(I am not sure about the last part though, we have
+  no meaning for "auto" here)
 
+> +    MemoryRegion bar;
+
+I suggest renaming it to shpc_bar, it will make the code
+more readable.
+
+> +    /*< public >*/
+> +} PCIEPCIBridge;
+> +
+> +#define TYPE_PCIE_PCI_BRIDGE_DEV      "pcie-pci-bridge"
+> +#define PCIE_PCI_BRIDGE_DEV(obj) \
+> +        OBJECT_CHECK(PCIEPCIBridge, (obj), TYPE_PCIE_PCI_BRIDGE_DEV)
+> +
+> +static void pciepci_bridge_realize(PCIDevice *d, Error **errp)
+> +{
+> +    PCIBridge *br = PCI_BRIDGE(d);
+> +    PCIEPCIBridge *pcie_br = PCIE_PCI_BRIDGE_DEV(d);
+> +    int rc, pos;
+> +    Error *local_err = NULL;
+
+Since you don't "create" errors in this function, you
+could simply pass errp to the functions and not use
+local_err, it will save some code lines.
+
+> +
+> +    pci_bridge_initfn(d, TYPE_PCI_BUS);
+> +
+> +    d->config[PCI_INTERRUPT_PIN] = 0x1;
+> +    memory_region_init(&pcie_br->bar, OBJECT(d), "shpc-bar",
+> +                       shpc_bar_size(d));
+> +    rc = shpc_init(d, &br->sec_bus, &pcie_br->bar, 0, &local_err);
+> +    if (rc) {
+> +        error_propagate(errp, local_err);
+> +        goto error;
+> +    }
+> +
+> +    rc = pcie_cap_init(d, 0, PCI_EXP_TYPE_PCI_BRIDGE, 0, &local_err);
+> +    if (rc < 0) {
+> +        error_propagate(errp, local_err);
+> +        goto cap_error;
+> +    }
+> +
+> +    pos = pci_add_capability(d, PCI_CAP_ID_PM, 0, PCI_PM_SIZEOF, &local_err);
+> +    if (pos < 0) {
+> +        error_propagate(errp, local_err);
+> +        goto pm_error;
+> +    }
+> +    d->exp.pm_cap = pos;
+> +    pci_set_word(d->config + pos + PCI_PM_PMC, 0x3);
+> +
+> +    pcie_cap_arifwd_init(d);
+> +    pcie_cap_deverr_init(d);
+> +
+> +    rc = pcie_aer_init(d, PCI_ERR_VER, 0x100, PCI_ERR_SIZEOF, &local_err);
+> +    if (rc < 0) {
+> +        error_propagate(errp, local_err);
+> +        goto aer_error;
+> +    }
+> +
+> +    if (pcie_br->msi_enable) {
+> +        rc = msi_init(d, 0, 1, true, true, &local_err);
+> +        if (rc < 0) {
+> +            error_propagate(errp, local_err);
+> +            goto msi_error;
+> +        }
+> +    }
+> +    pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+> +                     PCI_BASE_ADDRESS_MEM_TYPE_64, &pcie_br->bar);
+> +    return;
+> +
+> +msi_error:
+> +    pcie_aer_exit(d);
+> +aer_error:
+> +pm_error:
+> +    pcie_cap_exit(d);
+> +cap_error:
+> +    shpc_free(d);
+> +error:
+> +    pci_bridge_exitfn(d);
+> +}
+> +
+> +static void pciepci_bridge_exit(PCIDevice *d)
+> +{
+> +    PCIEPCIBridge *bridge_dev = PCIE_PCI_BRIDGE_DEV(d);
+> +    pcie_cap_exit(d);
+> +    shpc_cleanup(d, &bridge_dev->bar);
+> +    pci_bridge_exitfn(d);
+> +}
+> +
+> +static void pciepci_bridge_reset(DeviceState *qdev)
+> +{
+> +    PCIDevice *d = PCI_DEVICE(qdev);
+> +    pci_bridge_reset(qdev);
+> +    msi_reset(d);
+> +    shpc_reset(d);
+> +}
+> +
+> +static void pcie_pci_bridge_write_config(PCIDevice *d,
+> +        uint32_t address, uint32_t val, int len)
+> +{
+> +    pci_bridge_write_config(d, address, val, len);
+> +    msi_write_config(d, address, val, len);
+> +    shpc_cap_write_config(d, address, val, len);
+> +}
+> +
+> +static bool pci_device_shpc_present(void *opaque, int version_id)
+> +{
+> +    PCIDevice *dev = opaque;
+> +
+> +    return shpc_present(dev);
+> +}
+> +
+> +static Property pcie_pci_bridge_dev_properties[] = {
+> +        DEFINE_PROP_BOOL("msi_enable", PCIEPCIBridge, msi_enable, true),
+> +        DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static const VMStateDescription pciepci_bridge_dev_vmstate = {
+> +        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
+> +        .fields = (VMStateField[]) {
+> +            VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
+> +            SHPC_VMSTATE(shpc, PCIDevice, pci_device_shpc_present),
+
+SHPC is always present for this device, right?
+You don't need tfor presence, just add it to the vmsate.
+
+> +            VMSTATE_END_OF_LIST()
+> +        }
+> +};
+> +
+> +static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
+> +                                      DeviceState *dev, Error **errp)
+> +{
+> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> +
+> +    if (!shpc_present(pci_hotplug_dev)) {
+> +        error_setg(errp, "standard hotplug controller has been disabled for "
+> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+> +        return;
+> +    }
+> +    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
+> +}
+> +
+> +static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                                 DeviceState *dev,
+> +                                                 Error **errp)
+> +{
+> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> +
+> +    if (!shpc_present(pci_hotplug_dev)) {
+> +        error_setg(errp, "standard hotplug controller has been disabled for "
+> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+> +        return;
+> +    }
+> +    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
+> +}
+> +
+> +static void pciepci_bridge_class_init(ObjectClass *klass, void *data)
+> +{
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+> +
+> +    k->is_express = 1;
+> +    k->is_bridge = 1;
+> +    k->vendor_id = PCI_VENDOR_ID_REDHAT;
+> +    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> +    k->realize = pciepci_bridge_realize;
+> +    k->exit = pciepci_bridge_exit;
+> +    k->config_write = pcie_pci_bridge_write_config;
+> +    dc->vmsd = &pciepci_bridge_dev_vmstate;
+> +    dc->props = pcie_pci_bridge_dev_properties;
+> +    dc->vmsd = &pciepci_bridge_dev_vmstate;
+> +    dc->reset = &pciepci_bridge_reset;
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +    hc->plug = pcie_pci_bridge_hotplug_cb;
+> +    hc->unplug_request = pcie_pci_bridge_hot_unplug_request_cb;
+> +}
+> +
+> +static const TypeInfo pciepci_bridge_info = {
+> +        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
+> +        .parent = TYPE_PCI_BRIDGE,
+> +        .instance_size = sizeof(PCIEPCIBridge),
+> +        .class_init = pciepci_bridge_class_init,
+> +        .interfaces = (InterfaceInfo[]) {
+> +            { TYPE_HOTPLUG_HANDLER },
+> +            { },
+> +        }
+> +};
+> +
+> +static void pciepci_register(void)
+> +{
+> +    type_register_static(&pciepci_bridge_info);
+> +}
+> +
+> +type_init(pciepci_register);
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index e598b09..b33a34f 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -98,6 +98,7 @@
+>   #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
+>   #define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
+>   #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
+> +#define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
+>   #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+>   
+>   #define FMT_PCIBUS                      PRIx64
 > 
-> For emulated device, we can define chpids for use. E.g.:
-> -device chp,cssid=fe,chpid=11 \
-> -device chp,cssid=fe,chpid=22 \
-> -chardev socket,id=terminal0,host=0.0.0.0,port=23,nowait,server,tn3270 \
-> -device x-terminal3270,chardev=terminal0,id=terminal3270_0,devno=fe.0.000a,chpids=1122000000000000
 
-If we go that route (which I'm not too sure of), we should rather
-reference the chp objects by id instead of providing a to-be-parsed
-parameter.
+Other than the comments above the implementation
+looks good to me.
 
-> 
-> Or, I think, we could let Qemu automatically find a free chp for them.
-> Sine, the same as the virtio devices, defining more chps or changing
-> chpid for emulated devices does provide added values either. In this
-> case, we do not need to touch the emualted device command line too.
-
-We should keep this working for compat (even if it's an x- device).
-
-> 
-> When defining a vfio-ccw device, since the real subchannel implicitly
-> indicates the chps it bound to, we grasp the CHPIDs from sysfs (or, with
-> my current work, we could even retrieve these information from a new
-> added MMIO region). In this case, defining some channel path devices
-> separately does not make sense to me.
-
-We might want to pass only a subset of the channel paths to guest. This
-can only work if we can define individual chp objects.
-
-> 
-> After thinking quite a while, if we do want to add a real device object
-> for a channel path, the most intractable problem (but not the only one)
-> for me is to find a good way to map the real path with the virtual one.
-> How would we retrieve the information from the real one? We'd need the
-> host kernel to provide totally new interfaces for channel path
-> information synchronization and notification machenism. I don't think in
-> this case sysfs is the choice. Ioctls, vfio MMIO regions and eventfd
-> could be a better choice. I think, this is like we are trying to
-> passthru a channel path. So we'd need to have a new vfio device physical
-> driver (e.g. vfio-chp) to handle this...
-
-And that would run into the problem of (1) the chp objects not using a
-bus on Linux, and (2) implying dedicating the chpids, which we likely
-do not want.
-
-> 
-> And, if we finnaly find a way to solve the above problem, we may have
-> some commandline as the follows, and there is still other problems. E.g.:
-> 
-> lscss:
-> MDEV                                  Subchan.  PIM PAM POM  CHPIDs
-> ------------------------------------------------------------------------------
-> 6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920  0.0.013f  f0  f0  ff   42434445 00000000
-> 
-> lschp:
-> CHPID  Vary  Cfg.  Type  Cmg  Shared  PCHID
-> ============================================
-> 0.42   1     1     1b    2    1       0158 
-> 0.43   1     1     1b    2    1       0159 
-> 0.44   1     1     1b    2    1       01a0 
-> 0.45   1     1     1b    2    1       01a1
-> 
-> Suppose we want to pass through the above mdev ($MDEV_CCW013f), we could
-> have the following command line:
-> -device vfio-chp,sysfsdev=$MDEV_CHP42,cssid=0,chpid=42 \
-> -device vfio-chp,sysfsdev=$MDEV_CHP43,cssid=0,chpid=43 \
-> -device vfio-chp,sysfsdev=$MDEV_CHP44,cssid=0,chpid=44 \
-> -device vfio-chp,sysfsdev=$MDEV_CHP45,cssid=0,chpid=45 \
-> -device vfio-ccw,sysfsdev=$MDEV_CCW013f,devno=0.0.1234,chpids=4243444500000000
-> 
-> The above vfio-ccw devices can not use any other CHP besides the above
-> 4. Defining only some of the 4 CHPs for the vfio-ccw device does not
-> sounds reasonable. So isn't it redundant to explicitly define all of the
-> 4 chps in command line for the vfio-ccw device? Since, itself already
-> provides the CHPIDs information...
-
-See my comments above.
-
-> 
-> > - Give channel paths states: Defined, configured. The right time for a
-> >   CRW is the transition between those states.  
-> Sounds reasonable.
-> 
-> > - Only queue a 'device come' CRW for a subchannel if at least one of
-> >   its channel paths is in the configured state. Detach or make not
-> >   operational a subchannel if all of its paths are deconfigured.  
-> Sounds reasonable too.
-> 
-> > 
-> > Something along those lines also matches better what I've seen on z/VM
-> > or LPAR. I realize that it's not easy :(  
-> Yes... I don't find out a way that can satisfy all of the above
-> requirements for now...
-
-Even if you can, it sounds like a lot of work :(
-
-> 
-> > 
-> > tl;dr: I don't think we want chp crws until after we have a good chp
-> > model.  
-> I have to agree.
-
-I'm wondering whether we should just defer this to later. We can live
-with no chp crw being created (except for rchp), as due to the crw
-generation being unreliable the guest OS has to handle path changes
-without crws anyway.
-
-We just need to make sure that pno and friends are appropriately
-reported to the guest.
+Thanks,
+Marcel
