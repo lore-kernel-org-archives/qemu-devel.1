@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcFeZ-0002Hl-Ef
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:42:56 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dcFfF-0002gk-JD
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcFeW-000402-9Q
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:42:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcFeV-0003zX-W9
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:42:52 -0400
-Date: Mon, 31 Jul 2017 19:42:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170731184244.GJ2122@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-9-git-send-email-peterx@redhat.com>
+	(envelope-from <zuban32s@gmail.com>) id 1dcFfE-0004Ym-FC
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:43:37 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dcFfE-0004WQ-7M
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:43:36 -0400
+Received: by mail-pg0-x242.google.com with SMTP id u185so9601015pgb.0
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 11:43:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-9-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 08/29] migration: reuse mis->userfault_quit_fd
+In-Reply-To: <7ae8d9f8-9fac-430e-87f1-ccac20df8855@redhat.com>
+References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
+	<1501285073-2215-4-git-send-email-zuban32s@gmail.com>
+	<7ae8d9f8-9fac-430e-87f1-ccac20df8855@redhat.com>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Mon, 31 Jul 2017 21:43:34 +0300
+Message-ID: <CAKSfGUDfx9rfYg0fm9h=k2T_o06ZzH-G6XJZ5Xd+TFE-0YN7oQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] hw/pci: introduce bridge-only
+ vendor-specific capability to provide some hints to firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +30,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, seabios@seabios.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> It was only used for quitting the page fault thread before. Let it be
-> something more useful - now we can use it to notify a "wake" for the
-> page fault thread (for any reason), and it only means "quit" if the
-> fault_thread_quit is set.
-> 
-> Since we changed what it does, renaming it to userfault_event_fd.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+2017-07-31 14:29 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+> On 29/07/2017 2:37, Aleksandr Bezzubikov wrote:
+>>
+>> On PCI init PCI bridges may need some
+>> extra info about bus number to reserve, IO, memory and
+>> prefetchable memory limits. QEMU can provide this
+>> with a special vendor-specific PCI capability.
+>>
+>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>> ---
+>>   hw/pci/pci_bridge.c         | 37 +++++++++++++++++++++++++++++++++++++
+>>   include/hw/pci/pci_bridge.h | 28 ++++++++++++++++++++++++++++
+>>   2 files changed, 65 insertions(+)
+>>
+>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+>> index 720119b..e9f12d6 100644
+>> --- a/hw/pci/pci_bridge.c
+>> +++ b/hw/pci/pci_bridge.c
+>> @@ -408,6 +408,43 @@ void pci_bridge_map_irq(PCIBridge *br, const char*
+>> bus_name,
+>>       br->bus_name = bus_name;
+>>   }
+>>
+>
+> Hi Alexksander,
+>
+>
+>> +
+>> +int pci_bridge_qemu_cap_init(PCIDevice *dev, int cap_offset,
+>> +                              uint8_t bus_reserve, uint32_t io_reserve,
+>> +                              uint16_t non_pref_reserve, uint64_t
+>> pref_reserve,
+>> +                              Error **errp)
+>
+>
+> Maybe we should change it to something like
+> pci_bridge_res_reseve_cap_init ? Maybe we will
+> have other caps in the future.
+>
+>
+>> +{
+>> +    size_t cap_len = sizeof(PCIBridgeQemuCap);
+>> +    PCIBridgeQemuCap cap = {
+>> +            .len = cap_len,
+>> +            .type = REDHAT_PCI_CAP_QEMU,
+>> +            .bus_res = bus_reserve,
+>> +            .non_pref_16 = non_pref_reserve
+>> +    };
+>> +
+>> +    if ((uint8_t)io_reserve == io_reserve) {
+>> +        cap.io_8 = io_reserve;
+>> +    } else {
+>> +        cap.io_32 = io_reserve;
+>> +    }
+>> +    if ((uint16_t)pref_reserve == pref_reserve) {
+>> +        cap.pref_32 = pref_reserve;
+>> +    } else {
+>> +        cap.pref_64 = pref_reserve;
+>> +    }
+>> +
+>> +    int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
+>> +                                    cap_offset, cap_len, errp);
+>> +    if (offset < 0) {
+>> +        return offset;
+>> +    }
+>> +
+>> +    memcpy(dev->config + offset + PCI_CAP_FLAGS,
+>> +            (char *)&cap + PCI_CAP_FLAGS,
+>> +            cap_len - PCI_CAP_FLAGS);
+>> +    return 0;
+>> +}
+>> +
+>>   static const TypeInfo pci_bridge_type_info = {
+>>       .name = TYPE_PCI_BRIDGE,
+>>       .parent = TYPE_PCI_DEVICE,
+>> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+>> index ff7cbaa..e9b7cf4 100644
+>> --- a/include/hw/pci/pci_bridge.h
+>> +++ b/include/hw/pci/pci_bridge.h
+>> @@ -67,4 +67,32 @@ void pci_bridge_map_irq(PCIBridge *br, const char*
+>> bus_name,
+>>   #define  PCI_BRIDGE_CTL_DISCARD_STATUS        0x400   /* Discard timer
+>> status */
+>>   #define  PCI_BRIDGE_CTL_DISCARD_SERR  0x800   /* Discard timer SERR#
+>> enable */
+>>   +typedef struct PCIBridgeQemuCap {
+>> +    uint8_t id;     /* Standard PCI capability header field */
+>> +    uint8_t next;   /* Standard PCI capability header field */
+>> +    uint8_t len;    /* Standard PCI vendor-specific capability header
+>> field */
+>> +    uint8_t type;   /* Red Hat vendor-specific capability type.
+>> +                       Types are defined with REDHAT_PCI_CAP_ prefix */
+>> +
+>> +    uint16_t non_pref_16;   /* Non-prefetchable memory limit */
+>> +    uint8_t bus_res;        /* Minimum number of buses to reserve */
+>> +    uint8_t io_8;           /* IO space limit in case of 8-bit value */
+>> +    uint32_t io_32;         /* IO space limit in case of 32-bit value
+>> +                               This 2 values are mutually exclusive,
+>> +                               i.e. they can't be  >0 both*/
+>> +    uint32_t pref_32;       /* Prefetchable memory limit
+>> +                               in case of 32-bit value */
+>> +    uint64_t pref_64;       /* Prefetchable memory limit
+>> +                               in case of 64-bit value
+>> +                               This 2 values are mutually exclusive (just
+>> as
+>> +                               IO limit), i.e. they can't be  >0 both */
+>
+>
+> The same comments as for the SeaBIOS series, can the capability
+> be more simple?
+>    uint32_t bus_res
+>    uint32_t io_res
+>    uint32_t mem_res
+>    uint32_t pref_32_res
+>    uint64_t pref_64_res
+>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+In this version I've designed it just as Laszlo suggested -
+whenever we have variable-size fields - like IO and prefetchable -
+we use mutually exclusive fields.
+I think now we should choose one common format and fix it for the future,
+otherwise every next version it will cause new questions.
 
-> ---
->  migration/migration.h    |  6 ++++--
->  migration/postcopy-ram.c | 24 ++++++++++++++++--------
->  2 files changed, 20 insertions(+), 10 deletions(-)
-> 
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 148c9fa..70e3094 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -35,6 +35,8 @@ struct MigrationIncomingState {
->      bool           have_fault_thread;
->      QemuThread     fault_thread;
->      QemuSemaphore  fault_thread_sem;
-> +    /* Set this when we want the fault thread to quit */
-> +    bool           fault_thread_quit;
->  
->      bool           have_listen_thread;
->      QemuThread     listen_thread;
-> @@ -42,8 +44,8 @@ struct MigrationIncomingState {
->  
->      /* For the kernel to send us notifications */
->      int       userfault_fd;
-> -    /* To tell the fault_thread to quit */
-> -    int       userfault_quit_fd;
-> +    /* To notify the fault_thread to wake, e.g., when need to quit */
-> +    int       userfault_event_fd;
->      QEMUFile *to_src_file;
->      QemuMutex rp_mutex;    /* We send replies from multiple threads */
->      void     *postcopy_tmp_page;
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 952b73a..4278fe7 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -305,7 +305,8 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->           * currently be at 0, we're going to increment it to 1
->           */
->          tmp64 = 1;
-> -        if (write(mis->userfault_quit_fd, &tmp64, 8) == 8) {
-> +        atomic_set(&mis->fault_thread_quit, 1);
-> +        if (write(mis->userfault_event_fd, &tmp64, 8) == 8) {
->              trace_postcopy_ram_incoming_cleanup_join();
->              qemu_thread_join(&mis->fault_thread);
->          } else {
-> @@ -315,7 +316,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->          }
->          trace_postcopy_ram_incoming_cleanup_closeuf();
->          close(mis->userfault_fd);
-> -        close(mis->userfault_quit_fd);
-> +        close(mis->userfault_event_fd);
->          mis->have_fault_thread = false;
->      }
->  
-> @@ -438,7 +439,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          pfd[0].fd = mis->userfault_fd;
->          pfd[0].events = POLLIN;
->          pfd[0].revents = 0;
-> -        pfd[1].fd = mis->userfault_quit_fd;
-> +        pfd[1].fd = mis->userfault_event_fd;
->          pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
->          pfd[1].revents = 0;
->  
-> @@ -448,8 +449,15 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          }
->  
->          if (pfd[1].revents) {
-> -            trace_postcopy_ram_fault_thread_quit();
-> -            break;
-> +            uint64_t tmp64 = 0;
-> +
-> +            /* Consume the signal */
-> +            read(mis->userfault_event_fd, &tmp64, 8);
-> +
-> +            if (atomic_read(&mis->fault_thread_quit)) {
-> +                trace_postcopy_ram_fault_thread_quit();
-> +                break;
-> +            }
->          }
->  
->          ret = read(mis->userfault_fd, &msg, sizeof(msg));
-> @@ -528,9 +536,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->      }
->  
->      /* Now an eventfd we use to tell the fault-thread to quit */
-> -    mis->userfault_quit_fd = eventfd(0, EFD_CLOEXEC);
-> -    if (mis->userfault_quit_fd == -1) {
-> -        error_report("%s: Opening userfault_quit_fd: %s", __func__,
-> +    mis->userfault_event_fd = eventfd(0, EFD_CLOEXEC);
-> +    if (mis->userfault_event_fd == -1) {
-> +        error_report("%s: Opening userfault_event_fd: %s", __func__,
->                       strerror(errno));
->          close(mis->userfault_fd);
->          return -1;
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> It is possible I missed some arguments, I'll have another look
+> on the thread.
+>
+> Thanks,
+> Marcel
+>
+>
+>
+>> +} PCIBridgeQemuCap;
+>> +
+>> +#define REDHAT_PCI_CAP_QEMU     1
+>> +
+>> +int pci_bridge_qemu_cap_init(PCIDevice *dev, int cap_offset,
+>> +                              uint8_t bus_reserve, uint32_t io_reserve,
+>> +                              uint16_t mem_reserve, uint64_t
+>> pref_reserve,
+>> +                              Error **errp);
+>> +
+>>   #endif /* QEMU_PCI_BRIDGE_H */
+>>
+>
+
+
+
+-- 
+Alexander Bezzubikov
