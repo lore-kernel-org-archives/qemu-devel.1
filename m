@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcExV-0005zk-2S
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 13:58:25 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dcF4v-0007TQ-Bo
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:06:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcExS-0004lT-1w
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 13:58:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcExR-0004kq-Rj
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 13:58:21 -0400
-Date: Mon, 31 Jul 2017 18:58:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170731175815.GF2122@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-6-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1dcF4q-0000wm-E3
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:06:05 -0400
+Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:37039)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dcF4q-0000un-8t
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:06:00 -0400
+Received: by mail-io0-x22c.google.com with SMTP id c74so114162772iod.4
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 11:05:58 -0700 (PDT)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-6-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 05/29] bitmap: introduce bitmap_count_one()
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <c76ef5de-81a5-a98e-d598-161694248788@redhat.com>
+Date: Mon, 31 Jul 2017 14:05:51 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <776EE91A-4857-4484-AAC1-3C5D67BA77F7@gmail.com>
+References: <374E3394-46D9-4459-AE2E-059F8EEC7406@gmail.com>
+	<c76ef5de-81a5-a98e-d598-161694248788@redhat.com>
+Subject: Re: [Qemu-devel] Call for testers for various versions of Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Count how many bits set in the bitmap.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/qemu/bitmap.h | 10 ++++++++++
->  util/bitmap.c         | 15 +++++++++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-> index 460d899..9c18da0 100644
-> --- a/include/qemu/bitmap.h
-> +++ b/include/qemu/bitmap.h
-> @@ -83,6 +83,7 @@ int slow_bitmap_andnot(unsigned long *dst, const unsigned long *bitmap1,
->  int slow_bitmap_intersects(const unsigned long *bitmap1,
->                             const unsigned long *bitmap2, long bits);
->  void slow_bitmap_invert(unsigned long *bitmap, long nbits);
-> +long slow_bitmap_count_one(const unsigned long *bitmap, long nbits);
->  
->  static inline unsigned long *bitmap_try_new(long nbits)
->  {
-> @@ -226,6 +227,15 @@ static inline void bitmap_invert(unsigned long *bitmap, long nbits)
->      }
->  }
->  
-> +static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
-> +{
-> +    if (small_nbits(nbits)) {
-> +        return (ctpopl(*bitmap & BITMAP_LAST_WORD_MASK(nbits)));
-> +    } else {
-> +        return slow_bitmap_count_one(bitmap, nbits);
-> +    }
-> +}
-> +
->  void bitmap_set(unsigned long *map, long i, long len);
->  void bitmap_set_atomic(unsigned long *map, long i, long len);
->  void bitmap_clear(unsigned long *map, long start, long nr);
-> diff --git a/util/bitmap.c b/util/bitmap.c
-> index 9b7408c..73a1063 100644
-> --- a/util/bitmap.c
-> +++ b/util/bitmap.c
-> @@ -368,3 +368,18 @@ void slow_bitmap_invert(unsigned long *bitmap, long nbits)
->          bitmap[k] ^= BITMAP_LAST_WORD_MASK(nbits);
->      }
->  }
-> +
-> +long slow_bitmap_count_one(const unsigned long *bitmap, long nbits)
-> +{
-> +    long k, lim = nbits/BITS_PER_LONG, result = 0;
-> +
-> +    for (k = 0; k < lim; k++) {
-> +        result += ctpopl(bitmap[k]);
-> +    }
-> +
-> +    if (nbits % BITS_PER_LONG) {
-> +        result += ctpopl(bitmap[k] & BITMAP_LAST_WORD_MASK(nbits));
-> +    }
-> +
-> +    return result;
-> +}
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> On Jul 31, 2017, at 2:03 PM, John Snow <jsnow@redhat.com> wrote:
+>=20
+>=20
+>=20
+> On 07/28/2017 03:45 PM, Programmingkid wrote:
+>> I have made a page that keeps track of anyone who wishes to be a =
+tester for a particular version of Windows. Here is the page: =
+http://wiki.qemu.org/Testing/Windows
+>>=20
+>=20
+> I think for this to be successful, you'd have to define exactly what =
+the
+> required testing *is*.
+>=20
+> Are these simple installation smoketests? Installation and boot? How =
+big
+> is the test matrix? What is considered a pass and what is not? Across
+> which machine types and which architectures?
+>=20
+> etc.
+>=20
+>> If there is a version of Window you would like to help test in QEMU, =
+please contact me with the email address you wish to use and the version =
+of Windows you wish to support. Your information will be added to this =
+list. With this list someone who makes a patch may need your help =
+ensuring the patch is compatible with your supported version of Windows.=20=
 
-(I checked what happens with BITMAP_LAST_WORD_MASK(0) interestingly it's
-all 1 - so you do need that if)
+>>=20
+>> Here are all the versions of Windows I have up so far:
+>>=20
+>> Windows 3.1
+>> Windows NT 3.1
+>> Windows NT 3.5
+>> Windows 95
+>> Windows NT 4.0
+>> Windows 98
+>> Windows ME
+>> Windows 2000
+>> Windows XP
+>> Windows Vista
+>> Windows 7
+>> Windows 8
+>> Windows 10
+>> ReactOS
+>>=20
+>=20
+> There's probably people willing to at least do boot tests for some of
+> these, but I doubt there's much interest in doing anything more =
+rigorous
+> than that.
 
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Ok. I could add something like this:
+
+Testing could include these categories:
+- Booting
+- Networking
+- USB
+- IDE/ATA
+- Video
+- Sound
+- Input Devices
+
+
+Thank you for the input.=
