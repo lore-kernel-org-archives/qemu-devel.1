@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1dc6RF-0006S0-01
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:52:34 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dc6TY-0000D5-AF
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1dc6RD-0000gv-P2
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:52:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40628)
+	(envelope-from <cohuck@redhat.com>) id 1dc6TU-0001o3-Ea
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:54:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1dc6RD-0000g2-FK
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:52:31 -0400
-From: Amador Pahim <apahim@redhat.com>
-Date: Mon, 31 Jul 2017 10:51:10 +0200
-Message-Id: <20170731085110.1050-8-apahim@redhat.com>
-In-Reply-To: <20170731085110.1050-1-apahim@redhat.com>
-References: <20170731085110.1050-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 7/7] qemu.py: include debug information on
- launch error
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dc6TU-0001nr-5O
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:54:52 -0400
+Date: Mon, 31 Jul 2017 10:54:47 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170731105447.70428667@gondolin>
+In-Reply-To: <20170728155048.GB5874@bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727114603.77b801e2@gondolin>
+	<20170728092108.GE15504@bjsdjshi@linux.vnet.ibm.com>
+	<20170728135301.0b510793@gondolin>
+	<20170728155048.GB5874@bjsdjshi@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] Channel Path realted CRW generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-When launching a VM, if an exception happens and the VM is not
-initiated, it is useful to see the qemu command line that was executed
-and the output of that command.
+On Fri, 28 Jul 2017 23:50:48 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-Before this patch:
+> * Cornelia Huck <cohuck@redhat.com> [2017-07-28 13:53:01 +0200]:
 
-    >>> import qemu
-    >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
-    >>> vm.launch()
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-      File "qemu.py", line 175, in launch
-        self._launch()
-      File "qemu.py", line 189, in _launch
-        self._post_launch()
-      File "qemu.py", line 154, in _post_launch
-        self._qmp.accept()
-      File "qmp/qmp.py", line 145, in accept
-        self.__sock, _ = self.__sock.accept()
-      File "/usr/lib64/python2.7/socket.py", line 206, in accept
-        sock, addr = self._sock.accept()
-    socket.timeout: timed out
-    >>>
+> > > > You're bound to get different kinds of notifications: via a CRW with
+> > > > source channel path, via event information retrievable via CHSC
+> > > > (indicated by a CRW with source CSS),    
+> > > Ha, I was not awre of this one before!  
+> > 
+> > That's the 'link incident' and 'resource accessibility' stuff.  
+> My focus was trying to have the minimum stuff to make a Linux guest
+> working well -- basically, my working on prototype targeted to make the
+> output lschp and lscss corect and uptodate. I
+> 
+> I will dig this and see if I need to do more stuff.
 
-After this patch:
+You can probably skip this for now, unless you want to propagate the
+ficon-related stuff. Just plain channel-path related changes should
+already cover the interesting stuff.
 
-    >>> import qemu
-    >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
-    >>> vm.launch()
-    DEBUG:qemu:Error launching VM. Command: 'qemu-system-aarch64
-    -chardev socket,id=mon,path=/var/tmp/qemu-5298-monitor.sock
-    -mon chardev=mon,mode=control -display none -vga none'.
-    Output: 'qemu-system-aarch64: No machine specified, and there
-    is no default\nUse -machine help to list supported machines\n'.
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-      File "qemu.py", line 175, in launch
-        self._launch()
-      File "qemu.py", line 189, in _launch
-        self._post_launch()
-      File "qemu.py", line 154, in _post_launch
-        self._qmp.accept()
-      File "qmp/qmp.py", line 145, in accept
-        self.__sock, _ = self.__sock.accept()
-      File "/usr/lib64/python2.7/socket.py", line 206, in accept
-        sock, addr = self._sock.accept()
-    socket.timeout: timed out
-    >>>
+> > > My prototype work tries to sync the belowing information from host
+> > > kernel to qemu:
+> > > 1. the real SCHIB, so stsch from guest could get the updated path masks.  
+> > 
+> > How far do you want to go with mirroring? I think you need to modify at
+> > least the devno in the pmcw, no?  
+> I didn't think this very deep. For now, I only sync the PIM, POM, PAM
+> and CHPIDs lazily.
 
-Signed-off-by: Amador Pahim <apahim@redhat.com>
----
- scripts/qemu.py | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Also consider the pno bit and the pnom.
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index e9a3a96d13..43fd0b072c 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -158,7 +158,10 @@ class QEMUMachine(object):
-             self._remove_if_exists(self._created_files.pop())
- 
-     def launch(self):
--        '''Launch the VM and establish a QMP connection'''
-+        '''
-+        Try to launch the VM and make sure we cleanup and expose the
-+        command line/output in case of exception.
-+        '''
- 
-         if self.is_running():
-             raise QEMULaunchError('VM already running.')
-@@ -169,6 +172,7 @@ class QEMUMachine(object):
-                                   'before launching again.')
- 
-         try:
-+            self._iolog = None
-             self._qemu_full_args = None
-             self._qemu_full_args = (self._wrapper + [self._binary] +
-                                     self._base_args() + self._args)
-@@ -176,9 +180,15 @@ class QEMUMachine(object):
-             self._pending_shutdown = True
-         except:
-             self.shutdown()
-+            LOG.debug('Error launching VM.%s%s',
-+                      ' Command: %r.' % ' '.join(self._qemu_full_args)
-+                      if self._qemu_full_args else '',
-+                      ' Output: %r.' % self._iolog
-+                      if self._iolog else '')
-             raise
- 
-     def _launch(self):
-+        '''Launch the VM and establish a QMP connection.'''
-         self._pre_launch()
-         devnull = open(os.path.devnull, 'rb')
-         self._popen = subprocess.Popen(self._qemu_full_args,
--- 
-2.13.3
+> For devno... I need to think more. If the qemu command has a given
+> "devno" for the vfio-ccw device, maybe we should not override its dev_id
+> with the real one "device number".
+
+The guest should not be surprised by a different devno, so you need to
+be sure everything is consistent.
+
+
+> > > 3. still working on support CHSC store channel path description command.  
+> > 
+> > I'm currently wondering how many of those chscs are optional. OTOH, if
+> > a modern Linux guest cannot work properly without them, it makes no
+> > sense to leave them out.  
+> Nod.
+> 
+> But I think I need to define the criteria for "work properly". For
+> example, with the current code, a Linux guest with a passed through
+> device works, while lschp shows the Cfg. as 3 (not recognized), and the
+> Shared and PCHID as "-". For this case, do you think it "work properly"?
+
+It depends upon what you want to expose to the guest. Some
+configuration checking or management tools might be reporting a
+configuration deficiency (*might*, I do not know).
+
+Shared and PGID may be useful if the operator wants to perform some
+maintenance on the hardware (so they can figure out which systems/disks
+are affected), but the information should be available in the
+hypervisor as well, so I'm not sure whether it's a big deal.
