@@ -1,43 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dc9qO-0007d9-6y
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:30:45 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dc9t9-0008PO-ID
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dc9qL-0000rw-2J
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:30:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dc9qK-0000q9-OX
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:30:40 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6VCU1X1033983
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 08:30:39 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2c21x00602-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 08:30:38 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 31 Jul 2017 13:30:35 +0100
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
-	<20170727135910.27d9e42e@gondolin>
-	<20170731035137.GB21572@bjsdjshi@linux.vnet.ibm.com>
-	<20170731131302.5bb2198c@gondolin>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 31 Jul 2017 14:30:32 +0200
+	(envelope-from <wei.w.wang@intel.com>) id 1dc9t6-0003bd-DN
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:33:35 -0400
+Received: from mga09.intel.com ([134.134.136.24]:43541)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dc9t6-0003aE-3K
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:33:32 -0400
+Message-ID: <597F2439.5070309@intel.com>
+Date: Mon, 31 Jul 2017 20:36:09 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170731131302.5bb2198c@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <bcb1d8d2-b620-fc47-4a2f-c89bbb744d0b@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
- initialized CRW for channel path hotplug
+References: <59686EEB.8080805@intel.com>
+	<20170723044036-mutt-send-email-mst@kernel.org>
+	<59781119.8010200@intel.com>
+	<20170726155856-mutt-send-email-mst@kernel.org>
+	<597954E3.2070801@intel.com>
+	<20170729020231-mutt-send-email-mst@kernel.org>
+	<597C83CC.7060702@intel.com>
+	<20170730043922-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F739288D85@shsmsx102.ccr.corp.intel.com>
+	<20170730191735-mutt-send-email-mst@kernel.org>
+	<20170730191911-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170730191911-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,59 +37,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 
-
-
-On 07/31/2017 01:13 PM, Cornelia Huck wrote:
-> On Mon, 31 Jul 2017 11:51:37 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
->> * Cornelia Huck <cohuck@redhat.com> [2017-07-27 13:59:10 +0200]:
+On 07/31/2017 12:20 AM, Michael S. Tsirkin wrote:
+> On Sun, Jul 30, 2017 at 07:18:33PM +0300, Michael S. Tsirkin wrote:
+>> On Sun, Jul 30, 2017 at 05:59:17AM +0000, Wang, Wei W wrote:
+>> That's a hypervisor implementation detail. From guest point of view,
+>> discarding contents can not be distinguished from writing old contents.
 >>
->>> On Thu, 27 Jul 2017 03:54:18 +0200
->>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-[..]
->>
->> After thinking quite a while, if we do want to add a real device object
->> for a channel path, the most intractable problem (but not the only one)
->> for me is to find a good way to map the real path with the virtual one.
+> Besides, ignoring the free page tricks, consider regular ballooning.
+> We map page with DONTNEED then back with WILLNEED. Result is
+> getting a zero page. So at least one of deflate/inflate should be input.
+> I'd say both for symmetry.
+>
 
-Yeah, channel path virtualisation... IMHO our current solution is not
-not really solving the problem. Say, do we  care about a design which
-could work with live migration (@Dong Jia)?
+OK, I see the point. Thanks.
 
->> How would we retrieve the information from the real one? We'd need the
->> host kernel to provide totally new interfaces for channel path
->> information synchronization and notification machenism. I don't think in
->> this case sysfs is the choice. Ioctls, vfio MMIO regions and eventfd
->> could be a better choice. I think, this is like we are trying to
->> passthru a channel path. So we'd need to have a new vfio device physical
->> driver (e.g. vfio-chp) to handle this...
-> 
-> And that would run into the problem of (1) the chp objects not using a
-> bus on Linux, and (2) implying dedicating the chpids, which we likely
-> do not want.
-> 
-
-AFAIU this is about "real-virtual" vs "virutal-virtual". I would really like
-to see some design here (@Dong Jia). I'm not sure any more where do we want to go.
-
-[..]
->>
->>>
->>> tl;dr: I don't think we want chp crws until after we have a good chp
->>> model.  
->> I have to agree.
-> 
-> I'm wondering whether we should just defer this to later. We can live
-> with no chp crw being created (except for rchp), as due to the crw
-> generation being unreliable the guest OS has to handle path changes
-> without crws anyway.
-> 
-> We just need to make sure that pno and friends are appropriately
-> reported to the guest.
-> 
-
-+1 
+Best,
+Wei
