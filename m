@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dc6b3-0004Vy-33
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 05:02:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dc6r8-0007zn-U1
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 05:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dc6b0-0005fl-8v
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 05:02:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34392)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dc6b0-0005fJ-2b
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 05:02:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1501249552-788-1-git-send-email-armbru@redhat.com>
-	<1501249552-788-3-git-send-email-armbru@redhat.com>
-	<20170728171731.GB3008@work-vm>
-	<c246b4bf-cb19-3348-9bdc-83409162abfc@redhat.com>
-Date: Mon, 31 Jul 2017 11:02:34 +0200
-In-Reply-To: <c246b4bf-cb19-3348-9bdc-83409162abfc@redhat.com> (Eric Blake's
-	message of "Fri, 28 Jul 2017 13:07:43 -0500")
-Message-ID: <87lgn59dxx.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1dc6r3-0008DB-SQ
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 05:19:18 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dc6r3-0008An-Ls
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 05:19:13 -0400
+Received: by mail-wm0-x244.google.com with SMTP id d40so5745131wma.3
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 02:19:12 -0700 (PDT)
+Date: Mon, 31 Jul 2017 10:19:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170731091908.GB11830@stefanha-x1.localdomain>
+References: <20170729131159.24949-1-vsementsov@virtuozzo.com>
+	<20170729131159.24949-2-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Define COLOMode without QAPI
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rJwd6BRFiFCcLxzm"
+Content-Disposition: inline
+In-Reply-To: <20170729131159.24949-2-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] coding_style: add point about 0x in
+ trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, peter.maydell@linaro.org, berrange@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
 
-> On 07/28/2017 12:17 PM, Dr. David Alan Gilbert wrote:
->> * Markus Armbruster (armbru@redhat.com) wrote:
->>> COLOMode is defined in the QAPI schema, but not used there.  Of the
->>> stuff QAPI generates for it only the typedef is actually used.  Use of
->>> QAPI is pointless and only complicates things, so don't.
->> 
->> Hmm, in one of the old COLO worlds I have, there's code to emit an event
->> on exiting from COLO and that event includes the mode it was in.
->> 
->> If the intent is to bring that or similar back then it would be worth
->> keeping.
->
-> We can always revert the removal once there is a user.
+--rJwd6BRFiFCcLxzm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I assume YAGNI until proven otherwise.
+On Sat, Jul 29, 2017 at 04:11:56PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  CODING_STYLE | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+>=20
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index 2fa0c0b65b..2e6a0507be 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -123,3 +123,26 @@ We use traditional C-style /* */ comments and avoid =
+// comments.
+> =20
+>  Rationale: The // form is valid in C99, so this is purely a matter of
+>  consistency of style. The checkpatch script will warn you about this.
+> +
+> +8. trace-events style
+> +
+> +In trace-events files use '0x' prefix to specify hex numbers, as in:
 
-Posting patches putting COLOMode to use could serve as proof.
+s/use '0x' prefix/use a '0x' prefix/
+
+> +
+> +some_trace(unsigned x, uint64_t y) "x 0x%x y 0x" PRIx64
+> +
+> +The exclusion is a group of numbers, separated by symbols '.', '/', ':',=
+ ' ':
+
+A little bit more background helps make this exception clearer:
+
+"An exception is made for groups of numbers that are hexadecimal by
+convention and separated by the symbols '.', '/', ':', or ' ' (such as
+PCI bus addresses):"
+
+> +
+> +some_other_trace(unsigned a, unsigned b, unsigned c) "num %x.%x.%x"
+> +
+> +However, you can use '0x' for such groups if you want. Anyway, be sure t=
+hat
+> +it is obvious that numbers are in hex, ex.:
+> +
+> +data_dump(uint8_t c1, uint8_t c2, uint8_t c3) "bytes (in hex): %02x %02x=
+ %02x"
+> +
+> +For consistency do not use printf flag '#', like '%#x'.
+> +
+> +Rationale: hex numbers are hard to read in logs when there no 0x prefix,
+
+s/there no/there is no/
+
+> +especially when (occasionally) the representation doesn't contain any le=
+tters
+> +and especially in one line with other decimal numbers. Number groups are
+> +allowed to not use '0x' because for some things notations like %x.%x.%x =
+are
+> +used not only in Qemu. Also dumping raw data bytes with '0x' is less rea=
+dable.
+> --=20
+> 2.11.1
+>=20
+
+--rJwd6BRFiFCcLxzm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZfvYMAAoJEJykq7OBq3PIkeIH/3a/OQmdniSmJf/oVXlHeQpn
+eXAO5NNzibqmryaGQI7puIx53AwKwd8MMnprSyp4IDRqFix5V4dGzAKaY7w662C8
+svmZnTDjkwWekBCnpduieEeBKjDmPwMiNhPjZjfFOEU4wUJiKp0xr+sKWsltNgIB
+7kvTs5HJXKO5PDNlg82wO8gOAcMiTMlTa7hthrbJkITo0cw3rdGAYYQ0W/Q3NXB0
+okZ1QCvjaJeCaupieJRXSsd+YCZ0Y6iRjbGrHTaLkAu5ulc5+JzIftJtvH+r6XKd
+4nvWOwa2cQ8gt7m7VJWhUPlBdzb9sngDUE+KO4G3WZoXBakbw9BqP9fyjgm57JY=
+=SkGt
+-----END PGP SIGNATURE-----
+
+--rJwd6BRFiFCcLxzm--
