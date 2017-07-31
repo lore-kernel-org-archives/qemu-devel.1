@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dc6PT-0005bc-4s
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:50:43 -0400
+	(envelope-from <apahim@redhat.com>) id 1dc6Qq-0006AY-8L
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dc6PS-00086F-Dh
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:50:43 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:32787)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dc6PS-00085Z-1H
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:50:42 -0400
-Received: by mail-wr0-x229.google.com with SMTP id v105so145990567wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 01:50:41 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
-References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 31 Jul 2017 09:50:20 +0100
-Message-ID: <CAFEAcA8N_JyMVtLPdSFEUUgmJ0OG6AbHuD=5KhO8kv3fJDLwGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
- for multiboot?
+	(envelope-from <apahim@redhat.com>) id 1dc6Qo-0000ST-5r
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:52:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1dc6Qn-0000Rq-Vl
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 04:52:06 -0400
+From: Amador Pahim <apahim@redhat.com>
+Date: Mon, 31 Jul 2017 10:51:05 +0200
+Message-Id: <20170731085110.1050-3-apahim@redhat.com>
+In-Reply-To: <20170731085110.1050-1-apahim@redhat.com>
+References: <20170731085110.1050-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 2/7] qemu.py: fix is_running() return before
+ first launch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
 
-On 28 July 2017 at 22:28, Anatol Pomozov <anatol.pomozov@gmail.com> wrote:
-> So I need to perform 2 things:
->
->  - Load ELF section headers into target's memory. I did by appending
-> additional space to mbs.mb_buf and copying header data. Is it the best
-> way to do?
->
->  - Next I need to load other ELF sections such as symbols (e.g.
-> .shstrtab) that store section names. What is the best way to do in
-> multiboo.c code? Would it make sense to load all ELF sections?
+is_running() returns None when called before the first time we
+call launch():
 
-This seems a bit odd, because in general an ELF loader should
-not care at all about sections and the section header. It
-should only need to look at the program header, which defines
-which segments to load. If the guest binary needs some things
-to be loaded then I would expect that it is the job of the linker
-that produces the guest binary to make sure those things are in
-segments which are marked as LOAD.
+    >>> import qemu
+    >>> vm = qemu.QEMUMachine('qemu-system-x86_64')
+    >>> vm.is_running()
+    >>>
 
-thanks
--- PMM
+It should retunt False instead. This patch fixes that.
+
+Signed-off-by: Amador Pahim <apahim@redhat.com>
+---
+ scripts/qemu.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 2f1984c93c..77565eb092 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -86,7 +86,7 @@ class QEMUMachine(object):
+             raise
+ 
+     def is_running(self):
+-        return self._popen and (self._popen.poll() is None)
++        return self._popen is not None and (self._popen.poll() is None)
+ 
+     def exitcode(self):
+         if self._popen is None:
+-- 
+2.13.3
