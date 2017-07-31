@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dcFcV-0001Mu-6n
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:40:49 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcFeZ-0002Hl-Ef
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dcFcT-0002LW-Bi
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:40:47 -0400
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:34744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dcFcT-0002Jc-1i
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:40:45 -0400
-Received: by mail-pf0-x22e.google.com with SMTP id q85so124117281pfq.1
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 11:40:43 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dcFeW-000402-9Q
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:42:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcFeV-0003zX-W9
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 14:42:52 -0400
+Date: Mon, 31 Jul 2017 19:42:45 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170731184244.GJ2122@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-9-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e64320d2-6fa3-03cb-a96e-7c5ce508afdb@redhat.com>
-References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-	<1501285073-2215-3-git-send-email-zuban32s@gmail.com>
-	<e64320d2-6fa3-03cb-a96e-7c5ce508afdb@redhat.com>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Mon, 31 Jul 2017 21:40:41 +0300
-Message-ID: <CAKSfGUCo9bqxwtMgmW1PO4h-ratpLodJwJa3twL8OKkbuNJs=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] hw/pci: introduce pcie-pci-bridge
- device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501229198-30588-9-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 08/29] migration: reuse mis->userfault_quit_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,343 +27,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin OConnor <kevin@koconnor.net>, lersek@redhat.com, seabios@seabios.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-2017-07-31 14:23 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
-> On 29/07/2017 2:37, Aleksandr Bezzubikov wrote:
->>
->> Introduce a new PCIExpress-to-PCI Bridge device,
->> which is a hot-pluggable PCI Express device and
->> supports devices hot-plug with SHPC.
->>
->> This device is intended to replace the DMI-to-PCI
->> Bridge in an overwhelming majority of use-cases.
->>
->> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> ---
->>   hw/pci-bridge/Makefile.objs     |   2 +-
->>   hw/pci-bridge/pcie_pci_bridge.c | 220
->> ++++++++++++++++++++++++++++++++++++++++
->>   include/hw/pci/pci.h            |   1 +
->>   3 files changed, 222 insertions(+), 1 deletion(-)
->>   create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
->>
->> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
->> index c4683cf..666db37 100644
->> --- a/hw/pci-bridge/Makefile.objs
->> +++ b/hw/pci-bridge/Makefile.objs
->> @@ -1,4 +1,4 @@
->> -common-obj-y += pci_bridge_dev.o
->> +common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
->>   common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
->>   common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
->>   common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
->> diff --git a/hw/pci-bridge/pcie_pci_bridge.c
->> b/hw/pci-bridge/pcie_pci_bridge.c
->> new file mode 100644
->> index 0000000..c28f820
->> --- /dev/null
->> +++ b/hw/pci-bridge/pcie_pci_bridge.c
->> @@ -0,0 +1,220 @@
->> +/*
->> + * QEMU Generic PCIE-PCI Bridge
->> + *
->> + * Copyright (c) 2017 Aleksandr Bezzubikov
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining
->> a copy
->> + * of this software and associated documentation files (the "Software"),
->> to deal
->> + * in the Software without restriction, including without limitation the
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
->> IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "hw/pci/pci.h"
->> +#include "hw/pci/pci_bus.h"
->> +#include "hw/pci/pci_bridge.h"
->> +#include "hw/pci/msi.h"
->> +#include "hw/pci/shpc.h"
->> +#include "hw/pci/slotid_cap.h"
->> +
->
->
-> Hi Aleksander,
+* Peter Xu (peterx@redhat.com) wrote:
+> It was only used for quitting the page fault thread before. Let it be
+> something more useful - now we can use it to notify a "wake" for the
+> page fault thread (for any reason), and it only means "quit" if the
+> fault_thread_quit is set.
+> 
+> Since we changed what it does, renaming it to userfault_event_fd.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Hi Marcel,
-thanks for the review
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->
->> +typedef struct PCIEPCIBridge {
->> +    /*< private >*/
->> +    PCIBridge parent_obj;
->> +
->> +    bool msi_enable;
->
->
-> Please rename the msi_enable property to "msi" in order
-> to be aligned with the existent PCIBridgeDev and
-> consider making it OnOffAuto for the same reason.
-> (I am not sure about the last part though, we have
->  no meaning for "auto" here)
->
-
-Agreed about "msi", but OnOffAuto looks weird to me
-as we always want MSI to be enabled.
-
->> +    MemoryRegion bar;
->
->
-> I suggest renaming it to shpc_bar, it will make the code
-> more readable.
->
-
-OK.
-
->> +    /*< public >*/
->> +} PCIEPCIBridge;
->> +
->> +#define TYPE_PCIE_PCI_BRIDGE_DEV      "pcie-pci-bridge"
->> +#define PCIE_PCI_BRIDGE_DEV(obj) \
->> +        OBJECT_CHECK(PCIEPCIBridge, (obj), TYPE_PCIE_PCI_BRIDGE_DEV)
->> +
->> +static void pciepci_bridge_realize(PCIDevice *d, Error **errp)
->> +{
->> +    PCIBridge *br = PCI_BRIDGE(d);
->> +    PCIEPCIBridge *pcie_br = PCIE_PCI_BRIDGE_DEV(d);
->> +    int rc, pos;
->> +    Error *local_err = NULL;
->
->
-> Since you don't "create" errors in this function, you
-> could simply pass errp to the functions and not use
-> local_err, it will save some code lines.
->
->
->> +
->> +    pci_bridge_initfn(d, TYPE_PCI_BUS);
->> +
->> +    d->config[PCI_INTERRUPT_PIN] = 0x1;
->> +    memory_region_init(&pcie_br->bar, OBJECT(d), "shpc-bar",
->> +                       shpc_bar_size(d));
->> +    rc = shpc_init(d, &br->sec_bus, &pcie_br->bar, 0, &local_err);
->> +    if (rc) {
->> +        error_propagate(errp, local_err);
->> +        goto error;
->> +    }
->> +
->> +    rc = pcie_cap_init(d, 0, PCI_EXP_TYPE_PCI_BRIDGE, 0, &local_err);
->> +    if (rc < 0) {
->> +        error_propagate(errp, local_err);
->> +        goto cap_error;
->> +    }
->> +
->> +    pos = pci_add_capability(d, PCI_CAP_ID_PM, 0, PCI_PM_SIZEOF,
->> &local_err);
->> +    if (pos < 0) {
->> +        error_propagate(errp, local_err);
->> +        goto pm_error;
->> +    }
->> +    d->exp.pm_cap = pos;
->> +    pci_set_word(d->config + pos + PCI_PM_PMC, 0x3);
->> +
->> +    pcie_cap_arifwd_init(d);
->> +    pcie_cap_deverr_init(d);
->> +
->> +    rc = pcie_aer_init(d, PCI_ERR_VER, 0x100, PCI_ERR_SIZEOF,
->> &local_err);
->> +    if (rc < 0) {
->> +        error_propagate(errp, local_err);
->> +        goto aer_error;
->> +    }
->> +
->> +    if (pcie_br->msi_enable) {
->> +        rc = msi_init(d, 0, 1, true, true, &local_err);
->> +        if (rc < 0) {
->> +            error_propagate(errp, local_err);
->> +            goto msi_error;
->> +        }
->> +    }
->> +    pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->> +                     PCI_BASE_ADDRESS_MEM_TYPE_64, &pcie_br->bar);
->> +    return;
->> +
->> +msi_error:
->> +    pcie_aer_exit(d);
->> +aer_error:
->> +pm_error:
->> +    pcie_cap_exit(d);
->> +cap_error:
->> +    shpc_free(d);
->> +error:
->> +    pci_bridge_exitfn(d);
->> +}
->> +
->> +static void pciepci_bridge_exit(PCIDevice *d)
->> +{
->> +    PCIEPCIBridge *bridge_dev = PCIE_PCI_BRIDGE_DEV(d);
->> +    pcie_cap_exit(d);
->> +    shpc_cleanup(d, &bridge_dev->bar);
->> +    pci_bridge_exitfn(d);
->> +}
->> +
->> +static void pciepci_bridge_reset(DeviceState *qdev)
->> +{
->> +    PCIDevice *d = PCI_DEVICE(qdev);
->> +    pci_bridge_reset(qdev);
->> +    msi_reset(d);
->> +    shpc_reset(d);
->> +}
->> +
->> +static void pcie_pci_bridge_write_config(PCIDevice *d,
->> +        uint32_t address, uint32_t val, int len)
->> +{
->> +    pci_bridge_write_config(d, address, val, len);
->> +    msi_write_config(d, address, val, len);
->> +    shpc_cap_write_config(d, address, val, len);
->> +}
->> +
->> +static bool pci_device_shpc_present(void *opaque, int version_id)
->> +{
->> +    PCIDevice *dev = opaque;
->> +
->> +    return shpc_present(dev);
->> +}
->> +
->> +static Property pcie_pci_bridge_dev_properties[] = {
->> +        DEFINE_PROP_BOOL("msi_enable", PCIEPCIBridge, msi_enable, true),
->> +        DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static const VMStateDescription pciepci_bridge_dev_vmstate = {
->> +        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
->> +        .fields = (VMStateField[]) {
->> +            VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
->> +            SHPC_VMSTATE(shpc, PCIDevice, pci_device_shpc_present),
->
->
-> SHPC is always present for this device, right?
-> You don't need tfor presence, just add it to the vmsate.
->
->
->> +            VMSTATE_END_OF_LIST()
->> +        }
->> +};
->> +
->> +static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
->> +                                      DeviceState *dev, Error **errp)
->> +{
->> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
->> +
->> +    if (!shpc_present(pci_hotplug_dev)) {
->> +        error_setg(errp, "standard hotplug controller has been disabled
->> for "
->> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
->> +        return;
->> +    }
->> +    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
->> +}
->> +
->> +static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler
->> *hotplug_dev,
->> +                                                 DeviceState *dev,
->> +                                                 Error **errp)
->> +{
->> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
->> +
->> +    if (!shpc_present(pci_hotplug_dev)) {
->> +        error_setg(errp, "standard hotplug controller has been disabled
->> for "
->> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
->> +        return;
->> +    }
->> +    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
->> +}
->> +
->> +static void pciepci_bridge_class_init(ObjectClass *klass, void *data)
->> +{
->> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
->> +
->> +    k->is_express = 1;
->> +    k->is_bridge = 1;
->> +    k->vendor_id = PCI_VENDOR_ID_REDHAT;
->> +    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
->> +    k->realize = pciepci_bridge_realize;
->> +    k->exit = pciepci_bridge_exit;
->> +    k->config_write = pcie_pci_bridge_write_config;
->> +    dc->vmsd = &pciepci_bridge_dev_vmstate;
->> +    dc->props = pcie_pci_bridge_dev_properties;
->> +    dc->vmsd = &pciepci_bridge_dev_vmstate;
->> +    dc->reset = &pciepci_bridge_reset;
->> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->> +    hc->plug = pcie_pci_bridge_hotplug_cb;
->> +    hc->unplug_request = pcie_pci_bridge_hot_unplug_request_cb;
->> +}
->> +
->> +static const TypeInfo pciepci_bridge_info = {
->> +        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
->> +        .parent = TYPE_PCI_BRIDGE,
->> +        .instance_size = sizeof(PCIEPCIBridge),
->> +        .class_init = pciepci_bridge_class_init,
->> +        .interfaces = (InterfaceInfo[]) {
->> +            { TYPE_HOTPLUG_HANDLER },
->> +            { },
->> +        }
->> +};
->> +
->> +static void pciepci_register(void)
->> +{
->> +    type_register_static(&pciepci_bridge_info);
->> +}
->> +
->> +type_init(pciepci_register);
->> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
->> index e598b09..b33a34f 100644
->> --- a/include/hw/pci/pci.h
->> +++ b/include/hw/pci/pci.h
->> @@ -98,6 +98,7 @@
->>   #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
->>   #define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
->>   #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
->> +#define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
->>   #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
->>     #define FMT_PCIBUS                      PRIx64
->>
->
-> Other than the comments above the implementation
-> looks good to me.
->
-> Thanks,
-> Marcel
->
-
-
-
--- 
-Alexander Bezzubikov
+> ---
+>  migration/migration.h    |  6 ++++--
+>  migration/postcopy-ram.c | 24 ++++++++++++++++--------
+>  2 files changed, 20 insertions(+), 10 deletions(-)
+> 
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 148c9fa..70e3094 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -35,6 +35,8 @@ struct MigrationIncomingState {
+>      bool           have_fault_thread;
+>      QemuThread     fault_thread;
+>      QemuSemaphore  fault_thread_sem;
+> +    /* Set this when we want the fault thread to quit */
+> +    bool           fault_thread_quit;
+>  
+>      bool           have_listen_thread;
+>      QemuThread     listen_thread;
+> @@ -42,8 +44,8 @@ struct MigrationIncomingState {
+>  
+>      /* For the kernel to send us notifications */
+>      int       userfault_fd;
+> -    /* To tell the fault_thread to quit */
+> -    int       userfault_quit_fd;
+> +    /* To notify the fault_thread to wake, e.g., when need to quit */
+> +    int       userfault_event_fd;
+>      QEMUFile *to_src_file;
+>      QemuMutex rp_mutex;    /* We send replies from multiple threads */
+>      void     *postcopy_tmp_page;
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 952b73a..4278fe7 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -305,7 +305,8 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>           * currently be at 0, we're going to increment it to 1
+>           */
+>          tmp64 = 1;
+> -        if (write(mis->userfault_quit_fd, &tmp64, 8) == 8) {
+> +        atomic_set(&mis->fault_thread_quit, 1);
+> +        if (write(mis->userfault_event_fd, &tmp64, 8) == 8) {
+>              trace_postcopy_ram_incoming_cleanup_join();
+>              qemu_thread_join(&mis->fault_thread);
+>          } else {
+> @@ -315,7 +316,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>          }
+>          trace_postcopy_ram_incoming_cleanup_closeuf();
+>          close(mis->userfault_fd);
+> -        close(mis->userfault_quit_fd);
+> +        close(mis->userfault_event_fd);
+>          mis->have_fault_thread = false;
+>      }
+>  
+> @@ -438,7 +439,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          pfd[0].fd = mis->userfault_fd;
+>          pfd[0].events = POLLIN;
+>          pfd[0].revents = 0;
+> -        pfd[1].fd = mis->userfault_quit_fd;
+> +        pfd[1].fd = mis->userfault_event_fd;
+>          pfd[1].events = POLLIN; /* Waiting for eventfd to go positive */
+>          pfd[1].revents = 0;
+>  
+> @@ -448,8 +449,15 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          }
+>  
+>          if (pfd[1].revents) {
+> -            trace_postcopy_ram_fault_thread_quit();
+> -            break;
+> +            uint64_t tmp64 = 0;
+> +
+> +            /* Consume the signal */
+> +            read(mis->userfault_event_fd, &tmp64, 8);
+> +
+> +            if (atomic_read(&mis->fault_thread_quit)) {
+> +                trace_postcopy_ram_fault_thread_quit();
+> +                break;
+> +            }
+>          }
+>  
+>          ret = read(mis->userfault_fd, &msg, sizeof(msg));
+> @@ -528,9 +536,9 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>      }
+>  
+>      /* Now an eventfd we use to tell the fault-thread to quit */
+> -    mis->userfault_quit_fd = eventfd(0, EFD_CLOEXEC);
+> -    if (mis->userfault_quit_fd == -1) {
+> -        error_report("%s: Opening userfault_quit_fd: %s", __func__,
+> +    mis->userfault_event_fd = eventfd(0, EFD_CLOEXEC);
+> +    if (mis->userfault_event_fd == -1) {
+> +        error_report("%s: Opening userfault_event_fd: %s", __func__,
+>                       strerror(errno));
+>          close(mis->userfault_fd);
+>          return -1;
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
