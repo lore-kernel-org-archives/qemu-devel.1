@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dcDVb-0007L6-8b
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:25:32 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcDWz-0008Ui-1V
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:26:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dcDVX-0007Y3-Su
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:25:31 -0400
-Resent-Message-Id: <E1dcDVX-0007Y3-Su@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dcDVX-0007Vj-Lv
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:25:27 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170731160135.12101-1-vsementsov@virtuozzo.com>
-Message-ID: <150151830180.30.8372766744028446541@93e45bedd699>
+	(envelope-from <stefanha@redhat.com>) id 1dcDWx-0000r0-IV
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:26:57 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 31 Jul 2017 17:26:41 +0100
+Message-Id: <20170731162641.24160-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 31 Jul 2017 09:25:03 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] trace-events: print 0x before hex
- numbers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] qemu-iotests: add a "how to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +20,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vsementsov@virtuozzo.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@gmail.com, cohuck@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, eblake@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MyAwLzRdIHRyYWNlLWV2ZW50czogcHJpbnQgMHggYmVmb3JlIGhleCBu
-dW1iZXJzCk1lc3NhZ2UtaWQ6IDIwMTcwNzMxMTYwMTM1LjEyMTAxLTEtdnNlbWVudHNvdkB2aXJ0
-dW96em8uY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZDkyNDViZTdiZSB0cmFjZS1l
-dmVudHM6IGZpeCBjb2RlIHN0eWxlOiBwcmludCAweCBiZWZvcmUgaGV4IG51bWJlcnMKNGM0ZTI2
-NDMwZCBjaGVja3BhdGNoOiBjaGVjayB0cmFjZS1ldmVudHMgY29kZSBzdHlsZQo4MTFlZjI5OWZk
-IHRyYWNlLWV2ZW50czogZml4IGNvZGUgc3R5bGU6ICUjIC0+IDB4JQpiOTA4YWQxMjYzIGNvZGlu
-Z19zdHlsZTogYWRkIHBvaW50IGFib3V0IDB4IGluIHRyYWNlLWV2ZW50cwoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBjb2Rpbmdfc3R5bGU6IGFkZCBwb2ludCBhYm91
-dCAweCBpbiB0cmFjZS1ldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiB0cmFjZS1ldmVudHM6
-IGZpeCBjb2RlIHN0eWxlOiAlIyAtPiAweCUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiBjaGVja3Bh
-dGNoOiBjaGVjayB0cmFjZS1ldmVudHMgY29kZSBzdHlsZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMjY6IEZJTEU6IHNjcmlwdHMvY2hlY2twYXRjaC5wbDoxMzQzOgorCQkJ
-CUVSUk9SKCJEb24ndCB1c2UgJyMnIGZsYWcgb2YgcHJpbnRmIGZvcm1hdCAoJyUjJykgaW4gIiAu
-CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI3OiBGSUxFOiBzY3JpcHRzL2NoZWNr
-cGF0Y2gucGw6MTM0NDoKKwkJCQkgICAgICAidHJhY2UtZXZlbnRzLCB1c2UgJzB4JyBwcmVmaXgg
-aW5zdGVhZFxuIiAuICRoZXJlY3Vycik7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzMwOiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6MTM0NzoKKwkJCQkJcXIvJVstKyAqLjAt
-OV0qKFtobGp6dExdfGxsfGhoKT8oeHxYfCJccypQUklbeFhdW14iXSoiPykvOwoKRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjEz
-NDk6CisJCQkJIyBkb24ndCBjb25zaWRlciBncm91cHMgc3BsaXR0ZWQgYnkgWy46LyBdLCBsaWtl
-IDJBLjIwOjEyYWIKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMzogRklMRTog
-c2NyaXB0cy9jaGVja3BhdGNoLnBsOjEzNTA6CisJCQkJbXkgJHRtcGxpbmUgPSAkcmF3bGluZSA9
-fiBzLygkaGV4Wy46XC8gXSkrJGhleC8vZ3I7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojMzY6IEZJTEU6IHNjcmlwdHMvY2hlY2twYXRjaC5wbDoxMzUzOgorCQkJCQlFUlJPUigi
-SGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCdcbiIgLgoKdG90YWw6IDMgZXJy
-b3JzLCAzIHdhcm5pbmdzLCAyNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IHRyYWNlLWV2ZW50czogZml4IGNv
-ZGUgc3R5bGU6IHByaW50IDB4IGJlZm9yZSBoZXggbnVtYmVycy4uLgo9PT0gT1VUUFVUIEVORCA9
-PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+There is not much getting started documentation for qemu-iotests.  This
+patch explains how to create a new test and covers the overall testing
+approach.
+
+Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v3:
+ * Explicitly mention source and build trees so that out-of-tree builds
+   work [Peter]
+ * Mention common.qemu library for bash tests [Jeff]
+v2:
+ * Added missing "touch <test-number>.out" step [Kevin]
+ * Added reference to SubmitAPatch wiki page [Eric & Philippe]
+---
+ tests/qemu-iotests/README | 109 ++++++++++++++++++++++++++++++++++++++++=
+++++--
+ 1 file changed, 106 insertions(+), 3 deletions(-)
+
+diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
+index 6079b401ae..6c71f9005c 100644
+--- a/tests/qemu-iotests/README
++++ b/tests/qemu-iotests/README
+@@ -10,12 +10,115 @@ but no actual block drivers like ide, scsi or virtio=
+.
+=20
+ * Usage
+=20
+-Just run ./check to run all tests for the raw image format, or ./check
+--qcow2 to test the qcow2 image format.  The output of ./check -h explain=
+s
+-additional options to test further image formats or I/O methods.
++Just run ./check from the build tree to run all tests for the raw image =
+format,
++or ./check -qcow2 to test the qcow2 image format.  The output of ./check=
+ -h
++explains additional options to test further image formats or I/O methods=
+.
++
++* Testing approach
++
++Each test is an executable file (usually a bash script) that is run by t=
+he
++./check test harness.  Standard out and standard error are captured to a=
+n
++output file.  If the output file differs from the "golden master" output=
+ file
++for the test then it fails.
++
++Tests are simply a sequence of commands that produce output and the test=
+ itself
++does not judge whether it passed or failed.  If you find yourself writin=
+g
++checks to determine success or failure then you should rethink the test =
+and
++rely on output diffing instead.
++
++** Filtering volatile output
++
++When output contains absolute file paths, timestamps, process IDs, hostn=
+ames,
++or other volatile strings, the diff against golden master output will fa=
+il.
++Such output must be filtered to replace volatile strings with fixed
++placeholders.
++
++For example, the path to the temporary working directory changes between=
+ test
++runs so it must be filtered:
++
++  sed -e "s#$TEST_DIR/#TEST_DIR/#g"
++
++Commonly needed filters are available in ./common.filter.
++
++** Bash tests
++
++Tests are usually bash scripts that perform a sequence of qemu-img and q=
+emu-io
++commands.
++
++If you wish to create a test in Bash that interacts with the QMP monitor=
+,
++'common.qemu' provides functions for interacting with multiple QEMU
++processes.
++
++** Python tests
++
++Most tests are implemented in bash but it is difficult to interact with =
+the QMP
++monitor.  A Python module called 'iotests' is available for tests that r=
+equire
++JSON and interacting with QEMU.
++
++* How to create a test
++
++1. Choose an unused test number
++
++Tests are identified by a unique number.  Look for the highest test case=
+ number
++by looking at the test files.  Then search the qemu-devel@nongnu.org mai=
+ling
++list to check if anyone has already sent patches using the next availabl=
+e
++number.  You may need to increment the number a few times to reach an un=
+used
++number.
++
++2. Create the test file
++
++Copy an existing test (one that most closely resembles what you wish to =
+test)
++to the new test number in the source tree:
++
++  cp 001 <test-number>
++
++3. Assign groups to the test
++
++Add your test to the ./group file.  This file is the index of tests and =
+assigns
++them to functional groups like "rw" for read-write tests.  Most tests be=
+long to
++the "rw" and "auto" groups.  "auto" means the test runs when ./check is =
+invoked
++without a -g argument.
++
++Consider adding your test to the "quick" group if it executes quickly (<=
+1s).
++This group is run by "make check-block" and is often included as part of=
+ build
++tests in continuous integration systems.
++
++4. Write the test
++
++Edit the test script.  Look at existing tests for examples.
++
++5. Generate the golden master file
++
++Create an empty golden master file in the source tree:
++
++  touch <test-number>.out
++
++Then run your test from the build tree:
++
++  ./check <test-number>
++
++You may need additional command-line options to use an image format or
++protocol like -qcow2.
++
++The test will fail because there is no golden master yet.  Inspect the o=
+utput
++that your test generated with "cat <test-number>.out.bad".
++
++Verify that the output is as expected and contains no volatile strings l=
+ike
++timestamps.  You may need to add filters to your test to remove volatile
++strings.
++
++Once you are happy with the test output it can be used as the golden mas=
+ter
++with "mv <test-number>.out.bad <test-number>.out".  Rerun the test to ve=
+rify
++that it passes.
++
++Congratulations, you've created a new test!
++
++To contribute your test to qemu.git please follow the guidelines here:
++http://wiki.qemu.org/Contribute/SubmitAPatch
+=20
+ * Feedback and patches
+=20
+ Please send improvements to the test suite, general feedback or just
+ reports of failing tests cases to qemu-devel@nongnu.org with a CC:
+ to qemu-block@nongnu.org.
++
+--=20
+2.13.3
