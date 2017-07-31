@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dcASQ-00044v-Ar
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:10:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1dcASh-0004Lx-Hi
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dcASM-00035P-7C
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:10:02 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:57304)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dcASM-0002pJ-1O
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:09:58 -0400
-From: James Hogan <james.hogan@imgtec.com>
-Date: Mon, 31 Jul 2017 14:09:12 +0100
-Message-ID: <e6cc2ce8c49b15a8e12d3db770da05971cb59e5d.1501506432.git-series.james.hogan@imgtec.com>
-In-Reply-To: <cover.6535001d6b9cd2357109d19b1060e3f6a2b958a7.1501506432.git-series.james.hogan@imgtec.com>
-References: <cover.6535001d6b9cd2357109d19b1060e3f6a2b958a7.1501506432.git-series.james.hogan@imgtec.com>
+	(envelope-from <berrange@redhat.com>) id 1dcASd-0003Oy-Gx
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:10:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45541)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dcASd-0003OG-7m
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:10:15 -0400
+Date: Mon, 31 Jul 2017 14:10:10 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170731131010.GB21310@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <BCFCA0C8-8811-43C3-B65A-76B4470868FD@gmail.com>
+	<20170731094657.GE766@redhat.com>
+	<421095EC-3086-46A4-AA1E-653831EA746D@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/2] mips: Improve segment defs for KVM T&E
- guests
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <421095EC-3086-46A4-AA1E-653831EA746D@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Add more function keys to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: James Hogan <james.hogan@imgtec.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-Improve the segment definitions used by get_physical_address() to yield
-target_ulong types, e.g. 0xffffffff80000000 instead of 0x80000000. This
-is in preparation for enabling emulation of MIPS KVM T&E segments in TCG
-MIPS targets, which unlike KVM could potentially have 64-bit
-target_ulong. In such a case the offset guest KSEG0 address ends up at
-e.g. 0x000000008xxxxxxx instead of 0xffffffff8xxxxxxx.
+On Mon, Jul 31, 2017 at 08:46:56AM -0400, Programmingkid wrote:
+> 
+> > On Jul 31, 2017, at 5:46 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > 
+> > On Sun, Jul 30, 2017 at 04:29:27PM -0400, Programmingkid wrote:
+> >> There are now keyboards that have 19 function keys. This patch extends QEMU so these function keys can be used.
+> >> 
+> >> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> >> ---
+> >> qapi-schema.json  | 12 +++++++++++-
+> >> ui/input-keymap.c |  9 +++++++++
+> >> 2 files changed, 20 insertions(+), 1 deletion(-)
+> >> 
+> >> diff --git a/qapi-schema.json b/qapi-schema.json
+> >> index c96f0a2..f1c989b 100644
+> >> --- a/qapi-schema.json
+> >> +++ b/qapi-schema.json
+> >> @@ -4862,6 +4862,15 @@
+> >> # @ac_refresh: since 2.10
+> >> # @ac_bookmarks: since 2.10
+> >> # altgr, altgr_r: dropped in 2.10
+> >> +# @f16: since 2.11
+> >> +# @f17: since 2.11
+> >> +# @f18: since 2.11
+> >> +# @f19: since 2.11
+> >> +# @f20: since 2.11
+> >> +# @f21: since 2.11
+> >> +# @f22: since 2.11
+> >> +# @f23: since 2.11
+> >> +# @f24: since 2.11
+> >> #
+> >> # Since: 1.3.0
+> >> #
+> >> @@ -4888,7 +4897,8 @@
+> >>             'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
+> >>             'volumeup', 'volumedown', 'mediaselect',
+> >>             'mail', 'calculator', 'computer',
+> >> -            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks' ] }
+> >> +            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks',
+> >> +            'f16', 'f17', 'f18', 'f19', 'f20', 'f21', 'f22', 'f23', 'f24'] }
+> >> 
+> >> ##
+> >> # @KeyValue:
+> > 
+> > This bit looks fine.
+> > 
+> >> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+> >> index cf979c2..c0413e1 100644
+> >> --- a/ui/input-keymap.c
+> >> +++ b/ui/input-keymap.c
+> >> @@ -251,6 +251,15 @@ static const int qcode_to_number[] = {
+> >> 
+> >>     [Q_KEY_CODE_F11] = 0x57,
+> >>     [Q_KEY_CODE_F12] = 0x58,
+> >> +    [Q_KEY_CODE_F16] = 0x59,
+> >> +    [Q_KEY_CODE_F17] = 0x5a,
+> >> +    [Q_KEY_CODE_F18] = 0x5b,
+> >> +    [Q_KEY_CODE_F19] = 0x5c,
+> >> +    [Q_KEY_CODE_F20] = 0x5d,
+> >> +    [Q_KEY_CODE_F21] = 0x5e,
+> >> +    [Q_KEY_CODE_F22] = 0x5f,
+> >> +    [Q_KEY_CODE_F23] = 0x60,
+> >> +    [Q_KEY_CODE_F24] = 0x61,
+> > 
+> > You've got a gap there F13, F14, F15 were all missing (pre-existing bug in
+> > QEMU), so you can't carry on just incrementing after F12.
+> 
+> Actually F13, F14,and F15 are called Q_KEY_CODE_PRINT, Q_KEY_CODE_SCROLL_LOCK,
+> and Q_KEY_CODE_PAUSE respectively.
 
-This also allows the casts to int32_t that force sign extension to be
-removed, which removes any confusion due to relational comparison of
-unsigned (target_ulong) and signed (int32_t) types.
+Huh. That's not right. Print/Scroll/Pause are completely separate to F13/14/15
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
----
- target/mips/helper.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index a2b79e8725a6..05883b9f4251 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -216,14 +216,14 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-     /* effective address (modified for KVM T&E kernel segments) */
-     target_ulong address = real_address;
- 
--#define USEG_LIMIT      0x7FFFFFFFUL
--#define KSEG0_BASE      0x80000000UL
--#define KSEG1_BASE      0xA0000000UL
--#define KSEG2_BASE      0xC0000000UL
--#define KSEG3_BASE      0xE0000000UL
-+#define USEG_LIMIT      ((target_ulong)(int32_t)0x7FFFFFFFUL)
-+#define KSEG0_BASE      ((target_ulong)(int32_t)0x80000000UL)
-+#define KSEG1_BASE      ((target_ulong)(int32_t)0xA0000000UL)
-+#define KSEG2_BASE      ((target_ulong)(int32_t)0xC0000000UL)
-+#define KSEG3_BASE      ((target_ulong)(int32_t)0xE0000000UL)
- 
--#define KVM_KSEG0_BASE  0x40000000UL
--#define KVM_KSEG2_BASE  0x60000000UL
-+#define KVM_KSEG0_BASE  ((target_ulong)(int32_t)0x40000000UL)
-+#define KVM_KSEG2_BASE  ((target_ulong)(int32_t)0x60000000UL)
- 
-     if (kvm_enabled()) {
-         /* KVM T&E adds guest kernel segments in useg */
-@@ -307,17 +307,17 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-             ret = TLBRET_BADADDR;
-         }
- #endif
--    } else if (address < (int32_t)KSEG1_BASE) {
-+    } else if (address < KSEG1_BASE) {
-         /* kseg0 */
-         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
-                                           access_type, mmu_idx,
-                                           env->CP0_SegCtl1 >> 16, 0x1FFFFFFF);
--    } else if (address < (int32_t)KSEG2_BASE) {
-+    } else if (address < KSEG2_BASE) {
-         /* kseg1 */
-         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
-                                           access_type, mmu_idx,
-                                           env->CP0_SegCtl1, 0x1FFFFFFF);
--    } else if (address < (int32_t)KSEG3_BASE) {
-+    } else if (address < KSEG3_BASE) {
-         /* sseg (kseg2) */
-         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
-                                           access_type, mmu_idx,
-@@ -974,8 +974,7 @@ void mips_cpu_do_interrupt(CPUState *cs)
-         } else if (cause == 30 && !(env->CP0_Config3 & (1 << CP0C3_SC) &&
-                                     env->CP0_Config5 & (1 << CP0C5_CV))) {
-             /* Force KSeg1 for cache errors */
--            env->active_tc.PC = (int32_t)KSEG1_BASE |
--                                (env->CP0_EBase & 0x1FFFF000);
-+            env->active_tc.PC = KSEG1_BASE | (env->CP0_EBase & 0x1FFFF000);
-         } else {
-             env->active_tc.PC = env->CP0_EBase & ~0xfff;
-         }
+Regards,
+Daniel
 -- 
-git-series 0.8.10
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
