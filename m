@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1dcB63-000392-B8
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:51:00 -0400
+	(envelope-from <mst@redhat.com>) id 1dcBBY-0004qz-Aw
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1dcB5y-0000LT-Ex
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:50:59 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34569)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1dcB5y-0000Ka-5Z
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:50:54 -0400
-Received: by mail-qt0-x244.google.com with SMTP id i19so18162030qte.1
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 06:50:52 -0700 (PDT)
-Date: Mon, 31 Jul 2017 09:50:50 -0400
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20170731135050.GA12595@morn.lan>
+	(envelope-from <mst@redhat.com>) id 1dcBBT-00052O-E7
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:56:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35351)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcBBT-00051I-3q
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:56:35 -0400
+Date: Mon, 31 Jul 2017 16:56:26 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170731165401-mutt-send-email-mst@kernel.org>
 References: <1501284872-2078-1-git-send-email-zuban32s@gmail.com>
 	<1501284872-2078-4-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
@@ -31,13 +29,16 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: seabios@seabios.org, marcel@redhat.com, mst@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: seabios@seabios.org, marcel@redhat.com, kevin@koconnor.net, lersek@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
 
 On Sat, Jul 29, 2017 at 02:34:32AM +0300, Aleksandr Bezzubikov wrote:
 > In case of Red Hat Generic PCIE Root Port reserve additional buses,
 > which number is provided in a vendor-specific capability.
 > 
 > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+
+Why does this ignore io/memory reserve parts of the capability?
+
 > ---
 >  src/fw/pciinit.c | 37 +++++++++++++++++++++++++++++++++++--
 >  src/hw/pci_ids.h |  3 +++
@@ -124,15 +125,8 @@ On Sat, Jul 29, 2017 at 02:34:32AM +0300, Aleksandr Bezzubikov wrote:
 >          })
 > +#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 > +#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-
-It seems there are many different implementations of min/max macros
-and how they handle the issue of multiple evaluation.  It may be a
-good idea to add these to SeaBIOS, but not as part of a PCI patch.
-For now, so as not to complicate this patch, I suggest you just
-open-code the single use of MAX in your patch.
-
-Otherwise, I'm okay with the SeaBIOS patch series.  The QEMU series
-will need to be committed prior to committing the SeaBIOS patches.
-However, please continue to address Marcel's (and other's) comments.
-
--Kevin
+>  #define ALIGN(x,a)              __ALIGN_MASK(x,(typeof(x))(a)-1)
+>  #define __ALIGN_MASK(x,mask)    (((x)+(mask))&~(mask))
+>  #define ALIGN_DOWN(x,a)         ((x) & ~((typeof(x))(a)-1))
+> -- 
+> 2.7.4
