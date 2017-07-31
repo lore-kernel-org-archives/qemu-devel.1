@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dc4bl-0005hM-EX
+	(envelope-from <no-reply@patchew.org>) id 1dc4bl-0005hL-6Y
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dc4bd-0006U1-5h
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:55:13 -0400
-Received: from mga03.intel.com ([134.134.136.65]:19584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1dc4bc-0006Ns-PV
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:55:09 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Mon, 31 Jul 2017 06:54:59 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D50356@SHSMSX101.ccr.corp.intel.com>
-References: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1dc4bc-0006Sc-2g
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:55:12 -0400
+Resent-Message-Id: <E1dc4bc-0006Sc-2g@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dc4bb-0006P2-RM
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:55:08 -0400
+Reply-To: <qemu-devel@nongnu.org>
 In-Reply-To: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <150148408682.30.12995069518805352654@93e45bedd699>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 30 Jul 2017 23:54:48 -0700 (PDT)
 Subject: Re: [Qemu-devel] [RFC V2 0/4] vfio: Introduce Live migration
  capability to vfio_mdev device
 List-Id: <qemu-devel.nongnu.org>
@@ -29,89 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Yulei" <yulei.zhang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+To: yulei.zhang@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, alex.williamson@redhat.com, xiao.zheng@intel.com, zhi.a.wang@intel.com
 
-> From: Zhang, Yulei
-> Sent: Tuesday, May 9, 2017 3:59 PM
->=20
-> Summary
->=20
-> This series RFC would like to introduce the live migration capability
-> to vfio_mdev device.
->=20
-> As currently vfio_mdev device don't support migration, we introduce
-> a new vfio subtype region
-> VFIO_REGION_SUBTYPE_INTEL_IGD_DEVICE_STATE
-> for Intel vGPU device, during the vfio device initialization, the mdev
-> device will be set to migratable if the new region exist.
-
-Looking at your series, there is really nothing specific to vGPU or
-even Intel vGPU regarding to device state save/restore...
-
->=20
-> The intention to add the new region is using it for vfio_mdev device
-> status save and restore during the migration. The access to this region
-> will be trapped and forward to the vfio_mdev device driver. And we use
-> the first byte in the new region to control the running state of mdev
-> device.
->=20
-> Meanwhile we add one new ioctl VFIO_IOMMU_GET_DIRTY_BITMAP to help
-> do
-> the mdev device dirty page synchronization.
->=20
-> So the vfio_mdev device migration sequence would be
-> Source VM side:
-> 			start migration
-> 				|
-> 				V
->         	 get the cpu state change callback, write to the
->         	 subregion's first byte to stop the mdev device
-> 				|
-> 				V
-> 		 quary the dirty page bitmap from iommu container
-> 		 and add into qemu dirty list for synchronization
-> 				|
-> 				V
-> 		 save the deivce status into Qemufile which is
->                      read from the vfio device subregion
->=20
-> Target VM side:
-> 		   restore the mdev device after get the
-> 		     saved status context from Qemufile
-> 				|
-> 				V
-> 		     get the cpu state change callback
->  		     write to subregion's first byte to
->                       start the mdev device to put it in
->                       running status
-> 				|
-> 				V
-> 			finish migration
->=20
-> V1->V2:
-> Per Alex's suggestion:
-> 1. use device subtype region instead of VFIO PCI fixed region.
-> 2. remove unnecessary ioctl, use the first byte of subregion to
->    control the running state of mdev device.
-> 3. for dirty page synchronization, implement the interface with
->    VFIOContainer instead of vfio pci device.
->=20
-> Yulei Zhang (4):
->   vfio: introduce a new VFIO sub region for mdev device migration
->     support
->   vfio: Add vm status change callback to stop/restart the mdev device
->   vfio: Add struct vfio_vmstate_info to introduce put/get callback
->     funtion     for vfio device status save/restore
->   vifo: introduce new VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP
->=20
->  hw/vfio/common.c              |  32 +++++++++
->  hw/vfio/pci.c                 | 164
-> +++++++++++++++++++++++++++++++++++++++++-
->  hw/vfio/pci.h                 |   1 +
->  include/hw/vfio/vfio-common.h |   1 +
->  linux-headers/linux/vfio.h    |  26 ++++++-
->  5 files changed, 220 insertions(+), 4 deletions(-)
->=20
-> --
-> 2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgVjIgMC80XSB2ZmlvOiBJbnRyb2R1Y2UgTGl2ZSBtaWdyYXRpb24gY2FwYWJp
+bGl0eSB0byB2ZmlvX21kZXYgZGV2aWNlCk1lc3NhZ2UtaWQ6IDE0OTQzMTY3MjctMTU1MTgtMS1n
+aXQtc2VuZC1lbWFpbC15dWxlaS56aGFuZ0BpbnRlbC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
+IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
+ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
+KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
+Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
+CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
+CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwplNzIyOTBkZDc3IHZpZm86IGludHJvZHVjZSBuZXcgVkZJTyBpb2N0bCBWRklPX0lP
+TU1VX0dFVF9ESVJUWV9CSVRNQVAKZTYzZWM5Nzg1YiB2ZmlvOiBBZGQgc3RydWN0IHZmaW9fdm1z
+dGF0ZV9pbmZvIHRvIGludHJvZHVjZSBwdXQvZ2V0IGNhbGxiYWNrIGZ1bnRpb24gZm9yIHZmaW8g
+ZGV2aWNlIHN0YXR1cyBzYXZlL3Jlc3RvcmUKMTk2ZTIwMGQzYyB2ZmlvOiBBZGQgdm0gc3RhdHVz
+IGNoYW5nZSBjYWxsYmFjayB0byBzdG9wL3Jlc3RhcnQgdGhlIG1kZXYgZGV2aWNlCmJkOWZmOWJl
+ZDIgdmZpbzogaW50cm9kdWNlIGEgbmV3IFZGSU8gc3ViIHJlZ2lvbiBmb3IgbWRldiBkZXZpY2Ug
+bWlncmF0aW9uIHN1cHBvcnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
+NDogdmZpbzogaW50cm9kdWNlIGEgbmV3IFZGSU8gc3ViIHJlZ2lvbiBmb3IgbWRldiBkZXZpY2Ug
+bWlncmF0aW9uIHN1cHBvcnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM0
+OiBGSUxFOiBody92ZmlvL3BjaS5jOjI4MjI6CisJbWVtY3B5KCZ2ZGV2LT5kZXZpY2Vfc3RhdGUs
+IGRldmljZV9zdGF0ZSwgc2l6ZW9mKHN0cnVjdCB2ZmlvX3JlZ2lvbl9pbmZvKSk7CgpFUlJPUjog
+Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNDogRklMRTogaHcvdmZpby9wY2ku
+YzoyODIyOgorXkltZW1jcHkoJnZkZXYtPmRldmljZV9zdGF0ZSwgZGV2aWNlX3N0YXRlLCBzaXpl
+b2Yoc3RydWN0IHZmaW9fcmVnaW9uX2luZm8pKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiMzNTogRklMRTogaHcvdmZpby9wY2kuYzoyODIzOgorXklnX2ZyZWUo
+ZGV2aWNlX3N0YXRlKTskCgpFUlJPUjogaW5pdGlhbGl6ZXIgZm9yIHN0cnVjdCBWTVN0YXRlRGVz
+Y3JpcHRpb24gc2hvdWxkIG5vcm1hbGx5IGJlIGNvbnN0CiM0NzogRklMRTogaHcvdmZpby9wY2ku
+YzozMDA4Ogorc3RhdGljIFZNU3RhdGVEZXNjcmlwdGlvbiB2ZmlvX3BjaV92bXN0YXRlID0gewoK
+dG90YWw6IDMgZXJyb3JzLCAxIHdhcm5pbmdzLCA1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IHZmaW86IEFk
+ZCB2bSBzdGF0dXMgY2hhbmdlIGNhbGxiYWNrIHRvIHN0b3AvcmVzdGFydCB0aGUgbWRldiBkZXZp
+Y2UuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ5OiBGSUxFOiBody92Zmlv
+L3BjaS5jOjI5NzU6CisgICAgaWYgKHB3cml0ZSh2ZGV2LT52YmFzZWRldi5mZCwgJmRldl9zdGF0
+ZSwgc3osIHZkZXYtPmRldmljZV9zdGF0ZS5vZmZzZXQpICE9IHN6KSB7CgpFUlJPUjogRXJyb3Ig
+bWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVzCiM1MDogRklMRTogaHcvdmZpby9w
+Y2kuYzoyOTc2OgorICAgICAgICBlcnJvcl9yZXBvcnQoInZmaW86IEZhaWxlZCB0byAlcyBkZXZp
+Y2VcbiIsIHJ1bm5pbmcgPyAic3RhcnQiIDogInN0b3AiKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3
+YXJuaW5ncywgNTMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy80OiB2ZmlvOiBBZGQgc3RydWN0IHZmaW9fdm1zdGF0
+ZV9pbmZvIHRvIGludHJvZHVjZSBwdXQvZ2V0IGNhbGxiYWNrIGZ1bnRpb24gZm9yIHZmaW8gZGV2
+aWNlIHN0YXR1cyBzYXZlL3Jlc3RvcmUuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzMzOiBGSUxFOiBody92ZmlvL3BjaS5jOjI5ODM6CitzdGF0aWMgaW50IHZmaW9fZGV2aWNl
+X3B1dChRRU1VRmlsZSAqZiwgdm9pZCAqcHYsIHNpemVfdCBzaXplLCBWTVN0YXRlRmllbGQgKmZp
+ZWxkLAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM0
+NDogRklMRTogaHcvdmZpby9wY2kuYzoyOTk0OgorICAgICAgICBiYXJfY2ZnID0gcGNpX2RlZmF1
+bHRfcmVhZF9jb25maWcocGRldiwgUENJX0JBU0VfQUREUkVTU18wICsgaSo0LCA0KTsKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTE6IEZJTEU6IGh3
+L3ZmaW8vcGNpLmM6MzAwMToKKyAgICBtc2lfbG8gPSBwY2lfZGVmYXVsdF9yZWFkX2NvbmZpZyhw
+ZGV2LCBwZGV2LT5tc2lfY2FwICsgUENJX01TSV9BRERSRVNTX0xPLCA0KTsKCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1NTogRklMRTogaHcvdmZpby9wY2kuYzozMDA1OgorICAg
+ICAgICBtc2lfaGkgPSBwY2lfZGVmYXVsdF9yZWFkX2NvbmZpZyhwZGV2LCBwZGV2LT5tc2lfY2Fw
+ICsgUENJX01TSV9BRERSRVNTX0hJLCA0KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiM2MDogRklMRTogaHcvdmZpby9wY2kuYzozMDEwOgorICAgICAgICAgICAgICAgICBwZGV2
+LT5tc2lfY2FwICsgKG1zaV82NGJpdCA/IFBDSV9NU0lfREFUQV82NCA6IFBDSV9NU0lfREFUQV8z
+MiksIDIpOwoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5l
+cwojNjU6IEZJTEU6IGh3L3ZmaW8vcGNpLmM6MzAxNToKKyAgICAgICAgZXJyb3JfcmVwb3J0KCJ2
+ZmlvOiBGYWlsZWQgdG8gYWxsb2NhdGUgbWVtb3J5IGZvciBtaWdyYXRlXG4iKTsKCkVSUk9SOiBF
+cnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzcxOiBGSUxFOiBody92
+ZmlvL3BjaS5jOjMwMjE6CisgICAgICAgIGVycm9yX3JlcG9ydCgidmZpbzogRmFpbGVkIHRvIHJl
+YWQgRGV2aWNlIFN0YXRlIFJlZ2lvblxuIik7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nh
+cnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM3ODogRklMRTogaHcvdmZpby9wY2ku
+YzozMDI4OgorICAgIGlmIChidWYpClsuLi5dCgpFUlJPUjogZ19mcmVlKE5VTEwpIGlzIHNhZmUg
+dGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzc5OiBGSUxFOiBody92ZmlvL3Bj
+aS5jOjMwMjk6CisgICAgaWYgKGJ1ZikKKyAgICAgICAgZ19mcmVlKGJ1Zik7CgpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojODQ6IEZJTEU6IGh3L3ZmaW8vcGNpLmM6MzAzNDoKK3N0
+YXRpYyBpbnQgdmZpb19kZXZpY2VfZ2V0KFFFTVVGaWxlICpmLCB2b2lkICpwdiwgc2l6ZV90IHNp
+emUsIFZNU3RhdGVGaWVsZCAqZmllbGQpCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
+aGF0ICcqJyAoY3R4OlZ4VikKIzk5OiBGSUxFOiBody92ZmlvL3BjaS5jOjMwNDk6CisgICAgICAg
+IHZmaW9fcGNpX3dyaXRlX2NvbmZpZyhwZGV2LCBQQ0lfQkFTRV9BRERSRVNTXzAgKyBpKjQsIGJh
+cl9jZmcsIDQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF4KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTc6IEZJ
+TEU6IGh3L3ZmaW8vcGNpLmM6MzA2NzoKKyAgICAgICAgdmZpb19wY2lfd3JpdGVfY29uZmlnKHBk
+ZXYsIHBkZXYtPm1zaV9jYXAgKyBQQ0lfTVNJX0FERFJFU1NfSEksIG1zaV9oaSwgNCk7CgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTIxOiBGSUxFOiBody92ZmlvL3BjaS5jOjMw
+NzE6CisgICAgICAgICAgICAgICAgICAgICAgICAgIHBkZXYtPm1zaV9jYXAgKyAobXNpXzY0Yml0
+ID8gUENJX01TSV9EQVRBXzY0IDogUENJX01TSV9EQVRBXzMyKSwKCkVSUk9SOiBFcnJvciBtZXNz
+YWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzEyOTogRklMRTogaHcvdmZpby9wY2ku
+YzozMDc5OgorICAgICAgICBlcnJvcl9yZXBvcnQoInZmaW86IEZhaWxlZCB0byBhbGxvY2F0ZSBt
+ZW1vcnkgZm9yIG1pZ3JhdGVcbiIpOwoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3Qg
+Y29udGFpbiBuZXdsaW5lcwojMTM2OiBGSUxFOiBody92ZmlvL3BjaS5jOjMwODY6CisgICAgICAg
+IGVycm9yX3JlcG9ydCgidmZpbzogRmFpbGVkIHRvIHdyaXRlIERldmljZSBTdGF0ZSBSZWdpb25c
+biIpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlz
+IHN0YXRlbWVudAojMTQwOiBGSUxFOiBody92ZmlvL3BjaS5jOjMwOTA6CisgICAgaWYgKGJ1ZikK
+Wy4uLl0KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE0MTogRklM
+RTogaHcvdmZpby9wY2kuYzozMDkxOgorXklnX2ZyZWUoYnVmKTskCgpFUlJPUjogZ19mcmVlKE5V
+TEwpIGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzE0MTogRklM
+RTogaHcvdmZpby9wY2kuYzozMDkxOgorICAgIGlmIChidWYpCisJZ19mcmVlKGJ1Zik7CgpFUlJP
+UjogaW5pdGlhbGl6ZXIgZm9yIHN0cnVjdCBWTVN0YXRlSW5mbyBzaG91bGQgbm9ybWFsbHkgYmUg
+Y29uc3QKIzE1MjogRklMRTogaHcvdmZpby9wY2kuYzozMTM5Ogorc3RhdGljIFZNU3RhdGVJbmZv
+IHZmaW9fdm1zdGF0ZV9pbmZvID0gewoKdG90YWw6IDEyIGVycm9ycywgNyB3YXJuaW5ncywgMTU1
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDQvNDogdmlmbzogaW50cm9kdWNlIG5ldyBWRklPIGlvY3RsIFZGSU9fSU9N
+TVVfR0VUX0RJUlRZX0JJVE1BUC4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9y
+IGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzNzogRklMRTogaHcvdmZpby9jb21tb24uYzo2
+MzU6CisgICAgICAgaWYgKHZiYXNlZGV2LT5kZXZpY2Vfc3RhdGUgPT0gVkZJT19ERVZJQ0VfU1RB
+UlQpClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzODog
+RklMRTogaHcvdmZpby9jb21tb24uYzo2MzY6CiteSV5JcmV0dXJuOyQKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM0NDogRklMRTogaHcvdmZpby9jb21tb24uYzo2NDI6CisgICAg
+dW5zaWduZWQgbG9uZyBiaXRtYXBfc2l6ZSA9IChCSVRTX1RPX0xPTkdTKHBhZ2VfbnIpICsgMSkg
+KiBzaXplb2YodW5zaWduZWQgbG9uZyk7CgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5v
+dCBjb250YWluIG5ld2xpbmVzCiM1MDogRklMRTogaHcvdmZpby9jb21tb24uYzo2NDg6CisgICAg
+ICAgIGVycm9yX3JlcG9ydCgidmZpbzogRmFpbGVkIHRvIGZldGNoIGRpcnR5IHBhZ2VzIGZvciBt
+aWdyYXRpb25cbiIpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1NDogRklMRTog
+aHcvdmZpby9jb21tb24uYzo2NTI6CisgICAgY3B1X3BoeXNpY2FsX21lbW9yeV9zZXRfZGlydHlf
+bGViaXRtYXAoKHVuc2lnbmVkIGxvbmcqKSZkLT5kaXJ0eV9iaXRtYXAsIGQtPnN0YXJ0X2FkZHIs
+IGQtPnBhZ2VfbnIpOwoKRVJST1I6ICIoZm9vKikiIHNob3VsZCBiZSAiKGZvbyAqKSIKIzU0OiBG
+SUxFOiBody92ZmlvL2NvbW1vbi5jOjY1MjoKKyAgICBjcHVfcGh5c2ljYWxfbWVtb3J5X3NldF9k
+aXJ0eV9sZWJpdG1hcCgodW5zaWduZWQgbG9uZyopJmQtPmRpcnR5X2JpdG1hcCwgZC0+c3RhcnRf
+YWRkciwgZC0+cGFnZV9ucik7Cgp0b3RhbDogNSBlcnJvcnMsIDEgd2FybmluZ3MsIDY3IGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
+Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
