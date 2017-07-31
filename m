@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dcDdo-0005ox-2m
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcDeH-0006Cw-HQ
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dcDdl-0005wU-DQ
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55730)
+	(envelope-from <dgilbert@redhat.com>) id 1dcDeE-0006Ds-T0
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dcDdl-0005w4-7Z
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:33:57 -0400
-Date: Mon, 31 Jul 2017 17:33:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170731163353.GA24783@stefanha-x1.localdomain>
-References: <20170731140718.22010-1-stefanha@redhat.com>
-	<20170731140718.22010-3-stefanha@redhat.com>
-	<87d18g3anv.fsf@frigg.lan>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcDeE-0006CJ-Ly
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:26 -0400
+Date: Mon, 31 Jul 2017 17:34:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170731163414.GB2122@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6c2NcOVqGQ03X4Wi"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d18g3anv.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] trace: add
- trace_event_get_state_backends()
+In-Reply-To: <1501229198-30588-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 01/29] migration: fix incorrect postcopy
+ recved_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> The bitmap setup during postcopy is incorrectly when the pgaes are huge
+> pages. Fix it.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/postcopy-ram.c | 2 +-
+>  migration/ram.c          | 8 ++++++++
+>  migration/ram.h          | 2 ++
+>  3 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 276ce12..952b73a 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -578,7 +578,7 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+>          ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+>      }
+>      if (!ret) {
+> -        ramblock_recv_bitmap_set(host_addr, rb);
+> +        ramblock_recv_bitmap_set_range(rb, host_addr, pagesize / getpagesize());
 
---6c2NcOVqGQ03X4Wi
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+isn't that   pagesize / qemu_target_page_size() ?
 
-On Mon, Jul 31, 2017 at 06:09:56PM +0300, Llu=EDs Vilanova wrote:
-> Stefan Hajnoczi writes:
->=20
-> > Code that checks dstate is unaware of SystemTap and LTTng UST dstate, so
-> > the following trace event will not fire when solely enabled by SystemTap
-> > or LTTng UST:
->=20
-> >   if (trace_event_get_state(TRACE_MY_EVENT)) {
-> >       str =3D g_strdup_printf("Expensive string to generate ...",
-> >                             ...);
-> >       trace_my_event(str);
-> >       g_free(str);
-> >   }
->=20
-> I believe this should be trace_event_get_state_backends(). Same applies t=
-o the
-> cover letter.
+Other than that it looks OK.
 
-This instance and the cover letter are both showing the pattern in
-existing code.
-
-The description "event will not fire" is correct with
-trace_event_get_state().  If I change it to
-trace_event_get_state_backends() then the description is no longer
-correct :).
-
-Stefan
-
---6c2NcOVqGQ03X4Wi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZf1vxAAoJEJykq7OBq3PI7YcIAJP2Xxj8IxTgYD1VRtN/oDrT
-1h70D4RNgf30aNoImYowxLnv00XwXBW/F6Gt8aZEX7YIQZOeuSz5KXfRdRPOgQUm
-OlI8hvA9DZ5J5J4/BisFrVfu1vGW0XsiQIdqTLFiBBHade7vqNqoHAtU40L91ctI
-3R9M3DtkPWHVXhAldIfu900YAXWhnh9cZ+uS/AWy6Q6q54gf+ZtyV2JTCmnvY5ux
-LMup3rqPEbT6MW+YOaxtNbnXN10v8hFGFbz5PjPOVx7wBXkETXG79nefQm0K4KwD
-GHVzrmRhW3rw0lEpnJ5OuC974q+UtrqN9ifEs3DCIOBWGP9p84VRSPecuo28oNQ=
-=u6+g
------END PGP SIGNATURE-----
-
---6c2NcOVqGQ03X4Wi--
+>      }
+>      return ret;
+>  }
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 107ee9d..c93973c 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -168,6 +168,14 @@ void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb)
+>      set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
+>  }
+>  
+> +void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
+> +                                    size_t len)
+> +{
+> +    bitmap_set(rb->receivedmap,
+> +               ramblock_recv_bitmap_offset(host_addr, rb),
+> +               len);
+> +}
+> +
+>  void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb)
+>  {
+>      clear_bit(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
+> diff --git a/migration/ram.h b/migration/ram.h
+> index b711552..84e8623 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -55,6 +55,8 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+>  
+>  int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb);
+>  void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
+> +void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
+> +                                    size_t len);
+>  void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
+>  
+>  #endif
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
