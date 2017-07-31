@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc84X-00062o-Ko
+	(envelope-from <mjt@tls.msk.ru>) id 1dc84X-00062n-Kd
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc84U-0006w9-JK
+	(envelope-from <mjt@tls.msk.ru>) id 1dc84U-0006wB-JW
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:37:13 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 31 Jul 2017 13:21:41 +0300
-Message-Id: <b208ac07ea8455878bba250796be38dbe58066db.1501496350.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 31 Jul 2017 13:21:30 +0300
+Message-Id: <9f26f3252534e7680cfc7c0dbd1d79fdb56519ad.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
@@ -15,8 +15,7 @@ References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/25] docs: fix broken paths to
- docs/devel/atomics.txt
+Subject: [Qemu-devel] [PULL 11/25] ui/vnc: fix leak of SocketAddress **
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +29,96 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@no
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-With the move of some docs/ to docs/devel/ on ac06724a71,
-a couple of references were not updated.
+Extract the (correct) cleaning code as a new function vnc_free_addresses(=
+) then
+use it to remove the memory leaks.
 
+Reported-by: Clang Static Analyzer
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- docs/devel/lockcnt.txt | 2 +-
- include/qemu/atomic.h  | 4 ++--
- tcg/README             | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ ui/vnc.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/docs/devel/lockcnt.txt b/docs/devel/lockcnt.txt
-index 2a79b3205b..7c099bc6c8 100644
---- a/docs/devel/lockcnt.txt
-+++ b/docs/devel/lockcnt.txt
-@@ -145,7 +145,7 @@ can also be more efficient in two ways:
- - on some platforms, one can implement QemuLockCnt to hold the lock
-   and the mutex in a single word, making the fast path no more expensive
-   than simply managing a counter using atomic operations (see
--  docs/atomics.txt).  This can be very helpful if concurrent access to
-+  docs/devel/atomics.txt).  This can be very helpful if concurrent acces=
-s to
-   the data structure is expected to be rare.
+diff --git a/ui/vnc.c b/ui/vnc.c
+index eb91559b6b..651cbb8606 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3521,6 +3521,20 @@ static int vnc_display_get_address(const char *add=
+rstr,
+     return ret;
+ }
 =20
++static void vnc_free_addresses(SocketAddress ***retsaddr,
++                               size_t *retnsaddr)
++{
++    size_t i;
++
++    for (i =3D 0; i < *retnsaddr; i++) {
++        qapi_free_SocketAddress((*retsaddr)[i]);
++    }
++    g_free(*retsaddr);
++
++    *retsaddr =3D NULL;
++    *retnsaddr =3D 0;
++}
++
+ static int vnc_display_get_addresses(QemuOpts *opts,
+                                      bool reverse,
+                                      SocketAddress ***retsaddr,
+@@ -3538,7 +3552,6 @@ static int vnc_display_get_addresses(QemuOpts *opts=
+,
+     bool has_ipv6 =3D qemu_opt_get(opts, "ipv6");
+     bool ipv4 =3D qemu_opt_get_bool(opts, "ipv4", false);
+     bool ipv6 =3D qemu_opt_get_bool(opts, "ipv6", false);
+-    size_t i;
+     int displaynum =3D -1;
+     int ret =3D -1;
 =20
-diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-index e07c7972ab..b6b62fb771 100644
---- a/include/qemu/atomic.h
-+++ b/include/qemu/atomic.h
-@@ -8,7 +8,7 @@
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  * See the COPYING file in the top-level directory.
-  *
-- * See docs/atomics.txt for discussion about the guarantees each
-+ * See docs/devel/atomics.txt for discussion about the guarantees each
-  * atomic primitive is meant to provide.
-  */
+@@ -3614,16 +3627,8 @@ static int vnc_display_get_addresses(QemuOpts *opt=
+s,
+     ret =3D 0;
+  cleanup:
+     if (ret < 0) {
+-        for (i =3D 0; i < *retnsaddr; i++) {
+-            qapi_free_SocketAddress((*retsaddr)[i]);
+-        }
+-        g_free(*retsaddr);
+-        for (i =3D 0; i < *retnwsaddr; i++) {
+-            qapi_free_SocketAddress((*retwsaddr)[i]);
+-        }
+-        g_free(*retwsaddr);
+-        *retsaddr =3D *retwsaddr =3D NULL;
+-        *retnsaddr =3D *retnwsaddr =3D 0;
++        vnc_free_addresses(retsaddr, retnsaddr);
++        vnc_free_addresses(retwsaddr, retnwsaddr);
+     }
+     return ret;
+ }
+@@ -3772,7 +3777,6 @@ void vnc_display_open(const char *id, Error **errp)
+     int acl =3D 0;
+     int lock_key_sync =3D 1;
+     int key_delay_ms;
+-    size_t i;
 =20
-@@ -427,7 +427,7 @@
-  * sequentially consistent operations.
-  *
-  * As long as they are used as paired operations they are safe to
-- * use. See docs/atomic.txt for more discussion.
-+ * use. See docs/devel/atomics.txt for more discussion.
-  */
+     if (!vd) {
+         error_setg(errp, "VNC display not active");
+@@ -3993,12 +3997,8 @@ void vnc_display_open(const char *id, Error **errp=
+)
+     }
 =20
- #ifndef atomic_mb_read
-diff --git a/tcg/README b/tcg/README
-index bf49e8242b..03bfb6acd4 100644
---- a/tcg/README
-+++ b/tcg/README
-@@ -446,7 +446,7 @@ when MTTCG is enabled.
- The guest translators should generate this opcode for all guest instruct=
-ions
- which have ordering side effects.
+  cleanup:
+-    for (i =3D 0; i < nsaddr; i++) {
+-        qapi_free_SocketAddress(saddr[i]);
+-    }
+-    for (i =3D 0; i < nwsaddr; i++) {
+-        qapi_free_SocketAddress(wsaddr[i]);
+-    }
++    vnc_free_addresses(&saddr, &nsaddr);
++    vnc_free_addresses(&wsaddr, &nwsaddr);
+     return;
 =20
--Please see docs/atomics.txt for more information on memory barriers.
-+Please see docs/devel/atomics.txt for more information on memory barrier=
-s.
-=20
- ********* 64-bit guest on 32-bit host support
-=20
+ fail:
 --=20
 2.11.0
