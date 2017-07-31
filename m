@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcCo5-0001Ro-Ip
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:40:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dcCpz-0002Oo-Hp
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:42:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcCo4-0004YZ-P4
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:40:33 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcCo4-0004Y1-HR
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:40:32 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id k20so16264839wmg.0
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 08:40:32 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1dcCpw-0005VM-Ck
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:42:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dcCpw-0005Ug-6Z
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 11:42:28 -0400
+References: <1501120851-4314-1-git-send-email-changpeng.liu@intel.com>
+	<1501120851-4314-2-git-send-email-changpeng.liu@intel.com>
+	<20170726103513.GB18489@stefanha-x1.localdomain>
+	<FF7FC980937D6342B9D289F5F3C7C2625B59C79E@SHSMSX103.ccr.corp.intel.com>
+	<20170727094836.GB10129@stefanha-x1.localdomain>
+	<FF7FC980937D6342B9D289F5F3C7C2625B59CD56@SHSMSX103.ccr.corp.intel.com>
+	<20170728103557.GB11097@stefanha-x1.localdomain>
+	<FF7FC980937D6342B9D289F5F3C7C2625B59D340@SHSMSX103.ccr.corp.intel.com>
+	<20170731145141.GI11830@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <88704b75-74af-0fff-da0c-7a051185fd0e@redhat.com>
+Date: Mon, 31 Jul 2017 17:41:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <1501503765-15639-1-git-send-email-peter.maydell@linaro.org>
-References: <1501503765-15639-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 31 Jul 2017 16:40:10 +0100
-Message-ID: <CAFEAcA8sCJryehMgrDCiXGHXGmVhkg_XUdoni+-SU+pSChOtNQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20170731145141.GI11830@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] target-arm queue
+Subject: Re: [Qemu-devel] [PATCH 1/2] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, "Liu, Changpeng" <changpeng.liu@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "felipe@nutanix.com" <felipe@nutanix.com>, "mst@redhat.com" <mst@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 31 July 2017 at 13:22, Peter Maydell <peter.maydell@linaro.org> wrote:
-> ARM queue for 2.10: all M profile bugfixes...
->
-> thanks
-> -- PMM
->
-> The following changes since commit 25dd0e77898c3e10796d4cbeb35e8af5ba6ce9=
-75:
->
->   Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
-nto staging (2017-07-31 11:27:43 +0100)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-=
-20170731
->
-> for you to fetch changes up to 89cbc3778a3d61761e2231e740269218c9a8a41d:
->
->   hw/mps2_scc: fix incorrect properties (2017-07-31 13:11:56 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * fix broken properties on MPS2 SCC device
->  * fix MPU trace handling of write vs exec
->  * fix MPU M profile bugs:
->    - not handling system space or PPB region correctly
->    - not resetting state
->    - not migrating MPU_RNR
->
-> ----------------------------------------------------------------
-> Peter Maydell (6):
->       target/arm: Correct MPU trace handling of write vs execute
->       target/arm: Don't do MPU lookups for addresses in M profile PPB reg=
-ion
->       target/arm: Don't allow guest to make System space executable for M=
- profile
->       target/arm: Rename cp15.c6_rgnr to pmsav7.rnr
->       target/arm: Move PMSAv7 reset into arm_cpu_reset() so M profile MPU=
-s get reset
->       target/arm: Migrate MPU_RNR register state for M profile cores
->
-> Philippe Mathieu-Daud=C3=A9 (1):
->       hw/mps2_scc: fix incorrect properties
+On 31/07/2017 16:51, Stefan Hajnoczi wrote:
+> typedef enum VhostUserRequest {
+>     ...
+>=20
+>     /* Submitted by the vhost-user master when the guest writes to
+>      * virtio config space and also after live migration on the
+>      * destination host.
+>      */
+>     VHOST_USER_SET_CONFIG,
+>=20
+>     /* Submitted by the vhost-user master to fetch the contents of the
+>      * virtio config space.  The vhost-user master may cache the
+>      * contents to avoid repeated VHOST_USER_GET_CONFIG calls.
+>      */
+>     VHOST_USER_GET_CONFIG,
+>=20
+>     ...
+> };
 
-Applied, thanks.
+Also:
 
--- PMM
+	/* Submitted by the vhost-user master if it would like to
+	 * be informed of virtio config space changes.   The slave
+	 * signals the eventfd whenever config space is modified.
+	 */
+	VHOST_USER_SET_CONFIG_FD,
+
+Paolo
+
+> struct VuDev {
+>     ...
+>     int config_change_fd;
+>     ...
+> };
