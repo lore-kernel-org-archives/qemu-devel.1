@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc84a-00063r-DB
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:37:17 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dc885-0000nb-0T
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc84U-0006vx-GI
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:37:16 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dc881-0000yA-Tv
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:40:53 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:33983)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mjt@tls.msk.ru>) id 1dc881-0000xe-D0
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:40:49 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 31 Jul 2017 13:21:34 +0300
-Message-Id: <bc658e4a2e81593f75a3ae34b112be77efbb3e0a.1501496349.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
-References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
-References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
+Message-ID: <93cb052b-78fb-6934-fd35-1d2805090d2a@msgid.tls.msk.ru>
+Date: Mon, 31 Jul 2017 13:40:48 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/25] syscall: fix dereference of undefined
- pointer
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] xhci: guard xhci_kick_epctx against recursive calls
+ for 2.8?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+After applying commit 96d87bdda3919bb16f754b3d3fd1227e1f38f13c:
 
-linux-user/syscall.c:5581:9: warning: Dereference of undefined pointer va=
-lue
-    if (*host_rt_dev_ptr !=3D 0) {
-        ^~~~~~~~~~~~~~~~
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Thu Feb 2 12:36:12 2017 +0100
 
-Reported-by: Clang Static Analyzer
-Suggested-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- linux-user/syscall.c | 1 +
- 1 file changed, 1 insertion(+)
+    xhci: guard xhci_kick_epctx against recursive calls
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 003943b736..71d45a9963 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5573,6 +5573,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, u=
-int8_t *buf_temp,
-                                     field_types, THUNK_HOST);
-     }
-     unlock_user(argptr, arg, 0);
-+    assert(host_rt_dev_ptr);
-=20
-     ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
-     if (*host_rt_dev_ptr !=3D 0) {
---=20
-2.11.0
+    Track xhci_kick_epctx processing being active in a variable.  Check the
+    variable before calling xhci_kick_epctx from xhci_kick_ep.  Add an
+    assert to make sure we don't call recursively into xhci_kick_epctx.
+
+    Cc: 1653384@bugs.launchpad.net
+    Fixes: 94b037f2a451b3dc855f9f2c346e5049a361bd55
+    Reported-by: Fabian Lesniak <fabian@lesniak-it.de>
+    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+    Message-id: 1486035372-3621-1-git-send-email-kraxel@redhat.com
+    Message-id: 1485790607-31399-5-git-send-email-kraxel@redhat.com
+
+to 2.8, to fix the CVE-2017-9375 in 2.8, it starts to fail at
+startup with the assertion failure introduced in this commit:
+
+ hw/usb/hcd-xhci.c:2169: xhci_kick_epctx: Assertion `!epctx->kick_active' failed.
+
+The commit itself looks sane, but might be there were other
+fixes before this one, on top of 2.8, required for it to
+functioning properly?  I'm not sure I understand the xhci
+machinery right.
+
+Gerd, can you shed some light on this please?
+
+Thank you!
+
+/mjt
