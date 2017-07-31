@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcD7A-0001ri-CX
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:00:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dcD8d-0004YR-3t
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcD71-0007Sd-5r
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:00:16 -0400
-Date: Mon, 31 Jul 2017 17:59:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170731155955.GD12064@localhost.localdomain>
-References: <20170726130337.24102-1-stefanha@redhat.com>
-	<ac8960ca-5149-19d3-3853-bcd8c0445e8f@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
-Content-Disposition: inline
-In-Reply-To: <ac8960ca-5149-19d3-3853-bcd8c0445e8f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] docs: add qemu-block-drivers(7) man page
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dcD8Z-0008Dm-6x
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:01:47 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:1163 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dcD8Y-0008D6-Sq
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:01:43 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 31 Jul 2017 19:01:31 +0300
+Message-Id: <20170731160135.12101-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] trace-events: print 0x before hex
+ numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, el13635@mail.ntua.gr
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, stefanha@gmail.com, peter.maydell@linaro.org, berrange@redhat.com, cohuck@redhat.com
 
+Hi all!
 
---24zk1gE8NUlDmwG9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It is hard to read logs, when there are hex and dec numbers in one line, when
+hex number doesn't contain any letters and don't have '0x' prefix.
 
-Am 31.07.2017 um 17:56 hat Eric Blake geschrieben:
-> On 07/26/2017 08:03 AM, Stefan Hajnoczi wrote:
-> > Block driver documentation is available in qemu-doc.html.  It would be
-> > convenient to have documentation for formats, protocols, and filter
-> > drivers in a man page.
-> >=20
-> > Extract the relevant part of qemu-doc.html into a new file called
-> > docs/qemu-block-drivers.texi.  This file can also be built as a
-> > stand-alone document (man, html, etc).
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> > v3:
-> >  * Rebased due to LUKS documentation conflict [Kevin]
->=20
-> Building in-tree on Kevin's block branch now sees this in git status:
->=20
-> Untracked files:
->   (use "git add <file>..." to include in what will be committed)
->=20
-> 	docs/qemu-block-drivers.html
-> 	docs/qemu-block-drivers.txt
->=20
-> Can we get those added to .gitignore (either squashed in here, or as a
-> followup)?
+So, here is a complete solution for the problem:
 
-I also noticed this warning today:
+- add information into CODING_STYLE
+- add a check into checkpatch.pl
+- fix current state
 
-docs/qemu-block-drivers.texi: warning: must specify a title with a title co=
-mmand or @top
+The new rule for the style is:
 
-Kevin
+Hex numbers should be prefixed by '0x', except groups of numbers,
+separated by symbols ' ', '.', ':', '/', however '0x' can be used for
+numbers in such groups too. Flag '#' in number format is not allowed.
 
---24zk1gE8NUlDmwG9
-Content-Type: application/pgp-signature; name="signature.asc"
+Note: checkpatch fails on checkpatch change (03) due to long lines.
+It is because checkpatch.pl is indented by tabs and when it checks
+for long lines it consider tabs as 8 spaces. Looks like nobody cares,
+so do I. I see two ways here:
+ -  s/\t/    /g
+ -  make exclusion in checkpatch.pl for checkpatch.pl to consider tabs
+    as 4 spaces, not 8.  However I don't want to fix it in the context
+    of these series.
 
------BEGIN PGP SIGNATURE-----
+v3: 01 - rewording
+    02 - adjust commit message - add two printf flags "'I" into a check
+         add Stefan's and Eric's r-bs
+    03 - fix commit message s/Accordingly/According/
+         add Stefan's r-b
+    04 - add Stefan's r-b
+         add Cornelia's a-b
+v2: almost everything (style, checkpatch, excluding number groups)
+V1: was a draft of the idea using two sed commands.
 
-iQIcBAEBAgAGBQJZf1P7AAoJEH8JsnLIjy/Wqg0QALhzq2eQolUII4RTcIsnv+m+
-ozQ0FH679H5ubS4Pzx6d2SwXCXfiFpt+tftRiN1sas4ykOTruPdD+PsBx04ZPGat
-0orVIJy/5VMMIKtB3U1dfSW/BatLQMBeY58Whr8oqhWdzD5N9pSVQjslO7uStVa4
-b3UVa0DTJDWTkwtD+xNB1EIPUH7hicqZO3OWkFgHy+4iyA6igvhFewCjzVLwrnxG
-KpKb5YXWNYRhxGNSIGRlyqNeI7edHp3ur89YkpZrSYG6TL9kayle5wFLnW/IEmgN
-lVQsnH+jACANXdb+B6EfeTOVaLPe4sim1HTTCi6/fX9n9F1MaDN0QzKtIZKzoika
-+FClnE4CIg3HyzNmdKq4Pv9hd7U8mGy4AYYFEACLlCEyWE1uAgqBY5rANdokxiII
-PWYwYBk/kAwPH20BLTLNkI0CzcHvVk+pbAicW/xsN9IR5gVqrjCpsx32nAfCewyU
-svLU1S30Ze4kXXm2EQIoQK4zUJWNj3ZqnqUi6A+6Ah0o5Xt9+2IJ12mWL8UgxuVi
-gzyMDUwTJj2VvpFtZeLklFTxi3BgZvl+YxM26DTwiwklcbUtgqG2PP4Ezygb8pKu
-qVKJdDBUEK5txRWdYosaM3iwjouNz3rsaW0s7Hod+ynuQTG50AaqioTUUujjvyPP
-andbRTmDfshDwwm+mlMP
-=nm86
------END PGP SIGNATURE-----
+Vladimir Sementsov-Ogievskiy (4):
+  coding_style: add point about 0x in trace-events
+  trace-events: fix code style: %# -> 0x%
+  checkpatch: check trace-events code style
+  trace-events: fix code style: print 0x before hex numbers
 
---24zk1gE8NUlDmwG9--
+ CODING_STYLE              |  35 +++++++++
+ accel/tcg/trace-events    |   2 +-
+ audio/trace-events        |   4 +-
+ block/trace-events        |  28 ++++----
+ hw/audio/trace-events     |   4 +-
+ hw/char/trace-events      |  12 ++--
+ hw/display/trace-events   |  14 ++--
+ hw/dma/trace-events       |  20 +++---
+ hw/i386/xen/trace-events  |  26 +++----
+ hw/input/trace-events     |   6 +-
+ hw/intc/trace-events      | 176 +++++++++++++++++++++++-----------------------
+ hw/isa/trace-events       |   4 +-
+ hw/misc/trace-events      |  78 ++++++++++----------
+ hw/net/trace-events       |  52 +++++++-------
+ hw/nvram/trace-events     |   2 +-
+ hw/pci/trace-events       |   4 +-
+ hw/ppc/trace-events       |  64 ++++++++---------
+ hw/s390x/trace-events     |  20 +++---
+ hw/scsi/trace-events      | 118 +++++++++++++++----------------
+ hw/sd/trace-events        |   4 +-
+ hw/timer/trace-events     |  20 +++---
+ hw/usb/trace-events       |  56 +++++++--------
+ hw/vfio/trace-events      |  44 ++++++------
+ hw/virtio/trace-events    |   6 +-
+ hw/xen/trace-events       |   8 +--
+ linux-user/trace-events   |  10 +--
+ migration/trace-events    |  36 +++++-----
+ nbd/trace-events          |  18 ++---
+ net/trace-events          |   4 +-
+ scripts/checkpatch.pl     |  19 +++++
+ target/arm/trace-events   |  10 +--
+ target/s390x/trace-events |   2 +-
+ target/sparc/trace-events |  30 ++++----
+ trace-events              |  20 +++---
+ 34 files changed, 505 insertions(+), 451 deletions(-)
+
+-- 
+2.11.1
