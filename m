@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc84X-00062m-KS
+	(envelope-from <mjt@tls.msk.ru>) id 1dc84X-00062p-Kl
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc84U-0006wN-L6
+	(envelope-from <mjt@tls.msk.ru>) id 1dc84U-0006wI-Ju
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:37:13 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 31 Jul 2017 13:21:40 +0300
-Message-Id: <b3125e73d45126ecf49bd73d3a92426102759cda.1501496350.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 31 Jul 2017 13:21:22 +0300
+Message-Id: <1b61270be156872e52291698afc1fdec5b055842.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
@@ -15,8 +15,8 @@ References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/25] docs: fix broken paths to
- docs/devel/qapi-code-gen.txt
+Subject: [Qemu-devel] [PULL 03/25] MAINTAINERS: Improve the NetBSD regex
+ pattern
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +26,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
 
-With the move of some docs to docs/interop on ac06724a71,
-a couple of references were not updated.
+Currently get_maintainers.pl claims that the configure script is
+maintained by Kamil:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+ $ scripts/get_maintainer.pl -f configure
+ Kamil Rytarowski <kamil@netbsd.org> (maintainer:NETBSD)
+ qemu-devel@nongnu.org (open list:All patches CC here)
+
+This happens because the regex pattern for the NETBSD entry triggers
+on everything that contains the keyword "NetBSD". Ease the situation
+a little bit by restricting this to "Subject:" lines only, like
+we do it in the "trivial patches" section already.
+
+Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- docs/devel/writing-qmp-commands.txt | 2 +-
- include/qapi/visitor.h              | 2 +-
- qapi/introspect.json                | 2 +-
- qapi/qapi-util.c                    | 2 +-
- scripts/qapi2texi.py                | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/devel/writing-qmp-commands.txt b/docs/devel/writing-qmp=
--commands.txt
-index 69793e320e..4f5b24c0c4 100644
---- a/docs/devel/writing-qmp-commands.txt
-+++ b/docs/devel/writing-qmp-commands.txt
-@@ -7,7 +7,7 @@ This document doesn't discuss QMP protocol level details,=
- nor does it dive
- into the QAPI framework implementation.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5ea273f899..577e17b78d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -353,7 +353,7 @@ NETBSD
+ L: qemu-devel@nongnu.org
+ M: Kamil Rytarowski <kamil@netbsd.org>
+ S: Maintained
+-K: (?i)NetBSD
++K: ^Subject:.*(?i)NetBSD
 =20
- For an in-depth introduction to the QAPI framework, please refer to
--docs/qapi-code-gen.txt. For documentation about the QMP protocol,
-+docs/devel/qapi-code-gen.txt. For documentation about the QMP protocol,
- start with docs/interop/qmp-intro.txt.
-=20
- =3D=3D Overview =3D=3D
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index fe9faf469f..0f3b8cb459 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -36,7 +36,7 @@
-  * QemuOpts, and clone visitors have some implementation limitations;
-  * see the documentation for each visitor for more details on what it
-  * supports.  Also, see visitor-impl.h for the callback contracts
-- * implemented by each visitor, and docs/qapi-code-gen.txt for more
-+ * implemented by each visitor, and docs/devel/qapi-code-gen.txt for mor=
-e
-  * about the QAPI code generator.
-  *
-  * All of the visitors are created via:
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 1dbaef56eb..cf77ff0669 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -226,7 +226,7 @@
- #
- # @members: the alternate type's members, in no particular order.
- #           The members' wire encoding is distinct, see
--#           docs/qapi-code-gen.txt section Alternate types.
-+#           docs/devel/qapi-code-gen.txt section Alternate types.
- #
- # On the wire, this can be any of the members.
- #
-diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-index e28dbd0ac3..46eda7d196 100644
---- a/qapi/qapi-util.c
-+++ b/qapi/qapi-util.c
-@@ -40,7 +40,7 @@ int qapi_enum_parse(const char * const lookup[], const =
-char *buf,
-  * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
-  * may contain only letters, digits, hyphen and period.
-  * The special exception for enumeration names is not implemented.
-- * See docs/qapi-code-gen.txt for more on QAPI naming rules.
-+ * See docs/devel/qapi-code-gen.txt for more on QAPI naming rules.
-  * Keep this consistent with scripts/qapi.py!
-  * If @complete, the parse fails unless it consumes @str completely.
-  * Return its length on success, -1 on failure.
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 9e015002ef..a317526e51 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -91,7 +91,7 @@ def texi_format(doc):
-         # doesn't.
-         #
-         # Make sure to update section "Documentation markup" in
--        # docs/qapi-code-gen.txt when fixing this.
-+        # docs/devel/qapi-code-gen.txt when fixing this.
-         if line.startswith('| '):
-             line =3D EXAMPLE_FMT(code=3Dline[2:])
-         elif line.startswith('=3D '):
+ W32, W64
+ L: qemu-devel@nongnu.org
 --=20
 2.11.0
