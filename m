@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcALj-0000Vx-Sf
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:03:09 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dcANg-0001vr-49
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:05:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcALf-0007A5-TQ
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:03:07 -0400
-References: <cover.1501477080.git.jcody@redhat.com>
-	<402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bea61cfc-0426-68c5-3f39-eb2ada5e0bc3@redhat.com>
-Date: Mon, 31 Jul 2017 08:02:39 -0500
+	(envelope-from <rth7680@gmail.com>) id 1dcANc-0008TU-1u
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:05:08 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:38132)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dcANb-0008Rm-SN
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:05:03 -0400
+Received: by mail-pg0-x242.google.com with SMTP id 125so17223382pgi.5
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 06:05:02 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
+	<CAFEAcA8N_JyMVtLPdSFEUUgmJ0OG6AbHuD=5KhO8kv3fJDLwGw@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <19ee3dfd-dd1c-191d-14fb-a44058c8ccb6@twiddle.net>
+Date: Mon, 31 Jul 2017 06:04:59 -0700
 MIME-Version: 1.0
-In-Reply-To: <402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 3/3] qemu-iotests: add option to
- save temp files on error
+In-Reply-To: <CAFEAcA8N_JyMVtLPdSFEUUgmJ0OG6AbHuD=5KhO8kv3fJDLwGw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
+ for multiboot?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
-Message-ID: <bea61cfc-0426-68c5-3f39-eb2ada5e0bc3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 3/3] qemu-iotests: add option to
- save temp files on error
-References: <cover.1501477080.git.jcody@redhat.com>
- <402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
-In-Reply-To: <402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 07/31/2017 01:50 AM, Peter Maydell wrote:
+> On 28 July 2017 at 22:28, Anatol Pomozov <anatol.pomozov@gmail.com> wrote:
+>> So I need to perform 2 things:
+>>
+>>   - Load ELF section headers into target's memory. I did by appending
+>> additional space to mbs.mb_buf and copying header data. Is it the best
+>> way to do?
+>>
+>>   - Next I need to load other ELF sections such as symbols (e.g.
+>> .shstrtab) that store section names. What is the best way to do in
+>> multiboo.c code? Would it make sense to load all ELF sections?
+> 
+> This seems a bit odd, because in general an ELF loader should
+> not care at all about sections and the section header. It
+> should only need to look at the program header, which defines
+> which segments to load. If the guest binary needs some things
+> to be loaded then I would expect that it is the job of the linker
+> that produces the guest binary to make sure those things are in
+> segments which are marked as LOAD.
 
-On 07/31/2017 12:04 AM, Jeff Cody wrote:
-> Now that ./check takes care of cleaning up after each tests, it
-> can also selectively not clean up.  Add option to leave all output from=
-
-> tests intact if that test encountered an error.
->=20
-> Note: this currently only works for bash tests, as the python tests
-> still clean up after themselves manually.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  tests/qemu-iotests/check  | 5 ++++-
->  tests/qemu-iotests/common | 6 ++++++
->  2 files changed, 10 insertions(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Agreed.  If you're touching ELF sections, then I think you're missing the point 
+of the ELF program header entirely.  If you write your own linker script, you 
+have complete control of the ELF PHDR, and can arrange for anything you like to 
+be loaded.
 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/KnAACgkQp6FrSiUn
-Q2qeoQgApHwafZR+DOlyDB+3I6gNmuzw2t472oHP/F9OtGsWaMv746k6tfOw9gHT
-sy/eMSlai/KnLG2Pe7km4Uml2+s29M1UEeMurDejf6HVD02//HbwdNjCpN0Srcbl
-cQTKdIkWV2K2qT2NxIu2HOsbUd2kt5xEDPbI/sXS3ht9pbrA3WERHnsQQYCzZJr5
-o3vkdm9jt3lt7DZS3O3DCURE8peoLVLUrNDEfuRcBuQC5BZhFzuDb5b/NLMEAfuS
-4MVPJYXX6gEGHzN2lnXrPWMOFpp73C6U01ZFNUOONFeDLEBwFnd0skgkayPs5eIs
-m8QMsdG2PZZRTP6JjtEC4w2jNg7SDw==
-=5xUL
------END PGP SIGNATURE-----
-
---nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE--
+r~
