@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcAP1-0002ov-MB
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:06:35 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcASE-0003yx-4Y
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcAOw-0000op-U1
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:06:31 -0400
-References: <20170731125111.28052-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0c81b100-89af-83ba-069c-88b962b8a472@redhat.com>
-Date: Mon, 31 Jul 2017 08:06:18 -0500
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcASA-0002su-0e
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:09:50 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:2978)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcAS9-0002oO-Qc
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:09:45 -0400
+From: James Hogan <james.hogan@imgtec.com>
+Date: Mon, 31 Jul 2017 14:09:11 +0100
+Message-ID: <cover.6535001d6b9cd2357109d19b1060e3f6a2b958a7.1501506432.git-series.james.hogan@imgtec.com>
 MIME-Version: 1.0
-In-Reply-To: <20170731125111.28052-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] block/qapi: Remove redundat NULL
- check to silence Coverity
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/2] mips: KVM T&E segment support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +23,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: James Hogan <james.hogan@imgtec.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Message-ID: <0c81b100-89af-83ba-069c-88b962b8a472@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] block/qapi: Remove redundat NULL
- check to silence Coverity
-References: <20170731125111.28052-1-kwolf@redhat.com>
-In-Reply-To: <20170731125111.28052-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIPS KVM trap & emulate guest kernels have a different segment layout
+compared with traditional MIPS kernels, to allow both the user and
+kernel code to run from the user address segment without repeatedly
+trapping to KVM.
 
-On 07/31/2017 07:51 AM, Kevin Wolf wrote:
-> When skipping implicit nodes in bdrv_block_device_info(), we know that
-> bs0 is always non-NULL; initially, because it's taken from a BdrvChild
-> and a BdrvChild never has a NULL bs, and after the first iteration
-> because implicit nodes always have a backing file.
->=20
-> Remove the NULL check and add an assertion that the implicit node does
-> indeed have a backing file.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qapi.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+QEMU currently supports this layout only for KVM, but its sometimes
+useful to be able to run these kernels in QEMU on a PC. This patchset
+enables it for TCG too.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This also paves the way for MIPS KVM VZ support (which uses the normal
+virtual memory layout) by abstracting whether user mode kernel segments
+are in use.
 
->=20
-> diff --git a/block/qapi.c b/block/qapi.c
-> index d2b18ee9df..5f1a71f5d2 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -145,8 +145,9 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBacken=
-d *blk,
-> =20
->          /* Skip automatically inserted nodes that the user isn't aware=
- of for
->           * query-block (blk !=3D NULL), but not for query-named-block-=
-nodes */
-> -        while (blk && bs0 && bs0->drv && bs0->implicit) {
-> +        while (blk && bs0->drv && bs0->implicit) {
->              bs0 =3D backing_bs(bs0);
-> +            assert(bs0);
->          }
->      }
-> =20
->=20
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+James Hogan (2):
+  mips: Improve segment defs for KVM T&E guests
+  mips: Add KVM T&E segment support for TCG
 
+ hw/mips/addr.c            | 12 ++++++++++++
+ hw/mips/mips_malta.c      | 17 +++++++----------
+ include/hw/mips/cpudevs.h |  5 +++--
+ target/mips/helper.c      | 27 +++++++++++++--------------
+ target/mips/translate.c   |  4 ++--
+ 5 files changed, 37 insertions(+), 28 deletions(-)
 
---Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/K0oACgkQp6FrSiUn
-Q2oO4ggAq7efmSDBZki8aqHJ+DhqFGgqhnUZ83FvHxzjUMkpWwgFpRvKSHRGEVfa
-cYM2+fjZTR4gfqfLXuYupgNNlidOLjqcGf8nk7Yu7qmhz5CrBH1llqBr47dj6Bkw
-WPz1zmFuld/wsENitAfptekxm7Qq9N61po7cYlL/QT106jPME7z/c7RlHbxl6uon
-6Kr0KwmxE8PMfpZkryDSzbkmkqw3EFn+xZRqJC4VHknK3piu3N48GprxvZS06oTT
-yj9Aus6lhzjCoZ89y8mSMLsiuA+DCwXsXWN+FWcca/IX9FJHUF0VS6jtwrxZ7h3U
-Xo4dnMSGGsZ1/iiVvvBD/Q9/yYamvw==
-=fbaR
------END PGP SIGNATURE-----
-
---Bhni5eKL2WrT2LWJeFaijNew2CKeGelG5--
+-- 
+git-series 0.8.10
