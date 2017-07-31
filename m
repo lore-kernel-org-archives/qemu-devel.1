@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcA7w-0004j1-8t
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:48:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dcAAV-0006AV-Dq
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcA7s-0004qw-9X
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:48:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dcA7s-0004q5-0d
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:48:48 -0400
-References: <20170729131159.24949-1-vsementsov@virtuozzo.com>
-	<20170729131159.24949-4-vsementsov@virtuozzo.com>
-	<20170731092606.GD11830@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cce442b5-c483-b6ea-e0cf-63005c0cb51c@redhat.com>
-Date: Mon, 31 Jul 2017 07:48:41 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170731092606.GD11830@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D20lE2AGxhF6aOXuokuG1mM70oBWFjjng"
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] checkpatch: check trace-events code
- style
+	(envelope-from <kwolf@redhat.com>) id 1dcAAU-00078S-N3
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 08:51:31 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 31 Jul 2017 14:51:11 +0200
+Message-Id: <20170731125111.28052-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10] block/qapi: Remove redundat NULL
+ check to silence Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, peter.maydell@linaro.org, berrange@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D20lE2AGxhF6aOXuokuG1mM70oBWFjjng
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mreitz@redhat.com,
- jsnow@redhat.com, den@openvz.org, peter.maydell@linaro.org,
- berrange@redhat.com
-Message-ID: <cce442b5-c483-b6ea-e0cf-63005c0cb51c@redhat.com>
-Subject: Re: [PATCH v2 3/4] checkpatch: check trace-events code style
-References: <20170729131159.24949-1-vsementsov@virtuozzo.com>
- <20170729131159.24949-4-vsementsov@virtuozzo.com>
- <20170731092606.GD11830@stefanha-x1.localdomain>
-In-Reply-To: <20170731092606.GD11830@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When skipping implicit nodes in bdrv_block_device_info(), we know that
+bs0 is always non-NULL; initially, because it's taken from a BdrvChild
+and a BdrvChild never has a NULL bs, and after the first iteration
+because implicit nodes always have a backing file.
 
-On 07/31/2017 04:26 AM, Stefan Hajnoczi wrote:
-> On Sat, Jul 29, 2017 at 04:11:58PM +0300, Vladimir Sementsov-Ogievskiy =
-wrote:
->> Accordingly to CODING_STYLE, check that in trace-events:
+Remove the NULL check and add an assertion that the implicit node does
+indeed have a backing file.
 
-s/Accordingly/According/
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qapi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
->> 1. hex numbers are prefixed with '0x'
->> 2. '#' flag of printf is not used
->> 3. The exclusion from 1. are period-separated groups of numbers
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
-
->> ---
->>  scripts/checkpatch.pl | 19 +++++++++++++++++++
->>  1 file changed, 19 insertions(+)
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---D20lE2AGxhF6aOXuokuG1mM70oBWFjjng
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/JyoACgkQp6FrSiUn
-Q2q4dwgAoOMOc8SCSVZILPe+OpRVhs0MJxryESDn4RjjvGAqqqPgqXBTtVfpUNgN
-1PCd6l1ZM3aUO9U3vp/tzwrqDSyMkx9f3naFo/Ib0D2nx5O+0l8PDj3YxdvSZLWd
-mqAeJiXb6bjN4Gf6k1YHi+L7XeB4qBA2OEtJFy4ntRM3ERsxk58NXoywwo6vfbVZ
-GZrNEyB3EzK/oNCn8Re7VrJHX4nrE6WgkIKUSxPHyq0kEtZoW8+pfuzvdjAc/eSN
-qXrLPGA3xUJ9KFZueayzXdeVi2nzv3JCb5IA8yFVbW2zHxIUE1rO4o4Q28K7zhOj
-L8yrJlhQSBFxMR6L67ugmWLaUkS81Q==
-=Hf3c
------END PGP SIGNATURE-----
-
---D20lE2AGxhF6aOXuokuG1mM70oBWFjjng--
+diff --git a/block/qapi.c b/block/qapi.c
+index d2b18ee9df..5f1a71f5d2 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -145,8 +145,9 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+ 
+         /* Skip automatically inserted nodes that the user isn't aware of for
+          * query-block (blk != NULL), but not for query-named-block-nodes */
+-        while (blk && bs0 && bs0->drv && bs0->implicit) {
++        while (blk && bs0->drv && bs0->implicit) {
+             bs0 = backing_bs(bs0);
++            assert(bs0);
+         }
+     }
+ 
+-- 
+2.13.3
