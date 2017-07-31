@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcBL1-0007n7-Bs
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:06:28 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcBM2-0008G0-2Q
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcBL0-0005KD-DV
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:06:27 -0400
-Date: Mon, 31 Jul 2017 17:06:11 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170731170217-mutt-send-email-mst@kernel.org>
-References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
-	<20170525011034-mutt-send-email-mst@kernel.org>
-	<AM3PR04MB061619F6FDC53F7FD4C1DAE4FFF10@AM3PR04MB0616.eurprd04.prod.outlook.com>
-	<20170706023845-mutt-send-email-mst@kernel.org>
-	<AM3PR04MB0616507B6F0989360D582F37FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	(envelope-from <stefanha@redhat.com>) id 1dcBLy-0006Hp-3Y
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:07:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dcBLx-0006Ed-T5
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 10:07:26 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 31 Jul 2017 15:07:16 +0100
+Message-Id: <20170731140718.22010-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM3PR04MB0616507B6F0989360D582F37FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/2] trace: fix trace_event_get_state() for
+ SystemTap and LTTng UST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Diana Madalina Craciun <diana.craciun@nxp.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marcel@redhat.com" <marcel@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Mike Caraman <mike.caraman@nxp.com>, Laurentiu Tudor <laurentiu.tudor@nxp.com>
+To: qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Jul 31, 2017 at 01:22:45PM +0000, Diana Madalina Craciun wrote:
-> >> If we are to use a value of 0 for the constant in case of PCI devices,
-> >> what happens if we have multiple PCI controllers?
-> > I guess we'd use the PCI Segment number for that?
-> >
-> >
-> 
-> Yes, we can use the PCI segment for this scenario. But this would mean
-> different solutions for the same problem. The main problem is that we
-> can have multiple entities in the system that are using MSIs (for now
-> PCI and NXP non-PCI bus infrastructure
-> (https://lwn.net/Articles/635905/). I guess that we may have other
-> platform devices that are using MSIs in the future.
-> 
-> Thanks,
-> Diana
-> 
-> 
+v2:
+ * Don't special-case QEMU dstate [Daniel Berrange]
+ * Use _backends() postfix to clarify function purpose [Llu=C3=ADs]
 
-Don't have the time to explore NXP in depth, sorry - there's
-a lot of complexity there.
-Could you maybe stick some bits to specify bus type in there?
-It just looks very wrong to push low level things like this
-that users have no interest in up the stack.
+Trace events that compute their arguments can affect performance.  The
+following idom can be used to avoid computing arguments when the trace ev=
+ent is
+disabled:
 
--- 
-MST
+  if (trace_event_get_state(TRACE_MY_EVENT)) {
+      char *str =3D g_strdup_printf("Expensive string ...", ...);
+      trace_my_event(str);
+      g_free(str);
+  }
+
+Unfortunately this breaks the trace event for SystemTap and LTTng UST sin=
+ce
+those tracers manage their own enabled/disabled state.
+
+These patches add per-backend dstate to trace_event_get_state() so that t=
+he
+trace event fires as expected when enabled via SystemTap or LTTng UST.
+
+Stefan Hajnoczi (2):
+  trace: add TRACE_<event>_BACKEND_DSTATE()
+  trace: add trace_event_get_state_backends()
+
+ docs/devel/tracing.txt                |  2 +-
+ trace/control.h                       | 18 +++++++++++++++++-
+ hw/usb/hcd-ohci.c                     | 13 +++++--------
+ net/colo-compare.c                    | 11 ++++++-----
+ net/filter-rewriter.c                 |  4 ++--
+ scripts/tracetool/__init__.py         |  1 +
+ scripts/tracetool/backend/__init__.py |  3 +++
+ scripts/tracetool/backend/dtrace.py   | 12 ++++++++++++
+ scripts/tracetool/backend/ftrace.py   |  5 +++++
+ scripts/tracetool/backend/log.py      |  5 +++++
+ scripts/tracetool/backend/simple.py   |  5 +++++
+ scripts/tracetool/backend/syslog.py   |  5 +++++
+ scripts/tracetool/backend/ust.py      |  5 +++++
+ scripts/tracetool/format/h.py         | 10 ++++++++++
+ 14 files changed, 82 insertions(+), 17 deletions(-)
+
+--=20
+2.13.3
