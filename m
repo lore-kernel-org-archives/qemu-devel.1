@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcAKD-0008KP-RV
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:01:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dcALj-0000Vx-Sf
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:03:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcAKC-0006Qo-QR
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:01:33 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcAKC-0006QE-KO
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:01:32 -0400
-Received: by mail-wm0-x231.google.com with SMTP id m85so169383461wma.1
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 06:01:32 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dcALf-0007A5-TQ
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:03:07 -0400
+References: <cover.1501477080.git.jcody@redhat.com>
+	<402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bea61cfc-0426-68c5-3f39-eb2ada5e0bc3@redhat.com>
+Date: Mon, 31 Jul 2017 08:02:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <bc658e4a2e81593f75a3ae34b112be77efbb3e0a.1501496349.git.mjt@msgid.tls.msk.ru>
-References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
-	<bc658e4a2e81593f75a3ae34b112be77efbb3e0a.1501496349.git.mjt@msgid.tls.msk.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 31 Jul 2017 14:01:10 +0100
-Message-ID: <CAFEAcA-4_nqre=0BQSCgFtanNnVajubNH4r5SrG7Lg67QqeVRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 15/25] syscall: fix dereference of undefined
- pointer
+In-Reply-To: <402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE"
+Subject: Re: [Qemu-devel] [PATCH for-2.11 3/3] qemu-iotests: add option to
+ save temp files on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
 
-On 31 July 2017 at 11:21, Michael Tokarev <mjt@tls.msk.ru> wrote:
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> linux-user/syscall.c:5581:9: warning: Dereference of undefined pointer va=
-lue
->     if (*host_rt_dev_ptr !=3D 0) {
->         ^~~~~~~~~~~~~~~~
->
-> Reported-by: Clang Static Analyzer
-> Suggested-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
+Message-ID: <bea61cfc-0426-68c5-3f39-eb2ada5e0bc3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 3/3] qemu-iotests: add option to
+ save temp files on error
+References: <cover.1501477080.git.jcody@redhat.com>
+ <402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
+In-Reply-To: <402fccc1212ad053c47110420b9f1c2e751d3d31.1501477080.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/31/2017 12:04 AM, Jeff Cody wrote:
+> Now that ./check takes care of cleaning up after each tests, it
+> can also selectively not clean up.  Add option to leave all output from=
+
+> tests intact if that test encountered an error.
+>=20
+> Note: this currently only works for bash tests, as the python tests
+> still clean up after themselves manually.
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  linux-user/syscall.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 003943b736..71d45a9963 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -5573,6 +5573,7 @@ static abi_long do_ioctl_rt(const IOCTLEntry *ie, u=
-int8_t *buf_temp,
->                                      field_types, THUNK_HOST);
->      }
->      unlock_user(argptr, arg, 0);
-> +    assert(host_rt_dev_ptr);
->
->      ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
->      if (*host_rt_dev_ptr !=3D 0) {
-> --
+>  tests/qemu-iotests/check  | 5 ++++-
+>  tests/qemu-iotests/common | 6 ++++++
+>  2 files changed, 10 insertions(+), 1 deletion(-)
 
-This appears not to build with all versions of gcc; the ones in my
-test set were fine but the gcc 4.6.3 that some of the travis
-configs use complains:
-linux-user/syscall.c: In function 'do_ioctl_rt':
-linux-user/syscall.c:5577:37: error: 'host_rt_dev_ptr' may be used uninitia=
-lized
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-It's not obvious to me that the compiler is wrong, either,
-though why it complains about the assert but not the if()
-I have no idea.
 
-In any case, I'm going to revert this commit to fix the
-Travis builds; we can have another go at it later.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-thanks
--- PMM
+
+--nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll/KnAACgkQp6FrSiUn
+Q2qeoQgApHwafZR+DOlyDB+3I6gNmuzw2t472oHP/F9OtGsWaMv746k6tfOw9gHT
+sy/eMSlai/KnLG2Pe7km4Uml2+s29M1UEeMurDejf6HVD02//HbwdNjCpN0Srcbl
+cQTKdIkWV2K2qT2NxIu2HOsbUd2kt5xEDPbI/sXS3ht9pbrA3WERHnsQQYCzZJr5
+o3vkdm9jt3lt7DZS3O3DCURE8peoLVLUrNDEfuRcBuQC5BZhFzuDb5b/NLMEAfuS
+4MVPJYXX6gEGHzN2lnXrPWMOFpp73C6U01ZFNUOONFeDLEBwFnd0skgkayPs5eIs
+m8QMsdG2PZZRTP6JjtEC4w2jNg7SDw==
+=5xUL
+-----END PGP SIGNATURE-----
+
+--nXW8s8BOGB6Ogp58QwEaa6Ad2upvhNjiE--
