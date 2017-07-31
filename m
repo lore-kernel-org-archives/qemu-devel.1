@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dc49Z-0005tp-Rc
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:11 -0400
+	(envelope-from <yulei.zhang@intel.com>) id 1dc49i-0005zy-TT
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dc49X-0007Qg-65
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:09 -0400
-Received: from mga01.intel.com ([192.55.52.88]:5627)
+	(envelope-from <yulei.zhang@intel.com>) id 1dc49h-0007a4-PV
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:18 -0400
+Received: from mga05.intel.com ([192.55.52.43]:6607)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1dc49W-0007NV-Tt
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:07 -0400
+	id 1dc49h-0007Ui-HX
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 02:26:17 -0400
 From: Yulei Zhang <yulei.zhang@intel.com>
-Message-Id: <1494316727-15518-3-git-send-email-yulei.zhang@intel.com>
+Message-Id: <1494316727-15518-5-git-send-email-yulei.zhang@intel.com>
 In-Reply-To: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
 References: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
-Subject: [Qemu-devel] [RFC V2 2/4] vfio: Add vm status change callback to
- stop/restart the mdev device
+Subject: [Qemu-devel] [RFC V2 4/4] vifo: introduce new VFIO ioctl
+ VFIO_IOMMU_GET_DIRTY_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Mon, 31 Jul 2017 06:26:11 -0000
+Date: Mon, 31 Jul 2017 06:26:21 -0000
 To: qemu-devel@nongnu.org
 Cc: kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, xiao.zheng@intel.com, zhi.a.wang@intel.com, alex.williamson@redhat.com, Yulei Zhang <yulei.zhang@intel.com>
 
-VM status change handler is added to change the vfio pci device
-status during the migration, write the demanded device status
-to the DEVICE STATUS subregion to stop the device on the source side
-before fetch its status and start the deivce on the target side
-after restore its status.
+New VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP is used to fetch the
+bitmap of pinned memory in iommu container, we need copy those
+memory to the target during the migration as they are dirtied by
+mdev devices.
 
 Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
 ---
- hw/vfio/pci.c                 | 19 +++++++++++++++++++
- include/hw/vfio/vfio-common.h |  1 +
- linux-headers/linux/vfio.h    |  3 +++
- 3 files changed, 23 insertions(+)
+ hw/vfio/common.c           | 32 ++++++++++++++++++++++++++++++++
+ linux-headers/linux/vfio.h | 14 ++++++++++++++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 21a5cef..753da80 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -38,6 +38,7 @@
- static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
- static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
- static VMStateDescription vfio_pci_vmstate;
-+static void vfio_vm_change_state_handler(void *pv, int running, RunState state);
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index f3ba9b9..54d43d5 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/kvm.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "exec/ram_addr.h"
  
- /*
-  * Disabling BAR mmaping can be slow, but toggling it around INTx can
-@@ -2858,6 +2859,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vfio_register_err_notifier(vdev);
-     vfio_register_req_notifier(vdev);
-     vfio_setup_resetfn_quirk(vdev);
-+    qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
- 
-     return;
- 
-@@ -2940,6 +2942,23 @@ post_reset:
-     vfio_pci_post_reset(vdev);
+ struct vfio_group_head vfio_group_list =
+     QLIST_HEAD_INITIALIZER(vfio_group_list);
+@@ -603,9 +604,40 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     }
  }
  
-+static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
++static void vfio_log_sync(MemoryListener *listener,
++                          MemoryRegionSection *section)
 +{
-+    VFIOPCIDevice *vdev = pv;
-+    VFIODevice *vbasedev = &vdev->vbasedev;
-+    uint8_t dev_state;
-+    uint8_t sz = 1;
-+
-+    dev_state = running ? VFIO_DEVICE_START : VFIO_DEVICE_STOP;
-+
-+    if (pwrite(vdev->vbasedev.fd, &dev_state, sz, vdev->device_state.offset) != sz) {
-+        error_report("vfio: Failed to %s device\n", running ? "start" : "stop");
-+        return;
++    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
++    VFIOGroup *group = QLIST_FIRST(&container->group_list);
++    VFIODevice *vbasedev;
++    QLIST_FOREACH(vbasedev, &group->device_list, next) {
++       if (vbasedev->device_state == VFIO_DEVICE_START)
++		return;
 +    }
 +
-+    vbasedev->device_state = dev_state;
++    struct vfio_iommu_get_dirty_bitmap *d;
++    ram_addr_t size = int128_get64(section->size);
++    unsigned long page_nr = size >> TARGET_PAGE_BITS;
++    unsigned long bitmap_size = (BITS_TO_LONGS(page_nr) + 1) * sizeof(unsigned long);
++    d = g_malloc0(sizeof(*d) + bitmap_size);
++    d->start_addr = section->offset_within_address_space;
++    d->page_nr = page_nr;
++
++    if (ioctl(container->fd, VFIO_IOMMU_GET_DIRTY_BITMAP, d)) {
++        error_report("vfio: Failed to fetch dirty pages for migration\n");
++        goto exit;
++    }
++
++    cpu_physical_memory_set_dirty_lebitmap((unsigned long*)&d->dirty_bitmap, d->start_addr, d->page_nr);
++
++exit:
++    g_free(d);
 +}
 +
- static void vfio_instance_init(Object *obj)
- {
-     PCIDevice *pci_dev = PCI_DEVICE(obj);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index c582de1..c4bab97 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -123,6 +123,7 @@ typedef struct VFIODevice {
-     unsigned int num_irqs;
-     unsigned int num_regions;
-     unsigned int flags;
-+    bool device_state;
- } VFIODevice;
+ static const MemoryListener vfio_memory_listener = {
+     .region_add = vfio_listener_region_add,
+     .region_del = vfio_listener_region_del,
++    .log_sync = vfio_log_sync,
+ };
  
- struct VFIODeviceOps {
+ static void vfio_listener_release(VFIOContainer *container)
 diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index e2c53bf..ae1b953 100644
+index dbbe7e1..cf3d163 100644
 --- a/linux-headers/linux/vfio.h
 +++ b/linux-headers/linux/vfio.h
-@@ -299,6 +299,9 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG		(3)
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_DEVICE_STATE	(4)
+@@ -553,6 +553,20 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
  
-+#define VFIO_DEVICE_START	0
-+#define VFIO_DEVICE_STOP	1
++/**
++ * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOW(VFIO_TYPE, VFIO_BASE + 17,
++ *				    struct vfio_iommu_get_dirty_bitmap)
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++struct vfio_iommu_get_dirty_bitmap{
++	__u64	       start_addr;
++	__u64	       page_nr;
++	__u8           dirty_bitmap[];
++};
 +
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-  *				    struct vfio_irq_info)
++#define VFIO_IOMMU_GET_DIRTY_BITMAP _IO(VFIO_TYPE, VFIO_BASE + 17)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
 -- 
 2.7.4
