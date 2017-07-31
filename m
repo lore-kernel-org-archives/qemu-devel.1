@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <diana.craciun@nxp.com>) id 1dcAZ6-0000aa-5I
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:58 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dcAZ9-0000cv-9u
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <diana.craciun@nxp.com>) id 1dcAZ0-0008Nd-OZ
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:56 -0400
-From: Diana Madalina Craciun <diana.craciun@nxp.com>
-Date: Mon, 31 Jul 2017 13:16:43 +0000
-Message-ID: <AM3PR04MB06168786DF6A6BA0FB70DD88FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
-References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
-	<CAFEAcA_Zd1kFdv11Pbh9=_Hu2uBvULxPHbk15ot-uKGpzw4s3A@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <eric.auger@redhat.com>) id 1dcAZ7-0008Sh-VK
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:59 -0400
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<1496851287-9428-7-git-send-email-eric.auger@redhat.com>
+	<20170714021733.GA27284@pxdev.xzpeter.org>
+	<AM5PR0401MB2545B52A31CCA827DB3EE5A79AAD0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<20170717012809.GO27284@pxdev.xzpeter.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <45e202fa-2b6b-bc17-9200-b0eaa1879c78@redhat.com>
+Date: Mon, 31 Jul 2017 15:08:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
+In-Reply-To: <20170717012809.GO27284@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
+ translation and commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,164 +27,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, Mike Caraman <mike.caraman@nxp.com>, qemu-arm <qemu-arm@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer
-	Dall <christoffer.dall@linaro.org>, Laurentiu Tudor <laurentiu.tudor@nxp.com>
+To: Peter Xu <peterx@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "drjones@redhat.com" <drjones@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
-Hi Peter,
+Hi Peter, Bharat,
 
-On 07/10/2017 08:10 PM, Peter Maydell wrote:
+On 17/07/2017 03:28, Peter Xu wrote:
+> On Fri, Jul 14, 2017 at 06:40:34AM +0000, Bharat Bhushan wrote:
+>> Hi Peter,
+>>
+>>> -----Original Message-----
+>>> From: Peter Xu [mailto:peterx@redhat.com]
+>>> Sent: Friday, July 14, 2017 7:48 AM
+>>> To: Eric Auger <eric.auger@redhat.com>
+>>> Cc: eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+>>> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
+>>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com;
+>>> wei@redhat.com; kevin.tian@intel.com; Bharat Bhushan
+>>> <bharat.bhushan@nxp.com>; marc.zyngier@arm.com; tn@semihalf.com;
+>>> will.deacon@arm.com; drjones@redhat.com; robin.murphy@arm.com;
+>>> christoffer.dall@linaro.org
+>>> Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
+>>> translation and commands
+>>>
+>>> On Wed, Jun 07, 2017 at 06:01:25PM +0200, Eric Auger wrote:
+>>>> This patch adds the actual implementation for the translation routine
+>>>> and the virtio-iommu commands.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> [...]
+>>>
+>>>>  static int virtio_iommu_attach(VirtIOIOMMU *s,
+>>>>                                 struct virtio_iommu_req_attach *req)
+>>>> @@ -95,10 +135,34 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+>>>>      uint32_t asid = le32_to_cpu(req->address_space);
+>>>>      uint32_t devid = le32_to_cpu(req->device);
+>>>>      uint32_t reserved = le32_to_cpu(req->reserved);
+>>>> +    viommu_as *as;
+>>>> +    viommu_dev *dev;
+>>>>
+>>>>      trace_virtio_iommu_attach(asid, devid, reserved);
+>>>>
+>>>> -    return VIRTIO_IOMMU_S_UNSUPP;
+>>>> +    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(devid));
+>>>> +    if (dev) {
+>>>> +        return -1;
+>>>> +    }
+>>>> +
+>>>> +    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
+>>>> +    if (!as) {
+>>>> +        as = g_malloc0(sizeof(*as));
+>>>> +        as->id = asid;
+>>>> +        as->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
+>>>> +                                         NULL, NULL, (GDestroyNotify)g_free);
+>>>> +        g_tree_insert(s->address_spaces, GUINT_TO_POINTER(asid), as);
+>>>> +        trace_virtio_iommu_new_asid(asid);
+>>>> +    }
+>>>> +
+>>>> +    dev = g_malloc0(sizeof(*dev));
+>>>> +    dev->as = as;
+>>>> +    dev->id = devid;
+>>>> +    as->nr_devices++;
+>>>> +    trace_virtio_iommu_new_devid(devid);
+>>>> +    g_tree_insert(s->devices, GUINT_TO_POINTER(devid), dev);
+>>>
+>>> Here do we need to record something like a refcount for address space?
+>>> Since...
+>>
+>> We are using "nr_devices" as number of devices attached to an address-space
+>>
+>>>
+>>>> +
+>>>> +    return VIRTIO_IOMMU_S_OK;
+>>>>  }
+>>>>
+>>>>  static int virtio_iommu_detach(VirtIOIOMMU *s, @@ -106,10 +170,13 @@
+>>>> static int virtio_iommu_detach(VirtIOIOMMU *s,  {
+>>>>      uint32_t devid = le32_to_cpu(req->device);
+>>>>      uint32_t reserved = le32_to_cpu(req->reserved);
+>>>> +    int ret;
+>>>>
+>>>>      trace_virtio_iommu_detach(devid, reserved);
+>>>>
+>>>> -    return VIRTIO_IOMMU_S_UNSUPP;
+>>>> +    ret = g_tree_remove(s->devices, GUINT_TO_POINTER(devid));
+>>>
+>>> ... here when detach, imho we should check the refcount: if there is no
+>>> device using specific address space, we should release the address space as
+>>> well.
+>>>
+>>> Otherwise there would have no way to destroy an address space?
+>>
+>>
+>> Here if nr_devices == 0 then release the address space, is that ok? 
+>>
+>> This is how I implemented as part of VFIO integration over this patch series.
+>> 	"[RFC PATCH 2/2] virtio-iommu: vfio integration with virtio-iommu"
 
-On 23 May 2017 at 12:12, Diana Craciun <diana.craciun@nxp.com><mailto:diana=
-.craciun@nxp.com> wrote:
+glib provides g_tree_ref/g_tree_unref. I think the most elegant is to
+use g_tree_ref when adding a device and decrementing when removing a
+device, as suggested by Peter.
 
+"if the reference count drops to 0, all keys and values will be
+destroyed (if destroy functions were specified) and all memory allocated
+by tree will be released."
 
-The NXP DPAA2 is a hardware architecture designed for high-speeed network
-packet processing. The DPAA2 hardware components are managed by a hardware
-component called the Management Complex (or MC) which provides an
-object-base abstraction for software drivers to use the DPAA2 hardware.
-For more details you can see:
-https://emea01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgit.ke=
-rnel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git%2Ftree%2=
-Fdrivers%2Fstaging%2Ffsl-mc%2FREADME.txt%3Fh%3Dv4.10&data=3D01%7C01%7Cdiana=
-.craciun%40nxp.com%7C87a43122f7374dd4483008d4c7b68d10%7C686ea1d3bc2b4c6fa92=
-cd99c5c301635%7C0&sdata=3DRf9Uae7gxCeBSbLbRyAs24J9R6HUT1p4%2B4K46BgxqvM%3D&=
-reserved=3D0
+That way we should be able to remove nr_devices from viommu_as
 
-The interrupts generated by the DPAA2 hardware components are MSIs. We will=
- add
-support for direct assigning these DPAA2 components/objects to a virtual
-machine. However, this will add the need to expand the MSI usage in QEMU.
+Bharat, if this breaks your implementation I will let you re-introduce
+nr_devices as part of the VFIO patch.
 
-Currently the MSIs in QEMU are pretty much tied to PCI. For ARM the
-GIC ITS is using a device ID for interrupt translation. Currently, for
-PCI, the requester ID is used as device ID. This will not work when
-we add another entity that needs also a device ID which is supposed to
-be unique across the system.
+Thanks
 
-My proposal is to add a static allocation in the virt machine. I considered
-that this allocation is specific to each machine/platform. Currently only
-virt machine has it, but other implementations may use the same mechanism
-as well.
-So, I used a static allocation with this formula:
-
-DeviceID =3D zero_extend( RequesterID[15:0] ) + 0x10000 * Constant
-
-This formula was taken from SBSA spec (Appendix I: DeviceID generation and
-ITS groups). In case of QEMU the constant will be different for each entity=
-.
-In this way a unique DeviceID will be generated and the device ID will be
-derived from a requesterID (in case of PCI) or other means in case of other
-entities.
-
-The implementation is generic as there might be in the future other non-pci=
- devices
-that are using MSIs or IOMMU. Any architecture can use it, though currently
-only the ARM architecture is using the function that retrieves the stream I=
-D. I
-did not change all the replacements of the pci_requester_id (with pci_strea=
-m_id)
-in the code (although if the constant is 0, the stream_id is equal with req=
-uester_id).
-The other architectures (e.g. intel iommu code) assume that the ID is the
-requester ID.
-
-Tested on NXP LS2080 platform.
-
-
-
-So I'm still a bit confused about what this is for and what the
-relationship is with how the equivalent task would be performed
-in real hardware. Can you explain how that works, please?
-Would there be a system MMU involved somewhere that would be
-allocating these IDs somehow?
-
-Let's keep the discussion to MSIs for now (assuming that there is no SMMU a=
-s QEMU does not have currently an SMMU emulation integrated).
-Every device that sends MSIs has a deviceID associated with it. The deviceI=
-D is used by the GIC-ITS hardware for interrupt translation. The deviceID i=
-s assigned by the "system designer", so there is not an hardware entity tha=
-t generates/allocates the deviceIDs (the device ID can be programmed into t=
-he device by software).
-
-For PCI these IDs are specified in the device tree:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Doc=
-umentation/devicetree/bindings/pci/pci-msi.txt
-
-(msi-map property).
-
-
-
-The patchset also seems to be introducing a fair amount of
-mechanism without also implementing the actual use for it -- yes,
-if we had two PCI controllers in the virt board we would need to
-sort something out I guess, but we don't, we only have one.
-Evaluating whether the mechanism makes sense without its major
-user is always trickier.
-
-Right, we have only one PCI controller in the QEMU for now. We are in the p=
-rocess of implementing device pass-through for our non-PCI bus infrastructu=
-re which is using MSIs as well. As Mike pointed out, the mc-bus infrastruct=
-ure is on the point of getting out of staging:
-
-"
-The fsl-mc is a hardware resource manager that manages specialized hardware=
- objects used in network-oriented packet processing applications. After the=
- fsl-mc block is enabled, pools of hardware resources are available, such a=
-s queues, buffer pools, I/O interfaces. These resources are building blocks=
- that can be used to create functional hardware objects such as network int=
-erfaces, crypto accelerator instances, or L2 switches.
-
-All the fsl-mc managed hardware resources/objects are represented in a phys=
-ical grouping mechanism called a 'container' or DPRC (data path resource co=
-ntainer).
-
->From the point of view of an OS, a DPRC functions similar to a plug and pla=
-y bus. Using fsl-mc commands software can enumerate the contents of the DPR=
-C discovering the hardware objects present and binding them to drivers. Har=
-dware objects can be created and removed dynamically, providing hot pluggab=
-ility of the hardware objects.
-"
-
-After adding pass-through support, we will have two entities that are using=
- MSIs and thus that are needing unique deviceIDs.
-PCI is making the assumption that the deviceID=3DrequesterID, so, theoretic=
-ally, we could allocate numbers bigger than the requesterID for our bus inf=
-rastructure. But I thought that this is more like an temporary workaround w=
-hich will not work in the future when: another PCI controller is added or a=
-nother platform device that is using MSIs is added.
-
-
-
-
-Essentially, I know very little about this use case, but my
-default position is that if in doubt we should aim to match
-how real hardware handles something. Virtualization-specific
-code, and especially something specific to a niche use case like
-this, is something I'd really prefer to avoid. The ideal is to
-have something like PCI device passthrough, where the guest can
-automatically probe for things and QEMU doesn't need to get
-involved.
-
-
-It is not automatically probed for PCI, either. In the current implementati=
-on an assumption is made:
-
-if the msi-map is missing from the device tree (property which specifies th=
-e translation between requesterID and deviceID) it is asummed that the devi=
-ceID is the same with the requesterID.
-
-
-
-I was hoping Eric would review this, since he's more up to speed
-on direct hardware passthrough than I am, but I think he's just
-gone off on holiday...
-
-thanks
--- PMM
-
-
-
-Thanks,
-
-Diana
+Eric
+> 
+> Sorry I didn't read that when posting. It is what I mean.  Thanks,
+> 
