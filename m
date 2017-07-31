@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc7ur-0007q8-2d
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:27:13 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dc7ur-0007q9-3H
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dc7uo-0001zW-Dt
+	(envelope-from <mjt@tls.msk.ru>) id 1dc7uo-0001zC-AR
 	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 06:27:13 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 31 Jul 2017 13:21:31 +0300
-Message-Id: <b2caa3b82edca29ccb5e7d6311ffcf841b9b7786.1501496349.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 31 Jul 2017 13:21:27 +0300
+Message-Id: <2a4e2e4919d1fcb915f1b33f9396aad5dc4616f5.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
@@ -15,8 +15,8 @@ References: <cover.1501496349.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/25] net/eth: fix incorrect check of
- iov_to_buf() return value
+Subject: [Qemu-devel] [PULL 08/25] loader: check get_image_size() return
+ value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,46 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@no
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-So we have sizeof(struct in6_address) !=3D sizeof(uintptr_t)
-and Clang > Coverity on this, see 4555ca6816c :)
+since a negative value means it errored.
 
-net/eth.c:426:30: warning: The code calls sizeof() on a pointer type. Thi=
-s can produce an unexpected result
-        return bytes_read =3D=3D sizeof(dst_addr);
-                             ^     ~~~~~~~~~~
-net/eth.c:475:34: warning: The code calls sizeof() on a pointer type. Thi=
-s can produce an unexpected result
-            return bytes_read =3D=3D sizeof(src_addr);
-                                 ^     ~~~~~~~~~~
+hw/core/loader.c:149:9: warning: Loss of sign in implicit conversion
+    if (size > max_sz) {
+        ^~~~
+hw/core/loader.c:171:9: warning: Loss of sign in implicit conversion
+    if (size > memory_region_size(mr)) {
+        ^~~~
 
 Reported-by: Clang Static Analyzer
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- net/eth.c | 4 ++--
+ hw/core/loader.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/eth.c b/net/eth.c
-index 5b9ba26a56..ae5d881aae 100644
---- a/net/eth.c
-+++ b/net/eth.c
-@@ -423,7 +423,7 @@ _eth_get_rss_ex_dst_addr(const struct iovec *pkt, int=
- pkt_frags,
-                                 rthdr_offset + sizeof(*ext_hdr),
-                                 dst_addr, sizeof(*dst_addr));
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index e5e8cbb638..ebe574c7ea 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -146,7 +146,7 @@ int load_image_targphys_as(const char *filename,
+     int size;
 =20
--        return bytes_read =3D=3D sizeof(dst_addr);
-+        return bytes_read =3D=3D sizeof(*dst_addr);
+     size =3D get_image_size(filename);
+-    if (size > max_sz) {
++    if (size < 0 || size > max_sz) {
+         return -1;
      }
+     if (size > 0) {
+@@ -168,7 +168,7 @@ int load_image_mr(const char *filename, MemoryRegion =
+*mr)
 =20
-     return false;
-@@ -472,7 +472,7 @@ _eth_get_rss_ex_src_addr(const struct iovec *pkt, int=
- pkt_frags,
-                                     opt_offset + sizeof(opthdr),
-                                     src_addr, sizeof(*src_addr));
+     size =3D get_image_size(filename);
 =20
--            return bytes_read =3D=3D sizeof(src_addr);
-+            return bytes_read =3D=3D sizeof(*src_addr);
-         }
-=20
-         opt_offset +=3D optlen;
+-    if (size > memory_region_size(mr)) {
++    if (size < 0 || size > memory_region_size(mr)) {
+         return -1;
+     }
+     if (size > 0) {
 --=20
 2.11.0
