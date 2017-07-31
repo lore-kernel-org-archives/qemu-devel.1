@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dcAZ9-0000cv-9u
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:17:00 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcAas-0001qR-AK
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dcAZ7-0008Sh-VK
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:16:59 -0400
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<1496851287-9428-7-git-send-email-eric.auger@redhat.com>
-	<20170714021733.GA27284@pxdev.xzpeter.org>
-	<AM5PR0401MB2545B52A31CCA827DB3EE5A79AAD0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<20170717012809.GO27284@pxdev.xzpeter.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <45e202fa-2b6b-bc17-9200-b0eaa1879c78@redhat.com>
-Date: Mon, 31 Jul 2017 15:08:26 +0200
+	(envelope-from <James.Hogan@imgtec.com>) id 1dcAao-0001IP-WB
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:18:46 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:4551
+	helo=imgpgp01.kl.imgtec.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
+	id 1dcAao-0001Ho-K5
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 09:18:42 -0400
+Date: Mon, 31 Jul 2017 14:18:40 +0100
+From: James Hogan <james.hogan@imgtec.com>
+Message-ID: <20170731131840.GB6973@jhogan-linux.le.imgtec.org>
+References: <4053c89eefa69e2b4aa3e1072a6ae975b8d87734.1500477656.git-series.james.hogan@imgtec.com>
+	<150047888562.93.7391881979986874204@5d477a5b5989>
 MIME-Version: 1.0
-In-Reply-To: <20170717012809.GO27284@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
- translation and commands
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dN72Vk/q4pSfSeuV"
+Content-Disposition: inline
+In-Reply-To: <150047888562.93.7391881979986874204@5d477a5b5989>
+Subject: Re: [Qemu-devel] [PATCH] target/mips: Fix microMIPS jumps in 128MB
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,120 +31,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>
-Cc: "wei@redhat.com" <wei@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "drjones@redhat.com" <drjones@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, yongbok.kim@imgtec.com, froydnj@codesourcery.com, aurelien@aurel32.net
 
-Hi Peter, Bharat,
+--dN72Vk/q4pSfSeuV
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 17/07/2017 03:28, Peter Xu wrote:
-> On Fri, Jul 14, 2017 at 06:40:34AM +0000, Bharat Bhushan wrote:
->> Hi Peter,
->>
->>> -----Original Message-----
->>> From: Peter Xu [mailto:peterx@redhat.com]
->>> Sent: Friday, July 14, 2017 7:48 AM
->>> To: Eric Auger <eric.auger@redhat.com>
->>> Cc: eric.auger.pro@gmail.com; peter.maydell@linaro.org;
->>> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
->>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com;
->>> wei@redhat.com; kevin.tian@intel.com; Bharat Bhushan
->>> <bharat.bhushan@nxp.com>; marc.zyngier@arm.com; tn@semihalf.com;
->>> will.deacon@arm.com; drjones@redhat.com; robin.murphy@arm.com;
->>> christoffer.dall@linaro.org
->>> Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
->>> translation and commands
->>>
->>> On Wed, Jun 07, 2017 at 06:01:25PM +0200, Eric Auger wrote:
->>>> This patch adds the actual implementation for the translation routine
->>>> and the virtio-iommu commands.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> [...]
->>>
->>>>  static int virtio_iommu_attach(VirtIOIOMMU *s,
->>>>                                 struct virtio_iommu_req_attach *req)
->>>> @@ -95,10 +135,34 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
->>>>      uint32_t asid = le32_to_cpu(req->address_space);
->>>>      uint32_t devid = le32_to_cpu(req->device);
->>>>      uint32_t reserved = le32_to_cpu(req->reserved);
->>>> +    viommu_as *as;
->>>> +    viommu_dev *dev;
->>>>
->>>>      trace_virtio_iommu_attach(asid, devid, reserved);
->>>>
->>>> -    return VIRTIO_IOMMU_S_UNSUPP;
->>>> +    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(devid));
->>>> +    if (dev) {
->>>> +        return -1;
->>>> +    }
->>>> +
->>>> +    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
->>>> +    if (!as) {
->>>> +        as = g_malloc0(sizeof(*as));
->>>> +        as->id = asid;
->>>> +        as->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
->>>> +                                         NULL, NULL, (GDestroyNotify)g_free);
->>>> +        g_tree_insert(s->address_spaces, GUINT_TO_POINTER(asid), as);
->>>> +        trace_virtio_iommu_new_asid(asid);
->>>> +    }
->>>> +
->>>> +    dev = g_malloc0(sizeof(*dev));
->>>> +    dev->as = as;
->>>> +    dev->id = devid;
->>>> +    as->nr_devices++;
->>>> +    trace_virtio_iommu_new_devid(devid);
->>>> +    g_tree_insert(s->devices, GUINT_TO_POINTER(devid), dev);
->>>
->>> Here do we need to record something like a refcount for address space?
->>> Since...
->>
->> We are using "nr_devices" as number of devices attached to an address-space
->>
->>>
->>>> +
->>>> +    return VIRTIO_IOMMU_S_OK;
->>>>  }
->>>>
->>>>  static int virtio_iommu_detach(VirtIOIOMMU *s, @@ -106,10 +170,13 @@
->>>> static int virtio_iommu_detach(VirtIOIOMMU *s,  {
->>>>      uint32_t devid = le32_to_cpu(req->device);
->>>>      uint32_t reserved = le32_to_cpu(req->reserved);
->>>> +    int ret;
->>>>
->>>>      trace_virtio_iommu_detach(devid, reserved);
->>>>
->>>> -    return VIRTIO_IOMMU_S_UNSUPP;
->>>> +    ret = g_tree_remove(s->devices, GUINT_TO_POINTER(devid));
->>>
->>> ... here when detach, imho we should check the refcount: if there is no
->>> device using specific address space, we should release the address space as
->>> well.
->>>
->>> Otherwise there would have no way to destroy an address space?
->>
->>
->> Here if nr_devices == 0 then release the address space, is that ok? 
->>
->> This is how I implemented as part of VFIO integration over this patch series.
->> 	"[RFC PATCH 2/2] virtio-iommu: vfio integration with virtio-iommu"
+On Wed, Jul 19, 2017 at 08:41:26AM -0700, no-reply@patchew.org wrote:
+> ERROR:/tmp/qemu-test/src/tests/test-qga.c:78:fixture_setup: assertion fai=
+led (fixture->fd !=3D -1): (-1 !=3D -1)
+> GTester: last random seed: R02Sdc111f0781db4246a37f87a06bb4b260
+> make: *** [check-tests/test-qga] Error 1
+> make: *** Waiting for unfinished jobs....
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 382, in <module>
+>     sys.exit(main())
+>   File "./tests/docker/docker.py", line 379, in main
+>     return args.cmdobj.run(args, argv)
+>   File "./tests/docker/docker.py", line 237, in run
+>     return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
+>   File "./tests/docker/docker.py", line 205, in run
+>     quiet=3Dquiet)
+>   File "./tests/docker/docker.py", line 123, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com=
+=2Eqemu.instance.uuid=3Dc15f627c6c9611e79e0b525400c803e1', '-u', '0', '-t',=
+ '--rm', '--net=3Dnone', '-e', 'TARGET_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPT=
+S=3D', '-e', 'V=3D', '-e', 'J=3D8', '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1',=
+ '-e', 'CCACHE_DIR=3D/var/tmp/ccache', '-v', '/var/tmp/patchew-tester-tmp-s=
+0w6saox/src/docker-src.2017-07-19-11.27.16.20592:/var/tmp/qemu:z,ro', '-v',=
+ '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:centos6', '/var=
+/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
+> tests/docker/Makefile.include:124: recipe for target 'docker-run' failed
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-s0w6saox/src'
+> tests/docker/Makefile.include:156: recipe for target 'docker-run-test-qui=
+ck@centos6' failed
+> make: *** [docker-run-test-quick@centos6] Error 2
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 2
 
-glib provides g_tree_ref/g_tree_unref. I think the most elegant is to
-use g_tree_ref when adding a device and decrementing when removing a
-device, as suggested by Peter.
+Erm, I don't think these errors could have anything to do with my patch.
 
-"if the reference count drops to 0, all keys and values will be
-destroyed (if destroy functions were specified) and all memory allocated
-by tree will be released."
+Cheers
+James
 
-That way we should be able to remove nr_devices from viommu_as
+--dN72Vk/q4pSfSeuV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-Bharat, if this breaks your implementation I will let you re-introduce
-nr_devices as part of the VFIO patch.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks
+iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAll/LiUACgkQbAtpk944
+dno9CQ//V3K99PANLkYCSUHCaRF8NZEk/hsg8E2VvKrv8MlL5zfpWWLTXqnfB4jP
+DpFmmXwbb2OnDd06hjJK00lNb4mHVScgdln+GvUMhtCP0LVW4aWKjXBpK/5zAUmn
+m7ljFTLrqTV1o+9RZs1IUFl8tqrGDSNPrGC0wb6BtO1iKb2K7HnHyZwiZss+HqSm
+1ScEBv3JvoH+egH9JjJf3W0WN21RTCOpP5F3WqiVy669TopEa2OGacs2CrhYO+Uf
+sf+aLfcZ+AgoYytsLJFSvUcn1uwifFD8Dmry8YndQOrdn++8jRs8srxuyRF3O9SP
+RXLxHCe3O/w2G3wcBtHXNdtF6P2gS6/BtdyHHOUl6WXZrYwSivVGdUbaFRgdEVyt
+jVIWFj1IqxF7rAEIPA81CHmAkv+6HsQoHYiS1vI7N1YdkKYfJ4JoTc6IPnbZJxg3
+amksieQ7EyEfCwDtoDURH0yR5cMmczcIoSefO3CN00hMsesKmrkQtVyeLcXITFas
+NER5p4YDhLwuAvxtfJg1Jjh8os+K28y927jRNllDvcnlx13P1OGpFf19V9bhleuQ
+zQ8KlRgZD9tczV5Wz3PHAyB1ERpatBPlk9AobFLi65zlkiK3WhxqI/+y5ziZSS6R
+tq40Mpw+6qboQD7pGD9BZPWx6SRRX+3TBLTPnlz9yeKAenidWu4=
+=mahr
+-----END PGP SIGNATURE-----
 
-Eric
-> 
-> Sorry I didn't read that when posting. It is what I mean.  Thanks,
-> 
+--dN72Vk/q4pSfSeuV--
