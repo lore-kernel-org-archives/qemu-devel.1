@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcDeH-0006Cw-HQ
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcDf4-0006vd-2w
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcDeE-0006Ds-T0
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38818)
+	(envelope-from <stefanha@redhat.com>) id 1dcDf1-0006g7-Cj
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:35:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcDeE-0006CJ-Ly
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:34:26 -0400
-Date: Mon, 31 Jul 2017 17:34:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170731163414.GB2122@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-2-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dcDf1-0006fX-6C
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 12:35:15 -0400
+Date: Mon, 31 Jul 2017 17:35:11 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170731163511.GB24783@stefanha-x1.localdomain>
+References: <20170731140718.22010-1-stefanha@redhat.com>
+	<20170731140718.22010-2-stefanha@redhat.com>
+	<20170731151639.GE21310@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Pd0ReVV5GZGQvF3a"
 Content-Disposition: inline
-In-Reply-To: <1501229198-30588-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 01/29] migration: fix incorrect postcopy
- recved_bitmap
+In-Reply-To: <20170731151639.GE21310@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] trace: add
+ TRACE_<event>_BACKEND_DSTATE()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> The bitmap setup during postcopy is incorrectly when the pgaes are huge
-> pages. Fix it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/postcopy-ram.c | 2 +-
->  migration/ram.c          | 8 ++++++++
->  migration/ram.h          | 2 ++
->  3 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 276ce12..952b73a 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -578,7 +578,7 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
->          ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
->      }
->      if (!ret) {
-> -        ramblock_recv_bitmap_set(host_addr, rb);
-> +        ramblock_recv_bitmap_set_range(rb, host_addr, pagesize / getpagesize());
 
-isn't that   pagesize / qemu_target_page_size() ?
+--Pd0ReVV5GZGQvF3a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Other than that it looks OK.
+On Mon, Jul 31, 2017 at 04:16:39PM +0100, Daniel P. Berrange wrote:
+> On Mon, Jul 31, 2017 at 03:07:17PM +0100, Stefan Hajnoczi wrote:
+> > diff --git a/scripts/tracetool/backend/dtrace.py b/scripts/tracetool/ba=
+ckend/dtrace.py
+> > index c6812b70a2..17f902cc62 100644
+> > --- a/scripts/tracetool/backend/dtrace.py
+> > +++ b/scripts/tracetool/backend/dtrace.py
+> > @@ -44,8 +44,20 @@ def generate_h_begin(events, group):
+> >      out('#include "%s"' % header,
+> >          '')
+> > =20
+> > +    # SystemTap defines <provider>_<name>_ENABLED() but other DTrace
+> > +    # implementations might not.
+> > +    for e in events:
+> > +        out('#ifndef QEMU_%(uppername)s_ENABLED',
+> > +            '#define QEMU_%(uppername)s_ENABLED() false',
+> > +            '#endif',
+> > +            uppername=3De.name.upper())
+>=20
+>=20
+> IIUC, this means that on other DTrace impls, any trace points guarded by
+> QEMU_*_ENABLED() will never run, even if DTrace probes are set. Having
+> some trace points silently never run makes it pretty useless IMHO.
+>=20
+> IOW, you need the opposite, #define it to true. The probe will still
+> only be executed if DTrace has enabled it, but you'll have to take the
+> hit of evaluating the probe arguments regardless. Not as optimized
+> performance-wise, but functionally correct at least.
 
->      }
->      return ret;
->  }
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 107ee9d..c93973c 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -168,6 +168,14 @@ void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb)
->      set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
->  }
->  
-> +void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-> +                                    size_t len)
-> +{
-> +    bitmap_set(rb->receivedmap,
-> +               ramblock_recv_bitmap_offset(host_addr, rb),
-> +               len);
-> +}
-> +
->  void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb)
->  {
->      clear_bit(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
-> diff --git a/migration/ram.h b/migration/ram.h
-> index b711552..84e8623 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -55,6 +55,8 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
->  
->  int ramblock_recv_bitmap_test(void *host_addr, RAMBlock *rb);
->  void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
-> +void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-> +                                    size_t len);
->  void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
->  
->  #endif
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Good point!  Thank you, will fix when merging.
+
+Stefan
+
+--Pd0ReVV5GZGQvF3a
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZf1w/AAoJEJykq7OBq3PInZcIAIMExXptd7Q2AtvwEx+bcFju
+VPHsKOir65HCswZCRwPNDPaNTZwTBX1gjLGHdo0NRvhW/CzSaONVAN7hFgEWFxcq
+Lzb5sIGOCY6kcAQVX9Qro5A+gQG5j5jkxQ3f4PLwVRKlzYSI731VGWD2bZX6w5Qp
+OmhAzQSJJLhRyvMeuyQJOdYksychr5w6vAnFqvfBbo96beskbzx5S8kQiAYLpSvz
+3yFgmQSQHMFMJtqyqedta7Rswgwe7d67MSZ7lIC/tb/g7pA4XYCaK+/gnfX9Vo82
+6frgOvOGVZO4Tprt5k1qWctHX7qhFEbxy9gkI5acWsuZkGj4luJBWAuTRoxZCZ0=
+=9JML
+-----END PGP SIGNATURE-----
+
+--Pd0ReVV5GZGQvF3a--
