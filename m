@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcerY-0001Gf-Kd
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:38:01 -0400
+	(envelope-from <mst@redhat.com>) id 1dcerZ-0001Hn-WF
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcerX-0004or-GQ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:38:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38958)
+	(envelope-from <mst@redhat.com>) id 1dcerZ-0004px-5Z
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:38:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcerX-0004oO-AF
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:37:59 -0400
-Date: Wed, 2 Aug 2017 00:37:54 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcerY-0004pH-TP
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:38:01 -0400
+Date: Wed, 2 Aug 2017 00:37:58 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1501623438-31419-9-git-send-email-mst@redhat.com>
+Message-ID: <1501623438-31419-10-git-send-email-mst@redhat.com>
 References: <1501623438-31419-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1501623438-31419-1-git-send-email-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/10] vhost-user: fix watcher need be removed
- when vhost-user hotplug
+Subject: [Qemu-devel] [PULL 09/10] pc: make 'pc.rom' readonly when machine
+ has PCI enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +28,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yunjian Wang <wangyunjian@huawei.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Yunjian Wang <wangyunjian@huawei.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-"nc" is freed after hotplug vhost-user, but the watcher is not removed.
-The QEMU crash when the watcher access the "nc" when socket disconnects.
+looking at bios ROM mapping in QEMU it seems that only isapc
+(i.e. not PCI enabled machine) requires ROM being mapped as
+RW in other cases BIOS is mapped as RO. Do the same for option
+ROM 'pc.rom' when machine has PCI enabled.
 
-    Program received signal SIGSEGV, Segmentation fault.
-    #0  object_get_class (obj=3Dobj@entry=3D0x2) at qom/object.c:750
-    #1  0x00007f9bb4180da1 in qemu_chr_fe_disconnect (be=3D<optimized out=
->) at chardev/char-fe.c:372
-    #2  0x00007f9bb40d1100 in net_vhost_user_watch (chan=3D<optimized out=
->, cond=3D<optimized out>, opaque=3D<optimized out>) at net/vhost-user.c:=
-188
-    #3  0x00007f9baf97f99a in g_main_context_dispatch () from /usr/lib64/=
-libglib-2.0.so.0
-    #4  0x00007f9bb41d7ebc in glib_pollfds_poll () at util/main-loop.c:21=
-3
-    #5  os_host_main_loop_wait (timeout=3D<optimized out>) at util/main-l=
-oop.c:261
-    #6  main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at util/main=
--loop.c:515
-    #7  0x00007f9bb3e266a7 in main_loop () at vl.c:1917
-    #8  main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<opt=
-imized out>) at vl.c:4786
+As useful side-effect pc.rom MemoryRegion stops being
+put in vhost memory map (filtered out by vhost_section()),
+which reduces number of entries by 1.
 
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Coincidentally it fixes migration failure reported in
+
+"[PATCH V2]  vhost: fix a migration failed because of vhost region merge"
+
+where following destination CLI with /sys/module/vhost/parameters/max_mem_regions = 8
+
+export DIMMSCOUNT=6
+QEMU -enable-kvm \
+     -netdev type=tap,id=guest0,vhost=on,script=no,vhostforce \
+     -device virtio-net-pci,netdev=guest0 \
+     -m 256,slots=256,maxmem=2G \
+     `i=0; while [ $i -lt $DIMMSCOUNT ]; do echo \
+         "-object memory-backend-ram,id=m$i,size=128M \
+          -device pc-dimm,id=d$i,memdev=m$i"; i=$(($i + 1)); \
+     done`
+
+will fail to startup with error:
+
+ "-device pc-dimm,id=d5,memdev=m5: a used vhost backend has no free memory slots left"
+
+while it's possible to add the 6th DIMM during hotplug
+on source.
+
+Issue is caused by the fact that number of entries in vhost map
+is bigger on 1 entry, when -device is processed, than
+after guest boots up, and that offending entry belongs to
+'pc.rom', it's not like vhost intends to do IO in ROM range
+so making it RO hides region from vhost and makes number
+of entries in vhost memory map at -device/machine_done time
+match number of entries after guest boots.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reported-by: Peng Hao <peng.hao2@zte.com.cn>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- net/vhost-user.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/i386/pc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 36f32a2..c23927c 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -151,6 +151,10 @@ static void vhost_user_cleanup(NetClientState *nc)
-         s->vhost_net =3D NULL;
-     }
-     if (nc->queue_index =3D=3D 0) {
-+        if (s->watch) {
-+            g_source_remove(s->watch);
-+            s->watch =3D 0;
-+        }
-         qemu_chr_fe_deinit(&s->chr, true);
-     }
-=20
---=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 22e1603..5943539 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1443,6 +1443,9 @@ void pc_memory_init(PCMachineState *pcms,
+     option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+     memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+                            &error_fatal);
++    if (pcmc->pci_enabled) {
++        memory_region_set_readonly(option_rom_mr, true);
++    }
+     memory_region_add_subregion_overlap(rom_memory,
+                                         PC_ROM_MIN_VGA,
+                                         option_rom_mr,
+-- 
 MST
