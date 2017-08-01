@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dcVXZ-0002xk-GE
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:46 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dcVXa-0002xm-6F
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dcVXU-0002UE-4m
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:45 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:9229)
+	(envelope-from <a.perevalov@samsung.com>) id 1dcVXV-0002Uu-F8
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:46 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:22372)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dcVXT-0002Sc-S4
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:40 -0400
+	id 1dcVXV-0002Tr-5x
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:41 -0400
 Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com
+	by mailout4.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OU000MT58FOICA0@mailout2.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:40:36 +0100 (BST)
+	2014)) with ESMTP id <0OU000EYU8FPRFA0@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:40:37 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Tue, 01 Aug 2017 14:40:21 +0300
-Message-id: <1501587624-5915-1-git-send-email-a.perevalov@samsung.com>
-References: <CGME20170801114034eucas1p1a4473bb03afada257f68392c38263b99@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v9 0/3] Add bitmap for received pages in
- postcopy migration
+Date: Tue, 01 Aug 2017 14:40:23 +0300
+Message-id: <1501587624-5915-3-git-send-email-a.perevalov@samsung.com>
+In-reply-to: <1501587624-5915-1-git-send-email-a.perevalov@samsung.com>
+References: <1501587624-5915-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170801114036eucas1p1f374ce73c38cb9e87f62877038b3513a@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v9 2/3] migration: introduce
+ qemu_ufd_copy_ioctl helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +34,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-This is 9th version of
-[PATCH v1 0/2] Add bitmap for copied pages in postcopy migration
-cover message from there
+Just for placing auxilary operations inside helper,
+auxilary operations like: track received pages,
+notify about copying operation in futher patches.
 
-This is a separate patch set, it derived from
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+---
+ migration/postcopy-ram.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-There are several possible use cases:
-1. solve issue with postcopy live migration and shared memory.
-OVS-VSWITCH requires information about copied pages, to fallocate
-newly allocated pages.
-2. calculation vCPU blocktime
-for more details see
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
-3. Recovery after fail in the middle of postcopy migration 
-
-----------------------------------------------------------------
-V8 -> V9
-    - patch: "migration: fix incorrect postcopy recved_bitmap" from
-"[RFC 00/29] Migration: postcopy failure recovery" patch set was squashed
-into the latest patch of this patchset, getpagesize was replaced to
-qemu_target_page_size, as David suggested.
-    - for the sake of API uniformity semantics of all functions were
-changed, now RAMBlock *rb is the first argument, as well as in bitmap API.
-    - Also define TARGET_PAGE_BITS was replaced to qemu_target_page_bits in
-all other places of this patchset, for uniformity and maintenance. 
-
-V7 -> V8
-    - removed unnecessary renaming and moving of block variable to ram_load's
-function scope
-    - ramblock_recv_map_init became static function
-
-V6 -> V7
-    - rebased on
-[PATCH v7 0/5] Create setup/cleanup methods for migration incoming side
-    - live time of the received map was changed (ram_load_setup/ram_load_cleanup) 
-
-V5 -> V6
-    - call ramblock_recv_map_init from migration_fd_process_incoming (Peter suggested)But finalization is still in ram_load_cleanup as Juan suggested.    
-
-V4 -> V5
-    - remove ramblock_recv_bitmap_clear_range in favor to bitmap_clear (comment from David)
-    - single invocation place for ramblock_recv_bitmap_set (comment from Peter)
-    - minor changes like removing comment from qemu_ufd_copy_ioctl and local variable from
-ramblock_recv_map_init (comment from Peter)
-
-V3 -> V4
-    - clear_bit instead of ramblock_recv_bitmap_clear in ramblock_recv_bitmap_clear_range,
-it reduced number of operation (comment from Juan)
-    - for postcopy ramblock_recv_bitmap_set is calling after page was copied,
-only in case of success (comment from David)
-    - indentation fixes (comment from Juan)
-
-V2 -> V3
-    - ramblock_recv_map_init call is placed into migration_incoming_get_current,
-looks like it's general place for both precopy and postcopy case.
-    - received bitmap memory releasing is placed into ram_load_cleanup,
-unfortunatelly, it calls only in case of precopy.
-    - precopy case and discard ram block case
-    - function renaming, and another minor cleanups
-
-V1 -> V2
-    - change in terminology s/copied/received/g
-    - granularity became TARGET_PAGE_SIZE, but not actual page size of the
-ramblock
-    - movecopiedmap & get_copiedmap_size were removed, until patch set where
-it will be necessary
-    - releasing memory of receivedmap was added into ram_load_cleanup
-    - new patch "migration: introduce qemu_ufd_copy_ioctl helper"
-
-Patchset is based on:
-commit 6d60e295ef020759a03b90724d0342012c189ba2
-"Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging"
-
-Alexey Perevalov (3):
-  migration: postcopy_place_page factoring out
-  migration: introduce qemu_ufd_copy_ioctl helper
-  migration: add bitmap for received page
-
- include/exec/ram_addr.h  | 10 +++++++++
- migration/postcopy-ram.c | 54 +++++++++++++++++++++++++++++++-----------------
- migration/postcopy-ram.h |  4 ++--
- migration/ram.c          | 49 +++++++++++++++++++++++++++++++++++++++++--
- migration/ram.h          |  6 ++++++
- 5 files changed, 100 insertions(+), 23 deletions(-)
-
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 996e64d..be497bb 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -559,6 +559,25 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+     return 0;
+ }
+ 
++static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
++        void *from_addr, uint64_t pagesize)
++{
++    if (from_addr) {
++        struct uffdio_copy copy_struct;
++        copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
++        copy_struct.src = (uint64_t)(uintptr_t)from_addr;
++        copy_struct.len = pagesize;
++        copy_struct.mode = 0;
++        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
++    } else {
++        struct uffdio_zeropage zero_struct;
++        zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
++        zero_struct.range.len = pagesize;
++        zero_struct.mode = 0;
++        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
++    }
++}
++
+ /*
+  * Place a host page (from) at (host) atomically
+  * returns 0 on success
+@@ -566,20 +585,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+                         RAMBlock *rb)
+ {
+-    struct uffdio_copy copy_struct;
+     size_t pagesize = qemu_ram_pagesize(rb);
+ 
+-    copy_struct.dst = (uint64_t)(uintptr_t)host;
+-    copy_struct.src = (uint64_t)(uintptr_t)from;
+-    copy_struct.len = pagesize;
+-    copy_struct.mode = 0;
+-
+     /* copy also acks to the kernel waking the stalled thread up
+      * TODO: We can inhibit that ack and only do it if it was requested
+      * which would be slightly cheaper, but we'd have to be careful
+      * of the order of updating our page state.
+      */
+-    if (ioctl(mis->userfault_fd, UFFDIO_COPY, &copy_struct)) {
++    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
+         int e = errno;
+         error_report("%s: %s copy host: %p from: %p (size: %zd)",
+                      __func__, strerror(e), host, from, pagesize);
+@@ -601,12 +614,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+     trace_postcopy_place_page_zero(host);
+ 
+     if (qemu_ram_pagesize(rb) == getpagesize()) {
+-        struct uffdio_zeropage zero_struct;
+-        zero_struct.range.start = (uint64_t)(uintptr_t)host;
+-        zero_struct.range.len = getpagesize();
+-        zero_struct.mode = 0;
+-
+-        if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
++        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
+             int e = errno;
+             error_report("%s: %s zero host: %p",
+                          __func__, strerror(e), host);
 -- 
 1.9.1
