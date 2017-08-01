@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcYRg-0000GA-Gl
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dcYRl-0000Lg-5n
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcYRf-0005TK-Ib
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dcYRk-0005XU-Jw
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:57 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  1 Aug 2017 16:46:24 +0200
-Message-Id: <20170801144632.3831-8-kwolf@redhat.com>
+Date: Tue,  1 Aug 2017 16:46:26 +0200
+Message-Id: <20170801144632.3831-10-kwolf@redhat.com>
 In-Reply-To: <20170801144632.3831-1-kwolf@redhat.com>
 References: <20170801144632.3831-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 07/15] block: fix leaks in bdrv_open_driver()
+Subject: [Qemu-devel] [PULL 09/15] qemu-iotests: Remove blkdebug.conf after
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,100 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+qemu-iotests 074 and 179 left a blkdebug.conf behind in the scratch
+directory. Make sure to clean up after completing the tests.
 
-bdrv_open_driver() is called in two places, bdrv_new_open_driver() and
-bdrv_open_common(). In the latter, failure cleanup in is in its caller,
-bdrv_open_inherit(), which unrefs the bs->file of the failed driver open
-if it exists.
-
-Let's move the bs->file cleanup to bdrv_open_driver() to take care of
-all callers and do not set bs->drv to NULL unless the driver's open
-function failed. When bs is destroyed by removing its last reference, it
-calls bdrv_close() which checks bs->drv to perform the needed cleanups
-and also call the driver's close function. Since it cleans up options
-and opaque we must take care not leave dangling pointers.
-
-The error paths in bdrv_open_driver() are now two:
-If open fails, drv->bdrv_close() should not be called. Unref the child
-if it exists, free what we allocated and set bs->drv to NULL. Return the
-error and let callers free their stuff.
-
-If open succeeds but we fail after, return the error and let callers
-unref and delete their bs, while cleaning up their allocations.
-
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/074 | 1 +
+ tests/qemu-iotests/179 | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/block.c b/block.c
-index 7a78bc647b..ce9cce7b3c 100644
---- a/block.c
-+++ b/block.c
-@@ -1119,20 +1119,19 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
-         } else {
-             error_setg_errno(errp, -ret, "Could not open image");
-         }
--        goto free_and_fail;
-+        goto open_failed;
-     }
- 
-     ret = refresh_total_sectors(bs, bs->total_sectors);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Could not refresh total sector count");
--        goto free_and_fail;
-+        return ret;
-     }
- 
-     bdrv_refresh_limits(bs, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--        ret = -EINVAL;
--        goto free_and_fail;
-+        return -EINVAL;
-     }
- 
-     assert(bdrv_opt_mem_align(bs) != 0);
-@@ -1140,12 +1139,14 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
-     assert(is_power_of_2(bs->bl.request_alignment));
- 
-     return 0;
--
--free_and_fail:
--    /* FIXME Close bs first if already opened*/
-+open_failed:
-+    bs->drv = NULL;
-+    if (bs->file != NULL) {
-+        bdrv_unref_child(bs, bs->file);
-+        bs->file = NULL;
-+    }
-     g_free(bs->opaque);
-     bs->opaque = NULL;
--    bs->drv = NULL;
-     return ret;
+diff --git a/tests/qemu-iotests/074 b/tests/qemu-iotests/074
+index aba126cb69..b17866bd34 100755
+--- a/tests/qemu-iotests/074
++++ b/tests/qemu-iotests/074
+@@ -32,6 +32,7 @@ _cleanup()
+     echo "Cleanup"
+     _cleanup_test_img
+     rm "${TEST_IMG2}"
++    rm -f "$TEST_DIR/blkdebug.conf"
  }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-@@ -1166,7 +1167,9 @@ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
-     ret = bdrv_open_driver(bs, drv, node_name, bs->options, flags, errp);
-     if (ret < 0) {
-         QDECREF(bs->explicit_options);
-+        bs->explicit_options = NULL;
-         QDECREF(bs->options);
-+        bs->options = NULL;
-         bdrv_unref(bs);
-         return NULL;
-     }
-@@ -2600,9 +2603,6 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
+index 7bc8db8fe0..115944a753 100755
+--- a/tests/qemu-iotests/179
++++ b/tests/qemu-iotests/179
+@@ -30,6 +30,7 @@ status=1	# failure is the default!
+ _cleanup()
+ {
+ 	_cleanup_test_img
++    rm -f "$TEST_DIR/blkdebug.conf"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
- fail:
-     blk_unref(file);
--    if (bs->file != NULL) {
--        bdrv_unref_child(bs, bs->file);
--    }
-     QDECREF(snapshot_options);
-     QDECREF(bs->explicit_options);
-     QDECREF(bs->options);
 -- 
 2.13.3
