@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dcTac-0008T9-Bi
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:35:48 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dcTb3-0000P3-9F
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dcTaZ-0003Am-KG
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:35:46 -0400
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:33551)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1dcTaY-00038T-Sj
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:35:43 -0400
-Received: by mail-io0-x235.google.com with SMTP id j32so6119837iod.0
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 02:35:42 -0700 (PDT)
+	(envelope-from <frederic.konrad@adacore.com>) id 1dcTb0-0004Aa-1q
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:36:13 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:53435
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dcTaz-00046t-OV
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:36:09 -0400
+References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
+	<1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
+	<086e70d6-d5c1-2879-874f-ea1804c6ab38@adacore.com>
+	<20170801093015.GA4859@toto>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
+Date: Tue, 1 Aug 2017 11:35:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170731234626.7664be18@w520.home>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-	<20170726092931.0678689e@w520.home>
-	<20170726190348-mutt-send-email-mst@kernel.org>
-	<20170726113222.52aad9a6@w520.home>
-	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
-	<20170731234626.7664be18@w520.home>
-From: Bob Chen <a175818323@gmail.com>
-Date: Tue, 1 Aug 2017 17:35:40 +0800
-Message-ID: <CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
-	=?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+In-Reply-To: <20170801093015.GA4859@toto>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
+ blocker when using mmio_execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,202 +34,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
-
-2017-08-01 13:46 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>:
-
-> On Tue, 1 Aug 2017 13:04:46 +0800
-> Bob Chen <a175818323@gmail.com> wrote:
->
-> > Hi,
-> >
-> > This is a sketch of my hardware topology.
-> >
-> >           CPU0         <- QPI ->        CPU1
-> >            |                             |
-> >     Root Port(at PCIe.0)        Root Port(at PCIe.1)
-> >        /        \                   /       \
->
-> Are each of these lines above separate root ports?  ie. each root
-> complex hosts two root ports, each with a two-port switch downstream of
-> it?
->
-
-Not quite sure if root complex is a concept or a real physical device ...
-
-But according to my observation by `lspci -vt`, there are indeed 4 Root
-Ports in the system. So the sketch might need a tiny update.
-
-
-          CPU0         <- QPI ->        CPU1
-
-           |                             |
-
-      Root Complex(device?)      Root Complex(device?)
-
-         /    \                       /    \
-
-    Root Port  Root Port         Root Port  Root Port
-
-       /        \                   /        \
-
-    Switch    Switch             Switch    Switch
-
-     /   \      /  \              /   \     /   \
-
-   GPU   GPU  GPU  GPU          GPU   GPU  GPU   GPU
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
 
 
->
-> >     Switch    Switch             Switch    Switch
-> >      /   \      /  \              /   \    /    \
-> >    GPU   GPU  GPU  GPU          GPU   GPU GPU   GPU
-> >
-> >
-> > And below are the p2p bandwidth test results.
-> >
-> > Host=EF=BC=9A
-> >    D\D     0      1      2      3      4      5      6      7
-> >      0 426.91  25.32  19.72  19.72  19.69  19.68  19.75  19.66
-> >      1  25.31 427.61  19.74  19.72  19.66  19.68  19.74  19.73
-> >      2  19.73  19.73 429.49  25.33  19.66  19.74  19.73  19.74
-> >      3  19.72  19.71  25.36 426.68  19.70  19.71  19.77  19.74
-> >      4  19.72  19.72  19.73  19.75 425.75  25.33  19.72  19.71
-> >      5  19.71  19.75  19.76  19.75  25.35 428.11  19.69  19.70
-> >      6  19.76  19.72  19.79  19.78  19.73  19.74 425.75  25.35
-> >      7  19.69  19.75  19.79  19.75  19.72  19.72  25.39 427.15
-> >
-> > VM=EF=BC=9A
-> >    D\D     0      1      2      3      4      5      6      7
-> >      0 427.38  10.52  18.99  19.11  19.75  19.62  19.75  19.71
-> >      1  10.53 426.68  19.28  19.19  19.73  19.71  19.72  19.73
-> >      2  18.88  19.30 426.92  10.48  19.66  19.71  19.67  19.68
-> >      3  18.93  19.18  10.45 426.94  19.69  19.72  19.67  19.72
-> >      4  19.60  19.66  19.69  19.70 428.13  10.49  19.40  19.57
-> >      5  19.52  19.74  19.72  19.69  10.44 426.45  19.68  19.61
-> >      6  19.63  19.50  19.72  19.64  19.59  19.66 426.91  10.47
-> >      7  19.69  19.75  19.70  19.69  19.66  19.74  10.45 426.23
->
-> Interesting test, how do you get these numbers?  What are the units,
-> GB/s?
->
+On 08/01/2017 11:30 AM, Edgar E. Iglesias wrote:
+> On Tue, Aug 01, 2017 at 11:13:56AM +0200, KONRAD Frederic wrote:
+>>
+>>
+>> On 08/01/2017 11:00 AM, Peter Maydell wrote:
+>>> On 1 August 2017 at 09:10, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+>>>> This adds a migration blocker when mmio_execution has been used.
+>>>>
+>>>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+>>>> ---
+>>>>   hw/ssi/xilinx_spips.c | 11 +++++++++++
+>>>>   1 file changed, 11 insertions(+)
+>>>>
+>>>> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+>>>> index e833028..d46491f 100644
+>>>> --- a/hw/ssi/xilinx_spips.c
+>>>> +++ b/hw/ssi/xilinx_spips.c
+>>>> @@ -31,6 +31,8 @@
+>>>>   #include "hw/ssi/ssi.h"
+>>>>   #include "qemu/bitops.h"
+>>>>   #include "hw/ssi/xilinx_spips.h"
+>>>> +#include "qapi/error.h"
+>>>> +#include "migration/blocker.h"
+>>>>
+>>>>   #ifndef XILINX_SPIPS_ERR_DEBUG
+>>>>   #define XILINX_SPIPS_ERR_DEBUG 0
+>>>> @@ -139,6 +141,7 @@ typedef struct {
+>>>>
+>>>>       uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
+>>>>       hwaddr lqspi_cached_addr;
+>>>> +    Error *migration_blocker;
+>>>>   } XilinxQSPIPS;
+>>>>
+>>>>   typedef struct XilinxSPIPSClass {
+>>>> @@ -603,6 +606,14 @@ static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
+>>>>       XilinxQSPIPS *q = opaque;
+>>>>       hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
+>>>>
+>>>> +    /* mmio_execution breaks migration better aborting than having strange
+>>>> +     * bugs.
+>>>> +     */
+>>>> +    if (!q->migration_blocker) {
+>>>> +        error_setg(&q->migration_blocker, "booting from SPI breaks migration");
+>>>> +        migrate_add_blocker(q->migration_blocker, &error_fatal);
+>>>> +    }
+>>>> +
+>>>
+>>> This doesn't handle the case when migration is already in progress
+>>> and this function is called (which will cause migrate_add_blocker
+>>> to fail).
+>>
+>> Maybe I can make the request_ptr to fail if migration is in
+>> progress.. But is that safe or do I risk a race.
+>>
+> 
+> Hi Fred,
+> 
+> At this stage, perhaps we should just register the blocker when this dev realizes.
+> 
+> If a request_ptr comes in during migration, the VM will fail either way...
+> 
+> Cheers,
+> Edgar
+> 
 
+Hi Edgar,
 
+Yes but this will breaks migration for the spips device everytime
+and not only when mmio-execution is used?
 
-A p2pBandwidthLatencyTest from Nvidia CUDA sample code. Units are
-GB/s. Asynchronous read and write. Bidirectional.
-
-However, the Unidirectional test had shown a different result. Didn't fall
-down to a half.
-
-VM:
-Unidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3      4      5      6      7
-     0 424.07  10.02  11.33  11.30  11.09  11.05  11.06  11.10
-     1  10.05 425.98  11.40  11.33  11.08  11.10  11.13  11.09
-     2  11.31  11.28 423.67  10.10  11.14  11.13  11.13  11.11
-     3  11.30  11.31  10.08 425.05  11.10  11.07  11.09  11.06
-     4  11.16  11.17  11.21  11.17 423.67  10.08  11.25  11.28
-     5  10.97  11.01  11.07  11.02  10.09 425.52  11.23  11.27
-     6  11.09  11.13  11.16  11.10  11.28  11.33 422.71  10.10
-     7  11.13  11.09  11.15  11.11  11.36  11.33  10.02 422.75
-
-Host:
-Unidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3      4      5      6      7
-     0 424.13  13.38  10.17  10.17  11.23  11.21  10.94  11.22
-     1  13.38 424.06  10.18  10.19  11.20  11.19  11.19  11.14
-     2  10.18  10.18 422.75  13.38  11.19  11.19  11.17  11.17
-     3  10.18  10.18  13.38 425.05  11.05  11.08  11.08  11.06
-     4  11.01  11.06  11.06  11.03 423.21  13.38  10.17  10.17
-     5  10.91  10.91  10.89  10.92  13.38 425.52  10.18  10.18
-     6  11.28  11.30  11.32  11.31  10.19  10.18 424.59  13.37
-     7  11.18  11.20  11.16  11.21  10.17  10.19  13.38 424.13
-
-
-
->
-> > In the VM, the bandwidth between two GPUs under the same physical switc=
-h
-> is
-> > obviously lower, as per the reasons you said in former threads.
->
-> Hmm, I'm not sure I can explain why the number is lower than to more
-> remote GPUs though.  Is the test simultaneously reading and writing and
-> therefore we overload the link to the upstream switch port?  Otherwise
-> I'd expect the bidirectional support in PCIe to be able to handle the
-> bandwidth.  Does the test have a read-only or write-only mode?
->
-> > But what confused me most is that GPUs under different switches could
-> > achieve the same speed, as well as in the Host. Does that mean after
-> IOMMU
-> > address translation, data traversing has utilized QPI bus by default?
-> Even
-> > these two devices do not belong to the same PCIe bus?
->
-> Yes, of course.  Once the transaction is translated by the IOMMU it's
-> just a matter of routing the resulting address, whether that's back
-> down the I/O hierarchy under the same root complex or across the QPI
-> link to the other root complex.  The translated address could just as
-> easily be to RAM that lives on the other side of the QPI link.  Also, it
-> seems like the IOMMU overhead is perhaps negligible here, unless the
-> IOMMU is actually being used in both cases.
->
-
-
-Yes, the overhead of bandwidth is negligible, but the latency is not as
-good as we expected. I assume it is IOMMU address translation to blame.
-
-I ran this twice with IOMMU on/off on Host, the results were the same.
-
-VM:
-P2P=3DEnabled Latency Matrix (us)
-   D\D     0      1      2      3      4      5      6      7
-     0   4.53  13.44  13.60  13.60  14.37  14.51  14.55  14.49
-     1  13.47   4.41  13.37  13.37  14.49  14.51  14.56  14.52
-     2  13.38  13.61   4.32  13.47  14.45  14.43  14.53  14.33
-     3  13.55  13.60  13.38   4.45  14.50  14.48  14.54  14.51
-     4  13.85  13.72  13.71  13.81   4.47  14.61  14.58  14.47
-     5  13.75  13.77  13.75  13.77  14.46   4.46  14.52  14.45
-     6  13.76  13.78  13.73  13.84  14.50  14.55   4.45  14.53
-     7  13.73  13.78  13.76  13.80  14.53  14.63  14.56   4.46
-
-Host:
-P2P=3DEnabled Latency Matrix (us)
-   D\D     0      1      2      3      4      5      6      7
-     0   3.66   5.88   6.59   6.58  15.26  15.15  15.03  15.14
-     1   5.80   3.66   6.50   6.50  15.15  15.04  15.06  15.00
-     2   6.58   6.52   4.12   5.85  15.16  15.06  15.00  15.04
-     3   6.80   6.81   6.71   4.12  15.12  13.08  13.75  13.31
-     4  14.91  14.18  14.34  12.93   4.13   6.45   6.56   6.63
-     5  15.17  14.99  15.03  14.57   5.61   3.49   6.19   6.29
-     6  15.12  14.78  14.60  13.47   6.16   6.15   3.53   5.68
-     7  15.00  14.65  14.82  14.28   6.16   6.15   5.44   3.56
-
-
-
->
-> In the host test, is the IOMMU still enabled?  The routing of PCIe
-> transactions is going to be governed by ACS, which Linux enables
-> whenever the IOMMU is enabled, not just when a device is assigned to a
-> VM.  It would be interesting to see if another performance tier is
-> exposed if the IOMMU is entirely disabled, or perhaps it might better
-> expose the overhead of the IOMMU translation.  It would also be
-> interesting to see the ACS settings in lspci for each downstream port
-> for each test.  Thanks,
->
-> Alex
->
-
-
-How to display GPU's ACS settings? Like this?
-
-[420 v2] Advanced Error Reporting
-UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP-
-ECRC- UnsupReq- ACSViol-
-UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP-
-ECRC- UnsupReq- ACSViol-
-UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+
-ECRC- UnsupReq- ACSViol-
+Thanks,
+Fred
