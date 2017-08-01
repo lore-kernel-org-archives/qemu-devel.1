@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcUle-0007yn-I5
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:51:15 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcUtS-0001g2-Lw
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcUld-0001Gv-Gm
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:51:14 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:36717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcUld-0001G8-AN
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:51:13 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id y43so5158272wrd.3
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 03:51:13 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dcUtO-0000gg-IR
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:59:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcUtO-0000gN-9E
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:59:14 -0400
+Date: Tue, 1 Aug 2017 11:59:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170801105906.GJ2079@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-18-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Aug 2017 11:50:51 +0100
-Message-ID: <CAFEAcA_Kj8wCp-BLS45ds-RmZbp7UK_8oEBcEKgpP98CE0jNcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Cleaning up handling of CPU exceptions accessing
- non-existent memory/devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501229198-30588-18-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 17/29] migration: rebuild channel on source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +27,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Hi; I've been looking at our code to handle allowing guest CPUs
-to generate exceptions when they access non-existent memory or
-devices (in ARM terms, external aborts; also often called bus errors).
+* Peter Xu (peterx@redhat.com) wrote:
+> This patch detects the "resume" flag of migration command, rebuild the
+> channels only if the flag is set.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 52 ++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 41 insertions(+), 11 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 36ff8c3..64de0ee 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1244,6 +1244,15 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>      MigrationState *s = migrate_get_current();
+>      const char *p;
+>  
+> +    if (has_resume && resume) {
+> +        if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +            error_setg(errp, "Cannot resume if there is no "
+> +                       "paused migration");
+> +            return;
+> +        }
+> +        goto do_resume;
+> +    }
+> +
+>      if (migration_is_setup_or_active(s->state) ||
+>          s->state == MIGRATION_STATUS_CANCELLING ||
+>          s->state == MIGRATION_STATUS_COLO) {
+> @@ -1279,6 +1288,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>  
+>      s = migrate_init();
+>  
+> +do_resume:
 
-At the moment we have a hook for this: do_unassigned_access().
-Unfortunately this was designed a long time ago and has some nasty
-problems. The hook is called from the unassigned_mem_write() and
-unassigned_mem_read() functions if the current_cpu pointer is non-NULL.
-This means that:
- * it will be called even if the access was not directly done by the
-   CPU -- for instance if the CPU writes to an ethernet device enable
-   register and triggers the ethernet device to try to read a packet
-   out of non-existent memory, the CPU will take a bogus exception
- * it won't be called if there really is a device there and it actively
-   reports a bus error by returning a failure MemTxResult code
- * it's called even when KVM is enabled even though trying to
-   raise an exception then will crash because there's no setjmp
-   context to longjmp back to
+Can we find a way to avoid this label?
+Perhaps split the bottom half of this function out into a separate
+function?
 
-Since we have MemTxResult now, we don't need to try to call the CPU
-hook from down at the bottom of the memory system; we can just call
-it near the top when we get back a failure status.
+Dave
 
-My proposal is that we should define a new QOM CPU hook:
-  void (*do_transaction_failed)(CPUState *cpu, hwaddr physaddr, vaddr addr,
-                                unsigned size, MMUAccessType access_type,
-                                MemTxAttrs attrs, MemTxResult response);
-
-which is called from io_readx() and io_writex() if their calls
-to memory_region_dispatch_{read,write} return something other than
-MEMTX_OK. We can also call it from get_page_addr_code() as a
-way to report instruction-fetch faults (where we currently call
-cpu_unassigned_access), though I have a feeling there is a nicer
-place to handle this (perhaps best left for later cleanup).
-
-That will mean that:
- * memory accesses from generated code can cause exceptions due to
-   bus faults
- * memory accesses by C code calling helper functions which take a
-   virtual address can cause busfaults (which longjump out) -- but
-   that should be already expected as those calls can cause MMU
-   exceptions and alignment exceptions. (This kind of helper I think
-   is just helper_{le,be,ret}_{ld,st}_*)
- * any other memory access by C code (ie by physical address) will not
-   cause a bus fault exception -- C code must use one of the load/store
-   functions that returns a MemTxResult and handle it appropriately
-   if it needs some particular behaviour.
-
-I think this is an easy rule of thumb to remember ('exceptions for
-vaddr accesses; handle failure yourself for physaddr accesses') and
-it seems likely that most physaddr accesses will want special casing
-anyway.
-
-The awkward part is the transition from the current hook to the new one;
-we can put in the new hook easily enough, but the old one is used by:
- alpha, microblaze, mips, sparc, xtensa
-Converting the hook code from the old API to the new will be easy,
-but it's harder to know if there were places where the target is
-relying on the old behaviour that an access by physical address
-would generate an exception; in an ideal world we'd audit all the
-loads and stores the target code did to check their behaviour...
-I can have a go at converting some of these archs, but I can't
-necessarily promise I'll get all the obscure corner cases.
-
-When we've got all the archs converted we can delete the old
-hook code.
-
-Does this seem like a good plan?
-
-thanks
--- PMM
+>      if (strstart(uri, "tcp:", &p)) {
+>          tcp_start_outgoing_migration(s, p, &local_err);
+>  #ifdef CONFIG_RDMA
+> @@ -1700,7 +1710,8 @@ out:
+>      return NULL;
+>  }
+>  
+> -static int open_return_path_on_source(MigrationState *ms)
+> +static int open_return_path_on_source(MigrationState *ms,
+> +                                      bool create_thread)
+>  {
+>  
+>      ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
+> @@ -1709,6 +1720,12 @@ static int open_return_path_on_source(MigrationState *ms)
+>      }
+>  
+>      trace_open_return_path_on_source();
+> +
+> +    if (!create_thread) {
+> +        /* We're done */
+> +        return 0;
+> +    }
+> +
+>      qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+>                         source_return_path_thread, ms, QEMU_THREAD_JOINABLE);
+>  
+> @@ -2249,15 +2266,24 @@ static void *migration_thread(void *opaque)
+>  
+>  void migrate_fd_connect(MigrationState *s)
+>  {
+> -    s->expected_downtime = s->parameters.downtime_limit;
+> -    s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
+> +    int64_t rate_limit;
+> +    bool resume = s->state == MIGRATION_STATUS_POSTCOPY_PAUSED;
+>  
+> -    qemu_file_set_blocking(s->to_dst_file, true);
+> -    qemu_file_set_rate_limit(s->to_dst_file,
+> -                             s->parameters.max_bandwidth / XFER_LIMIT_RATIO);
+> +    if (resume) {
+> +        /* This is a resumed migration */
+> +        rate_limit = INT64_MAX;
+> +    } else {
+> +        /* This is a fresh new migration */
+> +        rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
+> +        s->expected_downtime = s->parameters.downtime_limit;
+> +        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
+>  
+> -    /* Notify before starting migration thread */
+> -    notifier_list_notify(&migration_state_notifiers, s);
+> +        /* Notify before starting migration thread */
+> +        notifier_list_notify(&migration_state_notifiers, s);
+> +    }
+> +
+> +    qemu_file_set_rate_limit(s->to_dst_file, rate_limit);
+> +    qemu_file_set_blocking(s->to_dst_file, true);
+>  
+>      /*
+>       * Open the return path. For postcopy, it is used exclusively. For
+> @@ -2265,15 +2291,19 @@ void migrate_fd_connect(MigrationState *s)
+>       * QEMU uses the return path.
+>       */
+>      if (migrate_postcopy_ram() || migrate_use_return_path()) {
+> -        if (open_return_path_on_source(s)) {
+> +        if (open_return_path_on_source(s, !resume)) {
+>              error_report("Unable to open return-path for postcopy");
+> -            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+> -                              MIGRATION_STATUS_FAILED);
+> +            migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+>              migrate_fd_cleanup(s);
+>              return;
+>          }
+>      }
+>  
+> +    if (resume) {
+> +        /* TODO: do the resume logic */
+> +        return;
+> +    }
+> +
+>      qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+>                         QEMU_THREAD_JOINABLE);
+>      s->migration_thread_running = true;
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
