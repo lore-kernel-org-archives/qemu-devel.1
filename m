@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dcdpb-0001io-Lo
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 16:31:57 -0400
+	(envelope-from <mst@redhat.com>) id 1dceUl-0002jZ-Fl
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:14:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dcdpU-0003Nm-Bf
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 16:31:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47792)
+	(envelope-from <mst@redhat.com>) id 1dceUi-0004TW-Cx
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:14:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dcdpU-0003MS-2B
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 16:31:48 -0400
-References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-	<1501285073-2215-6-git-send-email-zuban32s@gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <491f77fc-974c-33dd-3974-08ab61d2c078@redhat.com>
-Date: Tue, 1 Aug 2017 22:31:33 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dceUi-0004TB-6j
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:14:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E78DC64E83
+	for <qemu-devel@nongnu.org>; Tue,  1 Aug 2017 21:14:22 +0000 (UTC)
+Date: Wed, 2 Aug 2017 00:14:18 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170802001139-mutt-send-email-mst@kernel.org>
+References: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1501285073-2215-6-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/5] tests: acpi: make sure FADT
+ is compared to reference table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,310 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com, seabios@seabios.org, kevin@koconnor.net, kraxel@redhat.com, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, rth@twiddle.net
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
 
-(Whenever my comments conflict with Michael's or Marcel's, I defer to them.)
+On Mon, Jul 31, 2017 at 05:40:47PM +0200, Igor Mammedov wrote:
+> While refactoring i386/FADT generation to build_append_int_noprefix()            
+> and testing it, It turned out that FADT is only tested for valid                 
+> checksum but actual test for unintended changes isn't applied to it              
+> even though we have reference tables in tree.                                    
+> So here goes a couple of cleanups to reflect what fuctions do +                  
+> some comments and actual fix.                                                    
+>                                                                                  
+> Note to maintainer:                                                              
+>   FADT reference table is out of sync and should be updated along with           
+>   series applied.                                                                
+>                                                                                  
+> CC: "Michael S. Tsirkin" <mst@redhat.com>                                        
+> CC: Marcel Apfelbaum <marcel@redhat.com> 
 
-On 07/29/17 01:37, Aleksandr Bezzubikov wrote:
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->  docs/pcie.txt            |  46 ++++++++++--------
->  docs/pcie_pci_bridge.txt | 121 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 147 insertions(+), 20 deletions(-)
->  create mode 100644 docs/pcie_pci_bridge.txt
+Absolutely good stuff, but not a bugfix as such (it's not that the
+test is wrong, it's that we skip FADT for now)
+so I don't think this is 2.10 material.
+
+> Igor Mammedov (5):
+>   tests: acpi: move tested tables array allocation outside of
+>     test_acpi_dsdt_table()
+>   tests: acpi: init table descriptor in test_dst_table()
+>   tests: acpi: rename test_acpi_tables()/test_dst_table() to reflect its
+>     usage
+>   tests: acpi: add comments to fetch_rsdt_referenced_tables/data->tables
+>     usage
+>   tests: acpi: fix FADT not being compared to reference table
 > 
-> diff --git a/docs/pcie.txt b/docs/pcie.txt
-> index 5bada24..338b50e 100644
-> --- a/docs/pcie.txt
-> +++ b/docs/pcie.txt
-> @@ -46,7 +46,7 @@ Place only the following kinds of devices directly on the Root Complex:
->      (2) PCI Express Root Ports (ioh3420), for starting exclusively PCI Express
->          hierarchies.
->  
-> -    (3) DMI-PCI Bridges (i82801b11-bridge), for starting legacy PCI
-> +    (3) PCIE-PCI Bridge (pcie-pci-bridge), for starting legacy PCI
->          hierarchies.
->  
->      (4) Extra Root Complexes (pxb-pcie), if multiple PCI Express Root Buses
-
-When reviewing previous patches modifying / adding this file, I
-requested that we spell out "PCI Express" every single time. I'd like to
-see the same in this patch, if possible.
-
-> @@ -55,18 +55,18 @@ Place only the following kinds of devices directly on the Root Complex:
->     pcie.0 bus
->     ----------------------------------------------------------------------------
->          |                |                    |                  |
-> -   -----------   ------------------   ------------------   --------------
-> -   | PCI Dev |   | PCIe Root Port |   | DMI-PCI Bridge |   |  pxb-pcie  |
-> -   -----------   ------------------   ------------------   --------------
-> +   -----------   ------------------   -------------------   --------------
-> +   | PCI Dev |   | PCIe Root Port |   | PCIE-PCI Bridge |   |  pxb-pcie  |
-> +   -----------   ------------------   -------------------   --------------
->  
->  2.1.1 To plug a device into pcie.0 as a Root Complex Integrated Endpoint use:
->            -device <dev>[,bus=pcie.0]
->  2.1.2 To expose a new PCI Express Root Bus use:
->            -device pxb-pcie,id=pcie.1,bus_nr=x[,numa_node=y][,addr=z]
-> -      Only PCI Express Root Ports and DMI-PCI bridges can be connected
-> +      Only PCI Express Root Ports, PCIE-PCI bridges and DMI-PCI bridges can be connected
-
-It would be nice if we could keep the flowing text wrapped to 80 chars.
-
-Also, here you add the "PCI Express-PCI" bridge to the list of allowed
-controllers (and you keep DMI-PCI as permitted), but above DMI was
-replaced. I think these should be made consistent -- we should make up
-our minds if we continue to recommend the DMI-PCI bridge or not. If not,
-then we should eradicate all traces of it. If we want to keep it at
-least for compatibility, then it should remain as fully documented as it
-is now.
-
->        to the pcie.1 bus:
->            -device ioh3420,id=root_port1[,bus=pcie.1][,chassis=x][,slot=y][,addr=z]                                     \
-> -          -device i82801b11-bridge,id=dmi_pci_bridge1,bus=pcie.1
-> +          -device pcie-pci-bridge,id=pcie_pci_bridge1,bus=pcie.1
->  
->  
->  2.2 PCI Express only hierarchy
-> @@ -130,21 +130,25 @@ Notes:
->  Legacy PCI devices can be plugged into pcie.0 as Integrated Endpoints,
->  but, as mentioned in section 5, doing so means the legacy PCI
->  device in question will be incapable of hot-unplugging.
-> -Besides that use DMI-PCI Bridges (i82801b11-bridge) in combination
-> +Besides that use PCIE-PCI Bridges (pcie-pci-bridge) in combination
->  with PCI-PCI Bridges (pci-bridge) to start PCI hierarchies.
-> +Instead of the PCIE-PCI Bridge DMI-PCI one can be used,
-> +but it doens't support hot-plug, is not crossplatform and since that
-
-s/doens't/doesn't/
-
-s/since that/therefore it/
-
-> +is obsolete and deprecated. Use the PCIE-PCI Bridge if you're not 
-> +absolutely sure you need the DMI-PCI Bridge.
->  
-> -Prefer flat hierarchies. For most scenarios a single DMI-PCI Bridge
-> +Prefer flat hierarchies. For most scenarios a single PCIE-PCI Bridge
->  (having 32 slots) and several PCI-PCI Bridges attached to it
->  (each supporting also 32 slots) will support hundreds of legacy devices.
-> -The recommendation is to populate one PCI-PCI Bridge under the DMI-PCI Bridge
-> +The recommendation is to populate one PCI-PCI Bridge under the PCIE-PCI Bridge
->  until is full and then plug a new PCI-PCI Bridge...
->  
->     pcie.0 bus
->     ----------------------------------------------
->          |                            |
-> -   -----------               ------------------
-> -   | PCI Dev |               | DMI-PCI BRIDGE |
-> -   ----------                ------------------
-> +   -----------               -------------------
-> +   | PCI Dev |               | PCIE-PCI BRIDGE |
-> +   ----------                -------------------
->                                 |            |
->                    ------------------    ------------------
->                    | PCI-PCI Bridge |    | PCI-PCI Bridge |   ...
-> @@ -157,11 +161,11 @@ until is full and then plug a new PCI-PCI Bridge...
->  2.3.1 To plug a PCI device into pcie.0 as an Integrated Endpoint use:
->        -device <dev>[,bus=pcie.0]
->  2.3.2 Plugging a PCI device into a PCI-PCI Bridge:
-> -      -device i82801b11-bridge,id=dmi_pci_bridge1[,bus=pcie.0]                        \
-> -      -device pci-bridge,id=pci_bridge1,bus=dmi_pci_bridge1[,chassis_nr=x][,addr=y]   \
-> +      -device pcie-pci-bridge,id=pcie_pci_bridge1[,bus=pcie.0]                        \
-> +      -device pci-bridge,id=pci_bridge1,bus=pcie_pci_bridge1[,chassis_nr=x][,addr=y]   \
->        -device <dev>,bus=pci_bridge1[,addr=x]
->        Note that 'addr' cannot be 0 unless shpc=off parameter is passed to
-> -      the PCI Bridge.
-> +      the PCI Bridge, and can never be 0 when plugging into the PCIE-PCI Bridge.
->  
->  3. IO space issues
->  ===================
-> @@ -219,25 +223,27 @@ do not support hot-plug, so any devices plugged into Root Complexes
->  cannot be hot-plugged/hot-unplugged:
->      (1) PCI Express Integrated Endpoints
->      (2) PCI Express Root Ports
-> -    (3) DMI-PCI Bridges
-> +    (3) PCIE-PCI Bridges
->      (4) pxb-pcie
->  
->  Be aware that PCI Express Downstream Ports can't be hot-plugged into
->  an existing PCI Express Upstream Port.
->  
-> -PCI devices can be hot-plugged into PCI-PCI Bridges. The PCI hot-plug is ACPI
-> -based and can work side by side with the PCI Express native hot-plug.
-> +PCI devices can be hot-plugged into PCIE-PCI and PCI-PCI Bridges.
-> +The PCI hot-plug into PCI-PCI bridge is ACPI based, whereas hot-plug into
-> +PCIE-PCI bridges is SHPC-base. They both can work side by side with the PCI Express native hot-plug.
-
-s/SHPC-base/SHPC-based/
-
-And, I don't understand the difference between "ACPI based" and "SHPC
-based". I thought the PCI Express - PCI bridge reused the same hotplug
-mechanism of the PCI-PCI bridge. That is, "ACPI based" and "SHPC based"
-were the same thing, and they were both used by the PCI Express-PCI
-bridge, and the PCI-PCI bridge.
-
-I'm basing this on the fact that the "shpc=off" property was always
-mentioned for PCI-PCI bridges in this document (in a different context,
-see above), which implies that the PCI-PCI bridge has a SHPC too. And,
-we've always called that "ACPI based" hotplug in this section.
-
->  PCI Express devices can be natively hot-plugged/hot-unplugged into/from
-> -PCI Express Root Ports (and PCI Express Downstream Ports).
-> +PCI Express Root Ports (and PCI Express Downstream Ports) and PCIExpress-to-PCI Bridges.
-
-I don't think this is right; PCI Express endpoints should be plugged
-into PCI Express downstream and root ports only. (... See the last
-sentence of "2. Device placement strategy".)
-
->  
->  5.1 Planning for hot-plug:
->      (1) PCI hierarchy
->          Leave enough PCI-PCI Bridge slots empty or add one
-> -        or more empty PCI-PCI Bridges to the DMI-PCI Bridge.
-> +        or more empty PCI-PCI Bridges to the PCIE-PCI Bridge.
->  
->          For each such PCI-PCI Bridge the Guest Firmware is expected to reserve
->          4K IO space and 2M MMIO range to be used for all devices behind it.
-> +        Appropriate PCI capability is designed, see pcie_pci_bridge.txt.
->  
->          Because of the hard IO limit of around 10 PCI Bridges (~ 40K space)
->          per system don't use more than 9 PCI-PCI Bridges, leaving 4K for the
-> diff --git a/docs/pcie_pci_bridge.txt b/docs/pcie_pci_bridge.txt
-> new file mode 100644
-> index 0000000..ad392ad
-> --- /dev/null
-> +++ b/docs/pcie_pci_bridge.txt
-> @@ -0,0 +1,121 @@
-> +Generic PCIExpress-to-PCI Bridge
-> +================================
-> +
-> +Description
-> +===========
-> +PCIE-to-PCI bridge is a new method for legacy PCI
-> +hierarchies creation on Q35 machines.
-> +
-> +Previously Intel DMI-to-PCI bridge was used for this purpose.
-> +But due to its strict limitations - no support of hot-plug,
-> +no cross-platform and cross-architecture support - a new generic
-> +PCIE-to-PCI bridge should now be used for any legacy PCI device usage
-> +with PCI Express machine.
-> +
-> +This generic PCIE-PCI bridge is a cross-platform device,
-> +can be hot-plugged into appropriate root port (requires additional actions, 
-> +see 'PCIE-PCI bridge hot-plug' section),
-> +and supports devices hot-plug into the bridge itself 
-> +(with some limitations, see below).
-> +
-> +Hot-plug of legacy PCI devices into the bridge
-> +is provided by bridge's built-in Standard hot-plug Controller.
-> +Though it still has some limitations, see 'Limitations' below.
-> +
-> +PCIE-PCI bridge hot-plug
-> +=======================
-> +As opposed to Windows, Linux guest requires extra efforts to
-> +enable PCIE-PCI bridge hot-plug.
-> +Motivation - now on init any PCI Express root port which doesn't have
-> +any device plugged in, has no free buses reserved to provide any of them
-> +to a hot-plugged devices in future.
-> +
-> +To solve this problem we reserve additional buses on a firmware level. 
-> +Currently only SeaBIOS is supported.
-> +The way of bus number to reserve delivery is special
-> +Red Hat vendor-specific PCI capability, added to the root port
-> +that is planned to have PCIE-PCI bridge hot-plugged in.
-> +
-> +Capability layout (defined in include/hw/pci/pci_bridge.h):
-> +
-> +    uint8_t id;     Standard PCI capability header field
-> +    uint8_t next;   Standard PCI capability header field
-> +    uint8_t len;    Standard PCI vendor-specific capability header field
-> +    
-> +    uint8_t type;   Red Hat vendor-specific capability type
-> +                    List of currently existing types:
-> +                        QEMU = 1
-> +    
-> +    uint16_t non_pref_16;	Non-prefetchable memory limit
-> +
-> +    uint8_t bus_res;    Minimum number of buses to reserve
-> +    
-> +    uint8_t io_8;       IO space limit in case of 8-bit value
-> +    uint32_t io_32;     IO space limit in case of 32-bit value
-> +                        This two values are mutually exclusive,
-> +                        i.e. they can't both be  >0.
-> +
-> +    uint32_t pref_32;   Prefetchable memory limit in case of 32-bit value
-> +    uint64_t pref_64;   Prefetchable memory limit in case of 64-bit value
-> +                        This two values are mutually exclusive (just as IO limit),
-> +                        i.e. they can't both be  >0.
-> +
-> +Memory limits are unused now, in future they are planned
-> +to be used for providing similar hints to the firmware.
-> +
-> +At the moment this capability is used only in
-> +QEMU generic PCIE root port (-device pcie-root-port).
-> +Capability construction function takes bus range value
-> +from root ports' common property 'bus_reserve'.
-> +By default it is set to 0 to leave root port's default
-> +behavior unchanged.
-
-This paragraph looks too narrow. Please fill it / wrap it to 80 chars or
-so (this should apply to all flowing text paragraphs).
-
-> +
-> +Usage
-> +=====
-> +A detailed command line would be:
-> +
-> +[qemu-bin + storage options]
-> +-m 2G
-> +-device ioh3420,bus=pcie.0,id=rp1
-> +-device ioh3420,bus=pcie.0,id=rp2
-> +-device pcie-root-port,bus=pcie.0,id=rp3,bus-reserve=1
-> +-device pcie-pci-bridge,id=br1,bus=rp1
-> +-device pcie-pci-bridge,id=br2,bus=rp2
-> +-device e1000,bus=br1,addr=8
-
-Backslashes seem to be missing.
-
-Thanks
-Laszlo
-
-> +
-> +Then in monitor it's OK to do:
-> +device_add pcie-pci-bridge,id=br3,bus=rp3
-> +device_add e1000,bus=br2,addr=1
-> +device_add e1000,bus=br3,addr=1
-> +
-> +Here you have:
-> + (1) Cold-plugged:
-> +    - Root ports: 1 QEMU generic root port with the capability mentioned above, 
-> +                  2 ioh3420 root ports;
-> +    - 2 PCIE-PCI bridges plugged into 2 different root ports;
-> +    - e1000 plugged into the first bridge.
-> + (2) Hot-plugged:
-> +    - PCIE-PCI bridge, plugged into QEMU generic root port;
-> +    - 2 e1000 cards, one plugged into the cold-plugged PCIE-PCI bridge, 
-> +                     another plugged into the hot-plugged bridge.
-> +
-> +Limitations
-> +===========
-> +The PCIE-PCI bridge can be hot-plugged only into pcie-root-port that
-> +has proper 'bus_reserve' property value to provide secondary bus for the hot-plugged bridge.
-> +
-> +Windows 7 and older versions don't support hot-plug devices into the PCIE-PCI bridge.
-> +To enable device hot-plug into the bridge on Linux there're 3 ways:
-> +1) Build shpchp module with this patch http://www.spinics.net/lists/linux-pci/msg63052.html
-> +2) Wait until the kernel patch mentioned above get merged into upstream - 
-> +    it's expected to happen in 4.14.
-> +3) set 'msi_enable' property to false - this forced the bridge to use legacy INTx,
-> +    which allows the bridge to notify the OS about hot-plug event without having
-> +    BUSMASTER set.
-> +
-> +Implementation
-> +==============
-> +The PCIE-PCI bridge is based on PCI-PCI bridge,
-> +but also accumulates PCI Express features 
-> +as a PCI Express device (is_express=1).
-> +
+>  tests/bios-tables-test.c | 30 ++++++++++++++++++------------
+>  1 file changed, 18 insertions(+), 12 deletions(-)
 > 
+> -- 
+> 2.7.4
