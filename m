@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcbPq-0007LM-5f
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:57:16 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcbWm-0001Dz-Ni
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 14:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcbPp-0006vY-9M
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:57:10 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:35364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcbPp-0006ua-3A
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:57:09 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id k71so9840166wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 10:57:08 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dcbWi-0004Dp-PV
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 14:04:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcbWi-0004Bv-JN
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 14:04:16 -0400
+Date: Tue, 1 Aug 2017 19:04:08 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170801180408.GC2471@work-vm>
 References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Aug 2017 18:56:47 +0100
-Message-ID: <CAFEAcA-VkU5tG9fV16+vSKkQCgZ2BSoHLtwe-VhDOsbOsm9Vww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<1501604245-33460-3-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8ArjNALptSYkR4T-SaejWPQxpazYjm-b_aCkGDFFXgnw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8ArjNALptSYkR4T-SaejWPQxpazYjm-b_aCkGDFFXgnw@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/17] Misc changes for QEMU 2.10-rc1 (?)
+Subject: Re: [Qemu-devel] [PULL 02/17]
+ cpu_physical_memory_sync_dirty_bitmap: Fix alignment check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, alex.bennee@linaro.org, QEMU Developers <qemu-devel@nongnu.org>
 
-On 1 August 2017 at 17:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 7d48cf8102a10e4a54333811bafb5eb5665092=
-68:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reques=
-t' into staging (2017-08-01 14:33:56 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 33f21e4f044ac1c37f60edc1f1aee628be8f463b:
->
->   mc146818rtc: implement UIP latching as intended (2017-08-01 17:27:34 +0=
-200)
->
-> ----------------------------------------------------------------
-> * Xen fix (Anthony)
-> * chardev fixes (Anton, Marc-Andr=C3=A9)
-> * small dead code removal (Zhongyi)
-> * documentation (Dan)
-> * bugfixes (David)
-> * decrease migration downtime (Jay)
-> * improved error output (Laurent)
-> * RTC tests and bugfix (me)
-> * Bluetooth clang analyzer fix (me)
-> * KVM CPU hotplug race (Peng Hao)
-> * Two other patches from Philippe's clang analyzer series
->
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 1 August 2017 at 17:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > This code has an optimised, word aligned version, and a boring
+> > unaligned version.  Recently 084140bd498909 fixed a missing offset
+> > addition from the core of both versions.  However, the offset isn't
+> > necessarily aligned and thus the choice between the two versions
+> > needs fixing up to also include the offset.
+> >
+> > Symptom:
+> >   A few stuck unsent pages during migration; not normally noticed
+> > unless under very low bandwidth in which case the migration may get
+> > stuck never ending and never performing a 2nd sync; noticed by
+> > a hanging postcopy-test on a very heavily loaded system.
+> >
+> > Fixes: 084140bd498909
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reported-by: Alex Benne=C3=A9 <alex.benee@linaro.org>
+> > Tested-by: Alex Benne=C3=A9 <alex.benee@linaro.org>
+> >
+> > --
+> > v2
+> >   Move 'page' inside the if (Comment from Paolo)
+> > Message-Id: <20170724165125.29887-1-dgilbert@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> Something somewhere along the line seems to have mangled the
+> unicode characters in Alex's name :-(
+> Also, Alex's email address is typoed, and what should be the
+> '---' marker has been written as '--' so the below-the-fold waffle
+> is still hanging around in the commit.
+>=20
+> This doesn't seem worth rejecting the pull request on the
+> eve of rc1 for, but it's still a bit sad :-(
 
-Applied, thanks, but can you check whatever it is in your
-workflow that's mangling non-ascii characters?
+Hmm yes, I think some of that's mine - the missing 'n' is certainly
+my fault; and I may have got his two 'e's in the wrong order,
+but I don't know what changed the encoding, that seems right on:
+  https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07417.html
 
-thanks
--- PMM
+Dave
+
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
