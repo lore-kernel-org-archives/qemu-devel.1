@@ -1,43 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcMfp-0006Kq-Oj
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:12:42 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dcMo6-0007h4-9O
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcMfm-00071d-IM
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:12:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36995
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dcMfm-00071A-Cw
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:12:38 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7128uWs143204
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:12:37 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2c2a86qpd2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:12:37 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 31 Jul 2017 20:12:37 -0600
-Date: Tue, 1 Aug 2017 10:12:31 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727114603.77b801e2@gondolin>
-	<20170728092108.GE15504@bjsdjshi@linux.vnet.ibm.com>
-	<20170728135301.0b510793@gondolin>
-	<20170728155048.GB5874@bjsdjshi@linux.vnet.ibm.com>
-	<20170731105447.70428667@gondolin>
+	(envelope-from <aik@ozlabs.ru>) id 1dcMo2-00049T-6l
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:21:14 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dcMo1-00047J-Rx
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:21:10 -0400
+Received: by mail-pg0-x241.google.com with SMTP id 125so432265pgi.5
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 19:21:05 -0700 (PDT)
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100578691.27487.8944448515009831240.stgit@bahia>
+	<20170728040257.GI3098@umbus.fritz.box>
+	<c3750e7d-47af-4cd4-9121-73d8d8d0f81e@redhat.com>
+	<20170731045821.GE2652@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <a9d88270-94ec-84a1-a664-4e6df3f2af31@ozlabs.ru>
+Date: Tue, 1 Aug 2017 12:20:56 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170731105447.70428667@gondolin>
-Message-Id: <20170801021231.GE12259@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Channel Path realted CRW generation
+In-Reply-To: <20170731045821.GE2652@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="APfH549nHCt5i51XajV5am0w21RGouMJL"
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to
+ update the XICS phandle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,86 +34,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
+To: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-* Cornelia Huck <cohuck@redhat.com> [2017-07-31 10:54:47 +0200]:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--APfH549nHCt5i51XajV5am0w21RGouMJL
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
+ qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Message-ID: <a9d88270-94ec-84a1-a664-4e6df3f2af31@ozlabs.ru>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to update
+ the XICS phandle
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+ <150100578691.27487.8944448515009831240.stgit@bahia>
+ <20170728040257.GI3098@umbus.fritz.box>
+ <c3750e7d-47af-4cd4-9121-73d8d8d0f81e@redhat.com>
+ <20170731045821.GE2652@umbus.fritz.box>
+In-Reply-To: <20170731045821.GE2652@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, 28 Jul 2017 23:50:48 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > * Cornelia Huck <cohuck@redhat.com> [2017-07-28 13:53:01 +0200]:
-> 
-> > > > > You're bound to get different kinds of notifications: via a CRW with
-> > > > > source channel path, via event information retrievable via CHSC
-> > > > > (indicated by a CRW with source CSS),    
-> > > > Ha, I was not awre of this one before!  
-> > > 
-> > > That's the 'link incident' and 'resource accessibility' stuff.  
-> > My focus was trying to have the minimum stuff to make a Linux guest
-> > working well -- basically, my working on prototype targeted to make the
-> > output lschp and lscss corect and uptodate. I
-> > 
-> > I will dig this and see if I need to do more stuff.
-> 
-> You can probably skip this for now, unless you want to propagate the
-> ficon-related stuff.
-I don't even want to know about that now. ;)
+On 31/07/17 14:58, David Gibson wrote:
+> On Fri, Jul 28, 2017 at 08:20:57AM +0200, Thomas Huth wrote:
+>> On 28.07.2017 06:02, David Gibson wrote:
+>>> On Tue, Jul 25, 2017 at 08:03:06PM +0200, Greg Kurz wrote:
+>>>> The "phandle" property of the XICS node is referenced by the "interr=
+upt-map"
+>>>> property of each PHB node. This is used by the guest OS to setup IRQ=
+s for
+>>>> all PCI devices.
+>>>>
+>>>> QEMU uses an arbitrary value (0x1111) for this phandle, but SLOF con=
+verts
+>>>> this value to a SLOF specific one, which is then presented to the gu=
+est OS.
+>>>>
+>>>> This patches introduces the new KVMPPC_H_UPDATE_PHANDLE hcall, which=
+ is used
+>>>> by SLOF to communicate the patched phandle value back to QEMU. This =
+value
+>>>> is then cached and preserved accross migration until machine reset.
+>>>>
+>>>> This is required to be able to support PHB hotplug.
+>>>>
+>>>> Note, that SLOF already has some code to call KVMPPC_H_RTAS_UPDATE, =
+so we
+>>>> have to introduce its number even if QEMU currently doesn't implemen=
+t it.
+>>>>
+>>>> Suggested-by: Thomas Huth <thuth@redhat.com>
+>>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>>
+>>> Ugh.  I really, really hope we can avoid this, though I don't
+>>> immediately see how.  Having to have two way communication between
+>>> qemu and SLOF about the device tree contents just seems like opening
+>>> the door to endless complexities.
+>>>
+>>> This is basically a consequence of the fact that both qemu and partly=
 
-> Just plain channel-path related changes should already cover the
-> interesting stuff.
-> 
-> > > > My prototype work tries to sync the belowing information from host
-> > > > kernel to qemu:
-> > > > 1. the real SCHIB, so stsch from guest could get the updated path masks.  
-> > > 
-> > > How far do you want to go with mirroring? I think you need to modify at
-> > > least the devno in the pmcw, no?  
-> > I didn't think this very deep. For now, I only sync the PIM, POM, PAM
-> > and CHPIDs lazily.
-> 
-> Also consider the pno bit and the pnom.
-Roger!
+>>> responsible for constructing the device tree for the guest, and that'=
+s
+>>> not easy to avoid.
+>>>
+>>> Hrm.. Thomas, I know it's not really the OF way, but would it be
+>>> feasible to change SLOF to use the phandles as supplied by qemu rathe=
+r
+>>> than creating its own?
+>>
+>> I don't see a way to do this in an easy, clean, reasonable way. SLOF
+>> uses pointers to internal structures as phandles all over the place. Y=
+ou
+>> likely can't replace that so easily without rewriting half of the whol=
+e
+>> device tree related code in SLOF, I guess...
+>=20
+> Dang, that's what I suspected.
+>=20
+> Just to be clear the phandles are used directly as raw pointers?
+> There's not even some lookup macro we could change?
+>=20
 
-> 
-> > For devno... I need to think more. If the qemu command has a given
-> > "devno" for the vfio-ccw device, maybe we should not override its dev_id
-> > with the real one "device number".
-> 
-> The guest should not be surprised by a different devno, so you need to
-> be sure everything is consistent.
-Ok. Will handle the device number.
+We would need to rewrite
+https://github.com/aik/SLOF/blob/master/slof/fs/node.fs
 
-> 
-> 
-> > > > 3. still working on support CHSC store channel path description command.  
-> > > 
-> > > I'm currently wondering how many of those chscs are optional. OTOH, if
-> > > a modern Linux guest cannot work properly without them, it makes no
-> > > sense to leave them out.  
-> > Nod.
-> > 
-> > But I think I need to define the criteria for "work properly". For
-> > example, with the current code, a Linux guest with a passed through
-> > device works, while lschp shows the Cfg. as 3 (not recognized), and the
-> > Shared and PCHID as "-". For this case, do you think it "work properly"?
-> 
-> It depends upon what you want to expose to the guest. Some
-> configuration checking or management tools might be reporting a
-> configuration deficiency (*might*, I do not know).
-This is helpful.
+Since SLOF does not seem to use phandles as pointers directly anywhere bu=
+t
+in nofe.fs, this should be doable. Easier said than done though.
 
-> 
-> Shared and PGID may be useful if the operator wants to perform some
-> maintenance on the hardware (so they can figure out which systems/disks
-> are affected), but the information should be available in the
-> hypervisor as well, so I'm not sure whether it's a big deal.
-> 
-Oh! This information is also very helpful.
 
-Since I only want to expose the minimum information that the guest needs
-to work without serious problem. I think I can also deffer these stuff
-until we have the good chp modelling.
+--=20
+Alexey
 
--- 
-Dong Jia Shi
+
+--APfH549nHCt5i51XajV5am0w21RGouMJL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIrBAEBCAAVBQJZf+WJDhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5UJAQALmU
+/Wi1rvpFRxoE8CK1wP2WoXt42FK0xDnf8/NoCQiUKcvtyVaFD98EIpsSD3dSACPZ
+IBYPkT7gAy4NOzpoL6iTcc3BUuT/H+DCge9UEiHT4eII8GZlTgTmP/4SXGrhCvH1
+/g/0OeO6ZWz3CQRbwYy+t676kO1nPnpEl2yqCsMvhFj4jt0dCKm73Wbhwvh8O4uB
+lQaQlc/PD361ezF9p7/O4DME0Ezmf4Kb4YbrKC+YZ1KAgPTMyG0GDPQ0XDtSClHH
+AiV1IMEaspMOJ+SpBZxvDI1ESgjVyTivs50Wzm+m/DuyeTgsuL7XAnrgh6C9TGAq
+qSuwhaGqimiSGN6xBjYyYWR3yp5STq8ITsPV2T7DPXNCnMfEcZRa//IrAaRmoDog
+mVr7bdF9Ihnn7zAkqoeghFBmDX2NkgvcdH2ubbZkc13IpWx2b9eh5rh9pPLf1xJi
+M3VRo1rij2/9LmyouP3HTTAFfTCFXCdyFZE+fQVHM2aAePg8AKJbuqn9d0FXxkBn
+hNaWa/5VQM/cz1zrflx8pnkaFtrdnSGjdOclp3worC2/fSBFkr6MzPYrfVjaTuPv
+wu8W4YirWBYhYN9eVlon/kuaCSr7K6lBorzYKDrX9jyfk3yPX3f854PQOAi+74k5
+nqzX97DHmfy34BOWFnTABkqViAf8Rdztr1+j3VoA
+=3Vm8
+-----END PGP SIGNATURE-----
+
+--APfH549nHCt5i51XajV5am0w21RGouMJL--
