@@ -1,44 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcMWV-0003lj-Uf
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:03:05 -0400
+	(envelope-from <mst@redhat.com>) id 1dcMZL-0004cw-M5
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcMWS-0000Yp-RK
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:03:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40958
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dcMWS-0000YD-Lv
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:03:00 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v711xVCW120683
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:02:59 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2c2a86qcf0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:02:58 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 31 Jul 2017 22:02:58 -0400
-Date: Tue, 1 Aug 2017 10:02:53 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
-	<20170727135910.27d9e42e@gondolin>
-	<20170731035137.GB21572@bjsdjshi@linux.vnet.ibm.com>
-	<20170731131302.5bb2198c@gondolin>
-	<bcb1d8d2-b620-fc47-4a2f-c89bbb744d0b@linux.vnet.ibm.com>
+	(envelope-from <mst@redhat.com>) id 1dcMZK-00021E-Et
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:05:59 -0400
+Date: Tue, 1 Aug 2017 05:05:42 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170801045857-mutt-send-email-mst@kernel.org>
+References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
+	<20170525011034-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061619F6FDC53F7FD4C1DAE4FFF10@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170706023845-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB0616507B6F0989360D582F37FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170731170217-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061656F255D688500AC8622BFFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bcb1d8d2-b620-fc47-4a2f-c89bbb744d0b@linux.vnet.ibm.com>
-Message-Id: <20170801020253.GD12259@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
- initialized CRW for channel path hotplug
+In-Reply-To: <AM3PR04MB061656F255D688500AC8622BFFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,81 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
+To: Diana Madalina Craciun <diana.craciun@nxp.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marcel@redhat.com" <marcel@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Mike Caraman <mike.caraman@nxp.com>, Laurentiu Tudor <laurentiu.tudor@nxp.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-31 14:30:32 +0200]:
-
-> 
-> 
-> On 07/31/2017 01:13 PM, Cornelia Huck wrote:
-> > On Mon, 31 Jul 2017 11:51:37 +0800
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > 
-> >> * Cornelia Huck <cohuck@redhat.com> [2017-07-27 13:59:10 +0200]:
-> >>
-> >>> On Thu, 27 Jul 2017 03:54:18 +0200
-> >>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> [..]
-> >>
-> >> After thinking quite a while, if we do want to add a real device object
-> >> for a channel path, the most intractable problem (but not the only one)
-> >> for me is to find a good way to map the real path with the virtual one.
-> 
-> Yeah, channel path virtualisation... IMHO our current solution is not
-> not really solving the problem.
-If we choose to go with Conny's idea, then yes, my prototype is totally
-in the wrong direction.
-
-> Say, do we  care about a design which could work with live migration
-> (@Dong Jia)?
-Channel I/O pass through and live migration don't go together.
-
-I'm afraid, we did not considerate live migration yet. If we can
-migrate, that would be great! But we are still struggling in finding a
-way out the current swamp...
-
-> 
-> >> How would we retrieve the information from the real one? We'd need the
-> >> host kernel to provide totally new interfaces for channel path
-> >> information synchronization and notification machenism. I don't think in
-> >> this case sysfs is the choice. Ioctls, vfio MMIO regions and eventfd
-> >> could be a better choice. I think, this is like we are trying to
-> >> passthru a channel path. So we'd need to have a new vfio device physical
-> >> driver (e.g. vfio-chp) to handle this...
-> > 
-> > And that would run into the problem of (1) the chp objects not using a
-> > bus on Linux, and (2) implying dedicating the chpids, which we likely
-> > do not want.
-> > 
-> 
-> AFAIU this is about "real-virtual" vs "virutal-virtual". I would really like
-> to see some design here (@Dong Jia). I'm not sure any more where do we want to go.
-If we can find a way to satisfy the requirements that Conny mentioned, I
-can prepare a design. Sadly, we are not there yet.
-
-> 
-> [..]
-> >>
+On Mon, Jul 31, 2017 at 03:13:09PM +0000, Diana Madalina Craciun wrote:
+> On 07/31/2017 05:06 PM, Michael S. Tsirkin wrote:
+> > On Mon, Jul 31, 2017 at 01:22:45PM +0000, Diana Madalina Craciun wrote:
+> >>>> If we are to use a value of 0 for the constant in case of PCI devices,
+> >>>> what happens if we have multiple PCI controllers?
+> >>> I guess we'd use the PCI Segment number for that?
 > >>>
-> >>> tl;dr: I don't think we want chp crws until after we have a good chp
-> >>> model.  
-> >> I have to agree.
-> > 
-> > I'm wondering whether we should just defer this to later. We can live
-> > with no chp crw being created (except for rchp), as due to the crw
-> > generation being unreliable the guest OS has to handle path changes
-> > without crws anyway.
-> > 
-> > We just need to make sure that pno and friends are appropriately
-> > reported to the guest.
-> > 
+> >>>
+> >> Yes, we can use the PCI segment for this scenario. But this would mean
+> >> different solutions for the same problem. The main problem is that we
+> >> can have multiple entities in the system that are using MSIs (for now
+> >> PCI and NXP non-PCI bus infrastructure
+> >> (https://emea01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flwn.net%2FArticles%2F635905%2F&data=01%7C01%7Cdiana.craciun%40nxp.com%7C6b0c6c879af64718a21908d4d81d534e%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0&sdata=bpYMMqajWzgzdbdQgy%2FUYR7y%2BswyvwE%2BqFzs7wdIkkA%3D&reserved=0). I guess that we may have other
+> >> platform devices that are using MSIs in the future.
+> >>
+> >> Thanks,
+> >> Diana
+> >>
+> >>
+> > Don't have the time to explore NXP in depth, sorry - there's
+> > a lot of complexity there.
+> > Could you maybe stick some bits to specify bus type in there?
+> > It just looks very wrong to push low level things like this
+> > that users have no interest in up the stack.
+> >
+> Let's generalize the problem a little bit, the NXP details just does not
+> matter much. The problem we have is the following:
 > 
-> +1 
-Ha! This is very very clever!
+> The GIC-ITS, the ARM MSI controller is using deviceIDs in order to remap
+> the interrupts. Each device which is expected to send MSIs has a
+> deviceID associated with it. These deviceIDs are configured into devices
+> by software/firmware. There is support in the device tree to specify the
+> correlation between requesterID and deviceID:
+> 
+> "msi-map: Maps a Requester ID to an MSI controller and associated
+>   msi-specifier data. The property is an arbitrary number of tuples of
+>   (rid-base,msi-controller,msi-base,length)"
+> (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/pci/pci-msi.txt)
+> 
+> Our problem is that we have to allocate these deviceIDs in QEMU as well
+> and we have to ensure that they are unique. Currently, for PCI, the
+> assumption requesterID=deviceID is made which will no longer be true in
+> case other devices are added. So we need a way (preferable a general
+> one) to allocate these IDs to different devices in the system in a
+> consistent way which will ensure that two devices do not share the same ID.
 
-I will give it a try. If everything go well, I will agree with this
-happyly. ;)
+My question would be, do other types of devices that are there
+right now have some kind of ID like the requester ID?
+If so I would say just use that, and set high bits in the device ID
+to specify the type (e.g. 00 for pci, etc).
+
+
+IMHO if possible that is preferable to pushing this up to users.
+
+
+> The reason I put this ID into the controller itself is because on real
+> hardware is actually programmed into the controller. It is needed (for
+> example) when the MSIs are sent.
+> 
+> Thanks,
+> 
+> Diana
+> 
+
+IIUC what happens on real hardware is controller maps each requester ID
+(or presumably other source ID in the request) to the device ID,
+and the mapping is internal to controller.
+If you wanted a lot of flexibility then looks like you could pass this
+mapping to controllers, but is it really necessary?
+Why don't we build a mapping that's convenient for us?
+
 
 -- 
-Dong Jia Shi
+MST
