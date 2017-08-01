@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcU8x-0006uo-47
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:11:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dcUMl-0001GL-Sc
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:25:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcU8t-0002Hn-0X
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:11:15 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35466)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcU8s-0002HY-QI
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:11:10 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r77so2273394wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 03:11:10 -0700 (PDT)
-Date: Tue, 1 Aug 2017 11:11:07 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170801101107.GG13521@stefanha-x1.localdomain>
-References: <20170731085110.1050-1-apahim@redhat.com>
-	<20170731085110.1050-6-apahim@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dcUMi-00058R-Ju
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:25:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dcUMi-00057B-DO
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:25:28 -0400
+References: <201707250902596770211@zte.com.cn>
+	<f53aa34f-5ca0-c38e-a303-4688698a2d42@cn.fujitsu.com>
+	<20170728002501.GM5117@lemon.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9ca67be4-4398-853a-4e4a-36bfc3591fd0@redhat.com>
+Date: Tue, 1 Aug 2017 12:25:17 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PyMzGVE0NRonI6bs"
-Content-Disposition: inline
-In-Reply-To: <20170731085110.1050-6-apahim@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 5/7] qemu.py: use os.path.null instead
- of /dev/null
+In-Reply-To: <20170728002501.GM5117@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2 02/04] colo-compare: Processpactkets in
+ the IOThreadofthe primary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
+To: Fam Zheng <famz@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: wang.yong155@zte.com.cn, lizhijian@cn.fujitsu.com, wang.guang55@zte.com.cn, jasowang@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@gmail.com, stefanha@redhat.com, zhang.zhanghailiang@huawei.com
 
+On 28/07/2017 02:25, Fam Zheng wrote:
+> On Thu, 07/27 15:47, Zhang Chen wrote:
+>> CC. Fam and David.
+>>
+>> Any idea about it?
+> 
+> Is it possible to use g_main_context_{push,pop}_thread_default to "move" chardev
+> GSources to IOThread's context, then use g_main_context_query like main thread
+> and poll the fds in aio_poll?
 
---PyMzGVE0NRonI6bs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+How would you do that without making aio_poll performance worse for
+everyone?
 
-On Mon, Jul 31, 2017 at 10:51:08AM +0200, Amador Pahim wrote:
-> For increased portability, let's use os.path.devnull.
->=20
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
-> ---
->  scripts/qemu.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---PyMzGVE0NRonI6bs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgFO7AAoJEJykq7OBq3PINuoIAJYhYphlS9nCqq/zgv+xb5vf
-vaUB02CVJ6V66x9j31kVgewk9PQoKB94v3B6kQ0BOzUZA3+R0GOxgI2Vubk5jtma
-DqE0LBmCEwIAXoohj4GmZAzTAnT+fCDs8NZoCxenvFVpXcJRjbJ4X12YywVb6/F3
-cFQDrTiEXuWL4rg8iY7ZuX+kLAgMobjc6KUU7/rRR5LlPrDG20FPRirO0GCD+o5A
-GJJ+4GrnoyG9eqvWvvZg5GmCMYoVf+qo/PY+hKAYOodeQJlGH4aC2xl0YCRKQvhx
-Y2VsKQrqToPKdw8bLi1B/uZGcKKJFSfVExwPWjMuIOnfMvzHrSE04VVogpMMP1Q=
-=cRX9
------END PGP SIGNATURE-----
-
---PyMzGVE0NRonI6bs--
+Paolo
