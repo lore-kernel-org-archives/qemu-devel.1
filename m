@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcWrx-0005Uu-O2
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:05:59 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dcWte-0006V6-S9
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcWrs-0000CS-UB
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:05:53 -0400
-Date: Tue, 1 Aug 2017 14:05:44 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170801130544.GA22017@stefanha-x1.localdomain>
-References: <20170726120255.14292-1-maozy.fnst@cn.fujitsu.com>
-	<20170726120255.14292-5-maozy.fnst@cn.fujitsu.com>
+	(envelope-from <eric.auger@redhat.com>) id 1dcWtd-0001C2-5P
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:07:38 -0400
+References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
+	<a8fd7038-a840-8667-0db2-5765624903d3@caviumnetworks.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <50d1685e-bfa6-02ac-2650-37637745431a@redhat.com>
+Date: Tue, 1 Aug 2017 15:07:15 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
-Content-Disposition: inline
-In-Reply-To: <20170726120255.14292-5-maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] hw/block: Fix the return type
+In-Reply-To: <a8fd7038-a840-8667-0db2-5765624903d3@caviumnetworks.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v5 0/8] ARM SMMUv3 Emulation Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +23,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Tomasz Nowicki <tnowicki@caviumnetworks.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com
+Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, tcain@qti.qualcomm.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, jean-philippe.brucker@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>
 
+Hi Tomasz,
+On 01/08/2017 13:01, Tomasz Nowicki wrote:
+> Hi Eric,
+> 
+> Just letting you know that I am facing another issue with the following
+> setup:
+> 1. host (4.12 kernel & 64K page) and VM (4.12 kernel & 64K page)
+> 2. QEMU + -netdev type=tap,ifname=tap,id=net0 -device
+> virtio-net-pci,netdev=net0,iommu_platform,disable-modern=off,disable-legacy=on
+> 
+> 2. On VM, I allocate some huge pages and run DPDK testpmd app:
+> # echo 4 > /sys/kernel/mm/hugepages/hugepages-524288kB/nr_hugepages
+> # ./dpdk/usertools/dpdk-devbind.py -b vfio-pci  0000:00:02.0
+> # ./dpdk/build/app/testpmd -l 0-13 -n 4 -w 0000:00:02.0 --
+> --disable-hw-vlan-filter --disable-rss -i
+> EAL: Detected 14 lcore(s)
+> EAL: Probing VFIO support...
+> EAL: VFIO support initialized
+> EAL: PCI device 0000:00:02.0 on NUMA socket -1
+> EAL:   probe driver: 1af4:1041 net_virtio
+> EAL:   using IOMMU type 1 (Type 1)
+> EAL: iommu_map_dma vaddr ffff20000000 size 80000000 iova 120000000
+> EAL: Can't write to PCI bar (0) : offset (12)
+> EAL: Can't read from PCI bar (0) : offset (12)
+> EAL: Can't read from PCI bar (0) : offset (12)
+> EAL: Can't write to PCI bar (0) : offset (12)
+> EAL: Can't read from PCI bar (0) : offset (12)
+> EAL: Can't write to PCI bar (0) : offset (12)
+> EAL: Can't read from PCI bar (0) : offset (0)
+> EAL: Can't write to PCI bar (0) : offset (4)
+> EAL: Can't write to PCI bar (0) : offset (14)
+> EAL: Can't write to PCI bar (0) : offset (e)
+> EAL: Can't read from PCI bar (0) : offset (c)
+> EAL: Requested device 0000:00:02.0 cannot be used
+> EAL: No probed ethernet devices
+> Interactive-mode selected
+> USER1: create a new mbuf pool <mbuf_pool_socket_0>: n=251456, size=2176,
+> socket=0
+> 
+> When VM uses *4K pages* the same setup works fine. I will work on this
+> but please let me know in case you already know what is going on.
 
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No I did not face that one. I was able to launch testpmd without such
+early message. However I assigned an igbvf device to the guest and then
+to DPDK. I've never tested your config.
 
-On Wed, Jul 26, 2017 at 08:02:53PM +0800, Mao Zhongyi wrote:
-> When the function no success value to transmit, it usually make the
-> function return void. It has turned out not to be a success, because
-> it means that the extra local_err variable and error_propagate() will
-> be needed. It leads to cumbersome code, therefore, transmit success/
-> failure in the return value is worth.
->=20
-> So fix the return type of blkconf_apply_backend_options(),
-> blkconf_geometry() and virtio_blk_data_plane_create() to avoid it.
->=20
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  hw/block/block.c                | 21 ++++++++++++---------
->  hw/block/dataplane/virtio-blk.c | 16 +++++++++-------
->  hw/block/dataplane/virtio-blk.h |  6 +++---
->  include/hw/block/block.h        | 10 +++++-----
->  4 files changed, 29 insertions(+), 24 deletions(-)
->=20
-> diff --git a/hw/block/block.c b/hw/block/block.c
-> index 27878d0..717bd0e 100644
-> --- a/hw/block/block.c
-> +++ b/hw/block/block.c
-> @@ -51,8 +51,8 @@ void blkconf_blocksizes(BlockConf *conf)
->      }
->  }
-> =20
-> -void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-> -                                   bool resizable, Error **errp)
-> +int blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-> +                                  bool resizable, Error **errp)
+However as stated in my cover letter at the moment DPDK is not working
+for me because of storms of tlbi-on-maps. I intend to work on this as
+soon as get some bandwidth, sorry.
 
-I'm not a fan of these changes because it makes inconsistencies between
-the return value and the errp argument possible (e.g. returning success
-but setting errp, or returning failure without setting errp).
+Thanks
 
-If you really want to do this please use bool as the return type instead
-of int.  int can be abused to return error information that should
-really be in the Error object.
-
-Stefan
-
---9amGYk9869ThD9tj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgHyoAAoJEJykq7OBq3PIynsIAKBbY94OXyFgQC1h9ttzKK6N
-0hZfPR53oG+hQHibSfYjToQ0HX3oQIXbpHB3+bc6vGcpWdAMcpGmLSApM5gFZsGb
-07GRCkqrDt7WbGrp7uRQDHkPVT36QAHEv4nkgzzgEm23UMtgo3jMhq43hMdRRmlC
-avNx2ToVb3Nan2nrCJvY9mZEGJ9I2hK1q0tTgCqKv3vLYOJCb/65mzx5jptIyBtU
-C+FZrI0I+MbiR6/yv/Eu5GrinZDNPK+ck8uyzGoPRBhBCv9RyfxOlIkbKT3n9VyR
-dPL16KzPzgZGYbJE7jkYg/k+csXhyYwyzGub39XrWhVEnssdd2Qx9dFvAXl3yrQ=
-=Y+Jn
------END PGP SIGNATURE-----
-
---9amGYk9869ThD9tj--
+Eric
+> 
+> Thanks,
+> Tomasz
+> 
+> 
+> On 09.07.2017 22:51, Eric Auger wrote:
+>> This series implements the emulation code for ARM SMMUv3.
+>> This is the continuation of Prem's work [1].
+>>
+>> This v5 mainly brings VFIO integration in DT mode. On guest kernel
+>> side, this requires a quirk [1] to force TLB invalidation on map.
+>>
+>> The following changes also are noticeable:
+>> - fix SMMU_CMDQ_CONS offset
+>> - adds dma-coherent dt property which fixes the unhandled command
+>>    opcode bug.
+>> - implements block PTE
+>>
+>> The smmu is instantiated when passing the smmu option to machvirt:
+>> "-M virt-2.10,smmu"
+>>
+>> As I haven't split the code yet so that it can be easily reviewable
+>> I don't expect deep reviews at this stage. Also the implementation may
+>> be largely sub-optimal.
+>>
+>> Tested Use Cases:
+>> - booted a guest in dt and acpi mode with an iommu_platform
+>>    virtio-net-pci device (using dma ops). Tested with the following
+>>    guest combinations: 4K page - 39 bit VA, 4K - 48b, 64K - 39b,
+>>    64K - 48b.
+>> - booted a guest (featuring [1]) with PCIe passthrough'ed PCIe devices:
+>>    - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
+>>    - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
+>>
+>> Unfortunately I have not been able to run DPDK testpmd yet on guest side.
+>> The problem I see is the user space driver dma-maps a huge area
+>> and this causes plenty of CMDQ_OP_TLBI_NH_VA commands to be sent
+>> (tlbi-on-map) which are sent for each page whereas the dma-map covers a
+>> huge page. I will work on this issue for next version.
+>>
+>> Known limitations:
+>> - no VMSAv8-32 suport
+>> - no nested stage support (S1 + S2)
+>> - no support for HYP mappings
+>> - register fine emulation, commands, interrupts and errors were
+>>    not accurately tested. Handling is sufficient to run use cases
+>>    described hereafter though.
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> v5: https://github.com/eauger/qemu/tree/v2.9-SMMU-v5
+>> v4: https://github.com/eauger/qemu/tree/v2.9-SMMU-v4
+>>
+>> References:
+>> [1] [RFC 0/2] arm-smmu-v3 tlbi-on-map option
+>> [2] Prem's last iteration:
+>> - https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03531.html
+>>
+>> History:
+>> v4 -> v5:
+>> - initial_level now part of SMMUTransCfg
+>> - smmu_page_walk_64 takes into account the max input size
+>> - implement sys->iommu_ops.replay and sys->iommu_ops.notify_flag_changed
+>> - smmuv3_translate: bug fix: don't walk on bypass
+>> - smmu_update_qreg: fix PROD index update
+>> - I did not yet address Peter's comments as the code is not mature enough
+>>    to be split into sub patches.
+>>
+>> v3 -> v4 [Eric]:
+>> - page table walk rewritten to allow scan of the page table within a
+>>    range of IOVA. This prepares for VFIO integration and replay.
+>> - configuration parsing partially reworked.
+>> - do not advertise unsupported/untested features: S2, S1 + S2, HYP,
+>>    PRI, ATS, ..
+>> - added ACPI table generation
+>> - migrated to dynamic traces
+>> - mingw compilation fix
+>>
+>> v2 -> v3 [Eric]:
+>> - rebased on 2.9
+>> - mostly code and patch reorganization to ease the review process
+>> - optional patches removed. They may be handled separately. I am
+>> currently
+>>    working on ACPI enablement.
+>> - optional instantiation of the smmu in mach-virt
+>> - removed [2/9] (fdt functions) since not mandated
+>> - start splitting main patch into base and derived object
+>> - no new function feature added
+>>
+>> v1 -> v2 [Prem]:
+>> - Adopted review comments from Eric Auger
+>>          - Make SMMU_DPRINTF to internally call qemu_log
+>>              (since translation requests are too many, we need control
+>>               on the type of log we want)
+>>          - SMMUTransCfg modified to suite simplicity
+>>          - Change RegInfo to uint64 register array
+>>          - Code cleanup
+>>          - Test cleanups
+>> - Reshuffled patches
+>>
+>> v0 -> v1 [Prem]:
+>> - As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
+>> - Reworked register access/update logic
+>> - Factored out translation code for
+>>          - single point bug fix
+>>          - sharing/removal in future
+>> - (optional) Unit tests added, with PCI test device
+>>          - S1 with 4k/64k, S1+S2 with 4k/64k
+>>          - (S1 or S2) only can be verified by Linux 4.7 driver
+>>          - (optional) Priliminary ACPI support
+>>
+>> v0 [Prem]:
+>> - Implements SMMUv3 spec 11.0
+>> - Supported for PCIe devices,
+>> - Command Queue and Event Queue supported
+>> - LPAE only, S1 is supported and Tested, S2 not tested
+>> - BE mode Translation not supported
+>> - IRQ support (legacy, no MSI)
+>> - Tested with DPDK and e1000
+>>
+>>
+>> Eric Auger (5):
+>>    hw/arm/smmu-common: smmu base class
+>>    hw/arm/virt: Add 2.10 machine type
+>>    hw/arm/virt: Add tlbi-on-map property to the smmuv3 node
+>>    target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
+>>    hw/arm/smmuv3: VFIO integration
+>>
+>> Prem Mallappa (3):
+>>    hw/arm/smmuv3: smmuv3 emulation model
+>>    hw/arm/virt: Add SMMUv3 to the virt board
+>>    hw/arm/virt-acpi-build: Add smmuv3 node in IORT table
+>>
+>>   default-configs/aarch64-softmmu.mak |    1 +
+>>   hw/arm/Makefile.objs                |    1 +
+>>   hw/arm/smmu-common.c                |  474 +++++++++++++
+>>   hw/arm/smmu-internal.h              |   89 +++
+>>   hw/arm/smmuv3-internal.h            |  651 ++++++++++++++++++
+>>   hw/arm/smmuv3.c                     | 1256
+>> +++++++++++++++++++++++++++++++++++
+>>   hw/arm/trace-events                 |   54 ++
+>>   hw/arm/virt-acpi-build.c            |   56 +-
+>>   hw/arm/virt.c                       |  111 +++-
+>>   include/hw/acpi/acpi-defs.h         |   15 +
+>>   include/hw/arm/smmu-common.h        |  127 ++++
+>>   include/hw/arm/smmuv3.h             |   87 +++
+>>   include/hw/arm/virt.h               |    5 +
+>>   target/arm/kvm.c                    |   28 +
+>>   target/arm/trace-events             |    3 +
+>>   15 files changed, 2949 insertions(+), 9 deletions(-)
+>>   create mode 100644 hw/arm/smmu-common.c
+>>   create mode 100644 hw/arm/smmu-internal.h
+>>   create mode 100644 hw/arm/smmuv3-internal.h
+>>   create mode 100644 hw/arm/smmuv3.c
+>>   create mode 100644 include/hw/arm/smmu-common.h
+>>   create mode 100644 include/hw/arm/smmuv3.h
+>>
