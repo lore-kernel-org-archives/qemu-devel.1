@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcXPd-0002iz-Hu
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:40:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dcXQV-0003Du-GF
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:41:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcXPc-0007C2-Ig
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:40:41 -0400
-Date: Tue, 1 Aug 2017 15:40:26 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170801134026.GB4257@localhost.localdomain>
-References: <20170711170821.24669-1-ppandit@redhat.com>
-	<29e5dd08-80e7-ae0d-7179-73f5d34c3485@redhat.com>
-	<20170721154712.GM18014@stefanha-x1.localdomain>
-	<b3ba0182-8700-76fc-5d20-97c054137ef9@redhat.com>
-	<e8a30256-9b83-1c58-d8e6-9ec5192604b6@redhat.com>
-	<3a90fa30-00b3-b389-5b78-54b55046648c@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dcXQS-0007Yi-5c
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:41:35 -0400
+Resent-Message-Id: <E1dcXQS-0007Yi-5c@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21770)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dcXQR-0007YB-Sp
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:41:32 -0400
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170801131618.27332-1-stefanha@redhat.com>
+Message-ID: <150159487566.36.9394869878810954316@93e45bedd699>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a90fa30-00b3-b389-5b78-54b55046648c@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: check BlockDriverState
- object before dereference
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 1 Aug 2017 06:41:16 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/9] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Kieron Shorrock <kshorrock@paloaltonetworks.com>, Prasad J Pandit <pjp@fedoraproject.org>, Markus Armbruster <armbru@redhat.com>
+To: stefanha@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Am 01.08.2017 um 10:35 hat Paolo Bonzini geschrieben:
-> On 01/08/2017 02:14, John Snow wrote:
-> > I may need some nudging towards understanding what the right solution
-> > here is, though. Should the blk_aio_flush assume that there always is a
-> > root BDS? should it not assume that?
-> 
-> I think blk_aio_flush is not special.  If there is no root BDS, either
-> you return -ENOMEDIUM, or you crash.  But all functions should be doing
-> the same.
-
-The intended semantics is that they return -ENOMEDIUM (or fail at
-least). This is how things have always worked, and that it crashes now
-because of the bdrv_inc_in_flight() was not an intentional change, but
-simply a bug in the patch.
-
-> The former makes sense, but right now blk_prwv for one are crashing if
-> there is no root BDS so the minimum patch would fix the caller rather
-> than blk_aio_flush.
-
-The synchronous versions don't crash, and bdrv_aio_prwv() would fix all
-cases if bdrv_inc_in_flight() were moved inside the coroutine; probably
-right before blk_aio_complete(). This would be more consistent with how
-the synchronous versions work, too, increasing the in-flight count only
-by 1 rather than 2 for an AIO request.
-
-Kevin
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAvOV0gVHJhY2luZyBwYXRjaGVzCk1lc3NhZ2UtaWQ6IDIwMTcwODAxMTMx
+NjE4LjI3MzMyLTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
+Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
+aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
+IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
+YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
+ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
+aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCmVhMWFjMjJiNmYgbW9uaXRvcjogUmVkdWNlIGhhbmRsZV9xbXBfY29tbWFuZCgpIHRyYWNp
+bmcgb3ZlcmhlYWQKMzEwNzkwYWY1MiB0cmFjZS1ldmVudHM6IGZpeCBjb2RlIHN0eWxlOiBwcmlu
+dCAweCBiZWZvcmUgaGV4IG51bWJlcnMKZjQwMWRlNmQ3OCBjaGVja3BhdGNoOiBjaGVjayB0cmFj
+ZS1ldmVudHMgY29kZSBzdHlsZQo1MzM4Y2QzYmNhIHRyYWNlLWV2ZW50czogZml4IGNvZGUgc3R5
+bGU6ICUjIC0+IDB4JQo3OGI3ZWY5YzY2IGNvZGluZ19zdHlsZTogYWRkIHBvaW50IGFib3V0IDB4
+IGluIHRyYWNlLWV2ZW50cwplMTNmYzU3YWU5IHRyYWNlOiBhZGQgdHJhY2VfZXZlbnRfZ2V0X3N0
+YXRlX2JhY2tlbmRzKCkKYWJjNjQ3YmJhNiB0cmFjZTogYWRkIFRSQUNFXzxldmVudD5fQkFDS0VO
+RF9EU1RBVEUoKQoxZGQyN2Q0MzNkIHRyYWNlOiBlbnN1cmUgdW5pcXVlIGZ1bmN0aW9uIC8gdmFy
+aWFibGUgbmFtZXMgcGVyIC5zdHAgZmlsZQpkYzhhMTdiZWEwIHRyYWNlOiBlbnN1cmUgLnN0cCBm
+aWxlcyBhcmUgcmVidWlsdCBpZiB0cmFjZSB0b29sIHNvdXJjZSBjaGFuZ2VzCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHRyYWNlOiBlbnN1cmUgLnN0cCBmaWxlcyBh
+cmUgcmVidWlsdCBpZiB0cmFjZSB0b29sIHNvdXJjZSBjaGFuZ2VzLi4uCkNoZWNraW5nIFBBVENI
+IDIvOTogdHJhY2U6IGVuc3VyZSB1bmlxdWUgZnVuY3Rpb24gLyB2YXJpYWJsZSBuYW1lcyBwZXIg
+LnN0cCBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDMvOTogdHJhY2U6IGFkZCBUUkFDRV88ZXZlbnQ+
+X0JBQ0tFTkRfRFNUQVRFKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC85OiB0cmFjZTogYWRkIHRyYWNl
+X2V2ZW50X2dldF9zdGF0ZV9iYWNrZW5kcygpLi4uCkNoZWNraW5nIFBBVENIIDUvOTogY29kaW5n
+X3N0eWxlOiBhZGQgcG9pbnQgYWJvdXQgMHggaW4gdHJhY2UtZXZlbnRzLi4uCkNoZWNraW5nIFBB
+VENIIDYvOTogdHJhY2UtZXZlbnRzOiBmaXggY29kZSBzdHlsZTogJSMgLT4gMHglLi4uCkNoZWNr
+aW5nIFBBVENIIDcvOTogY2hlY2twYXRjaDogY2hlY2sgdHJhY2UtZXZlbnRzIGNvZGUgc3R5bGUu
+Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI4OiBGSUxFOiBzY3JpcHRzL2No
+ZWNrcGF0Y2gucGw6MTM0MzoKKwkJCQlFUlJPUigiRG9uJ3QgdXNlICcjJyBmbGFnIG9mIHByaW50
+ZiBmb3JtYXQgKCclIycpIGluICIgLgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMy
+OTogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjEzNDQ6CisJCQkJICAgICAgInRyYWNlLWV2
+ZW50cywgdXNlICcweCcgcHJlZml4IGluc3RlYWRcbiIgLiAkaGVyZWN1cnIpOwoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjEz
+NDc6CisJCQkJCXFyLyVbLSsgKi4wLTldKihbaGxqenRMXXxsbHxoaCk/KHh8WHwiXHMqUFJJW3hY
+XVteIl0qIj8pLzsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNj
+cmlwdHMvY2hlY2twYXRjaC5wbDoxMzQ5OgorCQkJCSMgZG9uJ3QgY29uc2lkZXIgZ3JvdXBzIHNw
+bGl0dGVkIGJ5IFsuOi8gXSwgbGlrZSAyQS4yMDoxMmFiCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMzU6IEZJTEU6IHNjcmlwdHMvY2hlY2twYXRjaC5wbDoxMzUwOgorCQkJCW15
+ICR0bXBsaW5lID0gJHJhd2xpbmUgPX4gcy8oJGhleFsuOlwvIF0pKyRoZXgvL2dyOwoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gu
+cGw6MTM1MzoKKwkJCQkJRVJST1IoIkhleCBudW1iZXJzIG11c3QgYmUgcHJlZml4ZWQgd2l0aCAn
+MHgnXG4iIC4KCnRvdGFsOiAzIGVycm9ycywgMyB3YXJuaW5ncywgMjUgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC85
+OiB0cmFjZS1ldmVudHM6IGZpeCBjb2RlIHN0eWxlOiBwcmludCAweCBiZWZvcmUgaGV4IG51bWJl
+cnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS85OiBtb25pdG9yOiBSZWR1Y2UgaGFuZGxlX3FtcF9jb21t
+YW5kKCkgdHJhY2luZyBvdmVyaGVhZC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
