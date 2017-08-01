@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcUNK-0001Wh-4C
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:26:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcUSB-0002oq-UG
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:31:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcUNG-0005XT-Rv
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:26:06 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcUNG-0005Wu-KL
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:26:02 -0400
-Received: by mail-wm0-x233.google.com with SMTP id m85so10465447wma.0
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 03:26:02 -0700 (PDT)
-Date: Tue, 1 Aug 2017 11:25:58 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170801102558.GH13521@stefanha-x1.localdomain>
-References: <20170717103308.GI7163@stefanha-x1.localdomain>
-	<8760epr9vw.fsf@dusky.pond.sub.org>
-	<20170721153331.GL18014@stefanha-x1.localdomain>
-	<026a093f-1f79-4af9-a5c9-d540342b472e@redhat.com>
-	<8760eiuxu5.fsf@dusky.pond.sub.org>
-	<9d4a3015-a3d2-e9d5-2254-0bcb77b37161@redhat.com>
-	<871sp2gut9.fsf@dusky.pond.sub.org>
-	<20170727091957.GC5117@lemon.lan>
-	<20170727100958.GG2555@redhat.com>
-	<20170727111652.GI5117@lemon.lan>
+	(envelope-from <dgilbert@redhat.com>) id 1dcUS7-0008KW-W9
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:31:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcUS7-0008Jv-ME
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:31:03 -0400
+Date: Tue, 1 Aug 2017 11:30:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170801103055.GG2079@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-15-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xQmOcGOVkeO43v2v"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170727111652.GI5117@lemon.lan>
-Subject: Re: [Qemu-devel] Improving QMP test coverage
+In-Reply-To: <1501229198-30588-15-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 14/29] migration: allow send_rq to fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,60 +27,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <cleber@redhat.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+
+* Peter Xu (peterx@redhat.com) wrote:
+> We will not allow failures to happen when sending data from destination
+> to source via the return path. However it is possible that there can be
+> errors along the way.  This patch allows the migrate_send_rp_message()
+> to return error when it happens, and further extended it to
+> migrate_send_rp_req_pages().
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 38 ++++++++++++++++++++++++++++++--------
+>  migration/migration.h |  2 +-
+>  2 files changed, 31 insertions(+), 9 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index d0b9a86..9a0b5b0 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -195,17 +195,35 @@ static void deferred_incoming_migration(Error **errp)
+>   * Send a message on the return channel back to the source
+>   * of the migration.
+>   */
+> -static void migrate_send_rp_message(MigrationIncomingState *mis,
+> -                                    enum mig_rp_message_type message_type,
+> -                                    uint16_t len, void *data)
+> +static int migrate_send_rp_message(MigrationIncomingState *mis,
+> +                                   enum mig_rp_message_type message_type,
+> +                                   uint16_t len, void *data)
+>  {
+> +    int ret = 0;
+> +
+>      trace_migrate_send_rp_message((int)message_type, len);
+>      qemu_mutex_lock(&mis->rp_mutex);
+> +
+> +    /*
+> +     * It's possible that the file handle got lost due to network
+> +     * failures.
+> +     */
+> +    if (!mis->to_src_file) {
+> +        ret = -EIO;
+> +        goto error;
+> +    }
+> +
+
+Right, and this answers one of my questions from the previous patches.
 
 
---xQmOcGOVkeO43v2v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 27, 2017 at 07:16:52PM +0800, Fam Zheng wrote:
-> On Thu, 07/27 11:09, Daniel P. Berrange wrote:
-> > On Thu, Jul 27, 2017 at 05:19:57PM +0800, Fam Zheng wrote:
-> > > On Thu, 07/27 10:14, Markus Armbruster wrote:
-> > > > This brings some advantages of "verify output with diff" to tests t=
-hat
-> > > > verify with code.  Improvement if it simplifies the verification co=
-de.
-> > > >=20
-> > > > I'd still prefer *no* verification code (by delegating the job to d=
-iff)
-> > > > for tests where I can get away wit it.
-> > >=20
-> > > Python based iotests can be (re)done in such a way that they print ac=
-tual logs
-> > > (interactions with qtest/monitor, stdout/stderr of QEMU, etc) instead=
- of the
-> > > current dot dot dot summary, then we automatically have diff based ve=
-rification,
-> > > no?
-> >=20
-> > The python test 149 that I wrote does exactly that. There's no reason w=
-hy
-> > the others couldn't do the same.
->=20
-> Yes, and IMO it should be the default and recommended way.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-I agree.  It's something I embarked on but never finished a few years
-ago.  I wanted to modify iotests.py to use logging and drop the unittest
-framework.
-
-Stefan
-
---xQmOcGOVkeO43v2v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgFc2AAoJEJykq7OBq3PI6bUIAK7d/XiZTKqm37MBKqmljdF2
-gLlyrqfTZfCRNvM7qUyd2wN37ZuIFQPPsmG2F6CDyy8Nn2vhEHGWkUxkkNYduDsB
-MDyyT8SM5b11TTJUZv8qJtTMqcGYFMCDapFLq50qmE/tUGvw3PXdHPG29qoPzOhG
-0zFRa+hS1iV0kVE4iIa00TKFgU3pT5tv19b+Qb0Y7Ypt63RwbFChJWcUMHjF5aMR
-8d4LrdFfB7L/LLuMAmWaTIDAVMUmyFqPXA+KdptOLbE9A2Zh0oQCTKoQ0Ql6uu/r
-atTs7WGCOXb4ymzKdqXULjSGLcA7Dux0okEIgZgSnDQXvPxYfRKR52qoB6wH4Hg=
-=2axf
------END PGP SIGNATURE-----
-
---xQmOcGOVkeO43v2v--
+>      qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
+>      qemu_put_be16(mis->to_src_file, len);
+>      qemu_put_buffer(mis->to_src_file, data, len);
+>      qemu_fflush(mis->to_src_file);
+> +
+> +    /* It's possible that qemu file got error during sending */
+> +    ret = qemu_file_get_error(mis->to_src_file);
+> +
+> +error:
+>      qemu_mutex_unlock(&mis->rp_mutex);
+> +    return ret;
+>  }
+>  
+>  /* Request a range of pages from the source VM at the given
+> @@ -215,26 +233,30 @@ static void migrate_send_rp_message(MigrationIncomingState *mis,
+>   *   Start: Address offset within the RB
+>   *   Len: Length in bytes required - must be a multiple of pagesize
+>   */
+> -void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+> -                               ram_addr_t start, size_t len)
+> +int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+> +                              ram_addr_t start, size_t len)
+>  {
+>      uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
+>      size_t msglen = 12; /* start + len */
+> +    int rbname_len;
+> +    enum mig_rp_message_type msg_type;
+>  
+>      *(uint64_t *)bufc = cpu_to_be64((uint64_t)start);
+>      *(uint32_t *)(bufc + 8) = cpu_to_be32((uint32_t)len);
+>  
+>      if (rbname) {
+> -        int rbname_len = strlen(rbname);
+> +        rbname_len = strlen(rbname);
+>          assert(rbname_len < 256);
+>  
+>          bufc[msglen++] = rbname_len;
+>          memcpy(bufc + msglen, rbname, rbname_len);
+>          msglen += rbname_len;
+> -        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES_ID, msglen, bufc);
+> +        msg_type = MIG_RP_MSG_REQ_PAGES_ID;
+>      } else {
+> -        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES, msglen, bufc);
+> +        msg_type = MIG_RP_MSG_REQ_PAGES;
+>      }
+> +
+> +    return migrate_send_rp_message(mis, msg_type, msglen, bufc);
+>  }
+>  
+>  void qemu_start_incoming_migration(const char *uri, Error **errp)
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 7aaab13..047872b 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -201,7 +201,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
+>                            uint32_t value);
+>  void migrate_send_rp_pong(MigrationIncomingState *mis,
+>                            uint32_t value);
+> -void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+> +int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+>                                ram_addr_t start, size_t len);
+>  
+>  #endif
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
