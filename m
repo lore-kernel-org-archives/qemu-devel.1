@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcTm1-0007n4-RX
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcTzI-0004Li-7Z
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcTlz-0002na-8X
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:33 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38535)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcTly-0002n0-Rl
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:31 -0400
-Received: by mail-wm0-x241.google.com with SMTP id y206so2162218wmd.5
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 02:47:30 -0700 (PDT)
-Date: Tue, 1 Aug 2017 10:47:26 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170801094726.GD13521@stefanha-x1.localdomain>
-References: <20170731160135.12101-1-vsementsov@virtuozzo.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dcTzD-0004ho-Ef
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:01:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36844)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcTzD-0004fu-3i
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:01:11 -0400
+Date: Tue, 1 Aug 2017 11:01:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170801100100.GF2079@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-14-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8nsIa27JVQLqB7/C"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170731160135.12101-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] trace-events: print 0x before hex
- numbers
+In-Reply-To: <1501229198-30588-14-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 13/29] migration: allow src return path to
+ pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +28,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, peter.maydell@linaro.org, berrange@redhat.com, cohuck@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Let the thread pause for network issues.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c  | 35 +++++++++++++++++++++++++++++++++--
+>  migration/migration.h  |  1 +
+>  migration/trace-events |  2 ++
+>  3 files changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index c729c5a..d0b9a86 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -996,6 +996,7 @@ static void migrate_fd_cleanup(void *opaque)
+>      block_cleanup_parameters(s);
+>  
+>      qemu_sem_destroy(&s->postcopy_pause_sem);
+> +    qemu_sem_destroy(&s->postcopy_pause_rp_sem);
+>  }
+>  
+>  void migrate_fd_error(MigrationState *s, const Error *error)
+> @@ -1140,6 +1141,7 @@ MigrationState *migrate_init(void)
+>      error_free(s->error);
+>      s->error = NULL;
+>      qemu_sem_init(&s->postcopy_pause_sem, 0);
+> +    qemu_sem_init(&s->postcopy_pause_rp_sem, 0);
+>  
+>      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+>  
+> @@ -1527,6 +1529,18 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
+>      }
+>  }
+>  
+> +/* Return true to retry, false to quit */
+> +static bool postcopy_pause_return_path_thread(MigrationState *s)
+> +{
+> +    trace_postcopy_pause_return_path();
+> +
+> +    qemu_sem_wait(&s->postcopy_pause_rp_sem);
+> +
+> +    trace_postcopy_pause_return_path_continued();
+> +
+> +    return true;
+> +}
+> +
+>  /*
+>   * Handles messages sent on the return path towards the source VM
+>   *
+> @@ -1543,6 +1557,8 @@ static void *source_return_path_thread(void *opaque)
+>      int res;
+>  
+>      trace_source_return_path_thread_entry();
+> +
+> +retry:
+>      while (!ms->rp_state.error && !qemu_file_get_error(rp) &&
+>             migration_is_setup_or_active(ms->state)) {
+>          trace_source_return_path_thread_loop_top();
+> @@ -1634,13 +1650,28 @@ static void *source_return_path_thread(void *opaque)
+>              break;
+>          }
+>      }
+> -    if (qemu_file_get_error(rp)) {
+> +
+> +out:
+> +    res = qemu_file_get_error(rp);
+> +    if (res) {
+> +        if (res == -EIO) {
+> +            /*
+> +             * Maybe there is something we can do: it looks like a
+> +             * network down issue, and we pause for a recovery.
+> +             */
+> +            if (postcopy_pause_return_path_thread(ms)) {
+> +                /* Reload rp, reset the rest */
+> +                rp = ms->rp_state.from_dst_file;
+> +                ms->rp_state.error = false;
+> +                goto retry;
 
---8nsIa27JVQLqB7/C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The recursion trick I suggested in the previous patch might
+also work here.
 
-On Mon, Jul 31, 2017 at 07:01:31PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Hi all!
->=20
-> It is hard to read logs, when there are hex and dec numbers in one line, =
-when
-> hex number doesn't contain any letters and don't have '0x' prefix.
->=20
-> So, here is a complete solution for the problem:
->=20
-> - add information into CODING_STYLE
-> - add a check into checkpatch.pl
-> - fix current state
->=20
-> The new rule for the style is:
->=20
-> Hex numbers should be prefixed by '0x', except groups of numbers,
-> separated by symbols ' ', '.', ':', '/', however '0x' can be used for
-> numbers in such groups too. Flag '#' in number format is not allowed.
->=20
-> Note: checkpatch fails on checkpatch change (03) due to long lines.
-> It is because checkpatch.pl is indented by tabs and when it checks
-> for long lines it consider tabs as 8 spaces. Looks like nobody cares,
-> so do I. I see two ways here:
->  -  s/\t/    /g
->  -  make exclusion in checkpatch.pl for checkpatch.pl to consider tabs
->     as 4 spaces, not 8.  However I don't want to fix it in the context
->     of these series.
->=20
-> v3: 01 - rewording
->     02 - adjust commit message - add two printf flags "'I" into a check
->          add Stefan's and Eric's r-bs
->     03 - fix commit message s/Accordingly/According/
->          add Stefan's r-b
->     04 - add Stefan's r-b
->          add Cornelia's a-b
-> v2: almost everything (style, checkpatch, excluding number groups)
-> V1: was a draft of the idea using two sed commands.
->=20
-> Vladimir Sementsov-Ogievskiy (4):
->   coding_style: add point about 0x in trace-events
->   trace-events: fix code style: %# -> 0x%
->   checkpatch: check trace-events code style
->   trace-events: fix code style: print 0x before hex numbers
->=20
->  CODING_STYLE              |  35 +++++++++
->  accel/tcg/trace-events    |   2 +-
->  audio/trace-events        |   4 +-
->  block/trace-events        |  28 ++++----
->  hw/audio/trace-events     |   4 +-
->  hw/char/trace-events      |  12 ++--
->  hw/display/trace-events   |  14 ++--
->  hw/dma/trace-events       |  20 +++---
->  hw/i386/xen/trace-events  |  26 +++----
->  hw/input/trace-events     |   6 +-
->  hw/intc/trace-events      | 176 +++++++++++++++++++++++-----------------=
-------
->  hw/isa/trace-events       |   4 +-
->  hw/misc/trace-events      |  78 ++++++++++----------
->  hw/net/trace-events       |  52 +++++++-------
->  hw/nvram/trace-events     |   2 +-
->  hw/pci/trace-events       |   4 +-
->  hw/ppc/trace-events       |  64 ++++++++---------
->  hw/s390x/trace-events     |  20 +++---
->  hw/scsi/trace-events      | 118 +++++++++++++++----------------
->  hw/sd/trace-events        |   4 +-
->  hw/timer/trace-events     |  20 +++---
->  hw/usb/trace-events       |  56 +++++++--------
->  hw/vfio/trace-events      |  44 ++++++------
->  hw/virtio/trace-events    |   6 +-
->  hw/xen/trace-events       |   8 +--
->  linux-user/trace-events   |  10 +--
->  migration/trace-events    |  36 +++++-----
->  nbd/trace-events          |  18 ++---
->  net/trace-events          |   4 +-
->  scripts/checkpatch.pl     |  19 +++++
->  target/arm/trace-events   |  10 +--
->  target/s390x/trace-events |   2 +-
->  target/sparc/trace-events |  30 ++++----
->  trace-events              |  20 +++---
->  34 files changed, 505 insertions(+), 451 deletions(-)
->=20
-> --=20
-> 2.11.1
->=20
+but it's OK, so
 
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Stefan
-
---8nsIa27JVQLqB7/C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgE4uAAoJEJykq7OBq3PIiLMIAIBXIrerb6rItwlYBcmQoXRb
-0tZ+6OmJFZULAmDb1X9v2D+q/u7EONlw7dHFqWGolrVgFjrNVbSJ27H0by8Z35Ql
-0SxXVmlkcisHKPvzxt1YPHKwzXtEjJNHG9fTnxmiNiEY6ARRvtmtxAUV4x2uOeUk
-Yu0vrrM8EDvvtGA4yNrVmf6g2TJG6yUjg53n1QWQs+JHaF15esK2VdbfYCYTHyE+
-LJhUSS3a8OzYe7rymZ6K/c9Aen/++xS5HjHGoJQLdTeywtb5YhWEmkVVCeJzW/IJ
-3nNYwU9hKCUFMgbeFwx7rk7Ffg8R4PfY0FrAKmudz3wmuiaF1kfkIsZZkV5ichQ=
-=zqU6
------END PGP SIGNATURE-----
-
---8nsIa27JVQLqB7/C--
+> +            }
+> +        }
+> +
+>          trace_source_return_path_thread_bad_end();
+>          mark_source_rp_bad(ms);
+>      }
+>  
+>      trace_source_return_path_thread_end();
+> -out:
+>      ms->rp_state.from_dst_file = NULL;
+>      qemu_fclose(rp);
+>      return NULL;
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 08b90e8..7aaab13 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -157,6 +157,7 @@ struct MigrationState
+>  
+>      /* Needed by postcopy-pause state */
+>      QemuSemaphore postcopy_pause_sem;
+> +    QemuSemaphore postcopy_pause_rp_sem;
+>  };
+>  
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 22a629e..a269eec 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -98,6 +98,8 @@ migration_thread_setup_complete(void) ""
+>  open_return_path_on_source(void) ""
+>  open_return_path_on_source_continue(void) ""
+>  postcopy_start(void) ""
+> +postcopy_pause_return_path(void) ""
+> +postcopy_pause_return_path_continued(void) ""
+>  postcopy_pause_continued(void) ""
+>  postcopy_pause_incoming(void) ""
+>  postcopy_pause_incoming_continued(void) ""
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
