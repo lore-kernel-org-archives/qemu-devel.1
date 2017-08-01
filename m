@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcUtS-0001g2-Lw
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:59:19 -0400
+	(envelope-from <berrange@redhat.com>) id 1dcUy4-0002vu-Mx
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:04:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcUtO-0000gg-IR
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:59:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40002)
+	(envelope-from <berrange@redhat.com>) id 1dcUy1-0003g4-II
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:04:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcUtO-0000gN-9E
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:59:14 -0400
-Date: Tue, 1 Aug 2017 11:59:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170801105906.GJ2079@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dcUy1-0003em-Bq
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:04:01 -0400
+Date: Tue, 1 Aug 2017 12:03:48 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170801110348.GH12670@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-18-git-send-email-peterx@redhat.com>
+	<1501229198-30588-17-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1501229198-30588-18-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 17/29] migration: rebuild channel on source
+In-Reply-To: <1501229198-30588-17-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 16/29] qmp: hmp: add migrate "resume" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,132 +29,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> This patch detects the "resume" flag of migration command, rebuild the
-> channels only if the flag is set.
+On Fri, Jul 28, 2017 at 04:06:25PM +0800, Peter Xu wrote:
+> It will be used when we want to resume one paused migration.
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  migration/migration.c | 52 ++++++++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 41 insertions(+), 11 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 36ff8c3..64de0ee 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1244,6 +1244,15 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->      MigrationState *s = migrate_get_current();
->      const char *p;
->  
-> +    if (has_resume && resume) {
-> +        if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> +            error_setg(errp, "Cannot resume if there is no "
-> +                       "paused migration");
-> +            return;
-> +        }
-> +        goto do_resume;
-> +    }
-> +
->      if (migration_is_setup_or_active(s->state) ||
->          s->state == MIGRATION_STATUS_CANCELLING ||
->          s->state == MIGRATION_STATUS_COLO) {
-> @@ -1279,6 +1288,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->  
->      s = migrate_init();
->  
-> +do_resume:
+>  hmp-commands.hx       | 7 ++++---
+>  hmp.c                 | 4 +++-
+>  migration/migration.c | 2 +-
+>  qapi-schema.json      | 5 ++++-
+>  4 files changed, 12 insertions(+), 6 deletions(-)
 
-Can we find a way to avoid this label?
-Perhaps split the bottom half of this function out into a separate
-function?
+I'm not seeing explicit info about how we handle the original failure
+and how it relates to this resume command, but this feels like a
+potentially racy approach to me.
 
-Dave
+If we have a network problem between source & target, we could see
+two results. Either the TCP stream will simply hang (it'll still
+appear open to QEMU but no traffic will be flowing), or the connection
+may actually break such that we get EOF and end up closing the file
+descriptor.
 
->      if (strstart(uri, "tcp:", &p)) {
->          tcp_start_outgoing_migration(s, p, &local_err);
->  #ifdef CONFIG_RDMA
-> @@ -1700,7 +1710,8 @@ out:
->      return NULL;
->  }
->  
-> -static int open_return_path_on_source(MigrationState *ms)
-> +static int open_return_path_on_source(MigrationState *ms,
-> +                                      bool create_thread)
->  {
->  
->      ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
-> @@ -1709,6 +1720,12 @@ static int open_return_path_on_source(MigrationState *ms)
->      }
->  
->      trace_open_return_path_on_source();
-> +
-> +    if (!create_thread) {
-> +        /* We're done */
-> +        return 0;
-> +    }
-> +
->      qemu_thread_create(&ms->rp_state.rp_thread, "return path",
->                         source_return_path_thread, ms, QEMU_THREAD_JOINABLE);
->  
-> @@ -2249,15 +2266,24 @@ static void *migration_thread(void *opaque)
->  
->  void migrate_fd_connect(MigrationState *s)
->  {
-> -    s->expected_downtime = s->parameters.downtime_limit;
-> -    s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
-> +    int64_t rate_limit;
-> +    bool resume = s->state == MIGRATION_STATUS_POSTCOPY_PAUSED;
->  
-> -    qemu_file_set_blocking(s->to_dst_file, true);
-> -    qemu_file_set_rate_limit(s->to_dst_file,
-> -                             s->parameters.max_bandwidth / XFER_LIMIT_RATIO);
-> +    if (resume) {
-> +        /* This is a resumed migration */
-> +        rate_limit = INT64_MAX;
-> +    } else {
-> +        /* This is a fresh new migration */
-> +        rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
-> +        s->expected_downtime = s->parameters.downtime_limit;
-> +        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
->  
-> -    /* Notify before starting migration thread */
-> -    notifier_list_notify(&migration_state_notifiers, s);
-> +        /* Notify before starting migration thread */
-> +        notifier_list_notify(&migration_state_notifiers, s);
-> +    }
-> +
-> +    qemu_file_set_rate_limit(s->to_dst_file, rate_limit);
-> +    qemu_file_set_blocking(s->to_dst_file, true);
->  
->      /*
->       * Open the return path. For postcopy, it is used exclusively. For
-> @@ -2265,15 +2291,19 @@ void migrate_fd_connect(MigrationState *s)
->       * QEMU uses the return path.
->       */
->      if (migrate_postcopy_ram() || migrate_use_return_path()) {
-> -        if (open_return_path_on_source(s)) {
-> +        if (open_return_path_on_source(s, !resume)) {
->              error_report("Unable to open return-path for postcopy");
-> -            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> -                              MIGRATION_STATUS_FAILED);
-> +            migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
->              migrate_fd_cleanup(s);
->              return;
->          }
->      }
->  
-> +    if (resume) {
-> +        /* TODO: do the resume logic */
-> +        return;
-> +    }
-> +
->      qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
->                         QEMU_THREAD_JOINABLE);
->      s->migration_thread_running = true;
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+In the latter case, we're ok because the original channel is now
+gone and we can safely establish the new one by issuing the new
+'migrate --resume URI' command.
+
+In the former case, however, there is the possibility that the
+hang may come back to life at some point, concurrently with us
+trying to do 'migrate --resume URI' and I'm unclear on the
+semantics if that happens.
+
+Should the original connection carry on, and thus cause the
+'migrate --resume' command to fail, or will we forcably terminate
+the original connection no matter what and use the new "resumed"
+connection.
+
+There's also synchronization with the target host - at the time we
+want to recover, we need to be able to tell the target to accept
+new incoming clients again, but we don't want to do that if the
+original connection comes back to life.
+
+It feels to me that if the mgmt app or admin believes the migration
+is in a stuck state, we should be able to explicitly terminate the
+existing connection via a monitor command. Then setup the target
+host to accept new client, and then issue this migrate resume on
+the source.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
