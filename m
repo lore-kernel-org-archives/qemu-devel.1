@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dcSGw-0003D9-FO
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:11:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dcSLD-0005nr-VJ
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dcSGu-0008In-BF
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:11:22 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:44533
-	helo=smtp.eu.adacore.com)
+	(envelope-from <cohuck@redhat.com>) id 1dcSLA-0003F1-P0
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:15:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50974)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dcSGu-0008I0-5C
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:11:20 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Tue,  1 Aug 2017 10:10:48 +0200
-Message-Id: <1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
-In-Reply-To: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
-References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
- blocker when using mmio_execution
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dcSLA-0003EK-HR
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:15:44 -0400
+Date: Tue, 1 Aug 2017 10:15:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170801101535.16f4d486@gondolin>
+In-Reply-To: <20170728141309.14275-2-marcandre.lureau@redhat.com>
+References: <20170728141309.14275-1-marcandre.lureau@redhat.com>
+	<20170728141309.14275-2-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] build-sys: add --disable-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com, alistair.francis@xilinx.com, dgilbert@redhat.com, quintela@redhat.com, frederic.konrad@adacore.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, philippe.mathieu.daude@gmail.com, mst@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-This adds a migration blocker when mmio_execution has been used.
+On Fri, 28 Jul 2017 16:13:08 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
----
- hw/ssi/xilinx_spips.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+> Learn to compile out vhost-user. Keep it enabled by default on
+> non-win32, that is assumed to be POSIX. Fail if trying to enable it on
+> win32.
+>=20
+> When trying to make a vhost-user netdev, it gives the following error:
+>=20
+> -netdev vhost-user,id=3Dfoo,chardev=3Dchr-test: Parameter 'type' expects =
+a netdev backend type
+>=20
+> And similar error with the HMP/QMP monitors.
+>=20
+> While at it, rename CONFIG_VHOST_NET_TEST CONFIG_VHOST_USER_NET_TEST
+> since it's a vhost-user specific variable.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/virtio/virtio-pci.c            |  4 ++--
+>  configure                         | 29 +++++++++++++++++++++++++++--
+>  default-configs/pci.mak           |  2 +-
+>  default-configs/s390x-softmmu.mak |  2 +-
+>  tests/Makefile.include            |  6 +++---
+>  5 files changed, 34 insertions(+), 9 deletions(-)
+>=20
+(...)
+> diff --git a/configure b/configure
+> index 987f59ba88..efec1a613e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -306,6 +306,7 @@ tcg=3D"yes"
+>  vhost_net=3D"no"
+>  vhost_scsi=3D"no"
+>  vhost_vsock=3D"no"
+> +vhost_user=3D""
+>  kvm=3D"no"
+>  hax=3D"no"
+>  rdma=3D""
+> @@ -1282,6 +1283,15 @@ for opt do
+>    ;;
+>    --enable-vxhs) vxhs=3D"yes"
+>    ;;
+> +  --disable-vhost-user) vhost_user=3D"no"
+> +  ;;
+> +  --enable-vhost-user)
+> +      vhost_user=3D"yes"
+> +      if test "$mingw32" =3D "yes" ; then
+> +          echo "ERROR: vhost-user isn't available on win32"
+> +          exit 1
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index e833028..d46491f 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -31,6 +31,8 @@
- #include "hw/ssi/ssi.h"
- #include "qemu/bitops.h"
- #include "hw/ssi/xilinx_spips.h"
-+#include "qapi/error.h"
-+#include "migration/blocker.h"
- 
- #ifndef XILINX_SPIPS_ERR_DEBUG
- #define XILINX_SPIPS_ERR_DEBUG 0
-@@ -139,6 +141,7 @@ typedef struct {
- 
-     uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
-     hwaddr lqspi_cached_addr;
-+    Error *migration_blocker;
- } XilinxQSPIPS;
- 
- typedef struct XilinxSPIPSClass {
-@@ -603,6 +606,14 @@ static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
-     XilinxQSPIPS *q = opaque;
-     hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
- 
-+    /* mmio_execution breaks migration better aborting than having strange
-+     * bugs.
-+     */
-+    if (!q->migration_blocker) {
-+        error_setg(&q->migration_blocker, "booting from SPI breaks migration");
-+        migrate_add_blocker(q->migration_blocker, &error_fatal);
-+    }
-+
-     lqspi_load_cache(opaque, offset_within_the_region);
-     *size = LQSPI_CACHE_SIZE;
-     *offset = offset_within_the_region;
--- 
-1.8.3.1
+error_exit?
+
+> +      fi
+> +  ;;
+>    *)
+>        echo "ERROR: unknown option $opt"
+>        echo "Try '$0 --help' for more information"
+(...)
+
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-so=
+ftmmu.mak
+> index b227a36179..51191b77df 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -1,6 +1,6 @@
+>  CONFIG_PCI=3Dy
+>  CONFIG_VIRTIO_PCI=3Dy
+> -CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
+> +CONFIG_VHOST_USER_SCSI=3D$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+
+Huh. I wonder if anyone actually tried this on s390x?
+
+(The change is fine in the context of this patch, of course.)
+
+>  CONFIG_VIRTIO=3Dy
+>  CONFIG_SCLPCONSOLE=3Dy
+>  CONFIG_TERMINAL3270=3Dy
