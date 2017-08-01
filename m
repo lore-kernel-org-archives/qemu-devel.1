@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrV-0004J3-6s
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:38 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrY-0004La-8a
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrT-0007AH-1y
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:36 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33364)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrW-0007D0-PQ
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:40 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37947)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dcZrS-0007A0-R5
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:34 -0400
-Received: by mail-wr0-x241.google.com with SMTP id y43so1805099wrd.0
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:34 -0700 (PDT)
+	id 1dcZrW-0007CR-FQ
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:38 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id m85so19435526wma.1
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:38 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  1 Aug 2017 18:17:11 +0200
-Message-Id: <1501604245-33460-4-git-send-email-pbonzini@redhat.com>
+Date: Tue,  1 Aug 2017 18:17:14 +0200
+Message-Id: <1501604245-33460-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
 References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/17] accel: cleanup error output
+Subject: [Qemu-devel] [PULL 06/17] docs: document deprecation policy &
+ deprecated features in appendix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +29,222 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Only emit "XXX accelerator not found", if there are not
-further accelerators listed. eg
+The deprecation of features in QEMU is totally adhoc currently,
+with no way for the user to get a list of what is deprecated
+in each release. This adds an appendix to the doc that records
+when each deprecation was made and provides text explaining
+what to use instead, if anything.
 
-   accel=kvm:tcg
+Since there has been no formal policy around removal of deprecated
+features in the past, any deprecations prior to 2.10.0 are to be
+treated as if they had been made at the 2.10.0 release. Thus the
+earliest that existing deprecations will be deleted is the start
+of the 2.12.0 cycle.
 
-doesn't print a "KVM accelerator not found" warning
-when it falls back to tcg, but a
-
-   accel=kvm
-
-prints a warning, since no fallback is given.
-
-Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170717144527.24534-1-lvivier@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-Id: <20170725113638.7019-1-berrange@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/accel.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ qemu-doc.texi | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
 
-diff --git a/accel/accel.c b/accel/accel.c
-index fa85844..8ae40e1 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -33,6 +33,7 @@
- #include "sysemu/qtest.h"
- #include "hw/xen/xen.h"
- #include "qom/object.h"
-+#include "qemu/error-report.h"
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 48af515..aeb7bc5 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -38,6 +38,7 @@
+ * QEMU Guest Agent::
+ * QEMU User space emulator::
+ * Implementation notes::
++* Deprecated features::
+ * License::
+ * Index::
+ @end menu
+@@ -3128,6 +3129,180 @@ Run the emulation in single step mode.
  
- static const TypeInfo accel_type = {
-     .name = TYPE_ACCEL,
-@@ -69,19 +70,20 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+ @include qemu-tech.texi
  
- void configure_accelerator(MachineState *ms)
- {
--    const char *p;
-+    const char *accel, *p;
-     char buf[10];
-     int ret;
-     bool accel_initialised = false;
-     bool init_failed = false;
-     AccelClass *acc = NULL;
- 
--    p = qemu_opt_get(qemu_get_machine_opts(), "accel");
--    if (p == NULL) {
-+    accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
-+    if (accel == NULL) {
-         /* Use the default "accelerator", tcg */
--        p = "tcg";
-+        accel = "tcg";
-     }
- 
-+    p = accel;
-     while (!accel_initialised && *p != '\0') {
-         if (*p == ':') {
-             p++;
-@@ -89,7 +91,6 @@ void configure_accelerator(MachineState *ms)
-         p = get_opt_name(buf, sizeof(buf), p, ':');
-         acc = accel_find(buf);
-         if (!acc) {
--            fprintf(stderr, "\"%s\" accelerator not found.\n", buf);
-             continue;
-         }
-         if (acc->available && !acc->available()) {
-@@ -100,9 +101,8 @@ void configure_accelerator(MachineState *ms)
-         ret = accel_init_machine(acc, ms);
-         if (ret < 0) {
-             init_failed = true;
--            fprintf(stderr, "failed to initialize %s: %s\n",
--                    acc->name,
--                    strerror(-ret));
-+            error_report("failed to initialize %s: %s",
-+                         acc->name, strerror(-ret));
-         } else {
-             accel_initialised = true;
-         }
-@@ -110,13 +110,13 @@ void configure_accelerator(MachineState *ms)
- 
-     if (!accel_initialised) {
-         if (!init_failed) {
--            fprintf(stderr, "No accelerator found!\n");
-+            error_report("-machine accel=%s: No accelerator found", accel);
-         }
-         exit(1);
-     }
- 
-     if (init_failed) {
--        fprintf(stderr, "Back to %s accelerator.\n", acc->name);
-+        error_report("Back to %s accelerator", acc->name);
-     }
- }
++@node Deprecated features
++@appendix Deprecated features
++
++In general features are intended to be supported indefinitely once
++introduced into QEMU. In the event that a feature needs to be removed,
++it will be listed in this appendix. The feature will remain functional
++for 2 releases prior to actual removal. Deprecated features may also
++generate warnings on the console when QEMU starts up, or if activated
++via a monitor command, however, this is not a mandatory requirement.
++
++Prior to the 2.10.0 release there was no official policy on how
++long features would be deprecated prior to their removal, nor
++any documented list of which features were deprecated. Thus
++any features deprecated prior to 2.10.0 will be treated as if
++they were first deprecated in the 2.10.0 release.
++
++What follows is a list of all features currently marked as
++deprecated.
++
++@section System emulator command line arguments
++
++@subsection -drive boot=on|off (since 1.3.0)
++
++The ``boot=on|off'' option to the ``-drive'' argument is
++ignored. Applications should use the ``bootindex=N'' parameter
++to set an absolute ordering between devices instead.
++
++@subsection -tdf (since 1.3.0)
++
++The ``-tdf'' argument is ignored. The behaviour implemented
++by this argument is now the default when using the KVM PIT,
++but can be requested explicitly using
++``-global kvm-pit.lost_tick_policy=slew''.
++
++@subsection -no-kvm-pit-reinjection (since 1.3.0)
++
++The ``-no-kvm-pit-reinjection'' argument is now a
++synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
++
++@subsection -no-kvm-irqchip (since 1.3.0)
++
++The ``-no-kvm-irqchip'' argument is now a synonym for
++setting ``-machine kernel_irqchip=off''.
++
++@subsection -no-kvm-pit (since 1.3.0)
++
++The ``-no-kvm-pit'' argument is ignored. It is no longer
++possible to disable the KVM PIT directly.
++
++@subsection -no-kvm (since 1.3.0)
++
++The ``-no-kvm'' argument is now a synonym for setting
++``-machine accel=tcg''.
++
++@subsection -mon default=on (since 2.4.0)
++
++The ``default'' option to the ``-mon'' argument is
++now ignored. When multiple monitors were enabled, it
++indicated which monitor would receive log messages
++from the various subsystems. This feature is no longer
++required as messages are now only sent to the monitor
++in response to explicitly monitor commands.
++
++@subsection -vnc tls (since 2.5.0)
++
++The ``-vnc tls'' argument is now a synonym for setting
++``-object tls-creds-anon,id=tls0'' combined with
++``-vnc tls-creds=tls0'
++
++@subsection -vnc x509 (since 2.5.0)
++
++The ``-vnc x509=/path/to/certs'' argument is now a
++synonym for setting
++``-object tls-creds-x509,dir=/path/to/certs,id=tls0,verify-peer=no''
++combined with ``-vnc tls-creds=tls0'
++
++@subsection -vnc x509verify (since 2.5.0)
++
++The ``-vnc x509verify=/path/to/certs'' argument is now a
++synonym for setting
++``-object tls-creds-x509,dir=/path/to/certs,id=tls0,verify-peer=yes''
++combined with ``-vnc tls-creds=tls0'
++
++@subsection -tftp (since 2.6.0)
++
++The ``-tftp /some/dir'' argument is now a synonym for setting
++the ``-netdev user,tftp=/some/dir' argument. The new syntax
++allows different settings to be provided per NIC.
++
++@subsection -bootp (since 2.6.0)
++
++The ``-bootp /some/file'' argument is now a synonym for setting
++the ``-netdev user,bootp=/some/file' argument. The new syntax
++allows different settings to be provided per NIC.
++
++@subsection -redir (since 2.6.0)
++
++The ``-redir ARGS'' argument is now a synonym for setting
++the ``-netdev user,hostfwd=ARGS'' argument instead. The new
++syntax allows different settings to be provided per NIC.
++
++@subsection -smb (since 2.6.0)
++
++The ``-smb /some/dir'' argument is now a synonym for setting
++the ``-netdev user,smb=/some/dir'' argument instead. The new
++syntax allows different settings to be provided per NIC.
++
++@subsection -net channel (since 2.6.0)
++
++The ``--net channel,ARGS'' argument is now a synonym for setting
++the ``-netdev user,guestfwd=ARGS'' argument instead.
++
++@subsection -net vlan (since 2.9.0)
++
++The ``-net van=NN'' argument is partially replaced with the
++new ``-netdev'' argument. The remaining use cases will no
++longer be directly supported in QEMU.
++
++@subsection -drive if=scsi (since 2.9.0)
++
++The ``-drive if=scsi'' argument is replaced by the the
++``-device BUS-TYPE'' argument combined with ``-drive if=none''.
++
++@subsection -net dump (since 2.10.0)
++
++The ``--net dump'' argument is now replaced with the
++``-object filter-dump'' argument which works in combination
++with the modern ``-netdev`` backends instead.
++
++@subsection -hdachs (since 2.10.0)
++
++The ``-hdachs'' argument is now a synonym for setting
++the ``cyls'', ``heads'', ``secs'', and ``trans'' properties
++on the ``ide-hd'' device using the ``-device'' argument.
++The new syntax allows different settings to be provided
++per disk.
++
++@subsection -usbdevice (since 2.10.0)
++
++The ``-usbdevice DEV'' argument is now a synonym for setting
++the ``-device usb-DEV'' argument instead. The deprecated syntax
++would automatically enable USB support on the machine type.
++If using the new syntax, USB support must be explicitly
++enabled via the ``-machine usb=on'' argument.
++
++@section qemu-img command line arguments
++
++@subsection convert -s (since 2.0.0)
++
++The ``convert -s snapshot_id_or_name'' argument is obsoleted
++by the ``convert -l snapshot_param'' argument instead.
++
++@section System emulator human monitor commands
++
++@subsection usb_add (since 2.10.0)
++
++The ``usb_add'' command is replaced by the ``device_add'' command.
++
++@subsection usb_del (since 2.10.0)
++
++The ``usb_del'' command is replaced by the ``device_del'' command.
++
++@section System emulator devices
++
++@subsection ivshmem (since 2.6.0)
++
++The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
++or ``ivshmem-doorbell`` device types.
++
++@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
++
++The ``spapr-pci-vfio-host-bridge'' device type is replaced by
++the ``spapr-pci-host-bridge'' device type.
++
+ @node License
+ @appendix License
  
 -- 
 1.8.3.1
