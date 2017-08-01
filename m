@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcWzt-0000aF-9N
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:14:06 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcX2B-0001Mv-Eo
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcWzo-00046d-Lz
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:14:05 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcWzo-00046Q-C1
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:14:00 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y206so2976079wmd.5
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 06:14:00 -0700 (PDT)
-Date: Tue, 1 Aug 2017 14:13:56 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170801131356.GB22017@stefanha-x1.localdomain>
-References: <20170726112633.GE18489@stefanha-x1.localdomain>
-	<CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-	<20170727104302.GI2555@redhat.com>
-	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
-	<20170727152137.GW2555@redhat.com>
-	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
-	<20170727154535.GY2555@redhat.com>
-	<20170728133430.GS12364@stefanha-x1.localdomain>
-	<20170728135241.GP31495@redhat.com> <87pockles6.fsf@frigg.lan>
+	(envelope-from <stefanha@redhat.com>) id 1dcX28-0005MV-O6
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:16:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dcX28-0005M8-Ej
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:16:24 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue,  1 Aug 2017 14:16:09 +0100
+Message-Id: <20170801131618.27332-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
-Content-Disposition: inline
-In-Reply-To: <87pockles6.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/9] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,132 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
+The following changes since commit 5619c179057e24195ff19c8fe6d6a6cbcb16ed=
+28:
 
---z6Eq5LdranGa6ru8
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+70731' into staging (2017-07-31 14:45:42 +0100)
 
-On Fri, Jul 28, 2017 at 07:14:33PM +0300, Llu=EDs Vilanova wrote:
-> Daniel P Berrange writes:
->=20
-> > On Fri, Jul 28, 2017 at 02:34:30PM +0100, Stefan Hajnoczi wrote:
-> >> On Thu, Jul 27, 2017 at 04:45:35PM +0100, Daniel P. Berrange wrote:
-> >> > On Thu, Jul 27, 2017 at 04:33:01PM +0100, Peter Maydell wrote:
-> >> > > On 27 July 2017 at 16:21, Daniel P. Berrange <berrange@redhat.com>=
- wrote:
-> >> > > > On Thu, Jul 27, 2017 at 11:54:29AM +0100, Peter Maydell wrote:
-> >> > > >> That said, yes, I was going to ask if we could do this via
-> >> > > >> leveraging the tracepoint infrastructure and whatever scripting
-> >> > > >> facilities it provides. Are there any good worked examples of
-> >> > > >> this sort of thing? Can you do it as an ordinary non-root user?
-> >> > > >
-> >> > > > Do you have a particular thing you'd like to see an example of ?
-> >> > > >
-> >> > > > To dynamically probe a function which doesn't have a tracepoint
-> >> > > > defined you can do:
-> >> > > >
-> >> > > > probe process("/usr/bin/qemu-x86_64").function("helper_syscall")=
- {
-> >> > > >   printf("syscall stasrt\n")
-> >> > > > }
-> >> > > >
-> >> > > > but getting access to the function args is not as easy as with
-> >> > > > pre-defined tracepoints.
-> >> > >=20
-> >> > > How do I go about actually running that script? What I
-> >> > > have in mind by "worked example" is something like a blog
-> >> > > post that says "ok, here's a problem, we want to find out
-> >> > > what QEMU is doing in situation X, here's how you do this
-> >> > > with $TRACING_THINGY" and generally steps you through how
-> >> > > it works assuming you know nothing at all about whatever
-> >> > > the tracing facility you're using is.
-> >> >=20
-> >> > Ok, so something like this example that I wrote for libvirt a
-> >> > while back then
-> >> >=20
-> >> >   https://www.berrange.com/posts/2011/11/30/watching-the-libvirt-rpc=
--protocol-using-systemtap/
-> >> >=20
-> >> >=20
-> >> > > > You can't typically run this as root,
-> >> > >=20
-> >> > > Do you mean "non-root" ?
-> >> >=20
-> >> > Sigh, yes, of course.
-> >> >=20
-> >> > > > however, I don't think that's a
-> >> > > > huge issue, because most QEMU deployments are not running as you=
-r own
-> >> > > > user account anyway, so you can't directly interact with them no
-> >> > > > matter what.
-> >> > >=20
-> >> > > It is important, because almost all uses of TCG QEMU are
-> >> > > running it from the command line as non-root normal users,
-> >> > > especially if they're trying to debug what's going on with a
-> >> > > guest binary. So any tracing solution for this kind of usecase
-> >> > > must work without requiring root access, I think.
-> >> >=20
-> >> > None of the Linux integrated tracing tools allow direct non-root acc=
-ess
-> >> > afaik. systemtap has ability to launch probes as non-root, via a pri=
-vileged
-> >> > daemon, but it is restricted to probe scripts that the administrator=
- has
-> >> > pre-defined.
-> >>=20
-> >> One exception is gdb's static userspace probes support.  If you can run
-> >> gdb on QEMU then you can trace the same events as SystemTap.  I have
-> >> never tried this GDB feature:
-> >>=20
-> >> https://sourceware.org/gdb/onlinedocs/gdb/Static-Probe-Points.html
-> >>=20
-> >> It should work out of the box if your distro builds QEMU with the
-> >> 'dtrace' backend enabled.
->=20
-> > Wow, that's great to learn about. It does indeed work !
->=20
-> > If you knew alot about ptrace() you could probably build something
-> > that use ptrace() and these probe points to call your dynamic
-> > instrumentation code with reasonable low overheads.
->=20
-> I don't think so. Ptrace traps into the kernel and stops the process whil=
-e a
-> separate process decides what to do. That's between 3 and 4 orders of mag=
-nitude
-> slower than calling an instrumentor function.
+are available in the git repository at:
 
-Dan might be referring to dynamic patching a jump to the instrumentation
-function.
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
 
-A static userspace probe is a single nop instruction (plus metadata
-stored in a separate ELF section).  Using ptrace you can binary patch
-the nop instruction.
+for you to fetch changes up to bd6952a391b6f2083d6597386f457f30044e32a3:
 
-Unfortunately a single nop instruction cannot hold most x86
-instructions.  uprobes places a breakpoint instruction (INT $3 - 0xcc)
-there.  That works because it's just one byte.
+  monitor: Reduce handle_qmp_command() tracing overhead (2017-08-01 12:13=
+:07 +0100)
 
-This technique would be way out of scope for qemu.git but perhaps
-perf(1) or a stand-alone tool could implement it.  There are libraries
-for binary patching like http://www.dyninst.org/dyninst.
+----------------------------------------------------------------
+Pull request
 
-Stefan
+Fixes for inconsistencies in the trace event format strings, broken
+trace_event_get_state() usage, and handle_qmp_command() fix.
 
---z6Eq5LdranGa6ru8
-Content-Type: application/pgp-signature; name="signature.asc"
+----------------------------------------------------------------
 
------BEGIN PGP SIGNATURE-----
+Daniel P. Berrange (2):
+  trace: ensure .stp files are rebuilt if trace tool source changes
+  trace: ensure unique function / variable names per .stp file
 
-iQEcBAEBAgAGBQJZgH6UAAoJEJykq7OBq3PIaZEIAMWcCXgO1aQh7ofuLwaUMDyE
-BuUz0bK44gDRX4LLiqf/tFot34+pWldI3rMYa7Hr3308G6IhASzoPxGe95fdYgrc
-bgRKz76+lA3Lm1YNDF3CY1YZTZJuKhmcDlEnWHlG2jQ4psIG7yb5qGZi3V2m4xpe
-U9gNR4Zn2A3gW1InPVikA8yTxKQ/gSOYJDgoosENC66Xo9PL4K8I3/63iaUH1c+U
-KwEnBY9TAQQ1zOT3oVfNhDuFYOw8BWmsgALrpwU+X5G3bxLvUAFYvkRhtHGhJppZ
-9D42t6kzc1J/KkURptUgivk+tj2MPT0zJwEMqaiAysXwVu/KgRrtdyRsdFJtdME=
-=b4VT
------END PGP SIGNATURE-----
+Denis V. Lunev (1):
+  monitor: Reduce handle_qmp_command() tracing overhead
 
---z6Eq5LdranGa6ru8--
+Stefan Hajnoczi (2):
+  trace: add TRACE_<event>_BACKEND_DSTATE()
+  trace: add trace_event_get_state_backends()
+
+Vladimir Sementsov-Ogievskiy (4):
+  coding_style: add point about 0x in trace-events
+  trace-events: fix code style: %# -> 0x%
+  checkpatch: check trace-events code style
+  trace-events: fix code style: print 0x before hex numbers
+
+ docs/devel/tracing.txt                       |   2 +-
+ Makefile.target                              |   9 +-
+ trace/control.h                              |  18 ++-
+ hw/usb/hcd-ohci.c                            |  13 +-
+ monitor.c                                    |   9 +-
+ net/colo-compare.c                           |  11 +-
+ net/filter-rewriter.c                        |   4 +-
+ CODING_STYLE                                 |  35 ++++++
+ accel/tcg/trace-events                       |   2 +-
+ audio/trace-events                           |   4 +-
+ block/trace-events                           |  28 ++---
+ hw/audio/trace-events                        |   4 +-
+ hw/char/trace-events                         |  12 +-
+ hw/display/trace-events                      |  14 +--
+ hw/dma/trace-events                          |  20 +--
+ hw/i386/xen/trace-events                     |  26 ++--
+ hw/input/trace-events                        |   6 +-
+ hw/intc/trace-events                         | 176 +++++++++++++--------=
+------
+ hw/isa/trace-events                          |   4 +-
+ hw/misc/trace-events                         |  78 ++++++------
+ hw/net/trace-events                          |  52 ++++----
+ hw/nvram/trace-events                        |   2 +-
+ hw/pci/trace-events                          |   4 +-
+ hw/ppc/trace-events                          |  64 +++++-----
+ hw/s390x/trace-events                        |  20 +--
+ hw/scsi/trace-events                         | 118 +++++++++---------
+ hw/sd/trace-events                           |   4 +-
+ hw/timer/trace-events                        |  20 +--
+ hw/usb/trace-events                          |  56 ++++-----
+ hw/vfio/trace-events                         |  44 +++----
+ hw/virtio/trace-events                       |   6 +-
+ hw/xen/trace-events                          |   8 +-
+ linux-user/trace-events                      |  10 +-
+ migration/trace-events                       |  36 +++---
+ nbd/trace-events                             |  18 +--
+ net/trace-events                             |   4 +-
+ scripts/checkpatch.pl                        |  19 +++
+ scripts/tracetool/__init__.py                |   1 +
+ scripts/tracetool/backend/__init__.py        |   3 +
+ scripts/tracetool/backend/dtrace.py          |  12 ++
+ scripts/tracetool/backend/ftrace.py          |   5 +
+ scripts/tracetool/backend/log.py             |   5 +
+ scripts/tracetool/backend/simple.py          |   5 +
+ scripts/tracetool/backend/syslog.py          |   5 +
+ scripts/tracetool/backend/ust.py             |  10 ++
+ scripts/tracetool/format/h.py                |  10 ++
+ scripts/tracetool/format/simpletrace_stap.py |  29 +++--
+ target/arm/trace-events                      |  10 +-
+ target/s390x/trace-events                    |   2 +-
+ target/sparc/trace-events                    |  30 ++---
+ trace-events                                 |  20 +--
+ 51 files changed, 622 insertions(+), 485 deletions(-)
+
+--=20
+2.13.3
