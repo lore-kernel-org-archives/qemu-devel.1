@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcTdo-0002YL-RQ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:39:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dcTgO-0004e8-Ug
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dcTdl-0006lm-HG
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:39:04 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37169)
+	(envelope-from <peter.maydell@linaro.org>) id 1dcTgO-0008P3-4s
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:41:44 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcTdl-0006kB-Ah
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:39:01 -0400
-Received: by mail-wm0-x244.google.com with SMTP id t138so2145151wmt.4
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 02:39:01 -0700 (PDT)
-Date: Tue, 1 Aug 2017 10:38:57 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170801093857.GC13521@stefanha-x1.localdomain>
-References: <20170731140718.22010-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dcTgN-0008OW-TD
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:41:44 -0400
+Received: by mail-wr0-x231.google.com with SMTP id 33so4416625wrz.4
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 02:41:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9Ek0hoCL9XbhcSqy"
-Content-Disposition: inline
-In-Reply-To: <20170731140718.22010-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] trace: fix trace_event_get_state()
- for SystemTap and LTTng UST
+In-Reply-To: <48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
+References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
+	<1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
+	<086e70d6-d5c1-2879-874f-ea1804c6ab38@adacore.com>
+	<20170801093015.GA4859@toto>
+	<48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 1 Aug 2017 10:41:22 +0100
+Message-ID: <CAFEAcA_eWCEmXBGNJXAfUjgXwYX10FwxRwd_YNcdtMYXNLAROg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
+ blocker when using mmio_execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Denis V. Lunev" <den@openvz.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
+On 1 August 2017 at 10:35, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+>
+>
+> On 08/01/2017 11:30 AM, Edgar E. Iglesias wrote:
+>> At this stage, perhaps we should just register the blocker when this dev
+>> realizes.
+>>
+>> If a request_ptr comes in during migration, the VM will fail either way...
 
---9Ek0hoCL9XbhcSqy
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Yes but this will breaks migration for the spips device everytime
+> and not only when mmio-execution is used?
 
-On Mon, Jul 31, 2017 at 03:07:16PM +0100, Stefan Hajnoczi wrote:
-> v2:
->  * Don't special-case QEMU dstate [Daniel Berrange]
->  * Use _backends() postfix to clarify function purpose [Llu=EDs]
->=20
-> Trace events that compute their arguments can affect performance.  The
-> following idom can be used to avoid computing arguments when the trace ev=
-ent is
-> disabled:
->=20
->   if (trace_event_get_state(TRACE_MY_EVENT)) {
->       char *str =3D g_strdup_printf("Expensive string ...", ...);
->       trace_my_event(str);
->       g_free(str);
->   }
->=20
-> Unfortunately this breaks the trace event for SystemTap and LTTng UST sin=
-ce
-> those tracers manage their own enabled/disabled state.
->=20
-> These patches add per-backend dstate to trace_event_get_state() so that t=
-he
-> trace event fires as expected when enabled via SystemTap or LTTng UST.
->=20
-> Stefan Hajnoczi (2):
->   trace: add TRACE_<event>_BACKEND_DSTATE()
->   trace: add trace_event_get_state_backends()
->=20
->  docs/devel/tracing.txt                |  2 +-
->  trace/control.h                       | 18 +++++++++++++++++-
->  hw/usb/hcd-ohci.c                     | 13 +++++--------
->  net/colo-compare.c                    | 11 ++++++-----
->  net/filter-rewriter.c                 |  4 ++--
->  scripts/tracetool/__init__.py         |  1 +
->  scripts/tracetool/backend/__init__.py |  3 +++
->  scripts/tracetool/backend/dtrace.py   | 12 ++++++++++++
->  scripts/tracetool/backend/ftrace.py   |  5 +++++
->  scripts/tracetool/backend/log.py      |  5 +++++
->  scripts/tracetool/backend/simple.py   |  5 +++++
->  scripts/tracetool/backend/syslog.py   |  5 +++++
->  scripts/tracetool/backend/ust.py      |  5 +++++
->  scripts/tracetool/format/h.py         | 10 ++++++++++
->  14 files changed, 82 insertions(+), 17 deletions(-)
->=20
-> --=20
-> 2.13.3
->=20
->=20
+This line of thought is why I ended up suggesting just disabling
+the exec-in-place feature -- that way we just don't introduce
+what would be a new-in-2.10 feature, rather than breaking something
+that used to work in 2.9.
 
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
-
-Stefan
-
---9Ek0hoCL9XbhcSqy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgEwxAAoJEJykq7OBq3PITDsH/3jrw5phUwcq3jgLsJYY7n2Y
-erOrntick08wt0Y0gMt1oa7yytB9YUm09oOgYMd7V3Rgfoi5ns7VsAxJme0EJSWW
-OqALzXP1+tYorj5L9KBpN+jbR6zv+t+zkL9X+BQ8nui9MpsxLbH/Kg8IOmimbO6c
-6Y5BsRHUqmg5cBxa8MVB2yHaC/PSt7q6HUakNwMtd+cUK2IbGDPaA9dyN089aijA
-3/ZGOtvykhdWEPPVmZqYGOsbSnA2yrjesu8lJtEyTwlaXZ1KYUl39duHpCbXOecj
-wGT6VjeBU+cSA4NEzQcEa4M6EkPEk4ZLE8qdFLOaD4LusM6qOJNi1+SV9zY+ztY=
-=B5yC
------END PGP SIGNATURE-----
-
---9Ek0hoCL9XbhcSqy--
+thanks
+-- PMM
