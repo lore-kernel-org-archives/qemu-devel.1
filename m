@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcVTX-00024N-A0
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:36:36 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dcVXZ-0002xk-GE
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcVTS-00089Y-Bs
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:36:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcVTS-00088e-2h
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:36:30 -0400
-Date: Tue, 1 Aug 2017 12:36:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170801113622.GK2079@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-19-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-19-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 18/29] migration: new state "postcopy-recover"
+	(envelope-from <a.perevalov@samsung.com>) id 1dcVXU-0002UE-4m
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:45 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:9229)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dcVXT-0002Sc-S4
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:40:40 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OU000MT58FOICA0@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:40:36 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Tue, 01 Aug 2017 14:40:21 +0300
+Message-id: <1501587624-5915-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20170801114034eucas1p1a4473bb03afada257f68392c38263b99@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v9 0/3] Add bitmap for received pages in
+ postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,148 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Introducing new migration state "postcopy-recover". If a migration
-> procedure is paused and the connection is rebuilt afterward
-> successfully, we'll switch the source VM state from "postcopy-paused" to
-> the new state "postcopy-recover", then we'll do the resume logic in the
-> migration thread (along with the return path thread).
-> 
-> This patch only do the state switch on source side. Another following up
-> patch will handle the state switching on destination side using the same
-> status bit.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c | 45 +++++++++++++++++++++++++++++++++++++++++----
->  qapi-schema.json      |  4 +++-
->  2 files changed, 44 insertions(+), 5 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 64de0ee..3aabe11 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -495,6 +495,7 @@ static bool migration_is_setup_or_active(int state)
->      case MIGRATION_STATUS_ACTIVE:
->      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
->      case MIGRATION_STATUS_POSTCOPY_PAUSED:
-> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
->      case MIGRATION_STATUS_SETUP:
->          return true;
->  
-> @@ -571,6 +572,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->      case MIGRATION_STATUS_CANCELLING:
->      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
->      case MIGRATION_STATUS_POSTCOPY_PAUSED:
-> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
->           /* TODO add some postcopy stats */
->          info->has_status = true;
->          info->has_total_time = true;
-> @@ -2018,6 +2020,13 @@ static bool postcopy_should_start(MigrationState *s)
->      return atomic_read(&s->start_postcopy) || s->start_postcopy_fast;
->  }
->  
-> +/* Return zero if success, or <0 for error */
-> +static int postcopy_do_resume(MigrationState *s)
-> +{
-> +    /* TODO: do the resume logic */
-> +    return 0;
-> +}
-> +
->  /*
->   * We don't return until we are in a safe state to continue current
->   * postcopy migration.  Returns true to continue the migration, or
-> @@ -2026,7 +2035,9 @@ static bool postcopy_should_start(MigrationState *s)
->  static bool postcopy_pause(MigrationState *s)
->  {
->      assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
-> -    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-> +
-> +do_pause:
-> +    migrate_set_state(&s->state, s->state,
->                        MIGRATION_STATUS_POSTCOPY_PAUSED);
->  
->      /* Current channel is possibly broken. Release it. */
-> @@ -2043,9 +2054,32 @@ static bool postcopy_pause(MigrationState *s)
->          qemu_sem_wait(&s->postcopy_pause_sem);
->      }
->  
-> -    trace_postcopy_pause_continued();
-> +    if (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
-> +        /* We were waken up by a recover procedure. Give it a shot */
->  
-> -    return true;
-> +        /*
-> +         * Firstly, let's wake up the return path now, with a new
-> +         * return path channel.
-> +         */
-> +        qemu_sem_post(&s->postcopy_pause_rp_sem);
-> +
-> +        /* Do the resume logic */
-> +        if (postcopy_do_resume(s) == 0) {
-> +            /* Let's continue! */
-> +            trace_postcopy_pause_continued();
-> +            return true;
-> +        } else {
-> +            /*
-> +             * Something wrong happened during the recovery, let's
-> +             * pause again. Pause is always better than throwing data
-> +             * away.
-> +             */
-> +            goto do_pause;
+This is 9th version of
+[PATCH v1 0/2] Add bitmap for copied pages in postcopy migration
+cover message from there
 
-You should be able to turn this around into a do {} while or similar
-rather than goto.
+This is a separate patch set, it derived from
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
 
-Dave
+There are several possible use cases:
+1. solve issue with postcopy live migration and shared memory.
+OVS-VSWITCH requires information about copied pages, to fallocate
+newly allocated pages.
+2. calculation vCPU blocktime
+for more details see
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
+3. Recovery after fail in the middle of postcopy migration 
 
-> +        }
-> +    } else {
-> +        /* This is not right... Time to quit. */
-> +        return false;
-> +    }
->  }
->  
->  /* Return true if we want to stop the migration, otherwise false. */
-> @@ -2300,7 +2334,10 @@ void migrate_fd_connect(MigrationState *s)
->      }
->  
->      if (resume) {
-> -        /* TODO: do the resume logic */
-> +        /* Wakeup the main migration thread to do the recovery */
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
-> +                          MIGRATION_STATUS_POSTCOPY_RECOVER);
-> +        qemu_sem_post(&s->postcopy_pause_sem);
->          return;
->      }
->  
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 27b7c4c..10f1f60 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -669,6 +669,8 @@
->  #
->  # @postcopy-paused: during postcopy but paused. (since 2.10)
->  #
-> +# @postcopy-recover: trying to recover from a paused postcopy. (since 2.11)
-> +#
->  # @completed: migration is finished.
->  #
->  # @failed: some error occurred during migration process.
-> @@ -682,7 +684,7 @@
->  { 'enum': 'MigrationStatus',
->    'data': [ 'none', 'setup', 'cancelling', 'cancelled',
->              'active', 'postcopy-active', 'postcopy-paused',
-> -            'completed', 'failed', 'colo' ] }
-> +            'postcopy-recover', 'completed', 'failed', 'colo' ] }
->  
->  ##
->  # @MigrationInfo:
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+----------------------------------------------------------------
+V8 -> V9
+    - patch: "migration: fix incorrect postcopy recved_bitmap" from
+"[RFC 00/29] Migration: postcopy failure recovery" patch set was squashed
+into the latest patch of this patchset, getpagesize was replaced to
+qemu_target_page_size, as David suggested.
+    - for the sake of API uniformity semantics of all functions were
+changed, now RAMBlock *rb is the first argument, as well as in bitmap API.
+    - Also define TARGET_PAGE_BITS was replaced to qemu_target_page_bits in
+all other places of this patchset, for uniformity and maintenance. 
+
+V7 -> V8
+    - removed unnecessary renaming and moving of block variable to ram_load's
+function scope
+    - ramblock_recv_map_init became static function
+
+V6 -> V7
+    - rebased on
+[PATCH v7 0/5] Create setup/cleanup methods for migration incoming side
+    - live time of the received map was changed (ram_load_setup/ram_load_cleanup) 
+
+V5 -> V6
+    - call ramblock_recv_map_init from migration_fd_process_incoming (Peter suggested)But finalization is still in ram_load_cleanup as Juan suggested.    
+
+V4 -> V5
+    - remove ramblock_recv_bitmap_clear_range in favor to bitmap_clear (comment from David)
+    - single invocation place for ramblock_recv_bitmap_set (comment from Peter)
+    - minor changes like removing comment from qemu_ufd_copy_ioctl and local variable from
+ramblock_recv_map_init (comment from Peter)
+
+V3 -> V4
+    - clear_bit instead of ramblock_recv_bitmap_clear in ramblock_recv_bitmap_clear_range,
+it reduced number of operation (comment from Juan)
+    - for postcopy ramblock_recv_bitmap_set is calling after page was copied,
+only in case of success (comment from David)
+    - indentation fixes (comment from Juan)
+
+V2 -> V3
+    - ramblock_recv_map_init call is placed into migration_incoming_get_current,
+looks like it's general place for both precopy and postcopy case.
+    - received bitmap memory releasing is placed into ram_load_cleanup,
+unfortunatelly, it calls only in case of precopy.
+    - precopy case and discard ram block case
+    - function renaming, and another minor cleanups
+
+V1 -> V2
+    - change in terminology s/copied/received/g
+    - granularity became TARGET_PAGE_SIZE, but not actual page size of the
+ramblock
+    - movecopiedmap & get_copiedmap_size were removed, until patch set where
+it will be necessary
+    - releasing memory of receivedmap was added into ram_load_cleanup
+    - new patch "migration: introduce qemu_ufd_copy_ioctl helper"
+
+Patchset is based on:
+commit 6d60e295ef020759a03b90724d0342012c189ba2
+"Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging"
+
+Alexey Perevalov (3):
+  migration: postcopy_place_page factoring out
+  migration: introduce qemu_ufd_copy_ioctl helper
+  migration: add bitmap for received page
+
+ include/exec/ram_addr.h  | 10 +++++++++
+ migration/postcopy-ram.c | 54 +++++++++++++++++++++++++++++++-----------------
+ migration/postcopy-ram.h |  4 ++--
+ migration/ram.c          | 49 +++++++++++++++++++++++++++++++++++++++++--
+ migration/ram.h          |  6 ++++++
+ 5 files changed, 100 insertions(+), 23 deletions(-)
+
+-- 
+1.9.1
