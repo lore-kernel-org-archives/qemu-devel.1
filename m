@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dcTZM-0007JJ-JZ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:34:31 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dcTZb-0007UF-10
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dcTZH-0001Ce-MJ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:34:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dcTZZ-0001Zk-PW
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:34:43 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  1 Aug 2017 11:33:06 +0200
-Message-Id: <1501579994-3320-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 0/8] VIRTIO-IOMMU device
+Date: Tue,  1 Aug 2017 11:33:08 +0200
+Message-Id: <1501579994-3320-3-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1501579994-3320-1-git-send-email-eric.auger@redhat.com>
+References: <1501579994-3320-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v3 2/8] linux-headers: Update for virtio-iommu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,80 +22,183 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com
 Cc: will.deacon@arm.com, kevin.tian@intel.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, drjones@redhat.com, wei@redhat.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com
 
-This series implements the virtio-iommu device.
+This is a partial linux header update against Jean-Philippe's branch:
+git://linux-arm.org/linux-jpb.git virtio-iommu/base (unstable)
 
-This v3 mostly is a rebase on top of v2.10-rc0 that uses
-IOMMUMmeoryRegion plus some small fixes.
-
-This is a proof of concept based on the virtio-iommu specification
-written by Jean-Philippe Brucker [1].
-
-The device gets instantiated using the "-device virtio-iommu-device"
-option. It currently works with ARM virt machine only, as the machine
-must handle the dt binding between the virtio-mmio "iommu" node and
-the PCI host bridge node.
-
-ACPI booting is not yet supported.
-
-Best Regards
-
-Eric
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v2.10.0-rc0-virtio-iommu-rfcv3
-
-References:
-[1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU,
-[2] [RFC PATCH linux] iommu: Add virtio-iommu driver
-[3] [RFC PATCH kvmtool 00/15] Add virtio-iommu
-
-Testing:
-- >= 4.12 guest kernel + virtio-iommu driver [2]
-- guest using a virtio-net-pci device:
-  ,vhost=off,iommu_platform,disable-modern=off,disable-legacy=on
-
-History:
-v2 -> v3:
-- rebase on top of 2.10-rc0 and especially
-  [PATCH qemu v9 0/2] memory/iommu: QOM'fy IOMMU MemoryRegion
-- add mutex init
-- fix as->mappings deletion using g_tree_ref/unref
-- when a dev is attached whereas it is already attached to
-  another address space, first detach it
-- fix some error values
-- page_sizes = TARGET_PAGE_MASK;
-- I haven't changed the unmap() semantics yet, waiting for the
-  next virtio-iommu spec revision.
-
-v1 -> v2:
-- fix redifinition of viommu_as typedef
-
-
-Eric Auger (8):
-  update-linux-headers: import virtio_iommu.h
-  linux-headers: Update for virtio-iommu
-  virtio_iommu: add skeleton
-  virtio-iommu: Decode the command payload
-  virtio_iommu: Add the iommu regions
-  virtio-iommu: Implement the translation and commands
-  hw/arm/virt: Add 2.10 machine type
-  hw/arm/virt: Add virtio-iommu the virt board
-
- hw/arm/virt.c                                 | 116 ++++-
- hw/virtio/Makefile.objs                       |   1 +
- hw/virtio/trace-events                        |  14 +
- hw/virtio/virtio-iommu.c                      | 670 ++++++++++++++++++++++++++
- include/hw/arm/virt.h                         |   5 +
- include/hw/virtio/virtio-iommu.h              |  61 +++
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
  include/standard-headers/linux/virtio_ids.h   |   1 +
- include/standard-headers/linux/virtio_iommu.h | 142 ++++++
+ include/standard-headers/linux/virtio_iommu.h | 142 ++++++++++++++++++++++++++
  linux-headers/linux/virtio_iommu.h            |   1 +
- scripts/update-linux-headers.sh               |   3 +
- 10 files changed, 1005 insertions(+), 9 deletions(-)
- create mode 100644 hw/virtio/virtio-iommu.c
- create mode 100644 include/hw/virtio/virtio-iommu.h
+ 3 files changed, 144 insertions(+)
  create mode 100644 include/standard-headers/linux/virtio_iommu.h
  create mode 100644 linux-headers/linux/virtio_iommu.h
 
+diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+index 6d5c3b2..934ed3d 100644
+--- a/include/standard-headers/linux/virtio_ids.h
++++ b/include/standard-headers/linux/virtio_ids.h
+@@ -43,5 +43,6 @@
+ #define VIRTIO_ID_INPUT        18 /* virtio input */
+ #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+ #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
++#define VIRTIO_ID_IOMMU	    61216 /* virtio IOMMU (temporary) */
+ 
+ #endif /* _LINUX_VIRTIO_IDS_H */
+diff --git a/include/standard-headers/linux/virtio_iommu.h b/include/standard-headers/linux/virtio_iommu.h
+new file mode 100644
+index 0000000..e139587
+--- /dev/null
++++ b/include/standard-headers/linux/virtio_iommu.h
+@@ -0,0 +1,142 @@
++/*
++ * Copyright (C) 2017 ARM Ltd.
++ *
++ * This header is BSD licensed so anyone can use the definitions
++ * to implement compatible drivers/servers:
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of ARM Ltd. nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++#ifndef _LINUX_VIRTIO_IOMMU_H
++#define _LINUX_VIRTIO_IOMMU_H
++
++/* Feature bits */
++#define VIRTIO_IOMMU_F_INPUT_RANGE		0
++#define VIRTIO_IOMMU_F_IOASID_BITS		1
++#define VIRTIO_IOMMU_F_MAP_UNMAP		2
++#define VIRTIO_IOMMU_F_BYPASS			3
++
++QEMU_PACKED
++struct virtio_iommu_config {
++	/* Supported page sizes */
++	uint64_t					page_sizes;
++	struct virtio_iommu_range {
++		uint64_t				start;
++		uint64_t				end;
++	} input_range;
++	uint8_t 					ioasid_bits;
++};
++
++/* Request types */
++#define VIRTIO_IOMMU_T_ATTACH			0x01
++#define VIRTIO_IOMMU_T_DETACH			0x02
++#define VIRTIO_IOMMU_T_MAP			0x03
++#define VIRTIO_IOMMU_T_UNMAP			0x04
++
++/* Status types */
++#define VIRTIO_IOMMU_S_OK			0x00
++#define VIRTIO_IOMMU_S_IOERR			0x01
++#define VIRTIO_IOMMU_S_UNSUPP			0x02
++#define VIRTIO_IOMMU_S_DEVERR			0x03
++#define VIRTIO_IOMMU_S_INVAL			0x04
++#define VIRTIO_IOMMU_S_RANGE			0x05
++#define VIRTIO_IOMMU_S_NOENT			0x06
++#define VIRTIO_IOMMU_S_FAULT			0x07
++
++QEMU_PACKED
++struct virtio_iommu_req_head {
++	uint8_t					type;
++	uint8_t					reserved[3];
++};
++
++QEMU_PACKED
++struct virtio_iommu_req_tail {
++	uint8_t					status;
++	uint8_t					reserved[3];
++};
++
++QEMU_PACKED
++struct virtio_iommu_req_attach {
++	struct virtio_iommu_req_head		head;
++
++	uint32_t					address_space;
++	uint32_t					device;
++	uint32_t					reserved;
++
++	struct virtio_iommu_req_tail		tail;
++};
++
++QEMU_PACKED
++struct virtio_iommu_req_detach {
++	struct virtio_iommu_req_head		head;
++
++	uint32_t					device;
++	uint32_t					reserved;
++
++	struct virtio_iommu_req_tail		tail;
++};
++
++#define VIRTIO_IOMMU_MAP_F_READ			(1 << 0)
++#define VIRTIO_IOMMU_MAP_F_WRITE		(1 << 1)
++#define VIRTIO_IOMMU_MAP_F_EXEC			(1 << 2)
++
++#define VIRTIO_IOMMU_MAP_F_MASK			(VIRTIO_IOMMU_MAP_F_READ |	\
++						 VIRTIO_IOMMU_MAP_F_WRITE |	\
++						 VIRTIO_IOMMU_MAP_F_EXEC)
++
++QEMU_PACKED
++struct virtio_iommu_req_map {
++	struct virtio_iommu_req_head		head;
++
++	uint32_t					address_space;
++	uint32_t					flags;
++	uint64_t					virt_addr;
++	uint64_t					phys_addr;
++	uint64_t					size;
++
++	struct virtio_iommu_req_tail		tail;
++};
++
++QEMU_PACKED
++struct virtio_iommu_req_unmap {
++	struct virtio_iommu_req_head		head;
++
++	uint32_t					address_space;
++	uint32_t					flags;
++	uint64_t					virt_addr;
++	uint64_t					size;
++
++	struct virtio_iommu_req_tail		tail;
++};
++
++union virtio_iommu_req {
++	struct virtio_iommu_req_head		head;
++
++	struct virtio_iommu_req_attach		attach;
++	struct virtio_iommu_req_detach		detach;
++	struct virtio_iommu_req_map		map;
++	struct virtio_iommu_req_unmap		unmap;
++};
++
++#endif
+diff --git a/linux-headers/linux/virtio_iommu.h b/linux-headers/linux/virtio_iommu.h
+new file mode 100644
+index 0000000..2dc4609
+--- /dev/null
++++ b/linux-headers/linux/virtio_iommu.h
+@@ -0,0 +1 @@
++#include "standard-headers/linux/virtio_iommu.h"
 -- 
 2.5.5
