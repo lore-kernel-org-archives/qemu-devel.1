@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcYCw-000348-VM
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:31:39 -0400
+	(envelope-from <mst@redhat.com>) id 1dcYKW-0006EN-VV
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:39:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcYCr-0002sO-7u
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:31:38 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:38856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcYCr-0002rt-1C
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:31:33 -0400
-Received: by mail-wr0-x229.google.com with SMTP id f21so7583984wrf.5
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 07:31:32 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dcYKU-0008UX-AY
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:39:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcYKU-0008T7-4c
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:39:26 -0400
+Date: Tue, 1 Aug 2017 17:39:17 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170801173438-mutt-send-email-mst@kernel.org>
+References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
+	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
+	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
+	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+	<20170726092931.0678689e@w520.home>
+	<20170726190348-mutt-send-email-mst@kernel.org>
+	<20170726113222.52aad9a6@w520.home>
+	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
+	<20170731234626.7664be18@w520.home>
+	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170801131618.27332-1-stefanha@redhat.com>
-References: <20170801131618.27332-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Aug 2017 15:31:11 +0100
-Message-ID: <CAFEAcA-RzsbqAWPc0HZ=hcSwhATiQC3dO5NpDqO4LNc43cQanw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/9] Tracing patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +36,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Bob Chen <a175818323@gmail.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?utf-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-On 1 August 2017 at 14:16, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 5619c179057e24195ff19c8fe6d6a6cbcb16ed28:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170731' into staging (2017-07-31 14:45:42 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/tracing-pull-request
->
-> for you to fetch changes up to bd6952a391b6f2083d6597386f457f30044e32a3:
->
->   monitor: Reduce handle_qmp_command() tracing overhead (2017-08-01 12:13:07 +0100)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> Fixes for inconsistencies in the trace event format strings, broken
-> trace_event_get_state() usage, and handle_qmp_command() fix.
->
-> ----------------------------------------------------------------
+On Tue, Aug 01, 2017 at 05:35:40PM +0800, Bob Chen wrote:
+> How to display GPU's ACS settings? Like this?
+> 
+> [420 v2] Advanced Error Reporting
+> UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC-
+> UnsupReq- ACSViol-
+> UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC-
+> UnsupReq- ACSViol-
+> UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC-
+> UnsupReq- ACSViol-
 
-Applied, thanks.
-
--- PMM
+Right but that's AER. You want ACS (Access Control Services).
