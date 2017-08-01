@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZzM-0003FK-A7
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:25:45 -0400
+	(envelope-from <mst@redhat.com>) id 1dcZzl-0003dD-0Z
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZzI-0004HN-V7
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:25:44 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35081)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dcZzI-0004GQ-ML
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:25:40 -0400
-Received: by mail-wm0-x241.google.com with SMTP id r77so3808820wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:25:40 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  1 Aug 2017 18:17:15 +0200
-Message-Id: <1501604245-33460-8-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 07/17] target-i386: kvm_get/put_vcpu_events
- don't handle sipi_vector
+	(envelope-from <mst@redhat.com>) id 1dcZzh-0004jX-8d
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:26:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcZzg-0004hX-TB
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:26:05 -0400
+Date: Tue, 1 Aug 2017 19:25:59 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170801192352-mutt-send-email-mst@kernel.org>
+References: <20170728141309.14275-1-marcandre.lureau@redhat.com>
+	<20170728141309.14275-3-marcandre.lureau@redhat.com>
+	<20170801190003-mutt-send-email-mst@kernel.org>
+	<19589902.63892974.1501604116921.JavaMail.zimbra@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <19589902.63892974.1501604116921.JavaMail.zimbra@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] build-sys: do not compile
+ net/vhost-user.c if vhost-user is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peng Hao <peng.hao2@zte.com.cn>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, philippe mathieu daude <philippe.mathieu.daude@gmail.com>, Jason Wang <jasowang@redhat.com>
 
-From: Peng Hao <peng.hao2@zte.com.cn>
+On Tue, Aug 01, 2017 at 12:15:16PM -0400, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> ----- Original Message -----
+> > On Fri, Jul 28, 2017 at 04:13:09PM +0200, Marc-Andr=E9 Lureau wrote:
+> > > This adds two extra #ifdef that have fairly limited conflict potent=
+ial.
+> > >=20
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >=20
+> > OK but why can't we keep all ifdefs in net/ where all the
+> > rest of the features are ifdef'ed?
+> >=20
+>=20
+> We would need fallback code for vhost_user_get_* functions (see below).
 
-qemu call kvm_get_vcpu_events, and kernel return sipi_vector always
-0, never valid when reporting to user space. But when qemu calls
-kvm_put_vcpu_events will make sipi_vector in kernel be 0. This will
-accidently modify sipi_vector when sipi_vector in kernel is not 0.
+Not if you merely add ifdefs around name arrays in net/net.c
+I think.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Reviewed-by: Liu Yi <liu.yi24@zte.com.cn>
-Message-Id: <1500047256-8911-1-git-send-email-peng.hao2@zte.com.cn>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/kvm.c | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
+> > My concern is no one is going to test this weird configuration
+> > so we might accidentally re-enable it without noticing.
+> > net/net.c is where all command line play happens so
+> > people know a bunch of configs need to be tested when
+> > changing it.
+>=20
+> I am not sure I understand your argument there. You are afraid we 'acci=
+dentaly re-enable' vhost-user... and forget to remove those #ifdef?
+>=20
+> I can imagine people don't like having code clutter with #ifdef, but I =
+think when it doesn't change much the logic (as in here with clean per-ca=
+se switch/if), it is fine, ymmv.
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index a6613e1..6db7783 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2444,8 +2444,10 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     }
- 
-     if (level >= KVM_PUT_RESET_STATE) {
--        events.flags |=
--            KVM_VCPUEVENT_VALID_NMI_PENDING | KVM_VCPUEVENT_VALID_SIPI_VECTOR;
-+        events.flags |= KVM_VCPUEVENT_VALID_NMI_PENDING;
-+        if (env->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
-+            events.flags |= KVM_VCPUEVENT_VALID_SIPI_VECTOR;
-+        }
-     }
- 
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
-@@ -2633,6 +2635,10 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     if (ret < 0) {
-         return ret;
-     }
-+    ret = kvm_put_vcpu_events(x86_cpu, level);
-+    if (ret < 0) {
-+        return ret;
-+    }
-     if (level >= KVM_PUT_RESET_STATE) {
-         ret = kvm_put_mp_state(x86_cpu);
-         if (ret < 0) {
-@@ -2644,11 +2650,6 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     if (ret < 0) {
-         return ret;
-     }
--
--    ret = kvm_put_vcpu_events(x86_cpu, level);
--    if (ret < 0) {
--        return ret;
--    }
-     ret = kvm_put_debugregs(x86_cpu);
-     if (ret < 0) {
-         return ret;
-@@ -2668,35 +2669,39 @@ int kvm_arch_get_registers(CPUState *cs)
- 
-     assert(cpu_is_stopped(cs) || qemu_cpu_is_self(cs));
- 
--    ret = kvm_getput_regs(cpu, 0);
-+    ret = kvm_get_vcpu_events(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_xsave(cpu);
-+    /*
-+     * KVM_GET_MPSTATE can modify CS and RIP, call it before
-+     * KVM_GET_REGS and KVM_GET_SREGS.
-+     */
-+    ret = kvm_get_mp_state(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_xcrs(cpu);
-+    ret = kvm_getput_regs(cpu, 0);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_sregs(cpu);
-+    ret = kvm_get_xsave(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_msrs(cpu);
-+    ret = kvm_get_xcrs(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_mp_state(cpu);
-+    ret = kvm_get_sregs(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_apic(cpu);
-+    ret = kvm_get_msrs(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_vcpu_events(cpu);
-+    ret = kvm_get_apic(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--- 
-1.8.3.1
+Let's assume all this code is refactored, we'd have to test
+with ifdefs.
+
+
+> >=20
+> >=20
+> > > ---
+> > >  hw/net/vhost_net.c | 4 ++++
+> > >  net/Makefile.objs  | 2 +-
+> > >  2 files changed, 5 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> > > index e037db63a3..96c4da49e4 100644
+> > > --- a/hw/net/vhost_net.c
+> > > +++ b/hw/net/vhost_net.c
+> > > @@ -193,6 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOption=
+s
+> > > *options)
+> > >          }
+> > >      }
+> > > =20
+> > > +#ifdef CONFIG_VHOST_USER
+> > >      /* Set sane init value. Override when guest acks. */
+> > >      if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
+> > >          features =3D vhost_user_get_acked_features(net->nc);
+> > > @@ -203,6 +204,7 @@ struct vhost_net *vhost_net_init(VhostNetOption=
+s
+> > > *options)
+> > >              goto fail;
+> > >          }
+> > >      }
+> > > +#endif
+> > > =20
+> > >      vhost_net_ack_features(net, features);
+> > > =20
+> > > @@ -414,10 +416,12 @@ VHostNetState *get_vhost_net(NetClientState *=
+nc)
+> > >      case NET_CLIENT_DRIVER_TAP:
+> > >          vhost_net =3D tap_get_vhost_net(nc);
+> > >          break;
+> > > +#ifdef CONFIG_VHOST_USER
+> > >      case NET_CLIENT_DRIVER_VHOST_USER:
+> > >          vhost_net =3D vhost_user_get_vhost_net(nc);
+> > >          assert(vhost_net);
+> > >          break;
+> > > +#endif
+> > >      default:
+> > >          break;
+> > >      }
+> > > diff --git a/net/Makefile.objs b/net/Makefile.objs
+> > > index 67ba5e26fb..7cac7ed1e4 100644
+> > > --- a/net/Makefile.objs
+> > > +++ b/net/Makefile.objs
+> > > @@ -3,7 +3,7 @@ common-obj-y +=3D socket.o
+> > >  common-obj-y +=3D dump.o
+> > >  common-obj-y +=3D eth.o
+> > >  common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
+> > > -common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
+> > > +common-obj-$(CONFIG_VHOST_USER) +=3D vhost-user.o
+>=20
+> So we could have something like:
+>=20
+> +common-obj-$(not CONFIG_VHOST_USER) +=3D vhost-user-stubs.o
+>=20
+> ?
+>=20
+> > >  common-obj-$(CONFIG_SLIRP) +=3D slirp.o
+> > >  common-obj-$(CONFIG_VDE) +=3D vde.o
+> > >  common-obj-$(CONFIG_NETMAP) +=3D netmap.o
+> > > --
+> > > 2.14.0.rc0.1.g40ca67566
+> >=20
