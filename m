@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcTlu-0007k1-6i
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:27 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dcTm1-0007n4-RX
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcTlr-0002lj-J6
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33358)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcTlr-0002lX-7v
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:23 -0400
-Date: Tue, 1 Aug 2017 10:47:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170801094715.GE2079@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-13-git-send-email-peterx@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dcTlz-0002na-8X
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:33 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38535)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcTly-0002n0-Rl
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:31 -0400
+Received: by mail-wm0-x241.google.com with SMTP id y206so2162218wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 02:47:30 -0700 (PDT)
+Date: Tue, 1 Aug 2017 10:47:26 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170801094726.GD13521@stefanha-x1.localdomain>
+References: <20170731160135.12101-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="8nsIa27JVQLqB7/C"
 Content-Disposition: inline
-In-Reply-To: <1501229198-30588-13-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 12/29] migration: allow dst vm pause on
- postcopy
+In-Reply-To: <20170731160135.12101-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] trace-events: print 0x before hex
+ numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, peter.maydell@linaro.org, berrange@redhat.com, cohuck@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> When there is IO error on the incoming channel (e.g., network down),
-> instead of bailing out immediately, we allow the dst vm to switch to the
-> new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
-> new semaphore, until someone poke it for another attempt.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c  |  1 +
->  migration/migration.h  |  3 +++
->  migration/savevm.c     | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  migration/trace-events |  2 ++
->  4 files changed, 51 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 0bc70c8..c729c5a 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
->          memset(&mis_current, 0, sizeof(MigrationIncomingState));
->          qemu_mutex_init(&mis_current.rp_mutex);
->          qemu_event_init(&mis_current.main_thread_load_event, false);
-> +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
->          once = true;
->      }
->      return &mis_current;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 24cdaf6..08b90e8 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -60,6 +60,9 @@ struct MigrationIncomingState {
->      /* The coroutine we should enter (back) after failover */
->      Coroutine *migration_incoming_co;
->      QemuSemaphore colo_incoming_sem;
-> +
-> +    /* notify PAUSED postcopy incoming migrations to try to continue */
-> +    QemuSemaphore postcopy_pause_sem_dst;
->  };
->  
->  MigrationIncomingState *migration_incoming_get_current(void);
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 13ae9d6..1f62268 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1954,11 +1954,41 @@ void qemu_loadvm_state_cleanup(void)
->      }
->  }
->  
-> +/* Return true if we should continue the migration, or false. */
-> +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-> +{
-> +    trace_postcopy_pause_incoming();
-> +
-> +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-> +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
-> +
-> +    assert(mis->from_src_file);
-> +    qemu_file_shutdown(mis->from_src_file);
-> +    qemu_fclose(mis->from_src_file);
-> +    mis->from_src_file = NULL;
-> +
-> +    assert(mis->to_src_file);
-> +    qemu_mutex_lock(&mis->rp_mutex);
-> +    qemu_file_shutdown(mis->to_src_file);
-> +    qemu_fclose(mis->to_src_file);
-> +    mis->to_src_file = NULL;
-> +    qemu_mutex_unlock(&mis->rp_mutex);
 
-Hmm is that safe?  If we look at migrate_send_rp_message we have:
+--8nsIa27JVQLqB7/C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    static void migrate_send_rp_message(MigrationIncomingState *mis,
-                                        enum mig_rp_message_type message_type,
-                                        uint16_t len, void *data)
-    {
-        trace_migrate_send_rp_message((int)message_type, len);
-        qemu_mutex_lock(&mis->rp_mutex);
-        qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
-        qemu_put_be16(mis->to_src_file, len);
-        qemu_put_buffer(mis->to_src_file, data, len);
-        qemu_fflush(mis->to_src_file);
-        qemu_mutex_unlock(&mis->rp_mutex);
-    }
+On Mon, Jul 31, 2017 at 07:01:31PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> It is hard to read logs, when there are hex and dec numbers in one line, =
+when
+> hex number doesn't contain any letters and don't have '0x' prefix.
+>=20
+> So, here is a complete solution for the problem:
+>=20
+> - add information into CODING_STYLE
+> - add a check into checkpatch.pl
+> - fix current state
+>=20
+> The new rule for the style is:
+>=20
+> Hex numbers should be prefixed by '0x', except groups of numbers,
+> separated by symbols ' ', '.', ':', '/', however '0x' can be used for
+> numbers in such groups too. Flag '#' in number format is not allowed.
+>=20
+> Note: checkpatch fails on checkpatch change (03) due to long lines.
+> It is because checkpatch.pl is indented by tabs and when it checks
+> for long lines it consider tabs as 8 spaces. Looks like nobody cares,
+> so do I. I see two ways here:
+>  -  s/\t/    /g
+>  -  make exclusion in checkpatch.pl for checkpatch.pl to consider tabs
+>     as 4 spaces, not 8.  However I don't want to fix it in the context
+>     of these series.
+>=20
+> v3: 01 - rewording
+>     02 - adjust commit message - add two printf flags "'I" into a check
+>          add Stefan's and Eric's r-bs
+>     03 - fix commit message s/Accordingly/According/
+>          add Stefan's r-b
+>     04 - add Stefan's r-b
+>          add Cornelia's a-b
+> v2: almost everything (style, checkpatch, excluding number groups)
+> V1: was a draft of the idea using two sed commands.
+>=20
+> Vladimir Sementsov-Ogievskiy (4):
+>   coding_style: add point about 0x in trace-events
+>   trace-events: fix code style: %# -> 0x%
+>   checkpatch: check trace-events code style
+>   trace-events: fix code style: print 0x before hex numbers
+>=20
+>  CODING_STYLE              |  35 +++++++++
+>  accel/tcg/trace-events    |   2 +-
+>  audio/trace-events        |   4 +-
+>  block/trace-events        |  28 ++++----
+>  hw/audio/trace-events     |   4 +-
+>  hw/char/trace-events      |  12 ++--
+>  hw/display/trace-events   |  14 ++--
+>  hw/dma/trace-events       |  20 +++---
+>  hw/i386/xen/trace-events  |  26 +++----
+>  hw/input/trace-events     |   6 +-
+>  hw/intc/trace-events      | 176 +++++++++++++++++++++++-----------------=
+------
+>  hw/isa/trace-events       |   4 +-
+>  hw/misc/trace-events      |  78 ++++++++++----------
+>  hw/net/trace-events       |  52 +++++++-------
+>  hw/nvram/trace-events     |   2 +-
+>  hw/pci/trace-events       |   4 +-
+>  hw/ppc/trace-events       |  64 ++++++++---------
+>  hw/s390x/trace-events     |  20 +++---
+>  hw/scsi/trace-events      | 118 +++++++++++++++----------------
+>  hw/sd/trace-events        |   4 +-
+>  hw/timer/trace-events     |  20 +++---
+>  hw/usb/trace-events       |  56 +++++++--------
+>  hw/vfio/trace-events      |  44 ++++++------
+>  hw/virtio/trace-events    |   6 +-
+>  hw/xen/trace-events       |   8 +--
+>  linux-user/trace-events   |  10 +--
+>  migration/trace-events    |  36 +++++-----
+>  nbd/trace-events          |  18 ++---
+>  net/trace-events          |   4 +-
+>  scripts/checkpatch.pl     |  19 +++++
+>  target/arm/trace-events   |  10 +--
+>  target/s390x/trace-events |   2 +-
+>  target/sparc/trace-events |  30 ++++----
+>  trace-events              |  20 +++---
+>  34 files changed, 505 insertions(+), 451 deletions(-)
+>=20
+> --=20
+> 2.11.1
+>=20
 
-If we came into postcopy_pause_incoming at about the same time
-migrate_send_rp_message was being called and pause_incoming took the
-lock first, then once it release the lock, send_rp_message carries on
-and uses mis->to_src_file that's now NULL.
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
-One solution here is to just call qemu_file_shutdown() but leave the
-files open at this point, but clean the files up sometime later.
+Stefan
 
-> +
-> +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
-> +    }
-> +
-> +    trace_postcopy_pause_incoming_continued();
-> +
-> +    return true;
-> +}
-> +
->  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->  {
->      uint8_t section_type;
->      int ret = 0;
->  
-> +retry:
->      while (true) {
->          section_type = qemu_get_byte(f);
->  
-> @@ -2004,6 +2034,21 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->  out:
->      if (ret < 0) {
->          qemu_file_set_error(f, ret);
-> +
-> +        /*
-> +         * Detect whether it is:
-> +         *
-> +         * 1. postcopy running
-> +         * 2. network failure (-EIO)
-> +         *
-> +         * If so, we try to wait for a recovery.
-> +         */
-> +        if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-> +            ret == -EIO && postcopy_pause_incoming(mis)) {
-> +            /* Reset f to point to the newly created channel */
-> +            f = mis->from_src_file;
-> +            goto retry;
-> +        }
+--8nsIa27JVQLqB7/C
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I wonder if:
+-----BEGIN PGP SIGNATURE-----
 
-           if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-               ret == -EIO && postcopy_pause_incoming(mis)) {
-               /* Try again after postcopy recovery */
-               return qemu_loadvm_state_main(mis->from_src_file, mis);
-           }
-would be nicer; it avoids the goto loop.
+iQEcBAEBAgAGBQJZgE4uAAoJEJykq7OBq3PIiLMIAIBXIrerb6rItwlYBcmQoXRb
+0tZ+6OmJFZULAmDb1X9v2D+q/u7EONlw7dHFqWGolrVgFjrNVbSJ27H0by8Z35Ql
+0SxXVmlkcisHKPvzxt1YPHKwzXtEjJNHG9fTnxmiNiEY6ARRvtmtxAUV4x2uOeUk
+Yu0vrrM8EDvvtGA4yNrVmf6g2TJG6yUjg53n1QWQs+JHaF15esK2VdbfYCYTHyE+
+LJhUSS3a8OzYe7rymZ6K/c9Aen/++xS5HjHGoJQLdTeywtb5YhWEmkVVCeJzW/IJ
+3nNYwU9hKCUFMgbeFwx7rk7Ffg8R4PfY0FrAKmudz3wmuiaF1kfkIsZZkV5ichQ=
+=zqU6
+-----END PGP SIGNATURE-----
 
-Dave
-
->      }
->      return ret;
->  }
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 2211acc..22a629e 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -99,6 +99,8 @@ open_return_path_on_source(void) ""
->  open_return_path_on_source_continue(void) ""
->  postcopy_start(void) ""
->  postcopy_pause_continued(void) ""
-> +postcopy_pause_incoming(void) ""
-> +postcopy_pause_incoming_continued(void) ""
->  postcopy_start_set_run(void) ""
->  source_return_path_thread_bad_end(void) ""
->  source_return_path_thread_end(void) ""
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--8nsIa27JVQLqB7/C--
