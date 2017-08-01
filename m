@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dcTFy-0007k3-5B
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:14:27 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dcTNc-00021U-F1
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dcTFt-0006XA-KM
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:14:26 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:50837
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dcTFt-0006Vl-Di
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:14:21 -0400
-References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
-	<1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
-	<CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <086e70d6-d5c1-2879-874f-ea1804c6ab38@adacore.com>
-Date: Tue, 1 Aug 2017 11:13:56 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dcTNY-0002XG-DY
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:22:20 -0400
+Date: Tue, 1 Aug 2017 10:22:10 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170801092210.GB13521@stefanha-x1.localdomain>
+References: <20170731162641.24160-1-stefanha@redhat.com>
+	<fbe60111-cd7b-a69f-fc69-a385cd192b3c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
- blocker when using mmio_execution
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
+Content-Disposition: inline
+In-Reply-To: <fbe60111-cd7b-a69f-fc69-a385cd192b3c@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] qemu-iotests: add a "how
+ to" to ./README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
 
+--lEGEL1/lMxI0MVQ2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 08/01/2017 11:00 AM, Peter Maydell wrote:
-> On 1 August 2017 at 09:10, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
->> This adds a migration blocker when mmio_execution has been used.
->>
->> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->> ---
->>   hw/ssi/xilinx_spips.c | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
->> index e833028..d46491f 100644
->> --- a/hw/ssi/xilinx_spips.c
->> +++ b/hw/ssi/xilinx_spips.c
->> @@ -31,6 +31,8 @@
->>   #include "hw/ssi/ssi.h"
->>   #include "qemu/bitops.h"
->>   #include "hw/ssi/xilinx_spips.h"
->> +#include "qapi/error.h"
->> +#include "migration/blocker.h"
->>
->>   #ifndef XILINX_SPIPS_ERR_DEBUG
->>   #define XILINX_SPIPS_ERR_DEBUG 0
->> @@ -139,6 +141,7 @@ typedef struct {
->>
->>       uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
->>       hwaddr lqspi_cached_addr;
->> +    Error *migration_blocker;
->>   } XilinxQSPIPS;
->>
->>   typedef struct XilinxSPIPSClass {
->> @@ -603,6 +606,14 @@ static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
->>       XilinxQSPIPS *q = opaque;
->>       hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
->>
->> +    /* mmio_execution breaks migration better aborting than having strange
->> +     * bugs.
->> +     */
->> +    if (!q->migration_blocker) {
->> +        error_setg(&q->migration_blocker, "booting from SPI breaks migration");
->> +        migrate_add_blocker(q->migration_blocker, &error_fatal);
->> +    }
->> +
-> 
-> This doesn't handle the case when migration is already in progress
-> and this function is called (which will cause migrate_add_blocker
-> to fail).
+On Mon, Jul 31, 2017 at 12:28:44PM -0500, Eric Blake wrote:
+> On 07/31/2017 11:26 AM, Stefan Hajnoczi wrote:
+> > There is not much getting started documentation for qemu-iotests.  This
+> > patch explains how to create a new test and covers the overall testing
+> > approach.
+> >=20
+> > Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+>=20
+> >  Please send improvements to the test suite, general feedback or just
+> >  reports of failing tests cases to qemu-devel@nongnu.org with a CC:
+> >  to qemu-block@nongnu.org.
+> > +
+> >=20
+>=20
+> Is this adding a spurious blank line at EOF?
 
-Maybe I can make the request_ptr to fail if migration is in
-progress.. But is that safe or do I risk a race.
+Yes.  Please remove when merging.
 
-Fred
+Thanks,
+Stefan
 
-> 
-> thanks
-> -- PMM
-> 
+--lEGEL1/lMxI0MVQ2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZgEhCAAoJEJykq7OBq3PISbYIALLdS+xK732hYzYo2MkvmCKe
+ReLOe/Yi1Z1ILHGrViDvCPVumK/BEqKi30HJZVWNTtHvObpRL1p/S3zs/cVnjU6D
+i6bTnz9HtJAkZIT+QbVTTpRRBUIwrOzdvt/CqG7X+a5AIMb31BMDLDUMY5w7zRoA
+5Seyrrp7TcDlA1Csi4OXVWmAxglPvoJaR3imfO/lhxw3/6Afah7p5GQA7hN0R5Yr
+QuPeZYjx5wyU3PVWMr+vGM/Mu1Q2qhu9nCfixEOtHKAvt10yowp72aQ8jj0QtnWU
+Z7RSWRXZB97fWrCvh+1MJle26e2K99gqQPaFPRWb9r1orkHLNgvG1JcvhIE6w74=
+=MMdH
+-----END PGP SIGNATURE-----
+
+--lEGEL1/lMxI0MVQ2--
