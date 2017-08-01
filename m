@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dcZpQ-0003Bb-Ky
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:15:29 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcZqf-0003uw-CV
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dcZpM-0005kh-IQ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:15:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dcZpM-0005jt-9I
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:15:24 -0400
-Date: Tue, 1 Aug 2017 12:15:16 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <19589902.63892974.1501604116921.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170801190003-mutt-send-email-mst@kernel.org>
-References: <20170728141309.14275-1-marcandre.lureau@redhat.com>
-	<20170728141309.14275-3-marcandre.lureau@redhat.com>
-	<20170801190003-mutt-send-email-mst@kernel.org>
+	(envelope-from <stefanha@redhat.com>) id 1dcZqe-0006ep-De
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:16:45 -0400
+Date: Tue, 1 Aug 2017 17:16:33 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170801161633.GF22017@stefanha-x1.localdomain>
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+	<20170731095443.28211-7-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] build-sys: do not compile
- net/vhost-user.c if vhost-user is disabled
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9ADF8FXzFeE7X4jE"
+Content-Disposition: inline
+In-Reply-To: <20170731095443.28211-7-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block: add BlockDevOptionsThrottle
+ to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, philippe mathieu daude <philippe.mathieu.daude@gmail.com>, Jason Wang <jasowang@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
 
-Hi
 
------ Original Message -----
-> On Fri, Jul 28, 2017 at 04:13:09PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > This adds two extra #ifdef that have fairly limited conflict potential.
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> OK but why can't we keep all ifdefs in net/ where all the
-> rest of the features are ifdef'ed?
->=20
+--9ADF8FXzFeE7X4jE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We would need fallback code for vhost_user_get_* functions (see below).
+On Mon, Jul 31, 2017 at 12:54:42PM +0300, Manos Pitsidianakis wrote:
+> @@ -3095,6 +3096,22 @@
+>              '*tls-creds': 'str' } }
+> =20
+>  ##
+> +# @BlockdevOptionsThrottle:
+> +#
+> +# Driver specific block device options for the throttle driver
+> +#
+> +# @throttle-group:   the name of the throttle-group object to use. It wi=
+ll be
+> +#                    created if it doesn't already exist
+> +# @file:             reference to or definition of the data source block=
+ device
+> +# @limits:           ThrottleLimits options
+> +# Since: 2.11
+> +##
+> +{ 'struct': 'BlockdevOptionsThrottle',
+> +  'data': { '*throttle-group': 'str',
+> +            'file' : 'BlockdevRef',
+> +            '*limits' : 'ThrottleLimits'
+> +             } }
 
-> My concern is no one is going to test this weird configuration
-> so we might accidentally re-enable it without noticing.
-> net/net.c is where all command line play happens so
-> people know a bunch of configs need to be tested when
-> changing it.
+What happens when throttle-group isn't given?  Please document it.
 
-I am not sure I understand your argument there. You are afraid we 'accident=
-aly re-enable' vhost-user... and forget to remove those #ifdef?
+--9ADF8FXzFeE7X4jE
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I can imagine people don't like having code clutter with #ifdef, but I thin=
-k when it doesn't change much the logic (as in here with clean per-case swi=
-tch/if), it is fine, ymmv.
+-----BEGIN PGP SIGNATURE-----
 
->=20
->=20
-> > ---
-> >  hw/net/vhost_net.c | 4 ++++
-> >  net/Makefile.objs  | 2 +-
-> >  2 files changed, 5 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> > index e037db63a3..96c4da49e4 100644
-> > --- a/hw/net/vhost_net.c
-> > +++ b/hw/net/vhost_net.c
-> > @@ -193,6 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions
-> > *options)
-> >          }
-> >      }
-> > =20
-> > +#ifdef CONFIG_VHOST_USER
-> >      /* Set sane init value. Override when guest acks. */
-> >      if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
-> >          features =3D vhost_user_get_acked_features(net->nc);
-> > @@ -203,6 +204,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions
-> > *options)
-> >              goto fail;
-> >          }
-> >      }
-> > +#endif
-> > =20
-> >      vhost_net_ack_features(net, features);
-> > =20
-> > @@ -414,10 +416,12 @@ VHostNetState *get_vhost_net(NetClientState *nc)
-> >      case NET_CLIENT_DRIVER_TAP:
-> >          vhost_net =3D tap_get_vhost_net(nc);
-> >          break;
-> > +#ifdef CONFIG_VHOST_USER
-> >      case NET_CLIENT_DRIVER_VHOST_USER:
-> >          vhost_net =3D vhost_user_get_vhost_net(nc);
-> >          assert(vhost_net);
-> >          break;
-> > +#endif
-> >      default:
-> >          break;
-> >      }
-> > diff --git a/net/Makefile.objs b/net/Makefile.objs
-> > index 67ba5e26fb..7cac7ed1e4 100644
-> > --- a/net/Makefile.objs
-> > +++ b/net/Makefile.objs
-> > @@ -3,7 +3,7 @@ common-obj-y +=3D socket.o
-> >  common-obj-y +=3D dump.o
-> >  common-obj-y +=3D eth.o
-> >  common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
-> > -common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
-> > +common-obj-$(CONFIG_VHOST_USER) +=3D vhost-user.o
+iQEcBAEBAgAGBQJZgKlhAAoJEJykq7OBq3PIz9AH/3MAGoP1TYPUi/w0ZULYEV/b
+ejTcVM+XJGl8plM5suhBXsTc6Dkyprouups8/xfl95oNyXiNIUzfbwDCB2qY8jXx
+tiDak8XMpB8EyNi+J4UfnBAHMcbHaog2rzYFCb/gwvkd3xW9D6JveQ/Uo4ZlqU97
+812GiNH/PoWPCGnIeTpKh1SLwmqAJnq9Ll2WksUluno17Sc3gVANRXEOUi2M9Uqd
+3q2flniwn/fZWrL5E0nA+B1RskvNTSFeQsWLZFieBeC55IG6tnb7ZvsuD6H3WJJV
+dkpgiqUC0FbSeJtxJpPWbQ7Ih9GNrcxPYSivC2qkUxIBRUsaXxyvSLIlgF7wS/M=
+=GjiP
+-----END PGP SIGNATURE-----
 
-So we could have something like:
-
-+common-obj-$(not CONFIG_VHOST_USER) +=3D vhost-user-stubs.o
-
-?
-
-> >  common-obj-$(CONFIG_SLIRP) +=3D slirp.o
-> >  common-obj-$(CONFIG_VDE) +=3D vde.o
-> >  common-obj-$(CONFIG_NETMAP) +=3D netmap.o
-> > --
-> > 2.14.0.rc0.1.g40ca67566
->=20
+--9ADF8FXzFeE7X4jE--
