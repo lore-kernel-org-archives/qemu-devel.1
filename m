@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcTzI-0004Li-7Z
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:01:21 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dcU2T-0005EU-MC
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcTzD-0004ho-Ef
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:01:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36844)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcTzD-0004fu-3i
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:01:11 -0400
-Date: Tue, 1 Aug 2017 11:01:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170801100100.GF2079@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-14-git-send-email-peterx@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dcU2P-0007DQ-Lo
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:04:33 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33465)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcU2P-0007Cs-FE
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:04:29 -0400
+Received: by mail-wm0-x242.google.com with SMTP id q189so2263985wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 03:04:29 -0700 (PDT)
+Date: Tue, 1 Aug 2017 11:04:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170801100425.GE13521@stefanha-x1.localdomain>
+References: <20170725143923.11241-1-den@openvz.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LSp5EJdfMPwZcMS1"
 Content-Disposition: inline
-In-Reply-To: <1501229198-30588-14-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 13/29] migration: allow src return path to
- pause
+In-Reply-To: <20170725143923.11241-1-den@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] monitor: improve tracing in
+ handle_qmp_command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Let the thread pause for network issues.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+
+--LSp5EJdfMPwZcMS1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jul 25, 2017 at 05:39:23PM +0300, Denis V. Lunev wrote:
+> Calculate req_json only if trace_handle_qmp_command enabled.
+>=20
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> CC: Llu=EDs Vilanova <vilanova@ac.upc.edu>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
 > ---
->  migration/migration.c  | 35 +++++++++++++++++++++++++++++++++--
->  migration/migration.h  |  1 +
->  migration/trace-events |  2 ++
->  3 files changed, 36 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index c729c5a..d0b9a86 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -996,6 +996,7 @@ static void migrate_fd_cleanup(void *opaque)
->      block_cleanup_parameters(s);
->  
->      qemu_sem_destroy(&s->postcopy_pause_sem);
-> +    qemu_sem_destroy(&s->postcopy_pause_rp_sem);
->  }
->  
->  void migrate_fd_error(MigrationState *s, const Error *error)
-> @@ -1140,6 +1141,7 @@ MigrationState *migrate_init(void)
->      error_free(s->error);
->      s->error = NULL;
->      qemu_sem_init(&s->postcopy_pause_sem, 0);
-> +    qemu_sem_init(&s->postcopy_pause_rp_sem, 0);
->  
->      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
->  
-> @@ -1527,6 +1529,18 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
->      }
->  }
->  
-> +/* Return true to retry, false to quit */
-> +static bool postcopy_pause_return_path_thread(MigrationState *s)
-> +{
-> +    trace_postcopy_pause_return_path();
-> +
-> +    qemu_sem_wait(&s->postcopy_pause_rp_sem);
-> +
-> +    trace_postcopy_pause_return_path_continued();
-> +
-> +    return true;
-> +}
-> +
->  /*
->   * Handles messages sent on the return path towards the source VM
->   *
-> @@ -1543,6 +1557,8 @@ static void *source_return_path_thread(void *opaque)
->      int res;
->  
->      trace_source_return_path_thread_entry();
-> +
-> +retry:
->      while (!ms->rp_state.error && !qemu_file_get_error(rp) &&
->             migration_is_setup_or_active(ms->state)) {
->          trace_source_return_path_thread_loop_top();
-> @@ -1634,13 +1650,28 @@ static void *source_return_path_thread(void *opaque)
->              break;
->          }
->      }
-> -    if (qemu_file_get_error(rp)) {
-> +
-> +out:
-> +    res = qemu_file_get_error(rp);
-> +    if (res) {
-> +        if (res == -EIO) {
-> +            /*
-> +             * Maybe there is something we can do: it looks like a
-> +             * network down issue, and we pause for a recovery.
-> +             */
-> +            if (postcopy_pause_return_path_thread(ms)) {
-> +                /* Reload rp, reset the rest */
-> +                rp = ms->rp_state.from_dst_file;
-> +                ms->rp_state.error = false;
-> +                goto retry;
+> Changes from v1:
+> - written in the explicit for, as discussed in the mailing list
+>=20
+>  monitor.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 
-The recursion trick I suggested in the previous patch might
-also work here.
+Replaced commit message & description with the one Markus suggested to
+include more details on why this patch is necessary.
 
-but it's OK, so
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Stefan
 
-> +            }
-> +        }
-> +
->          trace_source_return_path_thread_bad_end();
->          mark_source_rp_bad(ms);
->      }
->  
->      trace_source_return_path_thread_end();
-> -out:
->      ms->rp_state.from_dst_file = NULL;
->      qemu_fclose(rp);
->      return NULL;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 08b90e8..7aaab13 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -157,6 +157,7 @@ struct MigrationState
->  
->      /* Needed by postcopy-pause state */
->      QemuSemaphore postcopy_pause_sem;
-> +    QemuSemaphore postcopy_pause_rp_sem;
->  };
->  
->  void migrate_set_state(int *state, int old_state, int new_state);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 22a629e..a269eec 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -98,6 +98,8 @@ migration_thread_setup_complete(void) ""
->  open_return_path_on_source(void) ""
->  open_return_path_on_source_continue(void) ""
->  postcopy_start(void) ""
-> +postcopy_pause_return_path(void) ""
-> +postcopy_pause_return_path_continued(void) ""
->  postcopy_pause_continued(void) ""
->  postcopy_pause_incoming(void) ""
->  postcopy_pause_incoming_continued(void) ""
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--LSp5EJdfMPwZcMS1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZgFIpAAoJEJykq7OBq3PIankIAIsXRGKkCDuPrmyjFdVQF0O0
+V1wW3Jj8brmGL6RdsoovcP747q4m1dZ/Lk7YU2SPL+mk3cRFCiXM2UE7DgpNETyN
+s94trJ2b/WVdFeF3m9eT9b4LX9m2rt9PXgH90ceSd6g4h82+Nikmg58NjVx6UibH
+oqIQkz8PtLeIaH1pMS0PON96p6XdMX0EnZaMbe7IZxtG5dhSZApe4ciJbDhMj4FM
+0Hx5UIhFAtRwub76WddvVKh13moaIlmsQ60McnslNAV71nvOi6BJnAmpE72pRn72
+jpr2YvdUqZeg0ScGFEU6qPG7pV5sCGIl5hDxyMNczAMRhm+tDnqyagKl8lLrmzs=
+=die5
+-----END PGP SIGNATURE-----
+
+--LSp5EJdfMPwZcMS1--
