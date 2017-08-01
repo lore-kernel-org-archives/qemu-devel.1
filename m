@@ -1,46 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcLu0-00087i-Gk
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 21:23:17 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcMWV-0003lj-Uf
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:03:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcLtw-0001hL-Gz
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 21:23:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59312
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dcMWS-0000Yp-RK
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:03:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40958
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dcLtw-0001h8-BM
-	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 21:23:12 -0400
+	id 1dcMWS-0000YD-Lv
+	for qemu-devel@nongnu.org; Mon, 31 Jul 2017 22:03:00 -0400
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v711ImvO045746
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 21:23:11 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2c2a86nsa1-1
+	v711xVCW120683
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:02:59 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2c2a86qcf0-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 21:23:11 -0400
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:02:58 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 31 Jul 2017 21:23:10 -0400
-Date: Tue, 1 Aug 2017 09:23:04 +0800
+	Mon, 31 Jul 2017 22:02:58 -0400
+Date: Tue, 1 Aug 2017 10:02:53 +0800
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727015418.85407-4-bjsdjshi@linux.vnet.ibm.com>
 	<20170727135910.27d9e42e@gondolin>
-	<316dd24e-cc45-8469-dd23-491c8b15480e@linux.vnet.ibm.com>
-	<20170727161457.58b3c7d1@gondolin>
-	<abdfb954-d67b-d360-1627-b51bac263880@linux.vnet.ibm.com>
-	<20170728121101.2a85216a@gondolin>
-	<f183e2d8-4f75-2981-e148-02c88014a4b1@linux.vnet.ibm.com>
-	<20170728145819.2dd0e608@gondolin>
-	<20170731014616.GA10549@bjsdjshi@linux.vnet.ibm.com>
-	<20170731104147.51ff1d79@gondolin>
+	<20170731035137.GB21572@bjsdjshi@linux.vnet.ibm.com>
+	<20170731131302.5bb2198c@gondolin>
+	<bcb1d8d2-b620-fc47-4a2f-c89bbb744d0b@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170731104147.51ff1d79@gondolin>
-Message-Id: <20170801012304.GC12259@bjsdjshi@linux.vnet.ibm.com>
+In-Reply-To: <bcb1d8d2-b620-fc47-4a2f-c89bbb744d0b@linux.vnet.ibm.com>
+Message-Id: <20170801020253.GD12259@bjsdjshi@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH 3/3] s390x/css: generate channel path
  initialized CRW for channel path hotplug
 List-Id: <qemu-devel.nongnu.org>
@@ -51,44 +47,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
 
-* Cornelia Huck <cohuck@redhat.com> [2017-07-31 10:41:47 +0200]:
-
-> On Mon, 31 Jul 2017 09:46:17 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > * Cornelia Huck <cohuck@redhat.com> [2017-07-28 14:58:19 +0200]:
-> 
-> > > Exposing real channel paths to the guest means that the guest OS needs
-> > > to be able to deal with path-related things, but OTOH it has more
-> > > control. As I don't think we'll ever want to support a guest OS that
-> > > does not also run under LPAR, I'd prefer that way.
-> > >   
-> > My poor English... Sorry, I don't undersatnd the last sentence...
-> 
-> Probably too many negations... let me rephrase.
-Negations kill my brain. ;)
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-07-31 14:30:32 +0200]:
 
 > 
-> Looking at the guest OSes we want to support, it's currently Linux,
-> Linux, or Linux. And Linux runs fine under LPAR, as it is able to deal
-> with the details of channel path handling (and LPAR does not virtualize
-> anything of this).
-Nod.
+> 
+> On 07/31/2017 01:13 PM, Cornelia Huck wrote:
+> > On Mon, 31 Jul 2017 11:51:37 +0800
+> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> > 
+> >> * Cornelia Huck <cohuck@redhat.com> [2017-07-27 13:59:10 +0200]:
+> >>
+> >>> On Thu, 27 Jul 2017 03:54:18 +0200
+> >>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> [..]
+> >>
+> >> After thinking quite a while, if we do want to add a real device object
+> >> for a channel path, the most intractable problem (but not the only one)
+> >> for me is to find a good way to map the real path with the virtual one.
+> 
+> Yeah, channel path virtualisation... IMHO our current solution is not
+> not really solving the problem.
+If we choose to go with Conny's idea, then yes, my prototype is totally
+in the wrong direction.
+
+> Say, do we  care about a design which could work with live migration
+> (@Dong Jia)?
+Channel I/O pass through and live migration don't go together.
+
+I'm afraid, we did not considerate live migration yet. If we can
+migrate, that would be great! But we are still struggling in finding a
+way out the current swamp...
 
 > 
-> Of the other OSes, z/OS is way too insanely complex, z/VM does not make
-> much sense, and I don't see a case for z/TPF either. Which leaves
-> z/VSE, which should be able to deal with the path related stuff as well.
-Nod.
+> >> How would we retrieve the information from the real one? We'd need the
+> >> host kernel to provide totally new interfaces for channel path
+> >> information synchronization and notification machenism. I don't think in
+> >> this case sysfs is the choice. Ioctls, vfio MMIO regions and eventfd
+> >> could be a better choice. I think, this is like we are trying to
+> >> passthru a channel path. So we'd need to have a new vfio device physical
+> >> driver (e.g. vfio-chp) to handle this...
+> > 
+> > And that would run into the problem of (1) the chp objects not using a
+> > bus on Linux, and (2) implying dedicating the chpids, which we likely
+> > do not want.
+> > 
+> 
+> AFAIU this is about "real-virtual" vs "virutal-virtual". I would really like
+> to see some design here (@Dong Jia). I'm not sure any more where do we want to go.
+If we can find a way to satisfy the requirements that Conny mentioned, I
+can prepare a design. Sadly, we are not there yet.
 
 > 
-> So, I don't think we close any doors if we expose the path handling
-> complexities to the guest.
+> [..]
+> >>
+> >>>
+> >>> tl;dr: I don't think we want chp crws until after we have a good chp
+> >>> model.  
+> >> I have to agree.
+> > 
+> > I'm wondering whether we should just defer this to later. We can live
+> > with no chp crw being created (except for rchp), as due to the crw
+> > generation being unreliable the guest OS has to handle path changes
+> > without crws anyway.
+> > 
+> > We just need to make sure that pno and friends are appropriately
+> > reported to the guest.
+> > 
 > 
-Understand now! Thanks a lot!
+> +1 
+Ha! This is very very clever!
+
+I will give it a try. If everything go well, I will agree with this
+happyly. ;)
 
 -- 
 Dong Jia Shi
