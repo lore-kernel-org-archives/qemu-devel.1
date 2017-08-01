@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZri-0004Yj-O9
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:53 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrm-0004c2-0u
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrh-0007M2-DI
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:50 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33372)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrj-0007Mr-3k
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:54 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36435)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dcZrh-0007Lj-5q
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:49 -0400
-Received: by mail-wr0-x243.google.com with SMTP id y43so1805761wrd.0
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:49 -0700 (PDT)
+	id 1dcZri-0007MU-Tk
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:51 -0400
+Received: by mail-wm0-x243.google.com with SMTP id d40so3782835wma.3
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:50 -0700 (PDT)
 Received: from 640k.lan (94-39-192-75.adsl-ull.clienti.tiscali.it.
 	[94.39.192.75]) by smtp.gmail.com with ESMTPSA id
-	u187sm1724160wmd.26.2017.08.01.09.17.46 for <qemu-devel@nongnu.org>
+	u187sm1724160wmd.26.2017.08.01.09.17.47 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 01 Aug 2017 09:17:47 -0700 (PDT)
+	Tue, 01 Aug 2017 09:17:48 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  1 Aug 2017 18:17:23 +0200
-Message-Id: <1501604245-33460-16-git-send-email-pbonzini@redhat.com>
+Date: Tue,  1 Aug 2017 18:17:24 +0200
+Message-Id: <1501604245-33460-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
 References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 15/17] rtc-test: introduce more update tests
+Subject: [Qemu-devel] [PULL 16/17] mc146818rtc: simplify check_update_timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,119 +34,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Test divider reset and UIP behavior.
+Move all the optimized cases together, since they all have UF=1 in
+common.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/rtc-test.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 81 insertions(+), 1 deletion(-)
+ hw/timer/mc146818rtc.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index 798cf5e..d7a96cb 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -325,6 +325,30 @@ static void set_datetime_bcd(int h, int min, int s, int d, int m, int y)
-     cmos_write(RTC_DAY_OF_MONTH, d);
- }
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 1b8d3d7..ffb2c6a 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -291,26 +291,14 @@ static void check_update_timer(RTCState *s)
  
-+static void set_datetime_dec(int h, int min, int s, int d, int m, int y)
-+{
-+    cmos_write(RTC_HOURS, h);
-+    cmos_write(RTC_MINUTES, min);
-+    cmos_write(RTC_SECONDS, s);
-+    cmos_write(RTC_YEAR, y % 100);
-+    cmos_write(RTC_CENTURY, y / 100);
-+    cmos_write(RTC_MONTH, m);
-+    cmos_write(RTC_DAY_OF_MONTH, d);
-+}
-+
-+static void set_datetime(int mode, int h, int min, int s, int d, int m, int y)
-+{
-+    cmos_write(RTC_REG_B, mode);
-+
-+    cmos_write(RTC_REG_A, 0x76);
-+    if (mode & REG_B_DM) {
-+        set_datetime_dec(h, min, s, d, m, y);
-+    } else {
-+        set_datetime_bcd(h, min, s, d, m, y);
-+    }
-+    cmos_write(RTC_REG_A, 0x26);
-+}
-+
- #define assert_time(h, m, s) \
-     do { \
-         g_assert_cmpint(cmos_read(RTC_HOURS), ==, h); \
-@@ -559,6 +583,60 @@ static void register_b_set_flag(void)
-     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
- }
+     /* From the data sheet: "Holding the dividers in reset prevents
+      * interrupts from operating, while setting the SET bit allows"
+-     * them to occur.  However, it will prevent an alarm interrupt
+-     * from occurring, because the time of day is not updated.
++     * them to occur.
+      */
+     if ((s->cmos_data[RTC_REG_A] & 0x60) == 0x60) {
+         timer_del(s->update_timer);
+         return;
+     }
+-    if ((s->cmos_data[RTC_REG_C] & REG_C_UF) &&
+-        (s->cmos_data[RTC_REG_B] & REG_B_SET)) {
+-        timer_del(s->update_timer);
+-        return;
+-    }
+-    if ((s->cmos_data[RTC_REG_C] & REG_C_UF) &&
+-        (s->cmos_data[RTC_REG_C] & REG_C_AF)) {
+-        timer_del(s->update_timer);
+-        return;
+-    }
  
-+static void divider_reset(void)
-+{
-+    /* Enable binary-coded decimal (BCD) mode in Register B*/
-+    cmos_write(RTC_REG_B, REG_B_24H);
-+
-+    /* Enter divider reset */
-+    cmos_write(RTC_REG_A, 0x76);
-+    set_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-+
-+    assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-+
-+    /* Since divider reset flag is still enabled, these are equality checks. */
-+    clock_step(1000000000LL);
-+    assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-+
-+    /* The first update ends 500 ms after divider reset */
-+    cmos_write(RTC_REG_A, 0x26);
-+    clock_step(500000000LL - UIP_HOLD_LENGTH - 1);
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-+    assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-+
-+    clock_step(1);
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, !=, 0);
-+    clock_step(UIP_HOLD_LENGTH);
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-+
-+    assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
-+}
-+
-+static void uip_stuck(void)
-+{
-+    set_datetime(REG_B_24H, 0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-+
-+    /* The first update ends 500 ms after divider reset */
-+    (void)cmos_read(RTC_REG_C);
-+    clock_step(500000000LL);
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-+    assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
-+
-+    /* UF is now set.  */
-+    cmos_write(RTC_HOURS_ALARM, 0x02);
-+    cmos_write(RTC_MINUTES_ALARM, 0xC0);
-+    cmos_write(RTC_SECONDS_ALARM, 0xC0);
-+
-+    /* Because the alarm will fire soon, reading register A will latch UIP.  */
-+    clock_step(1000000000LL - UIP_HOLD_LENGTH / 2);
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, !=, 0);
-+
-+    /* Move the alarm far away.  This must not cause UIP to remain stuck!  */
-+    cmos_write(RTC_HOURS_ALARM, 0x03);
-+    clock_step(UIP_HOLD_LENGTH);
-+    g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-+}
-+
- #define RTC_PERIOD_CODE1    13   /* 8 Hz */
- #define RTC_PERIOD_CODE2    15   /* 2 Hz */
+     guest_nsec = get_guest_rtc_ns(s) % NANOSECONDS_PER_SECOND;
+-    /* if UF is clear, reprogram to next second */
+     next_update_time = qemu_clock_get_ns(rtc_clock)
+         + NANOSECONDS_PER_SECOND - guest_nsec;
  
-@@ -625,7 +703,9 @@ int main(int argc, char **argv)
-     qtest_add_func("/rtc/basic/bcd-12h", basic_12h_bcd);
-     qtest_add_func("/rtc/set-year/20xx", set_year_20xx);
-     qtest_add_func("/rtc/set-year/1980", set_year_1980);
--    qtest_add_func("/rtc/misc/register_b_set_flag", register_b_set_flag);
-+    qtest_add_func("/rtc/update/register_b_set_flag", register_b_set_flag);
-+    qtest_add_func("/rtc/update/divider-reset", divider_reset);
-+    qtest_add_func("/rtc/update/uip-stuck", uip_stuck);
-     qtest_add_func("/rtc/misc/fuzz-registers", fuzz_registers);
-     qtest_add_func("/rtc/periodic/interrupt", periodic_timer);
+@@ -321,7 +309,17 @@ static void check_update_timer(RTCState *s)
+     s->next_alarm_time = next_update_time +
+                          (next_alarm_sec - 1) * NANOSECONDS_PER_SECOND;
  
++    /* If UF is already set, we might be able to optimize. */
+     if (s->cmos_data[RTC_REG_C] & REG_C_UF) {
++        /* If AF cannot change (i.e. either it is set already, or
++         * SET=1 and then the time is not updated), nothing to do.
++         */
++        if ((s->cmos_data[RTC_REG_B] & REG_B_SET) ||
++            (s->cmos_data[RTC_REG_C] & REG_C_AF)) {
++            timer_del(s->update_timer);
++            return;
++        }
++
+         /* UF is set, but AF is clear.  Program the timer to target
+          * the alarm time.  */
+         next_update_time = s->next_alarm_time;
 -- 
 1.8.3.1
