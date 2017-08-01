@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dcOrN-0000DM-Hl
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 00:32:49 -0400
+	(envelope-from <a175818323@gmail.com>) id 1dcPMS-0004n7-5C
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 01:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dcOrK-0001qf-32
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 00:32:45 -0400
-Message-ID: <1501561942.5179.34.camel@aj.id.au>
-From: Andrew Jeffery <andrew@aj.id.au>
-Date: Tue, 01 Aug 2017 14:02:22 +0930
-In-Reply-To: <a2f01f69-13cb-dcb9-6dcb-e5ccc3bb504d@amsat.org>
-References: <20170801010425.25778-1-andrew@aj.id.au>
-	<a2f01f69-13cb-dcb9-6dcb-e5ccc3bb504d@amsat.org>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-mw8h11HAz22QEgQhmKe5"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] watchdog: wdt_aspeed: Add
- support for the reset width register
+	(envelope-from <a175818323@gmail.com>) id 1dcPMQ-0008Ma-93
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 01:04:52 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:38198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1dcPMQ-0008KS-2z
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 01:04:50 -0400
+Received: by mail-io0-x241.google.com with SMTP id o9so686384iod.5
+	for <qemu-devel@nongnu.org>; Mon, 31 Jul 2017 22:04:47 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170726113222.52aad9a6@w520.home>
+References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
+	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
+	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
+	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+	<20170726092931.0678689e@w520.home>
+	<20170726190348-mutt-send-email-mst@kernel.org>
+	<20170726113222.52aad9a6@w520.home>
+From: Bob Chen <a175818323@gmail.com>
+Date: Tue, 1 Aug 2017 13:04:46 +0800
+Message-ID: <CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+	=?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,353 +36,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, openbmc@lists.ozlabs.org, qemu-devel@nongnu.org, joel@jms.id.au, clg@kaod.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+
+Hi,
+
+This is a sketch of my hardware topology.
+
+          CPU0         <- QPI ->        CPU1
+           |                             |
+    Root Port(at PCIe.0)        Root Port(at PCIe.1)
+       /        \                   /       \
+    Switch    Switch             Switch    Switch
+     /   \      /  \              /   \    /    \
+   GPU   GPU  GPU  GPU          GPU   GPU GPU   GPU
 
 
---=-mw8h11HAz22QEgQhmKe5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+And below are the p2p bandwidth test results.
 
-Hi Phil,
+Host=EF=BC=9A
+   D\D     0      1      2      3      4      5      6      7
+     0 426.91  25.32  19.72  19.72  19.69  19.68  19.75  19.66
+     1  25.31 427.61  19.74  19.72  19.66  19.68  19.74  19.73
+     2  19.73  19.73 429.49  25.33  19.66  19.74  19.73  19.74
+     3  19.72  19.71  25.36 426.68  19.70  19.71  19.77  19.74
+     4  19.72  19.72  19.73  19.75 425.75  25.33  19.72  19.71
+     5  19.71  19.75  19.76  19.75  25.35 428.11  19.69  19.70
+     6  19.76  19.72  19.79  19.78  19.73  19.74 425.75  25.35
+     7  19.69  19.75  19.79  19.75  19.72  19.72  25.39 427.15
 
-On Tue, 2017-08-01 at 00:23 -0300, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Andrew,
->=20
-> On 07/31/2017 10:04 PM, Andrew Jeffery wrote:
-> > The reset width register controls how the pulse on the SoC's WDTRST{1,2=
-}
-> > pins behaves. A pulse is emitted if the external reset bit is set in
-> > WDT_CTRL. WDT_RESET_WIDTH requires magic bit patterns to configure both
-> > push-pull/open-drain and active-high/active-low behaviours and thus
-> > needs some special handling in the write path.
->=20
-> I wanted to verify the datashit but it seems to unavailable, looking ther=
-e:
-> https://www.verical.com/datasheet/aspeed-technology-inc-interface-misc-as=
-t2050a3-gp-4078885.pdf
->=20
-> Can you point out which cpu model you are modeling and where to get this=
-=C2=A0
-> watchdog datashit please? You might also add this to the header, for the=
-=C2=A0
-> next one looking at this file :)
+VM=EF=BC=9A
+   D\D     0      1      2      3      4      5      6      7
+     0 427.38  10.52  18.99  19.11  19.75  19.62  19.75  19.71
+     1  10.53 426.68  19.28  19.19  19.73  19.71  19.72  19.73
+     2  18.88  19.30 426.92  10.48  19.66  19.71  19.67  19.68
+     3  18.93  19.18  10.45 426.94  19.69  19.72  19.67  19.72
+     4  19.60  19.66  19.69  19.70 428.13  10.49  19.40  19.57
+     5  19.52  19.74  19.72  19.69  10.44 426.45  19.68  19.61
+     6  19.63  19.50  19.72  19.64  19.59  19.66 426.91  10.47
+     7  19.69  19.75  19.70  19.69  19.66  19.74  10.45 426.23
 
-The watchdog model is common to at least the Aspeed AST2400- and
-AST2500- SoC families, which I have datasheets for. However, they are
-not available to the public and therefore (unfortunately) I can't point
-you to them. You may be able to access them if you have appropriate
-arrangements with Aspeed.
 
-Regarding the features exposed by the patch, configuration of the
-electrical properties of the  external reset signal is only provided in
-the AST2500's watchdog IP, but the bits used in the reset width
-register are marked as reserved on the AST2400. Therefore I thought it
-was reasonable not to guard them behind some kind of revision test.
+In the VM, the bandwidth between two GPUs under the same physical switch is
+obviously lower, as per the reasons you said in former threads.
 
->=20
-> >=20
-> > > > Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
-> > ---
-> > I understand that we're in stabilisation mode, but I thought I'd send t=
-his out
-> > to provoke any feedback. Happy to resend after the 2.10 release if requ=
-ired.
->=20
-> you can subject it "PATCH for 2.11" so ppl testing/closing 2.10 can keep=
-=C2=A0
-> focused but still queue your mail for when 2.10 release is out.
+But what confused me most is that GPUs under different switches could
+achieve the same speed, as well as in the Host. Does that mean after IOMMU
+address translation, data traversing has utilized QPI bus by default? Even
+these two devices do not belong to the same PCIe bus?
 
-Thanks for the tip.
+In a word, I'm trying to build a massive deep-learning/HPC infrastructure
+for the cloud environment. Nvidia itself released a solution based on
+dockers, and I believe qemu/VMs could also do it. Hopefully I could get
+some help from the community.
 
->=20
-> >=20
-> > =C2=A0 hw/watchdog/wdt_aspeed.c | 47 ++++++++++++++++++++++++++++++++++=
-+++----------
-> > =C2=A0 1 file changed, 37 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-> > index 8bbe579b6b66..4ef1412e99fc 100644
-> > --- a/hw/watchdog/wdt_aspeed.c
-> > +++ b/hw/watchdog/wdt_aspeed.c
-> > @@ -14,10 +14,10 @@
-> > =C2=A0 #include "qemu/timer.h"
-> > =C2=A0 #include "hw/watchdog/wdt_aspeed.h"
-> > =C2=A0=C2=A0
-> > -#define WDT_STATUS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x00 / 4)
-> > -#define WDT_RELOAD_VALUE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0(0x04 / 4)
-> > -#define WDT_RESTART=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x08 / 4)
-> > -#define WDT_CTRL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x0C / 4)
-> > +#define WDT_STATUS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0(0x00 / 4)
-> > +#define WDT_RELOAD_VALUE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x04 / 4)
-> > +#define WDT_RESTART=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-(0x08 / 4)
-> > +#define WDT_CTRL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0(0x0C / 4)
-> > =C2=A0 #define=C2=A0=C2=A0=C2=A0WDT_CTRL_RESET_MODE_SOC=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x00 << 5)
-> > =C2=A0 #define=C2=A0=C2=A0=C2=A0WDT_CTRL_RESET_MODE_FULL_CHIP (0x01 << =
-5)
-> > =C2=A0 #define=C2=A0=C2=A0=C2=A0WDT_CTRL_1MHZ_CLK=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0BIT(4)
-> > @@ -25,12 +25,21 @@
-> > =C2=A0 #define=C2=A0=C2=A0=C2=A0WDT_CTRL_WDT_INTR=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0BIT(2)
-> > =C2=A0 #define=C2=A0=C2=A0=C2=A0WDT_CTRL_RESET_SYSTEM=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0BIT(1)
-> > =C2=A0 #define=C2=A0=C2=A0=C2=A0WDT_CTRL_ENABLE=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0BIT(0)
-> > +#define WDT_RESET_WIDTH=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x18 / 4)
-> > +#define=C2=A0=C2=A0=C2=A0WDT_RESET_WIDTH_ACTIVE_HIGH=C2=A0=C2=A0=C2=A0=
-BIT(31)
-> > +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WDT_POLARITY_MASK=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0xFF << 24)
-> > +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WDT_ACTIVE_HIGH_MAGIC=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0xA5 << 24)
-> > +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WDT_ACTIVE_LOW_MAGIC=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x5A << 24)
-> > +#define=C2=A0=C2=A0=C2=A0WDT_RESET_WIDTH_PUSH_PULL=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0BIT(30)
-> > +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WDT_DRIVE_TYPE_MASK=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0xFF << 24)
-> > +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WDT_PUSH_PULL_MAGIC=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0xA8 << 24)
-> > +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WDT_OPEN_DRAIN_MAGIC=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x8A << 24)
-> > +#define=C2=A0=C2=A0=C2=A0WDT_RESET_WIDTH_DURATION=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A00xFFF;
->=20
-> Which model? the AST2050 seems to be 0xff.
+The emulated switch you suggested looks like a good option to me, I will
+have a try.
 
-Ah, good catch, this is also the case in the AST2400. The AST2500
-extends this field. Host code for the AST2400 and AST2050 *shouldn't*
-set any greater values; is it worth enforcing?
 
->=20
-> > =C2=A0=C2=A0
-> > -#define WDT_TIMEOUT_STATUS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x10 / =
-4)
-> > -#define WDT_TIMEOUT_CLEAR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x=
-14 / 4)
-> > -#define WDT_RESET_WDITH=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0(0x18 / 4)
-> > +#define WDT_TIMEOUT_STATUS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x10 / 4)
-> > +#define WDT_TIMEOUT_CLEAR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(0x14 / 4)
-> > =C2=A0=C2=A0
-> > -#define WDT_RESTART_MAGIC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00x4=
-755
-> > +#define WDT_RESTART_MAGIC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00x4755
-> > =C2=A0=C2=A0
-> > =C2=A0 static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
-> > =C2=A0 {
-> > @@ -55,9 +64,10 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr=
- offset, unsigned size)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case WDT_CTRL:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return s->r=
-egs[WDT_CTRL];
-> > +=C2=A0=C2=A0=C2=A0=C2=A0case WDT_RESET_WIDTH:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return s->regs[WDT_RES=
-ET_WIDTH];
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case WDT_TIMEOUT_STATUS:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case WDT_TIMEOUT_CLEAR:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0case WDT_RESET_WDITH:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_log_ma=
-sk(LOG_UNIMP,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-"%s: uninmplemented read at offset 0x%" HWADDR_PRIx "\n",
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-__func__, offset);
-> > @@ -119,9 +129,25 @@ static void aspeed_wdt_write(void *opaque, hwaddr =
-offset, uint64_t data,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0timer_del(s->timer);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0case WDT_RESET_WIDTH:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t property =3D =
-data & WDT_POLARITY_MASK;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (property =3D=3D WD=
-T_ACTIVE_HIGH_MAGIC) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_HIGH;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (property =
-=3D=3D WDT_ACTIVE_LOW_MAGIC) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_HIGH;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (property =
-=3D=3D WDT_PUSH_PULL_MAGIC) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PULL;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (property =
-=3D=3D WDT_OPEN_DRAIN_MAGIC) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PULL;
->=20
-> } else {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_log_mask(LOG_GUEST_ERROR, ...
->=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+Thanks,
+Bob
 
-=46rom the datasheet: "For others value, this bit will keep old value
-without change." So it is not a guest error to write a value not
-matching the cases above.
 
->=20
-> Anyway I'm not sure about this if().
-> Usually watchdogs have a state machine, if you don't do all unlock steps=
-=C2=A0
-> ordered, the SM get reset. This is why magic is involved, else you could=
-=C2=A0
-> use it as a regular register.
-> I'd expect a guest writing ACTIVE_HIGH_MAGIC then PUSH_PULL_MAGIC to not=
-=C2=A0
-> modify the RESET_WIDTH register, since the correct behavior would be to=
-=C2=A0
-> write ordered RESTART_MAGIC, then HIGH_MAGIC, then LOW_MAGIC and finally=
-=C2=A0
-> the PULL/DRAIN change, but I'm just trying to model this wdg in my head=
-=C2=A0
-> without having study the DS so you can't rely on my comments :)
+2017-07-27 1:32 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>:
 
-Well, given I have it handy, I think the behaviour of the hardware
-resolves this query:
-
-root@romulus:~# devmem 0x1e785018
-0x000000FF
-root@romulus:~# devmem 0x1e785018 32 0xa80000ff
-root@romulus:~# devmem 0x1e785018
-0x400000FF
-root@romulus:~# devmem 0x1e785018 32 0x8a0000ff
-root@romulus:~# devmem 0x1e785018
-0x000000FF
-root@romulus:~# devmem 0x1e785018 32 0xa50000ff
-root@romulus:~# devmem 0x1e785018
-0x800000FF
-root@romulus:~# devmem 0x1e785018 32 0x5a0000ff
-root@romulus:~# devmem 0x1e785018
-0x000000FF
-root@romulus:~# devmem 0x1e785018 32 0xa80000ff
-root@romulus:~# devmem
-0x1e785018 32 0xa50000ff
-root@romulus:~# devmem 0x1e785018
-0xC00000FF
-root
-@romulus:~# devmem 0x1e785018 32 0x5a0000ff
-root@romulus:~# devmem
-0x1e785018 32 0x8a0000ff
-root@romulus:~# devmem 0x1e785018
-0x000000FF
-root@romulus:~# devmem 0x1e785018 32 0xa50000ff
-root@romulus:~# devmem 0x1e785018
-0x800000FF
-root@romulus:~# devmem 0x1e785018 32 0x000a5a5a
-root@romulus:~# devmem
-0x1e785018
-0x800A5A5A
-root@romulus:~# devmem 0x1e785018 32 0x5a0000ff
-root@romulus:~# devmem 0x1e785018
-0x000000FF
-
-Bear in mind the driver is loaded, so maybe it's messing with the test,
-but I haven't seen any indication to the contrary.
-
->=20
-> Also it seems unsafe to modify that kind of property while the watchdog=
-=C2=A0
-> is running, usually you disable it before modifying it, else while=C2=A0
-> running changes are automagically ignored.
-
-But that's a host-code problem, right? I don't see any hardware
-restriction noted in the datasheet along these lines.
-
->=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->regs[WDT_RESET_WIDT=
-H] &=3D ~WDT_RESET_WIDTH_DURATION;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->regs[WDT_RESET_WIDT=
-H] |=3D data & WDT_RESET_WIDTH_DURATION;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case WDT_TIMEOUT_STATUS:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case WDT_TIMEOUT_CLEAR:
-> > -=C2=A0=C2=A0=C2=A0=C2=A0case WDT_RESET_WDITH:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_log_ma=
-sk(LOG_UNIMP,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-"%s: uninmplemented write at offset 0x%" HWADDR_PRIx "\n",
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-__func__, offset);
-> > @@ -167,6 +193,7 @@ static void aspeed_wdt_reset(DeviceState *dev)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->regs[WDT_RELOAD_VALUE] =3D 0x03E=
-F1480;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->regs[WDT_RESTART] =3D 0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->regs[WDT_CTRL] =3D 0;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0s->regs[WDT_RESET_WIDTH] =3D 0XFF;
->=20
-> why different than your define WDT_RESET_WIDTH_DURATION?
-
-Maybe WDT_RESET_WIDTH_DURATION is poorly named, but it's a mask, not a
-value. The 0xFF here (somehow I got an upper-case X in there) is the
-default value for the register as documented in both the AST2400 and
-AST2500 datasheets. However, this *has* lead me to discover that I've
-defined the WDT_RESET_WIDTH_DURATION mask too narrow for the AST2500,
-it should be 0xFFFFF (19:0). The AST2400 datasheet documents the field
-as 7:0 (0xFF).
-
-I'll respin, taking into account the 2.11 note above, unless you have
-any more comments.
-
-Thanks for taking a look!
-
-Andrew
-
-> > =C2=A0=C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0timer_del(s->timer);
-> > =C2=A0 }
-> >=20
->=20
-> Regards,
->=20
-> Phil.
---=-mw8h11HAz22QEgQhmKe5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAABCgAGBQJZgARWAAoJEJ0dnzgO5LT5yzoP/A/dsr7O61gySJwGn3+TGSsF
-DmyLfDlDzPpG2vHpG+lE/ipgd0hnnkXF3JakEfpfDfR1Oj0fayrF1NfGVIHFpoTz
-kAlsztmg6mZssDHraPTmBON2cftPN1+rT4mX96XCWJRN072CNY/MTSAG9xVm7ph4
-yYi6hkX7cQA9hozTNOSJV0KIsBkH3vJBbxSN8NG/0/M24KghYOzLagOs3Od+63ES
-A2HDfAISniXpXeuvWWuNb46ZMSuMJTJoV8PBp8VT8SIkF5aKgT0vJQouJE7JkAAu
-DU3f+cbmBslXL6ZLlzS4uFK2K9XCD4FPCCbJi66UJiQnmIACa6NJZiKol4eXyy7P
-yQB1+bNPzsOxf2jI866Q5JsTxIclhWBYXTW0OQ4E0iPlJpVCFctEMiKwNn7/C+y6
-WdN54SbPJn/8TLpepd7lehg4yN3XLchWzowCgYUhyeOkGny7gYmWt2fl0ZXoCWhe
-j0w/+1zc9ZxRvak+X74pyFQ9AsyJqhRdtt7e8D0GVpBCLr/OJX0JNDRreyT+mpBp
-deAwgVEx4EJ6AQc7H76Y6nnqBOz6hm8UI0QK/X/3EXsUL9sx6h5FT5LD39u0U7r+
-W2HbduAEIM4Z22arM/Cqq+NgkYANhYd9KngSIbETLvDQMKJ0dnvWewrKjEH5URqb
-I4qzEZb+utZmwyyA64ky
-=AWxP
------END PGP SIGNATURE-----
-
---=-mw8h11HAz22QEgQhmKe5--
+> On Wed, 26 Jul 2017 19:06:58 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>
+> > On Wed, Jul 26, 2017 at 09:29:31AM -0600, Alex Williamson wrote:
+> > > On Wed, 26 Jul 2017 09:21:38 +0300
+> > > Marcel Apfelbaum <marcel@redhat.com> wrote:
+> > >
+> > > > On 25/07/2017 11:53, =E9=99=88=E5=8D=9A wrote:
+> > > > > To accelerate data traversing between devices under the same PCIE
+> Root
+> > > > > Port or Switch.
+> > > > >
+> > > > > See https://lists.nongnu.org/archive/html/qemu-devel/2017-
+> 07/msg07209.html
+> > > > >
+> > > >
+> > > > Hi,
+> > > >
+> > > > It may be possible, but maybe PCIe Switch assignment is not
+> > > > the only way to go.
+> > > >
+> > > > Adding Alex and Michael for their input on this matter.
+> > > > More info at:
+> > > > https://lists.nongnu.org/archive/html/qemu-devel/2017-
+> 07/msg07209.html
+> > >
+> > > I think you need to look at where the IOMMU is in the topology and wh=
+at
+> > > address space the devices are working in when assigned to a VM to
+> > > realize that it doesn't make any sense to assign switch ports to a VM=
+.
+> > > GPUs cannot do switch level peer to peer when assigned because they a=
+re
+> > > operating in an I/O virtual address space.  This is why we configure
+> > > ACS on downstream ports to prevent peer to peer.  Peer to peer
+> > > transactions must be forwarded upstream by the switch ports in order =
+to
+> > > reach the IOMMU for translation.  Note however that we do populate pe=
+er
+> > > to peer mappings within the IOMMU, so if the hardware supports it, th=
+e
+> > > IOMMU can reflect the transaction back out to the I/O bus to reach th=
+e
+> > > other device without CPU involvement.
+> > >
+> > > Therefore I think the better solution, if it encourages the NVIDIA
+> > > driver to do the right thing, is to use emulated switches.  Assigning
+> > > the physical switch would really do nothing more than make the PCIe
+> link
+> > > information more correct in the VM, everything else about the switch
+> > > would be emulated.  Even still, unless you have an I/O topology which
+> > > integrates the IOMMU into the switch itself, the data flow still need=
+s
+> > > to go all the way to the root complex to hit the IOMMU before being
+> > > reflected to the other device.  Direct peer to peer between downstrea=
+m
+> > > switch ports operates in the wrong address space.  Thanks,
+> > >
+> > > Alex
+> >
+> > That's true of course. What would make sense would be for
+> > hardware vendors to add ATS support to their cards.
+> >
+> > Then peer to peer should be allowed by hypervisor for translated
+> transactions.
+> >
+> > Gives you the performance benefit without the security issues.
+> >
+> > Does anyone know whether any hardware implements this?
+>
+> GPUs often do implement ATS and the ACS DT (Direct Translated P2P)
+> capability should handle routing requests with the Address Type field
+> indicating a translated address directly between downstream ports.  DT
+> is however not part of the standard set of ACS bits that we enable.  It
+> seems like it might be fairly easy to poke the DT enable bit with
+> setpci from userspace to test whether this "just works", providing of
+> course you can get the driver to attempt to do peer to peer and ATS is
+> already functioning on the GPU.  If so, then we should look at where
+> in the code to do that enabling automatically.  Thanks,
+>
+> Alex
+>
+>
