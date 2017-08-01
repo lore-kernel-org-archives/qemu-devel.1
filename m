@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1N-0000VZ-7Q
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:19:42 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1O-0000Xq-PA
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1K-0002Wm-P5
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:19:41 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1L-0002Xt-VK
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:19:42 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue,  1 Aug 2017 17:19:09 +0300
-Message-Id: <1501597152-25342-13-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue,  1 Aug 2017 17:19:11 +0300
+Message-Id: <1501597152-25342-15-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 12/15] qcow2: skip writing zero buffers to
- empty COW areas
+Subject: [Qemu-devel] [PATCH v4 14/15] iotest 190: test BDRV_REQ_ALLOCATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,198 +24,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-It can be detected that
-  1. COW alignment of a write request is zeroes
-  2. Respective areas on the underlying BDS already read as zeroes
-     after being preallocated previously
-
-If both of these true, COW may be skipped
-
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- block/qcow2.h         | 12 +++++++++++
- block/qcow2-cluster.c |  5 ++++-
- block/qcow2.c         | 60 ++++++++++++++++++++++++++++++++++++++++++++-------
- block/trace-events    |  1 +
- 4 files changed, 69 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/190     | 146 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/190.out |  50 ++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 197 insertions(+)
+ create mode 100755 tests/qemu-iotests/190
+ create mode 100644 tests/qemu-iotests/190.out
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 595ed9c..db1c6f5 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -363,6 +363,12 @@ typedef struct QCowL2Meta
-     bool keep_old_clusters;
- 
-     /**
-+     * True if the area is allocated at the end of data area
-+     * (i.e. >= BDRVQcow2State::data_end)
-+     */
-+    bool clusters_are_trailing;
+diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
+new file mode 100755
+index 0000000..ad7162a
+--- /dev/null
++++ b/tests/qemu-iotests/190
+@@ -0,0 +1,146 @@
++#!/bin/env bash
++#
++# Test qcow2 BDRV_REQ_ALLOCATE requests
++#
++# Copyright (c) 2017 Parallels International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++##
 +
-+    /**
-      * Requests that overlap with this allocation and wait to be restarted
-      * when the allocating request has completed.
-      */
-@@ -381,6 +387,12 @@ typedef struct QCowL2Meta
-     Qcow2COWRegion cow_end;
- 
-     /**
-+     * Indicates that both COW areas are empty (nb_bytes == 0)
-+     * or filled with zeroes and do not require any more copying
-+     */
-+    bool zero_cow;
++seq=`basename $0`
++echo "QA output created by $seq"
 +
-+    /**
-      * The I/O vector with the data from the actual guest write request.
-      * If non-NULL, this is meant to be merged together with the data
-      * from @cow_start and @cow_end into one single write operation.
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 75baaf4..d54b96a 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -735,7 +735,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     assert(start->offset + start->nb_bytes <= end->offset);
-     assert(!m->data_qiov || m->data_qiov->size == data_bytes);
- 
--    if (start->nb_bytes == 0 && end->nb_bytes == 0) {
-+    if ((start->nb_bytes == 0 && end->nb_bytes == 0) || m->zero_cow) {
-         return 0;
-     }
- 
-@@ -1203,6 +1203,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-     uint64_t *host_offset, uint64_t *bytes, QCowL2Meta **m)
- {
-     BDRVQcow2State *s = bs->opaque;
-+    const uint64_t old_data_end = s->data_end;
-     int l2_index;
-     uint64_t *l2_table;
-     uint64_t entry;
-@@ -1324,6 +1325,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-         .alloc_offset   = alloc_cluster_offset,
-         .offset         = start_of_cluster(s, guest_offset),
-         .nb_clusters    = nb_clusters,
-+        .clusters_are_trailing = alloc_cluster_offset >= old_data_end,
- 
-         .keep_old_clusters  = keep_old_clusters,
- 
-@@ -1335,6 +1337,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-             .offset     = nb_bytes,
-             .nb_bytes   = avail_bytes - nb_bytes,
-         },
-+        .zero_cow = false,
-     };
-     qemu_co_queue_init(&(*m)->dependent_requests);
-     QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2ec8b03..e49ad50 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1921,6 +1921,11 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
-             continue;
-         }
- 
-+        /* If both COW regions are zeroes already, skip this too */
-+        if (m->zero_cow) {
-+            continue;
-+        }
++status=1	# failure is the default!
 +
-         /* The data (middle) region must be immediately after the
-          * start region */
-         if (l2meta_cow_start(m) + m->cow_start.nb_bytes != offset) {
-@@ -1971,26 +1976,61 @@ static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
- /*
-  * If the specified area is beyond EOF, allocates it + prealloc_size
-  * bytes ahead.
-+ *
-+ * Returns
-+ *   true if the space is allocated and contains zeroes
-  */
--static void coroutine_fn handle_prealloc(BlockDriverState *bs,
-+static bool coroutine_fn handle_prealloc(BlockDriverState *bs,
-                                          const QCowL2Meta *m)
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t start = m->alloc_offset;
-     uint64_t end = start + m->nb_clusters * s->cluster_size;
-+    int ret;
-     int64_t flen = bdrv_getlength(bs->file->bs);
- 
-     if (flen < 0) {
--        return;
-+        return false;
-     }
- 
-     if (end > flen) {
-         /* try to alloc host space in one chunk for better locality */
--        bdrv_co_pwrite_zeroes(bs->file, flen,
--                              QEMU_ALIGN_UP(end + s->prealloc_size - flen,
--                                            s->cluster_size),
--                              BDRV_REQ_ALLOCATE);
-+        ret = bdrv_co_pwrite_zeroes(bs->file, flen,
-+                                    QEMU_ALIGN_UP(end + s->prealloc_size - flen,
-+                                                  s->cluster_size),
-+                                    BDRV_REQ_ALLOCATE);
-+        if (ret < 0) {
-+            return false;
-+        }
-     }
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    /* We're safe to assume that the area is zeroes if the area
-+     * was allocated at the end of data (s->data_end).
-+     * In this case, the only way for file length to be bigger is that
-+     * the area was preallocated by this or another request.
-+     */
-+    return m->clusters_are_trailing;
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++function do_io()
++{
++    $QEMU_IO "$@" | _filter_qemu_io |\
++        sed -e 's/bytes at offset [0-9]*/bytes at offset XXX/g'
 +}
 +
-+static bool check_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
++CLUSTER_SIZE=64k
++size=128M
++
++_make_test_img 1G
++
++echo
++echo "== Test discarded cluster reuse =="
++
++# allocate first two clusters
++do_io -c "writev -P 1 0x8000 0x10000" "$TEST_IMG"
++len=$(stat -c "%s" $TEST_IMG)
++
++# discard the 1st cluster on qcow2 level only
++do_io -c "open -o pass-discard-request=off $TEST_IMG" -c "discard 0 0x10000"
++
++# new write will reuse the dirty host cluster and has to overwrite that
++#  with zeroes
++do_io -c "writev -P 2 0x24000 0x8000" "$TEST_IMG"
++if [ $len -ne $(stat -c "%s" $TEST_IMG) ] ; then
++    >&2 echo "Failed to reuse cluster"
++    exit 1
++fi
++
++echo
++echo "== Test preallocation =="
++
++function io_commands()
 +{
-+    if (bs->encrypted) {
-+        return false;
-+    }
++    echo "open -o prealloc-size=$((1024*1024)) blkdebug::$TEST_IMG"
 +
-+    if (m->cow_start.nb_bytes != 0 &&
-+        !is_zero(bs, m->offset + m->cow_start.offset, m->cow_start.nb_bytes))
-+    {
-+        return false;
-+    }
++    # Verify that intersections of a running preallocation and new requests
++    #  is handled properly.
++    #
++    # 1. send a write #1 which triggers preallocation, suspend it in action
++    # 2. send a write #2 which intersects with the area being preallocated
++    # 3. using break/wait_break/resume, wait until write #2 is at least
++    #    at WRITE_AIO tracepoint.
++    #    Then it is supposed to enter pwrite(bs->child) and start waiting
++    #    for #1 to finish
++    # 4. resume #1
 +
-+    if (m->cow_end.nb_bytes != 0 &&
-+        !is_zero(bs, m->offset + m->cow_end.offset, m->cow_end.nb_bytes))
-+    {
-+        return false;
-+    }
++cat <<EOF
++break pwritev_zero A
++aio_write -P 3 0x30000 0x1000
++wait_break A
 +
-+    return true;
- }
- 
- static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-@@ -1999,8 +2039,12 @@ static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-     QCowL2Meta *m;
- 
-     for (m = l2meta; m != NULL; m = m->next) {
--        if (s->prealloc_size) {
--            handle_prealloc(bs, m);
-+        if (s->prealloc_size && handle_prealloc(bs, m)) {
-+            if (check_zero_cow(bs, m)) {
-+                trace_qcow2_skip_cow(qemu_coroutine_self(), m->offset,
-+                                     m->nb_clusters);
-+                m->zero_cow = true;
-+            }
-         }
-     }
- }
-diff --git a/block/trace-events b/block/trace-events
-index 13a5a87..faf1811 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -61,6 +61,7 @@ qcow2_writev_done_part(void *co, int cur_bytes) "co %p cur_bytes %d"
- qcow2_writev_data(void *co, uint64_t offset) "co %p offset %" PRIx64
- qcow2_pwrite_zeroes_start_req(void *co, int64_t offset, int count) "co %p offset %" PRIx64 " count %d"
- qcow2_pwrite_zeroes(void *co, int64_t offset, int count) "co %p offset %" PRIx64 " count %d"
-+qcow2_skip_cow(void* co, uint64_t offset, int nb_clusters) "co %p offset %" PRIx64 " nb_clusters %d"
- 
- # block/qcow2-cluster.c
- qcow2_alloc_clusters_offset(void *co, uint64_t offset, int bytes) "co %p offset %" PRIx64 " bytes %d"
++break write_aio B
++aio_write -P 4 0x40000 0x1000
++wait_break B
++resume B
++
++resume A
++aio_flush
++EOF
++
++    # Verify that new cluster in the preallocated area triggers
++    #  neither new preallocation nor COW read
++    #
++    # TODO: this test will not fail but hang. Better ideas?
++    #       wait and kill by timeout?
++
++cat <<EOF
++break pwritev_zero A
++break cow_read B
++writev -P 5 0x51000 0x1000
++EOF
++}
++
++io_commands | do_io
++
++echo
++echo "== Verify image content =="
++
++function verify_io()
++{
++cat <<EOF
++read -P 0 0 0x10000
++read -P 1 0x10000 0x8000
++read -P 0 0x18000 0xc000
++read -P 2 0x24000 0x8000
++read -P 0 0x2c000 0x4000
++
++read -P 3 0x30000 0x1000
++read -P 0 0x31000 0xf000
++read -P 4 0x40000 0x1000
++read -P 0 0x41000 0xf000
++
++read -P 0 0x50000 0x1000
++read -P 5 0x51000 0x1000
++read -P 0 0x52000 0xe000
++EOF
++}
++
++verify_io | do_io $TEST_IMG
++
++_check_test_img
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/190.out b/tests/qemu-iotests/190.out
+new file mode 100644
+index 0000000..46597ab
+--- /dev/null
++++ b/tests/qemu-iotests/190.out
+@@ -0,0 +1,50 @@
++QA output created by 190
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++
++== Test discarded cluster reuse ==
++wrote 65536/65536 bytes at offset XXX
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 65536/65536 bytes at offset XXX
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 32768/32768 bytes at offset XXX
++32 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== Test preallocation ==
++blkdebug: Suspended request 'A'
++blkdebug: Suspended request 'B'
++blkdebug: Resuming request 'B'
++blkdebug: Resuming request 'A'
++wrote 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== Verify image content ==
++read 65536/65536 bytes at offset XXX
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 32768/32768 bytes at offset XXX
++32 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 49152/49152 bytes at offset XXX
++48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 32768/32768 bytes at offset XXX
++32 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 16384/16384 bytes at offset XXX
++16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 61440/61440 bytes at offset XXX
++60 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 61440/61440 bytes at offset XXX
++60 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 4096/4096 bytes at offset XXX
++4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 57344/57344 bytes at offset XXX
++56 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++No errors were found on the image.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 2aba585..876b23f 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -183,3 +183,4 @@
+ 185 rw auto
+ 188 rw auto quick
+ 189 rw auto quick
++190 rw auto
 -- 
 2.7.4
