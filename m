@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcYRb-0000B7-Ay
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dcYRc-0000CN-HK
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcYRa-0005Nl-BU
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dcYRb-0005PA-Lx
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:46:48 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  1 Aug 2017 16:46:17 +0200
-Message-Id: <20170801144632.3831-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 00/15] Block layer patches for 2.10.0-rc1
+Date: Tue,  1 Aug 2017 16:46:20 +0200
+Message-Id: <20170801144632.3831-4-kwolf@redhat.com>
+In-Reply-To: <20170801144632.3831-1-kwolf@redhat.com>
+References: <20170801144632.3831-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 03/15] iotests: Redirect stderr to stdout in 186
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,70 +22,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-The following changes since commit 5619c179057e24195ff19c8fe6d6a6cbcb16ed28:
+From: Max Reitz <mreitz@redhat.com>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170731' into staging (2017-07-31 14:45:42 +0100)
+Without redirecting qemu's stderr to stdout, _filter_qemu will not apply
+to warnings.  This results in $QEMU_PROG not being replaced by QEMU_PROG
+which is not great if your qemu executable is not called
+qemu-system-x86_64 (e.g. qemu-system-i386).
 
-are available in the git repository at:
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/186     |  2 +-
+ tests/qemu-iotests/186.out | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 9ae03670701fea9124f4f1a6d4b6d1badbf9e485:
-
-  block/qapi: Remove redundant NULL check to silence Coverity (2017-08-01 15:26:04 +0200)
-
-----------------------------------------------------------------
-Block layer patches for 2.10.0-rc1
-
-----------------------------------------------------------------
-Eric Blake (2):
-      iotests: Check dirty bitmap statistics in 124
-      iotests: Add test of recent fix to 'qemu-img measure'
-
-Kevin Wolf (8):
-      qemu-iotests/041: Fix leaked scratch images
-      qemu-iotests: Remove blkdebug.conf after tests
-      qemu-iotests/141: Fix image cleanup
-      qemu-iotests/153: Fix leaked scratch images
-      qemu-iotests/162: Fix leaked temporary files
-      qemu-iotests/063: Fix leaked image
-      qemu-iotests/059: Fix leaked image files
-      block/qapi: Remove redundant NULL check to silence Coverity
-
-Manos Pitsidianakis (2):
-      block: fix dangling bs->explicit_options in block.c
-      block: fix leaks in bdrv_open_driver()
-
-Max Reitz (2):
-      iotests: Fix test 156
-      iotests: Redirect stderr to stdout in 186
-
-Stefan Hajnoczi (1):
-      docs: add qemu-block-drivers(7) man page
-
- block.c                      |  24 +-
- block/qapi.c                 |   3 +-
- Makefile                     |  23 +-
- docs/qemu-block-drivers.texi | 799 +++++++++++++++++++++++++++++++++++++++++++
- qemu-doc.texi                | 780 +-----------------------------------------
- tests/qemu-iotests/041       |   4 +-
- tests/qemu-iotests/059       |  11 +-
- tests/qemu-iotests/059.out   |  22 +-
- tests/qemu-iotests/063       |   4 +-
- tests/qemu-iotests/074       |   1 +
- tests/qemu-iotests/124       |   7 +-
- tests/qemu-iotests/141       |   2 +-
- tests/qemu-iotests/153       |   1 +
- tests/qemu-iotests/156       |   4 +-
- tests/qemu-iotests/162       |   7 +
- tests/qemu-iotests/179       |   1 +
- tests/qemu-iotests/186       |   2 +-
- tests/qemu-iotests/186.out   |  12 +-
- tests/qemu-iotests/190       |  59 ++++
- tests/qemu-iotests/190.out   |  11 +
- tests/qemu-iotests/common.rc |   3 +
- tests/qemu-iotests/group     |   1 +
- 22 files changed, 958 insertions(+), 823 deletions(-)
- create mode 100644 docs/qemu-block-drivers.texi
- create mode 100755 tests/qemu-iotests/190
- create mode 100644 tests/qemu-iotests/190.out
+diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
+index ab83ee402a..2b9f618f90 100755
+--- a/tests/qemu-iotests/186
++++ b/tests/qemu-iotests/186
+@@ -56,7 +56,7 @@ function do_run_qemu()
+             done
+         fi
+         echo quit
+-    ) | $QEMU -S -nodefaults -display none -device virtio-scsi-pci -monitor stdio "$@"
++    ) | $QEMU -S -nodefaults -display none -device virtio-scsi-pci -monitor stdio "$@" 2>&1
+     echo
+ }
+ 
+diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+index b8bf9a2550..c8377fe146 100644
+--- a/tests/qemu-iotests/186.out
++++ b/tests/qemu-iotests/186.out
+@@ -442,28 +442,28 @@ ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+     Cache mode:       writeback
+ (qemu) quit
+ 
+-qemu-system-x86_64: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
+ Testing: -drive if=scsi,driver=null-co
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) info block
++(qemu) QEMU_PROG: -drive if=scsi,driver=null-co: warning: bus=0,unit=0 is deprecated with this machine type
++info block
+ scsi0-hd0 (NODE_NAME): null-co:// (null-co)
+     Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+     Cache mode:       writeback
+ (qemu) quit
+ 
+-qemu-system-x86_64: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+ Testing: -drive if=scsi,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) info block
++(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
++info block
+ scsi0-cd0: [not inserted]
+     Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+     Removable device: not locked, tray closed
+ (qemu) quit
+ 
+-qemu-system-x86_64: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
+ Testing: -drive if=scsi,driver=null-co,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) info block
++(qemu) QEMU_PROG: -drive if=scsi,driver=null-co,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
++info block
+ scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
+     Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
+     Removable device: not locked, tray closed
+-- 
+2.13.3
