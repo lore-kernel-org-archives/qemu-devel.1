@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dcSLD-0005nr-VJ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:15:49 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dcSZU-0000zH-5m
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dcSLA-0003F1-P0
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:15:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50974)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dcSLA-0003EK-HR
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:15:44 -0400
-Date: Tue, 1 Aug 2017 10:15:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170801101535.16f4d486@gondolin>
-In-Reply-To: <20170728141309.14275-2-marcandre.lureau@redhat.com>
-References: <20170728141309.14275-1-marcandre.lureau@redhat.com>
-	<20170728141309.14275-2-marcandre.lureau@redhat.com>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dcSZP-000848-Mk
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:30:32 -0400
+Date: Tue, 1 Aug 2017 10:30:24 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170801083024.GZ4859@toto>
+References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
+	<20170525011034-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061619F6FDC53F7FD4C1DAE4FFF10@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170706023845-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB0616507B6F0989360D582F37FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170731170217-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061656F255D688500AC8622BFFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170801045857-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] build-sys: add --disable-vhost-user
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170801045857-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/2] Add global device ID in
+ virt machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, philippe.mathieu.daude@gmail.com, mst@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Diana Madalina Craciun <diana.craciun@nxp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "eric.auger@redhat.com" <eric.auger@redhat.com>, Mike Caraman <mike.caraman@nxp.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "marcel@redhat.com" <marcel@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Laurentiu Tudor <laurentiu.tudor@nxp.com>
 
-On Fri, 28 Jul 2017 16:13:08 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On Tue, Aug 01, 2017 at 05:05:42AM +0300, Michael S. Tsirkin wrote:
+> On Mon, Jul 31, 2017 at 03:13:09PM +0000, Diana Madalina Craciun wrote:
+> > On 07/31/2017 05:06 PM, Michael S. Tsirkin wrote:
+> > > On Mon, Jul 31, 2017 at 01:22:45PM +0000, Diana Madalina Craciun wrote:
+> > >>>> If we are to use a value of 0 for the constant in case of PCI devices,
+> > >>>> what happens if we have multiple PCI controllers?
+> > >>> I guess we'd use the PCI Segment number for that?
+> > >>>
+> > >>>
+> > >> Yes, we can use the PCI segment for this scenario. But this would mean
+> > >> different solutions for the same problem. The main problem is that we
+> > >> can have multiple entities in the system that are using MSIs (for now
+> > >> PCI and NXP non-PCI bus infrastructure
+> > >> (https://emea01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flwn.net%2FArticles%2F635905%2F&data=01%7C01%7Cdiana.craciun%40nxp.com%7C6b0c6c879af64718a21908d4d81d534e%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0&sdata=bpYMMqajWzgzdbdQgy%2FUYR7y%2BswyvwE%2BqFzs7wdIkkA%3D&reserved=0). I guess that we may have other
+> > >> platform devices that are using MSIs in the future.
+> > >>
+> > >> Thanks,
+> > >> Diana
+> > >>
+> > >>
+> > > Don't have the time to explore NXP in depth, sorry - there's
+> > > a lot of complexity there.
+> > > Could you maybe stick some bits to specify bus type in there?
+> > > It just looks very wrong to push low level things like this
+> > > that users have no interest in up the stack.
+> > >
+> > Let's generalize the problem a little bit, the NXP details just does not
+> > matter much. The problem we have is the following:
+> > 
+> > The GIC-ITS, the ARM MSI controller is using deviceIDs in order to remap
+> > the interrupts. Each device which is expected to send MSIs has a
+> > deviceID associated with it. These deviceIDs are configured into devices
+> > by software/firmware. There is support in the device tree to specify the
+> > correlation between requesterID and deviceID:
+> > 
+> > "msi-map: Maps a Requester ID to an MSI controller and associated
+> >   msi-specifier data. The property is an arbitrary number of tuples of
+> >   (rid-base,msi-controller,msi-base,length)"
+> > (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/pci/pci-msi.txt)
+> > 
+> > Our problem is that we have to allocate these deviceIDs in QEMU as well
+> > and we have to ensure that they are unique. Currently, for PCI, the
+> > assumption requesterID=deviceID is made which will no longer be true in
+> > case other devices are added. So we need a way (preferable a general
+> > one) to allocate these IDs to different devices in the system in a
+> > consistent way which will ensure that two devices do not share the same ID.
+> 
+> My question would be, do other types of devices that are there
+> right now have some kind of ID like the requester ID?
+> If so I would say just use that, and set high bits in the device ID
+> to specify the type (e.g. 00 for pci, etc).
+> 
+> 
+> IMHO if possible that is preferable to pushing this up to users.
+> 
+> 
+> > The reason I put this ID into the controller itself is because on real
+> > hardware is actually programmed into the controller. It is needed (for
+> > example) when the MSIs are sent.
+> > 
+> > Thanks,
+> > 
+> > Diana
+> > 
+> 
+> IIUC what happens on real hardware is controller maps each requester ID
+> (or presumably other source ID in the request) to the device ID,
+> and the mapping is internal to controller.
+> If you wanted a lot of flexibility then looks like you could pass this
+> mapping to controllers, but is it really necessary?
+> Why don't we build a mapping that's convenient for us?
+> 
 
-> Learn to compile out vhost-user. Keep it enabled by default on
-> non-win32, that is assumed to be POSIX. Fail if trying to enable it on
-> win32.
->=20
-> When trying to make a vhost-user netdev, it gives the following error:
->=20
-> -netdev vhost-user,id=3Dfoo,chardev=3Dchr-test: Parameter 'type' expects =
-a netdev backend type
->=20
-> And similar error with the HMP/QMP monitors.
->=20
-> While at it, rename CONFIG_VHOST_NET_TEST CONFIG_VHOST_USER_NET_TEST
-> since it's a vhost-user specific variable.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/virtio/virtio-pci.c            |  4 ++--
->  configure                         | 29 +++++++++++++++++++++++++++--
->  default-configs/pci.mak           |  2 +-
->  default-configs/s390x-softmmu.mak |  2 +-
->  tests/Makefile.include            |  6 +++---
->  5 files changed, 34 insertions(+), 9 deletions(-)
->=20
-(...)
-> diff --git a/configure b/configure
-> index 987f59ba88..efec1a613e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -306,6 +306,7 @@ tcg=3D"yes"
->  vhost_net=3D"no"
->  vhost_scsi=3D"no"
->  vhost_vsock=3D"no"
-> +vhost_user=3D""
->  kvm=3D"no"
->  hax=3D"no"
->  rdma=3D""
-> @@ -1282,6 +1283,15 @@ for opt do
->    ;;
->    --enable-vxhs) vxhs=3D"yes"
->    ;;
-> +  --disable-vhost-user) vhost_user=3D"no"
-> +  ;;
-> +  --enable-vhost-user)
-> +      vhost_user=3D"yes"
-> +      if test "$mingw32" =3D "yes" ; then
-> +          echo "ERROR: vhost-user isn't available on win32"
-> +          exit 1
+Hi,
 
-error_exit?
+I agree with you for boards that are defined by QEMU (like the ARM virt board).
+We can pick a convenient scheme and avoid too much user interaction.
 
-> +      fi
-> +  ;;
->    *)
->        echo "ERROR: unknown option $opt"
->        echo "Try '$0 --help' for more information"
-(...)
+But when we model real SoCs, the IDs and the way bridges convert these IDs
+needs to match real HW. Otherwise guest SW will not work unmodified.
+To make this work, users should not need to be involved though, it's
+the machine and SoC modules that should instantiate the necessary handling
+of it, IMO.
 
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-so=
-ftmmu.mak
-> index b227a36179..51191b77df 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -1,6 +1,6 @@
->  CONFIG_PCI=3Dy
->  CONFIG_VIRTIO_PCI=3Dy
-> -CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
-> +CONFIG_VHOST_USER_SCSI=3D$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
-
-Huh. I wonder if anyone actually tried this on s390x?
-
-(The change is fine in the context of this patch, of course.)
-
->  CONFIG_VIRTIO=3Dy
->  CONFIG_SCLPCONSOLE=3Dy
->  CONFIG_TERMINAL3270=3Dy
+Cheers,
+Edgar
