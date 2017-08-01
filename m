@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dcXYx-0005hq-Vc
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:50:24 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dcXZ1-0005lo-Uv
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:50:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dcXYw-0005JQ-Vw
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:50:20 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dcXYx-0005Je-6S
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:50:24 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Tue,  1 Aug 2017 16:49:06 +0300
-Message-Id: <20170801134907.31253-3-el13635@mail.ntua.gr>
+Date: Tue,  1 Aug 2017 16:49:05 +0300
+Message-Id: <20170801134907.31253-2-el13635@mail.ntua.gr>
 In-Reply-To: <20170801134907.31253-1-el13635@mail.ntua.gr>
 References: <20170801134907.31253-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH 2/3] block: skip implicit nodes in snapshots,
- blockjobs
+Subject: [Qemu-devel] [PATCH 1/3] block: add options parameter to
+ bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +23,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
 
-Implicit filter nodes added at the top of nodes can interfere with block
-jobs. This is not a problem when they are added by other jobs since
-adding another job will issue a QERR_DEVICE_IN_USE, but it can happen in
-the next commit which introduces an implicitly created throttle filter
-node below BlockBackend, which we want to be skipped during automatic
-operations on the graph since the user does not necessarily know about
-their existence.
+Allow passing a QDict *options parameter to bdrv_new_open_driver() so
+that it can be used if a driver needs it upon creation. The previous
+behaviour (empty bs->options and bs->explicit_options) remains when
+options is NULL.
 
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- block.c                   | 17 +++++++++++++++++
- blockdev.c                | 12 ++++++++++++
- include/block/block_int.h |  2 ++
- 3 files changed, 31 insertions(+)
+ block.c               | 16 +++++++++++++---
+ block/commit.c        |  4 ++--
+ block/mirror.c        |  2 +-
+ block/vvfat.c         |  2 +-
+ include/block/block.h |  2 +-
+ 5 files changed, 18 insertions(+), 8 deletions(-)
 
 diff --git a/block.c b/block.c
-index 886a457ab0..9ebdba28b0 100644
+index 37e72b7a96..886a457ab0 100644
 --- a/block.c
 +++ b/block.c
-@@ -4947,3 +4947,20 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
- 
-     return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
+@@ -1149,16 +1149,26 @@ free_and_fail:
+     return ret;
  }
-+
-+/* Get first non-implicit node down a bs chain. */
-+BlockDriverState *bdrv_get_first_non_implicit(BlockDriverState *bs)
-+{
-+    if (!bs) {
-+        return NULL;
+ 
++/*
++ * If options is not NULL it is cloned (which adds another reference to the
++ * option entries). If the call to bdrv_new_open_driver() is successful, the
++ * caller should unref options to pass ownership.
++ * */
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+-                                       int flags, Error **errp)
++                                       int flags, QDict *options, Error **errp)
+ {
+     BlockDriverState *bs;
+     int ret;
+ 
+     bs = bdrv_new();
+     bs->open_flags = flags;
+-    bs->explicit_options = qdict_new();
+-    bs->options = qdict_new();
++    if (options) {
++        bs->explicit_options = qdict_clone_shallow(options);
++        bs->options = qdict_clone_shallow(options);
++    } else {
++        bs->explicit_options = qdict_new();
++        bs->options = qdict_new();
 +    }
-+
-+    if (!bs->implicit) {
-+        return bs;
-+    }
-+
-+    /* at this point bs is implicit and must have a child */
-+    assert(bs->file);
-+
-+    return bdrv_get_first_non_implicit(bs->file->bs);
-+}
-diff --git a/blockdev.c b/blockdev.c
-index 23475abb72..d903a23786 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1664,6 +1664,9 @@ static void external_snapshot_prepare(BlkActionState *common,
+     bs->opaque = NULL;
+ 
+     update_options_from_flags(bs->options, flags);
+diff --git a/block/commit.c b/block/commit.c
+index c7857c3321..539e23c3f8 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -342,7 +342,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     /* Insert commit_top block node above top, so we can block consistent read
+      * on the backing chain below it */
+     commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, filter_node_name, 0,
+-                                         errp);
++                                         NULL, errp);
+     if (commit_top_bs == NULL) {
+         goto fail;
+     }
+@@ -494,7 +494,7 @@ int bdrv_commit(BlockDriverState *bs)
+     backing_file_bs = backing_bs(bs);
+ 
+     commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
+-                                         &local_err);
++                                         NULL, &local_err);
+     if (commit_top_bs == NULL) {
+         error_report_err(local_err);
+         goto ro_cleanup;
+diff --git a/block/mirror.c b/block/mirror.c
+index c9a6a3ca86..e1a160e6ea 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1164,7 +1164,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+      * reads on the top, while disabling it in the intermediate nodes, and make
+      * the backing chain writable. */
+     mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, filter_node_name,
+-                                         BDRV_O_RDWR, errp);
++                                         BDRV_O_RDWR, NULL, errp);
+     if (mirror_top_bs == NULL) {
          return;
      }
+diff --git a/block/vvfat.c b/block/vvfat.c
+index a9e207f7f0..6c59473baf 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3194,7 +3194,7 @@ static int enable_write_target(BlockDriverState *bs, Error **errp)
+ #endif
  
-+    /* Skip implicit filter nodes */
-+    state->old_bs = bdrv_get_first_non_implicit(state->old_bs);
-+
-     /* Acquire AioContext now so any threads operating on old_bs stop */
-     state->aio_context = bdrv_get_aio_context(state->old_bs);
-     aio_context_acquire(state->aio_context);
-@@ -3095,6 +3098,9 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         return;
-     }
+     backing = bdrv_new_open_driver(&vvfat_write_target, NULL, BDRV_O_ALLOW_RDWR,
+-                                   &error_abort);
++                                   NULL, &error_abort);
+     *(void**) backing->opaque = s;
  
-+    /* Skip implicit filter nodes */
-+    bs = bdrv_get_first_non_implicit(bs);
-+
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
- 
-@@ -3209,6 +3215,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-         return NULL;
-     }
- 
-+    /* Skip implicit filter nodes */
-+    bs = bdrv_get_first_non_implicit(bs);
-+
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
- 
-@@ -3484,6 +3493,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-         return;
-     }
- 
-+    /* Skip implicit filter nodes */
-+    bs = bdrv_get_first_non_implicit(bs);
-+
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d4f4ea7584..9eeae490f0 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -981,4 +981,6 @@ void bdrv_dec_in_flight(BlockDriverState *bs);
- 
- void blockdev_close_all_bdrv_states(void);
- 
-+BlockDriverState *bdrv_get_first_non_implicit(BlockDriverState *bs);
-+
- #endif /* BLOCK_INT_H */
+     bdrv_set_backing_hd(s->bs, backing, &error_abort);
+diff --git a/include/block/block.h b/include/block/block.h
+index 34770bb33a..020289a37d 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -263,7 +263,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+                             QDict *options, int flags, Error **errp);
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+-                                       int flags, Error **errp);
++                                       int flags, QDict *options, Error **errp);
+ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+                                     BlockDriverState *bs,
+                                     QDict *options, int flags);
 -- 
 2.11.0
