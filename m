@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dcZoJ-0002WD-LQ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:14:23 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dcZpQ-0003Bb-Ky
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dcZoF-0004rI-03
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:14:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56722)
+	(envelope-from <mlureau@redhat.com>) id 1dcZpM-0005kh-IQ
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:15:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dcZoE-0004pD-PY
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:14:14 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 553A133841B
-	for <qemu-devel@nongnu.org>; Tue,  1 Aug 2017 16:04:36 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  1 Aug 2017 17:04:18 +0100
-Message-Id: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dcZpM-0005jt-9I
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:15:24 -0400
+Date: Tue, 1 Aug 2017 12:15:16 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <19589902.63892974.1501604116921.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170801190003-mutt-send-email-mst@kernel.org>
+References: <20170728141309.14275-1-marcandre.lureau@redhat.com>
+	<20170728141309.14275-3-marcandre.lureau@redhat.com>
+	<20170801190003-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration: fix small leaks
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] build-sys: do not compile
+ net/vhost-user.c if vhost-user is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, philippe mathieu daude <philippe.mathieu.daude@gmail.com>, Jason Wang <jasowang@redhat.com>
 
-Spotted thanks to valgrind and tests/device-introspect-test:
+Hi
 
-=3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss record =
-6 of 14,537
-=3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
-=3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
-=3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
-=3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.c:22=
-26)
-=3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344)
-=3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object.c:3=
-75)
-=3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
-=3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
-=3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:542)
-=3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties (qmp=
--marshal.c:1425)
-=3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104)
-=3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
+----- Original Message -----
+> On Fri, Jul 28, 2017 at 04:13:09PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > This adds two extra #ifdef that have fairly limited conflict potential.
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> OK but why can't we keep all ifdefs in net/ where all the
+> rest of the features are ifdef'ed?
+>=20
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- migration/migration.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+We would need fallback code for vhost_user_get_* functions (see below).
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 085c32c994..c3fe0ed9ca 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2214,6 +2214,15 @@ static void migration_class_init(ObjectClass *klas=
-s, void *data)
-     dc->props =3D migration_properties;
- }
-=20
-+static void migration_instance_finalize(Object *obj)
-+{
-+    MigrationState *ms =3D MIGRATION_OBJ(obj);
-+    MigrationParameters *params =3D &ms->parameters;
-+
-+    g_free(params->tls_hostname);
-+    g_free(params->tls_creds);
-+}
-+
- static void migration_instance_init(Object *obj)
- {
-     MigrationState *ms =3D MIGRATION_OBJ(obj);
-@@ -2282,6 +2291,7 @@ static const TypeInfo migration_type =3D {
-     .class_size =3D sizeof(MigrationClass),
-     .instance_size =3D sizeof(MigrationState),
-     .instance_init =3D migration_instance_init,
-+    .instance_finalize =3D migration_instance_finalize,
- };
-=20
- static void register_migration_types(void)
---=20
-2.14.0.rc0.1.g40ca67566
+> My concern is no one is going to test this weird configuration
+> so we might accidentally re-enable it without noticing.
+> net/net.c is where all command line play happens so
+> people know a bunch of configs need to be tested when
+> changing it.
+
+I am not sure I understand your argument there. You are afraid we 'accident=
+aly re-enable' vhost-user... and forget to remove those #ifdef?
+
+I can imagine people don't like having code clutter with #ifdef, but I thin=
+k when it doesn't change much the logic (as in here with clean per-case swi=
+tch/if), it is fine, ymmv.
+
+>=20
+>=20
+> > ---
+> >  hw/net/vhost_net.c | 4 ++++
+> >  net/Makefile.objs  | 2 +-
+> >  2 files changed, 5 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> > index e037db63a3..96c4da49e4 100644
+> > --- a/hw/net/vhost_net.c
+> > +++ b/hw/net/vhost_net.c
+> > @@ -193,6 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions
+> > *options)
+> >          }
+> >      }
+> > =20
+> > +#ifdef CONFIG_VHOST_USER
+> >      /* Set sane init value. Override when guest acks. */
+> >      if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
+> >          features =3D vhost_user_get_acked_features(net->nc);
+> > @@ -203,6 +204,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions
+> > *options)
+> >              goto fail;
+> >          }
+> >      }
+> > +#endif
+> > =20
+> >      vhost_net_ack_features(net, features);
+> > =20
+> > @@ -414,10 +416,12 @@ VHostNetState *get_vhost_net(NetClientState *nc)
+> >      case NET_CLIENT_DRIVER_TAP:
+> >          vhost_net =3D tap_get_vhost_net(nc);
+> >          break;
+> > +#ifdef CONFIG_VHOST_USER
+> >      case NET_CLIENT_DRIVER_VHOST_USER:
+> >          vhost_net =3D vhost_user_get_vhost_net(nc);
+> >          assert(vhost_net);
+> >          break;
+> > +#endif
+> >      default:
+> >          break;
+> >      }
+> > diff --git a/net/Makefile.objs b/net/Makefile.objs
+> > index 67ba5e26fb..7cac7ed1e4 100644
+> > --- a/net/Makefile.objs
+> > +++ b/net/Makefile.objs
+> > @@ -3,7 +3,7 @@ common-obj-y +=3D socket.o
+> >  common-obj-y +=3D dump.o
+> >  common-obj-y +=3D eth.o
+> >  common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
+> > -common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
+> > +common-obj-$(CONFIG_VHOST_USER) +=3D vhost-user.o
+
+So we could have something like:
+
++common-obj-$(not CONFIG_VHOST_USER) +=3D vhost-user-stubs.o
+
+?
+
+> >  common-obj-$(CONFIG_SLIRP) +=3D slirp.o
+> >  common-obj-$(CONFIG_VDE) +=3D vde.o
+> >  common-obj-$(CONFIG_NETMAP) +=3D netmap.o
+> > --
+> > 2.14.0.rc0.1.g40ca67566
+>=20
