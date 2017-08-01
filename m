@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcTgO-0004e8-Ug
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:41:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcTlu-0007k1-6i
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcTgO-0008P3-4s
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:41:44 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36976)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcTgN-0008OW-TD
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:41:44 -0400
-Received: by mail-wr0-x231.google.com with SMTP id 33so4416625wrz.4
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 02:41:43 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dcTlr-0002lj-J6
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcTlr-0002lX-7v
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 05:47:23 -0400
+Date: Tue, 1 Aug 2017 10:47:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170801094715.GE2079@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-13-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
-References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
-	<1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
-	<CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
-	<086e70d6-d5c1-2879-874f-ea1804c6ab38@adacore.com>
-	<20170801093015.GA4859@toto>
-	<48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Aug 2017 10:41:22 +0100
-Message-ID: <CAFEAcA_eWCEmXBGNJXAfUjgXwYX10FwxRwd_YNcdtMYXNLAROg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
- blocker when using mmio_execution
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501229198-30588-13-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 12/29] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +28,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 1 August 2017 at 10:35, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
->
->
-> On 08/01/2017 11:30 AM, Edgar E. Iglesias wrote:
->> At this stage, perhaps we should just register the blocker when this dev
->> realizes.
->>
->> If a request_ptr comes in during migration, the VM will fail either way...
+* Peter Xu (peterx@redhat.com) wrote:
+> When there is IO error on the incoming channel (e.g., network down),
+> instead of bailing out immediately, we allow the dst vm to switch to the
+> new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+> new semaphore, until someone poke it for another attempt.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c  |  1 +
+>  migration/migration.h  |  3 +++
+>  migration/savevm.c     | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  migration/trace-events |  2 ++
+>  4 files changed, 51 insertions(+)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 0bc70c8..c729c5a 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+>          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+>          qemu_mutex_init(&mis_current.rp_mutex);
+>          qemu_event_init(&mis_current.main_thread_load_event, false);
+> +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+>          once = true;
+>      }
+>      return &mis_current;
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 24cdaf6..08b90e8 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -60,6 +60,9 @@ struct MigrationIncomingState {
+>      /* The coroutine we should enter (back) after failover */
+>      Coroutine *migration_incoming_co;
+>      QemuSemaphore colo_incoming_sem;
+> +
+> +    /* notify PAUSED postcopy incoming migrations to try to continue */
+> +    QemuSemaphore postcopy_pause_sem_dst;
+>  };
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 13ae9d6..1f62268 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1954,11 +1954,41 @@ void qemu_loadvm_state_cleanup(void)
+>      }
+>  }
+>  
+> +/* Return true if we should continue the migration, or false. */
+> +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> +{
+> +    trace_postcopy_pause_incoming();
+> +
+> +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> +
+> +    assert(mis->from_src_file);
+> +    qemu_file_shutdown(mis->from_src_file);
+> +    qemu_fclose(mis->from_src_file);
+> +    mis->from_src_file = NULL;
+> +
+> +    assert(mis->to_src_file);
+> +    qemu_mutex_lock(&mis->rp_mutex);
+> +    qemu_file_shutdown(mis->to_src_file);
+> +    qemu_fclose(mis->to_src_file);
+> +    mis->to_src_file = NULL;
+> +    qemu_mutex_unlock(&mis->rp_mutex);
 
-> Yes but this will breaks migration for the spips device everytime
-> and not only when mmio-execution is used?
+Hmm is that safe?  If we look at migrate_send_rp_message we have:
 
-This line of thought is why I ended up suggesting just disabling
-the exec-in-place feature -- that way we just don't introduce
-what would be a new-in-2.10 feature, rather than breaking something
-that used to work in 2.9.
+    static void migrate_send_rp_message(MigrationIncomingState *mis,
+                                        enum mig_rp_message_type message_type,
+                                        uint16_t len, void *data)
+    {
+        trace_migrate_send_rp_message((int)message_type, len);
+        qemu_mutex_lock(&mis->rp_mutex);
+        qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
+        qemu_put_be16(mis->to_src_file, len);
+        qemu_put_buffer(mis->to_src_file, data, len);
+        qemu_fflush(mis->to_src_file);
+        qemu_mutex_unlock(&mis->rp_mutex);
+    }
 
-thanks
--- PMM
+If we came into postcopy_pause_incoming at about the same time
+migrate_send_rp_message was being called and pause_incoming took the
+lock first, then once it release the lock, send_rp_message carries on
+and uses mis->to_src_file that's now NULL.
+
+One solution here is to just call qemu_file_shutdown() but leave the
+files open at this point, but clean the files up sometime later.
+
+> +
+> +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
+> +    }
+> +
+> +    trace_postcopy_pause_incoming_continued();
+> +
+> +    return true;
+> +}
+> +
+>  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>  {
+>      uint8_t section_type;
+>      int ret = 0;
+>  
+> +retry:
+>      while (true) {
+>          section_type = qemu_get_byte(f);
+>  
+> @@ -2004,6 +2034,21 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>  out:
+>      if (ret < 0) {
+>          qemu_file_set_error(f, ret);
+> +
+> +        /*
+> +         * Detect whether it is:
+> +         *
+> +         * 1. postcopy running
+> +         * 2. network failure (-EIO)
+> +         *
+> +         * If so, we try to wait for a recovery.
+> +         */
+> +        if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
+> +            ret == -EIO && postcopy_pause_incoming(mis)) {
+> +            /* Reset f to point to the newly created channel */
+> +            f = mis->from_src_file;
+> +            goto retry;
+> +        }
+
+I wonder if:
+
+           if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
+               ret == -EIO && postcopy_pause_incoming(mis)) {
+               /* Try again after postcopy recovery */
+               return qemu_loadvm_state_main(mis->from_src_file, mis);
+           }
+would be nicer; it avoids the goto loop.
+
+Dave
+
+>      }
+>      return ret;
+>  }
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 2211acc..22a629e 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -99,6 +99,8 @@ open_return_path_on_source(void) ""
+>  open_return_path_on_source_continue(void) ""
+>  postcopy_start(void) ""
+>  postcopy_pause_continued(void) ""
+> +postcopy_pause_incoming(void) ""
+> +postcopy_pause_incoming_continued(void) ""
+>  postcopy_start_set_run(void) ""
+>  source_return_path_thread_bad_end(void) ""
+>  source_return_path_thread_end(void) ""
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
