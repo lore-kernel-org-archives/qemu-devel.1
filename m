@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@intel.com>) id 1dcROd-0001Po-4o
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 03:15:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dcRST-0002kF-I2
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 03:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@intel.com>) id 1dcROZ-0002xx-5M
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 03:15:15 -0400
-From: "Hu, Robert" <robert.hu@intel.com>
-Date: Tue, 1 Aug 2017 07:15:01 +0000
-Message-ID: <9E79D1C9A97CFD4097BCE431828FDD311571D704@SHSMSX103.ccr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <cohuck@redhat.com>) id 1dcRSQ-0007pL-Ba
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 03:19:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40766)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dcRSQ-0007oP-5u
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 03:19:10 -0400
+Date: Tue, 1 Aug 2017 09:19:04 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170801091904.3ae59ad2@gondolin>
+In-Reply-To: <20170801021231.GE12259@bjsdjshi@linux.vnet.ibm.com>
+References: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170727114603.77b801e2@gondolin>
+	<20170728092108.GE15504@bjsdjshi@linux.vnet.ibm.com>
+	<20170728135301.0b510793@gondolin>
+	<20170728155048.GB5874@bjsdjshi@linux.vnet.ibm.com>
+	<20170731105447.70428667@gondolin>
+	<20170801021231.GE12259@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] Does qemu guest agent support 'guest-exec'?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] Channel Path realted CRW generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,16 +32,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, rth@twiddle.net
 
-Hi,
+On Tue, 1 Aug 2017 10:12:31 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-qemu/scripts/qmp/qemu-ga-client seems only support "cat, fsfreeze, fstrim, =
-halt, ifconfig, info, ping, powerdown, reboot, shutdown, suspend".
+> Since I only want to expose the minimum information that the guest needs
+> to work without serious problem. I think I can also deffer these stuff
+> until we have the good chp modelling.
 
-But from qemu/qga/commands.c seems at least Linux guest should already supp=
-ort this. Despite qemu-ga-client, how can I talk to guest-agent in guest to=
- execute some program? any other utils?
-
-Best Regards,
-Robert Hoo
+Yes, that's probably the best way to proceed.
