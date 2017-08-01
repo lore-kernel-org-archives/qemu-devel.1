@@ -1,37 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dcQPj-0008CX-1q
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 02:12:20 -0400
+	(envelope-from <peterx@redhat.com>) id 1dcQfi-0003CH-FD
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 02:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dcQPe-0007sy-1b
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 02:12:19 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:31720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dcQPd-0007sm-Os
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 02:12:13 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OTZ00MWOT89U200@mailout1.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:12:09 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <14d99c86-d096-2244-5ddd-d7d086cf4985@samsung.com>
-Date: Tue, 01 Aug 2017 09:12:06 +0300
-MIME-version: 1.0
-In-reply-to: <20170801060248.GG15697@pxdev.xzpeter.org>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-Content-language: en-GB
+	(envelope-from <peterx@redhat.com>) id 1dcQfe-0001KR-FV
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 02:28:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dcQfe-0001JO-6V
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 02:28:46 -0400
+Date: Tue, 1 Aug 2017 14:28:40 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170801062840.GH15697@pxdev.xzpeter.org>
 References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-2-git-send-email-peterx@redhat.com>
-	<20170731163414.GB2122@work-vm>
-	<CGME20170801021152epcas1p28d9b21ba2ddcddd0c1f3d6f9df4b04f1@epcas1p2.samsung.com>
-	<20170801021137.GA15697@pxdev.xzpeter.org>
-	<11b966a9-529f-eb17-d40d-e32be54bfd87@samsung.com>
-	<20170801060248.GG15697@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 01/29] migration: fix incorrect postcopy
- recved_bitmap
+	<1501229198-30588-12-git-send-email-peterx@redhat.com>
+	<20170731190617.GC3095@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170731190617.GC3095@work-vm>
+Subject: Re: [Qemu-devel] [RFC 11/29] migration: new postcopy-pause state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,60 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 08/01/2017 09:02 AM, Peter Xu wrote:
-> On Tue, Aug 01, 2017 at 08:48:18AM +0300, Alexey Perevalov wrote:
->> On 08/01/2017 05:11 AM, Peter Xu wrote:
->>> On Mon, Jul 31, 2017 at 05:34:14PM +0100, Dr. David Alan Gilbert wrote:
->>>> * Peter Xu (peterx@redhat.com) wrote:
->>>>> The bitmap setup during postcopy is incorrectly when the pgaes are huge
->>>>> pages. Fix it.
->>>>>
->>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
->>>>> ---
->>>>>   migration/postcopy-ram.c | 2 +-
->>>>>   migration/ram.c          | 8 ++++++++
->>>>>   migration/ram.h          | 2 ++
->>>>>   3 files changed, 11 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->>>>> index 276ce12..952b73a 100644
->>>>> --- a/migration/postcopy-ram.c
->>>>> +++ b/migration/postcopy-ram.c
->>>>> @@ -578,7 +578,7 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
->>>>>           ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
->>>>>       }
->>>>>       if (!ret) {
->>>>> -        ramblock_recv_bitmap_set(host_addr, rb);
->>>>> +        ramblock_recv_bitmap_set_range(rb, host_addr, pagesize / getpagesize());
->>>> isn't that   pagesize / qemu_target_page_size() ?
->>>>
->>>> Other than that it looks OK.
->>> Yes, I should have fixed this before.
->>>
->>> I guess Alexey will handle this change (along with the copied bitmap
->>> series)?  Anyway, I'll fix it as well in my series, until Alexey post
->>> the new version that I can rebase to.  Thanks,
->>>
->> I'll squash it, and I'll resend it today.
->> Are you agree to add
->>
->> Signed-off-by: Peter Xu <peterx@redhat.com>
->>
->> to my patch?
-> Firstly, if you are squashing the patch, fixing the issue that Dave
-> has pointed out, please feel free to add my R-b on the patch.
-Of course I'll take into account David's suggestion.
->
-> I don't know whether it would be suitable to add my S-o-b here - since
-> most of the patch content is written by you, not me. But I'm totally
-> fine if you want to include that (btw, thanks for the offer :).
->
-> So either one R-b or S-o-b is okay to me.  Thanks,
->
+On Mon, Jul 31, 2017 at 08:06:18PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Introducing a new state "postcopy-paused", which can be used to pause a
+> > postcopy migration. It is targeted to support network failures during
+> > postcopy migration. Now when network down for postcopy, the source side
+> > will not fail the migration. Instead we convert the status into this new
+> > paused state, and we will try to wait for a rescue in the future.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> I think this should probably be split into:
+>    a) A patch that adds a new state and the entries in query_migrate etc
+>    b) A patch that wires up the semaphore and the use of the state.
+
+Reasonable.  Let me split it.
+
+> 
+> > ---
+> >  migration/migration.c  | 78 +++++++++++++++++++++++++++++++++++++++++++++++---
+> >  migration/migration.h  |  3 ++
+> >  migration/trace-events |  1 +
+> >  qapi-schema.json       |  5 +++-
+> >  4 files changed, 82 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index efee87e..0bc70c8 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -470,6 +470,7 @@ static bool migration_is_setup_or_active(int state)
+> >      switch (state) {
+> >      case MIGRATION_STATUS_ACTIVE:
+> >      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+> > +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
+> >      case MIGRATION_STATUS_SETUP:
+> >          return true;
+> >  
+> > @@ -545,6 +546,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+> >      case MIGRATION_STATUS_ACTIVE:
+> >      case MIGRATION_STATUS_CANCELLING:
+> >      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+> > +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
+> >           /* TODO add some postcopy stats */
+> >          info->has_status = true;
+> >          info->has_total_time = true;
+> > @@ -991,6 +993,8 @@ static void migrate_fd_cleanup(void *opaque)
+> >  
+> >      notifier_list_notify(&migration_state_notifiers, s);
+> >      block_cleanup_parameters(s);
+> > +
+> > +    qemu_sem_destroy(&s->postcopy_pause_sem);
+> >  }
+> >  
+> >  void migrate_fd_error(MigrationState *s, const Error *error)
+> > @@ -1134,6 +1138,7 @@ MigrationState *migrate_init(void)
+> >      s->migration_thread_running = false;
+> >      error_free(s->error);
+> >      s->error = NULL;
+> > +    qemu_sem_init(&s->postcopy_pause_sem, 0);
+> >  
+> >      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+> >  
+> > @@ -1942,6 +1947,69 @@ static bool postcopy_should_start(MigrationState *s)
+> >  }
+> >  
+> >  /*
+> > + * We don't return until we are in a safe state to continue current
+> > + * postcopy migration.  Returns true to continue the migration, or
+> > + * false to terminate current migration.
+> > + */
+> > +static bool postcopy_pause(MigrationState *s)
+> > +{
+> > +    assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> 
+> I never like asserts on the sending side.
+
+Indeed aborting on source side is dangerous (e.g., source may loss
+data). However this is definitely a "valid assertion" - if current
+state is not "postcopy-active", we should be in a very strange state.
+If we just continue to run the latter codes, imho it is as dangerous
+as if we assert() here and stop the program. Even, that may be more
+dangerous considering that we don't really know what will happen
+next...
+
+> 
+> > +    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > +
+> > +    /* Current channel is possibly broken. Release it. */
+> > +    assert(s->to_dst_file);
+> > +    qemu_file_shutdown(s->to_dst_file);
+> > +    qemu_fclose(s->to_dst_file);
+> > +    s->to_dst_file = NULL;
+> 
+> That does scare me a little; I think it's OK, I'm not sure what happens
+> to the ->from_dst_file fd and the return-path processing.
+
+For sockets: I think the QIOChannelSocket.fd will be set to -1 during
+close, then the return path code will not be able to read from that
+channel any more (it'll get -EIO then as well), and it'll pause as
+well. If it was blocking at recvmsg(), it should return with a
+failure.
+
+But yes, I think there may have possible indeed risk conditions
+between the to/from QEMUFiles considering they are sharing the same
+channel... Maybe that is a separate problem of "whether QIO channel
+codes are thread safe"? I am not sure of it yet, otherwise we may need
+some locking mechanism.
+
+> 
+> > +    /*
+> > +     * We wait until things fixed up. Then someone will setup the
+> > +     * status back for us.
+> > +     */
+> > +    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> > +        qemu_sem_wait(&s->postcopy_pause_sem);
+> > +    }
+> 
+> Something should get written to stderr prior to this, so when we
+> find a migration apparently stuck we can tell why.
+
+Yes I think so.  Thanks,
 
 -- 
-Best regards,
-Alexey Perevalov
+Peter Xu
