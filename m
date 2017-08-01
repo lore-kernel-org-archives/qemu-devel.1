@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcSsb-0006ZA-J2
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:50:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcSxV-0007Zn-I1
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcSsW-0004D9-3N
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:50:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51032)
+	(envelope-from <dgilbert@redhat.com>) id 1dcSxR-0000Ew-Hc
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:55:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcSsV-0004BR-SQ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:50:12 -0400
-Date: Tue, 1 Aug 2017 09:50:02 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcSxR-0000Ei-8C
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:55:17 -0400
+Date: Tue, 1 Aug 2017 09:55:08 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170801085001.GB2079@work-vm>
+Message-ID: <20170801085507.GC2079@work-vm>
 References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-11-git-send-email-peterx@redhat.com>
-	<20170731185224.GB3095@work-vm>
-	<20170801031303.GE15697@pxdev.xzpeter.org>
+	<1501229198-30588-4-git-send-email-peterx@redhat.com>
+	<20170731165339.GD2122@work-vm>
+	<20170801022519.GB15697@pxdev.xzpeter.org>
+	<20170801083220.GB12670@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170801031303.GE15697@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 10/29] migration: new property
- "x-postcopy-fast"
+In-Reply-To: <20170801083220.GB12670@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 03/29] io: fix qio_channel_socket_accept err
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, stefanha@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Mon, Jul 31, 2017 at 07:52:24PM +0100, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > This provides a way to start postcopy ASAP when migration starts. To do
-> > > this, we need both:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Tue, Aug 01, 2017 at 10:25:19AM +0800, Peter Xu wrote:
+> > On Mon, Jul 31, 2017 at 05:53:39PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > When accept failed, we should setup errp with the reason. More
+> > > > importantly, the caller may assume errp be non-NULL when error happens,
+> > > > and not setting the errp may crash QEMU.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  io/channel-socket.c | 1 +
+> > > >  1 file changed, 1 insertion(+)
+> > > > 
+> > > > diff --git a/io/channel-socket.c b/io/channel-socket.c
+> > > > index 53386b7..7bc308e 100644
+> > > > --- a/io/channel-socket.c
+> > > > +++ b/io/channel-socket.c
+> > > > @@ -344,6 +344,7 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
+> > > >          if (errno == EINTR) {
+> > > >              goto retry;
+> > > >          }
+> > > > +        error_setg_errno(errp, errno, "Unable to accept connection");
+> > > >          goto error;
 > > > 
-> > >   -global migration.x-postcopy-ram=on \
-> > >   -global migration.x-postcopy-fast=on
+> > > OK, but this code actually has a bigger problem as well:
+> > > 
+> > > the original is:
+> > > 
+> > >     cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
+> > >                            &cioc->remoteAddrLen);
+> > >     if (cioc->fd < 0) {
+> > >         trace_qio_channel_socket_accept_fail(ioc);
+> > >         if (errno == EINTR) {
+> > >             goto retry;
+> > >         }
+> > >         goto error;
+> > >     }
+> > > 
+> > > Stefan confirmed that trace_ doesn't preserve errno; so the if
+> > > following it is wrong.  It needs to preserve errno.
 > > 
-> > Can you explain why this is necessary?  Both sides already know
-> > they're doing a postcopy recovery don't they?
+> > Ah... If so, not sure whether we can do the reservation in trace codes
+> > in general?
+> > 
+> > For this one, I can just move the trace_*() below the errno check.
+> > After all, if EINTR is got, it's not really a fail, so imho we should
+> > not trace it with "accept fail".
 > 
-> What I wanted to do here is to provide a way to start postcopy at the
-> very beginning (actually it'll possibly start postcopy at the first
-> loop in migration_thread), instead of start postcopy until we trigger
-> it using "migrate_start_postcopy" command.
-> 
-> I used it for easier debugging (so I don't need to type
-> "migrate_start_postcopy" every time when I trigger postcopy
-> migration), meanwhile I think it can also be used when someone really
-> want to start postcopy from the very beginning.
-> 
-> Would such a new parameter makes sense?
+> Agreed, we just need to move the trace below the if.
 
-Other than debugging, I don't think there's a real use for it; the
-slight delay between starting migration and triggering postcopy has
-very little cost.
+Peter: Can you split this as a separate patch and it seems OK to try and
+put this in 2.10 since it's a strict bug fix.
 
 Dave
 
 > 
+> Regards,
+> Daniel
 > -- 
-> Peter Xu
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
