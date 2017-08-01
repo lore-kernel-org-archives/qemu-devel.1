@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcUdW-0005ji-8g
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:42:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dcUla-0007x5-9u
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dcUdT-0005GC-KA
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:42:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49286)
+	(envelope-from <ehabkost@redhat.com>) id 1dcUlW-00019t-5H
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:51:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcUdT-0005Fr-BD
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:42:47 -0400
-Date: Tue, 1 Aug 2017 11:42:36 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170801104235.GI2079@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-17-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dcUlV-00015b-VQ
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 06:51:06 -0400
+Date: Tue, 1 Aug 2017 07:50:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170801105052.GA3108@localhost.localdomain>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-3-apahim@redhat.com>
+	<20170801100925.GF13521@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1501229198-30588-17-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 16/29] qmp: hmp: add migrate "resume" option
+In-Reply-To: <20170801100925.GF13521@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] qemu.py: fix is_running() return
+ before first launch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> It will be used when we want to resume one paused migration.
+On Tue, Aug 01, 2017 at 11:09:25AM +0100, Stefan Hajnoczi wrote:
+> On Mon, Jul 31, 2017 at 10:51:05AM +0200, Amador Pahim wrote:
+> > is_running() returns None when called before the first time we
+> > call launch():
+> > 
+> >     >>> import qemu
+> >     >>> vm = qemu.QEMUMachine('qemu-system-x86_64')
+> >     >>> vm.is_running()
+> >     >>>
+> > 
+> > It should retunt False instead. This patch fixes that.
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-
-Other than Eric's comments:
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  hmp-commands.hx       | 7 ++++---
->  hmp.c                 | 4 +++-
->  migration/migration.c | 2 +-
->  qapi-schema.json      | 5 ++++-
->  4 files changed, 12 insertions(+), 6 deletions(-)
+> s/retunt/return/
 > 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 1941e19..7adb029 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -928,13 +928,14 @@ ETEXI
->  
->      {
->          .name       = "migrate",
-> -        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
-> -        .params     = "[-d] [-b] [-i] uri",
-> +        .args_type  = "detach:-d,blk:-b,inc:-i,resume:-r,uri:s",
-> +        .params     = "[-d] [-b] [-i] [-r] uri",
->          .help       = "migrate to URI (using -d to not wait for completion)"
->  		      "\n\t\t\t -b for migration without shared storage with"
->  		      " full copy of disk\n\t\t\t -i for migration without "
->  		      "shared storage with incremental copy of disk "
-> -		      "(base image shared between src and destination)",
-> +		      "(base image shared between src and destination)"
-> +                      "\n\t\t\t -r to resume a paused migration",
->          .cmd        = hmp_migrate,
->      },
->  
-> diff --git a/hmp.c b/hmp.c
-> index fd80dce..ebc1563 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1891,10 +1891,12 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
->      bool detach = qdict_get_try_bool(qdict, "detach", false);
->      bool blk = qdict_get_try_bool(qdict, "blk", false);
->      bool inc = qdict_get_try_bool(qdict, "inc", false);
-> +    bool resume = qdict_get_try_bool(qdict, "resume", false);
->      const char *uri = qdict_get_str(qdict, "uri");
->      Error *err = NULL;
->  
-> -    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
-> +    qmp_migrate(uri, !!blk, blk, !!inc, inc,
-> +                false, false, true, resume, &err);
->      if (err) {
->          error_report_err(err);
->          return;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 9d93836..36ff8c3 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1238,7 +1238,7 @@ bool migration_is_blocked(Error **errp)
->  
->  void qmp_migrate(const char *uri, bool has_blk, bool blk,
->                   bool has_inc, bool inc, bool has_detach, bool detach,
-> -                 Error **errp)
-> +                 bool has_resume, bool resume, Error **errp)
->  {
->      Error *local_err = NULL;
->      MigrationState *s = migrate_get_current();
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 2a36b80..27b7c4c 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3208,6 +3208,8 @@
->  # @detach: this argument exists only for compatibility reasons and
->  #          is ignored by QEMU
->  #
-> +# @resume: resume one paused migration
-> +#
->  # Returns: nothing on success
->  #
->  # Since: 0.14.0
-> @@ -3229,7 +3231,8 @@
->  #
->  ##
->  { 'command': 'migrate',
-> -  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
-> +  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool',
-> +           '*detach': 'bool', '*resume': 'bool' } }
->  
->  ##
->  # @migrate-incoming:
-> -- 
-> 2.7.4
+> > 
+> > Signed-off-by: Amador Pahim <apahim@redhat.com>
+> > ---
+> >  scripts/qemu.py | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/qemu.py b/scripts/qemu.py
+> > index 2f1984c93c..77565eb092 100644
+> > --- a/scripts/qemu.py
+> > +++ b/scripts/qemu.py
+> > @@ -86,7 +86,7 @@ class QEMUMachine(object):
+> >              raise
+> >  
+> >      def is_running(self):
+> > -        return self._popen and (self._popen.poll() is None)
+> > +        return self._popen is not None and (self._popen.poll() is None)
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> The parentheses are inconsistent:
+> 
+>   return (self._popen is not None) and (self._popen.poll() is None)
+> 
+> An alternative:
+> 
+>   return bool(self._popen and self._popen.poll())
+
+is_running() should be True only if self._popen.poll() is None
+(and not if it's 0), so the "self._popen.poll() is None" part is
+necessary.
+
+
+-- 
+Eduardo
