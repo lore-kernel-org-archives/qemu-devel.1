@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dceUl-0002jZ-Fl
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:14:28 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dceeE-0006E5-95
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:24:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dceUi-0004TW-Cx
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:14:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51312)
+	(envelope-from <alex.williamson@redhat.com>) id 1dceeB-0002KS-4v
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:24:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42024)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dceUi-0004TB-6j
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:14:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E78DC64E83
-	for <qemu-devel@nongnu.org>; Tue,  1 Aug 2017 21:14:22 +0000 (UTC)
-Date: Wed, 2 Aug 2017 00:14:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170802001139-mutt-send-email-mst@kernel.org>
-References: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dceeA-0002Jg-V3
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:24:11 -0400
+Date: Tue, 1 Aug 2017 15:24:08 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170801152408.75b04e17@w520.home>
+In-Reply-To: <9F33156D-CBD0-4F16-BB2B-055501A2BA60@daynix.com>
+References: <20170724120729.24350-1-dmitry@daynix.com>
+	<20170725093148.3898b2da@w520.home>
+	<8082FF9BCB2B054996454E47167FF4EC1C56E3CC@SHSMSX104.ccr.corp.intel.com>
+	<751A50FA-0C7D-433F-B511-F4B13EC67DCC@daynix.com>
+	<8082FF9BCB2B054996454E47167FF4EC1C572AF2@SHSMSX104.ccr.corp.intel.com>
+	<9F33156D-CBD0-4F16-BB2B-055501A2BA60@daynix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/5] tests: acpi: make sure FADT
- is compared to reference table
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks: Set non-zero GMS memory
+ size for IGD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: Dmitry Fleytman <dmitry@daynix.com>
+Cc: "Zhang, Xiong Y" <xiong.y.zhang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Jul 31, 2017 at 05:40:47PM +0200, Igor Mammedov wrote:
-> While refactoring i386/FADT generation to build_append_int_noprefix()            
-> and testing it, It turned out that FADT is only tested for valid                 
-> checksum but actual test for unintended changes isn't applied to it              
-> even though we have reference tables in tree.                                    
-> So here goes a couple of cleanups to reflect what fuctions do +                  
-> some comments and actual fix.                                                    
->                                                                                  
-> Note to maintainer:                                                              
->   FADT reference table is out of sync and should be updated along with           
->   series applied.                                                                
->                                                                                  
-> CC: "Michael S. Tsirkin" <mst@redhat.com>                                        
-> CC: Marcel Apfelbaum <marcel@redhat.com> 
+On Fri, 28 Jul 2017 08:22:45 +0300
+Dmitry Fleytman <dmitry@daynix.com> wrote:
 
-Absolutely good stuff, but not a bugfix as such (it's not that the
-test is wrong, it's that we skip FADT for now)
-so I don't think this is 2.10 material.
-
-> Igor Mammedov (5):
->   tests: acpi: move tested tables array allocation outside of
->     test_acpi_dsdt_table()
->   tests: acpi: init table descriptor in test_dst_table()
->   tests: acpi: rename test_acpi_tables()/test_dst_table() to reflect its
->     usage
->   tests: acpi: add comments to fetch_rsdt_referenced_tables/data->tables
->     usage
->   tests: acpi: fix FADT not being compared to reference table
+> > On 28 Jul 2017, at 07:51 AM, Zhang, Xiong Y <xiong.y.zhang@intel.com> wrote:
+> >   
+> >>> On 26 Jul 2017, at 08:22 AM, Zhang, Xiong Y <xiong.y.zhang@intel.com>  
+> >> wrote:  
+> >>> 
+> >>> Sorry, we indeed found Intel windows guest graphic driver couldn't be bind  
+> >> when GMS memory size is zero. And we have fixed it and the next intel
+> >> windows driver release will contain this fix.  
+> >>> So currently please use x-igd-gms in legacy mode to work around this.
+> >>> 
+> >>> BTW, how did you know window driver allocate extra ~4G memory when  
+> >> GMS size set to 0 ?
+> >> 
+> >> We noticed that with new IGD driver memory usage on VMs raised by around
+> >> 4G.
+> >> 
+> >> Then we examined memory allocations with poolmon
+> >> (https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/poolm
+> >> on)
+> >> and saw that around 4G of memory is allocated with IGD driver pool tag.
+> >> Additionally we noticed that on VMs with less than 5G of memory IGD driver
+> >> does not load and system does fallback to standard VGA driver.
+> >>   
+> > [Zhang, Xiong Y]  I tried our internal driver and didn't found the above two issues, please wait for the next intel graphic driver release.  
 > 
->  tests/bios-tables-test.c | 30 ++++++++++++++++++------------
->  1 file changed, 18 insertions(+), 12 deletions(-)
-> 
-> -- 
-> 2.7.4
+> Thanks!
+
+So to close on this, we should just be recommending that users
+encountering this problem add the x-igd-gms=1 option to the device
+until the next Intel graphics release.  I won't plan to push this
+change.  Thanks all,
+
+Alex
