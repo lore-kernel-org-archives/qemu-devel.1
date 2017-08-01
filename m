@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcavc-0000Iv-3A
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:25:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dcavt-0000R0-AI
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcavZ-0000fd-Eh
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:25:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41308)
+	(envelope-from <pbonzini@redhat.com>) id 1dcavq-0000qc-Md
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:26:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcavZ-0000f6-5n
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:25:53 -0400
-Date: Tue, 1 Aug 2017 20:25:50 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170801202545-mutt-send-email-mst@kernel.org>
-References: <1500904220-29338-1-git-send-email-imammedo@redhat.com>
-	<20170725163315-mutt-send-email-mst@kernel.org>
-	<20170726160937.74e18968@nial.brq.redhat.com>
-	<20170726231754-mutt-send-email-mst@kernel.org>
-	<20170728142857.4fe29a6f@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dcavq-0000qD-G2
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 13:26:10 -0400
+References: <150160611982.36.12492156362530631521@93e45bedd699>
+	<09b423f3-c9fe-77de-c6df-4ed79f0fa9bf@redhat.com>
+	<CAFEAcA9Mea6ysDVm76rf20HKC+z1jcMfM88zmCdHod=jt1e62Q@mail.gmail.com>
+	<1743b106-1217-92ee-589d-9ba99f76556d@redhat.com>
+	<CAFEAcA_ikSRG6+dMuDeuJG_=S2G7Yk-nsHzORGGKZ8gaC6i=zw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7b1f1648-8581-27ab-ba28-337d3950868d@redhat.com>
+Date: Tue, 1 Aug 2017 19:26:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170728142857.4fe29a6f@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] pc: acpi: force FADT rev1 for 440fx
- based machine types
+In-Reply-To: <CAFEAcA_ikSRG6+dMuDeuJG_=S2G7Yk-nsHzORGGKZ8gaC6i=zw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/17] Misc changes for QEMU 2.10-rc1 (?)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
 
-On Fri, Jul 28, 2017 at 02:28:57PM +0200, Igor Mammedov wrote:
-> On Wed, 26 Jul 2017 23:18:01 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 01/08/2017 19:22, Peter Maydell wrote:
+> On 1 August 2017 at 18:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> Ok, for this patch I kept it consistent within the file, but for 2.11 we
+>> can change everything to "while (0)".
 > 
-> > On Wed, Jul 26, 2017 at 04:09:37PM +0200, Igor Mammedov wrote:
-> > > On Tue, 25 Jul 2017 16:36:06 +0300
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >   
-> > > > On Mon, Jul 24, 2017 at 03:50:20PM +0200, Igor Mammedov wrote:  
-> > > > > w2k used to boot on QEMU until revision of FADT has
-> > > > > been bumped to rev3
-> > > > > (commit 77af8a2b hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.)
-> > > > > 
-> > > > > Keep PC machine at rev1 to remain compatible and Q35
-> > > > > at rev3 where w2k isn't supported anyway so OSX could
-> > > > > run as well.
-> > > > > 
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > ---
-> > > > > v2:
-> > > > >    - make pc rev1 and q35 rev3.
-> > > > >        "Michael S. Tsirkin" <mst@redhat.com>
-> > > > > 
-> > > > > PS:
-> > > > > Only compile tested.
-> > > > > 
-> > > > > 
-> > > > > CC: Programmingkid <programmingkidx@gmail.com>
-> > > > > CC: Phil Dennis-Jordan <lists@philjordan.eu>
-> > > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > > 
-> > > > > ---
-> > > > >  hw/i386/acpi-build.c | 22 ++++++++++++++++++----
-> > > > >  1 file changed, 18 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > > index 6b7bade..b9c245c 100644
-> > > > > --- a/hw/i386/acpi-build.c
-> > > > > +++ b/hw/i386/acpi-build.c
-> > > > > @@ -90,6 +90,7 @@ typedef struct AcpiMcfgInfo {
-> > > > >  } AcpiMcfgInfo;
-> > > > >  
-> > > > >  typedef struct AcpiPmInfo {
-> > > > > +    bool force_rev1_fadt;
-> > > > >      bool s3_disabled;
-> > > > >      bool s4_disabled;
-> > > > >      bool pcihp_bridge_en;
-> > > > > @@ -129,10 +130,13 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-> > > > >      Object *obj = NULL;
-> > > > >      QObject *o;
-> > > > >  
-> > > > > +    pm->force_rev1_fadt = false;
-> > > > >      pm->cpu_hp_io_base = 0;
-> > > > >      pm->pcihp_io_base = 0;
-> > > > >      pm->pcihp_io_len = 0;
-> > > > >      if (piix) {
-> > > > > +        /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
-> > > > > +        pm->force_rev1_fadt = true;
-> > > > >          obj = piix;
-> > > > >          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-> > > > >          pm->pcihp_io_base =
-> > > > > @@ -304,6 +308,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
-> > > > >          fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-> > > > >      }
-> > > > >      fadt->century = RTC_CENTURY;
-> > > > > +    if (pm->force_rev1_fadt) {
-> > > > > +        return;
-> > > > > +    }
-> > > > >  
-> > > > >      fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-> > > > >      fadt->reset_value = 0xf;
-> > > > > @@ -342,6 +349,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > > >      unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-> > > > >      unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-> > > > >      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> > > > > +    int fadt_size = sizeof(*fadt);
-> > > > > +    int rev = 3;
-> > > > >  
-> > > > >      /* FACS address to be filled by Guest linker */
-> > > > >      bios_linker_loader_add_pointer(linker,
-> > > > > @@ -353,12 +362,17 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-> > > > >      bios_linker_loader_add_pointer(linker,
-> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-> > > > >          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > > -    bios_linker_loader_add_pointer(linker,
-> > > > > -        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> > > > > -        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> > > > > +    if (pm->force_rev1_fadt) {
-> > > > > +        rev = 1;
-> > > > > +        fadt_size = offsetof(typeof(*fadt), reset_register);    
-> > > > 
-> > > > I don't really like it that we are using structs to format fields - I
-> > > > would prefer build_append_int_noprefix based APIs - but since we do,
-> > > > let's add a proper structure for FADT rev 1 instead of this hack. 
->  
-> Michael,
-> 
-> I've tried to switch FADT to build_append_int_noprefix APIs,
-> but it turned out into quite a bit of re-factoring including
-> clean-ups and adding new APIs to pack all the stuff in FADT.
-> 
-> It's too much for hard freeze, lets not rush it and go with
-> this patch for 2.10 to put out fire.
-> 
-> When 2.11 merge window is open I'll rebase/post FADTv1/3
-> conversion to build_append_int_noprefix API.
+> Is this a proposal to bite the bullet and fix all our
+> code style issues in existing code? :-)
 
-Makes sense.
+Only "while (0)" :)
+
+> It would be an interesting question to find out what % of
+> QEMU's lines of code have not been touched in the six
+> years since we added checkpatch, and how they're
+> distributed in the codebase (are there any neat
+> visualisations of this sort of thing?) Fix-when-touched
+> works OK where we're actively working but can leave
+> some big dead spots I suspect.
+
+That's an interesting idea.  Since I've been volunteered to present
+about QEMU at KVM Forum, I might give it a shot.
+
+Paolo
