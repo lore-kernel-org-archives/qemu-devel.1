@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrV-0004J5-6u
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrV-0004J3-6s
 	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrU-0007Aq-4F
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrT-0007AH-1y
 	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:36 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36415)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33364)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dcZrT-0007AN-Th
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:36 -0400
-Received: by mail-wm0-x243.google.com with SMTP id d40so3781576wma.3
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:35 -0700 (PDT)
+	id 1dcZrS-0007A0-R5
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:34 -0400
+Received: by mail-wr0-x241.google.com with SMTP id y43so1805099wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  1 Aug 2017 18:17:12 +0200
-Message-Id: <1501604245-33460-5-git-send-email-pbonzini@redhat.com>
+Date: Tue,  1 Aug 2017 18:17:11 +0200
+Message-Id: <1501604245-33460-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
 References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/17] char-fd: remove useless chr pointer
+Subject: [Qemu-devel] [PULL 03/17] accel: cleanup error output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +28,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
 
-Apparently unused since it was introduced in commit
-a29753f8aa79a34a324afebe340182a51a5aef11. Now, it can be trivially
-accessed by CHARDEV() of self.
+Only emit "XXX accelerator not found", if there are not
+further accelerators listed. eg
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170720100046.4424-1-marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+   accel=kvm:tcg
+
+doesn't print a "KVM accelerator not found" warning
+when it falls back to tcg, but a
+
+   accel=kvm
+
+prints a warning, since no fallback is given.
+
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20170717144527.24534-1-lvivier@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-fd.c         | 1 -
- include/chardev/char-fd.h | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ accel/accel.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/chardev/char-fd.c b/chardev/char-fd.c
-index 1584a3d..6a62a54 100644
---- a/chardev/char-fd.c
-+++ b/chardev/char-fd.c
-@@ -141,7 +141,6 @@ void qemu_chr_open_fd(Chardev *chr,
-     qio_channel_set_name(QIO_CHANNEL(s->ioc_out), name);
-     g_free(name);
-     qemu_set_nonblock(fd_out);
--    s->chr = chr;
+diff --git a/accel/accel.c b/accel/accel.c
+index fa85844..8ae40e1 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -33,6 +33,7 @@
+ #include "sysemu/qtest.h"
+ #include "hw/xen/xen.h"
+ #include "qom/object.h"
++#include "qemu/error-report.h"
+ 
+ static const TypeInfo accel_type = {
+     .name = TYPE_ACCEL,
+@@ -69,19 +70,20 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+ 
+ void configure_accelerator(MachineState *ms)
+ {
+-    const char *p;
++    const char *accel, *p;
+     char buf[10];
+     int ret;
+     bool accel_initialised = false;
+     bool init_failed = false;
+     AccelClass *acc = NULL;
+ 
+-    p = qemu_opt_get(qemu_get_machine_opts(), "accel");
+-    if (p == NULL) {
++    accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
++    if (accel == NULL) {
+         /* Use the default "accelerator", tcg */
+-        p = "tcg";
++        accel = "tcg";
+     }
+ 
++    p = accel;
+     while (!accel_initialised && *p != '\0') {
+         if (*p == ':') {
+             p++;
+@@ -89,7 +91,6 @@ void configure_accelerator(MachineState *ms)
+         p = get_opt_name(buf, sizeof(buf), p, ':');
+         acc = accel_find(buf);
+         if (!acc) {
+-            fprintf(stderr, "\"%s\" accelerator not found.\n", buf);
+             continue;
+         }
+         if (acc->available && !acc->available()) {
+@@ -100,9 +101,8 @@ void configure_accelerator(MachineState *ms)
+         ret = accel_init_machine(acc, ms);
+         if (ret < 0) {
+             init_failed = true;
+-            fprintf(stderr, "failed to initialize %s: %s\n",
+-                    acc->name,
+-                    strerror(-ret));
++            error_report("failed to initialize %s: %s",
++                         acc->name, strerror(-ret));
+         } else {
+             accel_initialised = true;
+         }
+@@ -110,13 +110,13 @@ void configure_accelerator(MachineState *ms)
+ 
+     if (!accel_initialised) {
+         if (!init_failed) {
+-            fprintf(stderr, "No accelerator found!\n");
++            error_report("-machine accel=%s: No accelerator found", accel);
+         }
+         exit(1);
+     }
+ 
+     if (init_failed) {
+-        fprintf(stderr, "Back to %s accelerator.\n", acc->name);
++        error_report("Back to %s accelerator", acc->name);
+     }
  }
  
- static void char_fd_class_init(ObjectClass *oc, void *data)
-diff --git a/include/chardev/char-fd.h b/include/chardev/char-fd.h
-index 55ae5b4..e7c2b17 100644
---- a/include/chardev/char-fd.h
-+++ b/include/chardev/char-fd.h
-@@ -29,7 +29,7 @@
- 
- typedef struct FDChardev {
-     Chardev parent;
--    Chardev *chr;
-+
-     QIOChannel *ioc_in, *ioc_out;
-     int max_size;
- } FDChardev;
 -- 
 1.8.3.1
