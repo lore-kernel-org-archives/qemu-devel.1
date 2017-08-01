@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dcevd-0004xY-67
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:42:15 -0400
+	(envelope-from <jcody@redhat.com>) id 1dcevj-000521-8v
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dceva-000839-SD
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:42:13 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Tue,  1 Aug 2017 17:31:27 -0400
-Message-Id: <20170801213127.15036-2-crosa@redhat.com>
-In-Reply-To: <20170801213127.15036-1-crosa@redhat.com>
-References: <20170801213127.15036-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/1] qemu-iotests/109: Fix lock race condition
+	(envelope-from <jcody@redhat.com>) id 1dcevi-00089V-5f
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 17:42:19 -0400
+Date: Tue, 1 Aug 2017 17:42:06 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170801214206.GA1525@localhost.localdomain>
+References: <cover.1501508049.git.jcody@redhat.com>
+	<cover.1501508049.git.jcody@redhat.com>
+	<ded25c757d9f8854ce47e2e674a44f18132a94ed.1501508049.git.jcody@redhat.com>
+	<871sovztie.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871sovztie.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 3/3] qemu-iotests: add option
+ to save temp files on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,247 +26,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, jsnow@redhat.com
 
-A race condition is currently present between the clean up attempt of
-the QEMU process and the execution of qemu-img.  The actual (bad)
-output is:
+On Tue, Aug 01, 2017 at 08:34:01AM +0200, Markus Armbruster wrote:
+> Jeff Cody <jcody@redhat.com> writes:
+> 
+> > Now that ./check takes care of cleaning up after each tests, it
+> > can also selectively not clean up.  Add option to leave all output from
+> > tests intact if that test encountered an error.
+> >
+> > Note: this currently only works for bash tests, as the python tests
+> > still clean up after themselves manually.
+> 
+> Should we add a TODO comment for that?
+> 
 
- -Warning: Image size mismatch!
- -Images are identical.
- +qemu-img: Could not open '<build_dir>/tests/qemu-iotests/scratch/t.raw': Failed to get "consistent read" lock
- +Is another process using the image?
+Couldn't hurt!
 
-A KILL signal is sent to the QEMU process, but qemu-img may begin to
-run before the QEMU process is really gone.  qemu-img will then
-attempt to open the TEST_IMG file before it can secure a lock on it.
+> Much appreciated work, by the way.  You might want to mention in one of
+> your commit messages that this is also a step towards running iotests in
+> parallel.
+> 
 
-This attempts a more graceful shutdown, and waits for the QEMU process
-to exit.
+Thanks.  I'll go ahead and spin a v3 to clean up commit messages and add a
+TODO, since 2.11 won't open for a while.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/qemu-iotests/109     |  3 ++-
- tests/qemu-iotests/109.out | 56 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index 3b496a3..d70b574 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -67,7 +67,8 @@ function run_qemu()
-         _send_qemu_cmd $QEMU_HANDLE '' "BLOCK_JOB_COMPLETED"
-     fi
-     _send_qemu_cmd $QEMU_HANDLE '{"execute":"query-block-jobs"}' "return"
--    _cleanup_qemu
-+    _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
-+    wait=1 _cleanup_qemu
- }
- 
- for fmt in qcow qcow2 qed vdi vmdk vpc; do
-diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
-index dc02f9e..c189e28 100644
---- a/tests/qemu-iotests/109.out
-+++ b/tests/qemu-iotests/109.out
-@@ -12,12 +12,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -33,12 +38,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 197120, "offset": 197120, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -54,12 +64,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -75,12 +90,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 1024, "offset": 1024, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -96,12 +116,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 65536, "offset": 65536, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -117,12 +142,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -137,12 +167,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2560, "offset": 2560, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -157,12 +192,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 31457280, "offset": 31457280, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -177,12 +217,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 327680, "offset": 327680, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -197,12 +242,17 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
- {"return": []}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 2048, "offset": 2048, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -216,12 +266,18 @@ Specify the 'raw' format explicitly to remove the restrictions.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
- {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
- Warning: Image size mismatch!
- Images are identical.
- *** done
--- 
-2.9.4
+> Another step towards sanity would be making $TEST_DIR instead of
+> $source_iotests the current working directory for running tests.
+
+Yep!
