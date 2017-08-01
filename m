@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Tomasz.Nowicki@cavium.com>) id 1dcUvo-0002dv-VL
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:01:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dcXZU-0006D3-Mr
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Tomasz.Nowicki@cavium.com>) id 1dcUvj-0002J4-Il
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 07:01:45 -0400
-References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
-From: Tomasz Nowicki <tnowicki@caviumnetworks.com>
-Message-ID: <a8fd7038-a840-8667-0db2-5765624903d3@caviumnetworks.com>
-Date: Tue, 1 Aug 2017 13:01:18 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dcXZT-0005sN-F3
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:50:52 -0400
+Date: Tue, 1 Aug 2017 15:50:36 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170801135036.GC4257@localhost.localdomain>
+References: <20170726141924.qaqclberxsup5cdm@postretch>
+	<20170726151221.GA3600@stefanha-x1.localdomain>
+	<20170726182320.cnqx3y64c7nmhvp3@postretch>
+	<20170727100755.GC10129@stefanha-x1.localdomain>
+	<20170728120843.GD3983@localhost.localdomain>
+	<20170731173017.yorggmbkjmcppkka@postretch>
 MIME-Version: 1.0
-In-Reply-To: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v5 0/8] ARM SMMUv3 Emulation Support
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KsGdsel6WgEHnImy"
+Content-Disposition: inline
+In-Reply-To: <20170731173017.yorggmbkjmcppkka@postretch>
+Subject: Re: [Qemu-devel] [RFC] block-insert-node and block-job-delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,202 +28,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com
-Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, tcain@qti.qualcomm.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, jean-philippe.brucker@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>
-
-Hi Eric,
-
-Just letting you know that I am facing another issue with the following 
-setup:
-1. host (4.12 kernel & 64K page) and VM (4.12 kernel & 64K page)
-2. QEMU + -netdev type=tap,ifname=tap,id=net0 -device 
-virtio-net-pci,netdev=net0,iommu_platform,disable-modern=off,disable-legacy=on
-2. On VM, I allocate some huge pages and run DPDK testpmd app:
-# echo 4 > /sys/kernel/mm/hugepages/hugepages-524288kB/nr_hugepages
-# ./dpdk/usertools/dpdk-devbind.py -b vfio-pci  0000:00:02.0
-# ./dpdk/build/app/testpmd -l 0-13 -n 4 -w 0000:00:02.0 -- 
---disable-hw-vlan-filter --disable-rss -i
-EAL: Detected 14 lcore(s)
-EAL: Probing VFIO support...
-EAL: VFIO support initialized
-EAL: PCI device 0000:00:02.0 on NUMA socket -1
-EAL:   probe driver: 1af4:1041 net_virtio
-EAL:   using IOMMU type 1 (Type 1)
-EAL: iommu_map_dma vaddr ffff20000000 size 80000000 iova 120000000
-EAL: Can't write to PCI bar (0) : offset (12)
-EAL: Can't read from PCI bar (0) : offset (12)
-EAL: Can't read from PCI bar (0) : offset (12)
-EAL: Can't write to PCI bar (0) : offset (12)
-EAL: Can't read from PCI bar (0) : offset (12)
-EAL: Can't write to PCI bar (0) : offset (12)
-EAL: Can't read from PCI bar (0) : offset (0)
-EAL: Can't write to PCI bar (0) : offset (4)
-EAL: Can't write to PCI bar (0) : offset (14)
-EAL: Can't write to PCI bar (0) : offset (e)
-EAL: Can't read from PCI bar (0) : offset (c)
-EAL: Requested device 0000:00:02.0 cannot be used
-EAL: No probed ethernet devices
-Interactive-mode selected
-USER1: create a new mbuf pool <mbuf_pool_socket_0>: n=251456, size=2176, 
-socket=0
-
-When VM uses *4K pages* the same setup works fine. I will work on this 
-but please let me know in case you already know what is going on.
-
-Thanks,
-Tomasz
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>
 
 
-On 09.07.2017 22:51, Eric Auger wrote:
-> This series implements the emulation code for ARM SMMUv3.
-> This is the continuation of Prem's work [1].
-> 
-> This v5 mainly brings VFIO integration in DT mode. On guest kernel
-> side, this requires a quirk [1] to force TLB invalidation on map.
-> 
-> The following changes also are noticeable:
-> - fix SMMU_CMDQ_CONS offset
-> - adds dma-coherent dt property which fixes the unhandled command
->    opcode bug.
-> - implements block PTE
-> 
-> The smmu is instantiated when passing the smmu option to machvirt:
-> "-M virt-2.10,smmu"
-> 
-> As I haven't split the code yet so that it can be easily reviewable
-> I don't expect deep reviews at this stage. Also the implementation may
-> be largely sub-optimal.
-> 
-> Tested Use Cases:
-> - booted a guest in dt and acpi mode with an iommu_platform
->    virtio-net-pci device (using dma ops). Tested with the following
->    guest combinations: 4K page - 39 bit VA, 4K - 48b, 64K - 39b,
->    64K - 48b.
-> - booted a guest (featuring [1]) with PCIe passthrough'ed PCIe devices:
->    - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
->    - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
-> 
-> Unfortunately I have not been able to run DPDK testpmd yet on guest side.
-> The problem I see is the user space driver dma-maps a huge area
-> and this causes plenty of CMDQ_OP_TLBI_NH_VA commands to be sent
-> (tlbi-on-map) which are sent for each page whereas the dma-map covers a
-> huge page. I will work on this issue for next version.
-> 
-> Known limitations:
-> - no VMSAv8-32 suport
-> - no nested stage support (S1 + S2)
-> - no support for HYP mappings
-> - register fine emulation, commands, interrupts and errors were
->    not accurately tested. Handling is sufficient to run use cases
->    described hereafter though.
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> v5: https://github.com/eauger/qemu/tree/v2.9-SMMU-v5
-> v4: https://github.com/eauger/qemu/tree/v2.9-SMMU-v4
-> 
-> References:
-> [1] [RFC 0/2] arm-smmu-v3 tlbi-on-map option
-> [2] Prem's last iteration:
-> - https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03531.html
-> 
-> History:
-> v4 -> v5:
-> - initial_level now part of SMMUTransCfg
-> - smmu_page_walk_64 takes into account the max input size
-> - implement sys->iommu_ops.replay and sys->iommu_ops.notify_flag_changed
-> - smmuv3_translate: bug fix: don't walk on bypass
-> - smmu_update_qreg: fix PROD index update
-> - I did not yet address Peter's comments as the code is not mature enough
->    to be split into sub patches.
-> 
-> v3 -> v4 [Eric]:
-> - page table walk rewritten to allow scan of the page table within a
->    range of IOVA. This prepares for VFIO integration and replay.
-> - configuration parsing partially reworked.
-> - do not advertise unsupported/untested features: S2, S1 + S2, HYP,
->    PRI, ATS, ..
-> - added ACPI table generation
-> - migrated to dynamic traces
-> - mingw compilation fix
-> 
-> v2 -> v3 [Eric]:
-> - rebased on 2.9
-> - mostly code and patch reorganization to ease the review process
-> - optional patches removed. They may be handled separately. I am currently
->    working on ACPI enablement.
-> - optional instantiation of the smmu in mach-virt
-> - removed [2/9] (fdt functions) since not mandated
-> - start splitting main patch into base and derived object
-> - no new function feature added
-> 
-> v1 -> v2 [Prem]:
-> - Adopted review comments from Eric Auger
->          - Make SMMU_DPRINTF to internally call qemu_log
->              (since translation requests are too many, we need control
->               on the type of log we want)
->          - SMMUTransCfg modified to suite simplicity
->          - Change RegInfo to uint64 register array
->          - Code cleanup
->          - Test cleanups
-> - Reshuffled patches
-> 
-> v0 -> v1 [Prem]:
-> - As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
-> - Reworked register access/update logic
-> - Factored out translation code for
->          - single point bug fix
->          - sharing/removal in future
-> - (optional) Unit tests added, with PCI test device
->          - S1 with 4k/64k, S1+S2 with 4k/64k
->          - (S1 or S2) only can be verified by Linux 4.7 driver
->          - (optional) Priliminary ACPI support
-> 
-> v0 [Prem]:
-> - Implements SMMUv3 spec 11.0
-> - Supported for PCIe devices,
-> - Command Queue and Event Queue supported
-> - LPAE only, S1 is supported and Tested, S2 not tested
-> - BE mode Translation not supported
-> - IRQ support (legacy, no MSI)
-> - Tested with DPDK and e1000
-> 
-> 
-> Eric Auger (5):
->    hw/arm/smmu-common: smmu base class
->    hw/arm/virt: Add 2.10 machine type
->    hw/arm/virt: Add tlbi-on-map property to the smmuv3 node
->    target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
->    hw/arm/smmuv3: VFIO integration
-> 
-> Prem Mallappa (3):
->    hw/arm/smmuv3: smmuv3 emulation model
->    hw/arm/virt: Add SMMUv3 to the virt board
->    hw/arm/virt-acpi-build: Add smmuv3 node in IORT table
-> 
->   default-configs/aarch64-softmmu.mak |    1 +
->   hw/arm/Makefile.objs                |    1 +
->   hw/arm/smmu-common.c                |  474 +++++++++++++
->   hw/arm/smmu-internal.h              |   89 +++
->   hw/arm/smmuv3-internal.h            |  651 ++++++++++++++++++
->   hw/arm/smmuv3.c                     | 1256 +++++++++++++++++++++++++++++++++++
->   hw/arm/trace-events                 |   54 ++
->   hw/arm/virt-acpi-build.c            |   56 +-
->   hw/arm/virt.c                       |  111 +++-
->   include/hw/acpi/acpi-defs.h         |   15 +
->   include/hw/arm/smmu-common.h        |  127 ++++
->   include/hw/arm/smmuv3.h             |   87 +++
->   include/hw/arm/virt.h               |    5 +
->   target/arm/kvm.c                    |   28 +
->   target/arm/trace-events             |    3 +
->   15 files changed, 2949 insertions(+), 9 deletions(-)
->   create mode 100644 hw/arm/smmu-common.c
->   create mode 100644 hw/arm/smmu-internal.h
->   create mode 100644 hw/arm/smmuv3-internal.h
->   create mode 100644 hw/arm/smmuv3.c
->   create mode 100644 include/hw/arm/smmu-common.h
->   create mode 100644 include/hw/arm/smmuv3.h
-> 
+--KsGdsel6WgEHnImy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 31.07.2017 um 19:30 hat Manos Pitsidianakis geschrieben:
+> On Fri, Jul 28, 2017 at 02:08:43PM +0200, Kevin Wolf wrote:
+> > Am 27.07.2017 um 12:07 hat Stefan Hajnoczi geschrieben:
+> > > On Wed, Jul 26, 2017 at 09:23:20PM +0300, Manos Pitsidianakis wrote:
+> > > > On Wed, Jul 26, 2017 at 04:12:21PM +0100, Stefan Hajnoczi wrote:
+> > > > > On Wed, Jul 26, 2017 at 05:19:24PM +0300, Manos Pitsidianakis wro=
+te:
+> > > > > > This proposal follows a discussion we had with Kevin and Stefan=
+ on filter
+> > > > > > node management.
+> > > > > >
+> > > > > > With block filter drivers arises a need to configure filter nod=
+es on runtime
+> > > > > > with QMP on live graphs. A problem with doing live graph modifi=
+cations is
+> > > > > > that some block jobs modify the graph when they are done and do=
+n't operate
+> > > > > > under any synchronisation, resulting in a race condition if we =
+try to insert
+> > > > > > a filter node in the place of an existing edge.
+> > > > >
+> > > > > But maybe you are thinking about higher level race conditions bet=
+ween
+> > > > > QMP commands.  Can you give an example of the race?
+> > > >
+> > > > Exactly, synchronisation between the QMP/user actions. Here's an ex=
+ample,
+> > > > correct me if I'm wrong:
+> > > >
+> > > > User issues a block-commit to this tree to commit A onto B:
+> > > >    BB -> A -> B
+> > > >
+> > > > This inserts the dummy mirror node at the top since this is a mirro=
+r job
+> > > > (active commit)
+> > > >    BB -> dummy -> A -> B
+> > > >
+> > > > User wants to add a filter node F below the BB. First we create the=
+ node:
+> > > >    BB -> dummy -> A -> B
+> > > >       F /
+> > > >
+> > > > Commit finishes before we do block-insert-node, dummy and A is remo=
+ved from
+> > > > the BB's chain, mirror_exit calls bdrv_replace_node()
+> > > >
+> > > >    BB ------------> B
+> > > >                F -> /
+> > > >
+> > > > Now inserting F under BB will error since dummy does not exist any =
+more.
+> > >=20
+> > > I see the diagrams but the flow isn't clear without the user's QMP
+> > > commands.
+> > >=20
+> > > F is created using blockdev-add?  What are the parameters and how does
+> > > it know about dummy?  I think this is an interesting question in itse=
+lf
+> > > because dummy is a transient internal node that QMP users don't
+> > > necessarily know about.
+> >=20
+> > We can expect that users of block-insert-node also know about block job
+> > filter nodes, simply because the former is newer than the latter.
+> >=20
+> > (I also don't like the name "dummy", this makes it sound like it's not
+> > really a proper node. In reality, there is little reason to treat it
+> > specially.)
+> >=20
+> > > What is the full block-insert-node command?
+> > >=20
+> > > > The proposal doesn't guard against the following:
+> > > > User issues a block-commit to this tree to commit B onto C:
+> > > >    BB -> A -> B -> C
+> > > >
+> > > > The dummy node (commit's top bs is A):
+> > > >    BB -> A -> dummy -> B -> C
+> > > >
+> > > > blockdev-add of a filter we wish to eventually be between A and C:
+> > > >    BB -> A -> dummy -> B -> C
+> > > >             F/
+> > > >
+> > > > if commit finishes before we issue block-insert-node (commit_comple=
+te()
+> > > > calls bdrv_set_backing_hd() which only touches A)
+> > > >    BB -> A --------------> C
+> > > >           F -> dummy -> B /
+> > > >    resulting in error when issuing block-insert-node,
+> > > >
+> > > > else if we set the job to manual-delete and insert F:
+> > > >    BB -> A -> F -> dummy -> B -> C
+> > > > deleting the job will result in F being lost since the job's top bs=
+ wasn't
+> > > > updated.
+> > >=20
+> > > manual-delete is a solution for block jobs.  The write threshold
+> > > feature is a plain QMP command that in the future will create a
+> > > transient internal node (before write notifier).
+> >=20
+> > Yes, that becomes a legacy QMP command then. The new way is blockdev-add
+> > and block-insert-node for write threshold, too.
+> >=20
+> > Apart from that, a write threshold node never disappears by itself, it
+> > is only inserted or removed in the context of a QMP command. That makes
+> > it a lot less dangerous than automatic block completion.
+> >=20
+> > > I'm not sure it makes sense to turn the write threshold feature into a
+> > > block job.  I guess it could work, but it seems a little unnatural and
+> > > maybe there will be other features that use transient internal nodes.
+> >=20
+> > Yeah, no reason to do so. Just a manually created filter node.
+> >=20
+>=20
+> Can you explain what you have in mind? The current workflow is using
+> block-set-write-threshold on the targetted bs. If we want write threshold=
+ to
+> be on node level we would want a new filter driver so that it can take
+> options special to write-threshold.
+
+Yes, I think that's what we want.
+
+> Unless we make the notify filter be a write threshold by default, and
+> when using it internally by the backup job, disable the threshold and
+> add our backup notifier to the node's list. Of course the current
+> write threshold code could be refactored into a new driver so that it
+> doesn't have to rely on notifiers.
+
+As discussed on IRC, we shouldn't implement a bad interface (which
+notifiers are, they bypass normal block device configuration) in a
+different way, but we should replace it by something that fits better in
+the block layer design.
+
+In other words, don't add magic to provide the same notifier functions
+as we had, but convert their callers to have a block node of their own
+(i.e. one backup_top driver, one write-treshold driver, etc.).
+
+> The way I've currently done the conversion is to add an implicit
+> filter when enabling the threshold, just like in backup jobs.
+
+This is fine, but it should be specifically a write-threshold filter
+that a user can also manually insert whereever they like. The old QMP
+interfaces would be considered legacy commands then, because
+blockdev-add and blockdev-insert-node can provide the same thing.
+
+Kevin
+
+--KsGdsel6WgEHnImy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJZgIcsAAoJEH8JsnLIjy/Wkp4P/1ahSDVlW9kjgYRK75Yq7GcB
+CQ4mNgLI3bQIyy0XFEtjGwL3bRgUqCOc6FCIh+ZNOUNW9mG/JdL1r7wCZSRDWpWw
+2yFg22QtSalEB+awibqRsaqSlO1vkVfbzAARVSZBEg8aEioBgwhMNw1EaL24xNOs
+lEt5FpxmwA38cpZvKthfIOUlE1ToxN2A1O+aH4fjkFkp8jVJOxtrLY7Z8Wx0fO5d
+YYB66oKz7vZ6OLXROo56UWMgTQx+884CSu/n+nKz2N0BQttUgr9RguDIEGimVvVc
+qYvil0i5w/t9BmS9Amz7/KLEvoknfmypxJtDgsmwRUuCTZoqQZPRHW2K17cchwmf
+twh/ji+tUIyy5HMFx4EA4GhTlFDoAJfUdEKkKf7UwBpjTwf+GbxinoG5kTl7Cx6v
+qmrX19eLz5WsAqNezN/BJgi9+QgLqxkVaHCNMVLM7c3RS/3yOP56e2LgEP6f9wT5
+WhU/bCZ2ZHHi20yMrXedpAWYSIYwY4C9UERBwvNjfhfNLl60n78vKyKIh8BBEEx6
+J0yJRjX2wlXSSZfDoIprpuYq4Yot7qyg9gnLMkjsKdMbWwEFuNyhgSEsN+LtXakG
+AR5O1mQ6Y2JNDNfD/EdlrtQCfvUIxfYBlrrCh/A4Y2oiZYbwdzDpdSrySGH3j92Q
+aC/kOa/U9+XLZMwn5SWy
+=eVxo
+-----END PGP SIGNATURE-----
+
+--KsGdsel6WgEHnImy--
