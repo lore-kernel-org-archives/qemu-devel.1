@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrT-0004J1-Ql
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:37 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrW-0004Jc-2B
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrQ-00079K-KK
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:35 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34282)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrV-0007Bt-2U
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:38 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36419)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dcZrQ-00078X-Do
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:32 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id 12so8900803wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:30 -0700 (PDT)
-Received: from 640k.lan (94-39-192-75.adsl-ull.clienti.tiscali.it.
-	[94.39.192.75]) by smtp.gmail.com with ESMTPSA id
-	u187sm1724160wmd.26.2017.08.01.09.17.26 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 01 Aug 2017 09:17:27 -0700 (PDT)
+	id 1dcZrU-0007Av-SE
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:36 -0400
+Received: by mail-wm0-x242.google.com with SMTP id d40so3781765wma.3
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:36 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  1 Aug 2017 18:17:08 +0200
-Message-Id: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/17] Misc changes for QEMU 2.10-rc1 (?)
+Date: Tue,  1 Aug 2017 18:17:13 +0200
+Message-Id: <1501604245-33460-6-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
+References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 05/17] char: don't exit on hmp 'chardev-add help'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,87 +28,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-The following changes since commit 7d48cf8102a10e4a54333811bafb5eb566509268:
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2017-08-01 14:33:56 +0100)
+qemu_chr_new_from_opts() is used from both vl.c and hmp,
+and it is quite confusing to see qemu suddenly exit after receiving a help
+option in hmp.
 
-are available in the git repository at:
+Do exit(0) from vl.c instead.
 
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-Id: <1500977081-120929-1-git-send-email-anton.nefedov@virtuozzo.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ chardev/char.c         |  2 +-
+ include/chardev/char.h |  4 +++-
+ vl.c                   | 10 ++++++----
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 33f21e4f044ac1c37f60edc1f1aee628be8f463b:
-
-  mc146818rtc: implement UIP latching as intended (2017-08-01 17:27:34 +0200)
-
-----------------------------------------------------------------
-* Xen fix (Anthony)
-* chardev fixes (Anton, Marc-André)
-* small dead code removal (Zhongyi)
-* documentation (Dan)
-* bugfixes (David)
-* decrease migration downtime (Jay)
-* improved error output (Laurent)
-* RTC tests and bugfix (me)
-* Bluetooth clang analyzer fix (me)
-* KVM CPU hotplug race (Peng Hao)
-* Two other patches from Philippe's clang analyzer series
-
-----------------------------------------------------------------
-Anthony PERARD (1):
-      exec: Add lock parameter to qemu_ram_ptr_length
-
-Anton Nefedov (1):
-      char: don't exit on hmp 'chardev-add help'
-
-Daniel P. Berrange (2):
-      docs: document deprecation policy & deprecated features in appendix
-      qemu-options: document existance of versioned machine types
-
-Dr. David Alan Gilbert (2):
-      vl.c/exit: pause cpus before closing block devices
-      cpu_physical_memory_sync_dirty_bitmap: Fix alignment check
-
-Jay Zhou (1):
-      migration: optimize the downtime
-
-Laurent Vivier (1):
-      accel: cleanup error output
-
-Mao Zhongyi (2):
-      hw/scsi/vmw_pvscsi: Remove the dead error handling
-      hw/scsi/vmw_pvscsi: Convert to realize
-
-Marc-André Lureau (1):
-      char-fd: remove useless chr pointer
-
-Paolo Bonzini (5):
-      bt: stop the sdp memory allocation craziness
-      rtc-test: cleanup register_b_set_flag test
-      rtc-test: introduce more update tests
-      mc146818rtc: simplify check_update_timer
-      mc146818rtc: implement UIP latching as intended
-
-Peng Hao (1):
-      target-i386: kvm_get/put_vcpu_events don't handle sipi_vector
-
- accel/accel.c             |  20 +++---
- chardev/char-fd.c         |   1 -
- chardev/char.c            |   2 +-
- exec.c                    |  12 ++--
- hw/bt/sdp.c               |  17 +++--
- hw/scsi/vmw_pvscsi.c      |  12 +---
- hw/timer/mc146818rtc.c    |  37 +++++-----
- include/chardev/char-fd.h |   2 +-
- include/chardev/char.h    |   4 +-
- include/exec/ram_addr.h   |   7 +-
- memory.c                  |  36 +++++++++-
- qemu-doc.texi             | 175 ++++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx           |  15 +++-
- target/i386/kvm.c         |  35 ++++++----
- tests/rtc-test.c          | 156 +++++++++++++++++++++++++++++++++--------
- vl.c                      |  12 ++--
- 16 files changed, 437 insertions(+), 106 deletions(-)
+diff --git a/chardev/char.c b/chardev/char.c
+index c34b44a..5d283b9 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -620,7 +620,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
+ 
+         error_report("Available chardev backend types: %s", str->str);
+         g_string_free(str, true);
+-        exit(0);
++        return NULL;
+     }
+ 
+     if (id == NULL) {
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 1604ea9..66dde46 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -65,7 +65,9 @@ struct Chardev {
+  *
+  * @opts see qemu-config.c for a list of valid options
+  *
+- * Returns: a new character backend
++ * Returns: on success: a new character backend
++ *          otherwise:  NULL; @errp specifies the error
++ *                            or left untouched in case of help option
+  */
+ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+                                 Error **errp);
+diff --git a/vl.c b/vl.c
+index dd803fc..99fcfa0 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2344,10 +2344,12 @@ static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     Error *local_err = NULL;
+ 
+-    qemu_chr_new_from_opts(opts, &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
++    if (!qemu_chr_new_from_opts(opts, &local_err)) {
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
++        exit(0);
+     }
+     return 0;
+ }
 -- 
 1.8.3.1
