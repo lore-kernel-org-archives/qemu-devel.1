@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dcXQV-0003Du-GF
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:41:36 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dcXXE-0004em-BE
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:48:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dcXQS-0007Yi-5c
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:41:35 -0400
-Resent-Message-Id: <E1dcXQS-0007Yi-5c@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21770)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dcXQR-0007YB-Sp
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:41:32 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170801131618.27332-1-stefanha@redhat.com>
-Message-ID: <150159487566.36.9394869878810954316@93e45bedd699>
+	(envelope-from <stefanha@gmail.com>) id 1dcXXB-0003T8-Kn
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:48:32 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:32901)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dcXXB-0003S8-9V
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 09:48:29 -0400
+Received: by mail-wm0-x230.google.com with SMTP id k20so23067573wmg.0
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 06:48:29 -0700 (PDT)
+Date: Tue, 1 Aug 2017 14:48:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170801134825.GC22017@stefanha-x1.localdomain>
+References: <CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
+	<20170727104302.GI2555@redhat.com>
+	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
+	<20170727152137.GW2555@redhat.com>
+	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
+	<20170727154535.GY2555@redhat.com>
+	<20170728133430.GS12364@stefanha-x1.localdomain>
+	<CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
+	<20170728140623.GQ31495@redhat.com> <87vamclf6w.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 1 Aug 2017 06:41:16 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/9] Tracing patches
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
+Content-Disposition: inline
+In-Reply-To: <87vamclf6w.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +38,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: ale+qemu@clearmind.me, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAvOV0gVHJhY2luZyBwYXRjaGVzCk1lc3NhZ2UtaWQ6IDIwMTcwODAxMTMx
-NjE4LjI3MzMyLTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
-Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
-aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
-IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
-YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
-ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
-aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCmVhMWFjMjJiNmYgbW9uaXRvcjogUmVkdWNlIGhhbmRsZV9xbXBfY29tbWFuZCgpIHRyYWNp
-bmcgb3ZlcmhlYWQKMzEwNzkwYWY1MiB0cmFjZS1ldmVudHM6IGZpeCBjb2RlIHN0eWxlOiBwcmlu
-dCAweCBiZWZvcmUgaGV4IG51bWJlcnMKZjQwMWRlNmQ3OCBjaGVja3BhdGNoOiBjaGVjayB0cmFj
-ZS1ldmVudHMgY29kZSBzdHlsZQo1MzM4Y2QzYmNhIHRyYWNlLWV2ZW50czogZml4IGNvZGUgc3R5
-bGU6ICUjIC0+IDB4JQo3OGI3ZWY5YzY2IGNvZGluZ19zdHlsZTogYWRkIHBvaW50IGFib3V0IDB4
-IGluIHRyYWNlLWV2ZW50cwplMTNmYzU3YWU5IHRyYWNlOiBhZGQgdHJhY2VfZXZlbnRfZ2V0X3N0
-YXRlX2JhY2tlbmRzKCkKYWJjNjQ3YmJhNiB0cmFjZTogYWRkIFRSQUNFXzxldmVudD5fQkFDS0VO
-RF9EU1RBVEUoKQoxZGQyN2Q0MzNkIHRyYWNlOiBlbnN1cmUgdW5pcXVlIGZ1bmN0aW9uIC8gdmFy
-aWFibGUgbmFtZXMgcGVyIC5zdHAgZmlsZQpkYzhhMTdiZWEwIHRyYWNlOiBlbnN1cmUgLnN0cCBm
-aWxlcyBhcmUgcmVidWlsdCBpZiB0cmFjZSB0b29sIHNvdXJjZSBjaGFuZ2VzCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHRyYWNlOiBlbnN1cmUgLnN0cCBmaWxlcyBh
-cmUgcmVidWlsdCBpZiB0cmFjZSB0b29sIHNvdXJjZSBjaGFuZ2VzLi4uCkNoZWNraW5nIFBBVENI
-IDIvOTogdHJhY2U6IGVuc3VyZSB1bmlxdWUgZnVuY3Rpb24gLyB2YXJpYWJsZSBuYW1lcyBwZXIg
-LnN0cCBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDMvOTogdHJhY2U6IGFkZCBUUkFDRV88ZXZlbnQ+
-X0JBQ0tFTkRfRFNUQVRFKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC85OiB0cmFjZTogYWRkIHRyYWNl
-X2V2ZW50X2dldF9zdGF0ZV9iYWNrZW5kcygpLi4uCkNoZWNraW5nIFBBVENIIDUvOTogY29kaW5n
-X3N0eWxlOiBhZGQgcG9pbnQgYWJvdXQgMHggaW4gdHJhY2UtZXZlbnRzLi4uCkNoZWNraW5nIFBB
-VENIIDYvOTogdHJhY2UtZXZlbnRzOiBmaXggY29kZSBzdHlsZTogJSMgLT4gMHglLi4uCkNoZWNr
-aW5nIFBBVENIIDcvOTogY2hlY2twYXRjaDogY2hlY2sgdHJhY2UtZXZlbnRzIGNvZGUgc3R5bGUu
-Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI4OiBGSUxFOiBzY3JpcHRzL2No
-ZWNrcGF0Y2gucGw6MTM0MzoKKwkJCQlFUlJPUigiRG9uJ3QgdXNlICcjJyBmbGFnIG9mIHByaW50
-ZiBmb3JtYXQgKCclIycpIGluICIgLgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMy
-OTogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjEzNDQ6CisJCQkJICAgICAgInRyYWNlLWV2
-ZW50cywgdXNlICcweCcgcHJlZml4IGluc3RlYWRcbiIgLiAkaGVyZWN1cnIpOwoKRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjEz
-NDc6CisJCQkJCXFyLyVbLSsgKi4wLTldKihbaGxqenRMXXxsbHxoaCk/KHh8WHwiXHMqUFJJW3hY
-XVteIl0qIj8pLzsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNj
-cmlwdHMvY2hlY2twYXRjaC5wbDoxMzQ5OgorCQkJCSMgZG9uJ3QgY29uc2lkZXIgZ3JvdXBzIHNw
-bGl0dGVkIGJ5IFsuOi8gXSwgbGlrZSAyQS4yMDoxMmFiCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMzU6IEZJTEU6IHNjcmlwdHMvY2hlY2twYXRjaC5wbDoxMzUwOgorCQkJCW15
-ICR0bXBsaW5lID0gJHJhd2xpbmUgPX4gcy8oJGhleFsuOlwvIF0pKyRoZXgvL2dyOwoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gu
-cGw6MTM1MzoKKwkJCQkJRVJST1IoIkhleCBudW1iZXJzIG11c3QgYmUgcHJlZml4ZWQgd2l0aCAn
-MHgnXG4iIC4KCnRvdGFsOiAzIGVycm9ycywgMyB3YXJuaW5ncywgMjUgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC85
-OiB0cmFjZS1ldmVudHM6IGZpeCBjb2RlIHN0eWxlOiBwcmludCAweCBiZWZvcmUgaGV4IG51bWJl
-cnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS85OiBtb25pdG9yOiBSZWR1Y2UgaGFuZGxlX3FtcF9jb21t
-YW5kKCkgdHJhY2luZyBvdmVyaGVhZC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+--L6iaP+gRLNZHKoI4
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jul 28, 2017 at 07:05:43PM +0300, Llu=EDs Vilanova wrote:
+> Daniel P Berrange writes:
+>=20
+> > On Fri, Jul 28, 2017 at 02:41:19PM +0100, Peter Maydell wrote:
+> >> On 28 July 2017 at 14:34, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >> > Llu=EDs/Peter: What are the requirements for instrumentation code
+> >> > interacting with the running QEMU instance?  simpletrace is
+> >> > asynchronous, meaning it does not wait for anyone handle the trace e=
+vent
+> >> > before continuing execution, and is therefore not suitable for
+> >> > SystemTap-style scripts that can interact with the program while
+> >> > handling a trace event.
+> >>=20
+> >> I think you'd probably want synchronous -- it's pretty helpful
+> >> to be able to say "register a trace event hook that doesn't
+> >> fire very often, and use that to get to the region of
+> >> execution that's of interest to you, then enable more hooks
+> >> to get more detail at that point". (For instance, "wait til
+> >> we've executed 5,000,000 instructions, then turn on the
+> >> tracing of all instruction execution, register modification
+> >> and memory accesses".)
+>=20
+> > Currently simpletrace probes have a fixed action when they are enabled,
+> > namely to print state to the trace log file. Perhaps we can make the
+> > action more flexible, if we create a more formal protocol for simpletra=
+ce
+> > to let it talk over a UNIX socket. By default it could send probe data
+> > asynchronously as now, but you could mark probes such that they require
+> > a synchronous ACK, thus pausing execution until that ACK is received
+> > from the instrumenting program.
+>=20
+> > For that to be useful, we would need to have allow probes to be turned
+> > on/off via this trace socket, since the normal HMP/QMP monitor execution
+> > would be blocked while this probe is running.
+>=20
+> This sounds like much more work to me for much lower performance (copy th=
+rough
+> fifo/socket & process synchronization). Especially if many interesting ev=
+ents
+> become "synchronous". Also, with MTTCG using fifos becomes more complex o=
+n both
+> sides (select on the client & synchronization of events between streams o=
+n both
+> sides).
+>=20
+> As a performance example, I've used the approach of this series to perfor=
+m some
+> non-trivial instrumentation and I can get performance on par with PIN (a
+> state-of-the-art tool from intel) on most SPEC benchmarks.
+>=20
+> Honestly, I would try to see if there's a GPL-preserving way to allow nat=
+ive
+> instrumentation libraries to run inside QEMU (either dynamic or static, t=
+hat's
+> less important to me).
+>=20
+> As for the (minimum) requirements I've collected:
+>=20
+> * Peek at register values and guest memory.
+> * Enumerate guest cpus.
+> * Control when events are raised to minimize overheads (e.g., avoid gener=
+ating
+>   TCG code to trace a guest code event we don't care about just now).
+> * When a guest code event is raised at translation time, let instrumentor=
+ decide
+>   if it needs to be raised at execution time too (e.g., might be decided =
+on
+>   instruction opcode)
+> * Minimum overhead when instrumenting (I think the proposed fifo/socket a=
+pproach
+>   does not meet this; point 2 helps a lot here, which is what the current
+>   tracing code does)
+> * Let instrumentor know when TBs are being freed (i.e., to free internal =
+per-TB
+>   structures; I have a patch queued adding this event).
+>=20
+> Nice to have:
+>=20
+> * Avoid recompilation for each new instrumentation logic.
+> * Poke at register values and guest memory.
+> * [synchronous for sure] Let user annotate guest programs to raise additi=
+onal
+>   events with guest-specified information (the hypertrace series I sent).
+> * [synchronous for sure] Make guest breakpoints/watchpoints raise an even=
+t (for
+>   when we cannot annotate the guest code; I have some patches).
+> * Trigger QEMU's event tracing routine when the instrumentation code
+>   decides. This is what this series does now, as then lazy instrumentors =
+don't
+>   need to write their own tracing-to-disk code. Otherwise, per-event trac=
+ing
+>   states would need to be independent of instrumentation states (but the =
+logic
+>   is exactly the same).
+> * Let instrumentor define additional arguments to execution-time events d=
+uring
+>   translation-time (e.g., to quickly index into an instrumentor struct wh=
+en the
+>   execution-time event comes that references info collected during transl=
+ation).
+> * Attach an instrumentor-specified value to each guest CPU (e.g., pointin=
+g to
+>   the instrumentor's cpu state). Might be less necessary if the point abo=
+ve is
+>   met (if we only look at overall performance).
+
+Thanks for sharing the requirements.  A stable API is necessary for
+providing these features.
+
+We're essentially talking about libqemu.  That means QEMU in library
+form with an API for JIT engine, reverse engineering, instrumentation,
+etc tasks.
+
+The user must write a driver program:
+
+  #include <stdio.h>
+  #include <libqemu.h>
+
+  static void my_syscall(QemuVcpu *vcpu, uint64_t num, uint64_t arg1, ...)
+  {
+      if (num =3D=3D 0x123) {
+          printf("r1 =3D %x\n", qemu_vcpu_get_reg32(vcpu, QEMU_REG_R1));
+      }
+  }
+
+  int main(int argc, char **argv)
+  {
+      qemu_init(argc, argv);
+      qemu_add_syscall_handler(my_syscall);
+      qemu_run();
+      return 0;
+  }
+
+There should be real C functions with API documentation instead of
+hooking trace events by name.  Raw QEMU trace event arguments are not
+suitable for libqemu users anyway (libqemu QemuVcpu and similar stable
+API types are needed instead).
+
+Maintaining libqemu will take ongoing effort and no one has committed.
+The last discussion about libqemu was here:
+https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg04847.html
+
+I think think meets your requirements - native instrumentation code, no
+recompiling QEMU, and flexible/powerful APIs possible.
+
+Perhaps if you start with a focus on your use cases other people will
+step in to help maintain and broaden the scope of libqemu for other
+tasks.
+
+What do you think?
+
+Stefan
+
+--L6iaP+gRLNZHKoI4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZgIapAAoJEJykq7OBq3PIPS8H/2fOMdqMNSFqr5EvYAVTTVGp
+xPISNMDPjX7QPNKE82Iebv+q/vqsmI3Zf8hMsGqR5YbbL7tEfjw6MEMFED09c0w4
+AGBtPWBctgCroEShlYoQMA5T0//2nXRJ8Zb37T3QceDiveKORFshBl2ldj2xsHVa
+u2M5Jd5MZwj2FlKGKWaos3WHltCUt17HxmLwnr7/ZtGHXFAsbh4KG/5PZdwQ1pxr
+4vKLHdnb/b25Iq/NGdVJ95t+OCei71B2Rfo+eYYvrncQ/eOkzIsWvRlaJQ4e4ZXO
+MYEjKJZUVk3M2Xj1Ejf821bGJymAPM4wv+sO3HjJV1X5nuMdNMwTG/GIVwdQ7P8=
+=qFaY
+-----END PGP SIGNATURE-----
+
+--L6iaP+gRLNZHKoI4--
