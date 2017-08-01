@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dcSdH-0002MH-Jb
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:34:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dcSey-0003Z6-V1
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:36:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dcSdD-0001Wp-Kh
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:34:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dcSdD-0001WY-Bn
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:34:23 -0400
-Date: Tue, 1 Aug 2017 09:34:17 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170801083417.GC12670@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170731194437.4077-1-programmingkidx@gmail.com>
-	<20170731194437.4077-2-programmingkidx@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dcSex-0002WI-Vn
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 04:36:12 -0400
+References: <20170711170821.24669-1-ppandit@redhat.com>
+	<29e5dd08-80e7-ae0d-7179-73f5d34c3485@redhat.com>
+	<20170721154712.GM18014@stefanha-x1.localdomain>
+	<b3ba0182-8700-76fc-5d20-97c054137ef9@redhat.com>
+	<e8a30256-9b83-1c58-d8e6-9ec5192604b6@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a90fa30-00b3-b389-5b78-54b55046648c@redhat.com>
+Date: Tue, 1 Aug 2017 10:35:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170731194437.4077-2-programmingkidx@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] Add more function keys to QEMU
+In-Reply-To: <e8a30256-9b83-1c58-d8e6-9ec5192604b6@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: check BlockDriverState
+ object before dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, eblake@redhat.com
+To: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Kieron Shorrock <kshorrock@paloaltonetworks.com>, Prasad J Pandit <pjp@fedoraproject.org>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Jul 31, 2017 at 03:44:36PM -0400, John Arbuckle wrote:
-> There are now keyboards that have 19 function keys. This patch extends QEMU so these function keys can be used.
+On 01/08/2017 02:14, John Snow wrote:
+> I may need some nudging towards understanding what the right solution
+> here is, though. Should the blk_aio_flush assume that there always is a
+> root BDS? should it not assume that?
+
+I think blk_aio_flush is not special.  If there is no root BDS, either
+you return -ENOMEDIUM, or you crash.  But all functions should be doing
+the same.
+
+The former makes sense, but right now blk_prwv for one are crashing if
+there is no root BDS so the minimum patch would fix the caller rather
+than blk_aio_flush.
+
+Paolo
+
+> It's difficult for me to understand right now if the bug is in the
+> expectation for the blk_ functions and the caller should be amended, or
+> if you need changes to the way the blk_ functions are trying to
+> increment a counter that doesn't exist.
 > 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
->  qapi-schema.json  | 16 +++++++++++++++-
->  ui/input-keymap.c | 12 ++++++++++++
->  2 files changed, 27 insertions(+), 1 deletion(-)
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index c96f0a26f6..f3433aabe6 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -4862,6 +4862,18 @@
->  # @ac_refresh: since 2.10
->  # @ac_bookmarks: since 2.10
->  # altgr, altgr_r: dropped in 2.10
-> +# @f13: since 2.11
-> +# @f14: since 2.11
-> +# @f15: since 2.11
-> +# @f16: since 2.11
-> +# @f17: since 2.11
-> +# @f18: since 2.11
-> +# @f19: since 2.11
-> +# @f20: since 2.11
-> +# @f21: since 2.11
-> +# @f22: since 2.11
-> +# @f23: since 2.11
-> +# @f24: since 2.11
->  #
->  # Since: 1.3.0
->  #
-> @@ -4888,7 +4900,9 @@
->              'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
->              'volumeup', 'volumedown', 'mediaselect',
->              'mail', 'calculator', 'computer',
-> -            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks' ] }
-> +            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks',
-> +            'f13', 'f14', 'f15', 'f16', 'f17', 'f18', 'f19', 'f20', 'f21',
-> +            'f22', 'f23', 'f24']}
->  
->  ##
->  # @KeyValue:
-> diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-> index cf979c2ce9..21a25d9c63 100644
-> --- a/ui/input-keymap.c
-> +++ b/ui/input-keymap.c
-> @@ -251,6 +251,18 @@ static const int qcode_to_number[] = {
->  
->      [Q_KEY_CODE_F11] = 0x57,
->      [Q_KEY_CODE_F12] = 0x58,
-> +    [Q_KEY_CODE_F13] = 0x5d,
-> +    [Q_KEY_CODE_F14] = 0x5e,
-> +    [Q_KEY_CODE_F15] = 0x5f,
-> +    [Q_KEY_CODE_F16] = 0x55,
-> +    [Q_KEY_CODE_F17] = 0x83,
-> +    [Q_KEY_CODE_F18] = 0xf7,
-> +    [Q_KEY_CODE_F19] = 0x84,
-> +    [Q_KEY_CODE_F20] = 0x5a,
-> +    [Q_KEY_CODE_F21] = 0x74,
-> +    [Q_KEY_CODE_F22] = 0xf9,
-> +    [Q_KEY_CODE_F23] = 0x6d,
-> +    [Q_KEY_CODE_F24] = 0x6f,
->  
->      [Q_KEY_CODE_PRINT] = 0xb7,
->  
-> -- 
-> 2.11.0 (Apple Git-81)
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> I can handle the former fairly easily; if it's the latter, I'm afraid
+> it's stuck in the middle of some of your changes and I'd need a stronger
+> hint.
