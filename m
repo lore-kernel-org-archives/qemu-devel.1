@@ -1,41 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dcZ1x-00054T-2P
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 11:24:22 -0400
+	(envelope-from <groug@kaod.org>) id 1dcZ8Q-0000Ez-Sy
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 11:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dcZ1u-00021Z-88
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 11:24:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48087
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dcZ1u-00021E-2h
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 11:24:18 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v71FNgYK051922
-	for <qemu-devel@nongnu.org>; Tue, 1 Aug 2017 11:24:17 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c2tj2dqnw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 11:24:16 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 1 Aug 2017 16:24:15 +0100
-References: <20170801075727.31335-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170801075727.31335-2-bjsdjshi@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 1 Aug 2017 17:24:10 +0200
+	(envelope-from <groug@kaod.org>) id 1dcZ8O-0006XD-2R
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 11:31:02 -0400
+Received: from 11.mo7.mail-out.ovh.net ([87.98.173.157]:37323)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dcZ8N-0006W1-Ou
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 11:30:59 -0400
+Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 7DBD166E26
+	for <qemu-devel@nongnu.org>; Tue,  1 Aug 2017 17:30:57 +0200 (CEST)
+Date: Tue, 1 Aug 2017 17:30:46 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170801173046.3805979d@bahia.lan>
+In-Reply-To: <20170728042403.GK3098@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150105840463.12000.9666180368681199673.stgit@bahia>
+	<ac479056-e370-7083-bd9e-60d873baf2b4@ozlabs.ru>
+	<20170727190955.2792d785@bahia.lan>
+	<20170728042403.GK3098@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170801075727.31335-2-bjsdjshi@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <5c4c144e-7526-71cf-cd7a-c4ca4d2eff60@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/css: use macro for
- event-information pending error recover code
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/hjpCDu+srJeU+cWX3nTcxyc";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 26/26] spapr: add hotplug hooks
+ for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,64 +35,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, "Michael S.
+	Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
+--Sig_/hjpCDu+srJeU+cWX3nTcxyc
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 28 Jul 2017 14:24:03 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On 08/01/2017 09:57 AM, Dong Jia Shi wrote:
-> Let's use a macro for the ERC (error recover code) when generating a
-> Channel Subsystem Event-information pending CRW (channel report word).
-> 
-> While we are at it, let's also add all other ERCs.
-> 
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> ---
->  hw/s390x/css.c            |  2 +-
->  include/hw/s390x/ioinst.h | 11 +++++++++--
->  2 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 6a42b95cee..5321ca016b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -2103,7 +2103,7 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid)
->  void css_generate_css_crws(uint8_t cssid)
->  {
->      if (!channel_subsys.sei_pending) {
-> -        css_queue_crw(CRW_RSC_CSS, 0, 0, cssid);
-> +        css_queue_crw(CRW_RSC_CSS, CRW_ERC_EVENT, 0, cssid);
->      }
->      channel_subsys.sei_pending = true;
->  }
-> diff --git a/include/hw/s390x/ioinst.h b/include/hw/s390x/ioinst.h
-> index 92d15655e4..f89019f78f 100644
-> --- a/include/hw/s390x/ioinst.h
-> +++ b/include/hw/s390x/ioinst.h
-> @@ -201,8 +201,15 @@ typedef struct CRW {
->  #define CRW_FLAGS_MASK_A 0x0080
->  #define CRW_FLAGS_MASK_ERC 0x003f
-> 
-> -#define CRW_ERC_INIT 0x02
-> -#define CRW_ERC_IPI  0x04
-> +#define CRW_ERC_EVENT    0x00 /* event information pending */
-> +#define CRW_ERC_AVAIL    0x01 /* available */
-> +#define CRW_ERC_INIT     0x02 /* initialized */
-> +#define CRW_ERC_TERROR   0x03 /* temporary error */
-> +#define CRW_ERC_IPI      0x04 /* installed parm initialized */
-> +#define CRW_ERC_TERM     0x05 /* terminal */
-> +#define CRW_ERC_PERRN    0x06 /* perm. error, facility not init */
-> +#define CRW_ERC_PERRI    0x07 /* perm. error, facility init */
-> +#define CRW_ERC_PMOD     0x08 /* installed parameters modified */
+> On Thu, Jul 27, 2017 at 07:09:55PM +0200, Greg Kurz wrote:
+> > On Thu, 27 Jul 2017 14:41:31 +1000
+> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >  =20
+> > > On 26/07/17 18:40, Greg Kurz wrote: =20
+> > > > Hotplugging PHBs is a machine-level operation, but PHBs reside on t=
+he
+> > > > main system bus, so we register spapr machine as the handler for the
+> > > > main system bus.
+> > > >=20
+> > > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > > - rebased against ppc-for-2.10
+> > > > - converted to unplug_request
+> > > > - handle drc_id at pre-plug
+> > > > - reset hotplugged PHB at plug
+> > > > - compatibility with older machine types
+> > > > ---
+> > > >  hw/ppc/spapr.c              |  114 +++++++++++++++++++++++++++++++=
+++++++++++++
+> > > >  hw/ppc/spapr_drc.c          |    1=20
+> > > >  hw/ppc/spapr_pci.c          |    2 -
+> > > >  include/hw/pci-host/spapr.h |    2 +
+> > > >  include/hw/ppc/spapr.h      |    1=20
+> > > >  5 files changed, 118 insertions(+), 2 deletions(-)
+> > > >=20
+> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > index 90485054c2e7..589f76ef9fb8 100644
+> > > > --- a/hw/ppc/spapr.c
+> > > > +++ b/hw/ppc/spapr.c
+> > > > @@ -2540,6 +2540,10 @@ static void ppc_spapr_init(MachineState *mac=
+hine)
+> > > >      register_savevm_live(NULL, "spapr/htab", -1, 1,
+> > > >                           &savevm_htab_handlers, spapr);
+> > > > =20
+> > > > +    if (spapr->dr_phb_enabled) {
+> > > > +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(mach=
+ine), NULL);
+> > > > +    }
+> > > > +
+> > > >      qemu_register_boot_set(spapr_boot_set, spapr);
+> > > > =20
+> > > >      if (kvm_enabled()) {
+> > > > @@ -3238,6 +3242,103 @@ out:
+> > > >      error_propagate(errp, local_err);
+> > > >  }
+> > > > =20
+> > > > +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, Device=
+State *dev,
+> > > > +                               Error **errp)
+> > > > +{
+> > > > +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> > > > +
+> > > > +    if (sphb->drc_id =3D=3D (uint32_t)-1) {
+> > > > +        sphb->drc_id =3D sphb->index;
+> > > > +    }
+> > > > +
+> > > > +    if (sphb->drc_id >=3D SPAPR_DRC_MAX_PHB) {
+> > > > +        error_setg(errp, "PHB id %d out of range", sphb->drc_id);
+> > > > +    }   =20
+> > >=20
+> > >=20
+> > > sphb->index in considered 16bits in the existing code (even though it=
+ is
+> > > defined as 32bit) and SPAPR_DRC_MAX_PHB is just 256. I'd suggest usin=
+g the
+> > > same limit for both, either 256 or 65536 is fine for me.
+> > >=20
+> > > It is actually a bit weird - it is possible to completely configure f=
+ew
+> > > PHBs in the command line so they will have index=3D=3D-1 but PCI hotp=
+lug code -
+> > > spapr_phb_get_pci_func_drc() and spapr_phb_realize() - does not check=
+ for
+> > > this and just does (sphb->index << 16). =20
+> >=20
+> > You're right and this looks like a bug... I'll try to come up with a fi=
+x.
+> >  =20
+> > > May be just ditch drc_id, enforce index not to be -1 and use it as dr=
+c_id?
+> > >  =20
+> >=20
+> > This was how Mike did it in the original patchset but David suggested
+> > to introduce drc_id (to preserve existing setups I guess):
+> >=20
+> > http://patchwork.ozlabs.org/patch/466262/ =20
+>=20
+> Huh.  So I did.  But.. sorry, I've changed my mind.
+>=20
+> The fact that needing a DRC forces us to have a reasonable small id
+> for each PHB seems like a good excuse to make index mandatory - I'm
+> not convinced anyone was actually creating PHBs without index, and
+> this does allow us to simplify a bunch of things.
+>=20
+> I'd like to see that done as a preliminary cleanup patch, though.
+>=20
 
-You have missed installed parameters restored from the PoP (above
-you say add all other).
+Just to be sure. I could verify that the weirdness reported by Alexey
+causes QEMU to misbehave. Only the first "index-less" PHB has realized
+DRCs:
 
-Other than that.
+=3D> subsequent "index-less" PHBs silently ignore hotplugging of PCI devices
 
-LGTM
+=3D> QEMU won't even start with coldplugged devices in these "index-less"
+   PHBs
 
-> 
->  #define CRW_RSC_SUBCH 0x3
->  #define CRW_RSC_CHP   0x4
-> 
+This preliminary cleanup for hotpluggable PHBs is hence also a bug fix
+for current PHBs.
+
+Do we want to fix this long-standing bug in 2.10 ?
+
+Do we want to preserve the current buggy behavior for older machine types ?
+
+--Sig_/hjpCDu+srJeU+cWX3nTcxyc
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlmAnqYACgkQAvw66wEB28LhrQCdGXGn0qNH1wcxU3kEY1lyVZr8
+TskAn3/Ea1DxCryYltbxIFe5C9npnlUm
+=2sWJ
+-----END PGP SIGNATURE-----
+
+--Sig_/hjpCDu+srJeU+cWX3nTcxyc--
