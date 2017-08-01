@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrf-0004UZ-1d
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrf-0004Vi-UX
 	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZre-0007K2-01
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dcZrf-0007Ku-1r
 	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:47 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33950)
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:38110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dcZrd-0007JB-Pl
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:45 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x64so3782691wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:45 -0700 (PDT)
+	id 1dcZre-0007KJ-Rd
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 12:17:46 -0400
+Received: by mail-wr0-x242.google.com with SMTP id g32so1795886wrd.5
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 09:17:46 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  1 Aug 2017 18:17:20 +0200
-Message-Id: <1501604245-33460-13-git-send-email-pbonzini@redhat.com>
+Date: Tue,  1 Aug 2017 18:17:21 +0200
+Message-Id: <1501604245-33460-14-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
 References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 12/17] hw/scsi/vmw_pvscsi: Remove the dead error
- handling
+Subject: [Qemu-devel] [PULL 13/17] hw/scsi/vmw_pvscsi: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +32,51 @@ Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, Markus Armbruster <armbru@redhat.co
 
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 
-qemu_bh_new() is a wrapper around aio_bh_new(), which returns
-null only when g_new() does. It doesn't. So remove the dead
-error handling.
+Convert a device model where initialization obviously
+can't fail, make it implement realize() rather than init().
 
 Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-Id: <20170726084153.10121-1-maozy.fnst@cn.fujitsu.com>
+Message-Id: <20170726084153.10121-2-maozy.fnst@cn.fujitsu.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/vmw_pvscsi.c | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/scsi/vmw_pvscsi.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index 4a106da..d92973e 100644
+index d92973e..77d8b6f 100644
 --- a/hw/scsi/vmw_pvscsi.c
 +++ b/hw/scsi/vmw_pvscsi.c
-@@ -1138,10 +1138,6 @@ pvscsi_init(PCIDevice *pci_dev)
-     }
+@@ -1103,8 +1103,8 @@ static const struct SCSIBusInfo pvscsi_scsi_info = {
+         .cancel = pvscsi_request_cancelled,
+ };
  
-     s->completion_worker = qemu_bh_new(pvscsi_process_completion_queue, s);
--    if (!s->completion_worker) {
--        pvscsi_cleanup_msi(s);
--        return -ENOMEM;
--    }
+-static int
+-pvscsi_init(PCIDevice *pci_dev)
++static void
++pvscsi_realizefn(PCIDevice *pci_dev, Error **errp)
+ {
+     PVSCSIState *s = PVSCSI(pci_dev);
  
-     scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(pci_dev),
-                  &pvscsi_scsi_info, NULL);
+@@ -1144,8 +1144,6 @@ pvscsi_init(PCIDevice *pci_dev)
+     /* override default SCSI bus hotplug-handler, with pvscsi's one */
+     qbus_set_hotplug_handler(BUS(&s->bus), DEVICE(s), &error_abort);
+     pvscsi_reset_state(s);
+-
+-    return 0;
+ }
+ 
+ static void
+@@ -1278,7 +1276,7 @@ static void pvscsi_class_init(ObjectClass *klass, void *data)
+     PVSCSIClass *pvs_k = PVSCSI_DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+-    k->init = pvscsi_init;
++    k->realize = pvscsi_realizefn;
+     k->exit = pvscsi_uninit;
+     k->vendor_id = PCI_VENDOR_ID_VMWARE;
+     k->device_id = PCI_DEVICE_ID_VMWARE_PVSCSI;
 -- 
 1.8.3.1
