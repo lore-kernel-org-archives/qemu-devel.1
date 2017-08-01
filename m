@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1F-0000NF-EZ
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1F-0000ND-BF
 	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1E-0002Pp-ES
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dcY1B-0002Nq-UY
 	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 10:19:33 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue,  1 Aug 2017 17:19:01 +0300
-Message-Id: <1501597152-25342-5-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue,  1 Aug 2017 17:18:57 +0300
+Message-Id: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 04/15] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Subject: [Qemu-devel] [PATCH v4 00/15] qcow2: space preallocation and COW
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +23,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-The idea is that ALLOCATE requests may overlap with other requests.
-Reuse the existing block layer infrastructure for serialising requests.
-Use the following approach:
-  - mark ALLOCATE serialising, so subsequent requests to the area wait
-  - ALLOCATE request itself must never wait if another request is in flight
-    already. Return EAGAIN, let the caller reconsider.
+Changes in v4:
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
----
- block/io.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+  - rebased on top of Eric's series
+    [PATCH v2 00/20] add byte-based block_status driver callbacks
+    http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04370.html
 
-diff --git a/block/io.c b/block/io.c
-index 04d495e..0a7a372 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -488,7 +488,8 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
- 
--static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self,
-+                                                   bool nowait)
- {
-     BlockDriverState *bs = self->bs;
-     BdrvTrackedRequest *req;
-@@ -519,11 +520,14 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-                  * will wait for us as soon as it wakes up, then just go on
-                  * (instead of producing a deadlock in the former case). */
-                 if (!req->waiting_for) {
-+                    waited = true;
-+                    if (nowait) {
-+                        break;
-+                    }
-                     self->waiting_for = req;
-                     qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
-                     self->waiting_for = NULL;
-                     retry = true;
--                    waited = true;
-                     break;
-                 }
-             }
-@@ -1027,7 +1031,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-     }
- 
-     if (!(flags & BDRV_REQ_NO_SERIALISING)) {
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-     }
- 
-     if (flags & BDRV_REQ_COPY_ON_READ) {
-@@ -1321,7 +1325,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
-                                    align);
- 
--    waited = wait_serialising_requests(req);
-+    waited = wait_serialising_requests(req, flags & BDRV_REQ_ALLOCATE);
-+    if (waited && flags & BDRV_REQ_ALLOCATE) {
-+        return -EAGAIN;
-+    }
-     assert(!waited || !req->serialising);
-     assert(req->overlap_offset <= offset);
-     assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
-@@ -1425,7 +1432,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
- 
-         /* RMW the unaligned part before head. */
-         mark_request_serialising(req, align);
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
-         ret = bdrv_aligned_preadv(child, req, offset & ~(align - 1), align,
-                                   align, &local_qiov, 0);
-@@ -1445,6 +1452,10 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-         bytes -= zero_bytes;
-     }
- 
-+    if (flags & BDRV_REQ_ALLOCATE) {
-+        mark_request_serialising(req, align);
-+    }
-+
-     assert(!bytes || (offset & (align - 1)) == 0);
-     if (bytes >= align) {
-         /* Write the aligned part in the middle. */
-@@ -1463,7 +1474,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-         assert(align == tail_padding_bytes + bytes);
-         /* RMW the unaligned part after tail. */
-         mark_request_serialising(req, align);
--        wait_serialising_requests(req);
-+        wait_serialising_requests(req, false);
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
-         ret = bdrv_aligned_preadv(child, req, offset, align,
-                                   align, &local_qiov, 0);
-@@ -1532,7 +1543,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         struct iovec head_iov;
- 
-         mark_request_serialising(&req, align);
--        wait_serialising_requests(&req);
-+        wait_serialising_requests(&req, false);
- 
-         head_buf = qemu_blockalign(bs, align);
-         head_iov = (struct iovec) {
-@@ -1573,7 +1584,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         bool waited;
- 
-         mark_request_serialising(&req, align);
--        waited = wait_serialising_requests(&req);
-+        waited = wait_serialising_requests(&req, false);
-         assert(!waited || !use_local_qiov);
- 
-         tail_buf = qemu_blockalign(bs, align);
+  - patch 5 fixed to compile without CONFIG_FALLOCATE and support
+    BDRV_REQ_ALLOCATE with xfsctl enabled
+
+  - add patches 1, 2 to support write/zero flags in mirror and blkverify
+    drivers
+
+========
+
+Here goes a revisited series on qcow2 preallocation. It's probably a bit better
+integrated this time and the amount of code is reduced significantly.
+
+Changes in v3:
+  - requests intersection detection from the previous versions is removed
+    from qcow2 driver. Instead, tracked request infrastructure from the common
+    block layer is used.
+
+  - that made possible to omit preallocation for metadata writes.
+    Those are rare and won't affect performance.
+
+  - 'Simultaneous writes' feature (patches v2 12-15) dropped by now;
+     Might worth a separate series.
+
+  - various remarks to the previous version fixed
+
+  - some iotests added
+
+========
+
+Changes in v2:
+  - introduce new BDRV flag for write_zeroes()
+      instead of using driver callback directly.
+    Skipped introducing new functions like bdrv_co_pallocate() for now:
+      1. it seems ok to keep calling this write_zeroes() as zeroes
+      are expected;
+      2. most of the code can be reused now anyway, so changes to
+      write_zeroes() path are not significant
+      3. write_zeroes() alignment and max-request limits can also be reused
+
+    As a possible alternative we can have bdrv_co_pallocate() which can
+    switch to pwrite_zeroes(,flags|=BDRV_REQ_ALLOCATE) early.
+
+========
+
+This pull request is to address a few performance problems of qcow2 format:
+
+  1. non cluster-aligned write requests (to unallocated clusters) explicitly
+    pad data with zeroes if there is no backing data. This can be avoided
+    and the whole clusters are preallocated and zeroed in a single
+    efficient write_zeroes() operation, also providing better host file
+    continuity
+
+  2. moreover, efficient write_zeroes() operation can be used to preallocate
+    space megabytes ahead which gives noticeable improvement on some storage
+    types (e.g. distributed storages where space allocation operation is
+    expensive)
+
+  /* omitted in v3: */
+  3. preallocating/zeroing the clusters in advance makes possible to enable
+    simultaneous writes to the same unallocated cluster, which is beneficial
+    for parallel sequential write operations which are not cluster-aligned
+
+Performance test results are added to commit messages (see patch 3, 12)
+
+Anton Nefedov (12):
+  mirror: inherit supported write/zero flags
+  blkverify: set supported write/zero flags
+  block: introduce BDRV_REQ_ALLOCATE flag
+  block: treat BDRV_REQ_ALLOCATE as serialising
+  file-posix: support BDRV_REQ_ALLOCATE
+  block: support BDRV_REQ_ALLOCATE in passthrough drivers
+  qcow2: set inactive flag
+  qcow2: move is_zero() up
+  qcow2: skip writing zero buffers to empty COW areas
+  qcow2: allocate image space by-cluster
+  iotest 190: test BDRV_REQ_ALLOCATE
+  iotest 134: test cluster-misaligned encrypted write
+
+Denis V. Lunev (2):
+  qcow2: preallocation at image expand
+  qcow2: truncate preallocated space
+
+Pavel Butsykin (1):
+  qcow2: check space leak at the end of the image
+
+ include/block/block.h              |   6 +-
+ include/block/block_int.h          |   2 +-
+ block/qcow2.h                      |  18 ++++
+ block/blkdebug.c                   |   3 +-
+ block/blkverify.c                  |   9 ++
+ block/file-posix.c                 |   8 ++
+ block/io.c                         |  47 +++++++--
+ block/mirror.c                     |   5 +
+ block/qcow2-cluster.c              |  14 ++-
+ block/qcow2-refcount.c             |   7 ++
+ block/qcow2.c                      | 203 ++++++++++++++++++++++++++++++++-----
+ block/raw-format.c                 |   3 +-
+ block/trace-events                 |   1 +
+ qemu-options.hx                    |   4 +
+ tests/qemu-iotests/026.out         | 104 ++++++++++++++-----
+ tests/qemu-iotests/026.out.nocache | 104 ++++++++++++++-----
+ tests/qemu-iotests/029.out         |   5 +-
+ tests/qemu-iotests/060             |   2 +-
+ tests/qemu-iotests/060.out         |  13 ++-
+ tests/qemu-iotests/061.out         |   5 +-
+ tests/qemu-iotests/066             |   2 +-
+ tests/qemu-iotests/066.out         |   9 +-
+ tests/qemu-iotests/098.out         |   7 +-
+ tests/qemu-iotests/108.out         |   5 +-
+ tests/qemu-iotests/112.out         |   5 +-
+ tests/qemu-iotests/134             |   9 ++
+ tests/qemu-iotests/134.out         |  10 ++
+ tests/qemu-iotests/190             | 146 ++++++++++++++++++++++++++
+ tests/qemu-iotests/190.out         |  50 +++++++++
+ tests/qemu-iotests/group           |   1 +
+ 30 files changed, 705 insertions(+), 102 deletions(-)
+ create mode 100755 tests/qemu-iotests/190
+ create mode 100644 tests/qemu-iotests/190.out
+
 -- 
 2.7.4
