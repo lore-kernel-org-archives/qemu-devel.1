@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dcvhY-0003Ly-6I
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:36:49 -0400
+	(envelope-from <marcel@redhat.com>) id 1dcvvq-0007MM-5D
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dcvhV-0003S4-IT
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:36:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35464)
+	(envelope-from <marcel@redhat.com>) id 1dcvvm-0003YY-4p
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:51:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dcvhV-0003RR-9L
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:36:45 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dcvvl-0003Y8-S1
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:51:30 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3755E81241
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 15:51:28 +0000 (UTC)
 From: Marcel Apfelbaum <marcel@redhat.com>
-References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-	<1501285073-2215-6-git-send-email-zuban32s@gmail.com>
-	<491f77fc-974c-33dd-3974-08ab61d2c078@redhat.com>
-	<CAKSfGUCTom8YBs8wOHMX_MpzDF1efB8_USb4tuW+hcAdoG2xvw@mail.gmail.com>
-	<20170802003910-mutt-send-email-mst@kernel.org>
-	<17a71bfc-1933-f707-2504-c9c699534cea@redhat.com>
-	<20170802164551-mutt-send-email-mst@kernel.org>
-	<9e36b7d6-bff3-b046-6053-162fb75ca0a0@redhat.com>
-	<b0e1c72d-9c17-42e5-3135-5ebb1e53b4f1@redhat.com>
-Message-ID: <c4761b15-4525-247c-14da-510b20dbf90a@redhat.com>
-Date: Wed, 2 Aug 2017 18:36:29 +0300
-MIME-Version: 1.0
-In-Reply-To: <b0e1c72d-9c17-42e5-3135-5ebb1e53b4f1@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Date: Wed,  2 Aug 2017 18:51:13 +0300
+Message-Id: <20170802155113.62471-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH] docs/pcie.txt: Replace ioh3420 with
+ pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,137 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: marcel@redhat.com, lersek@redhat.com, mst@redhat.com, drjones@redhat.com
 
-On 02/08/2017 17:21, Marcel Apfelbaum wrote:
-> On 02/08/2017 17:16, Laszlo Ersek wrote:
->> On 08/02/17 15:47, Michael S. Tsirkin wrote:
->>> On Wed, Aug 02, 2017 at 12:23:46AM +0200, Laszlo Ersek wrote:
->>>> On 08/01/17 23:39, Michael S. Tsirkin wrote:
->>>>> On Wed, Aug 02, 2017 at 12:33:12AM +0300, Alexander Bezzubikov wrote:
->>>>>> 2017-08-01 23:31 GMT+03:00 Laszlo Ersek <lersek@redhat.com>:
->>>>>>> (Whenever my comments conflict with Michael's or Marcel's, I 
->>>>>>> defer to them.)
->>>>>>>
->>>>>>> On 07/29/17 01:37, Aleksandr Bezzubikov wrote:
->>>>>>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>>>>>>> ---
->>>>>>>>   docs/pcie.txt            |  46 ++++++++++--------
->>>>>>>>   docs/pcie_pci_bridge.txt | 121 
->>>>>>>> +++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>>   2 files changed, 147 insertions(+), 20 deletions(-)
->>>>>>>>   create mode 100644 docs/pcie_pci_bridge.txt
->>>>>>>>
->>>>>>>> diff --git a/docs/pcie.txt b/docs/pcie.txt
->>>>>>>> index 5bada24..338b50e 100644
->>>>>>>> --- a/docs/pcie.txt
->>>>>>>> +++ b/docs/pcie.txt
->>>>>>>> @@ -46,7 +46,7 @@ Place only the following kinds of devices 
->>>>>>>> directly on the Root Complex:
->>>>>>>>       (2) PCI Express Root Ports (ioh3420), for starting 
->>>>>>>> exclusively PCI Express
->>>>>>>>           hierarchies.
->>>>>>>>
->>>>>>>> -    (3) DMI-PCI Bridges (i82801b11-bridge), for starting legacy 
->>>>>>>> PCI
->>>>>>>> +    (3) PCIE-PCI Bridge (pcie-pci-bridge), for starting legacy PCI
->>>>>>>>           hierarchies.
->>>>>>>>
->>>>>>>>       (4) Extra Root Complexes (pxb-pcie), if multiple PCI 
->>>>>>>> Express Root Buses
->>>>>>>
->>>>>>> When reviewing previous patches modifying / adding this file, I
->>>>>>> requested that we spell out "PCI Express" every single time. I'd 
->>>>>>> like to
->>>>>>> see the same in this patch, if possible.
->>>>>>
->>>>>> OK, I didn't know it.
->>>>>>
->>>>>>>
->>>>>>>> @@ -55,18 +55,18 @@ Place only the following kinds of devices 
->>>>>>>> directly on the Root Complex:
->>>>>>>>      pcie.0 bus
->>>>>>>>      
->>>>>>>> ---------------------------------------------------------------------------- 
->>>>>>>>
->>>>>>>>           |                |                    
->>>>>>>> |                  |
->>>>>>>> -   -----------   ------------------   ------------------   
->>>>>>>> --------------
->>>>>>>> -   | PCI Dev |   | PCIe Root Port |   | DMI-PCI Bridge |   |  
->>>>>>>> pxb-pcie  |
->>>>>>>> -   -----------   ------------------   ------------------   
->>>>>>>> --------------
->>>>>>>> +   -----------   ------------------   -------------------   
->>>>>>>> --------------
->>>>>>>> +   | PCI Dev |   | PCIe Root Port |   | PCIE-PCI Bridge |   |  
->>>>>>>> pxb-pcie  |
->>>>>>>> +   -----------   ------------------   -------------------   
->>>>>>>> --------------
->>>>>>>>
->>>>>>>>   2.1.1 To plug a device into pcie.0 as a Root Complex 
->>>>>>>> Integrated Endpoint use:
->>>>>>>>             -device <dev>[,bus=pcie.0]
->>>>>>>>   2.1.2 To expose a new PCI Express Root Bus use:
->>>>>>>>             -device 
->>>>>>>> pxb-pcie,id=pcie.1,bus_nr=x[,numa_node=y][,addr=z]
->>>>>>>> -      Only PCI Express Root Ports and DMI-PCI bridges can be 
->>>>>>>> connected
->>>>>>>> +      Only PCI Express Root Ports, PCIE-PCI bridges and DMI-PCI 
->>>>>>>> bridges can be connected
->>>>>>>
->>>>>>> It would be nice if we could keep the flowing text wrapped to 80 
->>>>>>> chars.
->>>>>>>
->>>>>>> Also, here you add the "PCI Express-PCI" bridge to the list of 
->>>>>>> allowed
->>>>>>> controllers (and you keep DMI-PCI as permitted), but above DMI was
->>>>>>> replaced. I think these should be made consistent -- we should 
->>>>>>> make up
->>>>>>> our minds if we continue to recommend the DMI-PCI bridge or not. 
->>>>>>> If not,
->>>>>>> then we should eradicate all traces of it. If we want to keep it at
->>>>>>> least for compatibility, then it should remain as fully 
->>>>>>> documented as it
->>>>>>> is now.
->>>>>>
->>>>>> Now I'm beginning to think that we shouldn't keep the DMI-PCI bridge
->>>>>> even for compatibility and may want to use a new PCIE-PCI bridge
->>>>>> everywhere (of course, except some cases when users are
->>>>>> sure they need exactly DMI-PCI bridge for some reason)
->>>>>
->>>>> Can dmi-pci support shpc? why doesn't it? For compatibility?
->>>>
->>>> I don't know why, but the fact that it doesn't is the reason libvirt
->>>> settled on auto-creating a dmi-pci bridge and a pci-pci bridge under
->>>> that for Q35. The reasoning was (IIRC Laine's words correctly) that the
->>>> dmi-pci bridge cannot receive hotplugged devices, while the pci-pci
->>>> bridge cannot be connected to the root complex. So both were needed.
->>>>
->>>> Thanks
->>>> Laszlo
->>>
->>> OK. Is it true that dmi-pci + pci-pci under it will allow hotplug
->>> on Q35 if we just flip the bit in _OSC?
->>
->> Marcel, what say you?... :)
+Do not mention ioh3420 in the "how to" doc.
+The device still works and can be used by already
+existing setups, but no need to be mentioned.
 
-Good news, works with:
-    -device i82801b11-bridge,id=b1
-    -device pci-bridge,id=b2,bus=b1,chassis_nr=1,msi=off
+Suggested-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ docs/pcie.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Notice bridge's msi=off until the following kernel bug will be merged:
-   https://www.spinics.net/lists/linux-pci/msg63052.html
-
-
-Thanks,
-Marcel
-
->>
-> 
-> Will test and get back to you (it may actually work)
-> 
-> Thanks,
-> Marcel
-> 
+diff --git a/docs/pcie.txt b/docs/pcie.txt
+index 5bada24..f990033 100644
+--- a/docs/pcie.txt
++++ b/docs/pcie.txt
+@@ -43,8 +43,8 @@ Place only the following kinds of devices directly on the Root Complex:
+         strangely when PCI Express devices are integrated
+         with the Root Complex.
+ 
+-    (2) PCI Express Root Ports (ioh3420), for starting exclusively PCI Express
+-        hierarchies.
++    (2) PCI Express Root Ports (pcie-root-port), for starting exclusively
++        PCI Express hierarchies.
+ 
+     (3) DMI-PCI Bridges (i82801b11-bridge), for starting legacy PCI
+         hierarchies.
+@@ -65,7 +65,7 @@ Place only the following kinds of devices directly on the Root Complex:
+           -device pxb-pcie,id=pcie.1,bus_nr=x[,numa_node=y][,addr=z]
+       Only PCI Express Root Ports and DMI-PCI bridges can be connected
+       to the pcie.1 bus:
+-          -device ioh3420,id=root_port1[,bus=pcie.1][,chassis=x][,slot=y][,addr=z]                                     \
++          -device pcie-root-port,id=root_port1[,bus=pcie.1][,chassis=x][,slot=y][,addr=z]                                     \
+           -device i82801b11-bridge,id=dmi_pci_bridge1,bus=pcie.1
+ 
+ 
+@@ -107,14 +107,14 @@ Plug only PCI Express devices into PCI Express Ports.
+                                              ------------
+ 
+ 2.2.1 Plugging a PCI Express device into a PCI Express Root Port:
+-          -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
++          -device pcie-root-port,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
+           -device <dev>,bus=root_port1
+ 2.2.2 Using multi-function PCI Express Root Ports:
+-      -device ioh3420,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
+-      -device ioh3420,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
+-      -device ioh3420,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
++      -device pcie-root-port,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
++      -device pcie-root-port,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
++      -device pcie-root-port,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
+ 2.2.3 Plugging a PCI Express device into a Switch:
+-      -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
++      -device pcie-root-port,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
+       -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]          \
+       -device xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]] \
+       -device <dev>,bus=downstream_port1
+-- 
+2.9.4
