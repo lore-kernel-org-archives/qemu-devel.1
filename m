@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dcuAc-0001jt-HT
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:43 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dcuAn-0001qW-Ij
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dcuAZ-0005At-An
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:42 -0400
-Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:33304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dcuAZ-00055N-4C
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:39 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 16DDB4B157
-	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 15:58:27 +0200 (CEST)
-Date: Wed, 2 Aug 2017 15:58:16 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170802155816.17fd28fa@bahia.lan>
-In-Reply-To: <20170802103259.25940-1-lvivier@redhat.com>
-References: <20170802103259.25940-1-lvivier@redhat.com>
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dcuAk-0005Iy-HA
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:53 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:42971)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dcuAk-0005Ek-BE
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:50 -0400
+Received: from HHMAIL01.hh.imgtec.org (unknown [10.100.10.19])
+	by Forcepoint Email with ESMTPS id 9E66C66A06861
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 14:58:40 +0100 (IST)
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Wed, 2 Aug 2017 14:58:31 +0100
+Message-ID: <1501682311-16370-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/9nAH8zR9z5pt9KwcosmwU+r";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] cpu: don't allow negative core
- id
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target-mips: apply CP0.PageMask before writing
+ into TLB entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
---Sig_/9nAH8zR9z5pt9KwcosmwU+r
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Leon Alrae <leon.alrae@imgtec.com>
 
-On Wed,  2 Aug 2017 12:32:59 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
+PFN0 and PFN1 have to be masked out with PageMask_Mask.
 
-> With pseries machine type a negative core-id is not managed properly:
-> -1 gives an inaccurate error message ("core -1 already populated"),
-> -2 crashes QEMU (core dump)
->=20
-> As it seems a negative value is invalid for any architecture,
-> instead of checking this in spapr_core_pre_plug() I think it's better
-> to check this in the generic part, core_prop_set_core_id()
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
+Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+[Yongbok Kim:
+  Added commit message]
+Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+ target/mips/op_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Not sure why core_id is signed but, as you said to Philippe, it's probably
-not the right time to change the API.
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/cpu/core.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-> index 2bf960d..bd578ab 100644
-> --- a/hw/cpu/core.c
-> +++ b/hw/cpu/core.c
-> @@ -33,6 +33,11 @@ static void core_prop_set_core_id(Object *obj, Visitor=
- *v, const char *name,
->          return;
->      }
-> =20
-> +    if (value < 0) {
-> +        error_setg(errp, "Invalid core id %"PRId64, value);
-> +        return;
-> +    }
-> +
->      core->core_id =3D value;
->  }
-> =20
-
-
---Sig_/9nAH8zR9z5pt9KwcosmwU+r
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlmB2ngACgkQAvw66wEB28JYtACdGVS1fu8HNZX8wHH7XuynHYU7
-6u0AnicWOK66nu6ni9alpfn5WnBardsT
-=NPim
------END PGP SIGNATURE-----
-
---Sig_/9nAH8zR9z5pt9KwcosmwU+r--
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 526f8e4..320f2b0 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -2008,6 +2008,7 @@ static inline uint64_t get_tlb_pfn_from_entrylo(uint64_t entrylo)
+ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
+ {
+     r4k_tlb_t *tlb;
++    uint64_t mask = env->CP0_PageMask >> (TARGET_PAGE_BITS + 1);
+ 
+     /* XXX: detect conflicting TLBs and raise a MCHECK exception when needed */
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+@@ -2028,13 +2029,13 @@ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
+     tlb->C0 = (env->CP0_EntryLo0 >> 3) & 0x7;
+     tlb->XI0 = (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
+     tlb->RI0 = (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
+-    tlb->PFN[0] = get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) << 12;
++    tlb->PFN[0] = (get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) & ~mask) << 12;
+     tlb->V1 = (env->CP0_EntryLo1 & 2) != 0;
+     tlb->D1 = (env->CP0_EntryLo1 & 4) != 0;
+     tlb->C1 = (env->CP0_EntryLo1 >> 3) & 0x7;
+     tlb->XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
+     tlb->RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
+-    tlb->PFN[1] = get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) << 12;
++    tlb->PFN[1] = (get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) & ~mask) << 12;
+ }
+ 
+ void r4k_helper_tlbinv(CPUMIPSState *env)
+-- 
+2.7.4
