@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dcrQj-0004eM-Et
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 07:03:14 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dcrRe-0005CC-Sy
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 07:04:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dcrQe-0001KO-HL
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 07:03:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53260)
+	(envelope-from <stefanha@redhat.com>) id 1dcrRc-0002F5-88
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 07:04:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dcrQe-0001Jq-83
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 07:03:04 -0400
-Date: Wed, 2 Aug 2017 19:02:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170802110258.GB5561@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-20-git-send-email-peterx@redhat.com>
-	<20170801105610.GG12670@redhat.com>
-	<20170802070224.GD4475@pxdev.xzpeter.org>
-	<20170802092648.GB4098@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dcrRb-0002ER-VF
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 07:04:04 -0400
+Date: Wed, 2 Aug 2017 12:04:00 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170802110400.GI5531@stefanha-x1.localdomain>
+References: <CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
+	<20170727152137.GW2555@redhat.com>
+	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
+	<20170727154535.GY2555@redhat.com>
+	<20170728133430.GS12364@stefanha-x1.localdomain>
+	<CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
+	<20170728140623.GQ31495@redhat.com> <87vamclf6w.fsf@frigg.lan>
+	<20170801134825.GC22017@stefanha-x1.localdomain>
+	<CAFEAcA9KKqyiNfsfjSDVhhE7hMMsAZ==TuSjgtqb6pB=fVF+_w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="OfrWf2Fun5Ae4m0Y"
 Content-Disposition: inline
-In-Reply-To: <20170802092648.GB4098@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 19/29] migration: let dst listen on port
- always
+In-Reply-To: <CAFEAcA9KKqyiNfsfjSDVhhE7hMMsAZ==TuSjgtqb6pB=fVF+_w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,123 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Alessandro Di Federico <ale+qemu@clearmind.me>, "Daniel P. Berrange" <berrange@redhat.com>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Aug 02, 2017 at 10:26:48AM +0100, Daniel P. Berrange wrote:
-> On Wed, Aug 02, 2017 at 03:02:24PM +0800, Peter Xu wrote:
-> > On Tue, Aug 01, 2017 at 11:56:10AM +0100, Daniel P. Berrange wrote:
-> > > On Fri, Jul 28, 2017 at 04:06:28PM +0800, Peter Xu wrote:
-> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > ---
-> > > >  migration/exec.c   | 2 +-
-> > > >  migration/fd.c     | 2 +-
-> > > >  migration/socket.c | 4 ++--
-> > > >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/migration/exec.c b/migration/exec.c
-> > > > index 08b599e..b4412db 100644
-> > > > --- a/migration/exec.c
-> > > > +++ b/migration/exec.c
-> > > > @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
-> > > >  {
-> > > >      migration_channel_process_incoming(ioc);
-> > > >      object_unref(OBJECT(ioc));
-> > > > -    return FALSE; /* unregister */
-> > > > +    return TRUE; /* keep it registered */
-> > > >  }
-> > > >  
-> > > >  void exec_start_incoming_migration(const char *command, Error **errp)
-> > > > diff --git a/migration/fd.c b/migration/fd.c
-> > > > index 30f5258..865277a 100644
-> > > > --- a/migration/fd.c
-> > > > +++ b/migration/fd.c
-> > > > @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
-> > > >  {
-> > > >      migration_channel_process_incoming(ioc);
-> > > >      object_unref(OBJECT(ioc));
-> > > > -    return FALSE; /* unregister */
-> > > > +    return TRUE; /* keep it registered */
-> > > >  }
-> > > >  
-> > > >  void fd_start_incoming_migration(const char *infd, Error **errp)
-> > > > diff --git a/migration/socket.c b/migration/socket.c
-> > > > index 757d382..f2c2d01 100644
-> > > > --- a/migration/socket.c
-> > > > +++ b/migration/socket.c
-> > > > @@ -153,8 +153,8 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-> > > >  
-> > > >  out:
-> > > >      /* Close listening socket as its no longer needed */
-> > > > -    qio_channel_close(ioc, NULL);
-> > > > -    return FALSE; /* unregister */
-> > > > +    // qio_channel_close(ioc, NULL);
-> > > > +    return TRUE; /* keep it registered */
-> > > >  }
-> > > 
-> > > 
-> > > This is not a very desirable approach IMHO.
-> > > 
-> > > There are two separate things at play - first we have the listener socket,
-> > > and second we have the I/O watch that monitors for incoming clients.
-> > > 
-> > > The current code here closes the listener, and returns FALSE to unregister
-> > > the event loop watch.
-> > > 
-> > > You're reversing both of these so that we keep the listener open and we
-> > > keep monitoring for incoming clients. Ignoring migration resume for a
-> > > minute, this means that the destination QEMU will now accept arbitrarily
-> > > many incoming clients and keep trying to start a new incoming migration.
-> > > 
-> > > The behaviour we need is diferent. We *want* to unregister the event
-> > > loop watch once we've accepted a client. We should only keep the socket
-> > > listener in existance, but *not* accept any more clients. Only once we
-> > > have hit a problem and want to accept a new client to do migration
-> > > recovery, should we be re-adding the event loop watch.
-> > 
-> > I replied with another approach in the other thread: how about we
-> > re-enable the listen port duing "postcopy-pause" state, and disable
-> > the listen port when get out of that migration state?
-> 
-> Thinking about this agan, I realize I only considered the socket
-> migration backend.  If we are using the 'fd' backend, then we
-> *must* have an explicit monitor command invoked on the target
-> host to obtain the new client connection. This is because the
-> 'fd' that QEMU has is the actual client connection, not a listener
-> socket, so libvirt needs to be able to pass in a new fd.
 
-Hmm right... So looks like I cannot really ignore this issue even for
-the first version (I thought I could).
+--OfrWf2Fun5Ae4m0Y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Not sure whether we can do this: just allow the "migrate_incoming URL"
-to work even for not "delayed" cases? Then when we receive that
-command, we'll do:
+On Tue, Aug 01, 2017 at 02:54:29PM +0100, Peter Maydell wrote:
+> On 1 August 2017 at 14:48, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > Thanks for sharing the requirements.  A stable API is necessary for
+> > providing these features.
+> >
+> > We're essentially talking about libqemu.  That means QEMU in library
+> > form with an API for JIT engine, reverse engineering, instrumentation,
+> > etc tasks.
+>=20
+> > Maintaining libqemu will take ongoing effort and no one has committed.
+> > The last discussion about libqemu was here:
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg04847.html
+>=20
+> That thread seems to be focused on trying to extract TCG
+> from the rest of QEMU, which definitely isn't a requirement
+> for instrumentation, and I would suggest is something
+> of a distraction from it.
 
-- if there is no existing listening port (when the old URL is one of
-  "defer", "exec", "fd"), we create a new listening port using the new
-  URL provided
+You are right, it's a different use case.  I just wanted to reference
+previous discussion about libqemu.  There have been more in the past for
+different use cases.
 
-- if there is existing listening port (when the old URL is one of
-  "tcp", "sock", "rdma"), we first release the old listening port and
-  resources, then create a new port using the new URL
+> I want to be able to say "just
+> instrument this setup that QEMU already provides as a
+> board model", not have to write a driver that duplicates
+> all the work vl.c and our board models do for us today,
 
-> 
-> 
-> > Here "listen port" I mean both the IO watch and the socket object. Now
-> > what I can think of: we keep these objects always there, meanwhile we
-> > introduce a new bit for migration, say, "accept_incoming", to decide
-> > whether we will really accept one connection. Then we drop the new
-> > connection if that bit is not set.
-> > 
-> > (Or a new QIOChannelFeature to temporarily refuse incoming
-> >  connection? E.g., QIO_CHANNEL_FEATURE_LISTEN_REFUSE?)
-> 
-> That feature already exists - you just unregister the event loop
-> watch and re-register it when you're ready again. The chardev
-> socket code works this way already, since it only allows a single
-> client at a time
+Calling qemu_init(argc, argv) and qemu_run() isn't too onerous.  For the
+price of that you get an environment where we can offer stable APIs.
 
-Ah I see.  Thanks!
+> and I don't need the TCG engine to be a library to do that...
 
--- 
-Peter Xu
+You do need TCG APIs if you want TCG-level instrumentation, tuning
+options, callbacks, etc.
+
+> I agree that we want to provide something that is at least
+> closer to a stable API than "just expose trace events",
+> though.
+
+libqemu has at least three parts:
+
+1. VM API (i.e. qemu_init(argc, argv), qemu_run(), qemu_vcpu_get_reg32())
+2. TCG engine
+3. Device models
+
+Like I said in my email, start with what matters for the instrumentation
+use case (VM API at a minimum to control guest execution).  Other people
+can flesh out the other parts later, as needed.
+
+Other attempts to provide a stable API will be essentially the same
+thing as libqemu.
+
+Stefan
+
+--OfrWf2Fun5Ae4m0Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZgbGgAAoJEJykq7OBq3PIYrgH/R9hObn5r1yGjeNZlZBMJHZF
+T3Jlr3zvo3gAUBLOpl57z1cqVfc6ub71zjf5kNJMfC5cwCwesn+OPcmARaUqkeiy
+35p9poj9nJmsWoYfWN3ho/Dbr9xVf6Oo7CIHdB7Q7dnAvic4G9p21ulcbG5Z3cyK
+5iGi6ffXjhBvKtzEWjDi2cxWXsrEc+f8LWm1s+YjPObCjTsWsmhmVkfzxuUFlIQT
+//3JiLOtSOWz4EbXKDNtOxt46Ilcqef7VzAtvyOgLGYxGx4RjL5BNH06lhFvs52D
+MD2WzArC7rVYmqa8DuZwROX711gs1fR61gOxjV/LVg2nz4zHjw6nyAeOEl1ZWWM=
+=Mzju
+-----END PGP SIGNATURE-----
+
+--OfrWf2Fun5Ae4m0Y--
