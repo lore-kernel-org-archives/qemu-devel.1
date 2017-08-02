@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dcjUQ-0003iT-5N
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 22:34:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dcjZF-0004jA-4x
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 22:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yulei.zhang@intel.com>) id 1dcjUM-00016I-TF
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 22:34:26 -0400
-Received: from mga09.intel.com ([134.134.136.24]:40842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yulei.zhang@intel.com>)
-	id 1dcjUM-000130-Ja
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 22:34:22 -0400
-From: "Zhang, Yulei" <yulei.zhang@intel.com>
-Date: Wed, 2 Aug 2017 02:34:15 +0000
-Message-ID: <01FDBDDE256B79498DC57789713132D469E0FF18@SHSMSX101.ccr.corp.intel.com>
-References: <1494316727-15518-1-git-send-email-yulei.zhang@intel.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D50356@SHSMSX101.ccr.corp.intel.com>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D50356@SHSMSX101.ccr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgibson@ozlabs.org>) id 1dcjZD-0005lS-O9
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 22:39:25 -0400
+Date: Wed, 2 Aug 2017 12:35:31 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170802023531.GC2838@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100578691.27487.8944448515009831240.stgit@bahia>
+	<20170728040257.GI3098@umbus.fritz.box>
+	<c3750e7d-47af-4cd4-9121-73d8d8d0f81e@redhat.com>
+	<20170731045821.GE2652@umbus.fritz.box>
+	<a9d88270-94ec-84a1-a664-4e6df3f2af31@ozlabs.ru>
+	<20170801132615.7f7664e4@bahia.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC V2 0/4] vfio: Introduce Live migration
- capability to vfio_mdev device
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="yLVHuoLXiP9kZBkt"
+Content-Disposition: inline
+In-Reply-To: <20170801132615.7f7664e4@bahia.lan>
+Subject: Re: [Qemu-devel] [for-2.11 PATCH 24/26] spapr: allow guest to
+ update the XICS phandle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +30,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
 
+--yLVHuoLXiP9kZBkt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Tian, Kevin
-> Sent: Monday, July 31, 2017 2:55 PM
-> To: Zhang, Yulei <yulei.zhang@intel.com>; qemu-devel@nongnu.org
-> Cc: joonas.lahtinen@linux.intel.com; zhenyuw@linux.intel.com; Zheng, Xiao
-> <xiao.zheng@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>;
-> alex.williamson@redhat.com
-> Subject: RE: [Qemu-devel][RFC V2 0/4] vfio: Introduce Live migration
-> capability to vfio_mdev device
+On Tue, Aug 01, 2017 at 01:26:15PM +0200, Greg Kurz wrote:
+> On Tue, 1 Aug 2017 12:20:56 +1000
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 >=20
-> > From: Zhang, Yulei
-> > Sent: Tuesday, May 9, 2017 3:59 PM
-> >
-> > Summary
-> >
-> > This series RFC would like to introduce the live migration capability
-> > to vfio_mdev device.
-> >
-> > As currently vfio_mdev device don't support migration, we introduce a
-> > new vfio subtype region
-> VFIO_REGION_SUBTYPE_INTEL_IGD_DEVICE_STATE
-> > for Intel vGPU device, during the vfio device initialization, the mdev
-> > device will be set to migratable if the new region exist.
+> > On 31/07/17 14:58, David Gibson wrote:
+> > > On Fri, Jul 28, 2017 at 08:20:57AM +0200, Thomas Huth wrote: =20
+> > >> On 28.07.2017 06:02, David Gibson wrote: =20
+> > >>> On Tue, Jul 25, 2017 at 08:03:06PM +0200, Greg Kurz wrote: =20
+> > >>>> The "phandle" property of the XICS node is referenced by the "inte=
+rrupt-map"
+> > >>>> property of each PHB node. This is used by the guest OS to setup I=
+RQs for
+> > >>>> all PCI devices.
+> > >>>>
+> > >>>> QEMU uses an arbitrary value (0x1111) for this phandle, but SLOF c=
+onverts
+> > >>>> this value to a SLOF specific one, which is then presented to the =
+guest OS.
+> > >>>>
+> > >>>> This patches introduces the new KVMPPC_H_UPDATE_PHANDLE hcall, whi=
+ch is used
+> > >>>> by SLOF to communicate the patched phandle value back to QEMU. Thi=
+s value
+> > >>>> is then cached and preserved accross migration until machine reset.
+> > >>>>
+> > >>>> This is required to be able to support PHB hotplug.
+> > >>>>
+> > >>>> Note, that SLOF already has some code to call KVMPPC_H_RTAS_UPDATE=
+, so we
+> > >>>> have to introduce its number even if QEMU currently doesn't implem=
+ent it.
+> > >>>>
+> > >>>> Suggested-by: Thomas Huth <thuth@redhat.com>
+> > >>>> Signed-off-by: Greg Kurz <groug@kaod.org> =20
+> > >>>
+> > >>> Ugh.  I really, really hope we can avoid this, though I don't
+> > >>> immediately see how.  Having to have two way communication between
+> > >>> qemu and SLOF about the device tree contents just seems like opening
+> > >>> the door to endless complexities.
+> > >>>
+> > >>> This is basically a consequence of the fact that both qemu and part=
+ly
+> > >>> responsible for constructing the device tree for the guest, and tha=
+t's
+> > >>> not easy to avoid.
+> > >>>
+> > >>> Hrm.. Thomas, I know it's not really the OF way, but would it be
+> > >>> feasible to change SLOF to use the phandles as supplied by qemu rat=
+her
+> > >>> than creating its own? =20
+> > >>
+> > >> I don't see a way to do this in an easy, clean, reasonable way. SLOF
+> > >> uses pointers to internal structures as phandles all over the place.=
+ You
+> > >> likely can't replace that so easily without rewriting half of the wh=
+ole
+> > >> device tree related code in SLOF, I guess... =20
+> > >=20
+> > > Dang, that's what I suspected.
+> > >=20
+> > > Just to be clear the phandles are used directly as raw pointers?
+> > > There's not even some lookup macro we could change?
+> > >  =20
+> >=20
+> > We would need to rewrite
+> > https://github.com/aik/SLOF/blob/master/slof/fs/node.fs
+> >=20
+> > Since SLOF does not seem to use phandles as pointers directly anywhere =
+but
+> > in nofe.fs, this should be doable. Easier said than done though.
+> >=20
 >=20
-> Looking at your series, there is really nothing specific to vGPU or even =
-Intel
-> vGPU regarding to device state save/restore...
+> Yikes... If we go that way, I'll definitely need some assistance and time.
 >=20
+> Cc'ing Nikunj for some extra advices.
 
-You are right, we may define a new subtype for it as it is common region fo=
-r vfio=20
-device state save/restore.
+Yeah, I hope we could get a feasibility idea from someone who knows
+Forth - Thomas or Nikunj, maybe.
 
-> >
-> > The intention to add the new region is using it for vfio_mdev device
-> > status save and restore during the migration. The access to this
-> > region will be trapped and forward to the vfio_mdev device driver. And
-> > we use the first byte in the new region to control the running state
-> > of mdev device.
-> >
-> > Meanwhile we add one new ioctl VFIO_IOMMU_GET_DIRTY_BITMAP to
-> help do
-> > the mdev device dirty page synchronization.
-> >
-> > So the vfio_mdev device migration sequence would be Source VM side:
-> > 			start migration
-> > 				|
-> > 				V
-> >         	 get the cpu state change callback, write to the
-> >         	 subregion's first byte to stop the mdev device
-> > 				|
-> > 				V
-> > 		 quary the dirty page bitmap from iommu container
-> > 		 and add into qemu dirty list for synchronization
-> > 				|
-> > 				V
-> > 		 save the deivce status into Qemufile which is
-> >                      read from the vfio device subregion
-> >
-> > Target VM side:
-> > 		   restore the mdev device after get the
-> > 		     saved status context from Qemufile
-> > 				|
-> > 				V
-> > 		     get the cpu state change callback
-> >  		     write to subregion's first byte to
-> >                       start the mdev device to put it in
-> >                       running status
-> > 				|
-> > 				V
-> > 			finish migration
-> >
-> > V1->V2:
-> > Per Alex's suggestion:
-> > 1. use device subtype region instead of VFIO PCI fixed region.
-> > 2. remove unnecessary ioctl, use the first byte of subregion to
-> >    control the running state of mdev device.
-> > 3. for dirty page synchronization, implement the interface with
-> >    VFIOContainer instead of vfio pci device.
-> >
-> > Yulei Zhang (4):
-> >   vfio: introduce a new VFIO sub region for mdev device migration
-> >     support
-> >   vfio: Add vm status change callback to stop/restart the mdev device
-> >   vfio: Add struct vfio_vmstate_info to introduce put/get callback
-> >     funtion     for vfio device status save/restore
-> >   vifo: introduce new VFIO ioctl VFIO_IOMMU_GET_DIRTY_BITMAP
-> >
-> >  hw/vfio/common.c              |  32 +++++++++
-> >  hw/vfio/pci.c                 | 164
-> > +++++++++++++++++++++++++++++++++++++++++-
-> >  hw/vfio/pci.h                 |   1 +
-> >  include/hw/vfio/vfio-common.h |   1 +
-> >  linux-headers/linux/vfio.h    |  26 ++++++-
-> >  5 files changed, 220 insertions(+), 4 deletions(-)
-> >
-> > --
-> > 2.7.4
+I'd be thinking of replacing the direct pointer dereferences for
+phandles with a simple lookup table of phandle to pointer, populated
+as we unflatten the tree.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--yLVHuoLXiP9kZBkt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmBOnIACgkQbDjKyiDZ
+s5K97xAAuf1EplGCtCRkkirJzEi89SOBd0UilOznB94H10r9mVhdWvFmFnlAOz9J
+n5VP5iFX+lEjINc4pMhYF1XI54AWlp+OI+7JjGMNfi5nKsIbiiwtLHL7Y7NEBROf
+rDnNYkL9l8OS0VMn0JAGo4B49KsWraZek25VLoOjHy+3KnKmd3rDTt9j4663gUxh
+W5rEnNPzuIfrMlda76s2j3heW4gxWLXq4mbBDLArCVmh78tl9ly87vtMTt8nN/DV
+ovzXjN2w68QcAff1GHIzBHhJygqF9Z8hSI1hkQ6E7jHqxHz3OMmn8txl+YkgumYe
+5F1zGcmSdVcSsTs02BBfpGL8tk7gbNipE0tmzpqTea1mco4t27erkSiQnvSI6VxQ
+PkF5JHQ+2XCPEE0eZVNM5JBFKwuR5/s0BCs5TQepqf8hnnHZwf+4pJd6meAdd8Bm
+WhK014vKiwGnNYOF173zkbDi0UkR9gqYrR2XImOQ7ryxtwCQt5kIUnc+uQUo5Cmb
+Hvxggrk/zYJTzrQlDF15ny3eOAwdK49tWAd7XfIHk2Clh/nQFFmi1LSLvmHQ8orr
+ZoMBUMCnYnDA+fbXLu4nAshOQnDRMQxG6Ie/WijDtkWoLyDr7/G+2W7sDUJ7MYGK
+NzvrWBaXp3cLcnVXvqUD73aUJLR9xXfxUDeJgzMS6GG1giMRazY=
+=MrsJ
+-----END PGP SIGNATURE-----
+
+--yLVHuoLXiP9kZBkt--
