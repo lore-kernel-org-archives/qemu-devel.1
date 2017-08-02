@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcsqU-0007XQ-Nz
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1dcsql-0007pf-LB
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:34:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcsqR-0006Wv-JE
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57974)
+	(envelope-from <berrange@redhat.com>) id 1dcsqh-0006el-Ht
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:34:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dcsqR-0006Wl-AG
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:47 -0400
-References: <CAK6XCv6oYSL=gQKhv6N5e7y620szz5Wc5g13OOMd=C54Lc=O7w@mail.gmail.com>
-	<20170802121856.GG4098@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6da76618-0d93-dc45-1768-4598cf07a95f@redhat.com>
-Date: Wed, 2 Aug 2017 07:33:44 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dcsqh-0006cz-91
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:34:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2B8C9883C0
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 12:34:02 +0000 (UTC)
+Date: Wed, 2 Aug 2017 13:33:56 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170802123356.GI4098@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170728121040.631-1-otubo@redhat.com>
+	<20170728121040.631-3-otubo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170802121856.GG4098@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu"
-Subject: Re: [Qemu-devel] Where is the VM live migration code?
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170728121040.631-3-otubo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] seccomp: add obsolete argument to
+ command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +35,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Aditya Bhardwaj <adityaform@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Otubo <otubo@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Aditya Bhardwaj <adityaform@gmail.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <6da76618-0d93-dc45-1768-4598cf07a95f@redhat.com>
-Subject: Re: [Qemu-devel] Where is the VM live migration code?
-References: <CAK6XCv6oYSL=gQKhv6N5e7y620szz5Wc5g13OOMd=C54Lc=O7w@mail.gmail.com>
- <20170802121856.GG4098@redhat.com>
-In-Reply-To: <20170802121856.GG4098@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 28, 2017 at 02:10:36PM +0200, Eduardo Otubo wrote:
+> This patch introduces the argument [,obsolete=allow] to the `-sandbox on'
+> option. It allows Qemu to run safely on old system that still relies on
+> old system calls.
+> 
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> ---
+>  include/sysemu/seccomp.h |  4 +++-
+>  qemu-options.hx          |  9 +++++++--
+>  qemu-seccomp.c           | 32 +++++++++++++++++++++++++++++++-
+>  vl.c                     | 16 +++++++++++++++-
+>  4 files changed, 56 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
+> index cfc06008cb..7a7bde246b 100644
+> --- a/include/sysemu/seccomp.h
+> +++ b/include/sysemu/seccomp.h
+> @@ -15,7 +15,9 @@
+>  #ifndef QEMU_SECCOMP_H
+>  #define QEMU_SECCOMP_H
+>  
+> +#define OBSOLETE    0x0001
 
-On 08/02/2017 07:18 AM, Daniel P. Berrange wrote:
-> On Wed, Aug 02, 2017 at 04:25:08PM +0530, Aditya Bhardwaj wrote:
->> My lab setup is: 3 HP Servers each of 4 GB RAM. Server 1 and Server 2:=
+Please namespace this - its far too generic a term to expose to other
+source files. I'd suggest 
 
->> installed with Virtualization using KVM on Redhat 6.5 System. On top o=
-f
->> this I am using libvirtd for managing virtual machines. NFS server is
->> installed on Server 3 for shared disk image. VM migration is working
->> correctly. Now i need to do some changes in "migration.c" but did not =
-find
->> any source code of KVM-QEMU migration.
->>
->> Where I can find the migration source code for KVM-QEMU. All are reque=
-sted
->> to help me for this issue.
->=20
-> QEMU source code is in GIT
->=20
->   https://git.qemu.org/gitweb.cgi?p=3Dqemu.git;a=3Dsummary
->=20
-> in the 'migration' directory.
->=20
-> If you're new writing code for QEMU then see this page too
->=20
-> https://wiki.qemu.org/index.php/Documentation/GettingStartedDevelopers
+  QEMU_SECCOMP_SET_OBSOLETE
 
-I've also got a patch pending to make the various qemu executables
-provide a link to qemu.org as part of their --help output (which will in
-turn make it easier to find links to the source code):
+> -int seccomp_start(void);
+> +int seccomp_start(uint8_t seccomp_opts);
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg09049.html
+This only allows for 8 sets. Perhaps its enough, but I'd suggest
+just using a uint32_t straight away.
 
-It needs some review if it's going to be part of 2.10.
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 746b5fa75d..54e492f36a 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4004,13 +4004,18 @@ Old param mode (ARM only).
+>  ETEXI
+>  
+>  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
+> -    "-sandbox <arg>  Enable seccomp mode 2 system call filter (default 'off').\n",
+> +    "-sandbox on[,obsolete=allow]  Enable seccomp mode 2 system call filter (default 'off').\n" \
+> +    "                obsolete: Allow obsolete system calls\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+> -@item -sandbox @var{arg}
+> +@item -sandbox @var{arg}[,obsolete=@var{string}]
+>  @findex -sandbox
+>  Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
+>  disable it.  The default is 'off'.
+> +@table @option
+> +@item obsolete=@var{string}
+> +Enable Obsolete system calls
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Lets explain this a bit more.
+
+E obsolete system calls that are provided by the kernel, but typically no
+longer used by modern C library implementations. 
+
+> +@end table
+>  ETEXI
+>  
+>  DEF("readconfig", HAS_ARG, QEMU_OPTION_readconfig,
+> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> index f8877b07b5..c6a8b28260 100644
+> --- a/qemu-seccomp.c
+> +++ b/qemu-seccomp.c
+> @@ -31,6 +31,20 @@ struct QemuSeccompSyscall {
+>      uint8_t priority;
+>  };
+>  
+> +static const struct QemuSeccompSyscall obsolete[] = {
+> +    { SCMP_SYS(readdir), 255 },
+> +    { SCMP_SYS(_sysctl), 255 },
+> +    { SCMP_SYS(bdflush), 255 },
+> +    { SCMP_SYS(create_module), 255 },
+> +    { SCMP_SYS(get_kernel_syms), 255 },
+> +    { SCMP_SYS(query_module), 255 },
+> +    { SCMP_SYS(sgetmask), 255 },
+> +    { SCMP_SYS(ssetmask), 255 },
+> +    { SCMP_SYS(sysfs), 255 },
+> +    { SCMP_SYS(uselib), 255 },
+> +    { SCMP_SYS(ustat), 255 },
+> +};
+> +
+>  static const struct QemuSeccompSyscall blacklist[] = {
+>      { SCMP_SYS(reboot), 255 },
+>      { SCMP_SYS(swapon), 255 },
+> @@ -56,7 +70,20 @@ static const struct QemuSeccompSyscall blacklist[] = {
+>      { SCMP_SYS(vserver), 255 },
+>  };
+>  
+> -int seccomp_start(void)
+> +static int is_obsolete(int syscall)
+> +{
+> +    unsigned int i = 0;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(obsolete); i++) {
+> +        if (syscall == obsolete[i].num) {
+> +            return 1;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +int seccomp_start(uint8_t seccomp_opts)
+>  {
+>      int rc = 0;
+>      unsigned int i = 0;
+> @@ -69,6 +96,9 @@ int seccomp_start(void)
+>      }
+>  
+>      for (i = 0; i < ARRAY_SIZE(blacklist); i++) {
+> +        if ((seccomp_opts & OBSOLETE) && is_obsolete(blacklist[i].num)) {
+> +            continue;
+> +        }
+
+IMHO this is leading to a rather inefficient approach. Why not extend
+QemuSeccompSyscall struct so that it has another field to list which
+set it belongs to. Then you can do
 
 
---0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  static const struct QemuSeccompSyscall blacklist[] = {
+    { SCMP_SYS(reboot), 255, QEMU_SECCOMP_SET_DEFAULT },
+    { SCMP_SYS(swapon), 255, QEMU_SECCOMP_SET_DEFAULT },
+     ....
+    { SCMP_SYS(readdir), 255, QEMU_SECCOMP_SET_OBSOLETE },
+    { SCMP_SYS(_sysctl), 255, QEMU_SECCOMP_SET_OBSOLETE },
+    ...
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+And then to process this you can do
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmBxqkACgkQp6FrSiUn
-Q2pCuAf/Sqkxj1KVR1ect9ah7mnZ7nyntbRUx1lfnhecGeBiUwJhGJkohAkTZrB5
-1EvC5lF22KkObUWll2Qgd3iJBBornRyYaoDAJCGTkq2Ka6vzgiLZ9fxWqZxmWneW
-F+SyVrjqsHy46n55MrrwxxuyO2Io50DFXiXMpaW6tdy+uUna7DYJodA57x7Pz75H
-qsUNlfmWp4dcpzu9tAsIKQfWqy+klQBjG/nBImYehvY+UQfFYYIdukbofG0ZRU8N
-QQ3MSnIwDni6ibYGFJfUozWAcObEJLKupgZMIdUKyNBDI4viOlzH8f3/mObPnifk
-U3hLLW0rH6MhUVVIxpmsvdc6+bsquA==
-=dtLq
------END PGP SIGNATURE-----
+      for (i = 0; i < ARRAY_SIZE(blacklist); i++) {
+          if (blacklist[i].set != QEMU_SECCOMP_SET_OBSOLETE &&
+              blacklist[i].set & seccomp_opts) {
+	      continue;
+	  }
 
---0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu--
+
+>          rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, blacklist[i].num, 0);
+>          if (rc < 0) {
+>              goto seccomp_return;
+> diff --git a/vl.c b/vl.c
+> index 15b98800e9..cbe09c94af 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -271,6 +271,10 @@ static QemuOptsList qemu_sandbox_opts = {
+>              .name = "enable",
+>              .type = QEMU_OPT_BOOL,
+>          },
+> +        {
+> +            .name = "obsolete",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -1032,7 +1036,17 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+>  {
+>      if (qemu_opt_get_bool(opts, "enable", false)) {
+>  #ifdef CONFIG_SECCOMP
+> -        if (seccomp_start() < 0) {
+> +        uint8_t seccomp_opts = 0x0000;
+> +        const char *value = NULL;
+> +
+> +        value = qemu_opt_get(opts, "obsolete");
+> +        if (value) {
+> +            if (strcmp(value, "allow") == 0) {
+> +                seccomp_opts |= OBSOLETE;
+> +            }
+> +        }
+
+IIUC, the values will all be booleans, so we should just use
+
+   if (qemu_opt_get_bool(opts, "obsolete", false))
+       seccomp_opts |= OBSOLETE;
+
+> +
+> +        if (seccomp_start(seccomp_opts) < 0) {
+>              error_report("failed to install seccomp syscall filter "
+>                           "in the kernel");
+>              return -1;
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
