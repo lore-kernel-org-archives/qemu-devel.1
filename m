@@ -1,21 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@intel.com>) id 1dciHK-0008UU-SJ
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:16:52 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dciLH-0001sN-5q
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@intel.com>) id 1dciHH-0002jk-NW
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:16:50 -0400
-From: "Hu, Robert" <robert.hu@intel.com>
-Date: Wed, 2 Aug 2017 01:16:41 +0000
-Message-ID: <9E79D1C9A97CFD4097BCE431828FDD3115722003@SHSMSX103.ccr.corp.intel.com>
-References: <9E79D1C9A97CFD4097BCE431828FDD311571D704@SHSMSX103.ccr.corp.intel.com>
-	<150160581804.32118.1248845549166324825@loki>
-In-Reply-To: <150160581804.32118.1248845549166324825@loki>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dciLC-0005Zq-7T
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:20:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36675)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1dciLB-0005Z0-Sa
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:20:50 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v721Im5C002016
+	for <qemu-devel@nongnu.org>; Tue, 1 Aug 2017 21:20:48 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2c2v82ygqr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 21:20:48 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 2 Aug 2017 11:20:45 +1000
+Received: from d23av01.au.ibm.com (d23av01.au.ibm.com [9.190.234.96])
+	by d23relay10.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v721Kg8G24183012
+	for <qemu-devel@nongnu.org>; Wed, 2 Aug 2017 11:20:42 +1000
+Received: from d23av01.au.ibm.com (localhost [127.0.0.1])
+	by d23av01.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v721KfBQ002779
+	for <qemu-devel@nongnu.org>; Wed, 2 Aug 2017 11:20:42 +1000
+Date: Wed, 2 Aug 2017 09:20:41 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170801075727.31335-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170801075727.31335-3-bjsdjshi@linux.vnet.ibm.com>
+	<5aba0805-2645-0075-edcb-e9d5b3643dd2@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Does qemu guest agent support 'guest-exec'?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5aba0805-2645-0075-edcb-e9d5b3643dd2@linux.vnet.ibm.com>
+Message-Id: <20170802012041.GC24907@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] s390x/css: generate solicited crw
+ for rchp completion signaling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +51,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
 
-DQoNCkJlc3QgUmVnYXJkcywNClJvYmVydCBIb28NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
-LS0tLQ0KPiBGcm9tOiBNaWNoYWVsIFJvdGggW21haWx0bzptZHJvdGhAbGludXgudm5ldC5pYm0u
-Y29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIEF1Z3VzdCAyLCAyMDE3IDA6NDQNCj4gVG86IEh1LCBS
-b2JlcnQgPHJvYmVydC5odUBpbnRlbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUt
-DQo+IGRpc2N1c3NAbm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIERvZXMg
-cWVtdSBndWVzdCBhZ2VudCBzdXBwb3J0ICdndWVzdC1leGVjJz8NCj4gDQo+IFF1b3RpbmcgSHUs
-IFJvYmVydCAoMjAxNy0wOC0wMSAwMjoxNTowMSkNCj4gPiBIaSwNCj4gPg0KPiA+IHFlbXUvc2Ny
-aXB0cy9xbXAvcWVtdS1nYS1jbGllbnQgc2VlbXMgb25seSBzdXBwb3J0ICJjYXQsIGZzZnJlZXpl
-LCBmc3RyaW0sDQo+IGhhbHQsIGlmY29uZmlnLCBpbmZvLCBwaW5nLCBwb3dlcmRvd24sIHJlYm9v
-dCwgc2h1dGRvd24sIHN1c3BlbmQiLg0KPiA+DQo+ID4gQnV0IGZyb20gcWVtdS9xZ2EvY29tbWFu
-ZHMuYyBzZWVtcyBhdCBsZWFzdCBMaW51eCBndWVzdCBzaG91bGQgYWxyZWFkeQ0KPiBzdXBwb3J0
-IHRoaXMuIERlc3BpdGUgcWVtdS1nYS1jbGllbnQsIGhvdyBjYW4gSSB0YWxrIHRvIGd1ZXN0LWFn
-ZW50IGluIGd1ZXN0IHRvDQo+IGV4ZWN1dGUgc29tZSBwcm9ncmFtPyBhbnkgb3RoZXIgdXRpbHM/
-DQo+IA0KPiBxZW11LWdhLWNsaWVudCBpcyBtb3JlIG9mIGEgaGVscGVyIHNjcmlwdCB0byBtYWtl
-IGl0IGVhc2llciB0byBleGVjdXRlIHRoaW5ncw0KPiBmcm9tIGNtZGxpbmUgYW5kIGhhc24ndCBi
-ZWVuIHVwZGF0ZWQgdG8gc3VwcG9ydCBndWVzdC1leGVjLiBCdXQgdGhlIG9mZmljaWFsDQo+IEFQ
-SSBpcyBkb2N1bWVudGVkIGluIHFnYS9xYXBpLXNjaGVtYS5qc29uIGFuZCBpbnZvbHZlcyB0YWxr
-aW5nIHRvIHFlbXUtZ2ENCj4gZGlyZWN0bHkgdmlhIEpTT04gY29tbWFuZHMuIEEgc2ltcGxlIGV4
-YW1wbGUgZm9yIGd1ZXN0LWV4ZWMgd291bGQgYmUNCj4gc29tZXRoaW5nIGxpa2U6DQo+IA0KPiBt
-ZHJvdGhAbG9raTp+JCBzdWRvIG5jIC1VIC90bXAvdm0zLXFnYS5zb2NrDQo+IHsnZXhlY3V0ZSc6
-J2d1ZXN0LWV4ZWMnLCdhcmd1bWVudHMnOnsncGF0aCc6J2lwJywnYXJnJzogWydhZGRyJywgJ3No
-b3cnLA0KPiAnZXRoMCddLCdjYXB0dXJlLW91dHB1dCc6dHJ1ZX19DQo+IHsicmV0dXJuIjogeyJw
-aWQiOiAxNDYyfX0NCj4geydleGVjdXRlJzonZ3Vlc3QtZXhlYy1zdGF0dXMnLCdhcmd1bWVudHMn
-OnsncGlkJzoxNDYyfX0NCj4geyJyZXR1cm4iOiB7ImV4aXRjb2RlIjogMCwgIm91dC1kYXRhIjoN
-Cj4gIk1qb2daWFJvTURvZ1BFSlNUMEZFUTBGVFZDeE5WVXhVU1VOQlUxUXNWVkFzVEU5WFJWSmZW
-VkErSUcxMGQNCj4gU0F4TlRBd0lIRmthWE5qSUhCbWFXWnZYMlpoYzNRZ2MzUmhkR1VnVlZBZ1oz
-SnZkWEFnWkdWbVlYVnNkQ0INCj4geGJHVnVJREV3TURBS0lDQWdJR3hwYm1zdlpYUm9aWElnTlRJ
-Nk5UUTZNREE2TVRJNk16UTZNRE1nWW5Kaw0KPiBJR1ptT21abU9tWm1PbVptT21abU9tWm1DaUFn
-SUNCcGJtVjBJREU1TWk0eE5qZ3VNVEl5TGpFekx6STANCj4gSUdKeVpDQXhPVEl1TVRZNExqRXlN
-aTR5TlRVZ2MyTnZjR1VnWjJ4dlltRnNJR1I1Ym1GdGFXTWdaWFJvTUENCj4gb2dJQ0FnSUNBZ2Rt
-RnNhV1JmYkdaMElETXdOalJ6WldNZ2NISmxabVZ5Y21Wa1gyeG1kQ0F6TURZMGMyVmoNCj4gQ2lB
-Z0lDQnBibVYwTmlCbVpUZ3dPam8xTURVME9tWm1PbVpsTVRJNk16UXdNeTgyTkNCelkyOXdaU0IN
-Cj4gc2FXNXJJQW9nSUNBZ0lDQWdkbUZzYVdSZmJHWjBJR1p2Y21WMlpYSWdjSEpsWm1WeWNtVmtY
-MnhtZENCbWIzSg0KPiBsZG1WeUNnPT0iLCAiZXhpdGVkIjogdHJ1ZX19IF5DIG1kcm90aEBsb2tp
-On4kIGNhdCA8PEVPRiB8IGJhc2U2NCAtZA0KW1JvYmVydCBIb29dIA0KDQpbdHJpbS4uLl0NCltS
-b2JlcnQgSG9vXSANCg0KVGhhbmtzICBNaWNoYWVsLCB0aGlzIGV4YW1wbGUgaXMgaGVscGZ1bC4g
-SSdsbCBoYXZlIGEgdHJ5IHRoZW4uDQoNCjEgbW9yZSBxdWVzdGlvbjogaXMgcWVtdS1nYS1jbGll
-bnQgYWN0aXZlbHkgbWFpbnRhaW5lZD8gd2lsbCBpdCBiZSB1cGRhdGVkIHRvIHN1cHBvcnQgbW9y
-ZQ0KZ3Vlc3QgYWdlbnQgY29tbWFuZHM/DQoNCj4gMjogZXRoMDogPEJST0FEQ0FTVCxNVUxUSUNB
-U1QsVVAsTE9XRVJfVVA+IG10dSAxNTAwIHFkaXNjIHBmaWZvX2Zhc3QNCj4gc3RhdGUgVVAgZ3Jv
-dXAgZGVmYXVsdCBxbGVuIDEwMDANCj4gICAgIGxpbmsvZXRoZXIgNTI6NTQ6MDA6MTI6MzQ6MDMg
-YnJkIGZmOmZmOmZmOmZmOmZmOmZmDQo+ICAgICBpbmV0IDE5Mi4xNjguMTIyLjEzLzI0IGJyZCAx
-OTIuMTY4LjEyMi4yNTUgc2NvcGUgZ2xvYmFsIGR5bmFtaWMgZXRoMA0KPiAgICAgICAgdmFsaWRf
-bGZ0IDMwNjRzZWMgcHJlZmVycmVkX2xmdCAzMDY0c2VjDQo+ICAgICBpbmV0NiBmZTgwOjo1MDU0
-OmZmOmZlMTI6MzQwMy82NCBzY29wZSBsaW5rDQo+ICAgICAgICB2YWxpZF9sZnQgZm9yZXZlciBw
-cmVmZXJyZWRfbGZ0IGZvcmV2ZXINCj4gDQo+IA0KPiA+DQo+ID4gQmVzdCBSZWdhcmRzLA0KPiA+
-IFJvYmVydCBIb28NCj4gPg0KPiA+DQoNCg==
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-08-01 17:16:37 +0200]:
+
+> 
+> 
+> On 08/01/2017 09:57 AM, Dong Jia Shi wrote:
+> [..]
+> > --- a/hw/s390x/css.c
+> > +++ b/hw/s390x/css.c
+> > @@ -1745,10 +1745,10 @@ int css_do_rchp(uint8_t cssid, uint8_t chpid)
+> >      }
+> > 
+> >      /* We don't really use a channel path, so we're done here. */
+> > -    css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT,
+> > +    css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT, 1,
+> >                    channel_subsys.max_cssid > 0 ? 1 : 0, chpid);
+> >      if (channel_subsys.max_cssid > 0) {
+> > -        css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT, 0, real_cssid << 8);
+> > +        css_queue_crw(CRW_RSC_CHP, CRW_ERC_INIT, 1, 0, real_cssid << 8);
+> >      }
+> >      return 0;
+> >  }
+> > @@ -2028,7 +2028,8 @@ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+> >      }
+> >  }
+> > 
+> > -void css_queue_crw(uint8_t rsc, uint8_t erc, int chain, uint16_t rsid)
+> > +void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
+> > +                   int chain, uint16_t rsid)
+> 
+> I think you could make the parameters solicited and chain bool (AFAIU
+> they are conceptually bool) for clearer semantic. If you go with that
+> you could also get rid of the superfluous ternary operator ( we have
+> stuff like some_cond ? 1 : 0 for the chain parameter in more than
+> one place.
+> 
+> Btw. I find bool flags easy to mix up and difficult to read. I have no better
+> idea how to write this (in C) though. I was considering throwing chain and
+> solicited together into a single flags parameter, but looking at the client code
+> it does not look like a good idea.
+I think I just need to get used to differet tastes. ;)
+
+> 
+> Besides the cosmetic considerations above LGTM
+Thanks!
+
+-- 
+Dong Jia Shi
