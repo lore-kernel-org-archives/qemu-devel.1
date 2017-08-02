@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcuz0-0001dc-Nn
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:50:47 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dcv8H-0003h6-Ts
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dcuz0-0005nK-1K
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:50:46 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33567)
+	(envelope-from <rth7680@gmail.com>) id 1dcv8C-0004iu-Vq
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:00:21 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dcuyz-0005mo-Oc
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:50:45 -0400
-Received: by mail-wr0-x229.google.com with SMTP id v105so19744023wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 07:50:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dcv8C-0004hP-P2
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:00:16 -0400
+Received: by mail-pf0-x242.google.com with SMTP id j68so5476012pfc.2
+	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 08:00:15 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <cover.7fbcecb0d0061824a32985f26b9c1b7f816203b0.1501667615.git-series.james.hogan@imgtec.com>
+	<753c3960fd4ad5ca5c8ccea15d2c7f6fb95dc25d.1501667615.git-series.james.hogan@imgtec.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <9860940e-126d-d9bf-dead-ea61b773fde8@twiddle.net>
+Date: Wed, 2 Aug 2017 08:00:10 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170802135834.1455-1-dgilbert@redhat.com>
-References: <20170802135834.1455-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 2 Aug 2017 15:50:23 +0100
-Message-ID: <CAFEAcA96v4PaTD=PXjqBRALCpcCZVjEckUwybVXu15Zm2_XqDA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] migration queue
+In-Reply-To: <753c3960fd4ad5ca5c8ccea15d2c7f6fb95dc25d.1501667615.git-series.james.hogan@imgtec.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 1/3] target/mips: Use BS_EXCP
+ where interrupts are expected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: James Hogan <james.hogan@imgtec.com>, qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 2 August 2017 at 14:58, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The following changes since commit d3d183a638d6a3ead515618a6547b3f80d39fcb9:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-08-02 09:49:02 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dagrh/qemu.git tags/pull-migration-20170802a
->
-> for you to fetch changes up to 8bd9c4e6c565c566a6cba3470cb2d4ea63994143:
->
->   io: fix qio_channel_socket_accept err handling (2017-08-02 11:27:44 +0100)
->
-> ----------------------------------------------------------------
-> Migration pull 2017-08-02
->
-> Just minor fixes for 2.10
+On 08/02/2017 02:59 AM, James Hogan wrote:
+> Commit e350d8ca3ac7 ("target/mips: optimize indirect branches") made
+> indirect branches able to directly find the next TB and jump straight to
+> it without breaking out of translated code and going around the main
+> execution loop. This breaks the assumption in target/mips/translate.c
+> that BS_STOP is sufficient to cause pending interrupts to be handled,
+> since interrupts are only checked in the main loop.
+> 
+> Fix a few of these assumptions by using gen_save_pc to update the saved
+> PC and using BS_EXCP instead of BS_STOP:
 
-Applied, thanks.
+I don't like the name, BS_EXCP, because this isn't an exception.
 
--- PMM
+But, since one of the first things we'll do in 2.11 is land LLuis' generic 
+translation framework, and rename all of these exit conditions, this is ok.  It 
+certainly is the minimal change for 2.10, and this does work.
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+
+
+r~
