@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dcnfw-00021s-8o
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:02:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1dcnjs-00039L-JV
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dcnfr-0006Jc-ED
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:02:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:26475)
+	(envelope-from <quintela@redhat.com>) id 1dcnjo-0000eI-Kt
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:06:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dcnfr-0006J6-4x
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:02:31 -0400
-Date: Wed, 2 Aug 2017 15:02:24 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170802070224.GD4475@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-20-git-send-email-peterx@redhat.com>
-	<20170801105610.GG12670@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dcnjo-0000bv-FX
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:06:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 24127E67B1
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 06:58:49 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 1 Aug 2017 17:04:18 +0100")
+References: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 02 Aug 2017 08:58:46 +0200
+Message-ID: <87o9ryh2vt.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170801105610.GG12670@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 19/29] migration: let dst listen on port
- always
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: fix small leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +35,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Aug 01, 2017 at 11:56:10AM +0100, Daniel P. Berrange wrote:
-> On Fri, Jul 28, 2017 at 04:06:28PM +0800, Peter Xu wrote:
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/exec.c   | 2 +-
-> >  migration/fd.c     | 2 +-
-> >  migration/socket.c | 4 ++--
-> >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/migration/exec.c b/migration/exec.c
-> > index 08b599e..b4412db 100644
-> > --- a/migration/exec.c
-> > +++ b/migration/exec.c
-> > @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
-> >  {
-> >      migration_channel_process_incoming(ioc);
-> >      object_unref(OBJECT(ioc));
-> > -    return FALSE; /* unregister */
-> > +    return TRUE; /* keep it registered */
-> >  }
-> >  
-> >  void exec_start_incoming_migration(const char *command, Error **errp)
-> > diff --git a/migration/fd.c b/migration/fd.c
-> > index 30f5258..865277a 100644
-> > --- a/migration/fd.c
-> > +++ b/migration/fd.c
-> > @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
-> >  {
-> >      migration_channel_process_incoming(ioc);
-> >      object_unref(OBJECT(ioc));
-> > -    return FALSE; /* unregister */
-> > +    return TRUE; /* keep it registered */
-> >  }
-> >  
-> >  void fd_start_incoming_migration(const char *infd, Error **errp)
-> > diff --git a/migration/socket.c b/migration/socket.c
-> > index 757d382..f2c2d01 100644
-> > --- a/migration/socket.c
-> > +++ b/migration/socket.c
-> > @@ -153,8 +153,8 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-> >  
-> >  out:
-> >      /* Close listening socket as its no longer needed */
-> > -    qio_channel_close(ioc, NULL);
-> > -    return FALSE; /* unregister */
-> > +    // qio_channel_close(ioc, NULL);
-> > +    return TRUE; /* keep it registered */
-> >  }
-> 
-> 
-> This is not a very desirable approach IMHO.
-> 
-> There are two separate things at play - first we have the listener socket,
-> and second we have the I/O watch that monitors for incoming clients.
-> 
-> The current code here closes the listener, and returns FALSE to unregister
-> the event loop watch.
-> 
-> You're reversing both of these so that we keep the listener open and we
-> keep monitoring for incoming clients. Ignoring migration resume for a
-> minute, this means that the destination QEMU will now accept arbitrarily
-> many incoming clients and keep trying to start a new incoming migration.
-> 
-> The behaviour we need is diferent. We *want* to unregister the event
-> loop watch once we've accepted a client. We should only keep the socket
-> listener in existance, but *not* accept any more clients. Only once we
-> have hit a problem and want to accept a new client to do migration
-> recovery, should we be re-adding the event loop watch.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> Spotted thanks to valgrind and tests/device-introspect-test:
+>
+> =3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss record =
+6 of 14,537
+> =3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
+> =3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
+> =3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
+> =3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.c:22=
+26)
+> =3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344)
+> =3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object.c:3=
+75)
+> =3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
+> =3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
+> =3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:542)
+> =3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties (qmp=
+-marshal.c:1425)
+> =3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104)
+> =3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-I replied with another approach in the other thread: how about we
-re-enable the listen port duing "postcopy-pause" state, and disable
-the listen port when get out of that migration state?
-
-Here "listen port" I mean both the IO watch and the socket object. Now
-what I can think of: we keep these objects always there, meanwhile we
-introduce a new bit for migration, say, "accept_incoming", to decide
-whether we will really accept one connection. Then we drop the new
-connection if that bit is not set.
-
-(Or a new QIOChannelFeature to temporarily refuse incoming
- connection? E.g., QIO_CHANNEL_FEATURE_LISTEN_REFUSE?)
-
-Thanks,
-
--- 
-Peter Xu
+Reviewed-by: Juan Quintela <quintela@redhat.com>
