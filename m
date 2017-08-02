@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcxmE-0006Me-4e
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:49:47 -0400
+	(envelope-from <marcel@redhat.com>) id 1dcxvC-0000Xf-5k
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:59:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dcxmB-0000rI-1e
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:49:46 -0400
-References: <150169525609.4634.10414517308328488237.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0e3dd38b-66dd-7e70-2dc2-e30f26a83ae7@redhat.com>
-Date: Wed, 2 Aug 2017 12:49:37 -0500
+	(envelope-from <marcel@redhat.com>) id 1dcxv7-0006qO-KJ
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:59:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dcxv7-0006q6-Ds
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:58:57 -0400
+References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
+	<1501285073-2215-6-git-send-email-zuban32s@gmail.com>
+	<491f77fc-974c-33dd-3974-08ab61d2c078@redhat.com>
+	<CAKSfGUCTom8YBs8wOHMX_MpzDF1efB8_USb4tuW+hcAdoG2xvw@mail.gmail.com>
+	<20170802003910-mutt-send-email-mst@kernel.org>
+	<17a71bfc-1933-f707-2504-c9c699534cea@redhat.com>
+	<20170802164551-mutt-send-email-mst@kernel.org>
+	<9e36b7d6-bff3-b046-6053-162fb75ca0a0@redhat.com>
+	<b0e1c72d-9c17-42e5-3135-5ebb1e53b4f1@redhat.com>
+	<c4761b15-4525-247c-14da-510b20dbf90a@redhat.com>
+	<20170802192446-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <597fd60c-d8ec-0334-10de-3ff4947055ea@redhat.com>
+Date: Wed, 2 Aug 2017 20:58:41 +0300
 MIME-Version: 1.0
-In-Reply-To: <150169525609.4634.10414517308328488237.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BF1EclntdpJL4kxBAbKNQDRTf87ff7sK3"
-Subject: Re: [Qemu-devel] [PATCH] ppc: fix double-free in cpu_post_load()
+In-Reply-To: <20170802192446-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] docs: update documentation
+ considering PCIE-PCI bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +38,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net, laine@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BF1EclntdpJL4kxBAbKNQDRTf87ff7sK3
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <0e3dd38b-66dd-7e70-2dc2-e30f26a83ae7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] ppc: fix double-free in cpu_post_load()
-References: <150169525609.4634.10414517308328488237.stgit@bahia.lan>
-In-Reply-To: <150169525609.4634.10414517308328488237.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/08/2017 19:26, Michael S. Tsirkin wrote:
+> On Wed, Aug 02, 2017 at 06:36:29PM +0300, Marcel Apfelbaum wrote:
+>>>>>>> Can dmi-pci support shpc? why doesn't it? For compatibility?
+>>>>>>
+>>>>>> I don't know why, but the fact that it doesn't is the reason libvirt
+>>>>>> settled on auto-creating a dmi-pci bridge and a pci-pci bridge under
+>>>>>> that for Q35. The reasoning was (IIRC Laine's words correctly) that the
+>>>>>> dmi-pci bridge cannot receive hotplugged devices, while the pci-pci
+>>>>>> bridge cannot be connected to the root complex. So both were needed.
+>>>>>>
+>>>>>> Thanks
+>>>>>> Laszlo
+>>>>>
+>>>>> OK. Is it true that dmi-pci + pci-pci under it will allow hotplug
+>>>>> on Q35 if we just flip the bit in _OSC?
+>>>>
+>>>> Marcel, what say you?... :)
+>>
+>> Good news, works with:
+>>     -device i82801b11-bridge,id=b1
+>>     -device pci-bridge,id=b2,bus=b1,chassis_nr=1,msi=off
+> 
+> And presumably it works for modern windows?
+> OK, so it looks like patch 1 is merely a bugfix, I'll merge it for 2.10.
+> 
 
-On 08/02/2017 12:34 PM, Greg Kurz wrote:
-> When running nested with KVM PR, ppc_set_compat() fails and QEMU crashe=
-s
-> because of "double free or corruption (!prev)". The crash happens becau=
-se
-> error_report_err() has already called error_free().
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  target/ppc/machine.c |    1 -
->  1 file changed, 1 deletion(-)
+Tested with Win10, I think is OK to merge if for 2.10.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Notice bridge's msi=off until the following kernel bug will be merged:
+>>    https://www.spinics.net/lists/linux-pci/msg63052.html
+> 
+> Does libvirt support msi=off as a work-around?
+> 
 
->=20
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index f578156dd411..abe0a1cdf021 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -239,7 +239,6 @@ static int cpu_post_load(void *opaque, int version_=
-id)
->          ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
-> -            error_free(local_err);
->              return -1;
->          }
->      } else
->=20
->=20
->=20
+Adding Laine, maybe he has the answer.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+Marcel
 
 
---BF1EclntdpJL4kxBAbKNQDRTf87ff7sK3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmCELEACgkQp6FrSiUn
-Q2r3Twf9GNF6CSn2gyuFRMUiEzv9NH5tQ2HFO2PsEJB/RtZvdlCYWkGnMXqF/Rk5
-E3ODYwyDppo7A7crmjRQnVm1KmBdfO5Fhs22edOEmLqgGhjz8/4is2eMi1n945in
-k0EKvKMnGX3ljh7hmnGkGc33TSXPkABpVNRpzBwbWJfy7NxSXPCYP8euD2vZBbzE
-iK9XstYtpigri2oag3OmsCo70lP1ZfxISWg7we2ceF0MdK1wObsjO3aUwGMIMylE
-5JmvnxGcftL4aPCcbR9/K56nRV1lWuJ0tQEJzKzZNFKLCKZ0GPIkawBIPCRb64KR
-VEtepoUM6USHwTRrvCQLNN+kvsAjnQ==
-=Pk2R
------END PGP SIGNATURE-----
-
---BF1EclntdpJL4kxBAbKNQDRTf87ff7sK3--
+>>
+>> Thanks,
+>> Marcel
+> 
