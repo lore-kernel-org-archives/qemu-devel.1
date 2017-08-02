@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dd1D3-0001ZU-Kv
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:29:42 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dd1JY-0004VA-2D
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dd1Cy-0004uf-Nf
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:29:41 -0400
-Date: Wed, 2 Aug 2017 18:29:33 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170802212933.GG3108@localhost.localdomain>
-References: <20170802103259.25940-1-lvivier@redhat.com>
-	<CAAdtpL4fDx3JLm7+=TcJTZXwq_zuwup4=zkGH8QMLJ1ES=kqHw@mail.gmail.com>
-	<de5b3384-086b-bf7f-944f-94d10e185a7d@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dd1JU-0000cS-57
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:36:24 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36873)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dd1JU-0000bc-0L
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:36:20 -0400
+Received: by mail-qt0-x241.google.com with SMTP id d10so5890265qtb.4
+	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 14:36:19 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170802201512.29142-1-crosa@redhat.com>
+	<20170802201512.29142-2-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c9d1d353-855e-40fe-9f43-aecd9d4c34db@amsat.org>
+Date: Wed, 2 Aug 2017 18:36:16 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <de5b3384-086b-bf7f-944f-94d10e185a7d@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cpu: don't allow negative core id
+In-Reply-To: <20170802201512.29142-2-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] tests/tcg/test_path.c: include
+ utils/bufferiszero.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Aug 02, 2017 at 03:50:36PM +0200, Laurent Vivier wrote:
-> On 02/08/2017 15:42, Philippe Mathieu-Daud=E9 wrote:
-> > Hi Laurent,
-> >=20
-> > On Wed, Aug 2, 2017 at 7:32 AM, Laurent Vivier <lvivier@redhat.com> w=
-rote:
-> >> With pseries machine type a negative core-id is not managed properly=
-:
-> >> -1 gives an inaccurate error message ("core -1 already populated"),
-> >> -2 crashes QEMU (core dump)
-> >>
-> >> As it seems a negative value is invalid for any architecture,
-> >> instead of checking this in spapr_core_pre_plug() I think it's bette=
-r
-> >> to check this in the generic part, core_prop_set_core_id()
-> >=20
-> > Why is this property signed? If there is not reason to use it negativ=
-e,
-> > is it possible to use object_property_add(.."uint"..)?
->=20
-> You should be right:
->=20
-> { 'struct': 'NumaNodeOptions',
->   'data': {
->    '*nodeid': 'uint16',
->    '*cpus':   ['uint16'],
->    '*mem':    'size',
->    '*memdev': 'str' }}
->=20
-> but
->=20
-> { 'struct': 'CpuInstanceProperties',
->   'data': { '*node-id': 'int',
->             '*socket-id': 'int',
->             '*core-id': 'int',
->             '*thread-id': 'int'
->   }
-> }
->=20
-> But I'm not sure it's a good idea to change the API now.
+Hi Cleber,
 
-Property parsing is not affected by the QAPI schema at all, so
-touching the schema wouldn't fix the bug.
+On 08/02/2017 05:15 PM, Cleber Rosa wrote:
+> Which contains one specific function used by iov.c.
+> 
+> Without this, "make -C tests/tcg test_path" (and consequently
+> "make -C tests/tcg" or simply "make test") fails quite early.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/tcg/test_path.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/tests/tcg/test_path.c b/tests/tcg/test_path.c
+> index 1c29bce..74dbdaf 100644
+> --- a/tests/tcg/test_path.c
+> +++ b/tests/tcg/test_path.c
+> @@ -3,6 +3,7 @@
+>   #include "util/cutils.c"
+>   #include "util/hexdump.c"
+>   #include "util/iov.c"
+> +#include "util/bufferiszero.c"
 
-The same applies to the 'type' argument to object_property_add():
-it is ignored everywhere.
+This fixes the build, however why not take this opportunity to fix it 
+through the Makefile instead of including .c?
 
-However, the property setter can simply use a visitor for unsigned values=
-, and
-it will reject negative values automatically, e.g.:
+Regards,
 
-  diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-  index 2bf960d..b5af2bf 100644
-  --- a/hw/cpu/core.c
-  +++ b/hw/cpu/core.c
-  @@ -25,9 +25,9 @@ static void core_prop_set_core_id(Object *obj, Visito=
-r *v, const char *name,
-   {
-       CPUCore *core =3D CPU_CORE(obj);
-       Error *local_err =3D NULL;
-  -    int64_t value;
-  +    uint32_t value;
-  =20
-  -    visit_type_int(v, name, &value, &local_err);
-  +    visit_type_uint32(v, name, &value, &local_err);
-       if (local_err) {
-           error_propagate(errp, local_err);
-           return;
+Phil.
 
-
-  $ ./ppc64-softmmu/qemu-system-ppc64 -device POWER8_v2.0-spapr-cpu-core,=
-core-id=3D-2
-  qemu-system-ppc64: -device POWER8_v2.0-spapr-cpu-core,core-id=3D-2: Par=
-ameter 'core-id' expects uint32_t
-
-
-I would suggest changing the CPUCore struct fields to uint32_t or
-uint64_t, but it would be more intrusive and we're past hard
-freeze.  Your patch looks good for 2.10.
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-I'm queueing it on machine-next.
-
---=20
-Eduardo
+>   #include "util/path.c"
+>   #include "util/qemu-timer-common.c"
+>   #include <stdarg.h>
+> 
