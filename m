@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dd06m-00039w-Mb
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 16:19:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1dd0Bn-0005mc-LX
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 16:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dd06l-0000B1-IM
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 16:19:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57394)
+	(envelope-from <eblake@redhat.com>) id 1dd0Bj-0003Qo-Ce
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 16:24:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:20811)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dd06l-0000AE-7l
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 16:19:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dd0Bj-0003QD-2r
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 16:24:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3FED64E33B
-	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 20:19:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F2527C0587D7
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 20:24:13 +0000 (UTC)
+References: <20170802201900.11890-1-eblake@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  2 Aug 2017 15:19:00 -0500
-Message-Id: <20170802201900.11890-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] test-qga: Kill broken and dead
+Message-ID: <f5d1ac06-5f69-e46b-9e5c-acbdcc72bc5c@redhat.com>
+Date: Wed, 2 Aug 2017 15:24:09 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170802201900.11890-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gbw60MNeKWIw1CofFSO7h9Eq8L0EN59HC"
+Subject: Re: [Qemu-devel] [PATCH for-2.10?] test-qga: Kill broken and dead
  QGA_TEST_SIDE_EFFECTING code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,152 +35,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, marcandre.lureau@redhat.com
+Cc: marcandre.lureau@redhat.com, armbru@redhat.com
 
-Back when the test was introduced, in commit 62c39b307, the
-test was set up to run qemu-ga directly on the host performing
-the test, and defaults to limiting itself to safe commands.  At
-the time, it was envisioned that setting QGA_TEST_SIDE_EFFECTING
-in the environment could cover a few more commands, while noting
-the potential danger of those side effects running in the host.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gbw60MNeKWIw1CofFSO7h9Eq8L0EN59HC
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, armbru@redhat.com
+Message-ID: <f5d1ac06-5f69-e46b-9e5c-acbdcc72bc5c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10?] test-qga: Kill broken and dead
+ QGA_TEST_SIDE_EFFECTING code
+References: <20170802201900.11890-1-eblake@redhat.com>
+In-Reply-To: <20170802201900.11890-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-But this has NEVER been tested: if you enable the environment
-variable, the test WILL fail.  One obvious reason: if you are not
-running as root, you'll probably get a permission failure when
-trying to freeze the file systems, or when changing system time.
-Less obvious: if you run the test as root (wow, you're brave), you
-could end up hanging if the test tries to log things to a
-temporarily frozen filesystem.  But the cutest reason of all: if
-you get past the above hurdles, the test uses invalid JSON in
-test_qga_fstrim() (missing '' around the dictionary key 'minimum'),
-and will thus fail an assertion in qmp_fd().
+On 08/02/2017 03:19 PM, Eric Blake wrote:
+> Back when the test was introduced, in commit 62c39b307, the
+> test was set up to run qemu-ga directly on the host performing
+> the test, and defaults to limiting itself to safe commands.  At
+> the time, it was envisioned that setting QGA_TEST_SIDE_EFFECTING
+> in the environment could cover a few more commands, while noting
+> the potential danger of those side effects running in the host.
 
-Rather than leave this untested time-bomb in place, rip it out.
-Hopefully, as originally envisioned, we can find an opportunity
-to test an actual sandboxed guest where the guest-agent has
-full permissions and will not unduly affect the host running
-the test - if so, 'git revert' can be used if desired, for
-salvaging any useful parts of this attempt.
+> Rather than leave this untested time-bomb in place, rip it out.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/test-qga.c | 90 --------------------------------------------------------
- 1 file changed, 90 deletions(-)
+Oh, I meant to add that I'm wondering if this should be considered 2.10
+material.
 
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 06783e7585..fd6bc7690f 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -642,65 +642,6 @@ static void test_qga_get_time(gconstpointer fix)
-     QDECREF(ret);
- }
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
--static void test_qga_set_time(gconstpointer fix)
--{
--    const TestFixture *fixture = fix;
--    QDict *ret;
--    int64_t current, time;
--    gchar *cmd;
--
--    /* get current time */
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    current = qdict_get_int(ret, "return");
--    g_assert_cmpint(current, >, 0);
--    QDECREF(ret);
--
--    /* set some old time */
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-set-time',"
--                 " 'arguments': { 'time': 1000 } }");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--
--    /* check old time */
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    time = qdict_get_int(ret, "return");
--    g_assert_cmpint(time / 1000, <, G_USEC_PER_SEC * 10);
--    QDECREF(ret);
--
--    /* set back current time */
--    cmd = g_strdup_printf("{'execute': 'guest-set-time',"
--                          " 'arguments': { 'time': %" PRId64 " } }",
--                          current + time * 1000);
--    ret = qmp_fd(fixture->fd, cmd);
--    g_free(cmd);
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--}
--
--static void test_qga_fstrim(gconstpointer fix)
--{
--    const TestFixture *fixture = fix;
--    QDict *ret;
--    QList *list;
--    const QListEntry *entry;
--
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-fstrim',"
--                 " arguments: { minimum: 4194304 } }");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    list = qdict_get_qlist(ret, "return");
--    entry = qlist_first(list);
--    g_assert(qdict_haskey(qobject_to_qdict(entry->value), "paths"));
--
--    QDECREF(ret);
--}
--
- static void test_qga_blacklist(gconstpointer data)
- {
-     TestFixture fix;
-@@ -831,30 +772,6 @@ static void test_qga_fsfreeze_status(gconstpointer fix)
-     QDECREF(ret);
- }
 
--static void test_qga_fsfreeze_and_thaw(gconstpointer fix)
--{
--    const TestFixture *fixture = fix;
--    QDict *ret;
--    const gchar *status;
--
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-freeze'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-status'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    status = qdict_get_try_str(ret, "return");
--    g_assert_cmpstr(status, ==, "frozen");
--    QDECREF(ret);
--
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-thaw'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--}
--
- static void test_qga_guest_exec(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -1029,13 +946,6 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/guest-get-osinfo", &fix,
-                          test_qga_guest_get_osinfo);
+--gbw60MNeKWIw1CofFSO7h9Eq8L0EN59HC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--    if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
--        g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
--                             test_qga_fsfreeze_and_thaw);
--        g_test_add_data_func("/qga/set-time", &fix, test_qga_set_time);
--        g_test_add_data_func("/qga/fstrim", &fix, test_qga_fstrim);
--    }
--
-     ret = g_test_run();
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-     fixture_tear_down(&fix, NULL);
--- 
-2.13.3
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmCNOkACgkQp6FrSiUn
+Q2pidwgApgi45n32TyPXaqxCUkYlbuqbuWmAFIkQ0L1FVfhpG7BeJ7obMDtcFxqD
+VUra7bpCu3GgrWT6xNxYmqkur3Jc/uwDfsEFK4zVEtYzbr5pYZSJeKFkrMx4KPH9
+TK1Ye0csQxox+8iLa2VjEr64EMqnDcAotnz2j7cb3eiliWP6msmTvRqNbtbuMmAG
+buMYd9OH8dDBKgizUKZZpR4ITnajcX+sfTjybSM9Wi02rsiqPxLGEs5aMIllAsTo
+6qMgw/YOjBIAabvKypHBN0CrK6RArFF+Uzhcb9qI3AJxcmHEm5ADn0tpJ7k/COKz
+7XpowQX15Mgb5GSDUA2EElZ7JcGvCw==
+=mQi5
+-----END PGP SIGNATURE-----
+
+--gbw60MNeKWIw1CofFSO7h9Eq8L0EN59HC--
