@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dcxXJ-0000Dc-6v
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:34:22 -0400
+	(envelope-from <groug@kaod.org>) id 1dcxXP-0000MH-5q
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:34:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dcxXI-0005Uu-Ag
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:34:21 -0400
-Date: Wed, 2 Aug 2017 19:34:11 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170802173411.GH4859@toto>
-References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-	<1501692241-23310-3-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <groug@kaod.org>) id 1dcxXL-0005Xl-8P
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:34:27 -0400
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:37627)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dcxXL-0005X1-2m
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:34:23 -0400
+Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 509A54B13B
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 19:34:21 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 02 Aug 2017 19:34:16 +0200
+Message-ID: <150169525609.4634.10414517308328488237.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501692241-23310-3-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 02/15] target/arm: Don't trap WFI/WFE for M
- profile
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] ppc: fix double-free in cpu_post_load()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Aug 02, 2017 at 05:43:48PM +0100, Peter Maydell wrote:
-> M profile cores can never trap on WFI or WFE instructions. Check for
-> M profile in check_wfx_trap() to ensure this.
-> 
-> The existing code will do the right thing for v7M cores because
-> the hcr_el2 and scr_el3 registers will be all-zeroes and so we
-> won't attempt to trap, but when we start setting ARM_FEATURE_V8
-> for v8M cores the v8A handling of SCTLR.nTWE and .nTWI will not
-> give the right results.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+When running nested with KVM PR, ppc_set_compat() fails and QEMU crashes
+because of "double free or corruption (!prev)". The crash happens because
+error_report_err() has already called error_free().
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/machine.c |    1 -
+ 1 file changed, 1 deletion(-)
 
-
-> ---
->  target/arm/op_helper.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 2a85666..5a94a5f 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -370,6 +370,11 @@ static inline int check_wfx_trap(CPUARMState *env, bool is_wfe)
->      int cur_el = arm_current_el(env);
->      uint64_t mask;
->  
-> +    if (arm_feature(env, ARM_FEATURE_M)) {
-> +        /* M profile cores can never trap WFI/WFE. */
-> +        return 0;
-> +    }
-> +
->      /* If we are currently in EL0 then we need to check if SCTLR is set up for
->       * WFx instructions being trapped to EL1. These trap bits don't exist in v7.
->       */
-> -- 
-> 2.7.4
-> 
-> 
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index f578156dd411..abe0a1cdf021 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -239,7 +239,6 @@ static int cpu_post_load(void *opaque, int version_id)
+         ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+-            error_free(local_err);
+             return -1;
+         }
+     } else
