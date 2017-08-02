@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dcmqL-0007ui-8A
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 02:09:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1dcmvo-0000uR-8Q
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 02:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dcmqG-0002gh-9v
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 02:09:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59190)
+	(envelope-from <peterx@redhat.com>) id 1dcmvj-00075q-AO
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 02:14:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33102)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dcmqG-0002gT-2i
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 02:09:12 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E50B7E7B61
-	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 06:09:10 +0000 (UTC)
-Date: Wed, 2 Aug 2017 14:09:04 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dcmvj-000745-4K
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 02:14:51 -0400
+Date: Wed, 2 Aug 2017 14:14:43 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170802060903.GA4475@pxdev.xzpeter.org>
-References: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+Message-ID: <20170802061443.GB4475@pxdev.xzpeter.org>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-18-git-send-email-peterx@redhat.com>
+	<20170801105906.GJ2079@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170801160419.14180-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: fix small leaks
+In-Reply-To: <20170801105906.GJ2079@work-vm>
+Subject: Re: [Qemu-devel] [RFC 17/29] migration: rebuild channel on source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Tue, Aug 01, 2017 at 05:04:18PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Spotted thanks to valgrind and tests/device-introspect-test:
->=20
-> =3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss recor=
-d 6 of 14,537
-> =3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
-> =3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
-> =3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
-> =3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.c:=
-2226)
-> =3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344)
-> =3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object.c=
-:375)
-> =3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
-> =3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
-> =3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:542=
-)
-> =3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties (q=
-mp-marshal.c:1425)
-> =3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104)
-> =3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Tue, Aug 01, 2017 at 11:59:07AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > This patch detects the "resume" flag of migration command, rebuild the
+> > channels only if the flag is set.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c | 52 ++++++++++++++++++++++++++++++++++++++++-----------
+> >  1 file changed, 41 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 36ff8c3..64de0ee 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1244,6 +1244,15 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> >      MigrationState *s = migrate_get_current();
+> >      const char *p;
+> >  
+> > +    if (has_resume && resume) {
+> > +        if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> > +            error_setg(errp, "Cannot resume if there is no "
+> > +                       "paused migration");
+> > +            return;
+> > +        }
+> > +        goto do_resume;
+> > +    }
+> > +
+> >      if (migration_is_setup_or_active(s->state) ||
+> >          s->state == MIGRATION_STATUS_CANCELLING ||
+> >          s->state == MIGRATION_STATUS_COLO) {
+> > @@ -1279,6 +1288,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> >  
+> >      s = migrate_init();
+> >  
+> > +do_resume:
+> 
+> Can we find a way to avoid this label?
+> Perhaps split the bottom half of this function out into a separate
+> function?
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Yes this label can indeed be avoided (sorry for my laziness). Will
+take the suggestion.  Thanks,
 
-Thanks,
-
---=20
+-- 
 Peter Xu
