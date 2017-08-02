@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dcnjs-00039L-JV
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:06:41 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dcnrq-0005LF-EC
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dcnjo-0000eI-Kt
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62015)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dcnjo-0000bv-FX
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:06:36 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24127E67B1
-	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 06:58:49 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170801160419.14180-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 1 Aug 2017 17:04:18 +0100")
-References: <20170801160419.14180-1-marcandre.lureau@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 02 Aug 2017 08:58:46 +0200
-Message-ID: <87o9ryh2vt.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: fix small leaks
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dcnrm-0007HI-EK
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:14:54 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:55760)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dcnrl-00079m-QC
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 03:14:50 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Wed, 2 Aug 2017 23:27:34 +0800
+Message-Id: <1501687654-10733-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] target-i386 : reduce rtc 0x70 access vm-exit
+ time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +22,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> Spotted thanks to valgrind and tests/device-introspect-test:
->
-> =3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss record =
-6 of 14,537
-> =3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
-> =3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
-> =3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
-> =3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.c:22=
-26)
-> =3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344)
-> =3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object.c:3=
-75)
-> =3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
-> =3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
-> =3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:542)
-> =3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties (qmp=
--marshal.c:1425)
-> =3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104)
-> =3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+some versions of windows guest access rtc frequently because of 
+rtc as system tick.guest access rtc like this: write register index 
+to 0x70, then write or read data from 0x71. writing 0x70 port is 
+just as index and do nothing else. So writing 0x70 is not necessory 
+to exit to userspace every time and caching rtc register index in kvm 
+can reduce VM-EXIT time.
+without my patch, get the vm-exit time of accessing rtc 0x70 using
+perf tools: (guest OS : windows 7 64bit)
+IO Port Access  Samples Samples%   Time%    Min Time  Max Time  Avg time
+0x70:POUT         86     30.99%    74.59%   9us       29us     10.75us ( +- 3.41% )
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+with my patch
+IO Port Access  Samples Samples%  Time%   Min Time  Max Time   Avg time
+ 0x70:POUT       106    32.02%    29.47%    0us      10us     1.57us ( +- 7.38% )
+
+the patch is a part of optimizing rtc 0x70 port access.another is in
+kernel.
+
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+Reviewed-by: Liu Yi <liu.yi24@zte.com.cn>
+---
+ accel/kvm/kvm-all.c       | 17 +++++++++++++++++
+ linux-headers/linux/kvm.h |  3 ++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 46ce479..683274d 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1483,6 +1483,21 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi)
+     g_hash_table_insert(s->gsimap, irq, GINT_TO_POINTER(gsi));
+ }
+ 
++static void kvm_vrtc_create(KVMState *s)
++{
++    int ret;
++    if (kvm_check_extension(s, KVM_CAP_VRTC)) {
++        return;
++    }
++
++    ret = kvm_vm_ioctl(s, KVM_CREATE_VRTC);
++
++    if (ret < 0) {
++        fprintf(stderr, "Create kernel vrtc failed: %s\n", strerror(-ret));
++        exit(1);
++    }
++}
++
+ static void kvm_irqchip_create(MachineState *machine, KVMState *s)
+ {
+     int ret;
+@@ -1750,6 +1765,8 @@ static int kvm_init(MachineState *ms)
+     if (machine_kernel_irqchip_allowed(ms)) {
+         kvm_irqchip_create(ms, s);
+     }
++
++    kvm_vrtc_create(s);
+ 
+     if (kvm_eventfds_allowed) {
+         s->memory_listener.listener.eventfd_add = kvm_mem_ioeventfd_add;
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 7971a4f..784179a 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SMT_POSSIBLE 147
+ #define KVM_CAP_HYPERV_SYNIC2 148
+ #define KVM_CAP_HYPERV_VP_INDEX 149
++#define KVM_CAP_VRTC 150
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1258,7 +1259,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
+ /* Available with KVM_CAP_PPC_RADIX_MMU */
+ #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+-
++#define KVM_CREATE_VRTC           _IO(KVMIO,  0xba)
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+ 
+-- 
+1.8.3.1
