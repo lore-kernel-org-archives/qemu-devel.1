@@ -1,49 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dciG0-0007vT-Pq
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:15:29 -0400
+	(envelope-from <robert.hu@intel.com>) id 1dciHK-0008UU-SJ
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dciFx-0001kY-Ju
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:15:28 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39855
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dciFx-0001kE-Ej
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:15:25 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v721Duxn027947
-	for <qemu-devel@nongnu.org>; Tue, 1 Aug 2017 21:15:24 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c34691rq5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 01 Aug 2017 21:15:24 -0400
-Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 2 Aug 2017 11:15:21 +1000
-Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
-	by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v721FJ0724903702
-	for <qemu-devel@nongnu.org>; Wed, 2 Aug 2017 11:15:19 +1000
-Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
-	by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v721FJvt029996
-	for <qemu-devel@nongnu.org>; Wed, 2 Aug 2017 11:15:19 +1000
-Date: Wed, 2 Aug 2017 09:15:18 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170801075727.31335-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170801075727.31335-2-bjsdjshi@linux.vnet.ibm.com>
-	<5c4c144e-7526-71cf-cd7a-c4ca4d2eff60@linux.vnet.ibm.com>
+	(envelope-from <robert.hu@intel.com>) id 1dciHH-0002jk-NW
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 21:16:50 -0400
+From: "Hu, Robert" <robert.hu@intel.com>
+Date: Wed, 2 Aug 2017 01:16:41 +0000
+Message-ID: <9E79D1C9A97CFD4097BCE431828FDD3115722003@SHSMSX103.ccr.corp.intel.com>
+References: <9E79D1C9A97CFD4097BCE431828FDD311571D704@SHSMSX103.ccr.corp.intel.com>
+	<150160581804.32118.1248845549166324825@loki>
+In-Reply-To: <150160581804.32118.1248845549166324825@loki>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5c4c144e-7526-71cf-cd7a-c4ca4d2eff60@linux.vnet.ibm.com>
-Message-Id: <20170802011518.GB24907@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/css: use macro for
- event-information pending error recover code
+Subject: Re: [Qemu-devel] Does qemu guest agent support 'guest-exec'?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,72 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pmorel@linux.vnet.ibm.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-08-01 17:24:10 +0200]:
-
-> 
-> 
-> On 08/01/2017 09:57 AM, Dong Jia Shi wrote:
-> > Let's use a macro for the ERC (error recover code) when generating a
-> > Channel Subsystem Event-information pending CRW (channel report word).
-> > 
-> > While we are at it, let's also add all other ERCs.
-> > 
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > ---
-> >  hw/s390x/css.c            |  2 +-
-> >  include/hw/s390x/ioinst.h | 11 +++++++++--
-> >  2 files changed, 10 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> > index 6a42b95cee..5321ca016b 100644
-> > --- a/hw/s390x/css.c
-> > +++ b/hw/s390x/css.c
-> > @@ -2103,7 +2103,7 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid)
-> >  void css_generate_css_crws(uint8_t cssid)
-> >  {
-> >      if (!channel_subsys.sei_pending) {
-> > -        css_queue_crw(CRW_RSC_CSS, 0, 0, cssid);
-> > +        css_queue_crw(CRW_RSC_CSS, CRW_ERC_EVENT, 0, cssid);
-> >      }
-> >      channel_subsys.sei_pending = true;
-> >  }
-> > diff --git a/include/hw/s390x/ioinst.h b/include/hw/s390x/ioinst.h
-> > index 92d15655e4..f89019f78f 100644
-> > --- a/include/hw/s390x/ioinst.h
-> > +++ b/include/hw/s390x/ioinst.h
-> > @@ -201,8 +201,15 @@ typedef struct CRW {
-> >  #define CRW_FLAGS_MASK_A 0x0080
-> >  #define CRW_FLAGS_MASK_ERC 0x003f
-> > 
-> > -#define CRW_ERC_INIT 0x02
-> > -#define CRW_ERC_IPI  0x04
-> > +#define CRW_ERC_EVENT    0x00 /* event information pending */
-> > +#define CRW_ERC_AVAIL    0x01 /* available */
-> > +#define CRW_ERC_INIT     0x02 /* initialized */
-> > +#define CRW_ERC_TERROR   0x03 /* temporary error */
-> > +#define CRW_ERC_IPI      0x04 /* installed parm initialized */
-> > +#define CRW_ERC_TERM     0x05 /* terminal */
-> > +#define CRW_ERC_PERRN    0x06 /* perm. error, facility not init */
-> > +#define CRW_ERC_PERRI    0x07 /* perm. error, facility init */
-> > +#define CRW_ERC_PMOD     0x08 /* installed parameters modified */
-> 
-> You have missed installed parameters restored from the PoP (above
-> you say add all other).
-Ok. Will add:
-#define CRW_ERC_IPR      0x0A /* installed parameters restored */
-
-> 
-> Other than that.
-> 
-> LGTM
-> 
-> > 
-> >  #define CRW_RSC_SUBCH 0x3
-> >  #define CRW_RSC_CHP   0x4
-> > 
-
--- 
-Dong Jia Shi
+DQoNCkJlc3QgUmVnYXJkcywNClJvYmVydCBIb28NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
+LS0tLQ0KPiBGcm9tOiBNaWNoYWVsIFJvdGggW21haWx0bzptZHJvdGhAbGludXgudm5ldC5pYm0u
+Y29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIEF1Z3VzdCAyLCAyMDE3IDA6NDQNCj4gVG86IEh1LCBS
+b2JlcnQgPHJvYmVydC5odUBpbnRlbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUt
+DQo+IGRpc2N1c3NAbm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIERvZXMg
+cWVtdSBndWVzdCBhZ2VudCBzdXBwb3J0ICdndWVzdC1leGVjJz8NCj4gDQo+IFF1b3RpbmcgSHUs
+IFJvYmVydCAoMjAxNy0wOC0wMSAwMjoxNTowMSkNCj4gPiBIaSwNCj4gPg0KPiA+IHFlbXUvc2Ny
+aXB0cy9xbXAvcWVtdS1nYS1jbGllbnQgc2VlbXMgb25seSBzdXBwb3J0ICJjYXQsIGZzZnJlZXpl
+LCBmc3RyaW0sDQo+IGhhbHQsIGlmY29uZmlnLCBpbmZvLCBwaW5nLCBwb3dlcmRvd24sIHJlYm9v
+dCwgc2h1dGRvd24sIHN1c3BlbmQiLg0KPiA+DQo+ID4gQnV0IGZyb20gcWVtdS9xZ2EvY29tbWFu
+ZHMuYyBzZWVtcyBhdCBsZWFzdCBMaW51eCBndWVzdCBzaG91bGQgYWxyZWFkeQ0KPiBzdXBwb3J0
+IHRoaXMuIERlc3BpdGUgcWVtdS1nYS1jbGllbnQsIGhvdyBjYW4gSSB0YWxrIHRvIGd1ZXN0LWFn
+ZW50IGluIGd1ZXN0IHRvDQo+IGV4ZWN1dGUgc29tZSBwcm9ncmFtPyBhbnkgb3RoZXIgdXRpbHM/
+DQo+IA0KPiBxZW11LWdhLWNsaWVudCBpcyBtb3JlIG9mIGEgaGVscGVyIHNjcmlwdCB0byBtYWtl
+IGl0IGVhc2llciB0byBleGVjdXRlIHRoaW5ncw0KPiBmcm9tIGNtZGxpbmUgYW5kIGhhc24ndCBi
+ZWVuIHVwZGF0ZWQgdG8gc3VwcG9ydCBndWVzdC1leGVjLiBCdXQgdGhlIG9mZmljaWFsDQo+IEFQ
+SSBpcyBkb2N1bWVudGVkIGluIHFnYS9xYXBpLXNjaGVtYS5qc29uIGFuZCBpbnZvbHZlcyB0YWxr
+aW5nIHRvIHFlbXUtZ2ENCj4gZGlyZWN0bHkgdmlhIEpTT04gY29tbWFuZHMuIEEgc2ltcGxlIGV4
+YW1wbGUgZm9yIGd1ZXN0LWV4ZWMgd291bGQgYmUNCj4gc29tZXRoaW5nIGxpa2U6DQo+IA0KPiBt
+ZHJvdGhAbG9raTp+JCBzdWRvIG5jIC1VIC90bXAvdm0zLXFnYS5zb2NrDQo+IHsnZXhlY3V0ZSc6
+J2d1ZXN0LWV4ZWMnLCdhcmd1bWVudHMnOnsncGF0aCc6J2lwJywnYXJnJzogWydhZGRyJywgJ3No
+b3cnLA0KPiAnZXRoMCddLCdjYXB0dXJlLW91dHB1dCc6dHJ1ZX19DQo+IHsicmV0dXJuIjogeyJw
+aWQiOiAxNDYyfX0NCj4geydleGVjdXRlJzonZ3Vlc3QtZXhlYy1zdGF0dXMnLCdhcmd1bWVudHMn
+OnsncGlkJzoxNDYyfX0NCj4geyJyZXR1cm4iOiB7ImV4aXRjb2RlIjogMCwgIm91dC1kYXRhIjoN
+Cj4gIk1qb2daWFJvTURvZ1BFSlNUMEZFUTBGVFZDeE5WVXhVU1VOQlUxUXNWVkFzVEU5WFJWSmZW
+VkErSUcxMGQNCj4gU0F4TlRBd0lIRmthWE5qSUhCbWFXWnZYMlpoYzNRZ2MzUmhkR1VnVlZBZ1oz
+SnZkWEFnWkdWbVlYVnNkQ0INCj4geGJHVnVJREV3TURBS0lDQWdJR3hwYm1zdlpYUm9aWElnTlRJ
+Nk5UUTZNREE2TVRJNk16UTZNRE1nWW5Kaw0KPiBJR1ptT21abU9tWm1PbVptT21abU9tWm1DaUFn
+SUNCcGJtVjBJREU1TWk0eE5qZ3VNVEl5TGpFekx6STANCj4gSUdKeVpDQXhPVEl1TVRZNExqRXlN
+aTR5TlRVZ2MyTnZjR1VnWjJ4dlltRnNJR1I1Ym1GdGFXTWdaWFJvTUENCj4gb2dJQ0FnSUNBZ2Rt
+RnNhV1JmYkdaMElETXdOalJ6WldNZ2NISmxabVZ5Y21Wa1gyeG1kQ0F6TURZMGMyVmoNCj4gQ2lB
+Z0lDQnBibVYwTmlCbVpUZ3dPam8xTURVME9tWm1PbVpsTVRJNk16UXdNeTgyTkNCelkyOXdaU0IN
+Cj4gc2FXNXJJQW9nSUNBZ0lDQWdkbUZzYVdSZmJHWjBJR1p2Y21WMlpYSWdjSEpsWm1WeWNtVmtY
+MnhtZENCbWIzSg0KPiBsZG1WeUNnPT0iLCAiZXhpdGVkIjogdHJ1ZX19IF5DIG1kcm90aEBsb2tp
+On4kIGNhdCA8PEVPRiB8IGJhc2U2NCAtZA0KW1JvYmVydCBIb29dIA0KDQpbdHJpbS4uLl0NCltS
+b2JlcnQgSG9vXSANCg0KVGhhbmtzICBNaWNoYWVsLCB0aGlzIGV4YW1wbGUgaXMgaGVscGZ1bC4g
+SSdsbCBoYXZlIGEgdHJ5IHRoZW4uDQoNCjEgbW9yZSBxdWVzdGlvbjogaXMgcWVtdS1nYS1jbGll
+bnQgYWN0aXZlbHkgbWFpbnRhaW5lZD8gd2lsbCBpdCBiZSB1cGRhdGVkIHRvIHN1cHBvcnQgbW9y
+ZQ0KZ3Vlc3QgYWdlbnQgY29tbWFuZHM/DQoNCj4gMjogZXRoMDogPEJST0FEQ0FTVCxNVUxUSUNB
+U1QsVVAsTE9XRVJfVVA+IG10dSAxNTAwIHFkaXNjIHBmaWZvX2Zhc3QNCj4gc3RhdGUgVVAgZ3Jv
+dXAgZGVmYXVsdCBxbGVuIDEwMDANCj4gICAgIGxpbmsvZXRoZXIgNTI6NTQ6MDA6MTI6MzQ6MDMg
+YnJkIGZmOmZmOmZmOmZmOmZmOmZmDQo+ICAgICBpbmV0IDE5Mi4xNjguMTIyLjEzLzI0IGJyZCAx
+OTIuMTY4LjEyMi4yNTUgc2NvcGUgZ2xvYmFsIGR5bmFtaWMgZXRoMA0KPiAgICAgICAgdmFsaWRf
+bGZ0IDMwNjRzZWMgcHJlZmVycmVkX2xmdCAzMDY0c2VjDQo+ICAgICBpbmV0NiBmZTgwOjo1MDU0
+OmZmOmZlMTI6MzQwMy82NCBzY29wZSBsaW5rDQo+ICAgICAgICB2YWxpZF9sZnQgZm9yZXZlciBw
+cmVmZXJyZWRfbGZ0IGZvcmV2ZXINCj4gDQo+IA0KPiA+DQo+ID4gQmVzdCBSZWdhcmRzLA0KPiA+
+IFJvYmVydCBIb28NCj4gPg0KPiA+DQoNCg==
