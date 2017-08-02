@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcwdl-0002LP-8H
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:36:58 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dcwl6-0003WG-Tk
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:44:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dcwdh-0006TF-A4
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:36:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dcwdh-0006Rl-3b
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:36:53 -0400
-Date: Wed, 2 Aug 2017 19:26:42 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170802192446-mutt-send-email-mst@kernel.org>
-References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-	<1501285073-2215-6-git-send-email-zuban32s@gmail.com>
-	<491f77fc-974c-33dd-3974-08ab61d2c078@redhat.com>
-	<CAKSfGUCTom8YBs8wOHMX_MpzDF1efB8_USb4tuW+hcAdoG2xvw@mail.gmail.com>
-	<20170802003910-mutt-send-email-mst@kernel.org>
-	<17a71bfc-1933-f707-2504-c9c699534cea@redhat.com>
-	<20170802164551-mutt-send-email-mst@kernel.org>
-	<9e36b7d6-bff3-b046-6053-162fb75ca0a0@redhat.com>
-	<b0e1c72d-9c17-42e5-3135-5ebb1e53b4f1@redhat.com>
-	<c4761b15-4525-247c-14da-510b20dbf90a@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c4761b15-4525-247c-14da-510b20dbf90a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] docs: update documentation
- considering PCIE-PCI bridge
+	(envelope-from <pm215@archaic.org.uk>) id 1dcwl6-0004hL-3K
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:44:32 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed,  2 Aug 2017 17:43:59 +0100
+Message-Id: <1501692241-23310-14-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
+References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 13/15] target/arm: Create and use new function
+ arm_v7m_is_handler_mode()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +20,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Wed, Aug 02, 2017 at 06:36:29PM +0300, Marcel Apfelbaum wrote:
-> > > > > > Can dmi-pci support shpc? why doesn't it? For compatibility?
-> > > > > 
-> > > > > I don't know why, but the fact that it doesn't is the reason libvirt
-> > > > > settled on auto-creating a dmi-pci bridge and a pci-pci bridge under
-> > > > > that for Q35. The reasoning was (IIRC Laine's words correctly) that the
-> > > > > dmi-pci bridge cannot receive hotplugged devices, while the pci-pci
-> > > > > bridge cannot be connected to the root complex. So both were needed.
-> > > > > 
-> > > > > Thanks
-> > > > > Laszlo
-> > > > 
-> > > > OK. Is it true that dmi-pci + pci-pci under it will allow hotplug
-> > > > on Q35 if we just flip the bit in _OSC?
-> > > 
-> > > Marcel, what say you?... :)
-> 
-> Good news, works with:
->    -device i82801b11-bridge,id=b1
->    -device pci-bridge,id=b2,bus=b1,chassis_nr=1,msi=off
+Add a utility function for testing whether the CPU is in Handler
+mode; this is just a check whether v7m.exception is non-zero, but
+we do it in several places and it makes the code a bit easier
+to read to not have to mentally figure out what the test is testing.
 
-And presumably it works for modern windows?
-OK, so it looks like patch 1 is merely a bugfix, I'll merge it for 2.10.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/cpu.h    | 10 ++++++++--
+ target/arm/helper.c |  8 ++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-> Notice bridge's msi=off until the following kernel bug will be merged:
->   https://www.spinics.net/lists/linux-pci/msg63052.html
-
-Does libvirt support msi=off as a work-around?
-
-> 
-> Thanks,
-> Marcel
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index da90b7a..a3b4b78 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1630,13 +1630,19 @@ static inline int arm_highest_el(CPUARMState *env)
+     return 1;
+ }
+ 
++/* Return true if a v7M CPU is in Handler mode */
++static inline bool arm_v7m_is_handler_mode(CPUARMState *env)
++{
++    return env->v7m.exception != 0;
++}
++
+ /* Return the current Exception Level (as per ARMv8; note that this differs
+  * from the ARMv7 Privilege Level).
+  */
+ static inline int arm_current_el(CPUARMState *env)
+ {
+     if (arm_feature(env, ARM_FEATURE_M)) {
+-        return !((env->v7m.exception == 0) && (env->v7m.control & 1));
++        return arm_v7m_is_handler_mode(env) || !(env->v7m.control & 1);
+     }
+ 
+     if (is_a64(env)) {
+@@ -2636,7 +2642,7 @@ static inline void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+     }
+     *flags |= fp_exception_el(env) << ARM_TBFLAG_FPEXC_EL_SHIFT;
+ 
+-    if (env->v7m.exception != 0) {
++    if (arm_v7m_is_handler_mode(env)) {
+         *flags |= ARM_TBFLAG_HANDLER_MASK;
+     }
+ 
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0ecc8f1..7920153 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6147,7 +6147,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+      * that jumps to magic addresses don't have magic behaviour unless
+      * we're in Handler mode (compare pseudocode BXWritePC()).
+      */
+-    assert(env->v7m.exception != 0);
++    assert(arm_v7m_is_handler_mode(env));
+ 
+     /* In the spec pseudocode ExceptionReturn() is called directly
+      * from BXWritePC() and gets the full target PC value including
+@@ -6254,7 +6254,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+      * resuming in Thread mode. If that doesn't match what the
+      * exception return type specified then this is a UsageFault.
+      */
+-    if (return_to_handler == (env->v7m.exception == 0)) {
++    if (return_to_handler != arm_v7m_is_handler_mode(env)) {
+         /* Take an INVPC UsageFault by pushing the stack again. */
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+         env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
+@@ -6405,7 +6405,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     if (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) {
+         lr |= 4;
+     }
+-    if (env->v7m.exception == 0) {
++    if (!arm_v7m_is_handler_mode(env)) {
+         lr |= 8;
+     }
+ 
+@@ -8798,7 +8798,7 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+          * switch_v7m_sp() deals with updating the SPSEL bit in
+          * env->v7m.control, so we only need update the others.
+          */
+-        if (env->v7m.exception == 0) {
++        if (!arm_v7m_is_handler_mode(env)) {
+             switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+         }
+         env->v7m.control &= ~R_V7M_CONTROL_NPRIV_MASK;
 -- 
-MST
+2.7.4
