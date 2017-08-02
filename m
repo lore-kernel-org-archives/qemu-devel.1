@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dcxQT-0004qK-Jj
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:27:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1dcxU9-0006pN-Ao
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:31:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dcxQS-0000wW-4r
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:27:17 -0400
-Date: Wed, 2 Aug 2017 19:27:05 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170802172705.GG4859@toto>
-References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-	<1501692241-23310-2-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1dcxU5-0003CX-EN
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:31:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dcxU5-0003CB-90
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 13:31:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dcxU3-0004rj-F0
+	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 17:30:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C93F12E80D1
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 17:30:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501692241-23310-2-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 01/15] target/arm: Use
- MMUAccessType enum rather than int
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 Aug 2017 17:19:43 -0000
+From: Gheorghe Ungureanu <1708215@bugs.launchpad.net>
+Reply-To: Bug 1708215 <1708215@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150169387475.3916.9615851037093784733.malonedeb@gac.canonical.com>
+Message-Id: <150169438369.13068.5796154538118936896.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1708215] Re: Windows 10 clipboard bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,175 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On Wed, Aug 02, 2017 at 05:43:47PM +0100, Peter Maydell wrote:
-> In the ARM get_phys_addr() code, switch to using the MMUAccessType
-> enum and its MMU_* values rather than int and literal 0/1/2.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+UPDATE:
+Restarting "SPICE VDAagent" within the VM allows me to paste again from hos=
+t to VM, however as soon as I use copy within the VM, it stops working agai=
+n.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1708215
 
-> ---
->  target/arm/helper.c    | 30 +++++++++++++++---------------
->  target/arm/internals.h |  3 ++-
->  2 files changed, 17 insertions(+), 16 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index fa60040..b78d277 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -20,13 +20,13 @@
->  
->  #ifndef CONFIG_USER_ONLY
->  static bool get_phys_addr(CPUARMState *env, target_ulong address,
-> -                          int access_type, ARMMMUIdx mmu_idx,
-> +                          MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                            hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
->                            target_ulong *page_size, uint32_t *fsr,
->                            ARMMMUFaultInfo *fi);
->  
->  static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-> -                               int access_type, ARMMMUIdx mmu_idx,
-> +                               MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                                 hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
->                                 target_ulong *page_size_ptr, uint32_t *fsr,
->                                 ARMMMUFaultInfo *fi);
-> @@ -2135,7 +2135,7 @@ static CPAccessResult ats_access(CPUARMState *env, const ARMCPRegInfo *ri,
->  }
->  
->  static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-> -                             int access_type, ARMMMUIdx mmu_idx)
-> +                             MMUAccessType access_type, ARMMMUIdx mmu_idx)
->  {
->      hwaddr phys_addr;
->      target_ulong page_size;
-> @@ -2194,7 +2194,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
->  
->  static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
->  {
-> -    int access_type = ri->opc2 & 1;
-> +    MMUAccessType access_type = ri->opc2 & 1 ? MMU_DATA_STORE : MMU_DATA_LOAD;
->      uint64_t par64;
->      ARMMMUIdx mmu_idx;
->      int el = arm_current_el(env);
-> @@ -2253,7 +2253,7 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
->  static void ats1h_write(CPUARMState *env, const ARMCPRegInfo *ri,
->                          uint64_t value)
->  {
-> -    int access_type = ri->opc2 & 1;
-> +    MMUAccessType access_type = ri->opc2 & 1 ? MMU_DATA_STORE : MMU_DATA_LOAD;
->      uint64_t par64;
->  
->      par64 = do_ats_write(env, value, access_type, ARMMMUIdx_S2NS);
-> @@ -2273,7 +2273,7 @@ static CPAccessResult at_s1e2_access(CPUARMState *env, const ARMCPRegInfo *ri,
->  static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
->                          uint64_t value)
->  {
-> -    int access_type = ri->opc2 & 1;
-> +    MMUAccessType access_type = ri->opc2 & 1 ? MMU_DATA_STORE : MMU_DATA_LOAD;
->      ARMMMUIdx mmu_idx;
->      int secure = arm_is_secure_below_el3(env);
->  
-> @@ -7510,7 +7510,7 @@ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
->  }
->  
->  static bool get_phys_addr_v5(CPUARMState *env, uint32_t address,
-> -                             int access_type, ARMMMUIdx mmu_idx,
-> +                             MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                               hwaddr *phys_ptr, int *prot,
->                               target_ulong *page_size, uint32_t *fsr,
->                               ARMMMUFaultInfo *fi)
-> @@ -7626,7 +7626,7 @@ do_fault:
->  }
->  
->  static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
-> -                             int access_type, ARMMMUIdx mmu_idx,
-> +                             MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                               hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
->                               target_ulong *page_size, uint32_t *fsr,
->                               ARMMMUFaultInfo *fi)
-> @@ -7733,7 +7733,7 @@ static bool get_phys_addr_v6(CPUARMState *env, uint32_t address,
->          if (pxn && !regime_is_user(env, mmu_idx)) {
->              xn = 1;
->          }
-> -        if (xn && access_type == 2)
-> +        if (xn && access_type == MMU_INST_FETCH)
->              goto do_fault;
->  
->          if (arm_feature(env, ARM_FEATURE_V6K) &&
-> @@ -7848,7 +7848,7 @@ static bool check_s2_mmu_setup(ARMCPU *cpu, bool is_aa64, int level,
->  }
->  
->  static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-> -                               int access_type, ARMMMUIdx mmu_idx,
-> +                               MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                                 hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
->                                 target_ulong *page_size_ptr, uint32_t *fsr,
->                                 ARMMMUFaultInfo *fi)
-> @@ -8256,7 +8256,7 @@ static inline bool m_is_system_region(CPUARMState *env, uint32_t address)
->  }
->  
->  static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
-> -                                 int access_type, ARMMMUIdx mmu_idx,
-> +                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                                   hwaddr *phys_ptr, int *prot, uint32_t *fsr)
->  {
->      ARMCPU *cpu = arm_env_get_cpu(env);
-> @@ -8415,7 +8415,7 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->  }
->  
->  static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-> -                                 int access_type, ARMMMUIdx mmu_idx,
-> +                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                                   hwaddr *phys_ptr, int *prot, uint32_t *fsr)
->  {
->      int n;
-> @@ -8442,7 +8442,7 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
->          return true;
->      }
->  
-> -    if (access_type == 2) {
-> +    if (access_type == MMU_INST_FETCH) {
->          mask = env->cp15.pmsav5_insn_ap;
->      } else {
->          mask = env->cp15.pmsav5_data_ap;
-> @@ -8513,7 +8513,7 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
->   * @fsr: set to the DFSR/IFSR value on failure
->   */
->  static bool get_phys_addr(CPUARMState *env, target_ulong address,
-> -                          int access_type, ARMMMUIdx mmu_idx,
-> +                          MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                            hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
->                            target_ulong *page_size, uint32_t *fsr,
->                            ARMMMUFaultInfo *fi)
-> @@ -8626,7 +8626,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
->   * fsr with ARM DFSR/IFSR fault register format value on failure.
->   */
->  bool arm_tlb_fill(CPUState *cs, vaddr address,
-> -                  int access_type, int mmu_idx, uint32_t *fsr,
-> +                  MMUAccessType access_type, int mmu_idx, uint32_t *fsr,
->                    ARMMMUFaultInfo *fi)
->  {
->      ARMCPU *cpu = ARM_CPU(cs);
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 1f6efef..bb06946 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -457,7 +457,8 @@ struct ARMMMUFaultInfo {
->  };
->  
->  /* Do a page table walk and add page to TLB if possible */
-> -bool arm_tlb_fill(CPUState *cpu, vaddr address, int rw, int mmu_idx,
-> +bool arm_tlb_fill(CPUState *cpu, vaddr address,
-> +                  MMUAccessType access_type, int mmu_idx,
->                    uint32_t *fsr, ARMMMUFaultInfo *fi);
->  
->  /* Return true if the stage 1 translation regime is using LPAE format page
-> -- 
-> 2.7.4
-> 
-> 
+Title:
+  Windows 10 clipboard bug
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I am using qemu on arch:
+      pacman -Q libvirt qemu linux virt-manager
+  libvirt 3.5.0-1
+  qemu 2.9.0-2
+  linux 4.12.3-1
+  virt-manager 1.4.1-2
+
+  I have a windows 10 Guest, with all updates and the following packages in=
+stalled in the guest:
+  - QEMU guest agent 7.3.2
+  - SPICE Guest Tools 0.132
+
+  When I start the VM, I can copy/paste from the host to the guest.
+  However, after I use COPY inside the VM, copy/paste is not working any
+  more from host to guest. However, I can still copy/paste from guest to
+  host.
+
+  To summarize:
+  - copy/paste from guest to host works always
+  - copy/paste from host to guest works only if copy was not previously use=
+d in guest.
+
+  If this bug needs to be reported using another portal or if I can
+  provide any further information, please contact me.
+
+  Best Regards,
+  gxgung
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1708215/+subscriptions
