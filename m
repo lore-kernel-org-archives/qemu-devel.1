@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dcv9b-0004lH-LA
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:01:44 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dcvRN-0004xt-Fj
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dcv9V-0006tE-Ji
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:01:43 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:37025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dcv9V-0006sp-Dv
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:01:37 -0400
-Received: by mail-pf0-x241.google.com with SMTP id p13so2782534pfd.4
-	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 08:01:37 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <cover.7fbcecb0d0061824a32985f26b9c1b7f816203b0.1501667615.git-series.james.hogan@imgtec.com>
-	<248e7141b59e3cce8768f8210ade7f19108c92fa.1501667615.git-series.james.hogan@imgtec.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <de83fa91-03b1-19dd-2bb5-679052ad06cf@twiddle.net>
-Date: Wed, 2 Aug 2017 08:01:34 -0700
+	(envelope-from <vilanova@ac.upc.edu>) id 1dcvRG-0000F2-On
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:20:05 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:37765 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dcvRG-0000E2-8s
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 11:19:58 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
+	<20170727154535.GY2555@redhat.com>
+	<20170728133430.GS12364@stefanha-x1.localdomain>
+	<CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
+	<20170728140623.GQ31495@redhat.com> <87vamclf6w.fsf@frigg.lan>
+	<20170801134825.GC22017@stefanha-x1.localdomain>
+	<CAFEAcA9KKqyiNfsfjSDVhhE7hMMsAZ==TuSjgtqb6pB=fVF+_w@mail.gmail.com>
+	<20170802110400.GI5531@stefanha-x1.localdomain>
+	<CAFEAcA82EBmOF3k=fXN4tAAL2=J6s8avUoQGXKrBwchh1rmMCQ@mail.gmail.com>
+	<20170802144943.GF10101@stefanha-x1.localdomain>
+Date: Wed, 02 Aug 2017 18:19:29 +0300
+In-Reply-To: <20170802144943.GF10101@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Wed, 2 Aug 2017 15:49:43 +0100")
+Message-ID: <87lgn2q9oe.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <248e7141b59e3cce8768f8210ade7f19108c92fa.1501667615.git-series.james.hogan@imgtec.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 3/3] target/mips: Fix RDHWR CC
- with icount
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hogan <james.hogan@imgtec.com>, qemu-devel@nongnu.org
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alessandro Di Federico <ale+qemu@clearmind.me>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>
 
-On 08/02/2017 02:59 AM, James Hogan wrote:
-> RDHWR CC reads the CPU timer like MFC0 CP0_Count, so with icount enabled
-> it must set can_do_io while it calls the helper to avoid the "Bad icount
-> read" error. It should also break out of the translation loop to ensure
-> that timer interrupts are immediately handled.
-> 
-> Fixes: 2e70f6efa8b9 ("Add instruction counter.")
-> Signed-off-by: James Hogan<james.hogan@imgtec.com>
-> Cc: Aurelien Jarno<aurelien@aurel32.net>
-> Cc: Yongbok Kim<yongbok.kim@imgtec.com>
-> ---
-> I've based this on MFC0 Count, but this instruction is also available to
-> usermode (e.g. CONFIG_USER_ONLY), which I presume is still fine.
-> ---
->   target/mips/translate.c | 11 +++++++++++
->   1 file changed, 11 insertions(+), 0 deletions(-)
+Stefan Hajnoczi writes:
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+> On Wed, Aug 02, 2017 at 12:10:14PM +0100, Peter Maydell wrote:
+>> On 2 August 2017 at 12:04, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>> > On Tue, Aug 01, 2017 at 02:54:29PM +0100, Peter Maydell wrote:
+>> >> and I don't need the TCG engine to be a library to do that...
+>> >
+>> > You do need TCG APIs if you want TCG-level instrumentation, tuning
+>> > options, callbacks, etc.
+>> 
+>> I need an API; that doesn't necessarily look like the kind
+>> of API you want to be able to embed the TCG engine into
+>> other things, I think.
+>> 
+>> >> I agree that we want to provide something that is at least
+>> >> closer to a stable API than "just expose trace events",
+>> >> though.
+>> >
+>> > libqemu has at least three parts:
+>> >
+>> > 1. VM API (i.e. qemu_init(argc, argv), qemu_run(), qemu_vcpu_get_reg32())
+>> > 2. TCG engine
+>> > 3. Device models
+>> >
+>> > Like I said in my email, start with what matters for the instrumentation
+>> > use case (VM API at a minimum to control guest execution).  Other people
+>> > can flesh out the other parts later, as needed.
+>> >
+>> > Other attempts to provide a stable API will be essentially the same
+>> > thing as libqemu.
+>> 
+>> I don't think this is the case -- you could have a stable
+>> instrumentation API without it looking anything like
+>> libqemu. In particular I don't think you need to have
+>> something that sits at the top level and says 'run'.
+>> 
+>> In particular I think that pulling TCG out of QEMU
+>> is an enormous and painful undertaking that you just
+>> don't need to do at all to allow this kind of
+>> instrumentation API.
 
+> Please post an example of the API you'd like.
 
-r~
+In my opinion, the instrumentation support in this series provides an API that
+works in the opposite way you're suggesting (let's ignore the fact that it's
+built on tracing events).
+
+When QEMU loads an instrumentation library (which can happen at any time), some
+initialization function is called on the library so that it can establish what
+events to instrument. This also has the advantage that a user can hook into a
+running QEMU instance at any time to perform some instrumentation.
+
+I think this is the bare minimum necessary to make it work, and has the upside
+of being completely orthogonal to the libqemu approach. We could reuse most of
+the stable instrumentation API there too, except for the instrumentation code
+initialization.
+
+That being said, the libqemu approach *might* make it a bit easier to provide an
+API for things such as "run for this many instructions and return control to
+instrumentor", but I don't think that's mandatory for a first prototype (and can
+definitely be implemented using both approaches).
+
+Cheers,
+  Lluis
