@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dcuAn-0001qW-Ij
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:54 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcuAt-0001tJ-PG
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dcuAk-0005Iy-HA
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:53 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:42971)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dcuAk-0005Ek-BE
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:50 -0400
-Received: from HHMAIL01.hh.imgtec.org (unknown [10.100.10.19])
-	by Forcepoint Email with ESMTPS id 9E66C66A06861
-	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 14:58:40 +0100 (IST)
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Wed, 2 Aug 2017 14:58:31 +0100
-Message-ID: <1501682311-16370-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dcuAq-0005OF-N6
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcuAq-0005NW-GH
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 09:58:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69528155B9
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 13:58:55 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed,  2 Aug 2017 14:58:31 +0100
+Message-Id: <20170802135834.1455-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target-mips: apply CP0.PageMask before writing
- into TLB entry
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/3] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +31,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, peterx@redhat.com, marcandre.lureau@redhat.com
 
-From: Leon Alrae <leon.alrae@imgtec.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-PFN0 and PFN1 have to be masked out with PageMask_Mask.
+The following changes since commit d3d183a638d6a3ead515618a6547b3f80d39fc=
+b9:
 
-Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
-[Yongbok Kim:
-  Added commit message]
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- target/mips/op_helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2017-08-02 09:49:02 +0100)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 526f8e4..320f2b0 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -2008,6 +2008,7 @@ static inline uint64_t get_tlb_pfn_from_entrylo(uint64_t entrylo)
- static void r4k_fill_tlb(CPUMIPSState *env, int idx)
- {
-     r4k_tlb_t *tlb;
-+    uint64_t mask = env->CP0_PageMask >> (TARGET_PAGE_BITS + 1);
- 
-     /* XXX: detect conflicting TLBs and raise a MCHECK exception when needed */
-     tlb = &env->tlb->mmu.r4k.tlb[idx];
-@@ -2028,13 +2029,13 @@ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
-     tlb->C0 = (env->CP0_EntryLo0 >> 3) & 0x7;
-     tlb->XI0 = (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
-     tlb->RI0 = (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
--    tlb->PFN[0] = get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) << 12;
-+    tlb->PFN[0] = (get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) & ~mask) << 12;
-     tlb->V1 = (env->CP0_EntryLo1 & 2) != 0;
-     tlb->D1 = (env->CP0_EntryLo1 & 4) != 0;
-     tlb->C1 = (env->CP0_EntryLo1 >> 3) & 0x7;
-     tlb->XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
-     tlb->RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
--    tlb->PFN[1] = get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) << 12;
-+    tlb->PFN[1] = (get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) & ~mask) << 12;
- }
- 
- void r4k_helper_tlbinv(CPUMIPSState *env)
--- 
-2.7.4
+are available in the git repository at:
+
+  git://github.com/dagrh/qemu.git tags/pull-migration-20170802a
+
+for you to fetch changes up to 8bd9c4e6c565c566a6cba3470cb2d4ea63994143:
+
+  io: fix qio_channel_socket_accept err handling (2017-08-02 11:27:44 +01=
+00)
+
+----------------------------------------------------------------
+Migration pull 2017-08-02
+
+Just minor fixes for 2.10
+
+----------------------------------------------------------------
+Marc-Andr=C3=A9 Lureau (1):
+      migration: fix small leaks
+
+Peter Xu (2):
+      migration: fix comment disorder in RAMState
+      io: fix qio_channel_socket_accept err handling
+
+ io/channel-socket.c   |  3 ++-
+ migration/migration.c | 10 ++++++++++
+ migration/ram.c       |  4 ++--
+ 3 files changed, 14 insertions(+), 3 deletions(-)
