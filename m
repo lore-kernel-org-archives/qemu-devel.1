@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dcuWt-0000VN-2i
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:21:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dcuiW-00035K-FC
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:33:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dcuWp-00075N-2j
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60108)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dcuWo-00070d-PK
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:21:39 -0400
-References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-	<1501285073-2215-6-git-send-email-zuban32s@gmail.com>
-	<491f77fc-974c-33dd-3974-08ab61d2c078@redhat.com>
-	<CAKSfGUCTom8YBs8wOHMX_MpzDF1efB8_USb4tuW+hcAdoG2xvw@mail.gmail.com>
-	<20170802003910-mutt-send-email-mst@kernel.org>
-	<17a71bfc-1933-f707-2504-c9c699534cea@redhat.com>
-	<20170802164551-mutt-send-email-mst@kernel.org>
-	<9e36b7d6-bff3-b046-6053-162fb75ca0a0@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b0e1c72d-9c17-42e5-3135-5ebb1e53b4f1@redhat.com>
-Date: Wed, 2 Aug 2017 17:21:22 +0300
+	(envelope-from <dgibson@ozlabs.org>) id 1dcuiV-0001ad-Ey
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 10:33:44 -0400
+Date: Thu, 3 Aug 2017 00:22:53 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170802142253.GC394@umbus.fritz.box>
+References: <20170802103259.25940-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9e36b7d6-bff3-b046-6053-162fb75ca0a0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="kVXhAStRUZ/+rrGn"
+Content-Disposition: inline
+In-Reply-To: <20170802103259.25940-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] cpu: don't allow negative core id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,97 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 02/08/2017 17:16, Laszlo Ersek wrote:
-> On 08/02/17 15:47, Michael S. Tsirkin wrote:
->> On Wed, Aug 02, 2017 at 12:23:46AM +0200, Laszlo Ersek wrote:
->>> On 08/01/17 23:39, Michael S. Tsirkin wrote:
->>>> On Wed, Aug 02, 2017 at 12:33:12AM +0300, Alexander Bezzubikov wrote:
->>>>> 2017-08-01 23:31 GMT+03:00 Laszlo Ersek <lersek@redhat.com>:
->>>>>> (Whenever my comments conflict with Michael's or Marcel's, I defer to them.)
->>>>>>
->>>>>> On 07/29/17 01:37, Aleksandr Bezzubikov wrote:
->>>>>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>>>>>> ---
->>>>>>>   docs/pcie.txt            |  46 ++++++++++--------
->>>>>>>   docs/pcie_pci_bridge.txt | 121 +++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>   2 files changed, 147 insertions(+), 20 deletions(-)
->>>>>>>   create mode 100644 docs/pcie_pci_bridge.txt
->>>>>>>
->>>>>>> diff --git a/docs/pcie.txt b/docs/pcie.txt
->>>>>>> index 5bada24..338b50e 100644
->>>>>>> --- a/docs/pcie.txt
->>>>>>> +++ b/docs/pcie.txt
->>>>>>> @@ -46,7 +46,7 @@ Place only the following kinds of devices directly on the Root Complex:
->>>>>>>       (2) PCI Express Root Ports (ioh3420), for starting exclusively PCI Express
->>>>>>>           hierarchies.
->>>>>>>
->>>>>>> -    (3) DMI-PCI Bridges (i82801b11-bridge), for starting legacy PCI
->>>>>>> +    (3) PCIE-PCI Bridge (pcie-pci-bridge), for starting legacy PCI
->>>>>>>           hierarchies.
->>>>>>>
->>>>>>>       (4) Extra Root Complexes (pxb-pcie), if multiple PCI Express Root Buses
->>>>>>
->>>>>> When reviewing previous patches modifying / adding this file, I
->>>>>> requested that we spell out "PCI Express" every single time. I'd like to
->>>>>> see the same in this patch, if possible.
->>>>>
->>>>> OK, I didn't know it.
->>>>>
->>>>>>
->>>>>>> @@ -55,18 +55,18 @@ Place only the following kinds of devices directly on the Root Complex:
->>>>>>>      pcie.0 bus
->>>>>>>      ----------------------------------------------------------------------------
->>>>>>>           |                |                    |                  |
->>>>>>> -   -----------   ------------------   ------------------   --------------
->>>>>>> -   | PCI Dev |   | PCIe Root Port |   | DMI-PCI Bridge |   |  pxb-pcie  |
->>>>>>> -   -----------   ------------------   ------------------   --------------
->>>>>>> +   -----------   ------------------   -------------------   --------------
->>>>>>> +   | PCI Dev |   | PCIe Root Port |   | PCIE-PCI Bridge |   |  pxb-pcie  |
->>>>>>> +   -----------   ------------------   -------------------   --------------
->>>>>>>
->>>>>>>   2.1.1 To plug a device into pcie.0 as a Root Complex Integrated Endpoint use:
->>>>>>>             -device <dev>[,bus=pcie.0]
->>>>>>>   2.1.2 To expose a new PCI Express Root Bus use:
->>>>>>>             -device pxb-pcie,id=pcie.1,bus_nr=x[,numa_node=y][,addr=z]
->>>>>>> -      Only PCI Express Root Ports and DMI-PCI bridges can be connected
->>>>>>> +      Only PCI Express Root Ports, PCIE-PCI bridges and DMI-PCI bridges can be connected
->>>>>>
->>>>>> It would be nice if we could keep the flowing text wrapped to 80 chars.
->>>>>>
->>>>>> Also, here you add the "PCI Express-PCI" bridge to the list of allowed
->>>>>> controllers (and you keep DMI-PCI as permitted), but above DMI was
->>>>>> replaced. I think these should be made consistent -- we should make up
->>>>>> our minds if we continue to recommend the DMI-PCI bridge or not. If not,
->>>>>> then we should eradicate all traces of it. If we want to keep it at
->>>>>> least for compatibility, then it should remain as fully documented as it
->>>>>> is now.
->>>>>
->>>>> Now I'm beginning to think that we shouldn't keep the DMI-PCI bridge
->>>>> even for compatibility and may want to use a new PCIE-PCI bridge
->>>>> everywhere (of course, except some cases when users are
->>>>> sure they need exactly DMI-PCI bridge for some reason)
->>>>
->>>> Can dmi-pci support shpc? why doesn't it? For compatibility?
->>>
->>> I don't know why, but the fact that it doesn't is the reason libvirt
->>> settled on auto-creating a dmi-pci bridge and a pci-pci bridge under
->>> that for Q35. The reasoning was (IIRC Laine's words correctly) that the
->>> dmi-pci bridge cannot receive hotplugged devices, while the pci-pci
->>> bridge cannot be connected to the root complex. So both were needed.
->>>
->>> Thanks
->>> Laszlo
->>
->> OK. Is it true that dmi-pci + pci-pci under it will allow hotplug
->> on Q35 if we just flip the bit in _OSC?
-> 
-> Marcel, what say you?... :)
-> 
 
-Will test and get back to you (it may actually work)
+--kVXhAStRUZ/+rrGn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Marcel
+On Wed, Aug 02, 2017 at 12:32:59PM +0200, Laurent Vivier wrote:
+> With pseries machine type a negative core-id is not managed properly:
+> -1 gives an inaccurate error message ("core -1 already populated"),
+> -2 crashes QEMU (core dump)
+>=20
+> As it seems a negative value is invalid for any architecture,
+> instead of checking this in spapr_core_pre_plug() I think it's better
+> to check this in the generic part, core_prop_set_core_id()
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/cpu/core.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+> index 2bf960d..bd578ab 100644
+> --- a/hw/cpu/core.c
+> +++ b/hw/cpu/core.c
+> @@ -33,6 +33,11 @@ static void core_prop_set_core_id(Object *obj, Visitor=
+ *v, const char *name,
+>          return;
+>      }
+> =20
+> +    if (value < 0) {
+> +        error_setg(errp, "Invalid core id %"PRId64, value);
+> +        return;
+> +    }
+> +
+>      core->core_id =3D value;
+>  }
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--kVXhAStRUZ/+rrGn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmB4D0ACgkQbDjKyiDZ
+s5Lx7hAAgx7Q4hV/aXZ+3tVrXzNL5sqO4wAZhJuQgFdyzFqmyC/EGIzfmN9v3mqy
+9Qsn/gIhUeXLtoekJdHf1N8F2mW+hqqArsYFEezz/uV4G1xo7vEwf0NmFeq4cqnD
+r54Qfu/l8SbcPHowYGw6jBxjuZZw0RhMKpmwP4alBOTyt96X1ch31ef3B+Abi1bn
+aZ48bk4AE4z0Z0pOvHjqTT0G6I/vXWNIGNaR6blCMz39QGsK1ZmNU/vZLc9bXvL9
+ZSMvxAKcPXxqrEi3l4jdR6vKIwkhVk5hgeFkkNf87hsU/FX6y/HVzaWGP0xVFA7z
+RQmSi2QuWN2nwnON4T7fRbOkWszle1MaNhOPH5dd4QoLESOXhIpynk1KxvN6Vr6Z
+eAzLE5T6ay/TrUu3vyckghIC11D27OiVCx+YactBOtDTQi2e5Ji93QY3VjRNePN2
+emztLvxvETWcTrbY47h6fA/2br4vKO1c21bof0YnOwPhyeHbl5D+nlPsGOjPjEX6
+JPcy1hrciJpZ3HaV1mq3C7DfassfWZjLkkb6zMPDgYI1pTjI6/vgbG7Ck5L25Hrl
+g4edk5bAGedPf2ikt9NKMCopX/+0VCF2jfm4EC76rpvpk6HVp74t25+seuyg3mEl
+Wwrtwx6qjJepAOL0g9v1KO7ROcKc82Z2B/cTrqNn+HLpxGOi2T4=
+=8arz
+-----END PGP SIGNATURE-----
+
+--kVXhAStRUZ/+rrGn--
