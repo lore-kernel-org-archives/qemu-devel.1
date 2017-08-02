@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dd19N-00080C-7X
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:25:54 -0400
+	(envelope-from <mst@redhat.com>) id 1dd1Bi-0000fu-5c
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:28:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dd19I-0003Fi-9k
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:25:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51944)
+	(envelope-from <mst@redhat.com>) id 1dd1Bd-0004VM-8v
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:28:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dd19H-0003Er-Q5
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:25:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7850877540
-	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 21:25:46 +0000 (UTC)
-Date: Thu, 3 Aug 2017 00:25:43 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dd1Bc-0004VB-Vf
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:28:13 -0400
+Date: Thu, 3 Aug 2017 00:28:10 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170803002520-mutt-send-email-mst@kernel.org>
-References: <20170802155113.62471-1-marcel@redhat.com>
+Message-ID: <20170803002709-mutt-send-email-mst@kernel.org>
+References: <1501663295-18774-1-git-send-email-bhumirks@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170802155113.62471-1-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docs/pcie.txt: Replace ioh3420 with
- pcie-root-port
+In-Reply-To: <1501663295-18774-1-git-send-email-bhumirks@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] firmware: add const to bin_attribute
+ structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +27,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, drjones@redhat.com
+To: Bhumika Goyal <bhumirks@gmail.com>
+Cc: julia.lawall@lip6.fr, somlo@cmu.edu, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
 
-On Wed, Aug 02, 2017 at 06:51:13PM +0300, Marcel Apfelbaum wrote:
-> Do not mention ioh3420 in the "how to" doc.
-> The device still works and can be used by already
-> existing setups, but no need to be mentioned.
+On Wed, Aug 02, 2017 at 02:11:35PM +0530, Bhumika Goyal wrote:
+> Add const to bin_attribute structures as they are only passed to the
+> functions sysfs_{remove/create}_bin_file. The arguments passed are of
+> type const, so declare the structures to be const.
 > 
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> Done using Coccinelle.
+> 
+> @m disable optional_qualifier@
+> identifier s;
+> position p;
+> @@
+> static struct bin_attribute s@p={...};
+> 
+> @okay1@
+> position p;
+> identifier m.s;
+> @@
+> (
+> sysfs_create_bin_file(...,&s@p,...)
+> |
+> sysfs_remove_bin_file(...,&s@p,...)
+> )
+> 
+> @bad@
+> position p!={m.p,okay1.p};
+> identifier m.s;
+> @@
+> s@p
+> 
+> @change depends on !bad disable optional_qualifier@
+> identifier m.s;
+> @@
+> static
+> +const
+> struct bin_attribute s={...};
+> 
+> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+
+For qemu bits:
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+Feel free to merge.,
+
 > ---
-
-Do we need this in 2.10? I'm inclined to say no, it can wait
-until 2.11. Thoughts?
-
->  docs/pcie.txt | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>  drivers/firmware/dell_rbu.c          | 6 +++---
+>  drivers/firmware/dmi-sysfs.c         | 2 +-
+>  drivers/firmware/google/gsmi.c       | 2 +-
+>  drivers/firmware/google/memconsole.c | 2 +-
+>  drivers/firmware/qemu_fw_cfg.c       | 2 +-
+>  5 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/docs/pcie.txt b/docs/pcie.txt
-> index 5bada24..f990033 100644
-> --- a/docs/pcie.txt
-> +++ b/docs/pcie.txt
-> @@ -43,8 +43,8 @@ Place only the following kinds of devices directly on the Root Complex:
->          strangely when PCI Express devices are integrated
->          with the Root Complex.
+> diff --git a/drivers/firmware/dell_rbu.c b/drivers/firmware/dell_rbu.c
+> index 2f452f1..a771360 100644
+> --- a/drivers/firmware/dell_rbu.c
+> +++ b/drivers/firmware/dell_rbu.c
+> @@ -675,18 +675,18 @@ static ssize_t write_rbu_packet_size(struct file *filp, struct kobject *kobj,
+>  	return count;
+>  }
 >  
-> -    (2) PCI Express Root Ports (ioh3420), for starting exclusively PCI Express
-> -        hierarchies.
-> +    (2) PCI Express Root Ports (pcie-root-port), for starting exclusively
-> +        PCI Express hierarchies.
+> -static struct bin_attribute rbu_data_attr = {
+> +static const struct bin_attribute rbu_data_attr = {
+>  	.attr = {.name = "data", .mode = 0444},
+>  	.read = read_rbu_data,
+>  };
 >  
->      (3) DMI-PCI Bridges (i82801b11-bridge), for starting legacy PCI
->          hierarchies.
-> @@ -65,7 +65,7 @@ Place only the following kinds of devices directly on the Root Complex:
->            -device pxb-pcie,id=pcie.1,bus_nr=x[,numa_node=y][,addr=z]
->        Only PCI Express Root Ports and DMI-PCI bridges can be connected
->        to the pcie.1 bus:
-> -          -device ioh3420,id=root_port1[,bus=pcie.1][,chassis=x][,slot=y][,addr=z]                                     \
-> +          -device pcie-root-port,id=root_port1[,bus=pcie.1][,chassis=x][,slot=y][,addr=z]                                     \
->            -device i82801b11-bridge,id=dmi_pci_bridge1,bus=pcie.1
+> -static struct bin_attribute rbu_image_type_attr = {
+> +static const struct bin_attribute rbu_image_type_attr = {
+>  	.attr = {.name = "image_type", .mode = 0644},
+>  	.read = read_rbu_image_type,
+>  	.write = write_rbu_image_type,
+>  };
 >  
+> -static struct bin_attribute rbu_packet_size_attr = {
+> +static const struct bin_attribute rbu_packet_size_attr = {
+>  	.attr = {.name = "packet_size", .mode = 0644},
+>  	.read = read_rbu_packet_size,
+>  	.write = write_rbu_packet_size,
+> diff --git a/drivers/firmware/dmi-sysfs.c b/drivers/firmware/dmi-sysfs.c
+> index d5de6ee..936e656 100644
+> --- a/drivers/firmware/dmi-sysfs.c
+> +++ b/drivers/firmware/dmi-sysfs.c
+> @@ -440,7 +440,7 @@ static ssize_t dmi_sel_raw_read(struct file *filp, struct kobject *kobj,
+>  	return find_dmi_entry(entry, dmi_sel_raw_read_helper, &state);
+>  }
 >  
-> @@ -107,14 +107,14 @@ Plug only PCI Express devices into PCI Express Ports.
->                                               ------------
+> -static struct bin_attribute dmi_sel_raw_attr = {
+> +static const struct bin_attribute dmi_sel_raw_attr = {
+>  	.attr = {.name = "raw_event_log", .mode = 0400},
+>  	.read = dmi_sel_raw_read,
+>  };
+> diff --git a/drivers/firmware/google/gsmi.c b/drivers/firmware/google/gsmi.c
+> index c8f169b..1ad29f7 100644
+> --- a/drivers/firmware/google/gsmi.c
+> +++ b/drivers/firmware/google/gsmi.c
+> @@ -508,7 +508,7 @@ static ssize_t eventlog_write(struct file *filp, struct kobject *kobj,
 >  
->  2.2.1 Plugging a PCI Express device into a PCI Express Root Port:
-> -          -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
-> +          -device pcie-root-port,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
->            -device <dev>,bus=root_port1
->  2.2.2 Using multi-function PCI Express Root Ports:
-> -      -device ioh3420,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
-> -      -device ioh3420,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
-> -      -device ioh3420,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
-> +      -device pcie-root-port,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
-> +      -device pcie-root-port,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
-> +      -device pcie-root-port,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
->  2.2.3 Plugging a PCI Express device into a Switch:
-> -      -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
-> +      -device pcie-root-port,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
->        -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]          \
->        -device xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]] \
->        -device <dev>,bus=downstream_port1
+>  }
+>  
+> -static struct bin_attribute eventlog_bin_attr = {
+> +static const struct bin_attribute eventlog_bin_attr = {
+>  	.attr = {.name = "append_to_eventlog", .mode = 0200},
+>  	.write = eventlog_write,
+>  };
+> diff --git a/drivers/firmware/google/memconsole.c b/drivers/firmware/google/memconsole.c
+> index 166f07c..b11a02c 100644
+> --- a/drivers/firmware/google/memconsole.c
+> +++ b/drivers/firmware/google/memconsole.c
+> @@ -33,7 +33,7 @@ static ssize_t memconsole_read(struct file *filp, struct kobject *kobp,
+>  	return memconsole_read_func(buf, pos, count);
+>  }
+>  
+> -static struct bin_attribute memconsole_bin_attr = {
+> +static const struct bin_attribute memconsole_bin_attr = {
+>  	.attr = {.name = "log", .mode = 0444},
+>  	.read = memconsole_read,
+>  };
+> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+> index 0e20116..f254977 100644
+> --- a/drivers/firmware/qemu_fw_cfg.c
+> +++ b/drivers/firmware/qemu_fw_cfg.c
+> @@ -343,7 +343,7 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *filp, struct kobject *kobj,
+>  	return count;
+>  }
+>  
+> -static struct bin_attribute fw_cfg_sysfs_attr_raw = {
+> +static const struct bin_attribute fw_cfg_sysfs_attr_raw = {
+>  	.attr = { .name = "raw", .mode = S_IRUSR },
+>  	.read = fw_cfg_sysfs_read_raw,
+>  };
 > -- 
-> 2.9.4
+> 1.9.1
