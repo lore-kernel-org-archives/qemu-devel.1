@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dckEB-0002ES-Hw
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 23:21:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1dckHu-0003KU-Gm
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 23:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dckE8-0006Yt-7X
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 23:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55964)
+	(envelope-from <peterx@redhat.com>) id 1dckHt-0000fc-PA
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 23:25:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dckE7-0006We-VY
-	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 23:21:40 -0400
-Date: Wed, 2 Aug 2017 11:21:30 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dckHt-0000f2-J9
+	for qemu-devel@nongnu.org; Tue, 01 Aug 2017 23:25:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A249123E1C
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 03:25:32 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170802032130.GB15080@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-4-git-send-email-peterx@redhat.com>
-	<20170731165339.GD2122@work-vm>
-	<20170801022519.GB15697@pxdev.xzpeter.org>
-	<20170801083220.GB12670@redhat.com> <20170801085507.GC2079@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170801085507.GC2079@work-vm>
-Subject: Re: [Qemu-devel] [RFC 03/29] io: fix qio_channel_socket_accept err
- handling
+Date: Wed,  2 Aug 2017 11:25:20 +0800
+Message-Id: <1501644321-17721-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1501644321-17721-1-git-send-email-peterx@redhat.com>
+References: <1501644321-17721-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] migration: fix comment disorder in RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, peterx@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Aug 01, 2017 at 09:55:08AM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Tue, Aug 01, 2017 at 10:25:19AM +0800, Peter Xu wrote:
-> > > On Mon, Jul 31, 2017 at 05:53:39PM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > > When accept failed, we should setup errp with the reason. More
-> > > > > importantly, the caller may assume errp be non-NULL when error happens,
-> > > > > and not setting the errp may crash QEMU.
-> > > > > 
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > ---
-> > > > >  io/channel-socket.c | 1 +
-> > > > >  1 file changed, 1 insertion(+)
-> > > > > 
-> > > > > diff --git a/io/channel-socket.c b/io/channel-socket.c
-> > > > > index 53386b7..7bc308e 100644
-> > > > > --- a/io/channel-socket.c
-> > > > > +++ b/io/channel-socket.c
-> > > > > @@ -344,6 +344,7 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
-> > > > >          if (errno == EINTR) {
-> > > > >              goto retry;
-> > > > >          }
-> > > > > +        error_setg_errno(errp, errno, "Unable to accept connection");
-> > > > >          goto error;
-> > > > 
-> > > > OK, but this code actually has a bigger problem as well:
-> > > > 
-> > > > the original is:
-> > > > 
-> > > >     cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
-> > > >                            &cioc->remoteAddrLen);
-> > > >     if (cioc->fd < 0) {
-> > > >         trace_qio_channel_socket_accept_fail(ioc);
-> > > >         if (errno == EINTR) {
-> > > >             goto retry;
-> > > >         }
-> > > >         goto error;
-> > > >     }
-> > > > 
-> > > > Stefan confirmed that trace_ doesn't preserve errno; so the if
-> > > > following it is wrong.  It needs to preserve errno.
-> > > 
-> > > Ah... If so, not sure whether we can do the reservation in trace codes
-> > > in general?
-> > > 
-> > > For this one, I can just move the trace_*() below the errno check.
-> > > After all, if EINTR is got, it's not really a fail, so imho we should
-> > > not trace it with "accept fail".
-> > 
-> > Agreed, we just need to move the trace below the if.
-> 
-> Peter: Can you split this as a separate patch and it seems OK to try and
-> put this in 2.10 since it's a strict bug fix.
+Comments for "migration_dirty_pages" and "bitmap_mutex" are switched.
+Fix it.
 
-Sure!  Then I'll possibly include the comment fix patch as well.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ migration/ram.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/migration/ram.c b/migration/ram.c
+index 1b08296..e18b3e2 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -188,9 +188,9 @@ struct RAMState {
+     uint64_t iterations_prev;
+     /* Iterations since start */
+     uint64_t iterations;
+-    /* protects modification of the bitmap */
+-    uint64_t migration_dirty_pages;
+     /* number of dirty bits in the bitmap */
++    uint64_t migration_dirty_pages;
++    /* protects modification of the bitmap */
+     QemuMutex bitmap_mutex;
+     /* The RAMBlock used in the last src_page_requests */
+     RAMBlock *last_req_rb;
 -- 
-Peter Xu
+2.7.4
