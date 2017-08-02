@@ -1,14 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dcwlG-0003hm-GZ
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:44:43 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dcwnr-0005zh-3d
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dcwlF-0004ut-HR
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:44:42 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed,  2 Aug 2017 17:43:46 +0100
-Message-Id: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 00/15] v7M: cleanups and bugfixes prior to v8M
+	(envelope-from <el13635@mail.ntua.gr>) id 1dcwnq-0001OP-8r
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 12:47:23 -0400
+Date: Wed, 2 Aug 2017 19:46:31 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170802164631.h3zwxwogba6ng7ae@postretch>
+References: <20170801134907.31253-1-el13635@mail.ntua.gr>
+	<20170801134907.31253-4-el13635@mail.ntua.gr>
+	<20170802100724.GD5531@stefanha-x1.localdomain>
+	<20170802103319.GB3649@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gjq2kujpqgweaudz"
+Content-Disposition: inline
+In-Reply-To: <20170802103319.GB3649@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 3/3] block: remove legacy I/O throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,58 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
 
-(This is 2.11 material, obviously, but it's a coherent and
-large enough set of patches that I figured I might as well
-push it out for review now.)
 
-This patchset is a collection of cleanups, bugfixes, etc to
-the existing v7M code which are either necessary preliminary
-to implementing v8M or just things I noticed along the way.
-The non-trivial stuff is:
- * migration for M profile is shifted to not use read_cpsr()
-   and write_cpsr() which assume A profile semantics
-   (back compatibility with old migration state is maintained)
- * we implement the "user accesses should BusFault" behaviour
-   for the memory mapped registers in the SCS, though this
-   won't actually kick in until we turn MEMTX_ERROR into a
-   BusFault (I have patches for that)
+--gjq2kujpqgweaudz
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+On Wed, Aug 02, 2017 at 12:33:19PM +0200, Kevin Wolf wrote:
+>Am 02.08.2017 um 12:07 hat Stefan Hajnoczi geschrieben:
+>> On Tue, Aug 01, 2017 at 04:49:07PM +0300, Manos Pitsidianakis wrote:
+>> > diff --git a/block.c b/block.c
+>> > index 9ebdba28b0..c6aad25286 100644
+>> > --- a/block.c
+>> > +++ b/block.c
+>> > @@ -1975,6 +1975,7 @@ BdrvChild *bdrv_root_attach_child(BlockDriverSta=
+te *child_bs,
+>> >      child =3D g_new(BdrvChild, 1);
+>> >      *child =3D (BdrvChild) {
+>> >          .bs             =3D NULL,
+>> > +        .parent_bs      =3D NULL,
+>> >          .name           =3D g_strdup(child_name),
+>> >          .role           =3D child_role,
+>> >          .perm           =3D perm,
+>> > @@ -2009,6 +2010,7 @@ BdrvChild *bdrv_attach_child(BlockDriverState *p=
+arent_bs,
+>> >      if (child =3D=3D NULL) {
+>> >          return NULL;
+>> >      }
+>> > +    child->parent_bs =3D parent_bs;
+>> >
+>> >      QLIST_INSERT_HEAD(&parent_bs->children, child, next);
+>> >      return child;
+>> > @@ -3729,6 +3731,12 @@ const char *bdrv_get_parent_name(const BlockDri=
+verState *bs)
+>> >                  return name;
+>> >              }
+>> >          }
+>> > +        if (c->parent_bs && c->parent_bs->implicit) {
+>> > +            name =3D bdrv_get_parent_name(c->parent_bs);
+>> > +            if (name && *name) {
+>> > +                return name;
+>> > +            }
+>> > +        }
+>> >      }
+>> >
+>> >      return NULL;
+>>
+>> This should be a separate patch.
+>>
+>> Who updates parent_bs if the parent is changed (e.g.
+>> bdrv_replace_node())?
+>>
+>> We already have bs->parents.  Why is BdrvChild->parent_bs needed?
+>
+>I haven't look at the whole patch yet, but BdrvChild->parent_bs is a
+>thing that intentionally doesn't exist. A node simply has no business
+>knowing its parents - which may or may not be BlockDriverStates (the
+>obvious example where they aren't BDSes are BlockBackends, but block
+>jobs own some BdrvChild objects, too).
+>
+>Usually the replacement is a BdrvChildRole callback.
+>
+>Kevin
 
-Peter Maydell (15):
-  target/arm: Use MMUAccessType enum rather than int
-  target/arm: Don't trap WFI/WFE for M profile
-  target/arm: Consolidate PMSA handling in get_phys_addr()
-  target/arm: Tighten up Thumb decode where new v8M insns will be
-  hw/intc/armv7m_nvic.c: Remove out of date comment
-  target/arm: Remove incorrect comment about MPU_CTRL
-  target/arm: Fix outdated comment about exception exit
-  target/arm: Define and use XPSR bit masks
-  target/arm: Don't store M profile PRIMASK and FAULTMASK in daif
-  target/arm: Don't use cpsr_write/cpsr_read to transfer M profile XPSR
-  target/arm: Make arm_cpu_dump_state() handle the M-profile XPSR
-  target/arm: Don't calculate lr in arm_v7m_cpu_do_interrupt() until
-    needed
-  target/arm: Create and use new function arm_v7m_is_handler_mode()
-  armv7m_nvic.h: Move from include/hw/arm to include/hw/intc
-  nvic: Implement "user accesses BusFault" SCS region behaviour
+I think accessing the parent bs is necessary for the reasons I specified=20
+in my reply to Stefan. Will a callback that returns BdrvChild->opaque=20
+(parent_bs) for child_file and child_backing be okay?
 
- hw/intc/armv7m_nvic.c                  |  68 +++++++++++-------
- include/hw/arm/armv7m.h                |   2 +-
- include/hw/{arm => intc}/armv7m_nvic.h |   0
- target/arm/cpu.c                       |   5 --
- target/arm/cpu.h                       |  54 ++++++++++----
- target/arm/helper.c                    | 124 ++++++++++++++++-----------------
- target/arm/internals.h                 |   3 +-
- target/arm/machine.c                   |  54 +++++++++++++-
- target/arm/op_helper.c                 |   5 ++
- target/arm/translate.c                 | 106 +++++++++++++++++++++-------
- 10 files changed, 286 insertions(+), 135 deletions(-)
- rename include/hw/{arm => intc}/armv7m_nvic.h (100%)
 
--- 
-2.7.4
+--gjq2kujpqgweaudz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmCAecACgkQc2J8L2kN
+9xAndRAA1UoFnmgUyiObl6Yk2B4uzh+oGQdLDrBpxoFE1dB3etM0x6CmtJNgfonQ
+e98vWVjsqc7I2efH6peF59ep4W8Ch+94mMGOKKfRztSTC8oyvdj5YifSasPWE8Cq
+k3qtIWDfe5bldbOAhPV5j3lMOpksaUj+lETXXAvFqD30HibM5QD3UaTYfZWM6jlN
++GkG+dtr5PwcWqQqWcsmowF6gBeqPBWIawKuY+wALu6YDHSnJ25jO602d2mHOGkj
+6HqdPSu7yHYLvc+deR+jsjszoocWYJt0+uK9Jjh0t/zybIrPdy5VcRjO0UoX3rdT
+zkoEx/R5kGLKPoiAC3MdrXzW67G7+fzqIFQYxowIyEw1ojg2aoJhaH5+vZqELQBw
+SM4MYN5zEwd9l/gZMZZQkvOv3IVtiQcS3/ONd/ncIGqwuF3Ja0zpzrtyBKtaUK7S
+nJOT1adj/NDeoxY6ajcQW7JicjuCEAuKz9mhQjMZ+rrnRFF0qhsTaFHb7+SOEZlC
+IXK7Xn9QTgizYUo99wkxLGGGFmYUAtus6qxbKaPF25TMWKforDH/zAyVV0RZ3pg+
+j/AQCCusXYHp64Pyv25GoKO8E4tGUS/V+FimiWA9HPF0sG2ZeR0ChJ/nopBHErUl
+vbjiaM96yDmNvIvRQt2ZJvre+qf3g4EbqpZoMztbkSjLEj5LsHA=
+=ystQ
+-----END PGP SIGNATURE-----
+
+--gjq2kujpqgweaudz--
