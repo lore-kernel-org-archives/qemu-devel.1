@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dcsps-0007D5-80
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dcsqU-0007XQ-Nz
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dcspp-00067s-2T
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40617
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dcspo-00067h-TM
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:09 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v72CTBBl102343
-	for <qemu-devel@nongnu.org>; Wed, 2 Aug 2017 08:33:06 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c385nv922-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 08:33:05 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 2 Aug 2017 13:33:04 +0100
-References: <20170801230155.21083-1-ehabkost@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 2 Aug 2017 14:33:00 +0200
+	(envelope-from <eblake@redhat.com>) id 1dcsqR-0006Wv-JE
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dcsqR-0006Wl-AG
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:33:47 -0400
+References: <CAK6XCv6oYSL=gQKhv6N5e7y620szz5Wc5g13OOMd=C54Lc=O7w@mail.gmail.com>
+	<20170802121856.GG4098@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6da76618-0d93-dc45-1768-4598cf07a95f@redhat.com>
+Date: Wed, 2 Aug 2017 07:33:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170801230155.21083-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <61e65941-a035-a1fd-4a09-3dc54aac7354@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: Mark virtio-device as
- non-user-creatable
+In-Reply-To: <20170802121856.GG4098@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu"
+Subject: Re: [Qemu-devel] Where is the VM live migration code?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,67 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Aditya Bhardwaj <adityaform@gmail.com>
+Cc: qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>,
+ Aditya Bhardwaj <adityaform@gmail.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <6da76618-0d93-dc45-1768-4598cf07a95f@redhat.com>
+Subject: Re: [Qemu-devel] Where is the VM live migration code?
+References: <CAK6XCv6oYSL=gQKhv6N5e7y620szz5Wc5g13OOMd=C54Lc=O7w@mail.gmail.com>
+ <20170802121856.GG4098@redhat.com>
+In-Reply-To: <20170802121856.GG4098@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08/02/2017 07:18 AM, Daniel P. Berrange wrote:
+> On Wed, Aug 02, 2017 at 04:25:08PM +0530, Aditya Bhardwaj wrote:
+>> My lab setup is: 3 HP Servers each of 4 GB RAM. Server 1 and Server 2:=
+
+>> installed with Virtualization using KVM on Redhat 6.5 System. On top o=
+f
+>> this I am using libvirtd for managing virtual machines. NFS server is
+>> installed on Server 3 for shared disk image. VM migration is working
+>> correctly. Now i need to do some changes in "migration.c" but did not =
+find
+>> any source code of KVM-QEMU migration.
+>>
+>> Where I can find the migration source code for KVM-QEMU. All are reque=
+sted
+>> to help me for this issue.
+>=20
+> QEMU source code is in GIT
+>=20
+>   https://git.qemu.org/gitweb.cgi?p=3Dqemu.git;a=3Dsummary
+>=20
+> in the 'migration' directory.
+>=20
+> If you're new writing code for QEMU then see this page too
+>=20
+> https://wiki.qemu.org/index.php/Documentation/GettingStartedDevelopers
+
+I've also got a patch pending to make the various qemu executables
+provide a link to qemu.org as part of their --help output (which will in
+turn make it easier to find links to the source code):
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg09049.html
+
+It needs some review if it's going to be part of 2.10.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 08/02/2017 01:01 AM, Eduardo Habkost wrote:
-> TYPE_VIRTIO_DEVICE devices are already not usable with -device
-> and device_add, but they are reported as user-creatable on
-> "-device help" and through monitor interfaces.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I've tried -device virtio-rng on s390x and from what I see, it
-seems we 'auto-magically' create the 'controlling' virtio-rng-ccw
-device. So I have to ask what do you mean by 'already not usable'?
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmBxqkACgkQp6FrSiUn
+Q2pCuAf/Sqkxj1KVR1ect9ah7mnZ7nyntbRUx1lfnhecGeBiUwJhGJkohAkTZrB5
+1EvC5lF22KkObUWll2Qgd3iJBBornRyYaoDAJCGTkq2Ka6vzgiLZ9fxWqZxmWneW
+F+SyVrjqsHy46n55MrrwxxuyO2Io50DFXiXMpaW6tdy+uUna7DYJodA57x7Pz75H
+qsUNlfmWp4dcpzu9tAsIKQfWqy+klQBjG/nBImYehvY+UQfFYYIdukbofG0ZRU8N
+QQ3MSnIwDni6ibYGFJfUozWAcObEJLKupgZMIdUKyNBDI4viOlzH8f3/mObPnifk
+U3hLLW0rH6MhUVVIxpmsvdc6+bsquA==
+=dtLq
+-----END PGP SIGNATURE-----
 
-> 
-> Mark them as not user-creatable to avoid confusing users, and to
-> allow automated testing (e.g. scripts/device-crash-test) to skip
-> them.
-> 
-> Before this patch, device-crash-test will try to test
-> virtio-device devices with all machine-types:
-> 
->   $ time ./scripts/device-crash-test -D virtio-device -v ./x86_64-softmmu/qemu-system-x86_64
->   [...]
->   INFO: Total: 1088 test cases
->   INFO: Skipped 408 test cases
-> 
->   real    0m49.775s
-> 
-> After this patch, the script won't try to test virtio-device
-> devices:
-> 
->   $ time ./scripts/device-crash-test -D virtio-device -v ./x86_64-softmmu/qemu-system-x86_64
->   INFO: Total: 0 test cases
-> 
->   real    0m0.092s
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/virtio/virtio.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 464947f..c4bdb94 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2653,6 +2653,17 @@ static void virtio_device_class_init(ObjectClass *klass, void *data)
->      dc->unrealize = virtio_device_unrealize;
->      dc->bus_type = TYPE_VIRTIO_BUS;
->      dc->props = virtio_properties;
-> +    /*
-> +     * Reason:
-> +     * - TYPE_VIRTIO_DEVICE devices are not visible to guests
-> +     *   unless they are created and controlled by transport-specific
-> +     *   devices (virtio-pci, virtio-mmio, and virtio-ccw).
-> +     * - A TYPE_VIRTIO_BUS bus is never available for plugging
-> +     *   using -device/device_add, as virtio-bus buses are
-> +     *   created on the fly and immediately populated by the
-> +     *   transport-specific devices' realize methods.
-> +     */
-> +    dc->user_creatable = false;
->      vdc->start_ioeventfd = virtio_device_start_ioeventfd_impl;
->      vdc->stop_ioeventfd = virtio_device_stop_ioeventfd_impl;
-> 
+--0UijUVKjqeQalPAqeT8I0QsrU5TXIuqqu--
