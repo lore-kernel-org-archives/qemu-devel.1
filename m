@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dct3H-0006Km-Or
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:47:04 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dct62-0007CU-HC
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dct3G-00081j-T2
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:47:03 -0400
-Date: Wed, 2 Aug 2017 13:46:51 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170802124651.GP4098@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170728164708.12202-1-eblake@redhat.com>
-	<20170728164708.12202-5-eblake@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dct5w-0001SH-Hi
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:49:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dct5w-0001Rm-BT
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 08:49:48 -0400
+Date: Wed, 2 Aug 2017 13:49:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170802124943.GA2380@work-vm>
+References: <CAK6XCv6oYSL=gQKhv6N5e7y620szz5Wc5g13OOMd=C54Lc=O7w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170728164708.12202-5-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] maint: Include bug-reporting info
- in --help output.
+In-Reply-To: <CAK6XCv6oYSL=gQKhv6N5e7y620szz5Wc5g13OOMd=C54Lc=O7w@mail.gmail.com>
+Subject: Re: [Qemu-devel] Where is the VM live migration code?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, mreitz@redhat.com, pbonzini@redhat.com
+To: Aditya Bhardwaj <adityaform@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jul 28, 2017 at 11:47:08AM -0500, Eric Blake wrote:
-> These days, many programs are including a bug-reporting address,
-> or better yet, a link to the project web site, at the tail of
-> their --help output.  However, we were not very consistent at
-> doing so: only qemu-nbd and qemu-qa mentioned anything, with the
-> latter pointing to an individual person instead of the project.
+* Aditya Bhardwaj (adityaform@gmail.com) wrote:
+> My lab setup is: 3 HP Servers each of 4 GB RAM. Server 1 and Server 2:
+> installed with Virtualization using KVM on Redhat 6.5 System. On top of
+> this I am using libvirtd for managing virtual machines. NFS server is
+> installed on Server 3 for shared disk image. VM migration is working
+> correctly. Now i need to do some changes in "migration.c" but did not find
+> any source code of KVM-QEMU migration.
 > 
-> Add a new #define that sets up a uniform string, mentioning both
-> bug reporting instructions and overall project details, and which
-> a downstream vendor could tweak if they want bugs to go to a
-> downstream database.  Then use it in all of our binaries which
-> have --help output.
-> 
-> The canned text intentionally references http:// instead of https://
-> because our https website currently causes certificate errors in
-> some browsers.  That can be tweaked later once we have resolved the
-> web site issued.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
-> 
-> v2: tweak text to capitalize QEMU and use consistent trailing .
-> 
->  include/qemu-common.h | 5 +++++
->  vl.c                  | 4 +++-
->  bsd-user/main.c       | 2 ++
->  linux-user/main.c     | 4 +++-
->  qemu-img.c            | 2 +-
->  qemu-io.c             | 5 +++--
->  qemu-nbd.c            | 2 +-
->  qga/main.c            | 2 +-
->  8 files changed, 19 insertions(+), 7 deletions(-)
+> Where I can find the migration source code for KVM-QEMU. All are requested
+> to help me for this issue.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Migration is quite big - so take a step back first and understand how
+a migration works before diving into the code too far.
+First I'd suggest going for something newer than 6.5 - it has a very
+very old QEMU on it;  If you can upgrade to a 7.x it'll make your life a
+lot easier for building and working with current code.
 
+The current QEMU has a whole migration/ subdirectory with quite a bit of
+code, and there's also some kernel code that helps, and code in
+individual devices.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Then there's also the code in libvirt that drives it.
+
+A lot of code - so the trick is to figure out what you want to change
+and then find the right place.
+
+Dave
+> 
+> 
+> 
+> 
+> 
+> *Thank youWith Regards:Aditya Bhardwaj*
+> *Dept. of CSE *
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
