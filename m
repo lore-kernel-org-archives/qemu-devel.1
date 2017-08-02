@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcqsu-0002Tl-Ge
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 06:28:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dcqu9-0003CK-TQ
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 06:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dcqst-0006bf-Ku
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 06:28:12 -0400
-Date: Wed, 2 Aug 2017 12:27:59 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170802102759.GA3649@localhost.localdomain>
-References: <20170801213127.15036-1-crosa@redhat.com>
-	<20170801213127.15036-2-crosa@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dcqu6-0007fN-RC
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 06:29:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dcqu6-0007eY-Ku
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 06:29:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A65CC0587E8
+	for <qemu-devel@nongnu.org>; Wed,  2 Aug 2017 10:29:25 +0000 (UTC)
+Date: Wed, 2 Aug 2017 11:29:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170802102919.GB5624@work-vm>
+References: <1501666880-10159-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170801213127.15036-2-crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-iotests/109: Fix lock race
- condition
+In-Reply-To: <1501666880-10159-1-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] migration: fixes for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-Am 01.08.2017 um 23:31 hat Cleber Rosa geschrieben:
-> A race condition is currently present between the clean up attempt of
-> the QEMU process and the execution of qemu-img.  The actual (bad)
-> output is:
+* Peter Xu (peterx@redhat.com) wrote:
+> v2:
+> - patch 2: move trace_*() after error_setg_errno(). [Dan]
 > 
->  -Warning: Image size mismatch!
->  -Images are identical.
->  +qemu-img: Could not open '<build_dir>/tests/qemu-iotests/scratch/t.raw': Failed to get "consistent read" lock
->  +Is another process using the image?
-> 
-> A KILL signal is sent to the QEMU process, but qemu-img may begin to
-> run before the QEMU process is really gone.  qemu-img will then
-> attempt to open the TEST_IMG file before it can secure a lock on it.
-> 
-> This attempts a more graceful shutdown, and waits for the QEMU process
-> to exit.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Two patches isolated from the postcopy recovery series, which may be
+> good for 2.10.
 
-Thanks, applied to the block branch.
+Queued
 
-Kevin
+> Peter Xu (2):
+>   migration: fix comment disorder in RAMState
+>   io: fix qio_channel_socket_accept err handling
+> 
+>  io/channel-socket.c | 3 ++-
+>  migration/ram.c     | 4 ++--
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
