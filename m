@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dcpvg-0001Np-HV
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 05:27:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1dcpxb-0002Be-Ou
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 05:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dcpvc-0006Ns-Ib
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 05:27:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42998)
+	(envelope-from <berrange@redhat.com>) id 1dcpxX-0007xh-O0
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 05:28:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dcpvc-0006MH-8H
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 05:26:56 -0400
-Date: Wed, 2 Aug 2017 10:26:48 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dcpxX-0007wj-Dk
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 05:28:55 -0400
+Date: Wed, 2 Aug 2017 10:28:47 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170802092648.GB4098@redhat.com>
+Message-ID: <20170802092847.GC4098@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-20-git-send-email-peterx@redhat.com>
-	<20170801105610.GG12670@redhat.com>
-	<20170802070224.GD4475@pxdev.xzpeter.org>
+	<1501229198-30588-17-git-send-email-peterx@redhat.com>
+	<20170801110348.GH12670@redhat.com>
+	<20170802055646.GE15080@pxdev.xzpeter.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170802070224.GD4475@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 19/29] migration: let dst listen on port
- always
+In-Reply-To: <20170802055646.GE15080@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 16/29] qmp: hmp: add migrate "resume" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,101 +33,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Aug 02, 2017 at 03:02:24PM +0800, Peter Xu wrote:
-> On Tue, Aug 01, 2017 at 11:56:10AM +0100, Daniel P. Berrange wrote:
-> > On Fri, Jul 28, 2017 at 04:06:28PM +0800, Peter Xu wrote:
+On Wed, Aug 02, 2017 at 01:56:46PM +0800, Peter Xu wrote:
+> On Tue, Aug 01, 2017 at 12:03:48PM +0100, Daniel P. Berrange wrote:
+> > On Fri, Jul 28, 2017 at 04:06:25PM +0800, Peter Xu wrote:
+> > > It will be used when we want to resume one paused migration.
+> > > 
 > > > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > > ---
-> > >  migration/exec.c   | 2 +-
-> > >  migration/fd.c     | 2 +-
-> > >  migration/socket.c | 4 ++--
-> > >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/migration/exec.c b/migration/exec.c
-> > > index 08b599e..b4412db 100644
-> > > --- a/migration/exec.c
-> > > +++ b/migration/exec.c
-> > > @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
-> > >  {
-> > >      migration_channel_process_incoming(ioc);
-> > >      object_unref(OBJECT(ioc));
-> > > -    return FALSE; /* unregister */
-> > > +    return TRUE; /* keep it registered */
-> > >  }
-> > >  
-> > >  void exec_start_incoming_migration(const char *command, Error **errp)
-> > > diff --git a/migration/fd.c b/migration/fd.c
-> > > index 30f5258..865277a 100644
-> > > --- a/migration/fd.c
-> > > +++ b/migration/fd.c
-> > > @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
-> > >  {
-> > >      migration_channel_process_incoming(ioc);
-> > >      object_unref(OBJECT(ioc));
-> > > -    return FALSE; /* unregister */
-> > > +    return TRUE; /* keep it registered */
-> > >  }
-> > >  
-> > >  void fd_start_incoming_migration(const char *infd, Error **errp)
-> > > diff --git a/migration/socket.c b/migration/socket.c
-> > > index 757d382..f2c2d01 100644
-> > > --- a/migration/socket.c
-> > > +++ b/migration/socket.c
-> > > @@ -153,8 +153,8 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-> > >  
-> > >  out:
-> > >      /* Close listening socket as its no longer needed */
-> > > -    qio_channel_close(ioc, NULL);
-> > > -    return FALSE; /* unregister */
-> > > +    // qio_channel_close(ioc, NULL);
-> > > +    return TRUE; /* keep it registered */
-> > >  }
+> > >  hmp-commands.hx       | 7 ++++---
+> > >  hmp.c                 | 4 +++-
+> > >  migration/migration.c | 2 +-
+> > >  qapi-schema.json      | 5 ++++-
+> > >  4 files changed, 12 insertions(+), 6 deletions(-)
 > > 
+> > I'm not seeing explicit info about how we handle the original failure
+> > and how it relates to this resume command, but this feels like a
+> > potentially racy approach to me.
 > > 
-> > This is not a very desirable approach IMHO.
-> > 
-> > There are two separate things at play - first we have the listener socket,
-> > and second we have the I/O watch that monitors for incoming clients.
-> > 
-> > The current code here closes the listener, and returns FALSE to unregister
-> > the event loop watch.
-> > 
-> > You're reversing both of these so that we keep the listener open and we
-> > keep monitoring for incoming clients. Ignoring migration resume for a
-> > minute, this means that the destination QEMU will now accept arbitrarily
-> > many incoming clients and keep trying to start a new incoming migration.
-> > 
-> > The behaviour we need is diferent. We *want* to unregister the event
-> > loop watch once we've accepted a client. We should only keep the socket
-> > listener in existance, but *not* accept any more clients. Only once we
-> > have hit a problem and want to accept a new client to do migration
-> > recovery, should we be re-adding the event loop watch.
+> > If we have a network problem between source & target, we could see
+> > two results. Either the TCP stream will simply hang (it'll still
+> > appear open to QEMU but no traffic will be flowing),
 > 
-> I replied with another approach in the other thread: how about we
-> re-enable the listen port duing "postcopy-pause" state, and disable
-> the listen port when get out of that migration state?
-
-Thinking about this agan, I realize I only considered the socket
-migration backend.  If we are using the 'fd' backend, then we
-*must* have an explicit monitor command invoked on the target
-host to obtain the new client connection. This is because the
-'fd' that QEMU has is the actual client connection, not a listener
-socket, so libvirt needs to be able to pass in a new fd.
-
-
-> Here "listen port" I mean both the IO watch and the socket object. Now
-> what I can think of: we keep these objects always there, meanwhile we
-> introduce a new bit for migration, say, "accept_incoming", to decide
-> whether we will really accept one connection. Then we drop the new
-> connection if that bit is not set.
+> (let's say this is the "1st condition")
 > 
-> (Or a new QIOChannelFeature to temporarily refuse incoming
->  connection? E.g., QIO_CHANNEL_FEATURE_LISTEN_REFUSE?)
+> > or the connection
+> > may actually break such that we get EOF and end up closing the file
+> > descriptor.
+> 
+> (let's say this is the "2nd condition")
+> 
+> > 
+> > In the latter case, we're ok because the original channel is now
+> > gone and we can safely establish the new one by issuing the new
+> > 'migrate --resume URI' command.
+> > 
+> > In the former case, however, there is the possibility that the
+> > hang may come back to life at some point, concurrently with us
+> > trying to do 'migrate --resume URI' and I'm unclear on the
+> > semantics if that happens.
+> > 
+> > Should the original connection carry on, and thus cause the
+> > 'migrate --resume' command to fail, or will we forcably terminate
+> > the original connection no matter what and use the new "resumed"
+> > connection.
+> 
+> Hmm yes, this is a good question. Currently this series is only
+> handling the 2nd condition, say, when we can detect the error via
+> system calls (IIUC we can know nothing when the 1st condition is
+> encountered, we just e.g. block at the system calls as usual when
+> reading the file handle). And currently the "resume" command is only
+> allowed if the 2nd condition is detected (so it will never destroy an
+> existing channel).
+> 
+> If you see the next following patch, there is something like:
+> 
+>     if (has_resume && resume) {
+>         if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+>             error_setg(errp, "Cannot resume if there is no "
+>                        "paused migration");
+>             return;
+>         }
+>         goto do_resume;
+>     }
+> 
+> And here MIGRATION_STATUS_POSTCOPY_PAUSED will only be set when the
+> 2nd condition is met.
+> 
+> > 
+> > There's also synchronization with the target host - at the time we
+> > want to recover, we need to be able to tell the target to accept
+> > new incoming clients again, but we don't want to do that if the
+> > original connection comes back to life.
+> 
+> Yeah, I hacked this part in this v1 series (as you may have seen) to
+> keep the ports open-forever. I am not sure whether that is acceptable,
+> but looks not. :)
+> 
+> How about this: when destination detected 2nd condition, it firstly
+> switch to "postcopy-pause" state, then re-opens the accept channels.
+> And it can turns the accept channels off when the state moves out of
+> "postcopy-pause".
+> 
+> > 
+> > It feels to me that if the mgmt app or admin believes the migration
+> > is in a stuck state, we should be able to explicitly terminate the
+> > existing connection via a monitor command. Then setup the target
+> > host to accept new client, and then issue this migrate resume on
+> > the source.
+> 
+> Totally agree. That should be the only way to handle 1st condition
+> well. However, would you mind if I postpone it a bit? IMHO as long as
+> we can solve the 2nd condition nicely (which is the goal of this
+> series), then it won't be too hard to continue support the 1st
+> condition.
 
-That feature already exists - you just unregister the event loop
-watch and re-register it when you're ready again. The chardev
-socket code works this way already, since it only allows a single
-client at a time
+Sure, the 1st scenario is an easy bolt on to the second scenario. I
+just wanted to be clear about what the target of these patches is,
+because I think the 1st scenario is probably the most common one.
+
+I guess if you have TCP keepalives enabled with a reasonably short
+timeout, the 1st scenario will turn into the 2nd scenario fairly
+quickly.
 
 Regards,
 Daniel
