@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51640)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dd1Vy-0000jo-7A
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:49:15 -0400
+	id 1dd1Xm-0001gs-I4
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dd1Vx-0000hC-9p
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:49:14 -0400
+	id 1dd1Xj-0001rA-Cz
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:51:06 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-	<1501692241-23310-15-git-send-email-peter.maydell@linaro.org>
+	<1501692241-23310-4-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <988ce89c-4e6c-5cf3-f040-7797a9f7902d@amsat.org>
-Date: Wed, 2 Aug 2017 18:49:09 -0300
+Message-ID: <6c967927-f368-84c4-ce7e-54e51576ed14@amsat.org>
+Date: Wed, 2 Aug 2017 18:50:59 -0300
 MIME-Version: 1.0
-In-Reply-To: <1501692241-23310-15-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1501692241-23310-4-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 14/15] armv7m_nvic.h: Move from
- include/hw/arm to include/hw/intc
+Subject: Re: [Qemu-devel] [PATCH 03/15] target/arm: Consolidate PMSA
+ handling in get_phys_addr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +32,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-On 08/02/2017 01:44 PM, Peter Maydell wrote:
-> The armv7m_nvic.h header file was accidentally placed in
-> include/hw/arm; move it to include/hw/intc to match where
-> its corresponding .c file lives.
+On 08/02/2017 01:43 PM, Peter Maydell wrote:
+> Currently get_phys_addr() has PMSAv7 handling before the
+> "is translation disabled?" check, and then PMSAv5 after it.
+> Tidy this up by making the PMSAv5 code handle the "MPU disabled"
+> case itself, so that we have all the PMSA code in one place.
+> This will make adding the PMSAv8 code slightly cleaner, and
+> also means that pre-v7 PMSA cores benefit from the MPU lookup
+> logging that the PMSAv7 codepath had.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->   hw/intc/armv7m_nvic.c                  | 2 +-
->   include/hw/arm/armv7m.h                | 2 +-
->   include/hw/{arm => intc}/armv7m_nvic.h | 0
->   3 files changed, 2 insertions(+), 2 deletions(-)
->   rename include/hw/{arm => intc}/armv7m_nvic.h (100%)
+>   target/arm/helper.c | 38 ++++++++++++++++++++++----------------
+>   1 file changed, 22 insertions(+), 16 deletions(-)
 > 
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index 343bc16..5a18025 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -17,7 +17,7 @@
->   #include "hw/sysbus.h"
->   #include "qemu/timer.h"
->   #include "hw/arm/arm.h"
-> -#include "hw/arm/armv7m_nvic.h"
-> +#include "hw/intc/armv7m_nvic.h"
->   #include "target/arm/cpu.h"
->   #include "exec/exec-all.h"
->   #include "qemu/log.h"
-> diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-> index a9b3f2a..10eb058 100644
-> --- a/include/hw/arm/armv7m.h
-> +++ b/include/hw/arm/armv7m.h
-> @@ -11,7 +11,7 @@
->   #define HW_ARM_ARMV7M_H
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b78d277..fd83a21 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8423,6 +8423,13 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
+>       uint32_t base;
+>       bool is_user = regime_is_user(env, mmu_idx);
 >   
->   #include "hw/sysbus.h"
-> -#include "hw/arm/armv7m_nvic.h"
-> +#include "hw/intc/armv7m_nvic.h"
+> +    if (regime_translation_disabled(env, mmu_idx)) {
+> +        /* MPU disabled.  */
+> +        *phys_ptr = address;
+> +        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+> +        return false;
+> +    }
+> +
+>       *phys_ptr = address;
+>       for (n = 7; n >= 0; n--) {
+>           base = env->cp15.c6_region[n];
+> @@ -8572,16 +8579,20 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+>           }
+>       }
 >   
->   #define TYPE_BITBAND "ARM,bitband-memory"
->   #define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
-> diff --git a/include/hw/arm/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
-> similarity index 100%
-> rename from include/hw/arm/armv7m_nvic.h
-> rename to include/hw/intc/armv7m_nvic.h
+> -    /* pmsav7 has special handling for when MPU is disabled so call it before
+> -     * the common MMU/MPU disabled check below.
+> -     */
+> -    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+> -        arm_feature(env, ARM_FEATURE_V7)) {
+> +    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+>           bool ret;
+>           *page_size = TARGET_PAGE_SIZE;
+> -        ret = get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
+> -                                   phys_ptr, prot, fsr);
+> -        qemu_log_mask(CPU_LOG_MMU, "PMSAv7 MPU lookup for %s at 0x%08" PRIx32
+> +
+> +        if (arm_feature(env, ARM_FEATURE_V7)) {
+> +            /* PMSAv7 */
+> +            ret = get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
+> +                                       phys_ptr, prot, fsr);
+> +        } else {
+> +            /* Pre-v7 MPU */
+> +            ret = get_phys_addr_pmsav5(env, address, access_type, mmu_idx,
+> +                                       phys_ptr, prot, fsr);
+> +        }
+> +        qemu_log_mask(CPU_LOG_MMU, "PMSA MPU lookup for %s at 0x%08" PRIx32
+>                         " mmu_idx %u -> %s (prot %c%c%c)\n",
+>                         access_type == MMU_DATA_LOAD ? "reading" :
+>                         (access_type == MMU_DATA_STORE ? "writing" : "execute"),
+> @@ -8594,21 +8605,16 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+>           return ret;
+>       }
+>   
+> +    /* Definitely a real MMU, not an MPU */
+> +
+>       if (regime_translation_disabled(env, mmu_idx)) {
+> -        /* MMU/MPU disabled.  */
+> +        /* MMU disabled. */
+>           *phys_ptr = address;
+>           *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>           *page_size = TARGET_PAGE_SIZE;
+>           return 0;
+>       }
+>   
+> -    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+> -        /* Pre-v7 MPU */
+> -        *page_size = TARGET_PAGE_SIZE;
+> -        return get_phys_addr_pmsav5(env, address, access_type, mmu_idx,
+> -                                    phys_ptr, prot, fsr);
+> -    }
+> -
+>       if (regime_using_lpae_format(env, mmu_idx)) {
+>           return get_phys_addr_lpae(env, address, access_type, mmu_idx, phys_ptr,
+>                                     attrs, prot, page_size, fsr, fi);
 > 
