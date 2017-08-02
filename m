@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47646)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dd1JY-0004VA-2D
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:36:24 -0400
+	id 1dd1Ki-00055E-UL
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dd1JU-0000cS-57
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:36:24 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36873)
+	id 1dd1Ki-0001I4-3j
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:37:36 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:33979)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dd1JU-0000bc-0L
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:36:20 -0400
-Received: by mail-qt0-x241.google.com with SMTP id d10so5890265qtb.4
-	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 14:36:19 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170802201512.29142-1-crosa@redhat.com>
-	<20170802201512.29142-2-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c9d1d353-855e-40fe-9f43-aecd9d4c34db@amsat.org>
-Date: Wed, 2 Aug 2017 18:36:16 -0300
+	id 1dd1Kh-0001Ht-VA
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 17:37:36 -0400
+Received: by mail-it0-x243.google.com with SMTP id t78so24306ita.1
+	for <qemu-devel@nongnu.org>; Wed, 02 Aug 2017 14:37:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170802201512.29142-2-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests/tcg/test_path.c: include
- utils/bufferiszero.c
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <95ac9aa9-5969-674b-929a-095cc75f52c3@amsat.org>
+References: <20170802201512.29142-1-crosa@redhat.com>
+	<20170802201512.29142-4-crosa@redhat.com>
+	<95ac9aa9-5969-674b-929a-095cc75f52c3@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 2 Aug 2017 18:37:33 -0300
+Message-ID: <CAAdtpL7i7H75e-gER5Q8UgV3ExuazqcG-0VjA4M2LjnZB_xB9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] tests/tcg/linux-test.c: include
+ definitions for getrusage()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Hi Cleber,
+On Wed, Aug 2, 2017 at 6:28 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> Hi Cleber,
+>
+> On 08/02/2017 05:15 PM, Cleber Rosa wrote:
+>>
+>> A include for <sys/resources.h> is missing, and prevents
+>> tests/tcg/linux-test from compiling.
+>
+>
+> getrusage() I presume, don't know if worth adding in commit message.
 
-On 08/02/2017 05:15 PM, Cleber Rosa wrote:
-> Which contains one specific function used by iov.c.
-> 
-> Without this, "make -C tests/tcg test_path" (and consequently
-> "make -C tests/tcg" or simply "make test") fails quite early.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   tests/tcg/test_path.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/tests/tcg/test_path.c b/tests/tcg/test_path.c
-> index 1c29bce..74dbdaf 100644
-> --- a/tests/tcg/test_path.c
-> +++ b/tests/tcg/test_path.c
-> @@ -3,6 +3,7 @@
->   #include "util/cutils.c"
->   #include "util/hexdump.c"
->   #include "util/iov.c"
-> +#include "util/bufferiszero.c"
+Sorry I missed it from the commit subject :/
 
-This fixes the build, however why not take this opportunity to fix it 
-through the Makefile instead of including .c?
-
-Regards,
-
-Phil.
-
->   #include "util/path.c"
->   #include "util/qemu-timer-common.c"
->   #include <stdarg.h>
-> 
+>
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>
+>> ---
+>>   tests/tcg/linux-test.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/tests/tcg/linux-test.c b/tests/tcg/linux-test.c
+>> index 1c6c013..15c9d7f 100644
+>> --- a/tests/tcg/linux-test.c
+>> +++ b/tests/tcg/linux-test.c
+>> @@ -39,6 +39,7 @@
+>>   #include <dirent.h>
+>>   #include <setjmp.h>
+>>   #include <sys/shm.h>
+>> +#include <sys/resource.h>
+>>     #define TESTPATH "/tmp/linux-test.tmp"
+>>   #define TESTPORT 7654
+>>
+>
