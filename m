@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dcp3j-0002ZO-84
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 04:31:16 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dcp9u-0003X9-Pd
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 04:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dcp3i-0006lx-10
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 04:31:15 -0400
-References: <20170726120255.14292-1-maozy.fnst@cn.fujitsu.com>
-	<20170726120255.14292-5-maozy.fnst@cn.fujitsu.com>
-	<20170801130544.GA22017@stefanha-x1.localdomain>
-	<87o9rzpdjf.fsf@dusky.pond.sub.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <ed8b919e-63eb-2ed2-8c55-0a1de0a78ccf@cn.fujitsu.com>
-Date: Wed, 2 Aug 2017 15:51:05 +0800
-MIME-Version: 1.0
-In-Reply-To: <87o9rzpdjf.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] hw/block: Fix the return type
+	(envelope-from <andrew@aj.id.au>) id 1dcp9t-0003en-Da
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 04:37:38 -0400
+Message-ID: <1501663040.29409.3.camel@aj.id.au>
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Wed, 02 Aug 2017 18:07:20 +0930
+In-Reply-To: <855a154a-4cdf-b29a-6440-5deadbeed12e@kaod.org>
+References: <20170801010425.25778-1-andrew@aj.id.au>
+	<855a154a-4cdf-b29a-6440-5deadbeed12e@kaod.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-JEaDxwHEhN5nLi7aYnCM"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] watchdog: wdt_aspeed: Add support for the
+ reset width register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +24,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joel@jms.id.au, openbmc@lists.ozlabs.org
 
-Hi
 
-On 08/01/2017 10:29 PM, Markus Armbruster wrote:
-> Stefan Hajnoczi <stefanha@gmail.com> writes:
->
->> On Wed, Jul 26, 2017 at 08:02:53PM +0800, Mao Zhongyi wrote:
->>> When the function no success value to transmit, it usually make the
->>> function return void. It has turned out not to be a success, because
->>> it means that the extra local_err variable and error_propagate() will
->>> be needed. It leads to cumbersome code, therefore, transmit success/
->>> failure in the return value is worth.
->>>
->>> So fix the return type of blkconf_apply_backend_options(),
->>> blkconf_geometry() and virtio_blk_data_plane_create() to avoid it.
->>>
->>> Cc: John Snow <jsnow@redhat.com>
->>> Cc: Kevin Wolf <kwolf@redhat.com>
->>> Cc: Max Reitz <mreitz@redhat.com>
->>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
->>>
->>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>> ---
->>>  hw/block/block.c                | 21 ++++++++++++---------
->>>  hw/block/dataplane/virtio-blk.c | 16 +++++++++-------
->>>  hw/block/dataplane/virtio-blk.h |  6 +++---
->>>  include/hw/block/block.h        | 10 +++++-----
->>>  4 files changed, 29 insertions(+), 24 deletions(-)
->>>
->>> diff --git a/hw/block/block.c b/hw/block/block.c
->>> index 27878d0..717bd0e 100644
->>> --- a/hw/block/block.c
->>> +++ b/hw/block/block.c
->>> @@ -51,8 +51,8 @@ void blkconf_blocksizes(BlockConf *conf)
->>>      }
->>>  }
->>>
->>> -void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
->>> -                                   bool resizable, Error **errp)
->>> +int blkconf_apply_backend_options(BlockConf *conf, bool readonly,
->>> +                                  bool resizable, Error **errp)
->>
->> I'm not a fan of these changes because it makes inconsistencies between
->> the return value and the errp argument possible (e.g. returning success
->> but setting errp, or returning failure without setting errp).
->
-> Opinions and practice vary on this one, and we've discussed the
-> tradeoffs a few times.
->
-> Having both an Error parameter and an error return value poses the
-> question whether the two agree.  When there's no success value to
-> transmit, you avoid the problem by making the function return void.  The
-> problem remains for all the function that return a value on success, and
-> therefore must return some error value on failure.  A related problem
-> even remains for functions returning void: consistency between side
-> effects and the Error parameter.
->
-> Returning void leads to awkward boilerplate:
->
->     Error err = NULL;
->
->     foo(..., err);
->     if (err) {
->         error_propagate(errp, err);
->         ... bail out ...
->     }
->
-> Compare:
->
->     if (!foo(..., errp)) {
->         ... bail out ...
->     }
->
-> Much easier on the eyes.
->
-> For what it's worth, GLib wants you to transmit success / failure in the
-> return value, too:
->
-> https://developer.gnome.org/glib/unstable/glib-Error-Reporting.html#gerror-rules
->
-> Plenty of older code returns void, some newer code doesn't, because
-> returning void is just too awkward.  We willfully deviated from GLib's
-> convention, and we're now paying the price.
->
-> See also
-> Subject: Re: [RFC 00/15] Error API: Flag errors in *errp even if errors are being ignored
-> Message-ID: <87o9t8qy7d.fsf@dusky.pond.sub.org>
-> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06191.html
->
->> If you really want to do this please use bool as the return type instead
->> of int.  int can be abused to return error information that should
->> really be in the Error object.
->
-> For what it's worth, GLib wants bool[*].  Let's stick to that unless we
-> have a compelling reason to differ.
->
->
-> [*] Except being GLib, it wants its very own homemade version of bool.
-> Which is inferior to stdbool.h's in pretty much every conceivable way.
->
+--=-JEaDxwHEhN5nLi7aYnCM
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-Thanks for pointing that out！
-I will use bool as the return type instead of int.
+T24gVHVlLCAyMDE3LTA4LTAxIGF0IDA5OjIxICswMjAwLCBDw6lkcmljIExlIEdvYXRlciB3cm90
+ZToKPiBPbiAwOC8wMS8yMDE3IDAzOjA0IEFNLCBBbmRyZXcgSmVmZmVyeSB3cm90ZToKPiA+IFRo
+ZSByZXNldCB3aWR0aCByZWdpc3RlciBjb250cm9scyBob3cgdGhlIHB1bHNlIG9uIHRoZSBTb0Mn
+cyBXRFRSU1R7MSwyfQo+ID4gcGlucyBiZWhhdmVzLiBBIHB1bHNlIGlzIGVtaXR0ZWQgaWYgdGhl
+IGV4dGVybmFsIHJlc2V0IGJpdCBpcyBzZXQgaW4KPiA+IFdEVF9DVFJMLiBXRFRfUkVTRVRfV0lE
+VEggcmVxdWlyZXMgbWFnaWMgYml0IHBhdHRlcm5zIHRvIGNvbmZpZ3VyZSBib3RoCj4gPiBwdXNo
+LXB1bGwvb3Blbi1kcmFpbiBhbmQgYWN0aXZlLWhpZ2gvYWN0aXZlLWxvdyBiZWhhdmlvdXJzIGFu
+ZCB0aHVzCj4gPiBuZWVkcyBzb21lIHNwZWNpYWwgaGFuZGxpbmcgaW4gdGhlIHdyaXRlIHBhdGgu
+Cj4gPiAKPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBBbmRyZXcgSmVmZmVyeSA8YW5kcmV3QGFqLmlk
+LmF1Pgo+ID4gLS0tCj4gPiBJIHVuZGVyc3RhbmQgdGhhdCB3ZSdyZSBpbiBzdGFiaWxpc2F0aW9u
+IG1vZGUsIGJ1dCBJIHRob3VnaHQgSSdkIHNlbmQgdGhpcyBvdXQKPiA+IHRvIHByb3Zva2UgYW55
+IGZlZWRiYWNrLiBIYXBweSB0byByZXNlbmQgYWZ0ZXIgdGhlIDIuMTAgcmVsZWFzZSBpZiByZXF1
+aXJlZC4KPiA+IAo+ID4gwqBody93YXRjaGRvZy93ZHRfYXNwZWVkLmMgfCA0NyArKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQo+ID4gwqAxIGZpbGUgY2hhbmdl
+ZCwgMzcgaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRpb25zKC0pCj4gPiAKPiA+IGRpZmYgLS1naXQg
+YS9ody93YXRjaGRvZy93ZHRfYXNwZWVkLmMgYi9ody93YXRjaGRvZy93ZHRfYXNwZWVkLmMKPiA+
+IGluZGV4IDhiYmU1NzliNmI2Ni4uNGVmMTQxMmU5OWZjIDEwMDY0NAo+ID4gLS0tIGEvaHcvd2F0
+Y2hkb2cvd2R0X2FzcGVlZC5jCj4gPiArKysgYi9ody93YXRjaGRvZy93ZHRfYXNwZWVkLmMKPiA+
+IEBAIC0xNCwxMCArMTQsMTAgQEAKPiA+IMKgI2luY2x1ZGUgInFlbXUvdGltZXIuaCIKPiA+IMKg
+I2luY2x1ZGUgImh3L3dhdGNoZG9nL3dkdF9hc3BlZWQuaCIKPiA+IMKgCj4gPiAtI2RlZmluZSBX
+RFRfU1RBVFVTwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCgweDAwIC8gNCkKPiA+IC0jZGVm
+aW5lIFdEVF9SRUxPQURfVkFMVUXCoMKgwqDCoMKgwqDCoMKgKDB4MDQgLyA0KQo+ID4gLSNkZWZp
+bmUgV0RUX1JFU1RBUlTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCgweDA4IC8gNCkKPiA+IC0j
+ZGVmaW5lIFdEVF9DVFJMwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAoMHgwQyAvIDQp
+Cj4gPiArI2RlZmluZSBXRFRfU1RBVFVTwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAoMHgwMCAvIDQpCj4gPiArI2RlZmluZSBXRFRfUkVMT0FEX1ZBTFVFwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAoMHgwNCAvIDQpCj4gPiArI2RlZmluZSBXRFRfUkVT
+VEFSVMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCgweDA4IC8gNCkK
+PiA+ICsjZGVmaW5lIFdEVF9DVFJMwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgKDB4MEMgLyA0KQo+ID4gwqAjZGVmaW5lwqDCoMKgV0RUX0NUUkxfUkVTRVRf
+TU9ERV9TT0PCoMKgwqDCoMKgwqDCoCgweDAwIDw8IDUpCj4gPiDCoCNkZWZpbmXCoMKgwqBXRFRf
+Q1RSTF9SRVNFVF9NT0RFX0ZVTExfQ0hJUCAoMHgwMSA8PCA1KQo+ID4gwqAjZGVmaW5lwqDCoMKg
+V0RUX0NUUkxfMU1IWl9DTEvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoEJJVCg0KQo+ID4gQEAg
+LTI1LDEyICsyNSwyMSBAQAo+ID4gwqAjZGVmaW5lwqDCoMKgV0RUX0NUUkxfV0RUX0lOVFLCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoEJJVCgyKQo+ID4gwqAjZGVmaW5lwqDCoMKgV0RUX0NUUkxf
+UkVTRVRfU1lTVEVNwqDCoMKgwqDCoMKgwqDCoMKgQklUKDEpCj4gPiDCoCNkZWZpbmXCoMKgwqBX
+RFRfQ1RSTF9FTkFCTEXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBCSVQoMCkKPiA+ICsj
+ZGVmaW5lIFdEVF9SRVNFVF9XSURUSMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAo
+MHgxOCAvIDQpCj4gPiArI2RlZmluZcKgwqDCoFdEVF9SRVNFVF9XSURUSF9BQ1RJVkVfSElHSMKg
+wqDCoEJJVCgzMSkKPiA+ICsjZGVmaW5lwqDCoMKgwqDCoFdEVF9QT0xBUklUWV9NQVNLwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCgweEZGIDw8IDI0KQo+ID4gKyNkZWZpbmXCoMKgwqDCoMKgV0RUX0FD
+VElWRV9ISUdIX01BR0lDwqDCoMKgwqDCoMKgwqAoMHhBNSA8PCAyNCkKPiA+ICsjZGVmaW5lwqDC
+oMKgwqDCoFdEVF9BQ1RJVkVfTE9XX01BR0lDwqDCoMKgwqDCoMKgwqDCoCgweDVBIDw8IDI0KQo+
+ID4gKyNkZWZpbmXCoMKgwqBXRFRfUkVTRVRfV0lEVEhfUFVTSF9QVUxMwqDCoMKgwqDCoEJJVCgz
+MCkKPiA+ICsjZGVmaW5lwqDCoMKgwqDCoFdEVF9EUklWRV9UWVBFX01BU0vCoMKgwqDCoMKgwqDC
+oMKgwqAoMHhGRiA8PCAyNCkKPiA+ICsjZGVmaW5lwqDCoMKgwqDCoFdEVF9QVVNIX1BVTExfTUFH
+SUPCoMKgwqDCoMKgwqDCoMKgwqAoMHhBOCA8PCAyNCkKPiA+ICsjZGVmaW5lwqDCoMKgwqDCoFdE
+VF9PUEVOX0RSQUlOX01BR0lDwqDCoMKgwqDCoMKgwqDCoCgweDhBIDw8IDI0KQo+ID4gKyNkZWZp
+bmXCoMKgwqBXRFRfUkVTRVRfV0lEVEhfRFVSQVRJT07CoMKgwqDCoMKgwqAweEZGRjsKPiAKPiBJ
+IHdvdWxkIGNhbGwgdGhpcyBkZWZpbmUgV0RUX1JFU0VUX1dJRFRIX0RFRkFVTFQgKDB4RkYpIGFu
+ZMKgCj4gdXNlIGl0IGFsc28gaW4gdGhlIGFzcGVlZF93ZHRfcmVzZXQoKQoKVGhpcyBXRFRfUkVT
+RVRfV0lEVEhfRFVSQVRJT04gaXMgaW50ZW5kZWQgYXMgYSBtYXNrLiBJdCdzIHByb2JhYmx5CnBv
+b3JseSBuYW1lZC4gQXMgSSBmb3VuZCB3aGVuIHJlcGx5aW5nIHRvIFBoaWwsIHRoZSB3aWR0aCBh
+Y3R1YWxseQp2YXJpZXMgYmV0d2VlbiB0aGUgQVNUMjQwMCBhbmQgQVNUMjUwMCwgYW5kIG9uIHRo
+ZSBBU1QyNTAwIGlzIGFjdHVhbGx5CjIwIGJpdHMgd2lkZSwgbm90IDEyIChhbmQgaXMgOCBiaXRz
+IG9uIHRoZSBBU1QyNDAwKS4gSSdsbCBuZWVkIHRvCnJlc3BpbiB0byBmaXggdGhhdC4gT24gdGhl
+IG90aGVyaGFuZCwgMHhGRiBpcyB0aGUgZGVmYXVsdCB2YWx1ZSBmb3IgdGhlCmZpZWxkIG9uIGJv
+dGggdGhlIEFTVDI0MDAgYW5kIEFTVDI1MDAuCgo+IAo+IEkgaGF2ZSBjaGVja2VkIHRoZSBzcGVj
+cyBhbmQgdGhlIGJpdHMgZGVmaW5pdGlvbnMgYXJlIGNvcnJlY3QuCj4gV2hhdCBlbHNlIGNvdWxk
+IHdlIG1vZGVsID8gV291bGQgdGhlIHB1bHNlIGJlIGludGVyZXN0aW5nID/CoAoKSHJtLCB3ZSBj
+b3VsZC4gSW4gV2l0aGVyc3Bvb24gKGFuZCBSb211bHVzPykgc3lzdGVtcyB0aGUgcHVsc2UgaXMg
+YmVpbmcKdXNlZCB0byBkcml2ZSB0aGUgRkFVTFQgcGluIG9uIHRoZSBNQVgzMTc4NSBmYW4gY29u
+dHJvbGxlci4gSSd2ZSBnb3QKc29tZSB2ZXJ5IGhhY2t5IHBhdGNoZXMgbHlpbmcgYXJvdW5kIGFk
+ZGluZyBQTUJ1cyBzdXBwb3J0IGFuZCBhIGJhc2ljCk1BWDMxNzg1IG1vZGVsIHRvIFFFTVUgLSB3
+aXRoIGEgYml0IG9mIGV4dHJhIHdvcmsgd2UgY291bGQgaG9vayB1cCB0aGUKZXh0ZXJuYWwgd2F0
+Y2hkb2cgc2lnbmFsIHRvIHRoZSBGQVVMVCBwaW4gYW5kIGRyaXZlIG91ciB2aXJ0dWFsIGZhbnMg
+dG8KMTAwJSBQV00gZHV0eSBhcyBwZXIgdGhlIGhhcmR3YXJlLgoKSXQncyBub3QgaGlnaCBvbiBt
+eSB0b2RvIGxpc3QgdGhvdWdoIDopCgpBbmRyZXcKCj4gCj4gQy4KPiAKPiAKPiA+IMKgCj4gPiAt
+I2RlZmluZSBXRFRfVElNRU9VVF9TVEFUVVPCoMKgwqDCoMKgwqAoMHgxMCAvIDQpCj4gPiAtI2Rl
+ZmluZSBXRFRfVElNRU9VVF9DTEVBUsKgwqDCoMKgwqDCoMKgKDB4MTQgLyA0KQo+ID4gLSNkZWZp
+bmUgV0RUX1JFU0VUX1dESVRIwqDCoMKgwqDCoMKgwqDCoMKgKDB4MTggLyA0KQo+ID4gKyNkZWZp
+bmUgV0RUX1RJTUVPVVRfU1RBVFVTwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCgweDEwIC8g
+NCkKPiA+ICsjZGVmaW5lIFdEVF9USU1FT1VUX0NMRUFSwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgKDB4MTQgLyA0KQo+ID4gwqAKPiA+IC0jZGVmaW5lIFdEVF9SRVNUQVJUX01BR0lDwqDC
+oMKgwqDCoMKgwqAweDQ3NTUKPiA+ICsjZGVmaW5lIFdEVF9SRVNUQVJUX01BR0lDwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgMHg0NzU1Cj4gPiDCoAo+ID4gwqBzdGF0aWMgYm9vbCBhc3Bl
+ZWRfd2R0X2lzX2VuYWJsZWQoY29uc3QgQXNwZWVkV0RUU3RhdGUgKnMpCj4gPiDCoHsKPiA+IEBA
+IC01NSw5ICs2NCwxMCBAQCBzdGF0aWMgdWludDY0X3QgYXNwZWVkX3dkdF9yZWFkKHZvaWQgKm9w
+YXF1ZSwgaHdhZGRyIG9mZnNldCwgdW5zaWduZWQgc2l6ZSkKPiA+IMKgwqDCoMKgwqDCoMKgwqDC
+oHJldHVybiAwOwo+ID4gwqDCoMKgwqDCoGNhc2UgV0RUX0NUUkw6Cj4gPiDCoMKgwqDCoMKgwqDC
+oMKgwqByZXR1cm4gcy0+cmVnc1tXRFRfQ1RSTF07Cj4gPiArwqDCoMKgwqBjYXNlIFdEVF9SRVNF
+VF9XSURUSDoKPiA+ICvCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIHMtPnJlZ3NbV0RUX1JFU0VUX1dJ
+RFRIXTsKPiA+IMKgwqDCoMKgwqBjYXNlIFdEVF9USU1FT1VUX1NUQVRVUzoKPiA+IMKgwqDCoMKg
+wqBjYXNlIFdEVF9USU1FT1VUX0NMRUFSOgo+ID4gLcKgwqDCoMKgY2FzZSBXRFRfUkVTRVRfV0RJ
+VEg6Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqBxZW11X2xvZ19tYXNrKExPR19VTklNUCwKPiA+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAiJXM6IHVuaW5tcGxl
+bWVudGVkIHJlYWQgYXQgb2Zmc2V0IDB4JSIgSFdBRERSX1BSSXggIlxuIiwKPiA+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBfX2Z1bmNfXywgb2Zmc2V0KTsK
+PiA+IEBAIC0xMTksOSArMTI5LDI1IEBAIHN0YXRpYyB2b2lkIGFzcGVlZF93ZHRfd3JpdGUodm9p
+ZCAqb3BhcXVlLCBod2FkZHIgb2Zmc2V0LCB1aW50NjRfdCBkYXRhLAo+ID4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqB0aW1lcl9kZWwocy0+dGltZXIpOwo+ID4gwqDCoMKgwqDCoMKgwqDCoMKg
+fQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgYnJlYWs7Cj4gPiArwqDCoMKgwqBjYXNlIFdEVF9SRVNF
+VF9XSURUSDoKPiA+ICvCoMKgwqDCoHsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgdWludDMyX3QgcHJv
+cGVydHkgPSBkYXRhICYgV0RUX1BPTEFSSVRZX01BU0s7Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKg
+wqDCoGlmIChwcm9wZXJ0eSA9PSBXRFRfQUNUSVZFX0hJR0hfTUFHSUMpIHsKPiA+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqBzLT5yZWdzW1dEVF9SRVNFVF9XSURUSF0gfD0gV0RUX1JFU0VUX1dJ
+RFRIX0FDVElWRV9ISUdIOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqB9IGVsc2UgaWYgKHByb3BlcnR5
+ID09IFdEVF9BQ1RJVkVfTE9XX01BR0lDKSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+cy0+cmVnc1tXRFRfUkVTRVRfV0lEVEhdICY9IH5XRFRfUkVTRVRfV0lEVEhfQUNUSVZFX0hJR0g7
+Cj4gPiArwqDCoMKgwqDCoMKgwqDCoH0gZWxzZSBpZiAocHJvcGVydHkgPT0gV0RUX1BVU0hfUFVM
+TF9NQUdJQykgewo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHMtPnJlZ3NbV0RUX1JFU0VU
+X1dJRFRIXSB8PSBXRFRfUkVTRVRfV0lEVEhfUFVTSF9QVUxMOwo+ID4gK8KgwqDCoMKgwqDCoMKg
+wqB9IGVsc2UgaWYgKHByb3BlcnR5ID09IFdEVF9PUEVOX0RSQUlOX01BR0lDKSB7Cj4gPiArwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgcy0+cmVnc1tXRFRfUkVTRVRfV0lEVEhdICY9IH5XRFRfUkVT
+RVRfV0lEVEhfUFVTSF9QVUxMOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqB9Cj4gPiArwqDCoMKgwqDC
+oMKgwqDCoHMtPnJlZ3NbV0RUX1JFU0VUX1dJRFRIXSAmPSB+V0RUX1JFU0VUX1dJRFRIX0RVUkFU
+SU9OOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqBzLT5yZWdzW1dEVF9SRVNFVF9XSURUSF0gfD0gZGF0
+YSAmIFdEVF9SRVNFVF9XSURUSF9EVVJBVElPTjsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgYnJlYWs7
+Cj4gPiArwqDCoMKgwqB9Cj4gPiDCoMKgwqDCoMKgY2FzZSBXRFRfVElNRU9VVF9TVEFUVVM6Cj4g
+PiDCoMKgwqDCoMKgY2FzZSBXRFRfVElNRU9VVF9DTEVBUjoKPiA+IC3CoMKgwqDCoGNhc2UgV0RU
+X1JFU0VUX1dESVRIOgo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgcWVtdV9sb2dfbWFzayhMT0dfVU5J
+TVAsCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIiVz
+OiB1bmlubXBsZW1lbnRlZCB3cml0ZSBhdCBvZmZzZXQgMHglIiBIV0FERFJfUFJJeCAiXG4iLAo+
+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoF9fZnVuY19f
+LCBvZmZzZXQpOwo+ID4gQEAgLTE2Nyw2ICsxOTMsNyBAQCBzdGF0aWMgdm9pZCBhc3BlZWRfd2R0
+X3Jlc2V0KERldmljZVN0YXRlICpkZXYpCj4gPiDCoMKgwqDCoMKgcy0+cmVnc1tXRFRfUkVMT0FE
+X1ZBTFVFXSA9IDB4MDNFRjE0ODA7Cj4gPiDCoMKgwqDCoMKgcy0+cmVnc1tXRFRfUkVTVEFSVF0g
+PSAwOwo+ID4gwqDCoMKgwqDCoHMtPnJlZ3NbV0RUX0NUUkxdID0gMDsKPiA+ICvCoMKgwqDCoHMt
+PnJlZ3NbV0RUX1JFU0VUX1dJRFRIXSA9IDBYRkY7Cj4gPiDCoAo+ID4gwqDCoMKgwqDCoHRpbWVy
+X2RlbChzLT50aW1lcik7Cj4gPiDCoH0KPiA+IAo+IAo+IA==
 
-Thanks,
-Mao
+
+--=-JEaDxwHEhN5nLi7aYnCM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAABCgAGBQJZgY9AAAoJEJ0dnzgO5LT5L3AP/Rrbl6sm9FB/xeUwvfxIpcxN
+Ro1iX510uoapoUzYwqrET4o8zZSlUTdF0ivu84n+Ov2MzHtk+8MFpogMlESElWlF
+t93hYAkKYuz1+oo1NkSxCP4ApDUZXb+8Sm92k9Y5r80xtolIFZUaKHIKQ4W2kAQF
+7ovRYSS32kYOwyzNedl1mbY6xahAo5VKxpIFTIPjzKTs+bwM0VDUA9Ev4wC/buUF
+g7suURorzXpR/OUuaJeBK/OR+b17CZ1p0djpy+kFFwBE7Ki6eCux8cwnQJSj15+y
+snf35Ig/4irF+T1TEqOmhzKErUzFmWUU5JP//1rCCr8TOoyA6d2/Aaw0Le1kWsZ8
+VZTdjp8KfILw7jDPVMlvpM6ifuypRrDXMl7qjM66Dqat2AXBUc5fw3NPBMKaLZTX
+fPsnHYi2HcOYZ/3kmmW07XgwROlJKX7hNQzigmDQPFVQK0Z6Hxee11b/XFqVO0Yc
+2kY0EiojcWszzdCuFADbQ4yp2qh9eCXX+h8YkLsPNJf6nyC/66N52SRXL9DuRjFG
+8V3ueIu+VTSbHLZOnoz+rJpIinrB6VGuhcP/lHiBBMGHg7NK7XSgT1tLG9r/c8fC
+4dNKLRU7oNCITEl7unzSje8u8WI7zZxCXkfgVpxEk3dSafQ0H5hgCPFKOheO9dhK
+L+B9TfDNtrpDKJUMEOoF
+=Hh3x
+-----END PGP SIGNATURE-----
+
+--=-JEaDxwHEhN5nLi7aYnCM--
