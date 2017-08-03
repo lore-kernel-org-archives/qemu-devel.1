@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1ddDfy-0002av-5N
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:48:23 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddDiB-0003sE-8j
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1ddDfv-0001K7-Dj
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:48:22 -0400
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Date: Thu, 3 Aug 2017 10:48:15 +0000
-Message-ID: <AM5PR0401MB254523A43EB292B478C729279AB10@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<1496851287-9428-7-git-send-email-eric.auger@redhat.com>
-	<20170714021733.GA27284@pxdev.xzpeter.org>
-	<AM5PR0401MB2545B52A31CCA827DB3EE5A79AAD0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<20170717012809.GO27284@pxdev.xzpeter.org>
-	<45e202fa-2b6b-bc17-9200-b0eaa1879c78@redhat.com>
-In-Reply-To: <45e202fa-2b6b-bc17-9200-b0eaa1879c78@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgilbert@redhat.com>) id 1ddDi8-0004Ck-HI
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:50:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52110)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddDi8-0004B3-80
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:50:36 -0400
+Date: Thu, 3 Aug 2017 11:50:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803105021.GD2076@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-23-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
- translation and commands
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501229198-30588-23-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 22/29] migration: new message
+ MIG_RP_MSG_RECV_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +28,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: "wei@redhat.com" <wei@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "drjones@redhat.com" <drjones@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
-cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIEp1bHkg
-MzEsIDIwMTcgNjozOCBQTQ0KPiBUbzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsgQmhh
-cmF0IEJodXNoYW4NCj4gPGJoYXJhdC5iaHVzaGFuQG54cC5jb20+DQo+IENjOiB3ZWlAcmVkaGF0
-LmNvbTsgcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBrZXZpbi50aWFuQGludGVsLmNvbTsNCj4g
-ZHJqb25lc0ByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsgamVhbi1waGlsaXBwZS5icnVja2Vy
-QGFybS5jb207DQo+IHRuQHNlbWloYWxmLmNvbTsgd2lsbC5kZWFjb25AYXJtLmNvbTsgcWVtdS1k
-ZXZlbEBub25nbnUub3JnOw0KPiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgcWVtdS1hcm1A
-bm9uZ251Lm9yZzsNCj4gbWFyYy56eW5naWVyQGFybS5jb207IHJvYmluLm11cnBoeUBhcm0uY29t
-Ow0KPiBjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc7IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNv
-bQ0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgNi84XSB2aXJ0aW8taW9tbXU6
-IEltcGxlbWVudCB0aGUNCj4gdHJhbnNsYXRpb24gYW5kIGNvbW1hbmRzDQo+IA0KPiBIaSBQZXRl
-ciwgQmhhcmF0LA0KPiANCj4gT24gMTcvMDcvMjAxNyAwMzoyOCwgUGV0ZXIgWHUgd3JvdGU6DQo+
-ID4gT24gRnJpLCBKdWwgMTQsIDIwMTcgYXQgMDY6NDA6MzRBTSArMDAwMCwgQmhhcmF0IEJodXNo
-YW4gd3JvdGU6DQo+ID4+IEhpIFBldGVyLA0KPiA+Pg0KPiA+Pj4gLS0tLS1PcmlnaW5hbCBNZXNz
-YWdlLS0tLS0NCj4gPj4+IEZyb206IFBldGVyIFh1IFttYWlsdG86cGV0ZXJ4QHJlZGhhdC5jb21d
-DQo+ID4+PiBTZW50OiBGcmlkYXksIEp1bHkgMTQsIDIwMTcgNzo0OCBBTQ0KPiA+Pj4gVG86IEVy
-aWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4NCj4gPj4+IENjOiBlcmljLmF1Z2VyLnBy
-b0BnbWFpbC5jb207IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsNCj4gPj4+IGFsZXgud2lsbGlh
-bXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsgcWVtdS0NCj4gYXJtQG5vbmdudS5vcmc7
-DQo+ID4+PiBxZW11LWRldmVsQG5vbmdudS5vcmc7IGplYW4tcGhpbGlwcGUuYnJ1Y2tlckBhcm0u
-Y29tOw0KPiA+Pj4gd2VpQHJlZGhhdC5jb207IGtldmluLnRpYW5AaW50ZWwuY29tOyBCaGFyYXQg
-Qmh1c2hhbg0KPiA+Pj4gPGJoYXJhdC5iaHVzaGFuQG54cC5jb20+OyBtYXJjLnp5bmdpZXJAYXJt
-LmNvbTsNCj4gdG5Ac2VtaWhhbGYuY29tOw0KPiA+Pj4gd2lsbC5kZWFjb25AYXJtLmNvbTsgZHJq
-b25lc0ByZWRoYXQuY29tOyByb2Jpbi5tdXJwaHlAYXJtLmNvbTsNCj4gPj4+IGNocmlzdG9mZmVy
-LmRhbGxAbGluYXJvLm9yZw0KPiA+Pj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZDIHYy
-IDYvOF0gdmlydGlvLWlvbW11OiBJbXBsZW1lbnQgdGhlDQo+ID4+PiB0cmFuc2xhdGlvbiBhbmQg
-Y29tbWFuZHMNCj4gPj4+DQo+ID4+PiBPbiBXZWQsIEp1biAwNywgMjAxNyBhdCAwNjowMToyNVBN
-ICswMjAwLCBFcmljIEF1Z2VyIHdyb3RlOg0KPiA+Pj4+IFRoaXMgcGF0Y2ggYWRkcyB0aGUgYWN0
-dWFsIGltcGxlbWVudGF0aW9uIGZvciB0aGUgdHJhbnNsYXRpb24NCj4gPj4+PiByb3V0aW5lIGFu
-ZCB0aGUgdmlydGlvLWlvbW11IGNvbW1hbmRzLg0KPiA+Pj4+DQo+ID4+Pj4gU2lnbmVkLW9mZi1i
-eTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+Pj4NCj4gPj4+IFsuLi5d
-DQo+ID4+Pg0KPiA+Pj4+ICBzdGF0aWMgaW50IHZpcnRpb19pb21tdV9hdHRhY2goVmlydElPSU9N
-TVUgKnMsDQo+ID4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qgdmly
-dGlvX2lvbW11X3JlcV9hdHRhY2gNCj4gPj4+PiAqcmVxKSBAQCAtOTUsMTAgKzEzNSwzNCBAQCBz
-dGF0aWMgaW50DQo+IHZpcnRpb19pb21tdV9hdHRhY2goVmlydElPSU9NTVUgKnMsDQo+ID4+Pj4g
-ICAgICB1aW50MzJfdCBhc2lkID0gbGUzMl90b19jcHUocmVxLT5hZGRyZXNzX3NwYWNlKTsNCj4g
-Pj4+PiAgICAgIHVpbnQzMl90IGRldmlkID0gbGUzMl90b19jcHUocmVxLT5kZXZpY2UpOw0KPiA+
-Pj4+ICAgICAgdWludDMyX3QgcmVzZXJ2ZWQgPSBsZTMyX3RvX2NwdShyZXEtPnJlc2VydmVkKTsN
-Cj4gPj4+PiArICAgIHZpb21tdV9hcyAqYXM7DQo+ID4+Pj4gKyAgICB2aW9tbXVfZGV2ICpkZXY7
-DQo+ID4+Pj4NCj4gPj4+PiAgICAgIHRyYWNlX3ZpcnRpb19pb21tdV9hdHRhY2goYXNpZCwgZGV2
-aWQsIHJlc2VydmVkKTsNCj4gPj4+Pg0KPiA+Pj4+IC0gICAgcmV0dXJuIFZJUlRJT19JT01NVV9T
-X1VOU1VQUDsNCj4gPj4+PiArICAgIGRldiA9IGdfdHJlZV9sb29rdXAocy0+ZGV2aWNlcywgR1VJ
-TlRfVE9fUE9JTlRFUihkZXZpZCkpOw0KPiA+Pj4+ICsgICAgaWYgKGRldikgew0KPiA+Pj4+ICsg
-ICAgICAgIHJldHVybiAtMTsNCj4gPj4+PiArICAgIH0NCj4gPj4+PiArDQo+ID4+Pj4gKyAgICBh
-cyA9IGdfdHJlZV9sb29rdXAocy0+YWRkcmVzc19zcGFjZXMsDQo+IEdVSU5UX1RPX1BPSU5URVIo
-YXNpZCkpOw0KPiA+Pj4+ICsgICAgaWYgKCFhcykgew0KPiA+Pj4+ICsgICAgICAgIGFzID0gZ19t
-YWxsb2MwKHNpemVvZigqYXMpKTsNCj4gPj4+PiArICAgICAgICBhcy0+aWQgPSBhc2lkOw0KPiA+
-Pj4+ICsgICAgICAgIGFzLT5tYXBwaW5ncyA9DQo+IGdfdHJlZV9uZXdfZnVsbCgoR0NvbXBhcmVE
-YXRhRnVuYylpbnRlcnZhbF9jbXAsDQo+ID4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgTlVMTCwgTlVMTCwgKEdEZXN0cm95Tm90aWZ5KWdfZnJlZSk7DQo+ID4+
-Pj4gKyAgICAgICAgZ190cmVlX2luc2VydChzLT5hZGRyZXNzX3NwYWNlcywgR1VJTlRfVE9fUE9J
-TlRFUihhc2lkKSwgYXMpOw0KPiA+Pj4+ICsgICAgICAgIHRyYWNlX3ZpcnRpb19pb21tdV9uZXdf
-YXNpZChhc2lkKTsNCj4gPj4+PiArICAgIH0NCj4gPj4+PiArDQo+ID4+Pj4gKyAgICBkZXYgPSBn
-X21hbGxvYzAoc2l6ZW9mKCpkZXYpKTsNCj4gPj4+PiArICAgIGRldi0+YXMgPSBhczsNCj4gPj4+
-PiArICAgIGRldi0+aWQgPSBkZXZpZDsNCj4gPj4+PiArICAgIGFzLT5ucl9kZXZpY2VzKys7DQo+
-ID4+Pj4gKyAgICB0cmFjZV92aXJ0aW9faW9tbXVfbmV3X2RldmlkKGRldmlkKTsNCj4gPj4+PiAr
-ICAgIGdfdHJlZV9pbnNlcnQocy0+ZGV2aWNlcywgR1VJTlRfVE9fUE9JTlRFUihkZXZpZCksIGRl
-dik7DQo+ID4+Pg0KPiA+Pj4gSGVyZSBkbyB3ZSBuZWVkIHRvIHJlY29yZCBzb21ldGhpbmcgbGlr
-ZSBhIHJlZmNvdW50IGZvciBhZGRyZXNzIHNwYWNlPw0KPiA+Pj4gU2luY2UuLi4NCj4gPj4NCj4g
-Pj4gV2UgYXJlIHVzaW5nICJucl9kZXZpY2VzIiBhcyBudW1iZXIgb2YgZGV2aWNlcyBhdHRhY2hl
-ZCB0byBhbg0KPiA+PiBhZGRyZXNzLXNwYWNlDQo+ID4+DQo+ID4+Pg0KPiA+Pj4+ICsNCj4gPj4+
-PiArICAgIHJldHVybiBWSVJUSU9fSU9NTVVfU19PSzsNCj4gPj4+PiAgfQ0KPiA+Pj4+DQo+ID4+
-Pj4gIHN0YXRpYyBpbnQgdmlydGlvX2lvbW11X2RldGFjaChWaXJ0SU9JT01NVSAqcywgQEAgLTEw
-NiwxMCArMTcwLDEzDQo+ID4+Pj4gQEAgc3RhdGljIGludCB2aXJ0aW9faW9tbXVfZGV0YWNoKFZp
-cnRJT0lPTU1VICpzLCAgew0KPiA+Pj4+ICAgICAgdWludDMyX3QgZGV2aWQgPSBsZTMyX3RvX2Nw
-dShyZXEtPmRldmljZSk7DQo+ID4+Pj4gICAgICB1aW50MzJfdCByZXNlcnZlZCA9IGxlMzJfdG9f
-Y3B1KHJlcS0+cmVzZXJ2ZWQpOw0KPiA+Pj4+ICsgICAgaW50IHJldDsNCj4gPj4+Pg0KPiA+Pj4+
-ICAgICAgdHJhY2VfdmlydGlvX2lvbW11X2RldGFjaChkZXZpZCwgcmVzZXJ2ZWQpOw0KPiA+Pj4+
-DQo+ID4+Pj4gLSAgICByZXR1cm4gVklSVElPX0lPTU1VX1NfVU5TVVBQOw0KPiA+Pj4+ICsgICAg
-cmV0ID0gZ190cmVlX3JlbW92ZShzLT5kZXZpY2VzLCBHVUlOVF9UT19QT0lOVEVSKGRldmlkKSk7
-DQo+ID4+Pg0KPiA+Pj4gLi4uIGhlcmUgd2hlbiBkZXRhY2gsIGltaG8gd2Ugc2hvdWxkIGNoZWNr
-IHRoZSByZWZjb3VudDogaWYgdGhlcmUgaXMNCj4gPj4+IG5vIGRldmljZSB1c2luZyBzcGVjaWZp
-YyBhZGRyZXNzIHNwYWNlLCB3ZSBzaG91bGQgcmVsZWFzZSB0aGUNCj4gPj4+IGFkZHJlc3Mgc3Bh
-Y2UgYXMgd2VsbC4NCj4gPj4+DQo+ID4+PiBPdGhlcndpc2UgdGhlcmUgd291bGQgaGF2ZSBubyB3
-YXkgdG8gZGVzdHJveSBhbiBhZGRyZXNzIHNwYWNlPw0KPiA+Pg0KPiA+Pg0KPiA+PiBIZXJlIGlm
-IG5yX2RldmljZXMgPT0gMCB0aGVuIHJlbGVhc2UgdGhlIGFkZHJlc3Mgc3BhY2UsIGlzIHRoYXQg
-b2s/DQo+ID4+DQo+ID4+IFRoaXMgaXMgaG93IEkgaW1wbGVtZW50ZWQgYXMgcGFydCBvZiBWRklP
-IGludGVncmF0aW9uIG92ZXIgdGhpcyBwYXRjaA0KPiBzZXJpZXMuDQo+ID4+IAkiW1JGQyBQQVRD
-SCAyLzJdIHZpcnRpby1pb21tdTogdmZpbyBpbnRlZ3JhdGlvbiB3aXRoIHZpcnRpby1pb21tdSIN
-Cj4gDQo+IGdsaWIgcHJvdmlkZXMgZ190cmVlX3JlZi9nX3RyZWVfdW5yZWYuIEkgdGhpbmsgdGhl
-IG1vc3QgZWxlZ2FudCBpcyB0byB1c2UNCj4gZ190cmVlX3JlZiB3aGVuIGFkZGluZyBhIGRldmlj
-ZSBhbmQgZGVjcmVtZW50aW5nIHdoZW4gcmVtb3ZpbmcgYQ0KPiBkZXZpY2UsIGFzIHN1Z2dlc3Rl
-ZCBieSBQZXRlci4NCj4gDQo+ICJpZiB0aGUgcmVmZXJlbmNlIGNvdW50IGRyb3BzIHRvIDAsIGFs
-bCBrZXlzIGFuZCB2YWx1ZXMgd2lsbCBiZSBkZXN0cm95ZWQgKGlmDQo+IGRlc3Ryb3kgZnVuY3Rp
-b25zIHdlcmUgc3BlY2lmaWVkKSBhbmQgYWxsIG1lbW9yeSBhbGxvY2F0ZWQgYnkgdHJlZSB3aWxs
-IGJlDQo+IHJlbGVhc2VkLiINCj4gDQo+IFRoYXQgd2F5IHdlIHNob3VsZCBiZSBhYmxlIHRvIHJl
-bW92ZSBucl9kZXZpY2VzIGZyb20gdmlvbW11X2FzDQo+IA0KPiBCaGFyYXQsIGlmIHRoaXMgYnJl
-YWtzIHlvdXIgaW1wbGVtZW50YXRpb24gSSB3aWxsIGxldCB5b3UgcmUtaW50cm9kdWNlDQo+IG5y
-X2RldmljZXMgYXMgcGFydCBvZiB0aGUgVkZJTyBwYXRjaC4NCg0KV2UgbmVlZCB0byB1bm1hcCgp
-IGV2ZXJ5dGhpbmcgaW4gcGh5c2ljYWwtaW9tbXUgd2hlbiBsYXN0IGRldmljZSBpcyBkZXRhY2hl
-ZCwgc2VlbXMgbGlrZSBnX3RyZWVfcmVmL3VucmVmKCkgZG9lcyBub3QgZ2l2ZSBhbnkgaGFuZGxl
-IGZvciB0aGlzLiBJIHdpbGwgZ28gYWhlYWQgd2l0aCBhZGRpbmcgbnJfZGV2aWNlcyB3aXRoIFZG
-SU8gaW50ZWdyYXRpb24gcGF0Y2hlcy4NCg0KVGhhbmtzDQotQmhhcmF0DQoNCj4gDQo+IFRoYW5r
-cw0KPiANCj4gRXJpYw0KPiA+DQo+ID4gU29ycnkgSSBkaWRuJ3QgcmVhZCB0aGF0IHdoZW4gcG9z
-dGluZy4gSXQgaXMgd2hhdCBJIG1lYW4uICBUaGFua3MsDQo+ID4NCg==
+* Peter Xu (peterx@redhat.com) wrote:
+> Introducing new return path message MIG_RP_MSG_RECV_BITMAP to send
+> received bitmap of ramblock back to source.
+> 
+> This is the reply message of MIG_CMD_RECV_BITMAP, it contains not only
+> the header (including the ramblock name), and it was appended with the
+> whole ramblock received bitmap on the destination side.
+> 
+> When the source receives such a reply message (MIG_RP_MSG_RECV_BITMAP),
+> it parses it, convert it to the dirty bitmap by reverting the bits.
+
+Inverting not reverting?
+
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c  | 62 ++++++++++++++++++++++++++++++++++++++++++
+>  migration/migration.h  |  2 ++
+>  migration/ram.c        | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  migration/ram.h        |  2 ++
+>  migration/savevm.c     |  2 +-
+>  migration/trace-events |  2 ++
+>  6 files changed, 143 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e498fa4..c2b85ac 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -92,6 +92,7 @@ enum mig_rp_message_type {
+>  
+>      MIG_RP_MSG_REQ_PAGES_ID, /* data (start: be64, len: be32, id: string) */
+>      MIG_RP_MSG_REQ_PAGES,    /* data (start: be64, len: be32) */
+> +    MIG_RP_MSG_RECV_BITMAP,  /* send recved_bitmap back to source */
+>  
+>      MIG_RP_MSG_MAX
+>  };
+> @@ -450,6 +451,39 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+>      migrate_send_rp_message(mis, MIG_RP_MSG_PONG, sizeof(buf), &buf);
+>  }
+>  
+> +void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+> +                                 char *block_name)
+> +{
+> +    char buf[512];
+> +    int len;
+> +    int64_t res;
+> +
+> +    /*
+> +     * First, we send the header part. It contains only the len of
+> +     * idstr, and the idstr itself.
+> +     */
+> +    len = strlen(block_name);
+> +    buf[0] = len;
+> +    memcpy(buf + 1, block_name, len);
+> +
+> +    migrate_send_rp_message(mis, MIG_RP_MSG_RECV_BITMAP, len + 1, buf);
+> +
+> +    /*
+> +     * Next, we dump the received bitmap to the stream.
+> +     *
+> +     * TODO: currently we are safe since we are the only one that is
+> +     * using the to_src_file handle (fault thread is still paused),
+> +     * and it's ok even not taking the mutex. However the best way is
+> +     * to take the lock before sending the message header, and release
+> +     * the lock after sending the bitmap.
+> +     */
+
+Should we be checking the state?
+
+> +    qemu_mutex_lock(&mis->rp_mutex);
+> +    res = ramblock_recv_bitmap_send(mis->to_src_file, block_name);
+> +    qemu_mutex_unlock(&mis->rp_mutex);
+> +
+> +    trace_migrate_send_rp_recv_bitmap(block_name, res);
+
+OK, that's a little unusual - I don't think we've got anywhere else
+where the data for the rp_ message isn't in the call to
+migrate_send_rp_message.
+(Another way to structure it would be to make each message send a chunk
+of bitmap; but lets stick with this structure for now)
+
+Can you add, either here or in ramblock_recv_bitmap_send an 'end marker'
+on the bitmap data; just a (non-0) known value byte that would help us
+check if we had a mess where things got misaligned.
+
+> +}
+> +
+>  MigrationCapabilityStatusList *qmp_query_migrate_capabilities(Error **errp)
+>  {
+>      MigrationCapabilityStatusList *head = NULL;
+> @@ -1560,6 +1594,7 @@ static struct rp_cmd_args {
+>      [MIG_RP_MSG_PONG]           = { .len =  4, .name = "PONG" },
+>      [MIG_RP_MSG_REQ_PAGES]      = { .len = 12, .name = "REQ_PAGES" },
+>      [MIG_RP_MSG_REQ_PAGES_ID]   = { .len = -1, .name = "REQ_PAGES_ID" },
+> +    [MIG_RP_MSG_RECV_BITMAP]    = { .len = -1, .name = "RECV_BITMAP" },
+>      [MIG_RP_MSG_MAX]            = { .len = -1, .name = "MAX" },
+>  };
+>  
+> @@ -1604,6 +1639,19 @@ static bool postcopy_pause_return_path_thread(MigrationState *s)
+>      return true;
+>  }
+>  
+> +static int migrate_handle_rp_recv_bitmap(MigrationState *s, char *block_name)
+> +{
+> +    RAMBlock *block = qemu_ram_block_by_name(block_name);
+> +
+> +    if (!block) {
+> +        error_report("%s: invalid block name '%s'", __func__, block_name);
+> +        return -EINVAL;
+> +    }
+> +
+> +    /* Fetch the received bitmap and refresh the dirty bitmap */
+> +    return ram_dirty_bitmap_reload(s, block);
+> +}
+> +
+>  /*
+>   * Handles messages sent on the return path towards the source VM
+>   *
+> @@ -1709,6 +1757,20 @@ retry:
+>              migrate_handle_rp_req_pages(ms, (char *)&buf[13], start, len);
+>              break;
+>  
+> +        case MIG_RP_MSG_RECV_BITMAP:
+> +            if (header_len < 1) {
+> +                error_report("%s: missing block name", __func__);
+> +                mark_source_rp_bad(ms);
+> +                goto out;
+> +            }
+> +            /* Format: len (1B) + idstr (<255B). This ends the idstr. */
+> +            buf[buf[0] + 1] = '\0';
+> +            if (migrate_handle_rp_recv_bitmap(ms, (char *)(buf + 1))) {
+> +                mark_source_rp_bad(ms);
+> +                goto out;
+> +            }
+> +            break;
+> +
+>          default:
+>              break;
+>          }
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 574fedd..4d38308 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -204,5 +204,7 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+>                            uint32_t value);
+>  int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+>                                ram_addr_t start, size_t len);
+> +void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+> +                                 char *block_name);
+>  
+>  #endif
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 7f4cb0f..d543483 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -182,6 +182,32 @@ void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb)
+>  }
+>  
+>  /*
+> + * Format: bitmap_size (8 bytes) + whole_bitmap (N bytes).
+> + *
+> + * Returns >0 if success with sent bytes, or <0 if error.
+> + */
+> +int64_t ramblock_recv_bitmap_send(QEMUFile *file, char *block_name)
+> +{
+> +    RAMBlock *block = qemu_ram_block_by_name(block_name);
+> +    uint64_t size;
+> +
+> +    /* We should have made sure that the block exists */
+> +    assert(block);
+
+Best not to make it assert; just make it fail - the block name is
+coming off the wire anyway.
+(Also can we make it a const char *block_name)
+
+> +    /* Size of the bitmap, in bytes */
+> +    size = (block->max_length >> TARGET_PAGE_BITS) / 8;
+> +    qemu_put_be64(file, size);
+> +    qemu_put_buffer(file, (const uint8_t *)block->receivedmap, size);
+
+Do we need to be careful about endianness and length of long here?
+The migration stream can (theoretically) migrate between hosts of
+different endianness, e.g. a Power LE and Power BE host it can also
+migrate between a 32bit and 64bit host where the 'long' used in our
+bitmap is a different length.
+I think that means you have to save it as a series of long's;
+and also just make sure 'size' is a multiple of 'long' - otherwise
+you lose the last few bytes, which on a big endian system would
+be a problem.
+
+Also, should we be using 'max_length' or 'used_length' - ram_save_setup
+stores the used_length.  I don't think we should be accessing outside
+the used_length?  That might also make the thing about 'size' being
+rounded to a 'long' more interesting; maybe need to check you don't use
+the bits outside the used_length.
+
+> +    qemu_fflush(file);
+> +
+> +    if (qemu_file_get_error(file)) {
+> +        return qemu_file_get_error(file);
+> +    }
+> +
+> +    return sizeof(size) + size;
+
+I think since size is always sent as a 64bit that's  size + 8.
+
+> +}
+> +
+> +/*
+>   * An outstanding page request, on the source, having been received
+>   * and queued
+>   */
+> @@ -2705,6 +2731,54 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      return ret;
+>  }
+>  
+> +/*
+> + * Read the received bitmap, revert it as the initial dirty bitmap.
+> + * This is only used when the postcopy migration is paused but wants
+> + * to resume from a middle point.
+> + */
+> +int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+> +{
+> +    QEMUFile *file = s->rp_state.from_dst_file;
+> +    uint64_t local_size = (block->max_length >> TARGET_PAGE_BITS) / 8;
+> +    uint64_t size;
+> +
+> +    if (s->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> +        error_report("%s: incorrect state %s", __func__,
+> +                     MigrationStatus_lookup[s->state]);
+> +        return -EINVAL;
+> +    }
+> +
+> +    size = qemu_get_be64(file);
+> +
+> +    /* The size of the bitmap should match with our ramblock */
+> +    if (size != local_size) {
+> +        error_report("%s: ramblock '%s' bitmap size mismatch "
+> +                     "(0x%lx != 0x%lx)", __func__, block->idstr,
+> +                     size, local_size);
+> +        return -EINVAL;
+> +    }
+
+Coming back to the used_length thing above;  again I think the rule
+is that the used_length has to match not the max_length.
+
+> +    /*
+> +     * We are still during migration (though paused). The dirty bitmap
+> +     * won't change.  We can directly modify it.
+> +     */
+> +    size = qemu_get_buffer(file, (uint8_t *)block->bmap, local_size);
+> +
+> +    if (qemu_file_get_error(file)) {
+> +        return qemu_file_get_error(file);
+> +    }
+> +
+> +    /*
+> +     * What we received is "received bitmap". Revert it as the initial
+> +     * dirty bitmap for this ramblock.
+> +     */
+> +    bitmap_invert(block->bmap, block->max_length >> TARGET_PAGE_BITS);
+> +
+> +    trace_ram_dirty_bitmap_reload(block->idstr);
+> +
+> +    return 0;
+> +}
+> +
+>  static SaveVMHandlers savevm_ram_handlers = {
+>      .save_setup = ram_save_setup,
+>      .save_live_iterate = ram_save_iterate,
+> diff --git a/migration/ram.h b/migration/ram.h
+> index 84e8623..86eb973 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -58,5 +58,7 @@ void ramblock_recv_bitmap_set(void *host_addr, RAMBlock *rb);
+>  void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
+>                                      size_t len);
+>  void ramblock_recv_bitmap_clear(void *host_addr, RAMBlock *rb);
+> +int64_t ramblock_recv_bitmap_send(QEMUFile *file, char *block_name);
+> +int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *rb);
+>  
+>  #endif
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 0ab13c0..def9213 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1755,7 +1755,7 @@ static int loadvm_handle_recv_bitmap(MigrationIncomingState *mis,
+>          return -EINVAL;
+>      }
+>  
+> -    /* TODO: send the bitmap back to source */
+> +    migrate_send_rp_recv_bitmap(mis, block_name);
+>  
+>      return 0;
+>  }
+> diff --git a/migration/trace-events b/migration/trace-events
+> index ca7b43f..ed69551 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -77,6 +77,7 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
+>  ram_postcopy_send_discard_bitmap(void) ""
+>  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: %" PRIx64 " host: %p"
+>  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
+> +ram_dirty_bitmap_reload(char *str) "%s"
+>  
+>  # migration/migration.c
+>  await_return_path_close_on_source_close(void) ""
+> @@ -88,6 +89,7 @@ migrate_fd_cancel(void) ""
+>  migrate_handle_rp_req_pages(const char *rbname, size_t start, size_t len) "in %s at %zx len %zx"
+>  migrate_pending(uint64_t size, uint64_t max, uint64_t post, uint64_t nonpost) "pending size %" PRIu64 " max %" PRIu64 " (post=%" PRIu64 " nonpost=%" PRIu64 ")"
+>  migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
+> +migrate_send_rp_recv_bitmap(char *name, int64_t size) "block '%s' size 0x%"PRIi64
+>  migration_completion_file_err(void) ""
+>  migration_completion_postcopy_end(void) ""
+>  migration_completion_postcopy_end_after_complete(void) ""
+> -- 
+> 2.7.4
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
