@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddGXZ-0001ZT-Ug
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:51:55 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1ddGZV-0002VA-S9
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddGXW-0003Yi-WB
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:51:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddGXW-0003X7-LN
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:51:50 -0400
-References: <150176232235.21421.11970305069558342885.malonedeb@wampee.canonical.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <10dfbd79-e5bd-e88c-27d8-246f89315387@redhat.com>
-Date: Thu, 3 Aug 2017 08:51:44 -0500
+	(envelope-from <el13635@mail.ntua.gr>) id 1ddGZU-00069P-Qn
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:53:53 -0400
+Date: Thu, 3 Aug 2017 16:52:53 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170803135253.s2u6ut5hvrbupxao@postretch>
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+	<20170731095443.28211-8-el13635@mail.ntua.gr>
+	<20170803080750.GB4456@dhcp-200-186.str.redhat.com>
+	<20170803132455.bth53wkxr35imfhd@postretch>
+	<20170803133258.GI4456@dhcp-200-186.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <150176232235.21421.11970305069558342885.malonedeb@wampee.canonical.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="naTrWosQ2PSam0upfxSnnnEHbrQ2LNGBI"
-Subject: Re: [Qemu-devel] [Bug 1708442] [NEW] Crash(assert) during reading
- image from http url through qemu-nbd
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="aalczojz7evddsmc"
+Content-Disposition: inline
+In-Reply-To: <20170803133258.GI4456@dhcp-200-186.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] block: add throttle block filter
+ driver interface tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,138 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1708442 <1708442@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---naTrWosQ2PSam0upfxSnnnEHbrQ2LNGBI
-From: Eric Blake <eblake@redhat.com>
-To: Bug 1708442 <1708442@bugs.launchpad.net>, qemu-devel@nongnu.org
-Message-ID: <10dfbd79-e5bd-e88c-27d8-246f89315387@redhat.com>
-Subject: Re: [Qemu-devel] [Bug 1708442] [NEW] Crash(assert) during reading
- image from http url through qemu-nbd
-References: <150176232235.21421.11970305069558342885.malonedeb@wampee.canonical.com>
-In-Reply-To: <150176232235.21421.11970305069558342885.malonedeb@wampee.canonical.com>
-Content-Type: text/plain; charset=utf-8
+
+--aalczojz7evddsmc
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 08/03/2017 07:12 AM, Andrey Smetanin wrote:
-> Public bug reported:
->=20
-> Description:
-> During reading image from nbd device mounted by qemu-nbd server with ur=
-l backend I/O error happens
-> "blk_update_request: I/O error, dev nbd0, sector 42117" dmesg. After so=
-me investigation I found that qemu-nbd server aborts in aio_co_enter() as=
-sert in util/async.c:468.
->=20
+On Thu, Aug 03, 2017 at 03:32:58PM +0200, Kevin Wolf wrote:
+>Am 03.08.2017 um 15:24 hat Manos Pitsidianakis geschrieben:
+>> On Thu, Aug 03, 2017 at 10:07:50AM +0200, Kevin Wolf wrote:
+>> > Am 31.07.2017 um 11:54 hat Manos Pitsidianakis geschrieben:
+>> > > Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>> >
+>> > I would add at least two more cases:
+>> >
+>> > * Both limits and throttle-group are given in blockdev-add
+>> This exists in the "property changes in ThrottleGroup" section,
+>
+>You're right, I missed this. The test result shows that this command
+>succeeds. Do we really want to allow other nodes to be affected with a
+>blockdev-add? Wouldn't it be cleaner to just forbid the combination of
+>limits and throtte-group?
 
-Based on the backtrace, this looks to be a bug in the block/curl.c
-driver, rather than the nbd/ or block/nbd.c code.  If I'm right, it
-should be possible to reproduce the crash using qemu-io directly on the
-curl path, rather than adding the extra layer of an nbd client reading
-through qemu-nbd (then again, having the qemu-nbd layer may be what is
-allowing multiple parallel requests to hit the curl driver at once,
-while qemu-io is not quite as easy to provoke into performing
-complicated access patterns).
-
->=20
-> Steps to reproduce:
->=20
-> 1) sudo go run qemu-nbd-bug-report/qemu-nbd-bug.go (see qemu-nbd-bug-
-> report.tar.gz)
->=20
-> or try directly
->=20
-> 1) qemu-nbd -c /dev/nbd0 -r -v --aio=3Dnative -f qcow2 json:{"file.driv=
-er":"http","file.url":"http://localhost:9666/image","file.readahead":3276=
-800
-
-Presumably, you've got something serving the file at port 9666?
-
-> 2) try read whole nbd device while error in dmesg appears x
->=20
-> Versions:
->=20
-> 1) qemu built from sources(/configure --target-list=3Dx86_64-softmmu --=
-disable-user --enable-curl --enable-linux-aio --enable-virtfs --enable-de=
-bug --disable-pie
-> , top commit 5619c179057e24195ff19c8fe6d6a6cbcb16ed28):
->=20
-> qemu-nbd -v
-> qemu-nbd 2.9.90 (v2.10.0-rc0-67-g5619c17)
->=20
-> 2) libcurl(built from sources, top commit
-> 1767adf4399bb3be29121435e1bb1cc2bc05f7bf):
->=20
-> curl -V
-> curl 7.55.0-DEV (Linux) libcurl/7.55.0-DEV OpenSSL/1.0.2g zlib/1.2.8
->=20
->=20
-> Backtrace:
-> (gdb) bt
-> #0  0x00007f7131426428 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdep=
-s/unix/sysv/linux/raise.c:54
-> #1  0x00007f713142802a in __GI_abort () at abort.c:89
-> #2  0x00007f713141ebd7 in __assert_fail_base (fmt=3D<optimized out>, as=
-sertion=3Dassertion@entry=3D0x54c924 "self !=3D co",=20
->     file=3Dfile@entry=3D0x54c871 "util/async.c", line=3Dline@entry=3D46=
-8,=20
->     function=3Dfunction@entry=3D0x54c980 <__PRETTY_FUNCTION__.24766> "a=
-io_co_enter") at assert.c:92
-> #3  0x00007f713141ec82 in __GI___assert_fail (assertion=3D0x54c924 "sel=
-f !=3D co", file=3D0x54c871 "util/async.c", line=3D468,=20
->     function=3D0x54c980 <__PRETTY_FUNCTION__.24766> "aio_co_enter") at =
-assert.c:101
-> #4  0x00000000004fe6a2 in aio_co_enter (ctx=3D0xf0ddb0, co=3D0xf14650) =
-at util/async.c:468
-> #5  0x00000000004fe637 in aio_co_wake (co=3D0xf14650) at util/async.c:4=
-56
-> #6  0x0000000000495c8a in curl_read_cb (ptr=3D0xf566d9, size=3D1, nmemb=
-=3D16135, opaque=3D0xf1cb90) at block/curl.c:275
-> #7  0x00007f713242ac24 in Curl_client_chop_write () from /usr/lib/x86_6=
-4-linux-gnu/libcurl.so
-> #8  0x00007f713242ae03 in Curl_client_write () from /usr/lib/x86_64-lin=
-ux-gnu/libcurl.so
-> #9  0x00007f713244e1cf in readwrite_data () from /usr/lib/x86_64-linux-=
-gnu/libcurl.so
-> #10 0x00007f713244eb6f in Curl_readwrite () from /usr/lib/x86_64-linux-=
-gnu/libcurl.so
-> #11 0x00007f713245c1bb in multi_runsingle () from /usr/lib/x86_64-linux=
--gnu/libcurl.so
-> #12 0x00007f713245d819 in multi_socket () from /usr/lib/x86_64-linux-gn=
-u/libcurl.so
-> #13 0x00007f713245e067 in curl_multi_socket_action () from /usr/lib/x86=
-_64-linux-gnu/libcurl.so
-> #14 0x0000000000497555 in curl_setup_preadv (bs=3D0xf16820, acb=3D0x7f7=
-12d379860) at block/curl.c:918
-> #15 0x00000000004975fb in curl_co_preadv (bs=3D0xf16820, offset=3D65561=
-60, bytes=3D512, qiov=3D0x7f712d379b40, flags=3D0) at block/curl.c:935
-
-The backtrace is definitely pointing at curl as being the problem.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+So basically only anonymous, immutable groups can be created through the=20
+driver then. All other shared group configurations must be explicitly=20
+created with an -object / object-add syntax. I think this is a neat=20
+separation and compromise if we allow anonymous groups. If not, we can=20
+ignore limits on the throttle driver.
 
 
---naTrWosQ2PSam0upfxSnnnEHbrQ2LNGBI
+>> > * limits and throttle-group are both missing
+>> this creates an anonymous group with no limits. Should we fail at this c=
+ase?
+>
+>I'm not sure, you could argue either way. But there should be a test to
+>check that the semantics won't change.
+>
+>If we're going with Stefan's suggestion that anonymous groups shouldn't
+>exist, then the question is moot anyway.
+>
+>> > It would also be nice to test that query-block reflects the new thrott=
+le
+>> > group limits correctly when they are changed after the fact.
+>>
+>> This belongs to the remove legacy patch, since query-block displays the
+>> legacy limits.
+>
+>Ok, fair enough.
+>
+>Kevin
+
+
+
+--aalczojz7evddsmc
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDKnAACgkQp6FrSiUn
-Q2ry4Qf/RxLUMzjbbpOEXajFY7sOJfuLK6zkWWD05qynQHsKn9N+MAlJFEuLwiPw
-gb/Tj5zrHoxq+uUu5Q3Ytw7OUovdnbnNbJxpfEYNgtXz05WIKGUJYHalsRAdDb2w
-+r0F6POfQ6SZnjn0qMGgwKP/ZAsoFY6Pi28rD2kDx0fIhOnl/1FtUldFUC/gXYzX
-DbGiL6FvF7ZXv9LUPFBr5hoFqA8pFd9Lm7LBwieowLAe9MglYp+paHiic5bwKJmv
-JL6uUxyhAlpvbFVYjQfVAdjMqTMPFVPuNKG7j89nKGbSzA7NU6TTzDpntH/K8dak
-ieffQzDCOH86d8k5owgIGBVW3UpswA==
-=em7h
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmDKrUACgkQc2J8L2kN
+9xCd3xAAnyrhettncfep3CKcg154JI09G9fxEuFu7cAT4ytvJysbFAcQYOwYGhd1
+CEZfb7lw1tYDpSV2jCN4h1cCPWI/dsGlzrIbB0lARq7N6YnoryKLTkgJtfvzBBOs
+KHRIPePf6gpWPWQHd/jRCH7XJsFUKtM6cVm95xsf3mWkn3nGz87ISjm2WUiXiXzA
+s4qQoLyYQQzcLTaTm+DCIWvu7YVyzV4ndkfdyKnOlFiolAEL++8YXZGOEubkZSSg
+nw4dGJ2HFuHrbmn9xycyGekn6ClekOWK2FU/lx+owjwQ/nmrV2Z2C/5goMclm/yH
+RbE94QQYhK3JypAw9FIeSAX2mZaGA01pYhW5ycuTU5AMvKkU5tOsgLKc8wXHdEnk
+CBej7Vzm95FKMOKcMov7DwS+8Vd2r3CKNlOiBCnBjHMM+4vvwm7qzFoIZaR32QFr
+QWsjrk0kWYY/tUYINDxV2z/DSAQ9TqsubEdL+8rc3SWEE7eE1mUXTmuNfMivFDZs
+rVy2iwY4Gc9Oc1o6RkuWggBwzd2LBUsnGtLn4oiiwz3KSC/Vvahk9Py71kwf1UYc
+xyB4LrbZbYdythcidl78hO+ienWUoB1a80ME+QuCZdT3bArHox6rHhvYG5LA1znj
+vwFObi/2f54djcGnLMJMWM+PI5vT62oGa1FpLlMwEcoOYCQmSD8=
+=RO9h
 -----END PGP SIGNATURE-----
 
---naTrWosQ2PSam0upfxSnnnEHbrQ2LNGBI--
+--aalczojz7evddsmc--
