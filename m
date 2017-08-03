@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddBfo-0000wM-EJ
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:40:05 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ddC6q-0006bB-Sx
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 05:08:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddBfk-0002iY-De
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:40:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50660)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ddC6o-0002Bo-7e
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 05:08:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ddBfk-0002fm-4c
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:40:00 -0400
-Date: Thu, 3 Aug 2017 10:39:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170803083956.GD4456@dhcp-200-186.str.redhat.com>
-References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
-	<20170730214231.GC16400@localhost.localdomain>
-	<CAOMFOmUwi+jF4w7ve4iV_rrPt2uAqZDe6PMZ0r0W047yjFi-gw@mail.gmail.com>
-	<f6024bcb-3dcb-609f-c2a7-3d425e738e33@twiddle.net>
-	<CAOMFOmVN74ghnqWGyfxHB_LqcSLC8XzRkrk88VXaPh4JRvYRNQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ddC6n-00029P-UT
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 05:07:58 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  3 Aug 2017 11:07:46 +0200
+Message-Id: <20170803090746.30532-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMFOmVN74ghnqWGyfxHB_LqcSLC8XzRkrk88VXaPh4JRvYRNQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
- for multiboot?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3] build-sys: add --disable-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +25,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, philippe.mathieu.daude@gmail.com, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-Am 03.08.2017 um 00:00 hat Anatol Pomozov geschrieben:
-> Hello Richard
-> 
-> Thank you for this useful information. I still learning about ELF and
-> a lot of things are still unclear for me.
-> 
-> On Mon, Jul 31, 2017 at 11:20 AM, Richard Henderson <rth@twiddle.net> wrote:
-> > On 07/31/2017 10:21 AM, Anatol Pomozov wrote:
-> >> ELF sections info is needed for an OS to map address space properly.
-> >
-> > No, ELF *program header* info is needed for an OS to map the address space
-> > properly.  For example:
-> >
-> > $ readelf -hl vmlinux-4.9.0-3-5kc-malta
-> 
-> Thanks for this information about program headers. I reread elf_ops.h
-> and now I see that QEMU loads all PT_LOAD segments. I wonder why GRUB
-> bootloader loads also sections that are not in this segment (e.g. GRUB
-> loads content of .shstrtab into target's memory despite my elf does
-> not keep it in PT_LOAD segment).
+Learn to compile out vhost-user (net, scsi & upcoming users). Keep it
+enabled by default on non-win32, that is assumed to be POSIX. Fail if
+trying to enable it on win32.
 
-Remember that what we're talking about isn't primarily an ELF loader,
-but a Multiboot loader. Multiboot can work without ELF (e.g. with flat
-binaries) if bit 16 in the Multiboot header flags is set and the
-additional header fields are correctly provided. However, if you are
-loading an ELF binary, then Multiboot specifies that the bootloader
-makes use of the ELF headers and you don't have to set bit 16 in the
-header.
+When trying to make a vhost-user netdev, it gives the following error:
 
-If ELF says that some things have to be loaded (and bit 16 is clear),
-then the bootloader will load them. If Multiboot says that additional
-things can or have to be loaded, it will load those, too. The section
-headers are only one example of additional data that Multiboot provides.
-It also loads additional modules, provides the e820 memory map, etc.,
-none of which are described by ELF.
+-netdev vhost-user,id=3Dfoo,chardev=3Dchr-test: Parameter 'type' expects =
+a netdev backend type
 
-> What ELF specification says about it? Does it tell a loader to load
-> only PT_LOAD segments? In this case bootloaders should follow it as
-> well and current QEMU behavior is correct.
+And similar error with the HMP/QMP monitors.
 
-The current behaviour of QEMU is correct because it doesn't set bit 5 in
-the flags field of the Multiboot info struct, i.e. it doesn't advertise
-that the section headers are available, so it doesn't have to provide
-it.
+While at it, rename CONFIG_VHOST_NET_TEST CONFIG_VHOST_USER_NET_TEST
+since it's a vhost-user specific variable.
 
-It is also not feature complete, because a full Multiboot implementation
-would implement this and advertise bit 5. Adding the feature would be
-useful because there are guest kernels that can make use of it.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/virtio/virtio-pci.c            |  4 ++--
+ configure                         | 28 ++++++++++++++++++++++++++--
+ default-configs/pci.mak           |  2 +-
+ default-configs/s390x-softmmu.mak |  2 +-
+ tests/Makefile.include            |  6 +++---
+ 5 files changed, 33 insertions(+), 9 deletions(-)
 
-> But multiboot expects section headers info and .shstrtab section to be
-> loaded to the target memory. I believe I need to modify my linker
-> script and add this information into the loadable segment.
+v3:
+- user error_exit in configure
+- drop patch to compile out net/vhost-user.c
 
-No. First of all, you don't even need this information to find the start
-and end of the kernel code. Second, if a Multiboot loader loads this, it
-doesn't have to be in a loadable segment. This is more like debug
-information, not like an inherent part of the program.
+v2:
+- remove some #ifdef, reuse CONFIG_VHOST_NET_USED
+- split the patch to have net/vhost-user.c compiled out (adding 2 ifdefs)
+- fail if --enable-vhost-user on win32
 
-> Here is my current linker script:
-> 
-> ======================
-> ENTRY(start)
-> 
-> SECTIONS {
->     . = 1M;
-> 
->     .text : {
->         KEEP(*(.data.multiboot))
->         *(.text .text*)
->     }
-> 
->     .rodata : {
->         *(.rodata .rodata*)
->     }
-> 
->     .data : {
->         *(.data .data.*)
->     }
-> 
->     .bss : {
->         __bss_start = .;
->         *(.bss .bss*)
->         . = ALIGN(8);
->         __bss_end = .;
->     }
-> }
-> =======================
-> 
-> With my linker script only .text .rodata .data and .bss are included
-> into the loadable segment.
-> 
-> 
-> So my questions: how to tell the linker to include "section headers"
-> and ".shstrtab" section into loadable segment? Once it is done I can
-> try to modify QEMU to pass its addresses to the target.
-
-Requiring section headers to be contained in a loadable segment wouldn't
-be a correct implementation of the Multiboot feature.
-
-Kevin
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5d14bd66dc..8b0d6b69cd 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2135,7 +2135,7 @@ static const TypeInfo vhost_scsi_pci_info =3D {
+ };
+ #endif
+=20
+-#ifdef CONFIG_LINUX
++#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+ /* vhost-user-scsi-pci */
+ static Property vhost_user_scsi_pci_properties[] =3D {
+     DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+@@ -2665,7 +2665,7 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_VHOST_SCSI
+     type_register_static(&vhost_scsi_pci_info);
+ #endif
+-#ifdef CONFIG_LINUX
++#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+     type_register_static(&vhost_user_scsi_pci_info);
+ #endif
+ #ifdef CONFIG_VHOST_VSOCK
+diff --git a/configure b/configure
+index 987f59ba88..dd73cce62f 100755
+--- a/configure
++++ b/configure
+@@ -306,6 +306,7 @@ tcg=3D"yes"
+ vhost_net=3D"no"
+ vhost_scsi=3D"no"
+ vhost_vsock=3D"no"
++vhost_user=3D""
+ kvm=3D"no"
+ hax=3D"no"
+ rdma=3D""
+@@ -1282,6 +1283,14 @@ for opt do
+   ;;
+   --enable-vxhs) vxhs=3D"yes"
+   ;;
++  --disable-vhost-user) vhost_user=3D"no"
++  ;;
++  --enable-vhost-user)
++      vhost_user=3D"yes"
++      if test "$mingw32" =3D "yes"; then
++          error_exit "vhost-user isn't available on win32"
++      fi
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1290,6 +1299,14 @@ for opt do
+   esac
+ done
+=20
++if test "$vhost_user" =3D ""; then
++    if test "$mingw32" =3D "yes"; then
++        vhost_user=3D"no"
++    else
++        vhost_user=3D"yes"
++    fi
++fi
++
+ case "$cpu" in
+     ppc)
+            CPU_CFLAGS=3D"-m32"
+@@ -1518,6 +1535,7 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+   tools           build qemu-io, qemu-nbd and qemu-image tools
+   vxhs            Veritas HyperScale vDisk backend support
+   crypto-afalg    Linux AF_ALG crypto backend driver
++  vhost-user      vhost-user support
+=20
+ NOTE: The object files are built at the place where configure is launche=
+d
+ EOF
+@@ -5348,6 +5366,7 @@ echo "libcap-ng support $cap_ng"
+ echo "vhost-net support $vhost_net"
+ echo "vhost-scsi support $vhost_scsi"
+ echo "vhost-vsock support $vhost_vsock"
++echo "vhost-user support $vhost_user"
+ echo "Trace backends    $trace_backends"
+ if have_backend "simple"; then
+ echo "Trace output file $trace_file-<pid>"
+@@ -5757,12 +5776,15 @@ fi
+ if test "$vhost_scsi" =3D "yes" ; then
+   echo "CONFIG_VHOST_SCSI=3Dy" >> $config_host_mak
+ fi
+-if test "$vhost_net" =3D "yes" ; then
++if test "$vhost_net" =3D "yes" -a "$vhost_user" =3D "yes"; then
+   echo "CONFIG_VHOST_NET_USED=3Dy" >> $config_host_mak
+ fi
+ if test "$vhost_vsock" =3D "yes" ; then
+   echo "CONFIG_VHOST_VSOCK=3Dy" >> $config_host_mak
+ fi
++if test "$vhost_user" =3D "yes" ; then
++  echo "CONFIG_VHOST_USER=3Dy" >> $config_host_mak
++fi
+ if test "$blobs" =3D "yes" ; then
+   echo "INSTALL_BLOBS=3Dyes" >> $config_host_mak
+ fi
+@@ -6358,7 +6380,9 @@ if supported_kvm_target $target; then
+     echo "CONFIG_KVM=3Dy" >> $config_target_mak
+     if test "$vhost_net" =3D "yes" ; then
+         echo "CONFIG_VHOST_NET=3Dy" >> $config_target_mak
+-        echo "CONFIG_VHOST_NET_TEST_$target_name=3Dy" >> $config_host_ma=
+k
++        if test "$vhost_user" =3D "yes" ; then
++            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $confi=
+g_host_mak
++        fi
+     fi
+ fi
+ if supported_hax_target $target; then
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index acaa70301a..a758630d30 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -43,4 +43,4 @@ CONFIG_VGA=3Dy
+ CONFIG_VGA_PCI=3Dy
+ CONFIG_IVSHMEM_DEVICE=3D$(CONFIG_IVSHMEM)
+ CONFIG_ROCKER=3Dy
+-CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
++CONFIG_VHOST_USER_SCSI=3D$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-so=
+ftmmu.mak
+index b227a36179..51191b77df 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -1,6 +1,6 @@
+ CONFIG_PCI=3Dy
+ CONFIG_VIRTIO_PCI=3Dy
+-CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
++CONFIG_VHOST_USER_SCSI=3D$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+ CONFIG_VIRTIO=3Dy
+ CONFIG_SCLPCONSOLE=3Dy
+ CONFIG_TERMINAL3270=3Dy
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 59e536bf0b..eb4895f94a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -255,9 +255,9 @@ check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y +=3D hw/pci-host/q35.c
+-check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D tests/vhost-user-tes=
+t$(EXESUF)
+-ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+-check-qtest-x86_64-$(CONFIG_VHOST_NET_TEST_x86_64) +=3D tests/vhost-user=
+-test$(EXESUF)
++check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=3D tests/vhost-use=
+r-test$(EXESUF)
++ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
++check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=3D tests/vhost=
+-user-test$(EXESUF)
+ endif
+ check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
+ check-qtest-i386-y +=3D tests/test-filter-mirror$(EXESUF)
+--=20
+2.14.0.rc0.1.g40ca67566
