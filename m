@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1ddEvq-0008QG-P4
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:08:51 -0400
+	(envelope-from <ppandit@redhat.com>) id 1ddF24-00027F-5w
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1ddEvn-0004pn-QE
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:08:50 -0400
-References: <1501577097-14248-1-git-send-email-frederic.konrad@adacore.com>
-	<abac426c-5db4-7dd7-a727-880b60f5e9be@redhat.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <ef01b959-763d-35b0-0aa7-cf16288badb8@adacore.com>
-Date: Thu, 3 Aug 2017 14:08:19 +0200
+	(envelope-from <ppandit@redhat.com>) id 1ddF21-00073h-Av
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:15:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ddF21-00071P-5X
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:15:13 -0400
+Date: Thu, 3 Aug 2017 17:45:06 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+Message-ID: <alpine.LFD.2.20.1708031718030.16909@wniryva>
 MIME-Version: 1.0
-In-Reply-To: <abac426c-5db4-7dd7-a727-880b60f5e9be@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] booke206: fix MAS update on
- tlb miss
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: [Qemu-devel] A use-after-free in slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: wjjzhang <wjjzhang@tencent.com>, qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
+   Hello Jan, Samuel
 
+Wjjzhang(CC'd) has reported a use-after-free issue which seems to occur while 
+responding to a packet, after the socket has been closed by another thread.
 
-On 08/03/2017 01:37 PM, Thomas Huth wrote:
-> On 01.08.2017 10:44, KONRAD Frederic wrote:
->> When a tlb instruction miss happen, rw is set to 0 at the bottom
->> of cpu_ppc_handle_mmu_fault which cause the MAS update function to miss
->> the SAS and TS bit in MAS6, MAS1 in booke206_update_mas_tlb_miss.
->>
->> Just calling booke206_update_mas_tlb_miss with rw = 2 solve the issue.
->>
->> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->> ---
->>   target/ppc/mmu_helper.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
->> index b7b9088..f06b938 100644
->> --- a/target/ppc/mmu_helper.c
->> +++ b/target/ppc/mmu_helper.c
->> @@ -1551,7 +1551,7 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *env, target_ulong address,
->>                       env->spr[SPR_40x_ESR] = 0x00000000;
->>                       break;
->>                   case POWERPC_MMU_BOOKE206:
->> -                    booke206_update_mas_tlb_miss(env, address, rw);
->> +                    booke206_update_mas_tlb_miss(env, address, 2);
-> 
-Hi Thomas,
+===
+==31922==ERROR: AddressSanitizer: heap-use-after-free on address 0x61400001ff8c at pc 0x56485de28ea0 bp 0x7f00f44fc950 sp 0x7f00f44fc940
+READ of size 4 at 0x61400001ff8c thread T2
+     #0 0x56485de28e9f in if_start slirp/if.c:230
+     #1 0x56485de28a58 in if_output slirp/if.c:141
+     #2 0x56485de35173 in ip_output slirp/ip_output.c:85
+     #3 0x56485de57c48 in tcp_respond slirp/tcp_subr.c:218
+     #4 0x56485de52440 in tcp_input slirp/tcp_input.c:1392
+     #5 0x56485de329ef in ip_input slirp/ip_input.c:206
+     #6 0x56485de3cf93 in slirp_input slirp/slirp.c:872
+     #7 0x56485de0726d in net_slirp_receive net/slirp.c:119
+     #8 0x56485ddee24d in nc_sendv_compat net/net.c:707
+     #9 0x56485ddee3dd in qemu_deliver_packet_iov net/net.c:734
+     #10 0x56485ddf422c in qemu_net_queue_deliver_iov net/queue.c:179
+     ...
+===
 
-> Couldn't that code path be called for normal data read miss (instead of
-> instruction miss), too?
-> 
+A full trace output can be seen
 
-I don't think so because we have access_type == ACCESS_CODE and
-the code in cpu_ppc_handle_mmu_fault explicitely split the CODE
-and DATA cases.
+   here  -> https://paste.fedoraproject.org/paste/gh~hDctqUQ8uVt6UdG~zbg
 
-> Anyway, could we please use MMU_INST_FETCH instead of magic values like
-> 2 here?
+I tried to debug how the 'so' and 'slirp' objects are connected and why it's 
+leading to a UAF issue, but couldn't quite fix it.
 
-I agree it's not nice to have a magic value like this.. But it's
-used all over the code there and david took the patch.
+Could you please help with an appropriate patch for this one?
 
-So I suggest I send a second patch to fix all the instances of
-that magic value.
-
-Fred
-
-> 
->   Thomas
-> 
-> 
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
