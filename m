@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddJ4U-0005cu-Qt
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddJ4V-0005dl-Vt
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddJ4U-00043G-08
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddJ4V-00044k-8C
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:04 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  3 Aug 2017 11:33:49 -0500
-Message-Id: <20170803163353.19558-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 for-2.10 0/4] improved --version/--help
- tweaks
+Date: Thu,  3 Aug 2017 11:33:51 -0500
+Message-Id: <20170803163353.19558-3-eblake@redhat.com>
+In-Reply-To: <20170803163353.19558-1-eblake@redhat.com>
+References: <20170803163353.19558-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/4] qemu-io: Give more --version information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +22,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, berrange@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org
 
-Not sure if this should go through Kevin's block tree, Paolo's
-miscellaneous patches, or if I should just do a pull request
-myself (since patch 4 includes a change to qemu-nbd)
+Include the package version information (useful for detecting
+builds from git or downstream backports), and the copyright notice.
 
-since v2: add R-b on 2-4; also sort 'qemu-img --help' create text
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qemu-io.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-001/4:[0012] [FC] 'qemu-img: Sort sub-command names in --help'
-002/4:[----] [--] 'qemu-io: Give more --version information'
-003/4:[----] [--] 'qga: Give more --version information'
-004/4:[----] [--] 'maint: Include bug-reporting info in --help output'
+diff --git a/qemu-io.c b/qemu-io.c
+index 4cfa41c8f9..ec175630a6 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -26,6 +26,7 @@
+ #include "block/block_int.h"
+ #include "trace/control.h"
+ #include "crypto/init.h"
++#include "qemu-version.h"
 
-Eric Blake (4):
-  qemu-img: Sort sub-command names in --help
-  qemu-io: Give more --version information
-  qga: Give more --version information
-  maint: Include bug-reporting info in --help output
+ #define CMD_NOFILE_OK   0x01
 
- include/qemu-common.h |  5 +++++
- vl.c                  |  4 +++-
- bsd-user/main.c       |  2 ++
- linux-user/main.c     |  4 +++-
- qemu-img.c            |  2 +-
- qemu-io.c             |  9 ++++++---
- qemu-nbd.c            |  2 +-
- qga/main.c            |  8 +++++---
- qemu-img-cmds.hx      | 21 ++++++++++++---------
- 9 files changed, 38 insertions(+), 19 deletions(-)
-
---=20
+@@ -522,7 +523,8 @@ int main(int argc, char **argv)
+             trace_file = trace_opt_parse(optarg);
+             break;
+         case 'V':
+-            printf("%s version %s\n", progname, QEMU_VERSION);
++            printf("%s version " QEMU_VERSION QEMU_PKGVERSION "\n"
++                   QEMU_COPYRIGHT "\n", progname);
+             exit(0);
+         case 'h':
+             usage(progname);
+-- 
 2.13.3
