@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ddItl-0008Fx-OM
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:22:58 -0400
+	(envelope-from <jcody@redhat.com>) id 1ddIvP-0001A1-4V
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:24:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ddItk-0006Mt-ME
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:22:57 -0400
-Date: Thu, 3 Aug 2017 12:22:47 -0400
+	(envelope-from <jcody@redhat.com>) id 1ddIvN-0000JT-Mn
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:24:39 -0400
+Date: Thu, 3 Aug 2017 12:24:29 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170803162247.GF22129@localhost.localdomain>
+Message-ID: <20170803162429.GG22129@localhost.localdomain>
 References: <20170803150301.10177-1-kwolf@redhat.com>
-	<20170803150301.10177-3-kwolf@redhat.com>
+	<20170803150301.10177-4-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170803150301.10177-3-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 2/5] block: Allow
- reopen rw without BDRV_O_ALLOW_RDWR
+In-Reply-To: <20170803150301.10177-4-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 3/5] block: Set
+ BDRV_O_ALLOW_RDWR during rw reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +27,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Aug 03, 2017 at 05:02:58PM +0200, Kevin Wolf wrote:
-> BDRV_O_ALLOW_RDWR is a flag that tells whether qemu can internally
-> reopen a node read-write temporarily because the user requested
-> read-write for the top-level image, but qemu decided that read-only is
-> enough for this node (a backing file).
-> 
-> bdrv_reopen() is different, it is also used for cases where the user
-> changed their mind and wants to update the options. There is no reason
-> to forbid making a node read-write in that case.
+On Thu, Aug 03, 2017 at 05:02:59PM +0200, Kevin Wolf wrote:
+> Reopening an image should be consistent with opening it, so we should
+> set BDRV_O_ALLOW_RDWR for any image that is reopened read-write like in
+> bdrv_open_inherit().
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  include/block/block.h |  3 ++-
->  block.c               | 11 +++++++----
->  2 files changed, 9 insertions(+), 5 deletions(-)
+>  block.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 34770bb33a..ab80195378 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -436,7 +436,8 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
->  
->  bool bdrv_is_read_only(BlockDriverState *bs);
->  bool bdrv_is_writable(BlockDriverState *bs);
-> -int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
-> +int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-> +                           bool ignore_allow_rdw, Error **errp);
->  int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
->  bool bdrv_is_sg(BlockDriverState *bs);
->  bool bdrv_is_inserted(BlockDriverState *bs);
 > diff --git a/block.c b/block.c
-> index ab908cdc50..2711c3dd3b 100644
+> index 2711c3dd3b..3615a6809e 100644
 > --- a/block.c
 > +++ b/block.c
-> @@ -246,7 +246,8 @@ bool bdrv_is_writable(BlockDriverState *bs)
->      return !bdrv_is_read_only(bs) && !(bs->open_flags & BDRV_O_INACTIVE);
->  }
+> @@ -2729,8 +2729,11 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+>      bdrv_join_options(bs, options, old_options);
+>      QDECREF(old_options);
 >  
-> -int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
-> +int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-> +                           bool ignore_allow_rdw, Error **errp)
-
-I think 'override_allow_rdw' may be a bit clearer, but that is just
-bikeshedding.
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-
->  {
->      /* Do not set read_only if copy_on_read is enabled */
->      if (bs->copy_on_read && read_only) {
-> @@ -256,7 +257,9 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->      }
+> -    /* bdrv_open() masks this flag out */
+> +    /* bdrv_open_inherit() sets and clears some additional flags internally */
+>      flags &= ~BDRV_O_PROTOCOL;
+> +    if (flags & BDRV_O_RDWR) {
+> +        flags |= BDRV_O_ALLOW_RDWR;
+> +    }
 >  
->      /* Do not clear read_only if it is prohibited */
-> -    if (!read_only && !(bs->open_flags & BDRV_O_ALLOW_RDWR)) {
-> +    if (!read_only && !(bs->open_flags & BDRV_O_ALLOW_RDWR) &&
-> +        !ignore_allow_rdw)
-> +    {
->          error_setg(errp, "Node '%s' is read only",
->                     bdrv_get_device_or_node_name(bs));
->          return -EPERM;
-> @@ -269,7 +272,7 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->  {
->      int ret = 0;
->  
-> -    ret = bdrv_can_set_read_only(bs, read_only, errp);
-> +    ret = bdrv_can_set_read_only(bs, read_only, false, errp);
->      if (ret < 0) {
->          return ret;
->      }
-> @@ -2907,7 +2910,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
->       * to r/w. Attempting to set to r/w may fail if either BDRV_O_ALLOW_RDWR is
->       * not set, or if the BDS still has copy_on_read enabled */
->      read_only = !(reopen_state->flags & BDRV_O_RDWR);
-> -    ret = bdrv_can_set_read_only(reopen_state->bs, read_only, &local_err);
-> +    ret = bdrv_can_set_read_only(reopen_state->bs, read_only, true, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          goto error;
+>      QLIST_FOREACH(child, &bs->children, next) {
+>          QDict *new_child_options;
 > -- 
 > 2.13.3
 > 
 > 
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
