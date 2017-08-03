@@ -1,16 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ddKPU-0000Vf-08
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 13:59:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddKUS-0003uZ-Oi
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ddKPT-0004yd-2t
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 13:59:48 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu,  3 Aug 2017 14:59:37 -0300
-Message-Id: <20170803175937.22225-2-ehabkost@redhat.com>
-In-Reply-To: <20170803175937.22225-1-ehabkost@redhat.com>
-References: <20170803175937.22225-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] cpu: don't allow negative core id
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddKUO-0001lT-JW
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:04:56 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddKUO-0001km-CF
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:04:52 -0400
+Received: by mail-qk0-x244.google.com with SMTP id d145so2041058qkc.0
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 11:04:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170629010300.2848-1-f4bug@amsat.org>
+	<20170629010300.2848-7-f4bug@amsat.org>
+	<9a40c690-0b80-cd34-6129-849703b452e2@amsat.org>
+	<87a83reidf.fsf@linaro.org>
+	<748298c3-8616-05b7-d4f0-1287c625739a@amsat.org>
+	<cf883887-08ce-a8e1-bd98-cc1746e88790@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <32be245a-139e-ba83-19d7-dbca4b3f202a@amsat.org>
+Date: Thu, 3 Aug 2017 15:04:47 -0300
+MIME-Version: 1.0
+In-Reply-To: <cf883887-08ce-a8e1-bd98-cc1746e88790@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 6/8] tcg/tci: disable MTTCG if TCI is
+ enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,44 +40,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-stable@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, Jaroslaw Pelczar <j.pelczar@samsung.com>
 
-From: Laurent Vivier <lvivier@redhat.com>
+On 08/03/2017 02:56 PM, Richard Henderson wrote:
+> On 08/03/2017 10:40 AM, Philippe Mathieu-Daudé wrote:
+>> On 07/26/2017 05:02 AM, Alex Bennée wrote:
+>>>
+>>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>>>
+>>>> Hi Peter,
+>>>>
+>>>> I think this patch belongs to 2.10, as there is no time to fix TCI +
+>>>> MTTCG. Should I RESEND it alone with "for 2.10" subject?
+>>>>
+>>>> One other option might be disable TCI if MTTCG enabled, but there is
+>>>> no ./configure option for MTTCG while there is for TCI.
+>>>>
+>>>> Regards,
+>>>>
+>>>> Phil.
+>>>>
+>>>> On 06/28/2017 10:02 PM, Philippe Mathieu-Daudé wrote:
+>>>>> TCI + MTTCG cause strange errors...
+>>>>>
+>>>>>      $ arm-softmmu/qemu-system-arm -machine raspi2 -cpu cortex-a7 -smp 4
+>>>>> -accel tcg,thread=multi -kernel kernel7.img
+>>>>>      qemu-system-arm: Guest expects a stronger memory ordering than the host
+>>>>> provides
+>>>>>      This may cause strange/hard to debug errors
+>>>>>      Segmentation fault (core dumped)
+>>>
+>>> So this isn't TCI enabling MTTCG by accident - this is the user forcing
+>>> it when it wouldn't otherwise be enabled. Hence the scary warning...
+>>
+>> Hmmm this is the user enabling TCI, I'm not sure about "forcing it".
+>> Now MTTCG is enforced by the ./configure and there is no option to disable it.
+> 
+> Er, no.
+> 
+> If you write "-accel tcg" you are not forcing mttcg on.
+> If you write "-accel tcg,thread=multi" you are forcing it on.
 
-With pseries machine type a negative core-id is not managed properly:
--1 gives an inaccurate error message ("core -1 already populated"),
--2 crashes QEMU (core dump)
+Ok! I obviously missed this part.
 
-As it seems a negative value is invalid for any architecture,
-instead of checking this in spapr_core_pre_plug() I think it's better
-to check this in the generic part, core_prop_set_core_id()
+> If you write "-accel tcg,thread=single" you are forcing it off.
+> 
+> MTTCG is only enabled by default if TCG_TARGET_DEFAULT_MO is defined, and in
+> the case of TCI, it is not.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170802103259.25940-1-lvivier@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/cpu/core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Ok, so I misunderstood Alex :) I thought about ./configure enabled while 
+he was describing -accel enabled.
 
-diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-index 2bf960d..bd578ab 100644
---- a/hw/cpu/core.c
-+++ b/hw/cpu/core.c
-@@ -33,6 +33,11 @@ static void core_prop_set_core_id(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
-+    if (value < 0) {
-+        error_setg(errp, "Invalid core id %"PRId64, value);
-+        return;
-+    }
-+
-     core->core_id = value;
- }
- 
--- 
-2.9.4
+Thanks for pointing that out :)
+
+> 
+> 
+> r~
+> 
