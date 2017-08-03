@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ddL0j-0000XA-PK
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:38:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddLIk-0007cE-Hb
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ddL0h-0003f4-4X
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:38:17 -0400
-Received: from 1.mo7.mail-out.ovh.net ([178.33.45.51]:46046)
+	(envelope-from <eblake@redhat.com>) id 1ddLIh-0002ju-8N
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:56:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ddL0g-0003dM-U8
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:38:15 -0400
-Received: from player788.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id D54DC65CAD
-	for <qemu-devel@nongnu.org>; Thu,  3 Aug 2017 20:38:12 +0200 (CEST)
-Date: Thu, 3 Aug 2017 20:38:05 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170803203805.141d0708@bahia.lan>
-In-Reply-To: <5065c286-ad67-697e-bc02-84d66ad0682d@amsat.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddLIh-0002hP-0D
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:56:51 -0400
 References: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
 	<dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
 	<48882fff-563a-52cc-c215-12f0808857cd@redhat.com>
 	<5065c286-ad67-697e-bc02-84d66ad0682d@amsat.org>
+	<20170803203805.141d0708@bahia.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e11535cd-242f-bfc2-d854-af3cc9044665@redhat.com>
+Date: Thu, 3 Aug 2017 13:56:45 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/tbSQyWfHzovjlt1mKf8unEL";
-	protocol="application/pgp-signature"
+In-Reply-To: <20170803203805.141d0708@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KrAVHha6TIJcG0Mc5FgENAtbXi0Ufe4bQ"
 Subject: Re: [Qemu-devel] [PATCH] kvm: workaround build break on gcc-7.1.1 /
  fedora26
 List-Id: <qemu-devel.nongnu.org>
@@ -34,114 +32,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
---Sig_/tbSQyWfHzovjlt1mKf8unEL
-Content-Type: text/plain; charset=UTF-8
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KrAVHha6TIJcG0Mc5FgENAtbXi0Ufe4bQ
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>
+Message-ID: <e11535cd-242f-bfc2-d854-af3cc9044665@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] kvm: workaround build break on gcc-7.1.1 /
+ fedora26
+References: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
+ <dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
+ <48882fff-563a-52cc-c215-12f0808857cd@redhat.com>
+ <5065c286-ad67-697e-bc02-84d66ad0682d@amsat.org>
+ <20170803203805.141d0708@bahia.lan>
+In-Reply-To: <20170803203805.141d0708@bahia.lan>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 3 Aug 2017 11:07:13 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-
-> On 08/03/2017 10:55 AM, Eric Blake wrote:
-> > On 08/03/2017 08:34 AM, Philippe Mathieu-Daud=C3=A9 wrote: =20
-> >> Hi Greg,
-> >>
-> >> On 08/02/2017 11:47 AM, Greg Kurz wrote: =20
-> >>> Building QEMU on fedora26 with the latest gcc package fails:
-> >>>
-> >>>     CC      ppc64-softmmu/target/ppc/kvm.o
-> >>> In file included from include/sysemu/hw_accel.h:16:0,
-> >>>                    from target/ppc/kvm.c:31:
-> >>> target/ppc/kvm.c: In function =E2=80=98kvmppc_booke_watchdog_enable=
-=E2=80=99:
-> >>> include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may=
- be used
-> >>> uninitialized =20
-> >  =20
-> >>
-> >> This sizeof() use looks unnatural to me. I wonder why not use size_t,
-> >> since this is about sizeof()/ARRAY_SIZE(). The problem seems to come
-> >> from the commit this cast was introduced (61c7bbd236):
-> >>
-> >> target-ppc/kvm.c:1302:21: error: comparison of unsigned expression < 0
-> >> is always false [-Werror=3Dtype-limits]
-> >>
-> >> So I'd rather suggest this code, which looks more natural to read to m=
-e:
-> >>
-> >>      if (ARRAY_SIZE(args_tmp)) {
-> >>          for (i =3D 0; i < ARRAY_SIZE(args_tmp) && ... =20
+On 08/03/2017 01:38 PM, Greg Kurz wrote:
+> The following code snippet spits a warning with gcc-7.1.1-3.fc26 and -W=
+all on
+> ppc64le AND x86_64:
 >=20
-> Oops I forgot to suggest size_t i.
+> int foo(void)
+> {
+>     char empty_array[] =3D { };
+>     int i, ret =3D 0;
 >=20
-> >=20
-> > For that matter, the existing code is doing:
-> >=20
-> > int i;
-> > i < (int)ARRAY_SIZE(args_tmp)
-> >=20
-> > but wouldn't that be better as:
-> >=20
-> > size_t i;
-> > i < ARRAY_SIZE(args_temp)
-> >=20
-> > I guess we have both the old compilers (per commit 61c7bbd2) and the new
-> > to worry about; although I was unable to reproduce it on Fedora 26 on
-> > x86_64 (is this an architecture-dependent compiler bug?)
-> >  =20
+>     for (i =3D 0; i < (int) (sizeof(empty_array) / sizeof(empty_array[0=
+])); i++) {
+>         ret =3D empty_array[i];
+>     }
 >=20
+>     return ret;
+> }
 
-The following code snippet spits a warning with gcc-7.1.1-3.fc26 and -Wall =
-on
-ppc64le AND x86_64:
+Confirmed.  No idea why the cast makes gcc think i is uninitialized.
 
-int foo(void)
-{
-    char empty_array[] =3D { };
-    int i, ret =3D 0;
+>=20
+> If I drop the (int), the warning goes away... and so does the build bre=
+ak
+> of qemu-system-ppc64 on my ppc64le host.
+>=20
+> I don't have 4.7.1 or 4.6 compilers around but I could check 4.8.5
+> is okay with that change FWIW.
 
-    for (i =3D 0; i < (int) (sizeof(empty_array) / sizeof(empty_array[0]));=
- i++) {
-        ret =3D empty_array[i];
-    }
+I tested with gcc 4.4.7 on RHEL 6, but -Wtype-limits there didn't warn
+whether or not the (int) was present; it's possible that we still need
+to test with 4.6 or 4.7.1 to see whether it makes a difference.
 
-    return ret;
-}
-
-If I drop the (int), the warning goes away... and so does the build break
-of qemu-system-ppc64 on my ppc64le host.
-
-I don't have 4.7.1 or 4.6 compilers around but I could check 4.8.5
-is okay with that change FWIW.
-
-> Ok so let's stop losing time about compiler incoherent warnings, using=20
-> -Wno-type-limits for GCC < 5...
-> So we can keep a sane/understandable codebase, using size_t and no (int)=
+>=20
+>> Ok so let's stop losing time about compiler incoherent warnings, using=
 =20
-> cast.
+>> -Wno-type-limits for GCC < 5...
+>> So we can keep a sane/understandable codebase, using size_t and no (in=
+t)=20
+>> cast.
+
+That's also a possibility, if we still hit old compilers that require
+the (int).
+
+>>
 >=20
+> If I also convert 'int i' to 'size_t i' then I get the same error as
+> in commit 61c7bbd2:
+>=20
+> error: comparison of unsigned expression < 0 is always
+>  false [-Werror=3Dtype-limits]
 
-If I also convert 'int i' to 'size_t i' then I get the same error as
-in commit 61c7bbd2:
+Confirmed with newer gcc, whether or not the (int) cast is present.
 
-error: comparison of unsigned expression < 0 is always
- false [-Werror=3Dtype-limits]
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> Phil.
 
-
---Sig_/tbSQyWfHzovjlt1mKf8unEL
-Content-Type: application/pgp-signature
+--KrAVHha6TIJcG0Mc5FgENAtbXi0Ufe4bQ
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAlmDbY0ACgkQAvw66wEB28KzuQCfTXSOyHyA+2D+h/o/DaTGhPB4
-bpgAnAuxx+6eBSQrhHzBz4aAMWwnPR2b
-=dDY0
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDce0ACgkQp6FrSiUn
+Q2oW4Qf/WqD8029ZlF0ySuL4CnDyEUsVdFYSxKjVRSH1PsBUnmRvszsQeD+bvkNe
+8h5lkT4Y2B9kh9DARVLDF6K9sPzqtutvVk/i1NDDVnTp9LegJy2pa0THwBKzJlLM
+j3XpUNCadApv/obKJiupNeNdWRLnsPCB6NhKg6glhl0f5Gg+jYs6hazfS2+QDZOQ
+xbtJ3i87PylSvwXXq/khJ/2XzxKO/T152J/C7XfPw8C4P3teKDnyAJQz36UXSa6k
+D+laDlgX+q4An/YQSeAgXSCMJi9NRdIndxJpTfS3XlhehlPcSWHSmo8HAXOj7tdu
+iaujFVbBTlDagYuE0JdSCT4AXdMC+A==
+=gBh8
 -----END PGP SIGNATURE-----
 
---Sig_/tbSQyWfHzovjlt1mKf8unEL--
+--KrAVHha6TIJcG0Mc5FgENAtbXi0Ufe4bQ--
