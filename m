@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddJ4V-0005dF-D6
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddJ4Y-0005hK-40
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddJ4U-00043o-CC
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddJ4X-00047E-5g
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  3 Aug 2017 11:33:50 -0500
-Message-Id: <20170803163353.19558-2-eblake@redhat.com>
+Date: Thu,  3 Aug 2017 11:33:52 -0500
+Message-Id: <20170803163353.19558-4-eblake@redhat.com>
 In-Reply-To: <20170803163353.19558-1-eblake@redhat.com>
 References: <20170803163353.19558-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] qemu-img: Sort sub-command names in
- --help
+Subject: [Qemu-devel] [PATCH v3 3/4] qga: Give more --version information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,72 +20,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, berrange@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, berrange@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-'amend' and 'create' were not listed alphabetically; hoist them
-earlier.  Separate the @end table block to make it easier to
-copy-and-paste the addition of future sub-commands.
+Include the package version information (useful for detecting
+builds from git or downstream backports), and the copyright notice.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
-v3: also sort 'create' [Kevin]
----
- qemu-img-cmds.hx | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ qga/main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 3763f13625..e6ebdbfee4 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -9,6 +9,12 @@ STEXI
- @table @option
- ETEXI
-
-+DEF("amend", img_amend,
-+    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
-+STEXI
-+@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
-+ETEXI
-+
- DEF("bench", img_bench,
-     "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [-U] filename")
- STEXI
-@@ -21,12 +27,6 @@ STEXI
- @item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
- ETEXI
-
--DEF("create", img_create,
--    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
--STEXI
--@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
--ETEXI
--
- DEF("commit", img_commit,
-     "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
- STEXI
-@@ -45,6 +45,12 @@ STEXI
- @item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
- ETEXI
-
-+DEF("create", img_create,
-+    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
-+STEXI
-+@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
-+ETEXI
-+
- DEF("dd", img_dd,
-     "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
- STEXI
-@@ -87,9 +93,6 @@ STEXI
- @item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
- ETEXI
-
--DEF("amend", img_amend,
--    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
- STEXI
--@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
- @end table
- ETEXI
+diff --git a/qga/main.c b/qga/main.c
+index 1b381d0bf3..b64c7ac2a2 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -29,6 +29,7 @@
+ #include "qemu/help_option.h"
+ #include "qemu/sockets.h"
+ #include "qemu/systemd.h"
++#include "qemu-version.h"
+ #ifdef _WIN32
+ #include "qga/service-win32.h"
+ #include "qga/vss-win32.h"
+@@ -213,7 +214,8 @@ static void usage(const char *cmd)
+ {
+     printf(
+ "Usage: %s [-m <method> -p <path>] [<options>]\n"
+-"QEMU Guest Agent %s\n"
++"QEMU Guest Agent " QEMU_VERSION QEMU_PKGVERSION "\n"
++QEMU_COPYRIGHT "\n"
+ "\n"
+ "  -m, --method      transport method: one of unix-listen, virtio-serial,\n"
+ "                    isa-serial, or vsock-listen (virtio-serial is the default)\n"
+@@ -248,7 +250,7 @@ static void usage(const char *cmd)
+ "  -h, --help        display this help and exit\n"
+ "\n"
+ "Report bugs to <mdroth@linux.vnet.ibm.com>\n"
+-    , cmd, QEMU_VERSION, QGA_VIRTIO_PATH_DEFAULT, QGA_SERIAL_PATH_DEFAULT,
++    , cmd, QGA_VIRTIO_PATH_DEFAULT, QGA_SERIAL_PATH_DEFAULT,
+     dfl_pathnames.pidfile,
+ #ifdef CONFIG_FSFREEZE
+     QGA_FSFREEZE_HOOK_DEFAULT,
 -- 
 2.13.3
