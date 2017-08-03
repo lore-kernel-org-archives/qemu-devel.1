@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddBRl-0005kp-Vj
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:25:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ddBfo-0000wM-EJ
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddBRg-0007al-Uv
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:25:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53636)
+	(envelope-from <kwolf@redhat.com>) id 1ddBfk-0002iY-De
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:40:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50660)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddBRg-0007Zi-Nx
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:25:28 -0400
-Date: Thu, 3 Aug 2017 10:25:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170803102522.4758f156@gondolin>
-In-Reply-To: <20170803003527.86979-1-bjsdjshi@linux.vnet.ibm.com>
-References: <20170803003527.86979-1-bjsdjshi@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ddBfk-0002fm-4c
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 04:40:00 -0400
+Date: Thu, 3 Aug 2017 10:39:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170803083956.GD4456@dhcp-200-186.str.redhat.com>
+References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
+	<20170730214231.GC16400@localhost.localdomain>
+	<CAOMFOmUwi+jF4w7ve4iV_rrPt2uAqZDe6PMZ0r0W047yjFi-gw@mail.gmail.com>
+	<f6024bcb-3dcb-609f-c2a7-3d425e738e33@twiddle.net>
+	<CAOMFOmVN74ghnqWGyfxHB_LqcSLC8XzRkrk88VXaPh4JRvYRNQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] ERC cleanup and CRW bugfix
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOMFOmVN74ghnqWGyfxHB_LqcSLC8XzRkrk88VXaPh4JRvYRNQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
+ for multiboot?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
+To: Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On Thu,  3 Aug 2017 02:35:25 +0200
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+Am 03.08.2017 um 00:00 hat Anatol Pomozov geschrieben:
+> Hello Richard
+> 
+> Thank you for this useful information. I still learning about ELF and
+> a lot of things are still unclear for me.
+> 
+> On Mon, Jul 31, 2017 at 11:20 AM, Richard Henderson <rth@twiddle.net> wrote:
+> > On 07/31/2017 10:21 AM, Anatol Pomozov wrote:
+> >> ELF sections info is needed for an OS to map address space properly.
+> >
+> > No, ELF *program header* info is needed for an OS to map the address space
+> > properly.  For example:
+> >
+> > $ readelf -hl vmlinux-4.9.0-3-5kc-malta
+> 
+> Thanks for this information about program headers. I reread elf_ops.h
+> and now I see that QEMU loads all PT_LOAD segments. I wonder why GRUB
+> bootloader loads also sections that are not in this segment (e.g. GRUB
+> loads content of .shstrtab into target's memory despite my elf does
+> not keep it in PT_LOAD segment).
 
-> This series is trying to:
-> 1. clear up ERC related code
-> 2. bugfix for channel path related CRW generation
-> 
-> Change log
-> ----------
-> v2->v3:
-> Added Halil's R-B on both patches.
-> Patch #1:
->   Added ERC "installed parameters restored".
-> 
-> v1->v2:
-> Patch #1:
->   Add all ERCs.
->   Commit message update.
-> Patch #2:
->   Rename the new added parameter to more speaking name -- solicited.
-> 
-> Dong Jia Shi (2):
->   s390x/css: use macro for event-information pending error recover code
->   s390x/css: generate solicited crw for rchp completion signaling
-> 
->  hw/s390x/css.c            | 16 ++++++++++------
->  include/hw/s390x/css.h    |  3 ++-
->  include/hw/s390x/ioinst.h | 12 ++++++++++--
->  3 files changed, 22 insertions(+), 9 deletions(-)
-> 
+Remember that what we're talking about isn't primarily an ELF loader,
+but a Multiboot loader. Multiboot can work without ELF (e.g. with flat
+binaries) if bit 16 in the Multiboot header flags is set and the
+additional header fields are correctly provided. However, if you are
+loading an ELF binary, then Multiboot specifies that the bootloader
+makes use of the ELF headers and you don't have to set bit 16 in the
+header.
 
-Thanks, applied.
+If ELF says that some things have to be loaded (and bit 16 is clear),
+then the bootloader will load them. If Multiboot says that additional
+things can or have to be loaded, it will load those, too. The section
+headers are only one example of additional data that Multiboot provides.
+It also loads additional modules, provides the e820 memory map, etc.,
+none of which are described by ELF.
+
+> What ELF specification says about it? Does it tell a loader to load
+> only PT_LOAD segments? In this case bootloaders should follow it as
+> well and current QEMU behavior is correct.
+
+The current behaviour of QEMU is correct because it doesn't set bit 5 in
+the flags field of the Multiboot info struct, i.e. it doesn't advertise
+that the section headers are available, so it doesn't have to provide
+it.
+
+It is also not feature complete, because a full Multiboot implementation
+would implement this and advertise bit 5. Adding the feature would be
+useful because there are guest kernels that can make use of it.
+
+> But multiboot expects section headers info and .shstrtab section to be
+> loaded to the target memory. I believe I need to modify my linker
+> script and add this information into the loadable segment.
+
+No. First of all, you don't even need this information to find the start
+and end of the kernel code. Second, if a Multiboot loader loads this, it
+doesn't have to be in a loadable segment. This is more like debug
+information, not like an inherent part of the program.
+
+> Here is my current linker script:
+> 
+> ======================
+> ENTRY(start)
+> 
+> SECTIONS {
+>     . = 1M;
+> 
+>     .text : {
+>         KEEP(*(.data.multiboot))
+>         *(.text .text*)
+>     }
+> 
+>     .rodata : {
+>         *(.rodata .rodata*)
+>     }
+> 
+>     .data : {
+>         *(.data .data.*)
+>     }
+> 
+>     .bss : {
+>         __bss_start = .;
+>         *(.bss .bss*)
+>         . = ALIGN(8);
+>         __bss_end = .;
+>     }
+> }
+> =======================
+> 
+> With my linker script only .text .rodata .data and .bss are included
+> into the loadable segment.
+> 
+> 
+> So my questions: how to tell the linker to include "section headers"
+> and ".shstrtab" section into loadable segment? Once it is done I can
+> try to modify QEMU to pass its addresses to the target.
+
+Requiring section headers to be contained in a loadable segment wouldn't
+be a correct implementation of the Multiboot feature.
+
+Kevin
