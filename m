@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddEk7-0003Is-Eh
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:56:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddElz-0004GH-7S
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddEk3-0004W8-UM
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:56:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddEk3-0004V2-L1
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:56:39 -0400
-Date: Thu, 3 Aug 2017 12:56:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170803115631.GH2076@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-27-git-send-email-peterx@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ddEly-0007pm-AZ
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:58:39 -0400
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+	<20170731095443.28211-6-el13635@mail.ntua.gr>
+	<20170803080741.GA4456@dhcp-200-186.str.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b3d8be9b-0811-09f8-11a5-fd92e884da46@redhat.com>
+Date: Thu, 3 Aug 2017 06:58:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-27-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 26/29] migration: synchronize dirty bitmap
- for resume
+In-Reply-To: <20170803080741.GA4456@dhcp-200-186.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2j8WERihCUCregau86Br5fb34L6Fp4td2"
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,217 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> This patch implements the first part of core RAM resume logic for
-> postcopy. ram_resume_prepare() is provided for the work.
-> 
-> When the migration is interrupted by network failure, the dirty bitmap
-> on the source side will be meaningless, because even the dirty bit is
-> cleared, it is still possible that the sent page was lost along the way
-> to destination. Here instead of continue the migration with the old
-> dirty bitmap on source, we ask the destination side to send back its
-> received bitmap, then invert it to be our initial dirty bitmap.
-> 
-> The source side send thread will issue the MIG_CMD_RECV_BITMAP requests,
-> once per ramblock, to ask for the received bitmap. On destination side,
-> MIG_RP_MSG_RECV_BITMAP will be issued, along with the requested bitmap.
-> Data will be received on the return-path thread of source, and the main
-> migration thread will be notified when all the ramblock bitmaps are
-> synchronized.
-> 
-> One issue to be solved here is how to synchronize the source send thread
-> and return-path thread. Semaphore cannot really work here since we
-> cannot guarantee the order of wait/post (it's possible that the reply is
-> very fast, even before send thread starts to wait). So conditional
-> variable is used to make sure the ordering is always correct.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c  |  4 +++
->  migration/migration.h  |  4 +++
->  migration/ram.c        | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  migration/trace-events |  1 +
->  4 files changed, 77 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 6cb0ad3..93fbc96 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1093,6 +1093,8 @@ static void migrate_fd_cleanup(void *opaque)
->  
->      qemu_sem_destroy(&s->postcopy_pause_sem);
->      qemu_sem_destroy(&s->postcopy_pause_rp_sem);
-> +    qemu_mutex_destroy(&s->resume_lock);
-> +    qemu_cond_destroy(&s->resume_cond);
->  }
->  
->  void migrate_fd_error(MigrationState *s, const Error *error)
-> @@ -1238,6 +1240,8 @@ MigrationState *migrate_init(void)
->      s->error = NULL;
->      qemu_sem_init(&s->postcopy_pause_sem, 0);
->      qemu_sem_init(&s->postcopy_pause_rp_sem, 0);
-> +    qemu_mutex_init(&s->resume_lock);
-> +    qemu_cond_init(&s->resume_cond);
->  
->      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
->  
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 2a3f905..c270f4c 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -159,6 +159,10 @@ struct MigrationState
->      /* Needed by postcopy-pause state */
->      QemuSemaphore postcopy_pause_sem;
->      QemuSemaphore postcopy_pause_rp_sem;
-> +
-> +    /* Used to sync-up between main send thread and rp-thread */
-> +    QemuMutex resume_lock;
-> +    QemuCond resume_cond;
->  };
->  
->  void migrate_set_state(int *state, int old_state, int new_state);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index d543483..c695b13 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -46,6 +46,7 @@
->  #include "exec/ram_addr.h"
->  #include "qemu/rcu_queue.h"
->  #include "migration/colo.h"
-> +#include "savevm.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -256,6 +257,8 @@ struct RAMState {
->      RAMBlock *last_req_rb;
->      /* Queue of outstanding page requests from the destination */
->      QemuMutex src_page_req_mutex;
-> +    /* Ramblock counts to sync dirty bitmap. Only used for recovery */
-> +    int ramblock_to_sync;
->      QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
->  };
->  typedef struct RAMState RAMState;
-> @@ -2731,6 +2734,57 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      return ret;
->  }
->  
-> +/* Sync all the dirty bitmap with destination VM.  */
-> +static int ram_dirty_bitmap_sync_all(MigrationState *s, RAMState *rs)
-> +{
-> +    RAMBlock *block;
-> +    QEMUFile *file = s->to_dst_file;
-> +    int ramblock_count = 0;
-> +
-> +    trace_ram_dirty_bitmap_sync("start");
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2j8WERihCUCregau86Br5fb34L6Fp4td2
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <b3d8be9b-0811-09f8-11a5-fd92e884da46@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
+ driver
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+ <20170731095443.28211-6-el13635@mail.ntua.gr>
+ <20170803080741.GA4456@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20170803080741.GA4456@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Most (but not all) of our trace_ uses have separate trace_ entries for
-each step; e.g.   trace_ram_dirty_bitmap_sync_start9)
+On 08/03/2017 03:07 AM, Kevin Wolf wrote:
+> Am 31.07.2017 um 11:54 hat Manos Pitsidianakis geschrieben:
+>> block/throttle.c uses existing I/O throttle infrastructure inside a
+>> block filter driver. I/O operations are intercepted in the filter's
+>> read/write coroutines, and referred to block/throttle-groups.c
+>>
+>> The driver can be used with the syntax
+>> -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
+>>         limits.iops-total=3D...,throttle-group=3Dbar
+>>
+>> The configuration flags and their semantics are identical to the
+>> hardcoded throttling ones.
+>>
+>> A node can be created referring to an existing group, and will overwri=
+te
+>> its limits if any are specified, otherwise they are retained.
+>>
+>> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>> ---
 
-> +    /*
-> +     * We need to take the resume lock to make sure that the send
-> +     * thread (current thread) and the rp-thread will do their work in
-> +     * order.
-> +     */
-> +    qemu_mutex_lock(&s->resume_lock);
-> +
-> +    /* Request for receive-bitmap for each block */
-> +    RAMBLOCK_FOREACH(block) {
-> +        ramblock_count++;
-> +        qemu_savevm_send_recv_bitmap(file, block->idstr);
-> +    }
-> +
-> +    /* Init the ramblock count to total */
-> +    atomic_set(&rs->ramblock_to_sync, ramblock_count);
-> +
-> +    trace_ram_dirty_bitmap_sync("wait-bitmap");
-> +
-> +    /* Wait until all the ramblocks' dirty bitmap synced */
-> +    while (rs->ramblock_to_sync) {
-> +        qemu_cond_wait(&s->resume_cond, &s->resume_lock);
-> +    }
+>> +
+>> +    .is_filter                          =3D   true,
+>> +};
+>=20
+> What about .bdrv_co_get_block_status?
 
-Does the locking here get simpler if you:
-  a) count the number of RAMBlocks 'n'
-  b) Initialise a sempahore to -(n-1)
-  c) Call qemu_savevm_send_recv_bitmap for each bitmap
-  d) sem_wait on the semaphore - which is waiting for the semaphore to
-     be >0
+And if so, do you want my byte-based block status to go in first?  (Our
+two series conflict, so we need to pick who needs to rebase on top of
+the other).
 
-as you receive each bitmap do a sem_post; on the last one
-it should go from 0->1 and the sem_wait should wake up?
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Dave
 
-> +    trace_ram_dirty_bitmap_sync("completed");
-> +
-> +    qemu_mutex_unlock(&s->resume_lock);
-> +
-> +    return 0;
-> +}
-> +
-> +static void ram_dirty_bitmap_reload_notify(MigrationState *s)
-> +{
-> +    qemu_mutex_lock(&s->resume_lock);
-> +    atomic_dec(&ram_state->ramblock_to_sync);
-> +    if (ram_state->ramblock_to_sync == 0) {
-> +        /* Make sure the other thread gets the latest */
-> +        trace_ram_dirty_bitmap_sync("notify-send");
-> +        qemu_cond_signal(&s->resume_cond);
-> +    }
-> +    qemu_mutex_unlock(&s->resume_lock);
-> +}
-> +
->  /*
->   * Read the received bitmap, revert it as the initial dirty bitmap.
->   * This is only used when the postcopy migration is paused but wants
-> @@ -2776,9 +2830,22 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
->  
->      trace_ram_dirty_bitmap_reload(block->idstr);
->  
-> +    /*
-> +     * We succeeded to sync bitmap for current ramblock. If this is
-> +     * the last one to sync, we need to notify the main send thread.
-> +     */
-> +    ram_dirty_bitmap_reload_notify(s);
-> +
->      return 0;
->  }
->  
-> +static int ram_resume_prepare(MigrationState *s, void *opaque)
-> +{
-> +    RAMState *rs = *(RAMState **)opaque;
-> +
-> +    return ram_dirty_bitmap_sync_all(s, rs);
-> +}
-> +
->  static SaveVMHandlers savevm_ram_handlers = {
->      .save_setup = ram_save_setup,
->      .save_live_iterate = ram_save_iterate,
-> @@ -2789,6 +2856,7 @@ static SaveVMHandlers savevm_ram_handlers = {
->      .save_cleanup = ram_save_cleanup,
->      .load_setup = ram_load_setup,
->      .load_cleanup = ram_load_cleanup,
-> +    .resume_prepare = ram_resume_prepare,
->  };
->  
->  void ram_mig_init(void)
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 0fb2d1e..15ff1bf 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -80,6 +80,7 @@ ram_postcopy_send_discard_bitmap(void) ""
->  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: %" PRIx64 " host: %p"
->  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
->  ram_dirty_bitmap_reload(char *str) "%s"
-> +ram_dirty_bitmap_sync(const char *str) "%s"
->  
->  # migration/migration.c
->  await_return_path_close_on_source_close(void) ""
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--2j8WERihCUCregau86Br5fb34L6Fp4td2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDD+YACgkQp6FrSiUn
+Q2qrOAgAlP7phZg/0KQHVG1GcpJ5cEv2iscHZyFTqf+i4oRnJGESujlziSbFp2LU
+MP+r4EzPQfZYq3toIaelqxXe1c+gOaRYpRWScyMoqHYCZCO8Urh8K7Es7V80OwQx
+7NiyI1pnDXCaoM+ig59Ij+j3gjZAkEb6ehX8HyuvS+qKQHaf4RvI/EM3l5V/AsNH
+pkIYElD270/mI0VUlU3y1LwGSoaU6aByuMfq67mWFAf9fzKzI/VxezqIlEzRGix4
+h6/hSXFwKcDL1iijx13F151hoZjQPlMyHx0z3rNNTODQAqLS7Uw8NRNzm8T0iE6C
+xqSkKcK+jgGnIgk6Lao/9DbAHqj47g==
+=5MFq
+-----END PGP SIGNATURE-----
+
+--2j8WERihCUCregau86Br5fb34L6Fp4td2--
