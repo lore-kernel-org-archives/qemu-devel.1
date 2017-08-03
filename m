@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddIVg-00035y-Ci
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:58:07 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddIXO-0004dL-Ql
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:59:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddIVe-0007rg-Gw
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:58:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddIVe-0007qD-6r
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:58:02 -0400
-Date: Thu, 3 Aug 2017 16:57:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170803155753.GD3673@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddIXN-0001i0-NM
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:59:50 -0400
+Date: Thu, 3 Aug 2017 17:59:41 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170803155941.GW4859@toto>
+References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
+	<1501692241-23310-16-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 00/29] Migration: postcopy failure recovery
+In-Reply-To: <1501692241-23310-16-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 15/15] nvic: Implement "user
+ accesses BusFault" SCS region behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,211 +24,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, berrange@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> As we all know that postcopy migration has a potential risk to lost
-> the VM if the network is broken during the migration. This series
-> tries to solve the problem by allowing the migration to pause at the
-> failure point, and do recovery after the link is reconnected.
+On Wed, Aug 02, 2017 at 05:44:01PM +0100, Peter Maydell wrote:
+> The ARMv7M architecture specifies that most of the addresses in the
+> PPB region (which includes the NVIC, systick and system registers)
+> are not accessible to unprivileged accesses, which should
+> BusFault with a few exceptions:
+>  * the STIR is configurably user-accessible
+>  * the ITM (which we don't implement at all) is always
+>    user-accessible
 > 
-> There was existing work on this issue from Md Haris Iqbal:
+> Implement this by switching the register access functions
+> to the _with_attrs scheme that lets us distinguish user
+> mode accesses.
 > 
-> https://lists.nongnu.org/archive/html/qemu-devel/2016-08/msg03468.html
+> This allows us to pull the handling of the CCR.USERSETMPEND
+> flag up to the level where we can make it generate a BusFault
+> as it should for non-permitted accesses.
 > 
-> This series is a totally re-work of the issue, based on Alexey
-> Perevalov's recved bitmap v8 series:
+> Note that until the core ARM CPU code implements turning
+> MEMTX_ERROR into a BusFault the registers will continue to
+> act as RAZ/WI to user accesses.
 > 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06401.html
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-
-Hi Peter,
-  See my comments on the individual patches; but at a top level I think
-it looks pretty good.
-
-  I still worry about two related things, one I see is similar to what
-you discussed with Dan.
-
-  1) Is what happens if we end up hanging on a missing page with the bql
-  taken and can't use the monitor.
-  Checking my notes from when I was chatting to Harris last year,
-    'info cpu' was pretty good at doing this because it needed the vcpus
-  to come out of their loops, so if any vcpu was blocked on memory we'd
-  block waiting.  The other case is where an emulated IO device accesses
-  it, and that's easiest by doing a migrate with inbound network
-  traffic.
-  In this case, will your 'accept' still work?
-
-  2) Similar to Dan's question of what happens if the network just hangs
-  as opposed to gives an error;  it should eventually sort itself out
-  with TCP timeouts - eventually.  Perhaps the easiest way to test this
-  is just to add a iptables -j DROP  for the migration port - it's
-  probably easier to trigger (1).
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
-  Solving (1) is tricky - I'm not sure that it needs solving for a first
-attempt as long as we have some ideas.
-
-Dave
-
-> Two new status are added to support the migration (used on both
-> sides):
+> ---
+>  hw/intc/armv7m_nvic.c | 58 ++++++++++++++++++++++++++++++++++++---------------
+>  1 file changed, 41 insertions(+), 17 deletions(-)
 > 
->   MIGRATION_STATUS_POSTCOPY_PAUSED
->   MIGRATION_STATUS_POSTCOPY_RECOVER
-> 
-> The MIGRATION_STATUS_POSTCOPY_PAUSED state will be set when the
-> network failure is detected. It is a phase that we'll be in for a long
-> time as long as the failure is detected, and we'll be there until a
-> recovery is triggered.  In this state, all the threads (on source:
-> send thread, return-path thread; destination: ram-load thread,
-> page-fault thread) will be halted.
-> 
-> The MIGRATION_STATUS_POSTCOPY_RECOVER state is short. If we triggered
-> a recovery, both source/destination VM will jump into this stage, do
-> whatever it needs to prepare the recovery (e.g., currently the most
-> important thing is to synchronize the dirty bitmap, please see commit
-> messages for more information). After the preparation is ready, the
-> source will do the final handshake with destination, then both sides
-> will switch back to MIGRATION_STATUS_POSTCOPY_ACTIVE again.
-> 
-> New commands/messages are defined as well to satisfy the need:
-> 
-> MIG_CMD_RECV_BITMAP & MIG_RP_MSG_RECV_BITMAP are introduced for
-> delivering received bitmaps
-> 
-> MIG_CMD_RESUME & MIG_RP_MSG_RESUME_ACK are introduced to do the final
-> handshake of postcopy recovery.
-> 
-> Here's some more details on how the whole failure/recovery routine is
-> happened:
-> 
-> - start migration
-> - ... (switch from precopy to postcopy)
-> - both sides are in "postcopy-active" state
-> - ... (failure happened, e.g., network unplugged)
-> - both sides switch to "postcopy-paused" state
->   - all the migration threads are stopped on both sides
-> - ... (both VMs hanged)
-> - ... (user triggers recovery using "migrate -r -d tcp:HOST:PORT" on
->   source side, "-r" means "recover")
-> - both sides switch to "postcopy-recover" state
->   - on source: send-thread, return-path-thread will be waked up
->   - on dest: ram-load-thread waked up, fault-thread still paused
-> - source calls new savevmhandler hook resume_prepare() (currently,
->   only ram is providing the hook):
->   - ram_resume_prepare(): for each ramblock, fetch recved bitmap by:
->     - src sends MIG_CMD_RECV_BITMAP to dst
->     - dst replies MIG_RP_MSG_RECV_BITMAP to src, with bitmap data
->       - src uses the recved bitmap to rebuild dirty bitmap
-> - source do final handshake with destination
->   - src sends MIG_CMD_RESUME to dst, telling "src is ready"
->     - when dst receives the command, fault thread will be waked up,
->       meanwhile, dst switch back to "postcopy-active"
->   - dst sends MIG_RP_MSG_RESUME_ACK to src, telling "dst is ready"
->     - when src receives the ack, state switch to "postcopy-active"
-> - postcopy migration continued
-> 
-> Testing:
-> 
-> As I said, it's still an extremely simple test. I used socat to create
-> a socket bridge:
-> 
->   socat tcp-listen:6666 tcp-connect:localhost:5555 &
-> 
-> Then do the migration via the bridge. I emulated the network failure
-> by killing the socat process (bridge down), then tries to recover the
-> migration using the other channel (default dst channel). It looks
-> like:
-> 
->         port:6666    +------------------+
->         +----------> | socat bridge [1] |-------+
->         |            +------------------+       |
->         |         (Original channel)            |
->         |                                       | port: 5555
->      +---------+  (Recovery channel)            +--->+---------+
->      | src VM  |------------------------------------>| dst VM  |
->      +---------+                                     +---------+
-> 
-> Known issues/notes:
-> 
-> - currently destination listening port still cannot change. E.g., the
->   recovery should be using the same port on destination for
->   simplicity. (on source, we can specify new URL)
-> 
-> - the patch: "migration: let dst listen on port always" is still
->   hacky, it just kept the incoming accept open forever for now...
-> 
-> - some migration numbers might still be inaccurate, like total
->   migration time, etc. (But I don't really think that matters much
->   now)
-> 
-> - the patches are very lightly tested.
-> 
-> - Dave reported one problem that may hang destination main loop thread
->   (one vcpu thread holds the BQL) and the rest. I haven't encountered
->   it yet, but it does not mean this series can survive with it.
-> 
-> - other potential issues that I may have forgotten or unnoticed...
-> 
-> Anyway, the work is still in preliminary stage. Any suggestions and
-> comments are greatly welcomed.  Thanks.
-> 
-> Peter Xu (29):
->   migration: fix incorrect postcopy recved_bitmap
->   migration: fix comment disorder in RAMState
->   io: fix qio_channel_socket_accept err handling
->   bitmap: introduce bitmap_invert()
->   bitmap: introduce bitmap_count_one()
->   migration: dump str in migrate_set_state trace
->   migration: better error handling with QEMUFile
->   migration: reuse mis->userfault_quit_fd
->   migration: provide postcopy_fault_thread_notify()
->   migration: new property "x-postcopy-fast"
->   migration: new postcopy-pause state
->   migration: allow dst vm pause on postcopy
->   migration: allow src return path to pause
->   migration: allow send_rq to fail
->   migration: allow fault thread to pause
->   qmp: hmp: add migrate "resume" option
->   migration: rebuild channel on source
->   migration: new state "postcopy-recover"
->   migration: let dst listen on port always
->   migration: wakeup dst ram-load-thread for recover
->   migration: new cmd MIG_CMD_RECV_BITMAP
->   migration: new message MIG_RP_MSG_RECV_BITMAP
->   migration: new cmd MIG_CMD_POSTCOPY_RESUME
->   migration: new message MIG_RP_MSG_RESUME_ACK
->   migration: introduce SaveVMHandlers.resume_prepare
->   migration: synchronize dirty bitmap for resume
->   migration: setup ramstate for resume
->   migration: final handshake for the resume
->   migration: reset migrate thread vars when resumed
-> 
->  hmp-commands.hx              |   7 +-
->  hmp.c                        |   4 +-
->  include/migration/register.h |   2 +
->  include/qemu/bitmap.h        |  20 ++
->  io/channel-socket.c          |   1 +
->  migration/exec.c             |   2 +-
->  migration/fd.c               |   2 +-
->  migration/migration.c        | 465 ++++++++++++++++++++++++++++++++++++++++---
->  migration/migration.h        |  25 ++-
->  migration/postcopy-ram.c     | 109 +++++++---
->  migration/postcopy-ram.h     |   2 +
->  migration/ram.c              | 209 ++++++++++++++++++-
->  migration/ram.h              |   4 +
->  migration/savevm.c           | 189 +++++++++++++++++-
->  migration/savevm.h           |   3 +
->  migration/socket.c           |   4 +-
->  migration/trace-events       |  16 +-
->  qapi-schema.json             |  12 +-
->  util/bitmap.c                |  28 +++
->  19 files changed, 1024 insertions(+), 80 deletions(-)
-> 
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index 5a18025..bbfe2d5 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -733,11 +733,8 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>      }
+>      case 0xf00: /* Software Triggered Interrupt Register */
+>      {
+> -        /* user mode can only write to STIR if CCR.USERSETMPEND permits it */
+>          int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
+> -        if (excnum < s->num_irq &&
+> -            (arm_current_el(&cpu->env) ||
+> -             (cpu->env.v7m.ccr & R_V7M_CCR_USERSETMPEND_MASK))) {
+> +        if (excnum < s->num_irq) {
+>              armv7m_nvic_set_pending(s, excnum);
+>          }
+>          break;
+> @@ -748,14 +745,32 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>      }
+>  }
+>  
+> -static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
+> -                                 unsigned size)
+> +static bool nvic_user_access_ok(NVICState *s, hwaddr offset)
+> +{
+> +    /* Return true if unprivileged access to this register is permitted. */
+> +    switch (offset) {
+> +    case 0xf00: /* STIR: accessible only if CCR.USERSETMPEND permits */
+> +        return s->cpu->env.v7m.ccr & R_V7M_CCR_USERSETMPEND_MASK;
+> +    default:
+> +        /* All other user accesses cause a BusFault unconditionally */
+> +        return false;
+> +    }
+> +}
+> +
+> +static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+> +                                    uint64_t *data, unsigned size,
+> +                                    MemTxAttrs attrs)
+>  {
+>      NVICState *s = (NVICState *)opaque;
+>      uint32_t offset = addr;
+>      unsigned i, startvec, end;
+>      uint32_t val;
+>  
+> +    if (attrs.user && !nvic_user_access_ok(s, addr)) {
+> +        /* Generate BusFault for unprivileged accesses */
+> +        return MEMTX_ERROR;
+> +    }
+> +
+>      switch (offset) {
+>      /* reads of set and clear both return the status */
+>      case 0x100 ... 0x13f: /* NVIC Set enable */
+> @@ -826,11 +841,13 @@ static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
+>      }
+>  
+>      trace_nvic_sysreg_read(addr, val, size);
+> -    return val;
+> +    *data = val;
+> +    return MEMTX_OK;
+>  }
+>  
+> -static void nvic_sysreg_write(void *opaque, hwaddr addr,
+> -                              uint64_t value, unsigned size)
+> +static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
+> +                                     uint64_t value, unsigned size,
+> +                                     MemTxAttrs attrs)
+>  {
+>      NVICState *s = (NVICState *)opaque;
+>      uint32_t offset = addr;
+> @@ -839,6 +856,11 @@ static void nvic_sysreg_write(void *opaque, hwaddr addr,
+>  
+>      trace_nvic_sysreg_write(addr, value, size);
+>  
+> +    if (attrs.user && !nvic_user_access_ok(s, addr)) {
+> +        /* Generate BusFault for unprivileged accesses */
+> +        return MEMTX_ERROR;
+> +    }
+> +
+>      switch (offset) {
+>      case 0x100 ... 0x13f: /* NVIC Set enable */
+>          offset += 0x80;
+> @@ -853,7 +875,7 @@ static void nvic_sysreg_write(void *opaque, hwaddr addr,
+>              }
+>          }
+>          nvic_irq_update(s);
+> -        return;
+> +        return MEMTX_OK;
+>      case 0x200 ... 0x23f: /* NVIC Set pend */
+>          /* the special logic in armv7m_nvic_set_pending()
+>           * is not needed since IRQs are never escalated
+> @@ -870,9 +892,9 @@ static void nvic_sysreg_write(void *opaque, hwaddr addr,
+>              }
+>          }
+>          nvic_irq_update(s);
+> -        return;
+> +        return MEMTX_OK;
+>      case 0x300 ... 0x33f: /* NVIC Active */
+> -        return; /* R/O */
+> +        return MEMTX_OK; /* R/O */
+>      case 0x400 ... 0x5ef: /* NVIC Priority */
+>          startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
+>  
+> @@ -880,26 +902,28 @@ static void nvic_sysreg_write(void *opaque, hwaddr addr,
+>              set_prio(s, startvec + i, (value >> (i * 8)) & 0xff);
+>          }
+>          nvic_irq_update(s);
+> -        return;
+> +        return MEMTX_OK;
+>      case 0xd18 ... 0xd23: /* System Handler Priority.  */
+>          for (i = 0; i < size; i++) {
+>              unsigned hdlidx = (offset - 0xd14) + i;
+>              set_prio(s, hdlidx, (value >> (i * 8)) & 0xff);
+>          }
+>          nvic_irq_update(s);
+> -        return;
+> +        return MEMTX_OK;
+>      }
+>      if (size == 4) {
+>          nvic_writel(s, offset, value);
+> -        return;
+> +        return MEMTX_OK;
+>      }
+>      qemu_log_mask(LOG_GUEST_ERROR,
+>                    "NVIC: Bad write of size %d at offset 0x%x\n", size, offset);
+> +    /* This is UNPREDICTABLE; treat as RAZ/WI */
+> +    return MEMTX_OK;
+>  }
+>  
+>  static const MemoryRegionOps nvic_sysreg_ops = {
+> -    .read = nvic_sysreg_read,
+> -    .write = nvic_sysreg_write,
+> +    .read_with_attrs = nvic_sysreg_read,
+> +    .write_with_attrs = nvic_sysreg_write,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>  
 > -- 
 > 2.7.4
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
