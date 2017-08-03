@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ddGH7-0002gH-2E
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:34:54 -0400
+	(envelope-from <jcody@redhat.com>) id 1ddGS8-0006Oz-BB
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ddGH3-000186-Ce
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:34:53 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ddGH3-00017q-89
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:34:49 -0400
-Received: by mail-qk0-x244.google.com with SMTP id a77so1224737qkb.2
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 06:34:49 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
-Date: Thu, 3 Aug 2017 10:34:45 -0300
+	(envelope-from <jcody@redhat.com>) id 1ddGS5-00068R-A7
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:46:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1ddGS5-00067a-41
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:46:13 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AD01D806A7
+	for <qemu-devel@nongnu.org>; Thu,  3 Aug 2017 13:46:11 +0000 (UTC)
+Date: Thu, 3 Aug 2017 09:46:10 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170803134610.GC1525@localhost.localdomain>
+References: <fe7e4ab1254ac9eb1c6480f1920ed8d2548b4f6c.1501765516.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] kvm: workaround build break on gcc-7.1.1 /
- fedora26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe7e4ab1254ac9eb1c6480f1920ed8d2548b4f6c.1501765516.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-web: use https:// to access some
+ external assets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, pbonzini@redhat.com
 
-Hi Greg,
-
-On 08/02/2017 11:47 AM, Greg Kurz wrote:
-> Building QEMU on fedora26 with the latest gcc package fails:
+On Thu, Aug 03, 2017 at 09:07:43AM -0400, Jeff Cody wrote:
+> Now that we are using SSL, most (all?) web browsers will by default
+> block loading mixed content.  There are two assets that need to be
+> changed (Google fonts, and jquery).
 > 
->    CC      ppc64-softmmu/target/ppc/kvm.o
-> In file included from include/sysemu/hw_accel.h:16:0,
->                   from target/ppc/kvm.c:31:
-> target/ppc/kvm.c: In function ‘kvmppc_booke_watchdog_enable’:
-> include/sysemu/kvm.h:449:35: error: ‘args_tmp[i]’ may be used uninitialized
->   in this function [-Werror=maybe-uninitialized]
->               cap.args[i] = args_tmp[i];                               \
->                                     ^
-> target/ppc/kvm.c: In function ‘kvmppc_set_papr’:
-> include/sysemu/kvm.h:449:35: error: ‘args_tmp[i]’ may be used uninitialized
->   in this function [-Werror=maybe-uninitialized]
-> cc1: all warnings being treated as errors
-> 
-> $ rpm -q gcc
-> gcc-7.1.1-3.fc26.ppc64le
-> 
-> Testing the size of args_tmp seems to be enough to prevent the warning
-> to pop up.
-
-This sizeof() use looks unnatural to me. I wonder why not use size_t, 
-since this is about sizeof()/ARRAY_SIZE(). The problem seems to come 
-from the commit this cast was introduced (61c7bbd236):
-
-target-ppc/kvm.c:1302:21: error: comparison of unsigned expression < 0 
-is always false [-Werror=type-limits]
-
-So I'd rather suggest this code, which looks more natural to read to me:
-
-     if (ARRAY_SIZE(args_tmp)) {
-         for (i = 0; i < ARRAY_SIZE(args_tmp) && ...
-
-I Cc'ed Eric :)
-
-Regards,
-
-Phil.
-
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->   include/sysemu/kvm.h |   12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
+>  _includes/assets.html | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 91fc07ee9afe..41fc1005a9ea 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -429,9 +429,11 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
->           };                                                           \
->           uint64_t args_tmp[] = { __VA_ARGS__ };                       \
->           int i;                                                       \
-> -        for (i = 0; i < (int)ARRAY_SIZE(args_tmp) &&                 \
-> +        if (sizeof(args_tmp)) {                                      \
-> +            for (i = 0; i < (int)ARRAY_SIZE(args_tmp) &&             \
->                        i < ARRAY_SIZE(cap.args); i++) {                \
-> -            cap.args[i] = args_tmp[i];                               \
-> +                cap.args[i] = args_tmp[i];                           \
-> +            }                                                        \
->           }                                                            \
->           kvm_vm_ioctl(s, KVM_ENABLE_CAP, &cap);                       \
->       })
-> @@ -444,9 +446,11 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
->           };                                                           \
->           uint64_t args_tmp[] = { __VA_ARGS__ };                       \
->           int i;                                                       \
-> -        for (i = 0; i < (int)ARRAY_SIZE(args_tmp) &&                 \
-> +        if (sizeof(args_tmp)) {                                      \
-> +            for (i = 0; i < (int)ARRAY_SIZE(args_tmp) &&             \
->                        i < ARRAY_SIZE(cap.args); i++) {                \
-> -            cap.args[i] = args_tmp[i];                               \
-> +                cap.args[i] = args_tmp[i];                           \
-> +            }                                                        \
->           }                                                            \
->           kvm_vcpu_ioctl(cpu, KVM_ENABLE_CAP, &cap);                   \
->       })
-> 
-> 
+> diff --git a/_includes/assets.html b/_includes/assets.html
+> index 3a526a4..826a50f 100644
+> --- a/_includes/assets.html
+> +++ b/_includes/assets.html
+> @@ -2,7 +2,7 @@
+>  	<meta name="description" content="" />
+>  	<meta name="keywords" content="" />
+>  	<meta name="viewport" content="width=device-width">
+> -	<link href='http://fonts.googleapis.com/css?family=Roboto+Mono:300,400%7cRoboto:300,400,500' rel='stylesheet' type='text/css'>
+> +	<link href='https://fonts.googleapis.com/css?family=Roboto+Mono:300,400%7cRoboto:300,400,500' rel='stylesheet' type='text/css'>
+>  
+>  	<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png">
+>  	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png">
+> @@ -19,7 +19,7 @@
+>  	<link rel="stylesheet" href="/assets/css/style-mobile.css" media="(max-width:699px)"/>
+>  	<link rel="stylesheet" href="/assets/css/style-desktop.css" media="(min-width:700px)" />
+>  	<link rel="alternate" title="QEMU Blog (Atom feed)" href="/feed.xml" type="application/atom+xml" />
+> -	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+> +	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+>  	{% if page.colorbox %}
+>  	<script src="/assets/js/jquery.colorbox.js"></script>
+>  	<link rel="stylesheet" href="/assets/css/colorbox.css" />
+> -- 
+> 2.9.4
+>
+
+Thanks for the reviews.  Pushed to git.qemu.org/srv/git/qemu-web.git, and
+now live.
