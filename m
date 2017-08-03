@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddHek-0002bV-E1
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:03:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ddHep-0002fN-Qz
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddHef-0006XM-LH
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:03:22 -0400
+	(envelope-from <kwolf@redhat.com>) id 1ddHeo-0006zT-NT
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:03:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  3 Aug 2017 17:02:57 +0200
-Message-Id: <20170803150301.10177-2-kwolf@redhat.com>
+Date: Thu,  3 Aug 2017 17:03:01 +0200
+Message-Id: <20170803150301.10177-6-kwolf@redhat.com>
 In-Reply-To: <20170803150301.10177-1-kwolf@redhat.com>
 References: <20170803150301.10177-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 1/5] block: Fix order in
- bdrv_replace_child()
+Subject: [Qemu-devel] [PATCH for-2.10 5/5] qemu-iotests: Test reopen between
+ read-only and read-write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Commit 8ee03995 refactored the code incorrectly and broke the release of
-permissions on the old BDS. Instead of changing the permissions to the
-new required values after removing the old BDS from the list of
-children, it only re-obtains the permissions it already had.
-
-Change the order of operations so that the old BDS is removed again
-before calculating the new required permissions.
+This serves as a regression test for the bugs that were just fixed for
+bdrv_reopen() between read-only and read-write mode.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/187     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/187.out | 18 ++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 88 insertions(+)
+ create mode 100755 tests/qemu-iotests/187
+ create mode 100644 tests/qemu-iotests/187.out
 
-diff --git a/block.c b/block.c
-index ce9cce7b3c..ab908cdc50 100644
---- a/block.c
-+++ b/block.c
-@@ -1933,6 +1933,8 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
-     BlockDriverState *old_bs = child->bs;
-     uint64_t perm, shared_perm;
- 
-+    bdrv_replace_child_noperm(child, new_bs);
+diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
+new file mode 100755
+index 0000000000..7bb783363c
+--- /dev/null
++++ b/tests/qemu-iotests/187
+@@ -0,0 +1,69 @@
++#!/bin/bash
++#
++# Test switching between read-only and read-write
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     if (old_bs) {
-         /* Update permissions for old node. This is guaranteed to succeed
-          * because we're just taking a parent away, so we're loosening
-@@ -1942,8 +1944,6 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
-         bdrv_set_perm(old_bs, perm, shared_perm);
-     }
- 
--    bdrv_replace_child_noperm(child, new_bs);
--
-     if (new_bs) {
-         bdrv_get_cumulative_perm(new_bs, &perm, &shared_perm);
-         bdrv_set_perm(new_bs, perm, shared_perm);
++# creator
++owner=kwolf@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++    rm -f "$TEST_IMG.2"
++    rm -f "$TEST_IMG.3"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++size=64M
++_make_test_img $size
++
++echo
++echo "Start from read-only"
++echo
++
++$QEMU_IO -r -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
++$QEMU_IO -r -c 'reopen -w' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
++$QEMU_IO -r -c 'reopen -w' -c 'reopen -r' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
++
++echo
++echo "Start from read-write"
++echo
++
++$QEMU_IO -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
++$QEMU_IO -c 'reopen -r' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
++$QEMU_IO -c 'reopen -r' -c 'reopen -w' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/187.out b/tests/qemu-iotests/187.out
+new file mode 100644
+index 0000000000..68fb944cd5
+--- /dev/null
++++ b/tests/qemu-iotests/187.out
+@@ -0,0 +1,18 @@
++QA output created by 187
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++
++Start from read-only
++
++Block node is read-only
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Block node is read-only
++
++Start from read-write
++
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++write failed: Operation not permitted
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 823811076d..1848077932 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -182,6 +182,7 @@
+ 183 rw auto migration
+ 185 rw auto
+ 186 rw auto
++187 rw auto
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
 -- 
 2.13.3
