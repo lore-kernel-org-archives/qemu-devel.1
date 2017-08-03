@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddESD-00048q-Li
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:38:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1ddEYl-0006TW-V1
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:45:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddES9-0007ts-99
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:38:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddES9-0007sg-06
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:38:09 -0400
-Date: Thu, 3 Aug 2017 12:38:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170803113801.GG2076@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-26-git-send-email-peterx@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1ddEYh-000209-Je
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:44:59 -0400
+References: <1501577097-14248-1-git-send-email-frederic.konrad@adacore.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <abac426c-5db4-7dd7-a727-880b60f5e9be@redhat.com>
+Date: Thu, 3 Aug 2017 13:37:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-26-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 25/29] migration: introduce
- SaveVMHandlers.resume_prepare
+In-Reply-To: <1501577097-14248-1-git-send-email-frederic.konrad@adacore.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] booke206: fix MAS update on
+ tlb miss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>, david@gibson.dropbear.id.au, agraf@suse.de
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> This is hook function to be called when a postcopy migration wants to
-> resume from a failure. For each module, it should provide its own
-> recovery logic before we switch to the postcopy-active state.
-
-Would a change-state handler be able to do this, or perhaps
-the notifier chain I have in my shared memory world:
- https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06459.html
-
-Dave
-
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 01.08.2017 10:44, KONRAD Frederic wrote:
+> When a tlb instruction miss happen, rw is set to 0 at the bottom
+> of cpu_ppc_handle_mmu_fault which cause the MAS update function to miss
+> the SAS and TS bit in MAS6, MAS1 in booke206_update_mas_tlb_miss.
+> 
+> Just calling booke206_update_mas_tlb_miss with rw = 2 solve the issue.
+> 
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 > ---
->  include/migration/register.h |  2 ++
->  migration/migration.c        | 20 +++++++++++++++++++-
->  migration/savevm.c           | 25 +++++++++++++++++++++++++
->  migration/savevm.h           |  1 +
->  migration/trace-events       |  1 +
->  5 files changed, 48 insertions(+), 1 deletion(-)
+>  target/ppc/mmu_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/migration/register.h b/include/migration/register.h
-> index a0f1edd..b669362 100644
-> --- a/include/migration/register.h
-> +++ b/include/migration/register.h
-> @@ -41,6 +41,8 @@ typedef struct SaveVMHandlers {
->      LoadStateHandler *load_state;
->      int (*load_setup)(QEMUFile *f, void *opaque);
->      int (*load_cleanup)(void *opaque);
-> +    /* Called when postcopy migration wants to resume from failure */
-> +    int (*resume_prepare)(MigrationState *s, void *opaque);
->  } SaveVMHandlers;
->  
->  int register_savevm_live(DeviceState *dev,
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 62f91ce..6cb0ad3 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2150,7 +2150,25 @@ static bool postcopy_should_start(MigrationState *s)
->  /* Return zero if success, or <0 for error */
->  static int postcopy_do_resume(MigrationState *s)
->  {
-> -    /* TODO: do the resume logic */
-> +    int ret;
-> +
-> +    /*
-> +     * Call all the resume_prepare() hooks, so that modules can be
-> +     * ready for the migration resume.
-> +     */
-> +    ret = qemu_savevm_state_resume_prepare(s);
-> +    if (ret) {
-> +        error_report("%s: resume_prepare() failure detected: %d",
-> +                     __func__, ret);
-> +        return ret;
-> +    }
-> +
-> +    /*
-> +     * TODO: handshake with dest using MIG_CMD_RESUME,
-> +     * MIG_RP_MSG_RESUME_ACK, then switch source state to
-> +     * "postcopy-active"
-> +     */
-> +
->      return 0;
->  }
->  
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 02a67ac..08a4712 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1004,6 +1004,31 @@ void qemu_savevm_state_setup(QEMUFile *f)
->      }
->  }
->  
-> +int qemu_savevm_state_resume_prepare(MigrationState *s)
-> +{
-> +    SaveStateEntry *se;
-> +    int ret;
-> +
-> +    trace_savevm_state_resume_prepare();
-> +
-> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> +        if (!se->ops || !se->ops->resume_prepare) {
-> +            continue;
-> +        }
-> +        if (se->ops && se->ops->is_active) {
-> +            if (!se->ops->is_active(se->opaque)) {
-> +                continue;
-> +            }
-> +        }
-> +        ret = se->ops->resume_prepare(s, se->opaque);
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  /*
->   * this function has three return values:
->   *   negative: there was one error, and we have -errno.
-> diff --git a/migration/savevm.h b/migration/savevm.h
-> index a5f3879..3193f04 100644
-> --- a/migration/savevm.h
-> +++ b/migration/savevm.h
-> @@ -31,6 +31,7 @@
->  
->  bool qemu_savevm_state_blocked(Error **errp);
->  void qemu_savevm_state_setup(QEMUFile *f);
-> +int qemu_savevm_state_resume_prepare(MigrationState *s);
->  void qemu_savevm_state_header(QEMUFile *f);
->  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
->  void qemu_savevm_state_cleanup(void);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 0b43fec..0fb2d1e 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -37,6 +37,7 @@ savevm_send_postcopy_run(void) ""
->  savevm_send_postcopy_resume(void) ""
->  savevm_send_recv_bitmap(char *name) "%s"
->  savevm_state_setup(void) ""
-> +savevm_state_resume_prepare(void) ""
->  savevm_state_header(void) ""
->  savevm_state_iterate(void) ""
->  savevm_state_cleanup(void) ""
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> index b7b9088..f06b938 100644
+> --- a/target/ppc/mmu_helper.c
+> +++ b/target/ppc/mmu_helper.c
+> @@ -1551,7 +1551,7 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *env, target_ulong address,
+>                      env->spr[SPR_40x_ESR] = 0x00000000;
+>                      break;
+>                  case POWERPC_MMU_BOOKE206:
+> -                    booke206_update_mas_tlb_miss(env, address, rw);
+> +                    booke206_update_mas_tlb_miss(env, address, 2);
+
+Couldn't that code path be called for normal data read miss (instead of
+instruction miss), too?
+
+Anyway, could we please use MMU_INST_FETCH instead of magic values like
+2 here?
+
+ Thomas
