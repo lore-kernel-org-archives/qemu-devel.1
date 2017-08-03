@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1ddGZV-0002VA-S9
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:53:54 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddGaO-0003A5-Cw
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1ddGZU-00069P-Qn
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:53:53 -0400
-Date: Thu, 3 Aug 2017 16:52:53 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170803135253.s2u6ut5hvrbupxao@postretch>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-8-el13635@mail.ntua.gr>
-	<20170803080750.GB4456@dhcp-200-186.str.redhat.com>
-	<20170803132455.bth53wkxr35imfhd@postretch>
-	<20170803133258.GI4456@dhcp-200-186.str.redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1ddGaJ-0007NE-Px
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:54:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47644)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddGaJ-0007Lv-Gn
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:54:43 -0400
+Date: Thu, 3 Aug 2017 14:54:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803135434.GB3673@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-30-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aalczojz7evddsmc"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170803133258.GI4456@dhcp-200-186.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] block: add throttle block filter
- driver interface tests
+In-Reply-To: <1501229198-30588-30-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 29/29] migration: reset migrate thread vars
+ when resumed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +28,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Firstly, MigThrError enumeration is introduced to describe the error in
+> migration_detect_error() better. This gives the migration_thread() a
+> chance to know whether a recovery has happened.
+> 
+> Then, if a recovery is detected, migration_thread() will reset its local
+> variables to prepare for that.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 40 +++++++++++++++++++++++++++++-----------
+>  1 file changed, 29 insertions(+), 11 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ecebe30..439bc22 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2159,6 +2159,15 @@ static bool postcopy_should_start(MigrationState *s)
+>      return atomic_read(&s->start_postcopy) || s->start_postcopy_fast;
+>  }
+>  
+> +typedef enum MigThrError {
+> +    /* No error detected */
+> +    MIG_THR_ERR_NONE = 0,
+> +    /* Detected error, but resumed successfully */
+> +    MIG_THR_ERR_RECOVERED = 1,
+> +    /* Detected fatal error, need to exit */
+> +    MIG_THR_ERR_FATAL = 2,
+> +} MigThrError;
+> +
 
---aalczojz7evddsmc
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Could you move this patch earlier to when postcopy_pause is created
+so it's created with this enum?
 
-On Thu, Aug 03, 2017 at 03:32:58PM +0200, Kevin Wolf wrote:
->Am 03.08.2017 um 15:24 hat Manos Pitsidianakis geschrieben:
->> On Thu, Aug 03, 2017 at 10:07:50AM +0200, Kevin Wolf wrote:
->> > Am 31.07.2017 um 11:54 hat Manos Pitsidianakis geschrieben:
->> > > Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->> >
->> > I would add at least two more cases:
->> >
->> > * Both limits and throttle-group are given in blockdev-add
->> This exists in the "property changes in ThrottleGroup" section,
->
->You're right, I missed this. The test result shows that this command
->succeeds. Do we really want to allow other nodes to be affected with a
->blockdev-add? Wouldn't it be cleaner to just forbid the combination of
->limits and throtte-group?
+>  static int postcopy_resume_handshake(MigrationState *s)
+>  {
+>      qemu_mutex_lock(&s->resume_lock);
+> @@ -2209,10 +2218,10 @@ static int postcopy_do_resume(MigrationState *s)
+>  
+>  /*
+>   * We don't return until we are in a safe state to continue current
+> - * postcopy migration.  Returns true to continue the migration, or
+> - * false to terminate current migration.
+> + * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
+> + * MIG_THR_ERR_FATAL if unrecovery failure happened.
+>   */
+> -static bool postcopy_pause(MigrationState *s)
+> +static MigThrError postcopy_pause(MigrationState *s)
+>  {
+>      assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>  
+> @@ -2247,7 +2256,7 @@ do_pause:
+>          if (postcopy_do_resume(s) == 0) {
+>              /* Let's continue! */
+>              trace_postcopy_pause_continued();
+> -            return true;
+> +            return MIG_THR_ERR_RECOVERED;
+>          } else {
+>              /*
+>               * Something wrong happened during the recovery, let's
+> @@ -2258,12 +2267,11 @@ do_pause:
+>          }
+>      } else {
+>          /* This is not right... Time to quit. */
+> -        return false;
+> +        return MIG_THR_ERR_FATAL;
+>      }
+>  }
+>  
+> -/* Return true if we want to stop the migration, otherwise false. */
+> -static bool migration_detect_error(MigrationState *s)
+> +static MigThrError migration_detect_error(MigrationState *s)
+>  {
+>      int ret;
+>  
+> @@ -2272,7 +2280,7 @@ static bool migration_detect_error(MigrationState *s)
+>  
+>      if (!ret) {
+>          /* Everything is fine */
+> -        return false;
+> +        return MIG_THR_ERR_NONE;
+>      }
+>  
+>      if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE && ret == -EIO) {
+> @@ -2281,7 +2289,7 @@ static bool migration_detect_error(MigrationState *s)
+>           * while. After that, it can be continued by a
+>           * recovery phase.
+>           */
+> -        return !postcopy_pause(s);
+> +        return postcopy_pause(s);
+>      } else {
+>          /*
+>           * For precopy (or postcopy with error outside IO), we fail
+> @@ -2291,7 +2299,7 @@ static bool migration_detect_error(MigrationState *s)
+>          trace_migration_thread_file_err();
+>  
+>          /* Time to stop the migration, now. */
+> -        return true;
+> +        return MIG_THR_ERR_FATAL;
+>      }
+>  }
+>  
+> @@ -2319,6 +2327,7 @@ static void *migration_thread(void *opaque)
+>      /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
+>      enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
+>      bool enable_colo = migrate_colo_enabled();
+> +    MigThrError thr_error;
+>  
+>      rcu_register_thread();
+>  
+> @@ -2395,8 +2404,17 @@ static void *migration_thread(void *opaque)
+>           * Try to detect any kind of failures, and see whether we
+>           * should stop the migration now.
+>           */
+> -        if (migration_detect_error(s)) {
+> +        thr_error = migration_detect_error(s);
+> +        if (thr_error == MIG_THR_ERR_FATAL) {
+> +            /* Stop migration */
+>              break;
+> +        } else if (thr_error == MIG_THR_ERR_RECOVERED) {
+> +            /*
+> +             * Just recovered from a e.g. network failure, reset all
+> +             * the local variables.
+> +             */
+> +            initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +            initial_bytes = 0;
 
-So basically only anonymous, immutable groups can be created through the=20
-driver then. All other shared group configurations must be explicitly=20
-created with an -object / object-add syntax. I think this is a neat=20
-separation and compromise if we allow anonymous groups. If not, we can=20
-ignore limits on the throttle driver.
+They don't seem that important to reset?
 
+Dave
 
->> > * limits and throttle-group are both missing
->> this creates an anonymous group with no limits. Should we fail at this c=
-ase?
->
->I'm not sure, you could argue either way. But there should be a test to
->check that the semantics won't change.
->
->If we're going with Stefan's suggestion that anonymous groups shouldn't
->exist, then the question is moot anyway.
->
->> > It would also be nice to test that query-block reflects the new thrott=
-le
->> > group limits correctly when they are changed after the fact.
->>
->> This belongs to the remove legacy patch, since query-block displays the
->> legacy limits.
->
->Ok, fair enough.
->
->Kevin
-
-
-
---aalczojz7evddsmc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmDKrUACgkQc2J8L2kN
-9xCd3xAAnyrhettncfep3CKcg154JI09G9fxEuFu7cAT4ytvJysbFAcQYOwYGhd1
-CEZfb7lw1tYDpSV2jCN4h1cCPWI/dsGlzrIbB0lARq7N6YnoryKLTkgJtfvzBBOs
-KHRIPePf6gpWPWQHd/jRCH7XJsFUKtM6cVm95xsf3mWkn3nGz87ISjm2WUiXiXzA
-s4qQoLyYQQzcLTaTm+DCIWvu7YVyzV4ndkfdyKnOlFiolAEL++8YXZGOEubkZSSg
-nw4dGJ2HFuHrbmn9xycyGekn6ClekOWK2FU/lx+owjwQ/nmrV2Z2C/5goMclm/yH
-RbE94QQYhK3JypAw9FIeSAX2mZaGA01pYhW5ycuTU5AMvKkU5tOsgLKc8wXHdEnk
-CBej7Vzm95FKMOKcMov7DwS+8Vd2r3CKNlOiBCnBjHMM+4vvwm7qzFoIZaR32QFr
-QWsjrk0kWYY/tUYINDxV2z/DSAQ9TqsubEdL+8rc3SWEE7eE1mUXTmuNfMivFDZs
-rVy2iwY4Gc9Oc1o6RkuWggBwzd2LBUsnGtLn4oiiwz3KSC/Vvahk9Py71kwf1UYc
-xyB4LrbZbYdythcidl78hO+ienWUoB1a80ME+QuCZdT3bArHox6rHhvYG5LA1znj
-vwFObi/2f54djcGnLMJMWM+PI5vT62oGa1FpLlMwEcoOYCQmSD8=
-=RO9h
------END PGP SIGNATURE-----
-
---aalczojz7evddsmc--
+>          }
+>  
+>          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
