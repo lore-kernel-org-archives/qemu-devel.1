@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddI0U-0001YM-8H
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:25:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddI1q-0002Ii-MK
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:27:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddI0T-00020v-A4
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:25:50 -0400
-Date: Thu, 3 Aug 2017 17:25:40 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170803152540.GP4859@toto>
-References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-	<1501692241-23310-8-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1ddI1p-0003Wi-NN
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:27:14 -0400
+References: <20170803150301.10177-1-kwolf@redhat.com>
+	<20170803150301.10177-4-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <21ccb7fc-22e1-f97c-1b41-b382e43fad22@redhat.com>
+Date: Thu, 3 Aug 2017 10:27:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501692241-23310-8-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 07/15] target/arm: Fix outdated comment
- about exception exit
+In-Reply-To: <20170803150301.10177-4-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gChMBX3xtW44BVNULJVNLDjxM2bpg4bpP"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/5] block: Set BDRV_O_ALLOW_RDWR
+ during rw reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On Wed, Aug 02, 2017 at 05:43:53PM +0100, Peter Maydell wrote:
-> When we switched our handling of exception exit to detect
-> the magic addresses at translate time rather than via
-> a do_unassigned_access hook, we forgot to update a
-> comment; correct the omission.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gChMBX3xtW44BVNULJVNLDjxM2bpg4bpP
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <21ccb7fc-22e1-f97c-1b41-b382e43fad22@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/5] block: Set BDRV_O_ALLOW_RDWR
+ during rw reopen
+References: <20170803150301.10177-1-kwolf@redhat.com>
+ <20170803150301.10177-4-kwolf@redhat.com>
+In-Reply-To: <20170803150301.10177-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 08/03/2017 10:02 AM, Kevin Wolf wrote:
+> Reopening an image should be consistent with opening it, so we should
+> set BDRV_O_ALLOW_RDWR for any image that is reopened read-write like in=
 
-
+> bdrv_open_inherit().
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  target/arm/helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index fd83a21..cb88c66 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6143,7 +6143,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->      bool rettobase = false;
->  
->      /* We can only get here from an EXCP_EXCEPTION_EXIT, and
-> -     * arm_v7m_do_unassigned_access() enforces the architectural rule
-> +     * gen_bx_excret() enforces the architectural rule
->       * that jumps to magic addresses don't have magic behaviour unless
->       * we're in Handler mode (compare pseudocode BXWritePC()).
->       */
-> -- 
-> 2.7.4
-> 
-> 
+>  block.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--gChMBX3xtW44BVNULJVNLDjxM2bpg4bpP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDQMgACgkQp6FrSiUn
+Q2o4hQf+POUXifr1Z7B0SSenI+CiOgG3RPvNw4HrA93hcgFwAHRhvkcAbLbUkwzH
+12LhpyfrI1ctlfujGdcVpazowiAj+5+f0UNkfUkd29fqBJRwgQIAksS88KOnw2Vw
+ybqg/Duhip2ksrcYNLAeRYSksshF5OqxyuUp95cHjYTAF21aIJW1DOhuQr+Jlow7
+AIBwAc1dkkkD8jVZ+ya6B0w1dlr+QeG88yMnD4+HqaQ38cpZR2v43Q6glsrqKDpe
++90CmIjGaCkTUsG8EyeSeCTdQpgguTB0CnJEtZfy6b35TUzqcX+pKjw1Hy7/trHF
+PoH042F3SKa5dIfPmX2nhcqUBZaWUA==
+=qnGS
+-----END PGP SIGNATURE-----
+
+--gChMBX3xtW44BVNULJVNLDjxM2bpg4bpP--
