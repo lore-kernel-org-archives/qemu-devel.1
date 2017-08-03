@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddCkk-0003Ca-Ky
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 05:49:15 -0400
+	(envelope-from <Tomasz.Nowicki@cavium.com>) id 1ddD6U-0004Ya-53
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddCkh-0008BY-2S
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 05:49:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddCkg-00089k-Pf
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 05:49:11 -0400
-Date: Thu, 3 Aug 2017 10:49:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170803094901.GC2076@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-22-git-send-email-peterx@redhat.com>
+	(envelope-from <Tomasz.Nowicki@cavium.com>) id 1ddD6T-0000nx-2q
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:11:42 -0400
+References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
+	<a8fd7038-a840-8667-0db2-5765624903d3@caviumnetworks.com>
+	<50d1685e-bfa6-02ac-2650-37637745431a@redhat.com>
+From: Tomasz Nowicki <tnowicki@caviumnetworks.com>
+Message-ID: <35467208-4e8f-b944-c247-c049c2301878@caviumnetworks.com>
+Date: Thu, 3 Aug 2017 12:11:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-22-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 21/29] migration: new cmd MIG_CMD_RECV_BITMAP
+In-Reply-To: <50d1685e-bfa6-02ac-2650-37637745431a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v5 0/8] ARM SMMUv3 Emulation Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,153 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com
+Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, tcain@qti.qualcomm.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, jean-philippe.brucker@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Add a new vm command MIG_CMD_RECV_BITMAP to request received bitmap for
-> one ramblock.
+Hi Eric,
+
+On 01.08.2017 15:07, Auger Eric wrote:
+> Hi Tomasz,
+> On 01/08/2017 13:01, Tomasz Nowicki wrote:
+>> Hi Eric,
+>>
+>> Just letting you know that I am facing another issue with the following
+>> setup:
+>> 1. host (4.12 kernel & 64K page) and VM (4.12 kernel & 64K page)
+>> 2. QEMU + -netdev type=tap,ifname=tap,id=net0 -device
+>> virtio-net-pci,netdev=net0,iommu_platform,disable-modern=off,disable-legacy=on
+>>
+>> 2. On VM, I allocate some huge pages and run DPDK testpmd app:
+>> # echo 4 > /sys/kernel/mm/hugepages/hugepages-524288kB/nr_hugepages
+>> # ./dpdk/usertools/dpdk-devbind.py -b vfio-pci  0000:00:02.0
+>> # ./dpdk/build/app/testpmd -l 0-13 -n 4 -w 0000:00:02.0 --
+>> --disable-hw-vlan-filter --disable-rss -i
+>> EAL: Detected 14 lcore(s)
+>> EAL: Probing VFIO support...
+>> EAL: VFIO support initialized
+>> EAL: PCI device 0000:00:02.0 on NUMA socket -1
+>> EAL:   probe driver: 1af4:1041 net_virtio
+>> EAL:   using IOMMU type 1 (Type 1)
+>> EAL: iommu_map_dma vaddr ffff20000000 size 80000000 iova 120000000
+>> EAL: Can't write to PCI bar (0) : offset (12)
+>> EAL: Can't read from PCI bar (0) : offset (12)
+>> EAL: Can't read from PCI bar (0) : offset (12)
+>> EAL: Can't write to PCI bar (0) : offset (12)
+>> EAL: Can't read from PCI bar (0) : offset (12)
+>> EAL: Can't write to PCI bar (0) : offset (12)
+>> EAL: Can't read from PCI bar (0) : offset (0)
+>> EAL: Can't write to PCI bar (0) : offset (4)
+>> EAL: Can't write to PCI bar (0) : offset (14)
+>> EAL: Can't write to PCI bar (0) : offset (e)
+>> EAL: Can't read from PCI bar (0) : offset (c)
+>> EAL: Requested device 0000:00:02.0 cannot be used
+>> EAL: No probed ethernet devices
+>> Interactive-mode selected
+>> USER1: create a new mbuf pool <mbuf_pool_socket_0>: n=251456, size=2176,
+>> socket=0
+>>
+>> When VM uses *4K pages* the same setup works fine. I will work on this
+>> but please let me know in case you already know what is going on.
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/savevm.c     | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  migration/savevm.h     |  1 +
->  migration/trace-events |  1 +
->  3 files changed, 61 insertions(+)
+> No I did not face that one. I was able to launch testpmd without such
+> early message. However I assigned an igbvf device to the guest and then
+> to DPDK. I've never tested your config.
 > 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 386788d..0ab13c0 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -78,6 +78,7 @@ enum qemu_vm_cmd {
->                                        were previously sent during
->                                        precopy but are dirty. */
->      MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
-> +    MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
->      MIG_CMD_MAX
->  };
->  
-> @@ -95,6 +96,7 @@ static struct mig_cmd_args {
->      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
->                                     .len = -1, .name = "POSTCOPY_RAM_DISCARD" },
->      [MIG_CMD_PACKAGED]         = { .len =  4, .name = "PACKAGED" },
-> +    [MIG_CMD_RECV_BITMAP]      = { .len = -1, .name = "RECV_BITMAP" },
->      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
->  };
->  
-> @@ -929,6 +931,19 @@ void qemu_savevm_send_postcopy_run(QEMUFile *f)
->      qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RUN, 0, NULL);
->  }
->  
-> +void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name)
-> +{
-> +    size_t len;
-> +    char buf[512];
+> However as stated in my cover letter at the moment DPDK is not working
+> for me because of storms of tlbi-on-maps. I intend to work on this as
+> soon as get some bandwidth, sorry.
 
-Only needs to be 256 bytes?
+I found what was the reason of failure.
 
-> +    trace_savevm_send_recv_bitmap(block_name);
-> +
-> +    buf[0] = len = strlen(block_name);
-> +    memcpy(buf + 1, block_name, len);
-> +
-> +    qemu_savevm_command_send(f, MIG_CMD_RECV_BITMAP, len + 1, (uint8_t *)buf);
-> +}
-> +
->  bool qemu_savevm_state_blocked(Error **errp)
->  {
->      SaveStateEntry *se;
-> @@ -1705,6 +1720,47 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)
->  }
->  
->  /*
-> + * Handle request that source requests for recved_bitmap on
-> + * destination. Payload format:
-> + *
-> + * len (1 byte) + ramblock_name (<255 bytes)
-> + */
-> +static int loadvm_handle_recv_bitmap(MigrationIncomingState *mis,
-> +                                     uint16_t len)
-> +{
-> +    QEMUFile *file = mis->from_src_file;
-> +    RAMBlock *rb;
-> +    char block_name[256];
-> +    size_t cnt;
-> +
-> +    cnt = qemu_get_counted_string(file, block_name);
-> +    if (!cnt) {
-> +        error_report("%s: failed to read block name", __func__);
-> +        return -EINVAL;
-> +    }
-> +
-> +    /* Validate before using the data */
-> +    if (qemu_file_get_error(file)) {
-> +        return qemu_file_get_error(file);
-> +    }
-> +
-> +    if (len != cnt + 1) {
-> +        error_report("%s: invalid payload length (%d)", __func__, len);
-> +        return -EINVAL;
-> +    }
-> +
-> +    rb = qemu_ram_block_by_name(block_name);
-> +    if (!rb) {
-> +        error_report("%s: block '%s' not found", __func__, block_name);
-> +        return -EINVAL;
-> +    }
-> +
-> +    /* TODO: send the bitmap back to source */
+QEMU creates BARs for VIRTIO PCI device. The size of it depends on what 
+is necessary for VIRTIO protocol. In my case the BAR is 16K size which 
+is too small to be mmapable for kernel with 64K pages:
+vfio_pci_enable() -> vfio_pci_probe_mmaps() ->
+here guest kernel checks that BAR size is smaller than current PAGE_SIZE 
+and clears VFIO_REGION_INFO_FLAG_MMAP flag which prevents BAR from being 
+mmapped later on. I added -device virtio-net-pci,...,page-per-vq=on to 
+enlarge BAR size to 8M and now testpmd works fine. I wonder how the same 
+setup is working with e.g. Intel or AMD IOMMU.
 
-Probably worth adding a trace in this function somewhere.
-
-Other than that;
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +    return 0;
-> +}
-> +
-> +/*
->   * Process an incoming 'QEMU_VM_COMMAND'
->   * 0           just a normal return
->   * LOADVM_QUIT All good, but exit the loop
-> @@ -1777,6 +1833,9 @@ static int loadvm_process_command(QEMUFile *f)
->  
->      case MIG_CMD_POSTCOPY_RAM_DISCARD:
->          return loadvm_postcopy_ram_handle_discard(mis, len);
-> +
-> +    case MIG_CMD_RECV_BITMAP:
-> +        return loadvm_handle_recv_bitmap(mis, len);
->      }
->  
->      return 0;
-> diff --git a/migration/savevm.h b/migration/savevm.h
-> index 295c4a1..8126b1c 100644
-> --- a/migration/savevm.h
-> +++ b/migration/savevm.h
-> @@ -46,6 +46,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
->  void qemu_savevm_send_postcopy_advise(QEMUFile *f);
->  void qemu_savevm_send_postcopy_listen(QEMUFile *f);
->  void qemu_savevm_send_postcopy_run(QEMUFile *f);
-> +void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name);
->  
->  void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
->                                             uint16_t len,
-> diff --git a/migration/trace-events b/migration/trace-events
-> index dbb4971..ca7b43f 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -34,6 +34,7 @@ savevm_send_open_return_path(void) ""
->  savevm_send_ping(uint32_t val) "%x"
->  savevm_send_postcopy_listen(void) ""
->  savevm_send_postcopy_run(void) ""
-> +savevm_send_recv_bitmap(char *name) "%s"
->  savevm_state_setup(void) ""
->  savevm_state_header(void) ""
->  savevm_state_iterate(void) ""
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks,
+Tomasz
