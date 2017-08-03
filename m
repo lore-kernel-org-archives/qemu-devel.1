@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddON4-0004o8-CK
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:13:35 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddOOH-0005l2-Ul
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:14:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddON1-00060C-CA
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:13:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddOOE-0007Y7-T5
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:14:49 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-	<1501692241-23310-11-git-send-email-peter.maydell@linaro.org>
+	<1501692241-23310-12-git-send-email-peter.maydell@linaro.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <91f1649d-ffcf-85c5-b83b-644ad1875fcd@twiddle.net>
-Date: Thu, 3 Aug 2017 15:13:27 -0700
+Message-ID: <2f3523e9-a8b8-ed6d-3fae-33a4dfbaa6db@twiddle.net>
+Date: Thu, 3 Aug 2017 15:14:43 -0700
 MIME-Version: 1.0
-In-Reply-To: <1501692241-23310-11-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1501692241-23310-12-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/15] target/arm: Don't use
- cpsr_write/cpsr_read to transfer M profile XPSR
+Subject: Re: [Qemu-devel] [PATCH 11/15] target/arm: Make
+ arm_cpu_dump_state() handle the M-profile XPSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +30,18 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/02/2017 09:43 AM, Peter Maydell wrote:
-> +        if (val & XPSR_EXCP) {
-> +            /* This is a CPSR format value from an older QEMU. (We can tell
-> +             * because values transferred in XPSR format always have zero
-> +             * for the EXCP field, and CPSR format will always have bit 4
-> +             * set in CPSR_M.) Rearrange it into XPSR format. The significant
-> +             * differences are that the T bit is not in the same place, the
-> +             * primask/faultmask info may be in the CPSR I and F bits, and
-> +             * we do not want the mode bits.
-> +             */
-> +            uint32_t newval = val;
-> +
-> +            newval &= (CPSR_NZCV | CPSR_Q | CPSR_IT | CPSR_GE);
-> +            if (val & CPSR_T) {
-> +                newval |= XPSR_T;
-> +            }
-> +            /* If the I or F bits are set then this is a migration from
-> +             * an old QEMU which still stored the M profile FAULTMASK
-> +             * and PRIMASK in env->daif. For a new QEMU, the data is
-> +             * transferred using the vmstate_m_faultmask_primask subsection.
-> +             */
+> Make the arm_cpu_dump_state() debug logging handle the M-profile XPSR
+> rather than assuming it's an A-profile CPSR.  On M profile the PSR
+> line of a register dump will now look like this:
+> 
+> XPSR=41000000 -Z-- T priv-thread
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate.c | 58 ++++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 40 insertions(+), 18 deletions(-)
 
-The second comment seems sort of redundant with the first now.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
