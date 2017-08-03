@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddHhE-0004xM-Vk
+	(envelope-from <bounces@canonical.com>) id 1ddHhE-0004xK-Ui
 	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:05:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddHhB-0001sg-Lp
+	(envelope-from <bounces@canonical.com>) id 1ddHhB-0001ru-0A
 	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:05:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43246)
+Received: from indium.canonical.com ([91.189.90.7]:43240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ddHhB-0001qu-2W
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:05:53 -0400
+	id 1ddHhA-0001pZ-Ju
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:05:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ddHh9-00014n-TB
+	id 1ddHh9-00014g-AI
 	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 15:05:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D6E1F2E8030
+	by loganberry.canonical.com (Postfix) with ESMTP id 473572E80C7
 	for <qemu-devel@nongnu.org>; Thu,  3 Aug 2017 15:05:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Aug 2017 14:51:02 -0000
+Date: Thu, 03 Aug 2017 14:46:39 -0000
 From: Andrey Smetanin <1708442@bugs.launchpad.net>
 Reply-To: Bug 1708442 <1708442@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150176232235.21421.11970305069558342885.malonedeb@wampee.canonical.com>
-Message-Id: <150177186235.13356.5782041169595204538.malone@soybean.canonical.com>
+Message-Id: <150177159980.26652.14300986467967646714.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1708442] Re: Crash(assert) during reading image
  from http url through qemu-nbd
@@ -39,12 +39,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I've attached patch which resolves bug, but actually it's just
-workaround and may be not unsafe, because it's just ignore assert.
+I've build qemu-nbd-bug.go into binary qemu-nbd-bug (go build qemu-nbd-bug.=
+go), so to reproduce bug anyone may try:
+0) ensure image.img exists in current folder. image.img may be copied from =
+"Qemu-nbd core dump and script to reproduce " attachment.
+1) sudo ./qemu-nbd-bug
+2) wait while binary aborting(panicking)
+3) check dmesg for error like "blk_update_request: I/O error, dev nbd0, sec=
+tor 42117"
+4) check qemu-nbd core dump (since it's aborting due to assert in aio_co_en=
+ter(), util/async.c:468).
 
-** Patch added: "workaround patch"
-   https://bugs.launchpad.net/qemu/+bug/1708442/+attachment/4926546/+files/=
-0001-util-async-ignore-self-co-enter-instead-of-assert.patch
+** Attachment added: "qemu-nbd-bug"
+   https://bugs.launchpad.net/qemu/+bug/1708442/+attachment/4926543/+files/=
+qemu-nbd-bug
 
 -- =
 
