@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dd4mN-0003SZ-4q
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 21:18:24 -0400
+	(envelope-from <mst@redhat.com>) id 1dd4nd-0004EF-NV
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 21:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dd4mJ-0003hT-11
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 21:18:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42290)
+	(envelope-from <mst@redhat.com>) id 1dd4nZ-0004Ds-KR
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 21:19:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dd4mI-0003h8-Na
-	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 21:18:18 -0400
-Date: Thu, 3 Aug 2017 04:18:14 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dd4nZ-0004DQ-Do
+	for qemu-devel@nongnu.org; Wed, 02 Aug 2017 21:19:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A5F185363
+	for <qemu-devel@nongnu.org>; Thu,  3 Aug 2017 01:19:36 +0000 (UTC)
+Date: Thu, 3 Aug 2017 04:19:33 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170803041740-mutt-send-email-mst@kernel.org>
-References: <20170728141309.14275-1-marcandre.lureau@redhat.com>
-	<20170728141309.14275-2-marcandre.lureau@redhat.com>
+Message-ID: <20170803041922-mutt-send-email-mst@kernel.org>
+References: <1501515652-33372-1-git-send-email-imammedo@redhat.com>
+	<20170802001139-mutt-send-email-mst@kernel.org>
+	<20170802095122.228fc8a8@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170728141309.14275-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] build-sys: add --disable-vhost-user
+In-Reply-To: <20170802095122.228fc8a8@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/5] tests: acpi: make sure FADT
+ is compared to reference table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,193 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, philippe.mathieu.daude@gmail.com, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
 
-On Fri, Jul 28, 2017 at 04:13:08PM +0200, Marc-Andr=E9 Lureau wrote:
-> Learn to compile out vhost-user. Keep it enabled by default on
-> non-win32, that is assumed to be POSIX. Fail if trying to enable it on
-> win32.
->=20
-> When trying to make a vhost-user netdev, it gives the following error:
->=20
-> -netdev vhost-user,id=3Dfoo,chardev=3Dchr-test: Parameter 'type' expect=
-s a netdev backend type
->=20
-> And similar error with the HMP/QMP monitors.
->=20
-> While at it, rename CONFIG_VHOST_NET_TEST CONFIG_VHOST_USER_NET_TEST
-> since it's a vhost-user specific variable.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On Wed, Aug 02, 2017 at 09:51:22AM +0200, Igor Mammedov wrote:
+> On Wed, 2 Aug 2017 00:14:18 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Jul 31, 2017 at 05:40:47PM +0200, Igor Mammedov wrote:
+> > > While refactoring i386/FADT generation to build_append_int_noprefix()            
+> > > and testing it, It turned out that FADT is only tested for valid                 
+> > > checksum but actual test for unintended changes isn't applied to it              
+> > > even though we have reference tables in tree.                                    
+> > > So here goes a couple of cleanups to reflect what fuctions do +                  
+> > > some comments and actual fix.                                                    
+> > >                                                                                  
+> > > Note to maintainer:                                                              
+> > >   FADT reference table is out of sync and should be updated along with           
+> > >   series applied.                                                                
+> > >                                                                                  
+> > > CC: "Michael S. Tsirkin" <mst@redhat.com>                                        
+> > > CC: Marcel Apfelbaum <marcel@redhat.com>   
+> > 
+> > Absolutely good stuff, but not a bugfix as such (it's not that the
+> > test is wrong, it's that we skip FADT for now)
+> > so I don't think this is 2.10 material.
+> Agreed, it could go in when 2.11 merge window is open.
 
-OK so pls address Cornelia's comment and post just patch 1 as
-it seems appropriate for 2.10.
+thanks,pls remember to repost or ping then.
 
-> ---
->  hw/virtio/virtio-pci.c            |  4 ++--
->  configure                         | 29 +++++++++++++++++++++++++++--
->  default-configs/pci.mak           |  2 +-
->  default-configs/s390x-softmmu.mak |  2 +-
->  tests/Makefile.include            |  6 +++---
->  5 files changed, 34 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index 5d14bd66dc..8b0d6b69cd 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -2135,7 +2135,7 @@ static const TypeInfo vhost_scsi_pci_info =3D {
->  };
->  #endif
-> =20
-> -#ifdef CONFIG_LINUX
-> +#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
->  /* vhost-user-scsi-pci */
->  static Property vhost_user_scsi_pci_properties[] =3D {
->      DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
-> @@ -2665,7 +2665,7 @@ static void virtio_pci_register_types(void)
->  #ifdef CONFIG_VHOST_SCSI
->      type_register_static(&vhost_scsi_pci_info);
->  #endif
-> -#ifdef CONFIG_LINUX
-> +#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
->      type_register_static(&vhost_user_scsi_pci_info);
->  #endif
->  #ifdef CONFIG_VHOST_VSOCK
-> diff --git a/configure b/configure
-> index 987f59ba88..efec1a613e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -306,6 +306,7 @@ tcg=3D"yes"
->  vhost_net=3D"no"
->  vhost_scsi=3D"no"
->  vhost_vsock=3D"no"
-> +vhost_user=3D""
->  kvm=3D"no"
->  hax=3D"no"
->  rdma=3D""
-> @@ -1282,6 +1283,15 @@ for opt do
->    ;;
->    --enable-vxhs) vxhs=3D"yes"
->    ;;
-> +  --disable-vhost-user) vhost_user=3D"no"
-> +  ;;
-> +  --enable-vhost-user)
-> +      vhost_user=3D"yes"
-> +      if test "$mingw32" =3D "yes" ; then
-> +          echo "ERROR: vhost-user isn't available on win32"
-> +          exit 1
-> +      fi
-> +  ;;
->    *)
->        echo "ERROR: unknown option $opt"
->        echo "Try '$0 --help' for more information"
-> @@ -1290,6 +1300,14 @@ for opt do
->    esac
->  done
-> =20
-> +if test "$vhost_user" =3D ""; then
-> +    if test "$mingw32" =3D "yes" ; then
-> +        vhost_user=3D"no"
-> +    else
-> +        vhost_user=3D"yes"
-> +    fi
-> +fi
-> +
->  case "$cpu" in
->      ppc)
->             CPU_CFLAGS=3D"-m32"
-> @@ -1518,6 +1536,7 @@ disabled with --disable-FEATURE, default is enabl=
-ed if available:
->    tools           build qemu-io, qemu-nbd and qemu-image tools
->    vxhs            Veritas HyperScale vDisk backend support
->    crypto-afalg    Linux AF_ALG crypto backend driver
-> +  vhost-user      vhost-user support
-> =20
->  NOTE: The object files are built at the place where configure is launc=
-hed
->  EOF
-> @@ -5348,6 +5367,7 @@ echo "libcap-ng support $cap_ng"
->  echo "vhost-net support $vhost_net"
->  echo "vhost-scsi support $vhost_scsi"
->  echo "vhost-vsock support $vhost_vsock"
-> +echo "vhost-user support $vhost_user"
->  echo "Trace backends    $trace_backends"
->  if have_backend "simple"; then
->  echo "Trace output file $trace_file-<pid>"
-> @@ -5757,12 +5777,15 @@ fi
->  if test "$vhost_scsi" =3D "yes" ; then
->    echo "CONFIG_VHOST_SCSI=3Dy" >> $config_host_mak
->  fi
-> -if test "$vhost_net" =3D "yes" ; then
-> +if test "$vhost_net" =3D "yes" -a "$vhost_user" =3D "yes"; then
->    echo "CONFIG_VHOST_NET_USED=3Dy" >> $config_host_mak
->  fi
->  if test "$vhost_vsock" =3D "yes" ; then
->    echo "CONFIG_VHOST_VSOCK=3Dy" >> $config_host_mak
->  fi
-> +if test "$vhost_user" =3D "yes" ; then
-> +  echo "CONFIG_VHOST_USER=3Dy" >> $config_host_mak
-> +fi
->  if test "$blobs" =3D "yes" ; then
->    echo "INSTALL_BLOBS=3Dyes" >> $config_host_mak
->  fi
-> @@ -6358,7 +6381,9 @@ if supported_kvm_target $target; then
->      echo "CONFIG_KVM=3Dy" >> $config_target_mak
->      if test "$vhost_net" =3D "yes" ; then
->          echo "CONFIG_VHOST_NET=3Dy" >> $config_target_mak
-> -        echo "CONFIG_VHOST_NET_TEST_$target_name=3Dy" >> $config_host_=
-mak
-> +        if test "$vhost_user" =3D "yes" ; then
-> +            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $con=
-fig_host_mak
-> +        fi
->      fi
->  fi
->  if supported_hax_target $target; then
-> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-> index acaa70301a..a758630d30 100644
-> --- a/default-configs/pci.mak
-> +++ b/default-configs/pci.mak
-> @@ -43,4 +43,4 @@ CONFIG_VGA=3Dy
->  CONFIG_VGA_PCI=3Dy
->  CONFIG_IVSHMEM_DEVICE=3D$(CONFIG_IVSHMEM)
->  CONFIG_ROCKER=3Dy
-> -CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
-> +CONFIG_VHOST_USER_SCSI=3D$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-=
-softmmu.mak
-> index b227a36179..51191b77df 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -1,6 +1,6 @@
->  CONFIG_PCI=3Dy
->  CONFIG_VIRTIO_PCI=3Dy
-> -CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
-> +CONFIG_VHOST_USER_SCSI=3D$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
->  CONFIG_VIRTIO=3Dy
->  CONFIG_SCLPCONSOLE=3Dy
->  CONFIG_TERMINAL3270=3Dy
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 7af278db55..8f5a3a1cb6 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -255,9 +255,9 @@ check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
->  check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
->  check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
->  gcov-files-i386-y +=3D hw/pci-host/q35.c
-> -check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D tests/vhost-user-t=
-est$(EXESUF)
-> -ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-> -check-qtest-x86_64-$(CONFIG_VHOST_NET_TEST_x86_64) +=3D tests/vhost-us=
-er-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=3D tests/vhost-u=
-ser-test$(EXESUF)
-> +ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
-> +check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=3D tests/vho=
-st-user-test$(EXESUF)
->  endif
->  check-qtest-i386-y +=3D tests/test-netfilter$(EXESUF)
->  check-qtest-i386-y +=3D tests/test-filter-mirror$(EXESUF)
-> --=20
-> 2.14.0.rc0.1.g40ca67566
+> > 
+> > > Igor Mammedov (5):
+> > >   tests: acpi: move tested tables array allocation outside of
+> > >     test_acpi_dsdt_table()
+> > >   tests: acpi: init table descriptor in test_dst_table()
+> > >   tests: acpi: rename test_acpi_tables()/test_dst_table() to reflect its
+> > >     usage
+> > >   tests: acpi: add comments to fetch_rsdt_referenced_tables/data->tables
+> > >     usage
+> > >   tests: acpi: fix FADT not being compared to reference table
+> > > 
+> > >  tests/bios-tables-test.c | 30 ++++++++++++++++++------------
+> > >  1 file changed, 18 insertions(+), 12 deletions(-)
+> > > 
+> > > -- 
+> > > 2.7.4  
