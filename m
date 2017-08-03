@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddGiZ-0000We-DS
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:03:16 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddGjY-0001Fd-6E
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddGiU-0003Gd-Ne
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:03:15 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:6741)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddGiU-0003Df-Ht
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:03:10 -0400
-References: <1501682311-16370-1-git-send-email-yongbok.kim@imgtec.com>
-	<0f0aa868-90a9-12a4-36ea-63c569a8b869@amsat.org>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <07eb4179-b7a2-2244-1ac3-a67680a945b3@imgtec.com>
-Date: Thu, 3 Aug 2017 15:03:06 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1ddGjT-0004WN-CP
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:04:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddGjT-0004V1-2g
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:04:11 -0400
+Date: Thu, 3 Aug 2017 15:03:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803140356.GC3673@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-13-git-send-email-peterx@redhat.com>
+	<20170801094715.GE2079@work-vm>
+	<20170802050610.GD15080@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <0f0aa868-90a9-12a4-36ea-63c569a8b869@amsat.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target-mips: apply CP0.PageMask before
- writing into TLB entry
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170802050610.GD15080@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 12/29] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +30,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> On Tue, Aug 01, 2017 at 10:47:16AM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> 
+> [...]
+> 
+> > > +/* Return true if we should continue the migration, or false. */
+> > > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> > > +{
+> > > +    trace_postcopy_pause_incoming();
+> > > +
+> > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > > +
+> > > +    assert(mis->from_src_file);
+> > > +    qemu_file_shutdown(mis->from_src_file);
+> > > +    qemu_fclose(mis->from_src_file);
+> > > +    mis->from_src_file = NULL;
+> > > +
+> > > +    assert(mis->to_src_file);
+> > > +    qemu_mutex_lock(&mis->rp_mutex);
+> > > +    qemu_file_shutdown(mis->to_src_file);
+> > > +    qemu_fclose(mis->to_src_file);
+> > > +    mis->to_src_file = NULL;
+> > > +    qemu_mutex_unlock(&mis->rp_mutex);
+> > 
+> > Hmm is that safe?  If we look at migrate_send_rp_message we have:
+> > 
+> >     static void migrate_send_rp_message(MigrationIncomingState *mis,
+> >                                         enum mig_rp_message_type message_type,
+> >                                         uint16_t len, void *data)
+> >     {
+> >         trace_migrate_send_rp_message((int)message_type, len);
+> >         qemu_mutex_lock(&mis->rp_mutex);
+> >         qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
+> >         qemu_put_be16(mis->to_src_file, len);
+> >         qemu_put_buffer(mis->to_src_file, data, len);
+> >         qemu_fflush(mis->to_src_file);
+> >         qemu_mutex_unlock(&mis->rp_mutex);
+> >     }
+> > 
+> > If we came into postcopy_pause_incoming at about the same time
+> > migrate_send_rp_message was being called and pause_incoming took the
+> > lock first, then once it release the lock, send_rp_message carries on
+> > and uses mis->to_src_file that's now NULL.
+> > 
+> > One solution here is to just call qemu_file_shutdown() but leave the
+> > files open at this point, but clean the files up sometime later.
+> 
+> I see the commnent on patch 14 as well - yeah, we need patch 14 to
+> co-op here, and as long as we are with patch 14, we should be ok.
+> 
+> > 
+> > > +
+> > > +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> > > +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
+> > > +    }
+> > > +
+> > > +    trace_postcopy_pause_incoming_continued();
+> > > +
+> > > +    return true;
+> > > +}
+> > > +
+> > >  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+> > >  {
+> > >      uint8_t section_type;
+> > >      int ret = 0;
+> > >  
+> > > +retry:
+> > >      while (true) {
+> > >          section_type = qemu_get_byte(f);
+> > >  
+> > > @@ -2004,6 +2034,21 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+> > >  out:
+> > >      if (ret < 0) {
+> > >          qemu_file_set_error(f, ret);
+> > > +
+> > > +        /*
+> > > +         * Detect whether it is:
+> > > +         *
+> > > +         * 1. postcopy running
+> > > +         * 2. network failure (-EIO)
+> > > +         *
+> > > +         * If so, we try to wait for a recovery.
+> > > +         */
+> > > +        if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
+> > > +            ret == -EIO && postcopy_pause_incoming(mis)) {
+> > > +            /* Reset f to point to the newly created channel */
+> > > +            f = mis->from_src_file;
+> > > +            goto retry;
+> > > +        }
+> > 
+> > I wonder if:
+> > 
+> >            if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
+> >                ret == -EIO && postcopy_pause_incoming(mis)) {
+> >                /* Try again after postcopy recovery */
+> >                return qemu_loadvm_state_main(mis->from_src_file, mis);
+> >            }
+> > would be nicer; it avoids the goto loop.
+> 
+> I agree we should avoid using goto loops. However I do see vast usages
+> of goto like this one when we want to redo part of the procedures of a
+> function (or, of course, when handling errors in "C-style").
 
+We mostly use them to jump forward to an error exit; only rarely do
+we do loops with them;  so if we can sensibly avoid them it's best.
 
-On 02/08/2017 19:56, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Leon,
->=20
-> On 08/02/2017 10:58 AM, Yongbok Kim wrote:
->> From: Leon Alrae <leon.alrae@imgtec.com>
->>
->> PFN0 and PFN1 have to be masked out with PageMask_Mask.
->>
->> Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
->> Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
->> [Yongbok Kim:
->>    Added commit message]
->> Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
->> ---
->>   target/mips/op_helper.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
->> index 526f8e4..320f2b0 100644
->> --- a/target/mips/op_helper.c
->> +++ b/target/mips/op_helper.c
->> @@ -2008,6 +2008,7 @@ static inline uint64_t
->> get_tlb_pfn_from_entrylo(uint64_t entrylo)
->>   static void r4k_fill_tlb(CPUMIPSState *env, int idx)
->>   {
->>       r4k_tlb_t *tlb;
->> +    uint64_t mask =3D env->CP0_PageMask >> (TARGET_PAGE_BITS + 1);
->>         /* XXX: detect conflicting TLBs and raise a MCHECK exception w=
-hen
->> needed */
->>       tlb =3D &env->tlb->mmu.r4k.tlb[idx];
->> @@ -2028,13 +2029,13 @@ static void r4k_fill_tlb(CPUMIPSState *env, in=
-t idx)
->>       tlb->C0 =3D (env->CP0_EntryLo0 >> 3) & 0x7;
->>       tlb->XI0 =3D (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
->>       tlb->RI0 =3D (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
->> -    tlb->PFN[0] =3D get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) << 12=
-;
->> +    tlb->PFN[0] =3D (get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) & ~m=
-ask)
->> << 12;
->>       tlb->V1 =3D (env->CP0_EntryLo1 & 2) !=3D 0;
->>       tlb->D1 =3D (env->CP0_EntryLo1 & 4) !=3D 0;
->>       tlb->C1 =3D (env->CP0_EntryLo1 >> 3) & 0x7;
->>       tlb->XI1 =3D (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
->>       tlb->RI1 =3D (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
->> -    tlb->PFN[1] =3D get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) << 12=
-;
->> +    tlb->PFN[1] =3D (get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) & ~m=
-ask)
->> << 12;
->>   }
->>     void r4k_helper_tlbinv(CPUMIPSState *env)
->>
->=20
-> What about refactoring get_tlb_pfn_from_entrylo(uint64_t entrylo) ->
-> r4k_get_tlb_pfn_from_entrylo(uint64_t entrylo, uint64_t pagemask) to
-> directly masked pfn?
->=20
-> Regards,
->=20
-> Phil.
+> Calling qemu_loadvm_state_main() inside itself is ok as well, but it
+> also has defect: stack usage would be out of control, or even, it can
+> be controled by malicious users. E.g., if someone used program to
+> periodically stop/start any network endpoint along the migration
+> network, QEMU may go into a paused -> recovery -> active -> paused ...
+> loop, and stack usage will just grow with time. I'd say it's an
+> extreme example though...
 
-Hi Phil,
+I think it's safe because it's a tail-call so a new stack frame isn't
+needed.
 
-Leon left Imagination a year ago and this patch is one of his remainders.
-I agree to refactor the inline function but it is paired with other inlin=
-e
-function get_entrylo_pfn_from_tlb(). I will send another patch for both o=
-f
-them but it should be after 2.10.
+> (Another way besides above two: maybe we can just return in
+>  qemu_loadvm_state_main with something like -EAGAIN, then the caller
+>  of qemu_loadvm_state_main can re-call it when necessary, though I
+>  would prefer "goto is okay here"... :)
 
-Regards,
-Yongbok
+Dave
+
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
