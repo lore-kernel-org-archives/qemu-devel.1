@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ddGSm-0006mD-Kf
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:46:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddGTj-0007Md-Ra
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:47:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ddGSj-0006qW-Nn
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:46:56 -0400
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:36613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ddGSj-0006og-KM
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:46:53 -0400
-Received: by mail-qk0-x22e.google.com with SMTP id d136so7718930qkg.3
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 06:46:52 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <928f0ce3-159a-e371-6309-078fac31eace@amsat.org>
-Date: Thu, 3 Aug 2017 10:46:47 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1ddGTg-0007hG-SX
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:47:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddGTg-0007gV-J6
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:47:52 -0400
+Date: Thu, 3 Aug 2017 14:47:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803134744.GL2076@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-29-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] kvm: workaround build break on gcc-7.1.1 /
- fedora26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501229198-30588-29-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 28/29] migration: final handshake for the
+ resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +28,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Hi Greg,
-
-On 08/02/2017 11:47 AM, Greg Kurz wrote:
-> Building QEMU on fedora26 with the latest gcc package fails:
+* Peter Xu (peterx@redhat.com) wrote:
+> Finish the last step to do the final handshake for the recovery.
 > 
->    CC      ppc64-softmmu/target/ppc/kvm.o
-> In file included from include/sysemu/hw_accel.h:16:0,
->                   from target/ppc/kvm.c:31:
-> target/ppc/kvm.c: In function ‘kvmppc_booke_watchdog_enable’:
-> include/sysemu/kvm.h:449:35: error: ‘args_tmp[i]’ may be used uninitialized
->   in this function [-Werror=maybe-uninitialized]
->               cap.args[i] = args_tmp[i];                               \
->                                     ^
-> target/ppc/kvm.c: In function ‘kvmppc_set_papr’:
-> include/sysemu/kvm.h:449:35: error: ‘args_tmp[i]’ may be used uninitialized
->   in this function [-Werror=maybe-uninitialized]
-> cc1: all warnings being treated as errors
+> First source sends one MIG_CMD_RESUME to dst, telling that source is
+> ready to resume.
+> 
+> Then, dest replies with MIG_RP_MSG_RESUME_ACK to source, telling that
+> dest is ready to resume (after switch to postcopy-active state).
+> 
+> When source received the RESUME_ACK, it switches its state to
+> postcopy-active, and finally the recovery is completed.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 39 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 35 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 93fbc96..ecebe30 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1666,6 +1666,13 @@ static int migrate_handle_rp_recv_bitmap(MigrationState *s, char *block_name)
+>      return ram_dirty_bitmap_reload(s, block);
+>  }
+>  
+> +static void postcopy_resume_handshake_ack(MigrationState *s)
+> +{
+> +    qemu_mutex_lock(&s->resume_lock);
+> +    qemu_cond_signal(&s->resume_cond);
+> +    qemu_mutex_unlock(&s->resume_lock);
+> +}
+> +
+>  static int migrate_handle_rp_resume_ack(MigrationState *s, uint32_t value)
+>  {
+>      trace_source_return_path_thread_resume_ack(value);
+> @@ -1680,7 +1687,8 @@ static int migrate_handle_rp_resume_ack(MigrationState *s, uint32_t value)
+>      migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+>                        MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>  
+> -    /* TODO: notify send thread that time to continue send pages */
+> +    /* Notify send thread that time to continue send pages */
+> +    postcopy_resume_handshake_ack(s);
+>  
+>      return 0;
+>  }
+> @@ -2151,6 +2159,25 @@ static bool postcopy_should_start(MigrationState *s)
+>      return atomic_read(&s->start_postcopy) || s->start_postcopy_fast;
+>  }
+>  
+> +static int postcopy_resume_handshake(MigrationState *s)
+> +{
+> +    qemu_mutex_lock(&s->resume_lock);
+> +
+> +    qemu_savevm_send_postcopy_resume(s->to_dst_file);
+> +
+> +    while (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> +        qemu_cond_wait(&s->resume_cond, &s->resume_lock);
+> +    }
+> +
+> +    qemu_mutex_unlock(&s->resume_lock);
+> +
+> +    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> +        return 0;
+> +    }
 
-I'm trying to reproduce this in our docker images (all x86_64 based) but 
-can't reproduce.
+That feels to be a small racy - couldn't that validly become a
+MIGRATION_STATUS_COMPLETED before that check?
 
-./configure shows:
+I wonder if we need to change migrate_fd_cancel to be able to
+cause a cancel in this case?
 
-KVM support       yes
+Dave
 
-but in "sysemu/kvm.h" CONFIG_KVM_IS_POSSIBLE is not defined
-
-I can see CONFIG_KVM defined, but no NEED_CPU_H.
-
- >
- > $ rpm -q gcc
- > gcc-7.1.1-3.fc26.ppc64le
-
-I don't have native ppc64le to build, do you know if it is possible to 
-cross-compile enabling kvm? It seems I have the correct Linux headers, I 
-wonder if this isn't a ./configure test which disable the kvm cross-build.
-
-Regards,
-
-Phil.
+> +    return -1;
+> +}
+> +
+>  /* Return zero if success, or <0 for error */
+>  static int postcopy_do_resume(MigrationState *s)
+>  {
+> @@ -2168,10 +2195,14 @@ static int postcopy_do_resume(MigrationState *s)
+>      }
+>  
+>      /*
+> -     * TODO: handshake with dest using MIG_CMD_RESUME,
+> -     * MIG_RP_MSG_RESUME_ACK, then switch source state to
+> -     * "postcopy-active"
+> +     * Last handshake with destination on the resume (destination will
+> +     * switch to postcopy-active afterwards)
+>       */
+> +    ret = postcopy_resume_handshake(s);
+> +    if (ret) {
+> +        error_report("%s: handshake failed: %d", __func__, ret);
+> +        return ret;
+> +    }
+>  
+>      return 0;
+>  }
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
