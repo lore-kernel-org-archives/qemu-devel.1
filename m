@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ddDld-0005Y2-0H
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:54:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddDwv-0001SK-61
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ddDlb-0008Tc-Vc
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:54:13 -0400
-Date: Thu, 3 Aug 2017 11:53:59 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170803105359.GB22685@stefanha-x1.localdomain>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-5-el13635@mail.ntua.gr>
-	<20170801154703.GD22017@stefanha-x1.localdomain>
-	<20170801164933.c54ocjzr26sxaizy@postretch>
-	<20170802103922.GE5531@stefanha-x1.localdomain>
-	<20170802105704.m2jbxnivl32msbx6@postretch>
-	<20170803080801.GC4456@dhcp-200-186.str.redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1ddDwq-0004fn-Nz
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:05:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:15388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddDwq-0004en-9P
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:05:48 -0400
+Date: Thu, 3 Aug 2017 12:05:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803110540.GE2076@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-24-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170803080801.GC4456@dhcp-200-186.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/7] block: convert ThrottleGroup to
- object with QOM
+In-Reply-To: <1501229198-30588-24-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 23/29] migration: new cmd
+ MIG_CMD_POSTCOPY_RESUME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Introducing this new command to be sent when the source VM is ready to
+> resume the paused migration.  What the destination does here is
+> basically release the fault thread to continue service page faults.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/savevm.c     | 27 +++++++++++++++++++++++++++
+>  migration/savevm.h     |  1 +
+>  migration/trace-events |  1 +
+>  3 files changed, 29 insertions(+)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index def9213..2e330bc 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -77,6 +77,7 @@ enum qemu_vm_cmd {
+>      MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
+>                                        were previously sent during
+>                                        precopy but are dirty. */
+> +    MIG_CMD_POSTCOPY_RESUME,       /* resume postcopy on dest */
+>      MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
+>      MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
+>      MIG_CMD_MAX
+> @@ -95,6 +96,7 @@ static struct mig_cmd_args {
+>      [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
+>      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+>                                     .len = -1, .name = "POSTCOPY_RAM_DISCARD" },
+> +    [MIG_CMD_POSTCOPY_RESUME]  = { .len =  0, .name = "POSTCOPY_RESUME" },
+>      [MIG_CMD_PACKAGED]         = { .len =  4, .name = "PACKAGED" },
+>      [MIG_CMD_RECV_BITMAP]      = { .len = -1, .name = "RECV_BITMAP" },
+>      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+> @@ -931,6 +933,12 @@ void qemu_savevm_send_postcopy_run(QEMUFile *f)
+>      qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RUN, 0, NULL);
+>  }
+>  
+> +void qemu_savevm_send_postcopy_resume(QEMUFile *f)
+> +{
+> +    trace_savevm_send_postcopy_resume();
+> +    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RESUME, 0, NULL);
+> +}
+> +
+>  void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name)
+>  {
+>      size_t len;
+> @@ -1671,6 +1679,22 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+>      return LOADVM_QUIT;
+>  }
+>  
+> +static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+> +{
+> +    /*
+> +     * This means source VM is ready to resume the postcopy migration.
+> +     * It's time to switch state and release the fault thread to
+> +     * continue service page faults.
+> +     */
+> +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+> +                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> +    qemu_sem_post(&mis->postcopy_pause_sem_fault);
 
---IrhDeMKUP4DT/M7F
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Is it worth sanity checking that you were in RECOVER at this point?
 
-On Thu, Aug 03, 2017 at 10:08:01AM +0200, Kevin Wolf wrote:
-> Am 02.08.2017 um 12:57 hat Manos Pitsidianakis geschrieben:
-> > On Wed, Aug 02, 2017 at 11:39:22AM +0100, Stefan Hajnoczi wrote:
-> > > On Tue, Aug 01, 2017 at 07:49:33PM +0300, Manos Pitsidianakis wrote:
-> > > > On Tue, Aug 01, 2017 at 04:47:03PM +0100, Stefan Hajnoczi wrote:
-> > > > > On Mon, Jul 31, 2017 at 12:54:40PM +0300, Manos Pitsidianakis wro=
-te:
-> > > > > > ThrottleGroup is converted to an object. This will allow the fu=
-ture
-> > > > > > throttle block filter drive easy creation and configuration of =
-throttle
-> > > > > > groups in QMP and cli.
-> > > > > >
-> > > > > > A new QAPI struct, ThrottleLimits, is introduced to provide a s=
-hared
-> > > > > > struct for all throttle configuration needs in QMP.
-> > > > > >
-> > > > > > ThrottleGroups can be created via CLI as
-> > > > > >     -object throttle-group,id=3Dfoo,x-iops-total=3D100,x-..
-> > > > > > where x-* are individual limit properties. Since we can't add n=
-on-scalar
-> > > > > > properties in -object this interface must be used instead. Howe=
-ver,
-> > > > > > setting these properties must be disabled after initialization =
-because
-> > > > > > certain combinations of limits are forbidden and thus configura=
-tion
-> > > > > > changes should be done in one transaction. The individual prope=
-rties
-> > > > > > will go away when support for non-scalar values in CLI is imple=
-mented
-> > > > > > and thus are marked as experimental.
-> > > > > >
-> > > > > > ThrottleGroup also has a `limits` property that uses the Thrott=
-leLimits
-> > > > > > struct.  It can be used to create ThrottleGroups or set the
-> > > > > > configuration in existing groups as follows:
-> > > > > >
-> > > > > > { "execute": "object-add",
-> > > > > >   "arguments": {
-> > > > > >     "qom-type": "throttle-group",
-> > > > > >     "id": "foo",
-> > > > > >     "props" : {
-> > > > > >       "limits": {
-> > > > > >           "iops-total": 100
-> > > > > >       }
-> > > > > >     }
-> > > > > >   }
-> > > > > > }
-> > > > > > { "execute" : "qom-set",
-> > > > > >     "arguments" : {
-> > > > > >         "path" : "foo",
-> > > > > >         "property" : "limits",
-> > > > > >         "value" : {
-> > > > > >             "iops-total" : 99
-> > > > > >         }
-> > > > > >     }
-> > > > > > }
-> > > > > >
-> > > > > > This also means a group's configuration can be fetched with qom=
--get.
-> > > > > >
-> > > > > > ThrottleGroups can be anonymous which means they can't get acce=
-ssed by
-> > > > > > other users ie they will always be units instead of group (Beca=
-use they
-> > > > > > have one ThrottleGroupMember).
-> > > > >
-> > > > > blockdev.c automatically assigns -drive id=3D to the group name if
-> > > > > throttling.group=3D wasn't given.  So who will use anonymous sing=
-le-drive
-> > > > > mode?
-> > > >=20
-> > > > Manual filter nodes. It's possible to not pass a group name value a=
-nd the
-> > > > resulting group will be anonymous. Are you suggesting to move this =
-change to
-> > > > the throttle filter patch?
-> > >=20
-> > > What is the use case?  Human users will stick to the legacy syntax
-> > > because it's convenient.  Management tools will use the filter
-> > > explicitly in the future, and it's easy for them to choose a name.
-> > >=20
-> > > Unless there is a need for this case I'd prefer to make the group name
-> > > mandatory.  That way there are less code paths to worry about.
-> >=20
-> > I think Kevin requested this though I don't really remember the use cas=
-e.
->=20
-> There is no legacy syntax for putting a throttle node anywhere but at
-> the root of a BlockBackend. If you want to throttle e.g. only a specific
-> backing file, you need to manually create a throttle node.
->=20
-> (We tend to forget this occasionally, but the work you're doing is not
-> only cleanup just for fun, but it's actually new features that enable
-> new use cases by making everything more flexible.)
+Dave
 
-It's not clear to me from your reply whether you support anonymous
-throttle groups or not.  It is possible to throttle arbitrary nodes in
-the graph either way.
-
-Stefan
-
---IrhDeMKUP4DT/M7F
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgwDHAAoJEJykq7OBq3PI5pcH/1mXBOizbv3qNVmhfxa27JKD
-8NRGDiLiO/pRfdnyK6v/c+VynoVkYZSapRm+UIbJ/RHmq71X2heSuLiqMPBUfTQi
-BJOFuXuC9iXaAipCp0VhpSnupb2dWz+yUrV5cYKLdJM7t3fv/bO8b+Y7m/uZZQCq
-/M6uZjk20iG9sQBe2wb3fAD+0sI/P1taD3BToK/c+y16DFQDwWL42rvaWop+IOCD
-lH/nhqbUmbCSfKeR2Fz7s7KrFah+ercNLNNkTLaz4hvjttmm2Wr1TPt0Tx8MgHuD
-1Um6wwj5a60HJ6ZI+kmba3ab3FVAAxnbp1fTeayU7sPhwhzJEUfcUG1/d7SXh8k=
-=J5tE
------END PGP SIGNATURE-----
-
---IrhDeMKUP4DT/M7F--
+> +
+> +    /* TODO: Tell source that "we are ready" */
+> +
+> +    return 0;
+> +}
+> +
+>  /**
+>   * Immediately following this command is a blob of data containing an embedded
+>   * chunk of migration stream; read it and load it.
+> @@ -1834,6 +1858,9 @@ static int loadvm_process_command(QEMUFile *f)
+>      case MIG_CMD_POSTCOPY_RAM_DISCARD:
+>          return loadvm_postcopy_ram_handle_discard(mis, len);
+>  
+> +    case MIG_CMD_POSTCOPY_RESUME:
+> +        return loadvm_postcopy_handle_resume(mis);
+> +
+>      case MIG_CMD_RECV_BITMAP:
+>          return loadvm_handle_recv_bitmap(mis, len);
+>      }
+> diff --git a/migration/savevm.h b/migration/savevm.h
+> index 8126b1c..a5f3879 100644
+> --- a/migration/savevm.h
+> +++ b/migration/savevm.h
+> @@ -46,6 +46,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
+>  void qemu_savevm_send_postcopy_advise(QEMUFile *f);
+>  void qemu_savevm_send_postcopy_listen(QEMUFile *f);
+>  void qemu_savevm_send_postcopy_run(QEMUFile *f);
+> +void qemu_savevm_send_postcopy_resume(QEMUFile *f);
+>  void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name);
+>  
+>  void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+> diff --git a/migration/trace-events b/migration/trace-events
+> index ed69551..04dd9d8 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -34,6 +34,7 @@ savevm_send_open_return_path(void) ""
+>  savevm_send_ping(uint32_t val) "%x"
+>  savevm_send_postcopy_listen(void) ""
+>  savevm_send_postcopy_run(void) ""
+> +savevm_send_postcopy_resume(void) ""
+>  savevm_send_recv_bitmap(char *name) "%s"
+>  savevm_state_setup(void) ""
+>  savevm_state_header(void) ""
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
