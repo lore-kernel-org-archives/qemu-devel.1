@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddOP3-0006To-7n
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:15:38 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddOPi-0007Oz-6k
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddOP0-00007U-2P
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:15:37 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddOPf-00012V-6S
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 18:16:18 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
 References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
-	<1501692241-23310-11-git-send-email-peter.maydell@linaro.org>
-	<91f1649d-ffcf-85c5-b83b-644ad1875fcd@twiddle.net>
-Message-ID: <a07ea64f-1d12-7831-d91f-9c0e0cc3df40@twiddle.net>
-Date: Thu, 3 Aug 2017 15:15:31 -0700
+	<1501692241-23310-13-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <2266f042-5c2c-301e-f5e1-9e19c7879e37@twiddle.net>
+Date: Thu, 3 Aug 2017 15:16:11 -0700
 MIME-Version: 1.0
-In-Reply-To: <91f1649d-ffcf-85c5-b83b-644ad1875fcd@twiddle.net>
+In-Reply-To: <1501692241-23310-13-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/15] target/arm: Don't use
- cpsr_write/cpsr_read to transfer M profile XPSR
+Subject: Re: [Qemu-devel] [PATCH 12/15] target/arm: Don't calculate lr in
+ arm_v7m_cpu_do_interrupt() until needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +29,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-On 08/03/2017 03:13 PM, Richard Henderson wrote:
-> On 08/02/2017 09:43 AM, Peter Maydell wrote:
->> +        if (val & XPSR_EXCP) {
->> +            /* This is a CPSR format value from an older QEMU. (We can tell
->> +             * because values transferred in XPSR format always have zero
->> +             * for the EXCP field, and CPSR format will always have bit 4
->> +             * set in CPSR_M.) Rearrange it into XPSR format. The significant
->> +             * differences are that the T bit is not in the same place, the
->> +             * primask/faultmask info may be in the CPSR I and F bits, and
->> +             * we do not want the mode bits.
->> +             */
->> +            uint32_t newval = val;
->> +
->> +            newval &= (CPSR_NZCV | CPSR_Q | CPSR_IT | CPSR_GE);
->> +            if (val & CPSR_T) {
->> +                newval |= XPSR_T;
->> +            }
->> +            /* If the I or F bits are set then this is a migration from
->> +             * an old QEMU which still stored the M profile FAULTMASK
->> +             * and PRIMASK in env->daif. For a new QEMU, the data is
->> +             * transferred using the vmstate_m_faultmask_primask subsection.
->> +             */
+On 08/02/2017 09:43 AM, Peter Maydell wrote:
+> Move the code in arm_v7m_cpu_do_interrupt() that calculates the
+> magic LR value down to when we're actually going to use it.
+> Having the calculation and use so far apart makes the code
+> a little harder to understand than it needs to be.
 > 
-> The second comment seems sort of redundant with the first now.
-
-... and I meant to say, otherwise,
-
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
