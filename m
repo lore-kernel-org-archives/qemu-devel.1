@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddGaO-0003A5-Cw
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:54:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddGbG-0003rG-0I
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddGaJ-0007NE-Px
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:54:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47644)
+	(envelope-from <eblake@redhat.com>) id 1ddGbB-0000Oj-GR
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:55:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddGaJ-0007Lv-Gn
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:54:43 -0400
-Date: Thu, 3 Aug 2017 14:54:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170803135434.GB3673@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-30-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddGbB-0000Nj-7O
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 09:55:37 -0400
+References: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
+	<dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <48882fff-563a-52cc-c215-12f0808857cd@redhat.com>
+Date: Thu, 3 Aug 2017 08:55:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-30-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 29/29] migration: reset migrate thread vars
- when resumed
+In-Reply-To: <dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LseWh1EXxswdtWu4fI9FbxTdQpO4lGPoj"
+Subject: Re: [Qemu-devel] [PATCH] kvm: workaround build break on gcc-7.1.1 /
+ fedora26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,145 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Firstly, MigThrError enumeration is introduced to describe the error in
-> migration_detect_error() better. This gives the migration_thread() a
-> chance to know whether a recovery has happened.
-> 
-> Then, if a recovery is detected, migration_thread() will reset its local
-> variables to prepare for that.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c | 40 +++++++++++++++++++++++++++++-----------
->  1 file changed, 29 insertions(+), 11 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index ecebe30..439bc22 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2159,6 +2159,15 @@ static bool postcopy_should_start(MigrationState *s)
->      return atomic_read(&s->start_postcopy) || s->start_postcopy_fast;
->  }
->  
-> +typedef enum MigThrError {
-> +    /* No error detected */
-> +    MIG_THR_ERR_NONE = 0,
-> +    /* Detected error, but resumed successfully */
-> +    MIG_THR_ERR_RECOVERED = 1,
-> +    /* Detected fatal error, need to exit */
-> +    MIG_THR_ERR_FATAL = 2,
-> +} MigThrError;
-> +
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LseWh1EXxswdtWu4fI9FbxTdQpO4lGPoj
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <48882fff-563a-52cc-c215-12f0808857cd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] kvm: workaround build break on gcc-7.1.1 /
+ fedora26
+References: <150168523493.31663.3716600121804656211.stgit@bahia.lan>
+ <dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
+In-Reply-To: <dd0512d5-0d7e-3b66-382d-47ee4d1a2de2@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Could you move this patch earlier to when postcopy_pause is created
-so it's created with this enum?
+On 08/03/2017 08:34 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Greg,
+>=20
+> On 08/02/2017 11:47 AM, Greg Kurz wrote:
+>> Building QEMU on fedora26 with the latest gcc package fails:
+>>
+>>    CC      ppc64-softmmu/target/ppc/kvm.o
+>> In file included from include/sysemu/hw_accel.h:16:0,
+>>                   from target/ppc/kvm.c:31:
+>> target/ppc/kvm.c: In function =E2=80=98kvmppc_booke_watchdog_enable=E2=
+=80=99:
+>> include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may =
+be used
+>> uninitialized
 
->  static int postcopy_resume_handshake(MigrationState *s)
->  {
->      qemu_mutex_lock(&s->resume_lock);
-> @@ -2209,10 +2218,10 @@ static int postcopy_do_resume(MigrationState *s)
->  
->  /*
->   * We don't return until we are in a safe state to continue current
-> - * postcopy migration.  Returns true to continue the migration, or
-> - * false to terminate current migration.
-> + * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
-> + * MIG_THR_ERR_FATAL if unrecovery failure happened.
->   */
-> -static bool postcopy_pause(MigrationState *s)
-> +static MigThrError postcopy_pause(MigrationState *s)
->  {
->      assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
->  
-> @@ -2247,7 +2256,7 @@ do_pause:
->          if (postcopy_do_resume(s) == 0) {
->              /* Let's continue! */
->              trace_postcopy_pause_continued();
-> -            return true;
-> +            return MIG_THR_ERR_RECOVERED;
->          } else {
->              /*
->               * Something wrong happened during the recovery, let's
-> @@ -2258,12 +2267,11 @@ do_pause:
->          }
->      } else {
->          /* This is not right... Time to quit. */
-> -        return false;
-> +        return MIG_THR_ERR_FATAL;
->      }
->  }
->  
-> -/* Return true if we want to stop the migration, otherwise false. */
-> -static bool migration_detect_error(MigrationState *s)
-> +static MigThrError migration_detect_error(MigrationState *s)
->  {
->      int ret;
->  
-> @@ -2272,7 +2280,7 @@ static bool migration_detect_error(MigrationState *s)
->  
->      if (!ret) {
->          /* Everything is fine */
-> -        return false;
-> +        return MIG_THR_ERR_NONE;
->      }
->  
->      if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE && ret == -EIO) {
-> @@ -2281,7 +2289,7 @@ static bool migration_detect_error(MigrationState *s)
->           * while. After that, it can be continued by a
->           * recovery phase.
->           */
-> -        return !postcopy_pause(s);
-> +        return postcopy_pause(s);
->      } else {
->          /*
->           * For precopy (or postcopy with error outside IO), we fail
-> @@ -2291,7 +2299,7 @@ static bool migration_detect_error(MigrationState *s)
->          trace_migration_thread_file_err();
->  
->          /* Time to stop the migration, now. */
-> -        return true;
-> +        return MIG_THR_ERR_FATAL;
->      }
->  }
->  
-> @@ -2319,6 +2327,7 @@ static void *migration_thread(void *opaque)
->      /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
->      enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
->      bool enable_colo = migrate_colo_enabled();
-> +    MigThrError thr_error;
->  
->      rcu_register_thread();
->  
-> @@ -2395,8 +2404,17 @@ static void *migration_thread(void *opaque)
->           * Try to detect any kind of failures, and see whether we
->           * should stop the migration now.
->           */
-> -        if (migration_detect_error(s)) {
-> +        thr_error = migration_detect_error(s);
-> +        if (thr_error == MIG_THR_ERR_FATAL) {
-> +            /* Stop migration */
->              break;
-> +        } else if (thr_error == MIG_THR_ERR_RECOVERED) {
-> +            /*
-> +             * Just recovered from a e.g. network failure, reset all
-> +             * the local variables.
-> +             */
-> +            initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +            initial_bytes = 0;
+>=20
+> This sizeof() use looks unnatural to me. I wonder why not use size_t,
+> since this is about sizeof()/ARRAY_SIZE(). The problem seems to come
+> from the commit this cast was introduced (61c7bbd236):
+>=20
+> target-ppc/kvm.c:1302:21: error: comparison of unsigned expression < 0
+> is always false [-Werror=3Dtype-limits]
+>=20
+> So I'd rather suggest this code, which looks more natural to read to me=
+:
+>=20
+>     if (ARRAY_SIZE(args_tmp)) {
+>         for (i =3D 0; i < ARRAY_SIZE(args_tmp) && ...
 
-They don't seem that important to reset?
+For that matter, the existing code is doing:
 
-Dave
+int i;
+i < (int)ARRAY_SIZE(args_tmp)
 
->          }
->  
->          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+but wouldn't that be better as:
+
+size_t i;
+i < ARRAY_SIZE(args_temp)
+
+I guess we have both the old compilers (per commit 61c7bbd2) and the new
+to worry about; although I was unable to reproduce it on Fedora 26 on
+x86_64 (is this an architecture-dependent compiler bug?)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--LseWh1EXxswdtWu4fI9FbxTdQpO4lGPoj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDK1YACgkQp6FrSiUn
+Q2oyDAf/evtKHuRkSGO+D7bEAkIN0bWPlYpKnaTYbiC0ZnozR4+ER74/tZeiAaa9
+WKco2m2VlV4/ytlABGypVgKLeSXKLUqP4zSixIyACziyLIQhpaezgPXI1YSymjMf
+mGkNQOjR+0bNDMLVLFjzlH2RU0WytJeVGcPLN0nmH+ruhQaI4ujZumI0njTw2mom
+lBD3KNOUDJcXJ/oXkMB+oWoNjnxQTi9xQ601ux6q2yp8YhBFcZIWmeO0yB94YyJb
+DfxD+8GxRadNBeE3MS7D7vcWURIPUWeloCqvjH7092KqK2tH4q2zKyTq7BHF7Kar
+SYXgboO50jg+eHglPEMxJh8ewq2HWA==
+=rF/D
+-----END PGP SIGNATURE-----
+
+--LseWh1EXxswdtWu4fI9FbxTdQpO4lGPoj--
