@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddKbm-0006O9-B4
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:12:31 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddKbn-0006OS-0D
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:12:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddKbl-0003Ci-A9
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:12:30 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34572)
+	(envelope-from <rth7680@gmail.com>) id 1ddKbm-0003Dl-73
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:12:31 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37812)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddKbk-0003BV-Q9
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:12:29 -0400
-Received: by mail-pf0-x242.google.com with SMTP id t86so2188886pfe.1
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 11:12:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddKbm-0003D8-1S
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 14:12:30 -0400
+Received: by mail-pf0-x243.google.com with SMTP id p13so2180241pfd.4
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 11:12:30 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 11:12:23 -0700
-Message-Id: <20170803181224.21748-3-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 11:12:24 -0700
+Message-Id: <20170803181224.21748-4-rth@twiddle.net>
 In-Reply-To: <20170803181224.21748-1-rth@twiddle.net>
 References: <20170803181224.21748-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL for-2.10 2/3] target/s390x: Fix CSST for 16-byte
- store
+Subject: [Qemu-devel] [PULL for-2.10 3/3] tcg: Increase minimum alignment
+ from tcg_malloc to 8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +30,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Found by Coverity (CID 1378273).
+For a 64-bit ILP32 host, aligning to sizeof(long) is not enough.
+Guess the minimum for any host is 8, as that covers uint64_t.
+Qemu doesn't use a host long double or host vectors, except in
+extremely limited circumstances.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Fixes a bus error for a sparc v8plus host.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 1 +
- 1 file changed, 1 insertion(+)
+ tcg/tcg.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index cdc78aa3d4..c71dce4b1e 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1580,6 +1580,7 @@ uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
-                 cpu_stq_data_ra(env, a2 + 0, svh, ra);
-                 cpu_stq_data_ra(env, a2 + 8, svl, ra);
-             }
-+            break;
-         default:
-             g_assert_not_reached();
-         }
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index da78721a0d..17b7750ee6 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -762,7 +762,10 @@ static inline void *tcg_malloc(int size)
+ {
+     TCGContext *s = &tcg_ctx;
+     uint8_t *ptr, *ptr_end;
+-    size = (size + sizeof(long) - 1) & ~(sizeof(long) - 1);
++
++    /* ??? This is a weak placeholder for minimum malloc alignment.  */
++    size = QEMU_ALIGN_UP(size, 8);
++
+     ptr = s->pool_cur;
+     ptr_end = ptr + size;
+     if (unlikely(ptr_end > s->pool_end)) {
 -- 
 2.13.3
