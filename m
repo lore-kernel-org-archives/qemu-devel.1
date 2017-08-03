@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddHep-0002fN-Qz
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:03:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ddHgH-00040G-HJ
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddHeo-0006zT-NT
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:03:27 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  3 Aug 2017 17:03:01 +0200
-Message-Id: <20170803150301.10177-6-kwolf@redhat.com>
-In-Reply-To: <20170803150301.10177-1-kwolf@redhat.com>
-References: <20170803150301.10177-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 5/5] qemu-iotests: Test reopen between
- read-only and read-write
+	(envelope-from <imammedo@redhat.com>) id 1ddHgG-0000vm-Er
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:04:57 -0400
+Date: Thu, 3 Aug 2017 17:04:44 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170803170444.1009a26e@nial.brq.redhat.com>
+In-Reply-To: <20170802212933.GG3108@localhost.localdomain>
+References: <20170802103259.25940-1-lvivier@redhat.com>
+	<CAAdtpL4fDx3JLm7+=TcJTZXwq_zuwup4=zkGH8QMLJ1ES=kqHw@mail.gmail.com>
+	<de5b3384-086b-bf7f-944f-94d10e185a7d@redhat.com>
+	<20170802212933.GG3108@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cpu: don't allow negative core id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,131 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-This serves as a regression test for the bugs that were just fixed for
-bdrv_reopen() between read-only and read-write mode.
+On Wed, 2 Aug 2017 18:29:33 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/187     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/187.out | 18 ++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 88 insertions(+)
- create mode 100755 tests/qemu-iotests/187
- create mode 100644 tests/qemu-iotests/187.out
+> On Wed, Aug 02, 2017 at 03:50:36PM +0200, Laurent Vivier wrote:
+> > On 02/08/2017 15:42, Philippe Mathieu-Daud=C3=A9 wrote: =20
+> > > Hi Laurent,
+> > >=20
+> > > On Wed, Aug 2, 2017 at 7:32 AM, Laurent Vivier <lvivier@redhat.com> w=
+rote: =20
+> > >> With pseries machine type a negative core-id is not managed properly:
+> > >> -1 gives an inaccurate error message ("core -1 already populated"),
+> > >> -2 crashes QEMU (core dump)
+> > >>
+> > >> As it seems a negative value is invalid for any architecture,
+> > >> instead of checking this in spapr_core_pre_plug() I think it's better
+> > >> to check this in the generic part, core_prop_set_core_id() =20
+> > >=20
+> > > Why is this property signed? If there is not reason to use it negativ=
+e,
+> > > is it possible to use object_property_add(.."uint"..)? =20
+> >=20
+> > You should be right:
+> >=20
+> > { 'struct': 'NumaNodeOptions',
+> >   'data': {
+> >    '*nodeid': 'uint16',
+> >    '*cpus':   ['uint16'],
+> >    '*mem':    'size',
+> >    '*memdev': 'str' }}
+> >=20
+> > but
+> >=20
+> > { 'struct': 'CpuInstanceProperties',
+> >   'data': { '*node-id': 'int',
+> >             '*socket-id': 'int',
+> >             '*core-id': 'int',
+> >             '*thread-id': 'int'
+> >   }
+> > }
+> >=20
+> > But I'm not sure it's a good idea to change the API now. =20
+>=20
+> Property parsing is not affected by the QAPI schema at all, so
+> touching the schema wouldn't fix the bug.
+>=20
+> The same applies to the 'type' argument to object_property_add():
+> it is ignored everywhere.
+>=20
+> However, the property setter can simply use a visitor for unsigned values=
+, and
+> it will reject negative values automatically, e.g.:
+>=20
+>   diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+>   index 2bf960d..b5af2bf 100644
+>   --- a/hw/cpu/core.c
+>   +++ b/hw/cpu/core.c
+>   @@ -25,9 +25,9 @@ static void core_prop_set_core_id(Object *obj, Visito=
+r *v, const char *name,
+>    {
+>        CPUCore *core =3D CPU_CORE(obj);
+>        Error *local_err =3D NULL;
+>   -    int64_t value;
+>   +    uint32_t value;
+>   =20
+>   -    visit_type_int(v, name, &value, &local_err);
+>   +    visit_type_uint32(v, name, &value, &local_err);
+>        if (local_err) {
+>            error_propagate(errp, local_err);
+>            return;
+>=20
+>=20
+>   $ ./ppc64-softmmu/qemu-system-ppc64 -device POWER8_v2.0-spapr-cpu-core,=
+core-id=3D-2
+>   qemu-system-ppc64: -device POWER8_v2.0-spapr-cpu-core,core-id=3D-2: Par=
+ameter 'core-id' expects uint32_t
+>=20
+>=20
+> I would suggest changing the CPUCore struct fields to uint32_t or
+> uint64_t, but it would be more intrusive and we're past hard
+> freeze.  Your patch looks good for 2.10.
+there is one reason to use signed int here,
+negative values might be used to mark not set property value,
+I recall we do something like this in target-i386.
 
-diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
-new file mode 100755
-index 0000000000..7bb783363c
---- /dev/null
-+++ b/tests/qemu-iotests/187
-@@ -0,0 +1,69 @@
-+#!/bin/bash
-+#
-+# Test switching between read-only and read-write
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=kwolf@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+    rm -f "$TEST_IMG.2"
-+    rm -f "$TEST_IMG.3"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+size=64M
-+_make_test_img $size
-+
-+echo
-+echo "Start from read-only"
-+echo
-+
-+$QEMU_IO -r -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
-+$QEMU_IO -r -c 'reopen -w' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
-+$QEMU_IO -r -c 'reopen -w' -c 'reopen -r' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
-+
-+echo
-+echo "Start from read-write"
-+echo
-+
-+$QEMU_IO -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
-+$QEMU_IO -c 'reopen -r' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
-+$QEMU_IO -c 'reopen -r' -c 'reopen -w' -c 'write 0 64k' $TEST_IMG | _filter_qemu_io
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/187.out b/tests/qemu-iotests/187.out
-new file mode 100644
-index 0000000000..68fb944cd5
---- /dev/null
-+++ b/tests/qemu-iotests/187.out
-@@ -0,0 +1,18 @@
-+QA output created by 187
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+
-+Start from read-only
-+
-+Block node is read-only
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Block node is read-only
-+
-+Start from read-write
-+
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+write failed: Operation not permitted
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 823811076d..1848077932 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -182,6 +182,7 @@
- 183 rw auto migration
- 185 rw auto
- 186 rw auto
-+187 rw auto
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
--- 
-2.13.3
+
+>=20
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>=20
+> I'm queueing it on machine-next.
+>=20
