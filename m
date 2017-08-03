@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddIBl-00074q-3F
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:37:32 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddICR-0007TZ-La
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:38:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddIBk-00063R-8y
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:37:29 -0400
-References: <20170803150301.10177-1-kwolf@redhat.com>
-	<20170803150301.10177-5-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <21a14ce0-7c6a-6527-807c-d31555921d59@redhat.com>
-Date: Thu, 3 Aug 2017 10:37:19 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddICQ-0007GO-3Y
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:38:11 -0400
+Date: Thu, 3 Aug 2017 17:38:00 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170803153800.GR4859@toto>
+References: <1501692241-23310-1-git-send-email-peter.maydell@linaro.org>
+	<1501692241-23310-10-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170803150301.10177-5-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LvoBTLNjD089bApLgtRr26WUaJ9eKCulM"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 4/5] qemu-io: Allow reopen
- read-write
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501692241-23310-10-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 09/15] target/arm: Don't store M
+ profile PRIMASK and FAULTMASK in daif
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +24,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LvoBTLNjD089bApLgtRr26WUaJ9eKCulM
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <21a14ce0-7c6a-6527-807c-d31555921d59@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 4/5] qemu-io: Allow reopen
- read-write
-References: <20170803150301.10177-1-kwolf@redhat.com>
- <20170803150301.10177-5-kwolf@redhat.com>
-In-Reply-To: <20170803150301.10177-5-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/03/2017 10:03 AM, Kevin Wolf wrote:
-> This allows qemu-iotests to test the switch between read-only and
-> read-write mode for block devices.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On Wed, Aug 02, 2017 at 05:43:55PM +0100, Peter Maydell wrote:
+> We currently store the M profile CPU register state PRIMASK and
+> FAULTMASK in the daif field of the CPU state in its I and F
+> bits. This is a legacy from the original implementation, which
+> tried to share the cpu_exec_interrupt code between A profile
+> and M profile. We've since separated out the two cases because
+> they are significantly different, so now there is no common
+> code between M and A profile which looks at env->daif: all the
+> uses are either in A-only or M-only code paths. Sharing the state
+> fields now is just confusing, and will make things awkward
+> when we implement v8M, where the PRIMASK and FAULTMASK
+> registers are banked between security states.
+> 
+> Switch M profile over to using v7m.faultmask and v7m.primask
+> fields for these registers.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  qemu-io-cmds.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
->=20
+>  hw/intc/armv7m_nvic.c |  4 ++--
+>  target/arm/cpu.c      |  5 -----
+>  target/arm/cpu.h      |  4 +++-
+>  target/arm/helper.c   | 18 +++++-------------
+>  target/arm/machine.c  | 33 +++++++++++++++++++++++++++++++++
+>  5 files changed, 43 insertions(+), 21 deletions(-)
+> 
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index 2e8166a..343bc16 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -167,9 +167,9 @@ static inline int nvic_exec_prio(NVICState *s)
+>      CPUARMState *env = &s->cpu->env;
+>      int running;
+>  
+> -    if (env->daif & PSTATE_F) { /* FAULTMASK */
+> +    if (env->v7m.faultmask) {
+>          running = -1;
+> -    } else if (env->daif & PSTATE_I) { /* PRIMASK */
+> +    } else if (env->v7m.primask) {
+>          running = 0;
+>      } else if (env->v7m.basepri > 0) {
+>          running = env->v7m.basepri & nvic_gprio_mask(s);
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 05c038b..b241a63 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -185,11 +185,6 @@ static void arm_cpu_reset(CPUState *s)
+>          uint32_t initial_pc; /* Loaded from 0x4 */
+>          uint8_t *rom;
+>  
+> -        /* For M profile we store FAULTMASK and PRIMASK in the
+> -         * PSTATE F and I bits; these are both clear at reset.
+> -         */
+> -        env->daif &= ~(PSTATE_I | PSTATE_F);
+> -
+>          /* The reset value of this bit is IMPDEF, but ARM recommends
+>           * that it resets to 1, so QEMU always does that rather than making
+>           * it dependent on CPU model.
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 1f06de0..da90b7a 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -418,6 +418,8 @@ typedef struct CPUARMState {
+>          uint32_t bfar; /* BusFault Address */
+>          unsigned mpu_ctrl; /* MPU_CTRL */
+>          int exception;
+> +        uint32_t primask;
+> +        uint32_t faultmask;
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+It seems like these could be booleans?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cheers,
+Edgar
 
 
---LvoBTLNjD089bApLgtRr26WUaJ9eKCulM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDQy8ACgkQp6FrSiUn
-Q2qpKQgAiVZfz36cvG8oKEaYCZMwk8VrqOXJPM49yAIU40O78E4UiYgNX9tdBx4q
-mbqw0WYL0njPVKgBcSwX8T1cxQWx+krYp0mLD7AvpDRu40HCl5L9AMj38LOsi5Xa
-0M9SeiqpQu3W50dxxcFGVWpyFROL2CkXB/I2dAe/2ePn+8p2HXQtdq8rArB8O7TD
-k0JzVQShBiBV9sIIhv066hBMCnJGmy9YdM2NLstGd8YWGhGdA6Xo65j1B/M2BTg2
-uc2cTflvesJ0m0sPZabPvREFSxVpYcM/E+nMVSfQgz2UTJoZPRw3XDuSD+8kCHCI
-ue8Y8PAa6AniFAY2K9aD1/aMqwinAg==
-=G11S
------END PGP SIGNATURE-----
-
---LvoBTLNjD089bApLgtRr26WUaJ9eKCulM--
+>      } v7m;
+>  
+>      /* Information associated with an exception about to be taken:
+> @@ -2179,7 +2181,7 @@ static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
+>           * we're in a HardFault or NMI handler.
+>           */
+>          if ((env->v7m.exception > 0 && env->v7m.exception <= 3)
+> -            || env->daif & PSTATE_F) {
+> +            || env->v7m.faultmask) {
+>              return arm_to_core_mmu_idx(ARMMMUIdx_MNegPri);
+>          }
+>  
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index f087d42..b64ddb1 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6172,7 +6172,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+>  
+>      if (env->v7m.exception != ARMV7M_EXCP_NMI) {
+>          /* Auto-clear FAULTMASK on return from other than NMI */
+> -        env->daif &= ~PSTATE_F;
+> +        env->v7m.faultmask = 0;
+>      }
+>  
+>      switch (armv7m_nvic_complete_irq(env->nvic, env->v7m.exception)) {
+> @@ -8718,12 +8718,12 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+>          return (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) ?
+>              env->regs[13] : env->v7m.other_sp;
+>      case 16: /* PRIMASK */
+> -        return (env->daif & PSTATE_I) != 0;
+> +        return env->v7m.primask;
+>      case 17: /* BASEPRI */
+>      case 18: /* BASEPRI_MAX */
+>          return env->v7m.basepri;
+>      case 19: /* FAULTMASK */
+> -        return (env->daif & PSTATE_F) != 0;
+> +        return env->v7m.faultmask;
+>      default:
+>          qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
+>                                         " register %d\n", reg);
+> @@ -8778,11 +8778,7 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+>          }
+>          break;
+>      case 16: /* PRIMASK */
+> -        if (val & 1) {
+> -            env->daif |= PSTATE_I;
+> -        } else {
+> -            env->daif &= ~PSTATE_I;
+> -        }
+> +        env->v7m.primask = val & 1;
+>          break;
+>      case 17: /* BASEPRI */
+>          env->v7m.basepri = val & 0xff;
+> @@ -8793,11 +8789,7 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+>              env->v7m.basepri = val;
+>          break;
+>      case 19: /* FAULTMASK */
+> -        if (val & 1) {
+> -            env->daif |= PSTATE_F;
+> -        } else {
+> -            env->daif &= ~PSTATE_F;
+> -        }
+> +        env->v7m.faultmask = val & 1;
+>          break;
+>      case 20: /* CONTROL */
+>          /* Writing to the SPSEL bit only has an effect if we are in
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index 1f66da4..2fb4b76 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -97,6 +97,17 @@ static bool m_needed(void *opaque)
+>      return arm_feature(env, ARM_FEATURE_M);
+>  }
+>  
+> +static const VMStateDescription vmstate_m_faultmask_primask = {
+> +    .name = "cpu/m/faultmask-primask",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(env.v7m.faultmask, ARMCPU),
+> +        VMSTATE_UINT32(env.v7m.primask, ARMCPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_m = {
+>      .name = "cpu/m",
+>      .version_id = 4,
+> @@ -115,6 +126,10 @@ static const VMStateDescription vmstate_m = {
+>          VMSTATE_UINT32(env.v7m.mpu_ctrl, ARMCPU),
+>          VMSTATE_INT32(env.v7m.exception, ARMCPU),
+>          VMSTATE_END_OF_LIST()
+> +    },
+> +    .subsections = (const VMStateDescription*[]) {
+> +        &vmstate_m_faultmask_primask,
+> +        NULL
+>      }
+>  };
+>  
+> @@ -201,6 +216,24 @@ static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
+>      CPUARMState *env = &cpu->env;
+>      uint32_t val = qemu_get_be32(f);
+>  
+> +    if (arm_feature(env, ARM_FEATURE_M)) {
+> +        /* If the I or F bits are set then this is a migration from
+> +         * an old QEMU which still stored the M profile FAULTMASK
+> +         * and PRIMASK in env->daif. Set v7m.faultmask and v7m.primask
+> +         * accordingly, and then clear the bits so they don't confuse
+> +         * cpsr_write(). For a new QEMU, the bits here will always be
+> +         * clear, and the data is transferred using the
+> +         * vmstate_m_faultmask_primask subsection.
+> +         */
+> +        if (val & CPSR_F) {
+> +            env->v7m.faultmask = 1;
+> +        }
+> +        if (val & CPSR_I) {
+> +            env->v7m.primask = 1;
+> +        }
+> +        val &= ~(CPSR_F | CPSR_I);
+> +    }
+> +
+>      env->aarch64 = ((val & PSTATE_nRW) == 0);
+>  
+>      if (is_a64(env)) {
+> -- 
+> 2.7.4
+> 
+> 
