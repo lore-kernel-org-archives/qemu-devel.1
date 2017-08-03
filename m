@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ddEiW-0002Jl-Sc
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:55:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddEk7-0003Is-Eh
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ddEiT-00025N-7L
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:55:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35232)
+	(envelope-from <dgilbert@redhat.com>) id 1ddEk3-0004W8-UM
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:56:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ddEiS-00023n-Tj
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:55:01 -0400
-Date: Thu, 3 Aug 2017 12:54:57 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170803115457.GD22685@stefanha-x1.localdomain>
-References: <20170728133430.GS12364@stefanha-x1.localdomain>
-	<CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
-	<20170728140623.GQ31495@redhat.com> <87vamclf6w.fsf@frigg.lan>
-	<20170801134825.GC22017@stefanha-x1.localdomain>
-	<CAFEAcA9KKqyiNfsfjSDVhhE7hMMsAZ==TuSjgtqb6pB=fVF+_w@mail.gmail.com>
-	<20170802110400.GI5531@stefanha-x1.localdomain>
-	<CAFEAcA82EBmOF3k=fXN4tAAL2=J6s8avUoQGXKrBwchh1rmMCQ@mail.gmail.com>
-	<20170802144943.GF10101@stefanha-x1.localdomain>
-	<87lgn2q9oe.fsf@frigg.lan>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddEk3-0004V2-L1
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:56:39 -0400
+Date: Thu, 3 Aug 2017 12:56:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803115631.GH2076@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-27-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fOHHtNG4YXGJ0yqR"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87lgn2q9oe.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
- instrumentation
+In-Reply-To: <1501229198-30588-27-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 26/29] migration: synchronize dirty bitmap
+ for resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,119 +28,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alessandro Di Federico <ale+qemu@clearmind.me>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> This patch implements the first part of core RAM resume logic for
+> postcopy. ram_resume_prepare() is provided for the work.
+> 
+> When the migration is interrupted by network failure, the dirty bitmap
+> on the source side will be meaningless, because even the dirty bit is
+> cleared, it is still possible that the sent page was lost along the way
+> to destination. Here instead of continue the migration with the old
+> dirty bitmap on source, we ask the destination side to send back its
+> received bitmap, then invert it to be our initial dirty bitmap.
+> 
+> The source side send thread will issue the MIG_CMD_RECV_BITMAP requests,
+> once per ramblock, to ask for the received bitmap. On destination side,
+> MIG_RP_MSG_RECV_BITMAP will be issued, along with the requested bitmap.
+> Data will be received on the return-path thread of source, and the main
+> migration thread will be notified when all the ramblock bitmaps are
+> synchronized.
+> 
+> One issue to be solved here is how to synchronize the source send thread
+> and return-path thread. Semaphore cannot really work here since we
+> cannot guarantee the order of wait/post (it's possible that the reply is
+> very fast, even before send thread starts to wait). So conditional
+> variable is used to make sure the ordering is always correct.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c  |  4 +++
+>  migration/migration.h  |  4 +++
+>  migration/ram.c        | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  migration/trace-events |  1 +
+>  4 files changed, 77 insertions(+)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 6cb0ad3..93fbc96 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1093,6 +1093,8 @@ static void migrate_fd_cleanup(void *opaque)
+>  
+>      qemu_sem_destroy(&s->postcopy_pause_sem);
+>      qemu_sem_destroy(&s->postcopy_pause_rp_sem);
+> +    qemu_mutex_destroy(&s->resume_lock);
+> +    qemu_cond_destroy(&s->resume_cond);
+>  }
+>  
+>  void migrate_fd_error(MigrationState *s, const Error *error)
+> @@ -1238,6 +1240,8 @@ MigrationState *migrate_init(void)
+>      s->error = NULL;
+>      qemu_sem_init(&s->postcopy_pause_sem, 0);
+>      qemu_sem_init(&s->postcopy_pause_rp_sem, 0);
+> +    qemu_mutex_init(&s->resume_lock);
+> +    qemu_cond_init(&s->resume_cond);
+>  
+>      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+>  
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 2a3f905..c270f4c 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -159,6 +159,10 @@ struct MigrationState
+>      /* Needed by postcopy-pause state */
+>      QemuSemaphore postcopy_pause_sem;
+>      QemuSemaphore postcopy_pause_rp_sem;
+> +
+> +    /* Used to sync-up between main send thread and rp-thread */
+> +    QemuMutex resume_lock;
+> +    QemuCond resume_cond;
+>  };
+>  
+>  void migrate_set_state(int *state, int old_state, int new_state);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index d543483..c695b13 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -46,6 +46,7 @@
+>  #include "exec/ram_addr.h"
+>  #include "qemu/rcu_queue.h"
+>  #include "migration/colo.h"
+> +#include "savevm.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> @@ -256,6 +257,8 @@ struct RAMState {
+>      RAMBlock *last_req_rb;
+>      /* Queue of outstanding page requests from the destination */
+>      QemuMutex src_page_req_mutex;
+> +    /* Ramblock counts to sync dirty bitmap. Only used for recovery */
+> +    int ramblock_to_sync;
+>      QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
+>  };
+>  typedef struct RAMState RAMState;
+> @@ -2731,6 +2734,57 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      return ret;
+>  }
+>  
+> +/* Sync all the dirty bitmap with destination VM.  */
+> +static int ram_dirty_bitmap_sync_all(MigrationState *s, RAMState *rs)
+> +{
+> +    RAMBlock *block;
+> +    QEMUFile *file = s->to_dst_file;
+> +    int ramblock_count = 0;
+> +
+> +    trace_ram_dirty_bitmap_sync("start");
 
---fOHHtNG4YXGJ0yqR
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Most (but not all) of our trace_ uses have separate trace_ entries for
+each step; e.g.   trace_ram_dirty_bitmap_sync_start9)
 
-On Wed, Aug 02, 2017 at 06:19:29PM +0300, Llu=EDs Vilanova wrote:
-> Stefan Hajnoczi writes:
->=20
-> > On Wed, Aug 02, 2017 at 12:10:14PM +0100, Peter Maydell wrote:
-> >> On 2 August 2017 at 12:04, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> >> > On Tue, Aug 01, 2017 at 02:54:29PM +0100, Peter Maydell wrote:
-> >> >> and I don't need the TCG engine to be a library to do that...
-> >> >
-> >> > You do need TCG APIs if you want TCG-level instrumentation, tuning
-> >> > options, callbacks, etc.
-> >>=20
-> >> I need an API; that doesn't necessarily look like the kind
-> >> of API you want to be able to embed the TCG engine into
-> >> other things, I think.
-> >>=20
-> >> >> I agree that we want to provide something that is at least
-> >> >> closer to a stable API than "just expose trace events",
-> >> >> though.
-> >> >
-> >> > libqemu has at least three parts:
-> >> >
-> >> > 1. VM API (i.e. qemu_init(argc, argv), qemu_run(), qemu_vcpu_get_reg=
-32())
-> >> > 2. TCG engine
-> >> > 3. Device models
-> >> >
-> >> > Like I said in my email, start with what matters for the instrumenta=
-tion
-> >> > use case (VM API at a minimum to control guest execution).  Other pe=
-ople
-> >> > can flesh out the other parts later, as needed.
-> >> >
-> >> > Other attempts to provide a stable API will be essentially the same
-> >> > thing as libqemu.
-> >>=20
-> >> I don't think this is the case -- you could have a stable
-> >> instrumentation API without it looking anything like
-> >> libqemu. In particular I don't think you need to have
-> >> something that sits at the top level and says 'run'.
-> >>=20
-> >> In particular I think that pulling TCG out of QEMU
-> >> is an enormous and painful undertaking that you just
-> >> don't need to do at all to allow this kind of
-> >> instrumentation API.
->=20
-> > Please post an example of the API you'd like.
->=20
-> In my opinion, the instrumentation support in this series provides an API=
- that
-> works in the opposite way you're suggesting (let's ignore the fact that i=
-t's
-> built on tracing events).
->=20
-> When QEMU loads an instrumentation library (which can happen at any time)=
-, some
-> initialization function is called on the library so that it can establish=
- what
-> events to instrument. This also has the advantage that a user can hook in=
-to a
-> running QEMU instance at any time to perform some instrumentation.
->=20
-> I think this is the bare minimum necessary to make it work, and has the u=
-pside
-> of being completely orthogonal to the libqemu approach. We could reuse mo=
-st of
-> the stable instrumentation API there too, except for the instrumentation =
-code
-> initialization.
->=20
-> That being said, the libqemu approach *might* make it a bit easier to pro=
-vide an
-> API for things such as "run for this many instructions and return control=
- to
-> instrumentor", but I don't think that's mandatory for a first prototype (=
-and can
-> definitely be implemented using both approaches).
+> +    /*
+> +     * We need to take the resume lock to make sure that the send
+> +     * thread (current thread) and the rp-thread will do their work in
+> +     * order.
+> +     */
+> +    qemu_mutex_lock(&s->resume_lock);
+> +
+> +    /* Request for receive-bitmap for each block */
+> +    RAMBLOCK_FOREACH(block) {
+> +        ramblock_count++;
+> +        qemu_savevm_send_recv_bitmap(file, block->idstr);
+> +    }
+> +
+> +    /* Init the ramblock count to total */
+> +    atomic_set(&rs->ramblock_to_sync, ramblock_count);
+> +
+> +    trace_ram_dirty_bitmap_sync("wait-bitmap");
+> +
+> +    /* Wait until all the ramblocks' dirty bitmap synced */
+> +    while (rs->ramblock_to_sync) {
+> +        qemu_cond_wait(&s->resume_cond, &s->resume_lock);
+> +    }
 
-The main concern I have is that a feature for loading shared libraries
-and hooking QEMU will be abused.  This can be mostly solved by offering
-only a stable API without the ability to hook trace events.  There are
-still ways to abuse this and that's why I prefer the libqemu approach.
+Does the locking here get simpler if you:
+  a) count the number of RAMBlocks 'n'
+  b) Initialise a sempahore to -(n-1)
+  c) Call qemu_savevm_send_recv_bitmap for each bitmap
+  d) sem_wait on the semaphore - which is waiting for the semaphore to
+     be >0
 
-The libqemu approach also avoids the "how do I enable my
-instrumentation?" step for new users because they just need to run their
-program after compiling it.  The workflow is simpler.
+as you receive each bitmap do a sem_post; on the last one
+it should go from 0->1 and the sem_wait should wake up?
 
-As a next step I suggest defining the stable instrumentation API and
-dropping the tracing hooks.  We can still work out whether shared
-library loading or libqemu is okay later but the stable API is most
-important.
+Dave
 
-Stefan
-
---fOHHtNG4YXGJ0yqR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZgw8RAAoJEJykq7OBq3PIqrgH/2MxXYtZQ/AlF8tpxRFcJ/dp
-cgNxZvXAthl3OUk82EXeu4fUiwBssPEr9B76vBJ6rkVyNBEK9+TP4eTYgYBPrLcV
-MEjBBaGyGRVsjyi/YGCLw/keTsX5jNoFM5YJ4mFgvo9ZaNJnv9QjTT5K+5+Thg7A
-nKwGEO5/JJ5YuMLCFjE6lBTYsdQSr6q3WyycdHe/4yC2CNnhJ3fgzXEiVo7vLa+w
-8ED8gUHlkEraZtlz6FkgUUW8IJP4D02OrvxGYAftLN6YpMpnl+21KLkMv7SjUSik
-vN97t6m65NWp34e+Iw9k4xoQv/HbXKp4JRqH0RlPaFKJczLgWjo65w2+isIZAX8=
-=sq5n
------END PGP SIGNATURE-----
-
---fOHHtNG4YXGJ0yqR--
+> +    trace_ram_dirty_bitmap_sync("completed");
+> +
+> +    qemu_mutex_unlock(&s->resume_lock);
+> +
+> +    return 0;
+> +}
+> +
+> +static void ram_dirty_bitmap_reload_notify(MigrationState *s)
+> +{
+> +    qemu_mutex_lock(&s->resume_lock);
+> +    atomic_dec(&ram_state->ramblock_to_sync);
+> +    if (ram_state->ramblock_to_sync == 0) {
+> +        /* Make sure the other thread gets the latest */
+> +        trace_ram_dirty_bitmap_sync("notify-send");
+> +        qemu_cond_signal(&s->resume_cond);
+> +    }
+> +    qemu_mutex_unlock(&s->resume_lock);
+> +}
+> +
+>  /*
+>   * Read the received bitmap, revert it as the initial dirty bitmap.
+>   * This is only used when the postcopy migration is paused but wants
+> @@ -2776,9 +2830,22 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+>  
+>      trace_ram_dirty_bitmap_reload(block->idstr);
+>  
+> +    /*
+> +     * We succeeded to sync bitmap for current ramblock. If this is
+> +     * the last one to sync, we need to notify the main send thread.
+> +     */
+> +    ram_dirty_bitmap_reload_notify(s);
+> +
+>      return 0;
+>  }
+>  
+> +static int ram_resume_prepare(MigrationState *s, void *opaque)
+> +{
+> +    RAMState *rs = *(RAMState **)opaque;
+> +
+> +    return ram_dirty_bitmap_sync_all(s, rs);
+> +}
+> +
+>  static SaveVMHandlers savevm_ram_handlers = {
+>      .save_setup = ram_save_setup,
+>      .save_live_iterate = ram_save_iterate,
+> @@ -2789,6 +2856,7 @@ static SaveVMHandlers savevm_ram_handlers = {
+>      .save_cleanup = ram_save_cleanup,
+>      .load_setup = ram_load_setup,
+>      .load_cleanup = ram_load_cleanup,
+> +    .resume_prepare = ram_resume_prepare,
+>  };
+>  
+>  void ram_mig_init(void)
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 0fb2d1e..15ff1bf 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -80,6 +80,7 @@ ram_postcopy_send_discard_bitmap(void) ""
+>  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: %" PRIx64 " host: %p"
+>  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
+>  ram_dirty_bitmap_reload(char *str) "%s"
+> +ram_dirty_bitmap_sync(const char *str) "%s"
+>  
+>  # migration/migration.c
+>  await_return_path_close_on_source_close(void) ""
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
