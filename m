@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddFNO-0001NT-29
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:37:19 -0400
+	(envelope-from <groug@kaod.org>) id 1ddFNZ-0001RY-62
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddFNJ-0006Vh-JU
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:37:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11069)
+	(envelope-from <groug@kaod.org>) id 1ddFNU-0006sG-O8
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:37:29 -0400
+Received: from 9.mo7.mail-out.ovh.net ([46.105.60.248]:51532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddFNJ-0006TP-AB
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:37:13 -0400
-Date: Thu, 3 Aug 2017 13:37:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170803123704.GK2076@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-28-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ddFNU-0006oB-HP
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 08:37:24 -0400
+Received: from player788.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 0ABDB62DF9
+	for <qemu-devel@nongnu.org>; Thu,  3 Aug 2017 14:37:22 +0200 (CEST)
+Date: Thu, 3 Aug 2017 14:37:15 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170803143715.33d0a62c@bahia.lan>
+In-Reply-To: <4646e612ef5efb4f17f07eaec18e940f7ae93382.1501740002.git.sam.bobroff@au1.ibm.com>
+References: <cover.1501740002.git.sam.bobroff@au1.ibm.com>
+	<4646e612ef5efb4f17f07eaec18e940f7ae93382.1501740002.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501229198-30588-28-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 27/29] migration: setup ramstate for resume
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/Bt6lwlxxblybH1v2T4U=nXw";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: Fix bug in
+ h_signal_sys_reset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-* Peter Xu (peterx@redhat.com) wrote:
-> After we updated the dirty bitmaps of ramblocks, we also need to update
-> the critical fields in RAMState to make sure it is ready for a resume.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+--Sig_/Bt6lwlxxblybH1v2T4U=nXw
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 3 Aug 2017 16:28:27 +1000
+Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
+
+> The unicast case in h_signal_sys_reset() seems to be broken:
+> rather than selecting the target CPU, it looks like it will pick
+> either the first CPU or fail to find one at all.
+>=20
+> Fix it by using the search function rather than open coding the
+> search.
+>=20
+
+Heh the open coded search is using cpu where it should have been using
+POWERPC_CPU(cs) =3D> it can only succeed if a the vCPU is signalling itself.
+
+> This was found by inspection; the code appears to be unused because
+> the Linux kernel only uses the broadcast target.
+>=20
+> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
 > ---
->  migration/ram.c | 35 ++++++++++++++++++++++++++++++++++-
->  1 file changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index c695b13..427bf6e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1947,6 +1947,31 @@ static int ram_state_init(RAMState **rsp)
->      return 0;
->  }
->  
-> +static void ram_state_resume_prepare(RAMState *rs)
-> +{
-> +    RAMBlock *block;
-> +    long pages = 0;
-> +
-> +    /*
-> +     * Postcopy is not using xbzrle/compression, so no need for that.
-> +     * Also, since source are already halted, we don't need to care
-> +     * about dirty page logging as well.
-> +     */
-> +
-> +    RAMBLOCK_FOREACH(block) {
-> +        pages += bitmap_count_one(block->bmap,
-> +                                  block->max_length >> TARGET_PAGE_BITS);
+>  hw/ppc/spapr_hcall.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 72ea5a8247..07b3da8dc4 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1431,11 +1431,10 @@ static target_ulong h_signal_sys_reset(PowerPCCPU=
+ *cpu,
+> =20
+>      } else {
+>          /* Unicast */
+> -        CPU_FOREACH(cs) {
+> -            if (cpu->cpu_dt_id =3D=3D target) {
+> -                run_on_cpu(cs, spapr_do_system_reset_on_cpu, RUN_ON_CPU_=
+NULL);
+> -                return H_SUCCESS;
+> -            }
+> +        cs =3D CPU(ppc_get_vcpu_by_dt_id(target));
+> +        if (cs) {
+> +            run_on_cpu(cs, spapr_do_system_reset_on_cpu, RUN_ON_CPU_NULL=
+);
+> +            return H_SUCCESS;
+>          }
+>          return H_PARAMETER;
+>      }
 
-Again I think that needs to be block->used_length (see
-migration_bitmap_sync).
 
-> +    }
-> +
-> +    /* This may not be aligned with current bitmaps. Recalculate. */
-> +    rs->migration_dirty_pages = pages;
-> +
-> +    rs->last_seen_block = NULL;
-> +    rs->last_sent_block = NULL;
-> +    rs->last_page = 0;
-> +    rs->last_version = ram_list.version;
+--Sig_/Bt6lwlxxblybH1v2T4U=nXw
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-A trace at this point with the pages count might be worthwhile.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-> +}
-> +
->  /*
->   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
->   * long-running RCU critical section.  When rcu-reclaims in the code
-> @@ -2842,8 +2867,16 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
->  static int ram_resume_prepare(MigrationState *s, void *opaque)
->  {
->      RAMState *rs = *(RAMState **)opaque;
-> +    int ret;
->  
-> -    return ram_dirty_bitmap_sync_all(s, rs);
-> +    ret = ram_dirty_bitmap_sync_all(s, rs);
+iEYEARECAAYFAlmDGPsACgkQAvw66wEB28JTigCeIWVE2OCFDksNVHhi6n9/+kk5
+wAMAoJzPn6rfl94FOmR4Rq2JyJP63jyM
+=88Z+
+-----END PGP SIGNATURE-----
 
-Interesting; I'd assumed you'd load directly into this
-bitmap rather than loading into the bitmap on each block.
-Do we ever get the case where a bitmap is set on the source
-bitmap but not in the loaded bitmap?
-
-Dave
-
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    ram_state_resume_prepare(rs);
-> +
-> +    return 0;
->  }
->  
->  static SaveVMHandlers savevm_ram_handlers = {
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--Sig_/Bt6lwlxxblybH1v2T4U=nXw--
