@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddHNS-00016o-Py
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:45:31 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddHNS-00016k-OB
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:45:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddHNR-0002XG-O2
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddHNP-0002VY-LS
 	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:45:30 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:26811)
+Received: from mailapp01.imgtec.com ([195.59.15.196]:25747)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddHNR-0002X5-Ii
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:45:29 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ddHNP-0002VG-El
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 10:45:27 -0400
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Thu, 3 Aug 2017 15:45:14 +0100
-Message-ID: <1501771515-22847-8-git-send-email-yongbok.kim@imgtec.com>
+Date: Thu, 3 Aug 2017 15:45:12 +0100
+Message-ID: <1501771515-22847-6-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1501771515-22847-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1501771515-22847-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 7/8] target/mips: Drop redundant
- gen_io_start/stop()
+Subject: [Qemu-devel] [PULL 5/8] target-mips: apply CP0.PageMask before
+ writing into TLB entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +27,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Leon Alrae <leon.alrae@imgtec.com>
 
-From: James Hogan <james.hogan@imgtec.com>
+From: Leon Alrae <leon.alrae@imgtec.com>
 
-DMTC0 CP0_Cause does a redundant gen_io_start() and gen_io_end() pair,
-even though this is done for all DMTC0 operations outside of the switch
-statement. Remove these redundant calls.
+PFN0 and PFN1 have to be masked out with PageMask_Mask.
 
-Fixes: 5dc5d9f055c5 ("mips: more fixes to the MIPS interrupt glue logic")
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+[Yongbok Kim:
+  Added commit message]
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- target/mips/translate.c | 8 --------
- 1 file changed, 8 deletions(-)
+ target/mips/op_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ba6b8f5..bcea2a1 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -7401,15 +7401,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         switch (sel) {
-         case 0:
-             save_cpu_state(ctx, 1);
--            /* Mark as an IO operation because we may trigger a software
--               interrupt.  */
--            if (ctx->tb->cflags & CF_USE_ICOUNT) {
--                gen_io_start();
--            }
-             gen_helper_mtc0_cause(cpu_env, arg);
--            if (ctx->tb->cflags & CF_USE_ICOUNT) {
--                gen_io_end();
--            }
-             /* Stop translation as we may have triggered an intetrupt. BS_STOP
-              * isn't sufficient, we need to ensure we break out of translated
-              * code to check for pending interrupts.  */
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 526f8e4..320f2b0 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -2008,6 +2008,7 @@ static inline uint64_t get_tlb_pfn_from_entrylo(uint64_t entrylo)
+ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
+ {
+     r4k_tlb_t *tlb;
++    uint64_t mask = env->CP0_PageMask >> (TARGET_PAGE_BITS + 1);
+ 
+     /* XXX: detect conflicting TLBs and raise a MCHECK exception when needed */
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+@@ -2028,13 +2029,13 @@ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
+     tlb->C0 = (env->CP0_EntryLo0 >> 3) & 0x7;
+     tlb->XI0 = (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
+     tlb->RI0 = (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
+-    tlb->PFN[0] = get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) << 12;
++    tlb->PFN[0] = (get_tlb_pfn_from_entrylo(env->CP0_EntryLo0) & ~mask) << 12;
+     tlb->V1 = (env->CP0_EntryLo1 & 2) != 0;
+     tlb->D1 = (env->CP0_EntryLo1 & 4) != 0;
+     tlb->C1 = (env->CP0_EntryLo1 >> 3) & 0x7;
+     tlb->XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
+     tlb->RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
+-    tlb->PFN[1] = get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) << 12;
++    tlb->PFN[1] = (get_tlb_pfn_from_entrylo(env->CP0_EntryLo1) & ~mask) << 12;
+ }
+ 
+ void r4k_helper_tlbinv(CPUMIPSState *env)
 -- 
 2.7.4
