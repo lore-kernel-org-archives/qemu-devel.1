@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ddDO5-00051t-3G
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:29:55 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1ddDfy-0002av-5N
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ddDO1-00050T-LQ
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:29:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ddDO1-0004zL-C4
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:29:49 -0400
-References: <1501285073-2215-1-git-send-email-zuban32s@gmail.com>
-	<1501285073-2215-6-git-send-email-zuban32s@gmail.com>
-	<491f77fc-974c-33dd-3974-08ab61d2c078@redhat.com>
-	<CAKSfGUCTom8YBs8wOHMX_MpzDF1efB8_USb4tuW+hcAdoG2xvw@mail.gmail.com>
-	<20170802003910-mutt-send-email-mst@kernel.org>
-	<17a71bfc-1933-f707-2504-c9c699534cea@redhat.com>
-	<20170802164551-mutt-send-email-mst@kernel.org>
-	<9e36b7d6-bff3-b046-6053-162fb75ca0a0@redhat.com>
-	<b0e1c72d-9c17-42e5-3135-5ebb1e53b4f1@redhat.com>
-	<c4761b15-4525-247c-14da-510b20dbf90a@redhat.com>
-	<20170802192446-mutt-send-email-mst@kernel.org>
-	<597fd60c-d8ec-0334-10de-3ff4947055ea@redhat.com>
-	<6b6e8efe-18d6-8d77-ad8c-54b8f7ba2ef8@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <92801f02-1743-b604-8a07-fbf5db162386@redhat.com>
-Date: Thu, 3 Aug 2017 13:29:36 +0300
-MIME-Version: 1.0
-In-Reply-To: <6b6e8efe-18d6-8d77-ad8c-54b8f7ba2ef8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <bharat.bhushan@nxp.com>) id 1ddDfv-0001K7-Dj
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 06:48:22 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Thu, 3 Aug 2017 10:48:15 +0000
+Message-ID: <AM5PR0401MB254523A43EB292B478C729279AB10@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<1496851287-9428-7-git-send-email-eric.auger@redhat.com>
+	<20170714021733.GA27284@pxdev.xzpeter.org>
+	<AM5PR0401MB2545B52A31CCA827DB3EE5A79AAD0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<20170717012809.GO27284@pxdev.xzpeter.org>
+	<45e202fa-2b6b-bc17-9200-b0eaa1879c78@redhat.com>
+In-Reply-To: <45e202fa-2b6b-bc17-9200-b0eaa1879c78@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
+ translation and commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,163 +29,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laine Stump <laine@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>, ehabkost@redhat.com, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+To: Auger Eric <eric.auger@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "drjones@redhat.com" <drjones@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
-On 03/08/2017 5:41, Laine Stump wrote:
-> On 08/02/2017 01:58 PM, Marcel Apfelbaum wrote:
->> On 02/08/2017 19:26, Michael S. Tsirkin wrote:
->>> On Wed, Aug 02, 2017 at 06:36:29PM +0300, Marcel Apfelbaum wrote:
->>>>>>>>> Can dmi-pci support shpc? why doesn't it? For compatibility?
->>>>>>>>
->>>>>>>> I don't know why, but the fact that it doesn't is the reason libvirt
->>>>>>>> settled on auto-creating a dmi-pci bridge and a pci-pci bridge under
->>>>>>>> that for Q35. The reasoning was (IIRC Laine's words correctly)
->>>>>>>> that the
->>>>>>>> dmi-pci bridge cannot receive hotplugged devices, while the pci-pci
->>>>>>>> bridge cannot be connected to the root complex. So both were needed.
-> 
-
-Hi Laine,
-
-> 
-> At least that's what I was told :-) (seriously, 50% of the convoluted
-> rules encoded into libvirt's PCI bus topology construction and
-> connection rules come from trial and error, and the other 50% come from
-> advice and recommendations from others who (unlike me) actually know
-> something about PCI.)
-> 
-> Of course the whole setup of plugging a pci-bridge into a
-> dmi-to-pci-bridge was (at the time at least) an exercise in futility,
-> since hotplug didn't work properly on pci-bridge+Q35 anyway (that
-> initially wasn't explained to me; it was only after I had constructed
-> the odd bus topology and it was in released code that someone told me
-> "Oh, by the way, hotplug to pci-bridge doesn't work on Q35". At first it
-> was described as a bug, then later reclassified as a future feature.)
-> 
-> (I guess the upside is that all of the horrible complex/confusing code
-> needed to automatically add two controllers just to plug in a single
-> endpoint is now already in the code, and will "just work" if/when needed).
-> 
-> Now that I go back to look at this thread (qemu-devel is just too much
-> for me to try and read unless something has been Cc'ed to me - I really
-> don't know how you guys manage it!), I see that pcie-pci-bridge has been
-> implemented, and we (libvirt) will want to use that instead of
-> dmi-to-pci-bridge when available. And pcie-pci-bridge itself can have
-> endpoints hotplugged into it, correct? 
-
-Yes.
-
-> This means there will need to be
-> patches for libvirt that check for the presence of pcie-pci-bridge, and
-> if it's found they will replace any auto-added
-> dmi-to-pci-bridge+pci-bridge with a long pcie-pci-bridge.
-> 
-
-The PCIe-PCI bridge is to be plugged into a PCIe Root Port and then
-you can add PCI devices to it. The devices can be hot-plugged
-into it (see below the limitations) and even the bridge itself
-can be hot-plugged (old OSes might not support it).
-
-So the device will replace the dmi-pci-bridge + pci-pci
-bridge completely.
-
-libvirt will have 2 options:
-1. Start with a pcie-pci bridge attached to a PCIe Root Port
-    and all legacy PCI devices should land there (or on bus 0)
-    (You can use the "auto" device addressing, add PCI devices
-     automatically to this device until the bridge is full,
-     then use the last slot to add a pci brigde or use another
-     pcie-pci bridge)
-2. Leave a PCIe Root Port empty and configure with hints for
-    the fw that we might want to hotplug a pcie-pci bridge into it.
-    If a PCI device is needed, hotplug the pcie-pci bridge first,
-    then the device.
-
-The above model gives you enough elasticity so if you:
-   1. don't need PCI devices -> create the machine with
-      no pci controllers
-   2. need PCI devices -> add a pcie-pci bridge and you
-      get a legacy PCI bus supporting hotplug.
-   3. might need PCI devices -> leave a PCIe Root Port
-      empty (+ hints)
-
-
-
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>> Laszlo
->>>>>>>
->>>>>>> OK. Is it true that dmi-pci + pci-pci under it will allow hotplug
->>>>>>> on Q35 if we just flip the bit in _OSC?
->>>>>>
->>>>>> Marcel, what say you?... :)
->>>>
->>>> Good news, works with:
->>>>      -device i82801b11-bridge,id=b1
->>>>      -device pci-bridge,id=b2,bus=b1,chassis_nr=1,msi=off
->>>
->>> And presumably it works for modern windows?
->>> OK, so it looks like patch 1 is merely a bugfix, I'll merge it for 2.10.
->>>
->>
->> Tested with Win10, I think is OK to merge if for 2.10.
->>
->>>> Notice bridge's msi=off until the following kernel bug will be merged:
->>>>     https://www.spinics.net/lists/linux-pci/msg63052.html
->>>
->>> Does libvirt support msi=off as a work-around?
-> 
-> We have no explicit setting for msi on pci controllers. The only place
-> we explicitly set that is on the ivshmem device.
-> 
-
-We need msi=off because of a bug in Linux Kernel. Even if the bug
-is fixed (there is already a patch upstream), we don't know when
-will get in (actually 4.14) and what versions will include it.
-
-> That doesn't mean that we couldn't add it. However, if we were going to
-> do it manually, that would mean adding another knob that we have to
-> support forever. And even if we wanted to do it automatically, we would
-> not only need to find something in qemu to key off of when deciding
-> whether or not to set it, but we would *still* have to explicitly store
-> the setting in the config so that migrations between hosts using
-> differing versions of qemu would preserve guest ABI.
-
-It is not even something QEMU can be queried about. It depends on
-the guest OS.
-
-> Are there really
-> enough people demanding (with actual concrete plans of *using*) hotplug
-> of legacy PCI devices on Q35 guests *immediately* that we want to
-> permanently pollute libvirt's code in this manner just for an interim
-> workaround?
-> 
-
-If/when Q35 would become the default machine, we want feature parity,
-so the users can keep the exact (almost) setup on q35. PCI
-hotplug is part of it.
-
-> 
-> I didn't have enough time/energy to fully parse all the rest of this
-> thread - is msi=off currently required for pcie-pci-bridge hotplug as
-> well? 
-
-Yes.
-
-(not that it changes my opinion - just as we can tell people
-> "upgrade to a new qemu and libvirt if you want to hotplug legacy PCI
-> devices on Q35 guests", we can also tell them "Oh, and wait X weeks and
-> upgrade to a new kernel too".
-> 
-
-I agree it will be hard to manage such a flag on libvirt automatically,
-but exposing an msi property to the pcie-pci-bridge and adding a
-comment: "switch to off if pci-hotplug doesn't work" would be ok?
-
-An alternative is to not expose "msi" to libvirt and default it to off.
-In the future, if the feature proves valuable, we can ask libvirt
-to help for transition to "on".
-
-Thanks,
-Marcel
+SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
+cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIEp1bHkg
+MzEsIDIwMTcgNjozOCBQTQ0KPiBUbzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsgQmhh
+cmF0IEJodXNoYW4NCj4gPGJoYXJhdC5iaHVzaGFuQG54cC5jb20+DQo+IENjOiB3ZWlAcmVkaGF0
+LmNvbTsgcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBrZXZpbi50aWFuQGludGVsLmNvbTsNCj4g
+ZHJqb25lc0ByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsgamVhbi1waGlsaXBwZS5icnVja2Vy
+QGFybS5jb207DQo+IHRuQHNlbWloYWxmLmNvbTsgd2lsbC5kZWFjb25AYXJtLmNvbTsgcWVtdS1k
+ZXZlbEBub25nbnUub3JnOw0KPiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgcWVtdS1hcm1A
+bm9uZ251Lm9yZzsNCj4gbWFyYy56eW5naWVyQGFybS5jb207IHJvYmluLm11cnBoeUBhcm0uY29t
+Ow0KPiBjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc7IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNv
+bQ0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgNi84XSB2aXJ0aW8taW9tbXU6
+IEltcGxlbWVudCB0aGUNCj4gdHJhbnNsYXRpb24gYW5kIGNvbW1hbmRzDQo+IA0KPiBIaSBQZXRl
+ciwgQmhhcmF0LA0KPiANCj4gT24gMTcvMDcvMjAxNyAwMzoyOCwgUGV0ZXIgWHUgd3JvdGU6DQo+
+ID4gT24gRnJpLCBKdWwgMTQsIDIwMTcgYXQgMDY6NDA6MzRBTSArMDAwMCwgQmhhcmF0IEJodXNo
+YW4gd3JvdGU6DQo+ID4+IEhpIFBldGVyLA0KPiA+Pg0KPiA+Pj4gLS0tLS1PcmlnaW5hbCBNZXNz
+YWdlLS0tLS0NCj4gPj4+IEZyb206IFBldGVyIFh1IFttYWlsdG86cGV0ZXJ4QHJlZGhhdC5jb21d
+DQo+ID4+PiBTZW50OiBGcmlkYXksIEp1bHkgMTQsIDIwMTcgNzo0OCBBTQ0KPiA+Pj4gVG86IEVy
+aWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4NCj4gPj4+IENjOiBlcmljLmF1Z2VyLnBy
+b0BnbWFpbC5jb207IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsNCj4gPj4+IGFsZXgud2lsbGlh
+bXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsgcWVtdS0NCj4gYXJtQG5vbmdudS5vcmc7
+DQo+ID4+PiBxZW11LWRldmVsQG5vbmdudS5vcmc7IGplYW4tcGhpbGlwcGUuYnJ1Y2tlckBhcm0u
+Y29tOw0KPiA+Pj4gd2VpQHJlZGhhdC5jb207IGtldmluLnRpYW5AaW50ZWwuY29tOyBCaGFyYXQg
+Qmh1c2hhbg0KPiA+Pj4gPGJoYXJhdC5iaHVzaGFuQG54cC5jb20+OyBtYXJjLnp5bmdpZXJAYXJt
+LmNvbTsNCj4gdG5Ac2VtaWhhbGYuY29tOw0KPiA+Pj4gd2lsbC5kZWFjb25AYXJtLmNvbTsgZHJq
+b25lc0ByZWRoYXQuY29tOyByb2Jpbi5tdXJwaHlAYXJtLmNvbTsNCj4gPj4+IGNocmlzdG9mZmVy
+LmRhbGxAbGluYXJvLm9yZw0KPiA+Pj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZDIHYy
+IDYvOF0gdmlydGlvLWlvbW11OiBJbXBsZW1lbnQgdGhlDQo+ID4+PiB0cmFuc2xhdGlvbiBhbmQg
+Y29tbWFuZHMNCj4gPj4+DQo+ID4+PiBPbiBXZWQsIEp1biAwNywgMjAxNyBhdCAwNjowMToyNVBN
+ICswMjAwLCBFcmljIEF1Z2VyIHdyb3RlOg0KPiA+Pj4+IFRoaXMgcGF0Y2ggYWRkcyB0aGUgYWN0
+dWFsIGltcGxlbWVudGF0aW9uIGZvciB0aGUgdHJhbnNsYXRpb24NCj4gPj4+PiByb3V0aW5lIGFu
+ZCB0aGUgdmlydGlvLWlvbW11IGNvbW1hbmRzLg0KPiA+Pj4+DQo+ID4+Pj4gU2lnbmVkLW9mZi1i
+eTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+Pj4NCj4gPj4+IFsuLi5d
+DQo+ID4+Pg0KPiA+Pj4+ICBzdGF0aWMgaW50IHZpcnRpb19pb21tdV9hdHRhY2goVmlydElPSU9N
+TVUgKnMsDQo+ID4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qgdmly
+dGlvX2lvbW11X3JlcV9hdHRhY2gNCj4gPj4+PiAqcmVxKSBAQCAtOTUsMTAgKzEzNSwzNCBAQCBz
+dGF0aWMgaW50DQo+IHZpcnRpb19pb21tdV9hdHRhY2goVmlydElPSU9NTVUgKnMsDQo+ID4+Pj4g
+ICAgICB1aW50MzJfdCBhc2lkID0gbGUzMl90b19jcHUocmVxLT5hZGRyZXNzX3NwYWNlKTsNCj4g
+Pj4+PiAgICAgIHVpbnQzMl90IGRldmlkID0gbGUzMl90b19jcHUocmVxLT5kZXZpY2UpOw0KPiA+
+Pj4+ICAgICAgdWludDMyX3QgcmVzZXJ2ZWQgPSBsZTMyX3RvX2NwdShyZXEtPnJlc2VydmVkKTsN
+Cj4gPj4+PiArICAgIHZpb21tdV9hcyAqYXM7DQo+ID4+Pj4gKyAgICB2aW9tbXVfZGV2ICpkZXY7
+DQo+ID4+Pj4NCj4gPj4+PiAgICAgIHRyYWNlX3ZpcnRpb19pb21tdV9hdHRhY2goYXNpZCwgZGV2
+aWQsIHJlc2VydmVkKTsNCj4gPj4+Pg0KPiA+Pj4+IC0gICAgcmV0dXJuIFZJUlRJT19JT01NVV9T
+X1VOU1VQUDsNCj4gPj4+PiArICAgIGRldiA9IGdfdHJlZV9sb29rdXAocy0+ZGV2aWNlcywgR1VJ
+TlRfVE9fUE9JTlRFUihkZXZpZCkpOw0KPiA+Pj4+ICsgICAgaWYgKGRldikgew0KPiA+Pj4+ICsg
+ICAgICAgIHJldHVybiAtMTsNCj4gPj4+PiArICAgIH0NCj4gPj4+PiArDQo+ID4+Pj4gKyAgICBh
+cyA9IGdfdHJlZV9sb29rdXAocy0+YWRkcmVzc19zcGFjZXMsDQo+IEdVSU5UX1RPX1BPSU5URVIo
+YXNpZCkpOw0KPiA+Pj4+ICsgICAgaWYgKCFhcykgew0KPiA+Pj4+ICsgICAgICAgIGFzID0gZ19t
+YWxsb2MwKHNpemVvZigqYXMpKTsNCj4gPj4+PiArICAgICAgICBhcy0+aWQgPSBhc2lkOw0KPiA+
+Pj4+ICsgICAgICAgIGFzLT5tYXBwaW5ncyA9DQo+IGdfdHJlZV9uZXdfZnVsbCgoR0NvbXBhcmVE
+YXRhRnVuYylpbnRlcnZhbF9jbXAsDQo+ID4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgTlVMTCwgTlVMTCwgKEdEZXN0cm95Tm90aWZ5KWdfZnJlZSk7DQo+ID4+
+Pj4gKyAgICAgICAgZ190cmVlX2luc2VydChzLT5hZGRyZXNzX3NwYWNlcywgR1VJTlRfVE9fUE9J
+TlRFUihhc2lkKSwgYXMpOw0KPiA+Pj4+ICsgICAgICAgIHRyYWNlX3ZpcnRpb19pb21tdV9uZXdf
+YXNpZChhc2lkKTsNCj4gPj4+PiArICAgIH0NCj4gPj4+PiArDQo+ID4+Pj4gKyAgICBkZXYgPSBn
+X21hbGxvYzAoc2l6ZW9mKCpkZXYpKTsNCj4gPj4+PiArICAgIGRldi0+YXMgPSBhczsNCj4gPj4+
+PiArICAgIGRldi0+aWQgPSBkZXZpZDsNCj4gPj4+PiArICAgIGFzLT5ucl9kZXZpY2VzKys7DQo+
+ID4+Pj4gKyAgICB0cmFjZV92aXJ0aW9faW9tbXVfbmV3X2RldmlkKGRldmlkKTsNCj4gPj4+PiAr
+ICAgIGdfdHJlZV9pbnNlcnQocy0+ZGV2aWNlcywgR1VJTlRfVE9fUE9JTlRFUihkZXZpZCksIGRl
+dik7DQo+ID4+Pg0KPiA+Pj4gSGVyZSBkbyB3ZSBuZWVkIHRvIHJlY29yZCBzb21ldGhpbmcgbGlr
+ZSBhIHJlZmNvdW50IGZvciBhZGRyZXNzIHNwYWNlPw0KPiA+Pj4gU2luY2UuLi4NCj4gPj4NCj4g
+Pj4gV2UgYXJlIHVzaW5nICJucl9kZXZpY2VzIiBhcyBudW1iZXIgb2YgZGV2aWNlcyBhdHRhY2hl
+ZCB0byBhbg0KPiA+PiBhZGRyZXNzLXNwYWNlDQo+ID4+DQo+ID4+Pg0KPiA+Pj4+ICsNCj4gPj4+
+PiArICAgIHJldHVybiBWSVJUSU9fSU9NTVVfU19PSzsNCj4gPj4+PiAgfQ0KPiA+Pj4+DQo+ID4+
+Pj4gIHN0YXRpYyBpbnQgdmlydGlvX2lvbW11X2RldGFjaChWaXJ0SU9JT01NVSAqcywgQEAgLTEw
+NiwxMCArMTcwLDEzDQo+ID4+Pj4gQEAgc3RhdGljIGludCB2aXJ0aW9faW9tbXVfZGV0YWNoKFZp
+cnRJT0lPTU1VICpzLCAgew0KPiA+Pj4+ICAgICAgdWludDMyX3QgZGV2aWQgPSBsZTMyX3RvX2Nw
+dShyZXEtPmRldmljZSk7DQo+ID4+Pj4gICAgICB1aW50MzJfdCByZXNlcnZlZCA9IGxlMzJfdG9f
+Y3B1KHJlcS0+cmVzZXJ2ZWQpOw0KPiA+Pj4+ICsgICAgaW50IHJldDsNCj4gPj4+Pg0KPiA+Pj4+
+ICAgICAgdHJhY2VfdmlydGlvX2lvbW11X2RldGFjaChkZXZpZCwgcmVzZXJ2ZWQpOw0KPiA+Pj4+
+DQo+ID4+Pj4gLSAgICByZXR1cm4gVklSVElPX0lPTU1VX1NfVU5TVVBQOw0KPiA+Pj4+ICsgICAg
+cmV0ID0gZ190cmVlX3JlbW92ZShzLT5kZXZpY2VzLCBHVUlOVF9UT19QT0lOVEVSKGRldmlkKSk7
+DQo+ID4+Pg0KPiA+Pj4gLi4uIGhlcmUgd2hlbiBkZXRhY2gsIGltaG8gd2Ugc2hvdWxkIGNoZWNr
+IHRoZSByZWZjb3VudDogaWYgdGhlcmUgaXMNCj4gPj4+IG5vIGRldmljZSB1c2luZyBzcGVjaWZp
+YyBhZGRyZXNzIHNwYWNlLCB3ZSBzaG91bGQgcmVsZWFzZSB0aGUNCj4gPj4+IGFkZHJlc3Mgc3Bh
+Y2UgYXMgd2VsbC4NCj4gPj4+DQo+ID4+PiBPdGhlcndpc2UgdGhlcmUgd291bGQgaGF2ZSBubyB3
+YXkgdG8gZGVzdHJveSBhbiBhZGRyZXNzIHNwYWNlPw0KPiA+Pg0KPiA+Pg0KPiA+PiBIZXJlIGlm
+IG5yX2RldmljZXMgPT0gMCB0aGVuIHJlbGVhc2UgdGhlIGFkZHJlc3Mgc3BhY2UsIGlzIHRoYXQg
+b2s/DQo+ID4+DQo+ID4+IFRoaXMgaXMgaG93IEkgaW1wbGVtZW50ZWQgYXMgcGFydCBvZiBWRklP
+IGludGVncmF0aW9uIG92ZXIgdGhpcyBwYXRjaA0KPiBzZXJpZXMuDQo+ID4+IAkiW1JGQyBQQVRD
+SCAyLzJdIHZpcnRpby1pb21tdTogdmZpbyBpbnRlZ3JhdGlvbiB3aXRoIHZpcnRpby1pb21tdSIN
+Cj4gDQo+IGdsaWIgcHJvdmlkZXMgZ190cmVlX3JlZi9nX3RyZWVfdW5yZWYuIEkgdGhpbmsgdGhl
+IG1vc3QgZWxlZ2FudCBpcyB0byB1c2UNCj4gZ190cmVlX3JlZiB3aGVuIGFkZGluZyBhIGRldmlj
+ZSBhbmQgZGVjcmVtZW50aW5nIHdoZW4gcmVtb3ZpbmcgYQ0KPiBkZXZpY2UsIGFzIHN1Z2dlc3Rl
+ZCBieSBQZXRlci4NCj4gDQo+ICJpZiB0aGUgcmVmZXJlbmNlIGNvdW50IGRyb3BzIHRvIDAsIGFs
+bCBrZXlzIGFuZCB2YWx1ZXMgd2lsbCBiZSBkZXN0cm95ZWQgKGlmDQo+IGRlc3Ryb3kgZnVuY3Rp
+b25zIHdlcmUgc3BlY2lmaWVkKSBhbmQgYWxsIG1lbW9yeSBhbGxvY2F0ZWQgYnkgdHJlZSB3aWxs
+IGJlDQo+IHJlbGVhc2VkLiINCj4gDQo+IFRoYXQgd2F5IHdlIHNob3VsZCBiZSBhYmxlIHRvIHJl
+bW92ZSBucl9kZXZpY2VzIGZyb20gdmlvbW11X2FzDQo+IA0KPiBCaGFyYXQsIGlmIHRoaXMgYnJl
+YWtzIHlvdXIgaW1wbGVtZW50YXRpb24gSSB3aWxsIGxldCB5b3UgcmUtaW50cm9kdWNlDQo+IG5y
+X2RldmljZXMgYXMgcGFydCBvZiB0aGUgVkZJTyBwYXRjaC4NCg0KV2UgbmVlZCB0byB1bm1hcCgp
+IGV2ZXJ5dGhpbmcgaW4gcGh5c2ljYWwtaW9tbXUgd2hlbiBsYXN0IGRldmljZSBpcyBkZXRhY2hl
+ZCwgc2VlbXMgbGlrZSBnX3RyZWVfcmVmL3VucmVmKCkgZG9lcyBub3QgZ2l2ZSBhbnkgaGFuZGxl
+IGZvciB0aGlzLiBJIHdpbGwgZ28gYWhlYWQgd2l0aCBhZGRpbmcgbnJfZGV2aWNlcyB3aXRoIFZG
+SU8gaW50ZWdyYXRpb24gcGF0Y2hlcy4NCg0KVGhhbmtzDQotQmhhcmF0DQoNCj4gDQo+IFRoYW5r
+cw0KPiANCj4gRXJpYw0KPiA+DQo+ID4gU29ycnkgSSBkaWRuJ3QgcmVhZCB0aGF0IHdoZW4gcG9z
+dGluZy4gSXQgaXMgd2hhdCBJIG1lYW4uICBUaGFua3MsDQo+ID4NCg==
