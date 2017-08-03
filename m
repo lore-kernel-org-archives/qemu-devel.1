@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dd9d6-0005Ra-Ss
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 02:29:12 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1ddArv-000456-Cu
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 03:48:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dd9d3-0007Rd-Oq
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 02:29:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51166
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1dd9d3-0007Ql-Id
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 02:29:05 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v736Sfxs093941
-	for <qemu-devel@nongnu.org>; Thu, 3 Aug 2017 02:29:05 -0400
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c3v7xyfnt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 02:29:04 -0400
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Thu, 3 Aug 2017 16:29:02 +1000
-Date: Thu, 3 Aug 2017 16:28:02 +1000
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+	(envelope-from <ldoktor@redhat.com>) id 1ddArq-0004Fv-GF
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 03:48:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1ddArq-0004CV-6I
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 03:48:26 -0400
+References: <20170726144226.6913-1-ldoktor@redhat.com>
+	<20170726144226.6913-2-ldoktor@redhat.com>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <2727b3a4-f472-62c6-aa80-d03b17b30f59@redhat.com>
+Date: Thu, 3 Aug 2017 09:41:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Message-Id: <cover.1501740002.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH 0/4] Cleanup cpu_dt_id
+In-Reply-To: <20170726144226.6913-2-ldoktor@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MD8lWS0CX8FRWSWWufMeX1fhv2mwbMd8k"
+Subject: Re: [Qemu-devel] [PATCH v4 01/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,37 +28,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, agraf@suse.de
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MD8lWS0CX8FRWSWWufMeX1fhv2mwbMd8k
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+Message-ID: <2727b3a4-f472-62c6-aa80-d03b17b30f59@redhat.com>
+Subject: Re: [PATCH v4 01/10] qemu.py: Pylint/style fixes
+References: <20170726144226.6913-1-ldoktor@redhat.com>
+ <20170726144226.6913-2-ldoktor@redhat.com>
+In-Reply-To: <20170726144226.6913-2-ldoktor@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Would someone please take a look at this un-reviewed patch?
+
+Thanks,
+Luk=C3=A1=C5=A1
 
 
-In preparation for some other work in this area, here is a patch set that
-cleans up some of the code around the cpu_dt_id field of struct PowerPCCPU.
+Dne 26.7.2017 v 16:42 Luk=C3=A1=C5=A1 Doktor napsal(a):
+> No actual code changes, just several pylint/style fixes and docstring
+> clarifications.
+>=20
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> ---
+>  scripts/qemu.py | 76 ++++++++++++++++++++++++++++++++++++++++---------=
+--------
+>  1 file changed, 53 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 880e3e8..191c916 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -23,8 +23,22 @@ import qmp.qmp
+>  class QEMUMachine(object):
+>      '''A QEMU VM'''
+> =20
+> -    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone, t=
+est_dir=3D"/var/tmp",
+> -                 monitor_address=3DNone, socket_scm_helper=3DNone, deb=
+ug=3DFalse):
+> +    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
+> +                 test_dir=3D"/var/tmp", monitor_address=3DNone,
+> +                 socket_scm_helper=3DNone, debug=3DFalse):
+> +        '''
+> +        Create a QEMUMachine object
+> +
+> +        @param binary: path to the qemu binary (str)
+> +        @param args: initial list of extra arguments
+> +        @param wrapper: list of arguments used as prefix to qemu binar=
+y
+> +        @param name: name of this object (used for log/monitor/... fil=
+e names)
+> +        @param test_dir: base location to put log/monitor/... files in=
 
-It includes a bugfix for h_signal_sys_reset() because the code there uses the
-cpu_dt_id field and it would need to be changed by this set anyway.
+> +        @param monitor_address: custom address for QMP monitor
+> +        @param socket_scm_helper: path to scm_helper binary (to forwar=
+d fds)
+> +        @param debug: enable debug mode (forwarded to QMP helper and s=
+uch)
+> +        @note: Qemu process is not started until launch() is used.
+> +        '''
+>          if name is None:
+>              name =3D "qemu-%d" % os.getpid()
+>          if monitor_address is None:
+> @@ -33,12 +47,13 @@ class QEMUMachine(object):
+>          self._qemu_log_path =3D os.path.join(test_dir, name + ".log")
+>          self._popen =3D None
+>          self._binary =3D binary
+> -        self._args =3D list(args) # Force copy args in case we modify =
+them
+> +        self._args =3D list(args)     # Force copy args in case we mod=
+ify them
+>          self._wrapper =3D wrapper
+>          self._events =3D []
+>          self._iolog =3D None
+>          self._socket_scm_helper =3D socket_scm_helper
+>          self._debug =3D debug
+> +        self._qmp =3D None
+> =20
+>      # This can be used to add an unused monitor instance.
+>      def add_monitor_telnet(self, ip, port):
+> @@ -64,16 +79,16 @@ class QEMUMachine(object):
+>          if self._socket_scm_helper is None:
+>              print >>sys.stderr, "No path to socket_scm_helper set"
+>              return -1
+> -        if os.path.exists(self._socket_scm_helper) =3D=3D False:
+> +        if os.path.exists(self._socket_scm_helper) is False:
+>              print >>sys.stderr, "%s does not exist" % self._socket_scm=
+_helper
+>              return -1
+>          fd_param =3D ["%s" % self._socket_scm_helper,
+>                      "%d" % self._qmp.get_sock_fd(),
+>                      "%s" % fd_file_path]
+>          devnull =3D open('/dev/null', 'rb')
+> -        p =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3Dsys=
+=2Estdout,
+> -                             stderr=3Dsys.stderr)
+> -        return p.wait()
+> +        proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3D=
+sys.stdout,
+> +                                stderr=3Dsys.stderr)
+> +        return proc.wait()
+> =20
+>      @staticmethod
+>      def _remove_if_exists(path):
+> @@ -99,8 +114,8 @@ class QEMUMachine(object):
+>          return self._popen.pid
+> =20
+>      def _load_io_log(self):
+> -        with open(self._qemu_log_path, "r") as fh:
+> -            self._iolog =3D fh.read()
+> +        with open(self._qemu_log_path, "r") as iolog:
+> +            self._iolog =3D iolog.read()
+> =20
+>      def _base_args(self):
+>          if isinstance(self._monitor_address, tuple):
+> @@ -114,8 +129,8 @@ class QEMUMachine(object):
+>                  '-display', 'none', '-vga', 'none']
+> =20
+>      def _pre_launch(self):
+> -        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
+s, server=3DTrue,
+> -                                                debug=3Dself._debug)
+> +        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
+s,
+> +                                                server=3DTrue, debug=3D=
+self._debug)
+> =20
+>      def _post_launch(self):
+>          self._qmp.accept()
+> @@ -131,9 +146,11 @@ class QEMUMachine(object):
+>          qemulog =3D open(self._qemu_log_path, 'wb')
+>          try:
+>              self._pre_launch()
+> -            args =3D self._wrapper + [self._binary] + self._base_args(=
+) + self._args
+> +            args =3D (self._wrapper + [self._binary] + self._base_args=
+() +
+> +                    self._args)
+>              self._popen =3D subprocess.Popen(args, stdin=3Ddevnull, st=
+dout=3Dqemulog,
+> -                                           stderr=3Dsubprocess.STDOUT,=
+ shell=3DFalse)
+> +                                           stderr=3Dsubprocess.STDOUT,=
 
-(Alexander Graf: I've CC'd you because you're the maintainer of the e500 code.)
+> +                                           shell=3DFalse)
+>              self._post_launch()
+>          except:
+>              if self.is_running():
+> @@ -149,28 +166,34 @@ class QEMUMachine(object):
+>              try:
+>                  self._qmp.cmd('quit')
+>                  self._qmp.close()
+> -            except:
+> +            except:     # kill VM on any failure pylint: disable=3DW07=
+02
+>                  self._popen.kill()
+> =20
+>              exitcode =3D self._popen.wait()
+>              if exitcode < 0:
+> -                sys.stderr.write('qemu received signal %i: %s\n' % (-e=
+xitcode, ' '.join(self._args)))
+> +                sys.stderr.write('qemu received signal %i: %s\n'
+> +                                 % (-exitcode, ' '.join(self._args)))
+>              self._load_io_log()
+>              self._post_shutdown()
+> =20
+>      underscore_to_dash =3D string.maketrans('_', '-')
+> +
+>      def qmp(self, cmd, conv_keys=3DTrue, **args):
+>          '''Invoke a QMP command and return the result dict'''
+>          qmp_args =3D dict()
+> -        for k in args.keys():
+> +        for key in args.keys():
+>              if conv_keys:
+> -                qmp_args[k.translate(self.underscore_to_dash)] =3D arg=
+s[k]
+> +                qmp_args[key.translate(self.underscore_to_dash)] =3D a=
+rgs[key]
+>              else:
+> -                qmp_args[k] =3D args[k]
+> +                qmp_args[key] =3D args[key]
+> =20
+>          return self._qmp.cmd(cmd, args=3Dqmp_args)
+> =20
+>      def command(self, cmd, conv_keys=3DTrue, **args):
+> +        '''
+> +        Invoke a QMP command and on success report result dict or on f=
+ailure
+> +        raise exception with details.
+> +        '''
+>          reply =3D self.qmp(cmd, conv_keys, **args)
+>          if reply is None:
+>              raise Exception("Monitor is closed")
+> @@ -193,15 +216,18 @@ class QEMUMachine(object):
+>          return events
+> =20
+>      def event_wait(self, name, timeout=3D60.0, match=3DNone):
+> -        # Test if 'match' is a recursive subset of 'event'
+> -        def event_match(event, match=3DNone):
+> +        ''' Wait for event in QMP, optionally filter results by match.=
+ '''
+> +        # Test if 'match' is a recursive subset of 'event'; skips bran=
+ch
+> +        # processing on match's value `None`
+> +        #    {"foo": {"bar": 1} matches {"foo": None}
+> +        def _event_match(event, match=3DNone):
+>              if match is None:
+>                  return True
+> =20
+>              for key in match:
+>                  if key in event:
+>                      if isinstance(event[key], dict):
+> -                        if not event_match(event[key], match[key]):
+> +                        if not _event_match(event[key], match[key]):
+>                              return False
+>                      elif event[key] !=3D match[key]:
+>                          return False
+> @@ -212,18 +238,22 @@ class QEMUMachine(object):
+> =20
+>          # Search cached events
+>          for event in self._events:
+> -            if (event['event'] =3D=3D name) and event_match(event, mat=
+ch):
+> +            if (event['event'] =3D=3D name) and _event_match(event, ma=
+tch):
+>                  self._events.remove(event)
+>                  return event
+> =20
+>          # Poll for new events
+>          while True:
+>              event =3D self._qmp.pull_event(wait=3Dtimeout)
+> -            if (event['event'] =3D=3D name) and event_match(event, mat=
+ch):
+> +            if (event['event'] =3D=3D name) and _event_match(event, ma=
+tch):
+>                  return event
+>              self._events.append(event)
+> =20
+>          return None
+> =20
+>      def get_log(self):
+> +        '''
+> +        After self.shutdown or failed qemu execution this returns the =
+output
+> +        of the qemu process.
+> +        '''
+>          return self._iolog
+>=20
 
-Thanks to David Gibson for assistance with the design.
 
 
-Sam Bobroff (4):
-  spapr: Fix bug in h_signal_sys_reset()
-  e500: Use cpu_index instead of vcpu_dt_id
-  ppc: spapr: Rename cpu_dt_id to vcpu_id
-  ppc: spapr: Make VCPU ID handling private to SPAPR
+--MD8lWS0CX8FRWSWWufMeX1fhv2mwbMd8k
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- hw/ppc/e500.c               |  8 ++------
- hw/ppc/ppc.c                | 21 ---------------------
- hw/ppc/spapr.c              | 36 ++++++++++++++++++++++++++++--------
- hw/ppc/spapr_hcall.c        | 11 +++++------
- hw/ppc/spapr_rtas.c         |  4 ++--
- include/hw/ppc/spapr.h      |  3 +++
- target/ppc/cpu.h            | 20 +-------------------
- target/ppc/kvm.c            |  2 +-
- target/ppc/translate_init.c |  8 ++++----
- 9 files changed, 46 insertions(+), 67 deletions(-)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
--- 
-2.12.1.382.gc0f9c7058
+iQEwBAEBCAAaBQJZgtOjExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsHt
+bwf+KMpnhFEvrOxjY1GzolqmZId5YGLNo5E6roDlQuU3aTbO9w96gGylgJPnMva3
+GBCgHT9z35Sg2Wg6ACnSdP33oS4UxloHOUhj+/KqmBKZzogGXsNc6PrU+eCL7c2T
+gfMd0dH7okt7jGi4+mVgA0facRaQJpF57Pzw2+MqIb8kfRyrgFpHxeLAMWBPz8Ea
+TdI70p6aiWudn+UfGDAYa+VfvMzYIkt7MFyuJuQN+XWqPOde9lHPLUZb4nz+3eYQ
+TQDcvFPZLuPrYR2ad9EOSykb0YFP1ymtj0Bl1oqlxhfcxCHTtu14lz4aw5OUA+TT
+APMHpCmQk20NOXu2zIxjJ5KTtw==
+=sO8J
+-----END PGP SIGNATURE-----
+
+--MD8lWS0CX8FRWSWWufMeX1fhv2mwbMd8k--
