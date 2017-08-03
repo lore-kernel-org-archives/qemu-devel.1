@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddJ4V-0005dl-Vt
+	(envelope-from <eblake@redhat.com>) id 1ddJ4V-0005dF-D6
 	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddJ4V-00044k-8C
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddJ4U-00043o-CC
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 12:34:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  3 Aug 2017 11:33:51 -0500
-Message-Id: <20170803163353.19558-3-eblake@redhat.com>
+Date: Thu,  3 Aug 2017 11:33:50 -0500
+Message-Id: <20170803163353.19558-2-eblake@redhat.com>
 In-Reply-To: <20170803163353.19558-1-eblake@redhat.com>
 References: <20170803163353.19558-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/4] qemu-io: Give more --version information
+Subject: [Qemu-devel] [PATCH v3 1/4] qemu-img: Sort sub-command names in
+ --help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, berrange@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org
 
-Include the package version information (useful for detecting
-builds from git or downstream backports), and the copyright notice.
+'amend' and 'create' were not listed alphabetically; hoist them
+earlier.  Separate the @end table block to make it easier to
+copy-and-paste the addition of future sub-commands.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
+
 ---
- qemu-io.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+v3: also sort 'create' [Kevin]
+---
+ qemu-img-cmds.hx | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 4cfa41c8f9..ec175630a6 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -26,6 +26,7 @@
- #include "block/block_int.h"
- #include "trace/control.h"
- #include "crypto/init.h"
-+#include "qemu-version.h"
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 3763f13625..e6ebdbfee4 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -9,6 +9,12 @@ STEXI
+ @table @option
+ ETEXI
 
- #define CMD_NOFILE_OK   0x01
++DEF("amend", img_amend,
++    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
++STEXI
++@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
++ETEXI
++
+ DEF("bench", img_bench,
+     "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [-U] filename")
+ STEXI
+@@ -21,12 +27,6 @@ STEXI
+ @item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
+ ETEXI
 
-@@ -522,7 +523,8 @@ int main(int argc, char **argv)
-             trace_file = trace_opt_parse(optarg);
-             break;
-         case 'V':
--            printf("%s version %s\n", progname, QEMU_VERSION);
-+            printf("%s version " QEMU_VERSION QEMU_PKGVERSION "\n"
-+                   QEMU_COPYRIGHT "\n", progname);
-             exit(0);
-         case 'h':
-             usage(progname);
+-DEF("create", img_create,
+-    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
+-STEXI
+-@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
+-ETEXI
+-
+ DEF("commit", img_commit,
+     "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
+ STEXI
+@@ -45,6 +45,12 @@ STEXI
+ @item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
+
++DEF("create", img_create,
++    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
++STEXI
++@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
++ETEXI
++
+ DEF("dd", img_dd,
+     "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+ STEXI
+@@ -87,9 +93,6 @@ STEXI
+ @item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
+ ETEXI
+
+-DEF("amend", img_amend,
+-    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
+ STEXI
+-@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
+ @end table
+ ETEXI
 -- 
 2.13.3
