@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddE7v-0005vE-M8
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:17:16 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddECO-0007lR-TK
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ddE7u-0002P7-A5
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:17:15 -0400
-Date: Thu, 3 Aug 2017 13:17:01 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170803111701.GG4456@dhcp-200-186.str.redhat.com>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-5-el13635@mail.ntua.gr>
-	<20170801154703.GD22017@stefanha-x1.localdomain>
-	<20170801164933.c54ocjzr26sxaizy@postretch>
-	<20170802103922.GE5531@stefanha-x1.localdomain>
-	<20170802105704.m2jbxnivl32msbx6@postretch>
-	<20170803080801.GC4456@dhcp-200-186.str.redhat.com>
-	<20170803105359.GB22685@stefanha-x1.localdomain>
+	(envelope-from <dgilbert@redhat.com>) id 1ddECL-0008NS-4V
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:21:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddECK-0008Md-Rs
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 07:21:49 -0400
+Date: Thu, 3 Aug 2017 12:21:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170803112141.GF2076@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-25-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170803105359.GB22685@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 4/7] block: convert ThrottleGroup to
- object with QOM
+In-Reply-To: <1501229198-30588-25-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 24/29] migration: new message
+ MIG_RP_MSG_RESUME_ACK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,148 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+
+* Peter Xu (peterx@redhat.com) wrote:
+> Creating new message to reply for MIG_CMD_POSTCOPY_RESUME. One uint32_t
+> is used as payload to let the source know whether destination is ready
+> to continue the migration.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c  | 37 +++++++++++++++++++++++++++++++++++++
+>  migration/migration.h  |  1 +
+>  migration/savevm.c     |  3 ++-
+>  migration/trace-events |  1 +
+>  4 files changed, 41 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index c2b85ac..62f91ce 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -93,6 +93,7 @@ enum mig_rp_message_type {
+>      MIG_RP_MSG_REQ_PAGES_ID, /* data (start: be64, len: be32, id: string) */
+>      MIG_RP_MSG_REQ_PAGES,    /* data (start: be64, len: be32) */
+>      MIG_RP_MSG_RECV_BITMAP,  /* send recved_bitmap back to source */
+> +    MIG_RP_MSG_RESUME_ACK,   /* tell source that we are ready to resume */
+>  
+>      MIG_RP_MSG_MAX
+>  };
+> @@ -484,6 +485,14 @@ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+>      trace_migrate_send_rp_recv_bitmap(block_name, res);
+>  }
+>  
+> +void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value)
+> +{
+> +    uint32_t buf;
+> +
+> +    buf = cpu_to_be32(value);
+> +    migrate_send_rp_message(mis, MIG_RP_MSG_RESUME_ACK, sizeof(buf), &buf);
+> +}
+> +
+>  MigrationCapabilityStatusList *qmp_query_migrate_capabilities(Error **errp)
+>  {
+>      MigrationCapabilityStatusList *head = NULL;
+> @@ -1595,6 +1604,7 @@ static struct rp_cmd_args {
+>      [MIG_RP_MSG_REQ_PAGES]      = { .len = 12, .name = "REQ_PAGES" },
+>      [MIG_RP_MSG_REQ_PAGES_ID]   = { .len = -1, .name = "REQ_PAGES_ID" },
+>      [MIG_RP_MSG_RECV_BITMAP]    = { .len = -1, .name = "RECV_BITMAP" },
+> +    [MIG_RP_MSG_RESUME_ACK]     = { .len =  4, .name = "RESUME_ACK" },
+>      [MIG_RP_MSG_MAX]            = { .len = -1, .name = "MAX" },
+>  };
+>  
+> @@ -1652,6 +1662,25 @@ static int migrate_handle_rp_recv_bitmap(MigrationState *s, char *block_name)
+>      return ram_dirty_bitmap_reload(s, block);
+>  }
+>  
+> +static int migrate_handle_rp_resume_ack(MigrationState *s, uint32_t value)
+> +{
+> +    trace_source_return_path_thread_resume_ack(value);
+> +
+> +    /*
+> +     * Currently value will always be one. It can be used in the
+> +     * future to notify source that destination cannot continue.
+> +     */
+> +    assert(value == 1);
+
+Again I prefer the routine to fail than to assert.
+Maybe it's worth having a constant rather than the magic 1.
 
 
---IrhDeMKUP4DT/M7F
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +    /* Now both sides are active. */
+> +    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+> +                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> +
+> +    /* TODO: notify send thread that time to continue send pages */
+> +
+> +    return 0;
+> +}
+> +
+>  /*
+>   * Handles messages sent on the return path towards the source VM
+>   *
+> @@ -1771,6 +1800,14 @@ retry:
+>              }
+>              break;
+>  
+> +        case MIG_RP_MSG_RESUME_ACK:
+> +            tmp32 = ldl_be_p(buf);
+> +            if (migrate_handle_rp_resume_ack(ms, tmp32)) {
+> +                mark_source_rp_bad(ms);
+> +                goto out;
+> +            }
+> +            break;
+> +
+>          default:
+>              break;
+>          }
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 4d38308..2a3f905 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -206,5 +206,6 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+>                                ram_addr_t start, size_t len);
+>  void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+>                                   char *block_name);
+> +void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
+>  
+>  #endif
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 2e330bc..02a67ac 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1690,7 +1690,8 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+>                        MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>      qemu_sem_post(&mis->postcopy_pause_sem_fault);
+>  
+> -    /* TODO: Tell source that "we are ready" */
+> +    /* Tell source that "we are ready" */
+> +    migrate_send_rp_resume_ack(mis, 1);
+>  
+>      return 0;
+>  }
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 04dd9d8..0b43fec 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -116,6 +116,7 @@ source_return_path_thread_entry(void) ""
+>  source_return_path_thread_loop_top(void) ""
+>  source_return_path_thread_pong(uint32_t val) "%x"
+>  source_return_path_thread_shut(uint32_t val) "%x"
+> +source_return_path_thread_resume_ack(uint32_t v) "%"PRIu32
+>  migrate_global_state_post_load(const char *state) "loaded state: %s"
+>  migrate_global_state_pre_save(const char *state) "saved state: %s"
+>  migration_thread_low_pending(uint64_t pending) "%" PRIu64
+> -- 
+> 2.7.4
 
-Am 03.08.2017 um 12:53 hat Stefan Hajnoczi geschrieben:
-> On Thu, Aug 03, 2017 at 10:08:01AM +0200, Kevin Wolf wrote:
-> > Am 02.08.2017 um 12:57 hat Manos Pitsidianakis geschrieben:
-> > > On Wed, Aug 02, 2017 at 11:39:22AM +0100, Stefan Hajnoczi wrote:
-> > > > On Tue, Aug 01, 2017 at 07:49:33PM +0300, Manos Pitsidianakis wrote:
-> > > > > On Tue, Aug 01, 2017 at 04:47:03PM +0100, Stefan Hajnoczi wrote:
-> > > > > > On Mon, Jul 31, 2017 at 12:54:40PM +0300, Manos Pitsidianakis w=
-rote:
-> > > > > > > ThrottleGroup is converted to an object. This will allow the =
-future
-> > > > > > > throttle block filter drive easy creation and configuration o=
-f throttle
-> > > > > > > groups in QMP and cli.
-> > > > > > >
-> > > > > > > A new QAPI struct, ThrottleLimits, is introduced to provide a=
- shared
-> > > > > > > struct for all throttle configuration needs in QMP.
-> > > > > > >
-> > > > > > > ThrottleGroups can be created via CLI as
-> > > > > > >     -object throttle-group,id=3Dfoo,x-iops-total=3D100,x-..
-> > > > > > > where x-* are individual limit properties. Since we can't add=
- non-scalar
-> > > > > > > properties in -object this interface must be used instead. Ho=
-wever,
-> > > > > > > setting these properties must be disabled after initializatio=
-n because
-> > > > > > > certain combinations of limits are forbidden and thus configu=
-ration
-> > > > > > > changes should be done in one transaction. The individual pro=
-perties
-> > > > > > > will go away when support for non-scalar values in CLI is imp=
-lemented
-> > > > > > > and thus are marked as experimental.
-> > > > > > >
-> > > > > > > ThrottleGroup also has a `limits` property that uses the Thro=
-ttleLimits
-> > > > > > > struct.  It can be used to create ThrottleGroups or set the
-> > > > > > > configuration in existing groups as follows:
-> > > > > > >
-> > > > > > > { "execute": "object-add",
-> > > > > > >   "arguments": {
-> > > > > > >     "qom-type": "throttle-group",
-> > > > > > >     "id": "foo",
-> > > > > > >     "props" : {
-> > > > > > >       "limits": {
-> > > > > > >           "iops-total": 100
-> > > > > > >       }
-> > > > > > >     }
-> > > > > > >   }
-> > > > > > > }
-> > > > > > > { "execute" : "qom-set",
-> > > > > > >     "arguments" : {
-> > > > > > >         "path" : "foo",
-> > > > > > >         "property" : "limits",
-> > > > > > >         "value" : {
-> > > > > > >             "iops-total" : 99
-> > > > > > >         }
-> > > > > > >     }
-> > > > > > > }
-> > > > > > >
-> > > > > > > This also means a group's configuration can be fetched with q=
-om-get.
-> > > > > > >
-> > > > > > > ThrottleGroups can be anonymous which means they can't get ac=
-cessed by
-> > > > > > > other users ie they will always be units instead of group (Be=
-cause they
-> > > > > > > have one ThrottleGroupMember).
-> > > > > >
-> > > > > > blockdev.c automatically assigns -drive id=3D to the group name=
- if
-> > > > > > throttling.group=3D wasn't given.  So who will use anonymous si=
-ngle-drive
-> > > > > > mode?
-> > > > >=20
-> > > > > Manual filter nodes. It's possible to not pass a group name value=
- and the
-> > > > > resulting group will be anonymous. Are you suggesting to move thi=
-s change to
-> > > > > the throttle filter patch?
-> > > >=20
-> > > > What is the use case?  Human users will stick to the legacy syntax
-> > > > because it's convenient.  Management tools will use the filter
-> > > > explicitly in the future, and it's easy for them to choose a name.
-> > > >=20
-> > > > Unless there is a need for this case I'd prefer to make the group n=
-ame
-> > > > mandatory.  That way there are less code paths to worry about.
-> > >=20
-> > > I think Kevin requested this though I don't really remember the use c=
-ase.
-> >=20
-> > There is no legacy syntax for putting a throttle node anywhere but at
-> > the root of a BlockBackend. If you want to throttle e.g. only a specific
-> > backing file, you need to manually create a throttle node.
-> >=20
-> > (We tend to forget this occasionally, but the work you're doing is not
-> > only cleanup just for fun, but it's actually new features that enable
-> > new use cases by making everything more flexible.)
->=20
-> It's not clear to me from your reply whether you support anonymous
-> throttle groups or not.  It is possible to throttle arbitrary nodes in
-> the graph either way.
+Dave
 
-I think it would be nice for human users to have them, but on second
-thought you're right that it's just syntactic sugar for an explicit
--object, so if you think there is any difficulty with supporting
-anonymous groups, feel free to drop them.
-
-Hm, actually... Does this mean that then the whole 'limits' option in
-the throttle driver could go away, with all of the parsing code, and the
-group name becomes mandatory? That certainly does look tempting.
-
-Kevin
-
---IrhDeMKUP4DT/M7F
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZgwYtAAoJEH8JsnLIjy/W0qoQAKjX8dTicsrWWg3gQJVuxzWA
-9hNH5i3a60medi+Z9kfdCs8hLb+qTRnIvNwHkfN1h43lw2opbCALvNtjm6nOR4Sh
-XMcOsa+scukroKQuNySxNkepgHK13/OFkhSU0HeAShuKcSAzy7+MpvIxmYO4G2uK
-iBxsIAM6yAupsfQBEiaCavE45wH8+EFoqGyj7xRdX/Wy82v6nyHxddB697IPEwmv
-ITCsB35Xf14FOe+sjnP/e3zNP/FK2wZFtgds6+EZ55p2FK1vRADibYXU5q7hzi8X
-X2L6ZzGg5YcllKQ4BtkenZ4CvC9by+8lUzLe0Ic+LaFJtcO6UNE3aIUoHp+f6a1+
-/mSB51VyL09iuo1QB+qZEPL+cjFeposVlJfb5c2eGSZ7s9iBCjvmzUFUYRoDxHdm
-ZWg2AcUMCtj1YgwzO6TbY/fA7lO/ngM/ReKAqIPYRwBWT7FR0Goo1QzMu/QASber
-zz75HV1amFUfkZ3FzdmBLzCUkFBH+FoLpbjbKnWZUmUsMIVyRisBcuiVyIvp1sv1
-HZs7rOk09oBW454mVeEqe8Y1OilwfIg9F/ckgvxUxCbha7sS8LRKmmGBN+2kb/TS
-P8DvSC5vRz3pJq0f26yZ6KSHseaJ9uhYRF91phXaJNxfYLpyZLn3GRcLc5242hWD
-fSsMQRmQWsTUMSZYzwbC
-=AW8S
------END PGP SIGNATURE-----
-
---IrhDeMKUP4DT/M7F--
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
