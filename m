@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddHv9-0006Ne-UD
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:20:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddHwL-0007A1-OB
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddHv6-0003Ns-QP
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:20:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddHv6-0003Mx-Eq
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:20:16 -0400
-Date: Thu, 3 Aug 2017 17:20:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170803172008.23da4642@gondolin>
-In-Reply-To: <1501767019-4989-1-git-send-email-thuth@redhat.com>
-References: <1501767019-4989-1-git-send-email-thuth@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ddHwK-0004nI-Nd
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 11:21:33 -0400
+References: <20170803150301.10177-1-kwolf@redhat.com>
+	<20170803150301.10177-3-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8dfbc0ca-9a02-3620-d9e5-41aadee69d52@redhat.com>
+Date: Thu, 3 Aug 2017 10:21:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/pxe: Check virtio-net-ccw on s390x
+In-Reply-To: <20170803150301.10177-3-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XVXKnsVKWd8LmJH2x0puMlxSt7TjlcNR8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/5] block: Allow reopen rw
+ without BDRV_O_ALLOW_RDWR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On Thu,  3 Aug 2017 15:30:19 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XVXKnsVKWd8LmJH2x0puMlxSt7TjlcNR8
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <8dfbc0ca-9a02-3620-d9e5-41aadee69d52@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/5] block: Allow reopen rw without
+ BDRV_O_ALLOW_RDWR
+References: <20170803150301.10177-1-kwolf@redhat.com>
+ <20170803150301.10177-3-kwolf@redhat.com>
+In-Reply-To: <20170803150301.10177-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Now that we've got a firmware that can do TFTP booting on s390x (i.e.
-> the pc-bios/s390-netboot.img), we can enable the PXE tester for this
-> architecture, too.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 08/03/2017 10:02 AM, Kevin Wolf wrote:
+> BDRV_O_ALLOW_RDWR is a flag that tells whether qemu can internally
+> reopen a node read-write temporarily because the user requested
+> read-write for the top-level image, but qemu decided that read-only is
+> enough for this node (a backing file).
+>=20
+> bdrv_reopen() is different, it is also used for cases where the user
+> changed their mind and wants to update the options. There is no reason
+> to forbid making a node read-write in that case.
+
+Hmm, I wonder.  https://bugzilla.redhat.com/show_bug.cgi?id=3D1465320
+details a failure when starting qemu with a read-write NBD disk, then
+taking several snapshots (nbd <- snap1 <- snap2 <- snap3), then where
+intermediate commit (snap2 into nbd) works but live commit (snap3 into
+nbd) fails with a message that nbd does not support reopening.  I'm
+presuming that your series may help to address that; I'll give it a spin
+and see what happens.  But first, the code review:
+
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  Since this only adds a test, I guess this could still be included
->  for 2.10 ... otherwise, I think it's also OK to simply postpone this
->  to 2.11 instead
+>  include/block/block.h |  3 ++-
+>  block.c               | 11 +++++++----
+>  2 files changed, 9 insertions(+), 5 deletions(-)
+>=20
 
-Personally, I think it is a bit late for non-bugfixes - even if it is
-just a test.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
->  
->  tests/Makefile.include |  1 +
->  tests/boot-sector.c    | 25 ++++++++++++++++++++++---
->  tests/pxe-test.c       |  7 +++++++
->  3 files changed, 30 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 59e536b..f9af5e3 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -337,6 +337,7 @@ check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
->  check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
->  
->  check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
-> +check-qtest-s390x-y += tests/pxe-test$(EXESUF)
->  
->  check-qtest-generic-y += tests/qom-test$(EXESUF)
->  check-qtest-generic-y += tests/test-hmp$(EXESUF)
-> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-> index e3880f4..87a8fb5 100644
-> --- a/tests/boot-sector.c
-> +++ b/tests/boot-sector.c
-> @@ -21,6 +21,7 @@
->  #define SIGNATURE 0xdead
->  #define SIGNATURE_OFFSET 0x10
->  #define BOOT_SECTOR_ADDRESS 0x7c00
-> +#define SIGNATURE_ADDR (BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET)
->  
->  /* Boot sector code: write SIGNATURE into memory,
->   * then halt.
-> @@ -73,6 +74,7 @@ int boot_sector_init(char *fname)
->  {
->      int fd, ret;
->      size_t len = sizeof boot_sector;
-> +    const char *arch = qtest_get_arch();
->  
->      fd = mkstemp(fname);
->      if (fd < 0) {
-> @@ -81,10 +83,27 @@ int boot_sector_init(char *fname)
->      }
->  
->      /* For Open Firmware based system, we can use a Forth script instead */
-> -    if (strcmp(qtest_get_arch(), "ppc64") == 0) {
-> +    if (g_str_equal(arch, "ppc64")) {
->          len = sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c! %x %x c!\n",
-> -                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET,
-> -                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET + 1);
-> +                LOW(SIGNATURE), SIGNATURE_ADDR,
-> +                HIGH(SIGNATURE), SIGNATURE_ADDR + 1);
-> +    } else if (g_str_equal(arch, "s390x")) {
-> +        /* For s390x, fake a kernel signature */
-> +        const uint8_t psw[] = {
-> +            0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
-> +        };
-> +        const uint8_t code[] = {
-> +            0xa7, 0xf4, 0x00, 0x0a,     /* j 0x10010 */
-> +            0x00, 0x00, 0x00, 0x00,
-> +            'S', '3', '9', '0',
-> +            'E', 'P', 0x00, 0x01,
-> +            0xa7, 0x38, HIGH(SIGNATURE_ADDR), LOW(SIGNATURE_ADDR), /* lhi r3 */
-> +            0xa7, 0x48, LOW(SIGNATURE), HIGH(SIGNATURE),    /* lhi r4,0xadde */
-> +            0x40, 0x40, 0x30, 0x00,     /* sth r4,0(r3) */
-> +            0xa7, 0xf4, 0xff, 0xfa      /* j 0x10010 */
-> +        };
-> +        memcpy(boot_sector, psw, 8);
-> +        memcpy(&boot_sector[0x10000], code, sizeof(code));
->      }
->  
->      ret = write(fd, boot_sector, len);
-> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-> index cf6e225..0d70afc 100644
-> --- a/tests/pxe-test.c
-> +++ b/tests/pxe-test.c
-> @@ -51,6 +51,11 @@ static void test_pxe_spapr_vlan(void)
->      test_pxe_one("-device spapr-vlan,netdev=" NETNAME, true);
->  }
->  
-> +static void test_pxe_virtio_ccw(void)
-> +{
-> +    test_pxe_one("-device virtio-net-ccw,bootindex=1,netdev=" NETNAME, false);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->      int ret;
-> @@ -68,6 +73,8 @@ int main(int argc, char *argv[])
->      } else if (strcmp(arch, "ppc64") == 0) {
->          qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
->          qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
-> +    } else if (g_str_equal(arch, "s390x")) {
-> +        qtest_add_func("pxe/virtio-ccw", test_pxe_virtio_ccw);
->      }
->      ret = g_test_run();
->      boot_sector_cleanup(disk);
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-No objection, but I'll have to look at this some more as I'm not
-familiar with the test.
+
+--XVXKnsVKWd8LmJH2x0puMlxSt7TjlcNR8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmDP3QACgkQp6FrSiUn
+Q2rtegf+Kt16kQIRzq6gPxzkH+AjB1aJP6WsES0m5SGompaESXgdy0iaMwIco907
+k90hSPTPfPCXZcXzgcKq2WY3q9bFDMDWaNlI0cdoZll3fq3J0y6zsj59/bJ+nfBE
+YuwRTNMmpmh+QDUWaoeIM2a2eKbfe2iUCXMXZ9QawVv/89Ir8TyyDfX9fNddWugI
+Z7coJpBP5bsvGyxIryTTZlgi6PQPo6yPHlfl8bFpzkSHsfk6EhiaEZf6Z959ginS
+tsp8BxI5PA9mWF4Lj+EPuWgZdxgJA5HHkohWzez2ll4WWeMkIO4i5OY6m1uc2C/O
+7bRmnFomGl/aDZ98sZjRx4gww1LOBQ==
+=4nrM
+-----END PGP SIGNATURE-----
+
+--XVXKnsVKWd8LmJH2x0puMlxSt7TjlcNR8--
