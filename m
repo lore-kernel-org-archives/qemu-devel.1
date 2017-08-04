@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddW14-0003Ws-9A
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:23:23 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddW17-0003Yl-LG
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddW11-0005Ni-Hi
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:23:22 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34782)
+	(envelope-from <rth7680@gmail.com>) id 1ddW15-0005Tk-RS
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:23:25 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddW11-0005Mt-9a
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:23:19 -0400
-Received: by mail-pg0-x242.google.com with SMTP id y192so919163pgd.1
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 23:23:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddW15-0005St-Jl
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:23:23 -0400
+Received: by mail-pf0-x244.google.com with SMTP id c65so958053pfl.0
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 23:23:23 -0700 (PDT)
 Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
 	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	q199sm1335819pfq.135.2017.08.03.23.23.16 for <qemu-devel@nongnu.org>
+	q199sm1335819pfq.135.2017.08.03.23.23.21 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 23:23:16 -0700 (PDT)
+	Thu, 03 Aug 2017 23:23:21 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 23:23:09 -0700
-Message-Id: <20170804062314.12594-2-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 23:23:13 -0700
+Message-Id: <20170804062314.12594-6-rth@twiddle.net>
 In-Reply-To: <20170804062314.12594-1-rth@twiddle.net>
 References: <20170804062314.12594-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 1/6] tcg: Add tcg_reg_alloc_new
+Subject: [Qemu-devel] [PATCH for-2.11 5/6] tcg/i386: Use pext for extract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,261 +33,299 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This allows the backend to allocate an otherwise unused register.
-This can allow the backend to avoid having to reserve a full-time
-temporary register.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg.h |  1 +
- tcg/tcg.c | 58 +++++++++++++++++++++++++++++++++++++++++++++-------------
- 2 files changed, 46 insertions(+), 13 deletions(-)
+ tcg/i386/tcg-target.h     |   6 +-
+ tcg/i386/tcg-target.inc.c | 147 +++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 109 insertions(+), 44 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index ac94133870..dd97095af5 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -655,6 +655,7 @@ struct TCGContext {
-     uintptr_t *tb_jmp_insn_offset; /* tb->jmp_target_arg if direct_jump */
-     uintptr_t *tb_jmp_target_addr; /* tb->jmp_target_arg if !direct_jump */
- 
-+    TCGRegSet regs_in_use;
-     TCGRegSet reserved_regs;
-     intptr_t current_frame_offset;
-     intptr_t frame_start;
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index fd8a3dfe93..787c8ba0f7 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -112,6 +112,8 @@ static bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
- static void tcg_out_call(TCGContext *s, tcg_insn_unit *target);
- static int tcg_target_const_match(tcg_target_long val, TCGType type,
-                                   const TCGArgConstraint *arg_ct);
-+static TCGReg tcg_reg_alloc_new(TCGContext *s, TCGType t)
-+    __attribute__((unused));
- #ifdef TCG_TARGET_NEED_LDST_LABELS
- static bool tcg_out_ldst_finalize(TCGContext *s);
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index b89dababf4..85b0ccd98c 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -76,6 +76,7 @@ typedef enum {
  #endif
-@@ -1947,16 +1949,19 @@ static void temp_sync(TCGContext *s, TCGTemp *ts,
-             /* If we're going to free the temp immediately, then we won't
-                require it later in a register, so attempt to store the
-                constant to memory directly.  */
--            if (free_or_dead
--                && tcg_out_sti(s, ts->type, ts->val,
--                               ts->mem_base->reg, ts->mem_offset)) {
--                break;
-+            if (free_or_dead) {
-+                s->regs_in_use = -1;
-+                if (tcg_out_sti(s, ts->type, ts->val,
-+                                ts->mem_base->reg, ts->mem_offset)) {
-+                    break;
-+                }
-             }
-             temp_load(s, ts, tcg_target_available_regs[ts->type],
-                       allocated_regs);
-             /* fallthrough */
  
-         case TEMP_VAL_REG:
-+            s->regs_in_use = -1;
-             tcg_out_st(s, ts->type, ts->reg,
-                        ts->mem_base->reg, ts->mem_offset);
-             break;
-@@ -2015,6 +2020,14 @@ static TCGReg tcg_reg_alloc(TCGContext *s, TCGRegSet desired_regs,
-     tcg_abort();
+ extern bool have_bmi1;
++extern bool have_bmi2;
+ extern bool have_popcnt;
+ 
+ /* optional instructions */
+@@ -153,9 +154,10 @@ extern bool have_popcnt;
+ 
+ /* Check for the possibility of high-byte extraction and, for 64-bit,
+    zero-extending 32-bit right-shift.  */
+-#define TCG_TARGET_extract_i32_valid(ofs, len) ((ofs) == 8 && (len) == 8)
++#define TCG_TARGET_extract_i32_valid(ofs, len) \
++    (have_bmi2 || ((ofs) == 8 && (len) == 8))
+ #define TCG_TARGET_extract_i64_valid(ofs, len) \
+-    (((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
++    (have_bmi2 || ((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ # define TCG_AREG0 TCG_REG_R14
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 5231056fd3..69587c82de 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -124,11 +124,11 @@ static bool have_cmov;
+ /* We need these symbols in tcg-target.h, and we can't properly conditionalize
+    it there.  Therefore we always define the variable.  */
+ bool have_bmi1;
++bool have_bmi2;
+ bool have_popcnt;
+ 
+ #ifdef CONFIG_CPUID_H
+ static bool have_movbe;
+-static bool have_bmi2;
+ static bool have_lzcnt;
+ #else
+ # define have_movbe 0
+@@ -275,13 +275,14 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+ 
+ #define P_EXT		0x100		/* 0x0f opcode prefix */
+ #define P_EXT38         0x200           /* 0x0f 0x38 opcode prefix */
+-#define P_DATA16        0x400           /* 0x66 opcode prefix */
++#define P_EXT3A         0x400           /* 0x0f 0x3a opcode prefix */
++#define P_DATA16        0x800           /* 0x66 opcode prefix */
+ #if TCG_TARGET_REG_BITS == 64
+-# define P_ADDR32       0x800           /* 0x67 opcode prefix */
+-# define P_REXW         0x1000          /* Set REX.W = 1 */
+-# define P_REXB_R       0x2000          /* REG field as byte register */
+-# define P_REXB_RM      0x4000          /* R/M field as byte register */
+-# define P_GS           0x8000          /* gs segment override */
++# define P_ADDR32       0x1000          /* 0x67 opcode prefix */
++# define P_REXW         0x2000          /* Set REX.W = 1 */
++# define P_REXB_R       0x4000          /* REG field as byte register */
++# define P_REXB_RM      0x8000          /* R/M field as byte register */
++# define P_GS           0x10000         /* gs segment override */
+ #else
+ # define P_ADDR32	0
+ # define P_REXW		0
+@@ -289,14 +290,15 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+ # define P_REXB_RM	0
+ # define P_GS           0
+ #endif
+-#define P_SIMDF3        0x10000         /* 0xf3 opcode prefix */
+-#define P_SIMDF2        0x20000         /* 0xf2 opcode prefix */
++#define P_SIMDF3        0x20000         /* 0xf3 opcode prefix */
++#define P_SIMDF2        0x40000         /* 0xf2 opcode prefix */
+ 
+ #define OPC_ARITH_EvIz	(0x81)
+ #define OPC_ARITH_EvIb	(0x83)
+ #define OPC_ARITH_GvEv	(0x03)		/* ... plus (ARITH_FOO << 3) */
+ #define OPC_ANDN        (0xf2 | P_EXT38)
+ #define OPC_ADD_GvEv	(OPC_ARITH_GvEv | (ARITH_ADD << 3))
++#define OPC_BEXTR       (0xf7 | P_EXT38)
+ #define OPC_BSF         (0xbc | P_EXT)
+ #define OPC_BSR         (0xbd | P_EXT)
+ #define OPC_BSWAP	(0xc8 | P_EXT)
+@@ -327,12 +329,14 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define OPC_MOVSLQ	(0x63 | P_REXW)
+ #define OPC_MOVZBL	(0xb6 | P_EXT)
+ #define OPC_MOVZWL	(0xb7 | P_EXT)
++#define OPC_PEXT        (0xf5 | P_EXT38 | P_SIMDF3)
+ #define OPC_POP_r32	(0x58)
+ #define OPC_POPCNT      (0xb8 | P_EXT | P_SIMDF3)
+ #define OPC_PUSH_r32	(0x50)
+ #define OPC_PUSH_Iv	(0x68)
+ #define OPC_PUSH_Ib	(0x6a)
+ #define OPC_RET		(0xc3)
++#define OPC_RORX        (0xf0 | P_EXT3A | P_SIMDF2)
+ #define OPC_SETCC	(0x90 | P_EXT | P_REXB_RM) /* ... plus cc */
+ #define OPC_SHIFT_1	(0xd1)
+ #define OPC_SHIFT_Ib	(0xc1)
+@@ -455,6 +459,8 @@ static void tcg_out_opc(TCGContext *s, int opc, int r, int rm, int x)
+         tcg_out8(s, 0x0f);
+         if (opc & P_EXT38) {
+             tcg_out8(s, 0x38);
++        } else if (opc & P_EXT3A) {
++            tcg_out8(s, 0x3a);
+         }
+     }
+ 
+@@ -475,6 +481,8 @@ static void tcg_out_opc(TCGContext *s, int opc)
+         tcg_out8(s, 0x0f);
+         if (opc & P_EXT38) {
+             tcg_out8(s, 0x38);
++        } else if (opc & P_EXT3A) {
++            tcg_out8(s, 0x3a);
+         }
+     }
+     tcg_out8(s, opc);
+@@ -491,34 +499,29 @@ static void tcg_out_modrm(TCGContext *s, int opc, int r, int rm)
+     tcg_out8(s, 0xc0 | (LOWREGMASK(r) << 3) | LOWREGMASK(rm));
  }
  
-+static TCGReg tcg_reg_alloc_new(TCGContext *s, TCGType t)
-+{
-+    TCGReg r;
-+    r = tcg_reg_alloc(s, tcg_target_available_regs[t], s->regs_in_use, 0);
-+    tcg_regset_set_reg(s->regs_in_use, r);
-+    return r;
+-static void tcg_out_vex_modrm(TCGContext *s, int opc, int r, int v, int rm)
++static void tcg_out_vex_pfx_opc(TCGContext *s, int opc, int r, int v, int rm)
+ {
+     int tmp;
+ 
+-    if ((opc & (P_REXW | P_EXT | P_EXT38)) || (rm & 8)) {
+-        /* Three byte VEX prefix.  */
+-        tcg_out8(s, 0xc4);
+-
+-        /* VEX.m-mmmm */
+-        if (opc & P_EXT38) {
+-            tmp = 2;
+-        } else if (opc & P_EXT) {
+-            tmp = 1;
+-        } else {
+-            tcg_abort();
+-        }
+-        tmp |= 0x40;                       /* VEX.X */
+-        tmp |= (r & 8 ? 0 : 0x80);         /* VEX.R */
+-        tmp |= (rm & 8 ? 0 : 0x20);        /* VEX.B */
+-        tcg_out8(s, tmp);
++    /* Three byte VEX prefix.  */
++    tcg_out8(s, 0xc4);
+ 
+-        tmp = (opc & P_REXW ? 0x80 : 0);   /* VEX.W */
++    /* VEX.m-mmmm */
++    if (opc & P_EXT3A) {
++        tmp = 3;
++    } else if (opc & P_EXT38) {
++        tmp = 2;
++    } else if (opc & P_EXT) {
++        tmp = 1;
+     } else {
+-        /* Two byte VEX prefix.  */
+-        tcg_out8(s, 0xc5);
+-
+-        tmp = (r & 8 ? 0 : 0x80);          /* VEX.R */
++        tcg_abort();
+     }
++    tmp |= 0x40;                           /* VEX.X */
++    tmp |= (r & 8 ? 0 : 0x80);             /* VEX.R */
++    tmp |= (rm & 8 ? 0 : 0x20);            /* VEX.B */
++    tcg_out8(s, tmp);
++
++    tmp = (opc & P_REXW ? 0x80 : 0);       /* VEX.W */
+     /* VEX.pp */
+     if (opc & P_DATA16) {
+         tmp |= 1;                          /* 0x66 */
+@@ -530,9 +533,43 @@ static void tcg_out_vex_modrm(TCGContext *s, int opc, int r, int v, int rm)
+     tmp |= (~v & 15) << 3;                 /* VEX.vvvv */
+     tcg_out8(s, tmp);
+     tcg_out8(s, opc);
 +}
 +
- /* Make sure the temporary is in a register.  If needed, allocate the register
-    from DESIRED while avoiding ALLOCATED.  */
- static void temp_load(TCGContext *s, TCGTemp *ts, TCGRegSet desired_regs,
-@@ -2027,11 +2040,13 @@ static void temp_load(TCGContext *s, TCGTemp *ts, TCGRegSet desired_regs,
-         return;
-     case TEMP_VAL_CONST:
-         reg = tcg_reg_alloc(s, desired_regs, allocated_regs, ts->indirect_base);
-+        s->regs_in_use = allocated_regs;
-         tcg_out_movi(s, ts->type, reg, ts->val);
-         ts->mem_coherent = 0;
-         break;
-     case TEMP_VAL_MEM:
-         reg = tcg_reg_alloc(s, desired_regs, allocated_regs, ts->indirect_base);
-+        s->regs_in_use = -1;
-         tcg_out_ld(s, ts->type, reg, ts->mem_base->reg, ts->mem_offset);
-         ts->mem_coherent = 1;
-         break;
-@@ -2105,6 +2120,7 @@ static void tcg_reg_alloc_do_movi(TCGContext *s, TCGTemp *ots,
- {
-     if (ots->fixed_reg) {
-         /* For fixed registers, we do not do any constant propagation.  */
-+        s->regs_in_use = s->reserved_regs;
-         tcg_out_movi(s, ots->type, ots->reg, val);
-         return;
-     }
-@@ -2129,17 +2145,16 @@ static void tcg_reg_alloc_movi(TCGContext *s, const TCGArg *args,
-     TCGTemp *ots = &s->temps[args[0]];
-     tcg_target_ulong val = args[1];
- 
-+    s->regs_in_use = s->reserved_regs;
-     tcg_reg_alloc_do_movi(s, ots, val, arg_life);
++static void tcg_out_vex_modrm(TCGContext *s, int opc, int r, int v, int rm)
++{
++    tcg_out_vex_pfx_opc(s, opc, r, v, rm);
+     tcg_out8(s, 0xc0 | (LOWREGMASK(r) << 3) | LOWREGMASK(rm));
  }
  
- static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
-                               const TCGArg *args, TCGLifeData arg_life)
- {
--    TCGRegSet allocated_regs;
-     TCGTemp *ts, *ots;
-     TCGType otype, itype;
- 
--    tcg_regset_set(allocated_regs, s->reserved_regs);
-     ots = &s->temps[args[0]];
-     ts = &s->temps[args[1]];
- 
-@@ -2153,6 +2168,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
-         if (IS_DEAD_ARG(1)) {
-             temp_dead(s, ts);
-         }
-+        s->regs_in_use = s->reserved_regs;
-         tcg_reg_alloc_do_movi(s, ots, val, arg_life);
-         return;
-     }
-@@ -2162,7 +2178,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
-        the SOURCE value into its own register first, that way we
-        don't have to reload SOURCE the next time it is used. */
-     if (ts->val_type == TEMP_VAL_MEM) {
--        temp_load(s, ts, tcg_target_available_regs[itype], allocated_regs);
-+        temp_load(s, ts, tcg_target_available_regs[itype], s->reserved_regs);
-     }
- 
-     tcg_debug_assert(ts->val_type == TEMP_VAL_REG);
-@@ -2173,12 +2189,14 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
-         if (!ots->mem_allocated) {
-             temp_allocate_frame(s, args[0]);
-         }
-+        s->regs_in_use = -1;
-         tcg_out_st(s, otype, ts->reg, ots->mem_base->reg, ots->mem_offset);
-         if (IS_DEAD_ARG(1)) {
-             temp_dead(s, ts);
-         }
-         temp_dead(s, ots);
-     } else {
-+        TCGRegSet allocated_regs;
-         if (IS_DEAD_ARG(1) && !ts->fixed_reg && !ots->fixed_reg) {
-             /* the mov can be suppressed */
-             if (ots->val_type == TEMP_VAL_REG) {
-@@ -2188,19 +2206,21 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
-             temp_dead(s, ts);
-         } else {
-             if (ots->val_type != TEMP_VAL_REG) {
--                /* When allocating a new register, make sure to not spill the
--                   input one. */
-+                /* When allocating a new register, make sure to not
-+                   spill the input one. */
-+                allocated_regs = s->reserved_regs;
-                 tcg_regset_set_reg(allocated_regs, ts->reg);
-                 ots->reg = tcg_reg_alloc(s, tcg_target_available_regs[otype],
-                                          allocated_regs, ots->indirect_base);
-             }
-+            s->regs_in_use = -1;
-             tcg_out_mov(s, otype, ots->reg, ts->reg);
-         }
-         ots->val_type = TEMP_VAL_REG;
-         ots->mem_coherent = 0;
-         s->reg_to_temp[ots->reg] = ots;
-         if (NEED_SYNC_ARG(0)) {
--            temp_sync(s, ots, allocated_regs, 0);
-+            temp_sync(s, ots, s->reserved_regs, 0);
-         }
-     }
- }
-@@ -2281,6 +2301,7 @@ static void tcg_reg_alloc_op(TCGContext *s,
-                and move the temporary register into it */
-             reg = tcg_reg_alloc(s, arg_ct->u.regs, i_allocated_regs,
-                                 ts->indirect_base);
-+            s->regs_in_use = -1;
-             tcg_out_mov(s, ts->type, reg, ts->reg);
-         }
-         new_args[i] = reg;
-@@ -2355,6 +2376,7 @@ static void tcg_reg_alloc_op(TCGContext *s,
-     }
- 
-     /* emit instruction */
-+    s->regs_in_use = i_allocated_regs | o_allocated_regs;
-     tcg_out_op(s, opc, new_args, const_args);
-     
-     /* move the outputs in the correct register if needed */
-@@ -2362,6 +2384,7 @@ static void tcg_reg_alloc_op(TCGContext *s,
-         ts = &s->temps[args[i]];
-         reg = new_args[i];
-         if (ts->fixed_reg && ts->reg != reg) {
-+            s->regs_in_use = -1;
-             tcg_out_mov(s, ts->type, ts->reg, reg);
-         }
-         if (NEED_SYNC_ARG(i)) {
-@@ -2420,6 +2443,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
-             ts = &s->temps[arg];
-             temp_load(s, ts, tcg_target_available_regs[ts->type],
-                       s->reserved_regs);
-+            s->regs_in_use = -1;
-             tcg_out_st(s, ts->type, ts->reg, TCG_REG_CALL_STACK, stack_offset);
-         }
- #ifndef TCG_TARGET_STACK_GROWSUP
-@@ -2428,7 +2452,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
-     }
-     
-     /* assign input registers */
--    tcg_regset_set(allocated_regs, s->reserved_regs);
-+    allocated_regs = s->reserved_regs;
-     for(i = 0; i < nb_regs; i++) {
-         arg = args[nb_oargs + i];
-         if (arg != TCG_CALL_DUMMY_ARG) {
-@@ -2438,6 +2462,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
- 
-             if (ts->val_type == TEMP_VAL_REG) {
-                 if (ts->reg != reg) {
-+                    s->regs_in_use = -1;
-                     tcg_out_mov(s, ts->type, reg, ts->reg);
-                 }
-             } else {
-@@ -2458,7 +2483,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
-             temp_dead(s, &s->temps[args[i]]);
-         }
-     }
--    
++static void tcg_out_sfx_pool_imm(TCGContext *s, int r, tcg_target_ulong data)
++{
++    /* modrm for 64-bit rip-relative, or 32-bit absolute addressing.  */
++    tcg_out8(s, (LOWREGMASK(r) << 3) | 5);
 +
-     /* clobber call registers */
-     for (i = 0; i < TCG_TARGET_NB_REGS; i++) {
-         if (tcg_regset_test_reg(tcg_target_call_clobber_regs, i)) {
-@@ -2476,10 +2501,16 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
-         save_globals(s, allocated_regs);
-     }
- 
-+    s->regs_in_use = allocated_regs;
-     tcg_out_call(s, func_addr);
- 
-     /* assign output registers and emit moves if needed */
--    for(i = 0; i < nb_oargs; i++) {
-+    allocated_regs = s->reserved_regs;
-+    for (i = 0; i < nb_oargs; i++) {
-+        reg = tcg_target_call_oarg_regs[i];
-+        tcg_regset_set_reg(allocated_regs, reg);
++    if (TCG_TARGET_REG_BITS == 64) {
++        new_pool_label(s, data, R_386_PC32, s->code_ptr, -4);
++    } else {
++        new_pool_label(s, data, R_386_32, s->code_ptr, 0);
 +    }
-+    for (i = 0; i < nb_oargs; i++) {
-         arg = args[i];
-         ts = &s->temps[arg];
-         reg = tcg_target_call_oarg_regs[i];
-@@ -2487,6 +2518,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
++    tcg_out32(s, 0);
++}
++
++#if 0
++static void tcg_out_opc_pool_imm(TCGContext *s, int opc, int r,
++                                 tcg_target_ulong data)
++{
++    tcg_out_opc(s, opc, r, 0, 0);
++    tcg_out_sfx_pool_imm(s, r, data);
++}
++#endif
++
++static void tcg_out_vex_pool_imm(TCGContext *s, int opc, int r, int v,
++                                 tcg_target_ulong data)
++{
++    tcg_out_vex_pfx_opc(s, opc, r, v, 0);
++    tcg_out_sfx_pool_imm(s, r, data);
++}
++
+ /* Output an opcode with a full "rm + (index<<shift) + offset" address mode.
+    We handle either RM and INDEX missing with a negative value.  In 64-bit
+    mode for absolute addresses, ~RM is the size of the immediate operand
+@@ -877,6 +914,13 @@ static void tcg_out_addi(TCGContext *s, int reg, tcg_target_long val)
+     }
+ }
  
-         if (ts->fixed_reg) {
-             if (ts->reg != reg) {
-+                s->regs_in_use = -1;
-                 tcg_out_mov(s, ts->type, ts->reg, reg);
-             }
++static void tcg_out_rorx(TCGContext *s, int rexw,
++                         TCGReg dst, TCGReg src, int c)
++{
++    tcg_out_vex_modrm(s, OPC_RORX + rexw, dst, 0, src);
++    tcg_out8(s, c);
++}
++
+ /* Use SMALL != 0 to force a short forward branch.  */
+ static void tcg_out_jxx(TCGContext *s, int opc, TCGLabel *l, int small)
+ {
+@@ -1858,7 +1902,7 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
+ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+                               const TCGArg *args, const int *const_args)
+ {
+-    TCGArg a0, a1, a2;
++    TCGArg a0, a1, a2, a3;
+     int c, const_a2, vexop, rexw = 0;
+ 
+ #if TCG_TARGET_REG_BITS == 64
+@@ -2244,12 +2288,18 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         /* On the off-chance that we can use the high-byte registers.
+            Otherwise we emit the same ext16 + shift pattern that we
+            would have gotten from the normal tcg-op.c expansion.  */
+-        tcg_debug_assert(a2 == 8 && args[3] == 8);
+-        if (a1 < 4 && a0 < 8) {
+-            tcg_out_modrm(s, OPC_MOVZBL, a0, a1 + 4);
++        a3 = args[3];
++        if (a2 == 8 && a3 == 8) {
++            if (a1 < 4 && a0 < 8) {
++                tcg_out_modrm(s, OPC_MOVZBL, a0, a1 + 4);
++            } else {
++                tcg_out_ext16u(s, a0, a1);
++                tcg_out_shifti(s, SHIFT_SHR, a0, 8);
++            }
          } else {
+-            tcg_out_ext16u(s, a0, a1);
+-            tcg_out_shifti(s, SHIFT_SHR, a0, 8);
++            tcg_debug_assert(have_bmi2);
++            tcg_out_vex_pool_imm(s, OPC_PEXT + (a2 + a3 > 32) * P_REXW,
++                                 a0, a1, deposit64(0, a2, a3, -1));
+         }
+         break;
+ 
+@@ -2257,12 +2307,25 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         /* We don't implement sextract_i64, as we cannot sign-extend to
+            64-bits without using the REX prefix that explicitly excludes
+            access to the high-byte registers.  */
+-        tcg_debug_assert(a2 == 8 && args[3] == 8);
+-        if (a1 < 4 && a0 < 8) {
+-            tcg_out_modrm(s, OPC_MOVSBL, a0, a1 + 4);
++        a3 = args[3];
++        if (a2 == 8 && a3 == 8) {
++            if (a1 < 4 && a0 < 8) {
++                tcg_out_modrm(s, OPC_MOVSBL, a0, a1 + 4);
++            } else {
++                tcg_out_ext16s(s, a0, a1, 0);
++                tcg_out_shifti(s, SHIFT_SAR, a0, 8);
++            }
+         } else {
+-            tcg_out_ext16s(s, a0, a1, 0);
+-            tcg_out_shifti(s, SHIFT_SAR, a0, 8);
++            /* ??? We only have one extract_i32_valid macro.  But as it
++               happens we can perform a useful 3-operand shift.  */
++            tcg_debug_assert(have_bmi2);
++            if (a2 + a3 < 32) {
++                /* Rotate the field in A1 to the MSB of A0.  */
++                tcg_out_rorx(s, 0, a0, a1, a2 + a3);
++            } else {
++                tcg_out_mov(s, TCG_TYPE_I32, a0, a1);
++            }
++            tcg_out_shifti(s, SHIFT_SAR, a0, 32 - a3);
+         }
+         break;
+ 
 -- 
 2.13.3
