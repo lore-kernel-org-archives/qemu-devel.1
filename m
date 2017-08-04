@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPp-0004Av-GF
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:54 -0400
+	(envelope-from <peterx@redhat.com>) id 1ddVRl-0005tp-5G
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:46:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPo-0003sq-HR
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:53 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33067)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPo-0003rE-CI
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:52 -0400
-Received: by mail-pg0-x242.google.com with SMTP id u185so854016pgb.0
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:52 -0700 (PDT)
-Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
-	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	o14sm1061063pfi.158.2017.08.03.22.44.50 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 22:44:50 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:44:26 -0700
-Message-Id: <20170804054426.10590-24-rth@twiddle.net>
-In-Reply-To: <20170804054426.10590-1-rth@twiddle.net>
-References: <20170804054426.10590-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 23/23] tcg/ppc: Use constant pool for
- movi
+	(envelope-from <peterx@redhat.com>) id 1ddVRh-0001Op-NL
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:46:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60142)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ddVRh-0001Iu-H2
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:46:49 -0400
+Date: Fri, 4 Aug 2017 13:46:42 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170804054642.GE5561@pxdev.xzpeter.org>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-21-git-send-email-peterx@redhat.com>
+	<20170803092820.GB2076@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170803092820.GB2076@work-vm>
+Subject: Re: [Qemu-devel] [RFC 20/29] migration: wakeup dst ram-load-thread
+ for recover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,105 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- tcg/ppc/tcg-target.h     |  1 +
- tcg/ppc/tcg-target.inc.c | 34 ++++++++++++++++++++++++++++++----
- 2 files changed, 31 insertions(+), 4 deletions(-)
+On Thu, Aug 03, 2017 at 10:28:20AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On the destination side, we cannot wake up all the threads when we got
+> > reconnected. The first thing to do is to wake up the main load thread,
+> > so that we can continue to receive valid messages from source again and
+> > reply when needed.
+> > 
+> > At this point, we switch the destination VM state from postcopy-paused
+> > back to postcopy-recover.
+> > 
+> > Now we are finally ready to do the resume logic.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c | 34 +++++++++++++++++++++++++++++++---
+> >  1 file changed, 31 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 3aabe11..e498fa4 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -389,10 +389,38 @@ static void process_incoming_migration_co(void *opaque)
+> >  
+> >  void migration_fd_process_incoming(QEMUFile *f)
+> >  {
+> > -    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
+> > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    Coroutine *co;
+> > +
+> > +    mis->from_src_file = f;
+> > +
+> > +    if (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> > +        /* Resumed migration to postcopy state */
 
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index c1226ea5b6..e10d7e4411 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -130,5 +130,6 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
- #ifdef CONFIG_SOFTMMU
- #define TCG_TARGET_NEED_LDST_LABELS
- #endif
-+#define TCG_TARGET_NEED_POOL_LABELS
- 
- #endif
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 4b32809217..7598157e5f 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -22,6 +22,9 @@
-  * THE SOFTWARE.
-  */
- 
-+#include "elf.h"
-+#include "tcg-pool.inc.c"
-+
- #if defined _CALL_DARWIN || defined __APPLE__
- #define TCG_TARGET_CALL_DARWIN
- #endif
-@@ -58,8 +61,6 @@
- 
- static tcg_insn_unit *tb_ret_addr;
- 
--#include "elf.h"
--
- bool have_isa_2_06;
- bool have_isa_3_00;
- 
-@@ -224,9 +225,12 @@ static inline void tcg_out_bc_noaddr(TCGContext *s, int insn)
- static void patch_reloc(tcg_insn_unit *code_ptr, int type,
-                         intptr_t value, intptr_t addend)
- {
--    tcg_insn_unit *target = (tcg_insn_unit *)value;
-+    tcg_insn_unit *target;
-+    tcg_insn_unit old;
-+
-+    value += addend;
-+    target = (tcg_insn_unit *)value;
- 
--    tcg_debug_assert(addend == 0);
-     switch (type) {
-     case R_PPC_REL14:
-         reloc_pc14(code_ptr, target);
-@@ -234,6 +238,12 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
-     case R_PPC_REL24:
-         reloc_pc24(code_ptr, target);
-         break;
-+    case R_PPC_ADDR16:
-+        assert(value == (int16_t)value);
-+        old = *code_ptr;
-+        old = deposit32(old, 0, 16, value);
-+        *code_ptr = old;
-+        break;
-     default:
-         tcg_abort();
-     }
-@@ -647,6 +657,14 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-         return;
-     }
- 
-+    /* Use the constant pool, if possible.  */
-+    if (!in_prologue && USE_REG_TB) {
-+        new_pool_label(s, arg, R_PPC_ADDR16, s->code_ptr,
-+                       -(intptr_t)s->code_gen_ptr);
-+        tcg_out32(s, LD | TAI(ret, TCG_REG_TB, 0));
-+        return;
-+    }
-+
-     high = arg >> 31 >> 1;
-     tcg_out_movi(s, TCG_TYPE_I32, ret, high);
-     if (high) {
-@@ -1829,6 +1847,14 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is_64)
- #endif
- }
- 
-+static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
-+{
-+    int i;
-+    for (i = 0; i < count; ++i) {
-+        p[i] = NOP;
-+    }
-+}
-+
- /* Parameters for function call generation, used in tcg.c.  */
- #define TCG_TARGET_STACK_ALIGN       16
- #define TCG_TARGET_EXTEND_ARGS       1
+(I guess here it should be "Resumed from a paused postcopy migration")
+
+> > +
+> > +        /* Postcopy has standalone thread to do vm load */
+> > +        qemu_file_set_blocking(f, true);
+> > +
+> > +        /* Re-configure the return path */
+> > +        mis->to_src_file = qemu_file_get_return_path(f);
+> >  
+> > -    qemu_file_set_blocking(f, false);
+> > -    qemu_coroutine_enter(co);
+> > +        /* Reset the migration status to postcopy-active */
+> > +        migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
+> > +                          MIGRATION_STATUS_POSTCOPY_RECOVER);
+> 
+> The comment doesn't match the code.
+
+Indeed. I'll remove the comment since the code explains.
+
+> 
+> Other than that;
+> 
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Thanks,
+
 -- 
-2.13.3
+Peter Xu
