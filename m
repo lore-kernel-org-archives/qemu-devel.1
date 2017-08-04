@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddelm-0005ce-5w
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:44:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddeoK-0000XL-Rx
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddell-0005eU-7H
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:44:10 -0400
-References: <20170804140848.880-1-berto@igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1ddeoJ-00084p-SV
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:46:48 -0400
+References: <20170804140942.19342-1-famz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0c382c84-1135-56b6-d90f-1c44e33f1f00@redhat.com>
-Date: Fri, 4 Aug 2017 10:44:00 -0500
+Message-ID: <839fdd63-56d8-2821-37a4-c5b9f4f03720@redhat.com>
+Date: Fri, 4 Aug 2017 10:46:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170804140848.880-1-berto@igalia.com>
+In-Reply-To: <20170804140942.19342-1-famz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Handle bdrv_getlength()
- failures in quorum_co_flush()
+	boundary="UpFFGlBs7eUvfaDBRljj1o3VEkq86WO6W"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] vmdk: Fix error
+ handling/reporting of vmdk_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW
+--UpFFGlBs7eUvfaDBRljj1o3VEkq86WO6W
 From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
-Message-ID: <0c382c84-1135-56b6-d90f-1c44e33f1f00@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Handle bdrv_getlength()
- failures in quorum_co_flush()
-References: <20170804140848.880-1-berto@igalia.com>
-In-Reply-To: <20170804140848.880-1-berto@igalia.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <839fdd63-56d8-2821-37a4-c5b9f4f03720@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] vmdk: Fix error handling/reporting
+ of vmdk_check
+References: <20170804140942.19342-1-famz@redhat.com>
+In-Reply-To: <20170804140942.19342-1-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/04/2017 09:08 AM, Alberto Garcia wrote:
-> A bdrv_getlength() call can fail and return a negative value. This
-> is not being handled in quorum_co_flush(), which can result in a
-> QUORUM_REPORT_BAD event with an arbitrary value on the 'sectors-count'
-> field.
+On 08/04/2017 09:09 AM, Fam Zheng wrote:
+> Errors from the callees must be captured and propagated to our caller,
+> ensure this for both find_extent() and bdrv_getlength().
 >=20
 > Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  block/quorum.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  block/vmdk.c | 26 ++++++++++++++++++--------
+>  1 file changed, 18 insertions(+), 8 deletions(-)
 >=20
-> diff --git a/block/quorum.c b/block/quorum.c
-> index 55ba916655..d77991d680 100644
-> --- a/block/quorum.c
-> +++ b/block/quorum.c
-> @@ -785,8 +785,9 @@ static coroutine_fn int quorum_co_flush(BlockDriver=
-State *bs)
->      for (i =3D 0; i < s->num_children; i++) {
->          result =3D bdrv_co_flush(s->children[i]->bs);
->          if (result) {
-> +            int64_t length =3D bdrv_getlength(s->children[i]->bs);
->              quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0,
-> -                              bdrv_getlength(s->children[i]->bs),
-> +                              length > 0 ? length : 0,
 
-In the fallback case, is always picking 0 good enough?  Then again, this
-is in the error path, so it is unlikely in practice, and I don't see any
-better way to handle it.
+> +        if (ret =3D=3D VMDK_OK) {
+> +            int64_t extent_len =3D bdrv_getlength(extent->file->bs);
+> +            if (extent_len < 0) {
+> +                fprintf(stderr,
+> +                        "ERROR: could not get extent file length for s=
+ector %"
+> +                        PRId64 "\n", sector_num);
+> +                ret =3D extent_len;
+
+Pre-existing - our use of fprintf() is not ideal.  But this patch
+doesn't make it worse.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -78,7 +72,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW
+--UpFFGlBs7eUvfaDBRljj1o3VEkq86WO6W
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -87,14 +81,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmElkAACgkQp6FrSiUn
-Q2pQIgf/SsL3xcUzNykbvJOF2GMRF29s0D0VpsLq5gC9fdxksCfqDOO0iIXTruHl
-pwLpVvQpv8AD5yMjmr37xcMkkea9C0hgwuJq47Vzoz6DjliooNsaxO0ywzi10Pou
-8H4kyPCN0hVZXmO/6WjPRLO6ZSUs8NxZ+j1t5pJx3GmgVc+ipQIvi0b1WmzkW7o3
-Sb/63MMuEO0Sq7fnomigBSb6zWjC4cHVUDtw2IgmSys5lFiIzT/hE4CL7TtHNp8C
-mTZgO2Nq/P8JdIADaYk8qDn3GuVOiRRgECwrnLh4nvHQNHyNhNNbzI6uh3SzeVYp
-qxnaWO1rYDRVin1x4fgnCt1TkO74og==
-=AcJp
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmEltwACgkQp6FrSiUn
+Q2oX1Qf+OcO+X9nAgH/A9K9O97C+hXxbHcVPJ+yqsk2V3pPb6mvKZyLIo8hQV2SS
+EoAcHXihoxaOe+ivVdfkycM7JHXwPhnxeIcbK306IsBSDVE9H/qVwv/Q4ci7SLxn
+/FDvE4qsicKlhunXVXMJLtKcjXY+ErAVG09LxSlOIfYW5rtL07ki3yDPPSSvUwzp
+8G5pL3MEhgqYLeT68Mcp1skf2zn2kFT8YUnCWOs7WjJQnjL22GXU+0AwRVkvLLbj
+Q+YUXdHHiUUYgnEx2oiccSuNzP2MSSmmDC0FVXbGLVy2qtCgHAZS6LzJVvridRIO
+bH3R9K7TsYSlZMH8V8DyoqHfYrkDcQ==
+=oBh8
 -----END PGP SIGNATURE-----
 
---nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW--
+--UpFFGlBs7eUvfaDBRljj1o3VEkq86WO6W--
