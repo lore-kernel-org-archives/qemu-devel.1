@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddWMn-0000dS-Jl
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:50 -0400
+	(envelope-from <dhiru.kholia@gmail.com>) id 1ddWMy-0000iS-Lx
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddWMk-0003aZ-L8
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37264)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ddWMk-0003Yr-Fm
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ddWMj-0005Fq-6l
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 06:45:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3039D2E8041
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 06:45:45 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Aug 2017 06:31:29 -0000
-From: Thomas Huth <1708551@bugs.launchpad.net>
-Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150182828908.3687.6398256505959138792.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
- USB 2.0
+	(envelope-from <dhiru.kholia@gmail.com>) id 1ddWMv-0003pA-VH
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:46:00 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36707)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dhiru.kholia@gmail.com>)
+	id 1ddWMv-0003ma-MN
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:57 -0400
+Received: by mail-wm0-x244.google.com with SMTP id d40so4592355wma.3
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 23:45:56 -0700 (PDT)
+From: Dhiru Kholia <dhiru.kholia@gmail.com>
+Date: Fri,  4 Aug 2017 12:15:40 +0530
+Message-Id: <20170804064540.10523-1-dhiru.kholia@gmail.com>
+Subject: [Qemu-devel] [PATCH] pc/acpi: Fix booting of macOS with Clover EFI
+ bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,54 +26,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Dhiru Kholia <dhiru.kholia@gmail.com>
 
-Could you please try to run QEMU without the "-usb" option here? "-usb"
-automatically creates an EHCI and UHCI controller on the q35 machine, so
-that might be the reason that your USB devices get connected as USB 2.0
-instead.
+This was tested with macOS 10.12.5 and Clover r4114.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Without this patch, the macOS boot process gets stuck at the Apple logo
+without showing any progress bar.
 
--- =
+I have documented the process of running macOS on QEMU/KVM at,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1708551
+https://github.com/kholia/OSX-KVM/
 
-Title:
-  macOS Guest Reading USB 3.0 Bus as USB 2.0
+Instead of using this patch, adding an additional command-line knob
+which exposes this setting (force_rev1_fadt) to the user might be a more
+general solution.
+---
+ hw/i386/acpi-build.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Description:
-  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
-taType` on macOS guest confirms that the system "sees" my device, and that =
-qemu is passing *something* through. However, the system sees my connection=
- as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
-/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
-ze my iPhone in XCode & iTunes.
-
-  Parameters:
-  QEMU release version: 2.10.0-rc0
-  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
-ot)]
-  Command Line: https://pastebin.com/pBSYbrW1
-  Host: Arch Linux
-  Guest: macOS v10.12.6
-  Guest System Info: https://pastebin.com/U1Tihxei
-
-  Notes:
-  1. Observed sometime after late-May-early-June of this year.
-
-  2. Due to [a defect in qemu v2.8 which affected GTK
-  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
-  change to macOS' booting process conflicting with qemu
-  v2.9](https://lists.nongnu.org/archive/html/qemu-
-  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
-  -rc1 fails to load OVMF right now).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index b9c245c..0f8df19 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -145,6 +145,7 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+             object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+     }
+     if (lpc) {
++        pm->force_rev1_fadt = true;
+         obj = lpc;
+         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+     }
+-- 
+2.9.4
