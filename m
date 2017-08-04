@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41453)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1ddZNk-0006BA-PW
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:59:01 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <gengdongjiu@huawei.com>) id 1ddZRW-0000sl-Bi
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 06:02:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1ddZNf-00013n-Vr
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:59:00 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60331 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ddZNf-00013N-Lv
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:58:55 -0400
-References: <526F8457.5040907@kamp.de> <526F8701.2030906@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <1aefefcb-5ea7-e91f-bf11-4cde9ccd0f92@kamp.de>
-Date: Fri, 4 Aug 2017 11:58:52 +0200
+	(envelope-from <gengdongjiu@huawei.com>) id 1ddZRR-0003lD-ER
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 06:02:54 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Fri, 4 Aug 2017 18:22:18 +0800
+Message-ID: <1501842138-17606-4-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1501842138-17606-1-git-send-email-gengdongjiu@huawei.com>
+References: <1501842138-17606-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <526F8701.2030906@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Prohibit Windows from running in QEMU
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v10 3/3] ACPI: build and enable APEI GHES in
+ the Makefile and configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +22,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com
 
-Am 29.10.2013 um 10:59 schrieb Paolo Bonzini:
-> Il 29/10/2013 10:48, Peter Lieven ha scritto:
->> Hi all,
->>
->> this question might seem a bit weird, but does anyone see a good way to
->> avoid
->> that Windows is able to boot inside qemu?
->>
->> We have defined several profiles for different operation systems and I want
->> to avoid that someone chooses Linux and then installs Windows within
->> a VM. Reason is licensing.
-> Patch QEMU to crash when Hyper-V extensions are enabled...
+Add CONFIG_ACPI_APEI configuration in the Makefile and
+enable it in the arm-softmmu.mak
 
-Hi all,
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+thanks a lot Michael and Laszlo's review and comments: 
 
-this is an old topic that has become important for me again recently.
-Now all Linux versions should be able to detect KVM even if Hyper-V is enabled.
+change since v5:
+(1) no change
 
-But how do I detect from Qemu userspace that Hyper-V is enabled?
+change since v4:
+(1) fix email threading in this series is incorrect issue
 
-Thanks,
-Peter
+change since v3:
+(1) change name to "CONFIG_ACPI_APEI" from CONFIG_ACPI_APEI_GENERATION
+---
+ default-configs/arm-softmmu.mak | 1 +
+ hw/acpi/Makefile.objs           | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 1e3bd2b..ee6f5fc 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -121,3 +121,4 @@ CONFIG_ACPI=y
+ CONFIG_SMBIOS=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_GPIO_KEY=y
++CONFIG_ACPI_APEI=y
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 11c35bc..bafb148 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
++common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ 
+ common-obj-y += acpi_interface.o
+-- 
+1.8.3.1
