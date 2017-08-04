@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dddsL-0000tu-TB
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:47:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddduo-0000MD-F8
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddanp-0003SL-95
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddanp-0003Qr-0o
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:01 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  4 Aug 2017 13:29:39 +0200
-Message-Id: <20170804112946.5247-3-cohuck@redhat.com>
-In-Reply-To: <20170804112946.5247-1-cohuck@redhat.com>
-References: <20170804112946.5247-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/9] s390x/pci: add stubs
+	(envelope-from <eblake@redhat.com>) id 1ddduP-0000Qc-Fu
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:49:26 -0400
+References: <20170804143658.23020-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0cf16030-d5d0-6e7e-8fc7-88abd8f6d3ca@redhat.com>
+Date: Fri, 4 Aug 2017 09:42:59 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170804143658.23020-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SxkLw1AoEJ1nSmBVdUvooG0uu8h1nGa4O"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: Clarify about relative
+ backing file options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,113 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Some non-pci code calls into zpci code. Provide some stubs for builds
-without pci.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SxkLw1AoEJ1nSmBVdUvooG0uu8h1nGa4O
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <0cf16030-d5d0-6e7e-8fc7-88abd8f6d3ca@redhat.com>
+Subject: Re: [PATCH v2] qemu-img: Clarify about relative backing file options
+References: <20170804143658.23020-1-famz@redhat.com>
+In-Reply-To: <20170804143658.23020-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- hw/s390x/Makefile.objs   |  3 +-
- hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+), 1 deletion(-)
- create mode 100644 hw/s390x/s390-pci-stub.c
+On 08/04/2017 09:36 AM, Fam Zheng wrote:
+> It's not too surprising when a user specifies the backing file relative=
 
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index b2aade2466..7ee19d3abc 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -11,7 +11,8 @@ obj-y += 3270-ccw.o
- obj-y += virtio-ccw.o
- obj-y += css-bridge.o
- obj-y += ccw-device.o
--obj-y += s390-pci-bus.o s390-pci-inst.o
-+obj-$(CONFIG_PCI) += s390-pci-bus.o s390-pci-inst.o
-+obj-$(call lnot,$(CONFIG_PCI)) += s390-pci-stub.o
- obj-y += s390-skeys.o
- obj-y += s390-stattrib.o
- obj-$(CONFIG_KVM) += s390-skeys-kvm.o
-diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
-new file mode 100644
-index 0000000000..2e7e42a2af
---- /dev/null
-+++ b/hw/s390x/s390-pci-stub.c
-@@ -0,0 +1,74 @@
-+/* stubs for non-pci builds */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "s390-pci-inst.h"
-+#include "s390-pci-bus.h"
-+
-+/* target/s390x/ioinst.c */
-+int chsc_sei_nt2_get_event(void *res)
-+{
-+    return 1;
-+}
-+
-+int chsc_sei_nt2_have_event(void)
-+{
-+    return 0;
-+}
-+
-+/* hw/s390x/sclp.c */
-+void s390_pci_sclp_configure(SCCB *sccb)
-+{
-+}
-+
-+void s390_pci_sclp_deconfigure(SCCB *sccb)
-+{
-+}
-+
-+/* target/s390x/kvm.c */
-+int clp_service_call(S390CPU *cpu, uint8_t r2)
-+{
-+    return -1;
-+}
-+
-+int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-+{
-+    return -1;
-+}
-+
-+int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-+{
-+    return -1;
-+}
-+
-+int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar)
-+{
-+    return -1;
-+}
-+
-+int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-+{
-+    return -1;
-+}
-+
-+int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-+                        uint8_t ar)
-+{
-+    return -1;
-+}
-+
-+int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar)
-+{
-+    return -1;
-+}
-+
-+S390pciState *s390_get_phb(void)
-+{
-+    return NULL;
-+}
-+
-+S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
-+{
-+    return NULL;
-+}
--- 
-2.13.3
+> to the current working directory instead of the top layer image. This
+> causes error when they differ. Though the error message has enough
+> information to infer the fact about the misunderstanding, it is better
+> if we document this explicitly, so that users don't have to learn from
+> mistakes.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+> v2: Improve wording. [Eric]
+> ---
+>  qemu-img.texi | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--SxkLw1AoEJ1nSmBVdUvooG0uu8h1nGa4O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmEh/MACgkQp6FrSiUn
+Q2py8QgApEuiyukd6N/TbGgwR0OtHbV1yIm/j1Cm2DvM3HbS+cnrYgNLg0Hm/7Ie
+tm9WGzcQPBjf0bWCjxCYB+wrgJhhKDG7EwXHIwsoCCApIWTpW4mIyhqmxO5hldO/
+RFzQWBALie4cvn7NXnWRP+CbawfC/N81UBxMMMCyYmbnzAeST5CvYqH9/6refL7g
+T0jV3aE7v/Jug5sb4X6L9OzC8C1ZBZrtJAO0t7qJA3voQvZPSKP6f+VSVYT4x10Y
+YxH8Uv0t6LtSpN4uClXTf/mW+4ju8rYJxezCYZ98ecK+xTf78ktFzAO0o8TMBUH0
+fxMFAwQapAWPgYMNgs7DGgagezPAzQ==
+=/Ecc
+-----END PGP SIGNATURE-----
+
+--SxkLw1AoEJ1nSmBVdUvooG0uu8h1nGa4O--
