@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddb9c-0005EG-T7
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:56:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ddbLn-0003uf-4V
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddb7w-00026k-9C
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:52:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33404)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddb7v-00024u-AO
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:50:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 151015F7B0
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 11:50:46 +0000 (UTC)
-References: <150181165680.60.17068931498958654477@93e45bedd699>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d13bf86c-036d-4178-9d1d-52443ba226b6@redhat.com>
-Date: Fri, 4 Aug 2017 06:50:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ddbKi-0002J9-UT
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:05:06 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ddbKi-0002IM-Km
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:04:00 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id t201so17959504wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 05:04:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <150181165680.60.17068931498958654477@93e45bedd699>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW"
-Subject: Re: [Qemu-devel] [PATCH v4 00/22] Clean up around qmp() and hmp()
+In-Reply-To: <1501769263-27001-1-git-send-email-mst@redhat.com>
+References: <1501769263-27001-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Aug 2017 13:03:38 +0100
+Message-ID: <CAFEAcA_svMzhqBH-CbYWQXereG-1mZEz44HmpnQsVUjXd5=Z=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL] virtio: fix for rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, armbru@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, armbru@redhat.com
-Message-ID: <d13bf86c-036d-4178-9d1d-52443ba226b6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 00/22] Clean up around qmp() and hmp()
-References: <150181165680.60.17068931498958654477@93e45bedd699>
-In-Reply-To: <150181165680.60.17068931498958654477@93e45bedd699>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 3 August 2017 at 15:07, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit aaaec6acad7cf97372d48c1b09126a09697519=
+c8:
+>
+>   Update version for v2.10.0-rc1 release (2017-08-02 16:36:32 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to e6a74868d92f858ac33915b6772999d7de2fd288:
+>
+>   build-sys: add --disable-vhost-user (2017-08-03 15:55:41 +0300)
+>
+> ----------------------------------------------------------------
+> virtio: fix for rc2
+>
+> Looks like the constant stream of additions of vhost-user devices is a
+> problem for some people who are concerned about external connections
+> from qemu. A per-device flag seems like an overkill, but a single
+> configure flag seems like a sane way to support that, and it looks like
+> we need to do it before the release.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (1):
+>       build-sys: add --disable-vhost-user
 
-On 08/03/2017 08:54 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
+Applied, thanks.
 
-When will patchew have a syntax for stating dependencies? (Of course, I
-should actually mention those dependencies in my cover letter, not after
-the fact).
-
-> /tmp/qemu-test/src/tests/test-qga.c: In function =E2=80=98test_qga_set_=
-time=E2=80=99:
-> /tmp/qemu-test/src/tests/test-qga.c:652: warning: implicit declaration =
-of function =E2=80=98qmp_fd=E2=80=99
-
-This patch series depends on my earlier cleanup:
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00385.html
-[PATCH] test-qga: Kill broken and dead QGA_TEST_SIDE_EFFECT
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmEX5IACgkQp6FrSiUn
-Q2qzlAf/dV8pxxv8h5i1kzWZxv2rwNFe+zpTuKk6fqz5124XId0iCl3XezWHS52m
-cjZCqm7WXbCifae3YVYR1iDB7tBHEt0R0q/ddEP9UyKoiU5/EQUW+1zdkxeTlWWl
-lYFERHf1oo0m3Aj9vS0sFjejzOIG308Y9cnTUNi3X+jKmHp3sfo6toDaZ/I/Yl/M
-jCEo87AaYvlkDFaQj0OtfdXe2vd3OK4JExA0vL9YvfXfbU1E7kaZZEJJsThq/iSG
-tQ/L9Wl7cVvRl08TdE7RjXlpZycVjfBVsDj2ThF6A0Pu5hpfVfyPYXj8fLwokZvb
-AIQGRLTqFQ/PmADsgaAFu+E1o4LKLw==
-=i3NH
------END PGP SIGNATURE-----
-
---i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW--
+-- PMM
