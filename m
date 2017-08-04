@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddfyS-0006t8-PL
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:01:21 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ddgHX-0007Eb-EW
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddfyO-0001KD-81
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:01:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddfyN-0001JK-VB
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:01:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2FF3E80E75
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 17:01:14 +0000 (UTC)
-Date: Fri, 4 Aug 2017 18:01:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170804170110.GD2087@work-vm>
-References: <20170804161452.17413-1-pbonzini@redhat.com>
-	<20170804161452.17413-2-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170804161452.17413-2-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] rcu: completely disable pthread_atfork
- callbacks as soon as possible
+	(envelope-from <pm215@archaic.org.uk>) id 1ddgHW-0001V7-3L
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:21:03 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  4 Aug 2017 18:20:41 +0100
+Message-Id: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/8] Implement ARM external abort handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,117 +17,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> Because of -daemonize, system mode QEMU sometimes needs to fork() and
-> keep RCU enabled in the child.  However, there is a possible deadlock
-> with synchronize_rcu:
-> 
-> - the CPU thread is inside a RCU critical section and wants to take
->   the BQL in order to do MMIO
-> 
-> - the monitor thread, which is owning the BQL, calls rcu_init_lock
->   which tries to take the rcu_sync_lock
-> 
-> - the call_rcu thread has taken rcu_sync_lock in synchronize_rcu, but
->   synchronize_rcu needs the CPU thread to end the critical section
->   before returning.
-> 
-> This cannot happen for user-mode emulation, because it does not have
-> a BQL.
-> 
-> To fix it, assume that system mode QEMU only forks in preparation for
-> exec (except when daemonizing) and disable pthread_atfork as soon as
-> the double fork has happened.
-> 
-> Reported-by: David Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Following recent list discussion
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00063.html
 
-That seems to fix that issue (not tested it any more than that though),
-so for fixing that issue:
+here's a patchseries which defines a new API for handling CPU memory
+transaction failures at the right level in the memory subsystem code,
+and implements it for ARM so that we can generate prefetch abort and
+data abort exceptions for external aborts.
 
-Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+The first 3 patches here implement the core code support
+for the new cpu_transaction_failed_hook.
 
-> ---
->  include/qemu/rcu.h |  6 ++++++
->  util/rcu.c         | 20 ++++++++++++++++++++
->  vl.c               |  1 +
->  3 files changed, 27 insertions(+)
-> 
-> diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-> index 83ae2808be..c0da9907e8 100644
-> --- a/include/qemu/rcu.h
-> +++ b/include/qemu/rcu.h
-> @@ -105,6 +105,12 @@ extern void synchronize_rcu(void);
->   */
->  extern void rcu_register_thread(void);
->  extern void rcu_unregister_thread(void);
-> +
-> +/*
-> + * Support for fork().  fork() support is enabled at startup.
-> + */
-> +extern void rcu_enable_atfork(void);
-> +extern void rcu_disable_atfork(void);
->  extern void rcu_after_fork(void);
->  
->  struct rcu_head;
-> diff --git a/util/rcu.c b/util/rcu.c
-> index 9adc5e4a36..2142ddd93b 100644
-> --- a/util/rcu.c
-> +++ b/util/rcu.c
-> @@ -318,15 +318,35 @@ static void rcu_init_complete(void)
->      rcu_register_thread();
->  }
->  
-> +static int atfork_depth = 1;
-> +
-> +void rcu_enable_atfork(void)
-> +{
-> +    atfork_depth++;
-> +}
-> +
-> +void rcu_disable_atfork(void)
-> +{
-> +    atfork_depth--;
-> +}
-> +
->  #ifdef CONFIG_POSIX
->  static void rcu_init_lock(void)
->  {
-> +    if (atfork_depth < 1) {
-> +        return;
-> +    }
-> +
->      qemu_mutex_lock(&rcu_sync_lock);
->      qemu_mutex_lock(&rcu_registry_lock);
->  }
->  
->  static void rcu_init_unlock(void)
->  {
-> +    if (atfork_depth < 1) {
-> +        return;
-> +    }
-> +
->      qemu_mutex_unlock(&rcu_registry_lock);
->      qemu_mutex_unlock(&rcu_sync_lock);
->  }
-> diff --git a/vl.c b/vl.c
-> index 99fcfa0442..8967115514 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4121,6 +4121,7 @@ int main(int argc, char **argv, char **envp)
->      set_memory_options(&ram_slots, &maxram_size, machine_class);
->  
->      os_daemonize();
-> +    rcu_disable_atfork();
->  
->      if (pid_file && qemu_create_pidfile(pid_file) != 0) {
->          error_report("could not acquire pid file: %s", strerror(errno));
-> -- 
-> 2.13.3
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The next 2 patches add support for turning it off on
+a per-board basis, and use that to go back to RAZ/WI
+on the legacy ARM board models, because right now we rely
+on that so that guest code doesn't blow up when it touches
+a device we don't have a model for yet. (We leave the
+support enabled for 'virt' and 'mps2'.)
+
+Finally the last 3 patches do some cleanup and then
+implement the new hook for ARM.
+
+(I have not as yet audited the target/arm code to check that
+we correctly handle failed transactions in all the places
+that C code does physical address accesses; but since those
+lookups don't generate exceptions today, the series leaves
+behaviour there no worse off than they were before.)
+
+thanks
+-- PMM
+
+Peter Maydell (8):
+  memory.h: Move MemTxResult type to memattrs.h
+  cpu: Define new cpu_transaction_failed() hook
+  cputlb: Support generating CPU exceptions on memory transaction
+    failures
+  boards.h: Define new flag ignore_memory_transaction_failures
+  hw/arm: Set ignore_memory_transaction_failures for most ARM boards
+  target/arm: Factor out fault delivery code
+  target/arm: Allow deliver_fault() caller to specify EA bit
+  target/arm: Implement new do_transaction_failed hook
+
+ include/exec/memattrs.h |  10 ++++
+ include/exec/memory.h   |  10 ----
+ include/hw/boards.h     |  11 ++++
+ include/qom/cpu.h       |  26 ++++++++
+ softmmu_template.h      |   4 +-
+ target/arm/internals.h  |  12 ++++
+ accel/tcg/cputlb.c      |  32 +++++++++-
+ hw/arm/aspeed.c         |   3 +
+ hw/arm/collie.c         |   1 +
+ hw/arm/cubieboard.c     |   1 +
+ hw/arm/digic_boards.c   |   1 +
+ hw/arm/exynos4_boards.c |   2 +
+ hw/arm/gumstix.c        |   2 +
+ hw/arm/highbank.c       |   2 +
+ hw/arm/imx25_pdk.c      |   1 +
+ hw/arm/integratorcp.c   |   1 +
+ hw/arm/kzm.c            |   1 +
+ hw/arm/mainstone.c      |   1 +
+ hw/arm/musicpal.c       |   1 +
+ hw/arm/netduino2.c      |   1 +
+ hw/arm/nseries.c        |   2 +
+ hw/arm/omap_sx1.c       |   2 +
+ hw/arm/palm.c           |   1 +
+ hw/arm/raspi.c          |   1 +
+ hw/arm/realview.c       |   4 ++
+ hw/arm/sabrelite.c      |   1 +
+ hw/arm/spitz.c          |   4 ++
+ hw/arm/stellaris.c      |   2 +
+ hw/arm/tosa.c           |   1 +
+ hw/arm/versatilepb.c    |   2 +
+ hw/arm/vexpress.c       |   1 +
+ hw/arm/xilinx_zynq.c    |   1 +
+ hw/arm/xlnx-ep108.c     |   2 +
+ hw/arm/z2.c             |   1 +
+ qom/cpu.c               |   7 +++
+ target/arm/cpu.c        |   1 +
+ target/arm/op_helper.c  | 155 +++++++++++++++++++++++++++++++-----------------
+ 37 files changed, 243 insertions(+), 68 deletions(-)
+
+-- 
+2.7.4
