@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ddeKP-0006ig-M6
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:15:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddeRd-0005F5-Lk
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ddeKO-00005T-Mj
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:15:53 -0400
-Date: Fri, 4 Aug 2017 16:15:44 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170804151544.GF14504@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170804140826.1351-1-berrange@redhat.com>
-	<08b23cf1-5fc4-bb97-dad1-75103f3c5d8a@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ddeRY-0008Do-Ua
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:23:21 -0400
+References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1501597152-25342-3-git-send-email-anton.nefedov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <444f8ae2-dbf2-b4d5-a979-586142edae67@redhat.com>
+Date: Fri, 4 Aug 2017 10:23:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <08b23cf1-5fc4-bb97-dad1-75103f3c5d8a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] block: document semanatics of
- bdrv_co_preadv|pwritev
+In-Reply-To: <1501597152-25342-3-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qotgX8tp9TJbXc9i67eggj6tn4JOHkp5b"
+Subject: Re: [Qemu-devel] [PATCH v4 02/15] blkverify: set supported
+ write/zero flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com
 
-On Fri, Aug 04, 2017 at 09:28:54AM -0500, Eric Blake wrote:
-> On 08/04/2017 09:08 AM, Daniel P. Berrange wrote:
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> > 
-> >  - Clarify that @bytes matches @qiov total size (Kevin)
-> > 
-> >  include/block/block_int.h | 31 +++++++++++++++++++++++++++++++
-> >  1 file changed, 31 insertions(+)
-> 
-> [looks like the nongnu.org infrastructure is having heavy load today, so
-> mails are getting through more slowly than usual - leads to lots of
-> crossed emails, where I'm seeing replies or direct sends sooner than
-> list copies]
-> 
-> > +    /**
-> > +     * @offset: position in bytes to write at
-> > +     * @bytes: number of bytes to write
-> > +     * @qiov: the buffers containing data to write
-> > +     * @flags: zero or more of bits allowed by 'supported_write_flags'
-> 
-> maybe s/of //
-> 
-> > +     *
-> > +     * @offset and @bytes will be a multiple of 'request_alignment',
-> > +     * but the length of individual @qiov elements does not have to
-> > +     * be a multiple.
-> > +     *
-> > +     * @bytes will always equal the total size of @qiov, and will be
-> > +     * no larger than 'max_transfer'.
-> > +     *
-> > +     * The buffer in @qiov may point directly to guest memory.
-> > +     */
-> >      int coroutine_fn (*bdrv_co_pwritev)(BlockDriverState *bs,
-> >          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
-> 
-> Do we make guarantees that the driver callback is never reached if the
-> image is currently read-only?  If so, is that a guarantee worth documenting?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qotgX8tp9TJbXc9i67eggj6tn4JOHkp5b
+From: Eric Blake <eblake@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com,
+ mreitz@redhat.com
+Message-ID: <444f8ae2-dbf2-b4d5-a979-586142edae67@redhat.com>
+Subject: Re: [PATCH v4 02/15] blkverify: set supported write/zero flags
+References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1501597152-25342-3-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1501597152-25342-3-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-bdrv_co_pwritev() returns EPERM if bs->read_only, so it looks like you
-are right we have a guarantee we can document
+On 08/01/2017 09:18 AM, Anton Nefedov wrote:
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  block/blkverify.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+Basically, blkverify supports a flag if BOTH of its underlying files
+also support the flag; if either side can't handle the flag, then we
+fall back to emulation for both sides.
+
+With more overhead, we COULD state that we support both bits if at least
+one of the two underlying BDS supports the bit, and then emulate support
+for the bit on the second BDS where it was lacking, so that at least the
+first BDS doesn't suffer from the penalties of the fallbacks.  But that
+means duplicating the block layer fallback code in blkverify, which is
+already something that we don't necessarily expect high performance from.=
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+For FUA, failure to implement the bit merely means that we have more
+device-wide flush calls (instead of per-transaction mini-flushes), but
+the end data should be the same.  But for MAY_UNMAP, I'm worried that we
+may have situations where a plain BDS will create holes, while running
+the same device paired through blkverify will fall back to slower
+explicit zeroes.  I'm wondering whether this will bite us, if we have
+scenarios where the mere fact of trying to verify block device behavior
+changes what behavior we are even verifying.
+
+Thus, while I think the code change _looks_ okay, I'm not sure if it is
+correct design-wise, nor whether it is 2.10 material.
+
+> +    bs->supported_write_flags =3D BDRV_REQ_FUA &
+> +        bs->file->bs->supported_write_flags &
+> +        s->test_file->bs->supported_write_flags;
+> +
+> +    bs->supported_zero_flags =3D
+> +        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
+> +        bs->file->bs->supported_zero_flags &
+> +        s->test_file->bs->supported_zero_flags;
+> +
+>      ret =3D 0;
+>  fail:
+>      qemu_opts_del(opts);
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qotgX8tp9TJbXc9i67eggj6tn4JOHkp5b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmEkVwACgkQp6FrSiUn
+Q2od2wf/VifCry/ysPrG97ZR1/LGSEd0mDuNkhvQOIKCUGG/qESE1xmFA1hxHqYE
+x+S8ovV3AOnATZ1ee/DrwRyrk+YcGeDP0J5ArFQmhSa+G6071ulVRJlJiL0Qd3Fw
+l28TIbxb9Ur3x09YkrHdQdEaXQYQg8WYpQBYJ3+AGvWatJQt+YwC5OtKWOPR4S3z
+/vtl4fKhrX8UOatw1FZzO96QBcpppUyxVa0ufuImkdUgHrojrzhQOrobjGjRAg6u
+3pP3l4pM1Up+wZd9rJxBw0o6sSYdYbhF4GgYYz0GdbI0IqvhjcUmDUDP/hwApGvZ
+3kW7YTn4IWhJvKCW9kf0dCVtMOaN7g==
+=tQGj
+-----END PGP SIGNATURE-----
+
+--qotgX8tp9TJbXc9i67eggj6tn4JOHkp5b--
