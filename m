@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dddCX-0005dy-Ux
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:03:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dddDG-0006HA-1h
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:04:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dddCA-0007Fs-OB
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:03:41 -0400
-Date: Fri, 4 Aug 2017 16:02:10 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170804140210.GD4108@localhost.localdomain>
-References: <20170804105059.11941-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170804105059.11941-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: document semanatics of
- bdrv_co_preadv|pwritev
+	(envelope-from <cohuck@redhat.com>) id 1ddaoC-0004AR-GS
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddaoC-00047z-70
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:24 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri,  4 Aug 2017 13:29:45 +0200
+Message-Id: <20170804112946.5247-9-cohuck@redhat.com>
+In-Reply-To: <20170804112946.5247-1-cohuck@redhat.com>
+References: <20170804112946.5247-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 8/9] s390x/kvm: msi route fixup for non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Am 04.08.2017 um 12:50 hat Daniel P. Berrange geschrieben:
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  include/block/block_int.h | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
-> 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index d4f4ea7584..deb81a58bd 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -147,12 +147,41 @@ struct BlockDriver {
->  
->      int coroutine_fn (*bdrv_co_readv)(BlockDriverState *bs,
->          int64_t sector_num, int nb_sectors, QEMUIOVector *qiov);
-> +
-> +    /**
-> +     * @offset: position in bytes to read at
-> +     * @bytes: number of bytes to read
-> +     * @qiov: the buffers to fill with read data
-> +     *
-> +     * @offset and @bytes will be a multiple of 'request_alignment',
-> +     * but the length of individual @qiov elements does not have to
-> +     * be a multiple.
-> +     *
-> +     * @bytes may be less than the total sizeof @iov, and will be
-> +     * no larger than 'max_transfer'.
+If we don't provide pci, we cannot have a pci device for which we
+have to translate to adapter routes: just return -ENODEV.
 
-Really? We are asserting that they match in bdrv_aligned_preadv():
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/kvm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-    assert(!qiov || bytes == qiov->size);
-
-Also, s/sizeof @iov/size of @qiov/
-
-> +     *
-> +     * The buffer in @qiov may point directly to guest memory.
-> +     */
->      int coroutine_fn (*bdrv_co_preadv)(BlockDriverState *bs,
->          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
->      int coroutine_fn (*bdrv_co_writev)(BlockDriverState *bs,
->          int64_t sector_num, int nb_sectors, QEMUIOVector *qiov);
->      int coroutine_fn (*bdrv_co_writev_flags)(BlockDriverState *bs,
->          int64_t sector_num, int nb_sectors, QEMUIOVector *qiov, int flags);
-> +    /**
-> +     * @offset: position in bytes to write at
-> +     * @bytes: number of bytes to write
-> +     * @qiov: the buffers containing data to write
-> +     *
-> +     * @offset and @bytes will be a multiple of 'request_alignment',
-> +     * but the length of individual @qiov elements does not have to
-> +     * be a multiple.
-> +     *
-> +     * @bytes may be less than the total sizeof @iov, and will be
-> +     * no larger than 'max_transfer'.
-
-The same assertion exists in bdrv_aligned_pwritev() (and the same typo
-in your comment).
-
-> +     * The buffer in @qiov may point directly to guest memory.
-> +     */
->      int coroutine_fn (*bdrv_co_pwritev)(BlockDriverState *bs,
->          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
-
-Kevin
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 9de165d8b1..d8db1cbf6e 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2424,6 +2424,12 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+     uint32_t idx = data >> ZPCI_MSI_VEC_BITS;
+     uint32_t vec = data & ZPCI_MSI_VEC_MASK;
+ 
++    if (!s390_has_feat(S390_FEAT_ZPCI)) {
++        /* How can we get here without pci enabled? */
++        g_assert(false);
++        return -ENODEV;
++    }
++
+     pbdev = s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+     if (!pbdev) {
+         DPRINTF("add_msi_route no dev\n");
+-- 
+2.13.3
