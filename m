@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ddcrF-0002RV-C2
+	(envelope-from <david@redhat.com>) id 1ddcqQ-0002An-DL
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ddbi2-00078M-Nr
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:29:12 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 04 Aug 2017 14:16:41 +0200
-Message-ID: <8760e3mst2.fsf@dusky.pond.sub.org>
+	(envelope-from <david@redhat.com>) id 1ddcpM-0000W0-7I
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:40:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ddcpL-0000Ty-Lq
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:39:44 -0400
+References: <20170804091403.13478-1-lprosek@redhat.com>
+	<20170804091403.13478-4-lprosek@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2ddf96f2-be1a-7fc6-c2b2-80c53ea5ddf3@redhat.com>
+Date: Fri, 4 Aug 2017 15:39:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] Is the use of bdrv_getlength() in
- handle_aiocb_write_zeroes() kosher?
+In-Reply-To: <20170804091403.13478-4-lprosek@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: advertise Hyper-V frequency
+ MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,20 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, rkrcmar@redhat.com
 
-Denis, you added this in commit d50d822:
+On 04.08.2017 11:14, Ladi Prosek wrote:
+> As of kernel commit eb82feea59d6 ("KVM: hyperv: support HV_X64_MSR_TSC_FREQUENCY
+> and HV_X64_MSR_APIC_FREQUENCY"), KVM supports two new MSRs which are required
+> for nested Hyper-V to read timestamps with RDTSC + TSC page.
+> 
+> This commit makes QEMU advertise the MSRs with CPUID.40000003H:EAX[11] and
+> CPUID.40000003H:EDX[8] as specified in the Hyper-V TLFS and experimentally
+> verified on a Hyper-V host. The feature is enabled with the existing hv-time CPU
+> flag, and only if the TSC frequency is stable across migration and known.
+> 
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>  target/i386/kvm.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 77b6373..7e484a7 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -89,6 +89,7 @@ static bool has_msr_hv_vpindex;
+>  static bool has_msr_hv_runtime;
+>  static bool has_msr_hv_synic;
+>  static bool has_msr_hv_stimer;
+> +static bool has_msr_hv_frequencies;
+>  static bool has_msr_xss;
+>  
+>  static bool has_msr_architectural_pmu;
+> @@ -631,7 +632,17 @@ static int hyperv_handle_properties(CPUState *cs)
+>      if (cpu->hyperv_time) {
+>          env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
+>          env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
+> -        env->features[FEAT_HYPERV_EAX] |= 0x200;
+> +        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
+> +        if (has_msr_hv_frequencies> +            /* TSC clock must be stable and known for this feature. */
+> +            && ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC)
+> +                || env->user_tsc_khz != 0)
+> +            && env->tsc_khz != 0) {
 
-#ifdef CONFIG_FALLOCATE
-    if (s->has_fallocate && aiocb->aio_offset >= bdrv_getlength(aiocb->bs)) {
-        int ret = do_fallocate(s->fd, 0, aiocb->aio_offset, aiocb->aio_nbytes);
-        if (ret == 0 || ret != -ENOTSUP) {
-            return ret;
-        }
-        s->has_fallocate = false;
-    }
-#endif
+I'd drop the != 0 in both cases and move the env->tsc_khz check up to
+has_msr_hv_frequencies.
 
-bdrv_getlength() can fail.  Does it do the right thing then?  For what
-it's worth, the comparison of its value is signed.
+if (has_msr_hv_frequencies && env->tsc_khz && ...
+
+Wonder if it even would make sense to move some parts of this check into
+a helper function, to beautify this a bit. tsc_stable(env)
+tsc_known(env) ...
+
+> +
+> +            env->features[FEAT_HYPERV_EAX] |= HV_X64_ACCESS_FREQUENCY_MSRS;
+> +            env->features[FEAT_HYPERV_EDX] |=
+> +                HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
+> +        }
+>      }
+>      if (cpu->hyperv_crash && has_msr_hv_crash) {
+>          env->features[FEAT_HYPERV_EDX] |= HV_X64_GUEST_CRASH_MSR_AVAILABLE;
+> @@ -1127,6 +1138,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case HV_X64_MSR_STIMER0_CONFIG:
+>                      has_msr_hv_stimer = true;
+>                      break;
+> +                case HV_X64_MSR_TSC_FREQUENCY:
+> +                    has_msr_hv_frequencies = true;
+> +                    break;
+>                  }
+>  
+>              }
+> 
+
+
+-- 
+
+Thanks,
+
+David
