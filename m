@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddejq-0003ge-2T
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:42:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddelm-0005ce-5w
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:44:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddejp-0003bI-7W
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:42:10 -0400
-References: <20170804105059.11941-1-berrange@redhat.com>
-	<20170804140210.GD4108@localhost.localdomain>
-	<20170804140630.GC14504@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ddell-0005eU-7H
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:44:10 -0400
+References: <20170804140848.880-1-berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
-Date: Fri, 4 Aug 2017 10:41:54 -0500
+Message-ID: <0c382c84-1135-56b6-d90f-1c44e33f1f00@redhat.com>
+Date: Fri, 4 Aug 2017 10:44:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170804140630.GC14504@redhat.com>
+In-Reply-To: <20170804140848.880-1-berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: document semanatics of
- bdrv_co_preadv|pwritev
+	boundary="nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Handle bdrv_getlength()
+ failures in quorum_co_flush()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P
+--nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW
 From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] block: document semanatics of
- bdrv_co_preadv|pwritev
-References: <20170804105059.11941-1-berrange@redhat.com>
- <20170804140210.GD4108@localhost.localdomain>
- <20170804140630.GC14504@redhat.com>
-In-Reply-To: <20170804140630.GC14504@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+Message-ID: <0c382c84-1135-56b6-d90f-1c44e33f1f00@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Handle bdrv_getlength()
+ failures in quorum_co_flush()
+References: <20170804140848.880-1-berto@igalia.com>
+In-Reply-To: <20170804140848.880-1-berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/04/2017 09:06 AM, Daniel P. Berrange wrote:
-> On Fri, Aug 04, 2017 at 04:02:10PM +0200, Kevin Wolf wrote:
->> Am 04.08.2017 um 12:50 hat Daniel P. Berrange geschrieben:
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
-
->> Really? We are asserting that they match in bdrv_aligned_preadv():
->>
->>     assert(!qiov || bytes =3D=3D qiov->size);
+On 08/04/2017 09:08 AM, Alberto Garcia wrote:
+> A bdrv_getlength() call can fail and return a negative value. This
+> is not being handled in quorum_co_flush(), which can result in a
+> QUORUM_REPORT_BAD event with an arbitrary value on the 'sectors-count'
+> field.
 >=20
-> Hmm, why do we pass @bytes at all then ? If they're always the same,
-> how about deleting it and just letting everyone read qiov->size
-> directly.
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/quorum.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/quorum.c b/block/quorum.c
+> index 55ba916655..d77991d680 100644
+> --- a/block/quorum.c
+> +++ b/block/quorum.c
+> @@ -785,8 +785,9 @@ static coroutine_fn int quorum_co_flush(BlockDriver=
+State *bs)
+>      for (i =3D 0; i < s->num_children; i++) {
+>          result =3D bdrv_co_flush(s->children[i]->bs);
+>          if (result) {
+> +            int64_t length =3D bdrv_getlength(s->children[i]->bs);
+>              quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0,
+> -                              bdrv_getlength(s->children[i]->bs),
+> +                              length > 0 ? length : 0,
 
-Read the assertion again: qiov can be NULL (generally, when writing
-zeroes).  So we can't rely on qiov->size in that scenario.
+In the fallback case, is always picking 0 good enough?  Then again, this
+is in the error path, so it is unlikely in practice, and I don't see any
+better way to handle it.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -68,7 +78,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P
+--nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -77,14 +87,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmElcIACgkQp6FrSiUn
-Q2o1Cgf/TxBBcqZRqK2hdKHjxyLjwJb4NJo26zD3e5435JKveohes7nVWg1NJ9oP
-hecB05MhRdwGtKUbYYVvmF78POFBMHsdlJ7RxCX2LUUU8I4rLa2q98rCyDL2G6Rk
-6KwJS/0ihv+vzHD/rKeArxPgXCP36ZhkOhr4OPVemiYOqG7iRi+8SLIpp/Fm1C+u
-wmDMNxRnVfe/+8tJDU84Q6txNLmxIc739AYnXU4o1SfV9l+bMzZrirJ9Xp4lWdPZ
-VsN6ZUXA45FOVBs1zP5erxDp6EJ/YpP++NubTmJpv4h/8SEVQVjpuUGtknhN2m8k
-EuoEkmj7eVCDogba6fxjWN8QA/P7OA==
-=/fQF
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmElkAACgkQp6FrSiUn
+Q2pQIgf/SsL3xcUzNykbvJOF2GMRF29s0D0VpsLq5gC9fdxksCfqDOO0iIXTruHl
+pwLpVvQpv8AD5yMjmr37xcMkkea9C0hgwuJq47Vzoz6DjliooNsaxO0ywzi10Pou
+8H4kyPCN0hVZXmO/6WjPRLO6ZSUs8NxZ+j1t5pJx3GmgVc+ipQIvi0b1WmzkW7o3
+Sb/63MMuEO0Sq7fnomigBSb6zWjC4cHVUDtw2IgmSys5lFiIzT/hE4CL7TtHNp8C
+mTZgO2Nq/P8JdIADaYk8qDn3GuVOiRRgECwrnLh4nvHQNHyNhNNbzI6uh3SzeVYp
+qxnaWO1rYDRVin1x4fgnCt1TkO74og==
+=AcJp
 -----END PGP SIGNATURE-----
 
---ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P--
+--nWuWm1o7EMSh6wBsksOpOxKwqLPpPo1uW--
