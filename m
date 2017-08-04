@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPd-0003xq-Ku
+	(envelope-from <rth7680@gmail.com>) id 1ddVPe-0003yO-Al
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPa-0003Ko-UF
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:41 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36075)
+	(envelope-from <rth7680@gmail.com>) id 1ddVPc-0003Pl-RX
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:42 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34288)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPa-0003Ik-Kp
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:38 -0400
-Received: by mail-pf0-x243.google.com with SMTP id t83so862588pfj.3
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPc-0003O9-Lv
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:40 -0400
+Received: by mail-pg0-x244.google.com with SMTP id y192so836729pgd.1
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:40 -0700 (PDT)
 Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
 	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	o14sm1061063pfi.158.2017.08.03.22.44.36 for <qemu-devel@nongnu.org>
+	o14sm1061063pfi.158.2017.08.03.22.44.38 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 22:44:36 -0700 (PDT)
+	Thu, 03 Aug 2017 22:44:38 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:44:13 -0700
-Message-Id: <20170804054426.10590-11-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 22:44:15 -0700
+Message-Id: <20170804054426.10590-13-rth@twiddle.net>
 In-Reply-To: <20170804054426.10590-1-rth@twiddle.net>
 References: <20170804054426.10590-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 10/23] tcg/s390: Use constant pool for
- xori
+Subject: [Qemu-devel] [PATCH for-2.11 12/23] tcg/aarch64: Use constant pool
+ for movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,164 +36,119 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/s390/tcg-target.inc.c | 77 ++++++++++++++++++++++++-----------------------
- 1 file changed, 40 insertions(+), 37 deletions(-)
+ tcg/aarch64/tcg-target.h     |  1 +
+ tcg/aarch64/tcg-target.inc.c | 62 +++++++++++++++++++++++---------------------
+ 2 files changed, 33 insertions(+), 30 deletions(-)
 
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index 83fac71c31..b0b34fa5ab 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -39,11 +39,9 @@
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index 484cf6236c..e86c2684fb 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -123,5 +123,6 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
+ #ifdef CONFIG_SOFTMMU
+ #define TCG_TARGET_NEED_LDST_LABELS
+ #endif
++#define TCG_TARGET_NEED_POOL_LABELS
  
- #define TCG_CT_CONST_S16   0x100
- #define TCG_CT_CONST_S32   0x200
--#define TCG_CT_CONST_NN16  0x400
--#define TCG_CT_CONST_NN32  0x800
--#define TCG_CT_CONST_U31   0x1000
--#define TCG_CT_CONST_S33   0x2000
--#define TCG_CT_CONST_ZERO  0x4000
-+#define TCG_CT_CONST_U31   0x400
-+#define TCG_CT_CONST_S33   0x800
-+#define TCG_CT_CONST_ZERO  0x1000
+ #endif /* AARCH64_TCG_TARGET_H */
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index c7c751bafc..c2f3812214 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -10,6 +10,7 @@
+  * See the COPYING file in the top-level directory for details.
+  */
  
- /* Several places within the instruction set 0 means "no register"
-    rather than TCG_REG_R0.  */
-@@ -234,6 +232,7 @@ typedef enum S390Opcode {
-     RXY_STRVG   = 0xe32f,
-     RXY_STRVH   = 0xe33f,
-     RXY_STY     = 0xe350,
-+    RXY_XG      = 0xe382,
++#include "tcg-pool.inc.c"
+ #include "qemu/bitops.h"
  
-     RX_A        = 0x5a,
-     RX_C        = 0x59,
-@@ -424,12 +423,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
-     case 'J':
-         ct->ct |= TCG_CT_CONST_S32;
-         break;
--    case 'N':
--        ct->ct |= TCG_CT_CONST_NN16;
--        break;
--    case 'M':
--        ct->ct |= TCG_CT_CONST_NN32;
--        break;
-     case 'C':
-         /* ??? We have no insight here into whether the comparison is
-            signed or unsigned.  The COMPARE IMMEDIATE insn uses a 32-bit
-@@ -474,10 +467,6 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
-         return val == (int32_t)val;
-     } else if (ct & TCG_CT_CONST_S33) {
-         return val >= -0xffffffffll && val <= 0xffffffffll;
--    } else if (ct & TCG_CT_CONST_NN16) {
--        return !(val < 0 && val == (int16_t)val);
--    } else if (ct & TCG_CT_CONST_NN32) {
--        return !(val < 0 && val == (int32_t)val);
-     } else if (ct & TCG_CT_CONST_U31) {
-         return val >= 0 && val <= 0x7fffffff;
-     } else if (ct & TCG_CT_CONST_ZERO) {
-@@ -1062,14 +1051,40 @@ static void tgen_ori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
-     }
- }
- 
--static void tgen64_xori(TCGContext *s, TCGReg dest, tcg_target_ulong val)
-+static void tgen_xori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+ /* We're going to re-use TCGType in setting of the SF bit, which controls
+@@ -587,9 +588,11 @@ static void tcg_out_logicali(TCGContext *s, AArch64Insn insn, TCGType ext,
+ static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
+                          tcg_target_long value)
  {
--    /* Perform the xor by parts.  */
--    if (val & 0xffffffff) {
--        tcg_out_insn(s, RIL, XILF, dest, val);
-+    /* Try all 48-bit insns that can perform it in one go.  */
-+    if (s390_facilities & FACILITY_EXT_IMM) {
-+        if ((val & 0xffffffff00000000ull) == 0) {
-+            tcg_out_insn(s, RIL, XILF, dest, val);
-+            return;
-+        }
-+        if ((val & 0x00000000ffffffffull) == 0) {
-+            tcg_out_insn(s, RIL, XIHF, dest, val >> 32);
-+            return;
-+        }
+-    int i, wantinv, shift;
+     tcg_target_long svalue = value;
+     tcg_target_long ivalue = ~value;
++    tcg_target_long t0, t1, t2;
++    int s0, s1;
++    AArch64Insn opc;
+ 
+     /* For 32-bit values, discard potential garbage in value.  For 64-bit
+        values within [2**31, 2**32-1], we can create smaller sequences by
+@@ -638,38 +641,29 @@ static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
+         }
      }
--    if (val > 0xffffffff) {
--        tcg_out_insn(s, RIL, XIHF, dest, val >> 31 >> 1);
+ 
+-    /* Would it take fewer insns to begin with MOVN?  For the value and its
+-       inverse, count the number of 16-bit lanes that are 0.  */
+-    for (i = wantinv = 0; i < 64; i += 16) {
+-        tcg_target_long mask = 0xffffull << i;
+-        wantinv -= ((value & mask) == 0);
+-        wantinv += ((ivalue & mask) == 0);
+-    }
+-
+-    if (wantinv <= 0) {
+-        /* Find the lowest lane that is not 0x0000.  */
+-        shift = ctz64(value) & (63 & -16);
+-        tcg_out_insn(s, 3405, MOVZ, type, rd, value >> shift, shift);
+-        /* Clear out the lane that we just set.  */
+-        value &= ~(0xffffUL << shift);
+-        /* Iterate until all non-zero lanes have been processed.  */
+-        while (value) {
+-            shift = ctz64(value) & (63 & -16);
+-            tcg_out_insn(s, 3405, MOVK, type, rd, value >> shift, shift);
+-            value &= ~(0xffffUL << shift);
+-        }
++    /* Would it take fewer insns to begin with MOVN?  */
++    if (ctpop64(value) >= 32) {
++        t0 = ivalue;
++        opc = I3405_MOVN;
+     } else {
+-        /* Like above, but with the inverted value and MOVN to start.  */
+-        shift = ctz64(ivalue) & (63 & -16);
+-        tcg_out_insn(s, 3405, MOVN, type, rd, ivalue >> shift, shift);
+-        ivalue &= ~(0xffffUL << shift);
+-        while (ivalue) {
+-            shift = ctz64(ivalue) & (63 & -16);
+-            /* Provide MOVK with the non-inverted value.  */
+-            tcg_out_insn(s, 3405, MOVK, type, rd, ~(ivalue >> shift), shift);
+-            ivalue &= ~(0xffffUL << shift);
++        t0 = value;
++        opc = I3405_MOVZ;
++    }
++    s0 = ctz64(t0) & (63 & -16);
++    t1 = t0 & ~(0xffffUL << s0);
++    s1 = ctz64(t1) & (63 & -16);
++    t2 = t1 & ~(0xffffUL << s1);
++    if (t2 == 0) {
++        tcg_out_insn_3405(s, opc, type, rd, t0 >> s0, s0);
++        if (t1 != 0) {
++            tcg_out_insn(s, 3405, MOVK, type, rd, value >> s1, s1);
+         }
++        return;
+     }
 +
-+    /* Use the constant pool if USE_REG_TB, but not for small constants.  */
-+    if (maybe_out_small_movi(s, type, TCG_TMP0, val)) {
-+        if (type == TCG_TYPE_I32) {
-+            tcg_out_insn(s, RR, XR, dest, TCG_TMP0);
-+        } else {
-+            tcg_out_insn(s, RRE, XGR, dest, TCG_TMP0);
-+        }
-+    } else if (USE_REG_TB) {
-+        tcg_out_insn(s, RXY, XG, dest, TCG_REG_TB, TCG_REG_NONE, 0);
-+        new_pool_label(s, val, R_390_20, s->code_ptr - 2,
-+                       -(intptr_t)s->code_gen_ptr);
-+    } else {
-+        /* Perform the xor by parts.  */
-+        tcg_debug_assert(s390_facilities & FACILITY_EXT_IMM);
-+        if (val & 0xffffffff) {
-+            tcg_out_insn(s, RIL, XILF, dest, val);
-+        }
-+        if (val > 0xffffffff) {
-+            tcg_out_insn(s, RIL, XIHF, dest, val >> 32);
-+        }
-     }
++    /* For more than 2 insns, dump it into the constant pool.  */
++    new_pool_label(s, value, R_AARCH64_CONDBR19, s->code_ptr, 0);
++    tcg_out_insn(s, 3305, LDR, 0, rd);
  }
  
-@@ -1889,7 +1904,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         a0 = args[0], a1 = args[1], a2 = (uint32_t)args[2];
-         if (const_args[2]) {
-             tcg_out_mov(s, TCG_TYPE_I32, a0, a1);
--            tgen64_xori(s, a0, a2);
-+            tgen_xori(s, TCG_TYPE_I32, a0, a2);
-         } else if (a0 == a1) {
-             tcg_out_insn(s, RR, XR, args[0], args[2]);
-         } else {
-@@ -2121,7 +2136,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         a0 = args[0], a1 = args[1], a2 = args[2];
-         if (const_args[2]) {
-             tcg_out_mov(s, TCG_TYPE_I64, a0, a1);
--            tgen64_xori(s, a0, a2);
-+            tgen_xori(s, TCG_TYPE_I64, a0, a2);
-         } else if (a0 == a1) {
-             tcg_out_insn(s, RRE, XGR, a0, a2);
-         } else {
-@@ -2313,12 +2328,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef r_rC = { .args_ct_str = { "r", "rC" } };
-     static const TCGTargetOpDef r_rZ = { .args_ct_str = { "r", "rZ" } };
-     static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
--    static const TCGTargetOpDef r_r_rM = { .args_ct_str = { "r", "r", "rM" } };
--    static const TCGTargetOpDef r_0_r = { .args_ct_str = { "r", "0", "r" } };
-     static const TCGTargetOpDef r_0_ri = { .args_ct_str = { "r", "0", "ri" } };
-     static const TCGTargetOpDef r_0_rI = { .args_ct_str = { "r", "0", "rI" } };
-     static const TCGTargetOpDef r_0_rJ = { .args_ct_str = { "r", "0", "rJ" } };
--    static const TCGTargetOpDef r_0_rM = { .args_ct_str = { "r", "0", "rM" } };
-     static const TCGTargetOpDef a2_r
-         = { .args_ct_str = { "r", "r", "0", "1", "r", "r" } };
-     static const TCGTargetOpDef a2_ri
-@@ -2360,6 +2372,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_and_i64:
-     case INDEX_op_or_i32:
-     case INDEX_op_or_i64:
-+    case INDEX_op_xor_i32:
-+    case INDEX_op_xor_i64:
-         return (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri);
+ /* Define something more legible for general use.  */
+@@ -2030,6 +2024,14 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     tcg_out_insn(s, 3207, RET, TCG_REG_LR);
+ }
  
-     case INDEX_op_mul_i32:
-@@ -2370,17 +2384,6 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_mul_i64:
-         return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_rJ : &r_0_rI);
- 
--    case INDEX_op_xor_i32:
--        /* Without EXT_IMM, no immediates are supported.  Otherwise,
--           rejecting certain negative ranges leads to smaller code.  */
--        return (s390_facilities & FACILITY_EXT_IMM
--                ? (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri)
--                : &r_0_r);
--    case INDEX_op_xor_i64:
--        return (s390_facilities & FACILITY_EXT_IMM
--                ? (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_rM : &r_0_rM)
--                : &r_0_r);
--
-     case INDEX_op_shl_i32:
-     case INDEX_op_shr_i32:
-     case INDEX_op_sar_i32:
++static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
++{
++    int i;
++    for (i = 0; i < count; ++i) {
++        p[i] = NOP;
++    }
++}
++
+ typedef struct {
+     DebugFrameHeader h;
+     uint8_t fde_def_cfa[4];
 -- 
 2.13.3
