@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ddcN9-0000LV-AR
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:11:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ddcNl-0007sE-P1
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ddcM4-0006cP-5M
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:10:34 -0400
-References: <8760e3mst2.fsf@dusky.pond.sub.org>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <5f5a45ed-26c8-e96d-f39f-39e7a289ec91@openvz.org>
-Date: Fri, 4 Aug 2017 16:08:09 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1ddcDD-0000Pk-Hu
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:01:37 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ddcDD-0000Lr-81
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:00:19 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id m85so19349310wma.1
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 06:00:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8760e3mst2.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Is the use of bdrv_getlength() in
- handle_aiocb_write_zeroes() kosher?
+In-Reply-To: <CAFEAcA_Kj8wCp-BLS45ds-RmZbp7UK_8oEBcEKgpP98CE0jNcA@mail.gmail.com>
+References: <CAFEAcA_Kj8wCp-BLS45ds-RmZbp7UK_8oEBcEKgpP98CE0jNcA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Aug 2017 13:59:57 +0100
+Message-ID: <CAFEAcA9XUN0eaxnftrjL4UnnA86YugoQw823EPTq7BSiT2Sidg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Cleaning up handling of CPU exceptions accessing
+ non-existent memory/devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-On 08/04/2017 03:16 PM, Markus Armbruster wrote:
-> Denis, you added this in commit d50d822:
->
-> #ifdef CONFIG_FALLOCATE
->     if (s->has_fallocate && aiocb->aio_offset >=3D bdrv_getlength(aiocb=
-->bs)) {
->         int ret =3D do_fallocate(s->fd, 0, aiocb->aio_offset, aiocb->ai=
-o_nbytes);
->         if (ret =3D=3D 0 || ret !=3D -ENOTSUP) {
->             return ret;
->         }
->         s->has_fallocate =3D false;
->     }
-> #endif
->
-> bdrv_getlength() can fail.  Does it do the right thing then?  For what
-> it's worth, the comparison of its value is signed.
-fallocate() with 0 flags can work only beyond end of file
-or on top of the hole. Thus the check is made to validate
-that we are beyond EOF.
+On 1 August 2017 at 11:50, Peter Maydell <peter.maydell@linaro.org> wrote:
+> My proposal is that we should define a new QOM CPU hook:
+>   void (*do_transaction_failed)(CPUState *cpu, hwaddr physaddr, vaddr addr,
+>                                 unsigned size, MMUAccessType access_type,
+>                                 MemTxAttrs attrs, MemTxResult response);
 
-Technically fallocate should fail if that condition will be
-violated. But you right, we can add sanity check here.
-This would not harm.
+I realised that we probably also want the 'uintptr_t retaddr'
+and 'int mmu_idx' that tlb_fill() and the do_unaligned_access
+hook both already have.
 
-Should I send it?
+I have some patches mostly-ready which implement the
+common code changes plus the ARM mode implementation of the
+hook function.
 
-Den
+thanks
+-- PMM
