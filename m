@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPi-00043G-HD
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:47 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddVPd-0003xp-Kq
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPh-0003c4-Hg
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:46 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:38645)
+	(envelope-from <rth7680@gmail.com>) id 1ddVPa-0003Iz-8k
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:41 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:38631)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPh-0003aE-7L
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:45 -0400
-Received: by mail-pf0-x242.google.com with SMTP id h75so859905pfh.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPZ-0003Gc-Ls
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:38 -0400
+Received: by mail-pf0-x243.google.com with SMTP id h75so859598pfh.5
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:37 -0700 (PDT)
 Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
 	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	o14sm1061063pfi.158.2017.08.03.22.44.42 for <qemu-devel@nongnu.org>
+	o14sm1061063pfi.158.2017.08.03.22.44.35 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 22:44:43 -0700 (PDT)
+	Thu, 03 Aug 2017 22:44:35 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:44:19 -0700
-Message-Id: <20170804054426.10590-17-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 22:44:12 -0700
+Message-Id: <20170804054426.10590-10-rth@twiddle.net>
 In-Reply-To: <20170804054426.10590-1-rth@twiddle.net>
 References: <20170804054426.10590-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 16/23] tcg/arm: Tighten tlb indexing
- offset test
+Subject: [Qemu-devel] [PATCH for-2.11 09/23] tcg/s390: Use constant pool for
+ ori
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +34,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We are not going to use ldrd for loading the comparator
-for 32-bit guests, so don't limit cmp_off to 8 bits then.
-This eliminates one insn in the tlb load for some guests.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/arm/tcg-target.inc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tcg/s390/tcg-target.inc.c | 74 ++++++++++++++++++++++-------------------------
+ 1 file changed, 34 insertions(+), 40 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 66c369c239..6c12b169ce 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1202,7 +1202,9 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 4be57c5765..83fac71c31 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -225,6 +225,7 @@ typedef enum S390Opcode {
+     RXY_LRVH    = 0xe31f,
+     RXY_LY      = 0xe358,
+     RXY_NG      = 0xe380,
++    RXY_OG      = 0xe381,
+     RXY_STCY    = 0xe372,
+     RXY_STG     = 0xe324,
+     RXY_STHY    = 0xe370,
+@@ -1004,55 +1005,60 @@ static void tgen_andi(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+     }
+ }
+ 
+-static void tgen64_ori(TCGContext *s, TCGReg dest, tcg_target_ulong val)
++static void tgen_ori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+ {
+     static const S390Opcode oi_insns[4] = {
+         RI_OILL, RI_OILH, RI_OIHL, RI_OIHH
+     };
+-    static const S390Opcode nif_insns[2] = {
++    static const S390Opcode oif_insns[2] = {
+         RIL_OILF, RIL_OIHF
+     };
+ 
+     int i;
+ 
+     /* Look for no-op.  */
+-    if (val == 0) {
++    if (unlikely(val == 0)) {
+         return;
      }
  
-     /* We checked that the offset is contained within 16 bits above.  */
--    if (add_off > 0xfff || (use_armv6_instructions && cmp_off > 0xff)) {
-+    if (add_off > 0xfff
-+        || (use_armv6_instructions && TARGET_LONG_BITS == 64
-+            && cmp_off > 0xff)) {
-         tcg_out_dat_imm(s, COND_AL, ARITH_ADD, TCG_REG_R2, base,
-                         (24 << 7) | (cmp_off >> 8));
-         base = TCG_REG_R2;
+-    if (s390_facilities & FACILITY_EXT_IMM) {
+-        /* Try all 32-bit insns that can perform it in one go.  */
+-        for (i = 0; i < 4; i++) {
+-            tcg_target_ulong mask = (0xffffull << i*16);
+-            if ((val & mask) != 0 && (val & ~mask) == 0) {
+-                tcg_out_insn_RI(s, oi_insns[i], dest, val >> i*16);
+-                return;
+-            }
++    /* Try all 32-bit insns that can perform it in one go.  */
++    for (i = 0; i < 4; i++) {
++        tcg_target_ulong mask = (0xffffull << i*16);
++        if ((val & mask) != 0 && (val & ~mask) == 0) {
++            tcg_out_insn_RI(s, oi_insns[i], dest, val >> i*16);
++            return;
+         }
++    }
+ 
+-        /* Try all 48-bit insns that can perform it in one go.  */
++    /* Try all 48-bit insns that can perform it in one go.  */
++    if (s390_facilities & FACILITY_EXT_IMM) {
+         for (i = 0; i < 2; i++) {
+             tcg_target_ulong mask = (0xffffffffull << i*32);
+             if ((val & mask) != 0 && (val & ~mask) == 0) {
+-                tcg_out_insn_RIL(s, nif_insns[i], dest, val >> i*32);
++                tcg_out_insn_RIL(s, oif_insns[i], dest, val >> i*32);
+                 return;
+             }
+         }
++    }
+ 
++    /* Use the constant pool if USE_REG_TB, but not for small constants.  */
++    if (maybe_out_small_movi(s, type, TCG_TMP0, val)) {
++        if (type == TCG_TYPE_I32) {
++            tcg_out_insn(s, RR, OR, dest, TCG_TMP0);
++        } else {
++            tcg_out_insn(s, RRE, OGR, dest, TCG_TMP0);
++        }
++    } else if (USE_REG_TB) {
++        tcg_out_insn(s, RXY, OG, dest, TCG_REG_TB, TCG_REG_NONE, 0);
++        new_pool_label(s, val, R_390_20, s->code_ptr - 2,
++                       -(intptr_t)s->code_gen_ptr);
++    } else {
+         /* Perform the OR via sequential modifications to the high and
+            low parts.  Do this via recursion to handle 16-bit vs 32-bit
+            masks in each half.  */
+-        tgen64_ori(s, dest, val & 0x00000000ffffffffull);
+-        tgen64_ori(s, dest, val & 0xffffffff00000000ull);
+-    } else {
+-        /* With no extended-immediate facility, we don't need to be so
+-           clever.  Just iterate over the insns and mask in the constant.  */
+-        for (i = 0; i < 4; i++) {
+-            tcg_target_ulong mask = (0xffffull << i*16);
+-            if ((val & mask) != 0) {
+-                tcg_out_insn_RI(s, oi_insns[i], dest, val >> i*16);
+-            }
+-        }
++        tcg_debug_assert(s390_facilities & FACILITY_EXT_IMM);
++        tgen_ori(s, type, dest, val & 0x00000000ffffffffull);
++        tgen_ori(s, type, dest, val & 0xffffffff00000000ull);
+     }
+ }
+ 
+@@ -1872,7 +1878,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         a0 = args[0], a1 = args[1], a2 = (uint32_t)args[2];
+         if (const_args[2]) {
+             tcg_out_mov(s, TCG_TYPE_I32, a0, a1);
+-            tgen64_ori(s, a0, a2);
++            tgen_ori(s, TCG_TYPE_I32, a0, a2);
+         } else if (a0 == a1) {
+             tcg_out_insn(s, RR, OR, a0, a2);
+         } else {
+@@ -2104,7 +2110,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         a0 = args[0], a1 = args[1], a2 = args[2];
+         if (const_args[2]) {
+             tcg_out_mov(s, TCG_TYPE_I64, a0, a1);
+-            tgen64_ori(s, a0, a2);
++            tgen_ori(s, TCG_TYPE_I64, a0, a2);
+         } else if (a0 == a1) {
+             tcg_out_insn(s, RRE, OGR, a0, a2);
+         } else {
+@@ -2312,7 +2318,6 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     static const TCGTargetOpDef r_0_ri = { .args_ct_str = { "r", "0", "ri" } };
+     static const TCGTargetOpDef r_0_rI = { .args_ct_str = { "r", "0", "rI" } };
+     static const TCGTargetOpDef r_0_rJ = { .args_ct_str = { "r", "0", "rJ" } };
+-    static const TCGTargetOpDef r_0_rN = { .args_ct_str = { "r", "0", "rN" } };
+     static const TCGTargetOpDef r_0_rM = { .args_ct_str = { "r", "0", "rM" } };
+     static const TCGTargetOpDef a2_r
+         = { .args_ct_str = { "r", "r", "0", "1", "r", "r" } };
+@@ -2353,6 +2358,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_sub_i64:
+     case INDEX_op_and_i32:
+     case INDEX_op_and_i64:
++    case INDEX_op_or_i32:
++    case INDEX_op_or_i64:
+         return (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri);
+ 
+     case INDEX_op_mul_i32:
+@@ -2363,19 +2370,6 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_mul_i64:
+         return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_rJ : &r_0_rI);
+ 
+-    case INDEX_op_or_i32:
+-        /* The use of [iNM] constraints are optimization only, since a full
+-           64-bit immediate OR can always be performed with 4 sequential
+-           OI[LH][LH] instructions.  By rejecting certain negative ranges,
+-           the immediate load plus the reg-reg OR is smaller.  */
+-        return (s390_facilities & FACILITY_EXT_IMM
+-                ? (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri)
+-                : &r_0_rN);
+-    case INDEX_op_or_i64:
+-        return (s390_facilities & FACILITY_EXT_IMM
+-                ? (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_rM : &r_0_rM)
+-                : &r_0_rN);
+-
+     case INDEX_op_xor_i32:
+         /* Without EXT_IMM, no immediates are supported.  Otherwise,
+            rejecting certain negative ranges leads to smaller code.  */
 -- 
 2.13.3
