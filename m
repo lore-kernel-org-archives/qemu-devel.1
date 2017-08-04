@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ddcNl-0007sE-P1
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:13:00 -0400
+	(envelope-from <stefanha@redhat.com>) id 1ddcPy-0000SZ-QE
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ddcDD-0000Pk-Hu
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:01:37 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ddcDD-0000Lr-81
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:00:19 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id m85so19349310wma.1
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 06:00:18 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1ddc7U-0007iN-OE
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:55:15 -0400
+Date: Fri, 4 Aug 2017 13:53:16 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170804125316.GF14565@stefanha-x1.localdomain>
+References: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
+	<9f19357ed430981ff7222e836570141962ced3f4.1501827395.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Kj8wCp-BLS45ds-RmZbp7UK_8oEBcEKgpP98CE0jNcA@mail.gmail.com>
-References: <CAFEAcA_Kj8wCp-BLS45ds-RmZbp7UK_8oEBcEKgpP98CE0jNcA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Aug 2017 13:59:57 +0100
-Message-ID: <CAFEAcA9XUN0eaxnftrjL4UnnA86YugoQw823EPTq7BSiT2Sidg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Cleaning up handling of CPU exceptions accessing
- non-existent memory/devices
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tmoQ0UElFV5VgXgH"
+Content-Disposition: inline
+In-Reply-To: <9f19357ed430981ff7222e836570141962ced3f4.1501827395.git.maozy.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] hw/block: Use errp directly rather
+ than local_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 1 August 2017 at 11:50, Peter Maydell <peter.maydell@linaro.org> wrote:
-> My proposal is that we should define a new QOM CPU hook:
->   void (*do_transaction_failed)(CPUState *cpu, hwaddr physaddr, vaddr addr,
->                                 unsigned size, MMUAccessType access_type,
->                                 MemTxAttrs attrs, MemTxResult response);
 
-I realised that we probably also want the 'uintptr_t retaddr'
-and 'int mmu_idx' that tlb_fill() and the do_unaligned_access
-hook both already have.
+--tmoQ0UElFV5VgXgH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I have some patches mostly-ready which implement the
-common code changes plus the ARM mode implementation of the
-hook function.
+On Fri, Aug 04, 2017 at 06:26:42PM +0800, Mao Zhongyi wrote:
+> Pass the error message to errp directly rather than the local
+> variable local_err and propagate it to errp via error_propagate().
+>=20
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+>=20
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  hw/block/fdc.c        | 17 ++++++-----------
+>  hw/block/nvme.c       |  8 +++-----
+>  hw/block/virtio-blk.c | 17 +++++------------
+>  hw/ide/qdev.c         | 12 ++++--------
+>  hw/scsi/scsi-disk.c   | 13 ++++---------
+>  hw/usb/dev-storage.c  |  9 +++------
+>  6 files changed, 25 insertions(+), 51 deletions(-)
 
-thanks
--- PMM
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--tmoQ0UElFV5VgXgH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZhG48AAoJEJykq7OBq3PIizkH/AmMJmtTXlYym5hwMYZScbZl
+3hhK4qpbjiq/dzW8cM7ns327jVEIHyrDVMIIf5FE/fw1RAKXN4/Bs1s1SpmLr1TJ
+Ko1n1Hwuq+FCOdFMEImgB/VWeVX4WKK9HDitbnH5VkReLKVZBeXxnjVCEzozUr3b
+No6I1oyerWVOVr9Yqp64xj27MqXlCKpTq+e87JS9P/tv8wy8Cd0/AN/8f4OMaeMa
+0Jooe46VVPtUCFLmXlMrFQHSiNL3EJlQT5eXN1aoQmFEs7FjSKqS5StGNdxtpgjP
+WGHCwr0vs3eswjVk1/c0GbuRHdWX/hKSKiyZQs3ncg9+rMSKlehSV4uYO7Lq5TU=
+=2KN+
+-----END PGP SIGNATURE-----
+
+--tmoQ0UElFV5VgXgH--
