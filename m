@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ddghM-0007k0-Vn
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:47:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddgiP-0008HI-6b
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ddghI-0005Tw-3W
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:47:45 -0400
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:36046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ddghH-0005T0-SD
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:47:40 -0400
-Received: by mail-pg0-x233.google.com with SMTP id v77so10618253pgb.3
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 10:47:39 -0700 (PDT)
-References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-2-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7bec1b4f-1fd2-4104-814b-97476d619bf5@linaro.org>
-Date: Fri, 4 Aug 2017 10:47:36 -0700
+	(envelope-from <dgilbert@redhat.com>) id 1ddgiO-00070v-Ho
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:48:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddgiO-00070R-BK
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:48:48 -0400
+Date: Fri, 4 Aug 2017 18:48:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170804174843.GE2087@work-vm>
+References: <CAFEAcA-Se9r30gHpYd34vF0Z-yQbDtpOBi8qyqvtTXMja85Zdg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1501867249-1924-2-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-MW
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] memory.h: Move MemTxResult type to
- memattrs.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-Se9r30gHpYd34vF0Z-yQbDtpOBi8qyqvtTXMja85Zdg@mail.gmail.com>
+Subject: Re: [Qemu-devel] Do we need a "virt-2.10" machine type before the
+ 2.10 release?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>
 
-On 08/04/2017 10:20 AM, Peter Maydell wrote:
-> Move the MemTxResult type to memattrs.h. We're going to want to
-> use it in cpu/qom.h, which doesn't want to include all of
-> memory.h. In practice MemTxResult and MemTxAttrs are pretty
-> closely linked since both are used for the new-style
-> read_with_attrs and write_with_attrs callbacks, so memattrs.h
-> is a reasonable home for this rather than creating a whole
-> new header file for it.
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> Hi; I noticed today that the virt board doesn't have a virt-2.10
+> machine type defined. Do we need to add it before release?
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/exec/memattrs.h | 10 ++++++++++
->  include/exec/memory.h   | 10 ----------
->  2 files changed, 10 insertions(+), 10 deletions(-)
+> (I don't know if there have in fact been any changes between
+> 2.9 and 2.10 that would be compatibility issues.)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I think there's two sub questions:
+  a) The virt-2.9 needs to pick up HW_COMPAT_2_9 if anything
+  in it is relevant for ARM
 
+  b) If anything is relevant in it for ARM then you probably
+  want a virt-2.10 so that you can take advantage of whatever
+  was changed that needed compatibility adding in HW_COMPAT_2_9
 
-r~
+(The other thing is figuring out what we missed in HW_COMPAT_2_9,
+we normally miss something).
+
+Dave
+
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
