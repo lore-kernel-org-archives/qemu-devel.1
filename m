@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dddJH-0004AQ-Sx
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:10:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dddKI-0005VR-E0
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:11:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dddJ3-00055U-NI
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:10:39 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  4 Aug 2017 22:09:42 +0800
-Message-Id: <20170804140942.19342-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10] vmdk: Fix error handling/reporting of
- vmdk_check
+	(envelope-from <cohuck@redhat.com>) id 1ddao2-0003ru-KZ
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddao2-0003pj-80
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:14 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri,  4 Aug 2017 13:29:42 +0200
+Message-Id: <20170804112946.5247-6-cohuck@redhat.com>
+In-Reply-To: <20170804112946.5247-1-cohuck@redhat.com>
+References: <20170804112946.5247-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 5/9] s390x/ccw: create s390 phb conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,65 +24,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Errors from the callees must be captured and propagated to our caller,
-ensure this for both find_extent() and bdrv_getlength().
+Don't create the s390 pci host bridge if we do not provide the zpci
+facility.
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- block/vmdk.c | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 0fc97391a6..c665bcc977 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2236,6 +2236,7 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
-             fprintf(stderr,
-                     "ERROR: could not find extent for sector %" PRId64 "\n",
-                     sector_num);
-+            ret = -EINVAL;
-             break;
-         }
-         ret = get_cluster_offset(bs, extent, NULL,
-@@ -2247,19 +2248,28 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
-                     PRId64 "\n", sector_num);
-             break;
-         }
--        if (ret == VMDK_OK &&
--            cluster_offset >= bdrv_getlength(extent->file->bs))
--        {
--            fprintf(stderr,
--                    "ERROR: cluster offset for sector %"
--                    PRId64 " points after EOF\n", sector_num);
--            break;
-+        if (ret == VMDK_OK) {
-+            int64_t extent_len = bdrv_getlength(extent->file->bs);
-+            if (extent_len < 0) {
-+                fprintf(stderr,
-+                        "ERROR: could not get extent file length for sector %"
-+                        PRId64 "\n", sector_num);
-+                ret = extent_len;
-+                break;
-+            }
-+            if (cluster_offset >= extent_len) {
-+                fprintf(stderr,
-+                        "ERROR: cluster offset for sector %"
-+                        PRId64 " points after EOF\n", sector_num);
-+                ret = -EINVAL;
-+                break;
-+            }
-         }
-         sector_num += extent->cluster_sectors;
-     }
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1c7af39ce6..8be4a541c1 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -118,7 +118,6 @@ static void ccw_init(MachineState *machine)
+ {
+     int ret;
+     VirtualCssBus *css_bus;
+-    DeviceState *dev;
  
-     result->corruptions++;
--    return 0;
-+    return ret;
- }
+     s390_sclp_init();
+     s390_memory_init(machine->ram_size);
+@@ -134,10 +133,13 @@ static void ccw_init(MachineState *machine)
+                       machine->initrd_filename, "s390-ccw.img",
+                       "s390-netboot.img", true);
  
- static ImageInfoSpecific *vmdk_get_specific_info(BlockDriverState *bs)
+-    dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+-    object_property_add_child(qdev_get_machine(), TYPE_S390_PCI_HOST_BRIDGE,
+-                              OBJECT(dev), NULL);
+-    qdev_init_nofail(dev);
++    if (s390_has_feat(S390_FEAT_ZPCI)) {
++        DeviceState *dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
++        object_property_add_child(qdev_get_machine(),
++                                  TYPE_S390_PCI_HOST_BRIDGE,
++                                  OBJECT(dev), NULL);
++        qdev_init_nofail(dev);
++    }
+ 
+     /* register hypercalls */
+     virtio_ccw_register_hcalls();
 -- 
 2.13.3
