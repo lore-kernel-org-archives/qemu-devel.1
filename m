@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1ddbCc-0003d1-78
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:56:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddb9c-0005EG-T7
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1ddbBW-0001Wf-RC
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:55:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46811 helo=mx1.suse.de)
+	(envelope-from <eblake@redhat.com>) id 1ddb7w-00026k-9C
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:52:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1ddbBW-0001SU-Fh
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:54:30 -0400
-References: <1501835795-92331-1-git-send-email-hare@suse.de>
-	<1501835795-92331-5-git-send-email-hare@suse.de>
-	<f049ca6c-aa7e-e10b-91c0-208f12d61263@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <1f69ec77-fc8a-11d8-439e-52ee8a21756b@suse.de>
-Date: Fri, 4 Aug 2017 13:54:27 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddb7v-00024u-AO
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:50:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 151015F7B0
+	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 11:50:46 +0000 (UTC)
+References: <150181165680.60.17068931498958654477@93e45bedd699>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d13bf86c-036d-4178-9d1d-52443ba226b6@redhat.com>
+Date: Fri, 4 Aug 2017 06:50:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <f049ca6c-aa7e-e10b-91c0-208f12d61263@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCHv2 4/4] scsi: Add 'enclosure' option for
- scsi devices
+In-Reply-To: <150181165680.60.17068931498958654477@93e45bedd699>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW"
+Subject: Re: [Qemu-devel] [PATCH v4 00/22] Clean up around qmp() and hmp()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, armbru@redhat.com
 
-On 08/04/2017 12:48 PM, Paolo Bonzini wrote:
-> On 04/08/2017 10:36, Hannes Reinecke wrote:
->> Make enclosure support optional with the 'enclosure' argument to
->> the scsi device.
->> Adding 'enclosure=3Don' as option to the SCSI device will present
->> an enclosure service device on LUN0, either as a stand-alone
->> LUN (in case LUN0 is not assigned) or by setting the EncServ bit
->> int the inquiry data if LUN0 is assigned to a block devices.
->>
->> Signed-off-by: Hannes Reinecke <hare@suse.com>
->> ---
->>  hw/scsi/scsi-bus.c     | 11 ++++++++---
->>  hw/scsi/scsi-disk.c    |  4 +++-
->>  include/hw/scsi/scsi.h |  1 +
->>  3 files changed, 12 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
->> index 79a222f..c11422b 100644
->> --- a/hw/scsi/scsi-bus.c
->> +++ b/hw/scsi/scsi-bus.c
->> @@ -22,6 +22,7 @@ static Property scsi_props[] =3D {
->>      DEFINE_PROP_UINT32("channel", SCSIDevice, channel, 0),
->>      DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
->>      DEFINE_PROP_UINT32("lun", SCSIDevice, lun, -1),
->> +    DEFINE_PROP_BOOL("enclosure", SCSIDevice, enclosure, false),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->> =20
->> @@ -494,11 +495,14 @@ static bool scsi_target_emulate_inquiry(SCSITarg=
-etReq *r)
->>      if (r->req.lun !=3D 0) {
->>          r->buf[0] =3D TYPE_NO_LUN;
->>      } else {
->> -        r->buf[0] =3D TYPE_ENCLOSURE;
->> +        r->buf[0] =3D r->req.dev->enclosure ?
->> +            TYPE_ENCLOSURE : TYPE_NOT_PRESENT | TYPE_INACTIVE;
->>          r->buf[2] =3D 5; /* Version */
->>          r->buf[3] =3D 2 | 0x10; /* HiSup, response data format */
->>          r->buf[4] =3D r->len - 5; /* Additional Length =3D (Len - 1) =
-- 4 */
->> -        r->buf[6] =3D 0x40; /* Enclosure service */
->> +        if (r->req.dev->enclosure) {
->> +            r->buf[6] =3D 0x40; /* Enclosure service */
->> +        }
->>          r->buf[7] =3D 0x10 | (r->req.bus->info->tcq ? 0x02 : 0); /* S=
-ync, TCQ.  */
->>          memcpy(&r->buf[8], "QEMU    ", 8);
->>          memcpy(&r->buf[16], "QEMU TARGET     ", 16);
->> @@ -600,7 +604,8 @@ static int32_t scsi_target_send_command(SCSIReques=
-t *req, uint8_t *buf)
->>          }
->>          break;
->>      case RECEIVE_DIAGNOSTIC:
->> -        if (!scsi_target_emulate_receive_diagnostic(r)) {
->> +        if (!r->req.dev->enclosure ||
->> +            !scsi_target_emulate_receive_diagnostic(r)) {
->>              goto illegal_request;
->>          }
->>          break;
->> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
->> index 5f1e5e8..153d97d 100644
->> --- a/hw/scsi/scsi-disk.c
->> +++ b/hw/scsi/scsi-disk.c
->> @@ -792,7 +792,9 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *=
-req, uint8_t *outbuf)
->>                 the additional length is not adjusted */
->>          outbuf[4] =3D 36 - 5;
->>      }
->> -
->> +    if (s->qdev.lun =3D=3D 0 && s->qdev.enclosure) {
->> +            outbuf[6] =3D 0x40; /* Enclosure service */
->> +    }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, armbru@redhat.com
+Message-ID: <d13bf86c-036d-4178-9d1d-52443ba226b6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/22] Clean up around qmp() and hmp()
+References: <150181165680.60.17068931498958654477@93e45bedd699>
+In-Reply-To: <150181165680.60.17068931498958654477@93e45bedd699>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08/03/2017 08:54 PM, no-reply@patchew.org wrote:
+> Hi,
 >=20
-> Should this really be set on disks even if you do have a LUN0?
->=20
-Why not? You _can_ have embedded enclosure devices; that's what this bit
-is for...
+> This series failed automatic build test. Please find the testing comman=
+ds and
+> their output below. If you have docker installed, you can probably repr=
+oduce it
+> locally.
 
-> Why don't you instead add a very simple scsi-enclosure device that you
-> can specify as the LUN0?
->=20
-You don't have to.
-Once you leave LUN0 free (eg by assigning your first disk LUN1) you'll
-get this device by virtue of the current LUN0 emulation.
+When will patchew have a syntax for stating dependencies? (Of course, I
+should actually mention those dependencies in my cover letter, not after
+the fact).
 
-But yeah, maybe I can be doing a separate enclosure device.
-Will be checking if and how I can make it to work.
+> /tmp/qemu-test/src/tests/test-qga.c: In function =E2=80=98test_qga_set_=
+time=E2=80=99:
+> /tmp/qemu-test/src/tests/test-qga.c:652: warning: implicit declaration =
+of function =E2=80=98qmp_fd=E2=80=99
 
-Cheers,
+This patch series depends on my earlier cleanup:
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00385.html
+[PATCH] test-qga: Kill broken and dead QGA_TEST_SIDE_EFFECT
 
-Hannes
 --=20
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: F. Imend=C3=B6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N=C3=BCrnberg)
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmEX5IACgkQp6FrSiUn
+Q2qzlAf/dV8pxxv8h5i1kzWZxv2rwNFe+zpTuKk6fqz5124XId0iCl3XezWHS52m
+cjZCqm7WXbCifae3YVYR1iDB7tBHEt0R0q/ddEP9UyKoiU5/EQUW+1zdkxeTlWWl
+lYFERHf1oo0m3Aj9vS0sFjejzOIG308Y9cnTUNi3X+jKmHp3sfo6toDaZ/I/Yl/M
+jCEo87AaYvlkDFaQj0OtfdXe2vd3OK4JExA0vL9YvfXfbU1E7kaZZEJJsThq/iSG
+tQ/L9Wl7cVvRl08TdE7RjXlpZycVjfBVsDj2ThF6A0Pu5hpfVfyPYXj8fLwokZvb
+AIQGRLTqFQ/PmADsgaAFu+E1o4LKLw==
+=i3NH
+-----END PGP SIGNATURE-----
+
+--i5GcPpL0cKn1Kjre6R64lm5OvXmduuKvW--
