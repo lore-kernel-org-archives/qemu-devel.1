@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ddeJa-0005jT-V5
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:15:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1ddeKP-0006ig-M6
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ddeJU-0007Od-7i
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:15:02 -0400
-Date: Fri, 4 Aug 2017 11:14:47 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170804151447.GJ22129@localhost.localdomain>
-References: <20170804143658.23020-1-famz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1ddeKO-00005T-Mj
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:15:53 -0400
+Date: Fri, 4 Aug 2017 16:15:44 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170804151544.GF14504@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170804140826.1351-1-berrange@redhat.com>
+	<08b23cf1-5fc4-bb97-dad1-75103f3c5d8a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170804143658.23020-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-img: Clarify about
- relative backing file options
+In-Reply-To: <08b23cf1-5fc4-bb97-dad1-75103f3c5d8a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] block: document semanatics of
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Fri, Aug 04, 2017 at 10:36:58PM +0800, Fam Zheng wrote:
-> It's not too surprising when a user specifies the backing file relative
-> to the current working directory instead of the top layer image. This
-> causes error when they differ. Though the error message has enough
-> information to infer the fact about the misunderstanding, it is better
-> if we document this explicitly, so that users don't have to learn from
-> mistakes.
+On Fri, Aug 04, 2017 at 09:28:54AM -0500, Eric Blake wrote:
+> On 08/04/2017 09:08 AM, Daniel P. Berrange wrote:
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> > 
+> >  - Clarify that @bytes matches @qiov total size (Kevin)
+> > 
+> >  include/block/block_int.h | 31 +++++++++++++++++++++++++++++++
+> >  1 file changed, 31 insertions(+)
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> [looks like the nongnu.org infrastructure is having heavy load today, so
+> mails are getting through more slowly than usual - leads to lots of
+> crossed emails, where I'm seeing replies or direct sends sooner than
+> list copies]
 > 
-> ---
-> v2: Improve wording. [Eric]
-> ---
->  qemu-img.texi | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> > +    /**
+> > +     * @offset: position in bytes to write at
+> > +     * @bytes: number of bytes to write
+> > +     * @qiov: the buffers containing data to write
+> > +     * @flags: zero or more of bits allowed by 'supported_write_flags'
 > 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 72dabd6b3e..90c7eab4a8 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -244,6 +244,9 @@ only the differences from @var{backing_file}. No size needs to be specified in
->  this case. @var{backing_file} will never be modified unless you use the
->  @code{commit} monitor command (or qemu-img commit).
->  
-> +If a relative path name is given, the backing file is looked up relative to
-> +the directory containing @var{filename}.
-> +
->  Note that a given backing file will be opened to check that it is valid. Use
->  the @code{-u} option to enable unsafe backing file mode, which means that the
->  image will be created even if the associated backing file cannot be opened. A
-> @@ -343,6 +346,9 @@ created as a copy on write image of the specified base image; the
->  @var{backing_file} should have the same content as the input's base image,
->  however the path, image format, etc may differ.
->  
-> +If a relative path name is given, the backing file is looked up relative to
-> +the directory containing @var{output_filename}.
-> +
->  If the @code{-n} option is specified, the target volume creation will be
->  skipped. This is useful for formats such as @code{rbd} if the target
->  volume has already been created with site specific options that cannot
-> @@ -490,6 +496,9 @@ The backing file is changed to @var{backing_file} and (if the image format of
->  string), then the image is rebased onto no backing file (i.e. it will exist
->  independently of any backing file).
->  
-> +If a relative path name is given, the backing file is looked up relative to
-> +the directory containing @var{filename}.
-> +
->  @var{cache} specifies the cache mode to be used for @var{filename}, whereas
->  @var{src_cache} specifies the cache mode for reading backing files.
->  
-> -- 
-> 2.13.3
+> maybe s/of //
 > 
+> > +     *
+> > +     * @offset and @bytes will be a multiple of 'request_alignment',
+> > +     * but the length of individual @qiov elements does not have to
+> > +     * be a multiple.
+> > +     *
+> > +     * @bytes will always equal the total size of @qiov, and will be
+> > +     * no larger than 'max_transfer'.
+> > +     *
+> > +     * The buffer in @qiov may point directly to guest memory.
+> > +     */
+> >      int coroutine_fn (*bdrv_co_pwritev)(BlockDriverState *bs,
+> >          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
 > 
+> Do we make guarantees that the driver callback is never reached if the
+> image is currently read-only?  If so, is that a guarantee worth documenting?
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+bdrv_co_pwritev() returns EPERM if bs->read_only, so it looks like you
+are right we have a guarantee we can document
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
