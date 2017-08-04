@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dddsH-0002fm-3L
+	(envelope-from <cohuck@redhat.com>) id 1dddsI-0001f0-H7
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddanl-0003MZ-RO
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58730)
+	(envelope-from <cohuck@redhat.com>) id 1ddao6-0003ze-Ha
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddanl-0003L8-DX
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:29:57 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddao6-0003xs-46
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:18 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  4 Aug 2017 13:29:38 +0200
-Message-Id: <20170804112946.5247-2-cohuck@redhat.com>
+Date: Fri,  4 Aug 2017 13:29:43 +0200
+Message-Id: <20170804112946.5247-7-cohuck@redhat.com>
 In-Reply-To: <20170804112946.5247-1-cohuck@redhat.com>
 References: <20170804112946.5247-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 1/9] kvm: remove hard dependency on pci
+Subject: [Qemu-devel] [PATCH v4 6/9] s390x/sclp: properly guard pci-specific
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-The msi routing code in kvm calls some pci functions: provide
-some stubs to enable builds without pci.
+If we do not provide zpci, pci reconfiguration via sclp is not available
+either. Don't indicate it in the sclp facilities and return an invalid
+command if the guest tries to issue pci configure/deconfigure.
 
-Also, to make this more obvious, guard them via a pci_available boolean
-(which also can be reused in other places).
-
-Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
-Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- accel/kvm/kvm-all.c  |  6 +++---
- hw/pci/pci-stub.c    | 13 +++++++++++++
- hw/pci/pci.c         |  2 ++
- include/hw/pci/pci.h |  2 ++
- 4 files changed, 20 insertions(+), 3 deletions(-)
+ hw/s390x/sclp.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 46ce479dc3..f85553a851 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1248,7 +1248,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-     int virq;
-     MSIMessage msg = {0, 0};
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 9253dbbc64..d0104cd784 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -59,6 +59,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     int rnsize, rnmax;
+     int slots = MIN(machine->ram_slots, s390_get_memslot_count(kvm_state));
+     IplParameterBlock *ipib = s390_ipl_get_iplb();
++    uint64_t sclp_facilities = SCLP_HAS_CPU_INFO;
  
--    if (dev) {
-+    if (pci_available && dev) {
-         msg = pci_get_msi_message(dev, vector);
-     }
+     CPU_FOREACH(cpu) {
+         cpu_count++;
+@@ -79,8 +80,10 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
  
-@@ -1271,7 +1271,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-     kroute.u.msi.address_lo = (uint32_t)msg.address;
-     kroute.u.msi.address_hi = msg.address >> 32;
-     kroute.u.msi.data = le32_to_cpu(msg.data);
--    if (kvm_msi_devid_required()) {
-+    if (pci_available && kvm_msi_devid_required()) {
-         kroute.flags = KVM_MSI_VALID_DEVID;
-         kroute.u.msi.devid = pci_requester_id(dev);
-     }
-@@ -1309,7 +1309,7 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
-     kroute.u.msi.address_lo = (uint32_t)msg.address;
-     kroute.u.msi.address_hi = msg.address >> 32;
-     kroute.u.msi.data = le32_to_cpu(msg.data);
--    if (kvm_msi_devid_required()) {
-+    if (pci_available && kvm_msi_devid_required()) {
-         kroute.flags = KVM_MSI_VALID_DEVID;
-         kroute.u.msi.devid = pci_requester_id(dev);
-     }
-diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-index ecad664946..877c5d165e 100644
---- a/hw/pci/pci-stub.c
-+++ b/hw/pci/pci-stub.c
-@@ -23,10 +23,12 @@
- #include "monitor/monitor.h"
- #include "qapi/qmp/qerror.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/msi.h"
- #include "qmp-commands.h"
- #include "hw/pci/msi.h"
+     prepare_cpu_entries(sclp, read_info->entries, cpu_count);
  
- bool msi_nonbroken;
-+bool pci_available;
+-    read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
+-                                        SCLP_HAS_PCI_RECONFIG);
++    if (s390_has_feat(S390_FEAT_ZPCI)) {
++        sclp_facilities |= SCLP_HAS_PCI_RECONFIG;
++    }
++    read_info->facilities = cpu_to_be64(sclp_facilities);
  
- PciInfoList *qmp_query_pci(Error **errp)
- {
-@@ -38,3 +40,14 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
- {
-     monitor_printf(mon, "PCI devices not supported\n");
- }
-+
-+/* kvm-all wants this */
-+MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
-+{
-+    assert(false);
-+}
-+
-+uint16_t pci_requester_id(PCIDevice *dev)
-+{
-+    assert(false);
-+}
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 258fbe51e2..26f346db2c 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -49,6 +49,8 @@
- # define PCI_DPRINTF(format, ...)       do { } while (0)
- #endif
- 
-+bool pci_available = true;
-+
- static void pcibus_dev_print(Monitor *mon, DeviceState *dev, int indent);
- static char *pcibus_get_dev_path(DeviceState *dev);
- static char *pcibus_get_fw_dev_path(DeviceState *dev);
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e598b095eb..8bb6449dd7 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -10,6 +10,8 @@
- 
- #include "hw/pci/pcie.h"
- 
-+extern bool pci_available;
-+
- /* PCI bus */
- 
- #define PCI_DEVFN(slot, func)   ((((slot) & 0x1f) << 3) | ((func) & 0x07))
+     /* Memory Hotplug is only supported for the ccw machine type */
+     if (mhd) {
+@@ -385,10 +388,18 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
+         sclp_c->unassign_storage(sclp, sccb);
+         break;
+     case SCLP_CMDW_CONFIGURE_PCI:
+-        s390_pci_sclp_configure(sccb);
++        if (s390_has_feat(S390_FEAT_ZPCI)) {
++            s390_pci_sclp_configure(sccb);
++        } else {
++            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
++        }
+         break;
+     case SCLP_CMDW_DECONFIGURE_PCI:
+-        s390_pci_sclp_deconfigure(sccb);
++        if (s390_has_feat(S390_FEAT_ZPCI)) {
++            s390_pci_sclp_deconfigure(sccb);
++        } else {
++            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
++        }
+         break;
+     default:
+         efc->command_handler(ef, sccb, code);
 -- 
 2.13.3
