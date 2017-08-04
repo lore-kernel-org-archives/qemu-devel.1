@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ddVYD-0003NB-0v
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:53:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1ddVmt-0006Tg-BQ
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ddVY9-0000fz-MW
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:53:33 -0400
-Resent-Message-Id: <E1ddVY9-0000fz-MW@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ddVY9-0000e4-EI
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:53:29 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170804052833.10187-1-rth@twiddle.net>
-Message-ID: <150182599864.60.4988124099290197638@93e45bedd699>
+	(envelope-from <peterx@redhat.com>) id 1ddVmq-0001Er-Ja
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:08:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50132)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ddVmq-0001Cv-Ak
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:08:40 -0400
+Date: Fri, 4 Aug 2017 14:08:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170804060833.GF5561@pxdev.xzpeter.org>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-22-git-send-email-peterx@redhat.com>
+	<20170803094901.GC2076@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 3 Aug 2017 22:53:19 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/8] tcg/s390 improvments
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170803094901.GC2076@work-vm>
+Subject: Re: [Qemu-devel] [RFC 21/29] migration: new cmd MIG_CMD_RECV_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, agraf@suse.de
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBmb3ItMi4xMSAwLzhdIHRjZy9zMzkwIGltcHJvdm1lbnRzCk1lc3NhZ2Ut
-aWQ6IDIwMTcwODA0MDUyODMzLjEwMTg3LTEtcnRoQHR3aWRkbGUubmV0ClR5cGU6IHNlcmllcwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
-Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
-b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
-dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
-KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
-YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
-dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBh
-dGNoZXcvMTUwMTgyNTg3Mi0xMjU1NS0xLWdpdC1zZW5kLWVtYWlsLWdlbmdkb25naml1QGh1YXdl
-aS5jb20gLT4gcGF0Y2hldy8xNTAxODI1ODcyLTEyNTU1LTEtZ2l0LXNlbmQtZW1haWwtZ2VuZ2Rv
-bmdqaXVAaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdiMWE5NDNl
-Y2IgdGNnL3MzOTA6IFVzZSBzbGJnciBmb3Igc2V0Y29uZCBsZSBhbmQgbGV1CmNhNjY3YWJjOGUg
-dGNnL3MzOTA6IFVzZSBsb2FkLW9uLWNvbmRpdGlvbi0yIGZhY2lsaXR5CjE3YzIwNjcyMjkgdGNn
-L3MzOTA6IFVzZSBkaXN0aW5jdC1vcGVyYW5kcyBmYWNpbGl0eQoxNDFmYTQ2ODI3IHRjZy9zMzkw
-OiBNZXJnZSBvcmkreG9yaSBmYWNpbGl0aWVzIGNoZWNrIHRvIHRjZ190YXJnZXRfb3BfZGVmCjNk
-YTY2YjlkMzcgdGNnL3MzOTA6IE1lcmdlIGFkZDJpIGZhY2lsaXRpZXMgY2hlY2sgdG8gdGNnX3Rh
-cmdldF9vcF9kZWYKZThkYWI2NTJlNiB0Y2cvczM5MDogTWVyZ2UgbXVsaSBmYWNpbGl0aWVzIGNo
-ZWNrIHRvIHRjZ190YXJnZXRfb3BfZGVmCjc0Yjk5ZGI5NzUgdGNnOiBJbmNyZWFzZSBtaW5pbXVt
-IGFsaWdubWVudCBmcm9tIHRjZ19tYWxsb2MgdG8gOAo3NTAwMGI1NDk3IHRjZy9zMzkwOiBNZXJn
-ZSBjbXBpIGZhY2lsaXRpZXMgY2hlY2sgdG8gdGNnX3RhcmdldF9vcF9kZWYKZWYxMGU3NDRlMSB0
-YXJnZXQvczM5MHg6IEZpeCBDU1NUIGZvciAxNi1ieXRlIHN0b3JlCmU0ZjgwNGIwMWUgdGNnL3Mz
-OTA6IEZ1bGx5IGNvbnZlcnQgdGNnX3RhcmdldF9vcF9kZWYKNTZiZjAzZDdkOCB0Y2cvYXJtOiBG
-aXggcnVudGltZSBvdmVyYWxpZ25tZW50IHRlc3QKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMTE6IHRjZy9hcm06IEZpeCBydW50aW1lIG92ZXJhbGlnbm1lbnQgdGVzdC4u
-LgpDaGVja2luZyBQQVRDSCAyLzExOiB0Y2cvczM5MDogRnVsbHkgY29udmVydCB0Y2dfdGFyZ2V0
-X29wX2RlZi4uLgpDaGVja2luZyBQQVRDSCAzLzExOiB0YXJnZXQvczM5MHg6IEZpeCBDU1NUIGZv
-ciAxNi1ieXRlIHN0b3JlLi4uCkNoZWNraW5nIFBBVENIIDQvMTE6IHRjZy9zMzkwOiBNZXJnZSBj
-bXBpIGZhY2lsaXRpZXMgY2hlY2sgdG8gdGNnX3RhcmdldF9vcF9kZWYuLi4KRVJST1I6IHJldHVy
-biBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTA0OiBG
-SUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMDg6CisgICAgICAgIHJldHVybiAoczM5
-MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTSA/ICZyX3JpIDogJnJfclopOwoKRVJST1I6
-IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAoj
-MTA3OiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMTA6CisgICAgICAgIHJldHVy
-biAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTSA/ICZyX3JDIDogJnJfclopOwoK
-RVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1
-aXJlZAojMTIyOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzNjA6CisgICAgICAg
-ICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0VYVF9JTU0gPyAmc2V0Y19j
-IDogJnNldGNfeik7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNl
-cyBhcmUgbm90IHJlcXVpcmVkCiMxMzQ6IEZJTEU6IHRjZy9zMzkwL3RjZy10YXJnZXQuaW5jLmM6
-MjM3MDoKKyAgICAgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhU
-X0lNTSA/ICZtb3ZjX2MgOiAmbW92Y196KTsKCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywg
-MTE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CkNoZWNraW5nIFBBVENIIDUvMTE6IHRjZzogSW5jcmVhc2UgbWluaW11bSBhbGlnbm1lbnQgZnJv
-bSB0Y2dfbWFsbG9jIHRvIDguLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMTogdGNnL3MzOTA6IE1lcmdl
-IG11bGkgZmFjaWxpdGllcyBjaGVjayB0byB0Y2dfdGFyZ2V0X29wX2RlZi4uLgpFUlJPUjogcmV0
-dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM4Nzog
-RklMRTogdGNnL3MzOTAvdGNnLXRhcmdldC5pbmMuYzoyMjgxOgorICAgICAgICByZXR1cm4gKHMz
-OTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0dFTl9JTlNUX0VYVCA/ICZyXzBfcmkgOiAmcl8wX3JJ
-KTsKCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3Qg
-cmVxdWlyZWQKIzkwOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIyODM6CisgICAg
-ICAgIHJldHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfR0VOX0lOU1RfRVhUID8gJnJf
-MF9ySiA6ICZyXzBfckkpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA3NyBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCA3LzExOiB0Y2cvczM5MDogTWVyZ2UgYWRkMmkgZmFjaWxpdGllcyBjaGVjayB0byB0Y2df
-dGFyZ2V0X29wX2RlZi4uLgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRo
-ZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM4NDogRklMRTogdGNnL3MzOTAvdGNnLXRhcmdldC5pbmMu
-YzoyMzg3OgorICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0VYVF9J
-TU0gPyAmYTJfcmkgOiAmYTJfcik7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBw
-YXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM5MjogRklMRTogdGNnL3MzOTAvdGNnLXRhcmdl
-dC5pbmMuYzoyMzkwOgorICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZ
-X0VYVF9JTU0gPyAmYTJfckEgOiAmYTJfcik7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDc3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CkNoZWNraW5nIFBBVENIIDgvMTE6IHRjZy9zMzkwOiBNZXJnZSBvcmkreG9yaSBmYWNpbGl0aWVz
-IGNoZWNrIHRvIHRjZ190YXJnZXRfb3BfZGVmLi4uCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVu
-Y3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE0MDogRklMRTogdGNnL3MzOTAv
-dGNnLXRhcmdldC5pbmMuYzoyMjI5OgorICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAm
-IEZBQ0lMSVRZX0VYVF9JTU0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVu
-dGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE0NTogRklMRTogdGNnL3MzOTAvdGNnLXRhcmdldC5p
-bmMuYzoyMjMzOgorICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0VY
-VF9JTU0KCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBu
-b3QgcmVxdWlyZWQKIzE1MjogRklMRTogdGNnL3MzOTAvdGNnLXRhcmdldC5pbmMuYzoyMjQwOgor
-ICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0VYVF9JTU0KCkVSUk9S
-OiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQK
-IzE1NzogRklMRTogdGNnL3MzOTAvdGNnLXRhcmdldC5pbmMuYzoyMjQ0OgorICAgICAgICByZXR1
-cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0VYVF9JTU0KCnRvdGFsOiA0IGVycm9ycywg
-MCB3YXJuaW5ncywgMTQ0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDkvMTE6IHRjZy9zMzkwOiBVc2UgZGlzdGluY3Qt
-b3BlcmFuZHMgZmFjaWxpdHkuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFy
-ZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMjUxOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0
-LmluYy5jOjIyNzY6CisgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlf
-RElTVElOQ1RfT1BTID8gJnJfcl9yaSA6ICZyXzBfcmkpOwoKRVJST1I6IHJldHVybiBpcyBub3Qg
-YSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMjg0OiBGSUxFOiB0Y2cv
-czM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMTI6CisgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0
-aWVzICYgRkFDSUxJVFlfRElTVElOQ1RfT1BTID8gJnJfcl9yaSA6ICZyXzBfcmkpOwoKRVJST1I6
-IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAoj
-MjkwOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMTc6CisgICAgICAgIHJldHVy
-biAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRElTVElOQ1RfT1BTID8gJnJfcl9yaSA6ICZy
-XzBfcmkpOwoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNjMgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTAv
-MTE6IHRjZy9zMzkwOiBVc2UgbG9hZC1vbi1jb25kaXRpb24tMiBmYWNpbGl0eS4uLgpFUlJPUjog
-cmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMx
-ODg6IEZJTEU6IHRjZy9zMzkwL3RjZy10YXJnZXQuaW5jLmM6MjQzNjoKKyAgICAgICAgICAgIHJl
-dHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTQoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCAxNjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMTE6IHRjZy9zMzkwOiBVc2Ugc2xiZ3Ig
-Zm9yIHNldGNvbmQgbGUgYW5kIGxldS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Thu, Aug 03, 2017 at 10:49:02AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Add a new vm command MIG_CMD_RECV_BITMAP to request received bitmap for
+> > one ramblock.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/savevm.c     | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  migration/savevm.h     |  1 +
+> >  migration/trace-events |  1 +
+> >  3 files changed, 61 insertions(+)
+> > 
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 386788d..0ab13c0 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -78,6 +78,7 @@ enum qemu_vm_cmd {
+> >                                        were previously sent during
+> >                                        precopy but are dirty. */
+> >      MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
+> > +    MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
+> >      MIG_CMD_MAX
+> >  };
+> >  
+> > @@ -95,6 +96,7 @@ static struct mig_cmd_args {
+> >      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+> >                                     .len = -1, .name = "POSTCOPY_RAM_DISCARD" },
+> >      [MIG_CMD_PACKAGED]         = { .len =  4, .name = "PACKAGED" },
+> > +    [MIG_CMD_RECV_BITMAP]      = { .len = -1, .name = "RECV_BITMAP" },
+> >      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+> >  };
+> >  
+> > @@ -929,6 +931,19 @@ void qemu_savevm_send_postcopy_run(QEMUFile *f)
+> >      qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RUN, 0, NULL);
+> >  }
+> >  
+> > +void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name)
+> > +{
+> > +    size_t len;
+> > +    char buf[512];
+> 
+> Only needs to be 256 bytes?
+
+Yes, it is.
+
+Even, I guess I should use dynamic allocation, since 256 has the
+assumption of block_name size.
+
+[...]
+
+> > +static int loadvm_handle_recv_bitmap(MigrationIncomingState *mis,
+> > +                                     uint16_t len)
+> > +{
+> > +    QEMUFile *file = mis->from_src_file;
+> > +    RAMBlock *rb;
+> > +    char block_name[256];
+> > +    size_t cnt;
+> > +
+> > +    cnt = qemu_get_counted_string(file, block_name);
+> > +    if (!cnt) {
+> > +        error_report("%s: failed to read block name", __func__);
+> > +        return -EINVAL;
+> > +    }
+> > +
+> > +    /* Validate before using the data */
+> > +    if (qemu_file_get_error(file)) {
+> > +        return qemu_file_get_error(file);
+> > +    }
+> > +
+> > +    if (len != cnt + 1) {
+> > +        error_report("%s: invalid payload length (%d)", __func__, len);
+> > +        return -EINVAL;
+> > +    }
+> > +
+> > +    rb = qemu_ram_block_by_name(block_name);
+> > +    if (!rb) {
+> > +        error_report("%s: block '%s' not found", __func__, block_name);
+> > +        return -EINVAL;
+> > +    }
+> > +
+> > +    /* TODO: send the bitmap back to source */
+> 
+> Probably worth adding a trace in this function somewhere.
+
+Will do.
+
+> 
+> Other than that;
+> 
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Thanks!
+
+-- 
+Peter Xu
