@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVAB-0007Tz-FB
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:28:44 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddVAD-0007YP-Nq
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVAA-0001Ck-KM
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:28:43 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:38826)
+	(envelope-from <rth7680@gmail.com>) id 1ddVAC-0001GB-Of
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:28:45 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVAA-0001C4-ET
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:28:42 -0400
-Received: by mail-pg0-x243.google.com with SMTP id 123so778259pga.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:28:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVAC-0001Eu-GX
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:28:44 -0400
+Received: by mail-pg0-x244.google.com with SMTP id 83so789166pgb.4
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:28:44 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:28:27 -0700
-Message-Id: <20170804052833.10187-6-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 22:28:29 -0700
+Message-Id: <20170804052833.10187-8-rth@twiddle.net>
 In-Reply-To: <20170804052833.10187-1-rth@twiddle.net>
 References: <20170804052833.10187-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL for-2.10 3/3] tcg: Increase minimum alignment
- from tcg_malloc to 8
+Subject: [Qemu-devel] [PATCH 4/8] tcg/s390: Merge add2i facilities check to
+ tcg_target_op_def
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +30,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: agraf@suse.de, cohuck@redhat.com, borntraeger@de.ibm.com
 
-For a 64-bit ILP32 host, aligning to sizeof(long) is not enough.
-Guess the minimum for any host is 8, as that covers uint64_t.
-Qemu doesn't use a host long double or host vectors, except in
-extremely limited circumstances.
-
-Fixes a bus error for a sparc v8plus host.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tcg/s390/tcg-target.inc.c | 38 ++++++++++++++------------------------
+ 1 file changed, 14 insertions(+), 24 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index da78721a0d..17b7750ee6 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -762,7 +762,10 @@ static inline void *tcg_malloc(int size)
- {
-     TCGContext *s = &tcg_ctx;
-     uint8_t *ptr, *ptr_end;
--    size = (size + sizeof(long) - 1) & ~(sizeof(long) - 1);
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index ff3f644f8e..6b08ccea6d 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -43,7 +43,7 @@
+ #define TCG_CT_CONST_ORI   0x400
+ #define TCG_CT_CONST_XORI  0x800
+ #define TCG_CT_CONST_U31   0x1000
+-#define TCG_CT_CONST_ADLI  0x2000
++#define TCG_CT_CONST_S33   0x2000
+ #define TCG_CT_CONST_ZERO  0x4000
+ 
+ /* Several places within the instruction set 0 means "no register"
+@@ -387,7 +387,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         tcg_regset_set_reg(ct->u.regs, TCG_REG_R3);
+         break;
+     case 'A':
+-        ct->ct |= TCG_CT_CONST_ADLI;
++        ct->ct |= TCG_CT_CONST_S33;
+         break;
+     case 'I':
+         ct->ct |= TCG_CT_CONST_S16;
+@@ -478,20 +478,6 @@ static int tcg_match_xori(TCGType type, tcg_target_long val)
+     return 1;
+ }
+ 
+-/* Immediates to be used with add2/sub2.  */
+-
+-static int tcg_match_add2i(TCGType type, tcg_target_long val)
+-{
+-    if (s390_facilities & FACILITY_EXT_IMM) {
+-        if (type == TCG_TYPE_I32) {
+-            return 1;
+-        } else if (val >= -0xffffffffll && val <= 0xffffffffll) {
+-            return 1;
+-        }
+-    }
+-    return 0;
+-}
+-
+ /* Test if a constant matches the constraint. */
+ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+                                   const TCGArgConstraint *arg_ct)
+@@ -511,8 +497,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+         return val == (int16_t)val;
+     } else if (ct & TCG_CT_CONST_S32) {
+         return val == (int32_t)val;
+-    } else if (ct & TCG_CT_CONST_ADLI) {
+-        return tcg_match_add2i(type, val);
++    } else if (ct & TCG_CT_CONST_S33) {
++        return val >= -0xffffffffll && val <= 0xffffffffll;
+     } else if (ct & TCG_CT_CONST_ORI) {
+         return tcg_match_ori(type, val);
+     } else if (ct & TCG_CT_CONST_XORI) {
+@@ -2241,6 +2227,12 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     static const TCGTargetOpDef r_0_rJ = { .args_ct_str = { "r", "0", "rJ" } };
+     static const TCGTargetOpDef r_0_rO = { .args_ct_str = { "r", "0", "rO" } };
+     static const TCGTargetOpDef r_0_rX = { .args_ct_str = { "r", "0", "rX" } };
++    static const TCGTargetOpDef a2_r
++        = { .args_ct_str = { "r", "r", "0", "1", "r", "r" } };
++    static const TCGTargetOpDef a2_ri
++        = { .args_ct_str = { "r", "r", "0", "1", "ri", "r" } };
++    static const TCGTargetOpDef a2_rA
++        = { .args_ct_str = { "r", "r", "0", "1", "rA", "r" } };
+ 
+     switch (op) {
+     case INDEX_op_goto_ptr:
+@@ -2389,15 +2381,13 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+                 = { .args_ct_str = { "b", "a", "0", "r" } };
+             return &mul2;
+         }
 +
-+    /* ??? This is a weak placeholder for minimum malloc alignment.  */
-+    size = QEMU_ALIGN_UP(size, 8);
-+
-     ptr = s->pool_cur;
-     ptr_end = ptr + size;
-     if (unlikely(ptr_end > s->pool_end)) {
+     case INDEX_op_add2_i32:
+-    case INDEX_op_add2_i64:
+     case INDEX_op_sub2_i32:
++        return (s390_facilities & FACILITY_EXT_IMM ? &a2_ri : &a2_r);
++    case INDEX_op_add2_i64:
+     case INDEX_op_sub2_i64:
+-        {
+-            static const TCGTargetOpDef arith2
+-                = { .args_ct_str = { "r", "r", "0", "1", "rA", "r" } };
+-            return &arith2;
+-        }
++        return (s390_facilities & FACILITY_EXT_IMM ? &a2_rA : &a2_r);
+ 
+     default:
+         break;
 -- 
 2.13.3
