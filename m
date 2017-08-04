@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dddsI-0002Eu-5l
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:47:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dddsL-0000tu-TB
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ddao8-000439-JJ
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41624)
+	(envelope-from <cohuck@redhat.com>) id 1ddanp-0003SL-95
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddao8-00041E-5H
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:20 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddanp-0003Qr-0o
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:01 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  4 Aug 2017 13:29:44 +0200
-Message-Id: <20170804112946.5247-8-cohuck@redhat.com>
+Date: Fri,  4 Aug 2017 13:29:39 +0200
+Message-Id: <20170804112946.5247-3-cohuck@redhat.com>
 In-Reply-To: <20170804112946.5247-1-cohuck@redhat.com>
 References: <20170804112946.5247-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 7/9] s390x/pci: fence off instructions for
- non-pci
+Subject: [Qemu-devel] [PATCH v4 2/9] s390x/pci: add stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +26,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-If a guest running on a machine without zpci issues a pci instruction,
-throw them an exception.
+Some non-pci code calls into zpci code. Provide some stubs for builds
+without pci.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/kvm.c | 54 +++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 41 insertions(+), 13 deletions(-)
+ hw/s390x/Makefile.objs   |  3 +-
+ hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+), 1 deletion(-)
+ create mode 100644 hw/s390x/s390-pci-stub.c
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index bc62bba5b7..9de165d8b1 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1191,7 +1191,11 @@ static int kvm_clp_service_call(S390CPU *cpu, struct kvm_run *run)
- {
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return clp_service_call(cpu, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return clp_service_call(cpu, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_pcilg_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1199,7 +1203,11 @@ static int kvm_pcilg_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return pcilg_service_call(cpu, r1, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return pcilg_service_call(cpu, r1, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_pcistg_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1207,7 +1215,11 @@ static int kvm_pcistg_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return pcistg_service_call(cpu, r1, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return pcistg_service_call(cpu, r1, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_stpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1216,10 +1228,14 @@ static int kvm_stpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint64_t fiba;
-     uint8_t ar;
- 
--    cpu_synchronize_state(CPU(cpu));
--    fiba = get_base_disp_rxy(cpu, run, &ar);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        cpu_synchronize_state(CPU(cpu));
-+        fiba = get_base_disp_rxy(cpu, run, &ar);
- 
--    return stpcifc_service_call(cpu, r1, fiba, ar);
-+        return stpcifc_service_call(cpu, r1, fiba, ar);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_sic_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1247,7 +1263,11 @@ static int kvm_rpcit_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return rpcit_service_call(cpu, r1, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return rpcit_service_call(cpu, r1, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_pcistb_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1257,10 +1277,14 @@ static int kvm_pcistb_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint64_t gaddr;
-     uint8_t ar;
- 
--    cpu_synchronize_state(CPU(cpu));
--    gaddr = get_base_disp_rsy(cpu, run, &ar);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        cpu_synchronize_state(CPU(cpu));
-+        gaddr = get_base_disp_rsy(cpu, run, &ar);
- 
--    return pcistb_service_call(cpu, r1, r3, gaddr, ar);
-+        return pcistb_service_call(cpu, r1, r3, gaddr, ar);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1269,10 +1293,14 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint64_t fiba;
-     uint8_t ar;
- 
--    cpu_synchronize_state(CPU(cpu));
--    fiba = get_base_disp_rxy(cpu, run, &ar);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        cpu_synchronize_state(CPU(cpu));
-+        fiba = get_base_disp_rxy(cpu, run, &ar);
- 
--    return mpcifc_service_call(cpu, r1, fiba, ar);
-+        return mpcifc_service_call(cpu, r1, fiba, ar);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index b2aade2466..7ee19d3abc 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -11,7 +11,8 @@ obj-y += 3270-ccw.o
+ obj-y += virtio-ccw.o
+ obj-y += css-bridge.o
+ obj-y += ccw-device.o
+-obj-y += s390-pci-bus.o s390-pci-inst.o
++obj-$(CONFIG_PCI) += s390-pci-bus.o s390-pci-inst.o
++obj-$(call lnot,$(CONFIG_PCI)) += s390-pci-stub.o
+ obj-y += s390-skeys.o
+ obj-y += s390-stattrib.o
+ obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
+new file mode 100644
+index 0000000000..2e7e42a2af
+--- /dev/null
++++ b/hw/s390x/s390-pci-stub.c
+@@ -0,0 +1,74 @@
++/* stubs for non-pci builds */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "s390-pci-inst.h"
++#include "s390-pci-bus.h"
++
++/* target/s390x/ioinst.c */
++int chsc_sei_nt2_get_event(void *res)
++{
++    return 1;
++}
++
++int chsc_sei_nt2_have_event(void)
++{
++    return 0;
++}
++
++/* hw/s390x/sclp.c */
++void s390_pci_sclp_configure(SCCB *sccb)
++{
++}
++
++void s390_pci_sclp_deconfigure(SCCB *sccb)
++{
++}
++
++/* target/s390x/kvm.c */
++int clp_service_call(S390CPU *cpu, uint8_t r2)
++{
++    return -1;
++}
++
++int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++{
++    return -1;
++}
++
++int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++{
++    return -1;
++}
++
++int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar)
++{
++    return -1;
++}
++
++int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++{
++    return -1;
++}
++
++int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
++                        uint8_t ar)
++{
++    return -1;
++}
++
++int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar)
++{
++    return -1;
++}
++
++S390pciState *s390_get_phb(void)
++{
++    return NULL;
++}
++
++S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
++{
++    return NULL;
++}
 -- 
 2.13.3
