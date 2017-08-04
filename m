@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ddbLn-0003uf-4V
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:06:21 -0400
+	(envelope-from <stefanha@redhat.com>) id 1ddc8U-000416-OV
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ddbKi-0002J9-UT
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:05:06 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35860)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ddbKi-0002IM-Km
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:04:00 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id t201so17959504wmt.1
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 05:04:00 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1ddc7i-0007u6-Up
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:55:26 -0400
+Date: Fri, 4 Aug 2017 13:53:13 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170804125313.GE14565@stefanha-x1.localdomain>
+References: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
+	<563a64c240fea15b4ed3902db9e4415ba85d7075.1501827395.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <1501769263-27001-1-git-send-email-mst@redhat.com>
-References: <1501769263-27001-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Aug 2017 13:03:38 +0100
-Message-ID: <CAFEAcA_svMzhqBH-CbYWQXereG-1mZEz44HmpnQsVUjXd5=Z=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL] virtio: fix for rc2
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qOrJKOH36bD5yhNe"
+Content-Disposition: inline
+In-Reply-To: <563a64c240fea15b4ed3902db9e4415ba85d7075.1501827395.git.maozy.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] hw/block: Fix the return type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 3 August 2017 at 15:07, Michael S. Tsirkin <mst@redhat.com> wrote:
-> The following changes since commit aaaec6acad7cf97372d48c1b09126a09697519=
-c8:
->
->   Update version for v2.10.0-rc1 release (2017-08-02 16:36:32 +0100)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to e6a74868d92f858ac33915b6772999d7de2fd288:
->
->   build-sys: add --disable-vhost-user (2017-08-03 15:55:41 +0300)
->
-> ----------------------------------------------------------------
-> virtio: fix for rc2
->
-> Looks like the constant stream of additions of vhost-user devices is a
-> problem for some people who are concerned about external connections
-> from qemu. A per-device flag seems like an overkill, but a single
-> configure flag seems like a sane way to support that, and it looks like
-> we need to do it before the release.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
-> Marc-Andr=C3=A9 Lureau (1):
->       build-sys: add --disable-vhost-user
 
-Applied, thanks.
+--qOrJKOH36bD5yhNe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- PMM
+On Fri, Aug 04, 2017 at 06:26:41PM +0800, Mao Zhongyi wrote:
+> When the function no success value to transmit, it usually make the
+> function return void. It has turned out not to be a success, because
+> it means that the extra local_err variable and error_propagate() will
+> be needed. It leads to cumbersome code, therefore, transmit success/
+> failure in the return value is worth.
+>=20
+> So fix the return type of blkconf_apply_backend_options(),
+> blkconf_geometry() and virtio_blk_data_plane_create() to avoid it.
+>=20
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  hw/block/block.c                | 15 +++++++++------
+>  hw/block/dataplane/virtio-blk.c | 12 +++++++-----
+>  hw/block/dataplane/virtio-blk.h |  2 +-
+>  include/hw/block/block.h        |  4 ++--
+>  4 files changed, 19 insertions(+), 14 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--qOrJKOH36bD5yhNe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZhG45AAoJEJykq7OBq3PIk+8H/3gtVuMWOIW5wArCZyDkJwyI
+B5b8eHbwWTm9bT7jG6csEiU7Wbc7EXwAd6RIhL0QySJGFLmJxDD6qr03p89QVj53
+QhPi+cmo7hXJ4U+GFwcxvvRjG6W+KEVnFKeK7NxK57tZS1DvfBGdNj3vrBjSPQeH
+WrD6OnSL8qvgnwWkBuX1rZTeH3Y03wKT57wyKJ1KqNYNqfzkXmu5zPpOetNA1nMG
+8DE6rKC8svK1g8uw7B2oWkso1K7t2pS+pX0ZRHrJ8ttbUett/HZaZZvCTlWlNPSs
+3Nq1r7Gz83x3kF3cXJIBYhAE8P92i7f82feeDIMCRSZfH/UdrY+N7ZxtTiGRRv4=
+=aqv4
+-----END PGP SIGNATURE-----
+
+--qOrJKOH36bD5yhNe--
