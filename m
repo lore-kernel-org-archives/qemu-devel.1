@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ddkGr-0007CP-1H
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 17:36:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ddkGt-0007EE-J7
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 17:36:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ddkGq-0001kc-7G
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 17:36:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34434)
+	(envelope-from <ehabkost@redhat.com>) id 1ddkGs-0001nJ-FF
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 17:36:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ddkGq-0001in-1D
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 17:36:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ddkGs-0001m4-6T
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 17:36:38 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 388E2883C1
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 21:36:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 20CC8883AB
+	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 21:36:37 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  4 Aug 2017 18:36:23 -0300
-Message-Id: <20170804213625.3756-4-ehabkost@redhat.com>
+Date: Fri,  4 Aug 2017 18:36:25 -0300
+Message-Id: <20170804213625.3756-6-ehabkost@redhat.com>
 In-Reply-To: <20170804213625.3756-1-ehabkost@redhat.com>
 References: <20170804213625.3756-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 3/5] qmp-shell: execute_cmdargs()
- method
+Subject: [Qemu-devel] [PATCH for-2.11 5/5] Remove scripts/qmp/qmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +32,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-This will allow us to execute a command that was already split in
-a list.
+The only purpose of scripts/qmp/qmp was the ability to run QMP
+commands non-interactively.  Now it is possible to run qmp-shell
+non-interactively by providing a QMP command a command-line
+argument, making scripts/qmp/qmp obsolete.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qmp-shell | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ scripts/qmp/qmp | 126 --------------------------------------------------------
+ 1 file changed, 126 deletions(-)
+ delete mode 100755 scripts/qmp/qmp
 
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 5fe6162..6113aaf 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -260,7 +260,9 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-         print str(jsobj)
- 
-     def _execute_cmd(self, cmdline):
--        cmdargs = cmdline.split()
-+        return self.execute_cmdargs(cmdline.split())
-+
-+    def execute_cmdargs(self, cmdargs):
-         try:
-             qmpcmd = self.__build_cmd(cmdargs)
-         except Exception as e:
-@@ -386,6 +388,9 @@ class HMPShell(QMPShell):
-             print '%s: %s' % (resp['error']['class'], resp['error']['desc'])
-         return True
- 
-+    def execute_cmdargs(self, cmdargs):
-+        return self._execute_cmd(' '.join(cmdargs))
-+
-     def show_banner(self):
-         QMPShell.show_banner(self, msg='Welcome to the HMP shell!')
- 
+diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
+deleted file mode 100755
+index 514b539..0000000
+--- a/scripts/qmp/qmp
++++ /dev/null
+@@ -1,126 +0,0 @@
+-#!/usr/bin/python
+-#
+-# QMP command line tool
+-#
+-# Copyright IBM, Corp. 2011
+-#
+-# Authors:
+-#  Anthony Liguori <aliguori@us.ibm.com>
+-#
+-# This work is licensed under the terms of the GNU GPLv2 or later.
+-# See the COPYING file in the top-level directory.
+-
+-import sys, os
+-from qmp import QEMUMonitorProtocol
+-
+-def print_response(rsp, prefix=[]):
+-    if type(rsp) == list:
+-        i = 0
+-        for item in rsp:
+-            if prefix == []:
+-                prefix = ['item']
+-            print_response(item, prefix[:-1] + ['%s[%d]' % (prefix[-1], i)])
+-            i += 1
+-    elif type(rsp) == dict:
+-        for key in rsp.keys():
+-            print_response(rsp[key], prefix + [key])
+-    else:
+-        if len(prefix):
+-            print '%s: %s' % ('.'.join(prefix), rsp)
+-        else:
+-            print '%s' % (rsp)
+-
+-def main(args):
+-    path = None
+-
+-    # Use QMP_PATH if it's set
+-    if os.environ.has_key('QMP_PATH'):
+-        path = os.environ['QMP_PATH']
+-
+-    while len(args):
+-        arg = args[0]
+-
+-        if arg.startswith('--'):
+-            arg = arg[2:]
+-            if arg.find('=') == -1:
+-                value = True
+-            else:
+-                arg, value = arg.split('=', 1)
+-
+-            if arg in ['path']:
+-                if type(value) == str:
+-                    path = value
+-            elif arg in ['help']:
+-                os.execlp('man', 'man', 'qmp')
+-            else:
+-                print 'Unknown argument "%s"' % arg
+-
+-            args = args[1:]
+-        else:
+-            break
+-
+-    if not path:
+-        print "QMP path isn't set, use --path=qmp-monitor-address or set QMP_PATH"
+-        return 1
+-
+-    if len(args):
+-        command, args = args[0], args[1:]
+-    else:
+-        print 'No command found'
+-        print 'Usage: "qmp [--path=qmp-monitor-address] qmp-cmd arguments"'
+-        return 1
+-
+-    if command in ['help']:
+-        os.execlp('man', 'man', 'qmp')
+-
+-    srv = QEMUMonitorProtocol(path)
+-    srv.connect()
+-
+-    def do_command(srv, cmd, **kwds):
+-        rsp = srv.cmd(cmd, kwds)
+-        if rsp.has_key('error'):
+-            raise Exception(rsp['error']['desc'])
+-        return rsp['return']
+-
+-    commands = map(lambda x: x['name'], do_command(srv, 'query-commands'))
+-
+-    srv.close()
+-
+-    if command not in commands:
+-        fullcmd = 'qmp-%s' % command
+-        try:
+-            os.environ['QMP_PATH'] = path
+-            os.execvp(fullcmd, [fullcmd] + args)
+-        except OSError as exc:
+-            if exc.errno == 2:
+-                print 'Command "%s" not found.' % (fullcmd)
+-                return 1
+-            raise
+-        return 0
+-
+-    srv = QEMUMonitorProtocol(path)
+-    srv.connect()
+-
+-    arguments = {}
+-    for arg in args:
+-        if not arg.startswith('--'):
+-            print 'Unknown argument "%s"' % arg
+-            return 1
+-
+-        arg = arg[2:]
+-        if arg.find('=') == -1:
+-            value = True
+-        else:
+-            arg, value = arg.split('=', 1)
+-
+-        if arg in ['help']:
+-            os.execlp('man', 'man', 'qmp-%s' % command)
+-            return 1
+-
+-        arguments[arg] = value
+-
+-    rsp = do_command(srv, command, **arguments)
+-    print_response(rsp)
+-
+-if __name__ == '__main__':
+-    sys.exit(main(sys.argv[1:]))
 -- 
 2.9.4
