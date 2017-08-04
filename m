@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddRNV-0008Ot-UV
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddRNb-0008Tr-W3
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddRNU-0003yX-Bd
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45034)
+	(envelope-from <eblake@redhat.com>) id 1ddRNZ-00049t-Rc
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddRNU-0003xJ-2e
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:12 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ddRNZ-00047L-JL
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:17 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A703D4DD49
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 01:26:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69FDF883B4
+	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 01:26:16 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  3 Aug 2017 20:25:42 -0500
-Message-Id: <20170804012551.2714-14-eblake@redhat.com>
+Date: Thu,  3 Aug 2017 20:25:44 -0500
+Message-Id: <20170804012551.2714-16-eblake@redhat.com>
 In-Reply-To: <20170804012551.2714-1-eblake@redhat.com>
 References: <20170804012551.2714-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 13/22] libqtest: Add qmp_raw()
+Subject: [Qemu-devel] [PATCH v4 15/22] libqtest: Delete qtest_qmp() wrappers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,147 +32,302 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-The majority of calls into libqtest's qmp() and friends are passing
-a JSON object that includes a command name; we can prove this by
-adding an assertion.  The only outlier is qmp-test, which is testing
-appropriate error responses to protocol violations and id support,
-by sending raw strings, where those raw strings don't need
-interpolation anyways.
+None of our tests were directly using qtest_qmp() and friends;
+even tests like postcopy-test.c that manage multiple connections
+get along just fine changing global_qtest as needed (other than
+one callsite where it forgot to use the inlined form).  It's
+also annoying that we have qmp_async() but qtest_async_qmp(),
+with inconsistent naming for tracing through the wrappers.
 
-Adding a new entry-point makes a clean separation of which input
-needs interpolation, so that upcoming patches can refactor qmp()
-to be more like the recent additions to test-qga in taking the
-command name separately from the arguments for an overall
-reduction in testsuite boilerplate.
+As future patches are about to add some convenience functions
+for easier generation of QMP commands, it's easier if we don't
+have to percolate the changes through as many layers of the stack,
+by getting rid of the layer that no one uses, and just documenting
+that callers have to massage the global variable as needed. (Yes,
+this is backwards from good design that says all state should be
+passed as parameters rather than via a global variable - but such
+is life in maintaining a testsuite, where it is easier to write
+concise tests than it is to retrofit all existing tests to pass
+the extra parameter everywhere.)
 
-This change also lets us move the workaround for the QMP parser
-limitation of not ending a parse until } or newline: all calls
-through qmp() are passing an object ending in }, so only the
-few callers of qmp_raw() have to worry about a trailing newline.
+Internally, we rename qmp_fd_sendv() to qtest_qmp_sendv(), as
+well as give it a ... counterpart qmp_fd_send(), but the overall
+reduction in code makes this file a bit less repetitive.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h |  8 ++++++++
- tests/libqtest.c | 13 +++++++------
- tests/qmp-test.c | 19 ++++++++++++-------
- 3 files changed, 27 insertions(+), 13 deletions(-)
+ tests/libqtest.h      | 75 +++++----------------------------------------------
+ tests/libqtest.c      | 71 +++++++++++++-----------------------------------
+ tests/postcopy-test.c |  2 +-
+ 3 files changed, 25 insertions(+), 123 deletions(-)
 
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 33af3ae8ff..917ec5cf92 100644
+index 6bae0223aa..684cfb3507 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -550,6 +550,14 @@ static inline void qtest_end(void)
- QDict *qmp(const char *fmt, ...);
+@@ -21,6 +21,11 @@
+
+ typedef struct QTestState QTestState;
+
++/*
++ * The various qmp_*() commands operate on global_qtest.  Tests can
++ * alternate between two parallel connections by switching which state
++ * is current before issuing commands.
++ */
+ extern QTestState *global_qtest;
 
  /**
-+ * qmp_raw:
-+ * @msg: Raw QMP message to send to qemu.
-+ *
-+ * Sends a QMP message to QEMU and returns the response.
-+ */
-+QDict *qmp_raw(const char *msg);
-+
-+/**
-  * qmp_async:
-  * @fmt...: QMP message to send to qemu; formats arguments through
-  * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+@@ -48,49 +53,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
+ void qtest_quit(QTestState *s);
+
+ /**
+- * qtest_qmp:
+- * @s: #QTestState instance to operate on.
+- * @fmt...: QMP message to send to qemu; formats arguments through
+- * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+- *
+- * Sends a QMP message to QEMU and returns the response.
+- */
+-QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
+-
+-/**
+- * qtest_async_qmp:
+- * @s: #QTestState instance to operate on.
+- * @fmt...: QMP message to send to qemu; formats arguments through
+- * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+- *
+- * Sends a QMP message to QEMU and leaves the response in the stream.
+- */
+-void qtest_async_qmp(QTestState *s, const char *fmt, ...);
+-
+-/**
+- * qtest_qmpv:
+- * @s: #QTestState instance to operate on.
+- * @fmt: QMP message to send to QEMU; formats arguments through
+- * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+- * @ap: QMP message arguments
+- *
+- * Sends a QMP message to QEMU and returns the response.
+- */
+-QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
+-
+-/**
+- * qtest_async_qmpv:
+- * @s: #QTestState instance to operate on.
+- * @fmt: QMP message to send to QEMU; formats arguments through
+- * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+- * @ap: QMP message arguments
+- *
+- * Sends a QMP message to QEMU and leaves the response in the stream.
+- */
+-void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap);
+-
+-/**
+- * qtest_receive:
++ * qtest_qmp_receive:
+  * @s: #QTestState instance to operate on.
+  *
+  * Reads a QMP message from QEMU and returns the response.
+@@ -117,32 +80,6 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+
+ /**
+- * qtest_hmp:
+- * @s: #QTestState instance to operate on.
+- * @fmt...: HMP command to send to QEMU, formats arguments like sprintf().
+- *
+- * Send HMP command to QEMU via QMP's human-monitor-command.
+- * QMP events are discarded.
+- *
+- * Returns: the command's output.  The caller should g_free() it.
+- */
+-char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+-
+-/**
+- * qtest_hmpv:
+- * @s: #QTestState instance to operate on.
+- * @fmt: HMP command to send to QEMU, formats arguments like vsprintf().
+- * @ap: HMP command arguments
+- *
+- * Send HMP command to QEMU via QMP's human-monitor-command.
+- * QMP events are discarded.
+- *
+- * Returns: the command's output.  The caller should g_free() it.
+- */
+-char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
+-    GCC_FMT_ATTR(2, 0);
+-
+-/**
+  * qtest_get_irq:
+  * @s: #QTestState instance to operate on.
+  * @num: Interrupt to observe.
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 0fa32928c8..3071be2efb 100644
+index f9781d67f5..2df01682c0 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -451,7 +451,7 @@ static void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+@@ -233,9 +233,10 @@ QTestState *qtest_init(const char *extra_args)
+     QDict *greeting;
+
+     /* Read the QMP greeting and then do the handshake */
+-    greeting = qtest_qmp_receive(s);
++    greeting = qmp_fd_receive(s->qmp_fd);
+     QDECREF(greeting);
+-    greeting = qtest_qmp(s, "{ 'execute': 'qmp_capabilities' }");
++    qmp_fd_send(s->qmp_fd, "{ 'execute': 'qmp_capabilities' }");
++    greeting = qmp_fd_receive(s->qmp_fd);
+     QDECREF(greeting);
+
+     return s;
+@@ -446,7 +447,7 @@ QDict *qtest_qmp_receive(QTestState *s)
+  * Internal code that converts from interpolated JSON into a message
+  * to send over the wire, without waiting for a reply.
+  */
+-static void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
++static void qtest_qmp_sendv(QTestState *s, const char *fmt, va_list ap)
+ {
+     QObject *qobj = NULL;
      QString *qstr;
-     const char *str;
-
--    assert(*fmt);
-+    assert(strstr(fmt, "execute"));
-
-     /*
-      * A round trip through QObject is only needed if % interpolation
-@@ -496,11 +496,6 @@ void qmp_fd_send(int fd, const char *msg)
+@@ -460,7 +461,7 @@ static void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+      * order to escape strings properly.
+      */
+     if (!strchr(fmt, '%')) {
+-        qmp_fd_send(fd, fmt);
++        qmp_fd_send(s->qmp_fd, fmt);
+         return;
      }
+
+@@ -469,23 +470,19 @@ static void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+     str = qstring_get_str(qstr);
+
      /* Send QMP request */
+-    qmp_fd_send(fd, str);
++    qmp_fd_send(s->qmp_fd, str);
+
+     QDECREF(qstr);
+     qobject_decref(qobj);
+ }
+
+-void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap)
++static void qtest_qmp_send(QTestState *s, const char *fmt, ...)
+ {
+-    qmp_fd_sendv(s->qmp_fd, fmt, ap);
+-}
++    va_list ap;
+
+-QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
+-{
+-    qtest_async_qmpv(s, fmt, ap);
+-
+-    /* Receive reply */
+-    return qtest_qmp_receive(s);
++    va_start(ap, fmt);
++    qtest_qmp_sendv(s, fmt, ap);
++    va_end(ap);
+ }
+
+ void qmp_fd_send(int fd, const char *msg)
+@@ -499,26 +496,6 @@ void qmp_fd_send(int fd, const char *msg)
      socket_send(fd, msg, strlen(msg));
--    /*
--     * BUG: QMP doesn't react to input until it sees a newline, an
--     * object, or an array.  Work-around: give it a newline.
--     */
--    socket_send(fd, "\n", 1);
  }
 
- QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
-@@ -899,6 +894,12 @@ QDict *qmp(const char *fmt, ...)
-     return response;
+-QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
+-{
+-    va_list ap;
+-    QDict *response;
+-
+-    va_start(ap, fmt);
+-    response = qtest_qmpv(s, fmt, ap);
+-    va_end(ap);
+-    return response;
+-}
+-
+-void qtest_async_qmp(QTestState *s, const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start(ap, fmt);
+-    qtest_async_qmpv(s, fmt, ap);
+-    va_end(ap);
+-}
+-
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
+ {
+     QDict *response;
+@@ -541,16 +518,16 @@ void qtest_qmp_eventwait(QTestState *s, const char *event)
+     QDECREF(response);
  }
 
-+QDict *qmp_raw(const char *msg)
-+{
-+    qmp_fd_send(global_qtest->qmp_fd, msg);
-+    return qtest_qmp_receive(global_qtest);
-+}
-+
- void qmp_async(const char *fmt, ...)
+-char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
++static char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
+ {
+     char *cmd;
+     QDict *resp;
+     char *ret;
+
+     cmd = g_strdup_vprintf(fmt, ap);
+-    resp = qtest_qmp(s, "{'execute': 'human-monitor-command',"
+-                     " 'arguments': {'command-line': %s}}",
+-                     cmd);
++    qtest_qmp_send(s, "{'execute': 'human-monitor-command',"
++                   " 'arguments': {'command-line': %s}}", cmd);
++    resp = qtest_qmp_receive(s);
+     ret = g_strdup(qdict_get_try_str(resp, "return"));
+     while (ret == NULL && qdict_get_try_str(resp, "event")) {
+         /* Ignore asynchronous QMP events */
+@@ -564,17 +541,6 @@ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
+     return ret;
+ }
+
+-char *qtest_hmp(QTestState *s, const char *fmt, ...)
+-{
+-    va_list ap;
+-    char *ret;
+-
+-    va_start(ap, fmt);
+-    ret = qtest_hmpv(s, fmt, ap);
+-    va_end(ap);
+-    return ret;
+-}
+-
+ const char *qtest_get_arch(void)
+ {
+     const char *qemu = getenv("QTEST_QEMU_BINARY");
+@@ -870,12 +836,11 @@ void qtest_memset(QTestState *s, uint64_t addr, uint8_t pattern, size_t size)
+ QDict *qmp(const char *fmt, ...)
  {
      va_list ap;
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 5d0260b2be..905fb4b3e5 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -44,28 +44,33 @@ static void test_malformed(void)
- {
-     QDict *resp;
+-    QDict *response;
 
-+    /*
-+     * BUG: QMP doesn't react to input until it sees a newline, an
-+     * object, or an array.  Work-around: give it a newline.
-+     */
-+
-     /* Not even a dictionary */
--    resp = qmp("null");
-+    resp = qmp_raw("null\n");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-     QDECREF(resp);
-
-     /* No "execute" key */
--    resp = qmp("{}");
-+    resp = qmp_raw("{}");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-     QDECREF(resp);
-
-     /* "execute" isn't a string */
--    resp = qmp("{ 'execute': true }");
-+    resp = qmp_raw("{ 'execute': true }");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-     QDECREF(resp);
-
-     /* "arguments" isn't a dictionary */
--    resp = qmp("{ 'execute': 'no-such-cmd', 'arguments': [] }");
-+    resp = qmp_raw("{ 'execute': 'no-such-cmd', 'arguments': [] }");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-     QDECREF(resp);
-
-     /* extra key */
--    resp = qmp("{ 'execute': 'no-such-cmd', 'extra': true }");
-+    resp = qmp_raw("{ 'execute': 'no-such-cmd', 'extra': true }");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-     QDECREF(resp);
+     va_start(ap, fmt);
+-    response = qtest_qmpv(global_qtest, fmt, ap);
++    qtest_qmp_sendv(global_qtest, fmt, ap);
+     va_end(ap);
+-    return response;
++    return qtest_qmp_receive(global_qtest);
  }
-@@ -114,14 +119,14 @@ static void test_qmp_protocol(void)
-     test_malformed();
 
-     /* Test 'id' */
--    resp = qmp("{ 'execute': 'query-name', 'id': 'cookie#1' }");
-+    resp = qmp_raw("{ 'execute': 'query-name', 'id': 'cookie#1' }");
-     ret = qdict_get_qdict(resp, "return");
-     g_assert(ret);
-     g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, "cookie#1");
-     QDECREF(resp);
+ QDict *qmp_raw(const char *msg)
+@@ -889,7 +854,7 @@ void qmp_async(const char *fmt, ...)
+     va_list ap;
 
-     /* Test command failure with 'id' */
--    resp = qmp("{ 'execute': 'human-monitor-command', 'id': 2 }");
-+    resp = qmp_raw("{ 'execute': 'human-monitor-command', 'id': 2 }");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-     g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
-     QDECREF(resp);
+     va_start(ap, fmt);
+-    qtest_async_qmpv(global_qtest, fmt, ap);
++    qtest_qmp_sendv(global_qtest, fmt, ap);
+     va_end(ap);
+ }
+
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index ceaed823eb..61f4b4180a 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -236,7 +236,7 @@ static QDict *return_or_event(QDict *response)
+         got_stop = true;
+     }
+     QDECREF(response);
+-    return return_or_event(qtest_qmp_receive(global_qtest));
++    return return_or_event(qmp_receive());
+ }
+
+
 -- 
 2.13.3
