@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41425)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ddZNe-00065j-7u
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:58:55 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41453)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1ddZNk-0006BA-PW
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:59:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ddZNd-00013H-Cj
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:58:54 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36235)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ddZNd-000132-72
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:58:53 -0400
-Received: by mail-wm0-x244.google.com with SMTP id d40so5097497wma.3
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 02:58:53 -0700 (PDT)
+	(envelope-from <pl@kamp.de>) id 1ddZNf-00013n-Vr
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:59:00 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60331 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ddZNf-00013N-Lv
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:58:55 -0400
+References: <526F8457.5040907@kamp.de> <526F8701.2030906@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <1aefefcb-5ea7-e91f-bf11-4cde9ccd0f92@kamp.de>
+Date: Fri, 4 Aug 2017 11:58:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <c6161e7a-9b03-16bf-fb20-86df6f3fd9bc@redhat.com>
-References: <20170713190116.21608-1-dgilbert@redhat.com>
-	<20170717101703.GH7163@stefanha-x1.localdomain>
-	<20170717102642.GG2106@work-vm>
-	<c6161e7a-9b03-16bf-fb20-86df6f3fd9bc@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 4 Aug 2017 10:58:51 +0100
-Message-ID: <CAJSP0QWd7gtV21Hpr3noA0odAMhdriNkaqJtLJvbSNzoErvFdQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] vl.c/exit: pause cpus before closing block
- devices
+In-Reply-To: <526F8701.2030906@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Prohibit Windows from running in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Prasad Pandit <ppandit@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Jul 17, 2017 at 5:43 PM, John Snow <jsnow@redhat.com> wrote:
-> On 07/17/2017 06:26 AM, Dr. David Alan Gilbert wrote:
->> * Stefan Hajnoczi (stefanha@gmail.com) wrote:
->>> On Thu, Jul 13, 2017 at 08:01:16PM +0100, Dr. David Alan Gilbert (git) wrote:
->>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>>
->>>> There's a rare exit seg if the guest is accessing
->>>> IO during exit.
->>>> It's always hitting the atomic_inc(&bs->in_flight) with a NULL
->>>> bs. This was added recently in 99723548  but I don't see it
->>>> as the cause.
->>>>
->>>> Flip vl.c around so we pause the cpus before closing the block devices,
->>>> that way we shouldn't have anything trying to access them when
->>>> they're gone.
->>>>
->>>> This was originally Red Hat bz https://bugzilla.redhat.com/show_bug.cgi?id=1451015
->>>>
->>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> Reported-by: Cong Li <coli@redhat.com>
->>>>
->>>> --
->>>> This is a very rare race, I'll leave it running in a loop to see if
->>>> we hit anything else and to check this really fixes it.
->>>>
->>>> I do worry if there are other cases that can trigger this - e.g.
->>>> hot-unplug or ejecting a CD.
->>>>
->>>> ---
->>>>  vl.c | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Am 29.10.2013 um 10:59 schrieb Paolo Bonzini:
+> Il 29/10/2013 10:48, Peter Lieven ha scritto:
+>> Hi all,
 >>
->> Thanks;  and the test I left running seems solid - ~12k runs
->> over the weekend with no seg.
+>> this question might seem a bit weird, but does anyone see a good way to
+>> avoid
+>> that Windows is able to boot inside qemu?
 >>
->> Dave
->>
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>
->
-> the root cause of this bug is related to this as well:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg02945.html
->
-> From commit 99723548 we started assuming (incorrectly?) that blk_
-> functions always WILL have an attached BDS, but this is not always true,
-> for instance, flushing the cache from an empty CDROM.
->
-> Paolo, can we move the flight counter increment outside of the
-> block-backend layer, is that safe?
+>> We have defined several profiles for different operation systems and I want
+>> to avoid that someone chooses Linux and then installs Windows within
+>> a VM. Reason is licensing.
+> Patch QEMU to crash when Hyper-V extensions are enabled...
 
-I think the bdrv_inc_in_flight(blk_bs(blk)) needs to be fixed
-regardless of the throttling timer issue discussed below.  BB cannot
-assume that the BDS graph is non-empty.
+Hi all,
 
-Stefan
+this is an old topic that has become important for me again recently.
+Now all Linux versions should be able to detect KVM even if Hyper-V is enabled.
+
+But how do I detect from Qemu userspace that Hyper-V is enabled?
+
+Thanks,
+Peter
