@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddfwC-0005Sv-GA
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:59:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddfyS-0006t8-PL
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddfw3-0007Al-5u
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:58:56 -0400
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:34157)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddfw3-00079u-0x
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:58:51 -0400
-Received: by mail-pg0-x233.google.com with SMTP id u185so10195906pgb.1
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 09:58:50 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170804054426.10590-1-rth@twiddle.net>
-	<20170804054426.10590-23-rth@twiddle.net>
-	<a9a144cb-0e9d-c6dc-c549-c2bd6a1836a9@amsat.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7490e99e-8276-2ffd-76cf-6983c8ba6b4a@twiddle.net>
-Date: Fri, 4 Aug 2017 09:58:46 -0700
+	(envelope-from <dgilbert@redhat.com>) id 1ddfyO-0001KD-81
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:01:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddfyN-0001JK-VB
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:01:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2FF3E80E75
+	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 17:01:14 +0000 (UTC)
+Date: Fri, 4 Aug 2017 18:01:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170804170110.GD2087@work-vm>
+References: <20170804161452.17413-1-pbonzini@redhat.com>
+	<20170804161452.17413-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a9a144cb-0e9d-c6dc-c549-c2bd6a1836a9@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-MW
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 22/23] tcg/ppc: Look for shifted
- constants
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170804161452.17413-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] rcu: completely disable pthread_atfork
+ callbacks as soon as possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +34,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 08/04/2017 09:39 AM, Philippe Mathieu-Daudé wrote:
->>   @@ -638,6 +639,14 @@ static void tcg_out_movi_int(TCGContext *s, TCGType
->> type, TCGReg ret,
->>           return;
->>       }
->>   +    lsb = ctz64(arg);
->> +    high = arg >> lsb;
->> +    if (arg == (int16_t)arg) {
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> Because of -daemonize, system mode QEMU sometimes needs to fork() and
+> keep RCU enabled in the child.  However, there is a possible deadlock
+> with synchronize_rcu:
 > 
-> Can you move these here?
+> - the CPU thread is inside a RCU critical section and wants to take
+>   the BQL in order to do MMIO
 > 
-> +    lsb = ctz64(arg);
-> +    high = arg >> lsb;
+> - the monitor thread, which is owning the BQL, calls rcu_init_lock
+>   which tries to take the rcu_sync_lock
+> 
+> - the call_rcu thread has taken rcu_sync_lock in synchronize_rcu, but
+>   synchronize_rcu needs the CPU thread to end the critical section
+>   before returning.
+> 
+> This cannot happen for user-mode emulation, because it does not have
+> a BQL.
+> 
+> To fix it, assume that system mode QEMU only forks in preparation for
+> exec (except when daemonizing) and disable pthread_atfork as soon as
+> the double fork has happened.
+> 
+> Reported-by: David Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-No, because you've found a bug -- the if should be testing high, not arg.  ;-)
+That seems to fix that issue (not tested it any more than that though),
+so for fixing that issue:
 
-Thanks,
+Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-
-r~
+> ---
+>  include/qemu/rcu.h |  6 ++++++
+>  util/rcu.c         | 20 ++++++++++++++++++++
+>  vl.c               |  1 +
+>  3 files changed, 27 insertions(+)
+> 
+> diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+> index 83ae2808be..c0da9907e8 100644
+> --- a/include/qemu/rcu.h
+> +++ b/include/qemu/rcu.h
+> @@ -105,6 +105,12 @@ extern void synchronize_rcu(void);
+>   */
+>  extern void rcu_register_thread(void);
+>  extern void rcu_unregister_thread(void);
+> +
+> +/*
+> + * Support for fork().  fork() support is enabled at startup.
+> + */
+> +extern void rcu_enable_atfork(void);
+> +extern void rcu_disable_atfork(void);
+>  extern void rcu_after_fork(void);
+>  
+>  struct rcu_head;
+> diff --git a/util/rcu.c b/util/rcu.c
+> index 9adc5e4a36..2142ddd93b 100644
+> --- a/util/rcu.c
+> +++ b/util/rcu.c
+> @@ -318,15 +318,35 @@ static void rcu_init_complete(void)
+>      rcu_register_thread();
+>  }
+>  
+> +static int atfork_depth = 1;
+> +
+> +void rcu_enable_atfork(void)
+> +{
+> +    atfork_depth++;
+> +}
+> +
+> +void rcu_disable_atfork(void)
+> +{
+> +    atfork_depth--;
+> +}
+> +
+>  #ifdef CONFIG_POSIX
+>  static void rcu_init_lock(void)
+>  {
+> +    if (atfork_depth < 1) {
+> +        return;
+> +    }
+> +
+>      qemu_mutex_lock(&rcu_sync_lock);
+>      qemu_mutex_lock(&rcu_registry_lock);
+>  }
+>  
+>  static void rcu_init_unlock(void)
+>  {
+> +    if (atfork_depth < 1) {
+> +        return;
+> +    }
+> +
+>      qemu_mutex_unlock(&rcu_registry_lock);
+>      qemu_mutex_unlock(&rcu_sync_lock);
+>  }
+> diff --git a/vl.c b/vl.c
+> index 99fcfa0442..8967115514 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4121,6 +4121,7 @@ int main(int argc, char **argv, char **envp)
+>      set_memory_options(&ram_slots, &maxram_size, machine_class);
+>  
+>      os_daemonize();
+> +    rcu_disable_atfork();
+>  
+>      if (pid_file && qemu_create_pidfile(pid_file) != 0) {
+>          error_report("could not acquire pid file: %s", strerror(errno));
+> -- 
+> 2.13.3
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
