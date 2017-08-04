@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPU-0003mF-Bd
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:33 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddVPV-0003nf-Rb
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPR-0002wA-1z
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:32 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:33074)
+	(envelope-from <rth7680@gmail.com>) id 1ddVPT-000330-TB
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:33 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33518)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPQ-0002uG-Rc
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:28 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id u5so3860033pgn.0
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPT-00030z-Lg
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:31 -0400
+Received: by mail-pf0-x241.google.com with SMTP id c65so872800pfl.0
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:31 -0700 (PDT)
 Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
 	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	o14sm1061063pfi.158.2017.08.03.22.44.26 for <qemu-devel@nongnu.org>
+	o14sm1061063pfi.158.2017.08.03.22.44.29 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 22:44:26 -0700 (PDT)
+	Thu, 03 Aug 2017 22:44:29 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:44:03 -0700
-Message-Id: <20170804054426.10590-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 00/23] tcg constant pools
+Date: Thu,  3 Aug 2017 22:44:06 -0700
+Message-Id: <20170804054426.10590-4-rth@twiddle.net>
+In-Reply-To: <20170804054426.10590-1-rth@twiddle.net>
+References: <20170804054426.10590-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH for-2.11 03/23] tcg: Infrastructure for
+ managing constant pools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +34,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-RISC machines often require many instructions in order to construct large
-constants from the immediate values available to individual instructions.
-Static compilers like GCC often place these large constants into read-only
-memory and use one load instruction to fetch the constant instead; a
-collection of these is known as a "constant pool".
+A new shared header tcg-pool.inc.c adds new_pool_label,
+for registering a tcg_target_ulong to be emitted after
+the generated code, plus relocation data to install a
+pointer to the data.
 
-TCG currently generates all constants from immediate values.  This can
-require 4 insns for a full 64-bit value for AArch64, 4 insns for a
-full 32-bit value for AArch32 v6.  s390x z9 needs 4, ppc64 and sparc64
-need 5, mips64 needs 6.
+A new pointer is added to the TCGContext, so that we
+dump the constant pool as data, not code.
 
-Moreover, entries in the constant pool may be used more than once.  For
-instance, if there are 3 consecutive guest stores, then we can enter the
-host address of helper_le_ldul_mmu into the constant pool once for the 3
-call invocations.  Depending on the host memory map, the result may be a
-savings of (4*3*4) - (1*3*4+1*8) = 28 bytes.
-
-This last is even true for the x86_64 host, where
-
-    movq $helper_ld_ldul_mmu, %rax; call *%rax 
-
-costs 10+6 bytes, but
-
-    call *label(%rip); .quad helper_ld_ldul_mmu 
-
-costs 6+8 bytes, plus the ability to share the 8 bytes for the entry.
-
-
-r~
-
-
-Richard Henderson (23):
-  tcg: Move USE_DIRECT_JUMP discriminator to tcg/cpu/tcg-target.h
-  tcg: Rearrange ldst label tracking
-  tcg: Infrastructure for managing constant pools
-  tcg/i386: Store out-of-range call targets in constant pool
-  tcg/s390: Introduce TCG_REG_TB
-  tcg/s390: Fix sign of patch_reloc addend
-  tcg/s390: Use constant pool for movi
-  tcg/s390: Use constant pool for andi
-  tcg/s390: Use constant pool for ori
-  tcg/s390: Use constant pool for xori
-  tcg/s390: Use constant pool for cmpi
-  tcg/aarch64: Use constant pool for movi
-  tcg/sparc: Introduce TCG_REG_TB
-  tcg/sparc: Use constant pool for movi
-  tcg/arm: Improve tlb load for armv7
-  tcg/arm: Tighten tlb indexing offset test
-  tcg/arm: Code rearrangement
-  tcg/arm: Extract INSN_NOP
-  tcg/arm: Use constant pool for movi
-  tcg/arm: Use constant pool for call
-  tcg/ppc: Change TCG_REG_RA to TCG_REG_TB
-  tcg/ppc: Look for shifted constants
-  tcg/ppc: Use constant pool for movi
-
- include/elf.h                         |   3 +-
- include/exec/exec-all.h               |  95 +----
- tcg/aarch64/tcg-target.h              |   8 +
- tcg/arm/tcg-target.h                  |   9 +
- tcg/i386/tcg-target.h                 |  14 +
- tcg/ia64/tcg-target.h                 |   8 +
- tcg/mips/tcg-target.h                 |   7 +
- tcg/ppc/tcg-target.h                  |   7 +
- tcg/s390/tcg-target.h                 |  15 +
- tcg/sparc/tcg-target.h                |   5 +
- tcg/tcg-be-null.h                     |  44 --
- tcg/tcg.h                             |  14 +-
- tcg/tci/tcg-target.h                  |   9 +
- accel/tcg/cpu-exec.c                  |  35 ++
- accel/tcg/translate-all.c             |  36 +-
- tcg/aarch64/tcg-target.inc.c          |  78 ++--
- tcg/arm/tcg-target.inc.c              | 780 +++++++++++++++++++---------------
- tcg/i386/tcg-target.inc.c             |  20 +-
- tcg/ia64/tcg-target.inc.c             |  19 +-
- tcg/mips/tcg-target.inc.c             |   7 +-
- tcg/ppc/tcg-target.inc.c              | 320 +++++++-------
- tcg/s390/tcg-target.inc.c             | 527 +++++++++++++----------
- tcg/sparc/tcg-target.inc.c            | 240 ++++++++---
- tcg/{tcg-be-ldst.h => tcg-ldst.inc.c} |  27 +-
- tcg/tcg-pool.inc.c                    |  85 ++++
- tcg/tcg.c                             |  26 +-
- tcg/tci/tcg-target.inc.c              |   2 -
- 27 files changed, 1422 insertions(+), 1018 deletions(-)
- delete mode 100644 tcg/tcg-be-null.h
- rename tcg/{tcg-be-ldst.h => tcg-ldst.inc.c} (85%)
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ tcg/tcg.h                 |  4 +++
+ accel/tcg/translate-all.c | 22 +++++++++++-
+ tcg/tcg-pool.inc.c        | 85 +++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.c                 |  9 +++++
+ 4 files changed, 119 insertions(+), 1 deletion(-)
  create mode 100644 tcg/tcg-pool.inc.c
 
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index b0e00e744e..ac94133870 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -702,6 +702,7 @@ struct TCGContext {
+     void *code_gen_buffer;
+     size_t code_gen_buffer_size;
+     void *code_gen_ptr;
++    void *data_gen_ptr;
+ 
+     /* Threshold to flush the translated code buffer.  */
+     void *code_gen_highwater;
+@@ -716,6 +717,9 @@ struct TCGContext {
+ #ifdef TCG_TARGET_NEED_LDST_LABELS
+     struct TCGLabelQemuLdst *ldst_labels;
+ #endif
++#ifdef TCG_TARGET_NEED_POOL_LABELS
++    struct TCGLabelPoolData *pool_labels;
++#endif
+ 
+     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
+     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 93a1cf2ba8..2d1ed06065 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1329,7 +1329,27 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         qemu_log_in_addr_range(tb->pc)) {
+         qemu_log_lock();
+         qemu_log("OUT: [size=%d]\n", gen_code_size);
+-        log_disas(tb->tc_ptr, gen_code_size);
++        if (tcg_ctx.data_gen_ptr) {
++            size_t code_size = tcg_ctx.data_gen_ptr - tb->tc_ptr;
++            size_t data_size = gen_code_size - code_size;
++            size_t i;
++
++            log_disas(tb->tc_ptr, code_size);
++
++            for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
++                if (sizeof(tcg_target_ulong) == 8) {
++                    qemu_log("0x%08" PRIxPTR ":  .quad  0x%016" PRIx64 "\n",
++                             (uintptr_t)tcg_ctx.data_gen_ptr + i,
++                             *(uint64_t *)(tcg_ctx.data_gen_ptr + i));
++                } else {
++                    qemu_log("0x%08" PRIxPTR ":  .long  0x%08x\n",
++                             (uintptr_t)tcg_ctx.data_gen_ptr + i,
++                             *(uint32_t *)(tcg_ctx.data_gen_ptr + i));
++                }
++            }
++        } else {
++            log_disas(tb->tc_ptr, gen_code_size);
++        }
+         qemu_log("\n");
+         qemu_log_flush();
+         qemu_log_unlock();
+diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc.c
+new file mode 100644
+index 0000000000..8a85131405
+--- /dev/null
++++ b/tcg/tcg-pool.inc.c
+@@ -0,0 +1,85 @@
++/*
++ * TCG Backend Data: constant pool.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++typedef struct TCGLabelPoolData {
++    struct TCGLabelPoolData *next;
++    tcg_target_ulong data;
++    tcg_insn_unit *label;
++    intptr_t addend;
++    int type;
++} TCGLabelPoolData;
++
++
++static void new_pool_label(TCGContext *s, tcg_target_ulong data, int type,
++                           tcg_insn_unit *label, intptr_t addend)
++{
++    TCGLabelPoolData *n = tcg_malloc(sizeof(*n));
++    TCGLabelPoolData *i, **pp;
++
++    n->data = data;
++    n->label = label;
++    n->type = type;
++    n->addend = addend;
++
++    /* Insertion sort on the pool.  */
++    for (pp = &s->pool_labels; (i = *pp) && i->data < data; pp = &i->next) {
++        continue;
++    }
++    n->next = *pp;
++    *pp = n;
++}
++
++/* To be provided by cpu/tcg-target.inc.c.  */
++static void tcg_out_nop_fill(tcg_insn_unit *p, int count);
++
++static bool tcg_out_pool_finalize(TCGContext *s)
++{
++    TCGLabelPoolData *p = s->pool_labels;
++    tcg_target_ulong d, *a;
++
++    if (p == NULL) {
++        return true;
++    }
++
++    /* ??? Round up to qemu_icache_linesize, but then do not round
++       again when allocating the next TranslationBlock structure.  */
++    a = (void *)ROUND_UP((uintptr_t)s->code_ptr, sizeof(tcg_target_ulong));
++    tcg_out_nop_fill(s->code_ptr, (tcg_insn_unit *)a - s->code_ptr);
++    s->data_gen_ptr = a;
++
++    /* Ensure the first comparison fails.  */
++    d = p->data + 1;
++
++    for (; p != NULL; p = p->next) {
++        if (p->data != d) {
++            d = p->data;
++            if (unlikely((void *)a > s->code_gen_highwater)) {
++                return false;
++            }
++            *a++ = d;
++        }
++        patch_reloc(p->label, p->type, (intptr_t)(a - 1), p->addend);
++    }
++
++    s->code_ptr = (void *)a;
++    return true;
++}
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index dd74eabb0a..fd8a3dfe93 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -399,6 +399,7 @@ TranslationBlock *tcg_tb_alloc(TCGContext *s)
+         return NULL;
+     }
+     s->code_gen_ptr = next;
++    s->data_gen_ptr = NULL;
+     return tb;
+ }
+ 
+@@ -2619,6 +2620,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+ #ifdef TCG_TARGET_NEED_LDST_LABELS
+     s->ldst_labels = NULL;
+ #endif
++#ifdef TCG_TARGET_NEED_POOL_LABELS
++    s->pool_labels = NULL;
++#endif
+ 
+     num_insns = -1;
+     for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
+@@ -2698,6 +2702,11 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+         return -1;
+     }
+ #endif
++#ifdef TCG_TARGET_NEED_POOL_LABELS
++    if (!tcg_out_pool_finalize(s)) {
++        return -1;
++    }
++#endif
+ 
+     /* flush instruction cache */
+     flush_icache_range((uintptr_t)s->code_buf, (uintptr_t)s->code_ptr);
 -- 
 2.13.3
