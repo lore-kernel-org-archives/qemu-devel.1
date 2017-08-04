@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ddYYI-0001m1-PN
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:05:51 -0400
+	(envelope-from <lprosek@redhat.com>) id 1ddYlK-0007z3-RT
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ddYYH-00078o-Qf
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:05:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54126)
+	(envelope-from <lprosek@redhat.com>) id 1ddYlH-0006L6-NT
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:19:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ddYYH-00078K-KG
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:05:49 -0400
-Date: Fri, 4 Aug 2017 17:05:44 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170804090544.GP5561@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-29-git-send-email-peterx@redhat.com>
-	<20170803134744.GL2076@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170803134744.GL2076@work-vm>
-Subject: Re: [Qemu-devel] [RFC 28/29] migration: final handshake for the
- resume
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1ddYlH-0006Ib-Dp
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:19:15 -0400
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri,  4 Aug 2017 11:14:01 +0200
+Message-Id: <20170804091403.13478-2-lprosek@redhat.com>
+In-Reply-To: <20170804091403.13478-1-lprosek@redhat.com>
+References: <20170804091403.13478-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] i386/kvm: use a switch statement for MSR
+ detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +24,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, rkrcmar@redhat.com
 
-On Thu, Aug 03, 2017 at 02:47:44PM +0100, Dr. David Alan Gilbert wrote:
+Switch is easier on the eye and might lead to better codegen.
 
-[...]
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+---
+ target/i386/kvm.c | 76 +++++++++++++++++++++++--------------------------------
+ 1 file changed, 32 insertions(+), 44 deletions(-)
 
-> > +static int postcopy_resume_handshake(MigrationState *s)
-> > +{
-> > +    qemu_mutex_lock(&s->resume_lock);
-> > +
-> > +    qemu_savevm_send_postcopy_resume(s->to_dst_file);
-> > +
-> > +    while (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
-> > +        qemu_cond_wait(&s->resume_cond, &s->resume_lock);
-> > +    }
-> > +
-> > +    qemu_mutex_unlock(&s->resume_lock);
-> > +
-> > +    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> > +        return 0;
-> > +    }
-> 
-> That feels to be a small racy - couldn't that validly become a
-> MIGRATION_STATUS_COMPLETED before that check?
-
-Since postcopy_resume_handshake() is called in migration_thread()
-context, so it won't change to complete at this point (confirmed with
-Dave offlist on the question).
-
-> 
-> I wonder if we need to change migrate_fd_cancel to be able to
-> cause a cancel in this case?
-
-Yeah that's important, but haven't considered in current series. Do
-you mind to postpone it as TODO as well (along with the work to allow
-the user to manually switch to PAUSED state, as Dan suggested)?
-
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6db7783..ed119ca 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1081,66 +1081,54 @@ static int kvm_get_supported_msrs(KVMState *s)
+             int i;
+ 
+             for (i = 0; i < kvm_msr_list->nmsrs; i++) {
+-                if (kvm_msr_list->indices[i] == MSR_STAR) {
++                switch (kvm_msr_list->indices[i]) {
++                case MSR_STAR:
+                     has_msr_star = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_VM_HSAVE_PA) {
++                    break;
++                case MSR_VM_HSAVE_PA:
+                     has_msr_hsave_pa = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_TSC_AUX) {
++                    break;
++                case MSR_TSC_AUX:
+                     has_msr_tsc_aux = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_TSC_ADJUST) {
++                    break;
++                case MSR_TSC_ADJUST:
+                     has_msr_tsc_adjust = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_IA32_TSCDEADLINE) {
++                    break;
++                case MSR_IA32_TSCDEADLINE:
+                     has_msr_tsc_deadline = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_IA32_SMBASE) {
++                    break;
++                case MSR_IA32_SMBASE:
+                     has_msr_smbase = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_IA32_MISC_ENABLE) {
++                    break;
++                case MSR_IA32_MISC_ENABLE:
+                     has_msr_misc_enable = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_IA32_BNDCFGS) {
++                    break;
++                case MSR_IA32_BNDCFGS:
+                     has_msr_bndcfgs = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == MSR_IA32_XSS) {
++                    break;
++                case MSR_IA32_XSS:
+                     has_msr_xss = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == HV_X64_MSR_CRASH_CTL) {
++                    break;;
++                case HV_X64_MSR_CRASH_CTL:
+                     has_msr_hv_crash = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == HV_X64_MSR_RESET) {
++                    break;
++                case HV_X64_MSR_RESET:
+                     has_msr_hv_reset = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_INDEX) {
++                    break;
++                case HV_X64_MSR_VP_INDEX:
+                     has_msr_hv_vpindex = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_RUNTIME) {
++                    break;
++                case HV_X64_MSR_VP_RUNTIME:
+                     has_msr_hv_runtime = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == HV_X64_MSR_SCONTROL) {
++                    break;
++                case HV_X64_MSR_SCONTROL:
+                     has_msr_hv_synic = true;
+-                    continue;
+-                }
+-                if (kvm_msr_list->indices[i] == HV_X64_MSR_STIMER0_CONFIG) {
++                    break;
++                case HV_X64_MSR_STIMER0_CONFIG:
+                     has_msr_hv_stimer = true;
+-                    continue;
++                    break;
+                 }
++
+             }
+         }
+ 
 -- 
-Peter Xu
+2.9.3
