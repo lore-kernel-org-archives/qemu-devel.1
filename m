@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ddeJO-0005Uz-En
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:52 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ddeJP-0005Wp-Se
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ddeJL-0007F8-Sj
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:50 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:19287 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ddeJM-0007GW-R8
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:51 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:47517 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1ddeJL-0007Bw-G9
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:47 -0400
+	id 1ddeJM-00078e-Aq
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:48 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  4 Aug 2017 18:14:39 +0300
-Message-Id: <20170804151440.320927-17-vsementsov@virtuozzo.com>
+Date: Fri,  4 Aug 2017 18:14:30 +0300
+Message-Id: <20170804151440.320927-8-vsementsov@virtuozzo.com>
 In-Reply-To: <20170804151440.320927-1-vsementsov@virtuozzo.com>
 References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 16/17] block/nbd-client: drop reply field from
- NBDClientSession
+Subject: [Qemu-devel] [PATCH 07/17] block/nbd-client: refactor request
+ send/receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +28,206 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Drop 'reply' from NBDClientSession. It's usage is not very transparent:
+Move nbd_co_receive_reply and nbd_coroutine_end calls into
+nbd_co_send_request and rename the latter to just nbd_co_request.
 
-1. it is used to deliver error to receiving coroutine, and receiving
-   coroutine must save or handle it somehow and then zero out
-   it in NBDClientSession.
-2. it is used to inform receiving coroutines that nbd_read_reply_entry
-   is out for some reason (error or disconnect)
-
-To simplify this scheme:
-- drop NBDClientSession.reply
-- introduce NBDClientSession.requests[...].ret for (1)
-- introduce NBDClientSession.eio_to_all for (2)
+This removes code duplications in nbd_client_co_{pwrite,pread,...}
+functions. Also this is needed for further refactoring.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd-client.h |  3 ++-
- block/nbd-client.c | 25 ++++++++++---------------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+ block/nbd-client.c | 89 ++++++++++++++++++++----------------------------------
+ 1 file changed, 33 insertions(+), 56 deletions(-)
 
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index 0f84ccc073..0b0aa67342 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -31,8 +31,9 @@ typedef struct NBDClientSession {
-         Coroutine *co;
-         NBDRequest *request;
-         QEMUIOVector *qiov;
-+        int ret;
-     } requests[MAX_NBD_REQUESTS];
--    NBDReply reply;
-+    bool eio_to_all;
- } NBDClientSession;
- 
- NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
 diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 61780c5df9..7c151b3dd3 100644
+index 0c88d84de6..c9ade9b517 100644
 --- a/block/nbd-client.c
 +++ b/block/nbd-client.c
-@@ -72,10 +72,10 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-     uint64_t i;
-     int ret;
-     Error *local_err = NULL;
-+    NBDReply reply;
- 
-     for (;;) {
--        assert(s->reply.handle == 0);
--        ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
-+        ret = nbd_receive_reply(s->ioc, &reply, &local_err);
-         if (ret < 0) {
-             error_report_err(local_err);
-         }
-@@ -87,16 +87,14 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-          * handler acts as a synchronization point and ensures that only
-          * one coroutine is called until the reply finishes.
-          */
--        i = HANDLE_TO_INDEX(s, s->reply.handle);
-+        i = HANDLE_TO_INDEX(s, reply.handle);
-         if (i >= MAX_NBD_REQUESTS || !s->requests[i].co ||
--            s->reply.handle != s->requests[i].request->handle)
-+            reply.handle != s->requests[i].request->handle)
-         {
-             break;
-         }
- 
--        if (s->reply.error == 0 &&
--            s->requests[i].request->type == NBD_CMD_READ)
--        {
-+        if (reply.error == 0 && s->requests[i].request->type == NBD_CMD_READ) {
-             assert(s->requests[i].qiov != NULL);
-             ret = nbd_rwv(s->ioc, s->requests[i].qiov->iov,
-                           s->requests[i].qiov->niov,
-@@ -106,6 +104,8 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-             }
-         }
- 
-+        s->requests[i].ret = -reply.error;
-+
-         /* We're woken up by the receiving coroutine itself.  Note that there
-          * is no race between yielding and reentering read_reply_co.  This
-          * is because:
-@@ -121,7 +121,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-         qemu_coroutine_yield();
-     }
- 
--    s->reply.handle = 0;
-+    s->eio_to_all = true;
-     nbd_recv_coroutines_wake_all(s);
+@@ -112,12 +112,20 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
      s->read_reply_co = NULL;
  }
-@@ -180,19 +180,14 @@ static int nbd_co_request(BlockDriverState *bs,
  
-     /* Wait until we're woken up by nbd_read_reply_entry.  */
-     qemu_coroutine_yield();
--    if (!s->ioc || s->reply.handle == 0) {
-+    if (!s->ioc || s->eio_to_all) {
-         rc = -EIO;
-         goto out;
+-static int nbd_co_send_request(BlockDriverState *bs,
+-                               NBDRequest *request,
+-                               QEMUIOVector *qiov)
++static void nbd_co_receive_reply(NBDClientSession *s,
++                                 NBDRequest *request,
++                                 NBDReply *reply,
++                                 QEMUIOVector *qiov);
++static void nbd_coroutine_end(BlockDriverState *bs,
++                              NBDRequest *request);
++
++static int nbd_co_request(BlockDriverState *bs,
++                          NBDRequest *request,
++                          QEMUIOVector *qiov)
+ {
+     NBDClientSession *s = nbd_get_client_session(bs);
+     int rc, ret, i;
++    NBDReply reply;
+ 
+     qemu_co_mutex_lock(&s->send_mutex);
+     while (s->in_flight == MAX_NBD_REQUESTS) {
+@@ -141,7 +149,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         return -EPIPE;
      }
  
--    assert(s->reply.handle == request->handle);
--
--    rc = -s->reply.error;
-+    rc = s->requests[i].ret;
+-    if (qiov) {
++    if (request->type == NBD_CMD_WRITE) {
++        assert(qiov != NULL);
+         qio_channel_set_cork(s->ioc, true);
+         rc = nbd_send_request(s->ioc, request);
+         if (rc >= 0) {
+@@ -156,6 +165,21 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         rc = nbd_send_request(s->ioc, request);
+     }
+     qemu_co_mutex_unlock(&s->send_mutex);
++
++    if (rc < 0) {
++        goto out;
++    }
++
++    if (request->type == NBD_CMD_READ) {
++        assert(qiov != NULL);
++    } else {
++        qiov = NULL;
++    }
++    nbd_co_receive_reply(s, request, &reply, qiov);
++    rc = -reply.error;
++
++out:
++    nbd_coroutine_end(bs, request);
+     return rc;
+ }
  
- out:
--    /* Tell the read handler to read another header.  */
--    s->reply.handle = 0;
--
-     s->requests[i].co = NULL;
+@@ -208,26 +232,16 @@ static void nbd_coroutine_end(BlockDriverState *bs,
+ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+                          uint64_t bytes, QEMUIOVector *qiov, int flags)
+ {
+-    NBDClientSession *client = nbd_get_client_session(bs);
+     NBDRequest request = {
+         .type = NBD_CMD_READ,
+         .from = offset,
+         .len = bytes,
+     };
+-    NBDReply reply;
+-    int ret;
  
-     /* Kick the read_reply_co to get the next reply.  */
+     assert(bytes <= NBD_MAX_BUFFER_SIZE);
+     assert(!flags);
+ 
+-    ret = nbd_co_send_request(bs, &request, NULL);
+-    if (ret < 0) {
+-        reply.error = -ret;
+-    } else {
+-        nbd_co_receive_reply(client, &request, &reply, qiov);
+-    }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    return nbd_co_request(bs, &request, qiov);
+ }
+ 
+ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+@@ -239,8 +253,6 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+         .from = offset,
+         .len = bytes,
+     };
+-    NBDReply reply;
+-    int ret;
+ 
+     if (flags & BDRV_REQ_FUA) {
+         assert(client->info.flags & NBD_FLAG_SEND_FUA);
+@@ -249,27 +261,18 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+ 
+     assert(bytes <= NBD_MAX_BUFFER_SIZE);
+ 
+-    ret = nbd_co_send_request(bs, &request, qiov);
+-    if (ret < 0) {
+-        reply.error = -ret;
+-    } else {
+-        nbd_co_receive_reply(client, &request, &reply, NULL);
+-    }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    return nbd_co_request(bs, &request, qiov);
+ }
+ 
+ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+                                 int bytes, BdrvRequestFlags flags)
+ {
+-    int ret;
+     NBDClientSession *client = nbd_get_client_session(bs);
+     NBDRequest request = {
+         .type = NBD_CMD_WRITE_ZEROES,
+         .from = offset,
+         .len = bytes,
+     };
+-    NBDReply reply;
+ 
+     if (!(client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES)) {
+         return -ENOTSUP;
+@@ -283,22 +286,13 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+         request.flags |= NBD_CMD_FLAG_NO_HOLE;
+     }
+ 
+-    ret = nbd_co_send_request(bs, &request, NULL);
+-    if (ret < 0) {
+-        reply.error = -ret;
+-    } else {
+-        nbd_co_receive_reply(client, &request, &reply, NULL);
+-    }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    return nbd_co_request(bs, &request, NULL);
+ }
+ 
+ int nbd_client_co_flush(BlockDriverState *bs)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+     NBDRequest request = { .type = NBD_CMD_FLUSH };
+-    NBDReply reply;
+-    int ret;
+ 
+     if (!(client->info.flags & NBD_FLAG_SEND_FLUSH)) {
+         return 0;
+@@ -307,14 +301,7 @@ int nbd_client_co_flush(BlockDriverState *bs)
+     request.from = 0;
+     request.len = 0;
+ 
+-    ret = nbd_co_send_request(bs, &request, NULL);
+-    if (ret < 0) {
+-        reply.error = -ret;
+-    } else {
+-        nbd_co_receive_reply(client, &request, &reply, NULL);
+-    }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    return nbd_co_request(bs, &request, NULL);
+ }
+ 
+ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+@@ -325,22 +312,12 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+         .from = offset,
+         .len = bytes,
+     };
+-    NBDReply reply;
+-    int ret;
+ 
+     if (!(client->info.flags & NBD_FLAG_SEND_TRIM)) {
+         return 0;
+     }
+ 
+-    ret = nbd_co_send_request(bs, &request, NULL);
+-    if (ret < 0) {
+-        reply.error = -ret;
+-    } else {
+-        nbd_co_receive_reply(client, &request, &reply, NULL);
+-    }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
+-
++    return nbd_co_request(bs, &request, NULL);
+ }
+ 
+ void nbd_client_detach_aio_context(BlockDriverState *bs)
 -- 
 2.11.1
