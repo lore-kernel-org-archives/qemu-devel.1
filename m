@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddRNl-000082-Jc
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddRNq-0000Cr-2h
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddRNj-0004W0-4O
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddRNm-0004eu-Gf
+	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 21:26:34 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  3 Aug 2017 20:25:45 -0500
-Message-Id: <20170804012551.2714-17-eblake@redhat.com>
+Date: Thu,  3 Aug 2017 20:25:46 -0500
+Message-Id: <20170804012551.2714-18-eblake@redhat.com>
 In-Reply-To: <20170804012551.2714-1-eblake@redhat.com>
 References: <20170804012551.2714-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 16/22] libqtest: Add qmp_cmd() helper
+Subject: [Qemu-devel] [PATCH v4 17/22] libqtest: Add qmp_args() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,440 +20,860 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, John Snow <jsnow@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Jason Wang <jasowang@redhat.com>, Ben Warren <ben@skyportsystems.com>, "open list:IDE" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, John Snow <jsnow@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, "open list:IDE" <qemu-block@nongnu.org>
 
-Now that we've asserted that all of our interpolated QMP commands
-include 'execute', we can reduce some of the caller boilerplate
-by providing a helpr function to wrap commands with no arguments
-(later patches will cover commands with arguments).
-
-Adjust all callers that can use the new helpers; in the process,
-fixing a couple of places where we would have failed
--Wformat-nonliteral.  Likewise, libqos.c no longer needs
-qmp_execute(), which in turn fixes the fact that it is better
-to interpolate JSON strings through qobject_from_json() than
-through sprintf().
-
-The current name is long, but temporary: later patches will
-remove all other uses of qmp(), and then make the mass rename
-of qmp_cmd() down to qmp().
+Similar to the previous helper, we can reduce the boilerplate
+of most callers by passing the command name separately from
+the interpolated arguments.  Adjust the majority of the callers
+that can use the new helpers; in the process, fixing a few
+places where we would have failed -Wformat-nonliteral.  The
+new helper function already uses GCC_FMT_ATTR to match the
+underlying use of qobject_from_jsonv().
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h               | 16 ++++++++++++++++
- tests/libqtest.c               | 13 ++++++++++++-
- tests/ahci-test.c              |  4 +---
- tests/boot-order-test.c        |  2 +-
- tests/ide-test.c               |  2 +-
- tests/libqos/ahci.c            |  4 ++--
- tests/libqos/libqos.c          | 16 ++--------------
- tests/numa-test.c              |  2 +-
- tests/postcopy-test.c          |  8 ++++----
- tests/q35-test.c               |  2 +-
- tests/qmp-test.c               |  8 ++++----
- tests/qom-test.c               |  2 +-
- tests/test-filter-mirror.c     |  2 +-
- tests/test-filter-redirector.c |  4 ++--
- tests/test-x86-cpuid-compat.c  |  2 +-
- tests/virtio-net-test.c        | 13 ++++++-------
- tests/vmgenid-test.c           |  2 +-
- tests/wdt_ib700-test.c         |  2 +-
- 18 files changed, 58 insertions(+), 46 deletions(-)
+ tests/libqtest.h               |  20 ++++++
+ tests/libqtest.c               |  29 +++++++++
+ tests/ahci-test.c              |  19 +++---
+ tests/device-introspect-test.c |   4 +-
+ tests/drive_del-test.c         |  10 +--
+ tests/fdc-test.c               |   8 +--
+ tests/libqos/libqos.c          |   7 +--
+ tests/libqos/pci-pc.c          |   8 +--
+ tests/pc-cpu-test.c            |   8 +--
+ tests/postcopy-test.c          |  30 +++------
+ tests/qom-test.c               |   9 +--
+ tests/test-netfilter.c         | 139 ++++++++++++++++-------------------------
+ tests/test-x86-cpuid-compat.c  |   6 +-
+ tests/tmp105-test.c            |   9 +--
+ tests/usb-hcd-uhci-test.c      |  14 ++---
+ tests/usb-hcd-xhci-test.c      |  25 ++------
+ tests/vhost-user-test.c        |  12 +---
+ tests/virtio-blk-test.c        |  12 +---
+ tests/virtio-scsi-test.c       |  13 +---
+ tests/virtio-serial-test.c     |  12 +---
+ 20 files changed, 167 insertions(+), 227 deletions(-)
 
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 684cfb3507..e0d87d035a 100644
+index e0d87d035a..86ca7fa581 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -483,6 +483,22 @@ QDict *qmp_raw(const char *msg);
- void qmp_async(const char *fmt, ...);
+@@ -499,6 +499,26 @@ QDict *qmp_cmd(const char *cmd);
+ void qmp_cmd_async(const char *cmd);
 
  /**
-+ * qmp_cmd:
-+ * @cmd: QMP command, with no arguments.
++ * qmp_args:
++ * @cmd: QMP command to send to QEMU.
++ * @fmt...: Arguments for the command; formats arguments through
++ * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
 + *
 + * Sends a QMP message to QEMU and returns the response.
 + */
-+QDict *qmp_cmd(const char *cmd);
++QDict *qmp_args(const char *cmd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
 +
 +/**
-+ * qmp_cmd_async:
-+ * @cmd: QMP command, with no arguments.
++ * qmp_args_async:
++ * @cmd: QMP command to send to QEMU.
++ * @fmt...: Arguments for the command; formats arguments through
++ * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
 + *
 + * Sends a QMP message to QEMU and leaves the response in the stream.
 + */
-+void qmp_cmd_async(const char *cmd);
++void qmp_args_async(const char *cmd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
 +
 +/**
   * qmp_discard_response:
   *
   * Read and discard a QMP response, typically after qmp_async().
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 2df01682c0..3926a4d481 100644
+index 3926a4d481..49786cf2d7 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -858,6 +858,17 @@ void qmp_async(const char *fmt, ...)
-     va_end(ap);
+@@ -869,6 +869,35 @@ void qmp_cmd_async(const char *cmd)
+     qtest_qmp_send(global_qtest, "{'execute':%s}", cmd);
  }
 
-+QDict *qmp_cmd(const char *cmd)
++static void qmp_args_dict_async(const char *cmd, QDict *args)
 +{
-+    qmp_cmd_async(cmd);
++    assert(args);
++    qtest_qmp_send(global_qtest, "{'execute':%s, 'arguments':%p}", cmd, args);
++}
++
++QDict *qmp_args(const char *cmd, const char *fmt, ...)
++{
++    va_list ap;
++    QObject *obj;
++
++    va_start(ap, fmt);
++    obj = qobject_from_jsonv(fmt, ap);
++    va_end(ap);
++    qmp_args_dict_async(cmd, qobject_to_qdict(obj));
 +    return qtest_qmp_receive(global_qtest);
 +}
 +
-+void qmp_cmd_async(const char *cmd)
++void qmp_args_async(const char *cmd, const char *fmt, ...)
 +{
-+    qtest_qmp_send(global_qtest, "{'execute':%s}", cmd);
++    va_list ap;
++    QObject *obj;
++
++    va_start(ap, fmt);
++    obj = qobject_from_jsonv(fmt, ap);
++    va_end(ap);
++    qmp_args_dict_async(cmd, qobject_to_qdict(obj));
 +}
 +
  void qmp_discard_response(void)
  {
      QDict *response = qtest_qmp_receive(global_qtest);
-@@ -890,7 +901,7 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
-     const char *mname;
-
-     qtest_start("-machine none");
--    response = qmp("{ 'execute': 'query-machines' }");
-+    response = qmp_cmd("query-machines");
-     g_assert(response);
-     list = qdict_get_qlist(response, "return");
-     g_assert(list);
 diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index 9460843a9f..63d52edfca 100644
+index 63d52edfca..ee8a539cf6 100644
 --- a/tests/ahci-test.c
 +++ b/tests/ahci-test.c
-@@ -1350,7 +1350,6 @@ static void test_flush_migrate(void)
-     AHCIQState *src, *dst;
-     AHCICommand *cmd;
-     uint8_t px;
--    const char *s;
-     char *uri = g_strdup_printf("unix:%s", mig_socket);
+@@ -1588,14 +1588,12 @@ static void test_atapi_tray(void)
+     atapi_wait_tray(false);
 
-     prepare_blkdebug_script(debug_path, "flush_to_disk");
-@@ -1386,8 +1385,7 @@ static void test_flush_migrate(void)
-     ahci_migrate(src, dst, uri);
+     /* Remove media */
+-    qmp_async("{'execute': 'blockdev-open-tray', "
+-               "'arguments': {'device': 'drive0'}}");
++    qmp_args_async("blockdev-open-tray", "{'device': 'drive0'}");
+     atapi_wait_tray(true);
+     rsp = qmp_receive();
+     QDECREF(rsp);
 
-     /* Complete the command */
--    s = "{'execute':'cont' }";
--    qmp_async(s);
-+    qmp_cmd_async("cont");
-     qmp_eventwait("RESUME");
-     ahci_command_wait(dst, cmd);
-     ahci_command_verify(dst, cmd);
-diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
-index 4114720236..0be3333e6b 100644
---- a/tests/boot-order-test.c
-+++ b/tests/boot-order-test.c
-@@ -38,7 +38,7 @@ static void test_a_boot_order(const char *machine,
-     qtest_start(args);
-     actual = read_boot_order();
-     g_assert_cmphex(actual, ==, expected_boot);
--    qmp_async("{ 'execute': 'system_reset' }");
-+    qmp_cmd_async("system_reset");
-     /*
-      * system_reset only requests reset.  We get a RESET event after
-      * the actual reset completes.  Need to wait for that.
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 757af7cd1d..56a02b1c7f 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -651,7 +651,7 @@ static void test_retry_flush(const char *machine)
-     qmp_eventwait("STOP");
-
-     /* Complete the command */
--    qmp_async("{'execute':'cont' }");
-+    qmp_cmd_async("cont");
+-    qmp_async("{'execute': 'x-blockdev-remove-medium', "
+-              "'arguments': {'device': 'drive0'}}");
++    qmp_args_async("x-blockdev-remove-medium", "{'device': 'drive0'}");
      qmp_discard_response();
 
-     /* Check registers */
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 1ca7f456b5..06b9ce3a13 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -668,7 +668,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-         g_assert_cmpint(rc, ==, 0);
-     }
-     if (opts->error) {
--        qmp_async("{'execute':'cont' }");
-+        qmp_cmd_async("cont");
-         qmp_eventwait("RESUME");
-     }
+     /* Test the tray without a medium */
+@@ -1606,17 +1604,16 @@ static void test_atapi_tray(void)
+     atapi_wait_tray(true);
 
-@@ -706,7 +706,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
- void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
- {
-     /* Complete the command */
--    qmp_async("{'execute':'cont' }");
-+    qmp_cmd_async("cont");
-     qmp_eventwait("RESUME");
-     ahci_command_wait(ahci, cmd);
-     ahci_command_verify(ahci, cmd);
+     /* Re-insert media */
+-    qmp_async("{'execute': 'blockdev-add', 'arguments': {"
+-              "  'node-name': 'node0', 'driver': 'raw', "
+-              "  'file': { 'driver': 'file', 'filename': %s }}}", iso);
++    qmp_args_async("blockdev-add", "{'node-name': 'node0', "
++                   "'driver': 'raw', "
++                   "'file': { 'driver': 'file', 'filename': %s }}", iso);
+     qmp_discard_response();
+-    qmp_async("{'execute': 'x-blockdev-insert-medium',"
+-              "'arguments': { 'device': 'drive0', 'node-name': 'node0' }}");
++    qmp_args_async("x-blockdev-insert-medium",
++                   "{ 'device': 'drive0', 'node-name': 'node0' }");
+     qmp_discard_response();
+
+     /* Again, the event shows up first */
+-    qmp_async("{'execute': 'blockdev-close-tray', "
+-               "'arguments': {'device': 'drive0'}}");
++    qmp_args_async("blockdev-close-tray", "{'device': 'drive0'}");
+     atapi_wait_tray(false);
+     rsp = qmp_receive();
+     QDECREF(rsp);
+diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+index f7162c023f..e1fcd3b6c6 100644
+--- a/tests/device-introspect-test.c
++++ b/tests/device-introspect-test.c
+@@ -105,9 +105,7 @@ static void test_one_device(const char *type)
+     QDict *resp;
+     char *help, *qom_tree;
+
+-    resp = qmp("{'execute': 'device-list-properties',"
+-               " 'arguments': {'typename': %s}}",
+-               type);
++    resp = qmp_args("device-list-properties", "{'typename': %s}", type);
+     QDECREF(resp);
+
+     help = hmp("device_add \"%s,help\"", type);
+diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
+index 834a634da3..442eb35c2b 100644
+--- a/tests/drive_del-test.c
++++ b/tests/drive_del-test.c
+@@ -34,8 +34,7 @@ static void device_del(void)
+     QDict *response;
+
+     /* Complication: ignore DEVICE_DELETED event */
+-    qmp_async("{'execute': 'device_del',"
+-              " 'arguments': { 'id': 'dev0' } }");
++    qmp_args_async("device_del", "{ 'id': 'dev0' }");
+     qmp_discard_response();
+     response = qmp_receive();
+     g_assert(response);
+@@ -69,11 +68,8 @@ static void test_after_failed_device_add(void)
+     /* Make device_add fail.  If this leaks the virtio-blk-pci device then a
+      * reference to drive0 will also be held (via qdev properties).
+      */
+-    response = qmp("{'execute': 'device_add',"
+-                   " 'arguments': {"
+-                   "   'driver': 'virtio-blk-pci',"
+-                   "   'drive': 'drive0'"
+-                   "}}");
++    response = qmp_args("device_add",
++                        "{'driver': 'virtio-blk-pci', 'drive': 'drive0'}");
+     g_assert(response);
+     error = qdict_get_qdict(response, "error");
+     g_assert_cmpstr(qdict_get_try_str(error, "class"), ==, "GenericError");
+diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+index ab61a82873..9999e5f5c4 100644
+--- a/tests/fdc-test.c
++++ b/tests/fdc-test.c
+@@ -298,9 +298,9 @@ static void test_media_insert(void)
+
+     /* Insert media in drive. DSKCHK should not be reset until a step pulse
+      * is sent. */
+-    qmp_async("{'execute':'blockdev-change-medium', 'arguments':{"
+-              " 'id':'floppy0', 'filename': %s, 'format': 'raw' }}",
+-              test_image);
++    qmp_args_async("blockdev-change-medium",
++                   "{'id':'floppy0', 'filename': %s, 'format': 'raw' }",
++                   test_image);
+     qmp_discard_response();
+
+     dir = inb(FLOPPY_BASE + reg_dir);
+@@ -330,7 +330,7 @@ static void test_media_change(void)
+
+     /* Eject the floppy and check that DSKCHG is set. Reading it out doesn't
+      * reset the bit. */
+-    qmp_async("{'execute':'eject', 'arguments':{ 'id':'floppy0' }}");
++    qmp_args_async("eject", "{ 'id':'floppy0' }");
+     qmp_discard_response();
+
+     dir = inb(FLOPPY_BASE + reg_dir);
 diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 6226546c28..246a04d6e6 100644
+index 246a04d6e6..ba2707f89e 100644
 --- a/tests/libqos/libqos.c
 +++ b/tests/libqos/libqos.c
-@@ -84,18 +84,6 @@ void set_context(QOSState *s)
-     global_qtest = s->qts;
- }
-
--static QDict *qmp_execute(const char *command)
--{
--    char *fmt;
--    QDict *rsp;
--
--    fmt = g_strdup_printf("{ 'execute': '%s' }", command);
--    rsp = qmp(fmt);
--    g_free(fmt);
--
--    return rsp;
--}
--
+@@ -87,7 +87,6 @@ void set_context(QOSState *s)
  void migrate(QOSState *from, QOSState *to, const char *uri)
  {
      const char *st;
-@@ -106,7 +94,7 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
-     set_context(from);
+-    char *s;
+     QDict *rsp, *sub;
+     bool running;
 
-     /* Is the machine currently running? */
--    rsp = qmp_execute("query-status");
-+    rsp = qmp_cmd("query-status");
-     g_assert(qdict_haskey(rsp, "return"));
-     sub = qdict_get_qdict(rsp, "return");
-     g_assert(qdict_haskey(sub, "running"));
-@@ -137,7 +125,7 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
+@@ -102,11 +101,7 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
+     QDECREF(rsp);
 
-     /* Otherwise, we need to wait: poll until migration is completed. */
-     while (1) {
--        rsp = qmp_execute("query-migrate");
-+        rsp = qmp_cmd("query-migrate");
-         g_assert(qdict_haskey(rsp, "return"));
-         sub = qdict_get_qdict(rsp, "return");
-         g_assert(qdict_haskey(sub, "status"));
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index e1b6152244..d98500012f 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -74,7 +74,7 @@ static void test_mon_partial(const void *data)
-
- static QList *get_cpus(QDict **resp)
- {
--    *resp = qmp("{ 'execute': 'query-cpus' }");
-+    *resp = qmp_cmd("query-cpus");
-     g_assert(*resp);
-     g_assert(qdict_haskey(*resp, "return"));
-     return qdict_get_qlist(*resp, "return");
-diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-index 61f4b4180a..6f7f81eccd 100644
---- a/tests/postcopy-test.c
-+++ b/tests/postcopy-test.c
-@@ -252,7 +252,7 @@ static uint64_t get_migration_pass(void)
-     QDict *rsp, *rsp_return, *rsp_ram;
-     uint64_t result;
-
--    rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+    rsp = return_or_event(qmp_cmd("query-migrate"));
-     rsp_return = qdict_get_qdict(rsp, "return");
-     if (!qdict_haskey(rsp_return, "ram")) {
-         /* Still in setup */
-@@ -273,7 +273,7 @@ static void wait_for_migration_complete(void)
-     do {
-         const char *status;
-
--        rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+        rsp = return_or_event(qmp_cmd("query-migrate"));
-         rsp_return = qdict_get_qdict(rsp, "return");
-         status = qdict_get_str(rsp_return, "status");
-         completed = strcmp(status, "completed") == 0;
-@@ -455,7 +455,7 @@ static void test_migrate(void)
-
-     wait_for_migration_pass();
-
--    rsp = return_or_event(qmp("{ 'execute': 'migrate-start-postcopy' }"));
-+    rsp = return_or_event(qmp_cmd("migrate-start-postcopy"));
+     /* Issue the migrate command. */
+-    s = g_strdup_printf("{ 'execute': 'migrate',"
+-                        "'arguments': { 'uri': '%s' } }",
+-                        uri);
+-    rsp = qmp(s);
+-    g_free(s);
++    rsp = qmp_args("migrate", "{'uri': %s}", uri);
      g_assert(qdict_haskey(rsp, "return"));
      QDECREF(rsp);
 
-@@ -482,7 +482,7 @@ static void test_migrate(void)
-         usleep(10 * 1000);
-     } while (dest_byte_a == dest_byte_b);
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index 02ce49927a..b4790650ab 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -159,14 +159,8 @@ void qpci_free_pc(QPCIBus *bus)
+ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
+ {
+     QDict *response;
+-    char *cmd;
 
--    qmp_async("{ 'execute' : 'stop'}");
-+    qmp_cmd_async("stop");
-     qmp_discard_response();
-     /* With it stopped, check nothing changes */
-     qtest_memread(to, start_address, &dest_byte_c, 1);
-diff --git a/tests/q35-test.c b/tests/q35-test.c
-index f98bed7a2d..122872b90d 100644
---- a/tests/q35-test.c
-+++ b/tests/q35-test.c
-@@ -105,7 +105,7 @@ static void test_smram_lock(void)
-     g_assert(smram_test_bit(pcidev, MCH_HOST_BRIDGE_SMRAM_D_OPEN) == false);
-
-     /* reset */
--    response = qmp("{'execute': 'system_reset', 'arguments': {} }");
-+    response = qmp_cmd("system_reset");
+-    cmd = g_strdup_printf("{'execute': 'device_del',"
+-                          " 'arguments': {"
+-                          "   'id': '%s'"
+-                          "}}", id);
+-    response = qmp(cmd);
+-    g_free(cmd);
++    response = qmp_args("device_del", "{'id': %s}", id);
      g_assert(response);
      g_assert(!qdict_haskey(response, "error"));
      QDECREF(response);
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 905fb4b3e5..082c5f7e8d 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -92,7 +92,7 @@ static void test_qmp_protocol(void)
-     QDECREF(resp);
+diff --git a/tests/pc-cpu-test.c b/tests/pc-cpu-test.c
+index c4211a4e85..d4ea7ec612 100644
+--- a/tests/pc-cpu-test.c
++++ b/tests/pc-cpu-test.c
+@@ -37,8 +37,7 @@ static void test_pc_with_cpu_add(gconstpointer data)
+     qtest_start(args);
 
-     /* Test valid command before handshake */
--    resp = qmp("{ 'execute': 'query-version' }");
-+    resp = qmp_cmd("query-version");
-     g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
-     QDECREF(resp);
+     for (i = s->sockets * s->cores * s->threads; i < s->maxcpus; i++) {
+-        response = qmp("{ 'execute': 'cpu-add',"
+-                       "  'arguments': { 'id': %d } }", i);
++        response = qmp_args("cpu-add", "{ 'id': %d }", i);
+         g_assert(response);
+         g_assert(!qdict_haskey(response, "error"));
+         QDECREF(response);
+@@ -60,9 +59,8 @@ static void test_pc_without_cpu_add(gconstpointer data)
+                            s->sockets, s->cores, s->threads, s->maxcpus);
+     qtest_start(args);
 
-@@ -100,18 +100,18 @@ static void test_qmp_protocol(void)
-     test_malformed();
+-    response = qmp("{ 'execute': 'cpu-add',"
+-                   "  'arguments': { 'id': %d } }",
+-                   s->sockets * s->cores * s->threads);
++    response = qmp_args("cpu-add", "{ 'id': %d }",
++                        s->sockets * s->cores * s->threads);
+     g_assert(response);
+     g_assert(qdict_haskey(response, "error"));
+     QDECREF(response);
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index 6f7f81eccd..4e585006a8 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -358,7 +358,7 @@ static void test_migrate(void)
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *global = global_qtest, *from, *to;
+     unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
+-    gchar *cmd, *cmd_src, *cmd_dst;
++    gchar *cmd_src, *cmd_dst;
+     QDict *rsp;
 
-     /* Test handshake */
--    resp = qmp("{ 'execute': 'qmp_capabilities' }");
-+    resp = qmp_cmd("qmp_capabilities");
-     ret = qdict_get_qdict(resp, "return");
-     g_assert(ret && !qdict_size(ret));
-     QDECREF(resp);
+     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+@@ -408,20 +408,16 @@ static void test_migrate(void)
+     g_free(cmd_dst);
 
-     /* Test repeated handshake */
--    resp = qmp("{ 'execute': 'qmp_capabilities' }");
-+    resp = qmp_cmd("qmp_capabilities");
-     g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
-     QDECREF(resp);
+     global_qtest = from;
+-    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
+-                  "'arguments': { "
+-                      "'capabilities': [ {"
+-                          "'capability': 'postcopy-ram',"
+-                          "'state': true } ] } }");
++    rsp = qmp_args("migrate-set-capabilities",
++                   "{'capabilities': ["
++                   "  {'capability': 'postcopy-ram', 'state': true } ] }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
 
-     /* Test valid command */
--    resp = qmp("{ 'execute': 'query-version' }");
-+    resp = qmp_cmd("query-version");
-     test_version(qdict_get(resp, "return"));
-     QDECREF(resp);
+     global_qtest = to;
+-    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
+-                  "'arguments': { "
+-                      "'capabilities': [ {"
+-                          "'capability': 'postcopy-ram',"
+-                          "'state': true } ] } }");
++    rsp = qmp_args("migrate-set-capabilities",
++                   "{'capabilities': ["
++                   "  {'capability': 'postcopy-ram', 'state': true } ] }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+@@ -430,14 +426,12 @@ static void test_migrate(void)
+      * machine, so also set the downtime.
+      */
+     global_qtest = from;
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 100000000 } }");
++    rsp = qmp_args("migrate_set_speed", "{ 'value': 100000000 }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+     /* 1ms downtime - it should never finish precopy */
+-    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
+-              "'arguments': { 'value': 0.001 } }");
++    rsp = qmp_args("migrate_set_downtime", "{ 'value': 0.001 }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+@@ -445,11 +439,7 @@ static void test_migrate(void)
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp = qmp(cmd);
+-    g_free(cmd);
++    rsp = qmp_args("migrate", "{'uri':%s}", uri);
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
 
 diff --git a/tests/qom-test.c b/tests/qom-test.c
-index ab0595dc75..369972629a 100644
+index 369972629a..3c315cf864 100644
 --- a/tests/qom-test.c
 +++ b/tests/qom-test.c
-@@ -98,7 +98,7 @@ static void test_machine(gconstpointer data)
+@@ -51,8 +51,7 @@ static void test_properties(const char *path, bool recurse)
+     QListEntry *entry;
 
-     test_properties("/machine", true);
+     g_test_message("Obtaining properties of %s", path);
+-    response = qmp("{ 'execute': 'qom-list',"
+-                   "  'arguments': { 'path': %s } }", path);
++    response = qmp_args("qom-list", "{ 'path': %s }", path);
+     g_assert(response);
 
--    response = qmp("{ 'execute': 'quit' }");
-+    response = qmp_cmd("quit");
-     g_assert(qdict_haskey(response, "return"));
+     if (!recurse) {
+@@ -75,10 +74,8 @@ static void test_properties(const char *path, bool recurse)
+         } else {
+             const char *prop = qdict_get_str(tuple, "name");
+             g_test_message("Testing property %s.%s", path, prop);
+-            tmp = qmp("{ 'execute': 'qom-get',"
+-                      "  'arguments': { 'path': %s,"
+-                      "                 'property': %s } }",
+-                      path, prop);
++            tmp = qmp_args("qom-get", "{ 'path': %s, 'property': %s }",
++                           path, prop);
+             /* qom-get may fail but should not, e.g., segfault. */
+             g_assert(tmp);
+             QDECREF(tmp);
+diff --git a/tests/test-netfilter.c b/tests/test-netfilter.c
+index 8b5a9b21b5..736abc26ec 100644
+--- a/tests/test-netfilter.c
++++ b/tests/test-netfilter.c
+@@ -16,24 +16,20 @@ static void add_one_netfilter(void)
+ {
+     QDict *response;
+
+-    response = qmp("{'execute': 'object-add',"
+-                   " 'arguments': {"
+-                   "   'qom-type': 'filter-buffer',"
+-                   "   'id': 'qtest-f0',"
+-                   "   'props': {"
+-                   "     'netdev': 'qtest-bn0',"
+-                   "     'queue': 'rx',"
+-                   "     'interval': 1000"
+-                   "}}}");
++    response = qmp_args("object-add",
++                        "{ 'qom-type': 'filter-buffer',"
++                        "  'id': 'qtest-f0',"
++                        "  'props': {"
++                        "     'netdev': 'qtest-bn0',"
++                        "     'queue': 'rx',"
++                        "     'interval': 1000"
++                        "}}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
      QDECREF(response);
 
-diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
-index 79c5306fe7..0fb87c124d 100644
---- a/tests/test-filter-mirror.c
-+++ b/tests/test-filter-mirror.c
-@@ -57,7 +57,7 @@ static void test_mirror(void)
-     };
+-    response = qmp("{'execute': 'object-del',"
+-                   " 'arguments': {"
+-                   "   'id': 'qtest-f0'"
+-                   "}}");
++    response = qmp_args("object-del", "{'id': 'qtest-f0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+@@ -44,34 +40,26 @@ static void remove_netdev_with_one_netfilter(void)
+ {
+     QDict *response;
 
-     /* send a qmp command to guarantee that 'connected' is setting to true. */
--    qmp_async("{ 'execute' : 'query-status'}");
-+    qmp_cmd_async("query-status");
-     qmp_discard_response();
-     ret = iov_send(send_sock[0], iov, 2, 0, sizeof(size) + sizeof(send_buf));
-     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
-diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirector.c
-index a6a714abea..00f58f63b5 100644
---- a/tests/test-filter-redirector.c
-+++ b/tests/test-filter-redirector.c
-@@ -99,7 +99,7 @@ static void test_redirector_tx(void)
-     g_assert_cmpint(recv_sock, !=, -1);
+-    response = qmp("{'execute': 'object-add',"
+-                   " 'arguments': {"
+-                   "   'qom-type': 'filter-buffer',"
+-                   "   'id': 'qtest-f0',"
+-                   "   'props': {"
+-                   "     'netdev': 'qtest-bn0',"
+-                   "     'queue': 'rx',"
+-                   "     'interval': 1000"
+-                   "}}}");
++    response = qmp_args("object-add",
++                        "{ 'qom-type': 'filter-buffer',"
++                        "  'id': 'qtest-f0',"
++                        "  'props': {"
++                        "     'netdev': 'qtest-bn0',"
++                        "     'queue': 'rx',"
++                        "     'interval': 1000"
++                        "}}");
 
-     /* send a qmp command to guarantee that 'connected' is setting to true. */
--    qmp_async("{ 'execute' : 'query-status'}");
-+    qmp_cmd_async("query-status");
-     qmp_discard_response();
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
 
-     struct iovec iov[] = {
-@@ -185,7 +185,7 @@ static void test_redirector_rx(void)
-     send_sock = unix_connect(sock_path1, NULL);
-     g_assert_cmpint(send_sock, !=, -1);
-     /* send a qmp command to guarantee that 'connected' is setting to true. */
--    qmp_async("{ 'execute' : 'query-status'}");
-+    qmp_cmd_async("query-status");
-     qmp_discard_response();
+-    response = qmp("{'execute': 'netdev_del',"
+-                   " 'arguments': {"
+-                   "   'id': 'qtest-bn0'"
+-                   "}}");
++    response = qmp_args("netdev_del", "{'id': 'qtest-bn0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
 
-     ret = iov_send(send_sock, iov, 2, 0, sizeof(size) + sizeof(send_buf));
+     /* add back the netdev */
+-    response = qmp("{'execute': 'netdev_add',"
+-                   " 'arguments': {"
+-                   "   'type': 'user',"
+-                   "   'id': 'qtest-bn0'"
+-                   "}}");
++    response = qmp_args("netdev_add", "{'type': 'user', 'id': 'qtest-bn0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+@@ -82,46 +70,38 @@ static void add_multi_netfilter(void)
+ {
+     QDict *response;
+
+-    response = qmp("{'execute': 'object-add',"
+-                   " 'arguments': {"
+-                   "   'qom-type': 'filter-buffer',"
+-                   "   'id': 'qtest-f0',"
+-                   "   'props': {"
+-                   "     'netdev': 'qtest-bn0',"
+-                   "     'queue': 'rx',"
+-                   "     'interval': 1000"
+-                   "}}}");
++    response = qmp_args("object-add",
++                        "{ 'qom-type': 'filter-buffer',"
++                        "  'id': 'qtest-f0',"
++                        "  'props': {"
++                        "     'netdev': 'qtest-bn0',"
++                        "     'queue': 'rx',"
++                        "     'interval': 1000"
++                        "}}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'object-add',"
+-                   " 'arguments': {"
+-                   "   'qom-type': 'filter-buffer',"
+-                   "   'id': 'qtest-f1',"
+-                   "   'props': {"
+-                   "     'netdev': 'qtest-bn0',"
+-                   "     'queue': 'rx',"
+-                   "     'interval': 1000"
+-                   "}}}");
++    response = qmp_args("object-add",
++                        "{ 'qom-type': 'filter-buffer',"
++                        "  'id': 'qtest-f1',"
++                        "  'props': {"
++                        "     'netdev': 'qtest-bn0',"
++                        "     'queue': 'rx',"
++                        "     'interval': 1000"
++                        "}}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'object-del',"
+-                   " 'arguments': {"
+-                   "   'id': 'qtest-f0'"
+-                   "}}");
++    response = qmp_args("object-del", "{'id': 'qtest-f0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'object-del',"
+-                   " 'arguments': {"
+-                   "   'id': 'qtest-f1'"
+-                   "}}");
++    response = qmp_args("object-del", "{'id': 'qtest-f1'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+@@ -132,48 +112,39 @@ static void remove_netdev_with_multi_netfilter(void)
+ {
+     QDict *response;
+
+-    response = qmp("{'execute': 'object-add',"
+-                   " 'arguments': {"
+-                   "   'qom-type': 'filter-buffer',"
+-                   "   'id': 'qtest-f0',"
+-                   "   'props': {"
+-                   "     'netdev': 'qtest-bn0',"
+-                   "     'queue': 'rx',"
+-                   "     'interval': 1000"
+-                   "}}}");
++    response = qmp_args("object-add",
++                        "{ 'qom-type': 'filter-buffer',"
++                        "  'id': 'qtest-f0',"
++                        "  'props': {"
++                        "     'netdev': 'qtest-bn0',"
++                        "     'queue': 'rx',"
++                        "     'interval': 1000"
++                        "}}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'object-add',"
+-                   " 'arguments': {"
+-                   "   'qom-type': 'filter-buffer',"
+-                   "   'id': 'qtest-f1',"
+-                   "   'props': {"
+-                   "     'netdev': 'qtest-bn0',"
+-                   "     'queue': 'rx',"
+-                   "     'interval': 1000"
+-                   "}}}");
++    response = qmp_args("object-add",
++                        "{ 'qom-type': 'filter-buffer',"
++                        "  'id': 'qtest-f1',"
++                        "  'props': {"
++                        "     'netdev': 'qtest-bn0',"
++                        "     'queue': 'rx',"
++                        "     'interval': 1000"
++                        "}}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'netdev_del',"
+-                   " 'arguments': {"
+-                   "   'id': 'qtest-bn0'"
+-                   "}}");
++    response = qmp_args("netdev_del", "{'id': 'qtest-bn0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+     /* add back the netdev */
+-    response = qmp("{'execute': 'netdev_add',"
+-                   " 'arguments': {"
+-                   "   'type': 'user',"
+-                   "   'id': 'qtest-bn0'"
+-                   "}}");
++    response = qmp_args("netdev_add", "{'type': 'user', 'id': 'qtest-bn0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
 diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
-index 58a2dd9fe8..f29df9b9df 100644
+index f29df9b9df..536e1cae2c 100644
 --- a/tests/test-x86-cpuid-compat.c
 +++ b/tests/test-x86-cpuid-compat.c
-@@ -13,7 +13,7 @@ static char *get_cpu0_qom_path(void)
-     QDict *cpu0;
-     char *path;
+@@ -25,10 +25,8 @@ static char *get_cpu0_qom_path(void)
 
--    resp = qmp("{'execute': 'query-cpus', 'arguments': {}}");
-+    resp = qmp_cmd("query-cpus");
-     g_assert(qdict_haskey(resp, "return"));
-     ret = qdict_get_qlist(resp, "return");
-
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 635b942c36..5d934d19c2 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -151,7 +151,6 @@ static void rx_stop_cont_test(QVirtioDevice *dev,
-     char test[] = "TEST";
-     char buffer[64];
-     int len = htonl(sizeof(test));
--    QDict *rsp;
-     struct iovec iov[] = {
-         {
-             .iov_base = &len,
-@@ -168,8 +167,8 @@ static void rx_stop_cont_test(QVirtioDevice *dev,
-     free_head = qvirtqueue_add(vq, req_addr, 64, true, false);
-     qvirtqueue_kick(dev, vq, free_head);
-
--    rsp = qmp("{ 'execute' : 'stop'}");
--    QDECREF(rsp);
-+    qmp_cmd_async("stop");
-+    qmp_discard_response();
-
-     ret = iov_send(socket, iov, 2, 0, sizeof(len) + sizeof(test));
-     g_assert_cmpint(ret, ==, sizeof(test) + sizeof(len));
-@@ -177,10 +176,10 @@ static void rx_stop_cont_test(QVirtioDevice *dev,
-     /* We could check the status, but this command is more importantly to
-      * ensure the packet data gets queued in QEMU, before we do 'cont'.
-      */
--    rsp = qmp("{ 'execute' : 'query-status'}");
--    QDECREF(rsp);
--    rsp = qmp("{ 'execute' : 'cont'}");
--    QDECREF(rsp);
-+    qmp_cmd_async("query-status");
-+    qmp_discard_response();
-+    qmp_cmd_async("cont");
-+    qmp_discard_response();
-
-     qvirtio_wait_used_elem(dev, vq, free_head, QVIRTIO_NET_TIMEOUT_US);
-     memread(req_addr + VNET_HDR_SIZE, buffer, sizeof(test));
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 3d5c1c3615..0842833eba 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -118,7 +118,7 @@ static void read_guid_from_monitor(QemuUUID *guid)
-     QDict *rsp, *rsp_ret;
-     const char *guid_str;
-
--    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
-+    rsp = qmp_cmd("query-vm-generation-id");
-     if (qdict_haskey(rsp, "return")) {
-         rsp_ret = qdict_get_qdict(rsp, "return");
-         g_assert(qdict_haskey(rsp_ret, "guid"));
-diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
-index 4fc8eeae86..a5fd795cc9 100644
---- a/tests/wdt_ib700-test.c
-+++ b/tests/wdt_ib700-test.c
-@@ -13,7 +13,7 @@
-
- static void qmp_check_no_event(void)
+ static QObject *qom_get(const char *path, const char *prop)
  {
--    QDict *resp = qmp("{'execute':'query-status'}");
-+    QDict *resp = qmp_cmd("query-status");
-     g_assert(qdict_haskey(resp, "return"));
+-    QDict *resp = qmp("{ 'execute': 'qom-get',"
+-                      "  'arguments': { 'path': %s,"
+-                      "                 'property': %s } }",
+-                      path, prop);
++    QDict *resp = qmp_args("qom-get", "{ 'path': %s, 'property': %s }",
++                           path, prop);
+     QObject *ret = qdict_get(resp, "return");
+     qobject_incref(ret);
      QDECREF(resp);
+diff --git a/tests/tmp105-test.c b/tests/tmp105-test.c
+index a7940a4639..28e6f300bc 100644
+--- a/tests/tmp105-test.c
++++ b/tests/tmp105-test.c
+@@ -69,8 +69,8 @@ static int qmp_tmp105_get_temperature(const char *id)
+     QDict *response;
+     int ret;
+
+-    response = qmp("{ 'execute': 'qom-get', 'arguments': { 'path': %s, "
+-                   "'property': 'temperature' } }", id);
++    response = qmp_args("qom-get", "{ 'path': %s, 'property': 'temperature' }",
++                        id);
+     g_assert(qdict_haskey(response, "return"));
+     ret = qdict_get_int(response, "return");
+     QDECREF(response);
+@@ -81,8 +81,9 @@ static void qmp_tmp105_set_temperature(const char *id, int value)
+ {
+     QDict *response;
+
+-    response = qmp("{ 'execute': 'qom-set', 'arguments': { 'path': %s, "
+-                   "'property': 'temperature', 'value': %d } }", id, value);
++    response = qmp_args("qom-set",
++                        "{'path':%s, 'property':'temperature', 'value':%d}",
++                        id, value);
+     g_assert(qdict_haskey(response, "return"));
+     QDECREF(response);
  }
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index 0fb7f8d223..b45c0d7ac0 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -50,20 +50,14 @@ static void test_usb_storage_hotplug(void)
+ {
+     QDict *response;
+
+-    response = qmp("{'execute': 'device_add',"
+-                   " 'arguments': {"
+-                   "   'driver': 'usb-storage',"
+-                   "   'drive': 'drive0',"
+-                   "   'id': 'usbdev0'"
+-                   "}}");
++    response = qmp_args("device_add",
++                        "{ 'driver': 'usb-storage', 'drive': 'drive0',"
++                        "   'id': 'usbdev0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'device_del',"
+-                           " 'arguments': {"
+-                           "   'id': 'usbdev0'"
+-                           "}}");
++    response = qmp_args("device_del", "{'id': 'usbdev0'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index c05a339894..408e819a61 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -25,21 +25,14 @@ static void test_usb_uas_hotplug(void)
+ {
+     QDict *response;
+
+-    response = qmp("{'execute': 'device_add',"
+-                   " 'arguments': {"
+-                   "   'driver': 'usb-uas',"
+-                   "   'id': 'uas'"
+-                   "}}");
++    response = qmp_args("device_add", "{'driver': 'usb-uas', 'id': 'uas'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{'execute': 'device_add',"
+-                   " 'arguments': {"
+-                   "   'driver': 'scsi-hd',"
+-                   "   'drive': 'drive0',"
+-                   "   'id': 'scsi-hd'"
+-                   "}}");
++    response = qmp_args("device_add",
++                        "{'driver': 'scsi-hd', 'drive': 'drive0',"
++                        "  'id': 'scsi-hd'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+@@ -49,20 +42,14 @@ static void test_usb_uas_hotplug(void)
+         added disk is visible after BUS rescan
+     */
+
+-    response = qmp("{'execute': 'device_del',"
+-                           " 'arguments': {"
+-                           "   'id': 'scsi-hd'"
+-                           "}}");
++    response = qmp_args("device_del", "{'id': 'scsi-hd'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+     qmp_eventwait("DEVICE_DELETED");
+
+-    response = qmp("{'execute': 'device_del',"
+-                           " 'arguments': {"
+-                           "   'id': 'uas'"
+-                           "}}");
++    response = qmp_args("device_del", "{'id': 'uas'}");
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index d4da09f147..7c00f4b527 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -657,16 +657,11 @@ static void test_migrate(void)
+
+     /* slow down migration to have time to fiddle with log */
+     /* TODO: qtest could learn to break on some places */
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 10 } }");
++    rsp = qmp_args("migrate_set_speed", "{ 'value': 10 }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp = qmp(cmd);
+-    g_free(cmd);
++    rsp = qmp_args("migrate", "{'uri':%s}", uri);
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+@@ -681,8 +676,7 @@ static void test_migrate(void)
+     munmap(log, size);
+
+     /* speed things up */
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 0 } }");
++    rsp = qmp_args("migrate_set_speed", "{ 'value': 0 }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index fe966c0606..649ba03c92 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -409,9 +409,7 @@ static void pci_config(void)
+
+     qvirtio_set_driver_ok(&dev->vdev);
+
+-    qmp_async("{ 'execute': 'block_resize', "
+-              " 'arguments': { 'device': 'drive0', "
+-              " 'size': %d } }", n_size);
++    qmp_args_async("block_resize", "{'device': 'drive0', 'size': %d}", n_size);
+     qmp_discard_response();
+     qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
+
+@@ -460,9 +458,7 @@ static void pci_msix(void)
+
+     qvirtio_set_driver_ok(&dev->vdev);
+
+-    qmp_async("{ 'execute': 'block_resize', "
+-              " 'arguments': { 'device': 'drive0', "
+-              " 'size': %d } }", n_size);
++    qmp_args_async("block_resize", "{'device': 'drive0', 'size': %d}", n_size);
+     qmp_discard_response();
+
+     qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
+@@ -702,9 +698,7 @@ static void mmio_basic(void)
+
+     test_basic(&dev->vdev, alloc, vq);
+
+-    qmp_async("{ 'execute': 'block_resize', "
+-              " 'arguments': { 'device': 'drive0', "
+-              " 'size': %d } }", n_size);
++    qmp_args_async("block_resize", "{'device': 'drive0', 'size': %d}", n_size);
+     qmp_discard_response();
+
+     qvirtio_wait_queue_isr(&dev->vdev, vq, QVIRTIO_BLK_TIMEOUT_US);
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 87a3b6e81a..126a6225f0 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -197,21 +197,14 @@ static void hotplug(void)
+
+     qs = qvirtio_scsi_start(
+             "-drive id=drv1,if=none,file=null-co://,format=raw");
+-    response = qmp("{\"execute\": \"device_add\","
+-                   " \"arguments\": {"
+-                   "   \"driver\": \"scsi-hd\","
+-                   "   \"id\": \"scsi-hd\","
+-                   "   \"drive\": \"drv1\""
+-                   "}}");
++    response = qmp_args("device_add",
++                        "{'driver':'scsi-hd', 'id':'scsi-hd', 'drive':'drv1'}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{\"execute\": \"device_del\","
+-                   " \"arguments\": {"
+-                   "   \"id\": \"scsi-hd\""
+-                   "}}");
++    response = qmp_args("device_del", "{'id':'scsi-hd'}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
+index b14d943ada..f47c343a2f 100644
+--- a/tests/virtio-serial-test.c
++++ b/tests/virtio-serial-test.c
+@@ -19,20 +19,14 @@ static void hotplug(void)
+ {
+     QDict *response;
+
+-    response = qmp("{\"execute\": \"device_add\","
+-                   " \"arguments\": {"
+-                   "   \"driver\": \"virtserialport\","
+-                   "   \"id\": \"hp-port\""
+-                   "}}");
++    response = qmp_args("device_add",
++                        "{'driver':'virtserialport', 'id':'hp-port'}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("{\"execute\": \"device_del\","
+-                   " \"arguments\": {"
+-                   "   \"id\": \"hp-port\""
+-                   "}}");
++    response = qmp_args("device_del", "{'id':'hp-port'}");
+
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
 -- 
 2.13.3
