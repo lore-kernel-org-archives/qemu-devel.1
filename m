@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddehK-0000X8-Sm
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:39:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1ddeip-0002IM-AZ
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddehJ-0000Ea-N7
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:39:34 -0400
-References: <87d18be8tg.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fc78d5f1-f846-20f6-4880-890d03607586@redhat.com>
-Date: Fri, 4 Aug 2017 10:39:24 -0500
+	(envelope-from <bounces@canonical.com>) id 1ddeil-0002K4-Ie
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:41:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57618)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ddeil-0002IS-Al
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:41:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ddeik-0000TW-5H
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 15:41:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 271292E80CC
+	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 15:41:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87d18be8tg.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="s6PwFi7O41RxMrVSB82bXdIrgBtwgIHRo"
-Subject: Re: [Qemu-devel] Is blk_getlength() in find_image_format() and
- img_map() kosher?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Aug 2017 15:29:23 -0000
+From: Thomas Huth <1708551@bugs.launchpad.net>
+Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150186056359.3833.12694234540123013927.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
+ USB 2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s6PwFi7O41RxMrVSB82bXdIrgBtwgIHRo
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <fc78d5f1-f846-20f6-4880-890d03607586@redhat.com>
-Subject: Re: [Qemu-devel] Is blk_getlength() in find_image_format() and
- img_map() kosher?
-References: <87d18be8tg.fsf@dusky.pond.sub.org>
-In-Reply-To: <87d18be8tg.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Then simply omit the "bus=3Dusb-bus.0" here - the devices then should be
+put onto the XHCI bus automatically.
 
-On 08/04/2017 08:55 AM, Markus Armbruster wrote:
-> Have a look at find_image_format():
->=20
->     if (blk_is_sg(file) || !blk_is_inserted(file) || blk_getlength(file=
-) =3D=3D 0) {
->         *pdrv =3D &bdrv_raw;
->         return ret;
->     }
->=20
-> blk_getlength() can fail.  Shouldn't we error out then?
->=20
-> We pretty obviously should in img_map():
->=20
->     length =3D blk_getlength(blk);
->     while (curr.start + curr.length < length) {
->=20
-> Since I have to touch @length in the series I'm working on, I'll stick
-> in a fix.
+-- =
 
-/me goes and checks my byte-based block status series
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1708551
 
-Hmm, that problem is still present even after my refactoring of
-img_map().  I can rebase my series on top of your fix, as your fix
-belongs in 2.10.
+Title:
+  macOS Guest Reading USB 3.0 Bus as USB 2.0
 
-Alternatively, WHY do we allow blk_getlength() to fail?  Are there
-really situations where we can open a BDS but not know its length?  I
-know that we allow for online resizing detection, but presumably, either
-we always know the (prior) size of the device, or we're going to have
-problems talking to the device for anything beyond just a size request.
-What semantics would change if we could guarantee that blk_getlength()
-never failed?
+Status in QEMU:
+  Incomplete
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Bug description:
+  Description:
+  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
+taType` on macOS guest confirms that the system "sees" my device, and that =
+qemu is passing *something* through. However, the system sees my connection=
+ as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
+/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
+ze my iPhone in XCode & iTunes.
 
+  Parameters:
+  QEMU release version: 2.10.0-rc0
+  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
+ot)]
+  Command Line: https://pastebin.com/pBSYbrW1
+  Host: Arch Linux
+  Guest: macOS v10.12.6
+  Guest System Info: https://pastebin.com/U1Tihxei
 
---s6PwFi7O41RxMrVSB82bXdIrgBtwgIHRo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Notes:
+  1. Observed sometime after late-May-early-June of this year.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  2. Due to [a defect in qemu v2.8 which affected GTK
+  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
+  change to macOS' booting process conflicting with qemu
+  v2.9](https://lists.nongnu.org/archive/html/qemu-
+  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
+  -rc1 fails to load OVMF right now).
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmElSwACgkQp6FrSiUn
-Q2q1yQgArI9c/YF5kKpxqwNoVoXL+bfjnazJXmM9zYDWDNCO2/4cq8S5AQE3VcIH
-vRxVQY90ks+d3VlGGB7ghfJNNdMa7UI0tWRXLCz5ob/FAZSSsSGobCUfgxfoFJ7z
-czUeCLyA3ZQOKfnWDGuIlrhdOrP17qMxcwCCFSCOz1BC+lnpl3IY1hu3vCpti/q/
-qqxF/P0/MgAMpNiSDM6ro2VXl8gkAR2z3N7asmuOjNZ2mSZJkE1JzOymkXGwinC7
-rV2rq5niS+Le4xEPvmUeqdk+YRf2MABDMLs3rGDZ1dVDeOJPplFMylPVliOe6D1P
-rZ++04IMo8Yx+pBCl593nDr2llKyxQ==
-=MD3I
------END PGP SIGNATURE-----
-
---s6PwFi7O41RxMrVSB82bXdIrgBtwgIHRo--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
