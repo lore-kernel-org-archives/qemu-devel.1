@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddeIi-0004rN-0P
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ddeIq-000513-V1
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ddeIh-0006Yi-07
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:07 -0400
-References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1501597152-25342-2-git-send-email-anton.nefedov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9fc51026-6e93-dd87-d43f-226ef5223565@redhat.com>
-Date: Fri, 4 Aug 2017 10:13:59 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ddeIo-0006f3-1i
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ddeIn-0006bf-ON
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:14:13 -0400
+Date: Fri, 4 Aug 2017 17:14:06 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170804171406.367f2f64@nial.brq.redhat.com>
+In-Reply-To: <CANO7a6x6EaWNZ8y=MvLU=w_LjRLXserO3NmsgHvaYE0aUCCWzg@mail.gmail.com>
+References: <20170804064540.10523-1-dhiru.kholia@gmail.com>
+	<20170804110539.3885a22d@nial.brq.redhat.com>
+	<CANO7a6x6EaWNZ8y=MvLU=w_LjRLXserO3NmsgHvaYE0aUCCWzg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1501597152-25342-2-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WpCgk1FHb3rsAo5iFo5nC2wuFv2nojgSO"
-Subject: Re: [Qemu-devel] [PATCH v4 for-2.10 01/15] mirror: inherit
- supported write/zero flags
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc/acpi: Fix booting of macOS with Clover
+ EFI bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com
+To: Dhiru Kholia <dhiru.kholia@gmail.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Gabriel Somlo <somlo@cmu.edu>, qemu-devel@nongnu.org, Phil Dennis-Jordan <lists@philjordan.eu>, BALATON Zoltan <balaton@eik.bme.hu>, Programmingkid <programmingkidx@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WpCgk1FHb3rsAo5iFo5nC2wuFv2nojgSO
-From: Eric Blake <eblake@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com,
- mreitz@redhat.com
-Message-ID: <9fc51026-6e93-dd87-d43f-226ef5223565@redhat.com>
-Subject: Re: [PATCH v4 for-2.10 01/15] mirror: inherit supported write/zero
- flags
-References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1501597152-25342-2-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1501597152-25342-2-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 4 Aug 2017 16:17:07 +0530
+Dhiru Kholia <dhiru.kholia@gmail.com> wrote:
 
-On 08/01/2017 09:18 AM, Anton Nefedov wrote:
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  block/mirror.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> On Fri, Aug 4, 2017 at 2:35 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> > On Fri,  4 Aug 2017 12:15:40 +0530
+> > Dhiru Kholia <dhiru.kholia@gmail.com> wrote:
+> >  
+> >> This was tested with macOS 10.12.5 and Clover r4114.
+> >>
+> >> Without this patch, the macOS boot process gets stuck at the Apple logo
+> >> without showing any progress bar.
+> >>
+> >> I have documented the process of running macOS on QEMU/KVM at,
+> >>
+> >> https://github.com/kholia/OSX-KVM/
+> >>
+> >> Instead of using this patch, adding an additional command-line knob
+> >> which exposes this setting (force_rev1_fadt) to the user might be a more
+> >> general solution.  
+> >
+> > it's been reported that OVMF had issues that were fixed,
+> > you probably want to read this thread:
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg468456.html  
+> 
+> Hi Igor,
+> 
+> I have now tested various OVMF versions with the latest QEMU (commit
+> aaaec6acad7c).
+> 
+> When using edk2.git-ovmf-x64-0-20170726.b2826.gbb4831c03d.noarch.rpm
+> from [1] macOS does not boot and gets stuck. The CPU usage goes to
+> 100%. I haven't confirmed this but this OVMF build should have both
+> 198a46d and 072060a edk2 commits in it, based on the build date.
+> 
+> The OVMF blob from Gabriel Somlo [2] hangs on the OVMF logo screen and
+> it too results in 100% CPU usage after hanging.
+> 
+> I am using "boot-clover.sh" script from my repository [4] to test the
+> various OVMF versions.
+> 
+> The only OVMF blob which works with the current QEMU for booting macOS
+> is the one from Proxmox [3]. Unfortunately, I don't know the
+> corresponding commit in the edk2 repository for this working OVMF
+> blob.
+So it's guest side issue, I'd prefer if it fixed there if possible
+instead of adding new CLI options to QEMU to work around issue.
 
-I think this one counts as a bug fix worthy of inclusion in 2.10.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/block/mirror.c b/block/mirror.c
-> index d46dace..7e539f1 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -1056,6 +1056,11 @@ static void bdrv_mirror_top_refresh_filename(Blo=
-ckDriverState *bs, QDict *opts)
->      bdrv_refresh_filename(bs->backing->bs);
->      pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
->              bs->backing->bs->filename);
-> +    bs->supported_write_flags =3D BDRV_REQ_FUA &
-> +        bs->backing->bs->supported_write_flags;
-> +    bs->supported_zero_flags =3D
-> +        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-> +        bs->backing->bs->supported_zero_flags;
->  }
-> =20
->  static void bdrv_mirror_top_close(BlockDriverState *bs)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Added to CC BALATON Zoltan for whom updating OVMF fixed the problem,
+perhaps you'll be able to figure out what your setup is missing.
 
 
---WpCgk1FHb3rsAo5iFo5nC2wuFv2nojgSO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmEjzcACgkQp6FrSiUn
-Q2pmigf+KRFRdiVjjwK8Hmy+ATfUxeSffgvEXKV0BOUfklZZ2Pqr1v4hXdBPAzsy
-r2ndS9G/h5n0csCO2SrqsKKh32CG5YZLsSEn+lnbKt7Le0KMCuQ88ZQ/xDwaGoBt
-yU4rREucNJ2HI/b7Ayf3rh6koXAXcMUJLUIDSRRn4uGosJLrEDe7/pWv26g32UcK
-DoUiUDy1NtLu41ZBdIBnNsguaHDODtTTKoL4j/mgwrRcLdEGiag+rOALmY6eeQCE
-gsL2YBeGpf3UXCua9SOweOG04ft68ATGWludChhjJFjW/XTotF9wGNMd7B6jirx3
-bN9lvPewLd4PGflQj8hfX75WCjL3EA==
-=EeGb
------END PGP SIGNATURE-----
-
---WpCgk1FHb3rsAo5iFo5nC2wuFv2nojgSO--
+> References,
+> 
+> [1] https://www.kraxel.org/repos/jenkins/edk2/
+> 
+> [2] https://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/
+> 
+> [3] https://git.proxmox.com/?p=pve-qemu-kvm.git;a=tree;f=debian
+> 
+> [4] https://github.com/kholia/OSX-KVM/
+> 
+> It would be great if someone else could reproduce these results too.
+> 
+> Thanks,
+> Dhiru
+> 
