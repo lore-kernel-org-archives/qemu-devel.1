@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddeip-0002IM-AZ
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:41:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1ddejq-0003ge-2T
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddeil-0002K4-Ie
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:41:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57618)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ddeil-0002IS-Al
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:41:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ddeik-0000TW-5H
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 15:41:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 271292E80CC
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 15:41:02 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1ddejp-0003bI-7W
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:42:10 -0400
+References: <20170804105059.11941-1-berrange@redhat.com>
+	<20170804140210.GD4108@localhost.localdomain>
+	<20170804140630.GC14504@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+Date: Fri, 4 Aug 2017 10:41:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Aug 2017 15:29:23 -0000
-From: Thomas Huth <1708551@bugs.launchpad.net>
-Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150186056359.3833.12694234540123013927.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
- USB 2.0
+In-Reply-To: <20170804140630.GC14504@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: document semanatics of
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Then simply omit the "bus=3Dusb-bus.0" here - the devices then should be
-put onto the XHCI bus automatically.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+Subject: Re: [Qemu-block] [PATCH] block: document semanatics of
+ bdrv_co_preadv|pwritev
+References: <20170804105059.11941-1-berrange@redhat.com>
+ <20170804140210.GD4108@localhost.localdomain>
+ <20170804140630.GC14504@redhat.com>
+In-Reply-To: <20170804140630.GC14504@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 08/04/2017 09:06 AM, Daniel P. Berrange wrote:
+> On Fri, Aug 04, 2017 at 04:02:10PM +0200, Kevin Wolf wrote:
+>> Am 04.08.2017 um 12:50 hat Daniel P. Berrange geschrieben:
+>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>>> ---
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1708551
+>> Really? We are asserting that they match in bdrv_aligned_preadv():
+>>
+>>     assert(!qiov || bytes =3D=3D qiov->size);
+>=20
+> Hmm, why do we pass @bytes at all then ? If they're always the same,
+> how about deleting it and just letting everyone read qiov->size
+> directly.
 
-Title:
-  macOS Guest Reading USB 3.0 Bus as USB 2.0
+Read the assertion again: qiov can be NULL (generally, when writing
+zeroes).  So we can't rely on qiov->size in that scenario.
 
-Status in QEMU:
-  Incomplete
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  Description:
-  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
-taType` on macOS guest confirms that the system "sees" my device, and that =
-qemu is passing *something* through. However, the system sees my connection=
- as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
-/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
-ze my iPhone in XCode & iTunes.
 
-  Parameters:
-  QEMU release version: 2.10.0-rc0
-  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
-ot)]
-  Command Line: https://pastebin.com/pBSYbrW1
-  Host: Arch Linux
-  Guest: macOS v10.12.6
-  Guest System Info: https://pastebin.com/U1Tihxei
+--ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  Notes:
-  1. Observed sometime after late-May-early-June of this year.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  2. Due to [a defect in qemu v2.8 which affected GTK
-  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
-  change to macOS' booting process conflicting with qemu
-  v2.9](https://lists.nongnu.org/archive/html/qemu-
-  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
-  -rc1 fails to load OVMF right now).
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmElcIACgkQp6FrSiUn
+Q2o1Cgf/TxBBcqZRqK2hdKHjxyLjwJb4NJo26zD3e5435JKveohes7nVWg1NJ9oP
+hecB05MhRdwGtKUbYYVvmF78POFBMHsdlJ7RxCX2LUUU8I4rLa2q98rCyDL2G6Rk
+6KwJS/0ihv+vzHD/rKeArxPgXCP36ZhkOhr4OPVemiYOqG7iRi+8SLIpp/Fm1C+u
+wmDMNxRnVfe/+8tJDU84Q6txNLmxIc739AYnXU4o1SfV9l+bMzZrirJ9Xp4lWdPZ
+VsN6ZUXA45FOVBs1zP5erxDp6EJ/YpP++NubTmJpv4h/8SEVQVjpuUGtknhN2m8k
+EuoEkmj7eVCDogba6fxjWN8QA/P7OA==
+=/fQF
+-----END PGP SIGNATURE-----
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
+--ekXmh3XQRtoDUOJ3aaWdIllElR55kXT4P--
