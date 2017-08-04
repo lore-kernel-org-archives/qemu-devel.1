@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ddcVk-0000V4-B2
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:20:34 -0400
+	(envelope-from <david@redhat.com>) id 1ddcVo-0000Mc-JK
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ddc5i-0004d1-KH
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 08:53:40 -0400
-Date: Fri, 4 Aug 2017 13:49:50 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170804124950.GC14565@stefanha-x1.localdomain>
-References: <20170804105059.11941-1-berrange@redhat.com>
+	(envelope-from <david@redhat.com>) id 1ddcUd-00084V-DP
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:19:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ddcUc-00083P-Q1
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:18:19 -0400
+References: <20170804112946.5247-1-cohuck@redhat.com>
+	<20170804112946.5247-9-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e935b4ab-28e6-bf15-0e69-7d57b09e83ac@redhat.com>
+Date: Fri, 4 Aug 2017 15:18:14 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bAmEntskrkuBymla"
-Content-Disposition: inline
-In-Reply-To: <20170804105059.11941-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: document semanatics of
- bdrv_co_preadv|pwritev
+In-Reply-To: <20170804112946.5247-9-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 8/9] s390x/kvm: msi route fixup for
+ non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-
---bAmEntskrkuBymla
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Fri, Aug 04, 2017 at 11:50:59AM +0100, Daniel P. Berrange wrote:
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On 04.08.2017 13:29, Cornelia Huck wrote:
+> If we don't provide pci, we cannot have a pci device for which we
+> have to translate to adapter routes: just return -ENODEV.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  include/block/block_int.h | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
+>  target/s390x/kvm.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 9de165d8b1..d8db1cbf6e 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2424,6 +2424,12 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>      uint32_t idx = data >> ZPCI_MSI_VEC_BITS;
+>      uint32_t vec = data & ZPCI_MSI_VEC_MASK;
+>  
+> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+> +        /* How can we get here without pci enabled? */
+> +        g_assert(false);
+> +        return -ENODEV;
+> +    }
+> +
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+/* How can we get here without pci enabled? */
+g_assert(s390_has_feat(S390_FEAT_ZPCI));
 
---bAmEntskrkuBymla
-Content-Type: application/pgp-signature; name="signature.asc"
+?
 
------BEGIN PGP SIGNATURE-----
+>      pbdev = s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+>      if (!pbdev) {
+>          DPRINTF("add_msi_route no dev\n");
+> 
 
-iQEcBAEBAgAGBQJZhG1uAAoJEJykq7OBq3PIQR0H/22aXH86ELARhUckycNDyano
-m5mWtGgtrX/3aG8dEWR9icRVfDP24O2VSsp7IlwKNm4lMvskvii2TOVqJtoBdcwU
-5dz2cJDYURBi3HbQS9cCFl1X1EvCU0TO4F4uSauWxNZuGL9JHeDly72dnhrekqQ9
-NivwWFpF/RP+ahfqzgtaXHOaCrCFayvW91KOJLe5/svch5Q/c1ki6KOgJE2U8N/y
-SrlgKfLZiRsQxNkbs+36dRPstqJAHeGbAyoeeoHxbo1RteGX87dYV1Ya8mSFFkLK
-bdhbS9Fu8vKXSLDGuq94WTEX+TUJqiCC0LscpEsdsSE5bCyE3FCEgnZBPHKJsZ4=
-=F/3n
------END PGP SIGNATURE-----
 
---bAmEntskrkuBymla--
+-- 
+
+Thanks,
+
+David
