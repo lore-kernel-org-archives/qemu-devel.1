@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ddes3-0004Te-Td
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:50:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1ddfCX-0001UT-LA
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ddes2-0003KB-Pg
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:50:39 -0400
-Date: Fri, 4 Aug 2017 11:50:31 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170804155031.GK22129@localhost.localdomain>
-References: <20170804144354.21985-1-kwolf@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1ddfCT-0008Vc-Lh
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:11:49 -0400
+Date: Fri, 4 Aug 2017 17:11:35 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170804161135.GJ14504@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-6-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170804144354.21985-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/null: Remove 'filename'
- option
+In-Reply-To: <20170804151440.320927-6-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 05/17] block/nbd-client: get rid of ssize_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On Fri, Aug 04, 2017 at 04:43:54PM +0200, Kevin Wolf wrote:
-> This option was only added to allow 'null-co://' and 'null-aio://' as
-> filenames, its value never served any actual purpose and was ignored.
-> Nevertheless it was accepted as '-drive driver=null,filename=foo'.
-> 
-> The correct way to enable the protocol prefixes (and that without adding
-> a useless -drive option) is implementing .bdrv_parse_filename. This is
-> what this patch does.
-> 
-> Technically, this is an incompatible change, but the null block driver
-> is only used for benchmarking, testing and debugging, and an option
-> without effect isn't likely to be used by anyone anyway, so no bad
-> effects are to be expected.
-> 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/null.c | 31 ++++++++++++++++++++++++++-----
->  1 file changed, 26 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/null.c b/block/null.c
-> index 876f90965b..dd9c13f9ba 100644
-> --- a/block/null.c
-> +++ b/block/null.c
-> @@ -30,11 +30,6 @@ static QemuOptsList runtime_opts = {
->      .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
->      .desc = {
->          {
-> -            .name = "filename",
-> -            .type = QEMU_OPT_STRING,
-> -            .help = "",
-> -        },
-> -        {
->              .name = BLOCK_OPT_SIZE,
->              .type = QEMU_OPT_SIZE,
->              .help = "size of the null block",
-> @@ -54,6 +49,30 @@ static QemuOptsList runtime_opts = {
->      },
->  };
->  
-> +static void null_co_parse_filename(const char *filename, QDict *options,
-> +                                   Error **errp)
-> +{
-> +    /* This functions only exists so that a null-co:// filename is accepted
-> +     * with the null-co driver. */
-> +    if (strcmp(filename, "null-co://")) {
-> +        error_setg(errp, "The only allowed filename for this driver is "
-> +                         "'null-co://'");
-> +        return;
-> +    }
-> +}
-> +
-> +static void null_aio_parse_filename(const char *filename, QDict *options,
-> +                                    Error **errp)
-> +{
-> +    /* This functions only exists so that a null-aio:// filename is accepted
-> +     * with the null-aio driver. */
-> +    if (strcmp(filename, "null-aio://")) {
-> +        error_setg(errp, "The only allowed filename for this driver is "
-> +                         "'null-aio://'");
-> +        return;
-> +    }
-> +}
-> +
->  static int null_file_open(BlockDriverState *bs, QDict *options, int flags,
->                            Error **errp)
->  {
-> @@ -242,6 +261,7 @@ static BlockDriver bdrv_null_co = {
->      .instance_size          = sizeof(BDRVNullState),
->  
->      .bdrv_file_open         = null_file_open,
-> +    .bdrv_parse_filename    = null_co_parse_filename,
->      .bdrv_close             = null_close,
->      .bdrv_getlength         = null_getlength,
->  
-> @@ -261,6 +281,7 @@ static BlockDriver bdrv_null_aio = {
->      .instance_size          = sizeof(BDRVNullState),
->  
->      .bdrv_file_open         = null_file_open,
-> +    .bdrv_parse_filename    = null_aio_parse_filename,
->      .bdrv_close             = null_close,
->      .bdrv_getlength         = null_getlength,
->  
-> -- 
-> 2.13.3
-> 
-> 
+On Fri, Aug 04, 2017 at 06:14:28PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Use int variable for nbd_co_send_request return value (as
+> nbd_co_send_request returns int).
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Hmm, nbd_co_send_request() propagates return value of nbd_send_request,
+which returns ssize_t.  IOW, I think we need to fix nbd_co_send_request
+to also return ssize_t, rather than changing callers to use int.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
