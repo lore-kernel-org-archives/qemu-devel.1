@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPd-0003xp-Kq
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:43 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ddVPh-00042f-Vb
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPa-0003Iz-8k
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:41 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:38631)
+	(envelope-from <rth7680@gmail.com>) id 1ddVPg-0003YI-6k
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:46 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPZ-0003Gc-Ls
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:38 -0400
-Received: by mail-pf0-x243.google.com with SMTP id h75so859598pfh.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPf-0003Vw-Tb
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:44 -0400
+Received: by mail-pg0-x242.google.com with SMTP id 83so822317pgb.4
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:43 -0700 (PDT)
 Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
 	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	o14sm1061063pfi.158.2017.08.03.22.44.35 for <qemu-devel@nongnu.org>
+	o14sm1061063pfi.158.2017.08.03.22.44.41 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 22:44:35 -0700 (PDT)
+	Thu, 03 Aug 2017 22:44:41 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:44:12 -0700
-Message-Id: <20170804054426.10590-10-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 22:44:18 -0700
+Message-Id: <20170804054426.10590-16-rth@twiddle.net>
 In-Reply-To: <20170804054426.10590-1-rth@twiddle.net>
 References: <20170804054426.10590-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 09/23] tcg/s390: Use constant pool for
- ori
+Subject: [Qemu-devel] [PATCH for-2.11 15/23] tcg/arm: Improve tlb load for
+ armv7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,162 +34,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Use UBFX to avoid limitation on CPU_TLB_BITS.  Since we're dropping
+the initial shift, we need to replace the page masking.  We can use
+MOVW+BIC to do this without shifting.  The result is the same size
+as the armv6 path with one less conditional instruction.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/s390/tcg-target.inc.c | 74 ++++++++++++++++++++++-------------------------
- 1 file changed, 34 insertions(+), 40 deletions(-)
+ tcg/arm/tcg-target.inc.c | 72 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 52 insertions(+), 20 deletions(-)
 
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index 4be57c5765..83fac71c31 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -225,6 +225,7 @@ typedef enum S390Opcode {
-     RXY_LRVH    = 0xe31f,
-     RXY_LY      = 0xe358,
-     RXY_NG      = 0xe380,
-+    RXY_OG      = 0xe381,
-     RXY_STCY    = 0xe372,
-     RXY_STG     = 0xe324,
-     RXY_STHY    = 0xe370,
-@@ -1004,55 +1005,60 @@ static void tgen_andi(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
-     }
- }
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index 81ea900852..66c369c239 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -1173,18 +1173,33 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+     unsigned s_bits = opc & MO_SIZE;
+     unsigned a_bits = get_alignment_bits(opc);
  
--static void tgen64_ori(TCGContext *s, TCGReg dest, tcg_target_ulong val)
-+static void tgen_ori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
- {
-     static const S390Opcode oi_insns[4] = {
-         RI_OILL, RI_OILH, RI_OIHL, RI_OIHH
-     };
--    static const S390Opcode nif_insns[2] = {
-+    static const S390Opcode oif_insns[2] = {
-         RIL_OILF, RIL_OIHF
-     };
- 
-     int i;
- 
-     /* Look for no-op.  */
--    if (val == 0) {
-+    if (unlikely(val == 0)) {
-         return;
-     }
- 
--    if (s390_facilities & FACILITY_EXT_IMM) {
--        /* Try all 32-bit insns that can perform it in one go.  */
--        for (i = 0; i < 4; i++) {
--            tcg_target_ulong mask = (0xffffull << i*16);
--            if ((val & mask) != 0 && (val & ~mask) == 0) {
--                tcg_out_insn_RI(s, oi_insns[i], dest, val >> i*16);
--                return;
--            }
-+    /* Try all 32-bit insns that can perform it in one go.  */
-+    for (i = 0; i < 4; i++) {
-+        tcg_target_ulong mask = (0xffffull << i*16);
-+        if ((val & mask) != 0 && (val & ~mask) == 0) {
-+            tcg_out_insn_RI(s, oi_insns[i], dest, val >> i*16);
-+            return;
-         }
-+    }
- 
--        /* Try all 48-bit insns that can perform it in one go.  */
-+    /* Try all 48-bit insns that can perform it in one go.  */
-+    if (s390_facilities & FACILITY_EXT_IMM) {
-         for (i = 0; i < 2; i++) {
-             tcg_target_ulong mask = (0xffffffffull << i*32);
-             if ((val & mask) != 0 && (val & ~mask) == 0) {
--                tcg_out_insn_RIL(s, nif_insns[i], dest, val >> i*32);
-+                tcg_out_insn_RIL(s, oif_insns[i], dest, val >> i*32);
-                 return;
-             }
-         }
-+    }
- 
-+    /* Use the constant pool if USE_REG_TB, but not for small constants.  */
-+    if (maybe_out_small_movi(s, type, TCG_TMP0, val)) {
-+        if (type == TCG_TYPE_I32) {
-+            tcg_out_insn(s, RR, OR, dest, TCG_TMP0);
-+        } else {
-+            tcg_out_insn(s, RRE, OGR, dest, TCG_TMP0);
-+        }
-+    } else if (USE_REG_TB) {
-+        tcg_out_insn(s, RXY, OG, dest, TCG_REG_TB, TCG_REG_NONE, 0);
-+        new_pool_label(s, val, R_390_20, s->code_ptr - 2,
-+                       -(intptr_t)s->code_gen_ptr);
+-    /* Should generate something like the following:
+-     *   shr    tmp, addrlo, #TARGET_PAGE_BITS                    (1)
++    /* V7 generates the following:
++     *   ubfx   r0, addrlo, #TARGET_PAGE_BITS, #CPU_TLB_BITS
+      *   add    r2, env, #high
+-     *   and    r0, tmp, #(CPU_TLB_SIZE - 1)                      (2)
+-     *   add    r2, r2, r0, lsl #CPU_TLB_ENTRY_BITS               (3)
+-     *   ldr    r0, [r2, #cmp]                                    (4)
++     *   add    r2, r2, r0, lsl #CPU_TLB_ENTRY_BITS
++     *   ldr    r0, [r2, #cmp]
++     *   ldr    r2, [r2, #add]
++     *   movw   tmp, #page_align_mask
++     *   bic    tmp, addrlo, tmp
++     *   cmp    r0, tmp
++     *
++     * Otherwise we generate:
++     *   shr    tmp, addrlo, #TARGET_PAGE_BITS
++     *   add    r2, env, #high
++     *   and    r0, tmp, #(CPU_TLB_SIZE - 1)
++     *   add    r2, r2, r0, lsl #CPU_TLB_ENTRY_BITS
++     *   ldr    r0, [r2, #cmp]
++     *   ldr    r2, [r2, #add]
+      *   tst    addrlo, #s_mask
+-     *   ldr    r2, [r2, #add]                                    (5)
+      *   cmpeq  r0, tmp, lsl #TARGET_PAGE_BITS
+      */
+-    tcg_out_dat_reg(s, COND_AL, ARITH_MOV, TCG_REG_TMP,
+-                    0, addrlo, SHIFT_IMM_LSR(TARGET_PAGE_BITS));
++    if (use_armv7_instructions) {
++        tcg_out_extract(s, COND_AL, TCG_REG_R0, addrlo,
++                        TARGET_PAGE_BITS, CPU_TLB_BITS);
 +    } else {
-         /* Perform the OR via sequential modifications to the high and
-            low parts.  Do this via recursion to handle 16-bit vs 32-bit
-            masks in each half.  */
--        tgen64_ori(s, dest, val & 0x00000000ffffffffull);
--        tgen64_ori(s, dest, val & 0xffffffff00000000ull);
--    } else {
--        /* With no extended-immediate facility, we don't need to be so
--           clever.  Just iterate over the insns and mask in the constant.  */
--        for (i = 0; i < 4; i++) {
--            tcg_target_ulong mask = (0xffffull << i*16);
--            if ((val & mask) != 0) {
--                tcg_out_insn_RI(s, oi_insns[i], dest, val >> i*16);
--            }
--        }
-+        tcg_debug_assert(s390_facilities & FACILITY_EXT_IMM);
-+        tgen_ori(s, type, dest, val & 0x00000000ffffffffull);
-+        tgen_ori(s, type, dest, val & 0xffffffff00000000ull);
++        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, TCG_REG_TMP,
++                        0, addrlo, SHIFT_IMM_LSR(TARGET_PAGE_BITS));
++    }
+ 
+     /* We checked that the offset is contained within 16 bits above.  */
+     if (add_off > 0xfff || (use_armv6_instructions && cmp_off > 0xff)) {
+@@ -1194,9 +1209,10 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+         add_off -= cmp_off & 0xff00;
+         cmp_off &= 0xff;
      }
- }
- 
-@@ -1872,7 +1878,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         a0 = args[0], a1 = args[1], a2 = (uint32_t)args[2];
-         if (const_args[2]) {
-             tcg_out_mov(s, TCG_TYPE_I32, a0, a1);
--            tgen64_ori(s, a0, a2);
-+            tgen_ori(s, TCG_TYPE_I32, a0, a2);
-         } else if (a0 == a1) {
-             tcg_out_insn(s, RR, OR, a0, a2);
-         } else {
-@@ -2104,7 +2110,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         a0 = args[0], a1 = args[1], a2 = args[2];
-         if (const_args[2]) {
-             tcg_out_mov(s, TCG_TYPE_I64, a0, a1);
--            tgen64_ori(s, a0, a2);
-+            tgen_ori(s, TCG_TYPE_I64, a0, a2);
-         } else if (a0 == a1) {
-             tcg_out_insn(s, RRE, OGR, a0, a2);
-         } else {
-@@ -2312,7 +2318,6 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef r_0_ri = { .args_ct_str = { "r", "0", "ri" } };
-     static const TCGTargetOpDef r_0_rI = { .args_ct_str = { "r", "0", "rI" } };
-     static const TCGTargetOpDef r_0_rJ = { .args_ct_str = { "r", "0", "rJ" } };
--    static const TCGTargetOpDef r_0_rN = { .args_ct_str = { "r", "0", "rN" } };
-     static const TCGTargetOpDef r_0_rM = { .args_ct_str = { "r", "0", "rM" } };
-     static const TCGTargetOpDef a2_r
-         = { .args_ct_str = { "r", "r", "0", "1", "r", "r" } };
-@@ -2353,6 +2358,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_sub_i64:
-     case INDEX_op_and_i32:
-     case INDEX_op_and_i64:
-+    case INDEX_op_or_i32:
-+    case INDEX_op_or_i64:
-         return (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri);
- 
-     case INDEX_op_mul_i32:
-@@ -2363,19 +2370,6 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_mul_i64:
-         return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_rJ : &r_0_rI);
- 
--    case INDEX_op_or_i32:
--        /* The use of [iNM] constraints are optimization only, since a full
--           64-bit immediate OR can always be performed with 4 sequential
--           OI[LH][LH] instructions.  By rejecting certain negative ranges,
--           the immediate load plus the reg-reg OR is smaller.  */
--        return (s390_facilities & FACILITY_EXT_IMM
--                ? (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri)
--                : &r_0_rN);
--    case INDEX_op_or_i64:
--        return (s390_facilities & FACILITY_EXT_IMM
--                ? (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_rM : &r_0_rM)
--                : &r_0_rN);
 -
-     case INDEX_op_xor_i32:
-         /* Without EXT_IMM, no immediates are supported.  Otherwise,
-            rejecting certain negative ranges leads to smaller code.  */
+-    tcg_out_dat_imm(s, COND_AL, ARITH_AND,
+-                    TCG_REG_R0, TCG_REG_TMP, CPU_TLB_SIZE - 1);
++    if (!use_armv7_instructions) {
++        tcg_out_dat_imm(s, COND_AL, ARITH_AND,
++                        TCG_REG_R0, TCG_REG_TMP, CPU_TLB_SIZE - 1);
++    }
+     tcg_out_dat_reg(s, COND_AL, ARITH_ADD, TCG_REG_R2, base,
+                     TCG_REG_R0, SHIFT_IMM_LSL(CPU_TLB_ENTRY_BITS));
+ 
+@@ -1212,24 +1228,40 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+         }
+     }
+ 
++    /* Load the tlb addend.  */
++    tcg_out_ld32_12(s, COND_AL, TCG_REG_R2, TCG_REG_R2, add_off);
++
+     /* Check alignment.  We don't support inline unaligned acceses,
+        but we can easily support overalignment checks.  */
+     if (a_bits < s_bits) {
+         a_bits = s_bits;
+     }
+-    if (a_bits) {
+-        tcg_out_dat_imm(s, COND_AL, ARITH_TST, 0, addrlo, (1 << a_bits) - 1);
+-    }
+ 
+-    /* Load the tlb addend.  */
+-    tcg_out_ld32_12(s, COND_AL, TCG_REG_R2, TCG_REG_R2, add_off);
++    if (use_armv7_instructions) {
++        tcg_target_ulong mask = ~(TARGET_PAGE_MASK | ((1 << a_bits) - 1));
++        int rot = encode_imm(mask);
+ 
+-    tcg_out_dat_reg(s, (a_bits ? COND_EQ : COND_AL), ARITH_CMP, 0,
+-                    TCG_REG_R0, TCG_REG_TMP, SHIFT_IMM_LSL(TARGET_PAGE_BITS));
++        if (rot >= 0) { 
++            tcg_out_dat_imm(s, COND_AL, ARITH_BIC, TCG_REG_TMP, addrlo,
++                            rotl(mask, rot) | (rot << 7));
++        } else {
++            tcg_out_movi32(s, COND_AL, TCG_REG_TMP, mask);
++            tcg_out_dat_reg(s, COND_AL, ARITH_BIC, TCG_REG_TMP,
++                            addrlo, TCG_REG_TMP, 0);
++        }
++        tcg_out_dat_reg(s, COND_AL, ARITH_CMP, 0, TCG_REG_R0, TCG_REG_TMP, 0);
++    } else {
++        if (a_bits) {
++            tcg_out_dat_imm(s, COND_AL, ARITH_TST, 0, addrlo,
++                            (1 << a_bits) - 1);
++        }
++        tcg_out_dat_reg(s, (a_bits ? COND_EQ : COND_AL), ARITH_CMP,
++                        0, TCG_REG_R0, TCG_REG_TMP,
++                        SHIFT_IMM_LSL(TARGET_PAGE_BITS));
++    }
+ 
+     if (TARGET_LONG_BITS == 64) {
+-        tcg_out_dat_reg(s, COND_EQ, ARITH_CMP, 0,
+-                        TCG_REG_R1, addrhi, SHIFT_IMM_LSL(0));
++        tcg_out_dat_reg(s, COND_EQ, ARITH_CMP, 0, TCG_REG_R1, addrhi, 0);
+     }
+ 
+     return TCG_REG_R2;
 -- 
 2.13.3
