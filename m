@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1ddZEq-0006PG-TZ
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:49:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1ddZEu-0006UH-Na
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:49:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1ddZEo-00047P-Cv
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:49:48 -0400
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Fri, 4 Aug 2017 18:09:13 +0800
-Message-ID: <1501841356-6486-1-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <dgilbert@redhat.com>) id 1ddZEr-000499-Ft
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:49:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddZEr-00048M-69
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:49:49 -0400
+Date: Fri, 4 Aug 2017 10:49:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170804094941.GD2805@work-vm>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-23-git-send-email-peterx@redhat.com>
+	<20170803105021.GD2076@work-vm>
+	<20170804065914.GH5561@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 0/3] Generate APEI GHES table and
- dynamically record CPER
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170804065914.GH5561@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 22/29] migration: new message
+ MIG_RP_MSG_RECV_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,226 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhengqiang10@huawei.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-In the armv8 platform, the mainly hardware error source are ARMv8
-SEA/SEI/GSIV. For the ARMv8 SEA/SEI, the KVM or host kernel will signal SIGBUS
-or use other interface to notify user space, such as Qemu. After Qemu gets
-the notification, it will record the CPER and inject the SEA/SEI to KVM. this
-series of patches will generate APEI table when guest OS boot up, and dynamically
-record CPER for the guest OS about the generic hardware errors, currently the
-userspace only handle the memory section hardware errors. Before Qemu record the
-CPER, it needs to check the ACK value written by the guest OS to avoid read-write
-race condition.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Thu, Aug 03, 2017 at 11:50:22AM +0100, Dr. David Alan Gilbert wrote:
+> > > +    /* Size of the bitmap, in bytes */
+> > > +    size = (block->max_length >> TARGET_PAGE_BITS) / 8;
+> > > +    qemu_put_be64(file, size);
+> > > +    qemu_put_buffer(file, (const uint8_t *)block->receivedmap, size);
+> > 
+> > Do we need to be careful about endianness and length of long here?
+> > The migration stream can (theoretically) migrate between hosts of
+> > different endianness, e.g. a Power LE and Power BE host it can also
+> > migrate between a 32bit and 64bit host where the 'long' used in our
+> > bitmap is a different length.
+> 
+> Ah, good catch...
+> 
+> I feel like we'd better provide a new bitmap helper for this when the
+> bitmap will be sent to somewhere else, like:
+> 
+>   void bitmap_to_le(unsigned long *dst, const unsigned long *src,
+>                     long nbits);
+>   void bitmap_from_le(unsigned long *dst, const unsigned long *src,
+>                       long nbits);
+> 
+> I used little endian since I *think* that should work even cross 32/64
+> bits machines (and I think big endian should not work).
 
-Below is the APEI/GHESV2/CPER table layout, the max number of error soure is 11,
-which is classified by notification type, now only enable the SEA/SEI notification type
-error source.
+Lets think about some combinations:
 
-     etc/acpi/tables                               etc/hardware_errors
-    ====================                    ==========================================
-+ +--------------------------+            +------------------+
-| | HEST                     |            |    address       |              +--------------+
-| +--------------------------+            |    registers     |              | Error Status |
-| | GHES0                    |            | +----------------+              | Data Block 0 |
-| +--------------------------+ +--------->| |status_address0 |------------->| +------------+
-| | .................        | |          | +----------------+              | |  CPER      |
-| | error_status_address-----+-+ +------->| |status_address1 |----------+   | |  CPER      |
-| | .................        |   |        | +----------------+          |   | |  ....      |
-| | read_ack_register--------+-+ |        |  .............   |          |   | |  CPER      |
-| | read_ack_preserve        | | |        +------------------+          |   | +-+------------+
-| | read_ack_write           | | | +----->| |status_address10|--------+ |   | Error Status |
-+ +--------------------------+ | | |      | +----------------+        | |   | Data Block 1 |
-| | GHES1                    | +-+-+----->| |ack_address0    |--+     | +-->| +------------+
-+ +--------------------------+   | |      | +----------------+  |     |     | |  CPER      |
-| | .................        |   | | +--->| |ack_address1    |--+-+   |     | |  CPER      |
-| | error_status_address-----+---+ | |    | +----------------+  | |   |     | |  ....      |
-| | .................        |     | |    | | .............  |  | |   |     | |  CPER      |
-| | read_ack_register--------+-----+-+    | +----------------+  | |   |     +-+------------+
-| | read_ack_preserve        |     |   +->| |ack_address10   |--+-+-+ |     | |..........  |
-| | read_ack_write           |     |   |  | +----------------+  | | | |     | +------------+
-+ +--------------------------|     |   |  | |      ack0      |<-+ | | |     | Error Status |
-| | ...............          |     |   |  | +----------------+    | | |     | Data Block 10|
-+ +--------------------------+     |   |  | |      ack1      |<---+ | +---->| +------------+
-| | GHES10                   |     |   |  | +----------------+      |       | |  CPER      |
-+ +--------------------------+     |   |  | |       ....     |      |       | |  CPER      |
-| | .................        |     |   |  | +--------------+ |      |       | |  ....      |
-| | error_status_address-----+-----+   |  | |      ack10     |<---- +       | |  CPER      |
-| | .................        |         |  | +----------------+              +-+------------+
-| | read_ack_register--------+---------+
-| | read_ack_preserve        |
-| | read_ack_write           |
-+ +--------------------------+
+64 bit LE  G0,G1...G7
+64 bit BE  G7,G6...G0
+32 bit LE  A0,A1,A2,A3, B0,B1,B2,B3
+32 bit BE  A3,A2,A1,A0  B3,B2,B1,B0
 
-After injecting a SEA/SEI ghes error, the gueset OS kernel log will be shown as below:
+considering a 64bit BE src to a 32bit LE dest:
+  64 bit BE  G7,G6...G0
+  bitmap_to_le swaps that to
+             G0,G1,..G7
 
-[  142.911115] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 8
-[  142.913141] {1}[Hardware Error]: event severity: recoverable
-[  142.914498] {1}[Hardware Error]:  Error 0, type: recoverable
-[  142.915851] {1}[Hardware Error]:   section_type: memory error
-[  142.917163] {1}[Hardware Error]:   physical_address: 0x0000000000001111
-[  142.918792] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
+destination reads two 32bit chunks:
+  G0,G1,G2,G3    G4,G5,G6,G7
 
-how to test:
-1. In the guest OS, use this command to dump the APEI table: 
-	"iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST"
-2. And find the address for the generic error status block
-   according to the notification type
-3. then find the CPER record through the generic error status block.
+dest is LE so no byteswap is needed.
 
-For example(notification type is SEA):
+Yes, I _think_ that's OK.
 
-(1) root@genericarmv8:~# iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
-(2) root@genericarmv8:~# cat HEST.dsl
-    /*
-     * Intel ACPI Component Architecture
-     * AML/ASL+ Disassembler version 20170728 (64-bit version)
-     * Copyright (c) 2000 - 2017 Intel Corporation
-     *
-     * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Sep  5 07:59:17 2016
-     *
-     * ACPI Data Table [HEST]
-     *
-     * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
-     */
+> > I think that means you have to save it as a series of long's;
+> > and also just make sure 'size' is a multiple of 'long' - otherwise
+> > you lose the last few bytes, which on a big endian system would
+> > be a problem.
+> 
+> Yeah, then the size should possibly be pre-cooked with
+> BITS_TO_LONGS(). However that's slightly tricky as well, maybe I
+> should provide another bitmap helper:
+> 
+>   static inline long bitmap_size(long nbits)
+>   {
+>       return BITS_TO_LONGS(nbits);
+>   }
+> 
+> Since the whole thing should be part of bitmap APIs imho.
 
-    ..................................................................................
-	[308h 0776   2]                Subtable Type : 000A [Generic Hardware Error Source V2]
-	[30Ah 0778   2]                    Source Id : 0008
-	[30Ch 0780   2]            Related Source Id : FFFF
-	[30Eh 0782   1]                     Reserved : 00
-	[30Fh 0783   1]                      Enabled : 01
-	[310h 0784   4]       Records To Preallocate : 00000001
-	[314h 0788   4]      Max Sections Per Record : 00000001
-	[318h 0792   4]          Max Raw Data Length : 00001000
+The macro is enough I think.
 
-	[31Ch 0796  12]         Error Status Address : [Generic Address Structure]
-	[31Ch 0796   1]                     Space ID : 00 [SystemMemory]
-	[31Dh 0797   1]                    Bit Width : 40
-	[31Eh 0798   1]                   Bit Offset : 00
-	[31Fh 0799   1]         Encoded Access Width : 04 [QWord Access:64]
-	[320h 0800   8]                      Address : 00000000785D0040
+> > 
+> > Also, should we be using 'max_length' or 'used_length' - ram_save_setup
+> > stores the used_length.  I don't think we should be accessing outside
+> > the used_length?  That might also make the thing about 'size' being
+> > rounded to a 'long' more interesting; maybe need to check you don't use
+> > the bits outside the used_length.
+> 
+> Yes. AFAIU max_length and used_length are always the same currently in
+> our codes. I used max_length since in ram_state_init() we inited
+> block->bmap and block->unsentmap with it. I can switch to used_length
+> though.
 
-	[328h 0808  28]                       Notify : [Hardware Error Notification Structure]
-	[328h 0808   1]                  Notify Type : 08 [SEA]
-	[329h 0809   1]                Notify Length : 1C
-	[32Ah 0810   2]   Configuration Write Enable : 0000
-	[32Ch 0812   4]                 PollInterval : 00000000
-	[330h 0816   4]                       Vector : 00000000
-	[334h 0820   4]      Polling Threshold Value : 00000000
-	[338h 0824   4]     Polling Threshold Window : 00000000
-	[33Ch 0828   4]        Error Threshold Value : 00000000
-	[340h 0832   4]       Error Threshold Window : 00000000
+I remember it went in a couple of years ago because there were cases it
+was different; they're rare though - I think it was an ACPI case.
 
-	[344h 0836   4]    Error Status Block Length : 00001000
-	[348h 0840  12]            Read Ack Register : [Generic Address Structure]
-	[348h 0840   1]                     Space ID : 00 [SystemMemory]
-	[349h 0841   1]                    Bit Width : 40
-	[34Ah 0842   1]                   Bit Offset : 00
-	[34Bh 0843   1]         Encoded Access Width : 04 [QWord Access:64]
-	[34Ch 0844   8]                      Address : 00000000785D0098
+> > > +    qemu_fflush(file);
+> > > +
+> > > +    if (qemu_file_get_error(file)) {
+> > > +        return qemu_file_get_error(file);
+> > > +    }
+> > > +
+> > > +    return sizeof(size) + size;
+> > 
+> > I think since size is always sent as a 64bit that's  size + 8.
+> 
+> Yes. I "offloaded" the calcluation of sizeof(size) to compiler (in
+> case I got brain furt when writting the codes...). So you prefer
+> digits directly in these cases? It might be just fragile if we changed
+> the type of "size" someday (though I guess we won't).
+> 
+> Let me use "size + 8".
 
-	[354h 0852   8]            Read Ack Preserve : 00000000FFFFFFFE
-	[35Ch 0860   8]               Read Ack Write : 0000000000000001
+Lets stick with what you have actually; it's OK since size is a
+uint64_t.
 
-	[364h 0868   2]                Subtable Type : 000A [Generic Hardware Error Source V2]
-	[366h 0870   2]                    Source Id : 0009
-	[368h 0872   2]            Related Source Id : FFFF
-	[36Ah 0874   1]                     Reserved : 00
-	[36Bh 0875   1]                      Enabled : 01
-	[36Ch 0876   4]       Records To Preallocate : 00000001
-	[370h 0880   4]      Max Sections Per Record : 00000001
-	[374h 0884   4]          Max Raw Data Length : 00001000
+Dave
 
-	[378h 0888  12]         Error Status Address : [Generic Address Structure]
-	[378h 0888   1]                     Space ID : 00 [SystemMemory]
-	[379h 0889   1]                    Bit Width : 40
-	[37Ah 0890   1]                   Bit Offset : 00
-	[37Bh 0891   1]         Encoded Access Width : 04 [QWord Access:64]
-	[37Ch 0892   8]                      Address : 00000000785D0048
-
-	[384h 0900  28]                       Notify : [Hardware Error Notification Structure]
-	[384h 0900   1]                  Notify Type : 09 [SEI]
-	[385h 0901   1]                Notify Length : 1C
-	[386h 0902   2]   Configuration Write Enable : 0000
-	[388h 0904   4]                 PollInterval : 00000000
-	[38Ch 0908   4]                       Vector : 00000000
-	[390h 0912   4]      Polling Threshold Value : 00000000
-	[394h 0916   4]     Polling Threshold Window : 00000000
-	[398h 0920   4]        Error Threshold Value : 00000000
-	[39Ch 0924   4]       Error Threshold Window : 00000000
-
-	[3A0h 0928   4]    Error Status Block Length : 00001000
-	[3A4h 0932  12]            Read Ack Register : [Generic Address Structure]
-	[3A4h 0932   1]                     Space ID : 00 [SystemMemory]
-	[3A5h 0933   1]                    Bit Width : 40
-	[3A6h 0934   1]                   Bit Offset : 00
-	[3A7h 0935   1]         Encoded Access Width : 04 [QWord Access:64]
-	[3A8h 0936   8]                      Address : 00000000785D00A0
-
-	[3B0h 0944   8]            Read Ack Preserve : 00000000FFFFFFFE
-	[3B8h 0952   8]               Read Ack Write : 0000000000000001
-	.....................................................................................
-(3) according to above table, the address that contains the physical address of a block
-    of memory that holds the error status data for SEA notification error source is 0x00000000785D0040
-(4) the address for SEA notification error source is 0x785d8108
-    (qemu) xp /1 0x00000000785D0040
-    00000000785d0040: 0x785d80b0
-
-(5) check the content of generic error status block and generic error data entry
-    (qemu) xp /100x 0x785d80b0
-	00000000785d80b0: 0x00000001 0x00000000 0x00000000 0x00000098
-	00000000785d80c0: 0x00000000 0xa5bc1114 0x4ede6f64 0x833e63b8
-	00000000785d80d0: 0xb1837ced 0x00000000 0x00000300 0x00000050
-	00000000785d80e0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d80f0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8100: 0x00000000 0x00000000 0x00000000 0x00004002
-	00000000785d8110: 0x00000000 0x00000000 0x00000000 0x00001111
-	00000000785d8120: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8130: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8140: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8150: 0x00000000 0x00000003 0x00000000 0x00000000
-	00000000785d8160: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8170: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8180: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8190: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d81a0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d81b0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d81c0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d81d0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d81e0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d81f0: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8200: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8210: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8220: 0x00000000 0x00000000 0x00000000 0x00000000
-	00000000785d8230: 0x00000000 0x00000000 0x00000000 0x00000000
-(6) check the OSPM's ACK value(for example SEA)
-    /* Before OSPM acknowledges the error, check the ACK value */
-    (qemu) xp /1 0x00000000785D0098
-    00000000785d00f0: 0x00000000
-
-    /* After OSPM acknowledges the error, check the ACK value */
-    (qemu) xp /1 0x00000000785D0098
-    00000000785d00f0: 0x00000001
-
-
-Dongjiu Geng (3):
-  ACPI: add APEI/HEST/CPER structures and macros
-  ACPI: Add APEI GHES Table Generation support
-  ACPI: build and enable APEI GHES in the Makefile and configuration
-
- default-configs/arm-softmmu.mak |   1 +
- hw/acpi/Makefile.objs           |   1 +
- hw/acpi/aml-build.c             |   2 +
- hw/acpi/hest_ghes.c             | 344 ++++++++++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c        |   6 +
- include/hw/acpi/acpi-defs.h     | 193 ++++++++++++++++++++++
- include/hw/acpi/aml-build.h     |   1 +
- include/hw/acpi/hest_ghes.h     |  47 ++++++
- 8 files changed, 595 insertions(+)
- create mode 100644 hw/acpi/hest_ghes.c
- create mode 100644 include/hw/acpi/hest_ghes.h
-
--- 
-1.8.3.1
+> 
+> > 
+> > > +}
+> > > +
+> > > +/*
+> > >   * An outstanding page request, on the source, having been received
+> > >   * and queued
+> > >   */
+> > > @@ -2705,6 +2731,54 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> > >      return ret;
+> > >  }
+> > >  
+> > > +/*
+> > > + * Read the received bitmap, revert it as the initial dirty bitmap.
+> > > + * This is only used when the postcopy migration is paused but wants
+> > > + * to resume from a middle point.
+> > > + */
+> > > +int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+> > > +{
+> > > +    QEMUFile *file = s->rp_state.from_dst_file;
+> > > +    uint64_t local_size = (block->max_length >> TARGET_PAGE_BITS) / 8;
+> > > +    uint64_t size;
+> > > +
+> > > +    if (s->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> > > +        error_report("%s: incorrect state %s", __func__,
+> > > +                     MigrationStatus_lookup[s->state]);
+> > > +        return -EINVAL;
+> > > +    }
+> > > +
+> > > +    size = qemu_get_be64(file);
+> > > +
+> > > +    /* The size of the bitmap should match with our ramblock */
+> > > +    if (size != local_size) {
+> > > +        error_report("%s: ramblock '%s' bitmap size mismatch "
+> > > +                     "(0x%lx != 0x%lx)", __func__, block->idstr,
+> > > +                     size, local_size);
+> > > +        return -EINVAL;
+> > > +    }
+> > 
+> > Coming back to the used_length thing above;  again I think the rule
+> > is that the used_length has to match not the max_length.
+> 
+> Yeah. Will switch.
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
