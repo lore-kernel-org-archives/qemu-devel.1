@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ddcai-0001eq-VT
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:25:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ddcao-0008Nf-I2
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:29:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ddabU-0004FZ-VX
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:18:23 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  4 Aug 2017 11:51:36 +0100
-Message-Id: <20170804105136.12061-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.10] block: use 1 MB bounce buffers for
- crypto instead of 16KB
+	(envelope-from <peter.maydell@linaro.org>) id 1ddcZi-0005kq-VQ
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:24:40 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38823)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ddcZi-0005jQ-Ij
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 09:23:34 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id m85so19888311wma.1
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 06:23:34 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170803175937.22225-1-ehabkost@redhat.com>
+References: <20170803175937.22225-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Aug 2017 14:23:12 +0100
+Message-ID: <CAFEAcA-EDCYW_gq8YcOXfOZJ73=e5dQ8i9ZScK09thPaucQdCA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] cpu: crash fix for -rc2 (don't allow
+ negative core id)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,59 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Using 16KB bounce buffers creates a significant performance
-penalty for I/O to encrypted volumes on storage with high
-I/O latency (rotating rust & network drives), because it
-triggers lots of fairly small I/O operations.
+On 3 August 2017 at 18:59, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> The following changes since commit aaaec6acad7cf97372d48c1b09126a09697519c8:
+>
+>   Update version for v2.10.0-rc1 release (2017-08-02 16:36:32 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-pull-request
+>
+> for you to fetch changes up to be2960baae07e5257cde8c814cbd91647e235147:
+>
+>   cpu: don't allow negative core id (2017-08-02 18:30:13 -0300)
+>
+> ----------------------------------------------------------------
+> cpu: crash fix (don't allow negative core id)
+>
+> ----------------------------------------------------------------
+>
+> Laurent Vivier (1):
+>   cpu: don't allow negative core id
+>
+>  hw/cpu/core.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-On tests with rotating rust, and cache=none|directsync,
-write speed increased from 2MiB/s to 32MiB/s, on a par
-with that achieved by the in-kernel luks driver.
+Applied, thanks.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- block/crypto.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/block/crypto.c b/block/crypto.c
-index 58ef6f2f52..207941db9a 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -379,7 +379,7 @@ static void block_crypto_close(BlockDriverState *bs)
- }
- 
- 
--#define BLOCK_CRYPTO_MAX_SECTORS 32
-+#define BLOCK_CRYPTO_MAX_SECTORS 2048
- 
- static coroutine_fn int
- block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
-@@ -396,9 +396,8 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
- 
-     qemu_iovec_init(&hd_qiov, qiov->niov);
- 
--    /* Bounce buffer so we have a linear mem region for
--     * entire sector. XXX optimize so we avoid bounce
--     * buffer in case that qiov->niov == 1
-+    /* Bounce buffer because we're not permitted to touch
-+     * contents of qiov - it points to guest memory.
-      */
-     cipher_data =
-         qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * 512,
-@@ -464,9 +463,8 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
- 
-     qemu_iovec_init(&hd_qiov, qiov->niov);
- 
--    /* Bounce buffer so we have a linear mem region for
--     * entire sector. XXX optimize so we avoid bounce
--     * buffer in case that qiov->niov == 1
-+    /* Bounce buffer because we're not permitted to touch
-+     * contents of qiov - it points to guest memory.
-      */
-     cipher_data =
-         qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * 512,
--- 
-2.13.3
+-- PMM
