@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpy-0005Pp-6q
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpy-0005Pf-2h
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 06:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpx-0002g7-1e
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpx-0002gU-7p
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 06:28:10 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Fri, 4 Aug 2017 18:26:40 +0800
-Message-ID: <d3a51356a54282267a84cd747f7cc410dd536ad2.1501827395.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
+Date: Fri, 4 Aug 2017 18:26:37 +0800
+Message-ID: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/6] hw/block/nvme: Convert to realize
+Subject: [Qemu-devel] [PATCH v2 0/6] Convert to realize and improve error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +21,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Convert nvme_init() to realize and rename it to nvme_realize().
+This series mainly implements the conversions of ide, floppy and nvme
+device to realize. Add some error handling messages and remove the local
+variable local_err, use errp to propagate the error directly. Also
+fix the unusual function name.
+
+v2:
+  -use bool as the return type instead of int. [Markus Armbruster & Stefan Hajnoczi]
 
 Cc: John Snow <jsnow@redhat.com>
-Cc: Keith Busch <keith.busch@intel.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- hw/block/nvme.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+Mao Zhongyi (6):
+  hw/ide: Convert DeviceClass init to realize
+  hw/block/fdc: Convert to realize
+  hw/block/nvme: Convert to realize
+  hw/block: Fix the return type
+  hw/block: Use errp directly rather than local_err
+  dev-storage: Fix the unusual function name
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 6071dc1..43c60ab 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -920,7 +920,7 @@ static const MemoryRegionOps nvme_cmb_ops = {
-     },
- };
- 
--static int nvme_init(PCIDevice *pci_dev)
-+static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- {
-     NvmeCtrl *n = NVME(pci_dev);
-     NvmeIdCtrl *id = &n->id_ctrl;
-@@ -931,24 +931,27 @@ static int nvme_init(PCIDevice *pci_dev)
-     Error *local_err = NULL;
- 
-     if (!n->conf.blk) {
--        return -1;
-+        error_setg(errp, "drive property not set");
-+        return;
-     }
- 
-     bs_size = blk_getlength(n->conf.blk);
-     if (bs_size < 0) {
--        return -1;
-+        error_setg(errp, "could not get backing file size");
-+        return;
-     }
- 
-     blkconf_serial(&n->conf, &n->serial);
-     if (!n->serial) {
--        return -1;
-+        error_setg(errp, "serial property not set");
-+        return;
-     }
-     blkconf_blocksizes(&n->conf);
-     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
-                                   false, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
--        return -1;
-+        error_propagate(errp, local_err);
-+        return;
-     }
- 
-     pci_conf = pci_dev->config;
-@@ -1046,7 +1049,6 @@ static int nvme_init(PCIDevice *pci_dev)
-             cpu_to_le64(n->ns_size >>
-                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
-     }
--    return 0;
- }
- 
- static void nvme_exit(PCIDevice *pci_dev)
-@@ -1081,7 +1083,7 @@ static void nvme_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     PCIDeviceClass *pc = PCI_DEVICE_CLASS(oc);
- 
--    pc->init = nvme_init;
-+    pc->realize = nvme_realize;
-     pc->exit = nvme_exit;
-     pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
-     pc->vendor_id = PCI_VENDOR_ID_INTEL;
+ hw/block/block.c                | 15 ++++---
+ hw/block/dataplane/virtio-blk.c | 12 +++---
+ hw/block/dataplane/virtio-blk.h |  2 +-
+ hw/block/fdc.c                  | 48 +++++++++------------
+ hw/block/nvme.c                 | 24 +++++------
+ hw/block/virtio-blk.c           | 17 +++-----
+ hw/ide/core.c                   |  7 +--
+ hw/ide/qdev.c                   | 94 +++++++++++++++++++----------------------
+ hw/scsi/scsi-disk.c             | 13 ++----
+ hw/usb/dev-storage.c            | 29 ++++++-------
+ include/hw/block/block.h        |  4 +-
+ include/hw/ide/internal.h       |  5 ++-
+ 12 files changed, 125 insertions(+), 145 deletions(-)
+
 -- 
 2.9.4
