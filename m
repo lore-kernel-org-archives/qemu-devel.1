@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ddfFb-00046X-Ns
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:15:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddfQm-0007AR-Hi
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ddfFY-0002Yh-Ds
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:14:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59466)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ddfFY-0002YE-4L
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:14:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 317BA20A9B
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 16:14:55 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  4 Aug 2017 18:14:51 +0200
-Message-Id: <20170804161452.17413-2-pbonzini@redhat.com>
-In-Reply-To: <20170804161452.17413-1-pbonzini@redhat.com>
-References: <20170804161452.17413-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] rcu: completely disable pthread_atfork
- callbacks as soon as possible
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddfQl-0004FH-Kc
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:26:32 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
+	<11364022c248d196c455ac25bb50b611a01e096c.1501827395.git.maozy.fnst@cn.fujitsu.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cb43d13f-e86b-2f25-8f69-65534d09aa27@amsat.org>
+Date: Fri, 4 Aug 2017 13:26:20 -0300
+MIME-Version: 1.0
+In-Reply-To: <11364022c248d196c455ac25bb50b611a01e096c.1501827395.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] dev-storage: Fix the unusual
+ function name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Because of -daemonize, system mode QEMU sometimes needs to fork() and
-keep RCU enabled in the child.  However, there is a possible deadlock
-with synchronize_rcu:
+On 08/04/2017 07:26 AM, Mao Zhongyi wrote:
+> The function name of usb_msd_{realize,unrealize}_*,
+> usb_msd_class_initfn_* are unusual. Rename it to
+> usb_msd_*_{realize,unrealize}, usb_msd_class_*_initfn.
+> 
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> 
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 
-- the CPU thread is inside a RCU critical section and wants to take
-  the BQL in order to do MMIO
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-- the monitor thread, which is owning the BQL, calls rcu_init_lock
-  which tries to take the rcu_sync_lock
-
-- the call_rcu thread has taken rcu_sync_lock in synchronize_rcu, but
-  synchronize_rcu needs the CPU thread to end the critical section
-  before returning.
-
-This cannot happen for user-mode emulation, because it does not have
-a BQL.
-
-To fix it, assume that system mode QEMU only forks in preparation for
-exec (except when daemonizing) and disable pthread_atfork as soon as
-the double fork has happened.
-
-Reported-by: David Gilbert <dgilbert@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/qemu/rcu.h |  6 ++++++
- util/rcu.c         | 20 ++++++++++++++++++++
- vl.c               |  1 +
- 3 files changed, 27 insertions(+)
-
-diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-index 83ae2808be..c0da9907e8 100644
---- a/include/qemu/rcu.h
-+++ b/include/qemu/rcu.h
-@@ -105,6 +105,12 @@ extern void synchronize_rcu(void);
-  */
- extern void rcu_register_thread(void);
- extern void rcu_unregister_thread(void);
-+
-+/*
-+ * Support for fork().  fork() support is enabled at startup.
-+ */
-+extern void rcu_enable_atfork(void);
-+extern void rcu_disable_atfork(void);
- extern void rcu_after_fork(void);
- 
- struct rcu_head;
-diff --git a/util/rcu.c b/util/rcu.c
-index 9adc5e4a36..2142ddd93b 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -318,15 +318,35 @@ static void rcu_init_complete(void)
-     rcu_register_thread();
- }
- 
-+static int atfork_depth = 1;
-+
-+void rcu_enable_atfork(void)
-+{
-+    atfork_depth++;
-+}
-+
-+void rcu_disable_atfork(void)
-+{
-+    atfork_depth--;
-+}
-+
- #ifdef CONFIG_POSIX
- static void rcu_init_lock(void)
- {
-+    if (atfork_depth < 1) {
-+        return;
-+    }
-+
-     qemu_mutex_lock(&rcu_sync_lock);
-     qemu_mutex_lock(&rcu_registry_lock);
- }
- 
- static void rcu_init_unlock(void)
- {
-+    if (atfork_depth < 1) {
-+        return;
-+    }
-+
-     qemu_mutex_unlock(&rcu_registry_lock);
-     qemu_mutex_unlock(&rcu_sync_lock);
- }
-diff --git a/vl.c b/vl.c
-index 99fcfa0442..8967115514 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4121,6 +4121,7 @@ int main(int argc, char **argv, char **envp)
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
- 
-     os_daemonize();
-+    rcu_disable_atfork();
- 
-     if (pid_file && qemu_create_pidfile(pid_file) != 0) {
-         error_report("could not acquire pid file: %s", strerror(errno));
--- 
-2.13.3
+> ---
+>   hw/usb/dev-storage.c | 20 ++++++++++----------
+>   1 file changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+> index 801f552..2a05cd5 100644
+> --- a/hw/usb/dev-storage.c
+> +++ b/hw/usb/dev-storage.c
+> @@ -596,7 +596,7 @@ static void usb_msd_unrealize_storage(USBDevice *dev, Error **errp)
+>       object_unref(OBJECT(&s->bus));
+>   }
+>   
+> -static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
+> +static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+>   {
+>       MSDState *s = USB_STORAGE_DEV(dev);
+>       BlockBackend *blk = s->conf.blk;
+> @@ -643,14 +643,14 @@ static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
+>       s->scsi_dev = scsi_dev;
+>   }
+>   
+> -static void usb_msd_unrealize_bot(USBDevice *dev, Error **errp)
+> +static void usb_msd_bot_unrealize(USBDevice *dev, Error **errp)
+>   {
+>       MSDState *s = USB_STORAGE_DEV(dev);
+>   
+>       object_unref(OBJECT(&s->bus));
+>   }
+>   
+> -static void usb_msd_realize_bot(USBDevice *dev, Error **errp)
+> +static void usb_msd_bot_realize(USBDevice *dev, Error **errp)
+>   {
+>       MSDState *s = USB_STORAGE_DEV(dev);
+>       DeviceState *d = DEVICE(dev);
+> @@ -764,12 +764,12 @@ static void usb_msd_class_initfn_common(ObjectClass *klass, void *data)
+>       dc->vmsd = &vmstate_usb_msd;
+>   }
+>   
+> -static void usb_msd_class_initfn_storage(ObjectClass *klass, void *data)
+> +static void usb_msd_class_storage_initfn(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       USBDeviceClass *uc = USB_DEVICE_CLASS(klass);
+>   
+> -    uc->realize = usb_msd_realize_storage;
+> +    uc->realize = usb_msd_storage_realize;
+>       uc->unrealize = usb_msd_unrealize_storage;
+>       dc->props = msd_properties;
+>   }
+> @@ -828,26 +828,26 @@ static void usb_msd_instance_init(Object *obj)
+>       object_property_set_int(obj, -1, "bootindex", NULL);
+>   }
+>   
+> -static void usb_msd_class_initfn_bot(ObjectClass *klass, void *data)
+> +static void usb_msd_class_bot_initfn(ObjectClass *klass, void *data)
+>   {
+>       USBDeviceClass *uc = USB_DEVICE_CLASS(klass);
+>   
+> -    uc->realize = usb_msd_realize_bot;
+> -    uc->unrealize = usb_msd_unrealize_bot;
+> +    uc->realize = usb_msd_bot_realize;
+> +    uc->unrealize = usb_msd_bot_unrealize;
+>       uc->attached_settable = true;
+>   }
+>   
+>   static const TypeInfo msd_info = {
+>       .name          = "usb-storage",
+>       .parent        = TYPE_USB_STORAGE,
+> -    .class_init    = usb_msd_class_initfn_storage,
+> +    .class_init    = usb_msd_class_storage_initfn,
+>       .instance_init = usb_msd_instance_init,
+>   };
+>   
+>   static const TypeInfo bot_info = {
+>       .name          = "usb-bot",
+>       .parent        = TYPE_USB_STORAGE,
+> -    .class_init    = usb_msd_class_initfn_bot,
+> +    .class_init    = usb_msd_class_bot_initfn,
+>   };
+>   
+>   static void usb_msd_register_types(void)
+> 
