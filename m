@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ddj0E-0005Nw-Rs
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:15:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ddjBV-0000YV-44
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:27:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ddj09-0000v4-PA
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:15:22 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:37138)
+	(envelope-from <richard.henderson@linaro.org>) id 1ddjBR-00012x-74
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:27:01 -0400
+Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:37670)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ddj09-0000uX-IN
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:15:17 -0400
-Received: by mail-pg0-x235.google.com with SMTP id y129so11842139pgy.4
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 13:15:15 -0700 (PDT)
+	id 1ddjBR-00012b-11
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:26:57 -0400
+Received: by mail-pg0-x229.google.com with SMTP id y129so11933244pgy.4
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 13:26:56 -0700 (PDT)
 References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-8-git-send-email-peter.maydell@linaro.org>
+	<1501867249-1924-9-git-send-email-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d7b74b23-2979-e3d5-0d1d-98d795ec89ee@linaro.org>
-Date: Fri, 4 Aug 2017 13:15:13 -0700
+Message-ID: <17d709e6-7f71-1d5b-1bdd-57b0323d2bcb@linaro.org>
+Date: Fri, 4 Aug 2017 13:26:53 -0700
 MIME-Version: 1.0
-In-Reply-To: <1501867249-1924-8-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1501867249-1924-9-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 7/8] target/arm: Allow deliver_fault()
- caller to specify EA bit
+Subject: Re: [Qemu-devel] [PATCH 8/8] target/arm: Implement new
+ do_transaction_failed hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +36,15 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/04/2017 10:20 AM, Peter Maydell wrote:
-> For external aborts, we will want to be able to specify the EA
-> (external abort type) bit in the syndrome field.  Allow callers of
-> deliver_fault() to do that by adding a field to ARMMMUFaultInfo which
-> we use when constructing the syndrome values.
+> Implement the new do_transaction_failed hook for ARM, which should
+> cause the CPU to take a prefetch abort or data abort.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/internals.h |  2 ++
->  target/arm/op_helper.c | 10 +++++-----
->  2 files changed, 7 insertions(+), 5 deletions(-)
+>  target/arm/internals.h | 10 ++++++++++
+>  target/arm/cpu.c       |  1 +
+>  target/arm/op_helper.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 54 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
