@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dder3-0002vU-M1
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:49:38 -0400
+	(envelope-from <jcody@redhat.com>) id 1ddes3-0004Te-Td
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dder2-0002Qu-Kh
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:49:37 -0400
-Date: Fri, 4 Aug 2017 16:49:19 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170804154919.GI14504@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170804105059.11941-1-berrange@redhat.com>
-	<20170804140210.GD4108@localhost.localdomain>
-	<20170804140630.GC14504@redhat.com>
-	<9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1ddes2-0003KB-Pg
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 11:50:39 -0400
+Date: Fri, 4 Aug 2017 11:50:31 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170804155031.GK22129@localhost.localdomain>
+References: <20170804144354.21985-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: document semanatics of
- bdrv_co_preadv|pwritev
+In-Reply-To: <20170804144354.21985-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/null: Remove 'filename'
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +23,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Aug 04, 2017 at 10:41:54AM -0500, Eric Blake wrote:
-> On 08/04/2017 09:06 AM, Daniel P. Berrange wrote:
-> > On Fri, Aug 04, 2017 at 04:02:10PM +0200, Kevin Wolf wrote:
-> >> Am 04.08.2017 um 12:50 hat Daniel P. Berrange geschrieben:
-> >>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> >>> ---
+On Fri, Aug 04, 2017 at 04:43:54PM +0200, Kevin Wolf wrote:
+> This option was only added to allow 'null-co://' and 'null-aio://' as
+> filenames, its value never served any actual purpose and was ignored.
+> Nevertheless it was accepted as '-drive driver=null,filename=foo'.
 > 
-> >> Really? We are asserting that they match in bdrv_aligned_preadv():
-> >>
-> >>     assert(!qiov || bytes == qiov->size);
-> > 
-> > Hmm, why do we pass @bytes at all then ? If they're always the same,
-> > how about deleting it and just letting everyone read qiov->size
-> > directly.
+> The correct way to enable the protocol prefixes (and that without adding
+> a useless -drive option) is implementing .bdrv_parse_filename. This is
+> what this patch does.
 > 
-> Read the assertion again: qiov can be NULL (generally, when writing
-> zeroes).  So we can't rely on qiov->size in that scenario.
+> Technically, this is an incompatible change, but the null block driver
+> is only used for benchmarking, testing and debugging, and an option
+> without effect isn't likely to be used by anyone anyway, so no bad
+> effects are to be expected.
+> 
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/null.c | 31 ++++++++++++++++++++++++++-----
+>  1 file changed, 26 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/null.c b/block/null.c
+> index 876f90965b..dd9c13f9ba 100644
+> --- a/block/null.c
+> +++ b/block/null.c
+> @@ -30,11 +30,6 @@ static QemuOptsList runtime_opts = {
+>      .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+>      .desc = {
+>          {
+> -            .name = "filename",
+> -            .type = QEMU_OPT_STRING,
+> -            .help = "",
+> -        },
+> -        {
+>              .name = BLOCK_OPT_SIZE,
+>              .type = QEMU_OPT_SIZE,
+>              .help = "size of the null block",
+> @@ -54,6 +49,30 @@ static QemuOptsList runtime_opts = {
+>      },
+>  };
+>  
+> +static void null_co_parse_filename(const char *filename, QDict *options,
+> +                                   Error **errp)
+> +{
+> +    /* This functions only exists so that a null-co:// filename is accepted
+> +     * with the null-co driver. */
+> +    if (strcmp(filename, "null-co://")) {
+> +        error_setg(errp, "The only allowed filename for this driver is "
+> +                         "'null-co://'");
+> +        return;
+> +    }
+> +}
+> +
+> +static void null_aio_parse_filename(const char *filename, QDict *options,
+> +                                    Error **errp)
+> +{
+> +    /* This functions only exists so that a null-aio:// filename is accepted
+> +     * with the null-aio driver. */
+> +    if (strcmp(filename, "null-aio://")) {
+> +        error_setg(errp, "The only allowed filename for this driver is "
+> +                         "'null-aio://'");
+> +        return;
+> +    }
+> +}
+> +
+>  static int null_file_open(BlockDriverState *bs, QDict *options, int flags,
+>                            Error **errp)
+>  {
+> @@ -242,6 +261,7 @@ static BlockDriver bdrv_null_co = {
+>      .instance_size          = sizeof(BDRVNullState),
+>  
+>      .bdrv_file_open         = null_file_open,
+> +    .bdrv_parse_filename    = null_co_parse_filename,
+>      .bdrv_close             = null_close,
+>      .bdrv_getlength         = null_getlength,
+>  
+> @@ -261,6 +281,7 @@ static BlockDriver bdrv_null_aio = {
+>      .instance_size          = sizeof(BDRVNullState),
+>  
+>      .bdrv_file_open         = null_file_open,
+> +    .bdrv_parse_filename    = null_aio_parse_filename,
+>      .bdrv_close             = null_close,
+>      .bdrv_getlength         = null_getlength,
+>  
+> -- 
+> 2.13.3
+> 
+> 
 
-This is odd.  In the bdrv_aligned_readv() it looks very much like
-we'll reference qiov->niov, if bytes != 0, so if qiov was NULL we
-would crash.
-
-In bdrv_aligned_writev(), qiov->niov is also refernced if bytes != 0,
-*unless*  flags contains BDRV_REQ_ZERO_WRITE, in which case we'll
-invoke bdrv_co_do_pwrite_zeroes() instead.
-
-So unless I'm missing something, bdrv_co_preadv|writev cannot be
-called with a NULL  qiov, and bdrv_aligned_writev|readv might
-need their assertions tightened up.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Jeff Cody <jcody@redhat.com>
