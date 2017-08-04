@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1ddYnl-0000iO-6s
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:21:50 -0400
+	(envelope-from <peterx@redhat.com>) id 1ddYog-0001Ms-ES
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1ddYni-0008Jr-1l
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:21:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51202)
+	(envelope-from <peterx@redhat.com>) id 1ddYod-0000ii-9P
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:22:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1ddYnh-0008Ip-Rg
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:21:45 -0400
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Fri,  4 Aug 2017 11:14:03 +0200
-Message-Id: <20170804091403.13478-4-lprosek@redhat.com>
-In-Reply-To: <20170804091403.13478-1-lprosek@redhat.com>
-References: <20170804091403.13478-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] i386/kvm: advertise Hyper-V frequency MSRs
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ddYod-0000iK-0j
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 05:22:43 -0400
+Date: Fri, 4 Aug 2017 17:22:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170804092236.GQ5561@pxdev.xzpeter.org>
+References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
+	<1501229198-30588-24-git-send-email-peterx@redhat.com>
+	<20170803110540.GE2076@work-vm>
+	<20170804070419.GI5561@pxdev.xzpeter.org>
+	<20170804070957.GJ5561@pxdev.xzpeter.org>
+	<20170804083000.GA2805@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170804083000.GA2805@work-vm>
+Subject: Re: [Qemu-devel] [RFC 23/29] migration: new cmd
+ MIG_CMD_POSTCOPY_RESUME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, mtosatti@redhat.com, rkrcmar@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-As of kernel commit eb82feea59d6 ("KVM: hyperv: support HV_X64_MSR_TSC_FREQUENCY
-and HV_X64_MSR_APIC_FREQUENCY"), KVM supports two new MSRs which are required
-for nested Hyper-V to read timestamps with RDTSC + TSC page.
+On Fri, Aug 04, 2017 at 09:30:01AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Fri, Aug 04, 2017 at 03:04:19PM +0800, Peter Xu wrote:
+> > > On Thu, Aug 03, 2017 at 12:05:41PM +0100, Dr. David Alan Gilbert wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > > +static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+> > > > > +{
+> > > > > +    /*
+> > > > > +     * This means source VM is ready to resume the postcopy migration.
+> > > > > +     * It's time to switch state and release the fault thread to
+> > > > > +     * continue service page faults.
+> > > > > +     */
+> > > > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+> > > > > +                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> > > > > +    qemu_sem_post(&mis->postcopy_pause_sem_fault);
+> > > > 
+> > > > Is it worth sanity checking that you were in RECOVER at this point?
+> > > 
+> > > Yeah, it never hurts.  Will do.
+> > 
+> > Not sure whether this would be good (note: I returned 0 in the if):
+> > 
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index b7843c2..b34f59b 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -1709,6 +1709,12 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+> >  
+> >  static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+> >  {
+> > +    if (mis->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> > +        error_report("%s: illegal resume received", __func__);
+> > +        /* Don't fail the load, only for this. */
+> > +        return 0;
+> > +    }
+> > +
+> >      /*
+> >       * This means source VM is ready to resume the postcopy migration.
+> >       * It's time to switch state and release the fault thread to
+> > 
+> > Basically I just don't want to crash the dest VM (it holds hot dirty
+> > pages) even if it receives a faulty RESUME command.
+> 
+> Yes, so now that's a fun problem; effectively you then have 3 valid
+> failure modes:
+>     a) An IO failure so we need to go into POSTCOPY_PAUSE
+>     b) A fatal migration stream problem to quit
+>     c) A non-fatal migration stream problem to go .. back into PAUSE?
 
-This commit makes QEMU advertise the MSRs with CPUID.40000003H:EAX[11] and
-CPUID.40000003H:EDX[8] as specified in the Hyper-V TLFS and experimentally
-verified on a Hyper-V host. The feature is enabled with the existing hv-time CPU
-flag, and only if the TSC frequency is stable across migration and known.
+Hmm yes...
 
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
----
- target/i386/kvm.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+So I got at least three TODO ITEMs now:
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 77b6373..7e484a7 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -89,6 +89,7 @@ static bool has_msr_hv_vpindex;
- static bool has_msr_hv_runtime;
- static bool has_msr_hv_synic;
- static bool has_msr_hv_stimer;
-+static bool has_msr_hv_frequencies;
- static bool has_msr_xss;
- 
- static bool has_msr_architectural_pmu;
-@@ -631,7 +632,17 @@ static int hyperv_handle_properties(CPUState *cs)
-     if (cpu->hyperv_time) {
-         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
-         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
--        env->features[FEAT_HYPERV_EAX] |= 0x200;
-+        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
-+        if (has_msr_hv_frequencies
-+            /* TSC clock must be stable and known for this feature. */
-+            && ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC)
-+                || env->user_tsc_khz != 0)
-+            && env->tsc_khz != 0) {
-+
-+            env->features[FEAT_HYPERV_EAX] |= HV_X64_ACCESS_FREQUENCY_MSRS;
-+            env->features[FEAT_HYPERV_EDX] |=
-+                HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
-+        }
-     }
-     if (cpu->hyperv_crash && has_msr_hv_crash) {
-         env->features[FEAT_HYPERV_EDX] |= HV_X64_GUEST_CRASH_MSR_AVAILABLE;
-@@ -1127,6 +1138,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-                 case HV_X64_MSR_STIMER0_CONFIG:
-                     has_msr_hv_stimer = true;
-                     break;
-+                case HV_X64_MSR_TSC_FREQUENCY:
-+                    has_msr_hv_frequencies = true;
-+                    break;
-                 }
- 
-             }
+- support manual switch source into PAUSED state
+- support migrate_cancel during PAUSED/RECOVER state
+- when anything wrong happens during PAUSED/RECOVER, switching back to
+  PAUSED state on both sides
+
+It just depends on whether we would like to postpone these work, or we
+think any of them are essential even for the first version.
+
+IMHO we can postpone this 3rd one as well.
+
 -- 
-2.9.3
+Peter Xu
