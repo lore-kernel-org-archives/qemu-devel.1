@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ddivD-0003O1-Sc
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:10:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ddj0E-0005Nw-Rs
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ddivA-00064N-NU
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:10:11 -0400
-Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:33541)
+	(envelope-from <richard.henderson@linaro.org>) id 1ddj09-0000v4-PA
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:15:22 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:37138)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ddivA-00060e-HV
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:10:08 -0400
-Received: by mail-pf0-x22b.google.com with SMTP id d67so11777930pfc.0
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 13:10:08 -0700 (PDT)
+	id 1ddj09-0000uX-IN
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 16:15:17 -0400
+Received: by mail-pg0-x235.google.com with SMTP id y129so11842139pgy.4
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 13:15:15 -0700 (PDT)
 References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-7-git-send-email-peter.maydell@linaro.org>
+	<1501867249-1924-8-git-send-email-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <83c6b830-d15a-633a-c310-e3e541f1a6e2@linaro.org>
-Date: Fri, 4 Aug 2017 13:10:04 -0700
+Message-ID: <d7b74b23-2979-e3d5-0d1d-98d795ec89ee@linaro.org>
+Date: Fri, 4 Aug 2017 13:15:13 -0700
 MIME-Version: 1.0
-In-Reply-To: <1501867249-1924-7-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1501867249-1924-8-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/8] target/arm: Factor out fault delivery
- code
+Subject: Re: [Qemu-devel] [PATCH 7/8] target/arm: Allow deliver_fault()
+ caller to specify EA bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,20 +36,16 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/04/2017 10:20 AM, Peter Maydell wrote:
-> +    if (fsc == 0x3f) {
-> +        /* Caller doesn't have a long-format fault status code. This
-> +         * should only happen if this fault will never actually be reported
-> +         * to an EL that uses a syndrome register. Check that here.
-> +         * 0x3f is a (currently) reserved FSR code, in case the constructed
-> +         * syndrome does leak into the guest somehow.
-> +         */
-> +        assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-> +    }
-
-I see that this is just code movement, but there appears to be a typo in the
-comment, confusing fsc vs fsr and the 0x3f reserved value.
-
-Otherwise,
+> For external aborts, we will want to be able to specify the EA
+> (external abort type) bit in the syndrome field.  Allow callers of
+> deliver_fault() to do that by adding a field to ARMMMUFaultInfo which
+> we use when constructing the syndrome values.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/internals.h |  2 ++
+>  target/arm/op_helper.c | 10 +++++-----
+>  2 files changed, 7 insertions(+), 5 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
