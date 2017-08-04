@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ddgTF-0007Tj-2Y
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:33:10 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ddgTG-0007Un-AQ
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:33:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ddgTE-0001jN-1n
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:33:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ddgTF-0001kd-7h
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 13:33:10 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  4 Aug 2017 18:20:43 +0100
-Message-Id: <1501867249-1924-3-git-send-email-peter.maydell@linaro.org>
+Date: Fri,  4 Aug 2017 18:20:45 +0100
+Message-Id: <1501867249-1924-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
 References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/8] cpu: Define new cpu_transaction_failed()
- hook
+Subject: [Qemu-devel] [PATCH 4/8] boards.h: Define new flag
+ ignore_memory_transaction_failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-Currently we have a rather half-baked setup for allowing CPUs to
-generate exceptions on accesses to invalid memory: the CPU has a
-cpu_unassigned_access() hook which the memory system calls in
-unassigned_mem_write() and unassigned_mem_read() if the current_cpu
-pointer is non-NULL.  This was originally designed before we
-implemented the MemTxResult type that allows memory operations to
-report a success or failure code, which is why the hook is called
-right at the bottom of the memory system.  The major problem with
-this is that it means that the hook can be called even when the
-access was not actually done by the CPU: for instance if the CPU
-writes to a DMA engine register which causes the DMA engine to begin
-a transaction which has been set up by the guest to operate on
-invalid memory then this will casue the CPU to take an exception
-incorrectly.  Another minor problem is that currently if a device
-returns a transaction error then this won't turn into a CPU exception
-at all.
+Define a new MachineClass field ignore_memory_transaction_failures.
+If this is flag is true then the CPU will ignore memory transaction
+failures which should cause the CPU to take an exception due to an
+access to an unassigned physical address; the transaction will
+instead return zero (for a read) or be ignored (for a write).  This
+should be set only by legacy board models which rely on the old
+RAZ/WI behaviour for handling devices that QEMU does not yet model.
+New board models should instead use "unimplemented-device" for all
+memory ranges where the guest will attempt to probe for a device that
+QEMU doesn't implement and a stub device is required.
 
-The right way to do this is to have allow the CPU to respond
-to memory system transaction failures at the point where the
-CPU specific code calls into the memory system.
-
-Define a new QOM CPU method and utility function
-cpu_transaction_failed() which is called in these cases.
-The functionality here overlaps with the existing
-cpu_unassigned_access() because individual target CPUs will
-need some work to convert them to the new system. When this
-transition is complete we can remove the old cpu_unassigned_access()
-code.
+We need this for ARM boards, where we're about to implement support for
+generating external aborts on memory transaction failures. Too many
+of our legacy board models rely on the RAZ/WI behaviour and we
+would break currently working guests when their "probe for device"
+code provoked an external abort rather than a RAZ.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/qom/cpu.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ include/hw/boards.h | 11 +++++++++++
+ include/qom/cpu.h   |  7 ++++++-
+ qom/cpu.c           |  7 +++++++
+ 3 files changed, 24 insertions(+), 1 deletion(-)
 
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 3363dd1..7f044d1 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -131,6 +131,16 @@ typedef struct {
+  *    size than the target architecture's minimum. (Attempting to create
+  *    such a CPU will fail.) Note that changing this is a migration
+  *    compatibility break for the machine.
++ * @ignore_memory_transaction_failures:
++ *    If this is flag is true then the CPU will ignore memory transaction
++ *    failures which should cause the CPU to take an exception due to an
++ *    access to an unassigned physical address; the transaction will instead
++ *    return zero (for a read) or be ignored (for a write). This should be
++ *    set only by legacy board models which rely on the old RAZ/WI behaviour
++ *    for handling devices that QEMU does not yet model. New board models
++ *    should instead use "unimplemented-device" for all memory ranges where
++ *    the guest will attempt to probe for a device that QEMU doesn't
++ *    implement and a stub device is required.
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -171,6 +181,7 @@ struct MachineClass {
+     bool rom_file_has_mr;
+     int minimum_page_bits;
+     bool has_hotpluggable_cpus;
++    bool ignore_memory_transaction_failures;
+     int numa_mem_align_shift;
+     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
 diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 25eefea..fc54d55 100644
+index fc54d55..8cff86f 100644
 --- a/include/qom/cpu.h
 +++ b/include/qom/cpu.h
-@@ -85,8 +85,10 @@ struct TranslationBlock;
-  * @has_work: Callback for checking if there is work to do.
-  * @do_interrupt: Callback for interrupt handling.
-  * @do_unassigned_access: Callback for unassigned access handling.
-+ * (this is deprecated: new targets should use do_transaction_failed instead)
-  * @do_unaligned_access: Callback for unaligned access handling, if
-  * the target defines #ALIGNED_ONLY.
-+ * @do_transaction_failed: Callback for handling failed memory transactions
-  * @virtio_is_big_endian: Callback to return %true if a CPU which supports
-  * runtime configurable endianness is currently big-endian. Non-configurable
-  * CPUs can use the default implementation of this method. This method should
-@@ -153,6 +155,10 @@ typedef struct CPUClass {
-     void (*do_unaligned_access)(CPUState *cpu, vaddr addr,
-                                 MMUAccessType access_type,
-                                 int mmu_idx, uintptr_t retaddr);
-+    void (*do_transaction_failed)(CPUState *cpu, hwaddr physaddr, vaddr addr,
-+                                  unsigned size, MMUAccessType access_type,
-+                                  int mmu_idx, MemTxAttrs attrs,
-+                                  MemTxResult response, uintptr_t retaddr);
-     bool (*virtio_is_big_endian)(CPUState *cpu);
-     int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
-                            uint8_t *buf, int len, bool is_write);
-@@ -837,6 +843,21 @@ static inline void cpu_unaligned_access(CPUState *cpu, vaddr addr,
+@@ -311,6 +311,9 @@ struct qemu_work_item;
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+  * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
++ * @ignore_memory_transaction_failures: Cached copy of the MachineState
++ *    flag of the same name: allows the board to suppress calling of the
++ *    CPU do_transaction_failed hook function.
+  *
+  * State of one CPU core or thread.
+  */
+@@ -397,6 +400,8 @@ struct CPUState {
+      */
+     bool throttle_thread_scheduled;
  
-     cc->do_unaligned_access(cpu, addr, access_type, mmu_idx, retaddr);
- }
++    bool ignore_memory_transaction_failures;
 +
-+static inline void cpu_transaction_failed(CPUState *cpu, hwaddr physaddr,
-+                                          vaddr addr, unsigned size,
-+                                          MMUAccessType access_type,
-+                                          int mmu_idx, MemTxAttrs attrs,
-+                                          MemTxResult response,
-+                                          uintptr_t retaddr)
-+{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+
-+    if (cc->do_transaction_failed) {
-+        cc->do_transaction_failed(cpu, physaddr, addr, size, access_type,
-+                                  mmu_idx, attrs, response, retaddr);
-+    }
-+}
- #endif
+     /* Note that this is accessed at the start of every TB via a negative
+        offset from AREG0.  Leave this field at the end so as to make the
+        (absolute value) offset as small as possible.  This reduces code
+@@ -853,7 +858,7 @@ static inline void cpu_transaction_failed(CPUState *cpu, hwaddr physaddr,
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
  
- #endif /* NEED_CPU_H */
+-    if (cc->do_transaction_failed) {
++    if (!cpu->ignore_memory_transaction_failures && cc->do_transaction_failed) {
+         cc->do_transaction_failed(cpu, physaddr, addr, size, access_type,
+                                   mmu_idx, attrs, response, retaddr);
+     }
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 4f38db0..d8dcf64 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -29,6 +29,7 @@
+ #include "exec/cpu-common.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
++#include "hw/boards.h"
+ #include "hw/qdev-properties.h"
+ #include "trace-root.h"
+ 
+@@ -360,6 +361,12 @@ static void cpu_common_parse_features(const char *typename, char *features,
+ static void cpu_common_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cpu = CPU(dev);
++    Object *machine = qdev_get_machine();
++    ObjectClass *oc = object_get_class(machine);
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    cpu->ignore_memory_transaction_failures =
++        mc->ignore_memory_transaction_failures;
+ 
+     if (dev->hotplugged) {
+         cpu_synchronize_post_init(cpu);
 -- 
 2.7.4
