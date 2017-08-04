@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddVyk-0003GP-F6
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:20:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1ddWMn-0000dS-Jl
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddVyg-0001Wt-8l
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:20:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35138)
+	(envelope-from <bounces@canonical.com>) id 1ddWMk-0003aZ-L8
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37264)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ddVyg-0001V2-1b
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:20:54 -0400
+	id 1ddWMk-0003Yr-Fm
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 02:45:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ddVyc-0004xd-Fr
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 06:20:50 +0000
+	id 1ddWMj-0005Fq-6l
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 06:45:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 20F5B2E80E2
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 06:20:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3039D2E8041
+	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 06:45:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Aug 2017 06:03:30 -0000
-From: Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>
-Reply-To: Bug 1336794 <1336794@bugs.launchpad.net>
+Date: Fri, 04 Aug 2017 06:31:29 -0000
+From: Thomas Huth <1708551@bugs.launchpad.net>
+Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140702135258.23882.15100.malonedeb@soybean.canonical.com>
-Message-Id: <150182661009.21464.2287026155670302006.malone@wampee.canonical.com>
+References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150182828908.3687.6398256505959138792.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1336794] Re: 9pfs does not honor open file
- handles on unlinked files
+Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
+ USB 2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,89 +39,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hi Greg,
+Could you please try to run QEMU without the "-usb" option here? "-usb"
+automatically creates an EHCI and UHCI controller on the q35 machine, so
+that might be the reason that your USB devices get connected as USB 2.0
+instead.
 
-Did you push the qemu patch upstream, and now it is a matter of fixing
-the kernel?
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1336794
+https://bugs.launchpad.net/bugs/1708551
 
 Title:
-  9pfs does not honor open file handles on unlinked files
+  macOS Guest Reading USB 3.0 Bus as USB 2.0
 
 Status in QEMU:
-  In Progress
-Status in Ubuntu:
-  Confirmed
+  Incomplete
 
 Bug description:
-  This was originally filed over here:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1114221
+  Description:
+  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
+taType` on macOS guest confirms that the system "sees" my device, and that =
+qemu is passing *something* through. However, the system sees my connection=
+ as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
+/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
+ze my iPhone in XCode & iTunes.
 
-  The open-unlink-fstat idiom used in some places to create an anonymous
-  private temporary file does not work in a QEMU guest over a virtio-9p
-  filesystem.
+  Parameters:
+  QEMU release version: 2.10.0-rc0
+  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
+ot)]
+  Command Line: https://pastebin.com/pBSYbrW1
+  Host: Arch Linux
+  Guest: macOS v10.12.6
+  Guest System Info: https://pastebin.com/U1Tihxei
 
-  Version-Release number of selected component (if applicable):
+  Notes:
+  1. Observed sometime after late-May-early-June of this year.
 
-  qemu-kvm-1.6.2-6.fc20.x86_64
-  qemu-system-x86-1.6.2-6.fc20.x86_64
-  (those are fedora RPMs)
-
-  How reproducible:
-
-  Always. See this example C program:
-
-  https://bugzilla.redhat.com/attachment.cgi?id=3D913069
-
-  Steps to Reproduce:
-  1. Export a filesystem with virt-manager for the guest.
-        (type: mount, driver: default, mode: passthrough)
-  2. Start guest and mount that filesystem
-        (mount -t 9p -o trans=3Dvirtio,version=3D9p2000.L  ...)
-  3. Run a program that uses open-unlink-fstat
-        (in my case it was trying to compile Perl 5.20)
-
-  Actual results:
-
-  fstat fails:
-
-  open("/home/tst/filename", O_RDWR|O_CREAT|O_EXCL, 0600) =3D 3
-  unlink("/home/tst/filename")            =3D 0
-  fstat(3, 0x23aa1a8)                     =3D -1 ENOENT (No such file or di=
-rectory)
-  close(3)
-
-  Expected results:
-
-  open("/home/tst/filename", O_RDWR|O_CREAT|O_EXCL, 0600) =3D 3
-  unlink("/home/tst/filename")            =3D 0
-  fstat(3, {st_mode=3DS_IFREG|0600, st_size=3D0, ...}) =3D 0
-  fcntl(3, F_SETFD, FD_CLOEXEC)           =3D 0
-  close(3) =
-
-
-  Additional info:
-
-  There was a patch put into the kernel back in '07 to handle this very
-  problem for other filesystems; maybe its helpful:
-
-        http://lwn.net/Articles/251228/
-
-  There is also a thread on LKML from last December specifically about
-  this very problem:
-
-        https://lkml.org/lkml/2013/12/31/163
-
-  There was a discussion on the QEMU list back in '11 that doesn't seem
-  to have come to a conclusion, but did provide the test program that
-  i've attached to this report:
-
-        http://marc.info/?l=3Dqemu-devel&m=3D130443605720648&w=3D2
+  2. Due to [a defect in qemu v2.8 which affected GTK
+  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
+  change to macOS' booting process conflicting with qemu
+  v2.9](https://lists.nongnu.org/archive/html/qemu-
+  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
+  -rc1 fails to load OVMF right now).
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1336794/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
