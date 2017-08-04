@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddXzx-0002R4-0v
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 04:30:22 -0400
+	(envelope-from <hare@suse.de>) id 1ddY68-0005HK-5e
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 04:36:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ddXzs-0005Of-GJ
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 04:30:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56854)
+	(envelope-from <hare@suse.de>) id 1ddY63-00067C-KR
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 04:36:44 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50540 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ddXzs-0005NA-AF
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 04:30:16 -0400
-Date: Fri, 4 Aug 2017 09:30:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170804083000.GA2805@work-vm>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-24-git-send-email-peterx@redhat.com>
-	<20170803110540.GE2076@work-vm>
-	<20170804070419.GI5561@pxdev.xzpeter.org>
-	<20170804070957.GJ5561@pxdev.xzpeter.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170804070957.GJ5561@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 23/29] migration: new cmd
- MIG_CMD_POSTCOPY_RESUME
+	(Exim 4.71) (envelope-from <hare@suse.de>) id 1ddY63-00065N-DG
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 04:36:39 -0400
+From: Hannes Reinecke <hare@suse.de>
+Date: Fri,  4 Aug 2017 10:36:33 +0200
+Message-Id: <1501835795-92331-3-git-send-email-hare@suse.de>
+In-Reply-To: <1501835795-92331-1-git-send-email-hare@suse.de>
+References: <1501835795-92331-1-git-send-email-hare@suse.de>
+Subject: [Qemu-devel] [PATCHv2 2/4] scsi: use qemu_uuid to generate logical
+ identifier for SES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Aug 04, 2017 at 03:04:19PM +0800, Peter Xu wrote:
-> > On Thu, Aug 03, 2017 at 12:05:41PM +0100, Dr. David Alan Gilbert wrote:
-> > 
-> > [...]
-> > 
-> > > > +static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
-> > > > +{
-> > > > +    /*
-> > > > +     * This means source VM is ready to resume the postcopy migration.
-> > > > +     * It's time to switch state and release the fault thread to
-> > > > +     * continue service page faults.
-> > > > +     */
-> > > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
-> > > > +                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
-> > > > +    qemu_sem_post(&mis->postcopy_pause_sem_fault);
-> > > 
-> > > Is it worth sanity checking that you were in RECOVER at this point?
-> > 
-> > Yeah, it never hurts.  Will do.
-> 
-> Not sure whether this would be good (note: I returned 0 in the if):
-> 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index b7843c2..b34f59b 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1709,6 +1709,12 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
->  
->  static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
->  {
-> +    if (mis->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
-> +        error_report("%s: illegal resume received", __func__);
-> +        /* Don't fail the load, only for this. */
-> +        return 0;
-> +    }
-> +
->      /*
->       * This means source VM is ready to resume the postcopy migration.
->       * It's time to switch state and release the fault thread to
-> 
-> Basically I just don't want to crash the dest VM (it holds hot dirty
-> pages) even if it receives a faulty RESUME command.
+The SES enclosure descriptor requires a logical identifier,
+so generate one using the qemu_uuid and the Qumranet OUI.
 
-Yes, so now that's a fun problem; effectively you then have 3 valid
-failure modes:
-    a) An IO failure so we need to go into POSTCOPY_PAUSE
-    b) A fatal migration stream problem to quit
-    c) A non-fatal migration stream problem to go .. back into PAUSE?
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+---
+ hw/scsi/scsi-bus.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Dave
-
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index c89e82d..8419c75 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -10,6 +10,7 @@
+ #include "trace.h"
+ #include "sysemu/dma.h"
+ #include "qemu/cutils.h"
++#include "qemu/crc32c.h"
+ 
+ static char *scsibus_get_dev_path(DeviceState *dev);
+ static char *scsibus_get_fw_dev_path(DeviceState *dev);
+@@ -533,6 +534,22 @@ static bool scsi_target_emulate_receive_diagnostic(SCSITargetReq *r)
+         enc_desc[0] = 0x09;
+         enc_desc[2] = 1;
+         enc_desc[3] = 0x24;
++        if (qemu_uuid_set) {
++            uint32_t crc;
++
++            /*
++             * Make this a NAA IEEE Registered identifier
++             * using Qumranet OUI (0x001A4A) and the
++             * crc32 from the system UUID.
++             */
++            enc_desc[4] = 0x50;
++            enc_desc[5] = 0x01;
++            enc_desc[6] = 0xa4;
++            enc_desc[7] = 0xa0;
++            crc = crc32c(0xffffffff, qemu_uuid.data, 16);
++            cpu_to_le32s(&crc);
++            memcpy(&enc_desc[8], &crc, 4);
++        }
+         memcpy(&enc_desc[12], "QEMU    ", 8);
+         memcpy(&enc_desc[20], "QEMU TARGET     ", 16);
+         pstrcpy((char *)&enc_desc[36], 4, qemu_hw_version());
+-- 
+1.8.5.6
