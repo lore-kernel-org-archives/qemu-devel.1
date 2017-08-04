@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddfV7-0003kQ-Hi
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:31:02 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddfdA-0003pT-4f
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ddfV3-0002v5-S3
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:31:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ddfV3-0002sv-Lu
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:30:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ddfV1-0006Da-I2
-	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 16:30:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7B0C82E80C9
-	for <qemu-devel@nongnu.org>; Fri,  4 Aug 2017 16:30:55 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddfd6-0002fT-GU
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:39:20 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:38273)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ddfd6-0002em-9u
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 12:39:16 -0400
+Received: by mail-qt0-x243.google.com with SMTP id p3so2008416qtg.5
+	for <qemu-devel@nongnu.org>; Fri, 04 Aug 2017 09:39:16 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170804054426.10590-1-rth@twiddle.net>
+	<20170804054426.10590-23-rth@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a9a144cb-0e9d-c6dc-c549-c2bd6a1836a9@amsat.org>
+Date: Fri, 4 Aug 2017 13:39:12 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Aug 2017 16:18:57 -0000
-From: Divine E <1708551@bugs.launchpad.net>
-Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
-	<150186056359.3833.12694234540123013927.malone@gac.canonical.com>
-Message-Id: <92D8793D-D724-42CB-AB3F-675C9FB8F117@gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus
- as USB 2.0
+In-Reply-To: <20170804054426.10590-23-rth@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 22/23] tcg/ppc: Look for shifted
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,117 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-Removing the `bus=3Dusb-bus.0` param from everything, [as shown
-here](https://pastebin.com/x0Cp70XD), boots fine; but completely breaks
-mouse functionality. To mitigate, i tried passing through a Logitech
-mousepad I own--in similar fashion to the iPhone; but Host complained
-about permissions & `libusb` requiring "write access to USB device
-nodes".
+Hi Richard,
 
-FWIW, I vaguely recall the `usb-tablet` parameter being "a whole thing"
-with virtual macOS; however, I'll need to check my records to refresh my
-memory.
+On 08/04/2017 02:44 AM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>   tcg/ppc/tcg-target.inc.c | 9 +++++++++
+>   1 file changed, 9 insertions(+)
+> 
+> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+> index bc14d2c9c6..4b32809217 100644
+> --- a/tcg/ppc/tcg-target.inc.c
+> +++ b/tcg/ppc/tcg-target.inc.c
+> @@ -598,6 +598,7 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
+>   {
+>       intptr_t tb_diff;
+>       int32_t high;
+> +    int lsb;
+>   
+>       tcg_debug_assert(TCG_TARGET_REG_BITS == 64 || type == TCG_TYPE_I32);
+>   
+> @@ -638,6 +639,14 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
+>           return;
+>       }
+>   
+> +    lsb = ctz64(arg);
+> +    high = arg >> lsb;
+> +    if (arg == (int16_t)arg) {
 
+Can you move these here?
 
-> On Aug 4, 2017, at 11:29 AM, Thomas Huth <1708551@bugs.launchpad.net> wro=
-te:
-> =
++    lsb = ctz64(arg);
++    high = arg >> lsb;
 
-> Then simply omit the "bus=3Dusb-bus.0" here - the devices then should be
-> put onto the XHCI bus automatically.
-> =
+> +        tcg_out32(s, ADDI | TAI(ret, 0, high));
+> +        tcg_out_shli64(s, ret, ret, lsb);
+> +        return;
+> +    }
+> +
+>       high = arg >> 31 >> 1;
+>       tcg_out_movi(s, TCG_TYPE_I32, ret, high);
+>       if (high) {
+> 
 
-> -- =
+Regards,
 
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1708551
-> =
-
-> Title:
->  macOS Guest Reading USB 3.0 Bus as USB 2.0
-> =
-
-> Status in QEMU:
->  Incomplete
-> =
-
-> Bug description:
->  Description:
->  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBD=
-ataType` on macOS guest confirms that the system "sees" my device, and that=
- qemu is passing *something* through. However, the system sees my connectio=
-n as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhc=
-i/qemu-xhci). I suspect this is the reason why my guest is unable to recogn=
-ize my iPhone in XCode & iTunes.
-> =
-
->  Parameters:
->  QEMU release version: 2.10.0-rc0
->  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macb=
-oot)]
->  Command Line: https://pastebin.com/pBSYbrW1
->  Host: Arch Linux
->  Guest: macOS v10.12.6
->  Guest System Info: https://pastebin.com/U1Tihxei
-> =
-
->  Notes:
->  1. Observed sometime after late-May-early-June of this year.
-> =
-
->  2. Due to [a defect in qemu v2.8 which affected GTK
->  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
->  change to macOS' booting process conflicting with qemu
->  v2.9](https://lists.nongnu.org/archive/html/qemu-
->  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
->  -rc1 fails to load OVMF right now).
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1708551
-
-Title:
-  macOS Guest Reading USB 3.0 Bus as USB 2.0
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Description:
-  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
-taType` on macOS guest confirms that the system "sees" my device, and that =
-qemu is passing *something* through. However, the system sees my connection=
- as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
-/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
-ze my iPhone in XCode & iTunes.
-
-  Parameters:
-  QEMU release version: 2.10.0-rc0
-  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
-ot)]
-  Command Line: https://pastebin.com/pBSYbrW1
-  Host: Arch Linux
-  Guest: macOS v10.12.6
-  Guest System Info: https://pastebin.com/U1Tihxei
-
-  Notes:
-  1. Observed sometime after late-May-early-June of this year.
-
-  2. Due to [a defect in qemu v2.8 which affected GTK
-  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
-  change to macOS' booting process conflicting with qemu
-  v2.9](https://lists.nongnu.org/archive/html/qemu-
-  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
-  -rc1 fails to load OVMF right now).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
+Phil.
