@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dddhq-0003uD-8R
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:36:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dddjG-0005Pw-Fp
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dddhd-0002y0-NU
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:36:02 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.88458.1501824151.22737.qemu-devel@nongnu.org>
-Date: Fri, 4 Aug 2017 10:35:00 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FCC900B9-6498-46D1-92C7-800BEBDE9350@gmail.com>
-References: <mailman.88458.1501824151.22737.qemu-devel@nongnu.org>
-Subject: [Qemu-devel] [PATCH v6 0/3] Generate APEI GHES table and
- dynamically record CPER
+	(envelope-from <cohuck@redhat.com>) id 1ddanr-0003VZ-Jr
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:31:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ddanr-0003U0-2E
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 07:30:03 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri,  4 Aug 2017 13:29:40 +0200
+Message-Id: <20170804112946.5247-4-cohuck@redhat.com>
+In-Reply-To: <20170804112946.5247-1-cohuck@redhat.com>
+References: <20170804112946.5247-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 3/9] s390x: chsc nt2 events are pci-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,113 +23,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, "Michael	S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, zhaoshenglong@huawei.com, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, huangshaoyu@huawei.com, wuquanming@huawei.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
+The nt2 event class is pci-only - don't look for events if pci is
+not in the active cpu model.
 
-> On Aug 4, 2017, at 1:22 AM, qemu-devel-request@nongnu.org wrote:
->=20
-> Date: Fri, 4 Aug 2017 12:37:52 +0800
-> From: Dongjiu Geng <gengdongjiu@huawei.com>
-> To: <lersek@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
-> 	<zhaoshenglong@huawei.com>, <peter.maydell@linaro.org>,
-> 	<qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-> Cc: <gengdongjiu@huawei.com>, <huangshaoyu@huawei.com>,
-> 	<wuquanming@huawei.com>
-> Subject: [Qemu-devel] [PATCH v6 0/3] Generate APEI GHES table and
-> 	dynamically record CPER
-> Message-ID: <1501821475-14647-1-git-send-email-gengdongjiu@huawei.com>
-> Content-Type: text/plain
->=20
-> In the armv8 platform, the mainly hardware error source are ARMv8
-> SEA/SEI/GSIV. For the ARMv8 SEA/SEI, the KVM or host kernel will =
-signal SIGBUS
-> or use other interface to notify user space, such as Qemu. After Qemu =
-gets
-> the notification, it will record the CPER and inject the SEA/SEI to =
-KVM. this
-> series of patches will generate APEI table when guest OS boot up, and =
-dynamically
-> record CPER for the guest OS about the generic hardware errors, =
-currently the
-> userspace only handle the memory section hardware errors. Before Qemu =
-record the
-> CPER, it needs to check the ACK value written by the guest OS to avoid =
-read-write
-> race condition.
->=20
-> Below is the APEI/GHESV2/CPER table layout, the max number of error =
-soure is 11,
-> which is classified by notification type, now only enable the SEA/SEI =
-notification type
-> error source.
->=20
->     etc/acpi/tables                               etc/hardware_errors
->    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D        =
-            =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->                                          +------------------+
-> +----------------------------+            |    address       |         =
-     +--------------+
-> |    HEST                    +            |    registers     |         =
-     | Error Status |
-> + +--------------------------+            | +----------------+         =
-     | Data Block 0 |
-> | | GHES0                    | +--------->| |status_address0 =
-|------------->| +------------+
-> +--------------------------+ |          | +----------------+           =
-   | |  CPER      |
-> | | .................        | | +------->| |status_address1 =
-|----------+   | |  CPER      |
-> | | error_status_address     | | |        | +----------------+         =
- |   | |  ....      |
-> | | .................        | | |        |  .............   |         =
- |   | |  CPER      |
-> | | error_status_address-----+-+ |        +------------------+         =
- |   | +-+------------+
-> | | .................        |   | +----->| =
-|status_address10|--------+ |   | Error Status |
-> | | read_ack_register--------+-+ | |      | +----------------+        =
-| |   | Data Block 1 |
-> | | read_ack_preserve        | +-+-+----->| |ack_address0    |--+     =
-| +-->| +------------+
-> | | read_ack_write           |   | |      | +----------------+  |     =
-|     | |  CPER      |
-> + +--------------------------+   | | +--->| |ack_address1    |--+-+   =
-|     | |  CPER      |
-> | | GHES1                    |   | | |    | +----------------+  | |   =
-|     | |  ....      |
-> + +--------------------------+   | | |    | | .............  |  | |   =
-|     | |  CPER      |
-> | | .................        |   | | |    | +----------------+  | |   =
-|     +-+------------+
-> | | error_status_address-----+---+ | | +->| |ack_address10   |--+-+-+ =
-|     | |..........  |
-> | | .................        |     | | |  | +----------------+  | | | =
-|     | +------------+
-> | | read_ack_register--------+-----+-+ |  | |      ack0      |<-+ | | =
-|     | Error Status |
-> | | read_ack_preserve        |     |   |  | +----------------+    | | =
-|     | Data Block 10|
-> | | read_ack_write           |     |   |  | |      ack1      |<---+ | =
-+---->| +------------+
-> + +--------------------------+     |   |  | +----------------+      |  =
-     | |  CPER      |
-> | | ...............          |     |   |  | |       ....     |      |  =
-     | |  CPER      |
-> + +--------------------------+     |   |  | +--------------+ |      |  =
-     | |  ....      |
-> | | GHES10                   |     |   |  | |      ack10     |<---- +  =
-     | |  CPER      |
-> + +--------------------------+     |   |  | +----------------+         =
-     +-+------------+
-> | | .................        |     |   |
-> | | error_status_address-----+-----+   |
-> | | .................        |         |
-> | | read_ack_register--------+---------+
-> | | read_ack_preserve        |
-> | | read_ack_write           |
-> + +--------------------------+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c  |  4 ++--
+ hw/s390x/s390-pci-bus.h  |  4 ++--
+ hw/s390x/s390-pci-stub.c |  4 ++--
+ target/s390x/ioinst.c    | 16 ++++++++++++++++
+ 4 files changed, 22 insertions(+), 6 deletions(-)
 
-
-Excellent job with the ASCII drawing.=20
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 61cfd2138f..c57f6ebae0 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -47,7 +47,7 @@ S390pciState *s390_get_phb(void)
+     return phb;
+ }
+ 
+-int chsc_sei_nt2_get_event(void *res)
++int pci_chsc_sei_nt2_get_event(void *res)
+ {
+     ChscSeiNt2Res *nt2_res = (ChscSeiNt2Res *)res;
+     PciCcdfAvail *accdf;
+@@ -87,7 +87,7 @@ int chsc_sei_nt2_get_event(void *res)
+     return rc;
+ }
+ 
+-int chsc_sei_nt2_have_event(void)
++int pci_chsc_sei_nt2_have_event(void)
+ {
+     S390pciState *s = s390_get_phb();
+ 
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index 67af2c12ff..5df6292509 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -319,8 +319,8 @@ typedef struct S390pciState {
+ } S390pciState;
+ 
+ S390pciState *s390_get_phb(void);
+-int chsc_sei_nt2_get_event(void *res);
+-int chsc_sei_nt2_have_event(void);
++int pci_chsc_sei_nt2_get_event(void *res);
++int pci_chsc_sei_nt2_have_event(void);
+ void s390_pci_sclp_configure(SCCB *sccb);
+ void s390_pci_sclp_deconfigure(SCCB *sccb);
+ void s390_pci_iommu_enable(S390PCIIOMMU *iommu);
+diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
+index 2e7e42a2af..cc7278a865 100644
+--- a/hw/s390x/s390-pci-stub.c
++++ b/hw/s390x/s390-pci-stub.c
+@@ -7,12 +7,12 @@
+ #include "s390-pci-bus.h"
+ 
+ /* target/s390x/ioinst.c */
+-int chsc_sei_nt2_get_event(void *res)
++int pci_chsc_sei_nt2_get_event(void *res)
+ {
+     return 1;
+ }
+ 
+-int chsc_sei_nt2_have_event(void)
++int pci_chsc_sei_nt2_have_event(void)
+ {
+     return 0;
+ }
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index 51fbea620d..3fa3301f50 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -599,6 +599,22 @@ static int chsc_sei_nt0_have_event(void)
+     return 0;
+ }
+ 
++static int chsc_sei_nt2_get_event(void *res)
++{
++    if (s390_has_feat(S390_FEAT_ZPCI)) {
++        return pci_chsc_sei_nt2_get_event(res);
++    }
++    return 1;
++}
++
++static int chsc_sei_nt2_have_event(void)
++{
++    if (s390_has_feat(S390_FEAT_ZPCI)) {
++        return pci_chsc_sei_nt2_have_event();
++    }
++    return 0;
++}
++
+ #define CHSC_SEI_NT0    (1ULL << 63)
+ #define CHSC_SEI_NT2    (1ULL << 61)
+ static void ioinst_handle_chsc_sei(ChscReq *req, ChscResp *res)
+-- 
+2.13.3
