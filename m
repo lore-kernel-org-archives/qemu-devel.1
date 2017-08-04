@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPm-00047n-Pv
+	(envelope-from <rth7680@gmail.com>) id 1ddVPm-00047i-OJ
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ddVPj-0003h8-IC
+	(envelope-from <rth7680@gmail.com>) id 1ddVPk-0003jj-P6
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:50 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37865)
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36537)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPj-0003fq-DM
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:47 -0400
-Received: by mail-pf0-x243.google.com with SMTP id p13so862179pfd.4
-	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ddVPk-0003ia-HQ
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 01:44:48 -0400
+Received: by mail-pg0-x244.google.com with SMTP id y129so823862pgy.3
+	for <qemu-devel@nongnu.org>; Thu, 03 Aug 2017 22:44:48 -0700 (PDT)
 Received: from bigtime.twiddle.net (97-126-108-236.tukw.qwest.net.
 	[97.126.108.236]) by smtp.gmail.com with ESMTPSA id
-	o14sm1061063pfi.158.2017.08.03.22.44.45 for <qemu-devel@nongnu.org>
+	o14sm1061063pfi.158.2017.08.03.22.44.46 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 03 Aug 2017 22:44:45 -0700 (PDT)
+	Thu, 03 Aug 2017 22:44:46 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  3 Aug 2017 22:44:21 -0700
-Message-Id: <20170804054426.10590-19-rth@twiddle.net>
+Date: Thu,  3 Aug 2017 22:44:22 -0700
+Message-Id: <20170804054426.10590-20-rth@twiddle.net>
 In-Reply-To: <20170804054426.10590-1-rth@twiddle.net>
 References: <20170804054426.10590-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH for-2.11 18/23] tcg/arm: Extract INSN_NOP
+Subject: [Qemu-devel] [PATCH for-2.11 19/23] tcg/arm: Use constant pool for
+ movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +34,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We'll want this for tcg_out_nop_fill.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/arm/tcg-target.inc.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ tcg/arm/tcg-target.h     |  1 +
+ tcg/arm/tcg-target.inc.c | 92 ++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 75 insertions(+), 18 deletions(-)
 
+diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
+index 55de35a691..0f71a85a45 100644
+--- a/tcg/arm/tcg-target.h
++++ b/tcg/arm/tcg-target.h
+@@ -141,5 +141,6 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
+ #ifdef CONFIG_SOFTMMU
+ #define TCG_TARGET_NEED_LDST_LABELS
+ #endif
++#define TCG_TARGET_NEED_POOL_LABELS
+ 
+ #endif
 diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index f40e87066f..78603a19db 100644
+index 78603a19db..2736022d5a 100644
 --- a/tcg/arm/tcg-target.inc.c
 +++ b/tcg/arm/tcg-target.inc.c
-@@ -160,8 +160,18 @@ typedef enum {
+@@ -23,6 +23,7 @@
+  */
  
-     INSN_DMB_ISH   = 0x5bf07ff5,
-     INSN_DMB_MCR   = 0xba0f07ee,
-+
-+    /* Architected nop introduced in v6k.  */
-+    /* ??? This is an MSR (imm) 0,0,0 insn.  Anyone know if this
-+       also Just So Happened to do nothing on pre-v6k so that we
-+       don't need to conditionalize it?  */
-+    INSN_NOP_v6k   = 0xe320f000,
-+    /* Otherwise the assembler uses mov r0,r0 */
-+    INSN_NOP_v4    = (COND_AL << 28) | ARITH_MOV,
- } ARMInsn;
+ #include "elf.h"
++#include "tcg-pool.inc.c"
  
-+#define INSN_NOP   (use_armv7_instructions ? INSN_NOP_v6k : INSN_NOP_v4)
-+
- static const uint8_t tcg_cond_to_arm_cond[] = {
-     [TCG_COND_EQ] = COND_EQ,
-     [TCG_COND_NE] = COND_NE,
-@@ -375,16 +385,7 @@ static inline void tcg_out_dat_reg(TCGContext *s,
+ int arm_arch = __ARM_ARCH;
  
- static inline void tcg_out_nop(TCGContext *s)
+@@ -203,9 +204,39 @@ static inline void reloc_pc24_atomic(tcg_insn_unit *code_ptr, tcg_insn_unit *tar
+ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+                         intptr_t value, intptr_t addend)
  {
--    if (use_armv7_instructions) {
--        /* Architected nop introduced in v6k.  */
--        /* ??? This is an MSR (imm) 0,0,0 insn.  Anyone know if this
--           also Just So Happened to do nothing on pre-v6k so that we
--           don't need to conditionalize it?  */
--        tcg_out32(s, 0xe320f000);
--    } else {
--        /* Prior to that the assembler uses mov r0, r0.  */
--        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, 0, 0, 0, SHIFT_IMM_LSL(0));
--    }
-+    tcg_out32(s, INSN_NOP);
+-    tcg_debug_assert(type == R_ARM_PC24);
+     tcg_debug_assert(addend == 0);
+-    reloc_pc24(code_ptr, (tcg_insn_unit *)value);
++
++    if (type == R_ARM_PC24) {
++        reloc_pc24(code_ptr, (tcg_insn_unit *)value);
++    } else if (type == R_ARM_PC13) {
++        intptr_t diff = value - (uintptr_t)(code_ptr + 2);
++        tcg_insn_unit insn = *code_ptr;
++        bool u;
++
++        if (diff >= -0xfff && diff <= 0xfff) {
++            u = (diff >= 0);
++            if (!u) {
++                diff = -diff;
++            }
++        } else {
++            int rd = extract32(insn, 12, 4);
++            int rt = rd == TCG_REG_PC ? TCG_REG_TMP : rd;
++            assert(diff >= 0x1000 && diff < 0x100000);
++            /* add rt, pc, #high */
++            *code_ptr++ = ((insn & 0xf0000000) | (1 << 25) | ARITH_ADD
++                           | (TCG_REG_PC << 16) | (rt << 12)
++                           | (20 << 7) | (diff >> 12));
++            /* ldr rd, [rt, #low] */
++            insn = deposit32(insn, 12, 4, rt);
++            diff &= 0xfff;
++            u = 1;
++        }
++        insn = deposit32(insn, 23, 1, u);
++        insn = deposit32(insn, 0, 12, diff);
++        *code_ptr = insn;
++    } else {
++        g_assert_not_reached();
++    }
  }
  
- static inline void tcg_out_mov_reg(TCGContext *s, int cond, int rd, int rm)
+ #define TCG_CT_CONST_ARM  0x100
+@@ -581,9 +612,20 @@ static inline void tcg_out_ld8s_r(TCGContext *s, int cond, TCGReg rt,
+     tcg_out_memop_r(s, cond, INSN_LDRSB_REG, rt, rn, rm, 1, 1, 0);
+ }
+ 
++static void tcg_out_movi_pool(TCGContext *s, int cond, int rd, uint32_t arg)
++{
++    /* The 12-bit range on the ldr insn is sometimes a bit too small.
++       In order to get around that we require two insns, one of which
++       will usually be a nop, but may be replaced in patch_reloc.  */
++    new_pool_label(s, arg, R_ARM_PC13, s->code_ptr, 0);
++    tcg_out_ld32_12(s, cond, rd, TCG_REG_PC, 0);
++    tcg_out_nop(s);
++}
++
+ static void tcg_out_movi32(TCGContext *s, int cond, int rd, uint32_t arg)
+ {
+-    int rot, opc, rn, diff;
++    int rot, diff, opc, sh1, sh2;
++    uint32_t tt0, tt1, tt2;
+ 
+     /* Check a single MOV/MVN before anything else.  */
+     rot = encode_imm(arg);
+@@ -631,24 +673,30 @@ static void tcg_out_movi32(TCGContext *s, int cond, int rd, uint32_t arg)
+         return;
+     }
+ 
+-    /* TODO: This is very suboptimal, we can easily have a constant
+-       pool somewhere after all the instructions.  */
++    /* Look for sequences of two insns.  If we have lots of 1's, we can
++       shorten the sequence by beginning with mvn and then clearing
++       higher bits with eor.  */
++    tt0 = arg;
+     opc = ARITH_MOV;
+-    rn = 0;
+-    /* If we have lots of leading 1's, we can shorten the sequence by
+-       beginning with mvn and then clearing higher bits with eor.  */
+-    if (clz32(~arg) > clz32(arg)) {
+-        opc = ARITH_MVN, arg = ~arg;
++    if (ctpop32(arg) > 16) {
++        tt0 = ~arg;
++        opc = ARITH_MVN;
++    }
++    sh1 = ctz32(tt0) & ~1;
++    tt1 = tt0 & ~(0xff << sh1);
++    sh2 = ctz32(tt1) & ~1;
++    tt2 = tt1 & ~(0xff << sh2);
++    if (tt2 == 0) {
++        rot = ((32 - sh1) << 7) & 0xf00;
++        tcg_out_dat_imm(s, cond, opc, rd,  0, ((tt0 >> sh1) & 0xff) | rot);
++        rot = ((32 - sh2) << 7) & 0xf00;
++        tcg_out_dat_imm(s, cond, ARITH_EOR, rd, rd,
++                        ((tt0 >> sh2) & 0xff) | rot);
++        return;
+     }
+-    do {
+-        int i = ctz32(arg) & ~1;
+-        rot = ((32 - i) << 7) & 0xf00;
+-        tcg_out_dat_imm(s, cond, opc, rd, rn, ((arg >> i) & 0xff) | rot);
+-        arg &= ~(0xff << i);
+ 
+-        opc = ARITH_EOR;
+-        rn = rd;
+-    } while (arg);
++    /* Otherwise, drop it into the constant pool.  */
++    tcg_out_movi_pool(s, cond, rd, arg);
+ }
+ 
+ static inline void tcg_out_dat_rI(TCGContext *s, int cond, int opc, TCGArg dst,
+@@ -2164,6 +2212,14 @@ static inline void tcg_out_movi(TCGContext *s, TCGType type,
+     tcg_out_movi32(s, COND_AL, ret, arg);
+ }
+ 
++static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
++{
++    int i;
++    for (i = 0; i < count; ++i) {
++        p[i] = INSN_NOP;
++    }
++}
++
+ /* Compute frame size via macros, to share between tcg_target_qemu_prologue
+    and tcg_register_jit.  */
+ 
 -- 
 2.13.3
