@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dddGy-0001oc-7y
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:08:30 -0400
+	(envelope-from <berto@igalia.com>) id 1dddI1-0002oP-Dn
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dddGl-0002ke-KC
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:08:16 -0400
-Date: Fri, 4 Aug 2017 15:06:30 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170804140630.GC14504@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170804105059.11941-1-berrange@redhat.com>
-	<20170804140210.GD4108@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170804140210.GD4108@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] block: document semanatics of
- bdrv_co_preadv|pwritev
+	(envelope-from <berto@igalia.com>) id 1dddHm-0003gp-0g
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 10:09:21 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri,  4 Aug 2017 17:08:48 +0300
+Message-Id: <20170804140848.880-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] quorum: Handle bdrv_getlength() failures in
+ quorum_co_flush()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +18,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Fri, Aug 04, 2017 at 04:02:10PM +0200, Kevin Wolf wrote:
-> Am 04.08.2017 um 12:50 hat Daniel P. Berrange geschrieben:
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  include/block/block_int.h | 29 +++++++++++++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
-> > 
-> > diff --git a/include/block/block_int.h b/include/block/block_int.h
-> > index d4f4ea7584..deb81a58bd 100644
-> > --- a/include/block/block_int.h
-> > +++ b/include/block/block_int.h
-> > @@ -147,12 +147,41 @@ struct BlockDriver {
-> >  
-> >      int coroutine_fn (*bdrv_co_readv)(BlockDriverState *bs,
-> >          int64_t sector_num, int nb_sectors, QEMUIOVector *qiov);
-> > +
-> > +    /**
-> > +     * @offset: position in bytes to read at
-> > +     * @bytes: number of bytes to read
-> > +     * @qiov: the buffers to fill with read data
-> > +     *
-> > +     * @offset and @bytes will be a multiple of 'request_alignment',
-> > +     * but the length of individual @qiov elements does not have to
-> > +     * be a multiple.
-> > +     *
-> > +     * @bytes may be less than the total sizeof @iov, and will be
-> > +     * no larger than 'max_transfer'.
-> 
-> Really? We are asserting that they match in bdrv_aligned_preadv():
-> 
->     assert(!qiov || bytes == qiov->size);
+A bdrv_getlength() call can fail and return a negative value. This
+is not being handled in quorum_co_flush(), which can result in a
+QUORUM_REPORT_BAD event with an arbitrary value on the 'sectors-count'
+field.
 
-Hmm, why do we pass @bytes at all then ? If they're always the same,
-how about deleting it and just letting everyone read qiov->size
-directly.
+Reported-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/quorum.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> Also, s/sizeof @iov/size of @qiov/
-
-
-
-> 
-> > +     *
-> > +     * The buffer in @qiov may point directly to guest memory.
-> > +     */
-> >      int coroutine_fn (*bdrv_co_preadv)(BlockDriverState *bs,
-> >          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
-> >      int coroutine_fn (*bdrv_co_writev)(BlockDriverState *bs,
-> >          int64_t sector_num, int nb_sectors, QEMUIOVector *qiov);
-> >      int coroutine_fn (*bdrv_co_writev_flags)(BlockDriverState *bs,
-> >          int64_t sector_num, int nb_sectors, QEMUIOVector *qiov, int flags);
-> > +    /**
-> > +     * @offset: position in bytes to write at
-> > +     * @bytes: number of bytes to write
-> > +     * @qiov: the buffers containing data to write
-> > +     *
-> > +     * @offset and @bytes will be a multiple of 'request_alignment',
-> > +     * but the length of individual @qiov elements does not have to
-> > +     * be a multiple.
-> > +     *
-> > +     * @bytes may be less than the total sizeof @iov, and will be
-> > +     * no larger than 'max_transfer'.
-> 
-> The same assertion exists in bdrv_aligned_pwritev() (and the same typo
-> in your comment).
-> 
-> > +     * The buffer in @qiov may point directly to guest memory.
-> > +     */
-> >      int coroutine_fn (*bdrv_co_pwritev)(BlockDriverState *bs,
-> >          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
-> 
-> Kevin
-
-Regards,
-Daniel
+diff --git a/block/quorum.c b/block/quorum.c
+index 55ba916655..d77991d680 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -785,8 +785,9 @@ static coroutine_fn int quorum_co_flush(BlockDriverState *bs)
+     for (i = 0; i < s->num_children; i++) {
+         result = bdrv_co_flush(s->children[i]->bs);
+         if (result) {
++            int64_t length = bdrv_getlength(s->children[i]->bs);
+             quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0,
+-                              bdrv_getlength(s->children[i]->bs),
++                              length > 0 ? length : 0,
+                               s->children[i]->bs->node_name, result);
+             result_value.l = result;
+             quorum_count_vote(&error_votes, &result_value, i);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.11.0
