@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ddTWv-0004ze-VT
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 23:44:07 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1ddU4E-0006oF-Fy
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 00:18:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ddTWr-0001kd-09
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 23:44:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57660)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ddTWq-0001gd-NI
-	for qemu-devel@nongnu.org; Thu, 03 Aug 2017 23:44:00 -0400
-Date: Fri, 4 Aug 2017 11:43:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170804034350.GD5561@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<1501229198-30588-13-git-send-email-peterx@redhat.com>
-	<20170801094715.GE2079@work-vm>
-	<20170802050610.GD15080@pxdev.xzpeter.org>
-	<20170803140356.GC3673@work-vm>
+	(envelope-from <gengdongjiu@huawei.com>) id 1ddU4B-0006Fb-ON
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 00:18:30 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Fri, 4 Aug 2017 12:37:52 +0800
+Message-ID: <1501821475-14647-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170803140356.GC3673@work-vm>
-Subject: Re: [Qemu-devel] [RFC 12/29] migration: allow dst vm pause on
- postcopy
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v6 0/3] Generate APEI GHES table and
+ dynamically record CPER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,179 +20,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
 
-On Thu, Aug 03, 2017 at 03:03:57PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Tue, Aug 01, 2017 at 10:47:16AM +0100, Dr. David Alan Gilbert wrote:
-> > > * Peter Xu (peterx@redhat.com) wrote:
-> > 
-> > [...]
-> > 
-> > > > +/* Return true if we should continue the migration, or false. */
-> > > > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-> > > > +{
-> > > > +    trace_postcopy_pause_incoming();
-> > > > +
-> > > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-> > > > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
-> > > > +
-> > > > +    assert(mis->from_src_file);
-> > > > +    qemu_file_shutdown(mis->from_src_file);
-> > > > +    qemu_fclose(mis->from_src_file);
-> > > > +    mis->from_src_file = NULL;
-> > > > +
-> > > > +    assert(mis->to_src_file);
-> > > > +    qemu_mutex_lock(&mis->rp_mutex);
-> > > > +    qemu_file_shutdown(mis->to_src_file);
-> > > > +    qemu_fclose(mis->to_src_file);
-> > > > +    mis->to_src_file = NULL;
-> > > > +    qemu_mutex_unlock(&mis->rp_mutex);
-> > > 
-> > > Hmm is that safe?  If we look at migrate_send_rp_message we have:
-> > > 
-> > >     static void migrate_send_rp_message(MigrationIncomingState *mis,
-> > >                                         enum mig_rp_message_type message_type,
-> > >                                         uint16_t len, void *data)
-> > >     {
-> > >         trace_migrate_send_rp_message((int)message_type, len);
-> > >         qemu_mutex_lock(&mis->rp_mutex);
-> > >         qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
-> > >         qemu_put_be16(mis->to_src_file, len);
-> > >         qemu_put_buffer(mis->to_src_file, data, len);
-> > >         qemu_fflush(mis->to_src_file);
-> > >         qemu_mutex_unlock(&mis->rp_mutex);
-> > >     }
-> > > 
-> > > If we came into postcopy_pause_incoming at about the same time
-> > > migrate_send_rp_message was being called and pause_incoming took the
-> > > lock first, then once it release the lock, send_rp_message carries on
-> > > and uses mis->to_src_file that's now NULL.
-> > > 
-> > > One solution here is to just call qemu_file_shutdown() but leave the
-> > > files open at this point, but clean the files up sometime later.
-> > 
-> > I see the commnent on patch 14 as well - yeah, we need patch 14 to
-> > co-op here, and as long as we are with patch 14, we should be ok.
-> > 
-> > > 
-> > > > +
-> > > > +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> > > > +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
-> > > > +    }
-> > > > +
-> > > > +    trace_postcopy_pause_incoming_continued();
-> > > > +
-> > > > +    return true;
-> > > > +}
-> > > > +
-> > > >  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
-> > > >  {
-> > > >      uint8_t section_type;
-> > > >      int ret = 0;
-> > > >  
-> > > > +retry:
-> > > >      while (true) {
-> > > >          section_type = qemu_get_byte(f);
-> > > >  
-> > > > @@ -2004,6 +2034,21 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
-> > > >  out:
-> > > >      if (ret < 0) {
-> > > >          qemu_file_set_error(f, ret);
-> > > > +
-> > > > +        /*
-> > > > +         * Detect whether it is:
-> > > > +         *
-> > > > +         * 1. postcopy running
-> > > > +         * 2. network failure (-EIO)
-> > > > +         *
-> > > > +         * If so, we try to wait for a recovery.
-> > > > +         */
-> > > > +        if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-> > > > +            ret == -EIO && postcopy_pause_incoming(mis)) {
-> > > > +            /* Reset f to point to the newly created channel */
-> > > > +            f = mis->from_src_file;
-> > > > +            goto retry;
-> > > > +        }
-> > > 
-> > > I wonder if:
-> > > 
-> > >            if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
-> > >                ret == -EIO && postcopy_pause_incoming(mis)) {
-> > >                /* Try again after postcopy recovery */
-> > >                return qemu_loadvm_state_main(mis->from_src_file, mis);
-> > >            }
-> > > would be nicer; it avoids the goto loop.
-> > 
-> > I agree we should avoid using goto loops. However I do see vast usages
-> > of goto like this one when we want to redo part of the procedures of a
-> > function (or, of course, when handling errors in "C-style").
-> 
-> We mostly use them to jump forward to an error exit; only rarely do
-> we do loops with them;  so if we can sensibly avoid them it's best.
-> 
-> > Calling qemu_loadvm_state_main() inside itself is ok as well, but it
-> > also has defect: stack usage would be out of control, or even, it can
-> > be controled by malicious users. E.g., if someone used program to
-> > periodically stop/start any network endpoint along the migration
-> > network, QEMU may go into a paused -> recovery -> active -> paused ...
-> > loop, and stack usage will just grow with time. I'd say it's an
-> > extreme example though...
-> 
-> I think it's safe because it's a tail-call so a new stack frame isn't
-> needed.
+In the armv8 platform, the mainly hardware error source are ARMv8
+SEA/SEI/GSIV. For the ARMv8 SEA/SEI, the KVM or host kernel will signal SIGBUS
+or use other interface to notify user space, such as Qemu. After Qemu gets
+the notification, it will record the CPER and inject the SEA/SEI to KVM. this
+series of patches will generate APEI table when guest OS boot up, and dynamically
+record CPER for the guest OS about the generic hardware errors, currently the
+userspace only handle the memory section hardware errors. Before Qemu record the
+CPER, it needs to check the ACK value written by the guest OS to avoid read-write
+race condition.
 
-I tried it and dumped the assembly, looks like even with tail-call, we
-didn't really avoid the "callq":
+Below is the APEI/GHESV2/CPER table layout, the max number of error soure is 11,
+which is classified by notification type, now only enable the SEA/SEI notification type
+error source.
 
-(gdb) disassemble qemu_loadvm_state_main
-Dump of assembler code for function qemu_loadvm_state_main:
-   0x00000000005d9ff8 <+0>:     push   %rbp
-   0x00000000005d9ff9 <+1>:     mov    %rsp,%rbp
-   0x00000000005d9ffc <+4>:     sub    $0x20,%rsp
-   0x00000000005da000 <+8>:     mov    %rdi,-0x18(%rbp)
-   0x00000000005da004 <+12>:    mov    %rsi,-0x20(%rbp)
-   0x00000000005da008 <+16>:    movl   $0x0,-0x4(%rbp)
-   0x00000000005da00f <+23>:    mov    -0x18(%rbp),%rax
-   0x00000000005da013 <+27>:    mov    %rax,%rdi
-   0x00000000005da016 <+30>:    callq  0x5e185e <qemu_get_byte>
+     etc/acpi/tables                               etc/hardware_errors
+    ====================                    ==========================================
+                                          +------------------+
++----------------------------+            |    address       |              +--------------+
+|    HEST                    +            |    registers     |              | Error Status |
++ +--------------------------+            | +----------------+              | Data Block 0 |
+| | GHES0                    | +--------->| |status_address0 |------------->| +------------+
++--------------------------+ |          | +----------------+              | |  CPER      |
+| | .................        | | +------->| |status_address1 |----------+   | |  CPER      |
+| | error_status_address     | | |        | +----------------+          |   | |  ....      |
+| | .................        | | |        |  .............   |          |   | |  CPER      |
+| | error_status_address-----+-+ |        +------------------+          |   | +-+------------+
+| | .................        |   | +----->| |status_address10|--------+ |   | Error Status |
+| | read_ack_register--------+-+ | |      | +----------------+        | |   | Data Block 1 |
+| | read_ack_preserve        | +-+-+----->| |ack_address0    |--+     | +-->| +------------+
+| | read_ack_write           |   | |      | +----------------+  |     |     | |  CPER      |
++ +--------------------------+   | | +--->| |ack_address1    |--+-+   |     | |  CPER      |
+| | GHES1                    |   | | |    | +----------------+  | |   |     | |  ....      |
++ +--------------------------+   | | |    | | .............  |  | |   |     | |  CPER      |
+| | .................        |   | | |    | +----------------+  | |   |     +-+------------+
+| | error_status_address-----+---+ | | +->| |ack_address10   |--+-+-+ |     | |..........  |
+| | .................        |     | | |  | +----------------+  | | | |     | +------------+
+| | read_ack_register--------+-----+-+ |  | |      ack0      |<-+ | | |     | Error Status |
+| | read_ack_preserve        |     |   |  | +----------------+    | | |     | Data Block 10|
+| | read_ack_write           |     |   |  | |      ack1      |<---+ | +---->| +------------+
++ +--------------------------+     |   |  | +----------------+      |       | |  CPER      |
+| | ...............          |     |   |  | |       ....     |      |       | |  CPER      |
++ +--------------------------+     |   |  | +--------------+ |      |       | |  ....      |
+| | GHES10                   |     |   |  | |      ack10     |<---- +       | |  CPER      |
++ +--------------------------+     |   |  | +----------------+              +-+------------+
+| | .................        |     |   |
+| | error_status_address-----+-----+   |
+| | .................        |         |
+| | read_ack_register--------+---------+
+| | read_ack_preserve        |
+| | read_ack_write           |
++ +--------------------------+
 
-[...]
+After injecting a SEA/SEI ghes error, the gueset OS kernel log will be shown as below:
 
-   0x00000000005da135 <+317>:   jne    0x5da165 <qemu_loadvm_state_main+365>
-   0x00000000005da137 <+319>:   cmpl   $0xfffffffb,-0x4(%rbp)
-   0x00000000005da13b <+323>:   jne    0x5da165 <qemu_loadvm_state_main+365>
-   0x00000000005da13d <+325>:   mov    -0x20(%rbp),%rax
-   0x00000000005da141 <+329>:   mov    %rax,%rdi
-   0x00000000005da144 <+332>:   callq  0x5d9eb4 <postcopy_pause_incoming>
-   0x00000000005da149 <+337>:   test   %al,%al
-   0x00000000005da14b <+339>:   je     0x5da165 <qemu_loadvm_state_main+365>
-   0x00000000005da14d <+341>:   mov    -0x20(%rbp),%rax
-   0x00000000005da151 <+345>:   mov    (%rax),%rax
-   0x00000000005da154 <+348>:   mov    -0x20(%rbp),%rdx
-   0x00000000005da158 <+352>:   mov    %rdx,%rsi
-   0x00000000005da15b <+355>:   mov    %rax,%rdi
-   0x00000000005da15e <+358>:   callq  0x5d9ff8 <qemu_loadvm_state_main>
-                                ^^^^^^^^^^^^^^^ (this one)
-   0x00000000005da163 <+363>:   jmp    0x5da168 <qemu_loadvm_state_main+368>
-   0x00000000005da165 <+365>:   mov    -0x4(%rbp),%eax
-   0x00000000005da168 <+368>:   leaveq
-   0x00000000005da169 <+369>:   retq
+[  142.911115] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 8
+[  142.913141] {1}[Hardware Error]: event severity: recoverable
+[  142.914498] {1}[Hardware Error]:  Error 0, type: recoverable
+[  142.915851] {1}[Hardware Error]:   section_type: memory error
+[  142.917163] {1}[Hardware Error]:   physical_address: 0x0000000000001111
+[  142.918792] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
 
-Do we need extra compilation parameters to achieve the tail-call
-optimization for gcc? My gcc version is: v6.1.1 20160621.
+how to test:
+1. In the guest OS, use this command to dump the APEI table: 
+	"iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST"
+2. And find the address for the generic error status block
+   according to the notification type
+3. then find the CPER record through the generic error status block.
 
-(even with extra flags, I am still a bit worried on whether it'll work
- on the other compilers though)
+For example(notification type is SEA):
 
-And, the "label-way" to retry is indeed used widely at least in both
-QEMU and Linux kernel. I tried to directly grep "^retry:" (so we are
-ignoring the same usage using different label names), there are ~30
-usage in QEMU and hundreds of cases in Linux kernel. So not sure
-whether this can be seen as another "legal" way to use C labels...
+(1) root@genericarmv8:~# iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
+(2) root@genericarmv8:~# cat HEST.dsl
+    /*
+     * Intel ACPI Component Architecture
+     * AML/ASL+ Disassembler version 20170728 (64-bit version)
+     * Copyright (c) 2000 - 2017 Intel Corporation
+     *
+     * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Sep  5 07:59:17 2016
+     *
+     * ACPI Data Table [HEST]
+     *
+     * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
+     */
 
-Thanks,
+    ..................................................................................
+    [308h 0776   2]                Subtable Type : 000A [Generic Hardware Error Source V2]
+    [30Ah 0778   2]                    Source Id : 0008
+    [30Ch 0780   2]            Related Source Id : FFFF
+    [30Eh 0782   1]                     Reserved : 00
+    [30Fh 0783   1]                      Enabled : 01
+    [310h 0784   4]       Records To Preallocate : 00000001
+    [314h 0788   4]      Max Sections Per Record : 00000001
+    [318h 0792   4]          Max Raw Data Length : 00001000
+
+    [31Ch 0796  12]         Error Status Address : [Generic Address Structure]
+    [31Ch 0796   1]                     Space ID : 00 [SystemMemory]
+    [31Dh 0797   1]                    Bit Width : 40
+    [31Eh 0798   1]                   Bit Offset : 00
+    [31Fh 0799   1]         Encoded Access Width : 04 [QWord Access:64]
+    [320h 0800   8]                      Address : 00000000785D0040
+
+    [328h 0808  28]                       Notify : [Hardware Error Notification Structure]
+    [328h 0808   1]                  Notify Type : 08 [SEA]
+    [329h 0809   1]                Notify Length : 1C
+    [32Ah 0810   2]   Configuration Write Enable : 0000
+    [32Ch 0812   4]                 PollInterval : 00000000
+    [330h 0816   4]                       Vector : 00000000
+    [334h 0820   4]      Polling Threshold Value : 00000000
+    [338h 0824   4]     Polling Threshold Window : 00000000
+    [33Ch 0828   4]        Error Threshold Value : 00000000
+    [340h 0832   4]       Error Threshold Window : 00000000
+
+    [344h 0836   4]    Error Status Block Length : 00001000
+    [348h 0840  12]            Read Ack Register : [Generic Address Structure]
+    [348h 0840   1]                     Space ID : 00 [SystemMemory]
+    [349h 0841   1]                    Bit Width : 40
+    [34Ah 0842   1]                   Bit Offset : 00
+    [34Bh 0843   1]         Encoded Access Width : 04 [QWord Access:64]
+    [34Ch 0844   8]                      Address : 00000000785D0098
+
+    [354h 0852   8]            Read Ack Preserve : 00000000FFFFFFFE
+    [35Ch 0860   8]               Read Ack Write : 0000000000000001
+
+    [364h 0868   2]                Subtable Type : 000A [Generic Hardware Error Source V2]
+    [366h 0870   2]                    Source Id : 0009
+    [368h 0872   2]            Related Source Id : FFFF
+    [36Ah 0874   1]                     Reserved : 00
+    [36Bh 0875   1]                      Enabled : 01
+    [36Ch 0876   4]       Records To Preallocate : 00000001
+    [370h 0880   4]      Max Sections Per Record : 00000001
+    [374h 0884   4]          Max Raw Data Length : 00001000
+
+    [378h 0888  12]         Error Status Address : [Generic Address Structure]
+    [378h 0888   1]                     Space ID : 00 [SystemMemory]
+    [379h 0889   1]                    Bit Width : 40
+    [37Ah 0890   1]                   Bit Offset : 00
+    [37Bh 0891   1]         Encoded Access Width : 04 [QWord Access:64]
+    [37Ch 0892   8]                      Address : 00000000785D0048
+
+    [384h 0900  28]                       Notify : [Hardware Error Notification Structure]
+    [384h 0900   1]                  Notify Type : 09 [SEI]
+    [385h 0901   1]                Notify Length : 1C
+    [386h 0902   2]   Configuration Write Enable : 0000
+    [388h 0904   4]                 PollInterval : 00000000
+    [38Ch 0908   4]                       Vector : 00000000
+    [390h 0912   4]      Polling Threshold Value : 00000000
+    [394h 0916   4]     Polling Threshold Window : 00000000
+    [398h 0920   4]        Error Threshold Value : 00000000
+    [39Ch 0924   4]       Error Threshold Window : 00000000
+
+    [3A0h 0928   4]    Error Status Block Length : 00001000
+    [3A4h 0932  12]            Read Ack Register : [Generic Address Structure]
+    [3A4h 0932   1]                     Space ID : 00 [SystemMemory]
+    [3A5h 0933   1]                    Bit Width : 40
+    [3A6h 0934   1]                   Bit Offset : 00
+    [3A7h 0935   1]         Encoded Access Width : 04 [QWord Access:64]
+    [3A8h 0936   8]                      Address : 00000000785D00A0
+
+    [3B0h 0944   8]            Read Ack Preserve : 00000000FFFFFFFE
+    [3B8h 0952   8]               Read Ack Write : 000000000000000
+    .....................................................................................
+(3) according to above table, the address that contains the physical address of a block
+    of memory that holds the error status data for SEA notification error source is 0x00000000785D0040
+(4) the address for SEA notification error source is 0x785d8108
+    (qemu) xp /1 0x00000000785D0040
+    00000000785d0040: 0x785d8108
+
+(5) check the content of generic error status block and generic error data entry
+    (qemu) xp /100x 0x785d8108
+    00000000785d8108: 0x00000000 0x00000000 0x00000000 0x00000098
+    00000000785d8118: 0x00000000 0xa5bc1114 0x4ede6f64 0x833e63b8
+    00000000785d8128: 0xb1837ced 0x00000000 0x00000300 0x00000050
+    00000000785d8138: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8148: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8158: 0x00000000 0x00000000 0x00000000 0x00004002
+    00000000785d8168: 0x00000000 0x00000000 0x00000000 0x00001111
+    00000000785d8178: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8188: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8198: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d81a8: 0x00000000 0x00000003 0x00000000 0x00000000
+    00000000785d81b8: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d81c8: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d81d8: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d81e8: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d81f8: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8208: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8218: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8228: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8238: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8248: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8258: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8268: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8278: 0x00000000 0x00000000 0x00000000 0x00000000
+    00000000785d8288: 0x00000000 0x00000000 0x00000000 0x00000000
+(6) check the OSPM's ACK value(for example SEA)
+    /* The address of ACK value */
+    (qemu) xp /1 0x00000000785D0098
+    00000000785d0098: 0x785d00f0
+
+    /* Before OSPM acknowledges the error */
+    (qemu) xp /1 0x785d00f0
+    00000000785d00f0: 0x00000000
+
+    /* After OSPM acknowledges the error */
+    (qemu) xp /1 0x785d00f0
+    00000000785d00f0: 0x00000001
+
+Dongjiu Geng (3):
+  ACPI: add APEI/HEST/CPER structures and macros
+  ACPI: Add APEI GHES Table Generation support
+  ACPI: build and enable APEI GHES in the Makefile and configuration
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/acpi/Makefile.objs           |   1 +
+ hw/acpi/aml-build.c             |   2 +
+ hw/acpi/hest_ghes.c             | 370 ++++++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c        |   6 +
+ include/hw/acpi/acpi-defs.h     | 193 +++++++++++++++++++++
+ include/hw/acpi/aml-build.h     |   1 +
+ include/hw/acpi/hest_ghes.h     |  47 +++++
+ 8 files changed, 621 insertions(+)
+ create mode 100644 hw/acpi/hest_ghes.c
+ create mode 100644 include/hw/acpi/hest_ghes.h
 
 -- 
-Peter Xu
+1.8.3.1
