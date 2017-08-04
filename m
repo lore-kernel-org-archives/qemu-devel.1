@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpy-0005Pn-64
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpy-0005Pp-6q
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 06:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpx-0002gE-4U
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1ddZpx-0002g7-1e
 	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 06:28:10 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Fri, 4 Aug 2017 18:26:39 +0800
-Message-ID: <cd39d290c76646052e220e4815dc88e1afb6e982.1501827395.git.maozy.fnst@cn.fujitsu.com>
+Date: Fri, 4 Aug 2017 18:26:40 +0800
+Message-ID: <d3a51356a54282267a84cd747f7cc410dd536ad2.1501827395.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/6] hw/block/fdc: Convert to realize
+Subject: [Qemu-devel] [PATCH v2 3/6] hw/block/nvme: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,69 +22,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Convert floppy_drive_init() to realize and rename it to
-floppy_drive_realize().
+Convert nvme_init() to realize and rename it to nvme_realize().
 
 Cc: John Snow <jsnow@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>
 
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 ---
- hw/block/fdc.c | 33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
+ hw/block/nvme.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 4011290..02f4a46 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -517,7 +517,7 @@ static Property floppy_drive_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 6071dc1..43c60ab 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -920,7 +920,7 @@ static const MemoryRegionOps nvme_cmb_ops = {
+     },
  };
  
--static int floppy_drive_init(DeviceState *qdev)
-+static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+-static int nvme_init(PCIDevice *pci_dev)
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
  {
-     FloppyDrive *dev = FLOPPY_DRIVE(qdev);
-     FloppyBus *bus = FLOPPY_BUS(qdev->parent_bus);
-@@ -535,15 +535,15 @@ static int floppy_drive_init(DeviceState *qdev)
-     }
+     NvmeCtrl *n = NVME(pci_dev);
+     NvmeIdCtrl *id = &n->id_ctrl;
+@@ -931,24 +931,27 @@ static int nvme_init(PCIDevice *pci_dev)
+     Error *local_err = NULL;
  
-     if (dev->unit >= MAX_FD) {
--        error_report("Can't create floppy unit %d, bus supports only %d units",
--                     dev->unit, MAX_FD);
+     if (!n->conf.blk) {
 -        return -1;
-+        error_setg(errp, "Can't create floppy unit %d, bus supports "
-+                   "only %d units", dev->unit, MAX_FD);
++        error_setg(errp, "drive property not set");
 +        return;
      }
  
-     drive = get_drv(bus->fdc, dev->unit);
-     if (drive->blk) {
--        error_report("Floppy unit %d is in use", dev->unit);
+     bs_size = blk_getlength(n->conf.blk);
+     if (bs_size < 0) {
 -        return -1;
-+        error_setg(errp, "Floppy unit %d is in use", dev->unit);
++        error_setg(errp, "could not get backing file size");
 +        return;
      }
  
-     if (!dev->conf.blk) {
-@@ -557,8 +557,9 @@ static int floppy_drive_init(DeviceState *qdev)
-     if (dev->conf.logical_block_size != 512 ||
-         dev->conf.physical_block_size != 512)
-     {
--        error_report("Physical and logical block size must be 512 for floppy");
+     blkconf_serial(&n->conf, &n->serial);
+     if (!n->serial) {
 -        return -1;
-+        error_setg(errp, "Physical and logical block size must "
-+                   "be 512 for floppy");
++        error_setg(errp, "serial property not set");
 +        return;
      }
- 
-     /* rerror/werror aren't supported by fdc and therefore not even registered
-@@ -570,20 +571,20 @@ static int floppy_drive_init(DeviceState *qdev)
-     blkconf_apply_backend_options(&dev->conf, blk_is_read_only(dev->conf.blk),
+     blkconf_blocksizes(&n->conf);
+     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
                                    false, &local_err);
      if (local_err) {
 -        error_report_err(local_err);
@@ -93,38 +82,23 @@ index 4011290..02f4a46 100644
 +        return;
      }
  
-     /* 'enospc' is the default for -drive, 'report' is what blk_new() gives us
-      * for empty drives. */
-     if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
-         blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
--        error_report("fdc doesn't support drive option werror");
--        return -1;
-+        error_setg(errp, "fdc doesn't support drive option werror");
-+        return;
+     pci_conf = pci_dev->config;
+@@ -1046,7 +1049,6 @@ static int nvme_init(PCIDevice *pci_dev)
+             cpu_to_le64(n->ns_size >>
+                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
      }
-     if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
--        error_report("fdc doesn't support drive option rerror");
--        return -1;
-+        error_setg(errp, "fdc doesn't support drive option rerror");
-+        return;
-     }
- 
-     drive->conf = &dev->conf;
-@@ -599,14 +600,12 @@ static int floppy_drive_init(DeviceState *qdev)
-     dev->type = drive->drive;
- 
-     fd_revalidate(drive);
--
 -    return 0;
  }
  
- static void floppy_drive_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k = DEVICE_CLASS(klass);
--    k->init = floppy_drive_init;
-+    k->realize = floppy_drive_realize;
-     set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
-     k->bus_type = TYPE_FLOPPY_BUS;
-     k->props = floppy_drive_properties;
+ static void nvme_exit(PCIDevice *pci_dev)
+@@ -1081,7 +1083,7 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     PCIDeviceClass *pc = PCI_DEVICE_CLASS(oc);
+ 
+-    pc->init = nvme_init;
++    pc->realize = nvme_realize;
+     pc->exit = nvme_exit;
+     pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
+     pc->vendor_id = PCI_VENDOR_ID_INTEL;
 -- 
 2.9.4
