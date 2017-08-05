@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo9J-0005d1-Gd
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:45:06 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo9V-0006FO-87
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo9I-0006vA-LI
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:45:05 -0400
-Date: Sat, 5 Aug 2017 03:44:55 +0200
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo9U-0007Ef-Fw
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:45:17 -0400
+Date: Sat, 5 Aug 2017 03:45:07 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170805014455.GF4859@toto>
+Message-ID: <20170805014507.GG4859@toto>
 References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-9-git-send-email-peter.maydell@linaro.org>
+	<1501867249-1924-8-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1501867249-1924-9-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 8/8] target/arm: Implement new
- do_transaction_failed hook
+In-Reply-To: <1501867249-1924-8-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 7/8] target/arm: Allow
+ deliver_fault() caller to specify EA bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,9 +27,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On Fri, Aug 04, 2017 at 06:20:49PM +0100, Peter Maydell wrote:
-> Implement the new do_transaction_failed hook for ARM, which should
-> cause the CPU to take a prefetch abort or data abort.
+On Fri, Aug 04, 2017 at 06:20:48PM +0100, Peter Maydell wrote:
+> For external aborts, we will want to be able to specify the EA
+> (external abort type) bit in the syndrome field.  Allow callers of
+> deliver_fault() to do that by adding a field to ARMMMUFaultInfo which
+> we use when constructing the syndrome values.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
@@ -37,98 +39,74 @@ Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
 > ---
->  target/arm/internals.h | 10 ++++++++++
->  target/arm/cpu.c       |  1 +
->  target/arm/op_helper.c | 43 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 54 insertions(+)
+>  target/arm/internals.h |  2 ++
+>  target/arm/op_helper.c | 10 +++++-----
+>  2 files changed, 7 insertions(+), 5 deletions(-)
 > 
 > diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index a3adbd8..13bb001 100644
+> index 1f6efef..a3adbd8 100644
 > --- a/target/arm/internals.h
 > +++ b/target/arm/internals.h
-> @@ -471,6 +471,16 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
->                                   MMUAccessType access_type,
->                                   int mmu_idx, uintptr_t retaddr);
+> @@ -448,12 +448,14 @@ void arm_handle_psci_call(ARMCPU *cpu);
+>   * @s2addr: Address that caused a fault at stage 2
+>   * @stage2: True if we faulted at stage 2
+>   * @s1ptw: True if we faulted at stage 2 while doing a stage 1 page-table walk
+> + * @ea: True if we should set the EA (external abort type) bit in syndrome
+>   */
+>  typedef struct ARMMMUFaultInfo ARMMMUFaultInfo;
+>  struct ARMMMUFaultInfo {
+>      target_ulong s2addr;
+>      bool stage2;
+>      bool s1ptw;
+> +    bool ea;
+>  };
 >  
-> +/* arm_cpu_do_transaction_failed: handle a memory system error response
-> + * (eg "no device/memory present at address") by raising an external abort
-> + * exception
-> + */
-> +void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-> +                                   vaddr addr, unsigned size,
-> +                                   MMUAccessType access_type,
-> +                                   int mmu_idx, MemTxAttrs attrs,
-> +                                   MemTxResult response, uintptr_t retaddr);
-> +
->  /* Call the EL change hook if one has been registered */
->  static inline void arm_call_el_change_hook(ARMCPU *cpu)
->  {
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 05c038b..6baede0 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1670,6 +1670,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
->  #else
->      cc->do_interrupt = arm_cpu_do_interrupt;
->      cc->do_unaligned_access = arm_cpu_do_unaligned_access;
-> +    cc->do_transaction_failed = arm_cpu_do_transaction_failed;
->      cc->get_phys_page_attrs_debug = arm_cpu_get_phys_page_attrs_debug;
->      cc->asidx_from_attrs = arm_asidx_from_attrs;
->      cc->vmsd = &vmstate_arm_cpu;
+>  /* Do a page table walk and add page to TLB if possible */
 > diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 7eac272..54b6dd8 100644
+> index aa52a98..7eac272 100644
 > --- a/target/arm/op_helper.c
 > +++ b/target/arm/op_helper.c
-> @@ -229,6 +229,49 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
->      deliver_fault(cpu, vaddr, access_type, fsr, fsc, &fi);
->  }
+> @@ -80,7 +80,7 @@ uint32_t HELPER(neon_tbl)(CPUARMState *env, uint32_t ireg, uint32_t def,
 >  
-> +/* arm_cpu_do_transaction_failed: handle a memory system error response
-> + * (eg "no device/memory present at address") by raising an external abort
-> + * exception
-> + */
-> +void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-> +                                   vaddr addr, unsigned size,
-> +                                   MMUAccessType access_type,
-> +                                   int mmu_idx, MemTxAttrs attrs,
-> +                                   MemTxResult response, uintptr_t retaddr)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +    uint32_t fsr, fsc;
-> +    ARMMMUFaultInfo fi = {};
-> +    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
-> +
-> +    if (retaddr) {
-> +        /* now we have a real cpu fault */
-> +        cpu_restore_state(cs, retaddr);
-> +    }
-> +
-> +    /* The EA bit in syndromes and fault status registers is an
-> +     * IMPDEF classification of external aborts. ARM implementations
-> +     * usually use this to indicate AXI bus Decode error (0) or
-> +     * Slave error (1); in QEMU we follow that.
-> +     */
-> +    fi.ea = (response != MEMTX_DECODE_ERROR);
-> +
-> +    /* The fault status register format depends on whether we're using
-> +     * the LPAE long descriptor format, or the short descriptor format.
-> +     */
-> +    if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
-> +        /* long descriptor form, STATUS 0b010000: synchronous ext abort */
-> +        fsr = (fi.ea << 12) | (1 << 9) | 0x10;
-> +    } else {
-> +        /* short descriptor form, FSR 0b01000 : synchronous ext abort */
-> +        fsr = (fi.ea << 12) | 0x8;
-> +    }
-> +    fsc = 0x10;
-> +
-> +    deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
-> +}
-> +
->  #endif /* !defined(CONFIG_USER_ONLY) */
+>  static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+>                                              unsigned int target_el,
+> -                                            bool same_el,
+> +                                            bool same_el, bool ea,
+>                                              bool s1ptw, bool is_write,
+>                                              int fsc)
+>  {
+> @@ -99,7 +99,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+>       */
+>      if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+>          syn = syn_data_abort_no_iss(same_el,
+> -                                    0, 0, s1ptw, is_write, fsc);
+> +                                    ea, 0, s1ptw, is_write, fsc);
+>      } else {
+>          /* Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
+>           * syndrome created at translation time.
+> @@ -107,7 +107,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+>           */
+>          syn = syn_data_abort_with_iss(same_el,
+>                                        0, 0, 0, 0, 0,
+> -                                      0, 0, s1ptw, is_write, fsc,
+> +                                      ea, 0, s1ptw, is_write, fsc,
+>                                        false);
+>          /* Merge the runtime syndrome with the template syndrome.  */
+>          syn |= template_syn;
+> @@ -141,11 +141,11 @@ static void deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
+>      }
 >  
->  uint32_t HELPER(add_setq)(CPUARMState *env, uint32_t a, uint32_t b)
+>      if (access_type == MMU_INST_FETCH) {
+> -        syn = syn_insn_abort(same_el, 0, fi->s1ptw, fsc);
+> +        syn = syn_insn_abort(same_el, fi->ea, fi->s1ptw, fsc);
+>          exc = EXCP_PREFETCH_ABORT;
+>      } else {
+>          syn = merge_syn_data_abort(env->exception.syndrome, target_el,
+> -                                   same_el, fi->s1ptw,
+> +                                   same_el, fi->ea, fi->s1ptw,
+>                                     access_type == MMU_DATA_STORE,
+>                                     fsc);
+>          if (access_type == MMU_DATA_STORE
 > -- 
 > 2.7.4
 > 
