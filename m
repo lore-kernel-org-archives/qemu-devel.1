@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddnYE-0007qw-50
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:06:52 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddndZ-0001wq-6Y
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddnY7-0000q7-G2
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:06:43 -0400
-Date: Sat, 5 Aug 2017 03:06:22 +0200
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddndY-00068u-6d
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:12:17 -0400
+Date: Sat, 5 Aug 2017 03:12:09 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170805010622.GZ4859@toto>
+Message-ID: <20170805011209.GA4859@toto>
 References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
 	<1501867249-1924-3-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
@@ -56,9 +56,14 @@ On Fri, Aug 04, 2017 at 06:20:43PM +0100, Peter Maydell wrote:
 > need some work to convert them to the new system. When this
 > transition is complete we can remove the old cpu_unassigned_access()
 > code.
+
+BTW, a question. I don't know of any from memory but does any arch
+have the ability to report the payload that failed for stores?
+I guess it's easy enough to add that if needed though.
+
+
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
 > ---
 >  include/qom/cpu.h | 21 +++++++++++++++++++++
 >  1 file changed, 21 insertions(+)
@@ -75,15 +80,6 @@ On Fri, Aug 04, 2017 at 06:20:43PM +0100, Peter Maydell wrote:
 >   * @do_unaligned_access: Callback for unaligned access handling, if
 >   * the target defines #ALIGNED_ONLY.
 > + * @do_transaction_failed: Callback for handling failed memory transactions
-
-Looks OK but I wonder if there you might want to clarify that this is a
-bus/slave failure and not a failure within the CPU (e.g not an MMU fault).
-
-Anyway:
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
-
 >   * @virtio_is_big_endian: Callback to return %true if a CPU which supports
 >   * runtime configurable endianness is currently big-endian. Non-configurable
 >   * CPUs can use the default implementation of this method. This method should
