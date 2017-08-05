@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo5H-0004T7-AJ
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:40:56 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo9J-0005d1-Gd
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo5G-0003Qv-2z
-	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:40:55 -0400
-Date: Sat, 5 Aug 2017 03:40:45 +0200
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ddo9I-0006vA-LI
+	for qemu-devel@nongnu.org; Fri, 04 Aug 2017 21:45:05 -0400
+Date: Sat, 5 Aug 2017 03:44:55 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170805014045.GE4859@toto>
+Message-ID: <20170805014455.GF4859@toto>
 References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-7-git-send-email-peter.maydell@linaro.org>
+	<1501867249-1924-9-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1501867249-1924-7-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/8] target/arm: Factor out
- fault delivery code
+In-Reply-To: <1501867249-1924-9-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 8/8] target/arm: Implement new
+ do_transaction_failed hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,190 +27,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On Fri, Aug 04, 2017 at 06:20:47PM +0100, Peter Maydell wrote:
-> We currently have some similar code in tlb_fill() and in
-> arm_cpu_do_unaligned_access() for delivering a data abort or prefetch
-> abort.  We're also going to want to do the same thing to handle
-> external aborts.  Factor out the common code into a new function
-> deliver_fault().
-
-I found this a bit hard to read but I think it looks OK :-)
-Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
-
+On Fri, Aug 04, 2017 at 06:20:49PM +0100, Peter Maydell wrote:
+> Implement the new do_transaction_failed hook for ARM, which should
+> cause the CPU to take a prefetch abort or data abort.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+
 > ---
->  target/arm/op_helper.c | 110 +++++++++++++++++++++++++------------------------
->  1 file changed, 57 insertions(+), 53 deletions(-)
+>  target/arm/internals.h | 10 ++++++++++
+>  target/arm/cpu.c       |  1 +
+>  target/arm/op_helper.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 54 insertions(+)
 > 
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index a3adbd8..13bb001 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -471,6 +471,16 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+>                                   MMUAccessType access_type,
+>                                   int mmu_idx, uintptr_t retaddr);
+>  
+> +/* arm_cpu_do_transaction_failed: handle a memory system error response
+> + * (eg "no device/memory present at address") by raising an external abort
+> + * exception
+> + */
+> +void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+> +                                   vaddr addr, unsigned size,
+> +                                   MMUAccessType access_type,
+> +                                   int mmu_idx, MemTxAttrs attrs,
+> +                                   MemTxResult response, uintptr_t retaddr);
+> +
+>  /* Call the EL change hook if one has been registered */
+>  static inline void arm_call_el_change_hook(ARMCPU *cpu)
+>  {
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 05c038b..6baede0 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1670,6 +1670,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+>  #else
+>      cc->do_interrupt = arm_cpu_do_interrupt;
+>      cc->do_unaligned_access = arm_cpu_do_unaligned_access;
+> +    cc->do_transaction_failed = arm_cpu_do_transaction_failed;
+>      cc->get_phys_page_attrs_debug = arm_cpu_get_phys_page_attrs_debug;
+>      cc->asidx_from_attrs = arm_asidx_from_attrs;
+>      cc->vmsd = &vmstate_arm_cpu;
 > diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 2a85666..aa52a98 100644
+> index 7eac272..54b6dd8 100644
 > --- a/target/arm/op_helper.c
 > +++ b/target/arm/op_helper.c
-> @@ -115,6 +115,51 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
->      return syn;
+> @@ -229,6 +229,49 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+>      deliver_fault(cpu, vaddr, access_type, fsr, fsc, &fi);
 >  }
 >  
-> +static void deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
-> +                          uint32_t fsr, uint32_t fsc, ARMMMUFaultInfo *fi)
+> +/* arm_cpu_do_transaction_failed: handle a memory system error response
+> + * (eg "no device/memory present at address") by raising an external abort
+> + * exception
+> + */
+> +void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+> +                                   vaddr addr, unsigned size,
+> +                                   MMUAccessType access_type,
+> +                                   int mmu_idx, MemTxAttrs attrs,
+> +                                   MemTxResult response, uintptr_t retaddr)
 > +{
+> +    ARMCPU *cpu = ARM_CPU(cs);
 > +    CPUARMState *env = &cpu->env;
-> +    int target_el;
-> +    bool same_el;
-> +    uint32_t syn, exc;
-> +
-> +    target_el = exception_target_el(env);
-> +    if (fi->stage2) {
-> +        target_el = 2;
-> +        env->cp15.hpfar_el2 = extract64(fi->s2addr, 12, 47) << 4;
-> +    }
-> +    same_el = (arm_current_el(env) == target_el);
-> +
-> +    if (fsc == 0x3f) {
-> +        /* Caller doesn't have a long-format fault status code. This
-> +         * should only happen if this fault will never actually be reported
-> +         * to an EL that uses a syndrome register. Check that here.
-> +         * 0x3f is a (currently) reserved FSR code, in case the constructed
-> +         * syndrome does leak into the guest somehow.
-> +         */
-> +        assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-> +    }
-> +
-> +    if (access_type == MMU_INST_FETCH) {
-> +        syn = syn_insn_abort(same_el, 0, fi->s1ptw, fsc);
-> +        exc = EXCP_PREFETCH_ABORT;
-> +    } else {
-> +        syn = merge_syn_data_abort(env->exception.syndrome, target_el,
-> +                                   same_el, fi->s1ptw,
-> +                                   access_type == MMU_DATA_STORE,
-> +                                   fsc);
-> +        if (access_type == MMU_DATA_STORE
-> +            && arm_feature(env, ARM_FEATURE_V6)) {
-> +            fsr |= (1 << 11);
-> +        }
-> +        exc = EXCP_DATA_ABORT;
-> +    }
-> +
-> +    env->exception.vaddress = addr;
-> +    env->exception.fsr = fsr;
-> +    raise_exception(env, exc, syn, target_el);
-> +}
-> +
->  /* try to fill the TLB and return an exception if error. If retaddr is
->   * NULL, it means that the function was called in C code (i.e. not
->   * from generated code or from helper.c)
-> @@ -129,23 +174,13 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
->      ret = arm_tlb_fill(cs, addr, access_type, mmu_idx, &fsr, &fi);
->      if (unlikely(ret)) {
->          ARMCPU *cpu = ARM_CPU(cs);
-> -        CPUARMState *env = &cpu->env;
-> -        uint32_t syn, exc, fsc;
-> -        unsigned int target_el;
-> -        bool same_el;
-> +        uint32_t fsc;
->  
->          if (retaddr) {
->              /* now we have a real cpu fault */
->              cpu_restore_state(cs, retaddr);
->          }
->  
-> -        target_el = exception_target_el(env);
-> -        if (fi.stage2) {
-> -            target_el = 2;
-> -            env->cp15.hpfar_el2 = extract64(fi.s2addr, 12, 47) << 4;
-> -        }
-> -        same_el = arm_current_el(env) == target_el;
-> -
->          if (fsr & (1 << 9)) {
->              /* LPAE format fault status register : bottom 6 bits are
->               * status code in the same form as needed for syndrome
-> @@ -153,34 +188,15 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
->              fsc = extract32(fsr, 0, 6);
->          } else {
->              /* Short format FSR : this fault will never actually be reported
-> -             * to an EL that uses a syndrome register. Check that here,
-> -             * and use a (currently) reserved FSR code in case the constructed
-> -             * syndrome does leak into the guest somehow.
-> +             * to an EL that uses a syndrome register. Use a (currently)
-> +             * reserved FSR code in case the constructed syndrome does leak
-> +             * into the guest somehow. deliver_fault will assert that
-> +             * we don't target an EL using the syndrome.
->               */
-> -            assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
->              fsc = 0x3f;
->          }
->  
-> -        /* For insn and data aborts we assume there is no instruction syndrome
-> -         * information; this is always true for exceptions reported to EL1.
-> -         */
-> -        if (access_type == MMU_INST_FETCH) {
-> -            syn = syn_insn_abort(same_el, 0, fi.s1ptw, fsc);
-> -            exc = EXCP_PREFETCH_ABORT;
-> -        } else {
-> -            syn = merge_syn_data_abort(env->exception.syndrome, target_el,
-> -                                       same_el, fi.s1ptw,
-> -                                       access_type == MMU_DATA_STORE, fsc);
-> -            if (access_type == MMU_DATA_STORE
-> -                && arm_feature(env, ARM_FEATURE_V6)) {
-> -                fsr |= (1 << 11);
-> -            }
-> -            exc = EXCP_DATA_ABORT;
-> -        }
-> -
-> -        env->exception.vaddress = addr;
-> -        env->exception.fsr = fsr;
-> -        raise_exception(env, exc, syn, target_el);
-> +        deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
->      }
->  }
->  
-> @@ -191,9 +207,8 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
->  {
->      ARMCPU *cpu = ARM_CPU(cs);
->      CPUARMState *env = &cpu->env;
-> -    int target_el;
-> -    bool same_el;
-> -    uint32_t syn;
 > +    uint32_t fsr, fsc;
 > +    ARMMMUFaultInfo fi = {};
->      ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
->  
->      if (retaddr) {
-> @@ -201,28 +216,17 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
->          cpu_restore_state(cs, retaddr);
->      }
->  
-> -    target_el = exception_target_el(env);
-> -    same_el = (arm_current_el(env) == target_el);
-> -
-> -    env->exception.vaddress = vaddr;
-> -
->      /* the DFSR for an alignment fault depends on whether we're using
->       * the LPAE long descriptor format, or the short descriptor format
->       */
->      if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
-> -        env->exception.fsr = (1 << 9) | 0x21;
-> +        fsr = (1 << 9) | 0x21;
->      } else {
-> -        env->exception.fsr = 0x1;
-> -    }
-> -
-> -    if (access_type == MMU_DATA_STORE && arm_feature(env, ARM_FEATURE_V6)) {
-> -        env->exception.fsr |= (1 << 11);
-> +        fsr = 0x1;
->      }
-> +    fsc = 0x21;
->  
-> -    syn = merge_syn_data_abort(env->exception.syndrome, target_el,
-> -                               same_el, 0, access_type == MMU_DATA_STORE,
-> -                               0x21);
-> -    raise_exception(env, EXCP_DATA_ABORT, syn, target_el);
-> +    deliver_fault(cpu, vaddr, access_type, fsr, fsc, &fi);
->  }
->  
+> +    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
+> +
+> +    if (retaddr) {
+> +        /* now we have a real cpu fault */
+> +        cpu_restore_state(cs, retaddr);
+> +    }
+> +
+> +    /* The EA bit in syndromes and fault status registers is an
+> +     * IMPDEF classification of external aborts. ARM implementations
+> +     * usually use this to indicate AXI bus Decode error (0) or
+> +     * Slave error (1); in QEMU we follow that.
+> +     */
+> +    fi.ea = (response != MEMTX_DECODE_ERROR);
+> +
+> +    /* The fault status register format depends on whether we're using
+> +     * the LPAE long descriptor format, or the short descriptor format.
+> +     */
+> +    if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
+> +        /* long descriptor form, STATUS 0b010000: synchronous ext abort */
+> +        fsr = (fi.ea << 12) | (1 << 9) | 0x10;
+> +    } else {
+> +        /* short descriptor form, FSR 0b01000 : synchronous ext abort */
+> +        fsr = (fi.ea << 12) | 0x8;
+> +    }
+> +    fsc = 0x10;
+> +
+> +    deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
+> +}
+> +
 >  #endif /* !defined(CONFIG_USER_ONLY) */
+>  
+>  uint32_t HELPER(add_setq)(CPUARMState *env, uint32_t a, uint32_t b)
 > -- 
 > 2.7.4
 > 
