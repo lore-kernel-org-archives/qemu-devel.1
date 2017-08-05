@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1de0VB-0002tC-VH
-	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 10:56:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1de2J0-0007Tw-HG
+	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 12:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1de0V8-00053q-Us
-	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 10:56:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1de0V8-00051Q-OQ
-	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 10:56:26 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7C2554A6FA
-	for <qemu-devel@nongnu.org>; Sat,  5 Aug 2017 14:56:23 +0000 (UTC)
-Date: Sat, 5 Aug 2017 22:56:20 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170805145620.GE14780@lemon>
-References: <20170804213625.3756-1-ehabkost@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1de2Iz-0005GV-5m
+	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 12:52:02 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:38016)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1de2Iy-0005Ez-Ug
+	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 12:52:01 -0400
+Received: by mail-wr0-x233.google.com with SMTP id f21so26083603wrf.5
+	for <qemu-devel@nongnu.org>; Sat, 05 Aug 2017 09:52:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170804213625.3756-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/5] qmp-shell non-interactive
- mode, delete scripts/qmp/qmp
+In-Reply-To: <20170805010622.GZ4859@toto>
+References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
+	<1501867249-1924-3-git-send-email-peter.maydell@linaro.org>
+	<20170805010622.GZ4859@toto>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 5 Aug 2017 17:51:38 +0100
+Message-ID: <CAFEAcA-nx-zUa8zJv3dz9UiYg9oUQQpg8gSCYLahnY4xT_9Vpw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/8] cpu: Define new
+ cpu_transaction_failed() hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, 08/04 18:36, Eduardo Habkost wrote:
-> This series adds the ability to run QMP commands
-> non-interactively to qmp-shell, and deletes scripts/qmp/qmp.
+On 5 August 2017 at 02:06, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> On Fri, Aug 04, 2017 at 06:20:43PM +0100, Peter Maydell wrote:
+>> @@ -85,8 +85,10 @@ struct TranslationBlock;
+>>   * @has_work: Callback for checking if there is work to do.
+>>   * @do_interrupt: Callback for interrupt handling.
+>>   * @do_unassigned_access: Callback for unassigned access handling.
+>> + * (this is deprecated: new targets should use do_transaction_failed instead)
+>>   * @do_unaligned_access: Callback for unaligned access handling, if
+>>   * the target defines #ALIGNED_ONLY.
+>> + * @do_transaction_failed: Callback for handling failed memory transactions
+>
+> Looks OK but I wonder if there you might want to clarify that this is a
+> bus/slave failure and not a failure within the CPU (e.g not an MMU fault).
 
-Hmm, not so simple:
+Yes, we could add
+"(ie bus faults or external aborts; not MMU faults)"
+just to clarify.
 
-$ git grep 'import qmp'
-scripts/qemu.py:import qmp.qmp
-scripts/qmp/qemu-ga-client:import qmp
-scripts/qmp/qmp-shell:import qmp
-scripts/qtest.py:import qmp.qmp
-tests/migration/guestperf/engine.py:import qmp.qmp
-
-Fam
+thanks
+-- PMM
