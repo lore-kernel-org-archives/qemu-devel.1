@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1de5i5-0007wU-5T
+	(envelope-from <zuban32s@gmail.com>) id 1de5i5-0007wW-66
 	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 16:30:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1de5i1-0006Em-7w
+	(envelope-from <zuban32s@gmail.com>) id 1de5i4-0006Is-4M
 	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 16:30:09 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34816)
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:38534)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1de5i1-0006EY-0A
-	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 16:30:05 -0400
-Received: by mail-lf0-x241.google.com with SMTP id w199so3069165lff.2
-	for <qemu-devel@nongnu.org>; Sat, 05 Aug 2017 13:30:04 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1de5i3-0006GD-Th
+	for qemu-devel@nongnu.org; Sat, 05 Aug 2017 16:30:08 -0400
+Received: by mail-lf0-x243.google.com with SMTP id y15so3063292lfd.5
+	for <qemu-devel@nongnu.org>; Sat, 05 Aug 2017 13:30:07 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Sat,  5 Aug 2017 23:29:51 +0300
-Message-Id: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 0/3] Allow RedHat PCI bridges reserve more
- buses than necessary during init
+Date: Sat,  5 Aug 2017 23:29:53 +0300
+Message-Id: <1501964994-5257-3-git-send-email-zuban32s@gmail.com>
+In-Reply-To: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
+References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
+Subject: [Qemu-devel] [PATCH v4 2/3] pci: add QEMU-specific PCI capability
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +29,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: seabios@seabios.org
 Cc: mst@redhat.com, marcel@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-Now PCI bridges get a bus range number on a system init,
-basing on currently plugged devices. That's why when one wants to hotplug another bridge,
-it needs his child bus, which the parent is unable to provide (speaking about virtual device).
-The suggested workaround is to have vendor-specific capability in Red Hat PCI bridges
-that contains number of additional bus to reserve (as well as IO/MEM/PREF space limit hints) 
-on BIOS PCI init.
-So this capability is intented only for pure QEMU->SeaBIOS usage.
+On PCI init PCI bridge devices may need some
+extra info about bus number to reserve, IO, memory and
+prefetchable memory limits. QEMU can provide this
+with special vendor-specific PCI capability.
 
-Considering all aforesaid, this series is directly connected with
-QEMU series "Generic PCIE-PCI Bridge".
+This capability is intended to be used only
+for Red Hat PCI bridges, i.e. QEMU cooperation.
 
-Although the new PCI capability is supposed to contain various limits along with
-bus number to reserve, now only its full layout is proposed. And
-only bus_reserve field is used in QEMU and BIOS. Limits usage
-is still a subject for implementation as now
-the main goal of this series to provide necessary support from the 
-firmware side to PCIE-PCI bridge hotplug. 
-
-Changes v3->v4:
-1. Use all QEMU PCI capability fields - addresses Michael's comment
-2. Changes of the capability layout (QEMU side has the same changes):
-	- change reservation fields types: bus_res - uint32_t, others - uint64_t
-	- interpret -1 value as 'ignore'
-
-Changes v2->v3:
-1. Merge commit 2 (Red Hat vendor ID) into commit 4 - addresses Marcel's comment,
-	and add Generic PCIE Root Port device ID - addresses Michael's comment.
-2. Changes of the capability layout  (QEMU side has the same changes):
-	- add 'type' field to distinguish multiple 
-		RedHat-specific capabilities - addresses Michael's comment
-	- do not mimiс PCI Config space register layout, but use mutually exclusive differently
-		sized fields for IO and prefetchable memory limits - addresses Laszlo's comment
-	- use defines instead of structure and offsetof - addresses Michael's comment
-3. Interpret 'bus_reserve' field as a minimum necessary
-	 range to reserve - addresses Gerd's comment
-4. pci_find_capability moved to pci.c - addresses Kevin's comment
-5. Move capability layout header to src/fw/dev-pci.h - addresses Kevin's comment
-6. Add the capability documentation - addresses Michael's comment
-7. Add capability length and bus_reserve field sanity checks - addresses Michael's comment
-
-Changes v1->v2:
-1. New #define for Red Hat vendor added (addresses Konrad's comment).
-2. Refactored pci_find_capability function (addresses Marcel's comment).
-3. Capability reworked:
-	- data type added;
-	- reserve space in a structure for IO, memory and 
-	  prefetchable memory limits.
-
-Aleksandr Bezzubikov (3):
-  pci: refactor pci_find_capapibilty to get bdf as the first argument
-    instead of the whole pci_device
-  pci: add QEMU-specific PCI capability structure
-  pci: enable RedHat PCI bridges to reserve additional buses on PCI init
-
- src/fw/dev-pci.h    | 50 ++++++++++++++++++++++++++++++++++++
- src/fw/pciinit.c    | 73 ++++++++++++++++++++++++++++++++++++++++++++++++-----
- src/hw/pci.c        | 25 ++++++++++++++++++
- src/hw/pci.h        |  1 +
- src/hw/pci_ids.h    |  3 +++
- src/hw/pcidevice.c  | 24 ------------------
- src/hw/pcidevice.h  |  1 -
- src/hw/virtio-pci.c |  6 ++---
- 8 files changed, 149 insertions(+), 34 deletions(-)
+Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+---
+ src/fw/dev-pci.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
  create mode 100644 src/fw/dev-pci.h
 
+diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
+new file mode 100644
+index 0000000..2c8ddb0
+--- /dev/null
++++ b/src/fw/dev-pci.h
+@@ -0,0 +1,50 @@
++#ifndef _PCI_CAP_H
++#define _PCI_CAP_H
++
++#include "types.h"
++
++/*
++
++QEMU-specific vendor(Red Hat)-specific capability.
++It's intended to provide some hints for firmware to init PCI devices.
++
++Its structure is shown below:
++
++Header:
++
++u8 id;       Standard PCI Capability Header field
++u8 next;     Standard PCI Capability Header field
++u8 len;      Standard PCI Capability Header field
++u8 type;     Red Hat vendor-specific capability type:
++               now only REDHAT_CAP_TYP_QEMU=1 exists
++Data:
++
++u32 bus_res;            minimum bus number to reserve;
++                        this is necessary for PCI Express Root Ports
++                        to support PCIE-to-PCI bridge hotplug
++u64 io;                 IO space to reserve
++u64 mem;                non-prefetchable memory space to reserve
++u64 prefetchable_mem;   prefetchable memory space to reserve
++
++If any field value in Data section is -1,
++it means that such kind of reservation
++is not needed and must be ignored.
++
++*/
++
++/* Offset of vendor-specific capability type field */
++#define PCI_CAP_REDHAT_TYPE  3
++
++/* List of valid Red Hat vendor-specific capability types */
++#define REDHAT_CAP_TYPE_QEMU    1
++
++
++/* Offsets of QEMU capability fields */
++#define QEMU_PCI_CAP_BUS_RES        4
++#define QEMU_PCI_CAP_LIMITS_OFFSET  8
++#define QEMU_PCI_CAP_IO             8
++#define QEMU_PCI_CAP_MEM            16
++#define QEMU_PCI_CAP_PREF_MEM       24
++#define QEMU_PCI_CAP_SIZE           32
++
++#endif /* _PCI_CAP_H */
 -- 
 2.7.4
