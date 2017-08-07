@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1deihw-0006Iw-Si
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:08:38 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1deipl-00019h-3W
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:16:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1deihv-0007KG-2e
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:08:36 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36764)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1deihu-0007K4-U3
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:08:34 -0400
-Received: by mail-io0-x244.google.com with SMTP id j32so466584iod.3
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 07:08:34 -0700 (PDT)
-MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <20170807073345.GG14780@lemon>
-References: <150181165680.60.17068931498958654477@93e45bedd699>
-	<d13bf86c-036d-4178-9d1d-52443ba226b6@redhat.com>
-	<20170804121031.GA1913@lemon>
-	<20170807064330.GF14780@lemon> <20170807073345.GG14780@lemon>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Date: Mon, 7 Aug 2017 11:08:33 -0300
-Message-ID: <CAAdtpL5oZ39fhsO-qB9+AJ599k+EmSPrAn+nvZnm+CZoiuf=iw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 00/22] Clean up around qmp() and hmp()
+	(envelope-from <vsementsov@virtuozzo.com>) id 1deipj-00034h-Pa
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:16:41 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon,  7 Aug 2017 17:16:30 +0300
+Message-Id: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +17,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com
 
-On Mon, Aug 7, 2017 at 4:33 AM, Fam Zheng <famz@redhat.com> wrote:
-> On Mon, 08/07 14:43, Fam Zheng wrote:
->> On Fri, 08/04 20:10, Fam Zheng wrote:
->> > On Fri, 08/04 06:50, Eric Blake wrote:
->> > > On 08/03/2017 08:54 PM, no-reply@patchew.org wrote:
->> > > > Hi,
->> > > >
->> > > > This series failed automatic build test. Please find the testing commands and
->> > > > their output below. If you have docker installed, you can probably reproduce it
->> > > > locally.
->> > >
->> > > When will patchew have a syntax for stating dependencies? (Of course, I
->> > > should actually mention those dependencies in my cover letter, not after
->> > > the fact).
->> >
->> > I can give it a try this weekend, if it works, it will be announced on this
->> > list.
->>
->> Hijack! As an experiment of the newly pushed "base" tag handling on the server:
->>
->> Based-on: 20170802201900.11890-1-eblake@redhat.com
+185 iotest is broken.
 
-:)
+How to test:
+> i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
+  done; echo N = $i
 
->
-> It worked. Now, restarted the tests with the "rebased" branch:
->
-> https://github.com/patchew-project/qemu/commits/patchew/20170804012551.2714-1-eblake%40redhat.com
->
-> Fam
->
+finished for me like this:
+
+185 2s ... - output mismatch (see 185.out.bad)
+--- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
+    15:14:29.520343805 +0300
++++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
+@@ -37,7 +37,7 @@
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+     "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+    "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+        "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
+            "mirror"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+    "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+        "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
+
+ === Start backup job and exit qemu ===
+
+Failures: 185
+Failed 1 of 1 tests
+N = 8
+
+It doesn't seems logical to expect the constant offset on cancel,
+so let filter it out.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/185     | 2 +-
+ tests/qemu-iotests/185.out | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index 0eda371f27..446d78447e 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -157,7 +157,7 @@ _send_qemu_cmd $h \
+     "return"
+ 
+ _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
+-wait=1 _cleanup_qemu
++wait=1 _cleanup_qemu | _filter_block_job_offset
+ 
+ echo
+ echo === Start backup job and exit qemu ===
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index 57eaf8d699..f51af627fe 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -37,7 +37,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
+ {"return": {}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": OFFSET, "speed": 65536, "type": "mirror"}}
+ 
+ === Start backup job and exit qemu ===
+ 
+-- 
+2.11.1
