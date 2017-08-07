@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1deewb-0002Yv-Uk
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:07:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1defGA-0007Vl-Qn
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1deewY-0000pM-PT
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:07:29 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:32999)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1deewY-0000oT-Fh
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:07:26 -0400
-Received: by mail-wr0-x231.google.com with SMTP id v105so18711wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 03:07:24 -0700 (PDT)
-References: <1501604245-33460-1-git-send-email-pbonzini@redhat.com>
-	<1501604245-33460-3-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8ArjNALptSYkR4T-SaejWPQxpazYjm-b_aCkGDFFXgnw@mail.gmail.com>
-	<20170801180408.GC2471@work-vm>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170801180408.GC2471@work-vm>
-Date: Mon, 07 Aug 2017 11:07:21 +0100
-Message-ID: <87y3qvvgh2.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1defG7-00006P-1F
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:27:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1defG6-00006E-OB
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:27:38 -0400
+Date: Mon, 7 Aug 2017 11:27:29 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170807102729.GG18259@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.14d7e60ae019b1418a70bacc4e7d240fadf9c96c.1501362828.git-series.knut.omang@oracle.com>
+	<7c4ddf95a57f7dfa546c11f8a08a9091b8bd1ceb.1501362828.git-series.knut.omang@oracle.com>
+	<20170807084524.GF18259@redhat.com>
+	<1502097685.3624.6.camel@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 02/17]
- cpu_physical_memory_sync_dirty_bitmap: Fix alignment check
+Content-Disposition: inline
+In-Reply-To: <1502097685.3624.6.camel@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] tests: Add test-listen - a stress
+ test for QEMU socket listen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +32,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
+On Mon, Aug 07, 2017 at 11:21:25AM +0200, Knut Omang wrote:
+> On Mon, 2017-08-07 at 09:45 +0100, Daniel P. Berrange wrote:
+> > On Sat, Jul 29, 2017 at 11:18:15PM +0200, Knut Omang wrote:
+> > > There's a potential race condition between multiple bind()'s
+> > > attempting to bind to the same port, which occasionally
+> > > allows more than one bind to succeed against the same port.
+> > >=20
+> > > When a subsequent listen() call is made with the same socket
+> > > only one will succeed.
+> > >=20
+> > > The current QEMU code does however not take this situation into acc=
+ount
+> > > and the listen will cause the code to break out and fail even
+> > > when there are actually available ports to use.
+> > >=20
+> > > This test exposes two subtests:
+> > >=20
+> > > /socket/listen-serial
+> > > /socket/listen-compete
+> > >=20
+> > > The "compete" subtest creates a number of threads and have them all=
+ trying to bind
+> > > to the same port with a large enough offset input to
+> > > allow all threads to get it's own port.
+> > > The "serial" subtest just does the same, except in series in a
+> > > single thread.
+> > >=20
+> > > The serial version passes, probably in most versions of QEMU.
+> > >=20
+> > > The parallel version exposes the problem in a relatively reliable w=
+ay,
+> > > eg. it fails a majority of times, but not with a 100% rate, occasio=
+nal
+> > > passes can be seen. Nevertheless this is quite good given that
+> > > the bug was tricky to reproduce and has been left undetected for
+> > > a while.
+> > >=20
+> > > The problem seems to be present in all versions of QEMU.
+> > >=20
+> > > The original failure scenario occurred with VNC port allocation
+> > > in a traditional Xen based build, in different code
+> > > but with similar functionality.
+> > >=20
+> > > Reported-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> > > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > > Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> > > Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+> > > ---
+> > > =C2=A0tests/Makefile.include |=C2=A0=C2=A0=C2=A02 +-
+> > > =C2=A0tests/test-listen.c=C2=A0=C2=A0=C2=A0=C2=A0| 253 ++++++++++++=
+++++++++++++++++++++++++++++++-
+> > > =C2=A02 files changed, 255 insertions(+)
+> > > =C2=A0create mode 100644 tests/test-listen.c
+> > >=20
+> > > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > > index 7af278d..b37c0c8 100644
+> > > --- a/tests/Makefile.include
+> > > +++ b/tests/Makefile.include
+> > > @@ -128,6 +128,7 @@ check-unit-y +=3D tests/test-bufferiszero$(EXES=
+UF)
+> > > =C2=A0gcov-files-check-bufferiszero-y =3D util/bufferiszero.c
+> > > =C2=A0check-unit-y +=3D tests/test-uuid$(EXESUF)
+> > > =C2=A0check-unit-y +=3D tests/ptimer-test$(EXESUF)
+> > > +#check-unit-y +=3D tests/test-listen$(EXESUF)
+> > > =C2=A0gcov-files-ptimer-test-y =3D hw/core/ptimer.c
+> > > =C2=A0check-unit-y +=3D tests/test-qapi-util$(EXESUF)
+> > > =C2=A0gcov-files-test-qapi-util-y =3D qapi/qapi-util.c
+> > > @@ -769,6 +770,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm=
+-mptimer.o
+> > > =C2=A0tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-=
+util-obj-y)
+> > > =C2=A0tests/numa-test$(EXESUF): tests/numa-test.o
+> > > =C2=A0tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-=
+sector.o tests/acpi-utils.o
+> > > +tests/test-listen$(EXESUF): tests/test-listen.o $(test-util-obj-y)
+> > > =C2=A0
+> > > =C2=A0tests/migration/stress$(EXESUF): tests/migration/stress.o
+> > > =C2=A0	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB)=
+ -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+> > > diff --git a/tests/test-listen.c b/tests/test-listen.c
+> > > new file mode 100644
+> > > index 0000000..5c07537
+> > > --- /dev/null
+> > > +++ b/tests/test-listen.c
+> > > @@ -0,0 +1,253 @@
+> > > +/*
+> > > + * Copyright (c) 2017, Oracle and/or its affiliates. All rights re=
+served.
+> > > + *=C2=A0=C2=A0=C2=A0=C2=A0Author: Knut Omang <knut.omang@oracle.co=
+m>
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or m=
+odify
+> > > + * it under the terms of the GNU General Public License version 2
+> > > + * as published by the Free Software Foundation.
+> >=20
+> > Can you change that to "version 2 or later" - per the LICENSE file, w=
+e don't
+> > accept contributions under "version 2 only" except for 4 specific sub=
+dirs:
+> >=20
+> >=20
+> > =C2=A0 "As of July 2013, contributions under version 2 of the GNU Gen=
+eral Public
+> > =C2=A0=C2=A0=C2=A0License (and no later version) are only accepted fo=
+r the following files
+> > =C2=A0=C2=A0=C2=A0or directories: bsd-user/, linux-user/, hw/vfio/, h=
+w/xen/xen_pt*."
+>=20
+> Oh, sorry - I wasn't aware of this, +"...or later" is fine with me.
+> Would you like me to send a v7 of the set with only that change, or can=
+ you amend=C2=A0
+> it as part of the merge?
 
-Dr. David Alan Gilbert <dgilbert@redhat.com> writes:
+Since its a copyright statement, I'd prefer if you just sent a v7. I've n=
+o
+other comments, so will queue it for merge once you resend, and send a pu=
+ll
+request once 2.11 opens up.
 
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> On 1 August 2017 at 17:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> >
->> > This code has an optimised, word aligned version, and a boring
->> > unaligned version.  Recently 084140bd498909 fixed a missing offset
->> > addition from the core of both versions.  However, the offset isn't
->> > necessarily aligned and thus the choice between the two versions
->> > needs fixing up to also include the offset.
->> >
->> > Symptom:
->> >   A few stuck unsent pages during migration; not normally noticed
->> > unless under very low bandwidth in which case the migration may get
->> > stuck never ending and never performing a 2nd sync; noticed by
->> > a hanging postcopy-test on a very heavily loaded system.
->> >
->> > Fixes: 084140bd498909
->> >
->> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> > Reported-by: Alex BenneÃ© <alex.benee@linaro.org>
->> > Tested-by: Alex BenneÃ© <alex.benee@linaro.org>
->> >
->> > --
->> > v2
->> >   Move 'page' inside the if (Comment from Paolo)
->> > Message-Id: <20170724165125.29887-1-dgilbert@redhat.com>
->> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> Something somewhere along the line seems to have mangled the
->> unicode characters in Alex's name :-(
->> Also, Alex's email address is typoed, and what should be the
->> '---' marker has been written as '--' so the below-the-fold waffle
->> is still hanging around in the commit.
->>
->> This doesn't seem worth rejecting the pull request on the
->> eve of rc1 for, but it's still a bit sad :-(
->
-> Hmm yes, I think some of that's mine - the missing 'n' is certainly
-> my fault; and I may have got his two 'e's in the wrong order,
-> but I don't know what changed the encoding, that seems right on:
->   https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07417.html
-
-Hmm also the acute accent should be on the second (not third) e ;-)
-
---
-Alex Bennée
-(breaking UTF-8 workflow since before it was cool)
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
