@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1delDM-0007I8-RX
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:49:17 -0400
+	(envelope-from <otubo@redhat.com>) id 1delDT-0007MF-IF
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1delDH-0005Jh-Or
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:49:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38382)
+	(envelope-from <otubo@redhat.com>) id 1delDO-0005OA-KP
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:49:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1delDH-0005JD-Eu
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:49:07 -0400
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-5-git-send-email-zuban32s@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f500db9a-b31d-fe6f-8d30-2f81da3ac67b@redhat.com>
-Date: Mon, 7 Aug 2017 19:48:57 +0300
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1delDO-0005Mp-Al
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:49:14 -0400
+Reply-To: otubo@redhat.com
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <6b32aeb2-d488-eb3c-4147-a99fe4681a6f@redhat.com>
+Date: Mon, 7 Aug 2017 18:39:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <1501964858-5159-5-git-send-email-zuban32s@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] hw/pci: add QEMU-specific PCI
- capability to the Generic PCI Express Root Port
+Subject: [Qemu-devel] colo-compare: segfault and assert on
+ colo_compare_finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, seabios@seabios.org
+To: qemu-devel@nongnu.org
+Cc: zhang.zhanghailiang@huawei.com, wency@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, wang.guang55@zte.com.cn, wang.yong155@zte.com.cn
 
-On 05/08/2017 23:27, Aleksandr Bezzubikov wrote:
-> To enable hotplugging of a newly created pcie-pci-bridge,
-> we need to tell firmware (SeaBIOS in this case) to reserve
-> additional buses or IO/MEM/PREF space for pcie-root-port.
-> Additional bus reservation allows us to hotplug pcie-pci-bridge into this root port.
-> The number of buses to reserve is provided to the device via a corresponding
-> property, and to the firmware via new PCI capability.
-> The properties' default value is -1 to keep default behavior unchanged.
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->   hw/pci-bridge/gen_pcie_root_port.c | 33 +++++++++++++++++++++++++++++++++
->   include/hw/pci/pcie_port.h         |  1 +
->   2 files changed, 34 insertions(+)
-> 
-> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> index cb694d6..ff8d04c 100644
-> --- a/hw/pci-bridge/gen_pcie_root_port.c
-> +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> @@ -16,6 +16,8 @@
->   #include "hw/pci/pcie_port.h"
->   
->   #define TYPE_GEN_PCIE_ROOT_PORT                "pcie-root-port"
-> +#define GEN_PCIE_ROOT_PORT(obj) \
-> +        OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
->   
->   #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
->   #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
-> @@ -26,6 +28,12 @@ typedef struct GenPCIERootPort {
->       /*< public >*/
->   
->       bool migrate_msix;
-> +
-> +    /* additional buses to reserve on firmware init */
-> +    uint32_t bus_reserve;
-> +    uint64_t io_reserve;
-> +    uint64_t mem_reserve;
-> +    uint64_t pref_reserve;
->   } GenPCIERootPort;
->   
->   static uint8_t gen_rp_aer_vector(const PCIDevice *d)
-> @@ -60,6 +68,23 @@ static bool gen_rp_test_migrate_msix(void *opaque, int version_id)
->       return rp->migrate_msix;
->   }
->   
-> +static void gen_rp_realize(DeviceState *dev, Error **errp)
-> +{
-> +    PCIDevice *d = PCI_DEVICE(dev);
-> +    GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
-> +    PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
-> +
-> +    rpc->parent_realize(dev, errp);
-> +
-> +    int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
-> +            grp->io_reserve, grp->mem_reserve, grp->pref_reserve, errp);
-> +
-> +    if (rc < 0) {
-> +        rpc->parent_class.exit(d);
-> +        return;
-> +    }
-> +}
-> +
->   static const VMStateDescription vmstate_rp_dev = {
->       .name = "pcie-root-port",
->       .version_id = 1,
-> @@ -78,6 +103,10 @@ static const VMStateDescription vmstate_rp_dev = {
->   
->   static Property gen_rp_props[] = {
->       DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
-> +    DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort, bus_reserve, -1),
-> +    DEFINE_PROP_UINT64("io-reserve", GenPCIERootPort, io_reserve, -1),
-> +    DEFINE_PROP_UINT64("mem-reserve", GenPCIERootPort, mem_reserve, -1),
-> +    DEFINE_PROP_UINT64("pref-reserve", GenPCIERootPort, pref_reserve, -1),
->       DEFINE_PROP_END_OF_LIST()
->   };
->   
-> @@ -92,6 +121,10 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
->       dc->desc = "PCI Express Root Port";
->       dc->vmsd = &vmstate_rp_dev;
->       dc->props = gen_rp_props;
-> +
-> +    rpc->parent_realize = dc->realize;
-> +    dc->realize = gen_rp_realize;
-> +
->       rpc->aer_vector = gen_rp_aer_vector;
->       rpc->interrupts_init = gen_rp_interrupts_init;
->       rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> index 1333266..0736014 100644
-> --- a/include/hw/pci/pcie_port.h
-> +++ b/include/hw/pci/pcie_port.h
-> @@ -65,6 +65,7 @@ void pcie_chassis_del_slot(PCIESlot *s);
->   
->   typedef struct PCIERootPortClass {
->       PCIDeviceClass parent_class;
-> +    DeviceRealize parent_realize;
->   
->       uint8_t (*aer_vector)(const PCIDevice *dev);
->       int (*interrupts_init)(PCIDevice *dev, Error **errp);
-> 
+(please ignore my last email, looks like mutt wants play games lately)
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Hi all,
 
-Thanks,
-Marcel
+I have found a problem on colo-compare that leads to segmentation fault
+when calling qemu like this:
+
+  $ qemu-system-x86_64 -S -machine pc -object colo-compare,id=test-object
+
+First I got an assert failed:
+
+  (qemu-system-x86_64:7887): GLib-CRITICAL **: g_main_loop_quit: 
+assertion 'loop != NULL' failed
+
+ From this looks like s->compare_loop is NULL on the function
+colo_compare_finalize(), then I just added a check there and the assert 
+went away. But then there's the segfault:
+
+  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+  0x00007ffff333f79e in pthread_join () from /lib64/libpthread.so.0
+  (gdb) bt
+  #0  0x00007ffff333f79e in pthread_join () at /lib64/libpthread.so.0
+  #1  0x0000555555c379d2 in qemu_thread_join (thread=0x7ffff7ff5160) at 
+util/qemu-thread-posix.c:547
+  #2  0x0000555555adfc1a in colo_compare_finalize (obj=0x7ffff7fd3010) 
+at net/colo-compare.c:867
+  #3  0x0000555555b2cd87 in object_deinit (obj=0x7ffff7fd3010, 
+type=0x5555567432e0) at qom/object.c:453
+  #4  0x0000555555b2cdf9 in object_finalize (data=0x7ffff7fd3010) at 
+qom/object.c:467
+  #5  0x0000555555b2dd80 in object_unref (obj=0x7ffff7fd3010) at 
+qom/object.c:902
+  #6  0x0000555555b319a5 in user_creatable_add_type (type=0x5555567499a0 
+"colo-compare", id=0x555556749960 "test-object", qdict=0x555556835750, 
+v=0x55555681a3f0, errp=0x7fffffffde58) at qom/object_interfaces.c:105
+  #7  0x0000555555b31b02 in user_creatable_add_opts 
+(opts=0x555556749910, errp=0x7fffffffde58) at qom/object_interfaces.c:135
+  #8  0x0000555555b31bfd in user_creatable_add_opts_foreach 
+(opaque=0x5555558e9c39 <object_create_delayed>, opts=0x555556749910, 
+errp=0x0) at qom/object_interfaces.c:159
+  #9  0x0000555555c4aecf in qemu_opts_foreach (list=0x555556157ac0 
+<qemu_object_opts>, func=0x555555b31b6f 
+<user_creatable_add_opts_foreach>, opaque=0x5555558e9c39 
+<object_create_delayed>, errp=0x0) at util/qemu-option.c:1104
+  #10 0x00005555558edb75 in main (argc=6, argv=0x7fffffffe2d8, 
+envp=0x7fffffffe310) at vl.c:4520
+
+At this point '&s->thread' is '0'. Is this segfault and the above 
+mentioned assert trigged because I'm creating a colo-compare object 
+without any other parameter? In a positive case, a simple workaround and 
+error check should do it. Otherwise I'll debug a little more.
+
+Best regards,
+-- 
+Eduardo Otubo
+Senior Software Engineer // Red Hat Hyper-V Virtualization, Berlin, DE
+IRC: otubo@{RedHat, OFTC, Freenode}
