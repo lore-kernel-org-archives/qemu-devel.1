@@ -1,19 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dekPT-0003iv-Sq
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:45 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dekST-0006d0-GG
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dekPP-0000wU-0U
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:39 -0400
-Date: Mon, 7 Aug 2017 17:57:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170807155717.GI6578@localhost.localdomain>
-References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1dekSO-0002jV-HF
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:00:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dekSO-0002bw-3j
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:00:40 -0400
+Date: Mon, 7 Aug 2017 10:00:25 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170807100025.27221aa8@w520.home>
+In-Reply-To: <CAMxP3BT8Zps6Bp6kEcV+nYHQvncco5f_BQ9O=fTMUckUZz6Ymg@mail.gmail.com>
+References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
+	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
+	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
+	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
+	<20170726092931.0678689e@w520.home>
+	<20170726190348-mutt-send-email-mst@kernel.org>
+	<20170726113222.52aad9a6@w520.home>
+	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
+	<20170731234626.7664be18@w520.home>
+	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
+	<20170801090158.35d18f10@w520.home>
+	<CAMxP3BT8Zps6Bp6kEcV+nYHQvncco5f_BQ9O=fTMUckUZz6Ymg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,71 +39,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: Bob Chen <a175818323@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-Am 07.08.2017 um 16:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 185 iotest is broken.
-> 
-> How to test:
-> > i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
->   done; echo N = $i
-> 
-> finished for me like this:
-> 
-> 185 2s ... - output mismatch (see 185.out.bad)
-> --- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
->     15:14:29.520343805 +0300
-> +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
-> @@ -37,7 +37,7 @@
->  {"return": {}}
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
->      "event": "SHUTDOWN", "data": {"guest": false}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
->     "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
->         "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
->             "mirror"}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
->     "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
->         "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
-> 
->  === Start backup job and exit qemu ===
-> 
-> Failures: 185
-> Failed 1 of 1 tests
-> N = 8
-> 
-> It doesn't seems logical to expect the constant offset on cancel,
-> so let filter it out.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, 7 Aug 2017 21:04:16 +0800
+Bob Chen <a175818323@gmail.com> wrote:
 
-I'm quoting 185:
+> Besides, I checked the lspci -vvv output, no capabilities of Access Control
+> are seen.
 
-# Note that the reference output intentionally includes the 'offset' field in
-# BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
-# predictable and any change in the offsets would hint at a bug in the job
-# throttling code.
-#
-# In order to achieve these predictable offsets, all of the following tests
-# use speed=65536. Each job will perform exactly one iteration before it has
-# to sleep at least for a second, which is plenty of time for the 'quit' QMP
-# command to be received (after receiving the command, the rest runs
-# synchronously, so jobs can arbitrarily continue or complete).
-#
-# The buffer size for commit and streaming is 512k (waiting for 8 seconds after
-# the first request), for active commit and mirror it's large enough to cover
-# the full 4M, and for backup it's the qcow2 cluster size, which we know is
-# 64k. As all of these are at least as large as the speed, we are sure that the
-# offset doesn't advance after the first iteration before qemu exits.
+Are these switches onboard an NVIDIA card or are they separate
+components?  The examples I have on NVIDIA cards do include ACS:
 
-So before we change the expected output, can we explain why the offsets
-aren't predictable, even if throttling is used and contrary to what the
-comment says? Should we sleep a little before issuing 'quit'?
++-02.0-[42-47]----00.0-[43-47]--+-08.0-[44]----00.0  NVIDIA Corporation GK107GL [GRID K1]
+                                +-09.0-[45]----00.0  NVIDIA Corporation GK107GL [GRID K1]
+                                +-10.0-[46]----00.0  NVIDIA Corporation GK107GL [GRID K1]
+                                \-11.0-[47]----00.0  NVIDIA Corporation GK107GL [GRID K1]
 
-(By the way, I couldn't reproduce in N = 128 attempts, so it doesn't
-look like I can look into what's happening in detail, except with code
-review.)
+# lspci -vvvs 43: | grep -A 2 "Access Control Services"
+	Capabilities: [f24 v1] Access Control Services
+		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+ DirectTrans+
+		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+--
+	Capabilities: [f24 v1] Access Control Services
+		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+ DirectTrans+
+		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+--
+	Capabilities: [f24 v1] Access Control Services
+		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+ DirectTrans+
+		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+--
+	Capabilities: [f24 v1] Access Control Services
+		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+ DirectTrans+
+		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
 
-Kevin
++-03.0-[04-07]----00.0-[05-07]--+-08.0-[06]----00.0  NVIDIA Corporation GM204GL [Tesla M60]
+                                \-10.0-[07]----00.0  NVIDIA Corporation GM204GL [Tesla M60]
+
+# lspci -vvvs 5: | grep -A 2 "Access Control Services"
+	Capabilities: [f24 v1] Access Control Services
+		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+ DirectTrans+
+		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+--
+	Capabilities: [f24 v1] Access Control Services
+		ACSCap:	SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+ DirectTrans+
+		ACSCtl:	SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
+
+Without ACS on the downstream switch ports, the GPUs sharing the switch
+will be in the same IOMMU group and we have no ability to control
+anything about the routing between downstream ports.  Thanks,
+
+Alex
