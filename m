@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dekKT-0007xo-8q
+	(envelope-from <frederic.konrad@adacore.com>) id 1dekKT-0007y6-Un
 	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dekKO-0005nI-Ha
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:29 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dekKP-0005nj-69
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:30 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:44810
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dekKO-0005mt-W5
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:25 -0400
 From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Mon,  7 Aug 2017 17:50:46 +0200
-Message-Id: <1502121048-1816-3-git-send-email-frederic.konrad@adacore.com>
+Date: Mon,  7 Aug 2017 17:50:47 +0200
+Message-Id: <1502121048-1816-4-git-send-email-frederic.konrad@adacore.com>
 In-Reply-To: <1502121048-1816-1-git-send-email-frederic.konrad@adacore.com>
 References: <1502121048-1816-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH for-2.11 2/4] booke206: fix tlbnps for fixed
- size TLB
+Subject: [Qemu-devel] [PATCH for-2.11 3/4] booke206: allow to specify an
+ mmucfg value at the init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +29,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: david@gibson.dropbear.id.au, agraf@suse.de
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, frederic.konrad@adacore.com
 
-Some OS don't populate the TSIZE field when using a fixed size TLB which result
-in a 1KB TLB. When the TLB is a fixed size TLB the TSIZE field should be
-ignored.
-
-Fix this wrong behavior with MAV 2.0.
+This allows to init the MMUCFG SPR with a non NULL value.
 
 Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 ---
- target/ppc/cpu.h        | 22 ++++++++++++++++++++++
- target/ppc/mmu_helper.c | 16 ++++++++++------
- 2 files changed, 32 insertions(+), 6 deletions(-)
+ target/ppc/translate_init.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index d2faea9..32a44a8 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -2490,6 +2490,28 @@ static inline uint32_t booke206_tlbnps(CPUPPCState *env, const int tlbn)
-     return ret;
- }
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 01723bd..2627cbe 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -1842,7 +1842,7 @@ static inline uint32_t gen_tlbncfg(uint32_t assoc, uint32_t minsize,
  
-+static inline void booke206_fixed_size_tlbn(CPUPPCState *env, const int tlbn,
-+                                            ppcmas_tlb_t *tlb)
-+{
-+    uint8_t i;
-+    int32_t tsize = -1;
-+
-+    for (i = 0; i < 32; i++) {
-+        if ((env->spr[SPR_BOOKE_TLB0PS + tlbn]) & (1ULL << i)) {
-+            if (tsize == -1) {
-+                tsize = i;
-+            } else {
-+                return;
-+            }
-+        }
-+    }
-+
-+    /* TLBnPS unimplemented? Odd.. */
-+    assert(tsize != -1);
-+    tlb->mas1 &= ~MAS1_TSIZE_MASK;
-+    tlb->mas1 |= ((uint32_t)tsize) << MAS1_TSIZE_SHIFT;
-+}
-+
+ /* BookE 2.06 storage control registers */
+ static void gen_spr_BookE206(CPUPPCState *env, uint32_t mas_mask,
+-                              uint32_t *tlbncfg)
++                             uint32_t *tlbncfg, uint32_t mmucfg)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     const char *mas_names[8] = {
+@@ -1886,7 +1886,7 @@ static void gen_spr_BookE206(CPUPPCState *env, uint32_t mas_mask,
+     spr_register(env, SPR_MMUCFG, "MMUCFG",
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, SPR_NOACCESS,
+-                 0x00000000); /* TOFIX */
++                 mmucfg);
+     switch (env->nb_ways) {
+     case 4:
+         spr_register(env, SPR_BOOKE_TLB3CFG, "TLB3CFG",
+@@ -4615,7 +4615,7 @@ static void init_proc_e200(CPUPPCState *env)
+                  &spr_read_spefscr, &spr_write_spefscr,
+                  0x00000000);
+     /* Memory management */
+-    gen_spr_BookE206(env, 0x0000005D, NULL);
++    gen_spr_BookE206(env, 0x0000005D, NULL, 0);
+     /* XXX : not implemented */
+     spr_register(env, SPR_HID0, "HID0",
+                  SPR_NOACCESS, SPR_NOACCESS,
+@@ -4900,6 +4900,7 @@ static void init_proc_e500(CPUPPCState *env, int version)
+                     | 0x0020; /* 32 kb */
+     uint32_t l1cfg1 = 0x3800  /* 8 ways */
+                     | 0x0020; /* 32 kb */
++    uint32_t mmucfg = 0;
+ #if !defined(CONFIG_USER_ONLY)
+     int i;
  #endif
- 
- static inline bool msr_is_64bit(CPUPPCState *env, target_ulong msr)
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index f06b938..2a1f990 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -2632,12 +2632,16 @@ void helper_booke206_tlbwe(CPUPPCState *env)
-         env->spr[SPR_BOOKE_MAS3];
-     tlb->mas1 = env->spr[SPR_BOOKE_MAS1];
- 
--    /* MAV 1.0 only */
--    if (!(tlbncfg & TLBnCFG_AVAIL)) {
--        /* force !AVAIL TLB entries to correct page size */
--        tlb->mas1 &= ~MAS1_TSIZE_MASK;
--        /* XXX can be configured in MMUCSR0 */
--        tlb->mas1 |= (tlbncfg & TLBnCFG_MINSIZE) >> 12;
-+    if ((env->spr[SPR_MMUCFG] & MMUCFG_MAVN) == MMUCFG_MAVN_V2) {
-+        /* For TLB which has a fixed size TSIZE is ignored with MAV2 */
-+        booke206_fixed_size_tlbn(env, tlbn, tlb);
-+    } else {
-+        if (!(tlbncfg & TLBnCFG_AVAIL)) {
-+            /* force !AVAIL TLB entries to correct page size */
-+            tlb->mas1 &= ~MAS1_TSIZE_MASK;
-+            /* XXX can be configured in MMUCSR0 */
-+            tlb->mas1 |= (tlbncfg & TLBnCFG_MINSIZE) >> 12;
-+        }
+@@ -4974,7 +4975,7 @@ static void init_proc_e500(CPUPPCState *env, int version)
+     default:
+         cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n", env->spr[SPR_PVR]);
      }
- 
-     /* Make a mask from TLB size to discard invalid bits in EPN field */
+-    gen_spr_BookE206(env, 0x000000DF, tlbncfg);
++    gen_spr_BookE206(env, 0x000000DF, tlbncfg, mmucfg);
+     /* XXX : not implemented */
+     spr_register(env, SPR_HID0, "HID0",
+                  SPR_NOACCESS, SPR_NOACCESS,
 -- 
 1.8.3.1
