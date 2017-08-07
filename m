@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dea5V-0000Xs-WE
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 00:56:23 -0400
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1debCP-0003AZ-A6
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 02:07:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dea5S-0007aH-R6
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 00:56:22 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:54571)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dea5S-0007ZP-IE
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 00:56:18 -0400
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <1e52da76-269f-020e-c9cf-adaaef30b59c@samsung.com>
-Date: Mon, 07 Aug 2017 07:49:11 +0300
-MIME-version: 1.0
-In-reply-to: <20170628190047.26159-24-dgilbert@redhat.com>
-Content-type: text/plain; charset="utf-8"; format="flowed"
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<CGME20170628190250epcas2p1f018e6169b78276f65cf4cc9fbeb14a3@epcas2p1.samsung.com>
-	<20170628190047.26159-24-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 23/29] vub+postcopy: madvises
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1debCM-0000jK-4e
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 02:07:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1debCL-0000iw-RD
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 02:07:30 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7763tkY051357
+	for <qemu-devel@nongnu.org>; Mon, 7 Aug 2017 02:07:27 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2c5xu9h63v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 02:07:27 -0400
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Mon, 7 Aug 2017 16:07:24 +1000
+Date: Mon, 7 Aug 2017 16:07:20 +1000
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+References: <cover.1501740002.git.sam.bobroff@au1.ibm.com>
+	<696b158f34bcf950f95709927f7496b5a4426229.1501740002.git.sam.bobroff@au1.ibm.com>
+	<20170804031019.GG6553@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170804031019.GG6553@umbus.fritz.box>
+Message-Id: <20170807060720.vy5xggkhisaj3w2k@tungsten.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] ppc: spapr: Make VCPU ID handling
+ private to SPAPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +43,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
 
-On 06/28/2017 10:00 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Clear the area and turn off THP.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   contrib/libvhost-user/libvhost-user.c | 32 ++++++++++++++++++++++++++++++--
->   1 file changed, 30 insertions(+), 2 deletions(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index 0658b6e847..ceddeac74f 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -451,11 +451,39 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
->           }
->   
->           if (dev->postcopy_listening) {
-> +            int ret;
->               /* We should already have an open ufd need to mark each memory
->                * range as ufd.
-> -             * Note: Do we need any madvises? Well it's not been accessed
-> -             * yet, still probably need no THP to be safe, discard to be safe?
->                */
-> +
-> +            /* Discard any mapping we have here; note I can't use MADV_REMOVE
-> +             * or fallocate to make the hole since I don't want to lose
-> +             * data that's already arrived in the shared process.
-> +             * TODO: How to do hugepage
-> +             */
-Hi, David, frankly saying, I stuck with my solution, and I have also 
-another issues,
-but here I could suggest solution for hugepages. I think we could 
-transmit a received pages
-bitmap in VHOST_USER_SET_MEM_TABLE (VhostUserMemoryRegion), but it will 
-raise a compatibility issue,
-or introduce special message type for that and send it before 
-VHOST_USER_SET_MEM_TABLE.
-So it will be  possible to do fallocate on received bitmap basis, just 
-skip already copied pages.
-If you wish, I could send patches, rebased on yours, for doing it.
+On Fri, Aug 04, 2017 at 01:10:19PM +1000, David Gibson wrote:
+> On Thu, Aug 03, 2017 at 04:28:52PM +1000, Sam Bobroff wrote:
+> > The concept of a VCPU ID that differs from the CPU's index
+> > (cpu->cpu_index) exists only within SPAPR machines so, move the
+> > functions ppc_get_vcpu_id() and ppc_get_cpu_by_vcpu_id() into spapr.c
+> > and rename them appropriately.
+> > 
+> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> 
+> Mostly good, but...
+> 
+> [snip]
+> > +int spapr_vcpu_id(PowerPCCPU *cpu)
+> > +{
+> > +    return cpu->vcpu_id;
+> > +}
+> > +
+> > +PowerPCCPU *spapr_find_cpu(int vcpu_id)
+> > +{
+> > +    CPUState *cs;
+> > +
+> > +    CPU_FOREACH(cs) {
+> > +        PowerPCCPU *cpu = POWERPC_CPU(cs);
+> > +
+> > +        if (cpu->vcpu_id == vcpu_id) {
+> > +            return cpu;
+> > +        }
+> > +    }
+> > +
+> > +    return NULL;
+> > +}
+> 
+> [...]
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 7ccb350c5f..2bf2727860 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -512,7 +512,7 @@ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+> >  
+> >  unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+> >  {
+> > -    return ppc_get_vcpu_id(POWERPC_CPU(cpu));
+> > +    return spapr_vcpu_id(POWERPC_CPU(cpu));
+> >  }
+> 
+> Here you've replaced an implicit dependency on spapr details in the
+> generic code with an explicit dependency on spapr details.  That's the
+> wrong direction.
 
-> +            ret = madvise((void *)dev_region->mmap_addr,
-> +                          dev_region->size + dev_region->mmap_offset,
-> +                          MADV_DONTNEED);
-> +            if (ret) {
-> +                fprintf(stderr,
-> +                        "%s: Failed to madvise(DONTNEED) region %d: %s\n",
-> +                        __func__, i, strerror(errno));
-> +            }
-> +            /* Turn off transparent hugepages so we dont get lose wakeups
-> +             * in neighbouring pages.
-> +             * TODO: Turn this backon later.
-> +             */
-> +            ret = madvise((void *)dev_region->mmap_addr,
-> +                          dev_region->size + dev_region->mmap_offset,
-> +                          MADV_NOHUGEPAGE);
-> +            if (ret) {
-> +                /* Note: This can happen legally on kernels that are configured
-> +                 * without madvise'able hugepages
-> +                 */
-> +                fprintf(stderr,
-> +                        "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
-> +                        __func__, i, strerror(errno));
-> +            }
->               struct uffdio_register reg_struct;
->               /* Note: We might need to go back to using mmap_addr and
->                * len + mmap_offset for * huge pages, but then we do hope not to
+Ah right, I'll flip it around.
 
+> Instead _this_ one should directly reference vcpu_id, the spapr one
+> should be something like:
+> 
+> 	if (kvm)
+> 		return kvm_arch_vcpu_id(...)
+> 	else
+> 		return cpu_index;
 
--- 
-Best regards,
-Alexey Perevalov
+OK.
+
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
