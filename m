@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dejC5-00035R-B9
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:39:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dejDW-0004J5-7o
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dejC0-0006YU-EL
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:39:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dejDR-0007gk-Fc
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:41:14 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:37071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dejDR-0007fm-7i
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:41:09 -0400
+Received: by mail-wr0-x233.google.com with SMTP id 33so2575040wrz.4
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 07:41:09 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170807163121.797e7ad6@nial.brq.redhat.com>
+References: <20170807163121.797e7ad6@nial.brq.redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Aug 2017 15:39:12 +0100
-Message-Id: <1502116754-18867-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] loader: Handle ELF files with overlapping
- zero-init data
+Date: Mon, 7 Aug 2017 15:40:47 +0100
+Message-ID: <CAFEAcA8=+8cPjKayq3Bre7y9=6jzFgjCCjRkNUeHxArJu9Ue6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] AVMF & OVMF blobs in QEMU tree???
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,64 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Hua Yanghao <huayanghao@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Laszlo Ersek <lersek@redhat.com>
 
-For embedded systems, notably ARM, one common use of ELF file
-segments is that the 'physical addresses' represent load addresses
-and the 'virtual addresses' execution addresses, such that the load
-addresses are packed into ROM or flash, and the relocation and
-zero-initialization of data is done at runtime.  This means that the
-'memsz' in the segment header represents the runtime size of the
-segment, but the size that needs to be loaded is only the 'filesz'. 
-In particular, paddr+memsz may overlap with another segment to be
-loaded, as in this example:
+On 7 August 2017 at 15:31, Igor Mammedov <imammedo@redhat.com> wrote:
+> As I recall there were issues with FAT driver licensing in edk2,
+> but I've heard there were some changes in that regard.
+>
+> Is there any other reasons why we are not putting subj.
+> in QEMU tree like we do with SeaBIOS and other roms?
 
-0x70000001 off    0x00007f68 vaddr 0x00008150 paddr 0x00008150 align 2**2
-         filesz 0x00000008 memsz 0x00000008 flags r--
-    LOAD off    0x000000f4 vaddr 0x00000000 paddr 0x00000000 align 2**2
-         filesz 0x00000124 memsz 0x00000124 flags r--
-    LOAD off    0x00000218 vaddr 0x00000400 paddr 0x00000400 align 2**3
-         filesz 0x00007d58 memsz 0x00007d58 flags r-x
-    LOAD off    0x00007f70 vaddr 0x20000140 paddr 0x00008158 align 2**3
-         filesz 0x00000a80 memsz 0x000022f8 flags rw-
-    LOAD off    0x000089f0 vaddr 0x20002438 paddr 0x00008bd8 align 2**0
-         filesz 0x00000000 memsz 0x00004000 flags rw-
-    LOAD off    0x000089f0 vaddr 0x20000000 paddr 0x20000000 align 2**0
-         filesz 0x00000000 memsz 0x00000140 flags rw-
+I suspect the primary answer is "nobody who's willing to
+maintain, test and update the resulting binary blobs has
+stepped forward to say they want to do so" :-)
 
-where the segment at paddr 0x8158 has a memsz of 0x2258 and
-would overlap with the segment at paddr 0x8bd8 if QEMU's loader
-tried to honour it. (At runtime the segments will not overlap
-since their vaddrs are more widely spaced than their paddrs.)
-
-Currently if you try to load an ELF file like this with QEMU then
-it will fail with an error "rom: requested regions overlap",
-because we create a ROM image for each segment using the memsz
-as the size.
-
-This patchset adds support for ELF files using this scheme, by
-truncating the zero-initialized part of the segment if it would
-overlap another segment.  This will retain the existing loader
-behaviour for all ELF files we currently accept, and also accept ELF
-files which only need 'filesz' bytes to be loaded.
-
-Patch 2 deals with a vaguely related issue which is that if the ELF
-file specified a zero-length segment we would happily try to create
-a zero-length ROM blob, which could then falsely trigger the
-ROM-overlap check. (The zero-length case is more common after patch
-1 has done its truncation thing, but I have seen real-world ELF
-files with both filesz and memsz zero...)
+(I think that shipping them in the QEMU tree would be
+nice but is principally a convenience for our direct
+users, since distros are going to want to build their
+own ROM blobs from source anyway.)
 
 thanks
 -- PMM
-
-Peter Maydell (2):
-  loader: Handle ELF files with overlapping zero-initialized data
-  loader: Ignore zero-sized ELF segments
-
- include/hw/elf_ops.h | 72 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 65 insertions(+), 7 deletions(-)
-
--- 
-2.7.4
