@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJA-0007SH-IC
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJE-0007XJ-3L
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejIu-0003yz-Md
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejIy-00041v-0i
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  7 Aug 2017 16:45:35 +0200
-Message-Id: <1502117160-24655-32-git-send-email-armbru@redhat.com>
+Date: Mon,  7 Aug 2017 16:45:44 +0200
+Message-Id: <1502117160-24655-41-git-send-email-armbru@redhat.com>
 In-Reply-To: <1502117160-24655-1-git-send-email-armbru@redhat.com>
 References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 31/56] block: Make throttle byte rates and
- sizes unsigned in QAPI/QMP
+Subject: [Qemu-devel] [RFC PATCH 40/56] blockjob: Lift speed sign conversion
+ out of backup_job_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +23,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-Sizes and byte rates should use QAPI type 'size' (uint64_t).
-BlockIOThrottle and BlockDeviceInfo members @bps, @bps_rd, @bps_wr,
-@bps_max, @bps_rd_max, @bps_wr_max, @iops_size are 'int' (int64_t).
-qmp_block_set_io_throttle() and bdrv_block_device_info() copy @bps,
-@bps_rd, @bps_wr to / from LeakyBucket member @avg (implicit
-conversion to / from double), @bps_max, @bps_rd_max, @bps_wr_max to /
-from LeakyBucket member @max (implicit conversion to / from double),
-and @iops_size to / from ThrottleConfig member op_size (implicit
-conversion to / from uint64_t).
+backup_job_create() takes int64_t speed.  The underlying BlockJob
+abstraction takes uint64_t.  backup_job_create() converts from int64_t
+to uint64_t, rejecting negative speed.
 
-Change these BlockIOThrottle and BlockDeviceInfo members to 'size'.
-
-block_set_io_throttle now accepts sizes and rates between 2^63 and
-2^64-1.  It accepts negative values as before, because that's how the
-QObject input visitor works for backward compatibility.
-
-Doing the same for HMP's block_set_io_throttle deserves its own commit
-(the next one).
-
-query-block and query-named-block-nodes now report sizes and rates
-above 2^63-1 correctly instead of their (negative) two's complement.
-
-So does HMP's "info block".
+Lift this check and conversion out of backup_job_create() into its
+callers.  I'm going to lift it further until it falls off the top.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hmp.c                | 12 ++++++------
- qapi/block-core.json | 20 ++++++++++----------
- 2 files changed, 16 insertions(+), 16 deletions(-)
+ block/backup.c            |  7 +------
+ blockdev.c                | 12 ++++++++++++
+ include/block/block_int.h |  2 +-
+ 3 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 9bcdcb3..3253674 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -468,17 +468,17 @@ static void print_block_info(Monitor *mon, BlockInfo *info,
-     if (inserted->bps  || inserted->bps_rd  || inserted->bps_wr  ||
-         inserted->iops || inserted->iops_rd || inserted->iops_wr)
-     {
--        monitor_printf(mon, "    I/O throttling:   bps=%" PRId64
--                        " bps_rd=%" PRId64  " bps_wr=%" PRId64
--                        " bps_max=%" PRId64
--                        " bps_rd_max=%" PRId64
--                        " bps_wr_max=%" PRId64
-+        monitor_printf(mon, "    I/O throttling:   bps=%" PRIu64
-+                        " bps_rd=%" PRIu64  " bps_wr=%" PRIu64
-+                        " bps_max=%" PRIu64
-+                        " bps_rd_max=%" PRIu64
-+                        " bps_wr_max=%" PRIu64
-                         " iops=%" PRId64 " iops_rd=%" PRId64
-                         " iops_wr=%" PRId64
-                         " iops_max=%" PRId64
-                         " iops_rd_max=%" PRId64
-                         " iops_wr_max=%" PRId64
--                        " iops_size=%" PRId64
-+                        " iops_size=%" PRIu64
-                         " group=%s\n",
-                         inserted->bps,
-                         inserted->bps_rd,
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 9e96590..1e26cb0 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -356,16 +356,16 @@
-             '*backing_file': 'str', 'backing_file_depth': 'int',
-             'encrypted': 'bool', 'encryption_key_missing': 'bool',
-             'detect_zeroes': 'BlockdevDetectZeroesOptions',
--            'bps': 'int', 'bps_rd': 'int', 'bps_wr': 'int',
-+            'bps': 'size', 'bps_rd': 'size', 'bps_wr': 'size',
-             'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
-             'image': 'ImageInfo',
--            '*bps_max': 'int', '*bps_rd_max': 'int',
--            '*bps_wr_max': 'int', '*iops_max': 'int',
-+            '*bps_max': 'size', '*bps_rd_max': 'size',
-+            '*bps_wr_max': 'size', '*iops_max': 'int',
-             '*iops_rd_max': 'int', '*iops_wr_max': 'int',
-             '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
-             '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
-             '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
--            '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
-+            '*iops_size': 'size', '*group': 'str', 'cache': 'BlockdevCacheInfo',
-             'write_threshold': 'size' } }
+diff --git a/block/backup.c b/block/backup.c
+index 3a97836..eddc17a 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -529,7 +529,7 @@ static const BlockJobDriver backup_job_driver = {
+ };
  
- ##
-@@ -1866,15 +1866,15 @@
- # Since: 1.1
- ##
- { 'struct': 'BlockIOThrottle',
--  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
--            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
--            '*bps_max': 'int', '*bps_rd_max': 'int',
--            '*bps_wr_max': 'int', '*iops_max': 'int',
--            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
-+  'data': { '*device': 'str', '*id': 'str',
-+            'bps': 'size', 'bps_rd': 'size', 'bps_wr': 'size',
-+            'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
-+            '*bps_max': 'size', '*bps_rd_max': 'size', '*bps_wr_max': 'size',
-+            '*iops_max': 'int', '*iops_rd_max': 'int', '*iops_wr_max': 'int',
-             '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
-             '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
-             '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
--            '*iops_size': 'int', '*group': 'str' } }
-+            '*iops_size': 'size', '*group': 'str' } }
+ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+-                  BlockDriverState *target, int64_t speed,
++                  BlockDriverState *target, uint64_t speed,
+                   MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap,
+                   bool compress,
+                   BlockdevOnError on_source_error,
+@@ -577,11 +577,6 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+         return NULL;
+     }
  
- ##
- # @block-stream:
+-    if (speed < 0) {
+-        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+-        return NULL;
+-    }
+-
+     if (sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+         if (!sync_bitmap) {
+             error_setg(errp, "must provide a valid bitmap name for "
+diff --git a/blockdev.c b/blockdev.c
+index f9afc32..1deea49 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3210,6 +3210,12 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+         return NULL;
+     }
+ 
++    if (backup->speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
++                   "a non-negative rate limit");
++        return NULL;
++    }
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -3353,6 +3359,12 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+         return NULL;
+     }
+ 
++    if (backup->speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
++                   "a non-negative rate limit");
++        return NULL;
++    }
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c09076e..19639c0 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -923,7 +923,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
+  * until the job is cancelled or manually completed.
+  */
+ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+-                            BlockDriverState *target, int64_t speed,
++                            BlockDriverState *target, uint64_t speed,
+                             MirrorSyncMode sync_mode,
+                             BdrvDirtyBitmap *sync_bitmap,
+                             bool compress,
 -- 
 2.7.5
