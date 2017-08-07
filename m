@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1deha3-0000EF-Nz
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:56:28 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dehaK-0000YE-Rv
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dehZy-0005nt-Sk
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:56:23 -0400
-References: <cover.1502109078.git.jcody@redhat.com>
-	<e6f9362b49ae3837a0b20171cc2223aef2aa2e9a.1502109078.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <efb922c9-56ea-ac74-8ab7-f66ac2a858bd@redhat.com>
-Date: Mon, 7 Aug 2017 07:55:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dehaG-0005sa-3J
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:56:40 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:40523 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dehaF-0005qZ-N2
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:56:36 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-7-vsementsov@virtuozzo.com>
+	<4dc2dde8-2177-3d1c-c168-f98d826922b5@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <cf38e6aa-e934-bf75-48bf-3c3bbcb7f254@virtuozzo.com>
+Date: Mon, 7 Aug 2017 15:56:24 +0300
 MIME-Version: 1.0
-In-Reply-To: <e6f9362b49ae3837a0b20171cc2223aef2aa2e9a.1502109078.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2BxGvUmX45ctW0pW2wXa6Mo5Ock35XApc"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 4/4] block/vhdx: check error
- return of bdrv_truncate()
+In-Reply-To: <4dc2dde8-2177-3d1c-c168-f98d826922b5@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 06/17] block/nbd-client: fix
+ nbd_read_reply_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, kwolf@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2BxGvUmX45ctW0pW2wXa6Mo5Ock35XApc
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, kwolf@redhat.com
-Message-ID: <efb922c9-56ea-ac74-8ab7-f66ac2a858bd@redhat.com>
-Subject: Re: [PATCH v2 for-2.10 4/4] block/vhdx: check error return of
- bdrv_truncate()
-References: <cover.1502109078.git.jcody@redhat.com>
- <e6f9362b49ae3837a0b20171cc2223aef2aa2e9a.1502109078.git.jcody@redhat.com>
-In-Reply-To: <e6f9362b49ae3837a0b20171cc2223aef2aa2e9a.1502109078.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+07.08.2017 14:52, Eric Blake wrote:
+> On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Set reply.handle to 0 on error path to prevent normal path of
+>> nbd_co_receive_reply.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/nbd-client.c | 1 +
+>>   1 file changed, 1 insertion(+)
+> Can you document a case where not fixing this would be an observable bug
+> (even if it requires using gdb and single-stepping between client and
+> server to make what is otherwise a racy situation easy to see)?  I'm
+> trying to figure out if this is 2.10 material.
 
-On 08/07/2017 07:38 AM, Jeff Cody wrote:
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/vhdx-log.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
+it is simple enough:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+run qemu-nbd in gdb, set break on nbd_send_reply, and when it shoot s,
+next up to "stl_be_p(buf, NBD_REPLY_MAGIC);" and after it do "call 
+stl_be_p(buf, 1000)"
 
-> diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-> index a27dc05..14b724e 100644
-> --- a/block/vhdx-log.c
-> +++ b/block/vhdx-log.c
-> @@ -558,7 +558,11 @@ static int vhdx_log_flush(BlockDriverState *bs, BD=
-RVVHDXState *s,
->                      ret =3D -EINVAL;
->                      goto exit;
->                  }
-> -                bdrv_truncate(bs->file, new_file_size, PREALLOC_MODE_O=
-FF, NULL);
-> +                ret =3D bdrv_truncate(bs->file, new_file_size, PREALLO=
-C_MODE_OFF,
-> +                                    NULL);
-> +                if (ret < 0) {
-> +                    goto exit;
-> +                }
->              }
->          }
->          qemu_vfree(desc_entries);
->=20
+run qemu-io with some read in gdb, set break on
+br block/nbd-client.c:83
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+( it is break; after failed nbd_receive_reply call)
 
+and on
+br block/nbd-client.c:170
 
---2BxGvUmX45ctW0pW2wXa6Mo5Ock35XApc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+(it is in nbd_co_receive_reply after yield)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+on first break we will be sure that  nbd_receive_reply failed,
+on second we will be sure by
+(gdb) p s->reply
+$1 = {handle = 93825000680144, error = 0}
+(gdb) p request->handle
+$2 = 93825000680144
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmIY10ACgkQp6FrSiUn
-Q2rCRAf+K9uwhlUUwfSxZSiqsZEQxXYzYQudUwoG6My4Ts2xdTZAZustDQSuKjVX
-uxvtY1Rcv2UEj3BG7yoij3dCfvAJtx6kBL6B/LFhHh5fjtRwH/bkfNKamUNjE8A4
-ZNt4GIJF8ToxQ9HbjmxuHsFsSjlbMCkFtB3DZlWTg+PCKdbfWDg0vW79TiFa5Yh7
-sDoR7Am2X4epBl8HC1nvC/ptsQzJiFCr3u8KUXKTaa4+ytkkS5vnxxo8HdvJg2A7
-+ebdyrA6TWkXV3NB8rcVc2/rQYWJ7gCTYdNnoTTfLUfV1ObQYXTcZ2ypWSQ4MIyR
-HIWvbPmUfQsUIuINOocp/ANhC5qpMw==
-=Hj4O
------END PGP SIGNATURE-----
+that we are on normal receiving path.
 
---2BxGvUmX45ctW0pW2wXa6Mo5Ock35XApc--
+>
+>> diff --git a/block/nbd-client.c b/block/nbd-client.c
+>> index dc19894a7c..0c88d84de6 100644
+>> --- a/block/nbd-client.c
+>> +++ b/block/nbd-client.c
+>> @@ -107,6 +107,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>>           qemu_coroutine_yield();
+>>       }
+>>   
+>> +    s->reply.handle = 0;
+>>       nbd_recv_coroutines_enter_all(s);
+>>       s->read_reply_co = NULL;
+>>   }
+>>
+
+-- 
+Best regards,
+Vladimir
