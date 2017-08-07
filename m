@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dverma@redhat.com>) id 1dentP-0000nS-Ta
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 15:40:54 -0400
+	(envelope-from <marcel@redhat.com>) id 1deo6B-0005On-RI
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 15:54:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dverma@redhat.com>) id 1dentK-0006uz-Cw
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 15:40:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50686)
+	(envelope-from <marcel@redhat.com>) id 1deo66-0006Oj-O8
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 15:53:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dverma@redhat.com>) id 1dentK-0006sR-3c
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 15:40:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16AF98125F
-	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 19:40:41 +0000 (UTC)
-From: dverma <dverma@redhat.com>
-Date: Mon,  7 Aug 2017 15:40:06 -0400
-Message-Id: <1502134806-13669-4-git-send-email-dverma@redhat.com>
-In-Reply-To: <1502134806-13669-1-git-send-email-dverma@redhat.com>
-References: <1502134806-13669-1-git-send-email-dverma@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] Add new functions for whitelisting and
- their calls
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1deo66-0006Nr-8J
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 15:53:54 -0400
+References: <DB5PR0501MB1928246450227EDF80AE0E50B0AF0@DB5PR0501MB1928.eurprd05.prod.outlook.com>
+	<DB6PR0501MB2037EE71981AC82BDC42D19AD3AF0@DB6PR0501MB2037.eurprd05.prod.outlook.com>
+	<bf8b870b-a415-df56-7533-cb93803169fa@redhat.com>
+	<DB5PR0501MB19280F11B85DC0C9D51AF567B0AC0@DB5PR0501MB1928.eurprd05.prod.outlook.com>
+	<HE1PR0501MB2812B5FBFB7B4470BB7FA1CEB1A30@HE1PR0501MB2812.eurprd05.prod.outlook.com>
+	<1a9c127c-00eb-fe81-3bc3-09bbed4574d9@redhat.com>
+	<20170801003938-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <db6cd719-d56c-05d0-1453-4f7b0b374ad9@redhat.com>
+Date: Mon, 7 Aug 2017 22:53:42 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170801003938-mutt-send-email-mst@kernel.org>
+Content-Type: multipart/mixed; boundary="------------67CA79CA58E475A5A77167CA"
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Virtual RDMA device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,301 +32,422 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jen@redhat.com, dgilbert@redhat.com, quintela@redhat.com, dverma <dverma@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Liran Liss <liranl@mellanox.com>, Leon Romanovsky <leonro@mellanox.com>, Moni Shoua <monis@mellanox.com>, Tzahi Oved <tzahio@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, "yuval.shaia@oracle.com" <yuval.shaia@oracle.com>, qemu-devel <qemu-devel@nongnu.org>, linux-rdma <linux-rdma@vger.kernel.org>, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org
 
-The 'check_updated_properties' function keeps track of properties
-that were added/removed from fields across qemu versions. The
-'check_updated_sizes' function reduces false positives generated
-especially while testing backward migration by keeping a list
-of common size/version changes. The 'check_new_sections' function
-is used to check for sections that got deprecated or were introduced
-in different versions of qemu and will show as false positives while
-testing forward migration. Improved the variable names and added
-multiple blank newlines to keep Python PEP8 warning away.
+This is a multi-part message in MIME format.
+--------------67CA79CA58E475A5A77167CA
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Deepak Verma <dverma@redhat.com>
----
- scripts/vmstate-static-checker.py | 226 ++++++++++++++++++++++++++++++--------
- 1 file changed, 180 insertions(+), 46 deletions(-)
+On 01/08/2017 0:52, Michael S. Tsirkin wrote:
+> On Mon, Jul 31, 2017 at 10:10:15PM +0300, Marcel Apfelbaum wrote:
 
-diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-checker.py
-index ae41e44..77e63f1 100755
---- a/scripts/vmstate-static-checker.py
-+++ b/scripts/vmstate-static-checker.py
-@@ -40,6 +40,107 @@ def bump_taint():
-     if taint < 255:
-         taint = taint + 1
- 
-+# Sections gain/lose new fields with time.
-+# These are not name changes thats handled by another list.
-+# These will be 'missing' or 'not found' in different versions of qemu
-+
-+
-+def check_updated_properties(src_desc, field):
-+    src_desc = str(src_desc)
-+    field = str(field)
-+    updated_property = {
-+      'ICH9LPC': ['ICH9LPC/smi_feat'],
-+      'ide_bus/error': ['retry_sector_num', 'retry_nsector', 'retry_unit'],
-+      'e1000': ['e1000/full_mac_state'],
-+      'ich9_pm': ['ich9_pm/tco', 'ich9_pm/cpuhp']
-+    }
-+
-+    if src_desc in updated_property and field in updated_property[src_desc]:
-+        return True
-+
-+    return False
-+
-+
-+# A lot of errors are generated due to differences in sizes some of which are false positives. This list
-+# is used to save those common changes
-+def check_updated_sizes(field, old_size, new_size):
-+    new_sizes_list = {
-+            'tally_counters.TxOk': [8, 64],
-+            'intel-iommu': [0, 1],
-+            'iommu-intel': [0, 1]
-+            }
-+
-+    if field not in new_sizes_list:
-+        return False
-+
-+    if (old_size in new_sizes_list[field] and new_size in new_sizes_list[field]):
-+        return True
-+
-+    return False
-+
-+
-+# With time new sections/hardwares supported and old ones are depreciated on
-+# chipsets.
-+# There is no separate list for new or dead sections as it's relative to which
-+# qemu version you compare too.
-+# Update this list with such sections.
-+# some items in this list might overlap with changed sections names.
-+def check_new_sections(sec):
-+    new_sections_list = [
-+            'virtio-balloon-device',
-+            'virtio-rng-device',
-+            'virtio-scsi-device',
-+            'virtio-blk-device',
-+            'virtio-serial-device',
-+            'virtio-net-device',
-+            'vhost-vsock-device',
-+            'virtio-input-host-device',
-+            'virtio-input-hid-device',
-+            'virtio-mouse-device',
-+            'virtio-keyboard-device',
-+            'virtio-vga',
-+            'virtio-input-device',
-+            'virtio-gpu-device',
-+            'virtio-tablet-device',
-+            'isa-pcspk',
-+            'qemu-xhci',
-+            'base-xhci',
-+            'vmgenid',
-+            'intel-iommu',
-+            'i8257',
-+            'i82801b11-bridge',
-+            'ivshmem',
-+            'ivshmem-doorbell',
-+            'ivshmem-plain',
-+            'usb-storage-device',
-+            'usb-storage-dev',
-+            'pci-qxl',
-+            'pci-uhci-usb',
-+            'pci-piix3',
-+            'pci-vga',
-+            'pci-bridge-seat',
-+            'pcie-root-port',
-+            'fw_cfg_io',
-+            'fw_cfg_mem',
-+            'exynos4210-ehci-usb',
-+            'sysbus-ehci-usb',
-+            'tegra2-ehci-usb',
-+            'kvm-apic',
-+            'fusbh200-ehci-usb',
-+            'apic',
-+            'apic-common',
-+            'xlnx,ps7-usb',
-+            'e1000e',
-+            'e1000-82544gc',
-+            'e1000-82545em']
-+
-+    if sec in new_sections_list:
-+        return True
-+
-+    return False
-+
-+# Fields might change name with time across qemu versions.
-+
- 
- def check_fields_match(name, s_field, d_field):
-     if s_field == d_field:
-@@ -286,12 +387,22 @@ def check_fields(src_fields, dest_fields, desc, sec):
-                     unused_count = s_item["size"] - d_item["size"]
-                     continue
- 
--            print('Section "' + sec + '", '
--                  'Description "' + desc + '": '
--                  'expected field "' + s_item["field"] + '", '
--                  'got "' + d_item["field"] + '"; skipping rest')
--            bump_taint()
--            break
-+            # commit 20daa90a20d, extra field 'config' was added in newer releases
-+            # there will be a mismatch in the number of fields of irq_state and config
-+            # it's a known false positive so skip it
-+            if (desc in ["PCIDevice", "PCIEDevice"]):
-+                if((s_item["field"] in ["irq_state", "config"]) and
-+                   (d_item["field"] in ["irq_state", "config"])):
-+                    break
-+
-+            # some fields are new some dead, but are not errors.
-+            if not check_fields_match(desc, s_item["field"], d_item["field"]):
-+                print('Section "' + sec + '", '
-+                      'Description "' + desc + '": '
-+                      'expected field "' + s_item["field"] + '", '
-+                      'got "' + d_item["field"] + '"; skipping rest')
-+                bump_taint()
-+                break
- 
-         check_version(s_item, d_item, sec, desc)
- 
-@@ -312,7 +423,8 @@ def check_subsections(src_sub, dest_sub, desc, sec):
-             found = True
-             check_descriptions(s_item, d_item, sec)
- 
--        if not found:
-+        # check the updated properties list before throwing error
-+        if not found and (not check_updated_properties(desc, s_item["name"])):
-             print('Section "' + sec + '", '
-                   'Description "' + desc + '": '
-                   'Subsection "' + s_item["name"] + '" not found')
-@@ -343,51 +455,59 @@ def check_descriptions(src_desc, dest_desc, sec):
-         bump_taint()
-         return
- 
--    for f in src_desc:
--        if not f in dest_desc:
--            print('Section "' + sec + '" '
--                  'Description "' + src_desc["name"] + '": '
--                  'Entry "' + field + '" missing')
--            bump_taint()
--            continue
-+    for field in src_desc:
-+        if field not in dest_desc:
-+            # check the updated list of changed properties before throwing error
-+            if check_updated_properties(src_desc["name"], field):
-+                continue
-+            else:
-+                print('Section "' + sec + '" '
-+                      'Description "' + src_desc["name"] + '": '
-+                      'Entry "' + field + '" missing')
-+                bump_taint()
-+                continue
- 
--        if f == 'Fields':
--            check_fields(src_desc[f], dest_desc[f], src_desc["name"], sec)
-+        if field == 'Fields':
-+            check_fields(src_desc[field], dest_desc[field], src_desc["name"], sec)
- 
--        if f == 'Subsections':
--            check_subsections(src_desc[f], dest_desc[f], src_desc["name"], sec)
-+        if field == 'Subsections':
-+            check_subsections(src_desc[field], dest_desc[field], src_desc["name"], sec)
- 
- 
--def check_version(s, d, sec, desc=None):
--    if s["version_id"] > d["version_id"]:
--        print "Section \"" + sec + "\"",
--        if desc:
--            print "Description \"" + desc + "\":",
--        print "version error:", s["version_id"], ">", d["version_id"]
--        bump_taint()
-+def check_version(src_ver, dest_ver, sec, desc=None):
-+    if src_ver["version_id"] > dest_ver["version_id"]:
-+        if not check_updated_sizes(sec, src_ver["version_id"], dest_ver["version_id"]):
-+            print ('Section "' + sec + '"'),
-+            if desc:
-+                print ('Description "' + desc + '":'),
-+            print ('version error: ' + str(src_ver["version_id"]) + ' > ' + str(dest_ver["version_id"]))
-+            bump_taint()
- 
-     if "minimum_version_id" not in dest_ver:
-         return
- 
--    if s["version_id"] < d["minimum_version_id"]:
--        print "Section \"" + sec + "\"",
--        if desc:
--            print('Description "' + desc + '": ' +
--                  'minimum version error: ' + str(src_ver["version_id"]) + ' < ' +
--                  str(dest_ver["minimum_version_id"]))
--            bump_taint()
-+    if src_ver["version_id"] < dest_ver["minimum_version_id"]:
-+        if not check_updated_sizes(sec, src_ver["version_id"], dest_ver["minimum_version_id"]):
-+            print ('Section "' + sec + '"'),
-+            if desc:
-+                print('Description "' + desc + '": ' +
-+                      'minimum version error: ' + str(src_ver["version_id"]) + ' < ' +
-+                      str(dest_ver["minimum_version_id"]))
-+                bump_taint()
- 
- 
--def check_size(s, d, sec, desc=None, field=None):
--    if s["size"] != d["size"]:
--        print "Section \"" + sec + "\"",
--        if desc:
--            print "Description \"" + desc + "\"",
--        if field:
--            print "Field \"" + field + "\"",
--        print "size mismatch:", s["size"], ",", d["size"]
--        bump_taint()
-+def check_size(src, dest, sec, desc=None, field=None):
-+    if src["size"] != dest["size"]:
-+        # check updated sizes list before throwing error
- 
-+        if not check_updated_sizes(field, src["size"], dest["size"]):
-+            print ('Section "' + sec + '"'),
-+            if desc:
-+                print ('Description "' + desc + '"'),
-+            if field:
-+                print ('Field "' + field + '"'),
-+            print ('size mismatch: ' + str(src["size"]) + ' , ' + str(dest["size"]))
-+            bump_taint()
- 
- 
- def check_machine_type(src, dest):
-@@ -428,13 +548,27 @@ def main():
-     for sec in src_data:
-         dest_sec = sec
-         if dest_sec not in dest_data:
--            # Either the section name got changed, or the section
--            # doesn't exist in dest.
-+            # Either the section name got changed, or
-+            # the section doesn't exist in dest or
-+            # section was newly supported.
-             dest_sec = get_changed_sec_name(sec)
--            if dest_sec not in dest_data:
--                print('Section "' + sec + '" does not exist in dest')
--                bump_taint()
-+            if dest_sec == "":
-+                if not check_new_sections(sec):
-+                    # section not in newly supported list and not in dest
-+                    print('Section "' + sec + '" does not exist in dest')
-+                    bump_taint()
-                 continue
-+            else:
-+                # section name changed
-+                if dest_sec not in dest_data:
-+                    # new name not found in dest.
-+                    if check_new_sections(dest_sec):
-+                        continue
-+                    else:
-+                        # new name not in dest and not newly supported
-+                        print('Section "' + sec + '" does not exist in dest')
-+                        bump_taint()
-+                        continue
- 
-         s = src_data[sec]
-         d = dest_data[dest_sec]
--- 
-1.8.3.1
+[...]
+
+>> This seems to be the mail thread with most CCs.
+> 
+
+Hi Michael,
+
+> Please copy the upstream lists. virtio-dev, virtualization and
+> qemu-devel for starters. I'd say linux-rdma as well.
+> 
+
+Sure, adding all the mentioned lists.
+To recap:
+
+Yuval and I succeeded to implement a QEMU pvrdma device that works
+(with some limitations) with VMware's Linux driver.
+The git can be found at:
+     https://github.com/yuvalshaia/qemu/tree/pvrdma.master.ibverbs
+The QEMU RFC at:
+     https://patchwork.kernel.org/patch/9653893/
+
+While we do plan to merge it to QEMU, as a next step it seems
+to be a consensus that virtio should be used to implement guest<->host
+communication; since the project is not small, we need a plan.
+
+We will do our best to attend the Micro RDMA conference:
+   - 
+https://www.linuxplumbersconf.org/2017/rdma-microconference-accepted-into-the-linux-plumbers-conference/
+
+The attached presentation draft is intended to be a starting point
+for a discussion on how to continue the project.
+
+>> I attached a presentation
+>> draft with *current* implementation of the pvrdma
+>> device.(please excuse my presentation skills).
+>>
+>> It is supposed to be a starting point for discussing
+>> a virtio-rdma device and for a presentation at
+>> the RDMA Micro-conference.
+>>
+>> Please feel free to review/add and point to
+>> what important things have I missed and how
+>> we can continue.
+> 
+> I'd suggest ignoring migration initially, just get
+> rdma with memory overcommit working. For that:
+> - come up with a timeline
+> - decide who works on each of 3 things
+>    1. extend libibverbs
+>    2. layer virtio in qemu on top
+>    3. write guest driver
+> 
+> 
+>>
+>> I want to mention there is another discussion on this matter:
+>>    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06012.html
+> 
+> That simply lists what is missing in libibverbs to be able to implement
+> a PV RDMA device with memory overcommit and migration on top.
+> 
+>> We should converge somehow.
+>> Once Yuval returns from his vacation we will send a v2.
+>>
+>> Thanks,
+>> Marcel
+>>
+>>>
+>
+
+[...]
+Thanks,
+Marcel
+
+--------------67CA79CA58E475A5A77167CA
+Content-Type: application/vnd.oasis.opendocument.presentation;
+ name="pvrdma.odp"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="pvrdma.odp"
+
+UEsDBBQAAAgAANWW/0ozJqyoLwAAAC8AAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi92bmQu
+b2FzaXMub3BlbmRvY3VtZW50LnByZXNlbnRhdGlvblBLAwQUAAAIAADVlv9K6CbNZ9QLAADU
+CwAAGAAAAFRodW1ibmFpbHMvdGh1bWJuYWlsLnBuZ4lQTkcNChoKAAAADUlIRFIAAAEAAAAA
+wAgDAAAA3DNNVAAAAGZQTFRFAgICCwsLExMTGxsbIyMjLCwsMzMzOzs7QkJCS0tLU1NTW1tb
+Y2NjbGxscnJyfHx8g4ODjIyMlJSUm5ubpKSkq6urs7Ozu7u7w8PDzMzM09PT29vb4+Pj6+vr
+8/Pz/v7+AAAA////PExNMQAACylJREFUeNrtnIuWo6oShpN4ARFQ8S6Xev+3PFWY9G169py1
+zpzenZlyekw0SOTjB6kfzQX+8uXCABgAA2AADIABMAAGwAAYAANgAAyAATAABvDVS/yDAaxW
+tcMvCnhcwh8LQF+16+vb9s+p/B+rAHfNRW+LhDKPx1lQf6Qs+7g/lEEC8HuWQciJ4qNhpDMx
+hN0/JYDKnAW8TFCaur7i5lFVdTGDvw5VdZ0eTSDKUhQtKqYQZR3SdcXGc02wlXVdrkRQlCI+
+H4B0mc83tYWqjLBedqgRwnwN4aIBTP0AMJWoEXUcV6xoMz8ApKIHGArYLhGSXp8PQLws5xuh
+oerwtRjCZQ0hFFO4YOMYiweA5TpRBYdrRw3hAWC7+BD8ZfOXITxnH3AZz9eyg2ogJXT7pSjx
+3xgvB8D0ABDBVTeBclnFtRrSA8CMiTH1CrO41u4ZAcjmXsIVqp5ADJ4KnrsF/wZA7gUHKjbE
+qegfANZLeuQUppt7QgBLlkAUAvvDhhS+pAKVkIYY3itgprZSuZ0KaRRQ72ivKV5RFMGljTpL
+ZZ5xHOCutWlvEmu4qtuhRhDzzQxCflQA7W0LfxTtYG4LqLLXCq8Cw63rqxb2G+3ennIkGMZu
+yN135dbeUUd3DN2cII343p+XwTgl2jsGqu7OoTTS2C2RxLMNPWmDdnt4SgCvQwIH33ZhAF/x
+JfPB4TADYAAMgAEwAAbAABgAA2AADIABMAAG8BQAZilEn6CvhJA7gCve2/O2ElI4CAV+PAEY
+gfuOGyZcb2f0n4wQzQ4tmcPbzT8dgKUOELWBbsAy1bC4+n0ZzAgQS+8rgCAd6ArLbssNQNnT
+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
+--------------67CA79CA58E475A5A77167CA--
