@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dekiW-0001MG-8U
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:17:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dekje-000245-TW
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dekiR-0003j1-B6
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:17:20 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1502117160-24655-16-git-send-email-armbru@redhat.com> (Markus
-	Armbruster's message of "Mon, 7 Aug 2017 16:45:19 +0200")
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-16-git-send-email-armbru@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 07 Aug 2017 18:10:14 +0200
-Message-ID: <87lgmve4ux.fsf@secure.mitica>
+	(envelope-from <eblake@redhat.com>) id 1dekjZ-0004N6-Q5
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:18:30 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-7-vsementsov@virtuozzo.com>
+	<4dc2dde8-2177-3d1c-c168-f98d826922b5@redhat.com>
+	<cf38e6aa-e934-bf75-48bf-3c3bbcb7f254@virtuozzo.com>
+	<b204c5ab-2d4c-315d-7fe7-2111559052a8@redhat.com>
+	<ec30e36d-e6b2-78f6-3cf9-eb8ef12a0532@redhat.com>
+	<b11f4185-df95-5891-f7d3-43c64d9cb3b5@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <be296867-fc8b-26a4-2759-b762910f6685@redhat.com>
+Date: Mon, 7 Aug 2017 11:18:11 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 15/56] migration: Make XBZRLE cache
- size unsigned in QAPI/QMP
+In-Reply-To: <b11f4185-df95-5891-f7d3-43c64d9cb3b5@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OWoT2RaEOm8terH3ukkFaBSnLpSdptxGg"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/17] block/nbd-client: fix
+ nbd_read_reply_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, P J P <ppandit@redhat.com>, mreitz@redhat.com
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Sizes should use QAPI type 'size' (uint64_t).  migrate-set-cache-size
-> parameter @value is 'int' (int64_t).  qmp_migrate_set_cache_size()
-> ensures it fits into size_t.  page_cache.c implicitly converts the
-> signed size to unsigned types (it can't quite decide whether to use
-> uint64_t or size_t for cache offsets, but that's not something I can
-> tackle now).
->
-> XBZRLECacheStats member @cache-size and query-migrate-cache-size's
-> result are also 'int'.
->
-> Change the migrate-set-cache-size parameter and the XBZRLECacheStats
-> members to 'size', fix up hmp_migrate_set_cache_size(), and tweak a
-> few variable types to reduce implicit conversions.
->
-> migrate-set-cache-size now accepts size values between 2^63 and
-> 2^64-1.  It accepts negative values as before, because that's how the
-> QObject input visitor works for backward compatibility.
->
-> So does HMP's migrate_set_cache_size.
->
-> query-migrate and query-migrate-cache-size now report cache sizes
-> above 2^63-1 correctly instead of their (negative) two's complement.
->
-> So does HMP's "info migrate_cache_size".  HMP's "info migrate" already
-> reported the cache size correctly, because it printed the signed
-> integer with PRIu32.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OWoT2RaEOm8terH3ukkFaBSnLpSdptxGg
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org,
+ P J P <ppandit@redhat.com>, mreitz@redhat.com
+Message-ID: <be296867-fc8b-26a4-2759-b762910f6685@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 06/17] block/nbd-client: fix
+ nbd_read_reply_entry
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+ <20170804151440.320927-7-vsementsov@virtuozzo.com>
+ <4dc2dde8-2177-3d1c-c168-f98d826922b5@redhat.com>
+ <cf38e6aa-e934-bf75-48bf-3c3bbcb7f254@virtuozzo.com>
+ <b204c5ab-2d4c-315d-7fe7-2111559052a8@redhat.com>
+ <ec30e36d-e6b2-78f6-3cf9-eb8ef12a0532@redhat.com>
+ <b11f4185-df95-5891-f7d3-43c64d9cb3b5@virtuozzo.com>
+In-Reply-To: <b11f4185-df95-5891-f7d3-43c64d9cb3b5@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+On 08/07/2017 11:09 AM, Vladimir Sementsov-Ogievskiy wrote:
+
+>>>>> On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Set reply.handle to 0 on error path to prevent normal path of
+>>>>>> nbd_co_receive_reply.
+
+>>
+>> The client still tried to send a flush request to the server, when it
+>> should REALLY quit talking to the server at all and just disconnect,
+>> because the moment the client recognizes that the server has sent
+>> garbage is the moment that the client can no longer assume that the
+>> server will react correctly to any further commands.
+>>
+>> So I don't think your patch is quite correct, even if you have
+>> identified a shortfall in our client code.
+>>
+> Why do you think so? It just does what it states in commit message.
+
+The commit message doesn't state much on the way of WHY.  It it the
+subsequent discussion that says that the reason WHY we need to fix
+something is to make the client robustly hang up when it encounters a
+broken server - but once you couch it in those terms, this patch is NOT
+making the client hang up gracefully (it is making the client skip ONE
+invalid reply, but then immediately lets the client send another request
+and gets stuck waiting for a reply to that second request).  A full fix
+for the issue would make sure the client hangs up as soon as it detects
+a bogus server.
+
+>=20
+> Patch 17 should fix the case (but I doubt that it can be taken separate=
+ly).
+
+It's okay if it takes more than one patch to fix an issue, if the
+earlier patches document that more work is still needed.  Or maybe we
+can squash the best parts of 17 and this one.  I'm still playing with
+the best way to minimally address the issue for 2.10.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index c8cceb9..ecabff6 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -646,7 +646,7 @@
->  # Since: 1.2
->  ##
->  { 'struct': 'XBZRLECacheStats',
-> -  'data': {'cache-size': 'int', 'bytes': 'int', 'pages': 'int',
-> +  'data': {'cache-size': 'size', 'bytes': 'int', 'pages': 'int',
->             'cache-miss': 'int', 'cache-miss-rate': 'number',
->             'overflow': 'int' } }
->  
-> @@ -2875,7 +2875,7 @@
->  # <- { "return": {} }
->  #
->  ##
-> -{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'} }
-> +{ 'command': 'migrate-set-cache-size', 'data': {'value': 'size'} }
->  
->  ##
->  # @query-migrate-cache-size:
-> @@ -2892,7 +2892,7 @@
->  # <- { "return": 67108864 }
->  #
->  ##
-> -{ 'command': 'query-migrate-cache-size', 'returns': 'int' }
-> +{ 'command': 'query-migrate-cache-size', 'returns': 'size' }
->  
->  ##
->  # @ObjectPropertyInfo:
+--OWoT2RaEOm8terH3ukkFaBSnLpSdptxGg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I am ussming this bits are backward compatible (I don't understand QMP
-to assure this)
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmIksMACgkQp6FrSiUn
+Q2pG6Qf+Onm7dq4N+DwRwDW3FqwZvKvvMOk/uA9houpsFuX2dm3SesEbvROKOSM+
+daujcvDFbqUpRj4vCBK4F8Ypu6N1HQlsXUBsldfzwSq8cTuZEs9cG5iuuRJYeIbC
+1ub5AQtlY8wY8/fvmgkRLs/O3ZfHFoeKvPKCKa7c2Tq8Q4IbsY5Qkv4goYaxlAa9
+QTLsn6AjZ2W8dsM8MY1kELdYKUVWS+TGYwxdrgEgvoGtPf6IXYMxrp3DHc4xjtNX
+neRQJ/GmHPrMN7ohK6G+yDUCrzf6yqjFsnCvzk0Zv4kZCDXhUiedEDUWhYnamcEg
+dfFca+V+8HdVH+vq3LtyLS2JYbXC+Q==
+=S3EU
+-----END PGP SIGNATURE-----
+
+--OWoT2RaEOm8terH3ukkFaBSnLpSdptxGg--
