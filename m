@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJJ-0007dd-7d
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJA-0007Ss-VX
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJ2-00045x-Hi
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejIv-0003zd-Ej
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:05 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  7 Aug 2017 16:45:51 +0200
-Message-Id: <1502117160-24655-48-git-send-email-armbru@redhat.com>
+Date: Mon,  7 Aug 2017 16:45:48 +0200
+Message-Id: <1502117160-24655-45-git-send-email-armbru@redhat.com>
 In-Reply-To: <1502117160-24655-1-git-send-email-armbru@redhat.com>
 References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 47/56] blockjob: Make BlockJobInfo and
- event offsets unsigned in QAPI/QMP
+Subject: [Qemu-devel] [RFC PATCH 44/56] blockjob: Lift speed sign conversion
+ out of blockdev_mirror_common()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-File offsets should use QAPI type 'size' (uint64_t).  BlockJobInfo
-members @len, offset and parameters @len, @offset of events
-BLOCK_JOB_COMPLETED, BLOCK_JOB_CANCELLED, BLOCK_JOB_READY are 'int'
-(int64_t).  block_job_query(), block_job_event_completed(),
-block_job_event_cancelled(), block_job_event_ready() get them from
-BlockJob members @len and @offset, which are int64_t, but should never
-be negative.
+blockdev_mirror_common() takes int64_t speed.  The underlying BlockJob
+abstraction takes uint64_t.  blockdev_mirror_common() converts from
+int64_t to uint64_t, rejecting negative speed.
 
-Change the BlockJobInfo members and the event parameters to 'size',
-for QAPI/QMP consistency.
+Lift this check and conversion out of blockdev_mirror_common() into
+its callers.  I'm going to lift it further until it falls off the top.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hmp.c                |  8 ++++----
- qapi/block-core.json | 16 ++++++++--------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ blockdev.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index fae974e..867c50b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -966,16 +966,16 @@ void hmp_info_block_jobs(Monitor *mon, const QDict *qdict)
+diff --git a/blockdev.c b/blockdev.c
+index 06f87e3..13df88b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3419,7 +3419,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+                                    bool has_replaces, const char *replaces,
+                                    enum MirrorSyncMode sync,
+                                    BlockMirrorBackingMode backing_mode,
+-                                   bool has_speed, int64_t speed,
++                                   bool has_speed, uint64_t speed,
+                                    bool has_granularity, uint64_t granularity,
+                                    bool has_buf_size, int64_t buf_size,
+                                    bool has_on_source_error,
+@@ -3454,11 +3454,6 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+         filter_node_name = NULL;
+     }
  
-     while (list) {
-         if (strcmp(list->value->type, "stream") == 0) {
--            monitor_printf(mon, "Streaming device %s: Completed %" PRId64
--                           " of %" PRId64 " bytes, speed limit %" PRIu64
-+            monitor_printf(mon, "Streaming device %s: Completed %" PRIu64
-+                           " of %" PRIu64 " bytes, speed limit %" PRIu64
-                            " bytes/s\n",
-                            list->value->device,
-                            list->value->offset,
-                            list->value->len,
-                            list->value->speed);
-         } else {
--            monitor_printf(mon, "Type %s, device %s: Completed %" PRId64
--                           " of %" PRId64 " bytes, speed limit %" PRIu64
-+            monitor_printf(mon, "Type %s, device %s: Completed %" PRIu64
-+                           " of %" PRIu64 " bytes, speed limit %" PRIu64
-                            " bytes/s\n",
-                            list->value->type,
-                            list->value->device,
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 9e9f2d8..b8442f3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -955,8 +955,8 @@
- # Since: 1.1
- ##
- { 'struct': 'BlockJobInfo',
--  'data': {'type': 'str', 'device': 'str', 'len': 'int',
--           'offset': 'int', 'busy': 'bool', 'paused': 'bool',
-+  'data': {'type': 'str', 'device': 'str', 'len': 'size',
-+           'offset': 'size', 'busy': 'bool', 'paused': 'bool',
-            'speed': 'size',
-            'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
+-    if (speed < 0) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
+-                   "a non-negative rate limit");
+-        return;
+-    }
+     if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
+                    "a value in range [512B, 64MB]");
+@@ -3508,6 +3503,12 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         return;
+     }
  
-@@ -3606,8 +3606,8 @@
- { 'event': 'BLOCK_JOB_COMPLETED',
-   'data': { 'type'  : 'BlockJobType',
-             'device': 'str',
--            'len'   : 'int',
--            'offset': 'int',
-+            'len'   : 'size',
-+            'offset': 'size',
-             'speed' : 'size',
-             '*error': 'str' } }
++    if (arg->speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
++                   "a non-negative rate limit");
++        return;
++    }
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
  
-@@ -3642,8 +3642,8 @@
- { 'event': 'BLOCK_JOB_CANCELLED',
-   'data': { 'type'  : 'BlockJobType',
-             'device': 'str',
--            'len'   : 'int',
--            'offset': 'int',
-+            'len'   : 'size',
-+            'offset': 'size',
-             'speed' : 'size' } }
+@@ -3667,6 +3668,12 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+         return;
+     }
  
- ##
-@@ -3707,8 +3707,8 @@
- { 'event': 'BLOCK_JOB_READY',
-   'data': { 'type'  : 'BlockJobType',
-             'device': 'str',
--            'len'   : 'int',
--            'offset': 'int',
-+            'len'   : 'size',
-+            'offset': 'size',
-             'speed' : 'size' } }
++    if (speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
++                   "a non-negative rate limit");
++        return;
++    }
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
  
- ##
 -- 
 2.7.5
