@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1deiSo-0007XB-JE
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:53:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1deiW7-0000Q7-5k
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1deiSj-0007UL-Sk
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:52:58 -0400
-Date: Mon, 7 Aug 2017 15:52:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170807135238.GD6578@localhost.localdomain>
-References: <20170807123658.28772-1-berto@igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1deiW2-0000fE-HS
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:56:23 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35171)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1deiW2-0000eE-AW
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:56:18 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id m85so7878248wma.0
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 06:56:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170807123658.28772-1-berto@igalia.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10] quorum: Set
- sectors-count to 0 when reporting a flush error
+In-Reply-To: <20170807121410.2h5k6duxw7aia3ow@kamzik.brq.redhat.com>
+References: <1502106581-11714-1-git-send-email-eric.auger@redhat.com>
+	<20170807121410.2h5k6duxw7aia3ow@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Aug 2017 14:55:56 +0100
+Message-ID: <CAFEAcA-=2LdOOyFgi9DXdUvG3JUD326AFmRbeRrcQgPSgKwwuQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] hw/arm/virt: Add 2.10 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Am 07.08.2017 um 14:36 hat Alberto Garcia geschrieben:
-> The QUORUM_REPORT_BAD event has fields to report the sector in which
-> the error was detected and the number of affected sectors starting
-> from that one. This is important for read and write errors, but not
-> for flush errors.
-> 
-> For flush errors the current code reports the total size of the disk
-> image. That is however not useful information in this case. Moreover,
-> the bdrv_getlength() call can fail, and there's no good way of
-> handling that failure.
-> 
-> Since we're reporting useless information and we cannot even guarantee
-> to do it in a consistent way, this patch changes the code to report 0
-> instead in all cases.
-> 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+On 7 August 2017 at 13:14, Andrew Jones <drjones@redhat.com> wrote:
+> On Mon, Aug 07, 2017 at 11:49:41AM +0000, Eric Auger wrote:
+>> Add virt-2.10 machine type.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
 
-Thanks, applied to the block branch.
+Applied to master, thanks.
 
-Kevin
+-- PMM
