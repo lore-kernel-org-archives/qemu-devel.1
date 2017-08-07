@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dedYX-0003wc-Cg
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:38:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dedaK-0005Fk-GN
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dedYT-0005NF-H1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:38:33 -0400
-Date: Mon, 7 Aug 2017 09:38:25 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170807083825.GB3191@stefanha-x1.localdomain>
-References: <20170804152655.31510-1-pbonzini@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dedaH-0005tH-CM
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:40:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dedaH-0005sj-5A
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:40:21 -0400
+Date: Mon, 7 Aug 2017 09:40:08 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170807084008.GE18259@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.14d7e60ae019b1418a70bacc4e7d240fadf9c96c.1501362828.git-series.knut.omang@oracle.com>
+	<76cb37b3decd6d6c1c9bac72e21a06fabf7579be.1501362828.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="V0207lvV8h4k8FAm"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170804152655.31510-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: drop bdrv_set_key from
- BlockDriver
+In-Reply-To: <76cb37b3decd6d6c1c9bac72e21a06fabf7579be.1501362828.git-series.knut.omang@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v6 4/4] sockets: Handle race condition
+ between binds to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-
---V0207lvV8h4k8FAm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Aug 04, 2017 at 05:26:55PM +0200, Paolo Bonzini wrote:
-> This is not used anymore since c01c214b69 ("block: remove all encryption
-> handling APIs", 2017-07-11).
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Sat, Jul 29, 2017 at 11:18:18PM +0200, Knut Omang wrote:
+> If an offset of ports is specified to the inet_listen_saddr function(),
+> and two or more processes tries to bind from these ports at the same time,
+> occasionally more than one process may be able to bind to the same
+> port. The condition is detected by listen() but too late to avoid a failure.
+> 
+> This function is called by socket_listen() and used
+> by all socket listening code in QEMU, so all cases where any form of dynamic
+> port selection is used should be subject to this issue.
+> 
+> Add code to close and re-establish the socket when this
+> condition is observed, hiding the race condition from the user.
+> 
+> Also clean up some issues with error handling to allow more
+> accurate reporting of the cause of an error.
+> 
+> This has been developed and tested by means of the
+> test-listen unit test in the previous commit.
+> Enable the test for make check now that it passes.
+> 
+> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
 > ---
->  include/block/block_int.h | 1 -
->  1 file changed, 1 deletion(-)
+>  tests/Makefile.include |  2 +-
+>  util/qemu-sockets.c    | 58 ++++++++++++++++++++++++++++++-------------
+>  2 files changed, 42 insertions(+), 18 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
---V0207lvV8h4k8FAm
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZiCcBAAoJEJykq7OBq3PIFjgH/jh166H8fWXzQFMVMHsN+bwb
-3b95bFh5sWlRAgahew4y0kWWFPD1+3NB1XHiduu35U9z/XmktakG0omBSOtgQQiD
-R2hlhYEYEzhnqpmpkVgH6HyW/ye6h+43L0UyAGvCscn18et/EBn0llOFEyq4NObp
-k3Vxn8uk+G3Lab0e1/M7kYEzdodd/eK9PxL7w+YJNZk0pt86YRJKsgJ1ButCxYR0
-B4OrFhyfCIrv7JnmNwnkfHKy/5K1MvamouUzQwA7zjGlHBo62/7izjp1wtSouSsA
-tI3lEW55pz1LS/kU+xRz/Oj5JLZl3L1OW7kCOxCrSV0XXuZndDnm8FzkIBkiq44=
-=fjN4
------END PGP SIGNATURE-----
-
---V0207lvV8h4k8FAm--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
