@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dercs-0003Gi-Al
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:40:03 -0400
+	(envelope-from <cota@braap.org>) id 1derpL-0005yI-Fv
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dercn-0007ah-H8
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:39:58 -0400
-References: <20170803150301.10177-1-kwolf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <73c3ab64-382a-fc41-093c-99ad63923c83@redhat.com>
-Date: Mon, 7 Aug 2017 19:39:40 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170803150301.10177-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 0/5] block:
- bdrv_reopen() fixes
+	(envelope-from <cota@braap.org>) id 1derpG-0005ht-No
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:52:51 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:58895)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1derpG-0005h2-Jb
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:52:46 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Mon,  7 Aug 2017 19:52:18 -0400
+Message-Id: <1502149958-23381-3-git-send-email-cota@braap.org>
+In-Reply-To: <1502149958-23381-1-git-send-email-cota@braap.org>
+References: <1502149958-23381-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 02/22] linux-user: fix 'finshed' typo in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +23,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-On 08/03/2017 11:02 AM, Kevin Wolf wrote:
-> This is the first part of some fixes to bdrv_reopen(), which seems
-> reasonable enough to merge for 2.10.
-> 
-> There is much more wrong with bdrv_reopen() currently, especially with
-> respect to op blocker permissions (basically the required permissions
-> can change based on the options used in bdrv_reopen(), and both things
-> affect the whole tree and aren't integrated with each other at all), but
-> I have little hope to get this fixed before 2.10, so let's start with
-> what is ready now.
-> 
-> Kevin Wolf (5):
->   block: Fix order in bdrv_replace_child()
->   block: Allow reopen rw without BDRV_O_ALLOW_RDWR
->   block: Set BDRV_O_ALLOW_RDWR during rw reopen
->   qemu-io: Allow reopen read-write
->   qemu-iotests: Test reopen between read-only and read-write
-> 
->  include/block/block.h      |  3 +-
->  block.c                    | 20 +++++++++-----
->  qemu-io-cmds.c             | 19 +++++++++++--
->  tests/qemu-iotests/187     | 69 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/187.out | 18 ++++++++++++
->  tests/qemu-iotests/group   |  1 +
->  6 files changed, 120 insertions(+), 10 deletions(-)
->  create mode 100755 tests/qemu-iotests/187
->  create mode 100644 tests/qemu-iotests/187.out
-> 
-
-Not that you need it, but I reviewed the series because I wanted to know
-what this change was, so while I'm here:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index bbf7913..b1e993f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6231,7 +6231,7 @@ static void *clone_func(void *arg)
+     pthread_mutex_lock(&info->mutex);
+     pthread_cond_broadcast(&info->cond);
+     pthread_mutex_unlock(&info->mutex);
+-    /* Wait until the parent has finshed initializing the tls state.  */
++    /* Wait until the parent has finished initializing the tls state.  */
+     pthread_mutex_lock(&clone_lock);
+     pthread_mutex_unlock(&clone_lock);
+     cpu_loop(env);
+-- 
+2.7.4
