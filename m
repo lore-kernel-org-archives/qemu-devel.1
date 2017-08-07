@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1degxr-0005TH-DV
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:17:00 -0400
+	(envelope-from <jcody@redhat.com>) id 1degy4-0005Xm-6h
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:17:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1degxm-0000sQ-HX
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:16:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55110)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1degxm-0000sB-Bu
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:16:50 -0400
-Date: Mon, 7 Aug 2017 14:16:45 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170807141645.3392b3bf@gondolin>
-In-Reply-To: <150210580404.1343.7325713896658799315.stgit@bahia.lan>
-References: <150210580404.1343.7325713896658799315.stgit@bahia.lan>
+	(envelope-from <jcody@redhat.com>) id 1degxz-0000uc-0l
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:17:08 -0400
+Date: Mon, 7 Aug 2017 08:16:49 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170807121649.GF1525@localhost.localdomain>
+References: <cover.1502075213.git.jcody@redhat.com>
+	<85fe374c783a6d659bc86aa7f15d5f442b9d7a45.1502075213.git.jcody@redhat.com>
+	<20170807104630.GA6578@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] kvm: workaround build break on
- gcc-7.1.1 / fedora26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170807104630.GA6578@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] block/vhdx: check error
+ return of bdrv_getlength()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, qemu-block@nongnu.org
 
-On Mon, 07 Aug 2017 13:36:44 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Mon, Aug 07, 2017 at 12:46:30PM +0200, Kevin Wolf wrote:
+> Am 07.08.2017 um 05:08 hat Jeff Cody geschrieben:
+> > Calls to bdrv_getlength() were not checking for error.  In vhdx.c, this
+> > can lead to truncating an image file, so it is a definite bug.  In
+> > vhdx-log.c, the path for improper behavior is less clear, but it is best
+> > to check in any case.
+> > 
+> > Reported-by: Markus Armbruster <armbru@redhat.com>
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > ---
+> >  block/vhdx-log.c | 20 ++++++++++++++++----
+> >  block/vhdx.c     |  9 ++++++++-
+> >  2 files changed, 24 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+> > index 01278f3..fd4e7af 100644
+> > --- a/block/vhdx-log.c
+> > +++ b/block/vhdx-log.c
+> > @@ -491,6 +491,7 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
+> >      uint32_t cnt, sectors_read;
+> >      uint64_t new_file_size;
+> >      void *data = NULL;
+> > +    int64_t file_length;
+> >      VHDXLogDescEntries *desc_entries = NULL;
+> >      VHDXLogEntryHeader hdr_tmp = { 0 };
+> >  
+> > @@ -510,10 +511,15 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
+> >          if (ret < 0) {
+> >              goto exit;
+> >          }
+> > +        file_length = bdrv_getlength(bs->file->bs);
+> > +        if (file_length < 0) {
+> > +            ret = file_length;
+> > +            goto exit;
+> > +        }
+> >          /* if the log shows a FlushedFileOffset larger than our current file
+> >           * size, then that means the file has been truncated / corrupted, and
+> >           * we must refused to open it / use it */
+> > -        if (hdr_tmp.flushed_file_offset > bdrv_getlength(bs->file->bs)) {
+> > +        if (hdr_tmp.flushed_file_offset > file_length) {
+> >              ret = -EINVAL;
+> >              goto exit;
+> >          }
+> > @@ -543,7 +549,7 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
+> >                  goto exit;
+> >              }
+> >          }
+> > -        if (bdrv_getlength(bs->file->bs) < desc_entries->hdr.last_file_offset) {
+> > +        if (file_length < desc_entries->hdr.last_file_offset) {
+> >              new_file_size = desc_entries->hdr.last_file_offset;
+> >              if (new_file_size % (1024*1024)) {
+> >                  /* round up to nearest 1MB boundary */
+> 
+> The vhdx_log_flush() part looks good, but it made me notice a
+> bdrv_flush() in the same function where the return value isn't checked.
+> I'm almost sure that this is a bug.
+> 
 
-> Building QEMU on fedora26 with the latest gcc package fails:
->=20
->   CC      ppc64-softmmu/target/ppc/kvm.o
-> In file included from include/sysemu/hw_accel.h:16:0,
->                  from target/ppc/kvm.c:31:
-> target/ppc/kvm.c: In function =E2=80=98kvmppc_booke_watchdog_enable=E2=80=
-=99:
-> include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may be =
-used uninitialized
->  in this function [-Werror=3Dmaybe-uninitialized]
->              cap.args[i] =3D args_tmp[i];                               \
->                                    ^
-> target/ppc/kvm.c: In function =E2=80=98kvmppc_set_papr=E2=80=99:
-> include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may be =
-used uninitialized
->  in this function [-Werror=3Dmaybe-uninitialized]
-> cc1: all warnings being treated as errors
->=20
-> $ rpm -q gcc
-> gcc-7.1.1-3.fc26.ppc64le
->=20
-> The compiler should obviously optimize this code away when no extra
-> agument is passed to kvm_vm_enable_cap() and kvm_vcpu_enable_cap(),
-> but it doesn't. This bug should be fixed one day in gcc, but we can
-> also change our code pattern so that we don't hit the issue anymore.
-> We workaround this, by using memcpy() instead of open-coding the copy.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v2: - use memcpy()
-> ---
->  include/sysemu/kvm.h |   14 ++++----------
->  1 file changed, 4 insertions(+), 10 deletions(-)
+I'll add 2 more simple patches to the series: one for bdrv_flush(), and one
+for the unchecked bdrv_truncate() as well.
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+
+> > @@ -851,6 +857,7 @@ static int vhdx_log_write(BlockDriverState *bs, BDRVVHDXState *s,
+> >      uint32_t partial_sectors = 0;
+> >      uint32_t bytes_written = 0;
+> >      uint64_t file_offset;
+> > +    int64_t file_length;
+> >      VHDXHeader *header;
+> >      VHDXLogEntryHeader new_hdr;
+> >      VHDXLogDescriptor *new_desc = NULL;
+> > @@ -913,10 +920,15 @@ static int vhdx_log_write(BlockDriverState *bs, BDRVVHDXState *s,
+> >                  .sequence_number     = s->log.sequence,
+> >                  .descriptor_count    = sectors,
+> >                  .reserved            = 0,
+> > -                .flushed_file_offset = bdrv_getlength(bs->file->bs),
+> > -                .last_file_offset    = bdrv_getlength(bs->file->bs),
+> >                };
+> >  
+> > +    file_length = bdrv_getlength(bs->file->bs);
+> > +    if (file_length < 0) {
+> > +        ret = file_length;
+> > +        goto exit;
+> > +    }
+> > +    new_hdr.flushed_file_offset = file_length;
+> > +    new_hdr.last_file_offset    = file_length;
+> >      new_hdr.log_guid = header->log_guid;
+> 
+> If you move the bdrv_getlength() above the initialisation of new_hdr,
+> you could keep these fields in the designated initialiser, which should
+> be better for readability.
+> 
+> I also don't know why .log_guid isn't part if it, could be moved, too.
+> 
+> >      desc_sectors = vhdx_compute_desc_sectors(new_hdr.descriptor_count);
+> > diff --git a/block/vhdx.c b/block/vhdx.c
+> > index a9cecd2..6a14999 100644
+> > --- a/block/vhdx.c
+> > +++ b/block/vhdx.c
+> > @@ -1166,7 +1166,14 @@ exit:
+> >  static int vhdx_allocate_block(BlockDriverState *bs, BDRVVHDXState *s,
+> >                                      uint64_t *new_offset)
+> >  {
+> > -    *new_offset = bdrv_getlength(bs->file->bs);
+> > +    int64_t current_len;
+> > +    current_len = bdrv_getlength(bs->file->bs);
+> > +
+> > +    if (current_len < 0) {
+> > +        return current_len;
+> > +    }
+> 
+> Don't you want the empty line to be between declaration and code rather
+> than assignment and check?
+> 
+> > +    *new_offset = current_len;
+> >  
+> >      /* per the spec, the address for a block is in units of 1MB */
+> >      *new_offset = ROUND_UP(*new_offset, 1024 * 1024);
+> 
+> So the code looks correct, but we could make it a little nicer in a v2.
+>
+
+Yep, thanks.  I'll address all those cleanups you mentioned in v2.
