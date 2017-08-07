@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dedqj-0001Ql-L1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:23 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dedqm-0001RQ-AY
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dedqf-0007Ew-Sk
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37402)
+	(envelope-from <lprosek@redhat.com>) id 1dedqk-0007Gz-TZ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dedqf-0007Ds-N2
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:17 -0400
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dedqk-0007Ga-O7
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:22 -0400
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon,  7 Aug 2017 10:57:01 +0200
-Message-Id: <20170807085703.32267-3-lprosek@redhat.com>
+Date: Mon,  7 Aug 2017 10:57:03 +0200
+Message-Id: <20170807085703.32267-5-lprosek@redhat.com>
 In-Reply-To: <20170807085703.32267-1-lprosek@redhat.com>
 References: <20170807085703.32267-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] i386/kvm: set tsc_khz before
- configuring Hyper-V CPUID
+Subject: [Qemu-devel] [PATCH v2 4/4] i386/kvm: advertise Hyper-V frequency
+ MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +27,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, mtosatti@redhat.com, david@redhat.com, rkrcmar@redhat.com
 
-Timing-related Hyper-V enlightenments will benefit from knowing the final
-tsc_khz value. This commit just moves the code in preparation for further
-changes.
+As of kernel commit eb82feea59d6 ("KVM: hyperv: support HV_X64_MSR_TSC_FREQUENCY
+and HV_X64_MSR_APIC_FREQUENCY"), KVM supports two new MSRs which are required
+for nested Hyper-V to read timestamps with RDTSC + TSC page.
+
+This commit makes QEMU advertise the MSRs with CPUID.40000003H:EAX[11] and
+CPUID.40000003H:EDX[8] as specified in the Hyper-V TLFS and experimentally
+verified on a Hyper-V host. The feature is enabled with the existing hv-time CPU
+flag, and only if the TSC frequency is stable across migrations and known.
 
 Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 ---
- target/i386/kvm.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ target/i386/kvm.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index b14a0db..15d56ae 100644
+index 2dc01c9..739334a 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -695,6 +695,25 @@ int kvm_arch_init_vcpu(CPUState *cs)
+@@ -89,6 +89,7 @@ static bool has_msr_hv_vpindex;
+ static bool has_msr_hv_runtime;
+ static bool has_msr_hv_synic;
+ static bool has_msr_hv_stimer;
++static bool has_msr_hv_frequencies;
+ static bool has_msr_xss;
  
-     cpuid_i = 0;
- 
-+    r = kvm_arch_set_tsc_khz(cs);
-+    if (r < 0) {
-+        goto fail;
-+    }
+ static bool has_msr_architectural_pmu;
+@@ -640,7 +641,13 @@ static int hyperv_handle_properties(CPUState *cs)
+     if (cpu->hyperv_time) {
+         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
+-        env->features[FEAT_HYPERV_EAX] |= 0x200;
++        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
 +
-+    /* vcpu's TSC frequency is either specified by user, or following
-+     * the value used by KVM if the former is not present. In the
-+     * latter case, we query it from KVM and record in env->tsc_khz,
-+     * so that vcpu's TSC frequency can be migrated later via this field.
-+     */
-+    if (!env->tsc_khz) {
-+        r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-+            -ENOTSUP;
-+        if (r > 0) {
-+            env->tsc_khz = r;
++        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
++            env->features[FEAT_HYPERV_EAX] |= HV_X64_ACCESS_FREQUENCY_MSRS;
++            env->features[FEAT_HYPERV_EDX] |=
++                HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
 +        }
-+    }
-+
-     /* Paravirtualization CPUIDs */
-     if (hyperv_enabled(cpu)) {
-         c = &cpuid_data.entries[cpuid_i++];
-@@ -961,25 +980,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
      }
- 
--    r = kvm_arch_set_tsc_khz(cs);
--    if (r < 0) {
--        goto fail;
--    }
--
--    /* vcpu's TSC frequency is either specified by user, or following
--     * the value used by KVM if the former is not present. In the
--     * latter case, we query it from KVM and record in env->tsc_khz,
--     * so that vcpu's TSC frequency can be migrated later via this field.
--     */
--    if (!env->tsc_khz) {
--        r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
--            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
--            -ENOTSUP;
--        if (r > 0) {
--            env->tsc_khz = r;
--        }
--    }
--
-     if (cpu->vmware_cpuid_freq
-         /* Guests depend on 0x40000000 to detect this feature, so only expose
-          * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V) */
+     if (cpu->hyperv_crash && has_msr_hv_crash) {
+         env->features[FEAT_HYPERV_EDX] |= HV_X64_GUEST_CRASH_MSR_AVAILABLE;
+@@ -1134,6 +1141,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+                 case HV_X64_MSR_STIMER0_CONFIG:
+                     has_msr_hv_stimer = true;
+                     break;
++                case HV_X64_MSR_TSC_FREQUENCY:
++                    has_msr_hv_frequencies = true;
++                    break;
+                 }
+             }
+         }
 -- 
 2.9.3
