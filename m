@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1degy4-0005Xm-6h
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:17:13 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1deh0y-0006xj-74
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1degxz-0000uc-0l
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:17:08 -0400
-Date: Mon, 7 Aug 2017 08:16:49 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170807121649.GF1525@localhost.localdomain>
-References: <cover.1502075213.git.jcody@redhat.com>
-	<85fe374c783a6d659bc86aa7f15d5f442b9d7a45.1502075213.git.jcody@redhat.com>
-	<20170807104630.GA6578@localhost.localdomain>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1deh0s-00023B-Vs
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:20:08 -0400
+References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1501597152-25342-3-git-send-email-anton.nefedov@virtuozzo.com>
+	<444f8ae2-dbf2-b4d5-a979-586142edae67@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <378dfffd-0ae8-8103-9c76-292a171d5670@virtuozzo.com>
+Date: Mon, 7 Aug 2017 15:19:44 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170807104630.GA6578@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] block/vhdx: check error
- return of bdrv_getlength()
+In-Reply-To: <444f8ae2-dbf2-b4d5-a979-586142edae67@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 02/15] blkverify: set supported
+ write/zero flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com
 
-On Mon, Aug 07, 2017 at 12:46:30PM +0200, Kevin Wolf wrote:
-> Am 07.08.2017 um 05:08 hat Jeff Cody geschrieben:
-> > Calls to bdrv_getlength() were not checking for error.  In vhdx.c, this
-> > can lead to truncating an image file, so it is a definite bug.  In
-> > vhdx-log.c, the path for improper behavior is less clear, but it is best
-> > to check in any case.
-> > 
-> > Reported-by: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/vhdx-log.c | 20 ++++++++++++++++----
-> >  block/vhdx.c     |  9 ++++++++-
-> >  2 files changed, 24 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-> > index 01278f3..fd4e7af 100644
-> > --- a/block/vhdx-log.c
-> > +++ b/block/vhdx-log.c
-> > @@ -491,6 +491,7 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
-> >      uint32_t cnt, sectors_read;
-> >      uint64_t new_file_size;
-> >      void *data = NULL;
-> > +    int64_t file_length;
-> >      VHDXLogDescEntries *desc_entries = NULL;
-> >      VHDXLogEntryHeader hdr_tmp = { 0 };
-> >  
-> > @@ -510,10 +511,15 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
-> >          if (ret < 0) {
-> >              goto exit;
-> >          }
-> > +        file_length = bdrv_getlength(bs->file->bs);
-> > +        if (file_length < 0) {
-> > +            ret = file_length;
-> > +            goto exit;
-> > +        }
-> >          /* if the log shows a FlushedFileOffset larger than our current file
-> >           * size, then that means the file has been truncated / corrupted, and
-> >           * we must refused to open it / use it */
-> > -        if (hdr_tmp.flushed_file_offset > bdrv_getlength(bs->file->bs)) {
-> > +        if (hdr_tmp.flushed_file_offset > file_length) {
-> >              ret = -EINVAL;
-> >              goto exit;
-> >          }
-> > @@ -543,7 +549,7 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
-> >                  goto exit;
-> >              }
-> >          }
-> > -        if (bdrv_getlength(bs->file->bs) < desc_entries->hdr.last_file_offset) {
-> > +        if (file_length < desc_entries->hdr.last_file_offset) {
-> >              new_file_size = desc_entries->hdr.last_file_offset;
-> >              if (new_file_size % (1024*1024)) {
-> >                  /* round up to nearest 1MB boundary */
+On 08/04/2017 06:23 PM, Eric Blake wrote:
+> On 08/01/2017 09:18 AM, Anton Nefedov wrote:
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>   block/blkverify.c | 9 +++++++++
+>>   1 file changed, 9 insertions(+)
 > 
-> The vhdx_log_flush() part looks good, but it made me notice a
-> bdrv_flush() in the same function where the return value isn't checked.
-> I'm almost sure that this is a bug.
+> Basically, blkverify supports a flag if BOTH of its underlying files
+> also support the flag; if either side can't handle the flag, then we
+> fall back to emulation for both sides.
+> 
+> With more overhead, we COULD state that we support both bits if at least
+> one of the two underlying BDS supports the bit, and then emulate support
+> for the bit on the second BDS where it was lacking, so that at least the
+> first BDS doesn't suffer from the penalties of the fallbacks.  But that
+> means duplicating the block layer fallback code in blkverify, which is
+> already something that we don't necessarily expect high performance from.
+> 
+> For FUA, failure to implement the bit merely means that we have more
+> device-wide flush calls (instead of per-transaction mini-flushes), but
+> the end data should be the same.  But for MAY_UNMAP, I'm worried that we
+> may have situations where a plain BDS will create holes, while running
+> the same device paired through blkverify will fall back to slower
+> explicit zeroes.  I'm wondering whether this will bite us, if we have
+> scenarios where the mere fact of trying to verify block device behavior
+> changes what behavior we are even verifying.
+> 
+> Thus, while I think the code change _looks_ okay, I'm not sure if it is
+> correct design-wise, nor whether it is 2.10 material.
 > 
 
-I'll add 2 more simple patches to the series: one for bdrv_flush(), and one
-for the unchecked bdrv_truncate() as well.
+But this change doesn't make things worse, does it?
+Blkverify will support at least the matching bytes, while now it drops
+them all.
+
+Will the 'reference' driver (I guess it's raw/file in most of the cases)
+usually support a superset of 'tested' driver supported bits?
+Maybe we should report an error otherwise?
 
 
-> > @@ -851,6 +857,7 @@ static int vhdx_log_write(BlockDriverState *bs, BDRVVHDXState *s,
-> >      uint32_t partial_sectors = 0;
-> >      uint32_t bytes_written = 0;
-> >      uint64_t file_offset;
-> > +    int64_t file_length;
-> >      VHDXHeader *header;
-> >      VHDXLogEntryHeader new_hdr;
-> >      VHDXLogDescriptor *new_desc = NULL;
-> > @@ -913,10 +920,15 @@ static int vhdx_log_write(BlockDriverState *bs, BDRVVHDXState *s,
-> >                  .sequence_number     = s->log.sequence,
-> >                  .descriptor_count    = sectors,
-> >                  .reserved            = 0,
-> > -                .flushed_file_offset = bdrv_getlength(bs->file->bs),
-> > -                .last_file_offset    = bdrv_getlength(bs->file->bs),
-> >                };
-> >  
-> > +    file_length = bdrv_getlength(bs->file->bs);
-> > +    if (file_length < 0) {
-> > +        ret = file_length;
-> > +        goto exit;
-> > +    }
-> > +    new_hdr.flushed_file_offset = file_length;
-> > +    new_hdr.last_file_offset    = file_length;
-> >      new_hdr.log_guid = header->log_guid;
+>> +    bs->supported_write_flags = BDRV_REQ_FUA &
+>> +        bs->file->bs->supported_write_flags &
+>> +        s->test_file->bs->supported_write_flags;
+>> +
+>> +    bs->supported_zero_flags =
+>> +        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
+>> +        bs->file->bs->supported_zero_flags &
+>> +        s->test_file->bs->supported_zero_flags;
+>> +
+>>       ret = 0;
+>>   fail:
+>>       qemu_opts_del(opts);
+>>
 > 
-> If you move the bdrv_getlength() above the initialisation of new_hdr,
-> you could keep these fields in the designated initialiser, which should
-> be better for readability.
-> 
-> I also don't know why .log_guid isn't part if it, could be moved, too.
-> 
-> >      desc_sectors = vhdx_compute_desc_sectors(new_hdr.descriptor_count);
-> > diff --git a/block/vhdx.c b/block/vhdx.c
-> > index a9cecd2..6a14999 100644
-> > --- a/block/vhdx.c
-> > +++ b/block/vhdx.c
-> > @@ -1166,7 +1166,14 @@ exit:
-> >  static int vhdx_allocate_block(BlockDriverState *bs, BDRVVHDXState *s,
-> >                                      uint64_t *new_offset)
-> >  {
-> > -    *new_offset = bdrv_getlength(bs->file->bs);
-> > +    int64_t current_len;
-> > +    current_len = bdrv_getlength(bs->file->bs);
-> > +
-> > +    if (current_len < 0) {
-> > +        return current_len;
-> > +    }
-> 
-> Don't you want the empty line to be between declaration and code rather
-> than assignment and check?
-> 
-> > +    *new_offset = current_len;
-> >  
-> >      /* per the spec, the address for a block is in units of 1MB */
-> >      *new_offset = ROUND_UP(*new_offset, 1024 * 1024);
-> 
-> So the code looks correct, but we could make it a little nicer in a v2.
->
-
-Yep, thanks.  I'll address all those cleanups you mentioned in v2.
+/Anton
