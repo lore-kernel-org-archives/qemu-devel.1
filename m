@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1degLG-0006Xw-D1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:37:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1degQY-0008T9-2p
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1degLB-00024m-J1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:37:02 -0400
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:55916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1degLB-000247-Bh
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:36:57 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 69B6C8B65E
-	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 13:36:55 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 07 Aug 2017 13:36:44 +0200
-Message-ID: <150210580404.1343.7325713896658799315.stgit@bahia.lan>
+	(envelope-from <eblake@redhat.com>) id 1degQS-0004BE-RR
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:42:30 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <484ffeb7-6571-af84-ee4b-0bfcb83df7ad@redhat.com>
+Date: Mon, 7 Aug 2017 06:42:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] kvm: workaround build break on gcc-7.1.1 /
- fedora26
+In-Reply-To: <20170804151440.320927-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GjxWKc8jb3lcafD6keEEvJVVuMtJw3jOJ"
+Subject: Re: [Qemu-devel] [PATCH 02/17] nbd/client: refactor nbd_read_eof
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Building QEMU on fedora26 with the latest gcc package fails:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GjxWKc8jb3lcafD6keEEvJVVuMtJw3jOJ
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <484ffeb7-6571-af84-ee4b-0bfcb83df7ad@redhat.com>
+Subject: Re: [PATCH 02/17] nbd/client: refactor nbd_read_eof
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+ <20170804151440.320927-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170804151440.320927-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  CC      ppc64-softmmu/target/ppc/kvm.o
-In file included from include/sysemu/hw_accel.h:16:0,
-                 from target/ppc/kvm.c:31:
-target/ppc/kvm.c: In function =E2=80=98kvmppc_booke_watchdog_enable=E2=80=
-=99:
-include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may be =
-used uninitialized
- in this function [-Werror=3Dmaybe-uninitialized]
-             cap.args[i] =3D args_tmp[i];                               \
-                                   ^
-target/ppc/kvm.c: In function =E2=80=98kvmppc_set_papr=E2=80=99:
-include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may be =
-used uninitialized
- in this function [-Werror=3Dmaybe-uninitialized]
-cc1: all warnings being treated as errors
+On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Refactor nbd_read_eof to return 1 on success, 0 on eof, when no
+> data was read and <0 for other cases, because returned size of
+> read data is not actually used.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/nbd-internal.h         | 34 +++++++++++++++++++++++++---------
+>  nbd/client.c               |  5 -----
+>  tests/qemu-iotests/083.out |  4 ++--
+>  3 files changed, 27 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+> index 396ddb4d3e..3fb0b6098a 100644
+> --- a/nbd/nbd-internal.h
+> +++ b/nbd/nbd-internal.h
+> @@ -77,21 +77,37 @@
+>  #define NBD_ESHUTDOWN  108
+> =20
+>  /* nbd_read_eof
+> - * Tries to read @size bytes from @ioc. Returns number of bytes actual=
+ly read.
+> - * May return a value >=3D 0 and < size only on EOF, i.e. when iterati=
+vely called
+> - * qio_channel_readv() returns 0. So, there is no need to call nbd_rea=
+d_eof
+> - * iteratively.
+> + * Tries to read @size bytes from @ioc.
+> + * Returns 1 on success
+> + *         0 on eof, when no data was read (errp is not set)
+> + *         -EINVAL on eof, when some data < @size was read until eof
+> + *         < 0 on read fail
 
-$ rpm -q gcc
-gcc-7.1.1-3.fc26.ppc64le
+In general, mixing negative errno value and generic < 0 in the same
+function is most likely ambiguous.
 
-The compiler should obviously optimize this code away when no extra
-agument is passed to kvm_vm_enable_cap() and kvm_vcpu_enable_cap(),
-but it doesn't. This bug should be fixed one day in gcc, but we can
-also change our code pattern so that we don't hit the issue anymore.
-We workaround this, by using memcpy() instead of open-coding the copy.
+>   */
+> -static inline ssize_t nbd_read_eof(QIOChannel *ioc, void *buffer, size=
+_t size,
+> -                                   Error **errp)
+> +static inline int nbd_read_eof(QIOChannel *ioc, void *buffer, size_t s=
+ize,
+> +                               Error **errp)
+>  {
+>      struct iovec iov =3D { .iov_base =3D buffer, .iov_len =3D size };
+> +    ssize_t ret;
+> +
+>      /* Sockets are kept in blocking mode in the negotiation phase.  Af=
+ter
+>       * that, a non-readable socket simply means that another thread st=
+ole
+>       * our request/reply.  Synchronization is done with recv_coroutine=
+, so
+>       * that this is coroutine-safe.
+>       */
+> -    return nbd_rwv(ioc, &iov, 1, size, true, errp);
+> +
+> +    assert(size > 0);
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: - use memcpy()
----
- include/sysemu/kvm.h |   14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+Effectively the same as assert(size !=3D 0).
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 91fc07ee9afe..3a458f50e9f4 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -428,11 +428,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int=
- extension);
-             .flags =3D cap_flags,                                      \
-         };                                                           \
-         uint64_t args_tmp[] =3D { __VA_ARGS__ };                       \
--        int i;                                                       \
--        for (i =3D 0; i < (int)ARRAY_SIZE(args_tmp) &&                 \
--                     i < ARRAY_SIZE(cap.args); i++) {                \
--            cap.args[i] =3D args_tmp[i];                               \
--        }                                                            \
-+        size_t n =3D MIN(ARRAY_SIZE(args_tmp), ARRAY_SIZE(cap.args));  \
-+        memcpy(cap.args, args_tmp, n * sizeof(cap.args[0]));         \
-         kvm_vm_ioctl(s, KVM_ENABLE_CAP, &cap);                       \
-     })
-=20
-@@ -443,11 +440,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int=
- extension);
-             .flags =3D cap_flags,                                      \
-         };                                                           \
-         uint64_t args_tmp[] =3D { __VA_ARGS__ };                       \
--        int i;                                                       \
--        for (i =3D 0; i < (int)ARRAY_SIZE(args_tmp) &&                 \
--                     i < ARRAY_SIZE(cap.args); i++) {                \
--            cap.args[i] =3D args_tmp[i];                               \
--        }                                                            \
-+        size_t n =3D MIN(ARRAY_SIZE(args_tmp), ARRAY_SIZE(cap.args));  \
-+        memcpy(cap.args, args_tmp, n * sizeof(cap.args[0]));         \
-         kvm_vcpu_ioctl(cpu, KVM_ENABLE_CAP, &cap);                   \
-     })
-=20
+> +
+> +    ret =3D nbd_rwv(ioc, &iov, 1, size, true, errp);
+> +    if (ret <=3D 0) {
+> +        return ret;
+> +    }
+
+So this is a negative errno (or 0 on EOF),
+
+> +
+> +    if (ret !=3D size) {
+> +        error_setg(errp, "End of file");
+> +        return -EINVAL;
+
+and so is this. Which makes the function documentation not quite
+accurate; you aren't mixing a generic < 0.
+
+> +    }
+> +
+> +    return 1;
+>  }
+> =20
+>  /* nbd_read
+> @@ -100,9 +116,9 @@ static inline ssize_t nbd_read_eof(QIOChannel *ioc,=
+ void *buffer, size_t size,
+>  static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,=
+
+>                             Error **errp)
+>  {
+> -    ssize_t ret =3D nbd_read_eof(ioc, buffer, size, errp);
+> +    int ret =3D nbd_read_eof(ioc, buffer, size, errp);
+> =20
+> -    if (ret >=3D 0 && ret !=3D size) {
+> +    if (ret =3D=3D 0) {
+>          ret =3D -EINVAL;
+>          error_setg(errp, "End of file");
+
+Why do we have to set errp here instead of in nbd_read_eof()? Is there
+ever any case where hitting early EOF is not something that should be
+treated as an error?
+
+>      }
+> diff --git a/nbd/client.c b/nbd/client.c
+> index f1c16b588f..4556056daa 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -925,11 +925,6 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDRepl=
+y *reply, Error **errp)
+>          return ret;
+>      }
+> =20
+> -    if (ret !=3D sizeof(buf)) {
+> -        error_setg(errp, "read failed");
+> -        return -EINVAL;
+> -    }
+> -
+>      /* Reply
+>         [ 0 ..  3]    magic   (NBD_REPLY_MAGIC)
+>         [ 4 ..  7]    error   (0 =3D=3D no error)
+> diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+> index a24c6bfece..d3bea1b2f5 100644
+> --- a/tests/qemu-iotests/083.out
+> +++ b/tests/qemu-iotests/083.out
+> @@ -69,12 +69,12 @@ read failed: Input/output error
+> =20
+>  =3D=3D=3D Check disconnect 4 reply =3D=3D=3D
+> =20
+> -read failed
+> +End of file
+>  read failed: Input/output error
+
+At least you tracked that your changes tweak the error message.  But I'm
+not yet convinced whether this change simplifies anything.  Is there a
+later patch that is easier to write with the new semantics which was not
+possible with the pre-patch semantics?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--GjxWKc8jb3lcafD6keEEvJVVuMtJw3jOJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmIUhIACgkQp6FrSiUn
+Q2pvmAgAlFupeFlYutQ0KmPEIngZQQvGWMmnjl+5YkO0yYbgO0pHY8GfQZYphKmO
+I71QG/pByUnsrKRZvXBQuaeDG2vPdkx/c1QSNOuK6qEMOnQG1TkdMFUqFd2aDq2F
+tXOLWt2YIKuw7pd57QjNRUEm+On5DLwl74a07iEWw+hTl6F/8ewXhSbZBkaaaj9m
+S+3cG/P93s8DIhcv1juKQQi8iUb8Smm1QxSKSfNW/gjmINiTdd24GsTkQWcAF5Y5
+knKKskuH0uVOBhiHdrimULKV6vJ+7QmpqAst51zTb4CZ0lAOhgeYsP8SlhmpxUHN
+T+7GW1Et5UdO/jbsHsIMYAlS2S51Xg==
+=6weO
+-----END PGP SIGNATURE-----
+
+--GjxWKc8jb3lcafD6keEEvJVVuMtJw3jOJ--
