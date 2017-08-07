@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1deisY-0002jD-7Z
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:19:35 -0400
+	(envelope-from <david@redhat.com>) id 1deivO-0003rh-MT
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1deisU-00046X-Vl
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:19:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41678)
+	(envelope-from <david@redhat.com>) id 1deivL-0005zw-9X
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:22:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1deisU-00045y-Mw
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:19:30 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1deivL-0005zU-38
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:22:27 -0400
 References: <20170807085703.32267-1-lprosek@redhat.com>
-	<20170807085703.32267-2-lprosek@redhat.com>
+	<20170807085703.32267-4-lprosek@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <940cc5b5-623d-9a47-47ce-72e84a93d952@redhat.com>
-Date: Mon, 7 Aug 2017 16:19:26 +0200
+Message-ID: <cfa7082c-9809-7226-c891-9576c2eda82a@redhat.com>
+Date: Mon, 7 Aug 2017 16:22:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170807085703.32267-2-lprosek@redhat.com>
+In-Reply-To: <20170807085703.32267-4-lprosek@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] i386/kvm: use a switch statement
- for MSR detection
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] i386/kvm: introduce
+ tsc_is_stable_and_known()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +33,46 @@ To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, mtosatti@redhat.com, rkrcmar@redhat.com
 
 On 07.08.2017 10:57, Ladi Prosek wrote:
-> Switch is easier on the eye and might lead to better codegen.
+> Move the "is TSC stable and known" condition to a reusable helper.
 > 
 > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 > ---
->  target/i386/kvm.c | 75 +++++++++++++++++++++++--------------------------------
->  1 file changed, 31 insertions(+), 44 deletions(-)
+>  target/i386/kvm.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 > 
 > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6db7783..b14a0db 100644
+> index 15d56ae..2dc01c9 100644
 > --- a/target/i386/kvm.c
 > +++ b/target/i386/kvm.c
-> @@ -1081,65 +1081,52 @@ static int kvm_get_supported_msrs(KVMState *s)
->              int i;
+> @@ -611,6 +611,15 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
+>      return 0;
+>  }
 >  
->              for (i = 0; i < kvm_msr_list->nmsrs; i++) {
-> -                if (kvm_msr_list->indices[i] == MSR_STAR) {
-> +                switch (kvm_msr_list->indices[i]) {
-> +                case MSR_STAR:
->                      has_msr_star = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_VM_HSAVE_PA) {
-> +                    break;
-> +                case MSR_VM_HSAVE_PA:
->                      has_msr_hsave_pa = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_TSC_AUX) {
-> +                    break;
-> +                case MSR_TSC_AUX:
->                      has_msr_tsc_aux = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_TSC_ADJUST) {
-> +                    break;
-> +                case MSR_TSC_ADJUST:
->                      has_msr_tsc_adjust = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_IA32_TSCDEADLINE) {
-> +                    break;
-> +                case MSR_IA32_TSCDEADLINE:
->                      has_msr_tsc_deadline = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_IA32_SMBASE) {
-> +                    break;
-> +                case MSR_IA32_SMBASE:
->                      has_msr_smbase = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_IA32_MISC_ENABLE) {
-> +                    break;
-> +                case MSR_IA32_MISC_ENABLE:
->                      has_msr_misc_enable = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_IA32_BNDCFGS) {
-> +                    break;
-> +                case MSR_IA32_BNDCFGS:
->                      has_msr_bndcfgs = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == MSR_IA32_XSS) {
-> +                    break;
-> +                case MSR_IA32_XSS:
->                      has_msr_xss = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_CRASH_CTL) {
-> +                    break;;
-> +                case HV_X64_MSR_CRASH_CTL:
->                      has_msr_hv_crash = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_RESET) {
-> +                    break;
-> +                case HV_X64_MSR_RESET:
->                      has_msr_hv_reset = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_INDEX) {
-> +                    break;
-> +                case HV_X64_MSR_VP_INDEX:
->                      has_msr_hv_vpindex = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_RUNTIME) {
-> +                    break;
-> +                case HV_X64_MSR_VP_RUNTIME:
->                      has_msr_hv_runtime = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_SCONTROL) {
-> +                    break;
-> +                case HV_X64_MSR_SCONTROL:
->                      has_msr_hv_synic = true;
-> -                    continue;
-> -                }
-> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_STIMER0_CONFIG) {
-> +                    break;
-> +                case HV_X64_MSR_STIMER0_CONFIG:
->                      has_msr_hv_stimer = true;
-> -                    continue;
-> +                    break;
->                  }
->              }
->          }
+> +static bool tsc_is_stable_and_known(CPUX86State *env)
+> +{
+> +    if (!env->tsc_khz) {
+> +        return false;
+> +    }
+> +    return (env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC)
+> +        || env->user_tsc_khz;
+> +}> +
+>  static int hyperv_handle_properties(CPUState *cs)
+>  {
+>      X86CPU *cpu = X86_CPU(cs);
+> @@ -986,9 +995,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          && cpu->expose_kvm
+>          && kvm_base == KVM_CPUID_SIGNATURE
+>          /* TSC clock must be stable and known for this feature. */
+> -        && ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC)
+> -            || env->user_tsc_khz != 0)
+> -        && env->tsc_khz != 0) {
+> +        && tsc_is_stable_and_known(env)) {
+>  
+>          c = &cpuid_data.entries[cpuid_i++];
+>          c->function = KVM_CPUID_SIGNATURE | 0x10;
 > 
 
-Think you forgot to add my r-b.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
