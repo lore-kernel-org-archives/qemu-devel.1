@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58751)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dep0S-0008VB-Ry
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 16:52:14 -0400
+	id 1dep78-0001r9-Lw
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 16:59:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dep0N-00015Q-Aa
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 16:52:08 -0400
+	id 1dep73-0006Gg-Nr
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 16:59:02 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170807203007.19033-1-eblake@redhat.com>
-	<20170807203007.19033-3-eblake@redhat.com>
+References: <1502116754-18867-1-git-send-email-peter.maydell@linaro.org>
+	<1502116754-18867-3-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <07ae8d5d-ed33-23d9-639a-28ae5e7886f1@amsat.org>
-Date: Mon, 7 Aug 2017 17:51:45 -0300
+Message-ID: <3913adf1-78be-e668-57d6-5f9ba2910962@amsat.org>
+Date: Mon, 7 Aug 2017 17:58:52 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170807203007.19033-3-eblake@redhat.com>
+In-Reply-To: <1502116754-18867-3-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] qcow: Check failure of
- bdrv_getlength() and bdrv_truncate()
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] loader: Ignore zero-sized
+ ELF segments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,179 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Hua Yanghao <huayanghao@gmail.com>, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On 08/07/2017 05:30 PM, Eric Blake wrote:
-> This also requires changing the return type of get_cluster_offset()
-> and adjusting all callers.
+On 08/07/2017 11:39 AM, Peter Maydell wrote:
+> Some ELF files have program headers that specify segments that
+> are of zero size. Ignore them, rather than trying to create
+> zero-length ROM blobs for them, because the zero-length blob
+> can falsely trigger the overlapping-ROM-blobs check.
 > 
-> Use osdep.h macros instead of open-coded rounding while in the
-> area.
-> 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->   block/qcow.c | 64 ++++++++++++++++++++++++++++++++++++++++++------------------
->   1 file changed, 45 insertions(+), 19 deletions(-)
+>   include/hw/elf_ops.h | 24 +++++++++++++++++-------
+>   1 file changed, 17 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/qcow.c b/block/qcow.c
-> index c08cdc4a7b..937023d447 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -347,16 +347,17 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
->    * 'compressed_size'. 'compressed_size' must be > 0 and <
->    * cluster_size
->    *
-> - * return 0 if not allocated.
-> + * return 0 if not allocated, -errno on failure.
->    */
-> -static uint64_t get_cluster_offset(BlockDriverState *bs,
-> -                                   uint64_t offset, int allocate,
-> -                                   int compressed_size,
-> -                                   int n_start, int n_end)
-> +static int64_t get_cluster_offset(BlockDriverState *bs,
-> +                                  uint64_t offset, int allocate,
-> +                                  int compressed_size,
-> +                                  int n_start, int n_end)
->   {
->       BDRVQcowState *s = bs->opaque;
->       int min_index, i, j, l1_index, l2_index;
-> -    uint64_t l2_offset, *l2_table, cluster_offset, tmp;
-> +    int64_t l2_offset, cluster_offset;
-> +    uint64_t *l2_table, tmp;
->       uint32_t min_count;
->       int new_l2_table;
-> 
-> @@ -368,8 +369,11 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
->               return 0;
->           /* allocate a new l2 entry */
->           l2_offset = bdrv_getlength(bs->file->bs);
-> +        if (l2_offset < 0) {
-> +            return l2_offset;
-> +        }
->           /* round to cluster size */
-> -        l2_offset = (l2_offset + s->cluster_size - 1) & ~(s->cluster_size - 1);
-> +        l2_offset = QEMU_ALIGN_UP(l2_offset, s->cluster_size);
->           /* update the L1 entry */
->           s->l1_table[l1_index] = l2_offset;
->           tmp = cpu_to_be64(l2_offset);
-> @@ -430,8 +434,10 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
->               if (decompress_cluster(bs, cluster_offset) < 0)
->                   return 0;
->               cluster_offset = bdrv_getlength(bs->file->bs);
-> -            cluster_offset = (cluster_offset + s->cluster_size - 1) &
-> -                ~(s->cluster_size - 1);
-> +            if (cluster_offset < 0) {
-> +                return cluster_offset;
-> +            }
-> +            cluster_offset = QEMU_ALIGN_UP(cluster_offset, s->cluster_size);
->               /* write the cluster content */
->               if (bdrv_pwrite(bs->file, cluster_offset, s->cluster_cache,
->                               s->cluster_size) !=
-> @@ -439,12 +445,19 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
->                   return -1;
->           } else {
->               cluster_offset = bdrv_getlength(bs->file->bs);
-> +            if (cluster_offset < 0) {
-> +                return cluster_offset;
-> +            }
->               if (allocate == 1) {
-> +                int ret;
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index 2e526d3..d192e7e 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -451,14 +451,24 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>                   *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
+>               }
+>   
+> -            if (load_rom) {
+> -                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
+> -
+> -                /* rom_add_elf_program() seize the ownership of 'data' */
+> -                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
+> -            } else {
+> -                cpu_physical_memory_write(addr, data, file_size);
+> +            if (mem_size == 0) {
+> +                /* Some ELF files really do have segments of zero size;
+> +                 * just ignore them rather than trying to create empty
+> +                 * ROM blobs, because the zero-length blob can falsely
+> +                 * trigger the overlapping-ROM-blobs check.
+> +                 */
+>                   g_free(data);
+> +            } else {
+> +                if (load_rom) {
+> +                    snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
 > +
->                   /* round to cluster size */
-> -                cluster_offset = (cluster_offset + s->cluster_size - 1) &
-> -                    ~(s->cluster_size - 1);
-> -                bdrv_truncate(bs->file, cluster_offset + s->cluster_size,
-> -                              PREALLOC_MODE_OFF, NULL);
-> +                cluster_offset = QEMU_ALIGN_UP(cluster_offset, s->cluster_size);
-> +                ret = bdrv_truncate(bs->file, cluster_offset + s->cluster_size,
-> +                                    PREALLOC_MODE_OFF, NULL);
-> +                if (ret < 0) {
-> +                    return ret;
+> +                    /* rom_add_elf_program() seize the ownership of 'data' */
+> +                    rom_add_elf_program(label, data, file_size, mem_size,
+> +                                        addr, as);
+> +                } else {
+> +                    cpu_physical_memory_write(addr, data, file_size);
+> +                    g_free(data);
 > +                }
->                   /* if encrypted, we must initialize the cluster
->                      content which won't be written */
->                   if (bs->encrypted &&
-> @@ -491,11 +504,14 @@ static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
->   {
->       BDRVQcowState *s = bs->opaque;
->       int index_in_cluster, n;
-> -    uint64_t cluster_offset;
-> +    int64_t cluster_offset;
-> 
->       qemu_co_mutex_lock(&s->lock);
->       cluster_offset = get_cluster_offset(bs, sector_num << 9, 0, 0, 0, 0);
->       qemu_co_mutex_unlock(&s->lock);
-> +    if (cluster_offset < 0) {
-> +        return cluster_offset;
-> +    }
->       index_in_cluster = sector_num & (s->cluster_sectors - 1);
->       n = s->cluster_sectors - index_in_cluster;
->       if (n > nb_sectors)
-> @@ -567,7 +583,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
->       BDRVQcowState *s = bs->opaque;
->       int index_in_cluster;
->       int ret = 0, n;
-> -    uint64_t cluster_offset;
-> +    int64_t cluster_offset;
->       struct iovec hd_iov;
->       QEMUIOVector hd_qiov;
->       uint8_t *buf;
-> @@ -588,8 +604,10 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-> 
->       while (nb_sectors != 0) {
->           /* prepare next request */
-> -        cluster_offset = get_cluster_offset(bs, sector_num << 9,
-> -                                                 0, 0, 0, 0);
-> +        cluster_offset = get_cluster_offset(bs, sector_num << 9, 0, 0, 0, 0);
-> +        if (cluster_offset < 0) {
-> +            return cluster_offset;
-> +        }
->           index_in_cluster = sector_num & (s->cluster_sectors - 1);
->           n = s->cluster_sectors - index_in_cluster;
->           if (n > nb_sectors) {
-> @@ -670,7 +688,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
->   {
->       BDRVQcowState *s = bs->opaque;
->       int index_in_cluster;
-> -    uint64_t cluster_offset;
-> +    int64_t cluster_offset;
->       int ret = 0, n;
->       struct iovec hd_iov;
->       QEMUIOVector hd_qiov;
-> @@ -704,6 +722,10 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
->           cluster_offset = get_cluster_offset(bs, sector_num << 9, 1, 0,
->                                               index_in_cluster,
->                                               index_in_cluster + n);
-> +        if (cluster_offset < 0) {
-> +            ret = cluster_offset;
-> +            break;
-> +        }
->           if (!cluster_offset || (cluster_offset & 511) != 0) {
->               ret = -EIO;
->               break;
-> @@ -949,7 +971,7 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
->       z_stream strm;
->       int ret, out_len;
->       uint8_t *buf, *out_buf;
-> -    uint64_t cluster_offset;
-> +    int64_t cluster_offset;
-> 
->       buf = qemu_blockalign(bs, s->cluster_size);
->       if (bytes != s->cluster_size) {
-> @@ -1003,6 +1025,10 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
->       qemu_co_mutex_lock(&s->lock);
->       cluster_offset = get_cluster_offset(bs, offset, 2, out_len, 0, 0);
->       qemu_co_mutex_unlock(&s->lock);
-> +    if (cluster_offset < 0) {
-> +        ret = cluster_offset;
-> +        goto fail;
-> +    }
->       if (cluster_offset == 0) {
->           ret = -EIO;
->           goto fail;
+>               }
+>   
+>               total_size += mem_size;
 > 
