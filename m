@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1deicN-00034S-Ks
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1deifR-0004pg-08
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1deicI-00044s-S1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:51 -0400
-Date: Mon, 7 Aug 2017 16:02:27 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170807140227.GG6578@localhost.localdomain>
-References: <20170804144354.21985-1-kwolf@redhat.com>
-	<5af7c79e-130c-1010-e164-3989fd1c27fb@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1deifP-0005yZ-Ql
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:06:01 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
-Content-Disposition: inline
-In-Reply-To: <5af7c79e-130c-1010-e164-3989fd1c27fb@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/null: Remove 'filename'
- option
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <b750ff8d579d000c010c7465185801cfe8bb7a7d.1502109078.git.jcody@redhat.com>
+References: <cover.1502109078.git.jcody@redhat.com>
+	<b750ff8d579d000c010c7465185801cfe8bb7a7d.1502109078.git.jcody@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
+Date: Mon, 7 Aug 2017 11:05:56 -0300
+Message-ID: <CAAdtpL5evTV7OSNsgtNYc0oCkwYqywYoSDAECXDmf6a_xUWYAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 2/4] block/vhdx: check for
+ offset overflow to bdrv_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
+On Mon, Aug 7, 2017 at 9:38 AM, Jeff Cody <jcody@redhat.com> wrote:
+> VHDX uses uint64_t types for most offsets, following the VHDX spec.
+> However, bdrv_truncate() takes an int64_t value for the truncating
+> offset.  Check for overflow before calling bdrv_truncate().
+>
+> While we are here, replace the bit shifting with QEMU_ALIGN_UP as well.
+>
+> N.B.: For a compliant image this is not an issue, as the maximum VHDX
+> image size is defined per the spec to be 64TB.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 
---EVF5PPMfhYS0aIcm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Am 04.08.2017 um 16:56 hat Eric Blake geschrieben:
-> On 08/04/2017 09:43 AM, Kevin Wolf wrote:
-> > This option was only added to allow 'null-co://' and 'null-aio://' as
-> > filenames, its value never served any actual purpose and was ignored.
-> > Nevertheless it was accepted as '-drive driver=3Dnull,filename=3Dfoo'.
-> >=20
-> > The correct way to enable the protocol prefixes (and that without adding
-> > a useless -drive option) is implementing .bdrv_parse_filename. This is
-> > what this patch does.
-> >=20
-> > Technically, this is an incompatible change, but the null block driver
-> > is only used for benchmarking, testing and debugging, and an option
-> > without effect isn't likely to be used by anyone anyway, so no bad
-> > effects are to be expected.
->=20
-> Agreed with the analysis. Still, better to get it into 2.10 rather than
-> going yet another release with the option available.
-
-Makes sense. Applied to the block branch.
-
-Kevin
-
---EVF5PPMfhYS0aIcm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZiHLzAAoJEH8JsnLIjy/WYLAQAMnYl2E8e2769IyHwMDbtjwc
-s6jOGxxka9E06v9u4N4aJqXirXnIf5CjdVeePkI5jyYQpQm5CDfhjS16qgWm6ksG
-8S3XLrT7/1HT6MyW1xPrJtEaeIf6+h5+GBDT4SJAzQQWHkUEHXhvo8HgDjxQxT25
-ERx2LJzunCrFz3hvhZyJtPebDyjl0sFsitqWOjPw+Ycplp5FmZMRhzntIWYJuGPY
-b8OXxpNowYABFJDoxhnHiZ43Qrdk9utCwrTvajqxts43tm+nbw/pFz7JKjaPEow2
-OYsUYoiNbDzpB7SmND35Lsbx5W4EuIMpGOIHibtX4DXIAAISFbjvWx0/TeHt7Tnc
-g1HWpB8StDly0zbSxWpHlpVS10vJ9C8cufSHh6thVC9dLrLgMHwz0nwdYf93SwtL
-uOcJB9D8wLsymEzFBzM+Kp7S9/MMZmNiHuH2NFHeOqQLb4TFq4PtNRYbcAJXH4l/
-wyupWzgGUI24dSd5iJ0b1Dl/CBqkerCtsva6amASkONEmfx+6fIRQhxugtbnK+vt
-sMT0vZ5rSdnzW4pJ/xBnas/zVDNP7g7Rye5ki/CMcni4WMwclgdjAuvGEVlAP0/a
-Q6ZRGHM4BkhRJgSDJH81UOYHV7EcsiaoSuEh1G/yrv3M3Uxgu6UvS5z7oJbL33Co
-+I7PIQ/vBs3UOdvldOvU
-=/iKN
------END PGP SIGNATURE-----
-
---EVF5PPMfhYS0aIcm--
+> ---
+>  block/vhdx-log.c | 6 +++++-
+>  block/vhdx.c     | 3 +++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+> index 2e26fd4..9597223 100644
+> --- a/block/vhdx-log.c
+> +++ b/block/vhdx-log.c
+> @@ -553,7 +553,11 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRV=
+VHDXState *s,
+>              new_file_size =3D desc_entries->hdr.last_file_offset;
+>              if (new_file_size % (1024*1024)) {
+>                  /* round up to nearest 1MB boundary */
+> -                new_file_size =3D ((new_file_size >> 20) + 1) << 20;
+> +                new_file_size =3D QEMU_ALIGN_UP(new_file_size, MiB);
+> +                if (new_file_size > INT64_MAX) {
+> +                    ret =3D -EINVAL;
+> +                    goto exit;
+> +                }
+>                  bdrv_truncate(bs->file, new_file_size, PREALLOC_MODE_OFF=
+, NULL);
+>              }
+>          }
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 37224b8..7ae4589 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -1177,6 +1177,9 @@ static int vhdx_allocate_block(BlockDriverState *bs=
+, BDRVVHDXState *s,
+>
+>      /* per the spec, the address for a block is in units of 1MB */
+>      *new_offset =3D ROUND_UP(*new_offset, 1024 * 1024);
+> +    if (*new_offset > INT64_MAX) {
+> +        return -EINVAL;
+> +    }
+>
+>      return bdrv_truncate(bs->file, *new_offset + s->block_size,
+>                           PREALLOC_MODE_OFF, NULL);
+> --
+> 2.9.4
+>
+>
