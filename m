@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1delm4-0004Eh-M1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:09 -0400
+	(envelope-from <groug@kaod.org>) id 1delmG-0004S1-Ry
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dellz-0002Hs-KL
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:04 -0400
-Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:60933)
+	(envelope-from <groug@kaod.org>) id 1delmB-0002Uf-Vf
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:16 -0400
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:33436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dellz-0002HS-ET
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:24:59 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1delmB-0002TA-Pg
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:11 -0400
 Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 715CA8B4AA
-	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 19:24:58 +0200 (CEST)
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 65A948B49E
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 19:25:10 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 07 Aug 2017 19:24:51 +0200
-Message-ID: <150212669147.12227.8408662555599046182.stgit@bahia>
+Date: Mon, 07 Aug 2017 19:25:03 +0200
+Message-ID: <150212670348.12227.5534815630591997333.stgit@bahia>
 In-Reply-To: <150212666472.12227.5292551535430570753.stgit@bahia>
 References: <150212666472.12227.5292551535430570753.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.10 PATCH 2/3] spapr_drc: add Error ** argument
- to spapr_dr_connector_new()
+Subject: [Qemu-devel] [for-2.10 PATCH 3/3] spapr: error out if PHB fails to
+ setup PCI DRCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +33,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-This just allow spapr_dr_connector_new() to propagate errors to its
-callers. It doesn't change any functionality.
+It is currently possible to start QEMU with two PHBs without using the
+index property:
+
+-device spapr-pci-host-bridge,id=pci1,\
+                              buid=0x800000020000001,\
+                              liobn=0x80000100,\
+                              liobn64=0x80000101,\
+                              mem_win_addr=0x200100000000,\
+                              mem64_win_addr=0x220000000000,\
+                              io_win_addr=0x200000010000 \
+-device spapr-pci-host-bridge,id=pci2,\
+                              buid=0x800000020000002,\
+                              liobn=0x80000200,\
+                              liobn64=0x80000201,\
+                              mem_win_addr=0x200180000000,\
+                              mem64_win_addr=0x230000000000,\
+                              io_win_addr=0x200000020000 \
+
+Each PHB has its index property equal to -1. As a consequence, each PHB
+will want to create PCI DRCs with the same ids:
+
+    /* allocate connectors for child PCI devices */
+    if (sphb->dr_enabled) {
+        for (i = 0; i < PCI_SLOT_MAX * 8; i++) {
+            spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
+                                   (sphb->index << 16) | i);
+        }
+    }
+
+When DRC objects are added to the composition tree, an alias using the
+DRC id is created in the "/dr-connector" path. But DRC ids are supposed
+to be globally unique and the alias creation fails, leaving the DRC
+object unrealized, which isn't expected by the rest of the DR logic.
+
+This has the effect of silently turning-off PCI hotplug support (ie, PCI
+hotplug no longer works on any PHB and no error message is printed).
+
+This bug always existed and would even cause a non-fatal error to be
+reported on the console (until recent commit bf26ae32a92a). This patch
+causes the error message to be printed again and QEMU to exit.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c             |    4 ++--
- hw/ppc/spapr_drc.c         |    4 ++--
- hw/ppc/spapr_pci.c         |    2 +-
- include/hw/ppc/spapr_drc.h |    2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
+ hw/ppc/spapr_pci.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f7a19720dcdf..2bc3dbc25653 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2023,7 +2023,7 @@ static void spapr_create_lmb_dr_connectors(sPAPRMachineState *spapr)
- 
-         addr = i * lmb_size + spapr->hotplug_memory.base;
-         spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_LMB,
--                               addr / lmb_size);
-+                               addr / lmb_size, NULL);
-     }
- }
- 
-@@ -2118,7 +2118,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- 
-         if (mc->has_hotpluggable_cpus) {
-             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
--                                   (core_id / smp_threads) * smt);
-+                                   (core_id / smp_threads) * smt, NULL);
-         }
- 
-         if (i < boot_cores_nr) {
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 5260b5d363a0..061fff41654a 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -532,7 +532,7 @@ static void unrealize(DeviceState *d, Error **errp)
- }
- 
- sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
--                                         uint32_t id)
-+                                         uint32_t id, Error **errp)
- {
-     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(object_new(type));
-     char *prop_name;
-@@ -542,7 +542,7 @@ sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
-     prop_name = g_strdup_printf("dr-connector[%"PRIu32"]",
-                                 spapr_drc_index(drc));
-     object_property_add_child(owner, prop_name, OBJECT(drc), &error_abort);
--    object_property_set_bool(OBJECT(drc), true, "realized", NULL);
-+    object_property_set_bool(OBJECT(drc), true, "realized", errp);
-     g_free(prop_name);
- 
-     return drc;
 diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index d84abf1070a0..4b7882e3613d 100644
+index 4b7882e3613d..4a1e6c5f697c 100644
 --- a/hw/ppc/spapr_pci.c
 +++ b/hw/ppc/spapr_pci.c
-@@ -1733,7 +1733,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+@@ -1731,9 +1731,16 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ 
+     /* allocate connectors for child PCI devices */
      if (sphb->dr_enabled) {
++        Error *local_err = NULL;
++
          for (i = 0; i < PCI_SLOT_MAX * 8; i++) {
              spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
--                                   (sphb->index << 16) | i);
-+                                   (sphb->index << 16) | i, NULL);
+-                                   (sphb->index << 16) | i, NULL);
++                                   (sphb->index << 16) | i, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                error_prepend(errp, "Failed to create DRC: ");
++                return;
++            }
          }
      }
  
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index a7958d0a8d14..8651af2ffae0 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -248,7 +248,7 @@ uint32_t spapr_drc_index(sPAPRDRConnector *drc);
- sPAPRDRConnectorType spapr_drc_type(sPAPRDRConnector *drc);
- 
- sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *type,
--                                         uint32_t id);
-+                                         uint32_t id, Error **errp);
- sPAPRDRConnector *spapr_drc_by_index(uint32_t index);
- sPAPRDRConnector *spapr_drc_by_id(const char *type, uint32_t id);
- int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
