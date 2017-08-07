@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1deSyw-00080R-AQ
-	for qemu-devel@nongnu.org; Sun, 06 Aug 2017 17:21:07 -0400
+	(envelope-from <famz@redhat.com>) id 1deXrj-0005mn-Ch
+	for qemu-devel@nongnu.org; Sun, 06 Aug 2017 22:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1deSyr-0006io-C6
-	for qemu-devel@nongnu.org; Sun, 06 Aug 2017 17:21:06 -0400
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:35253)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1deSyr-0006hU-5s
-	for qemu-devel@nongnu.org; Sun, 06 Aug 2017 17:21:01 -0400
-Received: by mail-wm0-f48.google.com with SMTP id m85so54901646wma.0
-	for <qemu-devel@nongnu.org>; Sun, 06 Aug 2017 14:21:01 -0700 (PDT)
-References: <CAFEAcA-Se9r30gHpYd34vF0Z-yQbDtpOBi8qyqvtTXMja85Zdg@mail.gmail.com>
-	<20170804174843.GE2087@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4691b84-d83e-4bec-117d-1d7637ac35f1@redhat.com>
-Date: Sun, 6 Aug 2017 23:20:56 +0200
+	(envelope-from <famz@redhat.com>) id 1deXrf-0006W3-73
+	for qemu-devel@nongnu.org; Sun, 06 Aug 2017 22:33:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57148)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1deXrf-0006Sl-15
+	for qemu-devel@nongnu.org; Sun, 06 Aug 2017 22:33:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B767C04B930
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 02:26:06 +0000 (UTC)
+Date: Mon, 7 Aug 2017 10:26:03 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170807022603.GA28516@lemon>
+References: <20170804213625.3756-1-ehabkost@redhat.com>
+	<20170805145620.GE14780@lemon>
+	<20170805191133.GL3108@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170804174843.GE2087@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Do we need a "virt-2.10" machine type before the
- 2.10 release?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170805191133.GL3108@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 0/5] qmp-shell non-interactive
+ mode, delete scripts/qmp/qmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-On 04/08/2017 19:48, Dr. David Alan Gilbert wrote:
->>
->> (I don't know if there have in fact been any changes between
->> 2.9 and 2.10 that would be compatibility issues.)
-> I think there's two sub questions:
->   a) The virt-2.9 needs to pick up HW_COMPAT_2_9 if anything
->   in it is relevant for ARM
+On Sat, 08/05 16:11, Eduardo Habkost wrote:
+> On Sat, Aug 05, 2017 at 10:56:20PM +0800, Fam Zheng wrote:
+> > On Fri, 08/04 18:36, Eduardo Habkost wrote:
+> > > This series adds the ability to run QMP commands
+> > > non-interactively to qmp-shell, and deletes scripts/qmp/qmp.
+> > 
+> > Hmm, not so simple:
+> > 
+> > $ git grep 'import qmp'
+> > scripts/qemu.py:import qmp.qmp
+> > scripts/qmp/qemu-ga-client:import qmp
+> > scripts/qmp/qmp-shell:import qmp
+> > scripts/qtest.py:import qmp.qmp
+> > tests/migration/guestperf/engine.py:import qmp.qmp
+> 
+> I'm deleting scripts/qmp/qmp, not scripts/qmp/qmp.py.
 
-Except for intel-iommu, everything else in HW_COMPAT_2_9 is relevant for
-virt-2.9.  This implies that a virt-2.10 would be useful too.
+Yeah, OK, I was confused.
 
-Paolo
-
->   b) If anything is relevant in it for ARM then you probably
->   want a virt-2.10 so that you can take advantage of whatever
->   was changed that needed compatibility adding in HW_COMPAT_2_9
+Fam
