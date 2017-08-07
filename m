@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dekKa-000836-Ss
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dekPJ-0003ZN-Bh
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dekKV-0005t2-UM
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dekKV-0005sU-Li
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:52:31 -0400
-References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
-	<1501964994-5257-3-git-send-email-zuban32s@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
-Date: Mon, 7 Aug 2017 18:52:18 +0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dekPE-0000pu-Fd
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:29 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+	<9a27b8cf-f149-cb7c-681d-f4f7249bfbd5@redhat.com>
+	<5eca1bca-59cc-2d63-1413-0e3b87ebcb80@virtuozzo.com>
+Message-ID: <eedd0b75-c651-3902-4ba2-b8079da1b1a9@virtuozzo.com>
+Date: Mon, 7 Aug 2017 18:57:20 +0300
 MIME-Version: 1.0
-In-Reply-To: <1501964994-5257-3-git-send-email-zuban32s@gmail.com>
+In-Reply-To: <5eca1bca-59cc-2d63-1413-0e3b87ebcb80@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] pci: add QEMU-specific PCI
- capability structure
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-2.10] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,119 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org
-Cc: mst@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com
 
-On 05/08/2017 23:29, Aleksandr Bezzubikov wrote:
-> On PCI init PCI bridge devices may need some
-> extra info about bus number to reserve, IO, memory and
-> prefetchable memory limits. QEMU can provide this
-> with special vendor-specific PCI capability.
-> 
-> This capability is intended to be used only
-> for Red Hat PCI bridges, i.e. QEMU cooperation.
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->   src/fw/dev-pci.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 50 insertions(+)
->   create mode 100644 src/fw/dev-pci.h
-> 
-> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
-> new file mode 100644
-> index 0000000..2c8ddb0
+07.08.2017 18:46, Vladimir Sementsov-Ogievskiy wrote:
+> 07.08.2017 17:29, Eric Blake wrote:
+>> On 08/07/2017 09:16 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 185 iotest is broken.
+>>>
+>>> How to test:
+>>>> i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
+>>>    done; echo N = $i
+>>>
+>>> finished for me like this:
+>>>
+>>> 185 2s ... - output mismatch (see 185.out.bad)
+>>> --- /work/src/qemu/master/tests/qemu-iotests/185.out 2017-07-14 \
+>>>      15:14:29.520343805 +0300
+>>> +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
+>>> @@ -37,7 +37,7 @@
+>>>   {"return": {}}
+>>>   {"return": {}}
+>>>   {"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, \
+>>>       "event": "SHUTDOWN", "data": {"guest": false}}
+>>> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, \
+>>>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+>>>          "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
+>>>              "mirror"}}
+>>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, \
+>>>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+>>>          "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
+>> This diff says both 'len' and 'offset' differ...
+>>
+>>>   === Start backup job and exit qemu ===
+>>>
+>>> Failures: 185
+>>> Failed 1 of 1 tests
+>>> N = 8
+>>>
+>>> It doesn't seems logical to expect the constant offset on cancel,
+>>> so let filter it out.
+>> s/let/let's/
+>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   tests/qemu-iotests/185     | 2 +-
+>>>   tests/qemu-iotests/185.out | 2 +-
+>>>   2 files changed, 2 insertions(+), 2 deletions(-)
+>>> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, 
+>>> "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 
+>>> 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
+>>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, 
+>>> "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 
+>>> 4194304, "offset": OFFSET, "speed": 65536, "type": "mirror"}}
+>> ...while this diff only touched 'offset'.  Did you copy-and-paste
+>> incorrectly in the commit message?  If so, then with the commit message
+>> fixed, I'm okay with:
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+> Hmm, I can't reproduce with "len = 0", and it looks impossible. But 
+> I've scrolled up in one of my terminals and found this reproduce, 
+> really, '"len": 0', so, that is possible.
+>
+> And, after looking through the code it looks like it really possible - 
+> s->common.len is set not in the very beginning, but after for ex. call 
+> to block_job_pause_point().
+>
+> So, the reproduction that I've copied into commit message was very 
+> good match.
+>
+> But, I'm not sure, that len should be fixed in the same way. May be it 
+> would be better to set earlier and don't update on each iteration (why 
+> is it updated??)
+>
+>
 
-Hi Aleksandr,
-
-> --- /dev/null
-> +++ b/src/fw/dev-pci.h
-> @@ -0,0 +1,50 @@
-> +#ifndef _PCI_CAP_H
-> +#define _PCI_CAP_H
-> +
-> +#include "types.h"
-> +
-> +/*
-> +
-
-Please use the standard comment:
-
-/*
-  *
-  *
-  */
+So, IMHO, this patch is good (with s/"len": 0/"len": 4194304/ and 
+s/let/let's/ in commit message)
 
 
-> +QEMU-specific vendor(Red Hat)-specific capability.
-> +It's intended to provide some hints for firmware to init PCI devices.
-> +
-> +Its structure is shown below:
-> +
-> +Header:
-> +
-> +u8 id;       Standard PCI Capability Header field
-> +u8 next;     Standard PCI Capability Header field
-> +u8 len;      Standard PCI Capability Header field
-> +u8 type;     Red Hat vendor-specific capability type:
-> +               now only REDHAT_CAP_TYP_QEMU=1 exists
-
-Typo o the line before, but I think you don't need it there.
-
-> +Data:
-> +
-> +u32 bus_res;            minimum bus number to reserve;
-> +                        this is necessary for PCI Express Root Ports
-> +                        to support PCIE-to-PCI bridge hotplug
-
-I would add a broader class of usage:
-      necessary for nesting PCI bridges hotplug.
-
-> +u64 io;                 IO space to reserve
-> +u64 mem;                non-prefetchable memory space to reserve
-> +u64 prefetchable_mem;   prefetchable memory space to reserve
-> +
-
-Layout looks good to me.
-
-> +If any field value in Data section is -1,
-> +it means that such kind of reservation
-> +is not needed and must be ignored.
-> +
-
--1 is not a valid value for unsigned fields, you may
-want to say 0xff..f or some other way.
-
-> +*/
-> +
-> +/* Offset of vendor-specific capability type field */
-> +#define PCI_CAP_REDHAT_TYPE  3
-
-May I ask why why '3'? I am not against it, I just
-want to understand the number.
-
-> +
-> +/* List of valid Red Hat vendor-specific capability types */
-> +#define REDHAT_CAP_TYPE_QEMU    1
-
-I think I pointed this in another thread, the name is
-too vague, please change it to something like:
-    REDHAT_CAP_RES_RESERVE_QEMU
-that narrows down the intend.
-
-> +
-> +
-> +/* Offsets of QEMU capability fields */
-> +#define QEMU_PCI_CAP_BUS_RES        4
-> +#define QEMU_PCI_CAP_LIMITS_OFFSET  8
-> +#define QEMU_PCI_CAP_IO             8
-> +#define QEMU_PCI_CAP_MEM            16
-> +#define QEMU_PCI_CAP_PREF_MEM       24
-> +#define QEMU_PCI_CAP_SIZE           32
-> +
-> +#endif /* _PCI_CAP_H */
-> 
-
-The layout looks good to me.
-
-Thanks,
-Marcel
+-- 
+Best regards,
+Vladimir
