@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1deeAI-0001pr-DC
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 05:17:35 -0400
+	(envelope-from <knut.omang@oracle.com>) id 1deeED-0003WZ-9Z
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 05:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1deeAH-0008A5-Cx
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 05:17:34 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:36511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1deeAH-00089A-69
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 05:17:33 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id t201so2214410wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 02:17:31 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170803181224.21748-1-rth@twiddle.net>
-References: <20170803181224.21748-1-rth@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Aug 2017 10:17:09 +0100
-Message-ID: <CAFEAcA9UP+PZug-i-Pn_0Wq3HobOwXUXaTEYtrwT7Rmh2bjqTQ@mail.gmail.com>
+	(envelope-from <knut.omang@oracle.com>) id 1deeEA-0001SV-4F
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 05:21:37 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:28975)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1deeE9-0001Rf-QM
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 05:21:34 -0400
+Message-ID: <1502097685.3624.6.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Mon, 07 Aug 2017 11:21:25 +0200
+In-Reply-To: <20170807084524.GF18259@redhat.com>
+References: <cover.14d7e60ae019b1418a70bacc4e7d240fadf9c96c.1501362828.git-series.knut.omang@oracle.com>
+	<7c4ddf95a57f7dfa546c11f8a08a9091b8bd1ceb.1501362828.git-series.knut.omang@oracle.com>
+	<20170807084524.GF18259@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-2.10 0/3] TCG misc patches
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] tests: Add test-listen - a stress
+ test for QEMU socket listen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 3 August 2017 at 19:12, Richard Henderson <rth@twiddle.net> wrote:
-> Two of these have been posted before.  The third I discovered in
-> testing on a Sparc host yesterday.
->
->
-> r~
->
->
-> The following changes since commit aaaec6acad7cf97372d48c1b09126a09697519c8:
->
->   Update version for v2.10.0-rc1 release (2017-08-02 16:36:32 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20170803
->
-> for you to fetch changes up to 13aaef678ed377b12b76dc7fb9e615b2f2f9047b:
->
->   tcg: Increase minimum alignment from tcg_malloc to 8 (2017-08-03 11:00:30 -0700)
->
-> ----------------------------------------------------------------
-> Queued misc tcg patches
->
-> ----------------------------------------------------------------
-> Richard Henderson (3):
->       tcg/arm: Fix runtime overalignment test
->       target/s390x: Fix CSST for 16-byte store
->       tcg: Increase minimum alignment from tcg_malloc to 8
->
+On Mon, 2017-08-07 at 09:45 +0100, Daniel P. Berrange wrote:
+> On Sat, Jul 29, 2017 at 11:18:15PM +0200, Knut Omang wrote:
+> > There's a potential race condition between multiple bind()'s
+> > attempting to bind to the same port, which occasionally
+> > allows more than one bind to succeed against the same port.
+> >=20
+> > When a subsequent listen() call is made with the same socket
+> > only one will succeed.
+> >=20
+> > The current QEMU code does however not take this situation into account
+> > and the listen will cause the code to break out and fail even
+> > when there are actually available ports to use.
+> >=20
+> > This test exposes two subtests:
+> >=20
+> > /socket/listen-serial
+> > /socket/listen-compete
+> >=20
+> > The "compete" subtest creates a number of threads and have them all try=
+ing to bind
+> > to the same port with a large enough offset input to
+> > allow all threads to get it's own port.
+> > The "serial" subtest just does the same, except in series in a
+> > single thread.
+> >=20
+> > The serial version passes, probably in most versions of QEMU.
+> >=20
+> > The parallel version exposes the problem in a relatively reliable way,
+> > eg. it fails a majority of times, but not with a 100% rate, occasional
+> > passes can be seen. Nevertheless this is quite good given that
+> > the bug was tricky to reproduce and has been left undetected for
+> > a while.
+> >=20
+> > The problem seems to be present in all versions of QEMU.
+> >=20
+> > The original failure scenario occurred with VNC port allocation
+> > in a traditional Xen based build, in different code
+> > but with similar functionality.
+> >=20
+> > Reported-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> > Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+> > ---
+> > =C2=A0tests/Makefile.include |=C2=A0=C2=A0=C2=A02 +-
+> > =C2=A0tests/test-listen.c=C2=A0=C2=A0=C2=A0=C2=A0| 253 ++++++++++++++++=
+++++++++++++++++++++++++++-
+> > =C2=A02 files changed, 255 insertions(+)
+> > =C2=A0create mode 100644 tests/test-listen.c
+> >=20
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 7af278d..b37c0c8 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -128,6 +128,7 @@ check-unit-y +=3D tests/test-bufferiszero$(EXESUF)
+> > =C2=A0gcov-files-check-bufferiszero-y =3D util/bufferiszero.c
+> > =C2=A0check-unit-y +=3D tests/test-uuid$(EXESUF)
+> > =C2=A0check-unit-y +=3D tests/ptimer-test$(EXESUF)
+> > +#check-unit-y +=3D tests/test-listen$(EXESUF)
+> > =C2=A0gcov-files-ptimer-test-y =3D hw/core/ptimer.c
+> > =C2=A0check-unit-y +=3D tests/test-qapi-util$(EXESUF)
+> > =C2=A0gcov-files-test-qapi-util-y =3D qapi/qapi-util.c
+> > @@ -769,6 +770,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mpt=
+imer.o
+> > =C2=A0tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util=
+-obj-y)
+> > =C2=A0tests/numa-test$(EXESUF): tests/numa-test.o
+> > =C2=A0tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sect=
+or.o tests/acpi-utils.o
+> > +tests/test-listen$(EXESUF): tests/test-listen.o $(test-util-obj-y)
+> > =C2=A0
+> > =C2=A0tests/migration/stress$(EXESUF): tests/migration/stress.o
+> > =C2=A0	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o =
+$@ $< ,"LINK","$(TARGET_DIR)$@")
+> > diff --git a/tests/test-listen.c b/tests/test-listen.c
+> > new file mode 100644
+> > index 0000000..5c07537
+> > --- /dev/null
+> > +++ b/tests/test-listen.c
+> > @@ -0,0 +1,253 @@
+> > +/*
+> > + * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserv=
+ed.
+> > + *=C2=A0=C2=A0=C2=A0=C2=A0Author: Knut Omang <knut.omang@oracle.com>
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y
+> > + * it under the terms of the GNU General Public License version 2
+> > + * as published by the Free Software Foundation.
+>=20
+> Can you change that to "version 2 or later" - per the LICENSE file, we do=
+n't
+> accept contributions under "version 2 only" except for 4 specific subdirs=
+:
+>=20
+>=20
+> =C2=A0 "As of July 2013, contributions under version 2 of the GNU General=
+ Public
+> =C2=A0=C2=A0=C2=A0License (and no later version) are only accepted for th=
+e following files
+> =C2=A0=C2=A0=C2=A0or directories: bsd-user/, linux-user/, hw/vfio/, hw/xe=
+n/xen_pt*."
 
-Applied, thanks.
+Oh, sorry - I wasn't aware of this, +"...or later" is fine with me.
+Would you like me to send a v7 of the set with only that change, or can you=
+ amend=C2=A0
+it as part of the merge?
 
--- PMM
+Thanks,
+Knut
+
+>=20
+> > + *
+> > + * Test parallel port listen configuration with
+> > + * dynamic port allocation
+> > + */
+>=20
+>=20
+> Regards,
+> Daniel
