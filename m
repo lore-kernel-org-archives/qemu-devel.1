@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dejC1-0002qY-1l
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:39:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dejC4-00030s-5A
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:39:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dejBv-0006Vv-Nd
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:39:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dejBz-0006Y0-Cl
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:39:44 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Aug 2017 15:39:13 +0100
-Message-Id: <1502116754-18867-2-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  7 Aug 2017 15:39:14 +0100
+Message-Id: <1502116754-18867-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1502116754-18867-1-git-send-email-peter.maydell@linaro.org>
 References: <1502116754-18867-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] loader: Handle ELF files with overlapping
- zero-initialized data
+Subject: [Qemu-devel] [PATCH 2/2] loader: Ignore zero-sized ELF segments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +22,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Hua Yanghao <huayanghao@gmail.com>
 
-For embedded systems, notably ARM, one common use of ELF
-file segments is that the 'physical addresses' represent load addresses
-and the 'virtual addresses' execution addresses, such that
-the load addresses are packed into ROM or flash, and the
-relocation and zero-initialization of data is done at runtime.
-This means that the 'memsz' in the segment header represents
-the runtime size of the segment, but the size that needs to
-be loaded is only the 'filesz'. In particular, paddr+memsz
-may overlap with the next segment to be loaded, as in this
-example:
-
-0x70000001 off    0x00007f68 vaddr 0x00008150 paddr 0x00008150 align 2**2
-         filesz 0x00000008 memsz 0x00000008 flags r--
-    LOAD off    0x000000f4 vaddr 0x00000000 paddr 0x00000000 align 2**2
-         filesz 0x00000124 memsz 0x00000124 flags r--
-    LOAD off    0x00000218 vaddr 0x00000400 paddr 0x00000400 align 2**3
-         filesz 0x00007d58 memsz 0x00007d58 flags r-x
-    LOAD off    0x00007f70 vaddr 0x20000140 paddr 0x00008158 align 2**3
-         filesz 0x00000a80 memsz 0x000022f8 flags rw-
-    LOAD off    0x000089f0 vaddr 0x20002438 paddr 0x00008bd8 align 2**0
-         filesz 0x00000000 memsz 0x00004000 flags rw-
-    LOAD off    0x000089f0 vaddr 0x20000000 paddr 0x20000000 align 2**0
-         filesz 0x00000000 memsz 0x00000140 flags rw-
-
-where the segment at paddr 0x8158 has a memsz of 0x2258 and
-would overlap with the segment at paddr 0x8bd8 if QEMU's loader
-tried to honour it. (At runtime the segments will not overlap
-since their vaddrs are more widely spaced than their paddrs.)
-
-Currently if you try to load an ELF file like this with QEMU then
-it will fail with an error "rom: requested regions overlap",
-because we create a ROM image for each segment using the memsz
-as the size.
-
-Support ELF files using this scheme, by truncating the
-zero-initialized part of the segment if it would overlap another
-segment. This will retain the existing loader behaviour for
-all ELF files we currently accept, and also accept ELF files
-which only need 'filesz' bytes to be loaded.
+Some ELF files have program headers that specify segments that
+are of zero size. Ignore them, rather than trying to create
+zero-length ROM blobs for them, because the zero-length blob
+can falsely trigger the overlapping-ROM-blobs check.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/elf_ops.h | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ include/hw/elf_ops.h | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index a172a60..2e526d3 100644
+index 2e526d3..d192e7e 100644
 --- a/include/hw/elf_ops.h
 +++ b/include/hw/elf_ops.h
-@@ -362,6 +362,54 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-                     goto fail;
-                 }
+@@ -451,14 +451,24 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                 *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
              }
-+
-+            /* The ELF spec is somewhat vague about the purpose of the
-+             * physical address field. One common use in the embedded world
-+             * is that physical address field specifies the load address
-+             * and the virtual address field specifies the execution address.
-+             * Segments are packed into ROM or flash, and the relocation
-+             * and zero-initialization of data is done at runtime. This
-+             * means that the memsz header represents the runtime size of the
-+             * segment, but the filesz represents the loadtime size. If
-+             * we try to honour the memsz value for an ELF file like this
-+             * we will end up with overlapping segments (which the
-+             * loader.c code will later reject).
-+             * We support ELF files using this scheme by by checking whether
-+             * paddr + memsz for this segment would overlap with any other
-+             * segment. If so, then we assume it's using this scheme and
-+             * truncate the loaded segment to the filesz size.
-+             * If the segment considered as being memsz size doesn't overlap
-+             * then we use memsz for the segment length, to handle ELF files
-+             * which assume that the loader will do the zero-initialization.
-+             */
-+            if (mem_size > file_size) {
-+                /* If this segment's zero-init portion overlaps another
-+                 * segment's data or zero-init portion, then truncate this one.
-+                 * Invalid ELF files where the segments overlap even when
-+                 * only file_size bytes are loaded will be rejected by
-+                 * the ROM overlap check in loader.c, so we don't try to
-+                 * explicitly detect those here.
+ 
+-            if (load_rom) {
+-                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
+-
+-                /* rom_add_elf_program() seize the ownership of 'data' */
+-                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
+-            } else {
+-                cpu_physical_memory_write(addr, data, file_size);
++            if (mem_size == 0) {
++                /* Some ELF files really do have segments of zero size;
++                 * just ignore them rather than trying to create empty
++                 * ROM blobs, because the zero-length blob can falsely
++                 * trigger the overlapping-ROM-blobs check.
 +                 */
-+                int j;
-+                elf_word zero_start = ph->p_paddr + file_size;
-+                elf_word zero_end = ph->p_paddr + mem_size;
+                 g_free(data);
++            } else {
++                if (load_rom) {
++                    snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
 +
-+                for (j = 0; j < ehdr.e_phnum; j++) {
-+                    struct elf_phdr *jph = &phdr[j];
-+
-+                    if (i != j && jph->p_type == PT_LOAD) {
-+                        elf_word other_start = jph->p_paddr;
-+                        elf_word other_end = jph->p_paddr + jph->p_memsz;
-+
-+                        if (!(other_start >= zero_end ||
-+                              zero_start >= other_end)) {
-+                            mem_size = file_size;
-+                            break;
-+                        }
-+                    }
++                    /* rom_add_elf_program() seize the ownership of 'data' */
++                    rom_add_elf_program(label, data, file_size, mem_size,
++                                        addr, as);
++                } else {
++                    cpu_physical_memory_write(addr, data, file_size);
++                    g_free(data);
 +                }
-+            }
-+
-             /* address_offset is hack for kernel images that are
-                linked at the wrong physical address.  */
-             if (translate_fn) {
+             }
+ 
+             total_size += mem_size;
 -- 
 2.7.4
