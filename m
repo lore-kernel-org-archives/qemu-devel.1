@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ded6J-0001wm-5w
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:09:24 -0400
+	(envelope-from <bounces@canonical.com>) id 1dedCf-00040u-52
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:15:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ded6E-0003qv-J3
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:09:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58464)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ded6E-0003qf-DA
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:09:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0783C356E8
-	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 08:09:17 +0000 (UTC)
-Date: Mon, 7 Aug 2017 16:09:13 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170807080913.GI14780@lemon>
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<150181165680.60.17068931498958654477@93e45bedd699>
+	(envelope-from <bounces@canonical.com>) id 1dedCa-0006Eh-6G
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:15:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35792)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dedCZ-0006Eb-WF
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:15:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dedCX-0005Ha-Iv
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 08:15:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7F8152E80D0
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 08:15:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <150181165680.60.17068931498958654477@93e45bedd699>
-Subject: Re: [Qemu-devel] [PATCH v4 00/22] Clean up around qmp() and hmp()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 07 Aug 2017 08:04:27 -0000
+From: junchi <1709025@bugs.launchpad.net>
+Reply-To: Bug 1709025 <1709025@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150209306745.21201.16700911445033219702.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1709025] [NEW] Disk corrupted after snapshot
+ deletion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +37,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com
 
-On Thu, 08/03 18:54, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series failed automatic build test. Please find the testing commands and
-> their output below. If you have docker installed, you can probably reproduce it
-> locally.
+Public bug reported:
 
-As said in the sub-thread of this message, this is a false positive because
-patchew didn't know the dependency. With that fixed, this test and the other
-falsely failed one both pass. Thanks.
+  I found the vm disk corruption after snapshot deletion sometimes(the prob=
+ability is very low, I'm afraid i can't reproduce it). And I found there is=
+ a patch for it as follow, but I'm not sure whether the patch repaired the =
+bug. =
 
-Fam
+  Drain disk before snapshot deletion can't guarantee anything, there is st=
+ill pending IO in snapshot-deletion process. Anyone can help?
+
+author	Zhang Haoyu <zhanghy@sangfor.com>	2014-10-21 16:38:01 +0800
+committer	Stefan Hajnoczi <stefanha@redhat.com>	2014-11-03 09:48:42 +0000
+commit	3432a1929ee18e08787ce35476abd74f2c93a17c (patch)
+tree	13a81c0a46707d91622f1593ccf7b926935371fd /block/snapshot.c
+parent	573742a5431a99ceaba6968ae269cee247727cce (diff)
+snapshot: add bdrv_drain_all() to bdrv_snapshot_delete() to avoid concurren=
+cy problem
+If there are still pending i/o while deleting snapshot,
+because deleting snapshot is done in non-coroutine context, and
+the pending i/o read/write (bdrv_co_do_rw) is done in coroutine context,
+so it's possible to cause concurrency problem between above two operations.
+Add bdrv_drain_all() to bdrv_snapshot_delete() to avoid this problem.
+
+Signed-off-by: Zhang Haoyu <zhanghy@sangfor.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-id: 201410211637596311287@sangfor.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Diffstat (limited to 'block/snapshot.c')
+-rw-r--r--	block/snapshot.c	4	=
+
+1 files changed, 4 insertions, 0 deletions
+diff --git a/block/snapshot.c b/block/snapshot.c
+index 85c52ff..698e1a1 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -236,6 +236,10 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+         error_setg(errp, "snapshot_id and name are both NULL");
+         return -EINVAL;
+     }
++
++    /* drain all pending i/o before deleting snapshot */
++    bdrv_drain_all();
++
+     if (drv->bdrv_snapshot_delete) {
+         return drv->bdrv_snapshot_delete(bs, snapshot_id, name, errp);
+     }
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1709025
+
+Title:
+  Disk corrupted after snapshot deletion
+
+Status in QEMU:
+  New
+
+Bug description:
+    I found the vm disk corruption after snapshot deletion sometimes(the pr=
+obability is very low, I'm afraid i can't reproduce it). And I found there =
+is a patch for it as follow, but I'm not sure whether the patch repaired th=
+e bug. =
+
+    Drain disk before snapshot deletion can't guarantee anything, there is =
+still pending IO in snapshot-deletion process. Anyone can help?
+
+  author	Zhang Haoyu <zhanghy@sangfor.com>	2014-10-21 16:38:01 +0800
+  committer	Stefan Hajnoczi <stefanha@redhat.com>	2014-11-03 09:48:42 +0000
+  commit	3432a1929ee18e08787ce35476abd74f2c93a17c (patch)
+  tree	13a81c0a46707d91622f1593ccf7b926935371fd /block/snapshot.c
+  parent	573742a5431a99ceaba6968ae269cee247727cce (diff)
+  snapshot: add bdrv_drain_all() to bdrv_snapshot_delete() to avoid concurr=
+ency problem
+  If there are still pending i/o while deleting snapshot,
+  because deleting snapshot is done in non-coroutine context, and
+  the pending i/o read/write (bdrv_co_do_rw) is done in coroutine context,
+  so it's possible to cause concurrency problem between above two operation=
+s.
+  Add bdrv_drain_all() to bdrv_snapshot_delete() to avoid this problem.
+
+  Signed-off-by: Zhang Haoyu <zhanghy@sangfor.com>
+  Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+  Message-id: 201410211637596311287@sangfor.com
+  Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+  Diffstat (limited to 'block/snapshot.c')
+  -rw-r--r--	block/snapshot.c	4	=
+
+  1 files changed, 4 insertions, 0 deletions
+  diff --git a/block/snapshot.c b/block/snapshot.c
+  index 85c52ff..698e1a1 100644
+  --- a/block/snapshot.c
+  +++ b/block/snapshot.c
+  @@ -236,6 +236,10 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+           error_setg(errp, "snapshot_id and name are both NULL");
+           return -EINVAL;
+       }
+  +
+  +    /* drain all pending i/o before deleting snapshot */
+  +    bdrv_drain_all();
+  +
+       if (drv->bdrv_snapshot_delete) {
+           return drv->bdrv_snapshot_delete(bs, snapshot_id, name, errp);
+       }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1709025/+subscriptions
