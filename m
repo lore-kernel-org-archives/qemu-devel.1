@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1deix6-0004sk-Rb
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:24:18 -0400
+	(envelope-from <david@redhat.com>) id 1deiy1-0005bc-JP
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1deix3-0006vP-HN
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:24:16 -0400
-Received: from mail-ua0-f169.google.com ([209.85.217.169]:34684)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1deix3-0006vC-Cg
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:24:13 -0400
-Received: by mail-ua0-f169.google.com with SMTP id q25so2566837uah.1
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 07:24:12 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <940cc5b5-623d-9a47-47ce-72e84a93d952@redhat.com>
+	(envelope-from <david@redhat.com>) id 1deixw-0007JY-MM
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:25:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1deixw-0007I8-EQ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:25:08 -0400
 References: <20170807085703.32267-1-lprosek@redhat.com>
-	<20170807085703.32267-2-lprosek@redhat.com>
-	<940cc5b5-623d-9a47-47ce-72e84a93d952@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 7 Aug 2017 16:24:10 +0200
-Message-ID: <CABdb735PDRbG9_0h+pgxBbjgHdAxhkGH8Gr-FTCWrTyGsaAguw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] i386/kvm: use a switch statement
- for MSR detection
+	<20170807085703.32267-5-lprosek@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <11fbfc15-2173-845b-9871-9d5620b4b33d@redhat.com>
+Date: Mon, 7 Aug 2017 16:25:04 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170807085703.32267-5-lprosek@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] i386/kvm: advertise Hyper-V
+ frequency MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, rkrcmar@redhat.com
 
-On Mon, Aug 7, 2017 at 4:19 PM, David Hildenbrand <david@redhat.com> wrote:
-> On 07.08.2017 10:57, Ladi Prosek wrote:
->> Switch is easier on the eye and might lead to better codegen.
->>
->> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->> ---
->>  target/i386/kvm.c | 75 +++++++++++++++++++++++--------------------------------
->>  1 file changed, 31 insertions(+), 44 deletions(-)
->>
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 6db7783..b14a0db 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -1081,65 +1081,52 @@ static int kvm_get_supported_msrs(KVMState *s)
->>              int i;
->>
->>              for (i = 0; i < kvm_msr_list->nmsrs; i++) {
->> -                if (kvm_msr_list->indices[i] == MSR_STAR) {
->> +                switch (kvm_msr_list->indices[i]) {
->> +                case MSR_STAR:
->>                      has_msr_star = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_VM_HSAVE_PA) {
->> +                    break;
->> +                case MSR_VM_HSAVE_PA:
->>                      has_msr_hsave_pa = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_TSC_AUX) {
->> +                    break;
->> +                case MSR_TSC_AUX:
->>                      has_msr_tsc_aux = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_TSC_ADJUST) {
->> +                    break;
->> +                case MSR_TSC_ADJUST:
->>                      has_msr_tsc_adjust = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_IA32_TSCDEADLINE) {
->> +                    break;
->> +                case MSR_IA32_TSCDEADLINE:
->>                      has_msr_tsc_deadline = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_IA32_SMBASE) {
->> +                    break;
->> +                case MSR_IA32_SMBASE:
->>                      has_msr_smbase = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_IA32_MISC_ENABLE) {
->> +                    break;
->> +                case MSR_IA32_MISC_ENABLE:
->>                      has_msr_misc_enable = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_IA32_BNDCFGS) {
->> +                    break;
->> +                case MSR_IA32_BNDCFGS:
->>                      has_msr_bndcfgs = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == MSR_IA32_XSS) {
->> +                    break;
->> +                case MSR_IA32_XSS:
->>                      has_msr_xss = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_CRASH_CTL) {
->> +                    break;;
->> +                case HV_X64_MSR_CRASH_CTL:
->>                      has_msr_hv_crash = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_RESET) {
->> +                    break;
->> +                case HV_X64_MSR_RESET:
->>                      has_msr_hv_reset = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_INDEX) {
->> +                    break;
->> +                case HV_X64_MSR_VP_INDEX:
->>                      has_msr_hv_vpindex = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_RUNTIME) {
->> +                    break;
->> +                case HV_X64_MSR_VP_RUNTIME:
->>                      has_msr_hv_runtime = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_SCONTROL) {
->> +                    break;
->> +                case HV_X64_MSR_SCONTROL:
->>                      has_msr_hv_synic = true;
->> -                    continue;
->> -                }
->> -                if (kvm_msr_list->indices[i] == HV_X64_MSR_STIMER0_CONFIG) {
->> +                    break;
->> +                case HV_X64_MSR_STIMER0_CONFIG:
->>                      has_msr_hv_stimer = true;
->> -                    continue;
->> +                    break;
->>                  }
->>              }
->>          }
->>
->
-> Think you forgot to add my r-b.
+On 07.08.2017 10:57, Ladi Prosek wrote:
+> As of kernel commit eb82feea59d6 ("KVM: hyperv: support HV_X64_MSR_TSC_FREQUENCY
+> and HV_X64_MSR_APIC_FREQUENCY"), KVM supports two new MSRs which are required
+> for nested Hyper-V to read timestamps with RDTSC + TSC page.
+> 
+> This commit makes QEMU advertise the MSRs with CPUID.40000003H:EAX[11] and
+> CPUID.40000003H:EDX[8] as specified in the Hyper-V TLFS and experimentally
+> verified on a Hyper-V host. The feature is enabled with the existing hv-time CPU
+> flag, and only if the TSC frequency is stable across migrations and known.
+> 
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>  target/i386/kvm.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 2dc01c9..739334a 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -89,6 +89,7 @@ static bool has_msr_hv_vpindex;
+>  static bool has_msr_hv_runtime;
+>  static bool has_msr_hv_synic;
+>  static bool has_msr_hv_stimer;
+> +static bool has_msr_hv_frequencies;
+>  static bool has_msr_xss;
+>  
+>  static bool has_msr_architectural_pmu;
+> @@ -640,7 +641,13 @@ static int hyperv_handle_properties(CPUState *cs)
+>      if (cpu->hyperv_time) {
+>          env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
+>          env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
+> -        env->features[FEAT_HYPERV_EAX] |= 0x200;
+> +        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
 
-Oops, sorry about that!
+this could even go into a separate patch.
 
-> --
->
-> Thanks,
->
-> David
+> +
+> +        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
+> +            env->features[FEAT_HYPERV_EAX] |= HV_X64_ACCESS_FREQUENCY_MSRS;
+> +            env->features[FEAT_HYPERV_EDX] |=
+> +                HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
+> +        }
+>      }
+>      if (cpu->hyperv_crash && has_msr_hv_crash) {
+>          env->features[FEAT_HYPERV_EDX] |= HV_X64_GUEST_CRASH_MSR_AVAILABLE;
+> @@ -1134,6 +1141,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case HV_X64_MSR_STIMER0_CONFIG:
+>                      has_msr_hv_stimer = true;
+>                      break;
+> +                case HV_X64_MSR_TSC_FREQUENCY:
+> +                    has_msr_hv_frequencies = true;
+> +                    break;
+>                  }
+>              }
+>          }
+> 
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David
