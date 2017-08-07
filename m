@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejQR-0005ur-Hw
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:54:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejRh-0007GA-DF
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejQM-0000OW-JA
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:54:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59587)
+	(envelope-from <armbru@redhat.com>) id 1dejRc-0001Po-FZ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:55:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59218)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dejQM-0000OH-Cy
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:54:30 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dejRc-0001PW-6U
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:55:48 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1499182263-19139-7-git-send-email-pradeep.jagadeesh@huawei.com>
-	<87poddbdxd.fsf@dusky.pond.sub.org>
-	<df3f5857-8e4c-51c5-2914-13ea8a6e9db3@huawei.com>
-Date: Mon, 07 Aug 2017 16:54:27 +0200
-In-Reply-To: <df3f5857-8e4c-51c5-2914-13ea8a6e9db3@huawei.com> (Pradeep
-	Jagadeesh's message of "Mon, 7 Aug 2017 11:35:22 +0200")
-Message-ID: <87mv7bfmxo.fsf@dusky.pond.sub.org>
+	<87podcrcxu.fsf@dusky.pond.sub.org>
+	<c435b4df-2406-baa5-e1df-188d5aea11ab@huawei.com>
+Date: Mon, 07 Aug 2017 16:55:45 +0200
+In-Reply-To: <c435b4df-2406-baa5-e1df-188d5aea11ab@huawei.com> (Pradeep
+	Jagadeesh's message of "Mon, 7 Aug 2017 09:52:57 +0200")
+Message-ID: <87inhzfmvi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 6/6] fsdev: QMP interface for throttling
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +34,48 @@ Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.
 
 Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> writes:
 
-> On 7/6/2017 8:47 PM, Markus Armbruster wrote:
+> On 7/7/2017 8:14 AM, Markus Armbruster wrote:
 >> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
 >>
->>> This patch introduces qmp interfaces for the fsdev
->>> devices. This provides two interfaces one
->>> for querying info of all the fsdev devices. The second one
->>> to set the IO limits for the required fsdev device.
+>>> These patches provide the qmp interface, to query the io throttle
+>>> status of the all fsdev devices that are present in a vm.
+>>> also, it provides an interface to set the io throttle parameters of a
+>>> fsdev to a required value. some of the patches also remove the duplicate
+>>> code that was present in block and fsdev files.
 >>>
->>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->>> ---
->>>  Makefile                    |  4 +++
->>>  fsdev/qemu-fsdev-dummy.c    | 10 ++++++
->>>  fsdev/qemu-fsdev-throttle.c | 76 +++++++++++++++++++++++++++++++++++++=
-++-
->>>  fsdev/qemu-fsdev-throttle.h | 13 +++++++
->>>  fsdev/qemu-fsdev.c          | 37 ++++++++++++++++++++
->>>  monitor.c                   |  5 +++
->>>  qapi-schema.json            |  3 ++
->>>  qapi/fsdev.json             | 84 +++++++++++++++++++++++++++++++++++++=
-++++++++
->>>  qmp.c                       | 14 ++++++++
->>>  9 files changed, 245 insertions(+), 1 deletion(-)
+>>> Pradeep Jagadeesh (6):
+>>>   throttle: factor out duplicate code
+>>>   qmp: Create IOThrottle structure
+>>>   throttle: move out function to reuse the code
+>>>   hmp: create a throttle initialization function for code reusability
+>>>   fsdev: hmp interface for throttling
+>>>   fsdev: QMP interface for throttling
+>>>
+>>>  Makefile                        |   4 ++
+>>>  blockdev.c                      |  97 ++-------------------------------
+>>>  fsdev/qemu-fsdev-dummy.c        |  10 ++++
+>>>  fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
+>>>  fsdev/qemu-fsdev-throttle.h     |  13 +++++
+>>>  fsdev/qemu-fsdev.c              |  37 +++++++++++++
+>>>  hmp-commands-info.hx            |  18 ++++++
+>>>  hmp-commands.hx                 |  19 +++++++
+>>>  hmp.c                           |  81 +++++++++++++++++++++++++--
+>>>  hmp.h                           |   4 ++
+>>>  include/qemu/throttle-options.h |   7 +++
+>>>  include/qemu/throttle.h         |   4 +-
+>>>  include/qemu/typedefs.h         |   1 +
+>>>  monitor.c                       |   5 ++
+>>>  qapi-schema.json                |   3 +
+>>>  qapi/block-core.json            |  76 +-------------------------
+>>>  qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
+>>>  qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
+>>>  qmp.c                           |  14 +++++
+>>>  util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
+>>>  20 files changed, 577 insertions(+), 216 deletions(-)
 >>>  create mode 100644 qapi/fsdev.json
->>>
->>> diff --git a/Makefile b/Makefile
->>> index 16a0430..4fd7625 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -416,6 +416,10 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SR=
-C_PATH)/qapi/common.json \
->>>                 $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.js=
-on \
->>>                 $(SRC_PATH)/qapi/trace.json
->>>
->>> +ifdef CONFIG_VIRTFS
+>>>  create mode 100644 qapi/iothrottle.json
 >>
->> Uh, qapi-schema.json includes fsdev.json *unconditionally*, doesn't it?
-> Yes, I did not find any ways to include with some condition.
+>> No test coverage?
+> I wanted to upstream these first then I am planning to write the tests.
 
-Hiding dependencies from Make is unlikely to help.  Please drop the
-ifdef.
-
-QAPI doesn't currently support conditional inclusion or any compile-time
-conditionals for that matter.  Marc-Andr=C3=A9 is trying to change that:
-"[PATCH 00/26] qapi: add #if pre-processor conditions to generated
-code".
-
-[...]
+Feels backwards to me :)
