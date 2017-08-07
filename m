@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dek8C-0004hC-Ch
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:39:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dek8B-0004fz-27
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dek87-0006bh-Ch
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:39:48 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35787)
+	(envelope-from <alex.bennee@linaro.org>) id 1dek86-0006ad-A7
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:39:47 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dek87-0006ax-6N
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:39:43 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id k71so3230180wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 08:39:43 -0700 (PDT)
+	id 1dek86-0006Zv-4T
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:39:42 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id k71so3229988wrc.2
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 08:39:41 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  7 Aug 2017 16:39:33 +0100
-Message-Id: <20170807153934.29477-6-alex.bennee@linaro.org>
+Date: Mon,  7 Aug 2017 16:39:32 +0100
+Message-Id: <20170807153934.29477-5-alex.bennee@linaro.org>
 In-Reply-To: <20170807153934.29477-1-alex.bennee@linaro.org>
 References: <20170807153934.29477-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.10 v3 5/6] docker: don't install
- device-tree-compiler build-deps in travis.docker
+Subject: [Qemu-devel] [PATCH for 2.10 v3 4/6] docker: docker.py make
+ --no-cache skip checksum test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +33,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Installing the device-tree-compiler build-deps is a little extreme. We
-only actually need the binary so include it with the other packages.
+If you invoke with NOCACHE=1 we pass --no-cache in the argv to
+docker.py but may still not force a rebuild if the dockerfile checksum
+hasn't changed. By testing for its presence we can force builds
+without having to manually remove the docker image.
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/travis.docker | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tests/docker/docker.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
-index 636fa590a5..57ac8e1419 100644
---- a/tests/docker/dockerfiles/travis.docker
-+++ b/tests/docker/dockerfiles/travis.docker
-@@ -1,6 +1,5 @@
- FROM quay.io/travisci/travis-ruby
- RUN apt-get update
- RUN apt-get -y build-dep qemu
--RUN apt-get -y build-dep device-tree-compiler
--RUN apt-get -y install python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
-+RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
- ENV FEATURES pyyaml
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index ee40ca04d9..aab1648cc5 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -261,7 +261,8 @@ class BuildCommand(SubCommand):
+         tag = args.tag
+ 
+         dkr = Docker()
+-        if dkr.image_matches_dockerfile(tag, dockerfile):
++        if "--no-cache" not in argv and \
++           dkr.image_matches_dockerfile(tag, dockerfile):
+             if not args.quiet:
+                 print "Image is up to date."
+         else:
 -- 
 2.13.0
