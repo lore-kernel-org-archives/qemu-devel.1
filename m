@@ -1,37 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dehho-00046W-BD
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:04:31 -0400
+	(envelope-from <groug@kaod.org>) id 1dehr1-0006Y3-QL
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dehhh-0001ML-Nx
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:04:24 -0400
-Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:37233)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1dehhh-0001M3-HT
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:04:17 -0400
-Received: by mail-it0-x235.google.com with SMTP id 76so2070761ith.0
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 06:04:17 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dehqw-0005tq-76
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:13:55 -0400
+Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:53621)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dehqv-0005t6-TA
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:13:50 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 16A928B999
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 15:13:48 +0200 (CEST)
+Date: Mon, 7 Aug 2017 15:13:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170807151342.6e5a17a8@bahia.lan>
+In-Reply-To: <2b5e13652c749b9ad2a519190396fe4160ac0dea.1502087564.git.sam.bobroff@au1.ibm.com>
+References: <cover.1502087564.git.sam.bobroff@au1.ibm.com>
+	<2b5e13652c749b9ad2a519190396fe4160ac0dea.1502087564.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170801090158.35d18f10@w520.home>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-	<20170726092931.0678689e@w520.home>
-	<20170726190348-mutt-send-email-mst@kernel.org>
-	<20170726113222.52aad9a6@w520.home>
-	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
-	<20170731234626.7664be18@w520.home>
-	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
-	<20170801090158.35d18f10@w520.home>
-From: Bob Chen <a175818323@gmail.com>
-Date: Mon, 7 Aug 2017 21:04:16 +0800
-Message-ID: <CAMxP3BT8Zps6Bp6kEcV+nYHQvncco5f_BQ9O=fTMUckUZz6Ymg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
-	=?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/eqiBf6yCmTvA0O.1xVZyZ=N";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 1/1] ppc: spapr: Make VCPU ID
+ handling private to SPAPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,238 +32,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Besides, I checked the lspci -vvv output, no capabilities of Access Control
-are seen.
+--Sig_/eqiBf6yCmTvA0O.1xVZyZ=N
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-2017-08-01 23:01 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>:
+On Mon, 7 Aug 2017 16:33:29 +1000
+Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
 
-> On Tue, 1 Aug 2017 17:35:40 +0800
-> Bob Chen <a175818323@gmail.com> wrote:
->
-> > 2017-08-01 13:46 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>=
-:
-> >
-> > > On Tue, 1 Aug 2017 13:04:46 +0800
-> > > Bob Chen <a175818323@gmail.com> wrote:
-> > >
-> > > > Hi,
-> > > >
-> > > > This is a sketch of my hardware topology.
-> > > >
-> > > >           CPU0         <- QPI ->        CPU1
-> > > >            |                             |
-> > > >     Root Port(at PCIe.0)        Root Port(at PCIe.1)
-> > > >        /        \                   /       \
-> > >
-> > > Are each of these lines above separate root ports?  ie. each root
-> > > complex hosts two root ports, each with a two-port switch downstream =
-of
-> > > it?
-> > >
-> >
-> > Not quite sure if root complex is a concept or a real physical device .=
-..
-> >
-> > But according to my observation by `lspci -vt`, there are indeed 4 Root
-> > Ports in the system. So the sketch might need a tiny update.
-> >
-> >
-> >           CPU0         <- QPI ->        CPU1
-> >
-> >            |                             |
-> >
-> >       Root Complex(device?)      Root Complex(device?)
-> >
-> >          /    \                       /    \
-> >
-> >     Root Port  Root Port         Root Port  Root Port
-> >
-> >        /        \                   /        \
-> >
-> >     Switch    Switch             Switch    Switch
-> >
-> >      /   \      /  \              /   \     /   \
-> >
-> >    GPU   GPU  GPU  GPU          GPU   GPU  GPU   GPU
->
->
-> Yes, that's what I expected.  So the numbers make sense, the immediate
-> sibling GPU would share bandwidth between the root port and upstream
-> switch port, any other GPU should not double-up on any single link.
->
-> > > >     Switch    Switch             Switch    Switch
-> > > >      /   \      /  \              /   \    /    \
-> > > >    GPU   GPU  GPU  GPU          GPU   GPU GPU   GPU
-> > > >
-> > > >
-> > > > And below are the p2p bandwidth test results.
-> > > >
-> > > > Host=EF=BC=9A
-> > > >    D\D     0      1      2      3      4      5      6      7
-> > > >      0 426.91  25.32  19.72  19.72  19.69  19.68  19.75  19.66
-> > > >      1  25.31 427.61  19.74  19.72  19.66  19.68  19.74  19.73
-> > > >      2  19.73  19.73 429.49  25.33  19.66  19.74  19.73  19.74
-> > > >      3  19.72  19.71  25.36 426.68  19.70  19.71  19.77  19.74
-> > > >      4  19.72  19.72  19.73  19.75 425.75  25.33  19.72  19.71
-> > > >      5  19.71  19.75  19.76  19.75  25.35 428.11  19.69  19.70
-> > > >      6  19.76  19.72  19.79  19.78  19.73  19.74 425.75  25.35
-> > > >      7  19.69  19.75  19.79  19.75  19.72  19.72  25.39 427.15
-> > > >
-> > > > VM=EF=BC=9A
-> > > >    D\D     0      1      2      3      4      5      6      7
-> > > >      0 427.38  10.52  18.99  19.11  19.75  19.62  19.75  19.71
-> > > >      1  10.53 426.68  19.28  19.19  19.73  19.71  19.72  19.73
-> > > >      2  18.88  19.30 426.92  10.48  19.66  19.71  19.67  19.68
-> > > >      3  18.93  19.18  10.45 426.94  19.69  19.72  19.67  19.72
-> > > >      4  19.60  19.66  19.69  19.70 428.13  10.49  19.40  19.57
-> > > >      5  19.52  19.74  19.72  19.69  10.44 426.45  19.68  19.61
-> > > >      6  19.63  19.50  19.72  19.64  19.59  19.66 426.91  10.47
-> > > >      7  19.69  19.75  19.70  19.69  19.66  19.74  10.45 426.23
-> > >
-> > > Interesting test, how do you get these numbers?  What are the units,
-> > > GB/s?
-> > >
-> >
-> >
-> >
-> > A p2pBandwidthLatencyTest from Nvidia CUDA sample code. Units are
-> > GB/s. Asynchronous read and write. Bidirectional.
-> >
-> > However, the Unidirectional test had shown a different result. Didn't
-> fall
-> > down to a half.
-> >
-> > VM:
-> > Unidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-> >    D\D     0      1      2      3      4      5      6      7
-> >      0 424.07  10.02  11.33  11.30  11.09  11.05  11.06  11.10
-> >      1  10.05 425.98  11.40  11.33  11.08  11.10  11.13  11.09
-> >      2  11.31  11.28 423.67  10.10  11.14  11.13  11.13  11.11
-> >      3  11.30  11.31  10.08 425.05  11.10  11.07  11.09  11.06
-> >      4  11.16  11.17  11.21  11.17 423.67  10.08  11.25  11.28
-> >      5  10.97  11.01  11.07  11.02  10.09 425.52  11.23  11.27
-> >      6  11.09  11.13  11.16  11.10  11.28  11.33 422.71  10.10
-> >      7  11.13  11.09  11.15  11.11  11.36  11.33  10.02 422.75
-> >
-> > Host:
-> > Unidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-> >    D\D     0      1      2      3      4      5      6      7
-> >      0 424.13  13.38  10.17  10.17  11.23  11.21  10.94  11.22
-> >      1  13.38 424.06  10.18  10.19  11.20  11.19  11.19  11.14
-> >      2  10.18  10.18 422.75  13.38  11.19  11.19  11.17  11.17
-> >      3  10.18  10.18  13.38 425.05  11.05  11.08  11.08  11.06
-> >      4  11.01  11.06  11.06  11.03 423.21  13.38  10.17  10.17
-> >      5  10.91  10.91  10.89  10.92  13.38 425.52  10.18  10.18
-> >      6  11.28  11.30  11.32  11.31  10.19  10.18 424.59  13.37
-> >      7  11.18  11.20  11.16  11.21  10.17  10.19  13.38 424.13
->
-> Looks right, a unidirectional test would create bidirectional data
-> flows on the root port to upstream switch link and should be able to
-> saturate that link.  With the bidirectional test, that link becomes a
-> bottleneck.
->
-> > > > In the VM, the bandwidth between two GPUs under the same physical
-> switch
-> > > is
-> > > > obviously lower, as per the reasons you said in former threads.
-> > >
-> > > Hmm, I'm not sure I can explain why the number is lower than to more
-> > > remote GPUs though.  Is the test simultaneously reading and writing a=
-nd
-> > > therefore we overload the link to the upstream switch port?  Otherwis=
-e
-> > > I'd expect the bidirectional support in PCIe to be able to handle the
-> > > bandwidth.  Does the test have a read-only or write-only mode?
-> > >
-> > > > But what confused me most is that GPUs under different switches cou=
-ld
-> > > > achieve the same speed, as well as in the Host. Does that mean afte=
-r
-> > > IOMMU
-> > > > address translation, data traversing has utilized QPI bus by defaul=
-t?
-> > > Even
-> > > > these two devices do not belong to the same PCIe bus?
-> > >
-> > > Yes, of course.  Once the transaction is translated by the IOMMU it's
-> > > just a matter of routing the resulting address, whether that's back
-> > > down the I/O hierarchy under the same root complex or across the QPI
-> > > link to the other root complex.  The translated address could just as
-> > > easily be to RAM that lives on the other side of the QPI link.  Also,
-> it
-> > > seems like the IOMMU overhead is perhaps negligible here, unless the
-> > > IOMMU is actually being used in both cases.
-> > >
-> >
-> >
-> > Yes, the overhead of bandwidth is negligible, but the latency is not as
-> > good as we expected. I assume it is IOMMU address translation to blame.
-> >
-> > I ran this twice with IOMMU on/off on Host, the results were the same.
-> >
-> > VM:
-> > P2P=3DEnabled Latency Matrix (us)
-> >    D\D     0      1      2      3      4      5      6      7
-> >      0   4.53  13.44  13.60  13.60  14.37  14.51  14.55  14.49
-> >      1  13.47   4.41  13.37  13.37  14.49  14.51  14.56  14.52
-> >      2  13.38  13.61   4.32  13.47  14.45  14.43  14.53  14.33
-> >      3  13.55  13.60  13.38   4.45  14.50  14.48  14.54  14.51
-> >      4  13.85  13.72  13.71  13.81   4.47  14.61  14.58  14.47
-> >      5  13.75  13.77  13.75  13.77  14.46   4.46  14.52  14.45
-> >      6  13.76  13.78  13.73  13.84  14.50  14.55   4.45  14.53
-> >      7  13.73  13.78  13.76  13.80  14.53  14.63  14.56   4.46
-> >
-> > Host:
-> > P2P=3DEnabled Latency Matrix (us)
-> >    D\D     0      1      2      3      4      5      6      7
-> >      0   3.66   5.88   6.59   6.58  15.26  15.15  15.03  15.14
-> >      1   5.80   3.66   6.50   6.50  15.15  15.04  15.06  15.00
-> >      2   6.58   6.52   4.12   5.85  15.16  15.06  15.00  15.04
-> >      3   6.80   6.81   6.71   4.12  15.12  13.08  13.75  13.31
-> >      4  14.91  14.18  14.34  12.93   4.13   6.45   6.56   6.63
-> >      5  15.17  14.99  15.03  14.57   5.61   3.49   6.19   6.29
-> >      6  15.12  14.78  14.60  13.47   6.16   6.15   3.53   5.68
-> >      7  15.00  14.65  14.82  14.28   6.16   6.15   5.44   3.56
->
-> Yes, the IOMMU is not free, page table walks are occurring here.  Are
-> you using 1G pages for the VM?  2G?  Does this platform support 1G
-> super pages on the IOMMU?  (cat /sys/class/iommu/*/intel-iommu/cap, bit
-> 34 is 2MB page support, bit 35 is 1G).  All modern Xeons should support
-> 1G so you'll want to use 1G hugepages in the VM to take advantage of
-> that.
->
-> > > In the host test, is the IOMMU still enabled?  The routing of PCIe
-> > > transactions is going to be governed by ACS, which Linux enables
-> > > whenever the IOMMU is enabled, not just when a device is assigned to =
-a
-> > > VM.  It would be interesting to see if another performance tier is
-> > > exposed if the IOMMU is entirely disabled, or perhaps it might better
-> > > expose the overhead of the IOMMU translation.  It would also be
-> > > interesting to see the ACS settings in lspci for each downstream port
-> > > for each test.  Thanks,
-> > >
-> > > Alex
-> > >
-> >
-> >
-> > How to display GPU's ACS settings? Like this?
-> >
-> > [420 v2] Advanced Error Reporting
-> > UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP=
--
-> > ECRC- UnsupReq- ACSViol-
-> > UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP=
--
-> > ECRC- UnsupReq- ACSViol-
-> > UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTL=
-P+
-> > ECRC- UnsupReq- ACSViol-
->
-> As Michael notes, this is AER, ACS is Access Control Services.  It
-> should be another capability in lspci.  Thanks,
->
-> Alex
->
+> The concept of a VCPU ID that differs from the CPU's index
+> (cpu->cpu_index) exists only within SPAPR machines so, move the
+> functions ppc_get_vcpu_id() and ppc_get_cpu_by_vcpu_id() into spapr.c
+> and rename them appropriately.
+>=20
+> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> ---
+> Changes in v2:
+>=20
+> * Re-arranged so that spapr_vcpu_id() calls kvm_arch_vcpu_id() rather tha=
+n the
+> other way around.
+>=20
+
+Better indeed! :)
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/ppc.c           | 21 ---------------------
+>  hw/ppc/spapr.c         | 40 +++++++++++++++++++++++++++++++++-------
+>  hw/ppc/spapr_hcall.c   |  4 ++--
+>  hw/ppc/spapr_rtas.c    |  4 ++--
+>  include/hw/ppc/spapr.h |  3 +++
+>  target/ppc/cpu.h       | 18 ------------------
+>  target/ppc/kvm.c       |  2 +-
+>  7 files changed, 41 insertions(+), 51 deletions(-)
+>=20
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index 4477d4ad89..f76886f4d3 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -1358,27 +1358,6 @@ void PPC_debug_write (void *opaque, uint32_t addr,=
+ uint32_t val)
+>      }
+>  }
+> =20
+> -/* CPU device-tree ID helpers */
+> -int ppc_get_vcpu_id(PowerPCCPU *cpu)
+> -{
+> -    return cpu->vcpu_id;
+> -}
+> -
+> -PowerPCCPU *ppc_get_cpu_by_vcpu_id(int vcpu_id)
+> -{
+> -    CPUState *cs;
+> -
+> -    CPU_FOREACH(cs) {
+> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -
+> -        if (cpu->vcpu_id =3D=3D vcpu_id) {
+> -            return cpu;
+> -        }
+> -    }
+> -
+> -    return NULL;
+> -}
+> -
+>  void ppc_cpu_parse_features(const char *cpu_model)
+>  {
+>      CPUClass *cc;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d6c9b3e334..d31e6d2c0d 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -208,7 +208,7 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offs=
+et, PowerPCCPU *cpu,
+>      int i, ret =3D 0;
+>      uint32_t servers_prop[smt_threads];
+>      uint32_t gservers_prop[smt_threads * 2];
+> -    int index =3D ppc_get_vcpu_id(cpu);
+> +    int index =3D spapr_vcpu_id(cpu);
+> =20
+>      if (cpu->compat_pvr) {
+>          ret =3D fdt_setprop_cell(fdt, offset, "cpu-version", cpu->compat=
+_pvr);
+> @@ -237,7 +237,7 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offs=
+et, PowerPCCPU *cpu,
+> =20
+>  static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cp=
+u)
+>  {
+> -    int index =3D ppc_get_vcpu_id(cpu);
+> +    int index =3D spapr_vcpu_id(cpu);
+>      uint32_t associativity[] =3D {cpu_to_be32(0x5),
+>                                  cpu_to_be32(0x0),
+>                                  cpu_to_be32(0x0),
+> @@ -341,7 +341,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
+State *spapr)
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>          CPUPPCState *env =3D &cpu->env;
+>          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+> -        int index =3D ppc_get_vcpu_id(cpu);
+> +        int index =3D spapr_vcpu_id(cpu);
+>          int compat_smt =3D MIN(smp_threads, ppc_compat_max_threads(cpu));
+> =20
+>          if ((index % smt) !=3D 0) {
+> @@ -493,7 +493,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
+*fdt, int offset,
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      CPUPPCState *env =3D &cpu->env;
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
+> -    int index =3D ppc_get_vcpu_id(cpu);
+> +    int index =3D spapr_vcpu_id(cpu);
+>      uint32_t segs[] =3D {cpu_to_be32(28), cpu_to_be32(40),
+>                         0xffffffff, 0xffffffff};
+>      uint32_t tbfreq =3D kvm_enabled() ? kvmppc_get_tbfreq()
+> @@ -626,7 +626,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sP=
+APRMachineState *spapr)
+>       */
+>      CPU_FOREACH_REVERSE(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -        int index =3D ppc_get_vcpu_id(cpu);
+> +        int index =3D spapr_vcpu_id(cpu);
+>          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+>          int offset;
+> =20
+> @@ -2982,7 +2982,7 @@ static void *spapr_populate_hotplug_cpu_dt(CPUState=
+ *cs, int *fdt_offset,
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+> -    int id =3D ppc_get_vcpu_id(cpu);
+> +    int id =3D spapr_vcpu_id(cpu);
+>      void *fdt;
+>      int offset, fdt_size;
+>      char *nodename;
+> @@ -3392,7 +3392,7 @@ static void spapr_ics_resend(XICSFabric *dev)
+> =20
+>  static ICPState *spapr_icp_get(XICSFabric *xi, int vcpu_id)
+>  {
+> -    PowerPCCPU *cpu =3D ppc_get_cpu_by_vcpu_id(vcpu_id);
+> +    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
+> =20
+>      return cpu ? ICP(cpu->intc) : NULL;
+>  }
+> @@ -3412,6 +3412,32 @@ static void spapr_pic_print_info(InterruptStatsPro=
+vider *obj,
+>      ics_pic_print_info(spapr->ics, mon);
+>  }
+> =20
+> +int spapr_vcpu_id(PowerPCCPU *cpu)
+> +{
+> +    CPUState *cs =3D CPU(cpu);
+> +
+> +    if (kvm_enabled()) {
+> +        return kvm_arch_vcpu_id(cs);
+> +    } else {
+> +        return cs->cpu_index;
+> +    }
+> +}
+> +
+> +PowerPCCPU *spapr_find_cpu(int vcpu_id)
+> +{
+> +    CPUState *cs;
+> +
+> +    CPU_FOREACH(cs) {
+> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +
+> +        if (cpu->vcpu_id =3D=3D vcpu_id) {
+> +            return cpu;
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 4ca233854a..7cf0993800 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -999,7 +999,7 @@ static target_ulong h_register_vpa(PowerPCCPU *cpu, s=
+PAPRMachineState *spapr,
+>      CPUPPCState *tenv;
+>      PowerPCCPU *tcpu;
+> =20
+> -    tcpu =3D ppc_get_cpu_by_vcpu_id(procno);
+> +    tcpu =3D spapr_find_cpu(procno);
+>      if (!tcpu) {
+>          return H_PARAMETER;
+>      }
+> @@ -1431,7 +1431,7 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *=
+cpu,
+> =20
+>      } else {
+>          /* Unicast */
+> -        cs =3D CPU(ppc_get_cpu_by_vcpu_id(target));
+> +        cs =3D CPU(spapr_find_cpu(target));
+>          if (cs) {
+>              run_on_cpu(cs, spapr_do_system_reset_on_cpu, RUN_ON_CPU_NULL=
+);
+>              return H_SUCCESS;
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 626c06b375..cdf0b607a0 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -104,7 +104,7 @@ static void rtas_query_cpu_stopped_state(PowerPCCPU *=
+cpu_,
+>      }
+> =20
+>      id =3D rtas_ld(args, 0);
+> -    cpu =3D ppc_get_cpu_by_vcpu_id(id);
+> +    cpu =3D spapr_find_cpu(id);
+>      if (cpu !=3D NULL) {
+>          if (CPU(cpu)->halted) {
+>              rtas_st(rets, 1, 0);
+> @@ -158,7 +158,7 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMac=
+hineState *spapr,
+>      start =3D rtas_ld(args, 1);
+>      r3 =3D rtas_ld(args, 2);
+> =20
+> -    cpu =3D ppc_get_cpu_by_vcpu_id(id);
+> +    cpu =3D spapr_find_cpu(id);
+>      if (cpu !=3D NULL) {
+>          CPUState *cs =3D CPU(cpu);
+>          CPUPPCState *env =3D &cpu->env;
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 2a303a705c..86c982cf2c 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -704,4 +704,7 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_o=
+n_cpu_data arg);
+> =20
+>  #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+> =20
+> +int spapr_vcpu_id(PowerPCCPU *cpu);
+> +PowerPCCPU *spapr_find_cpu(int vcpu_id);
+> +
+>  #endif /* HW_SPAPR_H */
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 2a3594dea5..abc729f029 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -2513,23 +2513,5 @@ static inline bool lsw_reg_in_range(int start, int=
+ nregs, int rx)
+> =20
+>  void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env);
+> =20
+> -/**
+> - * ppc_get_vcpu_id:
+> - * @cs: a PowerPCCPU struct.
+> - *
+> - * Returns a device-tree ID for a CPU.
+> - */
+> -int ppc_get_vcpu_id(PowerPCCPU *cpu);
+> -
+> -/**
+> - * ppc_get_cpu_by_vcpu_id:
+> - * @vcpu_id: a VCPU ID
+> - *
+> - * Searches for a CPU by @vcpu_id.
+> - *
+> - * Returns: a PowerPCCPU struct
+> - */
+> -PowerPCCPU *ppc_get_cpu_by_vcpu_id(int vcpu_id);
+> -
+>  void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, int le=
+n);
+>  #endif /* PPC_CPU_H */
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7ccb350c5f..5b2abee4da 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -512,7 +512,7 @@ bool kvmppc_is_mem_backend_page_size_ok(const char *o=
+bj_path)
+> =20
+>  unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+>  {
+> -    return ppc_get_vcpu_id(POWERPC_CPU(cpu));
+> +    return POWERPC_CPU(cpu)->vcpu_id;
+>  }
+> =20
+>  /* e500 supports 2 h/w breakpoint and 2 watchpoint.
+
+
+--Sig_/eqiBf6yCmTvA0O.1xVZyZ=N
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlmIZ4cACgkQAvw66wEB28IACQCfaNxcGbMxM0D1AItyVBUHgSJ8
+Q64AoICJqXd+w/6qFebKwAE0AwmLxMcS
+=3D6s
+-----END PGP SIGNATURE-----
+
+--Sig_/eqiBf6yCmTvA0O.1xVZyZ=N--
