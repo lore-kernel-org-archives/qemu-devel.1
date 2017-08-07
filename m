@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dekPJ-0003ZN-Bh
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dekPT-0003iv-Sq
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dekPE-0000pu-Fd
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:29 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+	(envelope-from <kwolf@redhat.com>) id 1dekPP-0000wU-0U
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:57:39 -0400
+Date: Mon, 7 Aug 2017 17:57:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170807155717.GI6578@localhost.localdomain>
 References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-	<9a27b8cf-f149-cb7c-681d-f4f7249bfbd5@redhat.com>
-	<5eca1bca-59cc-2d63-1413-0e3b87ebcb80@virtuozzo.com>
-Message-ID: <eedd0b75-c651-3902-4ba2-b8079da1b1a9@virtuozzo.com>
-Date: Mon, 7 Aug 2017 18:57:20 +0300
 MIME-Version: 1.0
-In-Reply-To: <5eca1bca-59cc-2d63-1413-0e3b87ebcb80@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.10] iotests: fix 185
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +22,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
-07.08.2017 18:46, Vladimir Sementsov-Ogievskiy wrote:
-> 07.08.2017 17:29, Eric Blake wrote:
->> On 08/07/2017 09:16 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 185 iotest is broken.
->>>
->>> How to test:
->>>> i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
->>>    done; echo N = $i
->>>
->>> finished for me like this:
->>>
->>> 185 2s ... - output mismatch (see 185.out.bad)
->>> --- /work/src/qemu/master/tests/qemu-iotests/185.out 2017-07-14 \
->>>      15:14:29.520343805 +0300
->>> +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
->>> @@ -37,7 +37,7 @@
->>>   {"return": {}}
->>>   {"return": {}}
->>>   {"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, \
->>>       "event": "SHUTDOWN", "data": {"guest": false}}
->>> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, \
->>>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
->>>          "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
->>>              "mirror"}}
->>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, \
->>>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
->>>          "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
->> This diff says both 'len' and 'offset' differ...
->>
->>>   === Start backup job and exit qemu ===
->>>
->>> Failures: 185
->>> Failed 1 of 1 tests
->>> N = 8
->>>
->>> It doesn't seems logical to expect the constant offset on cancel,
->>> so let filter it out.
->> s/let/let's/
->>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>   tests/qemu-iotests/185     | 2 +-
->>>   tests/qemu-iotests/185.out | 2 +-
->>>   2 files changed, 2 insertions(+), 2 deletions(-)
->>> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, 
->>> "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 
->>> 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
->>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds": TIMESTAMP}, 
->>> "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 
->>> 4194304, "offset": OFFSET, "speed": 65536, "type": "mirror"}}
->> ...while this diff only touched 'offset'.  Did you copy-and-paste
->> incorrectly in the commit message?  If so, then with the commit message
->> fixed, I'm okay with:
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
-> Hmm, I can't reproduce with "len = 0", and it looks impossible. But 
-> I've scrolled up in one of my terminals and found this reproduce, 
-> really, '"len": 0', so, that is possible.
->
-> And, after looking through the code it looks like it really possible - 
-> s->common.len is set not in the very beginning, but after for ex. call 
-> to block_job_pause_point().
->
-> So, the reproduction that I've copied into commit message was very 
-> good match.
->
-> But, I'm not sure, that len should be fixed in the same way. May be it 
-> would be better to set earlier and don't update on each iteration (why 
-> is it updated??)
->
->
+Am 07.08.2017 um 16:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 185 iotest is broken.
+> 
+> How to test:
+> > i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
+>   done; echo N = $i
+> 
+> finished for me like this:
+> 
+> 185 2s ... - output mismatch (see 185.out.bad)
+> --- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
+>     15:14:29.520343805 +0300
+> +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
+> @@ -37,7 +37,7 @@
+>  {"return": {}}
+>  {"return": {}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+>      "event": "SHUTDOWN", "data": {"guest": false}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+>     "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+>         "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
+>             "mirror"}}
+> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+>     "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+>         "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
+> 
+>  === Start backup job and exit qemu ===
+> 
+> Failures: 185
+> Failed 1 of 1 tests
+> N = 8
+> 
+> It doesn't seems logical to expect the constant offset on cancel,
+> so let filter it out.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-So, IMHO, this patch is good (with s/"len": 0/"len": 4194304/ and 
-s/let/let's/ in commit message)
+I'm quoting 185:
 
+# Note that the reference output intentionally includes the 'offset' field in
+# BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
+# predictable and any change in the offsets would hint at a bug in the job
+# throttling code.
+#
+# In order to achieve these predictable offsets, all of the following tests
+# use speed=65536. Each job will perform exactly one iteration before it has
+# to sleep at least for a second, which is plenty of time for the 'quit' QMP
+# command to be received (after receiving the command, the rest runs
+# synchronously, so jobs can arbitrarily continue or complete).
+#
+# The buffer size for commit and streaming is 512k (waiting for 8 seconds after
+# the first request), for active commit and mirror it's large enough to cover
+# the full 4M, and for backup it's the qcow2 cluster size, which we know is
+# 64k. As all of these are at least as large as the speed, we are sure that the
+# offset doesn't advance after the first iteration before qemu exits.
 
--- 
-Best regards,
-Vladimir
+So before we change the expected output, can we explain why the offsets
+aren't predictable, even if throttling is used and contrary to what the
+comment says? Should we sleep a little before issuing 'quit'?
+
+(By the way, I couldn't reproduce in N = 128 attempts, so it doesn't
+look like I can look into what's happening in detail, except with code
+review.)
+
+Kevin
