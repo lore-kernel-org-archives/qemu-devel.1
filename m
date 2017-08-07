@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJE-0007XJ-3L
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJJ-0007dd-7d
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejIy-00041v-0i
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJ2-00045x-Hi
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:13 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  7 Aug 2017 16:45:44 +0200
-Message-Id: <1502117160-24655-41-git-send-email-armbru@redhat.com>
+Date: Mon,  7 Aug 2017 16:45:51 +0200
+Message-Id: <1502117160-24655-48-git-send-email-armbru@redhat.com>
 In-Reply-To: <1502117160-24655-1-git-send-email-armbru@redhat.com>
 References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 40/56] blockjob: Lift speed sign conversion
- out of backup_job_create()
+Subject: [Qemu-devel] [RFC PATCH 47/56] blockjob: Make BlockJobInfo and
+ event offsets unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-backup_job_create() takes int64_t speed.  The underlying BlockJob
-abstraction takes uint64_t.  backup_job_create() converts from int64_t
-to uint64_t, rejecting negative speed.
+File offsets should use QAPI type 'size' (uint64_t).  BlockJobInfo
+members @len, offset and parameters @len, @offset of events
+BLOCK_JOB_COMPLETED, BLOCK_JOB_CANCELLED, BLOCK_JOB_READY are 'int'
+(int64_t).  block_job_query(), block_job_event_completed(),
+block_job_event_cancelled(), block_job_event_ready() get them from
+BlockJob members @len and @offset, which are int64_t, but should never
+be negative.
 
-Lift this check and conversion out of backup_job_create() into its
-callers.  I'm going to lift it further until it falls off the top.
+Change the BlockJobInfo members and the event parameters to 'size',
+for QAPI/QMP consistency.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/backup.c            |  7 +------
- blockdev.c                | 12 ++++++++++++
- include/block/block_int.h |  2 +-
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ hmp.c                |  8 ++++----
+ qapi/block-core.json | 16 ++++++++--------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 3a97836..eddc17a 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -529,7 +529,7 @@ static const BlockJobDriver backup_job_driver = {
- };
+diff --git a/hmp.c b/hmp.c
+index fae974e..867c50b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -966,16 +966,16 @@ void hmp_info_block_jobs(Monitor *mon, const QDict *qdict)
  
- BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
--                  BlockDriverState *target, int64_t speed,
-+                  BlockDriverState *target, uint64_t speed,
-                   MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap,
-                   bool compress,
-                   BlockdevOnError on_source_error,
-@@ -577,11 +577,6 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         return NULL;
-     }
+     while (list) {
+         if (strcmp(list->value->type, "stream") == 0) {
+-            monitor_printf(mon, "Streaming device %s: Completed %" PRId64
+-                           " of %" PRId64 " bytes, speed limit %" PRIu64
++            monitor_printf(mon, "Streaming device %s: Completed %" PRIu64
++                           " of %" PRIu64 " bytes, speed limit %" PRIu64
+                            " bytes/s\n",
+                            list->value->device,
+                            list->value->offset,
+                            list->value->len,
+                            list->value->speed);
+         } else {
+-            monitor_printf(mon, "Type %s, device %s: Completed %" PRId64
+-                           " of %" PRId64 " bytes, speed limit %" PRIu64
++            monitor_printf(mon, "Type %s, device %s: Completed %" PRIu64
++                           " of %" PRIu64 " bytes, speed limit %" PRIu64
+                            " bytes/s\n",
+                            list->value->type,
+                            list->value->device,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 9e9f2d8..b8442f3 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -955,8 +955,8 @@
+ # Since: 1.1
+ ##
+ { 'struct': 'BlockJobInfo',
+-  'data': {'type': 'str', 'device': 'str', 'len': 'int',
+-           'offset': 'int', 'busy': 'bool', 'paused': 'bool',
++  'data': {'type': 'str', 'device': 'str', 'len': 'size',
++           'offset': 'size', 'busy': 'bool', 'paused': 'bool',
+            'speed': 'size',
+            'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
  
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return NULL;
--    }
--
-     if (sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-         if (!sync_bitmap) {
-             error_setg(errp, "must provide a valid bitmap name for "
-diff --git a/blockdev.c b/blockdev.c
-index f9afc32..1deea49 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3210,6 +3210,12 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-         return NULL;
-     }
+@@ -3606,8 +3606,8 @@
+ { 'event': 'BLOCK_JOB_COMPLETED',
+   'data': { 'type'  : 'BlockJobType',
+             'device': 'str',
+-            'len'   : 'int',
+-            'offset': 'int',
++            'len'   : 'size',
++            'offset': 'size',
+             'speed' : 'size',
+             '*error': 'str' } }
  
-+    if (backup->speed < 0) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
-+                   "a non-negative rate limit");
-+        return NULL;
-+    }
-+
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
+@@ -3642,8 +3642,8 @@
+ { 'event': 'BLOCK_JOB_CANCELLED',
+   'data': { 'type'  : 'BlockJobType',
+             'device': 'str',
+-            'len'   : 'int',
+-            'offset': 'int',
++            'len'   : 'size',
++            'offset': 'size',
+             'speed' : 'size' } }
  
-@@ -3353,6 +3359,12 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
-         return NULL;
-     }
+ ##
+@@ -3707,8 +3707,8 @@
+ { 'event': 'BLOCK_JOB_READY',
+   'data': { 'type'  : 'BlockJobType',
+             'device': 'str',
+-            'len'   : 'int',
+-            'offset': 'int',
++            'len'   : 'size',
++            'offset': 'size',
+             'speed' : 'size' } }
  
-+    if (backup->speed < 0) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
-+                   "a non-negative rate limit");
-+        return NULL;
-+    }
-+
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index c09076e..19639c0 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -923,7 +923,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-  * until the job is cancelled or manually completed.
-  */
- BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
--                            BlockDriverState *target, int64_t speed,
-+                            BlockDriverState *target, uint64_t speed,
-                             MirrorSyncMode sync_mode,
-                             BdrvDirtyBitmap *sync_bitmap,
-                             bool compress,
+ ##
 -- 
 2.7.5
