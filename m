@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dekEY-0003JX-JT
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:46:27 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dekFK-0003wS-De
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:47:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dekET-0002cm-Lo
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:46:22 -0400
-References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-	<9a27b8cf-f149-cb7c-681d-f4f7249bfbd5@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5eca1bca-59cc-2d63-1413-0e3b87ebcb80@virtuozzo.com>
-Date: Mon, 7 Aug 2017 18:46:14 +0300
+	(envelope-from <cohuck@redhat.com>) id 1dekFF-00032Y-Jr
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:47:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dekFF-000324-El
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:47:05 -0400
+Date: Mon, 7 Aug 2017 17:46:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170807174659.7faf9ef2@gondolin>
+In-Reply-To: <870ba6c0-e285-d75a-098e-0a2d1e02e02b@de.ibm.com>
+References: <20170718142455.32676-1-cohuck@redhat.com>
+	<20170719150313.6acdb087@gondolin>
+	<bcdcdd89-4a1d-aa7c-ac2d-f994a0613183@redhat.com>
+	<870ba6c0-e285-d75a-098e-0a2d1e02e02b@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <9a27b8cf-f149-cb7c-681d-f4f7249bfbd5@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.10] iotests: fix 185
+Subject: Re: [Qemu-devel] [PATCH RFC v2 0/9] s390x: zPCI detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-07.08.2017 17:29, Eric Blake wrote:
-> On 08/07/2017 09:16 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 185 iotest is broken.
->>
->> How to test:
->>> i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
->>    done; echo N = $i
->>
->> finished for me like this:
->>
->> 185 2s ... - output mismatch (see 185.out.bad)
->> --- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
->>      15:14:29.520343805 +0300
->> +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
->> @@ -37,7 +37,7 @@
->>   {"return": {}}
->>   {"return": {}}
->>   {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
->>       "event": "SHUTDOWN", "data": {"guest": false}}
->> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
->>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
->>          "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
->>              "mirror"}}
->> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
->>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
->>          "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
-> This diff says both 'len' and 'offset' differ...
->
->>   === Start backup job and exit qemu ===
->>
->> Failures: 185
->> Failed 1 of 1 tests
->> N = 8
->>
->> It doesn't seems logical to expect the constant offset on cancel,
->> so let filter it out.
-> s/let/let's/
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   tests/qemu-iotests/185     | 2 +-
->>   tests/qemu-iotests/185.out | 2 +-
->>   2 files changed, 2 insertions(+), 2 deletions(-)
->> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
->> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": OFFSET, "speed": 65536, "type": "mirror"}}
-> ...while this diff only touched 'offset'.  Did you copy-and-paste
-> incorrectly in the commit message?  If so, then with the commit message
-> fixed, I'm okay with:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-Hmm, I can't reproduce with "len = 0", and it looks impossible. But I've 
-scrolled up in one of my terminals and found this reproduce, really, 
-'"len": 0', so, that is possible.
+On Mon, 24 Jul 2017 12:44:43 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-And, after looking through the code it looks like it really possible - 
-s->common.len is set not in the very beginning, but after for ex. call 
-to block_job_pause_point().
+> On 07/19/2017 03:31 PM, Thomas Huth wrote:
+> > On 19.07.2017 15:03, Cornelia Huck wrote:  
+> >> On Tue, 18 Jul 2017 16:24:46 +0200
+> >> Cornelia Huck <cohuck@redhat.com> wrote:
+> >>  
+> >>> Next try of the zPCI detangling, taking cpu models into account.
+> >>>
+> >>> The goal of this is twofold:
+> >>> - Being able to disable PCI support in a build completely, as for v1.
+> >>> - Properly fencing off PCI if the relevant facility bit is not provided.
+> >>>
+> >>> The second one leads to an interesting usability problem: -device help
+> >>> still shows the various pci devices, but you cannot add them if the
+> >>> cpu model does not include zpci, due to the phb not being instantiated.
+> >>> The user is presented with
+> >>>
+> >>> qemu-system-s390x: -device virtio-rng-pci: No 'PCI' bus found for device 'virtio-rng-pci'
+> >>>
+> >>> ...which is not very helpful, as it does not point to the root cause (no
+> >>> zpci in the cpu model, and therefore no pci at all). Not sure how one can
+> >>> communicate this root cause, ideas welcome.  
+> >>
+> >> An idea on how to improve this would still be welcome :)  
+> > 
+> > IMHO it's ok to keep that error message ... but we should add a section
+> > to http://wiki.qemu.org/Documentation/Platforms/S390X about PCI devices,
+> > including a sample error message as above and a note what has to be done
+> > to get a machine with PCI support, so that people can find that page via
+> > Google in case they run into this problem.  
+> 
+> I agree, the message is actually not that bad for an error message. With
+> an wiki entry we should be fine.
+> 
 
-So, the reproduction that I've copied into commit message was very good 
-match.
-
-But, I'm not sure, that len should be fixed in the same way. May be it 
-would be better to set earlier and don't update on each iteration (why 
-is it updated??)
-
-
--- 
-Best regards,
-Vladimir
+Updated https://wiki.qemu.org/index.php/Documentation/Platforms/S390X
+with some info... review (or editing :) welcome.
