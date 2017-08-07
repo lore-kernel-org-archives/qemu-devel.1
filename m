@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJ9-0007RX-Lw
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJB-0007UI-QB
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejIu-0003y7-2z
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejIv-0003zu-MQ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:05 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  7 Aug 2017 16:45:39 +0200
-Message-Id: <1502117160-24655-36-git-send-email-armbru@redhat.com>
+Date: Mon,  7 Aug 2017 16:45:43 +0200
+Message-Id: <1502117160-24655-40-git-send-email-armbru@redhat.com>
 In-Reply-To: <1502117160-24655-1-git-send-email-armbru@redhat.com>
 References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 35/56] blockjob: Lift speed sign conversion
- into block_job_set_speed()
+Subject: [Qemu-devel] [RFC PATCH 39/56] blockjob: Lift speed sign conversion
+ out of block_job_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,151 +23,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-The BlockJob abstraction takes int64_t speed.  The underlying
-RateLimit abstraction takes uint64_t.  We convert from int64_t to
-uint64_t in the BlockJobDriver speed_set() methods.  They all reject
-negative speed.
+block_job_create() takes int64_t speed.  The underlying RateLimit
+abstraction takes uint64_t.  block_job_create() converts from int64_t
+to uint64_t, rejecting negative speed.
 
-Lift this check and conversion up into the method's caller
-block_job_set_speed().  I'm going to lift it further until it falls
-off the top.
-
-Improve the error message while there.
+Lift this check and conversion out of block_job_create() into its
+callers.  I'm going to lift it further until it falls off the top.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/backup.c               | 6 +-----
- block/commit.c               | 6 +-----
- block/mirror.c               | 6 +-----
- block/stream.c               | 6 +-----
- blockjob.c                   | 7 +++++++
- include/block/blockjob.h     | 2 +-
+ block/backup.c               | 5 +++++
+ block/commit.c               | 6 ++++++
+ block/mirror.c               | 6 ++++++
+ block/stream.c               | 6 ++++++
+ blockjob.c                   | 8 +-------
  include/block/blockjob_int.h | 2 +-
- 7 files changed, 13 insertions(+), 22 deletions(-)
+ 6 files changed, 25 insertions(+), 8 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index a37c944..b76143d 100644
+index 359e526..3a97836 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -188,14 +188,10 @@ static int coroutine_fn backup_before_write_notify(
-     return backup_do_cow(job, req->offset, req->bytes, NULL, true);
- }
+@@ -577,6 +577,11 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+         return NULL;
+     }
  
--static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
-+static void backup_set_speed(BlockJob *job, uint64_t speed, Error **errp)
- {
-     BackupBlockJob *s = container_of(job, BackupBlockJob, common);
- 
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
-     ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
- }
- 
++    if (speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
++        return NULL;
++    }
++
+     if (sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+         if (!sync_bitmap) {
+             error_setg(errp, "must provide a valid bitmap name for "
 diff --git a/block/commit.c b/block/commit.c
-index c7857c3..5dc1c73 100644
+index ae9191d..86d780e 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -220,14 +220,10 @@ out:
-     block_job_defer_to_main_loop(&s->common, commit_complete, data);
- }
- 
--static void commit_set_speed(BlockJob *job, int64_t speed, Error **errp)
-+static void commit_set_speed(BlockJob *job, uint64_t speed, Error **errp)
- {
-     CommitBlockJob *s = container_of(job, CommitBlockJob, common);
- 
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
-     ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
- }
- 
-diff --git a/block/mirror.c b/block/mirror.c
-index 37a8744..7959a7f 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -928,14 +928,10 @@ immediate_exit:
-     block_job_defer_to_main_loop(&s->common, mirror_exit, data);
- }
- 
--static void mirror_set_speed(BlockJob *job, int64_t speed, Error **errp)
-+static void mirror_set_speed(BlockJob *job, uint64_t speed, Error **errp)
- {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common);
- 
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
-     ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
- }
- 
-diff --git a/block/stream.c b/block/stream.c
-index e6f7234..11b6673 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -207,14 +207,10 @@ out:
-     block_job_defer_to_main_loop(&s->common, stream_complete, data);
- }
- 
--static void stream_set_speed(BlockJob *job, int64_t speed, Error **errp)
-+static void stream_set_speed(BlockJob *job, uint64_t speed, Error **errp)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common);
- 
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
-     ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
- }
- 
-diff --git a/blockjob.c b/blockjob.c
-index 70a7818..7f77b7e 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -460,6 +460,13 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
-         error_setg(errp, QERR_UNSUPPORTED);
+@@ -309,6 +309,12 @@ void commit_start(const char *job_id, BlockDriverState *bs,
          return;
      }
-+
+ 
 +    if (speed < 0) {
 +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
 +                   "a non-negative rate limit");
 +        return;
 +    }
 +
-     job->driver->set_speed(job, speed, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 67c0968..bf5314b 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -110,7 +110,7 @@ typedef struct BlockJob {
-     int64_t len;
+     s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
+                          speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
+     if (!s) {
+diff --git a/block/mirror.c b/block/mirror.c
+index 6c3b446..af54163 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1139,6 +1139,12 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+     Error *local_err = NULL;
+     int ret;
  
-     /** Speed that was set with @block_job_set_speed.  */
--    int64_t speed;
-+    uint64_t speed;
++    if (speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
++                   "a non-negative rate limit");
++        return;
++    }
++
+     if (granularity == 0) {
+         granularity = bdrv_get_default_bitmap_granularity(target);
+     }
+diff --git a/block/stream.c b/block/stream.c
+index 9a145f2..fefcdb9 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -237,6 +237,12 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+         }
+     }
  
-     /** The completion function that will be called when the job completes.  */
-     BlockCompletionFunc *cb;
++    if (speed < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
++                   "a non-negative rate limit");
++        return;
++    }
++
+     /* Prevent concurrent jobs trying to modify the graph structure here, we
+      * already have our own plans. Also don't allow resize as the image size is
+      * queried only at the job start and then cached. */
+diff --git a/blockjob.c b/blockjob.c
+index 998ffef..335099e 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -604,7 +604,7 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
+ 
+ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+                        BlockDriverState *bs, uint64_t perm,
+-                       uint64_t shared_perm, int64_t speed, int flags,
++                       uint64_t shared_perm, uint64_t speed, int flags,
+                        BlockCompletionFunc *cb, void *opaque, Error **errp)
+ {
+     BlockBackend *blk;
+@@ -641,12 +641,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+         }
+     }
+ 
+-    if (speed < 0) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "speed",
+-                   "a non-negative rate limit");
+-        return NULL;
+-    }
+-
+     blk = blk_new(perm, shared_perm);
+     ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
 diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index f13ad05..2d10794 100644
+index dadfd8c..33472ba 100644
 --- a/include/block/blockjob_int.h
 +++ b/include/block/blockjob_int.h
-@@ -42,7 +42,7 @@ struct BlockJobDriver {
-     BlockJobType job_type;
+@@ -133,7 +133,7 @@ struct BlockJobDriver {
+  */
+ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+                        BlockDriverState *bs, uint64_t perm,
+-                       uint64_t shared_perm, int64_t speed, int flags,
++                       uint64_t shared_perm, uint64_t speed, int flags,
+                        BlockCompletionFunc *cb, void *opaque, Error **errp);
  
-     /** Optional callback for job types that support setting a speed limit */
--    void (*set_speed)(BlockJob *job, int64_t speed, Error **errp);
-+    void (*set_speed)(BlockJob *job, uint64_t speed, Error **errp);
- 
-     /** Mandatory: Entrypoint for the Coroutine. */
-     CoroutineEntry *start;
+ /**
 -- 
 2.7.5
