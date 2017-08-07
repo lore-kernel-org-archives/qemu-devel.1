@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1deib1-0002Gp-J0
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:01:32 -0400
+	(envelope-from <berrange@redhat.com>) id 1deibl-0002di-9N
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1deiaw-0003Bv-SJ
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:01:27 -0400
-Date: Mon, 7 Aug 2017 16:01:07 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170807140107.GF6578@localhost.localdomain>
-References: <20170804152655.31510-1-pbonzini@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1deibg-0003Sb-1B
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1deibf-0003Rn-PP
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:07 -0400
+Date: Mon, 7 Aug 2017 15:02:00 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170807140200.GL18259@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.9aca98788e1a99635ffb85ab9c01cb0497d2b3d8.1502103332.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170804152655.31510-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: drop bdrv_set_key from
- BlockDriver
+In-Reply-To: <cover.9aca98788e1a99635ffb85ab9c01cb0497d2b3d8.1502103332.git-series.knut.omang@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] Unit test+fix for problem with QEMU
+ handling of multiple bind()s to the same port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,15 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Am 04.08.2017 um 17:26 hat Paolo Bonzini geschrieben:
-> This is not used anymore since c01c214b69 ("block: remove all encryption
-> handling APIs", 2017-07-11).
+On Mon, Aug 07, 2017 at 12:58:38PM +0200, Knut Omang wrote:
+> This series contains:
+> * a unit test that exposes a race condition which causes QEMU to fail
+>   to find a port even when there is plenty of available ports.
+> * a refactor of the qemu-sockets inet_listen_saddr() function
+>   to better handle this situation.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Changes from v6:
+> * Changed license of the (new) test-listen.c source file from
+>   GNU v2 to GNU v2 and later, according to QEMU standards.
+> 
+> Changes from v5:
+> * Also move setting of error from socket creation out
+>   into the main double for loop.
+> * Simplify and enhance reporting if socket creation fails:
+>   Only report failure to create sockets if none of the
+>   provided addrinfo list elements allows creation of a
+>   socket, otherwise report failure to find an available port.
+> * Further simplify if's within the for loops and make sure
+>   failure to recreate a socket gets distinctively reported.
+> * Rebased to current master.
+> 
+> Changes from v4:
+> * Move the complexity of recreating a socket and setting the error pointer
+>   into the main for loop, eliminating the try_bind_listen() function
+>   again. Cleaning up and improving error handling in the process.
+> 
+> Changes from v3:
+> * Test changes: Add missing license
+>   Add subtests for ipv4, ipv6 and both
+>   Various g_* usage improvements
+> * Split patch into 3 patches with two refactoring patches ahead
+>   of the actual fix.
+> 
+> Changes from v2:
+> * Non-trivial rebase + further abstraction
+>   on top of 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
+>   'tests: add functional test validating ipv4/ipv6 address flag handling'
+> 
+> Changes from v1:
+> * Fix potential uninitialized variable only detected by optimize.
+> * Improve unexpected error detection in test-listen to give more
+>   details about why the test fails unexpectedly.
+> * Fix some line length style issues.
+> 
+> Thanks,
+> Knut
+> 
+> Knut Omang (4):
+>   tests: Add test-listen - a stress test for QEMU socket listen
+>   sockets: factor out a new try_bind() function
+>   sockets: factor out create_fast_reuse_socket
+>   sockets: Handle race condition between binds to the same port
+> 
+>  tests/Makefile.include |   2 +-
+>  tests/test-listen.c    | 253 ++++++++++++++++++++++++++++++++++++++++++-
+>  util/qemu-sockets.c    | 138 +++++++++++++++--------
+>  3 files changed, 345 insertions(+), 48 deletions(-)
+>  create mode 100644 tests/test-listen.c
+> 
+> base-commit: a588c4985eff363154d65aee8607d0a4601655f7
 
-Thanks, applied to the block branch.
+Thanks, queued for 2.11
 
-Kevin
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
