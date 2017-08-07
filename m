@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dekSs-00074U-EG
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:01:15 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dekUR-00005x-Je
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:02:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dekSn-00034N-8u
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:01:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dekSn-000339-0B
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:01:05 -0400
-Date: Mon, 7 Aug 2017 09:52:24 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170807095224.5438ef8c@w520.home>
-In-Reply-To: <CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-	<20170726092931.0678689e@w520.home>
-	<20170726190348-mutt-send-email-mst@kernel.org>
-	<20170726113222.52aad9a6@w520.home>
-	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
-	<20170731234626.7664be18@w520.home>
-	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
-	<20170801090158.35d18f10@w520.home>
-	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
+	(envelope-from <zuban32s@gmail.com>) id 1dekUM-0004AL-K7
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:02:47 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37807)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dekUM-000491-Dj
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:02:42 -0400
+Received: by mail-pf0-x243.google.com with SMTP id p13so771762pfd.4
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 09:02:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
- =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+In-Reply-To: <5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
+References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
+	<1501964994-5257-3-git-send-email-zuban32s@gmail.com>
+	<5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Mon, 7 Aug 2017 19:02:38 +0300
+Message-ID: <CAKSfGUDnpSnkfBC-cCwdjh--HY3MqbccZVfJV5qGFC_hTiz0kw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] pci: add QEMU-specific PCI
+ capability structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,141 +30,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bob Chen <a175818323@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: seabios@seabios.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, 7 Aug 2017 21:00:04 +0800
-Bob Chen <a175818323@gmail.com> wrote:
+2017-08-07 18:52 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+> On 05/08/2017 23:29, Aleksandr Bezzubikov wrote:
+>>
+>> On PCI init PCI bridge devices may need some
+>> extra info about bus number to reserve, IO, memory and
+>> prefetchable memory limits. QEMU can provide this
+>> with special vendor-specific PCI capability.
+>>
+>> This capability is intended to be used only
+>> for Red Hat PCI bridges, i.e. QEMU cooperation.
+>>
+>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>> ---
+>>   src/fw/dev-pci.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 50 insertions(+)
+>>   create mode 100644 src/fw/dev-pci.h
+>>
+>> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
+>> new file mode 100644
+>> index 0000000..2c8ddb0
+>
+>
+> Hi Aleksandr,
+>
 
-> Bad news... The performance had dropped dramatically when using emulated
-> switches.
-> 
-> I was referring to the PCIe doc at
-> https://github.com/qemu/qemu/blob/master/docs/pcie.txt
-> 
-> # qemu-system-x86_64_2.6.2 -enable-kvm -cpu host,kvm=off -machine
-> q35,accel=kvm -nodefaults -nodefconfig \
-> -device ioh3420,id=root_port1,chassis=1,slot=1,bus=pcie.0 \
-> -device x3130-upstream,id=upstream_port1,bus=root_port1 \
-> -device
-> xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=11,slot=11
-> \
-> -device
-> xio3130-downstream,id=downstream_port2,bus=upstream_port1,chassis=12,slot=12
-> \
-> -device vfio-pci,host=08:00.0,multifunction=on,bus=downstream_port1 \
-> -device vfio-pci,host=09:00.0,multifunction=on,bus=downstream_port2 \
-> -device ioh3420,id=root_port2,chassis=2,slot=2,bus=pcie.0 \
-> -device x3130-upstream,id=upstream_port2,bus=root_port2 \
-> -device
-> xio3130-downstream,id=downstream_port3,bus=upstream_port2,chassis=21,slot=21
-> \
-> -device
-> xio3130-downstream,id=downstream_port4,bus=upstream_port2,chassis=22,slot=22
-> \
-> -device vfio-pci,host=89:00.0,multifunction=on,bus=downstream_port3 \
-> -device vfio-pci,host=8a:00.0,multifunction=on,bus=downstream_port4 \
-> ...
-> 
-> 
-> Not 8 GPUs this time, only 4.
-> 
-> *1. Attached to pcie bus directly (former situation):*
-> 
-> Unidirectional P2P=Disabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 420.93  10.03  11.07  11.09
->      1  10.04 425.05  11.08  10.97
->      2  11.17  11.17 425.07  10.07
->      3  11.25  11.25  10.07 423.64
-> Unidirectional P2P=Enabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 425.98  10.03  11.07  11.09
->      1   9.99 426.43  11.07  11.07
->      2  11.04  11.20 425.98   9.89
->      3  11.21  11.21  10.06 425.97
-> Bidirectional P2P=Disabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 430.67  10.45  19.59  19.58
->      1  10.44 428.81  19.49  19.53
->      2  19.62  19.62 429.52  10.57
->      3  19.60  19.66  10.43 427.38
-> Bidirectional P2P=Enabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 429.47  10.47  19.52  19.39
->      1  10.48 427.15  19.64  19.52
->      2  19.64  19.59 429.02  10.42
->      3  19.60  19.64  10.47 427.81
-> P2P=Disabled Latency Matrix (us)
->    D\D     0      1      2      3
->      0   4.50  13.72  14.49  14.44
->      1  13.65   4.53  14.52  14.33
->      2  14.22  13.82   4.52  14.50
->      3  13.87  13.75  14.53   4.55
-> P2P=Enabled Latency Matrix (us)
->    D\D     0      1      2      3
->      0   4.44  13.56  14.58  14.45
->      1  13.56   4.48  14.39  14.45
->      2  13.85  13.93   4.86  14.80
->      3  14.51  14.23  14.70   4.72
-> 
-> 
-> *2. Attached to emulated Root Port and Switches:*
-> 
-> Unidirectional P2P=Disabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 420.48   3.15   3.12   3.12
->      1   3.13 422.31   3.12   3.12
->      2   3.08   3.09 421.40   3.13
->      3   3.10   3.10   3.13 418.68
-> Unidirectional P2P=Enabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 418.68   3.14   3.12   3.12
->      1   3.15 420.03   3.12   3.12
->      2   3.11   3.10 421.39   3.14
->      3   3.11   3.08   3.13 419.13
-> Bidirectional P2P=Disabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 424.36   5.36   5.35   5.34
->      1   5.36 424.36   5.34   5.34
->      2   5.35   5.36 425.52   5.35
->      3   5.36   5.36   5.34 425.29
-> Bidirectional P2P=Enabled Bandwidth Matrix (GB/s)
->    D\D     0      1      2      3
->      0 422.98   5.35   5.35   5.35
->      1   5.35 423.44   5.34   5.33
->      2   5.35   5.35 425.29   5.35
->      3   5.35   5.34   5.34 423.21
-> P2P=Disabled Latency Matrix (us)
->    D\D     0      1      2      3
->      0   4.79  16.59  16.38  16.22
->      1  16.62   4.77  16.35  16.69
->      2  16.77  16.66   4.03  16.68
->      3  16.54  16.56  16.78   4.08
-> P2P=Enabled Latency Matrix (us)
->    D\D     0      1      2      3
->      0   4.51  16.56  16.58  16.66
->      1  15.65   3.87  16.74  16.61
->      2  16.59  16.81   3.96  16.70
->      3  16.47  16.28  16.68   4.03
-> 
-> 
-> Is it because the heavy load of CPU emulation had caused a bottleneck?
+Hi Marcel,
 
-QEMU should really not be involved in the data flow, once the memory
-slots are configured in KVM, we really should not be exiting out to
-QEMU regardless of the topology.  I wonder if it has something to do
-with the link speed/width advertised on the switch port.  I don't think
-the endpoint can actually downshift the physical link, so lspci on the
-host should probably still show the full bandwidth capability, but
-maybe the driver is somehow doing rate limiting.  PCIe gets a little
-more complicated as we go to newer versions, so it's not quite as
-simple as exposing a different bit configuration to advertise 8GT/s,
-x16.  Last I tried to do link matching it was deemed too complicated
-for something I couldn't prove at the time had measurable value.  This
-might be a good way to prove that value if it makes a difference here.
-I can't think why else you'd see such a performance difference, but
-testing to see if the KVM exit rate is significantly different could
-still be an interesting verification.  Thanks,
+>> --- /dev/null
+>> +++ b/src/fw/dev-pci.h
+>> @@ -0,0 +1,50 @@
+>> +#ifndef _PCI_CAP_H
+>> +#define _PCI_CAP_H
+>> +
+>> +#include "types.h"
+>> +
+>> +/*
+>> +
+>
+>
+> Please use the standard comment:
+>
+> /*
+>  *
+>  *
+>  */
+>
+>
+>> +QEMU-specific vendor(Red Hat)-specific capability.
+>> +It's intended to provide some hints for firmware to init PCI devices.
+>> +
+>> +Its structure is shown below:
+>> +
+>> +Header:
+>> +
+>> +u8 id;       Standard PCI Capability Header field
+>> +u8 next;     Standard PCI Capability Header field
+>> +u8 len;      Standard PCI Capability Header field
+>> +u8 type;     Red Hat vendor-specific capability type:
+>> +               now only REDHAT_CAP_TYP_QEMU=1 exists
+>
+>
+> Typo o the line before, but I think you don't need it there.
+>
+>> +Data:
+>> +
+>> +u32 bus_res;            minimum bus number to reserve;
+>> +                        this is necessary for PCI Express Root Ports
+>> +                        to support PCIE-to-PCI bridge hotplug
+>
+>
+> I would add a broader class of usage:
+>      necessary for nesting PCI bridges hotplug.
+>
+>> +u64 io;                 IO space to reserve
+>> +u64 mem;                non-prefetchable memory space to reserve
+>> +u64 prefetchable_mem;   prefetchable memory space to reserve
+>> +
+>
+>
+> Layout looks good to me.
+>
+>> +If any field value in Data section is -1,
+>> +it means that such kind of reservation
+>> +is not needed and must be ignored.
+>> +
+>
+>
+> -1 is not a valid value for unsigned fields, you may
+> want to say 0xff..f or some other way.
 
-Alex
+I meant cast to unsigned here (because we still use unsigned types),
+but if it can mislead someone I will change this.
+
+>
+>> +*/
+>> +
+>> +/* Offset of vendor-specific capability type field */
+>> +#define PCI_CAP_REDHAT_TYPE  3
+>
+>
+> May I ask why why '3'? I am not against it, I just
+> want to understand the number.
+>
+
+This is actually an offset to this field
+
+>> +
+>> +/* List of valid Red Hat vendor-specific capability types */
+>> +#define REDHAT_CAP_TYPE_QEMU    1
+>
+>
+> I think I pointed this in another thread, the name is
+> too vague, please change it to something like:
+>    REDHAT_CAP_RES_RESERVE_QEMU
+> that narrows down the intend.
+>
+
+What does the first 'RES' mean?
+
+>> +
+>> +
+>> +/* Offsets of QEMU capability fields */
+>> +#define QEMU_PCI_CAP_BUS_RES        4
+>> +#define QEMU_PCI_CAP_LIMITS_OFFSET  8
+>> +#define QEMU_PCI_CAP_IO             8
+>> +#define QEMU_PCI_CAP_MEM            16
+>> +#define QEMU_PCI_CAP_PREF_MEM       24
+>> +#define QEMU_PCI_CAP_SIZE           32
+>> +
+>> +#endif /* _PCI_CAP_H */
+>>
+>
+> The layout looks good to me.
+>
+> Thanks,
+> Marcel
+
+
+
+-- 
+Aleksandr Bezzubikov
