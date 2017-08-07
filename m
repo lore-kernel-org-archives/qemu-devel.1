@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1deh0y-0006xj-74
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:20:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1deh6L-0000BH-R4
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1deh0s-00023B-Vs
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:20:08 -0400
-References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1501597152-25342-3-git-send-email-anton.nefedov@virtuozzo.com>
-	<444f8ae2-dbf2-b4d5-a979-586142edae67@redhat.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <378dfffd-0ae8-8103-9c76-292a171d5670@virtuozzo.com>
-Date: Mon, 7 Aug 2017 15:19:44 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1deh6G-0005Ax-Pb
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:25:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1deh6G-0005AV-Gn
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:25:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 50BD413A45
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 12:25:35 +0000 (UTC)
+Date: Mon, 7 Aug 2017 13:25:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170807122529.GA2504@work-vm>
+References: <20170804175011.21944-1-dgilbert@redhat.com>
+	<20170807072101.GX5561@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <444f8ae2-dbf2-b4d5-a979-586142edae67@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/15] blkverify: set supported
- write/zero flags
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170807072101.GX5561@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH f0r 2.11] runstate/migrate: Two more
+ transitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +34,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
 
-On 08/04/2017 06:23 PM, Eric Blake wrote:
-> On 08/01/2017 09:18 AM, Anton Nefedov wrote:
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> ---
->>   block/blkverify.c | 9 +++++++++
->>   1 file changed, 9 insertions(+)
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Aug 04, 2017 at 06:50:11PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > There's a race if someone does a 'stop' near the end of migrate;
+> > the migration process goes through two runstates:
+> >     'finish migrate'
+> >     'postmigrate'
+> > 
+> > If the user issues a 'stop' between the two we end up with invalid
+> > state transitions.
+> > Add the transitions as valid.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  vl.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/vl.c b/vl.c
+> > index 99fcfa0442..bacb03f49d 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -621,6 +621,7 @@ static const RunStateTransition runstate_transitions_def[] = {
+> >  
+> >      { RUN_STATE_PAUSED, RUN_STATE_RUNNING },
+> >      { RUN_STATE_PAUSED, RUN_STATE_FINISH_MIGRATE },
+> > +    { RUN_STATE_PAUSED, RUN_STATE_POSTMIGRATE },
+> >      { RUN_STATE_PAUSED, RUN_STATE_PRELAUNCH },
+> >      { RUN_STATE_PAUSED, RUN_STATE_COLO},
+> >  
+> > @@ -633,6 +634,7 @@ static const RunStateTransition runstate_transitions_def[] = {
+> >      { RUN_STATE_PRELAUNCH, RUN_STATE_INMIGRATE },
+> >  
+> >      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_RUNNING },
+> > +    { RUN_STATE_FINISH_MIGRATE, RUN_STATE_PAUSED },
+> >      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_POSTMIGRATE },
+> >      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_PRELAUNCH },
+> >      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_COLO},
 > 
-> Basically, blkverify supports a flag if BOTH of its underlying files
-> also support the flag; if either side can't handle the flag, then we
-> fall back to emulation for both sides.
+> Do we need this as well?
 > 
-> With more overhead, we COULD state that we support both bits if at least
-> one of the two underlying BDS supports the bit, and then emulate support
-> for the bit on the second BDS where it was lacking, so that at least the
-> first BDS doesn't suffer from the penalties of the fallbacks.  But that
-> means duplicating the block layer fallback code in blkverify, which is
-> already something that we don't necessarily expect high performance from.
-> 
-> For FUA, failure to implement the bit merely means that we have more
-> device-wide flush calls (instead of per-transaction mini-flushes), but
-> the end data should be the same.  But for MAY_UNMAP, I'm worried that we
-> may have situations where a plain BDS will create holes, while running
-> the same device paired through blkverify will fall back to slower
-> explicit zeroes.  I'm wondering whether this will bite us, if we have
-> scenarios where the mere fact of trying to verify block device behavior
-> changes what behavior we are even verifying.
-> 
-> Thus, while I think the code change _looks_ okay, I'm not sure if it is
-> correct design-wise, nor whether it is 2.10 material.
-> 
+>     { RUN_STATE_POSTMIGRATE, RUN_STATE_PAUSED },
 
-But this change doesn't make things worse, does it?
-Blkverify will support at least the matching bytes, while now it drops
-them all.
+Apparently not:
 
-Will the 'reference' driver (I guess it's raw/file in most of the cases)
-usually support a superset of 'tested' driver supported bits?
-Maybe we should report an error otherwise?
+(qemu) migrate "exec:cat > /dev/null"
+(qemu) infomigrate
+unknown command: 'infomigrate'
+(qemu) info status
+VM status: paused (postmigrate)
+(qemu) stop
+(qemu) info status
+VM status: paused (postmigrate)
+(qemu)
 
 
->> +    bs->supported_write_flags = BDRV_REQ_FUA &
->> +        bs->file->bs->supported_write_flags &
->> +        s->test_file->bs->supported_write_flags;
->> +
->> +    bs->supported_zero_flags =
->> +        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
->> +        bs->file->bs->supported_zero_flags &
->> +        s->test_file->bs->supported_zero_flags;
->> +
->>       ret = 0;
->>   fail:
->>       qemu_opts_del(opts);
->>
-> 
-/Anton
+so doing a stop at that point doesn't seem to cause any problem.
+
+Dave
+
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
