@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dehdo-0002iF-Tz
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:00:24 -0400
+	(envelope-from <a175818323@gmail.com>) id 1dehho-00046W-BD
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dehdh-0007No-Ae
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:00:17 -0400
-Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:36771)
+	(envelope-from <a175818323@gmail.com>) id 1dehhh-0001ML-Nx
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:04:24 -0400
+Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:37233)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1dehdh-0007Ji-2M
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:00:09 -0400
-Received: by mail-it0-x229.google.com with SMTP id 77so3062026itj.1
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 06:00:07 -0700 (PDT)
+	id 1dehhh-0001M3-HT
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 09:04:17 -0400
+Received: by mail-it0-x235.google.com with SMTP id 76so2070761ith.0
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 06:04:17 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <20170801090158.35d18f10@w520.home>
 References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
@@ -26,8 +26,8 @@ References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
 	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
 	<20170801090158.35d18f10@w520.home>
 From: Bob Chen <a175818323@gmail.com>
-Date: Mon, 7 Aug 2017 21:00:04 +0800
-Message-ID: <CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
+Date: Mon, 7 Aug 2017 21:04:16 +0800
+Message-ID: <CAMxP3BT8Zps6Bp6kEcV+nYHQvncco5f_BQ9O=fTMUckUZz6Ymg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
@@ -43,126 +43,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alex Williamson <alex.williamson@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-Bad news... The performance had dropped dramatically when using emulated
-switches.
-
-I was referring to the PCIe doc at
-https://github.com/qemu/qemu/blob/master/docs/pcie.txt
-
-# qemu-system-x86_64_2.6.2 -enable-kvm -cpu host,kvm=3Doff -machine
-q35,accel=3Dkvm -nodefaults -nodefconfig \
--device ioh3420,id=3Droot_port1,chassis=3D1,slot=3D1,bus=3Dpcie.0 \
--device x3130-upstream,id=3Dupstream_port1,bus=3Droot_port1 \
--device
-xio3130-downstream,id=3Ddownstream_port1,bus=3Dupstream_port1,chassis=3D11,=
-slot=3D11
-\
--device
-xio3130-downstream,id=3Ddownstream_port2,bus=3Dupstream_port1,chassis=3D12,=
-slot=3D12
-\
--device vfio-pci,host=3D08:00.0,multifunction=3Don,bus=3Ddownstream_port1 \
--device vfio-pci,host=3D09:00.0,multifunction=3Don,bus=3Ddownstream_port2 \
--device ioh3420,id=3Droot_port2,chassis=3D2,slot=3D2,bus=3Dpcie.0 \
--device x3130-upstream,id=3Dupstream_port2,bus=3Droot_port2 \
--device
-xio3130-downstream,id=3Ddownstream_port3,bus=3Dupstream_port2,chassis=3D21,=
-slot=3D21
-\
--device
-xio3130-downstream,id=3Ddownstream_port4,bus=3Dupstream_port2,chassis=3D22,=
-slot=3D22
-\
--device vfio-pci,host=3D89:00.0,multifunction=3Don,bus=3Ddownstream_port3 \
--device vfio-pci,host=3D8a:00.0,multifunction=3Don,bus=3Ddownstream_port4 \
-...
-
-
-Not 8 GPUs this time, only 4.
-
-*1. Attached to pcie bus directly (former situation):*
-
-Unidirectional P2P=3DDisabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 420.93  10.03  11.07  11.09
-     1  10.04 425.05  11.08  10.97
-     2  11.17  11.17 425.07  10.07
-     3  11.25  11.25  10.07 423.64
-Unidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 425.98  10.03  11.07  11.09
-     1   9.99 426.43  11.07  11.07
-     2  11.04  11.20 425.98   9.89
-     3  11.21  11.21  10.06 425.97
-Bidirectional P2P=3DDisabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 430.67  10.45  19.59  19.58
-     1  10.44 428.81  19.49  19.53
-     2  19.62  19.62 429.52  10.57
-     3  19.60  19.66  10.43 427.38
-Bidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 429.47  10.47  19.52  19.39
-     1  10.48 427.15  19.64  19.52
-     2  19.64  19.59 429.02  10.42
-     3  19.60  19.64  10.47 427.81
-P2P=3DDisabled Latency Matrix (us)
-   D\D     0      1      2      3
-     0   4.50  13.72  14.49  14.44
-     1  13.65   4.53  14.52  14.33
-     2  14.22  13.82   4.52  14.50
-     3  13.87  13.75  14.53   4.55
-P2P=3DEnabled Latency Matrix (us)
-   D\D     0      1      2      3
-     0   4.44  13.56  14.58  14.45
-     1  13.56   4.48  14.39  14.45
-     2  13.85  13.93   4.86  14.80
-     3  14.51  14.23  14.70   4.72
-
-
-*2. Attached to emulated Root Port and Switches:*
-
-Unidirectional P2P=3DDisabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 420.48   3.15   3.12   3.12
-     1   3.13 422.31   3.12   3.12
-     2   3.08   3.09 421.40   3.13
-     3   3.10   3.10   3.13 418.68
-Unidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 418.68   3.14   3.12   3.12
-     1   3.15 420.03   3.12   3.12
-     2   3.11   3.10 421.39   3.14
-     3   3.11   3.08   3.13 419.13
-Bidirectional P2P=3DDisabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 424.36   5.36   5.35   5.34
-     1   5.36 424.36   5.34   5.34
-     2   5.35   5.36 425.52   5.35
-     3   5.36   5.36   5.34 425.29
-Bidirectional P2P=3DEnabled Bandwidth Matrix (GB/s)
-   D\D     0      1      2      3
-     0 422.98   5.35   5.35   5.35
-     1   5.35 423.44   5.34   5.33
-     2   5.35   5.35 425.29   5.35
-     3   5.35   5.34   5.34 423.21
-P2P=3DDisabled Latency Matrix (us)
-   D\D     0      1      2      3
-     0   4.79  16.59  16.38  16.22
-     1  16.62   4.77  16.35  16.69
-     2  16.77  16.66   4.03  16.68
-     3  16.54  16.56  16.78   4.08
-P2P=3DEnabled Latency Matrix (us)
-   D\D     0      1      2      3
-     0   4.51  16.56  16.58  16.66
-     1  15.65   3.87  16.74  16.61
-     2  16.59  16.81   3.96  16.70
-     3  16.47  16.28  16.68   4.03
-
-
-Is it because the heavy load of CPU emulation had caused a bottleneck?
-
-
+Besides, I checked the lspci -vvv output, no capabilities of Access Control
+are seen.
 
 2017-08-01 23:01 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>:
 
