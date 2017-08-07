@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1delmG-0004S1-Ry
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1deln4-0005Rv-CV
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1delmB-0002Uf-Vf
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:16 -0400
-Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:33436)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1delmB-0002TA-Pg
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:25:11 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 65A948B49E
-	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 19:25:10 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 07 Aug 2017 19:25:03 +0200
-Message-ID: <150212670348.12227.5534815630591997333.stgit@bahia>
-In-Reply-To: <150212666472.12227.5292551535430570753.stgit@bahia>
-References: <150212666472.12227.5292551535430570753.stgit@bahia>
+	(envelope-from <bounces@canonical.com>) id 1delmz-0003Jm-GU
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:26:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49837)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1delmz-0003IX-B1
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 13:26:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1delmw-0003um-Mp
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 17:25:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id ABCDB2E80D0
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 17:25:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.10 PATCH 3/3] spapr: error out if PHB fails to
- setup PCI DRCs
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 07 Aug 2017 17:08:25 -0000
+From: Thomas Huth <1088617@bugs.launchpad.net>
+Reply-To: Bug 1088617 <1088617@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121210194219.16564.99346.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150212570602.19046.5194992862895647230.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1088617] Re: qemu-system-mipsel save/restore
+ broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +38,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-It is currently possible to start QEMU with two PHBs without using the
-index property:
+Triaging old bug tickets ... can you still reproduce this issue with the
+latest version of QEMU?
 
--device spapr-pci-host-bridge,id=pci1,\
-                              buid=0x800000020000001,\
-                              liobn=0x80000100,\
-                              liobn64=0x80000101,\
-                              mem_win_addr=0x200100000000,\
-                              mem64_win_addr=0x220000000000,\
-                              io_win_addr=0x200000010000 \
--device spapr-pci-host-bridge,id=pci2,\
-                              buid=0x800000020000002,\
-                              liobn=0x80000200,\
-                              liobn64=0x80000201,\
-                              mem_win_addr=0x200180000000,\
-                              mem64_win_addr=0x230000000000,\
-                              io_win_addr=0x200000020000 \
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Each PHB has its index property equal to -1. As a consequence, each PHB
-will want to create PCI DRCs with the same ids:
+-- =
 
-    /* allocate connectors for child PCI devices */
-    if (sphb->dr_enabled) {
-        for (i = 0; i < PCI_SLOT_MAX * 8; i++) {
-            spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
-                                   (sphb->index << 16) | i);
-        }
-    }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1088617
 
-When DRC objects are added to the composition tree, an alias using the
-DRC id is created in the "/dr-connector" path. But DRC ids are supposed
-to be globally unique and the alias creation fails, leaving the DRC
-object unrealized, which isn't expected by the rest of the DR logic.
+Title:
+  qemu-system-mipsel save/restore broken
 
-This has the effect of silently turning-off PCI hotplug support (ie, PCI
-hotplug no longer works on any PHB and no error message is printed).
+Status in QEMU:
+  Incomplete
 
-This bug always existed and would even cause a non-fatal error to be
-reported on the console (until recent commit bf26ae32a92a). This patch
-causes the error message to be printed again and QEMU to exit.
+Bug description:
+  Save and restore on mipsel seems to be broken (tested with commit
+  1c97e303d4ea80a2691334b0febe87a50660f99d). To reproduce:
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_pci.c |    9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+  1. Download debian_squeeze_mipsel_standard.qcow2 and vmlinux-2.6.32-5
+  -4kc-malta from from http://people.debian.org/~aurel32/qemu/mipsel/
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 4b7882e3613d..4a1e6c5f697c 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1731,9 +1731,16 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
- 
-     /* allocate connectors for child PCI devices */
-     if (sphb->dr_enabled) {
-+        Error *local_err = NULL;
-+
-         for (i = 0; i < PCI_SLOT_MAX * 8; i++) {
-             spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
--                                   (sphb->index << 16) | i, NULL);
-+                                   (sphb->index << 16) | i, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                error_prepend(errp, "Failed to create DRC: ");
-+                return;
-+            }
-         }
-     }
- 
+  2. Boot the system. I had to ^D past a Bus error in fsck, which may be an=
+other bug (haven't investigated). The command line used was:
+  qemu-system-mipsel -M malta -kernel vmlinux-2.6.32-5-4kc-malta -hda debia=
+n_squeeze_mipsel_standard.qcow2 -append "root=3D/dev/sda1 console=3Dtty0" -=
+k en-us -vnc :0
+
+  3. Once the system is booted, go to the monitor and do "savevm
+  booted". Then quit.
+
+  4. Re-run qemu-system-mipsel again with "-loadvm booted". The guest
+  system comes back but is hung (the monitor remains responsive,
+  however).
+
+  I also captured a debug log, which is attached. The immediate cause of
+  the freeze seems to be that it's stuck in a loop repeatedly handling
+  the same page fault over and over.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1088617/+subscriptions
