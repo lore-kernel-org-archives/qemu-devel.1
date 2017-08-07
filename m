@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1defaS-0004up-QE
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:48:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1defav-00059h-4m
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1defaR-0000dW-S1
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:48:40 -0400
-Date: Mon, 7 Aug 2017 12:48:31 +0200
+	(envelope-from <kwolf@redhat.com>) id 1defau-0001q8-6d
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 06:49:09 -0400
+Date: Mon, 7 Aug 2017 12:48:59 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170807104831.GB6578@localhost.localdomain>
+Message-ID: <20170807104859.GC6578@localhost.localdomain>
 References: <cover.1502075213.git.jcody@redhat.com>
-	<403586fbd705655c9e861b9e57648b598b651896.1502075213.git.jcody@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <403586fbd705655c9e861b9e57648b598b651896.1502075213.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] block/vhdx: check for
- offset overflow to bdrv_truncate()
+In-Reply-To: <cover.1502075213.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] VHDX cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,13 +26,13 @@ To: Jeff Cody <jcody@redhat.com>
 Cc: qemu-devel@nongnu.org, armbru@redhat.com, qemu-block@nongnu.org
 
 Am 07.08.2017 um 05:08 hat Jeff Cody geschrieben:
-> VHDX uses uint64_t types for most offsets, following the VHDX spec.
-> However, bdrv_truncate() takes an int64_t value for the truncating
-> offset.  Check for overflow before calling bdrv_truncate().
+> Two VHDX items cleaned up:
 > 
-> N.B.: For a compliant image this is not an issue, as the maximum VHDX
-> image size is defined per the spec to be 64TB.
+> 1. Check for error when calling bdrv_getlength() [Markus]
 > 
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> 2. Check for overflow in offset prior to calling bdrv_truncate().
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+This doesn't look like cleanups to me, but like proper fixes. I think it
+would still qualify for 2.10.
+
+Kevin
