@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dekUR-00005x-Je
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:02:53 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dekav-0004V9-RX
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:09:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dekUM-0004AL-K7
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:02:47 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37807)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dekUM-000491-Dj
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:02:42 -0400
-Received: by mail-pf0-x243.google.com with SMTP id p13so771762pfd.4
-	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 09:02:40 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dekaq-0007PS-Fk
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:09:29 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:10133 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dekap-0007Os-W0
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:09:24 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-7-vsementsov@virtuozzo.com>
+	<4dc2dde8-2177-3d1c-c168-f98d826922b5@redhat.com>
+	<cf38e6aa-e934-bf75-48bf-3c3bbcb7f254@virtuozzo.com>
+	<b204c5ab-2d4c-315d-7fe7-2111559052a8@redhat.com>
+	<ec30e36d-e6b2-78f6-3cf9-eb8ef12a0532@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b11f4185-df95-5891-f7d3-43c64d9cb3b5@virtuozzo.com>
+Date: Mon, 7 Aug 2017 19:09:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
-References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
-	<1501964994-5257-3-git-send-email-zuban32s@gmail.com>
-	<5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Mon, 7 Aug 2017 19:02:38 +0300
-Message-ID: <CAKSfGUDnpSnkfBC-cCwdjh--HY3MqbccZVfJV5qGFC_hTiz0kw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] pci: add QEMU-specific PCI
- capability structure
+In-Reply-To: <ec30e36d-e6b2-78f6-3cf9-eb8ef12a0532@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/17] block/nbd-client: fix
+ nbd_read_reply_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +34,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: seabios@seabios.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, P J P <ppandit@redhat.com>, mreitz@redhat.com
 
-2017-08-07 18:52 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
-> On 05/08/2017 23:29, Aleksandr Bezzubikov wrote:
+07.08.2017 18:33, Eric Blake wrote:
+> On 08/07/2017 10:13 AM, Eric Blake wrote:
+>> On 08/07/2017 07:56 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 07.08.2017 14:52, Eric Blake wrote:
+>>>> On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Set reply.handle to 0 on error path to prevent normal path of
+>>>>> nbd_co_receive_reply.
+>> ...and the client is recognizing that the server sent garbage, but then
+>> proceeds to handle the packet anyway.  The ideal reaction is that the
+>> client should disconnect from the server, rather than handle the packet.
+>>   But because it didn't do that, the client is now unable to receive any
+>> future messages from the server.  Compare the traces of:
 >>
->> On PCI init PCI bridge devices may need some
->> extra info about bus number to reserve, IO, memory and
->> prefetchable memory limits. QEMU can provide this
->> with special vendor-specific PCI capability.
+>> followed by a clean disconnect; vs. the buggy server:
 >>
->> This capability is intended to be used only
->> for Red Hat PCI bridges, i.e. QEMU cooperation.
+>> 29148@1502118384.385133:nbd_opt_go_success Export is good to go
+>> 29148@1502118384.385321:nbd_send_request Sending request to server: {
+>> .from = 0, .len = 1, .handle = 94152262559840, .flags = 0x0, .type = 0
+>> (read) }
+>> 29148@1502118396.494643:nbd_receive_reply Got reply: { magic =
+>> 0x1446698, .error =  0, handle = 94152262559840 }
+>> invalid magic (got 0x1446698)
+>> read 1/1 bytes at offset 0
+>> 1 bytes, 1 ops; 0:00:12.10 (0.082581 bytes/sec and 0.0826 ops/sec)
+>> 29148@1502118396.494746:nbd_send_request Sending request to server: {
+>> .from = 0, .len = 0, .handle = 94152262559840, .flags = 0x0, .type = 3
+>> (flush) }
 >>
->> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> ---
->>   src/fw/dev-pci.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 50 insertions(+)
->>   create mode 100644 src/fw/dev-pci.h
->>
->> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
->> new file mode 100644
->> index 0000000..2c8ddb0
+>> where the client is now hung.  Thankfully, the client is blocked in an
+>> idle loop (not eating CPU), so I don't know if this counts as the
+>> ability for a malicious server to cause a denial of service against qemu
+>> as an NBD client (in general, being unable to read further data from the
+>> server because client internal state is now botched is not that much
+>> different from being unable to read further data from the server because
+>> the client hung up on the invalid server), unless there is some way to
+>> cause qemu to die from an assertion failure rather than just get stuck.
+> With just patch 6/17 applied, the client still hangs, but this time with
+> a different trace:
 >
+> 30053@1502119637.604092:nbd_opt_go_success Export is good to go
+> 30053@1502119637.604256:nbd_send_request Sending request to server: {
+> .from = 0, .len = 1, .handle = 94716063746144, .flags = 0x0, .type = 0
+> (read) }
+> 30053@1502119649.070156:nbd_receive_reply Got reply: { magic =
+> 0x1446698, .error =  0, handle = 94716063746144 }
+> invalid magic (got 0x1446698)
+> read failed: Input/output error
+> 30053@1502119649.070243:nbd_send_request Sending request to server: {
+> .from = 0, .len = 0, .handle = 94716063746144, .flags = 0x0, .type = 3
+> (flush) }
 >
-> Hi Aleksandr,
+> The client still tried to send a flush request to the server, when it
+> should REALLY quit talking to the server at all and just disconnect,
+> because the moment the client recognizes that the server has sent
+> garbage is the moment that the client can no longer assume that the
+> server will react correctly to any further commands.
 >
+> So I don't think your patch is quite correct, even if you have
+> identified a shortfall in our client code.
+>
+Why do you think so? It just does what it states in commit message.
 
-Hi Marcel,
-
->> --- /dev/null
->> +++ b/src/fw/dev-pci.h
->> @@ -0,0 +1,50 @@
->> +#ifndef _PCI_CAP_H
->> +#define _PCI_CAP_H
->> +
->> +#include "types.h"
->> +
->> +/*
->> +
->
->
-> Please use the standard comment:
->
-> /*
->  *
->  *
->  */
->
->
->> +QEMU-specific vendor(Red Hat)-specific capability.
->> +It's intended to provide some hints for firmware to init PCI devices.
->> +
->> +Its structure is shown below:
->> +
->> +Header:
->> +
->> +u8 id;       Standard PCI Capability Header field
->> +u8 next;     Standard PCI Capability Header field
->> +u8 len;      Standard PCI Capability Header field
->> +u8 type;     Red Hat vendor-specific capability type:
->> +               now only REDHAT_CAP_TYP_QEMU=1 exists
->
->
-> Typo o the line before, but I think you don't need it there.
->
->> +Data:
->> +
->> +u32 bus_res;            minimum bus number to reserve;
->> +                        this is necessary for PCI Express Root Ports
->> +                        to support PCIE-to-PCI bridge hotplug
->
->
-> I would add a broader class of usage:
->      necessary for nesting PCI bridges hotplug.
->
->> +u64 io;                 IO space to reserve
->> +u64 mem;                non-prefetchable memory space to reserve
->> +u64 prefetchable_mem;   prefetchable memory space to reserve
->> +
->
->
-> Layout looks good to me.
->
->> +If any field value in Data section is -1,
->> +it means that such kind of reservation
->> +is not needed and must be ignored.
->> +
->
->
-> -1 is not a valid value for unsigned fields, you may
-> want to say 0xff..f or some other way.
-
-I meant cast to unsigned here (because we still use unsigned types),
-but if it can mislead someone I will change this.
-
->
->> +*/
->> +
->> +/* Offset of vendor-specific capability type field */
->> +#define PCI_CAP_REDHAT_TYPE  3
->
->
-> May I ask why why '3'? I am not against it, I just
-> want to understand the number.
->
-
-This is actually an offset to this field
-
->> +
->> +/* List of valid Red Hat vendor-specific capability types */
->> +#define REDHAT_CAP_TYPE_QEMU    1
->
->
-> I think I pointed this in another thread, the name is
-> too vague, please change it to something like:
->    REDHAT_CAP_RES_RESERVE_QEMU
-> that narrows down the intend.
->
-
-What does the first 'RES' mean?
-
->> +
->> +
->> +/* Offsets of QEMU capability fields */
->> +#define QEMU_PCI_CAP_BUS_RES        4
->> +#define QEMU_PCI_CAP_LIMITS_OFFSET  8
->> +#define QEMU_PCI_CAP_IO             8
->> +#define QEMU_PCI_CAP_MEM            16
->> +#define QEMU_PCI_CAP_PREF_MEM       24
->> +#define QEMU_PCI_CAP_SIZE           32
->> +
->> +#endif /* _PCI_CAP_H */
->>
->
-> The layout looks good to me.
->
-> Thanks,
-> Marcel
-
+Patch 17 should fix the case (but I doubt that it can be taken separately).
 
 
 -- 
-Aleksandr Bezzubikov
+Best regards,
+Vladimir
