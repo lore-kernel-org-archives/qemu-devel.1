@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1deipl-00019h-3W
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:16:42 -0400
+	(envelope-from <david@redhat.com>) id 1deir0-0001pY-G2
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1deipj-00034h-Pa
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:16:41 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  7 Aug 2017 17:16:30 +0300
-Message-Id: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] iotests: fix 185
+	(envelope-from <david@redhat.com>) id 1deiqx-0003VN-6W
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:17:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1deiqx-0003V1-0A
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:17:55 -0400
+References: <20170804112946.5247-1-cohuck@redhat.com>
+	<20170804112946.5247-8-cohuck@redhat.com>
+	<234d7d0e-c5ae-44b8-76f5-d94f4f918ac4@redhat.com>
+	<20170807115209.78687892@gondolin>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <22422fc5-aaef-24b3-ec91-8bb64bea1bf7@redhat.com>
+Date: Mon, 7 Aug 2017 16:17:49 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170807115209.78687892@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 7/9] s390x/pci: fence off instructions
+ for non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,74 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-185 iotest is broken.
+On 07.08.2017 11:52, Cornelia Huck wrote:
+> On Fri, 4 Aug 2017 15:17:25 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 04.08.2017 13:29, Cornelia Huck wrote:
+>>> If a guest running on a machine without zpci issues a pci instruction,
+>>> throw them an exception.
+>>>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>  target/s390x/kvm.c | 54 +++++++++++++++++++++++++++++++++++++++++-------------
+>>>  1 file changed, 41 insertions(+), 13 deletions(-)
+>>>
+>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>>> index bc62bba5b7..9de165d8b1 100644
+>>> --- a/target/s390x/kvm.c
+>>> +++ b/target/s390x/kvm.c
+>>> @@ -1191,7 +1191,11 @@ static int kvm_clp_service_call(S390CPU *cpu, struct kvm_run *run)
+>>>  {
+>>>      uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
+>>>  
+>>> -    return clp_service_call(cpu, r2);
+>>> +    if (s390_has_feat(S390_FEAT_ZPCI)) {
+>>> +        return clp_service_call(cpu, r2);
+>>> +    } else {
+>>> +        return -1;
+>>> +    }  
+>>
+>> I am a fan of dropping these else case and returning directly. But that
+>> is just my opinion.
+>>
+>> (applies to all changes in this patch)
+>>
+>>
+> 
+> You are not the first to say that :)
 
-How to test:
-> i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
-  done; echo N = $i
+so ... at least 2 vs. 1? ;)
 
-finished for me like this:
+Nevermind, doesn't really matter.
 
-185 2s ... - output mismatch (see 185.out.bad)
---- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
-    15:14:29.520343805 +0300
-+++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
-@@ -37,7 +37,7 @@
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
-     "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
-    "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
-        "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
-            "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
-    "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
-        "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
+> 
+> I do prefer this way around, though, and if there aren't strong
+> objections, I'll keep it like this.
+> 
 
- === Start backup job and exit qemu ===
 
-Failures: 185
-Failed 1 of 1 tests
-N = 8
-
-It doesn't seems logical to expect the constant offset on cancel,
-so let filter it out.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/185     | 2 +-
- tests/qemu-iotests/185.out | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index 0eda371f27..446d78447e 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -157,7 +157,7 @@ _send_qemu_cmd $h \
-     "return"
- 
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
--wait=1 _cleanup_qemu
-+wait=1 _cleanup_qemu | _filter_block_job_offset
- 
- echo
- echo === Start backup job and exit qemu ===
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-index 57eaf8d699..f51af627fe 100644
---- a/tests/qemu-iotests/185.out
-+++ b/tests/qemu-iotests/185.out
-@@ -37,7 +37,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", "len": 4194304, "offset": OFFSET, "speed": 65536, "type": "mirror"}}
- 
- === Start backup job and exit qemu ===
- 
 -- 
-2.11.1
+
+Thanks,
+
+David
