@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1delF5-0000La-7O
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:51:04 -0400
+	(envelope-from <lersek@redhat.com>) id 1delFk-0000up-Ct
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1delF0-0006Xl-8r
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:50:59 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1502117160-24655-19-git-send-email-armbru@redhat.com> (Markus
-	Armbruster's message of "Mon, 7 Aug 2017 16:45:22 +0200")
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-19-git-send-email-armbru@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 07 Aug 2017 18:50:36 +0200
-Message-ID: <878tive2zn.fsf@secure.mitica>
+	(envelope-from <lersek@redhat.com>) id 1delFf-0007B4-Ii
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:51:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49354)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1delFf-00079m-CN
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:51:35 -0400
+References: <20170807163121.797e7ad6@nial.brq.redhat.com>
+	<CAFEAcA8=+8cPjKayq3Bre7y9=6jzFgjCCjRkNUeHxArJu9Ue6A@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <be880655-0c04-8369-01fc-76dd6241ca78@redhat.com>
+Date: Mon, 7 Aug 2017 18:51:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 18/56] migration: Make parameter
- max-bandwidth unsigned in QAPI/QMP
+In-Reply-To: <CAFEAcA8=+8cPjKayq3Bre7y9=6jzFgjCCjRkNUeHxArJu9Ue6A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] AVMF & OVMF blobs in QEMU tree???
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Byte rates should use QAPI type 'size' (uint64_t).
-> migrate_set_speed's parameter @value and member @max-bandwidth of
-> MigrationParameters and MigrateSetParameters are 'int' (int64_t).
->
-> Change them all to 'size'.
->
-> migrate_set_speed and migrate-set-parameters now accept bandwidth
-> values between 2^63 and SIZE_MAX (commonly 2^64-1).  They accept
-> negative values as before, because that's how the QObject input
-> visitor works for backward compatibility.
->
-> So does HMP's migrate_set_speed, except it continues to reject
-> negative values.
->
-> query-migrate-parameters now reports bandwidth values above 2^63-1
-> correctly instead of their (negative) two's complement.
->
-> So does HMP's "info migrate_params".
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 08/07/17 16:40, Peter Maydell wrote:
+> On 7 August 2017 at 15:31, Igor Mammedov <imammedo@redhat.com> wrote:
+>> As I recall there were issues with FAT driver licensing in edk2,
+>> but I've heard there were some changes in that regard.
+>>
+>> Is there any other reasons why we are not putting subj.
+>> in QEMU tree like we do with SeaBIOS and other roms?
+> 
+> I suspect the primary answer is "nobody who's willing to
+> maintain, test and update the resulting binary blobs has
+> stepped forward to say they want to do so" :-)
+> 
+> (I think that shipping them in the QEMU tree would be
+> nice but is principally a convenience for our direct
+> users, since distros are going to want to build their
+> own ROM blobs from source anyway.)
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I agree that OVMF and ArmVirtQemu firmware binaries (and matching
+varstore templates, likely compressed) should be bundled with QEMU.
+There are no license-related reasons left that would prevent this.
 
-> -    if (params->has_max_bandwidth &&
-> -        (params->max_bandwidth < 0 || params->max_bandwidth > SIZE_MAX)) {
-> +    if (params->has_max_bandwidth && params->max_bandwidth > SIZE_MAX) {
+Please let us discuss this when Gerd returns from vacation. (CC'ing Gerd.)
 
+NB, upstream edk2 does not do releases. Similarly to iPXE -- edk2 is
+production quality at all times! /me ducks ;)
 
-Much nicer for something that we know can't be negative O:-)
+Thanks
+Laszlo
