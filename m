@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1degva-0004AC-EU
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:14:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1degxr-0005TH-DV
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1degvV-0000DI-Kx
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:14:34 -0400
-Date: Mon, 7 Aug 2017 14:14:10 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170807121410.2h5k6duxw7aia3ow@kamzik.brq.redhat.com>
-References: <1502106581-11714-1-git-send-email-eric.auger@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1degxm-0000sQ-HX
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:16:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55110)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1degxm-0000sB-Bu
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:16:50 -0400
+Date: Mon, 7 Aug 2017 14:16:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170807141645.3392b3bf@gondolin>
+In-Reply-To: <150210580404.1343.7325713896658799315.stgit@bahia.lan>
+References: <150210580404.1343.7325713896658799315.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1502106581-11714-1-git-send-email-eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] hw/arm/virt: Add 2.10 machine type
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] kvm: workaround build break on
+ gcc-7.1.1 / fedora26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-On Mon, Aug 07, 2017 at 11:49:41AM +0000, Eric Auger wrote:
-> Add virt-2.10 machine type.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> ---
->  hw/arm/virt.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 31739d7..6b7a0fe 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1639,7 +1639,7 @@ static void machvirt_machine_init(void)
->  }
->  type_init(machvirt_machine_init);
->  
-> -static void virt_2_9_instance_init(Object *obj)
-> +static void virt_2_10_instance_init(Object *obj)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(obj);
->      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-> @@ -1699,10 +1699,25 @@ static void virt_2_9_instance_init(Object *obj)
->      vms->irqmap = a15irqmap;
->  }
->  
-> +static void virt_machine_2_10_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_VIRT_MACHINE_AS_LATEST(2, 10)
-> +
-> +#define VIRT_COMPAT_2_9 \
-> +    HW_COMPAT_2_9
-> +
-> +static void virt_2_9_instance_init(Object *obj)
-> +{
-> +    virt_2_10_instance_init(obj);
-> +}
-> +
->  static void virt_machine_2_9_options(MachineClass *mc)
->  {
-> +    virt_machine_2_10_options(mc);
-> +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_9);
->  }
-> -DEFINE_VIRT_MACHINE_AS_LATEST(2, 9)
-> +DEFINE_VIRT_MACHINE(2, 9)
->  
->  #define VIRT_COMPAT_2_8 \
->      HW_COMPAT_2_8
-> -- 
-> 1.9.1
-> 
->
+On Mon, 07 Aug 2017 13:36:44 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Building QEMU on fedora26 with the latest gcc package fails:
+>=20
+>   CC      ppc64-softmmu/target/ppc/kvm.o
+> In file included from include/sysemu/hw_accel.h:16:0,
+>                  from target/ppc/kvm.c:31:
+> target/ppc/kvm.c: In function =E2=80=98kvmppc_booke_watchdog_enable=E2=80=
+=99:
+> include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may be =
+used uninitialized
+>  in this function [-Werror=3Dmaybe-uninitialized]
+>              cap.args[i] =3D args_tmp[i];                               \
+>                                    ^
+> target/ppc/kvm.c: In function =E2=80=98kvmppc_set_papr=E2=80=99:
+> include/sysemu/kvm.h:449:35: error: =E2=80=98args_tmp[i]=E2=80=99 may be =
+used uninitialized
+>  in this function [-Werror=3Dmaybe-uninitialized]
+> cc1: all warnings being treated as errors
+>=20
+> $ rpm -q gcc
+> gcc-7.1.1-3.fc26.ppc64le
+>=20
+> The compiler should obviously optimize this code away when no extra
+> agument is passed to kvm_vm_enable_cap() and kvm_vcpu_enable_cap(),
+> but it doesn't. This bug should be fixed one day in gcc, but we can
+> also change our code pattern so that we don't hit the issue anymore.
+> We workaround this, by using memcpy() instead of open-coding the copy.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v2: - use memcpy()
+> ---
+>  include/sysemu/kvm.h |   14 ++++----------
+>  1 file changed, 4 insertions(+), 10 deletions(-)
+
+Acked-by: Cornelia Huck <cohuck@redhat.com>
