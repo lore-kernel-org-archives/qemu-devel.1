@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejRh-0007GA-DF
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:55:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1dejXg-0004uk-Dc
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejRc-0001Po-FZ
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:55:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dejRc-0001PW-6U
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:55:48 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<87podcrcxu.fsf@dusky.pond.sub.org>
-	<c435b4df-2406-baa5-e1df-188d5aea11ab@huawei.com>
-Date: Mon, 07 Aug 2017 16:55:45 +0200
-In-Reply-To: <c435b4df-2406-baa5-e1df-188d5aea11ab@huawei.com> (Pradeep
-	Jagadeesh's message of "Mon, 7 Aug 2017 09:52:57 +0200")
-Message-ID: <87inhzfmvi.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1dejXb-0004Vf-31
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:02:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44851)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dejXa-0004VJ-QO
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 11:01:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dejXX-00018g-K6
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 15:01:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 18D2E2E81F1
+	for <qemu-devel@nongnu.org>; Mon,  7 Aug 2017 15:01:52 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 07 Aug 2017 14:51:13 -0000
+From: James Page <james.page@ubuntu.com>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <150211747578.8395.13587919168350178714.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +37,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, greg kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
+To: qemu-devel@nongnu.org
 
-Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> writes:
+** Changed in: cloud-archive/mitaka
+       Status: Fix Committed =3D> Fix Released
 
-> On 7/7/2017 8:14 AM, Markus Armbruster wrote:
->> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
->>
->>> These patches provide the qmp interface, to query the io throttle
->>> status of the all fsdev devices that are present in a vm.
->>> also, it provides an interface to set the io throttle parameters of a
->>> fsdev to a required value. some of the patches also remove the duplicate
->>> code that was present in block and fsdev files.
->>>
->>> Pradeep Jagadeesh (6):
->>>   throttle: factor out duplicate code
->>>   qmp: Create IOThrottle structure
->>>   throttle: move out function to reuse the code
->>>   hmp: create a throttle initialization function for code reusability
->>>   fsdev: hmp interface for throttling
->>>   fsdev: QMP interface for throttling
->>>
->>>  Makefile                        |   4 ++
->>>  blockdev.c                      |  97 ++-------------------------------
->>>  fsdev/qemu-fsdev-dummy.c        |  10 ++++
->>>  fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
->>>  fsdev/qemu-fsdev-throttle.h     |  13 +++++
->>>  fsdev/qemu-fsdev.c              |  37 +++++++++++++
->>>  hmp-commands-info.hx            |  18 ++++++
->>>  hmp-commands.hx                 |  19 +++++++
->>>  hmp.c                           |  81 +++++++++++++++++++++++++--
->>>  hmp.h                           |   4 ++
->>>  include/qemu/throttle-options.h |   7 +++
->>>  include/qemu/throttle.h         |   4 +-
->>>  include/qemu/typedefs.h         |   1 +
->>>  monitor.c                       |   5 ++
->>>  qapi-schema.json                |   3 +
->>>  qapi/block-core.json            |  76 +-------------------------
->>>  qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
->>>  qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
->>>  qmp.c                           |  14 +++++
->>>  util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
->>>  20 files changed, 577 insertions(+), 216 deletions(-)
->>>  create mode 100644 qapi/fsdev.json
->>>  create mode 100644 qapi/iothrottle.json
->>
->> No test coverage?
-> I wanted to upstream these first then I am planning to write the tests.
+-- =
 
-Feels backwards to me :)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
+
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
+
+Status in Ubuntu Cloud Archive:
+  Invalid
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Released
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Released
+Status in qemu source package in Yakkety:
+  Fix Released
+Status in qemu source package in Zesty:
+  Fix Released
+
+Bug description:
+  [Impact]
+
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
+
+  [Test Case]
+
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
+
+
+  [Other Info]
+
+   * Christian Ehrhardt has been following this.
+
+  ORIGINAL DESCRIPTION:
+
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
