@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dedK4-0007Q0-Hx
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:23:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1dedKi-0007ma-BD
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dedK3-0000ce-8D
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:23:36 -0400
-Date: Mon, 7 Aug 2017 09:23:20 +0100
+	(envelope-from <berrange@redhat.com>) id 1dedKh-0000pc-35
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:24:16 -0400
+Date: Mon, 7 Aug 2017 09:24:03 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170807082320.GB18259@redhat.com>
+Message-ID: <20170807082403.GC18259@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
-	<20170804151440.320927-5-vsementsov@virtuozzo.com>
+	<20170804151440.320927-6-vsementsov@virtuozzo.com>
+	<20170804161135.GJ14504@redhat.com>
+	<b102b503-ff2f-db95-330f-9780ab4aaeb2@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170804151440.320927-5-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 04/17] nbd/client: fix nbd_send_request to
- return int
+In-Reply-To: <b102b503-ff2f-db95-330f-9780ab4aaeb2@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 05/17] block/nbd-client: get rid of ssize_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +29,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On Fri, Aug 04, 2017 at 06:14:27PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Fix nbd_send_request to return int, as it returns a return value
-> of nbd_write (which is int), and the only user of nbd_send_request's
-> return value (nbd_co_send_request) consider it as int too.
+On Mon, Aug 07, 2017 at 09:57:30AM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> 04.08.2017 19:11, Daniel P. Berrange wrote:
+> > On Fri, Aug 04, 2017 at 06:14:28PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> > > Use int variable for nbd_co_send_request return value (as
+> > > nbd_co_send_request returns int).
+> > Hmm, nbd_co_send_request() propagates return value of nbd_send_request,
+> > which returns ssize_t.
+> 
+> See patch 04, nbd_send_request fixed in it to return int. It propagates
+> return
+> value of nbd_write which is int.
 
-The real problem here is the return value of nbd_write() - it should be
-a ssize_t, not an int, since it is propagating the return value of
-nbd_rwv() which is ssize_t. Basically all functions that do I/O and
-return the number of bytes read/written should be ssize_t - any use of
-int is a bug.
+That's wrong too - nbd_write() should have been fixed to have ssize_t
+as its return type, since its returning the value of a ssize_t variable.
+
 
 Regards,
 Daniel
