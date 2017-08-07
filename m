@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJ6-0007Q7-UI
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJE-0007YG-Uj
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejIr-0003wb-PU
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejIz-00043I-Mb
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  7 Aug 2017 16:45:30 +0200
-Message-Id: <1502117160-24655-27-git-send-email-armbru@redhat.com>
+Date: Mon,  7 Aug 2017 16:45:56 +0200
+Message-Id: <1502117160-24655-53-git-send-email-armbru@redhat.com>
 In-Reply-To: <1502117160-24655-1-git-send-email-armbru@redhat.com>
 References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 26/56] block: Make BlockMeasureInfo sizes
- unsigned in QAPI
+Subject: [Qemu-devel] [RFC PATCH 52/56] block/nfs: Reject negative
+ readahead-size, page-cache-size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-Sizes should use QAPI type 'size' (uint64_t).  BlockMeasureInfo
-members @required and @fully-allocated are 'int' (int64_t).
-
-qcow2_measure() computes their values from qcow2_calc_prealloc_size(),
-@virtual_size and @required, all uint64_t (the former only since the
-previous commit).
-
-raw_measure() computes them either from bdrv_getlength() or from
-qemu_opt_get_size_del().  The former is int64_t, but we error out if
-it's negative.  The latter is uint64_t.
-
-Change these BlockMeasureInfo members to 'size'.
-
-qemu-img now reports them correctly above 2^63-1 instead of their
-(negative) two's complement.
+The nfs block driver uses QEMU_OPT_NUMBER for these sizes.  All other
+block drivers use QEMU_OPT_SIZE.  Both are uint64_t, but QEMU_OPT_SIZE
+rejects negative numbers, while QEMU_OPT_NUMBER interprets them modulo
+2^64.  Switch the nfs block driver to QEMU_OPT_SIZE.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/raw-format.c   | 10 ++++++----
- qapi/block-core.json |  2 +-
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ block/nfs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 142649e..6b73d5b 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -316,14 +316,16 @@ static BlockMeasureInfo *raw_measure(QemuOpts *opts, BlockDriverState *in_bs,
-                                      Error **errp)
- {
-     BlockMeasureInfo *info;
--    int64_t required;
-+    int64_t size;
-+    uint64_t required;
- 
-     if (in_bs) {
--        required = bdrv_getlength(in_bs);
--        if (required < 0) {
--            error_setg_errno(errp, -required, "Unable to get image size");
-+        size = bdrv_getlength(in_bs);
-+        if (size < 0) {
-+            error_setg_errno(errp, -size, "Unable to get image size");
-             return NULL;
+diff --git a/block/nfs.c b/block/nfs.c
+index 2776788..0ed3e7c 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -394,12 +394,12 @@ static QemuOptsList runtime_opts = {
+         },
+         {
+             .name = "readahead-size",
+-            .type = QEMU_OPT_NUMBER,
++            .type = QEMU_OPT_SIZE,
+             .help = "Set the readahead size in bytes",
+         },
+         {
+             .name = "page-cache-size",
+-            .type = QEMU_OPT_NUMBER,
++            .type = QEMU_OPT_SIZE,
+             .help = "Set the pagecache size in bytes",
+         },
+         {
+@@ -557,7 +557,7 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
+                              "if cache.direct = on");
+             goto fail;
          }
-+        required = size;
-     } else {
-         required = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-                             BDRV_SECTOR_SIZE);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 02e12f7..bc8e5b6 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -485,7 +485,7 @@
- # Since: 2.10
- ##
- { 'struct': 'BlockMeasureInfo',
--  'data': {'required': 'int', 'fully-allocated': 'int'} }
-+  'data': {'required': 'size', 'fully-allocated': 'size'} }
- 
- ##
- # @query-block:
+-        client->readahead = qemu_opt_get_number(opts, "readahead-size", 0);
++        client->readahead = qemu_opt_get_size(opts, "readahead-size", 0);
+         if (client->readahead > QEMU_NFS_MAX_READAHEAD_SIZE) {
+             warn_report("Truncating NFS readahead size to %d",
+                         QEMU_NFS_MAX_READAHEAD_SIZE);
+@@ -578,7 +578,7 @@ static int64_t nfs_client_open(NFSClient *client, QDict *options,
+                              "if cache.direct = on");
+             goto fail;
+         }
+-        client->pagecache = qemu_opt_get_number(opts, "page-cache-size", 0);
++        client->pagecache = qemu_opt_get_size(opts, "page-cache-size", 0);
+         if (client->pagecache > QEMU_NFS_MAX_PAGECACHE_SIZE) {
+             warn_report("Truncating NFS pagecache size to %d pages",
+                         QEMU_NFS_MAX_PAGECACHE_SIZE);
 -- 
 2.7.5
