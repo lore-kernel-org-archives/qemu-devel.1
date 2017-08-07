@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1degDv-0004Dm-HG
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:29:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1degGC-0005HC-L3
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1degDq-00070f-It
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:29:27 -0400
-References: <20170804140848.880-1-berto@igalia.com>
-	<0c382c84-1135-56b6-d90f-1c44e33f1f00@redhat.com>
-	<w51y3qvn4y4.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1degG7-00086G-Mn
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:31:48 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-2-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <63b22cb5-9753-85cc-283e-1b0b7710bcbf@redhat.com>
-Date: Mon, 7 Aug 2017 06:29:09 -0500
+Message-ID: <7d11b533-b0d9-3246-7c48-340e65b25783@redhat.com>
+Date: Mon, 7 Aug 2017 06:31:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <w51y3qvn4y4.fsf@maestria.local.igalia.com>
+In-Reply-To: <20170804151440.320927-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="kkgaAJNDcPwCGx8Cs4qBCH4ovmOVBhtgV"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Handle bdrv_getlength()
- failures in quorum_co_flush()
+	boundary="vBOHkWMM6CoP08JN26wMnSfASkiLEeQ00"
+Subject: Re: [Qemu-devel] [PATCH 01/17] nbd/client: fix nbd_opt_go
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kkgaAJNDcPwCGx8Cs4qBCH4ovmOVBhtgV
+--vBOHkWMM6CoP08JN26wMnSfASkiLEeQ00
 From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
-Message-ID: <63b22cb5-9753-85cc-283e-1b0b7710bcbf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Handle bdrv_getlength()
- failures in quorum_co_flush()
-References: <20170804140848.880-1-berto@igalia.com>
- <0c382c84-1135-56b6-d90f-1c44e33f1f00@redhat.com>
- <w51y3qvn4y4.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51y3qvn4y4.fsf@maestria.local.igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <7d11b533-b0d9-3246-7c48-340e65b25783@redhat.com>
+Subject: Re: [PATCH 01/17] nbd/client: fix nbd_opt_go
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+ <20170804151440.320927-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20170804151440.320927-2-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/07/2017 03:43 AM, Alberto Garcia wrote:
-> On Fri 04 Aug 2017 05:44:00 PM CEST, Eric Blake wrote:
->>> --- a/block/quorum.c
->>> +++ b/block/quorum.c
->>> @@ -785,8 +785,9 @@ static coroutine_fn int quorum_co_flush(BlockDriv=
-erState *bs)
->>>      for (i =3D 0; i < s->num_children; i++) {
->>>          result =3D bdrv_co_flush(s->children[i]->bs);
->>>          if (result) {
->>> +            int64_t length =3D bdrv_getlength(s->children[i]->bs);
->>>              quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0,
->>> -                              bdrv_getlength(s->children[i]->bs),
->>> +                              length > 0 ? length : 0,
->>
->> In the fallback case, is always picking 0 good enough?  Then again,
->> this is in the error path, so it is unlikely in practice, and I don't
->> see any better way to handle it.
+On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Do not send NBD_OPT_ABORT to the broken server. After sending
+> NBD_REP_ACK on NBD_OPT_GO server is most probably in transmission
+> phase, when option sending is finished.
 >=20
-> I don't see any better way to handle it either, and I'm not sure that i=
-t
-> matters much: this is a flush error event, the 'sectors-count' field
-> doesn't even mean anything, but we have to put something there.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/client.c | 2 --
+>  1 file changed, 2 deletions(-)
 
-If that's the case, can we ALWAYS report 0, instead of usually the
-length and sometimes 0?
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+But buggy servers aren't a severe enough problem to warrant this being
+in 2.10.  I'll save this for 2.11.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -76,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---kkgaAJNDcPwCGx8Cs4qBCH4ovmOVBhtgV
+--vBOHkWMM6CoP08JN26wMnSfASkiLEeQ00
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -85,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmITwUACgkQp6FrSiUn
-Q2rT8wf5AcQMaJuOA2i+ZH8l1ALVjKz07eGcThZ5CAUFHkIgi7x4ztIQgizwpPRj
-odVsmXmS6Uaepq9aNSdzKKU4MBkfS8vDFqc4JPVtSPDJzDuFUzg7P8s9rzqbgsA5
-U8HRsXuC28/Kj0KBQBEE5dldrYVXGpgfE10zCE/1VguOOsvTHBcfHeF5u+uICUh2
-mzkPPxO2GSGPlnms+0zHAdh2KbvB3FqRcG5cRbrC/kwmpDgZIaf69WKEYi/UGdUo
-XZgZHEJjvN+pI8EPxrg26jFGg7BLeSMHgy1eywCB78fSPEgNQKKllu1BEZMy6b8O
-VhCrapJ1vNVnJs+iciCaDpJFCeuaDA==
-=7vSY
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmIT5EACgkQp6FrSiUn
+Q2qWrwf+KB7UQjCDTeF+vC+ZcODWBc6frxnTS1q6jHTEFRXcZJE7/ExAYIaI5XXY
+iMV3FYNS3dKttmfhxZ9obYzw1yR0AHz02jHHWxvVk79GuGQc84DDbN0Vv008sIuM
+N+FbhmXpvO4mZlGwAL/nEZq9gKyd0BaU8ROVqaOQVfORCn2e96x9yI7gKGJjo8IF
+UN4w4Z4cU1j5enRV6HouLgGhKiwnOt5gO6INDaD6MtK5YgaWhF1uBWGSvz1trD7M
+ruwQ9fposBJeFxeByjcvyvT0EtNVVnILfDEJwce1Lp59G/Z23KPndLBs3pdJBnmk
+oLtm3XTtlviHjuW653CqpKmTRIHmFA==
+=fSyV
 -----END PGP SIGNATURE-----
 
---kkgaAJNDcPwCGx8Cs4qBCH4ovmOVBhtgV--
+--vBOHkWMM6CoP08JN26wMnSfASkiLEeQ00--
