@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dehLD-0006Nj-BX
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:41:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1dehOX-0000m1-4N
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:44:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dehL8-00056u-DS
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:41:03 -0400
-References: <20170807123658.28772-1-berto@igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1dehOS-0006z9-0w
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:44:29 -0400
+References: <1502109458-31251-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1502109458-31251-3-git-send-email-pradeep.jagadeesh@huawei.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <22de5419-2a4b-e918-298e-db4da2625512@redhat.com>
-Date: Mon, 7 Aug 2017 07:40:45 -0500
+Message-ID: <4329dde2-984f-8fcc-8d16-76d55dd9f538@redhat.com>
+Date: Mon, 7 Aug 2017 07:44:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170807123658.28772-1-berto@igalia.com>
+In-Reply-To: <1502109458-31251-3-git-send-email-pradeep.jagadeesh@huawei.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="6P1qg1Q1mqaVIMqKj9E2MpGGXGeh0Huu3"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] quorum: Set sectors-count to 0
- when reporting a flush error
+	boundary="B0248kjUtu1svKp4XF4acbDEk9OiVVvM8"
+Subject: Re: [Qemu-devel] [PATCH V8 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu block <qemu-block@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6P1qg1Q1mqaVIMqKj9E2MpGGXGeh0Huu3
+--B0248kjUtu1svKp4XF4acbDEk9OiVVvM8
 From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Message-ID: <22de5419-2a4b-e918-298e-db4da2625512@redhat.com>
-Subject: Re: [PATCH for-2.10] quorum: Set sectors-count to 0 when reporting a
- flush error
-References: <20170807123658.28772-1-berto@igalia.com>
-In-Reply-To: <20170807123658.28772-1-berto@igalia.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>,
+ qemu-devel@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ qemu block <qemu-block@nongnu.org>
+Message-ID: <4329dde2-984f-8fcc-8d16-76d55dd9f538@redhat.com>
+Subject: Re: [PATCH V8 2/6] qmp: Create IOThrottle structure
+References: <1502109458-31251-1-git-send-email-pradeep.jagadeesh@huawei.com>
+ <1502109458-31251-3-git-send-email-pradeep.jagadeesh@huawei.com>
+In-Reply-To: <1502109458-31251-3-git-send-email-pradeep.jagadeesh@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/07/2017 07:36 AM, Alberto Garcia wrote:
-> The QUORUM_REPORT_BAD event has fields to report the sector in which
-> the error was detected and the number of affected sectors starting
-> from that one. This is important for read and write errors, but not
-> for flush errors.
+On 08/07/2017 07:37 AM, Pradeep Jagadeesh wrote:
+> This patch enables qmp interfaces for the fsdev
+> devices. This provides two interfaces one
+> for querying info of all the fsdev devices. The second one
+> to set the IO limits for the required fsdev device.
 >=20
-> For flush errors the current code reports the total size of the disk
-> image. That is however not useful information in this case. Moreover,
-> the bdrv_getlength() call can fail, and there's no good way of
-> handling that failure.
->=20
-> Since we're reporting useless information and we cannot even guarantee
-> to do it in a consistent way, this patch changes the code to report 0
-> instead in all cases.
->=20
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/quorum.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  qapi/block-core.json | 76 ++------------------------------------------=
+-
+>  qapi/iothrottle.json | 88 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 91 insertions(+), 73 deletions(-)
+>  create mode 100644 qapi/iothrottle.json
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I'm wondering how much of this overlaps or even duplicates Manos'
+efforts on making throttling a separate filter BDS.
+
+
+> +++ b/qapi/iothrottle.json
+> @@ -0,0 +1,88 @@
+> +# -*- Mode: Python -*-
+> +
+> +##
+> +# =3D=3D QAPI IOThrottle definitions
+> +##
+> +
+> +##
+> +# @IOThrottle:
+> +#
+> +# A set of parameters describing IO throttling
+> +#
+> +# @id: The name or QOM path of the guest device (since: 2.8)
+
+> +# Since: 2.10
+
+Also, we've missed freeze for 2.10; this refactoring now belongs in 2.11.=
+
+
+> +##
+> +{ 'struct': 'IOThrottle',
+> +  'data': { '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr=
+': 'int',
+> +            '*bps_max': 'int', '*bps_rd_max': 'int',
+> +            '*bps_wr_max': 'int', '*iops_max': 'int',
+> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int'=
+,
+> +            '*iops_size': 'int' } }
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -69,7 +106,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---6P1qg1Q1mqaVIMqKj9E2MpGGXGeh0Huu3
+--B0248kjUtu1svKp4XF4acbDEk9OiVVvM8
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -78,14 +115,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmIX80ACgkQp6FrSiUn
-Q2rI+QgAn948wkTTa8/42c/LbO806J6yGxvxNNzH2z1Cl7mJF7sWuJ1rR+LxHRbR
-iD/C5ya2NpS47iUjvaIMntaFYwX0n33yKF88lyqFCKkg87JYuDcz6ccw7wjNehFi
-S7QOqWuNtiimTFlzg7U7f89kMQY1gzlHvr1EwBV2C4ZEuXCMdVAXTGNjo6AZfeIT
-K5YzysKwBZ2oYDt4tn1uee4mnWsiSEOwnX4UXpGEvTqLMoXrv23MxYgvS9JwsFD0
-ZrtjsXz2W9+UNfilfKlPs2sA5wUTYfCamMihPz+9zco9QYLKpw3GB8G8R0qP05ND
-g6EizKWaKs6bN+uXPk78xng42rbk5w==
-=qu6U
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmIYJkACgkQp6FrSiUn
+Q2oHUgf/UswRIHYAYM6LYy9rPeVKbfLkIKLDD42lXWvawjeKDqZ3SQSntHt0S2Xk
+cBbibubFykJgsuQHqw+BfPisNiZImRxuRAiZDstbKyOPLxb1k29cO7sE9mwwe+TQ
+Et+GQD4ZYwzCfQFJijf6Qb8M6j9VVPmrVCfq6k2fYoIAu6zKe7qsbHxjsZsXdghM
+IQSPH+GrpkWP5ExKUjopp2uCB5QjD2wzilvJuujQtLEya42IQSLm5KoNoZVZQpdZ
+C6q3B8Z/eYOF9aVSyVKBczEHyA63+k5WwRRcWqLsaQWXemtiyYJrnpJ8cp7nwLs0
+v4z4+aeWWCigIBYateCfmjziSplCCw==
+=ntHa
 -----END PGP SIGNATURE-----
 
---6P1qg1Q1mqaVIMqKj9E2MpGGXGeh0Huu3--
+--B0248kjUtu1svKp4XF4acbDEk9OiVVvM8--
