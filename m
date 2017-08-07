@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dehIt-0003UD-Bm
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:45 -0400
+	(envelope-from <jcody@redhat.com>) id 1dehIv-0003Wb-Ii
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dehIo-0003HQ-Je
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:39 -0400
+	(envelope-from <jcody@redhat.com>) id 1dehIq-0003Je-Qw
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:41 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon,  7 Aug 2017 08:38:18 -0400
-Message-Id: <cover.1502109078.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.10 0/4] VHDX bugfixes
+Date: Mon,  7 Aug 2017 08:38:21 -0400
+Message-Id: <3f89708534aeb149ebf4a0e3e54b4c24b44a1116.1502109078.git.jcody@redhat.com>
+In-Reply-To: <cover.1502109078.git.jcody@redhat.com>
+References: <cover.1502109078.git.jcody@redhat.com>
+In-Reply-To: <cover.1502109078.git.jcody@redhat.com>
+References: <cover.1502109078.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 for-2.10 3/4] block/vhdx: check error return
+ of bdrv_flush()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,49 +25,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, armbru@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block/vhdx-log.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-Some VHDX bug fixes, including:
-
-1. Checking bdrv_getlength(), bdrv_flush(), and bdrv_truncate() return values
-
-Changes from v1->v2:
-
-git-backport-diff -r qemu/master.. -u vhdx-fixes-v1
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/4:[0013] [FC] 'block/vhdx: check error return of bdrv_getlength()'
-       ^^^^
-Some code cleanup / movement (Thanks Kevin)
-
-002/4:[0002] [FC] 'block/vhdx: check for offset overflow to bdrv_truncate()'
-       ^^^^
-Use QEMU_ALIGN_UP (Thanks Eric)
-
-003/4:[down] 'block/vhdx: check error return of bdrv_flush()'
-
-New, suggested by Kevin.
-
-004/4:[down] 'block/vhdx: check error return of bdrv_truncate()'
-
-New.
-
-1. Check for error when calling bdrv_getlength() [Markus]
-
-2. Check for overflow in offset prior to calling bdrv_truncate().
-
-Jeff Cody (4):
-  block/vhdx: check error return of bdrv_getlength()
-  block/vhdx: check for offset overflow to bdrv_truncate()
-  block/vhdx: check error return of bdrv_flush()
-  block/vhdx: check error return of bdrv_truncate()
-
- block/vhdx-log.c | 52 ++++++++++++++++++++++++++++++++++++++++++----------
- block/vhdx.c     | 12 +++++++++++-
- 2 files changed, 53 insertions(+), 11 deletions(-)
-
+diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+index 9597223..a27dc05 100644
+--- a/block/vhdx-log.c
++++ b/block/vhdx-log.c
+@@ -565,7 +565,10 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
+         desc_entries = NULL;
+     }
+ 
+-    bdrv_flush(bs);
++    ret = bdrv_flush(bs);
++    if (ret < 0) {
++        goto exit;
++    }
+     /* once the log is fully flushed, indicate that we have an empty log
+      * now.  This also sets the log guid to 0, to indicate an empty log */
+     vhdx_log_reset(bs, s);
+@@ -1039,7 +1042,11 @@ int vhdx_log_write_and_flush(BlockDriverState *bs, BDRVVHDXState *s,
+ 
+     /* Make sure data written (new and/or changed blocks) is stable
+      * on disk, before creating log entry */
+-    bdrv_flush(bs);
++    ret = bdrv_flush(bs);
++    if (ret < 0) {
++        goto exit;
++    }
++
+     ret = vhdx_log_write(bs, s, data, length, offset);
+     if (ret < 0) {
+         goto exit;
+@@ -1047,7 +1054,11 @@ int vhdx_log_write_and_flush(BlockDriverState *bs, BDRVVHDXState *s,
+     logs.log = s->log;
+ 
+     /* Make sure log is stable on disk */
+-    bdrv_flush(bs);
++    ret = bdrv_flush(bs);
++    if (ret < 0) {
++        goto exit;
++    }
++
+     ret = vhdx_log_flush(bs, s, &logs);
+     if (ret < 0) {
+         goto exit;
 -- 
 2.9.4
