@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dehHv-0002uC-3P
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:37:43 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dehIW-0003Br-Pz
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dehHq-0002Rx-3y
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:37:39 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  7 Aug 2017 15:36:58 +0300
-Message-Id: <20170807123658.28772-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH for-2.10] quorum: Set sectors-count to 0 when
- reporting a flush error
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dehIR-0002uV-Ps
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:16 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1dehIR-0002qa-Io
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 08:38:11 -0400
+Received: by mail-wm0-x244.google.com with SMTP id d40so881885wma.3
+	for <qemu-devel@nongnu.org>; Mon, 07 Aug 2017 05:38:10 -0700 (PDT)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Mon,  7 Aug 2017 08:37:32 -0400
+Message-Id: <1502109458-31251-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH v8 0/6] fsdev: qmp interface for io throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,42 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-The QUORUM_REPORT_BAD event has fields to report the sector in which
-the error was detected and the number of affected sectors starting
-from that one. This is important for read and write errors, but not
-for flush errors.
+These patches provide the qmp interface, to query the io throttle 
+status of the all fsdev devices that are present in a vm.
+also, it provides an interface to set the io throttle parameters of a
+fsdev to a required value. some of the patches also remove the duplicate
+code that was present in block and fsdev files. 
 
-For flush errors the current code reports the total size of the disk
-image. That is however not useful information in this case. Moreover,
-the bdrv_getlength() call can fail, and there's no good way of
-handling that failure.
+Pradeep Jagadeesh (6):
+  throttle: factor out duplicate code
+  qmp: Create IOThrottle structure
+  throttle: move out function to reuse the code
+  hmp: create a throttle initialization function for code reusability
+  fsdev: QMP interface for throttling
+  fsdev: hmp interface for throttling
 
-Since we're reporting useless information and we cannot even guarantee
-to do it in a consistent way, this patch changes the code to report 0
-instead in all cases.
+ Makefile                        |   4 ++
+ blockdev.c                      |  97 ++------------------------------
+ fsdev/qemu-fsdev-dummy.c        |  11 ++++
+ fsdev/qemu-fsdev-throttle.c     | 120 ++++++++++++++++++++++++++--------------
+ fsdev/qemu-fsdev-throttle.h     |   8 ++-
+ fsdev/qemu-fsdev.c              |  38 +++++++++++++
+ hmp-commands-info.hx            |  18 ++++++
+ hmp-commands.hx                 |  19 +++++++
+ hmp.c                           |  81 +++++++++++++++++++++++++--
+ hmp.h                           |   4 ++
+ include/qemu/throttle-options.h |   7 +++
+ include/qemu/throttle.h         |   4 +-
+ include/qemu/typedefs.h         |   1 +
+ monitor.c                       |   5 ++
+ qapi-schema.json                |   3 +
+ qapi/block-core.json            |  76 +------------------------
+ qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
+ qapi/iothrottle.json            |  88 +++++++++++++++++++++++++++++
+ qmp.c                           |  14 +++++
+ util/throttle.c                 | 110 ++++++++++++++++++++++++++++++++++++
+ 20 files changed, 574 insertions(+), 218 deletions(-)
+ create mode 100644 qapi/fsdev.json
+ create mode 100644 qapi/iothrottle.json
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/quorum.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+v0 -> v1:
+ Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
+ Mainly renaming the functions and removing the redundant code.
 
-diff --git a/block/quorum.c b/block/quorum.c
-index 55ba916655..d04da4f430 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -785,8 +785,7 @@ static coroutine_fn int quorum_co_flush(BlockDriverState *bs)
-     for (i = 0; i < s->num_children; i++) {
-         result = bdrv_co_flush(s->children[i]->bs);
-         if (result) {
--            quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0,
--                              bdrv_getlength(s->children[i]->bs),
-+            quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0, 0,
-                               s->children[i]->bs->node_name, result);
-             result_value.l = result;
-             quorum_count_vote(&error_votes, &result_value, i);
+v1 -> v2:
+ Addressed comments from Eric Blake and Greg Kurz.
+ As per the suggestion I split the patches into smaller patches.
+ Removed some more duplicate code.
+
+v2 -> v3:
+ Addresssed comments from Alberto Garcia.
+ Changed the comment from block to iothrottle in the iothrottle.json 
+ Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
+ issues that were observed.
+
+v3 -> v4:
+ Addressed comments from Eric Blake and Greg Kurz
+ Re-ordered the patches
+ Added the dummy functions in qmp.c to address the cross compilation issues
+
+v4 -> v5:
+  Addressed comments from Eric Blake and Greg Kurz
+  Split the fsdev qmp patch into hmp and qmp related patches
+  Moved the common functionalities to throttle.c instead of creating
+  a new file
+
+v5 -> v6:
+  Addressed comments from Greg Kurz and Markus Armbruster
+  Split the commits to specific to hmp and throttle as suggested by Greg
+  Moved ThrottleConfig typedef to qemu/typedefs.h
+  Addressed compilation issue on FreeBSD by adding flags in qmp.c
+
+v6 -> v7:
+  Addressed comments from Albert Garcia and Dr. David Alan Gilbert
+  Fixed the hmp-commands-info.hx and hmp-commands.hx as per Dr. David's
+  comments.
+  Fixed the bug with the hmp fsdev_set_io_throttle and info fsdev_iothrottle  
+
+v7 -> v8:
+  Addressed comments from Markus Armbruster and Eric Blake
+  Removed unwanted headers from qmp-fsdev-throttle.h
 -- 
-2.11.0
+1.8.3.1
