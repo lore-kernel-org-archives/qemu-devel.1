@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejJ1-0007JL-GE
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejJ4-0007NE-Gg
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dejIl-0003ry-Je
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:46:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1dejIq-0003vN-Gb
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:46:58 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  7 Aug 2017 16:45:29 +0200
-Message-Id: <1502117160-24655-26-git-send-email-armbru@redhat.com>
+Date: Mon,  7 Aug 2017 16:45:28 +0200
+Message-Id: <1502117160-24655-25-git-send-email-armbru@redhat.com>
 In-Reply-To: <1502117160-24655-1-git-send-email-armbru@redhat.com>
 References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 25/56] block/qcow2: Change
- qcow2_calc_prealloc_size() to uint64_t
+Subject: [Qemu-devel] [RFC PATCH 24/56] block/qcow2: Change align_offset()
+ to operate on uint64_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +23,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-Change parameter @total_size and return value to uint64_t.  Callers
-mix uint64_t and int64_t.  Thus, the commit reduces, but does not
-eliminate implicit conversions.
-
-qcow2_create2() passes a (presumably non-negative) int64_t argument,
-then passes the result through a local variable to
-qemu_opt_set_number().  Change the local variable to uint64_t to avoid
-pointless conversions.
-
-qcow2_measure() passes a uint64_t argument, then assigns the result to
-int64_t (which the next commit will change to uint64_t).
+align_offset() mixes different widths, and its callers pass both
+signed and unsigned values.  It's best to stick to unsigned when
+twiddling bits.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/qcow2.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/qcow2.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index d7c600b..d96d1f6 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2613,13 +2613,13 @@ int64_t qcow2_refcount_metadata_size(int64_t clusters, size_t cluster_size,
-  * Returns: Total number of bytes required for the fully allocated image
-  * (including metadata).
-  */
--static int64_t qcow2_calc_prealloc_size(int64_t total_size,
--                                        size_t cluster_size,
--                                        int refcount_order)
-+static uint64_t qcow2_calc_prealloc_size(uint64_t total_size,
-+                                         size_t cluster_size,
-+                                         int refcount_order)
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 96a8d43..0d7043e 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -468,10 +468,9 @@ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
+     return (offset >> s->cluster_bits) & (s->l2_size - 1);
+ }
+ 
+-static inline int64_t align_offset(int64_t offset, int n)
++static inline uint64_t align_offset(uint64_t offset, uint64_t n)
  {
--    int64_t meta_size = 0;
-+    uint64_t meta_size = 0;
-     uint64_t nl1e, nl2e;
--    int64_t aligned_total_size = align_offset(total_size, cluster_size);
-+    uint64_t aligned_total_size = align_offset(total_size, cluster_size);
+-    offset = (offset + n - 1) & ~(n - 1);
+-    return offset;
++    return (offset + n - 1) & ~(n - 1);
+ }
  
-     /* header: 1 cluster */
-     meta_size += cluster_size;
-@@ -2729,7 +2729,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     int ret;
- 
-     if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
--        int64_t prealloc_size =
-+        uint64_t prealloc_size =
-             qcow2_calc_prealloc_size(total_size, cluster_size, refcount_order);
-         qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
-         qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_lookup[prealloc],
+ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
 -- 
 2.7.5
