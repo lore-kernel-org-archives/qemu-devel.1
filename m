@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1depi8-0003d8-Vo
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 17:37:22 -0400
+	(envelope-from <mst@redhat.com>) id 1deplS-0005HB-8p
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 17:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1depi4-0004PV-0v
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 17:37:17 -0400
-References: <20170807161529.3779-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3bebf07f-0505-8236-b3f7-c8ee74a2ee2d@redhat.com>
-Date: Mon, 7 Aug 2017 16:36:57 -0500
+	(envelope-from <mst@redhat.com>) id 1deplN-0006Qp-6e
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 17:40:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44398)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1deplM-0006QZ-RZ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 17:40:37 -0400
+Date: Tue, 8 Aug 2017 00:40:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1502142009-9370-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170807161529.3779-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lOvCMLhTqWck3Egv3aWKRdhg3HR3xJoDF"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] throttle: Make LeakyBucket.avg
- and LeakyBucket.max integer types
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL 0/2] virtio: fix for rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lOvCMLhTqWck3Egv3aWKRdhg3HR3xJoDF
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
-Message-ID: <3bebf07f-0505-8236-b3f7-c8ee74a2ee2d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] throttle: Make LeakyBucket.avg and
- LeakyBucket.max integer types
-References: <20170807161529.3779-1-berto@igalia.com>
-In-Reply-To: <20170807161529.3779-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit e6a74868d92f858ac33915b6772999d7de2fd288:
 
-On 08/07/2017 11:15 AM, Alberto Garcia wrote:
-> Both the throttling limits set with the throttling.iops-* and
-> throttling.bps-* options and their QMP equivalents defined in the
-> BlockIOThrottle struct are integer values.
->=20
-> Those limits are also reported in the BlockDeviceInfo struct and they
-> are integers there as well.
->=20
-> Therefore there's no reason to store them internally as double and do
-> the conversion everytime we're setting or querying them, so this patch
-> uses int64_t for those types.
->=20
-> LeakyBucket.level and LeakyBucket.burst_level do however remain double
-> because their value changes depending on the fraction of time elapsed
-> since the previous I/O operation.
->=20
-> There's one particular instance of the previous code where bkt->max
-> could have a non-integer value: that's in throttle_fix_bucket() when
-> bkt->max is initialized to bkt->avg / 10. This is now an integer
-> division and the result is rounded. We don't need to worry about this
-> because:
->=20
->    a) with the magnitudes we're dealing with (bytes per second, I/O
->       operations per second) the limits are likely to be always
->       multiples of 10.
->=20
->    b) even if they weren't this doesn't affect the actual limits, only
->       the algorithm that makes the throttling smoother.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  include/qemu/throttle.h | 4 ++--
->  util/throttle.c         | 7 ++-----
->  2 files changed, 4 insertions(+), 7 deletions(-)
+  build-sys: add --disable-vhost-user (2017-08-03 15:55:41 +0300)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+are available in the git repository at:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
+for you to fetch changes up to e2a7f28693aea7e194ec1435697ec4feb24f8a6f:
 
---lOvCMLhTqWck3Egv3aWKRdhg3HR3xJoDF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  cpu: add APIs to allocate/free CPU environment (2017-08-08 00:31:09 +0300)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+----------------------------------------------------------------
+virtio: fix for rc2
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmI3XkACgkQp6FrSiUn
-Q2qBHQf/aQwc/RSWTES86aYfQOTr+0IQBDeikMbD75Sgbv0nLP+MPhH7ZgQo5s3C
-CvHDZvAmThMTqZKsfAKKh+mP7CT9+fF02ky8CKfFDOj9CWzi/ldLUFJaGxScfwW5
-0wq8V9grAXVdBbdOl2VYAv8XM61HHZk4LBjZhV91ys3bn3yUMp53s9ahE+2FN2Z/
-yX6yy3i+aHo1lckg98DOVudIx9LetFGcVTM1iRmoDQDspyMdRx8vH/jLnUvj5TUL
-ohAMGIHMb/LypbUqoVK2ZWI8vnucVWW4qmsduf+cFWpHcgPlA0ZktiucCb3kXXge
-ex9yrawv0N2lQ4cV2jRZwQff3S52Yg==
-=WeA8
------END PGP SIGNATURE-----
+It turns out there's a way to setup SHPC on Q35: just put
+a PCI to PCI bridge behind a DMI to PCI one. Our _OSC is
+thus incorrect.
 
---lOvCMLhTqWck3Egv3aWKRdhg3HR3xJoDF--
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Aleksandr Bezzubikov (1):
+      hw/i386: allow SHPC for Q35 machine
+
+Michael S. Tsirkin (1):
+      cpu: add APIs to allocate/free CPU environment
+
+ include/qom/cpu.h    | 31 +++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c |  4 ++--
+ qom/cpu.c            | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 67 insertions(+), 2 deletions(-)
