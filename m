@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dekyB-0008OY-Ud
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:33:37 -0400
+	(envelope-from <eterrell@redhat.com>) id 1dekzB-0000RH-KV
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1deky6-0004bV-OZ
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:33:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58014)
+	(envelope-from <eterrell@redhat.com>) id 1dekz6-000587-7l
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:34:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1deky6-0004az-Ek
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:33:26 -0400
-References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
-	<1501964994-5257-3-git-send-email-zuban32s@gmail.com>
-	<5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
-	<CAKSfGUDnpSnkfBC-cCwdjh--HY3MqbccZVfJV5qGFC_hTiz0kw@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f332751c-3d7b-0940-c0d7-e15149fbdf6a@redhat.com>
-Date: Mon, 7 Aug 2017 19:33:19 +0300
+	(Exim 4.71) (envelope-from <eterrell@redhat.com>) id 1dekz6-00057t-0h
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:34:28 -0400
+Date: Mon, 7 Aug 2017 18:34:24 +0200
+From: Eduardo Otubo <eterrell@redhat.com>
+Message-ID: <20170807163424.GA15485@bluepex.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUDnpSnkfBC-cCwdjh--HY3MqbccZVfJV5qGFC_hTiz0kw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] pci: add QEMU-specific PCI
- capability structure
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] (no subject)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,164 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Bezzubikov <zuban32s@gmail.com>
-Cc: seabios@seabios.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: zhang.zhanghailiang@huawei.com, wency@cn.fujitsu.com
 
-On 07/08/2017 19:02, Alexander Bezzubikov wrote:
-> 2017-08-07 18:52 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
->> On 05/08/2017 23:29, Aleksandr Bezzubikov wrote:
->>>
->>> On PCI init PCI bridge devices may need some
->>> extra info about bus number to reserve, IO, memory and
->>> prefetchable memory limits. QEMU can provide this
->>> with special vendor-specific PCI capability.
->>>
->>> This capability is intended to be used only
->>> for Red Hat PCI bridges, i.e. QEMU cooperation.
->>>
->>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>> ---
->>>    src/fw/dev-pci.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 50 insertions(+)
->>>    create mode 100644 src/fw/dev-pci.h
->>>
->>> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
->>> new file mode 100644
->>> index 0000000..2c8ddb0
->>
->>
->> Hi Aleksandr,
->>
-> 
-> Hi Marcel,
-> 
->>> --- /dev/null
->>> +++ b/src/fw/dev-pci.h
->>> @@ -0,0 +1,50 @@
->>> +#ifndef _PCI_CAP_H
->>> +#define _PCI_CAP_H
->>> +
->>> +#include "types.h"
->>> +
->>> +/*
->>> +
->>
->>
->> Please use the standard comment:
->>
->> /*
->>   *
->>   *
->>   */
->>
->>
->>> +QEMU-specific vendor(Red Hat)-specific capability.
->>> +It's intended to provide some hints for firmware to init PCI devices.
->>> +
->>> +Its structure is shown below:
->>> +
->>> +Header:
->>> +
->>> +u8 id;       Standard PCI Capability Header field
->>> +u8 next;     Standard PCI Capability Header field
->>> +u8 len;      Standard PCI Capability Header field
->>> +u8 type;     Red Hat vendor-specific capability type:
->>> +               now only REDHAT_CAP_TYP_QEMU=1 exists
->>
->>
->> Typo o the line before, but I think you don't need it there.
->>
->>> +Data:
->>> +
->>> +u32 bus_res;            minimum bus number to reserve;
->>> +                        this is necessary for PCI Express Root Ports
->>> +                        to support PCIE-to-PCI bridge hotplug
->>
->>
->> I would add a broader class of usage:
->>       necessary for nesting PCI bridges hotplug.
->>
->>> +u64 io;                 IO space to reserve
->>> +u64 mem;                non-prefetchable memory space to reserve
->>> +u64 prefetchable_mem;   prefetchable memory space to reserve
->>> +
->>
->>
->> Layout looks good to me.
->>
->>> +If any field value in Data section is -1,
->>> +it means that such kind of reservation
->>> +is not needed and must be ignored.
->>> +
->>
->>
->> -1 is not a valid value for unsigned fields, you may
->> want to say 0xff..f or some other way.
-> 
-> I meant cast to unsigned here (because we still use unsigned types),
-> but if it can mislead someone I will change this.
-> 
-We should not document signed values for unsigned fields,
-even if the reason is "best practices."
+zhangchen.fnst@cn.fujitsu.com, wang.guang55@zte.com.cn,
+wang.yong155@zte.com.cn 
+Bcc: 
+Subject: colo-compare: segfault and assert on colo_compare_finalize
+Reply-To: 
 
->>
->>> +*/
->>> +
->>> +/* Offset of vendor-specific capability type field */
->>> +#define PCI_CAP_REDHAT_TYPE  3
->>
->>
->> May I ask why why '3'? I am not against it, I just
->> want to understand the number.
->>
-> 
-> This is actually an offset to this field
-> 
+Hi all,
 
-OK, so it should end with 'offset' to be clear.
-I was mislead.
+I have found a problem on colo-compare that leads to segmentation fault
+when calling qemu like this:
 
->>> +
->>> +/* List of valid Red Hat vendor-specific capability types */
->>> +#define REDHAT_CAP_TYPE_QEMU    1
->>
->>
->> I think I pointed this in another thread, the name is
->> too vague, please change it to something like:
->>     REDHAT_CAP_RES_RESERVE_QEMU
->> that narrows down the intend.
->>
-> 
-> What does the first 'RES' mean?
+ $ qemu-system-x86_64 -S -machine pc -object colo-compare,id=test-object
 
-Resource.
+First I got an assert failed:
 
-I don't mind you change it how you seem fit,
-just make it clear what it does. Is about
-resource reserving, not a general capability.
+ (qemu-system-x86_64:7887): GLib-CRITICAL **: g_main_loop_quit: assertion 'loop != NULL' failed
 
+>From this looks like s->compare_loop is NULL on the function
+colo_compare_finalize(), then I just added a check there and the assert went
+away. But then there's the segfault:
 
-Thanks,
-Marcel
+ Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+ 0x00007ffff333f79e in pthread_join () from /lib64/libpthread.so.0
+ (gdb) bt
+ #0  0x00007ffff333f79e in pthread_join () at /lib64/libpthread.so.0
+ #1  0x0000555555c379d2 in qemu_thread_join (thread=0x7ffff7ff5160) at util/qemu-thread-posix.c:547
+ #2  0x0000555555adfc1a in colo_compare_finalize (obj=0x7ffff7fd3010) at net/colo-compare.c:867
+ #3  0x0000555555b2cd87 in object_deinit (obj=0x7ffff7fd3010, type=0x5555567432e0) at qom/object.c:453
+ #4  0x0000555555b2cdf9 in object_finalize (data=0x7ffff7fd3010) at qom/object.c:467
+ #5  0x0000555555b2dd80 in object_unref (obj=0x7ffff7fd3010) at qom/object.c:902
+ #6  0x0000555555b319a5 in user_creatable_add_type (type=0x5555567499a0 "colo-compare", id=0x555556749960 "test-object", qdict=0x555556835750, v=0x55555681a3f0, errp=0x7fffffffde58) at qom/object_interfaces.c:105
+ #7  0x0000555555b31b02 in user_creatable_add_opts (opts=0x555556749910, errp=0x7fffffffde58) at qom/object_interfaces.c:135
+ #8  0x0000555555b31bfd in user_creatable_add_opts_foreach (opaque=0x5555558e9c39 <object_create_delayed>, opts=0x555556749910, errp=0x0) at qom/object_interfaces.c:159
+ #9  0x0000555555c4aecf in qemu_opts_foreach (list=0x555556157ac0 <qemu_object_opts>, func=0x555555b31b6f <user_creatable_add_opts_foreach>, opaque=0x5555558e9c39 <object_create_delayed>, errp=0x0) at util/qemu-option.c:1104
+ #10 0x00005555558edb75 in main (argc=6, argv=0x7fffffffe2d8, envp=0x7fffffffe310) at vl.c:4520
 
-> 
->>> +
->>> +
->>> +/* Offsets of QEMU capability fields */
->>> +#define QEMU_PCI_CAP_BUS_RES        4
->>> +#define QEMU_PCI_CAP_LIMITS_OFFSET  8
->>> +#define QEMU_PCI_CAP_IO             8
->>> +#define QEMU_PCI_CAP_MEM            16
->>> +#define QEMU_PCI_CAP_PREF_MEM       24
->>> +#define QEMU_PCI_CAP_SIZE           32
->>> +
->>> +#endif /* _PCI_CAP_H */
->>>
->>
->> The layout looks good to me.
->>
->> Thanks,
->> Marcel
-> 
-> 
-> 
+At this point '&s->thread' is '0'. Is this segfault and the above mentioned
+assert trigged because I'm creating a colo-compare object without any other
+parameter? In a positive case, a simple workaround and error check should do
+it. Otherwise I'll debug a little more.
+
+Best regards,
+
+-- 
+Eduardo Otubo
+Senior Software Engineer @ RedHat
