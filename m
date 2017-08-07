@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1defsU-0004NT-FH
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:07:19 -0400
+	(envelope-from <cohuck@redhat.com>) id 1defwh-0005ow-Gm
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:11:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1defsT-0002Vj-8Q
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:07:18 -0400
-References: <20170522211205.14265-1-hpoussin@reactos.org>
-	<20170522211205.14265-11-hpoussin@reactos.org>
-	<CAJhHMCAZjtSZ9bVP8ARuex=kEUox=ed__LdEe39a6-gY7oKggQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e20b65fe-9cb4-2b8f-05cb-fdc10485c9d9@redhat.com>
-Date: Mon, 7 Aug 2017 06:07:06 -0500
+	(envelope-from <cohuck@redhat.com>) id 1defwc-0005ew-H7
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:11:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1defwc-0005eV-An
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 07:11:34 -0400
+Date: Mon, 7 Aug 2017 13:11:28 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170807131128.6557b78c@gondolin>
+In-Reply-To: <a0d90bab-359c-5d60-2980-082faf6ff82e@redhat.com>
+References: <20170804112946.5247-1-cohuck@redhat.com>
+	<20170804112946.5247-6-cohuck@redhat.com>
+	<789fa061-be02-9fdb-b01b-bdec4c18d1c4@redhat.com>
+	<20170807120027.75d6b971@gondolin>
+	<a0d90bab-359c-5d60-2980-082faf6ff82e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJhHMCAZjtSZ9bVP8ARuex=kEUox=ed__LdEe39a6-gY7oKggQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hNQDOLIuS15qAL3JN8WCGrUb2XXSvNcCj"
-Subject: Re: [Qemu-devel] [PATCH v2 10/13] vvfat: correctly generate
- numeric-tail of short file names
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/9] s390x/ccw: create s390 phb
+ conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "open list:Block I/O path" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hNQDOLIuS15qAL3JN8WCGrUb2XXSvNcCj
-From: Eric Blake <eblake@redhat.com>
-To: Pranith Kumar <bobby.prani@gmail.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- "open list:Block I/O path" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <e20b65fe-9cb4-2b8f-05cb-fdc10485c9d9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 10/13] vvfat: correctly generate
- numeric-tail of short file names
-References: <20170522211205.14265-1-hpoussin@reactos.org>
- <20170522211205.14265-11-hpoussin@reactos.org>
- <CAJhHMCAZjtSZ9bVP8ARuex=kEUox=ed__LdEe39a6-gY7oKggQ@mail.gmail.com>
-In-Reply-To: <CAJhHMCAZjtSZ9bVP8ARuex=kEUox=ed__LdEe39a6-gY7oKggQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 7 Aug 2017 12:21:30 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 08/05/2017 01:52 PM, Pranith Kumar wrote:
-> FYI,
->=20
-> This commit breaks the build with gcc-7:
->=20
->   CC      block/vvfat.o
-> qemu/block/vvfat.c: In function =E2=80=98read_directory=E2=80=99:
-> qemu/block/vvfat.c:605:37: error: =E2=80=98__builtin___sprintf_chk=E2=80=
-=99 may write
-> a terminating nul past the end of the destination
-> [-Werror=3Dformat-overflow=3D]
->              int len =3D sprintf(tail, "~%d", i);
->                                      ^~~~~
+> On 07.08.2017 12:00, Cornelia Huck wrote:
+> > On Fri, 4 Aug 2017 15:20:26 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 04.08.2017 13:29, Cornelia Huck wrote:  
+> >>> Don't create the s390 pci host bridge if we do not provide the zpci
+> >>> facility.
+> >>>
+> >>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>    
+> >>
+> >> This works, because s390_init_cpus(machine) (which sets up features) is
+> >> called before adding the bus. Mind to add a comment so nobody tries to
+> >> reshuffle these functions?  
+> > 
+> > This is already needed by the flic setup (which also relies on the
+> > features being set up). We really want the cpu setup as early as
+> > possible.
+> > 
+> > Do you have a good comment handy? :)
+> >   
+> 
+> /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+> 
 
-Doesn't commit 7c8730d45f6 fix that?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---hNQDOLIuS15qAL3JN8WCGrUb2XXSvNcCj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmISdoACgkQp6FrSiUn
-Q2pp4ggAr6nLuh6n/kdtzUChbh+cUeZFjEzFlmxRjWArYhK26Eqf4j8+7NMXLaW1
-iPQ+qpkIwyDCwmD5N/czaE12+zj5fFO1o9xbcpTba+NlW0MH5BW09Qm8aCBZQN3d
-pgqvsBWSOxmT938yif/Obox0vuKQFhEWrsSERa+/7Jzz+YtyLugUMKU7qU1rb2lA
-5Xe4ja9Dp2hqJcD5UUHCcjRJzyYBzCI5TH5N16SPEVj6oxwl4PAeTbMCN5Aj4V/g
-zSIhZC2NUyZVC0zEuOcrvLS1Rm3RNa6kCnrAZdo8ei4CfyyVifLpB2pgJ8REYLrJ
-Zw5bbfFLSyL5K3YjeWtwgQz6xSLjKw==
-=inzr
------END PGP SIGNATURE-----
-
---hNQDOLIuS15qAL3JN8WCGrUb2XXSvNcCj--
+Thanks, I'll go with that.
