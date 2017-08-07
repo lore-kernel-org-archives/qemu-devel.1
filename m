@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1deibl-0002di-9N
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1deicN-00034S-Ks
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1deibg-0003Sb-1B
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1deibf-0003Rn-PP
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:07 -0400
-Date: Mon, 7 Aug 2017 15:02:00 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170807140200.GL18259@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.9aca98788e1a99635ffb85ab9c01cb0497d2b3d8.1502103332.git-series.knut.omang@oracle.com>
+	(envelope-from <kwolf@redhat.com>) id 1deicI-00044s-S1
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 10:02:51 -0400
+Date: Mon, 7 Aug 2017 16:02:27 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170807140227.GG6578@localhost.localdomain>
+References: <20170804144354.21985-1-kwolf@redhat.com>
+	<5af7c79e-130c-1010-e164-3989fd1c27fb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
 Content-Disposition: inline
-In-Reply-To: <cover.9aca98788e1a99635ffb85ab9c01cb0497d2b3d8.1502103332.git-series.knut.omang@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/4] Unit test+fix for problem with QEMU
- handling of multiple bind()s to the same port
+In-Reply-To: <5af7c79e-130c-1010-e164-3989fd1c27fb@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/null: Remove 'filename'
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org
 
-On Mon, Aug 07, 2017 at 12:58:38PM +0200, Knut Omang wrote:
-> This series contains:
-> * a unit test that exposes a race condition which causes QEMU to fail
->   to find a port even when there is plenty of available ports.
-> * a refactor of the qemu-sockets inet_listen_saddr() function
->   to better handle this situation.
-> 
-> Changes from v6:
-> * Changed license of the (new) test-listen.c source file from
->   GNU v2 to GNU v2 and later, according to QEMU standards.
-> 
-> Changes from v5:
-> * Also move setting of error from socket creation out
->   into the main double for loop.
-> * Simplify and enhance reporting if socket creation fails:
->   Only report failure to create sockets if none of the
->   provided addrinfo list elements allows creation of a
->   socket, otherwise report failure to find an available port.
-> * Further simplify if's within the for loops and make sure
->   failure to recreate a socket gets distinctively reported.
-> * Rebased to current master.
-> 
-> Changes from v4:
-> * Move the complexity of recreating a socket and setting the error pointer
->   into the main for loop, eliminating the try_bind_listen() function
->   again. Cleaning up and improving error handling in the process.
-> 
-> Changes from v3:
-> * Test changes: Add missing license
->   Add subtests for ipv4, ipv6 and both
->   Various g_* usage improvements
-> * Split patch into 3 patches with two refactoring patches ahead
->   of the actual fix.
-> 
-> Changes from v2:
-> * Non-trivial rebase + further abstraction
->   on top of 7ad9af343c7f1c70c8015c7c519c312d8c5f9fa1
->   'tests: add functional test validating ipv4/ipv6 address flag handling'
-> 
-> Changes from v1:
-> * Fix potential uninitialized variable only detected by optimize.
-> * Improve unexpected error detection in test-listen to give more
->   details about why the test fails unexpectedly.
-> * Fix some line length style issues.
-> 
-> Thanks,
-> Knut
-> 
-> Knut Omang (4):
->   tests: Add test-listen - a stress test for QEMU socket listen
->   sockets: factor out a new try_bind() function
->   sockets: factor out create_fast_reuse_socket
->   sockets: Handle race condition between binds to the same port
-> 
->  tests/Makefile.include |   2 +-
->  tests/test-listen.c    | 253 ++++++++++++++++++++++++++++++++++++++++++-
->  util/qemu-sockets.c    | 138 +++++++++++++++--------
->  3 files changed, 345 insertions(+), 48 deletions(-)
->  create mode 100644 tests/test-listen.c
-> 
-> base-commit: a588c4985eff363154d65aee8607d0a4601655f7
 
-Thanks, queued for 2.11
+--EVF5PPMfhYS0aIcm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Am 04.08.2017 um 16:56 hat Eric Blake geschrieben:
+> On 08/04/2017 09:43 AM, Kevin Wolf wrote:
+> > This option was only added to allow 'null-co://' and 'null-aio://' as
+> > filenames, its value never served any actual purpose and was ignored.
+> > Nevertheless it was accepted as '-drive driver=3Dnull,filename=3Dfoo'.
+> >=20
+> > The correct way to enable the protocol prefixes (and that without adding
+> > a useless -drive option) is implementing .bdrv_parse_filename. This is
+> > what this patch does.
+> >=20
+> > Technically, this is an incompatible change, but the null block driver
+> > is only used for benchmarking, testing and debugging, and an option
+> > without effect isn't likely to be used by anyone anyway, so no bad
+> > effects are to be expected.
+>=20
+> Agreed with the analysis. Still, better to get it into 2.10 rather than
+> going yet another release with the option available.
+
+Makes sense. Applied to the block branch.
+
+Kevin
+
+--EVF5PPMfhYS0aIcm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJZiHLzAAoJEH8JsnLIjy/WYLAQAMnYl2E8e2769IyHwMDbtjwc
+s6jOGxxka9E06v9u4N4aJqXirXnIf5CjdVeePkI5jyYQpQm5CDfhjS16qgWm6ksG
+8S3XLrT7/1HT6MyW1xPrJtEaeIf6+h5+GBDT4SJAzQQWHkUEHXhvo8HgDjxQxT25
+ERx2LJzunCrFz3hvhZyJtPebDyjl0sFsitqWOjPw+Ycplp5FmZMRhzntIWYJuGPY
+b8OXxpNowYABFJDoxhnHiZ43Qrdk9utCwrTvajqxts43tm+nbw/pFz7JKjaPEow2
+OYsUYoiNbDzpB7SmND35Lsbx5W4EuIMpGOIHibtX4DXIAAISFbjvWx0/TeHt7Tnc
+g1HWpB8StDly0zbSxWpHlpVS10vJ9C8cufSHh6thVC9dLrLgMHwz0nwdYf93SwtL
+uOcJB9D8wLsymEzFBzM+Kp7S9/MMZmNiHuH2NFHeOqQLb4TFq4PtNRYbcAJXH4l/
+wyupWzgGUI24dSd5iJ0b1Dl/CBqkerCtsva6amASkONEmfx+6fIRQhxugtbnK+vt
+sMT0vZ5rSdnzW4pJ/xBnas/zVDNP7g7Rye5ki/CMcni4WMwclgdjAuvGEVlAP0/a
+Q6ZRGHM4BkhRJgSDJH81UOYHV7EcsiaoSuEh1G/yrv3M3Uxgu6UvS5z7oJbL33Co
++I7PIQ/vBs3UOdvldOvU
+=/iKN
+-----END PGP SIGNATURE-----
+
+--EVF5PPMfhYS0aIcm--
