@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dedqj-0001Qj-Kz
+	(envelope-from <lprosek@redhat.com>) id 1dedqj-0001Qk-L3
 	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dedqf-0007En-My
+	(envelope-from <lprosek@redhat.com>) id 1dedqe-0007Dh-N0
 	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47480)
+Received: from mx1.redhat.com ([209.132.183.28]:57646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dedqf-0007DH-DU
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:17 -0400
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dedqe-0007Cp-GQ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 04:57:16 -0400
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon,  7 Aug 2017 10:57:00 +0200
-Message-Id: <20170807085703.32267-2-lprosek@redhat.com>
-In-Reply-To: <20170807085703.32267-1-lprosek@redhat.com>
-References: <20170807085703.32267-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] i386/kvm: use a switch statement for
- MSR detection
+Date: Mon,  7 Aug 2017 10:56:59 +0200
+Message-Id: <20170807085703.32267-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] i386/kvm: advertise Hyper-V frequency
+ MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +25,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, mtosatti@redhat.com, david@redhat.com, rkrcmar@redhat.com
 
-Switch is easier on the eye and might lead to better codegen.
+This is the QEMU part of the changes required for nested Hyper-V to read
+timestamps with RDTSC + TSC page. Without exposing the frequency MSRs,
+Windows with the Hyper-V role enabled use the much slower
+HV_X64_MSR_TIME_REF_COUNT (0x40000020) RDMSR to read timestamps.
 
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
----
- target/i386/kvm.c | 75 +++++++++++++++++++++++--------------------------------
- 1 file changed, 31 insertions(+), 44 deletions(-)
+The new registers are exposed only if the TSC frequency is stable across
+migration and known, as suggested by Paolo.
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6db7783..b14a0db 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1081,65 +1081,52 @@ static int kvm_get_supported_msrs(KVMState *s)
-             int i;
- 
-             for (i = 0; i < kvm_msr_list->nmsrs; i++) {
--                if (kvm_msr_list->indices[i] == MSR_STAR) {
-+                switch (kvm_msr_list->indices[i]) {
-+                case MSR_STAR:
-                     has_msr_star = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_VM_HSAVE_PA) {
-+                    break;
-+                case MSR_VM_HSAVE_PA:
-                     has_msr_hsave_pa = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_TSC_AUX) {
-+                    break;
-+                case MSR_TSC_AUX:
-                     has_msr_tsc_aux = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_TSC_ADJUST) {
-+                    break;
-+                case MSR_TSC_ADJUST:
-                     has_msr_tsc_adjust = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_IA32_TSCDEADLINE) {
-+                    break;
-+                case MSR_IA32_TSCDEADLINE:
-                     has_msr_tsc_deadline = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_IA32_SMBASE) {
-+                    break;
-+                case MSR_IA32_SMBASE:
-                     has_msr_smbase = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_IA32_MISC_ENABLE) {
-+                    break;
-+                case MSR_IA32_MISC_ENABLE:
-                     has_msr_misc_enable = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_IA32_BNDCFGS) {
-+                    break;
-+                case MSR_IA32_BNDCFGS:
-                     has_msr_bndcfgs = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == MSR_IA32_XSS) {
-+                    break;
-+                case MSR_IA32_XSS:
-                     has_msr_xss = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == HV_X64_MSR_CRASH_CTL) {
-+                    break;;
-+                case HV_X64_MSR_CRASH_CTL:
-                     has_msr_hv_crash = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == HV_X64_MSR_RESET) {
-+                    break;
-+                case HV_X64_MSR_RESET:
-                     has_msr_hv_reset = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_INDEX) {
-+                    break;
-+                case HV_X64_MSR_VP_INDEX:
-                     has_msr_hv_vpindex = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == HV_X64_MSR_VP_RUNTIME) {
-+                    break;
-+                case HV_X64_MSR_VP_RUNTIME:
-                     has_msr_hv_runtime = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == HV_X64_MSR_SCONTROL) {
-+                    break;
-+                case HV_X64_MSR_SCONTROL:
-                     has_msr_hv_synic = true;
--                    continue;
--                }
--                if (kvm_msr_list->indices[i] == HV_X64_MSR_STIMER0_CONFIG) {
-+                    break;
-+                case HV_X64_MSR_STIMER0_CONFIG:
-                     has_msr_hv_stimer = true;
--                    continue;
-+                    break;
-                 }
-             }
-         }
+v1->v2:
+* deleted an extra empty line in patch 1
+* added patch 3 introducing a helper function for the "TSC is stable and
+  known" check (David)
+
+Ladi Prosek (4):
+  i386/kvm: use a switch statement for MSR detection
+  i386/kvm: set tsc_khz before configuring Hyper-V CPUID
+  i386/kvm: introduce tsc_is_stable_and_known()
+  i386/kvm: advertise Hyper-V frequency MSRs
+
+ target/i386/kvm.c | 138 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 71 insertions(+), 67 deletions(-)
+
 -- 
 2.9.3
