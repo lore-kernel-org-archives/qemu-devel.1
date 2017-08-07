@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dektc-0006oJ-Qq
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:28:54 -0400
+	(envelope-from <marcel@redhat.com>) id 1dekyB-0008OY-Ud
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dektX-0001zW-I9
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:28:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34710)
+	(envelope-from <marcel@redhat.com>) id 1deky6-0004bV-OZ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:33:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dektX-0001zC-8m
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:28:43 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1deky6-0004az-Ek
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 12:33:26 -0400
 References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
-	<1501964994-5257-4-git-send-email-zuban32s@gmail.com>
+	<1501964994-5257-3-git-send-email-zuban32s@gmail.com>
+	<5d72a8a3-5990-4b9c-8d29-3a09fec9ad22@redhat.com>
+	<CAKSfGUDnpSnkfBC-cCwdjh--HY3MqbccZVfJV5qGFC_hTiz0kw@mail.gmail.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <bcd8d8b3-536f-b67b-d7f8-9623cef9ae51@redhat.com>
-Date: Mon, 7 Aug 2017 19:28:35 +0300
+Message-ID: <f332751c-3d7b-0940-c0d7-e15149fbdf6a@redhat.com>
+Date: Mon, 7 Aug 2017 19:33:19 +0300
 MIME-Version: 1.0
-In-Reply-To: <1501964994-5257-4-git-send-email-zuban32s@gmail.com>
+In-Reply-To: <CAKSfGUDnpSnkfBC-cCwdjh--HY3MqbccZVfJV5qGFC_hTiz0kw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] pci: enable RedHat PCI bridges to
- reserve additional buses on PCI init
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] pci: add QEMU-specific PCI
+ capability structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,179 +31,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org
-Cc: mst@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: Alexander Bezzubikov <zuban32s@gmail.com>
+Cc: seabios@seabios.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-On 05/08/2017 23:29, Aleksandr Bezzubikov wrote:
-> In case of Red Hat Generic PCIE Root Port reserve additional buses,
-> which number is provided in a vendor-specific capability.
+On 07/08/2017 19:02, Alexander Bezzubikov wrote:
+> 2017-08-07 18:52 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+>> On 05/08/2017 23:29, Aleksandr Bezzubikov wrote:
+>>>
+>>> On PCI init PCI bridge devices may need some
+>>> extra info about bus number to reserve, IO, memory and
+>>> prefetchable memory limits. QEMU can provide this
+>>> with special vendor-specific PCI capability.
+>>>
+>>> This capability is intended to be used only
+>>> for Red Hat PCI bridges, i.e. QEMU cooperation.
+>>>
+>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>>> ---
+>>>    src/fw/dev-pci.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>    1 file changed, 50 insertions(+)
+>>>    create mode 100644 src/fw/dev-pci.h
+>>>
+>>> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
+>>> new file mode 100644
+>>> index 0000000..2c8ddb0
+>>
+>>
+>> Hi Aleksandr,
+>>
+> 
+> Hi Marcel,
+> 
+>>> --- /dev/null
+>>> +++ b/src/fw/dev-pci.h
+>>> @@ -0,0 +1,50 @@
+>>> +#ifndef _PCI_CAP_H
+>>> +#define _PCI_CAP_H
+>>> +
+>>> +#include "types.h"
+>>> +
+>>> +/*
+>>> +
+>>
+>>
+>> Please use the standard comment:
+>>
+>> /*
+>>   *
+>>   *
+>>   */
+>>
+>>
+>>> +QEMU-specific vendor(Red Hat)-specific capability.
+>>> +It's intended to provide some hints for firmware to init PCI devices.
+>>> +
+>>> +Its structure is shown below:
+>>> +
+>>> +Header:
+>>> +
+>>> +u8 id;       Standard PCI Capability Header field
+>>> +u8 next;     Standard PCI Capability Header field
+>>> +u8 len;      Standard PCI Capability Header field
+>>> +u8 type;     Red Hat vendor-specific capability type:
+>>> +               now only REDHAT_CAP_TYP_QEMU=1 exists
+>>
+>>
+>> Typo o the line before, but I think you don't need it there.
+>>
+>>> +Data:
+>>> +
+>>> +u32 bus_res;            minimum bus number to reserve;
+>>> +                        this is necessary for PCI Express Root Ports
+>>> +                        to support PCIE-to-PCI bridge hotplug
+>>
+>>
+>> I would add a broader class of usage:
+>>       necessary for nesting PCI bridges hotplug.
+>>
+>>> +u64 io;                 IO space to reserve
+>>> +u64 mem;                non-prefetchable memory space to reserve
+>>> +u64 prefetchable_mem;   prefetchable memory space to reserve
+>>> +
+>>
+>>
+>> Layout looks good to me.
+>>
+>>> +If any field value in Data section is -1,
+>>> +it means that such kind of reservation
+>>> +is not needed and must be ignored.
+>>> +
+>>
+>>
+>> -1 is not a valid value for unsigned fields, you may
+>> want to say 0xff..f or some other way.
+> 
+> I meant cast to unsigned here (because we still use unsigned types),
+> but if it can mislead someone I will change this.
+> 
+We should not document signed values for unsigned fields,
+even if the reason is "best practices."
+
+>>
+>>> +*/
+>>> +
+>>> +/* Offset of vendor-specific capability type field */
+>>> +#define PCI_CAP_REDHAT_TYPE  3
+>>
+>>
+>> May I ask why why '3'? I am not against it, I just
+>> want to understand the number.
+>>
+> 
+> This is actually an offset to this field
 > 
 
-Hi Aleksandr,
+OK, so it should end with 'offset' to be clear.
+I was mislead.
 
-It seems the subject/commit description does not cover
-all that the patch does, not it also deals with other resources
-as well.
-
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->   src/fw/pciinit.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
->   src/hw/pci_ids.h |  3 +++
->   2 files changed, 68 insertions(+), 4 deletions(-)
+>>> +
+>>> +/* List of valid Red Hat vendor-specific capability types */
+>>> +#define REDHAT_CAP_TYPE_QEMU    1
+>>
+>>
+>> I think I pointed this in another thread, the name is
+>> too vague, please change it to something like:
+>>     REDHAT_CAP_RES_RESERVE_QEMU
+>> that narrows down the intend.
+>>
 > 
-> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
-> index 864954f..d241d66 100644
-> --- a/src/fw/pciinit.c
-> +++ b/src/fw/pciinit.c
-> @@ -15,6 +15,7 @@
->   #include "hw/pcidevice.h" // pci_probe_devices
->   #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
->   #include "hw/pci_regs.h" // PCI_COMMAND
-> +#include "fw/dev-pci.h" // qemu_pci_cap
->   #include "list.h" // struct hlist_node
->   #include "malloc.h" // free
->   #include "output.h" // dprintf
-> @@ -578,9 +579,42 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
->           pci_bios_init_bus_rec(secbus, pci_bus);
->   
->           if (subbus != *pci_bus) {
-> +            u8 res_bus = 0;
-> +            if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
-> +                    pci_config_readw(bdf, PCI_DEVICE_ID) ==
-> +                            PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
+> What does the first 'RES' mean?
 
-I think I already pointed out you should extract the code receiving
-the limit into a different function. Also now you have a chance
-to re-use the code for IO/MEM resources.
+Resource.
 
-> +                u8 cap;
-> +                do {
-> +                    cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
-
-Maybe I missed something, but how would the do-while will work
-if you always use pci_find_capability with offset 0. It will
-always start the search from 0 and find the same (first) capability,
-right?
-Maybe you need:
-   cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, cap);
-
-> +                } while (cap &&
-> +                         pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE) !=
-> +                                REDHAT_CAP_TYPE_QEMU);
-> +                if (cap) {
-> +                    u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
-> +                    if (cap_len != QEMU_PCI_CAP_SIZE) {
-> +                        dprintf(1, "PCI: QEMU cap length %d is invalid\n",
-> +                                cap_len);
-> +                    } else {
-> +                        u32 tmp_res_bus = pci_config_readl(bdf,
-> +                                                   cap + QEMU_PCI_CAP_BUS_RES);
-> +                        if (tmp_res_bus != (u32)-1) {
-
-I would extract the above check into a separate function
-to make code more readable
-
-    pci_qemu_res_cap_set(cap) { return cap != (u32)-1 }
-
-then the code will look like:
-
-                          if(pci_qemu_res_cap_set(res_bus)) {
-> +                            res_bus = tmp_res_bus & 0xFF;
-> +                            if ((u8)(res_bus + secbus) < secbus ||
-> +                                (u8)(res_bus + secbus) < res_bus) {
-> +                                dprintf(1, "PCI: bus_reserve value %d is invalid\n",
-> +                                        res_bus);
-> +                                res_bus = 0;
-> +                            }
-> +                        }
-> +                    }
-> +                }
-> +                res_bus = (*pci_bus > secbus + res_bus) ? *pci_bus
-> +                                                      : secbus + res_bus;
-> +            }
->               dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
-> -                    subbus, *pci_bus);
-> -            subbus = *pci_bus;
-> +                    subbus, res_bus);
-> +            subbus = res_bus;
-> +            *pci_bus = res_bus;
->           } else {
->               dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
->           }
-> @@ -951,11 +985,38 @@ pci_region_map_one_entry(struct pci_region_entry *entry, u64 addr)
->   
->       u16 bdf = entry->dev->bdf;
->       u64 limit = addr + entry->size - 1;
-> +
-> +    if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
-> +            pci_config_readw(bdf, PCI_DEVICE_ID) ==
-> +                    PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
-> +        u8 cap;
-> +        do {
-> +            cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
-> +        } while (cap &&
-> +                 pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE) !=
-> +                        REDHAT_CAP_TYPE_QEMU);
-> +        if (cap) {
-> +            u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
-> +            if (cap_len != QEMU_PCI_CAP_SIZE) {
-> +                dprintf(1, "PCI: QEMU cap length %d is invalid\n",
-> +                        cap_len);
-
-The above code should be re-used.
-
-> +            } else {
-> +                u32 offset = cap + QEMU_PCI_CAP_LIMITS_OFFSET + entry->type * 8;
-> +                u64 tmp_limit = (pci_config_readl(bdf, offset) |
-> +                            (u64)pci_config_readl(bdf, offset + 4) << 32);
-> +                if (tmp_limit != (u64)-1) {
-> +                    tmp_limit += addr - 1;
-> +                    limit = (limit > tmp_limit) ? limit : tmp_limit;
-> +                }
-
-
-I think it is too late to read (and use) the cap value here,
-because a lot of computations including IO/MEM ranges takes place 
-earlier, see:
-   pci_bios_check_devices
-
-pci_bios_map_devices uses previously computed ranges, at this time
-I think you shouldn't change ranges.
-
-> +            }
-> +        }
-> +    }
-> +
->       if (entry->type == PCI_REGION_TYPE_IO) {
->           pci_config_writeb(bdf, PCI_IO_BASE, addr >> PCI_IO_SHIFT);
-> -        pci_config_writew(bdf, PCI_IO_BASE_UPPER16, 0);
-> +        pci_config_writew(bdf, PCI_IO_BASE_UPPER16, limit >> 16);
->           pci_config_writeb(bdf, PCI_IO_LIMIT, limit >> PCI_IO_SHIFT);
-> -        pci_config_writew(bdf, PCI_IO_LIMIT_UPPER16, 0);
-> +        pci_config_writew(bdf, PCI_IO_LIMIT_UPPER16, limit >> 16);
-
-Judging the above code, it seems SeaBIOS does not support 32-bit IO,
-I am not sure yuo can change that.
+I don't mind you change it how you seem fit,
+just make it clear what it does. Is about
+resource reserving, not a general capability.
 
 
 Thanks,
 Marcel
 
->       }
->       if (entry->type == PCI_REGION_TYPE_MEM) {
->           pci_config_writew(bdf, PCI_MEMORY_BASE, addr >> PCI_MEMORY_SHIFT);
-> diff --git a/src/hw/pci_ids.h b/src/hw/pci_ids.h
-> index 4ac73b4..38fa2ca 100644
-> --- a/src/hw/pci_ids.h
-> +++ b/src/hw/pci_ids.h
-> @@ -2263,6 +2263,9 @@
->   #define PCI_DEVICE_ID_KORENIX_JETCARDF0	0x1600
->   #define PCI_DEVICE_ID_KORENIX_JETCARDF1	0x16ff
->   
-> +#define PCI_VENDOR_ID_REDHAT		0x1b36
-> +#define PCI_DEVICE_ID_REDHAT_ROOT_PORT	0x000C
-> +
->   #define PCI_VENDOR_ID_TEKRAM		0x1de1
->   #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
->   
+> 
+>>> +
+>>> +
+>>> +/* Offsets of QEMU capability fields */
+>>> +#define QEMU_PCI_CAP_BUS_RES        4
+>>> +#define QEMU_PCI_CAP_LIMITS_OFFSET  8
+>>> +#define QEMU_PCI_CAP_IO             8
+>>> +#define QEMU_PCI_CAP_MEM            16
+>>> +#define QEMU_PCI_CAP_PREF_MEM       24
+>>> +#define QEMU_PCI_CAP_SIZE           32
+>>> +
+>>> +#endif /* _PCI_CAP_H */
+>>>
+>>
+>> The layout looks good to me.
+>>
+>> Thanks,
+>> Marcel
+> 
+> 
 > 
