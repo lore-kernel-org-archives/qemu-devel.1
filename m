@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dfAac-0006k0-0a
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:54:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfAgQ-0000Hy-Du
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dfAaY-0000qy-T9
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:54:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dfAaY-0000qT-J4
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:54:50 -0400
-Date: Tue, 8 Aug 2017 22:54:43 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170808225149-mutt-send-email-mst@kernel.org>
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-5-git-send-email-zuban32s@gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1dfAgP-0003rC-8l
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:00:54 -0400
+References: <20170808183306.27474-1-jsnow@redhat.com>
+	<20170808183306.27474-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c0250626-4c3a-fa61-a749-387fbabd6934@redhat.com>
+Date: Tue, 8 Aug 2017 15:00:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501964858-5159-5-git-send-email-zuban32s@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] hw/pci: add QEMU-specific PCI
- capability to the Generic PCI Express Root Port
+In-Reply-To: <20170808183306.27474-2-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wTglCITBF39focD0NCdH9cIpxN5I9MmAb"
+Subject: Re: [Qemu-devel] [PATCH 1/9] IDE: replace DEBUG_IDE with tracing
+ system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +25,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, seabios@seabios.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On Sat, Aug 05, 2017 at 11:27:37PM +0300, Aleksandr Bezzubikov wrote:
-> To enable hotplugging of a newly created pcie-pci-bridge,
-> we need to tell firmware (SeaBIOS in this case)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wTglCITBF39focD0NCdH9cIpxN5I9MmAb
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <c0250626-4c3a-fa61-a749-387fbabd6934@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/9] IDE: replace DEBUG_IDE with tracing
+ system
+References: <20170808183306.27474-1-jsnow@redhat.com>
+ <20170808183306.27474-2-jsnow@redhat.com>
+In-Reply-To: <20170808183306.27474-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Why SeaBIOS is this case?
-
-> to reserve
-> additional buses or IO/MEM/PREF space for pcie-root-port.
-> Additional bus reservation allows us to hotplug pcie-pci-bridge into this root port.
-> The number of buses to reserve is provided to the device via a corresponding
-> property, and to the firmware via new PCI capability.
-> The properties' default value is -1 to keep default behavior unchanged.
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+On 08/08/2017 01:32 PM, John Snow wrote:
+> Out with the old, in with the new.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  hw/pci-bridge/gen_pcie_root_port.c | 33 +++++++++++++++++++++++++++++++++
->  include/hw/pci/pcie_port.h         |  1 +
->  2 files changed, 34 insertions(+)
-> 
-> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> index cb694d6..ff8d04c 100644
-> --- a/hw/pci-bridge/gen_pcie_root_port.c
-> +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> @@ -16,6 +16,8 @@
->  #include "hw/pci/pcie_port.h"
->  
->  #define TYPE_GEN_PCIE_ROOT_PORT                "pcie-root-port"
-> +#define GEN_PCIE_ROOT_PORT(obj) \
-> +        OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
->  
->  #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
->  #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
-> @@ -26,6 +28,12 @@ typedef struct GenPCIERootPort {
->      /*< public >*/
->  
->      bool migrate_msix;
-> +
-> +    /* additional buses to reserve on firmware init */
-> +    uint32_t bus_reserve;
-> +    uint64_t io_reserve;
-> +    uint64_t mem_reserve;
-> +    uint64_t pref_reserve;
->  } GenPCIERootPort;
->  
->  static uint8_t gen_rp_aer_vector(const PCIDevice *d)
-> @@ -60,6 +68,23 @@ static bool gen_rp_test_migrate_msix(void *opaque, int version_id)
->      return rp->migrate_msix;
->  }
->  
-> +static void gen_rp_realize(DeviceState *dev, Error **errp)
-> +{
-> +    PCIDevice *d = PCI_DEVICE(dev);
-> +    GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
-> +    PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
-> +
-> +    rpc->parent_realize(dev, errp);
-> +
-> +    int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
-> +            grp->io_reserve, grp->mem_reserve, grp->pref_reserve, errp);
 
-You have to skip adding this capability by default to avoid
-breaking migration to/from old QEMU. A simple way to do this is
-to check whether any have been specified as != -1.
+>  hw/ide/piix.c             | 11 ++++----
+>  hw/ide/trace-events       | 33 ++++++++++++++++++++++++
+>  hw/ide/via.c              | 10 +++-----
+
+Hmm - should we tweak scripts/git.orderfile to prioritize trace-events
+over .c files? Then again, right now it prioritizes all .c files before
+anything that didn't match, so that things like trace-events will at
+least avoid falling in the middle of a patch if you use the project's
+orderfile.
+
+> +++ b/hw/ide/cmd646.c
+> @@ -32,6 +32,7 @@
+>  #include "sysemu/dma.h"
+> =20
+>  #include "hw/ide/pci.h"
+> +#include "trace.h"
+> =20
+>  /* CMD646 specific */
+>  #define CFR		0x50
+> @@ -195,9 +196,8 @@ static uint64_t bmdma_read(void *opaque, hwaddr add=
+r,
+>          val =3D 0xff;
+>          break;
+>      }
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: readb " TARGET_FMT_plx " : 0x%02x\n", addr, val);
+> -#endif
+
+Yay for killing code prone to bitrot.
+
+> +++ b/hw/ide/core.c
+
+> @@ -2054,18 +2044,18 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val)
+>      }
+
+>      hob =3D 0;
+> -    switch(addr) {
+> +    switch(reg_num) {
+
+Worth fixing the style to put space after switch while touching this?
+
+> +++ b/hw/ide/trace-events
+> @@ -0,0 +1,33 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# hw/ide/core.c
 
 > +
-> +    if (rc < 0) {
-> +        rpc->parent_class.exit(d);
-> +        return;
-> +    }
-> +}
-> +
->  static const VMStateDescription vmstate_rp_dev = {
->      .name = "pcie-root-port",
->      .version_id = 1,
-> @@ -78,6 +103,10 @@ static const VMStateDescription vmstate_rp_dev = {
->  
->  static Property gen_rp_props[] = {
->      DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
-> +    DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort, bus_reserve, -1),
-> +    DEFINE_PROP_UINT64("io-reserve", GenPCIERootPort, io_reserve, -1),
-> +    DEFINE_PROP_UINT64("mem-reserve", GenPCIERootPort, mem_reserve, -1),
-> +    DEFINE_PROP_UINT64("pref-reserve", GenPCIERootPort, pref_reserve, -1),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> @@ -92,6 +121,10 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
->      dc->desc = "PCI Express Root Port";
->      dc->vmsd = &vmstate_rp_dev;
->      dc->props = gen_rp_props;
-> +
-> +    rpc->parent_realize = dc->realize;
-> +    dc->realize = gen_rp_realize;
-> +
->      rpc->aer_vector = gen_rp_aer_vector;
->      rpc->interrupts_init = gen_rp_interrupts_init;
->      rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> index 1333266..0736014 100644
-> --- a/include/hw/pci/pcie_port.h
-> +++ b/include/hw/pci/pcie_port.h
-> @@ -65,6 +65,7 @@ void pcie_chassis_del_slot(PCIESlot *s);
->  
->  typedef struct PCIERootPortClass {
->      PCIDeviceClass parent_class;
-> +    DeviceRealize parent_realize;
->  
->      uint8_t (*aer_vector)(const PCIDevice *dev);
->      int (*interrupts_init)(PCIDevice *dev, Error **errp);
-> -- 
-> 2.7.4
+> +# hw/ide/pci.c
+> +bmdma_reset(void) ""
+
+An empty trace? Do all the backends support it?
+
+> +# hw/ide/cmd646.c
+
+Worth sorting the sections by filename?
+
+Whether or not you tweak based on my nits,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--wTglCITBF39focD0NCdH9cIpxN5I9MmAb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmKGGgACgkQp6FrSiUn
+Q2qYiwf9E72zzEmce4Hjwj7Yj5OhtPi4NXGhS+a0T2I0qYKgowzL24RdVpAyDi7F
+uJ5MPgaSwubHyTo96WcLo2PpGcgSj0wVwkdSFsBAImTEN9vSam89EKWsvWv6J5lw
+54D2a6qa75QZ2nwgT+QDdPKL9gB9k7EKxZQaCCrnax7AgKc26smqfDfd7VC8V1xO
+sJuQCf1POlz4Xi6BEbMavJ6RsuOxc1+etdUbXj9OtbXgwR6zMmpP7OOqZR8vsOUz
+GfOzO5eZVO5bHUztPEz5ZdXLR3+8cyO70EiFVSN+azikpeRDpo8A22q49wvcbtoD
+nedLgUPCUSNzqcXOk39dIx35uCSALQ==
+=eMUU
+-----END PGP SIGNATURE-----
+
+--wTglCITBF39focD0NCdH9cIpxN5I9MmAb--
