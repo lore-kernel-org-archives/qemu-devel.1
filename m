@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df38H-000192-DW
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:57:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1df39P-0001hN-H0
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df38E-0007Ta-8Z
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:57:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43106)
+	(envelope-from <pbonzini@redhat.com>) id 1df39K-0007xf-Ck
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:58:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1df38D-0007Qo-VG
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:57:06 -0400
-Date: Tue, 8 Aug 2017 13:56:52 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170808115652.GH4850@dhcp-200-186.str.redhat.com>
-References: <20170713190116.21608-1-dgilbert@redhat.com>
-	<20170717101703.GH7163@stefanha-x1.localdomain>
-	<20170717102642.GG2106@work-vm>
-	<c6161e7a-9b03-16bf-fb20-86df6f3fd9bc@redhat.com>
-	<CAJSP0QWd7gtV21Hpr3noA0odAMhdriNkaqJtLJvbSNzoErvFdQ@mail.gmail.com>
-	<9e79cd50-c23a-2b96-4206-f505993179f5@redhat.com>
-	<20170808100243.GG4850@dhcp-200-186.str.redhat.com>
-	<5a5542b7-bc68-c032-24ea-12821b8b6a1a@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1df39K-0007x4-32
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:58:14 -0400
+References: <1502189042-9676-1-git-send-email-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fac418bf-1376-209c-9ac0-0b103886cfc8@redhat.com>
+Date: Tue, 8 Aug 2017 13:58:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5a5542b7-bc68-c032-24ea-12821b8b6a1a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vl.c/exit: pause cpus before closing block
- devices
+In-Reply-To: <1502189042-9676-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] docs/devel/loads-stores.rst: Document our
+ various load and store APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Prasad Pandit <ppandit@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-Am 08.08.2017 um 13:04 hat Paolo Bonzini geschrieben:
-> On 08/08/2017 12:02, Kevin Wolf wrote:
-> > Am 04.08.2017 um 13:46 hat Paolo Bonzini geschrieben:
-> >> On 04/08/2017 11:58, Stefan Hajnoczi wrote:
-> >>>> the root cause of this bug is related to this as well:
-> >>>> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg02945.html
-> >>>>
-> >>>> From commit 99723548 we started assuming (incorrectly?) that blk_
-> >>>> functions always WILL have an attached BDS, but this is not always true,
-> >>>> for instance, flushing the cache from an empty CDROM.
-> >>>>
-> >>>> Paolo, can we move the flight counter increment outside of the
-> >>>> block-backend layer, is that safe?
-> >>> I think the bdrv_inc_in_flight(blk_bs(blk)) needs to be fixed
-> >>> regardless of the throttling timer issue discussed below.  BB cannot
-> >>> assume that the BDS graph is non-empty.
-> >>
-> >> Can we make bdrv_aio_* return NULL (even temporarily) if there is no
-> >> attached BDS?  That would make it much easier to fix.
-> > 
-> > Would the proper fix be much more complicated than the following? I must
-> > admit that I don't fully understand the current state of affairs with
-> > respect to threading, AioContext etc. so I may well be missing
-> > something.
-> 
-> Not much, but it's not complete either.  The issues I see are that: 1)
-> blk_drain_all does not take the new counter into account;
+On 08/08/2017 12:44, Peter Maydell wrote:
+> +``cpu_{ld,st}_*``
+> +~~~~~~~~~~~~~~~~~
+> +
+> +These functions operate on a guest virtual address. Be aware
+> +that these functions may cause a guest CPU exception to be
+> +taken (eg for an alignment fault or MMU fault) which will
+> +result in guest CPU state being updated and control longjumping
+> +out of the function call. They should therefore only be used
+> +in code that is implementing emulation of the target CPU.
+>
+> +``cpu_{ld,st}_*_ra``
+> +~~~~~~~~~~~~~~~~~~~~
+> +
+> +Thes functions work like the ``cpu_{ld,st}_*`` functions except
+> +that they also take a ``retaddr`` argument.
+> +
+> +**TODO**: when should these be used and what should ``retaddr`` be?
 
-Ok, I think this does the trick:
+They should always be used instead of the non-ra version in helpers (or
+code that is called from helpers).  retaddr is GETPC() in the helper_*
+functions and in tlb_fill, and must be propagated down from there.
 
-void blk_drain_all(void)
-{
-    BlockBackend *blk = NULL;
+This means that the non-ra versions should only be called from
+translation, if I understand correctly.  You can use them after
+cpu_restore_state, but it seems simpler to me to just say "don't use
+them at all" and leave cpu_restore_state for special cases.
 
-    bdrv_drain_all_begin();
-    while ((blk = blk_all_next(blk)) != NULL) {
-        blk_drain(blk);
-    }
-    bdrv_drain_all_end();
-}
+> +``helper_*_{ld,st}*mmu``
+> +~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +These functions are intended primarily to be called by the code
+> +generated by the TCG backend. They may also be called by target
+> +CPU helper function code. (XXX why, and when this vs cpu_{ld,st}_* ?)
+> +
+> +**TODO** tcg.h claims the target-endian helper_ret* are temporary and
+> +will go away?
 
-> 2) bdrv_drain_all callers need to be audited to see if they should be
-> blk_drain_all (or more likely, only device BlockBackends should be drained).
+It seems indeed that we have:
 
-qmp_transaction() is unclear to me. It should be changed in some way
-anyway because it uses bdrv_drain_all() rather than a begin/end pair.
+- helper_ret_ldub_mmu/helper_ret_ldsb_mmu that can be changed to remove
+the "ret_" since there's no endianness there
 
-do_vm_stop() and vm_stop_force_state() probably want blk_drain_all().
+- some uses in target/mips of helper_ret_{lduw,ldul,ldq,stw,stl,stq}_mmu
 
-xen_invalidate_map_cache() - wtf? Looks like the wrong layer to do this,
-but I guess blk_drain_all(), too.
+> +**TODO** why is "target endian" "ret" anyway?
 
-block_migration_cleanup() is just lazy and really means a blk_drain()
-for its own BlockBackends. blk_drain_all() as the simple conversion.
+That "_ret" is like the "_ra" at the end of cpu functions, so perhaps
+these should be renamed to helper_{le,be}_{ld,st}*mmu_ra?
 
-migration/savevm: Migration wants blk_drain_all() to get the devices
-quiesced.
+They should only be used if the MMU index is not a constant and is not
+the active one.
 
-qemu-io: blk_drain_all(), too.
+> +``{ld,st}*_phys``
+> +~~~~~~~~~~~~~~~~~
+> +
+> +These are functions which are identical to
+> +``address_space_{ld,st}*``, except that they always pass
+> +``MEMTXATTRS_UNSPECIFIED`` for the transaction attributes, and ignore
+> +whether the transaction succeeded or failed.
+> +
+> +The fact that they ignore whether the transaction succeeded means
+> +they should not be used in new code.
 
-Hm, looks like there won't be many callers of bdrv_drain_all() left. :-)
+It depends---not all processors have a way of reporting failed transactio=
+ns.
 
-> > Note that my blk_drain() implementation doesn't necessarily drain
-> > blk_bs(blk) completely, but only those requests that came from the
-> > specific BlockBackend. I think this is what the callers want, but
-> > if otherwise, it shouldn't be hard to change.
-> 
-> Yes, this should be what they want.
+> +``cpu_physical_memory_*``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +These are convenience functions which are identical to
+> +``address_space_*`` but operate specifically on the system address spa=
+ce,
+> +always pass a ``MEMTXATTRS_UNSPECIFIED`` set of memory attributes and
+> +ignore whether the memory transaction succeeded or failed.
+> +For new code they are better avoided:
+> +
+> +* there is likely to be behaviour you need to model correctly for a
+> +  failed read or write operation
+> +* a device should usually perform operations on its own AddressSpace
+> +  rather than using the system address space
 
-Apparently not; block jobs don't complete with it any more. I haven't
-checked in detail, but it makes sense that they can have a BH (e.g. for
-block_job_defer_to_main_loop) without a request being in flight.
+Agreed.  Maybe we should just transform them with Coccinelle.
 
-So I'm including an unconditional bdrv_drain() again. Or I guess,
-calling aio_poll() unconditionally and including its return value
-in the loop condition would be the cleaner approach?
+> +``cpu_physical_memory_write_rom``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +This function performs a write by physical address like
+> +``address_space_write``, except that if the write is to a ROM then
+> +the ROM contents will be modified, even though a write by the guest
+> +CPU to the ROM would be ignored.
+> +
+> +Note that unlike ``cpu_physical_memory_write()`` this function takes
+> +an AddressSpace argument, but unlike ``address_space_write()`` this
+> +function does not take a ``MemTxAttrs`` or return a ``MemTxResult``.
+> +
+> +**TODO**: we should probably clean up this inconsistency and
+> +turn the function into ``address_space_write_rom`` with an API
+> +matching ``address_space_write``.
 
-Kevin
+Agreed.
+
+> +``dma_memory_*``
+> +~~~~~~~~~~~~~~~~
+> +
+> +These behave like ``address_space_*``, except that they perform a DMA
+> +barrier operation first.
+> +
+> +**TODO**: I don't understand when you need to use these, and when
+> +you can just use the address_space functions.
+
+I guess it depends on the memory ordering semantics of the bus you're
+implementing.  It's probably better/safer to just use these instead of
+address_space_*.
+
+Paolo
