@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1df5Zy-0000dI-7b
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:33:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1df5aU-00010k-Vv
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1df5Zu-0000NY-9O
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:33:54 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:34446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1df5Zt-0000MH-S1
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:33:50 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
-	<87bmoxcuvn.fsf@dusky.pond.sub.org>
-	<61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
-	<87shh3fn7d.fsf@dusky.pond.sub.org>
-	<w511soml2kh.fsf@maestria.local.igalia.com>
-	<34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
-Date: Tue, 08 Aug 2017 16:33:34 +0200
-Message-ID: <w51shh2jfi9.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
+	(envelope-from <eblake@redhat.com>) id 1df5aT-0000d3-Vu
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:34:26 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Tue,  8 Aug 2017 09:34:16 -0500
+Message-Id: <20170808143416.3581-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10] tests/multiboot: Fix whitespace
+ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +18,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-On Tue 08 Aug 2017 02:30:43 PM CEST, Pradeep Jagadeesh wrote:
-> On 8/8/2017 1:30 PM, Alberto Garcia wrote:
->> On Mon 07 Aug 2017 04:48:38 PM CEST, Markus Armbruster wrote:
->>>>> Awkward question for a v7, but here goes anyway: why is IOThrottle
->>>>> worth its very own .json file?
->>>> I feel this is a common throttle structure that is used by block
->>>> devices as well as fsdev, so moved to a separate file.
->>> I'm not sure that's a good idea.  Kevin, Berto, what do you think?
->>
->> Mmm... I don't have a very strong opinion, but if there's no actual need
->> to move it to a separate file I'd prefer to leave it where it is.
-> The segregation is the solid reason. Because throttling is a feature 
-> that is used by fsdev, block may many more in future. I do not see 
-> moving it back to block does it make any sense?
+Commit b43671f8 accidentally broke run_test.sh within tests/multiboot;
+due to a subtle change in whitespace.
 
-It's not "moving it back", it's keeping it where it is. But I see no big
-problem with moving it to a common file either.
+These two commands produce theh same output (at least, for sane $IFS
+of space-tab-newline):
 
-Berto
+echo -e "...$@..."
+echo -e "...$*..."
+
+But that's only because echo inserts spaces between multiple arguments
+(the $@ case), while the $* form gives a single argument to echo with
+the spaces already present.
+
+But when converting to printf %b, there are no automatic spaces between
+multiple arguments, so we HAVE to use $*.
+
+It doesn't help that run_test.sh isn't part of 'make check'.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ tests/multiboot/run_test.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
+index c8f3da8f37..0278148b43 100755
+--- a/tests/multiboot/run_test.sh
++++ b/tests/multiboot/run_test.sh
+@@ -26,7 +26,7 @@ run_qemu() {
+     local kernel=$1
+     shift
+
+-    printf %b "\n\n=== Running test case: $kernel $@ ===\n\n" >> test.log
++    printf %b "\n\n=== Running test case: $kernel $* ===\n\n" >> test.log
+
+     $QEMU \
+         -kernel $kernel \
+-- 
+2.13.4
