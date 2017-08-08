@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dfAJy-0001zX-AB
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:37:43 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dfAMS-00032D-27
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dfAJu-0000UW-Br
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:37:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36792)
+	(envelope-from <alex.williamson@redhat.com>) id 1dfAMO-0001eR-4f
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:40:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dfAJu-0000UB-2X
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:37:38 -0400
-Date: Tue, 8 Aug 2017 22:37:32 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170808223616-mutt-send-email-mst@kernel.org>
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-2-git-send-email-zuban32s@gmail.com>
-	<8893f281-e30d-d1c6-3da0-14a644da5a03@redhat.com>
-	<20170808183516-mutt-send-email-mst@kernel.org>
-	<09cc4eb5-cc15-726f-ae5f-2c7c5a401701@redhat.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dfAMN-0001de-RD
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:40:12 -0400
+Date: Tue, 8 Aug 2017 13:40:08 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170808134008.0648ab2e@w520.home>
+In-Reply-To: <20170727115042.GL2555@redhat.com>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
+	<20170727105348.GG7970@umbus.fritz.box>
+	<20170727115042.GL2555@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09cc4eb5-cc15-726f-ae5f-2c7c5a401701@redhat.com>
-Subject: Re: [Qemu-devel] acpi-test: Warning! DSDT mismatch
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Aleksandr Bezzubikov <zuban32s@gmail.com>, ehabkost@redhat.com, kevin@koconnor.net, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, lersek@redhat.com, Peter Maydell <peter.maydell@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Aug 08, 2017 at 08:38:18PM +0200, Thomas Huth wrote:
-> On 08.08.2017 17:35, Michael S. Tsirkin wrote:
-> > On Tue, Aug 08, 2017 at 04:48:26PM +0200, Thomas Huth wrote:
-> >> On 05.08.2017 22:27, Aleksandr Bezzubikov wrote:
-> >>> Unmask previously masked SHPC feature in _OSC method.
-> >>>
-> >>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> >>> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> >>> ---
-> >>>  hw/i386/acpi-build.c | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >>> index b9c245c..98dd424 100644
-> >>> --- a/hw/i386/acpi-build.c
-> >>> +++ b/hw/i386/acpi-build.c
-> >>> @@ -1862,9 +1862,9 @@ static Aml *build_q35_osc_method(void)
-> >>>  
-> >>>      /*
-> >>>       * Always allow native PME, AER (no dependencies)
-> >>> -     * Never allow SHPC (no SHPC controller in this system)
-> >>> +     * Allow SHPC (PCI bridges can have SHPC controller)
-> >>>       */
-> >>> -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1D), a_ctrl));
-> >>> +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
-> >>>  
-> >>>      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
-> >>>      /* Unknown revision */
-> >>>
-> >>
-> >> Since this patch has been merged, I now get a bunch of ugly warnings
-> >> during "make check":
-> >>
-> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-T2ST4Y.dsl,
-> >> aml:/tmp/aml-HVUT4Y], Expected [asl:/tmp/asl-00VT4Y.dsl,
-> >> aml:tests/acpi-test-data/q35/DSDT].
-> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-3BKN4Y.dsl,
-> >> aml:/tmp/aml-CDKN4Y], Expected [asl:/tmp/asl-2CZM4Y.dsl,
-> >> aml:tests/acpi-test-data/q35/DSDT.bridge].
-> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-ZVPA4Y.dsl,
-> >> aml:/tmp/aml-A3PA4Y], Expected [asl:/tmp/asl-F0QA4Y.dsl,
-> >> aml:tests/acpi-test-data/q35/DSDT.ipmibt].
-> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-TX7P4Y.dsl,
-> >> aml:/tmp/aml-S97P4Y], Expected [asl:/tmp/asl-AIJP4Y.dsl,
-> >> aml:tests/acpi-test-data/q35/DSDT.cphp].
-> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6J0C4Y.dsl,
-> >> aml:/tmp/aml-DCZC4Y], Expected [asl:/tmp/asl-9I1C4Y.dsl,
-> >> aml:tests/acpi-test-data/q35/DSDT.memhp].
-> >>
-> >> Did you maybe forget to update the ACPI test table according to the
-> >> changes? (and why was this merged during hard-freeze at all? The
-> >> ChangeLog text does not sound like a bug fix?)
-> >>
-> >>  Thomas
+On Thu, 27 Jul 2017 12:50:42 +0100
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+
+> On Thu, Jul 27, 2017 at 08:53:48PM +1000, David Gibson wrote:
+> > On Thu, Jul 27, 2017 at 10:11:48AM +0100, Peter Maydell wrote:  
+> > > On 27 July 2017 at 02:30, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:  
+> > > > In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
+> > > > quiesced by vfio-pci's finalize() routine until up to 6s after the
+> > > > DEVICE_DELETED was emitted, leading to detach-device on the libvirt side pretty
+> > > > much always crashing the host.  
+> > > 
+> > > My initial naive thought is that if the host kernel can crash then
+> > > this is a host kernel bug... shouldn't the host kernel refuse
+> > > the subsequent libvirt rebind if it would cause a crash ?  
 > > 
-> > My bad will fix ASAP.
+> > I think so too, but I haven't been able to convince Alex.  Nor
+> > find time to fix it in the kernel myself.  
 > 
-> Thanks! ... while you're at it, maybe it would be better to turn the
-> warnings into an g_assert() or something similar, too, so that they are
-> fatal? Otherwise these errors apparently can sneak in without anybody
-> noticing it...
-> 
->  Thomas
-> 
+> I think we need to fix both the QEMU premature sending of DEVICE_DELETED
+> and the kernel bug that allowed the crash.
 
-Nope, sorry.  They are warnings intentionally since getting expected
-files out of sync or even failing to disassemble the actual ones
-is not a necessarily an indication of a bug.
 
--- 
-MST
+Where do we stand on this for v2.10?  I'd like to see it get in.  There
+may be things to fix in the kernel, some of them may already be fixed
+in the latest development kernel, but ultimately the kernel considers
+driver binding to be a trusted operation and if userspace doesn't
+understand all the dependencies, they shouldn't be doing it.  In this
+case libvirt is using the DEVICE_DELETED signal with the assumption
+that the device has been fully released by QEMU, which is of course not
+accurate (libvirt could test this, but chooses not to).  libvirt
+therefore begins trying to unbind a device that is still in use, we try
+to handle it, but see official kernel stance that userspace is
+responsible for understanding device dependencies, so we can only do so
+much.
+
+IMO, the next step along those lines would be that libvirt needs to
+understand that even once a device is fully released from QEMU, it's
+not necessarily safe to re-bind the device to a host driver.  If the
+device is a member of a group where other devices are still in use by
+userspace, this will violate user/host device isolation and the kernel
+will crash to protect itself.  At best I may be able to improve this to
+killing the userspace process making use of the conflicting device, but
+the kernel view is that userspace (libvirt) has mandated to bind the
+device to the host driver and we must make it so, the user is
+responsible for the consequences.  Thanks,
+
+Alex
