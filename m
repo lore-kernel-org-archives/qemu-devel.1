@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df09h-0001nM-3Z
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:46:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1df0Ej-00039M-Pj
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df09f-0003Yf-Vw
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:46:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df09f-0003Wn-QN
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:46:23 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A84E94A705
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 08:46:22 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170719160030.GF3500@work-vm> (David Alan Gilbert's message of
-	"Wed, 19 Jul 2017 17:00:30 +0100")
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-6-quintela@redhat.com>
-	<20170719160030.GF3500@work-vm>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 Aug 2017 10:46:15 +0200
-Message-ID: <87fud2bg6g.fsf@secure.mitica>
+	(envelope-from <alex.bennee@linaro.org>) id 1df0Eg-0006aE-M4
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:51:37 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1df0Eg-0006Zi-Ee
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:51:34 -0400
+Received: by mail-wm0-x229.google.com with SMTP id m85so1528546wma.0
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 01:51:34 -0700 (PDT)
+References: <20170807153934.29477-1-alex.bennee@linaro.org>
+	<20170807153934.29477-5-alex.bennee@linaro.org>
+	<20170808014310.GP14780@lemon>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170808014310.GP14780@lemon>
+Date: Tue, 08 Aug 2017 09:51:31 +0100
+Message-ID: <87shh2v3vw.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 05/17] migration: Create
- x-multifd-threads parameter
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 v3 4/6] docker: docker.py make
+ --no-cache skip checksum test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,59 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> Indicates the number of threads that we would create.  By default we
->> create 2 threads.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Fam Zheng <famz@redhat.com> writes:
+
+> On Mon, 08/07 16:39, Alex Bennée wrote:
+>> If you invoke with NOCACHE=1 we pass --no-cache in the argv to
+>> docker.py but may still not force a rebuild if the dockerfile checksum
+>> hasn't changed. By testing for its presence we can force builds
+>> without having to manually remove the docker image.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  tests/docker/docker.py | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+>> index ee40ca04d9..aab1648cc5 100755
+>> --- a/tests/docker/docker.py
+>> +++ b/tests/docker/docker.py
+>> @@ -261,7 +261,8 @@ class BuildCommand(SubCommand):
+>>          tag = args.tag
+>>
+>>          dkr = Docker()
+>> -        if dkr.image_matches_dockerfile(tag, dockerfile):
+>> +        if "--no-cache" not in argv and \
+>> +           dkr.image_matches_dockerfile(tag, dockerfile):
+>>              if not args.quiet:
+>>                  print "Image is up to date."
+>>          else:
+>> --
+>> 2.13.0
+>>
+>>
 >
-> Also needs updating DEFINE_PROP stuff - and if Markus' qapi patch lands.
-
-Done.
-
->>  #
->>  # @return-path: If enabled, migration will use the return path even
->>  #               for precopy. (since 2.10)
->> +#
->>  # @x-multifd: Use more than one fd for migration (since 2.10)
->>  #
->>  # Since: 1.2
->> @@ -910,6 +911,7 @@
->>    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->>             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
->>             'block', 'return-path', 'x-multifd'] }
->> +
+> NACK.
 >
-> Escapee from previous patch.
-
-Done.
-
+> Please add "--no-cache" to BuildCommand.args, and use args.no_cache.
 >
->>  ##
->>  # @MigrationCapabilityStatus:
->>  #
->> @@ -1026,13 +1028,19 @@
->>  # 	migrated and the destination must already have access to the
->>  # 	same backing chain as was used on the source.  (since 2.10)
->>  #
->> +# @x-multifd-threads: Number of threads used to migrate data in
->> +#                     parallel. This is the same number that the
->> +#                     number of sockets used for migration.
->> +#                     The default value is 2 (since 2.10)
->> +#
->
-> That did make me think for a moment; I guess '2' makes sense once you've
-> set the x-multifd capability on.  The other possibility would be to
-> remove the capability and just rely on the threads > 1
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index ee40ca04d9..530bc62d40 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -251,6 +251,8 @@ class BuildCommand(SubCommand):
+>          parser.add_argument("--add-current-user", "-u", dest="user",
+>                              action="store_true",
+>                              help="Add the current user to image's passwd")
+> +        parser.add_argument("--no-cache", action="store_true",
+> +                            help="Disable docker cache and checksum")
+>          parser.add_argument("tag",
+>                              help="Image Tag")
+>          parser.add_argument("dockerfile",
 
-I think this is the same that xbzrle cache size.  It has a default
-value.  But we only used it when we set the capability.
+Fair enough, I just didn't want to clash with what usually gets passed
+directly to the docker command.
 
-I think that it makes the code more ortogonal with the others, no?
 
-Later, Juan.
+--
+Alex Bennée
