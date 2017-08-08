@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1df2ix-0006hN-Bp
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:31:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1df2kI-0007c2-4W
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1df2ir-0001TA-Jg
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:30:59 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1df2iq-0001Nn-HB
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:30:53 -0400
-References: <6b32aeb2-d488-eb3c-4147-a99fe4681a6f@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <5989A0D0.6010304@huawei.com>
-Date: Tue, 8 Aug 2017 19:30:24 +0800
+	(envelope-from <dgilbert@redhat.com>) id 1df2kC-0002Kf-TI
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:32:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1df2kC-0002JE-JX
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:32:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9311DC047B62
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 11:32:15 +0000 (UTC)
+Date: Tue, 8 Aug 2017 12:32:08 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170808113208.GF2081@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-17-quintela@redhat.com>
+	<20170720113113.GF2101@work-vm> <87k22e9usf.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <6b32aeb2-d488-eb3c-4147-a99fe4681a6f@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] colo-compare: segfault and assert on
- colo_compare_finalize
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k22e9usf.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v5 16/17] migration: Transfer pages over
+ new channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +35,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: otubo@redhat.com, qemu-devel@nongnu.org
-Cc: wency@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, wang.guang55@zte.com.cn, wang.yong155@zte.com.cn
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-Hi,
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> We switch for sending the page number to send real pages.
+> >> 
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >> 
+> >> --
+> >> 
+> >> Remove the HACK bit, now we have the function that calculates the size
+> >> of a page exported.
+> >> ---
+> >>  migration/migration.c | 14 ++++++++----
+> >>  migration/ram.c       | 59 +++++++++++++++++----------------------------------
+> >>  2 files changed, 29 insertions(+), 44 deletions(-)
+> >> 
+> >> diff --git a/migration/migration.c b/migration/migration.c
+> >> index e122684..34a34b7 100644
+> >> --- a/migration/migration.c
+> >> +++ b/migration/migration.c
+> >> @@ -1882,13 +1882,14 @@ static void *migration_thread(void *opaque)
+> >>      /* Used by the bandwidth calcs, updated later */
+> >>      int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> >>      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+> >> -    int64_t initial_bytes = 0;
+> >>      /*
+> >>       * The final stage happens when the remaining data is smaller than
+> >>       * this threshold; it's calculated from the requested downtime and
+> >>       * measured bandwidth
+> >>       */
+> >>      int64_t threshold_size = 0;
+> >> +    int64_t qemu_file_bytes = 0;
+> >> +    int64_t multifd_pages = 0;
+> >
+> > It feels like these changes to the transfer count should be in a
+> > separate patch.
+> 
+> Until this patch, we only sent the address number for testing purposes,
+> we can change it in the previous patch.  I can split the
+> qemu_file_bytes, though.
+> 
+> >>      int64_t start_time = initial_time;
+> >>      int64_t end_time;
+> >>      bool old_vm_running = false;
+> >> @@ -1976,9 +1977,13 @@ static void *migration_thread(void *opaque)
+> >>          }
+> >>          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> >>          if (current_time >= initial_time + BUFFER_DELAY) {
+> >> -            uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
+> >> -                                         initial_bytes;
+> >>              uint64_t time_spent = current_time - initial_time;
+> >> +            uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
+> >> +            uint64_t multifd_pages_now = ram_counters.multifd;
+> >> +            uint64_t transferred_bytes =
+> >> +                (qemu_file_bytes_now - qemu_file_bytes) +
+> >> +                (multifd_pages_now - multifd_pages) *
+> >> +                qemu_target_page_size();
+> >
+> > If I've followed this right, then ram_counters.multifd is in the main
+> > thread not the individual threads, so we should be OK doing that.
+> 
+> Yeap.
+> 
+> >
+> >>              double bandwidth = (double)transferred_bytes / time_spent;
+> >>              threshold_size = bandwidth * s->parameters.downtime_limit;
+> >>  
+> >> @@ -1996,7 +2001,8 @@ static void *migration_thread(void *opaque)
+> >>  
+> >>              qemu_file_reset_rate_limit(s->to_dst_file);
+> >>              initial_time = current_time;
+> >> -            initial_bytes = qemu_ftell(s->to_dst_file);
+> >> +            qemu_file_bytes = qemu_file_bytes_now;
+> >> +            multifd_pages = multifd_pages_now;
+> >>          }
+> >>          if (qemu_file_rate_limit(s->to_dst_file)) {
+> >>              /* usleep expects microseconds */
+> >> diff --git a/migration/ram.c b/migration/ram.c
+> >> index b55b243..c78b286 100644
+> >> --- a/migration/ram.c
+> >> +++ b/migration/ram.c
+> >> @@ -468,25 +468,21 @@ static void *multifd_send_thread(void *opaque)
+> >>              break;
+> >>          }
+> >>          if (p->pages.num) {
+> >> -            int i;
+> >>              int num;
+> >>  
+> >>              num = p->pages.num;
+> >>              p->pages.num = 0;
+> >>              qemu_mutex_unlock(&p->mutex);
+> >>  
+> >> -            for (i = 0; i < num; i++) {
+> >> -                if (qio_channel_write(p->c,
+> >> -                                      (const char *)&p->pages.iov[i].iov_base,
+> >> -                                      sizeof(uint8_t *), &error_abort)
+> >> -                    != sizeof(uint8_t *)) {
+> >> -                    MigrationState *s = migrate_get_current();
+> >> +            if (qio_channel_writev_all(p->c, p->pages.iov,
+> >> +                                       num, &error_abort)
+> >> +                != num * TARGET_PAGE_SIZE) {
+> >> +                MigrationState *s = migrate_get_current();
+> >
+> > Same comments as previous patch; note we should find a way to get
+> > the error message logged; not easy since we're in a thread, but
+> > we need to find a way to log the errors.
+> 
+> I am open to suggestions how to set errors in a different thread.
 
-Did you test this branch https://github.com/coloft/qemu/tree/colo-for-qem=
-u-2.10-2017-4-22 ?
+The thread function can 'return' a value - could that be an error
+pointer consumed when the thread is joined?
+I'd take a fprintf if nothing else (although that's not actually safe)
+but not an abort on the source side. Ever.
 
-This seems to be an already known problem, I'm not quite sure, it may be =
-fixed by this patch
+> 
+> >> @@ -1262,8 +1240,10 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+> >>                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> >>          fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
+> >>          qemu_put_be16(rs->f, fd_num);
+> >> +        if (fd_num != UINT16_MAX) {
+> >> +            qemu_fflush(rs->f);
+> >> +        }
+> >
+> > Is that to make sure that the relatively small messages actually get
+> > transmitted on the main fd so that the destination starts receiving
+> > them?
+> 
+> Yeap.
+> 
+> > I do have a worry there that, since the addresses are going down a
+> > single fd we are open to deadlock by the send threads filling up
+> > buffers and blocking waiting for the receivers to receive.
+> 
+> I think we are doing the intelligent case here.
+> We only sync when we are sure that the package has finished, so we
+> should be ok here.  If we finish the migration, we call fflush anyways on
+> other places, so we can't get stuck as far as I can see.
 
-b19456dd0ea4eb418ad093f092adbb882be13054
-char: Fix removing wrong GSource that be found by fd_in_tag
-We use fd_in_tag to find a GSource, fd_in_tag is return value of g_source=
-_attach(GSource *source, GMainContext *context), the return value is uniq=
-ue only in the same context, so we may get the same values with different=
- 'context' parameters. It is no problem to find the right fd_in_tag by us=
-ing g_main_context_find_source_by_id(GMainContext *context, guint source_=
-id) while there is only one default main context. But colo-compare tries =
-to create/use its own context, and if we pass wrong 'context' parameter w=
-ith right fd_in_tag, we will find a wrong GSource to handle. We tried to =
-fix the related codes in commit b43decb015a6efeb9e3cdbdb80f6547ad7248a4c,=
- but it didn't fix the bug completely, because we still have some codes d=
-idn't pass *right* context parameter for remove_fd_in_watch(). Let's fix =
-it by record the GSource directly instead of fd_in_tag. Signed-off-by: zh=
-anghailiang <zhang.zhanghailiang@huawei.com> Reviewed-by: Marc-Andr=C3=83=
-=C2=A9 Lureau <marcandre.lureau@redhat.com>=20
-Message-Id: <1492564532-91680-1-git-send-email-zhang.zhanghailiang@huawei=
-=2Ecom> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com> Actually, we h=
-ave already re-writed this part, and please follow the later series. Than=
-ks, Hailiang
+Dave
 
-On 2017/8/8 0:39, Eduardo Otubo wrote:
-> (please ignore my last email, looks like mutt wants play games lately)
->
-> Hi all,
->
-> I have found a problem on colo-compare that leads to segmentation fault=
-
-> when calling qemu like this:
->
->    $ qemu-system-x86_64 -S -machine pc -object colo-compare,id=3Dtest-o=
-bject
->
-> First I got an assert failed:
->
->    (qemu-system-x86_64:7887): GLib-CRITICAL **: g_main_loop_quit:
-> assertion 'loop !=3D NULL' failed
->
->   From this looks like s->compare_loop is NULL on the function
-> colo_compare_finalize(), then I just added a check there and the assert=
-
-> went away. But then there's the segfault:
->
->    Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fau=
-lt.
->    0x00007ffff333f79e in pthread_join () from /lib64/libpthread.so.0
->    (gdb) bt
->    #0  0x00007ffff333f79e in pthread_join () at /lib64/libpthread.so.0
->    #1  0x0000555555c379d2 in qemu_thread_join (thread=3D0x7ffff7ff5160)=
- at
-> util/qemu-thread-posix.c:547
->    #2  0x0000555555adfc1a in colo_compare_finalize (obj=3D0x7ffff7fd301=
-0)
-> at net/colo-compare.c:867
->    #3  0x0000555555b2cd87 in object_deinit (obj=3D0x7ffff7fd3010,
-> type=3D0x5555567432e0) at qom/object.c:453
->    #4  0x0000555555b2cdf9 in object_finalize (data=3D0x7ffff7fd3010) at=
-
-> qom/object.c:467
->    #5  0x0000555555b2dd80 in object_unref (obj=3D0x7ffff7fd3010) at
-> qom/object.c:902
->    #6  0x0000555555b319a5 in user_creatable_add_type (type=3D0x55555674=
-99a0
-> "colo-compare", id=3D0x555556749960 "test-object", qdict=3D0x5555568357=
-50,
-> v=3D0x55555681a3f0, errp=3D0x7fffffffde58) at qom/object_interfaces.c:1=
-05
->    #7  0x0000555555b31b02 in user_creatable_add_opts
-> (opts=3D0x555556749910, errp=3D0x7fffffffde58) at qom/object_interfaces=
-=2Ec:135
->    #8  0x0000555555b31bfd in user_creatable_add_opts_foreach
-> (opaque=3D0x5555558e9c39 <object_create_delayed>, opts=3D0x555556749910=
-,
-> errp=3D0x0) at qom/object_interfaces.c:159
->    #9  0x0000555555c4aecf in qemu_opts_foreach (list=3D0x555556157ac0
-> <qemu_object_opts>, func=3D0x555555b31b6f
-> <user_creatable_add_opts_foreach>, opaque=3D0x5555558e9c39
-> <object_create_delayed>, errp=3D0x0) at util/qemu-option.c:1104
->    #10 0x00005555558edb75 in main (argc=3D6, argv=3D0x7fffffffe2d8,
-> envp=3D0x7fffffffe310) at vl.c:4520
->
-> At this point '&s->thread' is '0'. Is this segfault and the above
-> mentioned assert trigged because I'm creating a colo-compare object
-> without any other parameter? In a positive case, a simple workaround an=
-d
-> error check should do it. Otherwise I'll debug a little more.
->
-> Best regards,
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
