@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1df6ae-0001Kr-LC
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:38:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1df6b2-0001eP-PX
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1df6aa-0003Ju-ON
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:38:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53524)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1df6aa-0003Jb-I1
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:38:36 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue,  8 Aug 2017 17:38:27 +0200
-Message-Id: <20170808153827.427-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH] 9pfs: fix dependencies
+	(envelope-from <armbru@redhat.com>) id 1df6b1-0003Zp-LF
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:39:04 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-8-git-send-email-armbru@redhat.com>
+	<20170808143101.GJ2081@work-vm>
+Date: Tue, 08 Aug 2017 17:37:37 +0200
+In-Reply-To: <20170808143101.GJ2081@work-vm> (David Alan Gilbert's message of
+	"Tue, 8 Aug 2017 15:31:02 +0100")
+Message-ID: <87fud26pfi.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 07/56] cpus: Make memsave,
+ pmemsave sizes, addresses unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
-on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
-device.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
-CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> Sizes, virtual and physical addresses should use QAPI type 'size'
+>> (uint64_t).  memsave, pmemsave parameters @val, @size are 'int'
+>> (int64_t).  qmp_memsave() and qmp_pmemsave() implicitly convert to
+>> target_ulong or hwaddr.
+>> 
+>> Change the parameters to 'size'.
+>> 
+>> Both commands now accept size and address values between 2^63 and
+>> 2^64-1.  They accept negative values as before, because that's how the
+>> QObject input visitor works for backward compatibility.
+>> 
+>> The HMP commands' size parameters remain uint32_t, as HMP args_type
+>> strings can't do uint64_t byte counts: 'l' is signed, and 'o'
+>> multiplies by 2^20.  Their address parameters remain int64_t for the
+>> same reason.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  cpus.c           | 6 +++---
+>>  qapi-schema.json | 5 +++--
+>>  2 files changed, 6 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/cpus.c b/cpus.c
+>> index 9bed61e..8c5ee05 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -1947,14 +1947,14 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+>>      return head;
+>>  }
+>>  
+>> -void qmp_memsave(int64_t addr, int64_t size, const char *filename,
+>> +void qmp_memsave(uint64_t addr, uint64_t size, const char *filename,
+>>                   bool has_cpu, int64_t cpu_index, Error **errp)
+>>  {
+>>      FILE *f;
+>>      uint32_t l;
+>>      CPUState *cpu;
+>>      uint8_t buf[1024];
+>> -    int64_t orig_addr = addr, orig_size = size;
+>> +    uint64_t orig_addr = addr, orig_size = size;
+>>  
+>>      if (!has_cpu) {
+>>          cpu_index = 0;
+>
+> a little bit further down is a:
+>             error_setg(errp, "Invalid addr 0x%016" PRIx64 "/size %" PRId64
+>                              " specified", orig_addr, orig_size);
+>
+> that PRId64 should be a PRIu64 now
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
+Will fix.
 
-This is the alternative approach to "9pfs: fix and simplify dependencies".
-Uglier; but probably not broken...
+> However, other than that;
+>
+>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
----
- default-configs/s390x-softmmu.mak | 1 +
- fsdev/Makefile.objs               | 9 +++------
- hw/Makefile.objs                  | 2 +-
- 3 files changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 51191b77df..e4c5236ceb 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -8,3 +8,4 @@ CONFIG_S390_FLIC=y
- CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
- CONFIG_VFIO_CCW=$(CONFIG_LINUX)
- CONFIG_WDT_DIAG288=y
-+CONFIG_VIRTIO_CCW=y
-diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-index 659df6e187..10d8caa291 100644
---- a/fsdev/Makefile.objs
-+++ b/fsdev/Makefile.objs
-@@ -1,10 +1,7 @@
--ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
--# only pull in the actual virtio-9p device if we also enabled virtio.
--common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
--else
--common-obj-y = qemu-fsdev-dummy.o
--endif
-+# only pull in the actual virtio-9p device if we also enabled a virtio backend.
-+common-obj-$(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))= qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-+common-obj-$(call lnot, $(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) = qemu-fsdev-dummy.o
- common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
- 
- # Toplevel always builds this; targets without virtio will put it in
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a2c61f6b09..10942fe0b4 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,4 +1,4 @@
--devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
-+devices-dirs-$(call land, $(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW))) += 9pfs/
- devices-dirs-$(CONFIG_SOFTMMU) += acpi/
- devices-dirs-$(CONFIG_SOFTMMU) += adc/
- devices-dirs-$(CONFIG_SOFTMMU) += audio/
--- 
-2.13.4
+Thanks!
