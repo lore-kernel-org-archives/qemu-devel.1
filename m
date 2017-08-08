@@ -1,37 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1df0hi-000732-KQ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:21:35 -0400
+	(envelope-from <berrange@redhat.com>) id 1df0i8-0007Np-64
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1df0he-0004ip-Je
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:21:34 -0400
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:43571)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1df0he-0004iO-Bu
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:21:30 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 17084892CA
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 11:21:29 +0200 (CEST)
-Date: Tue, 8 Aug 2017 11:21:24 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170808112124.78b86b01@bahia.lan>
-In-Reply-To: <20170808062106.GC25081@umbus.fritz.box>
-References: <20170629045940.11242-1-sjitindarsingh@gmail.com>
-	<20170630040317.GA13989@umbus.fritz.box>
-	<1499051918.2398.1.camel@gmail.com>
-	<20170703092007.GW13989@umbus.fritz.box>
-	<1499841917.20288.2.camel@gmail.com>
-	<20170713012118.GT4083@umbus.fritz.box>
-	<20170803192806.782ebf5b@bahia.lan>
-	<20170804023530.GF6553@umbus.fritz.box>
-	<20170807110018.25ddce73@bahia.lan>
-	<20170808062106.GC25081@umbus.fritz.box>
+	(envelope-from <berrange@redhat.com>) id 1df0i6-0004uz-RX
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:22:00 -0400
+Date: Tue, 8 Aug 2017 10:13:30 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170808091330.GB9393@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170804105059.11941-1-berrange@redhat.com>
+	<20170804140210.GD4108@localhost.localdomain>
+	<20170804140630.GC14504@redhat.com>
+	<9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+	<20170804154919.GI14504@redhat.com> <20170808023929.GR14780@lemon>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/K._zgHFH6ER8YKcIenqQN3Y";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Only set PCR in kvm
- if actually in a compat mode
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170808023929.GR14780@lemon>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: document semanatics of
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,71 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
---Sig_/K._zgHFH6ER8YKcIenqQN3Y
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Aug 08, 2017 at 10:39:29AM +0800, Fam Zheng wrote:
+> On Fri, 08/04 16:49, Daniel P. Berrange wrote:
+> > This is odd.  In the bdrv_aligned_readv() it looks very much like
+> > we'll reference qiov->niov, if bytes != 0, so if qiov was NULL we
+> > would crash.
+> 
+> It doesn't make sense if read doesn't have an iov, where should the data be
+> placed? :)
+> 
+> > 
+> > In bdrv_aligned_writev(), qiov->niov is also refernced if bytes != 0,
+> > *unless*  flags contains BDRV_REQ_ZERO_WRITE, in which case we'll
+> > invoke bdrv_co_do_pwrite_zeroes() instead.
+> 
+> This is intended. Zero-write doesn't need qiov, hence the BDRV_REQ_ZERO_WRITE
+> branch. Otherwise, we can assert qiov != NULL.
+> 
+> > 
+> > So unless I'm missing something, bdrv_co_preadv|writev cannot be
+> > called with a NULL  qiov, and bdrv_aligned_writev|readv might
+> > need their assertions tightened up.
+> 
+> bdrv_co_pwritev _is_ called with a NULL qiov from blk_aio_pwrite_zeroes. Your
+> other reasonings are right.
 
-On Tue, 8 Aug 2017 16:21:06 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-[...]
-> > > >=20
-> > > > Does it make sense at all to use compat mode with KVM_PR since it
-> > > > requires hypervisor privilege, that we're supposed not to have ?   =
-=20
-> > >=20
-> > > Uh.. what?  Availability of the PCR is a question of the guest
-> > > environment, and PR (at least potentially) supports various different
-> > > guest environments, both with and without (apparent) hypervisor
-> > > capability.
-> > >  =20
-> >=20
-> > I mean mtpcr/mfpcr only work when the CPU is in hypervisor state, and PR
-> > is supposed to be *mostly* used nested, ie, without hypervisor
-> > privilege. =20
->=20
-> It tends to be used that way, but it doesn't have to be.
->=20
-> > Thus, I don't see the point in implementing PPC_ARCH_COMPAT in PR... but
-> > I'm probably missing something :) =20
->=20
-> Well, qemu expects to be able to set ARCH_COMPAT for a pseries guest,
-> if that guest is going into a compatibility mode (which it usually
-> does these days).  We don't want userspace to have to be constantly
-> checking which KVM implementation its working against, so it makes
-> sense for PR to implement the call, even if it's a no-op because it
-> can't really implement the PCR fully.
->=20
+That will have BDRV_REQ_ZERO_WRITE flag set though, so we don't end up
+calling the bdrv_co_pwritev() callback function registered by the block
+driver.
 
-Thanks for the explanation!
+> So for write we cannot remove the bytes parameter.
 
-> >  =20
-> > > > Shouldn't we check for kvm_get_one_reg(KVM_REG_PPC_ARCH_COMPAT) and
-> > > > don't try to do any compat stuff if it isn't supported ? This would
-> > > > include exiting QEMU if max-cpu-compat was passed on the cmdline.  =
- =20
-> > >=20
-> > > Oh.. right.. that's actually what I meant by setting the PCR.  PCR
-> > > setting from the userspace side via PPC_ARCH_COMPAT, rather than PCR
-> > > setting from the guest side.
-> > >  =20
->=20
->=20
->=20
+We can't remove it from the bdrv_co_pwritev() function, but we can remove
+it from bdrv_co_pwritev block driver callback AFAICT.
 
-
---Sig_/K._zgHFH6ER8YKcIenqQN3Y
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlmJgpQACgkQAvw66wEB28LWgQCfVYvYx6tnr05wc342jEb2QiQr
-5toAoKbVT02YyyEeYF5x9HRrsPfY2QdK
-=CHf0
------END PGP SIGNATURE-----
-
---Sig_/K._zgHFH6ER8YKcIenqQN3Y--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
