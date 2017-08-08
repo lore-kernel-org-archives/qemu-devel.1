@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df75m-0002xs-0w
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:10:51 -0400
+	(envelope-from <quintela@redhat.com>) id 1df7HR-00076K-Gn
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df75k-0007Ef-9f
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:10:49 -0400
-Date: Tue, 8 Aug 2017 17:10:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170808161022.GO2081@work-vm>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-4-git-send-email-armbru@redhat.com>
-	<20170808112016.GD2081@work-vm> <87k22e6phm.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k22e6phm.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 03/56] monitor: Rewrite comment
- describing HMP .args_type
+	(envelope-from <quintela@redhat.com>) id 1df7HN-0005ah-Eq
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:22:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7HN-0005Yu-5V
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:22:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 475ED5AFED
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:22:44 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Tue,  8 Aug 2017 18:22:05 +0200
+Message-Id: <20170808162224.32419-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 00/19] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,187 +27,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> 
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> ---
-> >>  monitor.c | 75 +++++++++++++++++++++++++++++++++++++++------------------------
-> >>  1 file changed, 47 insertions(+), 28 deletions(-)
-> >> 
-> >> diff --git a/monitor.c b/monitor.c
-> >> index e0f8801..8b54ba1 100644
-> >> --- a/monitor.c
-> >> +++ b/monitor.c
-> >> @@ -85,37 +85,56 @@
-> >>  #endif
-> >>  
-> >>  /*
-> >> - * Supported types:
-> >> + * Command handlers (mon_cmd_t member @cmd) receive actual arguments
-> >> + * in a QDict, which is built by the HMP core according to mon_cmd_t
-> >> + * member @args_type.  It's a list of NAME:TYPE separated by comma.
-> >>   *
-> >> - * 'F'          filename
-> >> - * 'B'          block device name
-> >> - * 's'          string (accept optional quote)
-> >> - * 'S'          it just appends the rest of the string (accept optional quote)
-> >> - * 'O'          option string of the form NAME=VALUE,...
-> >> - *              parsed according to QemuOptsList given by its name
-> >> - *              Example: 'device:O' uses qemu_device_opts.
-> >> - *              Restriction: only lists with empty desc are supported
-> >> - *              TODO lift the restriction
-> >> - * 'i'          32 bit integer
-> >> - * 'l'          target long (32 or 64 bit)
-> >> - * 'M'          Non-negative target long (32 or 64 bit), in user mode the
-> >> - *              value is multiplied by 2^20 (think Mebibyte)
-> >> - * 'o'          octets (aka bytes)
-> >> - *              user mode accepts an optional E, e, P, p, T, t, G, g, M, m,
-> >> - *              K, k suffix, which multiplies the value by 2^60 for suffixes E
-> >> - *              and e, 2^50 for suffixes P and p, 2^40 for suffixes T and t,
-> >> - *              2^30 for suffixes G and g, 2^20 for M and m, 2^10 for K and k
-> >> - * 'T'          double
-> >> - *              user mode accepts an optional ms, us, ns suffix,
-> >> - *              which divides the value by 1e3, 1e6, 1e9, respectively
-> >> - * '/'          optional gdb-like print format (like "/10x")
-> >> + * TYPEs that put a string value with key NAME into the QDict:
-> >> + * 's'    Argument is enclosed in '"' or delimited by whitespace.  In
-> >> + *        the former case, escapes \n \r \\ \' and \" are recognized.
-> >> + * 'F'    File name, like 's' except for completion.
-> >> + * 'B'    BlockBackend name, like 's' except for completion.
-> >> + * 'S'    Argument is the remainder of the line, less leading
-> >> + *        whitespace.
-> >> +
-> >>   *
-> >> - * '?'          optional type (for all types, except '/')
-> >> - * '.'          other form of optional type (for 'i' and 'l')
-> >> - * 'b'          boolean
-> >> - *              user mode accepts "on" or "off"
-> >> - * '-'          optional parameter (eg. '-f')
-> >> + * TYPEs that put an int64_t value with key NAME:
-> >> + * 'l'    Argument is an expression (QEMU pocket calculator).
-> >> + * 'i'    Like 'l' except value must fit into 32 bit unsigned.
-> >> + * 'M'    Like 'l' except value must not be negative and is multiplied
-> >> + *        by 2^20 (think "mebibyte").
-> >>   *
-> >> + * TYPEs that put an uint64_t value with key NAME:
-> >> + * 'o'    Argument is a size (think "octets").  Without suffix the
-> >> + *        value is multiplied by 2^20 (mebibytes), with suffix E or e
-> >> + *        by 2^60 (exbibytes), with P or p by 2^50 (pebibytes), with T
-> >> + *        or t by 2^40 (tebibytes), with G or g by 2^30 (gibibytes),
-> >> + *        with M or m by 2^10 (mebibytes), with K or k by 2^10
-> >> + *        (kibibytes).
-> >
-> > 'o' is messy.  It using qemu_strtosz_MiB which uses a 'double' intermediate
-> > so I fear it can round.
-> 
-> It does, but only when you have more than 53 significant bits.
-> 
-> >                          It also has a note it can't take all f's due to
-> > an overflow from the conversion.
-> 
-> Correct, because values between 0xfffffffffffffc00 and 2^64-1 round up
-> to 2^64.
 
-Right, so these bother me not for normal sizes, but if we were to start
-to use them for hex values with meanings, like addresses for example.
-(Although I guess that's unlikely with the default assumption of MB)
+Hi
 
-> If it bothers you, feel free to explore the following: feed the string
-> both to strtod() and to strtoll().  Whichever eats more characters wins.
+Things NOT done yet:
 
-Is the reason we're using strtod because we actively want users to be
-able to say 3.5G ?  I guess that's a reason to keep it.
+- still uses error_abort/fail.  I need to redo all the error pages to
+  be able to return with errors from other threads.
+- still connects synchronusly.  I need to redo the other changes to fix this.
+- have to change the tests as danp wanted, I still don't undertand them.
 
-> This patch is of course just about better documenting what we have.  I
-> was starting to type something like "repeating the (complex) contract of
-> qemu_strtosz_MiB() here isn't so hot, let's include it by reference
-> instead", but then I looked it up.  Pffft.
-> 
-> >                                    Two things not mentioned are that
-> > it also takes hex (as explicit 0x) and that it also does 'b' as a suffix
-> > to multiply by 1.  Those two combine in bad ways - i.e. 0x1b is 27MB,
-> > 1b is 1 byte (same for 'e').  These are probably OK except if you were
-> > to start replacing 'l' by 'o' because you really wanted 64bit addresses
-> > say.
-> 
-> I guess the sanest solution is not to recognize suffixes when the number
-> is hexadecimal.
-> 
-> > (I also wouldn't bother expanding the size names and powers).
-> 
-> I erred on the side of tedious clarity.  Feel free to suggest something
-> you like better.
+Done:
+- Improve migration_ioc_porcess_incoming
+- teach about G_SOURCE_REMOVE/CONTINUE
+- Add test for migration_has_all_channels
+- use DEFIN_PROP*
+- change recv_state to use pointers to parameters
+  make easier to receive channels out of order
+- use g_strdup_printf()
+- improve count of threads to know when we have to finish
+- report channel id's on errors
+- Use last_page parameter for multifd_send_page() sooner
+- Improve commets for address
+- use g_new0() instead of g_malloc()
+- create MULTIFD_CONTINUE instead of using UINT16_MAX
+- clear memory used by group of pages
+  once there, pass everything to the global state variables instead of being
+  local to the function.  This way it works if we cancel migration and start
+  a new one
+- Really wait to create the migration_thread until all channels are created
+- split initial_bytes setup to make clearer following patches.
+- createRAM_SAVE_FLAG_MULTIFD_SYNC macro, to make clear what we are doing
+- move setting of need_flush to inside bitmap_sync
+- Lots of other small changes & reorderings
 
-I think something like:
-  The optional suffix's b/k/m/g/t/p/e are accepted (upper or lower case)
-  to denote bytes, kibibytes, mebibytes etc.  With no suffix, values
-  are interpreted as MiB.
+Please, comment.
 
-> >> + *
-> >> + * TYPEs that put a double value with key NAME:
-> >> + * 'T'    Argument is a time in seconds.  With optional ms, us, ns
-> >> + *        suffix, the value divided by 1e3, 1e6, 1e9 respectively.
-> >> + *
-> >> + * TYPEs that put a bool value with key NAME:
-> >> + * 'b'    Argument is either "on" (true) or "off" (false).
-> >> + * '-' CHAR
-> >> + *        Argument is either "-CHAR" (true) or absent (false).
-> >
-> > I found the previous description clearer.
-> 
-> What I don't like about the previous description: it defines by example.
-> Examples are great, but they are for illustrating a definition, they
-> can't really replace one.
 
-I'm less fussy if it's clear; how about
-   '-' CHAR
-       True if optional single character argument (e.g. -f) is present
-       else absent.
+[v5]
 
-  since you've got the '-' CHAR   you have the definition.
+- tests from qio functions (a.k.a. make danp happy)
+- 1st message from one channel to the other contains:
+   <uuid> multifd <channel number>
+   This would allow us to create more channels as we want them.
+   a.k.a. Making dave happy
+- Waiting in reception for new channels using qio listeners
+  Getting threads, qio and reference counters working at the same time
+  was interesing.
+  Another make danp happy.
 
-> >> + * TYPEs that put multiple values:
-> >> + * 'O'    Option string of the form NAME=VALUE,... parsed according to
-> >> + *        the QemuOptsList given by its name.
-> >> + *        Example: 'device:O' uses qemu_device_opts.
-> >> + *        Restriction: only lists with empty desc are supported.
-> >> + *        Puts all the NAME=VALUE.
-> >> + * '/'    Gdb-like print format (like "/10x"), always optional.
-> >> + *        Puts keys "count", "format", "size", all int.
-> >> + *
-> >> + * Modifier character following the type string:
-> >> + * '?'    Argument is optional, nothing is put when it is absent
-> >> + *        (all types except 'O', '/', 'b').
-> >> + * '.'    Argument is optional, must be preceded by '.' if present
-> >> + *        (only types 'i', 'l', 'M')
-> >
-> > That's obscure; I can only see one use of it in ioport_read and that's
-> > extra-special!
-> 
-> Extra-special baroque!  Took me a while to figure out WTF it does :)
+- Lots and lots of small changes and fixes.  Notice that the last 70 patches
+  that I merged or so what to make this series easier/smaller.
 
-Should we avoid a lot of the 'o' pain by adding a new type; something
-like:
-  '6'
-      A 64bit unsigned value.  Decimal or hex integers are accepted;
-   optional suffixes of k/m/g/t/p/e are accepted to denote kibibytes
-   etc.  With no suffix values are interpreted as bytes.
+- NOT DONE: I haven't been woring on measuring performance
+  differences, this was about getting the creation of the
+  threads/channels right.
 
-  then that would be suffix_mul() * qemu_strtou64()
+So, what I want:
 
-Dave
+- Are people happy with how I have (ab)used qio channels? (yes danp,
+  that is you).
+- My understanding is th
 
-> >>   */
-> >>  
-> >>  typedef struct mon_cmd_t {
-> >> -- 
-> >> 2.7.5
-> 
-> Thanks!
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ToDo:
+
+- Make paolo happy: He wanted to test using control information
+  through each channel, not only pages.  This requires yet more
+  cleanups to be able to have more than one QEMUFile/RAMState open at
+  the same time.
+
+- How I create multiple channels.  Things I know:
+  * with current changes, it should work with fd/channels (the multifd bits),
+    but we don;t have a way to pass multiple fd;s or exec files.
+    Danp, any idea about how to create an UI for it?
+  * My idea is that we would split current code to be:
+    + channel creation at migration.c
+    + rest of bits at ram.c
+    + change format to:
+      <uuid> main <rest of migration capabilities/paramentes> so we can check
+      <uuid> postcopy <no clue what parameters are needed>
+          Dave wanted a way to create a new fd for postcopy for some time
+    + Adding new channels is easy
+
+- Performance data/numbers: Yes, I wanted to get this out at once, I
+  would continue with this.
+
+
+Please, review.
+
+
+[v4]
+This is the 4th version of multifd. Changes:
+- XBZRLE don't need to be checked for
+- Documentation and defaults are consistent
+- split socketArgs
+- use iovec instead of creating something similar.
+- We use now the exported size of target page (another HACK removal)
+- created qio_chanel_{wirtev,readv}_all functions.  the _full() name
+  was already taken.
+  What they do is the same that the without _all() function, but if it
+  returns due to blocking it redo the call.
+- it is checkpatch.pl clean now.
+
+Please comment, Juan.
+
+Juan Quintela (19):
+  migration: Create migration_ioc_process_incoming()
+  migration: Teach it about G_SOURCE_REMOVE
+  migration: Add comments to channel functions
+  migration: Create migration_has_all_channels
+  qio: Create new qio_channel_{readv,writev}_all
+  migration: Add multifd capability
+  migration: Create x-multifd-threads parameter
+  migration: Create x-multifd-group parameter
+  migration: Create multifd migration threads
+  migration: Split migration_fd_process_incoming
+  migration: Start of multiple fd work
+  migration: Create ram_multifd_page
+  migration: Really use multiple pages at a time
+  migration: Send the fd number which we are going to use for this page
+  migration: Create thread infrastructure for multifd recv side
+  migration: Test new fd infrastructure
+  migration: Rename initial_bytes
+  migration: Transfer pages over new channels
+  migration: Flush receive queue
+
+ hmp.c                          |  16 ++
+ include/glib-compat.h          |   2 +
+ include/io/channel.h           |  46 ++++
+ io/channel.c                   |  77 ++++++
+ migration/channel.c            |  18 +-
+ migration/exec.c               |   2 +-
+ migration/fd.c                 |   2 +-
+ migration/migration.c          | 143 ++++++++++-
+ migration/migration.h          |   8 +
+ migration/qemu-file-channel.c  |  29 +--
+ migration/ram.c                | 537 ++++++++++++++++++++++++++++++++++++++++-
+ migration/ram.h                |   8 +
+ migration/socket.c             |  48 +++-
+ migration/socket.h             |  10 +
+ qapi-schema.json               |  44 +++-
+ tests/io-channel-helpers.c     |  55 +++++
+ tests/io-channel-helpers.h     |   4 +
+ tests/test-io-channel-buffer.c |  55 ++++-
+ 18 files changed, 1049 insertions(+), 55 deletions(-)
+
+-- 
+2.9.4
