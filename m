@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df1ya-0005zn-AZ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:05 -0400
+	(envelope-from <quintela@redhat.com>) id 1df1yc-000613-FU
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df1yX-0003rc-8O
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51996)
+	(envelope-from <quintela@redhat.com>) id 1df1yb-0003se-Aq
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1df1yW-0003rF-Vk
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:01 -0400
-References: <20170804112946.5247-1-cohuck@redhat.com>
-	<20170804165934.4d6fb98f@gondolin> <20170808111542.16422571@gondolin>
-	<798f1bb6-f21d-305c-5bcc-c7f828f284e1@redhat.com>
-	<20170808114652.29e354ed@gondolin>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ee17aafb-bc3c-6b4f-2c3b-e70ccaf94454@redhat.com>
-Date: Tue, 8 Aug 2017 12:42:54 +0200
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df1yb-0003sO-1P
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0648F7C852
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 10:43:04 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170720114507.GG2101@work-vm> (David Alan Gilbert's message of
+	"Thu, 20 Jul 2017 12:45:08 +0100")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-18-quintela@redhat.com>
+	<20170720114507.GG2101@work-vm>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 Aug 2017 12:43:00 +0200
+Message-ID: <87valy9w7f.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170808114652.29e354ed@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] s390x: zPCI detangling
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On 08.08.2017 11:46, Cornelia Huck wrote:
-> On Tue, 8 Aug 2017 11:29:50 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> On 08.08.2017 11:15, Cornelia Huck wrote:
->>> On Fri, 4 Aug 2017 16:59:34 +0200
->>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>   
->>>> On Fri,  4 Aug 2017 13:29:37 +0200
->>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>  
->>>>> Next version, not so many changes from v3.
->>>>>
->>>>> As you might have guessed, the goals are still the same:
->>>>> - Being able to disable PCI support in a build completely.
->>>>> - Properly fencing off PCI if the relevant facility bit is not provided.
->>>>>
->>>>> Changes v3->v4:
->>>>> - introduce pci_available boolean
->>>>> - use pci_available to fence off setting the zcpi facility bit
->>>>> - collected tags
->>>>>
->>>>> Branch is still git://github.com/cohuck/qemu no-zpci-cpumodel    
->>>>
->>>> make check on a build with pci disabled revealed an interesting
->>>> inconsistency: We create a virtio-9p-ccw device, but the base
->>>> virtio-9p-device is in code that is not built for !pci.
->>>>
->>>> If I remove the pci dependency for hw/9pfs/ and fsdev/, things look
->>>> fine (at least on s390x). We probably need a different dependency,
->>>> though.
->>>>
->>>> virtio-9p maintainers, any suggestions?  
->>>
->>> I have the patch below, which is ugly, but seems to work for me. Better
->>> ideas welcome :)  
->>
->> I haven't tried whether it works, but you could maybe change the define
->> of CONFIG_VIRTFS instead:
->>
->> diff --git a/configure b/configure
->> index dd73cce..64d21f6 100755
->> --- a/configure
->> +++ b/configure
->> @@ -5771,7 +5771,7 @@ if test "$libattr" = "yes" ; then
->>    echo "CONFIG_LIBATTR=y" >> $config_host_mak
->>  fi
->>  if test "$virtfs" = "yes" ; then
->> -  echo "CONFIG_VIRTFS=y" >> $config_host_mak
->> +  echo 'CONFIG_VIRTFS=$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)' >> $config_host_mak
->>  fi
->>  if test "$vhost_scsi" = "yes" ; then
->>    echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
->>
->> ... I think that should simplify the other statements quite a bit since
->> you then only have to test CONFIG_VIRTFS in the other locations?
->>
->>  Thomas
-> 
-> Would be a simplification if it worked, yes; not sure whether we should
-> change the semantic of --enable-virtfs to error out if we don't have
-> either virtio-pci or virtio-ccw?
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Each time that we sync the bitmap, it is a possiblity that we receive
+>> a page that is being processed by a different thread.  We fix this
+>> problem just making sure that we wait for all receiving threads to
+>> finish its work before we procedeed with the next stage.
+>> 
+>> We are low on page flags, so we use a combination that is not valid to
+>> emit that message:  MULTIFD_PAGE and COMPRESSED.
+>> 
+>> I tried to make a migration command for it, but it don't work because
+>> we sync the bitmap sometimes when we have already sent the beggining
+>> of the section, so I just added a new page flag.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-I don't think that this would work: configure is run once for all
-targets, but the CONFIG_PCI and CONFIG_CCW settings are only valid for
-individual targets, so you can not use the value of these config
-variables during "configure" yet.
+>> +static int multifd_flush(void)
+>> +{
+>> +    int i, thread_count;
+>> +
+>> +    if (!migrate_use_multifd()) {
+>> +        return 0;
+>> +    }
+>> +    thread_count = migrate_multifd_threads();
+>> +    for (i = 0; i < thread_count; i++) {
+>> +        MultiFDRecvParams *p = multifd_recv_state->params[i];
+>> +
+>> +        qemu_mutex_lock(&p->mutex);
+>> +        while (!p->done) {
+>> +            p->sync = true;
+>> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
+>> +        }
+>
+> I don't think I understand how that works in the case where the
+> recv_thread has already 'done' by the point you set sync=true; how does
+> it get back to the check and do the signal?
 
- Thomas
+We have two cases:
+* done = true
+* done = false
+
+if done is false, we need to wait until it is done.  But if it is true,
+we don't have to wait.  By definition, there is nothing on that thread
+that we need to wait for.  It is not in the middle of receiving a page.
+
+
+
+>
+>> +        qemu_mutex_unlock(&p->mutex);
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>>  /**
+>>   * save_page_header: write page header to wire
+>>   *
+>> @@ -809,6 +847,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
+>>  {
+>>      size_t size, len;
+>>  
+>> +    if (rs->multifd_needs_flush &&
+>> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+>> +        offset |= RAM_SAVE_FLAG_ZERO;
+>
+> In the comment near the top you say RAM_SAVE_FLAG_COMPRESS_PAGE;  it's
+> probably best to add an alias at the top to make it clear, e.g.
+>   #define RAM_SAVE_FLAG_MULTIFD_SYNC RAM_SAVE_FLAG_ZERO
+>
+>   or maybe (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)
+
+done.
+
+But I only use it when we use the "or".
+
+Thanks, Juan.
