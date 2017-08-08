@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1df5wQ-00053t-D7
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:57:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1df5yE-0005mj-En
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1df5wP-0006CV-9o
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:57:06 -0400
-Date: Tue, 8 Aug 2017 17:56:20 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170808145620.wlb5rdutuseutclx@postretch>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-6-el13635@mail.ntua.gr>
-	<w51valyjj7j.fsf@maestria.local.igalia.com>
-	<20170808134544.paekftiounmirhbo@postretch>
-	<w51poc6jeln.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1df5yD-0006qD-72
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:58:58 -0400
+Date: Tue, 8 Aug 2017 15:58:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170808145804.GK2081@work-vm>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-10-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hvp27giwc7lme2hw"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <w51poc6jeln.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
- driver
+In-Reply-To: <1502117160-24655-10-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 09/56] balloon: Make balloon size
+ unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +24,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Sizes should use QAPI type 'size' (uint64_t).  balloon parameter
+> @value is 'int' (int64_t).  qmp_balloon() implicitly converts to
+> ram_addr_t, i.e. uint64_t.  BALLOON_CHANGE parameter @actual and
+> BalloonInfo member @actual are also 'int'.
+> virtio_balloon_set_config() and virtio_balloon_stat() implicitly
+> convert from ram_addr_t.
+> 
+> Change all three to 'size', and adjust the code using them.
+> 
+> balloon now accepts size values between 2^63 and 2^64-1.  It accepts
+> negative values as before, because that's how the QObject input
+> visitor works for backward compatibility.
+> 
+> Doing the same for HMP's balloon deserves its own commit (the next
+> one).
+> 
+> BALLOON_CHANGE and query-balloon now report sizes above 2^63-1
+> correctly instead of their (negative) two's complement.
+> 
+> So does HMP's "info balloon".
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  balloon.c        | 2 +-
+>  hmp.c            | 2 +-
+>  qapi-schema.json | 4 ++--
+>  qapi/event.json  | 2 +-
+>  4 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/balloon.c b/balloon.c
+> index 1d720ff..2ecca76 100644
+> --- a/balloon.c
+> +++ b/balloon.c
+> @@ -102,7 +102,7 @@ BalloonInfo *qmp_query_balloon(Error **errp)
+>      return info;
+>  }
+>  
+> -void qmp_balloon(int64_t target, Error **errp)
+> +void qmp_balloon(uint64_t target, Error **errp)
+>  {
+>      if (!have_balloon(errp)) {
+>          return;
 
---hvp27giwc7lme2hw
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Can't you remove the:
+      if (target <= 0) {
 
-On Tue, Aug 08, 2017 at 04:53:08PM +0200, Alberto Garcia wrote:
->On Tue 08 Aug 2017 03:45:44 PM CEST, Manos Pitsidianakis wrote:
->> On Tue, Aug 08, 2017 at 03:13:36PM +0200, Alberto Garcia wrote:
->>>On Mon 31 Jul 2017 11:54:41 AM CEST, Manos Pitsidianakis wrote:
->>>> block/throttle.c uses existing I/O throttle infrastructure inside a
->>>> block filter driver. I/O operations are intercepted in the filter's
->>>> read/write coroutines, and referred to block/throttle-groups.c
->>>>
->>>> The driver can be used with the syntax
->>>> -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
->>>>         limits.iops-total=3D...,throttle-group=3Dbar
->>>
->>>Sorry for not having noticed this earlier, but can't you define the
->>>throttling group (and its limits) using -object throttle-group ... as
->>>shown in the previous patch, and simply reference it here? Or would we
->>>have two alternative ways of setting the throttling limits?
->>>
->>>What happens if you have many -drive lines each one with a different set
->>>of limits but with the same throttling group?
->>
->> The limits of the last one to be processed will win.
->
->That's what the current throttling API does, and I tend to agree that
->it's not completely straightforward (a few people have asked me the same
->question since this feature is available).
->
->If we're going to add a new API we could eliminate this ambiguity. After
->all the previous -drive throttling.iops-total=3D... would still be
->available, wouldn't it?
+check?
 
-Indeed, it already is.
+(The type of the trace_balloon_event probably needs fixing
+to be uint64_t rather than the unsigned long)
 
->
->> So basically if we have anonymous groups, we accept limits in the
->> driver options but only without a group-name.
->
->In the commit message you do however have limits and a group name, is
->that a mistake?
->
->    -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
->           limits.iops-total=3D...,throttle-group=3Dbar
->
+> diff --git a/hmp.c b/hmp.c
+> index 8257dd0..4556045 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -781,7 +781,7 @@ void hmp_info_balloon(Monitor *mon, const QDict *qdict)
+>          return;
+>      }
+>  
+> -    monitor_printf(mon, "balloon: actual=%" PRId64 "\n", info->actual >> 20);
+> +    monitor_printf(mon, "balloon: actual=%" PRIu64 "\n", info->actual >> 20);
+>  
+>      qapi_free_BalloonInfo(info);
+>  }
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 3ad2bc0..23eb60d 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -2003,7 +2003,7 @@
+>  # Since: 0.14.0
+>  #
+>  ##
+> -{ 'struct': 'BalloonInfo', 'data': {'actual': 'int' } }
+> +{ 'struct': 'BalloonInfo', 'data': {'actual': 'size' } }
+>  
+>  ##
+>  # @query-balloon:
+> @@ -2603,7 +2603,7 @@
+>  # <- { "return": {} }
+>  #
+>  ##
+> -{ 'command': 'balloon', 'data': {'value': 'int'} }
+> +{ 'command': 'balloon', 'data': {'value': 'size'} }
+>  
+>  ##
+>  # @Abort:
+> diff --git a/qapi/event.json b/qapi/event.json
+> index 6d22b02..9dfc70b 100644
+> --- a/qapi/event.json
+> +++ b/qapi/event.json
+> @@ -488,7 +488,7 @@
+>  #
+>  ##
+>  { 'event': 'BALLOON_CHANGE',
+> -  'data': { 'actual': 'int' } }
+> +  'data': { 'actual': 'size' } }
 
-Sorry this wasn't clear, I'm actually proposing to remove limits from=20
-the throttle driver options and only create/config throttle groups via=20
--object/object-add.
+I was going to ask whether that was a problem for any external users,
+but there again libvirt looks like it reads it into an unsigned long
+long.
 
---hvp27giwc7lme2hw
-Content-Type: application/pgp-signature; name="signature.asc"
+Dave
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmJ0RQACgkQc2J8L2kN
-9xAH2hAAnjhnLz7ycE5lPul4B8HNXkxDYGdRAmargOtRgLy/geaFXFhQTp0IBybC
-UthOLRRvj9x/fS1L7k8bYsqEfk6CJ0Of0EPkGp8yY5+dtV+Iw2ioAHiboixvNgX0
-oaam0OHat60ythUqVRF1yh6PouEnEwnx2FlOv8WkFqjFYOqCL8x37BIOf5/9v8X2
-kApKrdmJFx0MvSY8iFz3z7Zja6CZW9STZr3qCvuG4amU8iIMhpcYgHfpUgLlJkD6
-j8hF8FiVd6NwVPcrUOo9UCaG81wz1w5iFwQxnagnz7HkP4LuhI0f3NfgAX0qhpSX
-eyPWSKWegiy0H2MYAW4FcUyN0KHQWMfnpZa8qD8SQJR0+j4TQVcEcRrTDJ7tVwX1
-EP7a3smuQ7o6Vp2W1JLvb6gMYwdpz73dcx0HACzUVWXmsQmB2Hg8xhjY1zCiPHi0
-5e8xzaUB91VdJ6TIg4olSSb5VyGpz9pXe/VD3EZpQ8VH7Pw8BMn1w81FEeyAFGLj
-IrLBWLjs25yX7ZuzbGBaBBAKIpXikj3Pt7pqA48HZAwSvexReXv+jepXvqZN1xmQ
-K+78R/lfTASqAbAeyEnLgZSZFgJjxIC10XurMqGpqt8sr9lazS9tZXcZBaETmMvf
-u08q+TbiXo3RLDHjuDMEUYWbCYn6GrDD17VNSLee204s6GHXZ7U=
-=/5RQ
------END PGP SIGNATURE-----
-
---hvp27giwc7lme2hw--
+>  ##
+>  # @GUEST_PANICKED:
+> -- 
+> 2.7.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
