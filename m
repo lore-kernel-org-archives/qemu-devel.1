@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1df7L2-0001Wj-Je
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:26:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1df7LB-0001fM-Po
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1df7Ky-0007T8-CR
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:26:36 -0400
-Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:48739)
+	(envelope-from <quintela@redhat.com>) id 1df7L7-0007YC-O7
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:26:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1df7Ky-0007Sg-5a
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:26:32 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 950B68A13C
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 18:26:30 +0200 (CEST)
-Date: Tue, 8 Aug 2017 18:26:23 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170808182623.45e88fd6@bahia.lan>
-In-Reply-To: <20170808153827.427-1-cohuck@redhat.com>
-References: <20170808153827.427-1-cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/xHPGHSHKH4J5PNsiC0_rE2t";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix dependencies
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7L7-0007XU-FJ
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:26:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6FBF861497
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:26:40 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Tue,  8 Aug 2017 18:26:11 +0200
+Message-Id: <20170808162629.32493-2-quintela@redhat.com>
+In-Reply-To: <20170808162629.32493-1-quintela@redhat.com>
+References: <20170808162629.32493-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 01/19] migration: Create
+ migration_ioc_process_incoming()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
---Sig_/xHPGHSHKH4J5PNsiC0_rE2t
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+We pass the ioc instead of the fd.  This will allow us to have more
+than one channel open.  We also make sure that we set the
+from_src_file sooner, so we don't need to pass it as a parameter.
 
-On Tue,  8 Aug 2017 17:38:27 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/channel.c   |  3 +--
+ migration/migration.c | 25 ++++++++++++++++++++-----
+ migration/migration.h |  2 ++
+ 3 files changed, 23 insertions(+), 7 deletions(-)
 
-> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
-> on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
-> device.
->=20
-> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
-> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
->=20
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->=20
-> This is the alternative approach to "9pfs: fix and simplify dependencies".
-> Uglier; but probably not broken...
->=20
-
-Yikes. I don't know why yet but this doesn't work for PCI-less targets
-like cris-softmmu...
-
-  LINK    cris-softmmu/qemu-system-cris
-vl.o: In function `fsdev_init_func':
-vl.c:2360: undefined reference to `qemu_fsdev_add'
-
-> ---
->  default-configs/s390x-softmmu.mak | 1 +
->  fsdev/Makefile.objs               | 9 +++------
->  hw/Makefile.objs                  | 2 +-
->  3 files changed, 5 insertions(+), 7 deletions(-)
->=20
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-so=
-ftmmu.mak
-> index 51191b77df..e4c5236ceb 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=3Dy
->  CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
->  CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
->  CONFIG_WDT_DIAG288=3Dy
-> +CONFIG_VIRTIO_CCW=3Dy
-> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-> index 659df6e187..10d8caa291 100644
-> --- a/fsdev/Makefile.objs
-> +++ b/fsdev/Makefile.objs
-> @@ -1,10 +1,7 @@
-> -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
->  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
-> -# only pull in the actual virtio-9p device if we also enabled virtio.
-> -common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-> -else
-> -common-obj-y =3D qemu-fsdev-dummy.o
-> -endif
-> +# only pull in the actual virtio-9p device if we also enabled a virtio b=
-ackend.
-> +common-obj-$(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI=
-),$(CONFIG_VIRTIO_CCW)))=3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-> +common-obj-$(call lnot, $(call land, $(CONFIG_VIRTFS),$(call lor, $(CONF=
-IG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) =3D qemu-fsdev-dummy.o
->  common-obj-y +=3D qemu-fsdev-opts.o qemu-fsdev-throttle.o
-> =20
->  # Toplevel always builds this; targets without virtio will put it in
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index a2c61f6b09..10942fe0b4 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),=
-$(CONFIG_PCI))) +=3D 9pfs/
-> +devices-dirs-$(call land, $(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PC=
-I),$(CONFIG_VIRTIO_CCW))) +=3D 9pfs/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D acpi/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D adc/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D audio/
-
-
---Sig_/xHPGHSHKH4J5PNsiC0_rE2t
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlmJ5i8ACgkQAvw66wEB28JcFACgqGtYhpOs7W2Ix1T5A6b2dktc
-suYAnjKwsVL6tkNyfAjHvaJXMa+pVSwY
-=cOOk
------END PGP SIGNATURE-----
-
---Sig_/xHPGHSHKH4J5PNsiC0_rE2t--
+diff --git a/migration/channel.c b/migration/channel.c
+index 3b7252f..edceebd 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -36,8 +36,7 @@ void migration_channel_process_incoming(QIOChannel *ioc)
+             error_report_err(local_err);
+         }
+     } else {
+-        QEMUFile *f = qemu_fopen_channel_input(ioc);
+-        migration_fd_process_incoming(f);
++        migration_ioc_process_incoming(ioc);
+     }
+ }
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index c3fe0ed..86e41e8 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -307,17 +307,16 @@ static void process_incoming_migration_bh(void *opaque)
+ 
+ static void process_incoming_migration_co(void *opaque)
+ {
+-    QEMUFile *f = opaque;
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     PostcopyState ps;
+     int ret;
+ 
+-    mis->from_src_file = f;
++    assert(mis->from_src_file);
+     mis->largest_page_size = qemu_ram_pagesize_largest();
+     postcopy_state_set(POSTCOPY_INCOMING_NONE);
+     migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
+                       MIGRATION_STATUS_ACTIVE);
+-    ret = qemu_loadvm_state(f);
++    ret = qemu_loadvm_state(mis->from_src_file);
+ 
+     ps = postcopy_state_get();
+     trace_process_incoming_migration_co_end(ret, ps);
+@@ -365,12 +364,28 @@ static void process_incoming_migration_co(void *opaque)
+ 
+ void migration_fd_process_incoming(QEMUFile *f)
+ {
+-    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
+-
++    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    
++    if (!mis->from_src_file) {
++        mis->from_src_file = f;
++    }
+     qemu_file_set_blocking(f, false);
+     qemu_coroutine_enter(co);
+ }
+ 
++void migration_ioc_process_incoming(QIOChannel *ioc)
++{
++    MigrationIncomingState *mis = migration_incoming_get_current();
++
++    if (!mis->from_src_file) {
++        QEMUFile *f = qemu_fopen_channel_input(ioc);
++        mis->from_src_file = f;
++        migration_fd_process_incoming(f);
++    }
++    /* We still only have a single channel.  Nothing to do here yet */
++}
++
+ /*
+  * Send a 'SHUT' message on the return channel with the given value
+  * to indicate that we've finished with the RP.  Non-0 value indicates
+diff --git a/migration/migration.h b/migration/migration.h
+index 148c9fa..99c398d 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -20,6 +20,7 @@
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+ #include "hw/qdev.h"
++#include "io/channel.h"
+ 
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+@@ -152,6 +153,7 @@ struct MigrationState
+ void migrate_set_state(int *state, int old_state, int new_state);
+ 
+ void migration_fd_process_incoming(QEMUFile *f);
++void migration_ioc_process_incoming(QIOChannel *ioc);
+ 
+ uint64_t migrate_max_downtime(void);
+ 
+-- 
+2.9.4
