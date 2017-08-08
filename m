@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joseph_myers@mentor.com>) id 1dfEHo-0006EP-D7
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:51:45 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dfEN8-00089A-9D
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joseph_myers@mentor.com>) id 1dfEHj-00022n-Gf
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:51:44 -0400
-Received: from relay1.mentorg.com ([192.94.38.131]:33842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joseph_myers@mentor.com>)
-	id 1dfEHj-00022Y-Ae
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:51:39 -0400
-Date: Tue, 8 Aug 2017 23:51:29 +0000
-From: Joseph Myers <joseph@codesourcery.com>
-Message-ID: <alpine.DEB.2.20.1708082350340.23380@digraph.polyomino.org.uk>
+	(envelope-from <no-reply@patchew.org>) id 1dfEN3-0005nN-7J
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:57:14 -0400
+Resent-Message-Id: <E1dfEN3-0005nN-7J@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dfEN2-0005mY-Rf
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:57:09 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150223661780.30.635144886361361979@dd743fd916bd>
+In-Reply-To: <1502134806-13669-1-git-send-email-dverma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Subject: [Qemu-devel] [PATCH] target/i386: set rip_offset for further SSE
- instructions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 8 Aug 2017 16:56:58 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/3] Vmstate-static-checker.py fix upstream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: dverma@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, jen@redhat.com, quintela@redhat.com
 
-It turns out that my recent fix to set rip_offset when emulating some
-SSE4.1 instructions needs generalizing to cover a wider class of
-instructions.  Specifically, every instruction in the sse_op_table7
-table, coming from various instruction set extensions, has an 8-bit
-immediate operand that comes after any memory operand, and so needs
-rip_offset set for correctness if there is a memory operand that is
-rip-relative, and my patch only set it for a subset of those
-instructions.  This patch moves the rip_offset setting to cover the
-wider class of instructions, so fixing 9 further gcc testsuite
-failures in my GCC 6-based testing.  (I do not know whether there
-might be still further classes of instructions missing this setting.)
-
-Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-
----
-
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 5fdadf9..95f7261 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4077,10 +4077,11 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
-             if (!(s->cpuid_ext_features & sse_op_table7[b].ext_mask))
-                 goto illegal_op;
- 
-+            s->rip_offset = 1;
-+
-             if (sse_fn_eppi == SSE_SPECIAL) {
-                 ot = mo_64_32(s->dflag);
-                 rm = (modrm & 7) | REX_B(s);
--                s->rip_offset = 1;
-                 if (mod != 3)
-                     gen_lea_modrm(env, s, modrm);
-                 reg = ((modrm >> 3) & 7) | rex_r;
-
--- 
-Joseph S. Myers
-joseph@codesourcery.com
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTUw
+MjEzNDgwNi0xMzY2OS0xLWdpdC1zZW5kLWVtYWlsLWR2ZXJtYUByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBWbXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5IGZpeCB1
+cHN0cmVhbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
+bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
+ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
+KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
+Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
+aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcwZjYxN2E4ZGQgQWRkIG5ldyBm
+dW5jdGlvbnMgZm9yIHdoaXRlbGlzdGluZyBhbmQgdGhlaXIgY2FsbHMKMDhmZDVlMmE0NSBVcGRh
+dGUgdGhlIGV4aXN0aW5nIHdoaXRlbGlzdAo3NDUxZjc0YTNiIEZpeCBmb3JtYXQgYW5kIHN0eWxl
+czsgbWFrZSBjb2RlIG1vcmUgcHl0aG9uaWMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvMzogRml4IGZvcm1hdCBhbmQgc3R5bGVzOyBtYWtlIGNvZGUgbW9yZSBweXRob25p
+Yy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjE2OiBGSUxFOiBzY3JpcHRz
+L3Ztc3RhdGUtc3RhdGljLWNoZWNrZXIucHk6MzU4OgorICAgICAgICAgICAgICAgICAgJ21pbmlt
+dW0gdmVyc2lvbiBlcnJvcjogJyArIHN0cihzcmNfdmVyWyJ2ZXJzaW9uX2lkIl0pICsgJyA8ICcg
+KwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNDUgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyLzM6IFVwZGF0
+ZSB0aGUgZXhpc3Rpbmcgd2hpdGVsaXN0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiMzNjogRklMRTogc2NyaXB0cy92bXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5Ojk4OgorICAg
+ICAgICAnZTEwMDBlJzogWydQQ0lEZXZpY2UnLCAnUENJRURldmljZScsICdpbnRyX3N0YXRlJywg
+J3JlZGhhdF83XzNfaW50cl9zdGF0ZSddLAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0
+MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNo
+ZWNraW5nIFBBVENIIDMvMzogQWRkIG5ldyBmdW5jdGlvbnMgZm9yIHdoaXRlbGlzdGluZyBhbmQg
+dGhlaXIgY2FsbHMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0ODogRklMRTog
+c2NyaXB0cy92bXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5OjY0OgorIyBBIGxvdCBvZiBlcnJvcnMg
+YXJlIGdlbmVyYXRlZCBkdWUgdG8gZGlmZmVyZW5jZXMgaW4gc2l6ZXMgc29tZSBvZiB3aGljaCBh
+cmUgZmFsc2UgcG9zaXRpdmVzLiBUaGlzIGxpc3QKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM2MDogRklMRTogc2NyaXB0cy92bXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5Ojc2Ogor
+ICAgIGlmIChvbGRfc2l6ZSBpbiBuZXdfc2l6ZXNfbGlzdFtmaWVsZF0gYW5kIG5ld19zaXplIGlu
+IG5ld19zaXplc19saXN0W2ZpZWxkXSk6CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMTQxOiBGSUxFOiBzY3JpcHRzL3Ztc3RhdGUtc3RhdGljLWNoZWNrZXIucHk6MzkwOgorICAg
+ICAgICAgICAgIyBjb21taXQgMjBkYWE5MGEyMGQsIGV4dHJhIGZpZWxkICdjb25maWcnIHdhcyBh
+ZGRlZCBpbiBuZXdlciByZWxlYXNlcwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzE0MjogRklMRTogc2NyaXB0cy92bXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5OjM5MToKKyAgICAg
+ICAgICAgICMgdGhlcmUgd2lsbCBiZSBhIG1pc21hdGNoIGluIHRoZSBudW1iZXIgb2YgZmllbGRz
+IG9mIGlycV9zdGF0ZSBhbmQgY29uZmlnCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMTk2OiBGSUxFOiBzY3JpcHRzL3Ztc3RhdGUtc3RhdGljLWNoZWNrZXIucHk6NDcxOgorICAg
+ICAgICAgICAgY2hlY2tfZmllbGRzKHNyY19kZXNjW2ZpZWxkXSwgZGVzdF9kZXNjW2ZpZWxkXSwg
+c3JjX2Rlc2NbIm5hbWUiXSwgc2VjKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzIwMTogRklMRTogc2NyaXB0cy92bXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5OjQ3NDoKKyAgICAg
+ICAgICAgIGNoZWNrX3N1YnNlY3Rpb25zKHNyY19kZXNjW2ZpZWxkXSwgZGVzdF9kZXNjW2ZpZWxk
+XSwgc3JjX2Rlc2NbIm5hbWUiXSwgc2VjKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzIxMzogRklMRTogc2NyaXB0cy92bXN0YXRlLXN0YXRpYy1jaGVja2VyLnB5OjQ3OToKKyAg
+ICAgICAgaWYgbm90IGNoZWNrX3VwZGF0ZWRfc2l6ZXMoc2VjLCBzcmNfdmVyWyJ2ZXJzaW9uX2lk
+Il0sIGRlc3RfdmVyWyJ2ZXJzaW9uX2lkIl0pOgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
+ZXJzCiMyMTc6IEZJTEU6IHNjcmlwdHMvdm1zdGF0ZS1zdGF0aWMtY2hlY2tlci5weTo0ODM6Cisg
+ICAgICAgICAgICBwcmludCAoJ3ZlcnNpb24gZXJyb3I6ICcgKyBzdHIoc3JjX3ZlclsidmVyc2lv
+bl9pZCJdKSArICcgPiAnICsgc3RyKGRlc3RfdmVyWyJ2ZXJzaW9uX2lkIl0pKQoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMzE6IEZJTEU6IHNjcmlwdHMvdm1zdGF0ZS1zdGF0aWMt
+Y2hlY2tlci5weTo0OTA6CisgICAgICAgIGlmIG5vdCBjaGVja191cGRhdGVkX3NpemVzKHNlYywg
+c3JjX3ZlclsidmVyc2lvbl9pZCJdLCBkZXN0X3ZlclsibWluaW11bV92ZXJzaW9uX2lkIl0pOgoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIzNTogRklMRTogc2NyaXB0cy92bXN0
+YXRlLXN0YXRpYy1jaGVja2VyLnB5OjQ5NDoKKyAgICAgICAgICAgICAgICAgICAgICAnbWluaW11
+bSB2ZXJzaW9uIGVycm9yOiAnICsgc3RyKHNyY192ZXJbInZlcnNpb25faWQiXSkgKyAnIDwgJyAr
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjU5OiBGSUxFOiBzY3JpcHRzL3Zt
+c3RhdGUtc3RhdGljLWNoZWNrZXIucHk6NTA5OgorICAgICAgICAgICAgcHJpbnQgKCdzaXplIG1p
+c21hdGNoOiAnICsgc3RyKHNyY1sic2l6ZSJdKSArICcgLCAnICsgc3RyKGRlc3RbInNpemUiXSkp
+Cgp0b3RhbDogMyBlcnJvcnMsIDggd2FybmluZ3MsIDI2OSBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
+Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
