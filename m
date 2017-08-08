@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfAH7-0000aL-QT
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:34:47 -0400
+	(envelope-from <mst@redhat.com>) id 1dfAJy-0001zX-AB
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfAH3-00075s-T5
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:34:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56404)
+	(envelope-from <mst@redhat.com>) id 1dfAJu-0000UW-Br
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:37:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36792)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfAH3-00075H-JM
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:34:41 -0400
-References: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
-	<9e56de2e-2c20-6e28-efd0-1f78b21a7be5@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9f3c0af6-1ff8-adca-9f69-2be8dd7d250f@redhat.com>
-Date: Tue, 8 Aug 2017 14:34:36 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dfAJu-0000UB-2X
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:37:38 -0400
+Date: Tue, 8 Aug 2017 22:37:32 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170808223616-mutt-send-email-mst@kernel.org>
+References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
+	<1501964858-5159-2-git-send-email-zuban32s@gmail.com>
+	<8893f281-e30d-d1c6-3da0-14a644da5a03@redhat.com>
+	<20170808183516-mutt-send-email-mst@kernel.org>
+	<09cc4eb5-cc15-726f-ae5f-2c7c5a401701@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9e56de2e-2c20-6e28-efd0-1f78b21a7be5@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XjJRbB0EkDI1PahoQBifX7LCBThUeoBmH"
-Subject: Re: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix
- fchmodat_nofollow() limitations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09cc4eb5-cc15-726f-ae5f-2c7c5a401701@redhat.com>
+Subject: Re: [Qemu-devel] acpi-test: Warning! DSDT mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: zhiyong.wu@ucloud.cn, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Aleksandr Bezzubikov <zuban32s@gmail.com>, ehabkost@redhat.com, kevin@koconnor.net, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, lersek@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XjJRbB0EkDI1PahoQBifX7LCBThUeoBmH
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: zhiyong.wu@ucloud.cn, qemu-devel@nongnu.org
-Message-ID: <9f3c0af6-1ff8-adca-9f69-2be8dd7d250f@redhat.com>
-Subject: Re: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix
- fchmodat_nofollow() limitations
-References: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
- <9e56de2e-2c20-6e28-efd0-1f78b21a7be5@amsat.org>
-In-Reply-To: <9e56de2e-2c20-6e28-efd0-1f78b21a7be5@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Aug 08, 2017 at 08:38:18PM +0200, Thomas Huth wrote:
+> On 08.08.2017 17:35, Michael S. Tsirkin wrote:
+> > On Tue, Aug 08, 2017 at 04:48:26PM +0200, Thomas Huth wrote:
+> >> On 05.08.2017 22:27, Aleksandr Bezzubikov wrote:
+> >>> Unmask previously masked SHPC feature in _OSC method.
+> >>>
+> >>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> >>> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> >>> ---
+> >>>  hw/i386/acpi-build.c | 4 ++--
+> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> >>> index b9c245c..98dd424 100644
+> >>> --- a/hw/i386/acpi-build.c
+> >>> +++ b/hw/i386/acpi-build.c
+> >>> @@ -1862,9 +1862,9 @@ static Aml *build_q35_osc_method(void)
+> >>>  
+> >>>      /*
+> >>>       * Always allow native PME, AER (no dependencies)
+> >>> -     * Never allow SHPC (no SHPC controller in this system)
+> >>> +     * Allow SHPC (PCI bridges can have SHPC controller)
+> >>>       */
+> >>> -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1D), a_ctrl));
+> >>> +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
+> >>>  
+> >>>      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
+> >>>      /* Unknown revision */
+> >>>
+> >>
+> >> Since this patch has been merged, I now get a bunch of ugly warnings
+> >> during "make check":
+> >>
+> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-T2ST4Y.dsl,
+> >> aml:/tmp/aml-HVUT4Y], Expected [asl:/tmp/asl-00VT4Y.dsl,
+> >> aml:tests/acpi-test-data/q35/DSDT].
+> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-3BKN4Y.dsl,
+> >> aml:/tmp/aml-CDKN4Y], Expected [asl:/tmp/asl-2CZM4Y.dsl,
+> >> aml:tests/acpi-test-data/q35/DSDT.bridge].
+> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-ZVPA4Y.dsl,
+> >> aml:/tmp/aml-A3PA4Y], Expected [asl:/tmp/asl-F0QA4Y.dsl,
+> >> aml:tests/acpi-test-data/q35/DSDT.ipmibt].
+> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-TX7P4Y.dsl,
+> >> aml:/tmp/aml-S97P4Y], Expected [asl:/tmp/asl-AIJP4Y.dsl,
+> >> aml:tests/acpi-test-data/q35/DSDT.cphp].
+> >> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6J0C4Y.dsl,
+> >> aml:/tmp/aml-DCZC4Y], Expected [asl:/tmp/asl-9I1C4Y.dsl,
+> >> aml:tests/acpi-test-data/q35/DSDT.memhp].
+> >>
+> >> Did you maybe forget to update the ACPI test table according to the
+> >> changes? (and why was this merged during hard-freeze at all? The
+> >> ChangeLog text does not sound like a bug fix?)
+> >>
+> >>  Thomas
+> > 
+> > My bad will fix ASAP.
+> 
+> Thanks! ... while you're at it, maybe it would be better to turn the
+> warnings into an g_assert() or something similar, too, so that they are
+> fatal? Otherwise these errors apparently can sneak in without anybody
+> noticing it...
+> 
+>  Thomas
+> 
 
-On 08/08/2017 01:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+Nope, sorry.  They are warnings intentionally since getting expected
+files out of sync or even failing to disassemble the actual ones
+is not a necessarily an indication of a bug.
 
->> +    fd =3D openat_file(dirfd, name, O_RDONLY | O_PATH, 0);
->=20
-> since you use O_PATH, you can drop O_RDONLY.
-
-Technically, POSIX says (and 'man 2 open' agrees, modulo the fact that
-Linux still lacks O_SEARCH) that you MUST provide one of the 5 access
-modes (they are O_RDONLY, O_RDWR, O_WRONLY, O_EXEC, and O_SEARCH;
-although POSIX allows O_EXEC and O_SEARCH to be the same bit pattern),
-and then bitwise-or any additional flags.  So the usage here is correct.
-
-Practically, though, this code is ONLY compilable on Linux (no one else
-has O_PATH yet, although it is a useful Linux invention), and on Linux,
-O_RDONLY is 0.  So behaviorally, you are correct that open(O_PATH)
-rather than open(O_RDONLY | O_PATH) does the same thing, even if it sets
-a bad example. [Well, insofar as you don't have any other bugs by
-omitting O_NOFOLLOW, per my other thread...]
-
->> +++ b/hw/9pfs/9p-util.h
->> @@ -43,9 +43,13 @@ static inline int openat_file(int dirfd, const char=
-
->> *name, int flags,
->>       }
->>         serrno =3D errno;
->> -    /* O_NONBLOCK was only needed to open the file. Let's drop it. */=
-
->> -    ret =3D fcntl(fd, F_SETFL, flags);
->> -    assert(!ret);
->> +    /* O_NONBLOCK was only needed to open the file. Let's drop it. We=
-
->> don't
->> +     * do that with O_PATH since it ignores O_NONBLOCK.
->> +     */
->=20
-> thinking about if someone uses openat_file(d, O_PATH|O_CLOEXEC, ...),
-> why not set the fd flags always? like:
->=20
->        ret =3D fcntl(fd, F_SETFL, flags);
->        assert((flags & O_PATH) || !ret);
-
-Syscalls are expensive.  It's better to avoid fcntl() up front than it
-is to skip failure after the fact.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---XjJRbB0EkDI1PahoQBifX7LCBThUeoBmH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmKEkwACgkQp6FrSiUn
-Q2oLJggApErIGHEJtdi1es0pYIFYK4hGCbACzkFJLOOVcDkqW7OVjMQjXMcHYwD/
-P+XIe+T5fbqPceWC/fw6jjemOSvDkTzvszFVYnzF5rTGZMy3eXIirPZxiaH2JQAk
-gebQ1fyhEcLMBPKl80kLkCtHV1ib+HzAmI42itdsqoTiPfoBX3bYfFXLFPyoTSAS
-spSEQGcCD0KBFyQ0nsRn+yTJqVAWYKPwTnhEC4uPrqbSXgaoQdUKzXGSv/2XEvVY
-NVw3B8G0UIkZsU+vx9RB1EZN4wrhE0eFPQiaug1fW6WSKpmGyLwsEMhd21CKXizF
-tefVRwxC0NHI8Lrgo51Ccr5aghr5WQ==
-=l1G8
------END PGP SIGNATURE-----
-
---XjJRbB0EkDI1PahoQBifX7LCBThUeoBmH--
+-- 
+MST
