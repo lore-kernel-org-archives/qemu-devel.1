@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1df3nn-0000mu-JK
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:40:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1df3qc-0001gq-DS
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1df3nj-0007AP-3Y
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:40:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1df3ni-00079q-SX
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:39:59 -0400
-Date: Tue, 8 Aug 2017 20:39:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170808123954.GA2454@lemon>
-References: <20170807153934.29477-1-alex.bennee@linaro.org>
-	<20170807153934.29477-5-alex.bennee@linaro.org>
-	<20170808014310.GP14780@lemon> <87shh2v3vw.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87shh2v3vw.fsf@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 v3 4/6] docker: docker.py make
- --no-cache skip checksum test
+	(envelope-from <pm215@archaic.org.uk>) id 1df3qb-0000GZ-0T
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:42:58 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36816)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1df3qa-0000Fb-O0
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:42:56 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  8 Aug 2017 13:42:52 +0100
+Message-Id: <1502196172-13818-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/alpha: Switch to
+ do_transaction_failed() hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +23,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, 08/08 09:51, Alex Benn=E9e wrote:
->=20
-> Fam Zheng <famz@redhat.com> writes:
->=20
-> > On Mon, 08/07 16:39, Alex Benn=E9e wrote:
-> >> If you invoke with NOCACHE=3D1 we pass --no-cache in the argv to
-> >> docker.py but may still not force a rebuild if the dockerfile checks=
-um
-> >> hasn't changed. By testing for its presence we can force builds
-> >> without having to manually remove the docker image.
-> >>
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >> ---
-> >>  tests/docker/docker.py | 3 ++-
-> >>  1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> >> index ee40ca04d9..aab1648cc5 100755
-> >> --- a/tests/docker/docker.py
-> >> +++ b/tests/docker/docker.py
-> >> @@ -261,7 +261,8 @@ class BuildCommand(SubCommand):
-> >>          tag =3D args.tag
-> >>
-> >>          dkr =3D Docker()
-> >> -        if dkr.image_matches_dockerfile(tag, dockerfile):
-> >> +        if "--no-cache" not in argv and \
-> >> +           dkr.image_matches_dockerfile(tag, dockerfile):
-> >>              if not args.quiet:
-> >>                  print "Image is up to date."
-> >>          else:
-> >> --
-> >> 2.13.0
-> >>
-> >>
-> >
-> > NACK.
-> >
-> > Please add "--no-cache" to BuildCommand.args, and use args.no_cache.
-> >
-> > diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> > index ee40ca04d9..530bc62d40 100755
-> > --- a/tests/docker/docker.py
-> > +++ b/tests/docker/docker.py
-> > @@ -251,6 +251,8 @@ class BuildCommand(SubCommand):
-> >          parser.add_argument("--add-current-user", "-u", dest=3D"user=
-",
-> >                              action=3D"store_true",
-> >                              help=3D"Add the current user to image's =
-passwd")
-> > +        parser.add_argument("--no-cache", action=3D"store_true",
-> > +                            help=3D"Disable docker cache and checksu=
-m")
-> >          parser.add_argument("tag",
-> >                              help=3D"Image Tag")
-> >          parser.add_argument("dockerfile",
->=20
-> Fair enough, I just didn't want to clash with what usually gets passed
-> directly to the docker command.
+Switch the alpha target from the old unassigned_access hook
+to the new do_transaction_failed hook. This allows us to
+resolve a ??? in the old hook implementation.
 
-Hmm, if we care about clashing maybe it's better to call it --no-checksum=
-?
+The only part of the alpha target that does physical
+memory accesses is reading the page table -- add a
+TODO comment there to the effect that we should handle
+bus faults on page table walks. (Since the palcode
+doesn't actually do anything useful on a bus fault anyway
+it's a bit moot for now.)
 
-Fam
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Based-on: 1501867249-1924-1-git-send-email-peter.maydell@linaro.org
+This patch sits on top of the series adding the new hook.
+
+The comment in the page walk code could probably be
+rephrased by somebody who knows what the palcode
+behaviour in the busfault-on-table-walk case is.
+
+This patch isn't really tested (just 'make check' and
+checking that qemu-system-alpha can start up).
+---
+ target/alpha/cpu.h        |  8 +++++---
+ target/alpha/cpu.c        |  2 +-
+ target/alpha/helper.c     |  8 ++++++++
+ target/alpha/mem_helper.c | 19 ++++++++++---------
+ 4 files changed, 24 insertions(+), 13 deletions(-)
+
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index e95be2b..389e1a4 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -488,9 +488,11 @@ void cpu_alpha_store_fpcr (CPUAlphaState *env, uint64_t val);
+ uint64_t cpu_alpha_load_gr(CPUAlphaState *env, unsigned reg);
+ void cpu_alpha_store_gr(CPUAlphaState *env, unsigned reg, uint64_t val);
+ #ifndef CONFIG_USER_ONLY
+-QEMU_NORETURN void alpha_cpu_unassigned_access(CPUState *cpu, hwaddr addr,
+-                                               bool is_write, bool is_exec,
+-                                               int unused, unsigned size);
++void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
++                                     vaddr addr, unsigned size,
++                                     MMUAccessType access_type,
++                                     int mmu_idx, MemTxAttrs attrs,
++                                     MemTxResult response, uintptr_t retaddr);
+ #endif
+ 
+ static inline void cpu_get_tb_cpu_state(CPUAlphaState *env, target_ulong *pc,
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index 76150f4..4d49fd0 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -307,7 +307,7 @@ static void alpha_cpu_class_init(ObjectClass *oc, void *data)
+ #ifdef CONFIG_USER_ONLY
+     cc->handle_mmu_fault = alpha_cpu_handle_mmu_fault;
+ #else
+-    cc->do_unassigned_access = alpha_cpu_unassigned_access;
++    cc->do_transaction_failed = alpha_cpu_do_transaction_failed;
+     cc->do_unaligned_access = alpha_cpu_do_unaligned_access;
+     cc->get_phys_page_debug = alpha_cpu_get_phys_page_debug;
+     dc->vmsd = &vmstate_alpha_cpu;
+diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+index 34121f4..36407f7 100644
+--- a/target/alpha/helper.c
++++ b/target/alpha/helper.c
+@@ -163,6 +163,14 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
+ 
+     pt = env->ptbr;
+ 
++    /* TODO: rather than using ldq_phys() to read the page table we should
++     * use address_space_ldq() so that we can handle the case when
++     * the page table read gives a bus fault, rather than ignoring it.
++     * For the existing code the zero data that ldq_phys will return for
++     * an access to invalid memory will result in our treating the page
++     * table as invalid, which may even be the right behaviour.
++     */
++
+     /* L1 page table read.  */
+     index = (addr >> (TARGET_PAGE_BITS + 20)) & 0x3ff;
+     L1pte = ldq_phys(cs->as, pt + index*8);
+diff --git a/target/alpha/mem_helper.c b/target/alpha/mem_helper.c
+index 78a7d45..3c06baa 100644
+--- a/target/alpha/mem_helper.c
++++ b/target/alpha/mem_helper.c
+@@ -49,22 +49,23 @@ void alpha_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     cpu_loop_exit(cs);
+ }
+ 
+-void alpha_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+-                                 bool is_write, bool is_exec, int unused,
+-                                 unsigned size)
++void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
++                                     vaddr addr, unsigned size,
++                                     MMUAccessType access_type,
++                                     int mmu_idx, MemTxAttrs attrs,
++                                     MemTxResult response, uintptr_t retaddr)
+ {
+     AlphaCPU *cpu = ALPHA_CPU(cs);
+     CPUAlphaState *env = &cpu->env;
+ 
++    if (retaddr) {
++        cpu_restore_state(cs, retaddr);
++    }
++
+     env->trap_arg0 = addr;
+-    env->trap_arg1 = is_write ? 1 : 0;
++    env->trap_arg1 = access_type == MMU_DATA_STORE ? 1 : 0;
+     cs->exception_index = EXCP_MCHK;
+     env->error_code = 0;
+-
+-    /* ??? We should cpu_restore_state to the faulting insn, but this hook
+-       does not have access to the retaddr value from the original helper.
+-       It's all moot until the QEMU PALcode grows an MCHK handler.  */
+-
+     cpu_loop_exit(cs);
+ }
+ 
+-- 
+2.7.4
