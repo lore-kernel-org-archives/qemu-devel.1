@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df7Hr-0007JI-5w
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:23:20 -0400
+	(envelope-from <quintela@redhat.com>) id 1df7In-0007tO-PK
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df7Hn-0005jh-4I
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:23:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54754)
+	(envelope-from <quintela@redhat.com>) id 1df7Ij-0006EA-OJ
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7Hm-0005jO-RV
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:23:15 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7Ij-0006De-Hf
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:13 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C77027881A
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:23:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80518806C6
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:24:12 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue,  8 Aug 2017 18:22:06 +0200
-Message-Id: <20170808162224.32419-2-quintela@redhat.com>
+Date: Tue,  8 Aug 2017 18:22:07 +0200
+Message-Id: <20170808162224.32419-3-quintela@redhat.com>
 In-Reply-To: <20170808162224.32419-1-quintela@redhat.com>
 References: <20170808162224.32419-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 01/19] migration: Create
- migration_ioc_process_incoming()
+Subject: [Qemu-devel] [PATCH v6 02/19] migration: Teach it about
+ G_SOURCE_REMOVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +33,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We pass the ioc instead of the fd.  This will allow us to have more
-than one channel open.  We also make sure that we set the
-from_src_file sooner, so we don't need to pass it as a parameter.
+As this is defined on glib 2.32, add compatibility macros for older glibs.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/channel.c   |  3 +--
- migration/migration.c | 25 ++++++++++++++++++++-----
- migration/migration.h |  2 ++
- 3 files changed, 23 insertions(+), 7 deletions(-)
+ include/glib-compat.h | 2 ++
+ migration/exec.c      | 2 +-
+ migration/fd.c        | 2 +-
+ migration/socket.c    | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/migration/channel.c b/migration/channel.c
-index 3b7252f..edceebd 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -36,8 +36,7 @@ void migration_channel_process_incoming(QIOChannel *ioc)
-             error_report_err(local_err);
-         }
-     } else {
--        QEMUFile *f = qemu_fopen_channel_input(ioc);
--        migration_fd_process_incoming(f);
-+        migration_ioc_process_incoming(ioc);
-     }
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index fcffcd3..e15aca2 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -223,6 +223,8 @@ static inline gboolean g_hash_table_contains(GHashTable *hash_table,
+ {
+     return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
+ }
++#define G_SOURCE_CONTINUE TRUE
++#define G_SOURCE_REMOVE FALSE
+ #endif
+ 
+ #ifndef g_assert_true
+diff --git a/migration/exec.c b/migration/exec.c
+index 08b599e..f3be1ba 100644
+--- a/migration/exec.c
++++ b/migration/exec.c
+@@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
+ {
+     migration_channel_process_incoming(ioc);
+     object_unref(OBJECT(ioc));
+-    return FALSE; /* unregister */
++    return G_SOURCE_REMOVE;
  }
  
-diff --git a/migration/migration.c b/migration/migration.c
-index c3fe0ed..86e41e8 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -307,17 +307,16 @@ static void process_incoming_migration_bh(void *opaque)
- 
- static void process_incoming_migration_co(void *opaque)
+ void exec_start_incoming_migration(const char *command, Error **errp)
+diff --git a/migration/fd.c b/migration/fd.c
+index 30f5258..30de4b9 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
  {
--    QEMUFile *f = opaque;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyState ps;
-     int ret;
- 
--    mis->from_src_file = f;
-+    assert(mis->from_src_file);
-     mis->largest_page_size = qemu_ram_pagesize_largest();
-     postcopy_state_set(POSTCOPY_INCOMING_NONE);
-     migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
-                       MIGRATION_STATUS_ACTIVE);
--    ret = qemu_loadvm_state(f);
-+    ret = qemu_loadvm_state(mis->from_src_file);
- 
-     ps = postcopy_state_get();
-     trace_process_incoming_migration_co_end(ret, ps);
-@@ -365,12 +364,28 @@ static void process_incoming_migration_co(void *opaque)
- 
- void migration_fd_process_incoming(QEMUFile *f)
- {
--    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
--
-+    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    
-+    if (!mis->from_src_file) {
-+        mis->from_src_file = f;
-+    }
-     qemu_file_set_blocking(f, false);
-     qemu_coroutine_enter(co);
+     migration_channel_process_incoming(ioc);
+     object_unref(OBJECT(ioc));
+-    return FALSE; /* unregister */
++    return G_SOURCE_REMOVE;
  }
  
-+void migration_ioc_process_incoming(QIOChannel *ioc)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+
-+    if (!mis->from_src_file) {
-+        QEMUFile *f = qemu_fopen_channel_input(ioc);
-+        mis->from_src_file = f;
-+        migration_fd_process_incoming(f);
-+    }
-+    /* We still only have a single channel.  Nothing to do here yet */
-+}
-+
- /*
-  * Send a 'SHUT' message on the return channel with the given value
-  * to indicate that we've finished with the RP.  Non-0 value indicates
-diff --git a/migration/migration.h b/migration/migration.h
-index 148c9fa..99c398d 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -20,6 +20,7 @@
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
- #include "hw/qdev.h"
-+#include "io/channel.h"
+ void fd_start_incoming_migration(const char *infd, Error **errp)
+diff --git a/migration/socket.c b/migration/socket.c
+index 757d382..b02d37d 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+ out:
+     /* Close listening socket as its no longer needed */
+     qio_channel_close(ioc, NULL);
+-    return FALSE; /* unregister */
++    return G_SOURCE_REMOVE;
+ }
  
- /* State for the incoming migration */
- struct MigrationIncomingState {
-@@ -152,6 +153,7 @@ struct MigrationState
- void migrate_set_state(int *state, int old_state, int new_state);
- 
- void migration_fd_process_incoming(QEMUFile *f);
-+void migration_ioc_process_incoming(QIOChannel *ioc);
- 
- uint64_t migrate_max_downtime(void);
  
 -- 
 2.9.4
