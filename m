@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1df0lz-0001Vv-Ns
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:26:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1df0pv-0002T0-F5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:30:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1df0lv-0006Ul-MR
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:25:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52010)
+	(envelope-from <thuth@redhat.com>) id 1df0ps-0000Bh-6J
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:30:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1df0lv-0006UT-DO
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:25:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 274B8356CD
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 09:25:54 +0000 (UTC)
-Date: Tue, 8 Aug 2017 10:25:48 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170808092548.GC9393@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-4-quintela@redhat.com>
-	<20170719134447.GH30084@redhat.com> <87o9rqbggn.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1df0pr-0000Ax-TO
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:30:00 -0400
+References: <20170804112946.5247-1-cohuck@redhat.com>
+	<20170804165934.4d6fb98f@gondolin> <20170808111542.16422571@gondolin>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <798f1bb6-f21d-305c-5bcc-c7f828f284e1@redhat.com>
+Date: Tue, 8 Aug 2017 11:29:50 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170808111542.16422571@gondolin>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87o9rqbggn.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v5 03/17] qio: Create new
- qio_channel_{readv, writev}_all
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] s390x: zPCI detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,167 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Tue, Aug 08, 2017 at 10:40:08AM +0200, Juan Quintela wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > On Mon, Jul 17, 2017 at 03:42:24PM +0200, Juan Quintela wrote:
-> >> The functions waits until it is able to write the full iov.
-> >> 
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> 
-> >> --
-> >> 
-> >> Add tests.
-> >> ---
-> >>  include/io/channel.h           | 46 +++++++++++++++++++++++++
-> >>  io/channel.c                   | 76 ++++++++++++++++++++++++++++++++++++++++++
-> >>  migration/qemu-file-channel.c  | 29 +---------------
-> >>  tests/io-channel-helpers.c     | 55 ++++++++++++++++++++++++++++++
-> >>  tests/io-channel-helpers.h     |  4 +++
-> >>  tests/test-io-channel-buffer.c | 55 ++++++++++++++++++++++++++++--
-> >>  6 files changed, 234 insertions(+), 31 deletions(-)
-> >
-> >
-> >
-> >> diff --git a/io/channel.c b/io/channel.c
-> >> index cdf7454..82203ef 100644
-> >> --- a/io/channel.c
-> >> +++ b/io/channel.c
-> >> @@ -22,6 +22,7 @@
-> >>  #include "io/channel.h"
-> >>  #include "qapi/error.h"
-> >>  #include "qemu/main-loop.h"
-> >> +#include "qemu/iov.h"
-> >>  
-> >>  bool qio_channel_has_feature(QIOChannel *ioc,
-> >>                               QIOChannelFeature feature)
-> >> @@ -85,6 +86,81 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
-> >>  }
-> >>  
-> >>  
-> >> +
-> >> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
-> >> +                              const struct iovec *iov,
-> >> +                              size_t niov,
-> >> +                              Error **errp)
-> >> +{
-> >> +    ssize_t done = 0;
-> >> +    struct iovec *local_iov = g_new(struct iovec, niov);
-> >> +    struct iovec *local_iov_head = local_iov;
-> >> +    unsigned int nlocal_iov = niov;
-> >> +
-> >> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
-> >> +                          iov, niov,
-> >> +                          0, iov_size(iov, niov));
-> >> +
-> >> +    while (nlocal_iov > 0) {
-> >> +        ssize_t len;
-> >> +        len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
-> >> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> >> +            qio_channel_wait(ioc, G_IO_OUT);
-> >> +            continue;
-> >> +        }
-> >> +        if (len < 0) {
-> >> +            error_setg_errno(errp, EIO,
-> >> +                             "Channel was not able to read full iov");
-> >> +            done = -1;
-> >> +            goto cleanup;
-> >> +        }
-> >> +
-> >> +        iov_discard_front(&local_iov, &nlocal_iov, len);
-> >> +        done += len;
-> >> +    }
-> >
-> > If 'len == 0' (ie EOF from qio_channel_readv())  then this will busy
-> > loop. You need to break the loop on that condition and return whatever
-> > 'done' currently is.
+On 08.08.2017 11:15, Cornelia Huck wrote:
+> On Fri, 4 Aug 2017 16:59:34 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> Done.
+>> On Fri,  4 Aug 2017 13:29:37 +0200
+>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>
+>>> Next version, not so many changes from v3.
+>>>
+>>> As you might have guessed, the goals are still the same:
+>>> - Being able to disable PCI support in a build completely.
+>>> - Properly fencing off PCI if the relevant facility bit is not provided.
+>>>
+>>> Changes v3->v4:
+>>> - introduce pci_available boolean
+>>> - use pci_available to fence off setting the zcpi facility bit
+>>> - collected tags
+>>>
+>>> Branch is still git://github.com/cohuck/qemu no-zpci-cpumodel  
+>>
+>> make check on a build with pci disabled revealed an interesting
+>> inconsistency: We create a virtio-9p-ccw device, but the base
+>> virtio-9p-device is in code that is not built for !pci.
+>>
+>> If I remove the pci dependency for hw/9pfs/ and fsdev/, things look
+>> fine (at least on s390x). We probably need a different dependency,
+>> though.
+>>
+>> virtio-9p maintainers, any suggestions?
 > 
-> >> +static void test_io_channel_buf2(void)
-> >> +{
-> >> +    QIOChannelBuffer *buf;
-> >> +    QIOChannelTest *test;
-> >> +
-> >> +    buf = qio_channel_buffer_new(0);
-> >> +
-> >> +    test = qio_channel_test_new();
-> >> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
-> >> +    buf->offset = 0;
-> >> +    qio_channel_test_run_reader(test, QIO_CHANNEL(buf));
-> >> +    qio_channel_test_validate(test);
-> >> +
-> >> +    object_unref(OBJECT(buf));
-> >> +}
-> >> +
-> >> +static void test_io_channel_buf3(void)
-> >> +{
-> >> +    QIOChannelBuffer *buf;
-> >> +    QIOChannelTest *test;
-> >> +
-> >> +    buf = qio_channel_buffer_new(0);
-> >> +
-> >> +    test = qio_channel_test_new();
-> >> +    qio_channel_test_run_writer(test, QIO_CHANNEL(buf));
-> >> +    buf->offset = 0;
-> >> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
-> >> +    qio_channel_test_validate(test);
-> >> +
-> >> +    object_unref(OBJECT(buf));
-> >> +}
-> >> +
-> >> +static void test_io_channel_buf4(void)
-> >> +{
-> >> +    QIOChannelBuffer *buf;
-> >> +    QIOChannelTest *test;
-> >> +
-> >> +    buf = qio_channel_buffer_new(0);
-> >> +
-> >> +    test = qio_channel_test_new();
-> >> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
-> >> +    buf->offset = 0;
-> >> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
-> >> +    qio_channel_test_validate(test);
-> >> +
-> >> +    object_unref(OBJECT(buf));
-> >> +}
-> >>  
-> >>  int main(int argc, char **argv)
-> >>  {
-> >> @@ -46,6 +92,9 @@ int main(int argc, char **argv)
-> >>  
-> >>      g_test_init(&argc, &argv, NULL);
-> >>  
-> >> -    g_test_add_func("/io/channel/buf", test_io_channel_buf);
-> >> +    g_test_add_func("/io/channel/buf1", test_io_channel_buf1);
-> >> +    g_test_add_func("/io/channel/buf2", test_io_channel_buf2);
-> >> +    g_test_add_func("/io/channel/buf3", test_io_channel_buf3);
-> >> +    g_test_add_func("/io/channel/buf4", test_io_channel_buf4);
-> >>      return g_test_run();
-> >>  }
-> >
-> > There's no need to add any of these additions to the test suite.  Instead
-> > you can just change the existing io-channel-helpers.c functions
-> > test_io_thread_writer() and test_io_thread_reader(), to call
-> > qio_channel_writev_all() & qio_channel_readv_all() respectively.
+> I have the patch below, which is ugly, but seems to work for me. Better
+> ideas welcome :)
+
+I haven't tried whether it works, but you could maybe change the define
+of CONFIG_VIRTFS instead:
+
+diff --git a/configure b/configure
+index dd73cce..64d21f6 100755
+--- a/configure
++++ b/configure
+@@ -5771,7 +5771,7 @@ if test "$libattr" = "yes" ; then
+   echo "CONFIG_LIBATTR=y" >> $config_host_mak
+ fi
+ if test "$virtfs" = "yes" ; then
+-  echo "CONFIG_VIRTFS=y" >> $config_host_mak
++  echo 'CONFIG_VIRTFS=$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)' >> $config_host_mak
+ fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+
+... I think that should simplify the other statements quite a bit since
+you then only have to test CONFIG_VIRTFS in the other locations?
+
+ Thomas
+
+
+> From 0ba6427e7ac7cef38b487d28c9dce653d8cb9a71 Mon Sep 17 00:00:00 2001
+> From: Cornelia Huck <cohuck@redhat.com>
+> Date: Tue, 8 Aug 2017 11:03:38 +0200
+> Subject: [PATCH] 9pfs: fix dependencies
 > 
-> They are already done now, and the advantage of this was that I was able
-> to test that everything worked well against everything.  That was good
-> to be able to check that all worked as expected.
-
-The existing test_io_thread_reader/writer() methods that I mention are
-common code used by multiple tests - test-io-channel-buffer,
-test-io-chanel-socket, test-io-channel-file, test-io-channel-tls.
-
-I don't want to add code to test-io-channel-buffer that duplicates
-functionality that already exists, and is exercised by only one of the
-many IO channel implementation tests.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+> on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
+> device.
+> 
+> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  default-configs/s390x-softmmu.mak | 1 +
+>  fsdev/Makefile.objs               | 9 +++------
+>  hw/Makefile.objs                  | 2 +-
+>  3 files changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> index 6ab2bc65ac..7f15ab68b1 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=y
+>  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+>  CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+>  CONFIG_WDT_DIAG288=y
+> +CONFIG_VIRTIO_CCW=y
+> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+> index 659df6e187..10d8caa291 100644
+> --- a/fsdev/Makefile.objs
+> +++ b/fsdev/Makefile.objs
+> @@ -1,10 +1,7 @@
+> -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+>  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+> -# only pull in the actual virtio-9p device if we also enabled virtio.
+> -common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> -else
+> -common-obj-y = qemu-fsdev-dummy.o
+> -endif
+> +# only pull in the actual virtio-9p device if we also enabled a virtio backend.
+> +common-obj-$(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))= qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> +common-obj-$(call lnot, $(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) = qemu-fsdev-dummy.o
+>  common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+>  
+>  # Toplevel always builds this; targets without virtio will put it in
+> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> index a2c61f6b09..10942fe0b4 100644
+> --- a/hw/Makefile.objs
+> +++ b/hw/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
+> +devices-dirs-$(call land, $(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW))) += 9pfs/
+>  devices-dirs-$(CONFIG_SOFTMMU) += acpi/
+>  devices-dirs-$(CONFIG_SOFTMMU) += adc/
+>  devices-dirs-$(CONFIG_SOFTMMU) += audio/
+> 
