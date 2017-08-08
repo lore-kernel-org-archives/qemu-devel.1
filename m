@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1df6pC-0000iX-CJ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:53:43 -0400
+	(envelope-from <quintela@redhat.com>) id 1df6sF-0002MC-Je
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1df6p9-0004mM-7c
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:53:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44550)
+	(envelope-from <quintela@redhat.com>) id 1df6sC-0006ch-G5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:56:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1df6p8-0004lv-UX
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:53:39 -0400
-Date: Tue, 8 Aug 2017 18:53:14 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170808184619-mutt-send-email-mst@kernel.org>
-References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
-	<1501964994-5257-4-git-send-email-zuban32s@gmail.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df6sC-0006c2-6M
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:56:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFAE2883C8
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 15:56:46 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170719190238.GK3500@work-vm> (David Alan Gilbert's message of
+	"Wed, 19 Jul 2017 20:02:39 +0100")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-11-quintela@redhat.com>
+	<20170719190238.GK3500@work-vm>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 Aug 2017 17:56:41 +0200
+Message-ID: <87lgmu8346.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1501964994-5257-4-git-send-email-zuban32s@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] pci: enable RedHat PCI bridges to
- reserve additional buses on PCI init
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 10/17] migration: Create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +35,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: seabios@seabios.org, marcel@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On Sat, Aug 05, 2017 at 11:29:54PM +0300, Aleksandr Bezzubikov wrote:
-> In case of Red Hat Generic PCIE Root Port reserve additional buses,
-> which number is provided in a vendor-specific capability.
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->  src/fw/pciinit.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
->  src/hw/pci_ids.h |  3 +++
->  2 files changed, 68 insertions(+), 4 deletions(-)
-> 
-> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
-> index 864954f..d241d66 100644
-> --- a/src/fw/pciinit.c
-> +++ b/src/fw/pciinit.c
-> @@ -15,6 +15,7 @@
->  #include "hw/pcidevice.h" // pci_probe_devices
->  #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
->  #include "hw/pci_regs.h" // PCI_COMMAND
-> +#include "fw/dev-pci.h" // qemu_pci_cap
->  #include "list.h" // struct hlist_node
->  #include "malloc.h" // free
->  #include "output.h" // dprintf
-> @@ -578,9 +579,42 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
->          pci_bios_init_bus_rec(secbus, pci_bus);
->  
->          if (subbus != *pci_bus) {
-> +            u8 res_bus = 0;
-> +            if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
-> +                    pci_config_readw(bdf, PCI_DEVICE_ID) ==
-> +                            PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
-> +                u8 cap;
-> +                do {
-> +                    cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
-> +                } while (cap &&
-> +                         pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE) !=
-> +                                REDHAT_CAP_TYPE_QEMU);
-> +                if (cap) {
-> +                    u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
-> +                    if (cap_len != QEMU_PCI_CAP_SIZE) {
-> +                        dprintf(1, "PCI: QEMU cap length %d is invalid\n",
-> +                                cap_len);
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> The function still don't use multifd, but we have simplified
+>> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+>> counter and a new flag for this type of pages.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  hmp.c                 |  2 ++
+>>  migration/migration.c |  1 +
+>>  migration/ram.c       | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  qapi-schema.json      |  5 ++-
+>>  4 files changed, 96 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/hmp.c b/hmp.c
+>> index b01605a..eeb308b 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -234,6 +234,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>              monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
+>>                             info->ram->postcopy_requests);
+>>          }
+>> +        monitor_printf(mon, "multifd: %" PRIu64 " pages\n",
+>> +                       info->ram->multifd);
+>>      }
+>>  
+>>      if (info->has_disk) {
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index e1c79d5..d9d5415 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -528,6 +528,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>>      info->ram->dirty_sync_count = ram_counters.dirty_sync_count;
+>>      info->ram->postcopy_requests = ram_counters.postcopy_requests;
+>>      info->ram->page_size = qemu_target_page_size();
+>> +    info->ram->multifd = ram_counters.multifd;
+>>  
+>>      if (migrate_use_xbzrle()) {
+>>          info->has_xbzrle_cache = true;
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index b80f511..2bf3fa7 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -68,6 +68,7 @@
+>>  #define RAM_SAVE_FLAG_XBZRLE   0x40
+>>  /* 0x80 is reserved in migration.h start with 0x100 next */
+>>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+>> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
+>>  
+>>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
+>>  {
+>> @@ -362,12 +363,17 @@ static void compress_threads_save_setup(void)
+>>  /* Multiple fd's */
+>>  
+>>  struct MultiFDSendParams {
+>> +    /* not changed */
+>>      uint8_t id;
+>>      QemuThread thread;
+>>      QIOChannel *c;
+>>      QemuSemaphore sem;
+>>      QemuMutex mutex;
+>> +    /* protected by param mutex */
+>>      bool quit;
+>
+> Should probably comment to say what address space address is in - this
+> is really a qemu pointer - and that's why we can treat 0 as special?
 
-I would do cap_len < QEMU_PCI_CAP_SIZE here - this way you can extend
-the capability without breaking things.
+Ok.  Added
 
-> +                    } else {
-> +                        u32 tmp_res_bus = pci_config_readl(bdf,
-> +                                                   cap + QEMU_PCI_CAP_BUS_RES);
-> +                        if (tmp_res_bus != (u32)-1) {
-> +                            res_bus = tmp_res_bus & 0xFF;
-> +                            if ((u8)(res_bus + secbus) < secbus ||
-> +                                (u8)(res_bus + secbus) < res_bus) {
-> +                                dprintf(1, "PCI: bus_reserve value %d is invalid\n",
-> +                                        res_bus);
-> +                                res_bus = 0;
-> +                            }
-> +                        }
-> +                    }
-> +                }
-> +                res_bus = (*pci_bus > secbus + res_bus) ? *pci_bus
-> +                                                      : secbus + res_bus;
-> +            }
->              dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
-> -                    subbus, *pci_bus);
-> -            subbus = *pci_bus;
-> +                    subbus, res_bus);
-> +            subbus = res_bus;
-> +            *pci_bus = res_bus;
->          } else {
->              dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
->          }
-> @@ -951,11 +985,38 @@ pci_region_map_one_entry(struct pci_region_entry *entry, u64 addr)
->  
->      u16 bdf = entry->dev->bdf;
->      u64 limit = addr + entry->size - 1;
-> +
-> +    if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
-> +            pci_config_readw(bdf, PCI_DEVICE_ID) ==
-> +                    PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
-> +        u8 cap;
-> +        do {
-> +            cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
-> +        } while (cap &&
-> +                 pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE) !=
-> +                        REDHAT_CAP_TYPE_QEMU);
-> +        if (cap) {
-> +            u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
-> +            if (cap_len != QEMU_PCI_CAP_SIZE) {
-> +                dprintf(1, "PCI: QEMU cap length %d is invalid\n",
-> +                        cap_len);
+    /* This is a temp field.  We are using it now to transmit
+       something the address of the page.  Later in the series, we
+       change it for the real page.
+    */
 
-Same here.
 
-> +            } else {
-> +                u32 offset = cap + QEMU_PCI_CAP_LIMITS_OFFSET + entry->type * 8;
+>
+>> +    uint8_t *address;
+>> +    /* protected by multifd mutex */
+>> +    bool done;
+>
+> done needs a comment to explain what it is because
+> it sounds similar to quit;  I think 'done' is saying that
+> the thread is idle having done what was asked?
 
-what is this doing exactly? type is an enum so it's a trick. I'd rather
-have an inline with a switch. Use it for bus as well.
+    /* has the thread finish the last submitted job */
 
-> +                u64 tmp_limit = (pci_config_readl(bdf, offset) |
-> +                            (u64)pci_config_readl(bdf, offset + 4) << 32);
-> +                if (tmp_limit != (u64)-1) {
-> +                    tmp_limit += addr - 1;
-> +                    limit = (limit > tmp_limit) ? limit : tmp_limit;
-> +                }
-> +            }
-> +        }
-> +    }
-> +
->      if (entry->type == PCI_REGION_TYPE_IO) {
->          pci_config_writeb(bdf, PCI_IO_BASE, addr >> PCI_IO_SHIFT);
-> -        pci_config_writew(bdf, PCI_IO_BASE_UPPER16, 0);
-> +        pci_config_writew(bdf, PCI_IO_BASE_UPPER16, limit >> 16);
->          pci_config_writeb(bdf, PCI_IO_LIMIT, limit >> PCI_IO_SHIFT);
-> -        pci_config_writew(bdf, PCI_IO_LIMIT_UPPER16, 0);
-> +        pci_config_writew(bdf, PCI_IO_LIMIT_UPPER16, limit >> 16);
->      }
->      if (entry->type == PCI_REGION_TYPE_MEM) {
->          pci_config_writew(bdf, PCI_MEMORY_BASE, addr >> PCI_MEMORY_SHIFT);
-> diff --git a/src/hw/pci_ids.h b/src/hw/pci_ids.h
-> index 4ac73b4..38fa2ca 100644
-> --- a/src/hw/pci_ids.h
-> +++ b/src/hw/pci_ids.h
-> @@ -2263,6 +2263,9 @@
->  #define PCI_DEVICE_ID_KORENIX_JETCARDF0	0x1600
->  #define PCI_DEVICE_ID_KORENIX_JETCARDF1	0x16ff
->  
-> +#define PCI_VENDOR_ID_REDHAT		0x1b36
-> +#define PCI_DEVICE_ID_REDHAT_ROOT_PORT	0x000C
-> +
->  #define PCI_VENDOR_ID_TEKRAM		0x1de1
->  #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
->  
-> -- 
-> 2.7.4
+>> +static int multifd_send_page(uint8_t *address)
+>> +{
+>> +    int i;
+>> +    MultiFDSendParams *p = NULL; /* make happy gcc */
+>> +
+>> +    qemu_sem_wait(&multifd_send_state->sem);
+>> +    qemu_mutex_lock(&multifd_send_state->mutex);
+>> +    for (i = 0; i < multifd_send_state->count; i++) {
+>> +        p = &multifd_send_state->params[i];
+>> +
+>> +        if (p->done) {
+>> +            p->done = false;
+>> +            break;
+>> +        }
+>> +    }
+>> +    qemu_mutex_unlock(&multifd_send_state->mutex);
+>> +    qemu_mutex_lock(&p->mutex);
+>> +    p->address = address;
+>> +    qemu_mutex_unlock(&p->mutex);
+>> +    qemu_sem_post(&p->sem);
+>
+> My feeling, without having fully thought it through, is that
+> the locking around 'address' can be simplified; especially if the
+> sending-thread never actually changes it.
+>
+> http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_11
+> defines that most of the pthread_ functions act as barriers;
+> including the sem_post and pthread_cond_signal that qemu_sem_post
+> uses.
+
+At the end of the series the code is this:
+
+    qemu_mutex_lock(&p->mutex);
+    p->pages.num = pages->num;
+    iov_copy(p->pages.iov, pages->num, pages->iov, pages->num, 0,
+             iov_size(pages->iov, pages->num));
+    pages->num = 0;
+    qemu_mutex_unlock(&p->mutex);
+ 
+Are you sure that it looks like a good idea to drop the mutex?
+
+The other thread uses pages->num to know if things are ready.
+
+>
+>> +    return 0;
+>> +}
+>> +
+>>  struct MultiFDRecvParams {
+>>      uint8_t id;
+>>      QemuThread thread;
+>> @@ -537,6 +583,7 @@ void multifd_load_cleanup(void)
+>>          qemu_sem_destroy(&p->sem);
+>>          socket_recv_channel_destroy(p->c);
+>>          g_free(p);
+>> +        multifd_recv_state->params[i] = NULL;
+>>      }
+>>      g_free(multifd_recv_state->params);
+>>      multifd_recv_state->params = NULL;
+>> @@ -1058,6 +1105,32 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+>>      return pages;
+>>  }
+>>  
+>> +static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+>> +                            bool last_stage)
+>> +{
+>> +    int pages;
+>> +    uint8_t *p;
+>> +    RAMBlock *block = pss->block;
+>> +    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
+>> +
+>> +    p = block->host + offset;
+>> +
+>> +    pages = save_zero_page(rs, block, offset, p);
+>> +    if (pages == -1) {
+>> +        ram_counters.transferred +=
+>> +            save_page_header(rs, rs->f, block,
+>> +                             offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>> +        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+>> +        multifd_send_page(p);
+>> +        ram_counters.transferred += TARGET_PAGE_SIZE;
+>> +        pages = 1;
+>> +        ram_counters.normal++;
+>> +        ram_counters.multifd++;
+>> +    }
+>> +
+>> +    return pages;
+>> +}
+>> +
+>>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>>                                  ram_addr_t offset)
+>>  {
+>> @@ -1486,6 +1559,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>>          if (migrate_use_compression() &&
+>>              (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
+>>              res = ram_save_compressed_page(rs, pss, last_stage);
+>> +        } else if (migrate_use_multifd()) {
+>> +            res = ram_multifd_page(rs, pss, last_stage);
+>
+> It's a pity we can't wire this up with compression, but I understand
+> why you simplify that.
+>
+> I'll see how the multiple-pages stuff works below; but the interesting
+> thing here is we've already split up host-pages, which seems like a bad
+> idea.
+
+It is.  But I can't fix all the world in one go :-(
+>>  #        statistics (since 2.10)
+>>  #
+>> +# @multifd: number of pages sent with multifd (since 2.10)
+>
+> Hopeful!
+
+Everything puts 2.11.
+
+Later, Juan.
