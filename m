@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dex1f-0001ci-BQ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:26:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1dexKw-0005jw-42
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:45:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dex1a-0007OB-8P
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:25:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52090)
+	(envelope-from <bounces@canonical.com>) id 1dexKr-0008Fb-3z
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:45:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53743)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dex1a-0007N2-1n
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:25:50 -0400
+	id 1dexKq-0008Eg-Tb
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:45:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dex1X-00086I-Sp
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 05:25:47 +0000
+	id 1dexKp-0007V6-1v
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 05:45:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D0F182E80C9
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 05:25:47 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0CA442E80CC
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 05:45:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 05:15:32 -0000
-From: Divine E <1708551@bugs.launchpad.net>
+Date: Tue, 08 Aug 2017 05:34:17 -0000
+From: Thomas Huth <1708551@bugs.launchpad.net>
 Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
-	<150212369715.17249.12866308001900664823.malone@gac.canonical.com>
-Message-Id: <95EE2835-2AEC-4CDE-A006-2C5387CD1976@gmail.com>
+Message-Id: <150217045752.16565.314810984968100893.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus
- as USB 2.0
+Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
+ USB 2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,7 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In doing so, the device is now unseen by the system.
+** Changed in: qemu
+       Status: Incomplete =3D> Triaged
 
 -- =
 
@@ -52,7 +52,7 @@ Title:
   macOS Guest Reading USB 3.0 Bus as USB 2.0
 
 Status in QEMU:
-  Incomplete
+  Triaged
 
 Bug description:
   Description:
