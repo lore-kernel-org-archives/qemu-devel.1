@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1df4jQ-0005vw-Aa
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:39:41 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1df4qK-00037m-VQ
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1df4jK-0008Gp-Ug
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:39:36 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  8 Aug 2017 09:39:08 -0400
-Message-Id: <1962836ff62e2cc75d602496ee8ac8c9d465193a.1502198932.git.jcody@redhat.com>
-In-Reply-To: <cover.1502198932.git.jcody@redhat.com>
-References: <cover.1502198932.git.jcody@redhat.com>
-In-Reply-To: <cover.1502198932.git.jcody@redhat.com>
-References: <cover.1502198932.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 7/7] block/curl: code cleanup to
- comply with coding style
+	(envelope-from <el13635@mail.ntua.gr>) id 1df4qF-0003zl-VB
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:46:45 -0400
+Date: Tue, 8 Aug 2017 16:45:44 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170808134544.paekftiounmirhbo@postretch>
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+	<20170731095443.28211-6-el13635@mail.ntua.gr>
+	<w51valyjj7j.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gaxekyluahptihdx"
+Content-Disposition: inline
+In-Reply-To: <w51valyjj7j.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,242 +26,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-This addresses non-functional changes to help curl.c better comply
-with the coding styles (comments, indentation, brackets, etc.).
 
-One minor code change is the combination of two if statements into
-a single if statement.
+--gaxekyluahptihdx
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/curl.c | 100 +++++++++++++++++++++++++++++++----------------------------
- 1 file changed, 52 insertions(+), 48 deletions(-)
+On Tue, Aug 08, 2017 at 03:13:36PM +0200, Alberto Garcia wrote:
+>On Mon 31 Jul 2017 11:54:41 AM CEST, Manos Pitsidianakis wrote:
+>> block/throttle.c uses existing I/O throttle infrastructure inside a
+>> block filter driver. I/O operations are intercepted in the filter's
+>> read/write coroutines, and referred to block/throttle-groups.c
+>>
+>> The driver can be used with the syntax
+>> -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
+>>         limits.iops-total=3D...,throttle-group=3Dbar
+>
+>Sorry for not having noticed this earlier, but can't you define the
+>throttling group (and its limits) using -object throttle-group ... as
+>shown in the previous patch, and simply reference it here? Or would we
+>have two alternative ways of setting the throttling limits?
+>
+>What happens if you have many -drive lines each one with a different set
+>of limits but with the same throttling group?
 
-diff --git a/block/curl.c b/block/curl.c
-index 35cf417..c557b59 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -32,8 +32,10 @@
- #include <curl/curl.h>
- #include "qemu/cutils.h"
- 
--// #define DEBUG_CURL
--// #define DEBUG_VERBOSE
-+/*
-+ #define DEBUG_CURL
-+ #define DEBUG_VERBOSE
-+*/
- 
- #ifdef DEBUG_CURL
- #define DEBUG_CURL_PRINT 1
-@@ -76,15 +78,15 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
- #define CURL_TIMEOUT_DEFAULT 5
- #define CURL_TIMEOUT_MAX 10000
- 
--#define CURL_BLOCK_OPT_URL       "url"
--#define CURL_BLOCK_OPT_READAHEAD "readahead"
--#define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
--#define CURL_BLOCK_OPT_TIMEOUT "timeout"
--#define CURL_BLOCK_OPT_COOKIE    "cookie"
--#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
--#define CURL_BLOCK_OPT_USERNAME "username"
--#define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
--#define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
-+#define CURL_BLOCK_OPT_URL                   "url"
-+#define CURL_BLOCK_OPT_READAHEAD             "readahead"
-+#define CURL_BLOCK_OPT_SSLVERIFY             "sslverify"
-+#define CURL_BLOCK_OPT_TIMEOUT               "timeout"
-+#define CURL_BLOCK_OPT_COOKIE                "cookie"
-+#define CURL_BLOCK_OPT_COOKIE_SECRET         "cookie-secret"
-+#define CURL_BLOCK_OPT_USERNAME              "username"
-+#define CURL_BLOCK_OPT_PASSWORD_SECRET       "password-secret"
-+#define CURL_BLOCK_OPT_PROXY_USERNAME        "proxy-username"
- #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
- 
- struct BDRVCURLState;
-@@ -110,8 +112,7 @@ typedef struct CURLSocket {
-     QLIST_ENTRY(CURLSocket) next;
- } CURLSocket;
- 
--typedef struct CURLState
--{
-+typedef struct CURLState {
-     struct BDRVCURLState *s;
-     CURLAIOCB *acb[CURL_NUM_ACB];
-     CURL *curl;
-@@ -196,22 +197,22 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
- 
-     DPRINTF("CURL (AIO): Sock action %d on fd %d\n", action, (int)fd);
-     switch (action) {
--        case CURL_POLL_IN:
--            aio_set_fd_handler(s->aio_context, fd, false,
--                               curl_multi_read, NULL, NULL, state);
--            break;
--        case CURL_POLL_OUT:
--            aio_set_fd_handler(s->aio_context, fd, false,
--                               NULL, curl_multi_do, NULL, state);
--            break;
--        case CURL_POLL_INOUT:
--            aio_set_fd_handler(s->aio_context, fd, false,
--                               curl_multi_read, curl_multi_do, NULL, state);
--            break;
--        case CURL_POLL_REMOVE:
--            aio_set_fd_handler(s->aio_context, fd, false,
--                               NULL, NULL, NULL, NULL);
--            break;
-+    case CURL_POLL_IN:
-+        aio_set_fd_handler(s->aio_context, fd, false,
-+                           curl_multi_read, NULL, NULL, state);
-+        break;
-+    case CURL_POLL_OUT:
-+        aio_set_fd_handler(s->aio_context, fd, false,
-+                           NULL, curl_multi_do, NULL, state);
-+        break;
-+    case CURL_POLL_INOUT:
-+        aio_set_fd_handler(s->aio_context, fd, false,
-+                           curl_multi_read, curl_multi_do, NULL, state);
-+        break;
-+    case CURL_POLL_REMOVE:
-+        aio_set_fd_handler(s->aio_context, fd, false,
-+                           NULL, NULL, NULL, NULL);
-+        break;
-     }
- 
-     return 0;
-@@ -235,7 +236,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
- /* Called from curl_multi_do_locked, with s->mutex held.  */
- static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
- {
--    CURLState *s = ((CURLState*)opaque);
-+    CURLState *s = ((CURLState *)opaque);
-     size_t realsize = size * nmemb;
-     int i;
- 
-@@ -253,11 +254,12 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
-     s->buf_off += realsize;
- 
--    for(i=0; i<CURL_NUM_ACB; i++) {
-+    for (i = 0; i < CURL_NUM_ACB; i++) {
-         CURLAIOCB *acb = s->acb[i];
- 
--        if (!acb)
-+        if (!acb) {
-             continue;
-+        }
- 
-         if ((s->buf_off >= acb->end)) {
-             size_t request_length = acb->bytes;
-@@ -293,17 +295,16 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
-     uint64_t clamped_end = MIN(end, s->len);
-     uint64_t clamped_len = clamped_end - start;
- 
--    for (i=0; i<CURL_NUM_STATES; i++) {
-+    for (i = 0; i < CURL_NUM_STATES; i++) {
-         CURLState *state = &s->states[i];
-         uint64_t buf_end = (state->buf_start + state->buf_off);
-         uint64_t buf_fend = (state->buf_start + state->buf_len);
- 
--        if (!state->orig_buf)
--            continue;
--        if (!state->buf_off)
-+        if (!state->orig_buf || !state->buf_off) {
-             continue;
-+        }
- 
--        // Does the existing buffer cover our section?
-+        /* Does the existing buffer cover our section? */
-         if ((start >= state->buf_start) &&
-             (start <= buf_end) &&
-             (clamped_end >= state->buf_start) &&
-@@ -319,7 +320,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
-             return true;
-         }
- 
--        // Wait for unfinished chunks
-+        /* Wait for unfinished chunks */
-         if (state->in_use &&
-             (start >= state->buf_start) &&
-             (start <= buf_fend) &&
-@@ -331,7 +332,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
-             acb->start = start - state->buf_start;
-             acb->end = acb->start + clamped_len;
- 
--            for (j=0; j<CURL_NUM_ACB; j++) {
-+            for (j = 0; j < CURL_NUM_ACB; j++) {
-                 if (!state->acb[j]) {
-                     state->acb[j] = acb;
-                     return true;
-@@ -355,8 +356,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
-         msg = curl_multi_info_read(s->multi, &msgs_in_queue);
- 
-         /* Quit when there are no more completions */
--        if (!msg)
-+        if (!msg) {
-             break;
-+        }
- 
-         if (msg->msg == CURLMSG_DONE) {
-             CURLState *state = NULL;
-@@ -540,12 +542,14 @@ static void curl_clean_state(CURLState *s)
- {
-     CURLAIOCB *next;
-     int j;
-+
-     for (j = 0; j < CURL_NUM_ACB; j++) {
-         assert(!s->acb[j]);
-     }
- 
--    if (s->s->multi)
-+    if (s->s->multi) {
-         curl_multi_remove_handle(s->s->multi, s->curl);
-+    }
- 
-     while (!QLIST_EMPTY(&s->sockets)) {
-         CURLSocket *socket = QLIST_FIRST(&s->sockets);
-@@ -794,7 +798,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-         goto out_noclean;
-     }
- 
--    // Get file size
-+    /* Get file size */
- 
-     if (curl_init_state(s, state) < 0) {
-         goto out;
-@@ -802,11 +806,11 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     s->accept_range = false;
-     curl_easy_setopt(state->curl, CURLOPT_NOBODY, 1);
--    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION,
--                     curl_header_cb);
-+    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION, curl_header_cb);
-     curl_easy_setopt(state->curl, CURLOPT_HEADERDATA, s);
--    if (curl_easy_perform(state->curl))
-+    if (curl_easy_perform(state->curl)) {
-         goto out;
-+    }
-     if (curl_easy_getinfo(state->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &d)) {
-         goto out;
-     }
-@@ -876,13 +880,13 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
- 
-     qemu_mutex_lock(&s->mutex);
- 
--    // In case we have the requested data already (e.g. read-ahead),
--    // we can just call the callback and be done.
-+    /* In case we have the requested data already (e.g. read-ahead),
-+       we can just call the callback and be done. */
-     if (curl_find_buf(s, start, acb->bytes, acb)) {
-         goto out;
-     }
- 
--    // No cache found, so let's start a new request
-+    /* No cache found, so let's start a new request */
-     for (;;) {
-         state = curl_find_state(s);
-         if (state) {
--- 
-2.9.4
+The limits of the last one to be processed will win. Quoting a reply I=20
+made to Kevin on the interface test patch:
+
+>> You're right, I missed this. The test result shows that this command
+>> succeeds. Do we really want to allow other nodes to be affected with a
+>> blockdev-add? Wouldn't it be cleaner to just forbid the combination of
+>> limits and throtte-group?
+>
+>So basically only anonymous, immutable groups can be created through the=
+=20
+>driver then. All other shared group configurations must be explicitly=20
+>created with an -object / object-add syntax. I think this is a neat=20
+>separation and compromise if we allow anonymous groups. If not, we can=20
+>ignore limits on the throttle driver.
+
+So basically if we have anonymous groups, we accept limits in the driver=20
+options but only without a group-name. Without anonymous groups, we=20
+remove limits from the driver options and only use the=20
+object-add/-object commands to create throttle groups. Does this sound=20
+like a good idea? It will be more verbose for the human user. One=20
+advantage: all throttle groups can then be managed through=20
+qom-set/qom-get since they are owned by the qom tree.
+
+--gaxekyluahptihdx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmJwIgACgkQc2J8L2kN
+9xBUag/+PssQhcKSQnAotJQGaL+LX9EWjsxx+uOa5WBayYMMQ5R+pAP/4CuMrvDV
+RtEZdt1Pbp+hc5IcTCp8vbIc7iC8tVV0eVn+dzWnjI5yXEqTzyLqgoyVCbQ1MLVX
+buDyLLHI3nofYgHnPsVtI8XuwUQIp56aQ/Pu/PsAtD5fiS8YdmNtI666wQ+Vwj/9
+b+J5pO50BtIrh4v4z18a8DyqMzsdGmzBF+egWakMFmFniOFAV6nRZD8p8bGhotkY
++wT/xko2oqlyds8nZeINh1ciO2/URwi9bX8trVhBlhoZdZ6WKjkCz0+4213bCjgR
+2bi/23hfJbGKXdKB+w2xUuMZTtShzemB8hG2+7RbcqCsaNuLDTslxqL4wZeNO9GV
+fOdHElmbMhgIJTkETzTF5ktudkzyJlk+1sLbxa8cOCFWS6T2pmmKVGYItbtolbEq
+KHDEzXZzN8jGoT869PseVwj4Nkrx7MaKGQ0t8tR0C1B4spMtQ33LL0Hs8JgjE7cZ
+s9b1z/rYWxnXAtXy7Qsa3f7Qh2LmvPOSLHKwSr09XzJAVNDaCNWMD1zJkB9Y1SY3
+g5LlW3KBXdXmWHguAUVhWiVT+XRWuwUlSGTE15+9MBALnXgwIytMJkGP+Ukm1oqB
+IkLj9wDXn82ic6qWePlnrdC5ZNkOV4/NFtHKBQN+vtdqiKXRlZQ=
+=5BWh
+-----END PGP SIGNATURE-----
+
+--gaxekyluahptihdx--
