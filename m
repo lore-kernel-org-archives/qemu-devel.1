@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1df0Zj-0002r0-Gs
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:13:20 -0400
+	(envelope-from <cohuck@redhat.com>) id 1df0cD-0003qR-AE
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1df0Zf-000174-DN
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:13:19 -0400
-Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:60015)
+	(envelope-from <cohuck@redhat.com>) id 1df0c9-0001yU-3V
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:15:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1df0Zf-00015X-6j
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:13:15 -0400
-Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 1427D12AF00
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 11:13:11 +0200 (CEST)
-References: <20170808060817.2832-1-david@gibson.dropbear.id.au>
-	<20170808060817.2832-2-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5ee43f17-9797-689e-7c00-99e1375e54f9@kaod.org>
-Date: Tue, 8 Aug 2017 11:13:03 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1df0c8-0001yB-Qv
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:15:49 -0400
+Date: Tue, 8 Aug 2017 11:15:42 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170808111542.16422571@gondolin>
+In-Reply-To: <20170804165934.4d6fb98f@gondolin>
+References: <20170804112946.5247-1-cohuck@redhat.com>
+	<20170804165934.4d6fb98f@gondolin>
 MIME-Version: 1.0
-In-Reply-To: <20170808060817.2832-2-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/2] target/ppc: Implement TIDR
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] s390x: zPCI detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +27,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org
-Cc: mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, agraf@suse.de
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 08/08/2017 08:08 AM, David Gibson wrote:
-> This adds a trivial implementation of the TIDR register added in
-> POWER9.  This isn't particularly important to qemu directly - it's
-> used by accelerator modules that we don't emulate.
+On Fri, 4 Aug 2017 16:59:34 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Fri,  4 Aug 2017 13:29:37 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 >=20
-> However, since qemu isn't aware of it, its state is not synchronized
-> with KVM and therefore not migrated, which can be a problem.
-
-The Thread ID Register is defined in Power ISA 3.0B.
-
-Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-
-C.=20
-
-
+> > Next version, not so many changes from v3.
+> >=20
+> > As you might have guessed, the goals are still the same:
+> > - Being able to disable PCI support in a build completely.
+> > - Properly fencing off PCI if the relevant facility bit is not provided.
+> >=20
+> > Changes v3->v4:
+> > - introduce pci_available boolean
+> > - use pci_available to fence off setting the zcpi facility bit
+> > - collected tags
+> >=20
+> > Branch is still git://github.com/cohuck/qemu no-zpci-cpumodel =20
 >=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  target/ppc/cpu.h            | 1 +
->  target/ppc/translate_init.c | 5 +++++
->  2 files changed, 6 insertions(+)
+> make check on a build with pci disabled revealed an interesting
+> inconsistency: We create a virtio-9p-ccw device, but the base
+> virtio-9p-device is in code that is not built for !pci.
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 6ee2a26a96..f6e5413fad 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1451,6 +1451,7 @@ void ppc_compat_add_property(Object *obj, const c=
-har *name,
->  #define SPR_TEXASR            (0x082)
->  #define SPR_TEXASRU           (0x083)
->  #define SPR_UCTRL             (0x088)
-> +#define SPR_TIDR              (0x090)
->  #define SPR_MPC_CMPA          (0x090)
->  #define SPR_MPC_CMPB          (0x091)
->  #define SPR_MPC_CMPC          (0x092)
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 01723bdfec..94800cd29d 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8841,6 +8841,11 @@ static void init_proc_POWER9(CPUPPCState *env)
->      gen_spr_power8_book4(env);
->      gen_spr_power8_rpr(env);
-> =20
-> +    /* POWER9 Specific registers */
-> +    spr_register_kvm(env, SPR_TIDR, "TIDR", NULL, NULL,
-> +                     spr_read_generic, spr_write_generic,
-> +                     KVM_REG_PPC_TIDR, 0);
-> +
->      /* env variables */
->  #if !defined(CONFIG_USER_ONLY)
->      env->slb_nr =3D 32;
+> If I remove the pci dependency for hw/9pfs/ and fsdev/, things look
+> fine (at least on s390x). We probably need a different dependency,
+> though.
 >=20
+> virtio-9p maintainers, any suggestions?
+
+I have the patch below, which is ugly, but seems to work for me. Better
+ideas welcome :)
+
+=46rom 0ba6427e7ac7cef38b487d28c9dce653d8cb9a71 Mon Sep 17 00:00:00 2001
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Tue, 8 Aug 2017 11:03:38 +0200
+Subject: [PATCH] 9pfs: fix dependencies
+
+Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
+device.
+
+Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ default-configs/s390x-softmmu.mak | 1 +
+ fsdev/Makefile.objs               | 9 +++------
+ hw/Makefile.objs                  | 2 +-
+ 3 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-soft=
+mmu.mak
+index 6ab2bc65ac..7f15ab68b1 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -8,3 +8,4 @@ CONFIG_S390_FLIC=3Dy
+ CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
+ CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
+ CONFIG_WDT_DIAG288=3Dy
++CONFIG_VIRTIO_CCW=3Dy
+diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+index 659df6e187..10d8caa291 100644
+--- a/fsdev/Makefile.objs
++++ b/fsdev/Makefile.objs
+@@ -1,10 +1,7 @@
+-ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+ # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+-# only pull in the actual virtio-9p device if we also enabled virtio.
+-common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+-else
+-common-obj-y =3D qemu-fsdev-dummy.o
+-endif
++# only pull in the actual virtio-9p device if we also enabled a virtio bac=
+kend.
++common-obj-$(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),=
+$(CONFIG_VIRTIO_CCW)))=3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
++common-obj-$(call lnot, $(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG=
+_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) =3D qemu-fsdev-dummy.o
+ common-obj-y +=3D qemu-fsdev-opts.o qemu-fsdev-throttle.o
+=20
+ # Toplevel always builds this; targets without virtio will put it in
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index a2c61f6b09..10942fe0b4 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,4 +1,4 @@
+-devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(=
+CONFIG_PCI))) +=3D 9pfs/
++devices-dirs-$(call land, $(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI)=
+,$(CONFIG_VIRTIO_CCW))) +=3D 9pfs/
+ devices-dirs-$(CONFIG_SOFTMMU) +=3D acpi/
+ devices-dirs-$(CONFIG_SOFTMMU) +=3D adc/
+ devices-dirs-$(CONFIG_SOFTMMU) +=3D audio/
+--=20
+2.13.4
