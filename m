@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1df416-0006gg-OY
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:53:53 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1df44K-0007Yk-0B
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1df411-0007xU-NB
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:53:48 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34936)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1df411-0007wq-Go
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:53:43 -0400
-Received: by mail-wm0-x232.google.com with SMTP id m85so6474999wma.0
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 05:53:43 -0700 (PDT)
-Date: Tue, 8 Aug 2017 13:53:37 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170808125337.GO16801@stefanha-x1.localdomain>
-References: <20170713190116.21608-1-dgilbert@redhat.com>
-	<20170717101703.GH7163@stefanha-x1.localdomain>
-	<20170717102642.GG2106@work-vm>
-	<c6161e7a-9b03-16bf-fb20-86df6f3fd9bc@redhat.com>
-	<CAJSP0QWd7gtV21Hpr3noA0odAMhdriNkaqJtLJvbSNzoErvFdQ@mail.gmail.com>
-	<9e79cd50-c23a-2b96-4206-f505993179f5@redhat.com>
+	(envelope-from <ldoktor@redhat.com>) id 1df44E-0001g5-Nu
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:57:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53188)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1df44E-0001e4-E6
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:57:02 -0400
+References: <20170726144226.6913-1-ldoktor@redhat.com>
+	<20170726144226.6913-2-ldoktor@redhat.com>
+	<20170808123829.GM16801@stefanha-x1.localdomain>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <110c04e3-e676-c705-a6f9-de040208538e@redhat.com>
+Date: Tue, 8 Aug 2017 14:56:47 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Qa0ccP92Gc0Ko3P8"
-Content-Disposition: inline
-In-Reply-To: <9e79cd50-c23a-2b96-4206-f505993179f5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vl.c/exit: pause cpus before closing block
- devices
+In-Reply-To: <20170808123829.GM16801@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ieNPHlOtce2nPp0ngeXBjbpCXfAqBjIXq"
+Subject: Re: [Qemu-devel] [PATCH v4 01/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +29,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Prasad Pandit <ppandit@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-
---Qa0ccP92Gc0Ko3P8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ieNPHlOtce2nPp0ngeXBjbpCXfAqBjIXq
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com,
+ apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com,
+ f4bug@amsat.org
+Message-ID: <110c04e3-e676-c705-a6f9-de040208538e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 01/10] qemu.py: Pylint/style fixes
+References: <20170726144226.6913-1-ldoktor@redhat.com>
+ <20170726144226.6913-2-ldoktor@redhat.com>
+ <20170808123829.GM16801@stefanha-x1.localdomain>
+In-Reply-To: <20170808123829.GM16801@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 04, 2017 at 01:46:17PM +0200, Paolo Bonzini wrote:
-> On 04/08/2017 11:58, Stefan Hajnoczi wrote:
-> >> the root cause of this bug is related to this as well:
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg02945.html
-> >>
-> >> From commit 99723548 we started assuming (incorrectly?) that blk_
-> >> functions always WILL have an attached BDS, but this is not always tru=
-e,
-> >> for instance, flushing the cache from an empty CDROM.
-> >>
-> >> Paolo, can we move the flight counter increment outside of the
-> >> block-backend layer, is that safe?
-> > I think the bdrv_inc_in_flight(blk_bs(blk)) needs to be fixed
-> > regardless of the throttling timer issue discussed below.  BB cannot
-> > assume that the BDS graph is non-empty.
+Dne 8.8.2017 v 14:38 Stefan Hajnoczi napsal(a):
+> On Wed, Jul 26, 2017 at 04:42:17PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:=
+
+>> No actual code changes, just several pylint/style fixes and docstring
+>> clarifications.
+>>
+>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+>> ---
+>>  scripts/qemu.py | 76 ++++++++++++++++++++++++++++++++++++++++--------=
+---------
+>>  1 file changed, 53 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>> index 880e3e8..191c916 100644
+>> --- a/scripts/qemu.py
+>> +++ b/scripts/qemu.py
+>> @@ -23,8 +23,22 @@ import qmp.qmp
+>>  class QEMUMachine(object):
+>>      '''A QEMU VM'''
+>> =20
+>> -    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone, =
+test_dir=3D"/var/tmp",
+>> -                 monitor_address=3DNone, socket_scm_helper=3DNone, de=
+bug=3DFalse):
+>> +    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
+>> +                 test_dir=3D"/var/tmp", monitor_address=3DNone,
+>> +                 socket_scm_helper=3DNone, debug=3DFalse):
+>> +        '''
+>> +        Create a QEMUMachine object
+>> +
+>> +        @param binary: path to the qemu binary (str)
+>> +        @param args: initial list of extra arguments
+>> +        @param wrapper: list of arguments used as prefix to qemu bina=
+ry
+>> +        @param name: name of this object (used for log/monitor/... fi=
+le names)
+>> +        @param test_dir: base location to put log/monitor/... files i=
+n
+>> +        @param monitor_address: custom address for QMP monitor
+>> +        @param socket_scm_helper: path to scm_helper binary (to forwa=
+rd fds)
+>> +        @param debug: enable debug mode (forwarded to QMP helper and =
+such)
+>> +        @note: Qemu process is not started until launch() is used.
+>> +        '''
+>>          if name is None:
+>>              name =3D "qemu-%d" % os.getpid()
+>>          if monitor_address is None:
+>> @@ -33,12 +47,13 @@ class QEMUMachine(object):
+>>          self._qemu_log_path =3D os.path.join(test_dir, name + ".log")=
+
+>>          self._popen =3D None
+>>          self._binary =3D binary
+>> -        self._args =3D list(args) # Force copy args in case we modify=
+ them
+>> +        self._args =3D list(args)     # Force copy args in case we mo=
+dify them
+>>          self._wrapper =3D wrapper
+>>          self._events =3D []
+>>          self._iolog =3D None
+>>          self._socket_scm_helper =3D socket_scm_helper
+>>          self._debug =3D debug
+>> +        self._qmp =3D None
+>> =20
+>>      # This can be used to add an unused monitor instance.
+>>      def add_monitor_telnet(self, ip, port):
+>> @@ -64,16 +79,16 @@ class QEMUMachine(object):
+>>          if self._socket_scm_helper is None:
+>>              print >>sys.stderr, "No path to socket_scm_helper set"
+>>              return -1
+>> -        if os.path.exists(self._socket_scm_helper) =3D=3D False:
+>> +        if os.path.exists(self._socket_scm_helper) is False:
 >=20
-> Can we make bdrv_aio_* return NULL (even temporarily) if there is no
-> attached BDS?  That would make it much easier to fix.
+> PEP8 says:
+>=20
+>   Don't compare boolean values to True or False using =3D=3D.
+>=20
+> https://www.python.org/dev/peps/pep-0008/#id51
+>=20
+> This should be:
+>=20
+>   if not os.path.exists(self._socket_scm_helper):
+>=20
+Hello Stefan,
 
-There are many blk_aio_*() callers.  Returning NULL forces them to
-perform extra error handling.
+yep, you are right. I'll fix it in v5
 
-When you say "temporarily" do you mean it returns NULL but schedules a
-one-shot BH to invoke the callback?  I wonder if we can use a singleton
-aiocb instead of NULL for -ENOMEDIUM errors.
+>>      def command(self, cmd, conv_keys=3DTrue, **args):
+>> +        '''
+>> +        Invoke a QMP command and on success report result dict or on =
+failure
+>=20
+> s/report/return/ ?
+>=20
+Don't see much difference, but I'll use the "return" in the next version.=
 
-Stefan
 
---Qa0ccP92Gc0Ko3P8
+>> +        raise exception with details.
+>> +        '''
+>>          reply =3D self.qmp(cmd, conv_keys, **args)
+>>          if reply is None:
+>>              raise Exception("Monitor is closed")
+>> @@ -193,15 +216,18 @@ class QEMUMachine(object):
+>>          return events
+>> =20
+>>      def event_wait(self, name, timeout=3D60.0, match=3DNone):
+>> -        # Test if 'match' is a recursive subset of 'event'
+>> -        def event_match(event, match=3DNone):
+>> +        ''' Wait for event in QMP, optionally filter results by match=
+=2E '''
+>=20
+> Why are spaces around this docstring?
+>=20
+
+Sorry, this is a custom from other project's guidelines. I'll fix it.
+
+Luk=C3=A1=C5=A1
+
+
+--ieNPHlOtce2nPp0ngeXBjbpCXfAqBjIXq
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJZibRRAAoJEJykq7OBq3PIvGcH/1a45MioeYWuEYpoKz2s0zLd
-FPqb4TxNNKS1H21SP33tYmfAaBnCkZpYDkdlAI2hnd8DevgY8uXosS9AXKDCjeiM
-yrmpHOe+EjTtJdCax2dmIOjiTMa+nR8MczpF0BOhKGKm6UVw3+wLi14zwF2tzn35
-zCopLJE/bkFsqyNwwdKyAuUaJh1eeEU5+DRjJk3iM4ZqkMaEZb8JyaidYyfQU8Ay
-AVC6LUEmb90uSFtvA6t7j9LLawZZ7/1rHrRgjZ6/MkoSr5qxW44w6qmZFXhEAxU0
-xJkT06237ycxD94CrNH0/KoKssgi+MueFsDIf1Af4jBXtOKrgV+VZfT1C99Pf3M=
-=dyuG
+iQEwBAEBCAAaBQJZibUPExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsEr
+cAf+NYsFAVDYUwrI3P/kGdaJVEDN7rRdeU1t+/a1DZ5n6req3QRteLeI4TkJ1c1F
+V2GxpY0eGvx1P5tqiUFsDwiGSZsVyUiqouzHqWX7b3mzPihtgJPfrkD/GloL0LPA
+3sKCwDvBNqBo7ad6BYz1BQ5vjoROsj4ehI9TiXUB0HFMUlj9nOerBiUjob6mIVy7
+TxhlykDScYxwxB4iluAYGKo1X3spOkDOtJ335KbvXbStTsJdNrrzKQDmVBntzs18
+O/csLuCQy5UNoJzumHZ6GxZciThhPxs6vIXjydBb+ks+E2UFj9oQmT5egnKk0FEj
+Bo+4hgaBMwYIu2sikHqNQEqIbQ==
+=CUiw
 -----END PGP SIGNATURE-----
 
---Qa0ccP92Gc0Ko3P8--
+--ieNPHlOtce2nPp0ngeXBjbpCXfAqBjIXq--
