@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1df3fd-0005pM-Et
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:31:42 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1df3fx-0005we-3f
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:32:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1df3fY-0002UE-EV
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:31:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1df3fY-0002Tn-8t
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:31:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1df3fV-0004Ki-0m
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 12:31:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 82D0E2E80D3
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 12:31:28 +0000 (UTC)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1df3fs-0002cO-6d
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:31:57 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:20772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1df3fr-0002an-Sz
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:31:52 -0400
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87bmoxcuvn.fsf@dusky.pond.sub.org>
+	<61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
+	<87shh3fn7d.fsf@dusky.pond.sub.org>
+	<w511soml2kh.fsf@maestria.local.igalia.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
+Date: Tue, 8 Aug 2017 14:30:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 12:16:10 -0000
-From: Stefan Hajnoczi <1708462@bugs.launchpad.net>
-Reply-To: Bug 1708462 <1708462@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150176961654.13001.1653024142886908093.malonedeb@soybean.canonical.com>
-Message-Id: <150219457035.17031.2930727750473564981.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1708462] Re: Support Python 3 to build
+In-Reply-To: <w511soml2kh.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Python 2 EOL is in 2020 so there is a fair amount of time.
+On 8/8/2017 1:30 PM, Alberto Garcia wrote:
+> On Mon 07 Aug 2017 04:48:38 PM CEST, Markus Armbruster wrote:
+>>>> Awkward question for a v7, but here goes anyway: why is IOThrottle
+>>>> worth its very own .json file?
+>>> I feel this is a common throttle structure that is used by block
+>>> devices as well as fsdev, so moved to a separate file.
+>> I'm not sure that's a good idea.  Kevin, Berto, what do you think?
+>
+> Mmm... I don't have a very strong opinion, but if there's no actual need
+> to move it to a separate file I'd prefer to leave it where it is.
+The segregation is the solid reason. Because throttling is a feature 
+that is used by fsdev, block may many more in future. I do not see 
+moving it back to block does it make any sense?
 
-QEMU is transitioning to support both Python 2.6+ and 3 but most Python
-code has not been converted yet.
+Regards,
+Pradeep
 
-You are welcome to contribute patches:
-https://wiki.qemu.org/index.php/Contribute/SubmitAPatch
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1708462
-
-Title:
-  Support Python 3 to build
-
-Status in QEMU:
-  New
-
-Bug description:
-  Currently qemu's configure requires Python 2 to build.  As Python 2 is
-  rapidly approaching its EOL, it should be possible to build qemu with
-  Python 3.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1708462/+subscriptions
+>
+> Berto
+>
