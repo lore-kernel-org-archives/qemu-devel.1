@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dezDc-0006Oh-1p
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:46:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1dezGX-0007FD-JP
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:49:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dezDY-0005hf-1y
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:46:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dezDX-0005h4-SQ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:46:19 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dezDV-000413-Ih
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 07:46:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 628392E80CC
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:46:17 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1dezGT-0007ZM-J9
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:49:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dezGT-0007Yk-DM
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:49:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 21F7B61463
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:49:20 +0000 (UTC)
+Date: Tue, 8 Aug 2017 15:49:15 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170808074915.GB13486@pxdev.xzpeter.org>
+References: <1502175607-9531-1-git-send-email-peterx@redhat.com>
+	<3f0e8fe6-babd-df82-c690-de0f1ffdd460@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 07:31:06 -0000
-From: Thomas Huth <1318746@bugs.launchpad.net>
-Reply-To: Bug 1318746 <1318746@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140512165208.6408.69277.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150217746688.18876.3210911905933172146.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1318746] Re: qemu Windows 7 BSOD when using
- hv-time
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3f0e8fe6-babd-df82-c690-de0f1ffdd460@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] rcu: init globals only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-Triaging old bug tickets ... can you still reproduce this issue with the
-latest version of QEMU?
+On Tue, Aug 08, 2017 at 09:26:43AM +0200, Paolo Bonzini wrote:
+> On 08/08/2017 09:00, Peter Xu wrote:
+> > We were calling rcu_init_complete() twice in the child processes when
+> > fork happened. However the pthread library does not really suggest to do
+> > it that way:
+> > 
+> > http://pubs.opengroup.org/onlinepubs/7908799/xsh/pthread_mutex_init.html
+> > 
+> > "Attempting to initialise an already initialised mutex results in
+> >  undefined behaviour."
+> > 
+> > Actually, IMHO we can do it in a more natural way: Firstly, we only init
+> > the RCU globals once in rcu_init(). Then, in rcu_init_child(), we unlock
+> > all the locks held in rcu_init_lock() just like what we do in the parent
+> > process, then do the rest of RCU re-init (e.g., create the RCU thread).
+> 
+> This doesn't work for error-checking mutexes: rcu_init_child has a
+> different PID than the parent, so the mutexes aren't unlocked.  It's
+> also true that right now we don't use error-checking mutexes (commit
+> 24fa90499f, "qemu-thread: do not use PTHREAD_MUTEX_ERRORCHECK",
+> 2015-03-10); however, that's also a bit sad.
+> 
+> The reason for the undefined behavior is probably that some operating
+> systems allocate memory in pthread_mutex_init, and initializing twice
+> causes a memory leak.  One such operating system is OpenBSD. :(
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Good to know. :)
 
--- =
+I thought pthread_atfork() was designed to solve such a locking
+problem (in child hanlder, we unlock all the held locks). If
+PTHREAD_MUTEX_ERRORCHECK cannot coop well with it, not sure whether
+that means we should just avoid using PTHREAD_MUTEX_ERRORCHECK in such
+a use case (but we should be able to use the error checks in other
+mutexes that do not need extra fork handling)?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1318746
+Another idea is: can we just destroy the mutex first then re-init it
+in subprocess? A quick glance in libpthread code shows that at least
+pthread_mutex_destroy() won't check PTHREAD_MUTEX_ERRORCHECK.
 
-Title:
-  qemu Windows 7 BSOD when using hv-time
+Thanks,
 
-Status in QEMU:
-  Incomplete
+> 
+> Eric, you chimed in on the patch that became commit 24fa90499f, what do
+> you suggest?
+> 
+> Paolo
 
-Bug description:
-  When I use hv-time sub option and run CPU-Z or 3DMark (Physics Test)
-  the Windows 7 guest stops with BSOD (SYSTEM_SERVICE_EXCEPTION). It can
-  be easily reproduced by running CPU-Z. It will fail every second or
-  third time you execute CPU-Z and fail during "PCI detection". If I
-  disable hv-time I can run CPU-Z and 3DMark (Physics Test) without any
-  problems. QEMU was called with the following options:
-
-  /usr/bin/taskset -c 4,5,6,7 /usr/bin/qemu-system-x86_64 \
-  =C2=A0-machine q35,accel=3Dkvm,kernel_irqchip=3Don \
-  =C2=A0-enable-kvm \
-  =C2=A0-serial none \
-  =C2=A0-parallel none \
-  =C2=A0-monitor none \
-  =C2=A0-vga std \
-  =C2=A0-boot order=3Ddc \
-  =C2=A0-cpu host,hv-time \
-  =C2=A0-smp cores=3D4,threads=3D1,sockets=3D1 \
-  =C2=A0-m 8192 \
-  =C2=A0-k de \
-  =C2=A0-rtc base=3Dlocaltime \
-  =C2=A0-drive file=3D/srv/kvm/maggie-drive0.img,id=3Ddrive0,if=3Dnone,cach=
-e=3Dnone,aio=3Dthreads \
-  =C2=A0-mon chardev=3Dmonitor0 \
-  =C2=A0-chardev socket,id=3Dmonitor0,path=3D/tmp/maggie.monitor,nowait,ser=
-ver \
-  =C2=A0-netdev tap,id=3Dnet0,vhost=3Don,helper=3D/usr/lib/qemu/qemu-bridge=
--helper \
-  =C2=A0-device virtio-net-pci,netdev=3Dnet0,mac=3D00:00:00:02:01:01 \
-  =C2=A0-device virtio-blk-pci,drive=3Ddrive0,ioeventfd=3Don \
-  =C2=A0-device ioh3420,bus=3Dpcie.0,id=3Dpcie0,port=3D1,chassis=3D1,multif=
-unction=3Don
-
-  I've removed the VFIO PCI passthrough line of my GPU to make
-  reproduction easier. In any case it happens in both scenarios so VGA
-  passthrough is not the root cause. It happens with linux-3.15-rc5 and
-  linux-3.14.3 with patch from commit mentioned at
-  https://bugzilla.kernel.org/show_bug.cgi?id=3D73721#c3
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1318746/+subscriptions
+-- 
+Peter Xu
