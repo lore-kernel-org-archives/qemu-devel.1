@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1deyiL-00065W-LF
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:14:10 -0400
+	(envelope-from <cohuck@redhat.com>) id 1deyuY-0000jV-Fz
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:26:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1deyiG-0006qc-R6
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:14:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14274)
+	(envelope-from <cohuck@redhat.com>) id 1deyuT-0004Ev-Fr
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:26:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47710)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1deyiG-0006qF-Kf
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:14:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A04A75D697
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:13:59 +0000 (UTC)
-Date: Tue, 8 Aug 2017 15:13:55 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170808071355.GA13486@pxdev.xzpeter.org>
-References: <20170804175011.21944-1-dgilbert@redhat.com>
-	<874ltiee3l.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1deyuT-0004Ea-6P
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:26:37 -0400
+Date: Tue, 8 Aug 2017 09:26:27 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170808092627.4450aa05@gondolin>
+In-Reply-To: <016df631-ccf8-69bd-0211-becbecac4450@redhat.com>
+References: <1501767019-4989-1-git-send-email-thuth@redhat.com>
+	<20170807232833-mutt-send-email-mst@kernel.org>
+	<016df631-ccf8-69bd-0211-becbecac4450@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <874ltiee3l.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH f0r 2.11] runstate/migrate: Two more
- transitions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests/pxe: Check virtio-net-ccw on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Victor Kaplansky <victork@redhat.com>
 
-On Tue, Aug 08, 2017 at 09:02:54AM +0200, Juan Quintela wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > There's a race if someone does a 'stop' near the end of migrate;
-> > the migration process goes through two runstates:
-> >     'finish migrate'
-> >     'postmigrate'
-> >
-> > If the user issues a 'stop' between the two we end up with invalid
-> > state transitions.
-> > Add the transitions as valid.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> 
-> To answer Peter question:
-> 
-> int vm_stop(RunState state)
-> {
->     .... we don't care about this case ....
-> 
->     return do_vm_stop(state);
-> }
-> 
-> static int do_vm_stop(RunState state)
-> {
->     int ret = 0;
-> 
->     if (runstate_is_running()) {
->         cpu_disable_ticks();
->         pause_all_vcpus();
->         runstate_set(state);
->         vm_state_notify(0, state);
->         qapi_event_send_stop(&error_abort);
->     }
-> 
->     bdrv_drain_all();
->     replay_disable_events();
->     ret = bdrv_flush_all();
-> 
->     return ret;
-> }
-> 
-> 
-> int runstate_is_running(void)
-> {
->     return runstate_check(RUN_STATE_RUNNING);
-> }
-> 
-> 
-> So, "stop" only changes states when we are in RUNNING state.
-> The idea was that after migration, the only valid command (as in the
-> film "it should do something")is "run".
+On Tue, 8 Aug 2017 07:19:54 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Thanks for the details. :)
+> On 07.08.2017 22:35, Michael S. Tsirkin wrote:
+> > On Thu, Aug 03, 2017 at 03:30:19PM +0200, Thomas Huth wrote:  
+> >> Now that we've got a firmware that can do TFTP booting on s390x (i.e.
+> >> the pc-bios/s390-netboot.img), we can enable the PXE tester for this
+> >> architecture, too.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
--- 
-Peter Xu
+> >> @@ -81,10 +83,27 @@ int boot_sector_init(char *fname)
+> >>      }
+> >>  
+> >>      /* For Open Firmware based system, we can use a Forth script instead */
+> >> -    if (strcmp(qtest_get_arch(), "ppc64") == 0) {
+> >> +    if (g_str_equal(arch, "ppc64")) {
+> >>          len = sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c! %x %x c!\n",
+> >> -                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET,
+> >> -                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET + 1);
+> >> +                LOW(SIGNATURE), SIGNATURE_ADDR,
+> >> +                HIGH(SIGNATURE), SIGNATURE_ADDR + 1);
+> >> +    } else if (g_str_equal(arch, "s390x")) {
+> >> +        /* For s390x, fake a kernel signature */
+> >> +        const uint8_t psw[] = {
+> >> +            0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
+> >> +        };
+> >> +        const uint8_t code[] = {
+> >> +            0xa7, 0xf4, 0x00, 0x0a,     /* j 0x10010 */
+> >> +            0x00, 0x00, 0x00, 0x00,
+> >> +            'S', '3', '9', '0',
+> >> +            'E', 'P', 0x00, 0x01,
+> >> +            0xa7, 0x38, HIGH(SIGNATURE_ADDR), LOW(SIGNATURE_ADDR), /* lhi r3 */
+> >> +            0xa7, 0x48, LOW(SIGNATURE), HIGH(SIGNATURE),    /* lhi r4,0xadde */
+> >> +            0x40, 0x40, 0x30, 0x00,     /* sth r4,0(r3) */
+> >> +            0xa7, 0xf4, 0xff, 0xfa      /* j 0x10010 */
+> >> +        };
+> >> +        memcpy(boot_sector, psw, 8);
+> >> +        memcpy(&boot_sector[0x10000], code, sizeof(code));  
+> > 
+> > 
+> > Could we avoid overwriting boot sector?
+> > We really should have
+> > x86_boot_sector
+> > ppc64_boot_sector
+> > s390_boot_sector
+> > 
+> > And write out the correct thing.  
+
+That sounds good.
+
+> 
+> Ok, I don't mind either way ... I can try to come up with a patch.
+> 
+> > Also:
+> >  * Q35 machine requires a minimum 0x7e000 bytes disk.
+> >  * (bug or feature?)
+> > 
+> > probably does not apply to s390x, does it?  
+> 
+> We can also just load 0x10000 + sizeof(code) bytes here. I'll fix it.
+> 
+> Cornelia, please unqueue the patch, I'll send a v2...
+
+OK, I had not yet pushed out anyway.
