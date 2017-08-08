@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1df8lh-0001GX-El
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:58:14 -0400
+	(envelope-from <npiggin@gmail.com>) id 1df8nP-0002Tb-9O
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 14:00:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1df8lg-0002eQ-3f
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:58:13 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue,  8 Aug 2017 13:57:11 -0400
-Message-Id: <20170808175711.12203-5-jsnow@redhat.com>
-In-Reply-To: <20170808175711.12203-1-jsnow@redhat.com>
-References: <20170808175711.12203-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] block-backend: test flush op on empty
- backend
+	(envelope-from <npiggin@gmail.com>) id 1df8nM-0003Hw-0Q
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:59:59 -0400
+From: Nicholas Piggin <npiggin@gmail.com>
+Date: Wed,  9 Aug 2017 03:59:36 +1000
+Message-Id: <20170808175936.28793-1-npiggin@gmail.com>
+Subject: [Qemu-devel] [PATCH] ppc/spapr: fix unicast H_SIGNAL_SYS_RESET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,106 +17,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, pjp@redhat.com, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Kevin Wolf <kwolf@redhat.com>
+Unicast H_SIGNAL_SYS_RESET does not find the target CPU if it
+is not the current CPU.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- tests/Makefile.include     |  2 ++
- tests/test-block-backend.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+)
- create mode 100644 tests/test-block-backend.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index eb4895f..153494b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -56,6 +56,7 @@ check-unit-y += tests/test-hbitmap$(EXESUF)
- gcov-files-test-hbitmap-y = blockjob.c
- check-unit-y += tests/test-blockjob$(EXESUF)
- check-unit-y += tests/test-blockjob-txn$(EXESUF)
-+check-unit-y += tests/test-block-backend$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
-@@ -556,6 +557,7 @@ tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-o
- tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
- tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
-+tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
-diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
-new file mode 100644
-index 0000000..5348781
---- /dev/null
-+++ b/tests/test-block-backend.c
-@@ -0,0 +1,62 @@
-+/*
-+ * BlockBackend tests
-+ *
-+ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+Unfortunately this slipped through without my noticing because the
+Linux driver for NMI IPIs has a fallback to using regular IPIs, and
+because Linux did not make much use of unicasts. A new watchdog
+has started using them. After this patch, this function works properly:
+
+Watchdog CPU:0 detected Hard LOCKUP other CPUS:3
+*** Unicast NMI IPI is sent here ***
+Watchdog CPU:3 Hard LOCKUP
+Modules linked in:
+CPU: 3 PID: 1 Comm: swapper/0 Not tainted 4.13.0-rc3-00305-ge84cf82ae73a-dirty #1191
+task: c00000001e440000 task.stack: c00000001e480000
+NIP: c000000000023800 LR: c00000000000da28 CTR: c000000000626db0
+REGS: c00000001ff97d80 TRAP: 0100   Not tainted  (4.13.0-rc3-00305-ge84cf82ae73a-dirty)
+MSR: 8000000002001033 <SF,VEC,ME,IR,DR,RI,LE>
+  CR: 48000224  XER: 20000000
+CFAR: c00000000002380c SOFTE: 0 
+GPR00: c00000000000d9cc c00000001e483dc0 c000000000ebd900 000000000007d000 
+GPR04: f000000000078680 c00000001e1a0048 c00000001e1a0048 0000000000000001 
+GPR08: 0000000000000000 0000000000075036 00000003d5f633c2 0000000000000020 
+GPR12: 0000000000000000 c00000000fd80f00 c00000000000d988 0000000000000000 
+GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+GPR24: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+GPR28: 0000000000000000 0000000000000000 0000000000000000 0000000000000b60 
+NIP [c000000000023800] udelay+0x40/0x60
+LR [c00000000000da28] kernel_init+0xa8/0x1b0
+Call Trace:
+[c00000001e483dc0] [c00000000000d9cc] kernel_init+0x4c/0x1b0 (unreliable)
+[c00000001e483e30] [c00000000000bb1c] ret_from_kernel_thread+0x5c/0xc0
+Instruction dump:
+7c6349d2 7c210b78 7d4c42a6 7d2c42a6 7d2a4850 7fa34840 409d0028 48000014 
+60000000 60000000 60000000 60420000 <7d2c42a6> 7d2a4850 7fa34840 419dfff4 
+
+ hw/ppc/spapr_hcall.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 72ea5a8247..f50e979b43 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1432,7 +1432,9 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
+     } else {
+         /* Unicast */
+         CPU_FOREACH(cs) {
+-            if (cpu->cpu_dt_id == target) {
++            PowerPCCPU *c = POWERPC_CPU(cs);
 +
-+#include "qemu/osdep.h"
-+#include "block/block.h"
-+#include "sysemu/block-backend.h"
-+#include "qapi/error.h"
-+
-+static void test_drain_aio_error_flush_cb(void *opaque, int ret)
-+{
-+    bool *completed = opaque;
-+
-+    g_assert(ret == -ENOMEDIUM);
-+    *completed = true;
-+}
-+
-+static void test_drain_aio_error(void)
-+{
-+    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    BlockAIOCB *acb;
-+    bool completed = false;
-+
-+    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
-+    g_assert(acb != NULL);
-+    g_assert(completed == false);
-+
-+    blk_drain(blk);
-+    g_assert(completed == true);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    bdrv_init();
-+    qemu_init_main_loop(&error_abort);
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
-+
-+    return g_test_run();
-+}
++            if (c->cpu_dt_id == target) {
+                 run_on_cpu(cs, spapr_do_system_reset_on_cpu, RUN_ON_CPU_NULL);
+                 return H_SUCCESS;
+             }
 -- 
-2.9.4
+2.13.3
