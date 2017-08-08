@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dfBPt-0006QE-9J
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:47:54 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dfBQd-0006xw-8x
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dfBPs-0006b8-8H
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:47:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52838)
+	(envelope-from <jfreimann@redhat.com>) id 1dfBQc-0007RF-7K
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:48:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1dfBPs-0006aB-1p
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:47:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1dfBQc-0007QK-10
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:48:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B0764A700
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 20:39:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D3C03A723
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 20:39:42 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
-Date: Tue,  8 Aug 2017 22:38:55 +0200
-Message-Id: <20170808203900.7661-1-jfreimann@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/5] tests/pxe-test: add testcase using
- vhost-user-bridge
+Date: Tue,  8 Aug 2017 22:38:58 +0200
+Message-Id: <20170808203900.7661-4-jfreimann@redhat.com>
+In-Reply-To: <20170808203900.7661-1-jfreimann@redhat.com>
+References: <20170808203900.7661-1-jfreimann@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 3/5] libvhost-user: quit when no more data
+ received
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +34,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, jasowang@redhat.com, stefanha@redhat.com
 
-This implements a testcase for pxe-test using the vhost-user interface. Spawn a
-vhost-user-bridge process and connect it to the qemu process.
+From: Jens Freimann <jfreiman@redhat.com>
 
-To make the testcase work we need to apply a few patches before the actual testcase:
-- Patch 1 disables debug output of vhost-user-bridge
-- Patch 2 fixes passing a file descriptor to -netdev.  This was broken since the
-  mcast option was introduced. 
-- Patch 3 makes sure we stop processing vhost-user messages when recvmsg returns 0.
-- Patch 4 makes qtest abort handlers always work
+End processing of messages when VHOST_USER_NONE
+is received.
 
-changes v1->v2:
+Without this we run into a vubr_panic() call and get
+"PANIC: Unhandled request: 0"
 
-- new patch 4/5. Necessary to make qtest_add_abrt_handler work. 
-- get rid of hugepagefs specific code (mst)
-- use htonl and INADDR_LOOPBACK to set remote address (Stefan Hajnoczi)
-- add qtest abort handler (Stefan Hajnoczi)
-- spawn vhost-user-bridge process with flag DO_NOT_REAP_CHILD and add a child
-  watch function (Stefan Hajnoczi)
-  Killing the vubr process manually at the end of the test and watching
-  its termination with the child watch function. 
-- clean up pxe-test-disk images 
-- add Jason Wang to Cc
+Signed-off-by: Jens Freimann <jfreiman@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-regards,
-Jens
-
-Jens Freimann (5):
-  tests/vhost-user-bridge: disable debug output by default
-  net: fix -netdev socket,fd= for UDP sockets
-  libvhost-user: quit when no more data received
-  libqtest: always set up signal handler for SIGABRT 
-  tests/pxe-test: add testcase using vhost-user-bridge
-
- contrib/libvhost-user/libvhost-user.c |   4 +-
- net/socket.c                          |  37 ++++++-----
- tests/Makefile.include                |   4 +-
- tests/libqtest.c                      |   2 +-
- tests/pxe-test.c                      | 115 +++++++++++++++++++++++++++++++++-
- tests/vhost-user-bridge.c             |   2 +-
- 6 files changed, 140 insertions(+), 24 deletions(-)
-
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 9efb9dac0e..35fa0c5e56 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -161,7 +161,7 @@ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+         rc = recvmsg(conn_fd, &msg, 0);
+     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+ 
+-    if (rc <= 0) {
++    if (rc < 0) {
+         vu_panic(dev, "Error while recvmsg: %s", strerror(errno));
+         return false;
+     }
+@@ -806,6 +806,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_get_queue_num_exec(dev, vmsg);
+     case VHOST_USER_SET_VRING_ENABLE:
+         return vu_set_vring_enable_exec(dev, vmsg);
++    case VHOST_USER_NONE:
++        break;
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
 -- 
 2.13.3
