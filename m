@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df31M-0006HO-TQ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:50:05 -0400
+	(envelope-from <quintela@redhat.com>) id 1df32e-0007QA-32
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df31J-0003V0-0x
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:50:00 -0400
-References: <20170808060817.2832-1-david@gibson.dropbear.id.au>
-	<20170808060817.2832-3-david@gibson.dropbear.id.au>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <54c9ef1f-b41c-3ac6-9497-6bec8e5a3a8c@redhat.com>
-Date: Tue, 8 Aug 2017 13:49:52 +0200
+	(envelope-from <quintela@redhat.com>) id 1df32a-0004WZ-51
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:51:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df32Z-0004W0-RT
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:51:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C02DF81235
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 11:51:14 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170720102945.GC2101@work-vm> (David Alan Gilbert's message of
+	"Thu, 20 Jul 2017 11:29:46 +0100")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-14-quintela@redhat.com>
+	<20170720102945.GC2101@work-vm>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 Aug 2017 13:51:11 +0200
+Message-ID: <871som9t1s.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170808060817.2832-3-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.10 2/2] target/ppc: Add
- stub implementation of the PSSCR
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 13/17] migration: Create thread
+ infrastructure for multifd recv side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +36,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On 08.08.2017 08:08, David Gibson wrote:
-> The PSSCR register added in POWER9 controls certain power saving mode
-> behaviours.  Mostly, it's not relevant to TCG, however because qemu
-> doesn't know about it yet, it doesn't synchronize the state with KVM,
-> and thus it doesn't get migrated.
-> 
-> To fix that, this adds a minimal stub implementation of the register.
-> This isn't complete, even to the extent that an implementation is
-> possible in TCG, just enough to get migration working.  We need to
-> come back later and at least properly filter the various fields in the
-> register based on privilege level.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  target/ppc/cpu.h            | 1 +
->  target/ppc/translate_init.c | 5 +++++
->  2 files changed, 6 insertions(+)
-> 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index f6e5413fad..46d3dd88f6 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1771,6 +1771,7 @@ void ppc_compat_add_property(Object *obj, const char *name,
->  #define SPR_IC                (0x350)
->  #define SPR_VTB               (0x351)
->  #define SPR_MMCRC             (0x353)
-> +#define SPR_PSSCR             (0x357)
->  #define SPR_440_INV0          (0x370)
->  #define SPR_440_INV1          (0x371)
->  #define SPR_440_INV2          (0x372)
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 94800cd29d..8fb407ed73 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8846,6 +8846,11 @@ static void init_proc_POWER9(CPUPPCState *env)
->                       spr_read_generic, spr_write_generic,
->                       KVM_REG_PPC_TIDR, 0);
->  
-> +    /* FIXME: Filter fields properly based on privilege level */
-> +    spr_register_kvm_hv(env, SPR_PSSCR, "PSSCR", NULL, NULL, NULL, NULL,
-> +                        spr_read_generic, spr_write_generic,
-> +                        KVM_REG_PPC_PSSCR, 0);
-> +
->      /* env variables */
->  #if !defined(CONFIG_USER_ONLY)
->      env->slb_nr = 32;
-> 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> We make the locking and the transfer of information specific, even if we
+>> are still receiving things through the main thread.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/ram.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
+>>  1 file changed, 60 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index ac0742f..49c4880 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -49,6 +49,7 @@
+>>  #include "migration/colo.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "qemu/uuid.h"
+>> +#include "qemu/iov.h"
+>>  
+>>  /***********************************************************/
+>>  /* ram save/restore */
+>> @@ -527,7 +528,7 @@ int multifd_save_setup(void)
+>>      return 0;
+>>  }
+>>  
+>> -static int multifd_send_page(uint8_t *address)
+>> +static uint16_t multifd_send_page(uint8_t *address, bool last_page)
+>>  {
+>>      int i, j;
+>>      MultiFDSendParams *p = NULL; /* make happy gcc */
+>> @@ -543,8 +544,10 @@ static int multifd_send_page(uint8_t *address)
+>>      pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
+>>      pages.num++;
+>>  
+>> -    if (pages.num < (pages.size - 1)) {
+>> -        return UINT16_MAX;
+>> +    if (!last_page) {
+>> +        if (pages.num < (pages.size - 1)) {
+>> +            return UINT16_MAX;
+>> +        }
+>>      }
+>
+> This doesn't feel like it should be in a recv patch.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+I will change it, until here we don't need it :p
+
+>
+>>      qemu_sem_wait(&multifd_send_state->sem);
+>> @@ -572,12 +575,17 @@ static int multifd_send_page(uint8_t *address)
+>>  }
+>>  
+>>  struct MultiFDRecvParams {
+>> +    /* not changed */
+>>      uint8_t id;
+>>      QemuThread thread;
+>>      QIOChannel *c;
+>> +    QemuSemaphore ready;
+>>      QemuSemaphore sem;
+>>      QemuMutex mutex;
+>> +    /* proteced by param mutex */
+>>      bool quit;
+>> +    multifd_pages_t pages;
+>> +    bool done;
+>>  };
+>>  typedef struct MultiFDRecvParams MultiFDRecvParams;
+>
+> The params between Send and Recv keep looking very similar; I wonder
+> if we can share them.
+
+We use other parameters.  We could do, but I am not sure if it makes
+sense the trouble.
+
+>>   * save_page_header: write page header to wire
+>>   *
+>> @@ -1155,7 +1210,7 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+>>          ram_counters.transferred +=
+>>              save_page_header(rs, rs->f, block,
+>>                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>> -        fd_num = multifd_send_page(p);
+>> +        fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
+>
+> I think that belongs in the previous patch and probably answers one of
+> my questions.
+
+Ok, I change that.
