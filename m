@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1df2Lc-0006Gl-6R
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:06:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1df2N4-0007Bc-Qa
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:08:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1df2Lb-000186-0A
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:06:52 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170726140218.15904-1-eblake@redhat.com>
-	<20170726140218.15904-4-eblake@redhat.com>
-Date: Tue, 08 Aug 2017 13:06:42 +0200
-In-Reply-To: <20170726140218.15904-4-eblake@redhat.com> (Eric Blake's message
-	of "Wed, 26 Jul 2017 09:02:18 -0500")
-Message-ID: <877eye48u5.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1df2N1-0002KG-Ls
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 07:08:22 -0400
+References: <20170808060817.2832-1-david@gibson.dropbear.id.au>
+	<20170808060817.2832-2-david@gibson.dropbear.id.au>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4cb0d894-a6de-9b2c-f51c-59672c854212@redhat.com>
+Date: Tue, 8 Aug 2017 13:08:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/3] maint: Include bug-reporting info in
- --help output.
+In-Reply-To: <20170808060817.2832-2-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.10 1/2] target/ppc:
+ Implement TIDR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <laurent@vivier.eu>, pbonzini@redhat.com, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
-
-> These days, many programs are including a bug-reporting address,
-> or better yet, a link to the project web site, at the tail of
-> their --help output.  However, we were not very consistent at
-> doing so: only qemu-nbd and qemu-qa mentioned anything, with the
-> latter pointing to an individual person instead of the project.
->
-> Add a new #define that sets up a uniform string, mentioning both
-> bug reporting instructions and overall project details, and which
-> a downstream vendor could tweak if they want bugs to go to a
-> downstream database.  Then use it in all of our binaries which
-> have --help output.
->
-> The canned text intentionally references http:// instead of https://
-> because our https website currently causes certificate errors in
-> some browsers.  That can be tweaked later once we have resolved the
-> web site issued.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 08.08.2017 08:08, David Gibson wrote:
+> This adds a trivial implementation of the TIDR register added in
+> POWER9.  This isn't particularly important to qemu directly - it's
+> used by accelerator modules that we don't emulate.
+> 
+> However, since qemu isn't aware of it, its state is not synchronized
+> with KVM and therefore not migrated, which can be a problem.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  include/qemu-common.h | 5 +++++
->  vl.c                  | 4 +++-
->  bsd-user/main.c       | 2 ++
->  linux-user/main.c     | 4 +++-
->  qemu-img.c            | 2 +-
->  qemu-io.c             | 5 +++--
->  qemu-nbd.c            | 2 +-
->  qga/main.c            | 2 +-
->  8 files changed, 19 insertions(+), 7 deletions(-)
->
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index b5adbfa5e9..e751361458 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -22,6 +22,11 @@
->  #define QEMU_COPYRIGHT "Copyright (c) 2003-2017 " \
->      "Fabrice Bellard and the QEMU Project developers"
->
-> +/* Bug reporting information for --help arguments, About dialogs, etc */
-> +#define QEMU_BUGREPORTS \
-> +    "See <http://qemu.org/contribute/report-a-bug> for bug reports.\n" \
-
-"See ... for bug reports" sounds like it's about browsing existing bugs.
-The web page is actually about reporting bugs.  What about "for how to
-report bugs"?
-
-Since I'm basically bikeshedding already: the macro expands into more
-than just bug reporting.  Call it QEMU_HELP_BOTTOM?  Feel free to ignore
-this one.
-
-> +    "More information on the qemu project at <http://qemu.org>"
-
-"QEMU project"
-
+>  target/ppc/cpu.h            | 1 +
+>  target/ppc/translate_init.c | 5 +++++
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 6ee2a26a96..f6e5413fad 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1451,6 +1451,7 @@ void ppc_compat_add_property(Object *obj, const char *name,
+>  #define SPR_TEXASR            (0x082)
+>  #define SPR_TEXASRU           (0x083)
+>  #define SPR_UCTRL             (0x088)
+> +#define SPR_TIDR              (0x090)
+>  #define SPR_MPC_CMPA          (0x090)
+>  #define SPR_MPC_CMPB          (0x091)
+>  #define SPR_MPC_CMPC          (0x092)
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 01723bdfec..94800cd29d 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8841,6 +8841,11 @@ static void init_proc_POWER9(CPUPPCState *env)
+>      gen_spr_power8_book4(env);
+>      gen_spr_power8_rpr(env);
+>  
+> +    /* POWER9 Specific registers */
+> +    spr_register_kvm(env, SPR_TIDR, "TIDR", NULL, NULL,
+> +                     spr_read_generic, spr_write_generic,
+> +                     KVM_REG_PPC_TIDR, 0);
 > +
->  /* main function, renamed */
->  #if defined(CONFIG_COCOA)
->  int qemu_main(int argc, char **argv, char **envp);
+>      /* env variables */
+>  #if !defined(CONFIG_USER_ONLY)
+>      env->slb_nr = 32;
+> 
 
-Getting late for 2.10, but it's such a lovely little improvement...
+In case you respin: Maybe consider to put this into a separate
+gen_spr_power9() function that we could re-use on POWER10 (if appropriate)?
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
