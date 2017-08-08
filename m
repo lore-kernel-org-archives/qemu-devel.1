@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df69r-000536-UB
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:11:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1df6AJ-0005Qx-Fj
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df69q-0005aj-OS
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:10:59 -0400
-Date: Tue, 8 Aug 2017 16:10:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170808151005.GL2081@work-vm>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-11-git-send-email-armbru@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1df6AH-0005nT-BW
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:11:27 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:33804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1df6AH-0005lX-6Q
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:11:25 -0400
+Received: by mail-wm0-x232.google.com with SMTP id t138so7146138wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 08:11:23 -0700 (PDT)
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-19-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170728053610.15770-19-f4bug@amsat.org>
+Date: Tue, 08 Aug 2017 16:11:20 +0100
+Message-ID: <87mv7aumav.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1502117160-24655-11-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 10/56] hmp: Make balloon's argument
- unsigned
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 18/47] MAINTAINERS: add missing TCG entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> The previous commit made it unsigned in QMP.  Switch HMP's args_type
-> from 'M' to 'o'.  Loses support for expressions (QEMU pocket
-> calculator), gains support for units other than mebibytes.  Negative
-> values are no longer accepted and interpreted modulo 2^64.  Instead,
-> values between 2^63 and 2^64-1 are now accepted.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hmp-commands.hx | 2 +-
->  hmp.c           | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 1941e19..46ce79c 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1433,7 +1433,7 @@ ETEXI
->  
->      {
->          .name       = "balloon",
-> -        .args_type  = "value:M",
-> +        .args_type  = "value:o",
->          .params     = "target",
->          .help       = "request VM to change its memory allocation (in MB)",
->          .cmd        = hmp_balloon,
-> diff --git a/hmp.c b/hmp.c
-> index 4556045..1932a11 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -781,7 +781,7 @@ void hmp_info_balloon(Monitor *mon, const QDict *qdict)
->          return;
->      }
->  
-> -    monitor_printf(mon, "balloon: actual=%" PRIu64 "\n", info->actual >> 20);
-> +    monitor_printf(mon, "balloon: actual=%" PRId64 "\n", info->actual >> 20);
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8cb94af6c5..6b83dac812 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1633,6 +1633,7 @@ Common code
+>  M: Richard Henderson <rth@twiddle.net>
+>  S: Maintained
+>  F: tcg/
+> +F: disas.c
 
-That looks like a partial reversion of the last patch ?
+Is this really TCG only? Can't the monitor call monitor_disas in any
+mode?
 
-Dave
+>
+>  AArch64 target
+>  M: Claudio Fontana <claudio.fontana@huawei.com>
 
->      qapi_free_BalloonInfo(info);
->  }
-> @@ -1178,7 +1178,7 @@ void hmp_block_passwd(Monitor *mon, const QDict *qdict)
->  
->  void hmp_balloon(Monitor *mon, const QDict *qdict)
->  {
-> -    int64_t value = qdict_get_int(qdict, "value");
-> +    uint64_t value = qdict_get_uint(qdict, "value");
->      Error *err = NULL;
->  
->      qmp_balloon(value, &err);
-> -- 
-> 2.7.5
-> 
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Bennée
