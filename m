@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1df6RI-0000TB-3N
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:29:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1df6S4-00016r-GE
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:29:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1df6RE-0005xv-5Y
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:29:00 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38249)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1df6RD-0005wc-TL
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:28:56 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id m85so10047933wma.1
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 08:28:55 -0700 (PDT)
-From: Dmitry Fleytman <dmitry@daynix.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-Id: <3285CAA7-C1B4-4958-86F3-3F8124CAD1B7@daynix.com>
-Date: Tue, 8 Aug 2017 18:28:51 +0300
-Subject: [Qemu-devel] xhci issues with Logitech,
- Inc. Headset H340 audio device
+	(envelope-from <pbonzini@redhat.com>) id 1df6S1-0006dd-CG
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:29:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1df6S1-0006dB-32
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:29:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DB766148D
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 15:29:44 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-116-237.ams2.redhat.com
+	[10.36.116.237])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 85A3370958
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 15:29:43 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  8 Aug 2017 17:29:33 +0200
+Message-Id: <20170808152941.11247-2-pbonzini@redhat.com>
+In-Reply-To: <20170808152941.11247-1-pbonzini@redhat.com>
+References: <20170808152941.11247-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 1/9] rcu: completely disable pthread_atfork
+ callbacks as soon as possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +34,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: qemu-devel@nongnu.org
 
-Hi Gerd, qemu-devel
+Because of -daemonize, system mode QEMU sometimes needs to fork() and
+keep RCU enabled in the child.  However, there is a possible deadlock
+with synchronize_rcu:
 
-We are trying to use USB host device assignment to propagate
-Logitech H340 headset to QEMU guest with virtual XHCI controller
-running Windows 10.
+- the CPU thread is inside a RCU critical section and wants to take
+  the BQL in order to do MMIO
 
-For some reason headphone function of the device does not work -
-guest OS claims that the device does not complete requests.
+- the monitor thread, which is owning the BQL, calls rcu_init_lock
+  which tries to take the rcu_sync_lock
 
-We have a bunch of other devices that work, also, the same device =
-operates properly when:
+- the call_rcu thread has taken rcu_sync_lock in synchronize_rcu, but
+  synchronize_rcu needs the CPU thread to end the critical section
+  before returning.
 
-1. connected to physical machine running Windows 10,
-2. assigned to the same QEMU VM running Ubuntu Linux or Windows 7,
-3. assigned to QEMU VM with virtual OHCI controller and Windows 10.
+This cannot happen for user-mode emulation, because it does not have
+a BQL.
 
-=46rom what we see, the difference between this Logitech device and =
-other devices that work
-is that it exposes Isochronous Synch Endpoint (see USB audio spec =
-3.7.2.2) for headphones function.
+To fix it, assume that system mode QEMU only forks in preparation for
+exec (except when daemonizing) and disable pthread_atfork as soon as
+the double fork has happened.
 
-Windows traces show (AFAICT, they are pretty cryptic) that the device =
-does not properly complete
-isochronous IN transfers issued for this endpoint.
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qemu/rcu.h |  6 ++++++
+ util/rcu.c         | 20 ++++++++++++++++++++
+ vl.c               |  1 +
+ 3 files changed, 27 insertions(+)
 
-The difference between the problematic guest OS (Windows 10) and working
-guest OS (Ubuntu Linux) is that Windows 10 driver uses event data TRB =
-entries
-for completion notification while Linux sets IOC bit in data transfer =
-TRB descriptors.
-This difference exists for both ISO IN and ISO OUT endpoints of =
-headphones function.
-
-On QEMU side it looks like guest sends a bunch of ISO OUT requests with =
-data,
-1 ISO is request to synch endpoint and then hangs reading MFINDEX =
-register repeatedly.
-
-Of course QEMU processes this ISO IN request and issues data transfer =
-event
-TRB which is visible in sniffer running on the guest side (Wireshark).
-QEMU also generates events for all ISO OUT transfers, they are visible =
-in
-the sniffer as well.
-
-There is a separate parts of logic in XHCI controller code responsible =
-for generation
-of Event Data Transfer Event TRBs and this code works properly as far as =
-we can tell.
-
-Do you have any idea about what could be wrong with this device or =
-corresponding XHCI code?
-Do you see any additional research directions or places to look into?
-
-Thank you in advance,
-Dmitry=
+diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+index 83ae2808be..c0da9907e8 100644
+--- a/include/qemu/rcu.h
++++ b/include/qemu/rcu.h
+@@ -105,6 +105,12 @@ extern void synchronize_rcu(void);
+  */
+ extern void rcu_register_thread(void);
+ extern void rcu_unregister_thread(void);
++
++/*
++ * Support for fork().  fork() support is enabled at startup.
++ */
++extern void rcu_enable_atfork(void);
++extern void rcu_disable_atfork(void);
+ extern void rcu_after_fork(void);
+ 
+ struct rcu_head;
+diff --git a/util/rcu.c b/util/rcu.c
+index 9adc5e4a36..2142ddd93b 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -318,15 +318,35 @@ static void rcu_init_complete(void)
+     rcu_register_thread();
+ }
+ 
++static int atfork_depth = 1;
++
++void rcu_enable_atfork(void)
++{
++    atfork_depth++;
++}
++
++void rcu_disable_atfork(void)
++{
++    atfork_depth--;
++}
++
+ #ifdef CONFIG_POSIX
+ static void rcu_init_lock(void)
+ {
++    if (atfork_depth < 1) {
++        return;
++    }
++
+     qemu_mutex_lock(&rcu_sync_lock);
+     qemu_mutex_lock(&rcu_registry_lock);
+ }
+ 
+ static void rcu_init_unlock(void)
+ {
++    if (atfork_depth < 1) {
++        return;
++    }
++
+     qemu_mutex_unlock(&rcu_registry_lock);
+     qemu_mutex_unlock(&rcu_sync_lock);
+ }
+diff --git a/vl.c b/vl.c
+index 99fcfa0442..8967115514 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4121,6 +4121,7 @@ int main(int argc, char **argv, char **envp)
+     set_memory_options(&ram_slots, &maxram_size, machine_class);
+ 
+     os_daemonize();
++    rcu_disable_atfork();
+ 
+     if (pid_file && qemu_create_pidfile(pid_file) != 0) {
+         error_report("could not acquire pid file: %s", strerror(errno));
+-- 
+2.13.3
