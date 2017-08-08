@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df6AS-0005ah-Ra
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:11:38 -0400
+	(envelope-from <lersek@redhat.com>) id 1df6B9-0006BU-78
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:12:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df6AR-0005tn-Ik
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:11:36 -0400
-References: <20170807161529.3779-1-berto@igalia.com>
-	<20170808100030.GB16801@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e8e9540-8644-af56-b658-932bc4b0f514@redhat.com>
-Date: Tue, 8 Aug 2017 10:11:27 -0500
+	(envelope-from <lersek@redhat.com>) id 1df6B7-0006Ak-1n
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:12:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1df6B6-0006A4-Rd
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:12:16 -0400
+References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
+	<1501964858-5159-6-git-send-email-zuban32s@gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <87e569e6-e1ec-4238-e073-38c0e136af0d@redhat.com>
+Date: Tue, 8 Aug 2017 17:11:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170808100030.GB16801@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EEtGtbsSPCDmAOhJ0VibXTkKnej9Mu1oe"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] throttle: Make LeakyBucket.avg
- and LeakyBucket.max integer types
+In-Reply-To: <1501964858-5159-6-git-send-email-zuban32s@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] docs: update documentation
+ considering PCIE-PCI bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, seabios@seabios.org, kevin@koconnor.net, kraxel@redhat.com, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EEtGtbsSPCDmAOhJ0VibXTkKnej9Mu1oe
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <9e8e9540-8644-af56-b658-932bc4b0f514@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] throttle: Make LeakyBucket.avg and
- LeakyBucket.max integer types
-References: <20170807161529.3779-1-berto@igalia.com>
- <20170808100030.GB16801@stefanha-x1.localdomain>
-In-Reply-To: <20170808100030.GB16801@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+one comment below
 
-On 08/08/2017 05:00 AM, Stefan Hajnoczi wrote:
-> On Mon, Aug 07, 2017 at 07:15:29PM +0300, Alberto Garcia wrote:
->> Both the throttling limits set with the throttling.iops-* and
->> throttling.bps-* options and their QMP equivalents defined in the
->> BlockIOThrottle struct are integer values.
->>
->> Those limits are also reported in the BlockDeviceInfo struct and they
->> are integers there as well.
->>
->> Therefore there's no reason to store them internally as double and do
->> the conversion everytime we're setting or querying them, so this patch=
+On 08/05/17 22:27, Aleksandr Bezzubikov wrote:
 
->> uses int64_t for those types.
->>
+> +Capability layout (defined in include/hw/pci/pci_bridge.h):
+> +
+> +    uint8_t id;     Standard PCI capability header field
+> +    uint8_t next;   Standard PCI capability header field
+> +    uint8_t len;    Standard PCI vendor-specific capability header field
+> +
+> +    uint8_t type;   Red Hat vendor-specific capability type
+> +                    List of currently existing types:
+> +                        QEMU_RESERVE = 1
+> +
+> +
+> +    uint32_t bus_res;   Minimum number of buses to reserve
+> +
+> +    uint64_t io;        IO space to reserve
+> +    uint64_t mem        Non-prefetchable memory to reserve
+> +    uint64_t mem_pref;  Prefetchable memory to reserve
 
-> Why is this marked for-2.10?  Does it fix a bug?
+(I apologize if I missed any concrete points from the past messages
+regarding this structure.)
 
-Theoretically, converting between int64_t and double loses precision on
-any values larger than 2^53.  In all practicality, though, if you expect
-throttling to be precise through 2^53 (approximately 16 orders of
-magnitude), you're crazy.  I also don't see any change to potential
-division-by-zero actions (where differences in NaN vs. SIGFPE each have
-their own advantages, but changing between them can be construed as a
-bug fix).  So I'm also having a hard time seeing this as 2.10 material.
+How is the firmware supposed to know whether the prefetchable MMIO
+reservation should be made in 32-bit or 64-bit address space? If we
+reserve prefetchable MMIO outside of the 32-bit address space, then
+hot-plugging a device without 64-bit MMIO support could fail.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+My earlier request, to distinguish "prefetchable_32" from
+"prefetchable_64" (mutually exclusively), was so that firmware would
+know whether to restrict the MMIO reservation to 32-bit address space.
 
+This is based on an earlier email from Alex to me:
 
---EEtGtbsSPCDmAOhJ0VibXTkKnej9Mu1oe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On 10/03/16 18:01, Alex Williamson wrote:
+> I don't think there's such a thing as a 64-bit non-prefetchable
+> aperture.  In fact, there are not separate 32 and 64 bit prefetchable
+> apertures.  The apertures are:
+>
+> I/O base/limit - (default 16bit, may be 32bit)
+> Memory base/limit - (32bit only, non-prefetchable)
+> Prefetchable Memory base/limit - (default 32bit, may be 64bit)
+>
+> This is according to Table 3-2 in the PCI-to-PCI bridge spec rev 1.2.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+I don't care much about the 16-bit vs. 32-bit IO difference (that's
+entirely academic and the Platform Spec init doesn't even provide a way
+for OVMF to express such a difference). However, the optional
+restriction to 32-bit matters for the prefetchable MMIO aperture.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmJ1J8ACgkQp6FrSiUn
-Q2oS6QgArsJ9T85rJnKURO5MQL+lRocaUacAP/pquOIE79LJVttjAiDkv+2aKpX8
-BvAicUkWZ4q2vUAdyzyhXnCtjFOnjj8tgi4pxjbRiQrQOUwsKUxBrJLTFA2rOb7s
-X1RUTqkt94rJgDK7Qf9MnUw41myzkn5nbHSFuY10NhlqiVZ6pJkwK6gQssitdiJv
-/DeGDy3rksTlwQ38Fx5t/o5QfV1UUi76gyAI8YF2jesUvg3HqVfpg53BG43Arz0+
-hDDRNtSZJA5aBre8S4ycqfCp1ft42bZUYmnDUmx8x+PPR3WXTqNmAqQY8oM1JRs7
-fKPs4TE9ospTMnRgNH4LRf+FWGZd3w==
-=LLcv
------END PGP SIGNATURE-----
+Other than this, the patch looks good to me, and I'm ready to R-b.
 
---EEtGtbsSPCDmAOhJ0VibXTkKnej9Mu1oe--
+Thanks!
+Laszlo
