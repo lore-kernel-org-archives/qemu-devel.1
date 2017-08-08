@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1des4m-0003MN-JA
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:08:53 -0400
+	(envelope-from <joseph_myers@mentor.com>) id 1descl-0004GQ-Ow
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1des4h-0005KC-KK
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:08:48 -0400
-References: <20170803163353.19558-1-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3fdaf7c5-591e-4702-126d-b6013a12a690@redhat.com>
-Date: Mon, 7 Aug 2017 20:08:29 -0400
+	(envelope-from <joseph_myers@mentor.com>) id 1descg-0006th-IQ
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:43:55 -0400
+Received: from relay1.mentorg.com ([192.94.38.131]:41374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joseph_myers@mentor.com>)
+	id 1descg-0006sY-Bu
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:43:50 -0400
+Date: Tue, 8 Aug 2017 00:43:38 +0000
+From: Joseph Myers <joseph@codesourcery.com>
+Message-ID: <alpine.DEB.2.20.1708080041391.28702@digraph.polyomino.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170803163353.19558-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 for-2.10 0/4] improved
- --version/--help tweaks
+Content-Type: text/plain; charset="US-ASCII"
+Subject: [Qemu-devel] [PATCH] target/i386: set rip_offset for some SSE4.1
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, berrange@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
+When emulating various SSE4.1 instructions such as pinsrd, the address
+of a memory operand is computed without allowing for the 8-bit
+immediate operand located after the memory operand, meaning that the
+memory operand uses the wrong address in the case where it is
+rip-relative.  This patch adds the required rip_offset setting for
+those instructions, so fixing some GCC test failures (13 in the gcc
+testsuite in my GCC 6-based testing) when testing with a default CPU
+setting enabling those instructions.
 
+Signed-off-by: Joseph Myers <joseph@codesourcery.com>
 
-On 08/03/2017 12:33 PM, Eric Blake wrote:
-> Not sure if this should go through Kevin's block tree, Paolo's
-> miscellaneous patches, or if I should just do a pull request
-> myself (since patch 4 includes a change to qemu-nbd)
-> 
-> since v2: add R-b on 2-4; also sort 'qemu-img --help' create text
-> 
-> 001/4:[0012] [FC] 'qemu-img: Sort sub-command names in --help'
-> 002/4:[----] [--] 'qemu-io: Give more --version information'
-> 003/4:[----] [--] 'qga: Give more --version information'
-> 004/4:[----] [--] 'maint: Include bug-reporting info in --help output'
-> 
-> Eric Blake (4):
->   qemu-img: Sort sub-command names in --help
->   qemu-io: Give more --version information
->   qga: Give more --version information
->   maint: Include bug-reporting info in --help output
-> 
->  include/qemu-common.h |  5 +++++
->  vl.c                  |  4 +++-
->  bsd-user/main.c       |  2 ++
->  linux-user/main.c     |  4 +++-
->  qemu-img.c            |  2 +-
->  qemu-io.c             |  9 ++++++---
->  qemu-nbd.c            |  2 +-
->  qga/main.c            |  8 +++++---
->  qemu-img-cmds.hx      | 21 ++++++++++++---------
->  9 files changed, 38 insertions(+), 19 deletions(-)
-> 
+---
 
-Nothing to keep the commands from going out of order again, it looks
-like -- can this be added as a comment or otherwise scripted as a
-./hey_it_looks_like_you_are_about_to_release_qemu.sh script that makes
-sure we've dotted the 'i's and crossed the 't's?
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index cab9e32..5fdadf9 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -4080,6 +4080,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             if (sse_fn_eppi == SSE_SPECIAL) {
+                 ot = mo_64_32(s->dflag);
+                 rm = (modrm & 7) | REX_B(s);
++                s->rip_offset = 1;
+                 if (mod != 3)
+                     gen_lea_modrm(env, s, modrm);
+                 reg = ((modrm >> 3) & 7) | rex_r;
 
-Lastly, Didn't we fix the certificate issue? (I thought Jeff had) -- and
-even if not, it's still the correct address to send people to IMO. Let
-people report to us if the SSL certificate appears to be broken.
-
-Eh, regardless of shed coloring:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+-- 
+Joseph S. Myers
+joseph@codesourcery.com
