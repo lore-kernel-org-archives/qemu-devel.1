@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfBF0-0007K9-MT
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:36:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dfBI2-0008GV-5O
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfBEz-0007C9-HA
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:36:38 -0400
-References: <20170808183306.27474-1-jsnow@redhat.com>
-	<20170808183306.27474-4-jsnow@redhat.com>
-	<45a96c91-8261-d1f7-e312-3d872051e7d8@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9ec1df21-4083-8e94-b5ed-46833c15c36c@redhat.com>
-Date: Tue, 8 Aug 2017 15:36:24 -0500
-MIME-Version: 1.0
-In-Reply-To: <45a96c91-8261-d1f7-e312-3d872051e7d8@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="B6QlO0O7Mj92I5A0bO9OFkh2gQH6sGxfv"
-Subject: Re: [Qemu-devel] [PATCH 3/9] IDE: add tracing for data ports
+	(envelope-from <ehabkost@redhat.com>) id 1dfBHz-0000II-19
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:39:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dfBHy-0000HT-RX
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:39:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CB1857DD0B
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 20:39:41 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue,  8 Aug 2017 17:39:30 -0300
+Message-Id: <20170808203935.30021-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11 v2 0/5] qmp-shell non-interactive mode,
+ delete scripts/qmp/qmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---B6QlO0O7Mj92I5A0bO9OFkh2gQH6sGxfv
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <9ec1df21-4083-8e94-b5ed-46833c15c36c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/9] IDE: add tracing for data ports
-References: <20170808183306.27474-1-jsnow@redhat.com>
- <20170808183306.27474-4-jsnow@redhat.com>
- <45a96c91-8261-d1f7-e312-3d872051e7d8@redhat.com>
-In-Reply-To: <45a96c91-8261-d1f7-e312-3d872051e7d8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This series adds the ability to run QMP commands
+non-interactively to qmp-shell, and deletes scripts/qmp/qmp.
 
-On 08/08/2017 03:30 PM, Eric Blake wrote:
-> On 08/08/2017 01:33 PM, John Snow wrote:
->> To be used sparingly, but still interesting in the case of small
->> firmwares designed to reproduce bugs in QEMU IDE.
->=20
-> Is that because the trace would fire so frequently in normal usage that=
+Changes v1 -> v2:
+* Use optparse module instead of argparse. optparse is deprecated
+  since Python 2.7, but argparse is not available on Python 2.6,
+  the minimum Python version required to build QEMU.
+  * Reported-by: Stefan Hajnoczi <stefanha@gmail.com>
+  * Suggested-by: "Daniel P. Berrange" <berrange@redhat.com>
 
-> it will drown the user in noise?
->=20
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  hw/ide/core.c | 12 +++++++++++-
->>  1 file changed, 11 insertions(+), 1 deletion(-)
->>
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+Eduardo Habkost (5):
+  qmp-shell: Use optparse module
+  qmp-shell: Pass split cmdargs to __build_cmd()
+  qmp-shell: execute_cmdargs() method
+  qmp-shell: Accept QMP command as argument
+  Remove scripts/qmp/qmp
 
-Argh. I had two compose windows open at once. R-b is only valid if you
-fix the time-traveling trace-events changes :)
+ scripts/qmp/qmp       | 126 --------------------------------------------------
+ scripts/qmp/qmp-shell |  87 ++++++++++++++++------------------
+ 2 files changed, 39 insertions(+), 174 deletions(-)
+ delete mode 100755 scripts/qmp/qmp
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---B6QlO0O7Mj92I5A0bO9OFkh2gQH6sGxfv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmKIMgACgkQp6FrSiUn
-Q2rhaAf+LTZL/UsIYZ+gNk4pOaaECizeWol1J96Lw3Oi5VZ5vG/MVbHornFt7e8T
-FbEvBLsdkf9oyyMqCo8VrbBYDK3D1oSoGZv7NwksMn7knMYvrNeM6r1v+c4YV/LF
-DkjsRqfU5uULPu7LMyoeDNMleMv+bt/QMVCZQTG6ovbvkYjIgiuoGmWDFEkeN/ov
-wYbt1xAYFtAmn6T9hXR70+l1t8TpNAuDfKPGTs3le43W6pBRzSJYrbh3FlUaAgxr
-DvyBOhWD70jMq45e7JAh1E9LJZmRkfQgzYliffVTpLJ902D14o9fqgesjdzF0YiH
-VREwhHQvt0ph9XoX1hd6SFOYULHKDg==
-=MlT5
------END PGP SIGNATURE-----
-
---B6QlO0O7Mj92I5A0bO9OFkh2gQH6sGxfv--
+-- 
+2.9.4
