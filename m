@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1df6KW-0004gJ-A6
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:22:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1df6Ml-0006HO-4u
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1df6KR-0002QI-DL
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:22:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1df6KR-0002Pt-6V
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:21:55 -0400
-Date: Tue, 8 Aug 2017 17:21:48 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170808172141.72e66af7@gondolin>
-In-Reply-To: <20170808161559.3f623c89@bahia.lan>
-References: <20170808121701.18353-1-cohuck@redhat.com>
-	<20170808121701.18353-2-cohuck@redhat.com>
-	<20170808145000.3259f597@bahia.lan>
-	<20170808161559.3f623c89@bahia.lan>
+	(envelope-from <dgilbert@redhat.com>) id 1df6Mj-0003XN-W4
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:24:19 -0400
+Date: Tue, 8 Aug 2017 16:23:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170808152355.GM2081@work-vm>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-12-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] 9pfs: fix and simplify dependencies
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1502117160-24655-12-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 11/56] monitor: Drop unused HMP
+ .args_type 'M'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com, aneesh.kumar@linux.vnet.ibm.com, agraf@suse.de
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
 
-On Tue, 8 Aug 2017 16:15:59 +0200
-Greg Kurz <groug@kaod.org> wrote:
+* Markus Armbruster (armbru@redhat.com) wrote:
+> The previous commit switched balloon from 'M' to 'o', rendering 'M'
+> unused.  It was never used for anything else.  Drop it.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-> On Tue, 8 Aug 2017 14:50:00 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > On Tue,  8 Aug 2017 14:17:01 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> > > We want to compile the 9pfs code iff virtfs is enabled and a virtio
-> > > transport is available (not only pci!).
-> > > 
-> > > Let's make the generated CONFIG_VIRTFS statement depend on either
-> > > CONFIG_VIRTIO_PCI or (new) CONFIG_VIRTIO_CCW. The Makefiles for fsdev/
-> > > and hw/9pfs/ can then depend on CONFIG_VIRTFS directly.
-> > > 
-> > > Suggested-by: Thomas Huth <thuth@redhat.com>
-> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > ---    
-> > 
-> > It looks good to me.
-> >   
-> 
-> Oops, reading Thomas's other mail, I now realize that with this patch we
-> end up with the following in config-host.mak:
-> 
-> CONFIG_VIRTFS=$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW))
-> 
-> which looks wrong even if it may "work"... but we also get the
-> following in config-host.h:
-> 
-> #define CONFIG_VIRTFS $(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW))
-> 
-> which is clearly wrong.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Eek. Oh well, it would have been nice...
-
+> ---
+>  monitor.c | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
 > 
-> Maybe post the changes from your other mail instead ?
+> diff --git a/monitor.c b/monitor.c
+> index 8b54ba1..3b2757e 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -101,8 +101,6 @@
+>   * TYPEs that put an int64_t value with key NAME:
+>   * 'l'    Argument is an expression (QEMU pocket calculator).
+>   * 'i'    Like 'l' except value must fit into 32 bit unsigned.
+> - * 'M'    Like 'l' except value must not be negative and is multiplied
+> - *        by 2^20 (think "mebibyte").
+>   *
+>   * TYPEs that put an uint64_t value with key NAME:
+>   * 'o'    Argument is a size (think "octets").  Without suffix the
+> @@ -134,7 +132,7 @@
+>   * '?'    Argument is optional, nothing is put when it is absent
+>   *        (all types except 'O', '/', 'b').
+>   * '.'    Argument is optional, must be preceded by '.' if present
+> - *        (only types 'i', 'l', 'M')
+> + *        (only types 'i', 'l')
+>   */
+>  
+>  typedef struct mon_cmd_t {
+> @@ -2913,7 +2911,6 @@ static QDict *monitor_parse_arguments(Monitor *mon,
+>              break;
+>          case 'i':
+>          case 'l':
+> -        case 'M':
+>              {
+>                  int64_t val;
+>  
+> @@ -2944,12 +2941,6 @@ static QDict *monitor_parse_arguments(Monitor *mon,
+>                      monitor_printf(mon, "\'%s\' has failed: ", cmd->name);
+>                      monitor_printf(mon, "integer is for 32-bit values\n");
+>                      goto fail;
+> -                } else if (c == 'M') {
+> -                    if (val < 0) {
+> -                        monitor_printf(mon, "enter a positive value\n");
+> -                        goto fail;
+> -                    }
+> -                    val <<= 20;
+>                  }
+>                  qdict_put_int(qdict, key, val);
+>              }
+> -- 
+> 2.7.5
 > 
-> Message-ID: <20170808111542.16422571@gondolin>
-> 
-> The patch isn't that ugly, given the ugliness of the current makefiles :)
-
-It is slightly differently ugly :)
-
-> 
-> And we can come up with some cleanup patch later.
-
-Nod.
-
-> 
-> > Acked-by: Greg Kurz <groug@kaod.org>
-> >   
-> 
-> NAcked-by: in fact :)
-
-Heh :)
-
-I'll post the other patch properly.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
