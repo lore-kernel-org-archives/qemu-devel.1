@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df0pv-0002T0-F5
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:30:04 -0400
+	(envelope-from <quintela@redhat.com>) id 1df0vY-0003qz-2j
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df0ps-0000Bh-6J
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:30:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53160)
+	(envelope-from <quintela@redhat.com>) id 1df0vU-0004k3-PE
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:35:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1df0pr-0000Ax-TO
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:30:00 -0400
-References: <20170804112946.5247-1-cohuck@redhat.com>
-	<20170804165934.4d6fb98f@gondolin> <20170808111542.16422571@gondolin>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <798f1bb6-f21d-305c-5bcc-c7f828f284e1@redhat.com>
-Date: Tue, 8 Aug 2017 11:29:50 +0200
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df0vU-0004jc-GM
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:35:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 65DE0356E2
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 09:35:47 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170719173513.GJ3500@work-vm> (David Alan Gilbert's message of
+	"Wed, 19 Jul 2017 18:35:14 +0100")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-10-quintela@redhat.com>
+	<20170719173513.GJ3500@work-vm>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 Aug 2017 11:35:44 +0200
+Message-ID: <87ziba9zbj.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170808111542.16422571@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] s390x: zPCI detangling
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 09/17] migration: Start of multiple fd
+ work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +36,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On 08.08.2017 11:15, Cornelia Huck wrote:
-> On Fri, 4 Aug 2017 16:59:34 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
->> On Fri,  4 Aug 2017 13:29:37 +0200
->> Cornelia Huck <cohuck@redhat.com> wrote:
->>
->>> Next version, not so many changes from v3.
->>>
->>> As you might have guessed, the goals are still the same:
->>> - Being able to disable PCI support in a build completely.
->>> - Properly fencing off PCI if the relevant facility bit is not provided.
->>>
->>> Changes v3->v4:
->>> - introduce pci_available boolean
->>> - use pci_available to fence off setting the zcpi facility bit
->>> - collected tags
->>>
->>> Branch is still git://github.com/cohuck/qemu no-zpci-cpumodel  
->>
->> make check on a build with pci disabled revealed an interesting
->> inconsistency: We create a virtio-9p-ccw device, but the base
->> virtio-9p-device is in code that is not built for !pci.
->>
->> If I remove the pci dependency for hw/9pfs/ and fsdev/, things look
->> fine (at least on s390x). We probably need a different dependency,
->> though.
->>
->> virtio-9p maintainers, any suggestions?
-> 
-> I have the patch below, which is ugly, but seems to work for me. Better
-> ideas welcome :)
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> We create new channels for each new thread created. We only send through
+>> them a character to be sure that we are creating the channels in the
+>> right order.
+>
+> That text is out of date isn't it?
 
-I haven't tried whether it works, but you could maybe change the define
-of CONFIG_VIRTFS instead:
-
-diff --git a/configure b/configure
-index dd73cce..64d21f6 100755
---- a/configure
-+++ b/configure
-@@ -5771,7 +5771,7 @@ if test "$libattr" = "yes" ; then
-   echo "CONFIG_LIBATTR=y" >> $config_host_mak
- fi
- if test "$virtfs" = "yes" ; then
--  echo "CONFIG_VIRTFS=y" >> $config_host_mak
-+  echo 'CONFIG_VIRTFS=$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)' >> $config_host_mak
- fi
- if test "$vhost_scsi" = "yes" ; then
-   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
-
-... I think that should simplify the other statements quite a bit since
-you then only have to test CONFIG_VIRTFS in the other locations?
-
- Thomas
+oops, fixed.
 
 
-> From 0ba6427e7ac7cef38b487d28c9dce653d8cb9a71 Mon Sep 17 00:00:00 2001
-> From: Cornelia Huck <cohuck@redhat.com>
-> Date: Tue, 8 Aug 2017 11:03:38 +0200
-> Subject: [PATCH] 9pfs: fix dependencies
-> 
-> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
-> on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
-> device.
-> 
-> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
-> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  default-configs/s390x-softmmu.mak | 1 +
->  fsdev/Makefile.objs               | 9 +++------
->  hw/Makefile.objs                  | 2 +-
->  3 files changed, 5 insertions(+), 7 deletions(-)
-> 
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-> index 6ab2bc65ac..7f15ab68b1 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=y
->  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
->  CONFIG_VFIO_CCW=$(CONFIG_LINUX)
->  CONFIG_WDT_DIAG288=y
-> +CONFIG_VIRTIO_CCW=y
-> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-> index 659df6e187..10d8caa291 100644
-> --- a/fsdev/Makefile.objs
-> +++ b/fsdev/Makefile.objs
-> @@ -1,10 +1,7 @@
-> -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
->  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
-> -# only pull in the actual virtio-9p device if we also enabled virtio.
-> -common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-> -else
-> -common-obj-y = qemu-fsdev-dummy.o
-> -endif
-> +# only pull in the actual virtio-9p device if we also enabled a virtio backend.
-> +common-obj-$(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))= qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-> +common-obj-$(call lnot, $(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) = qemu-fsdev-dummy.o
->  common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
->  
->  # Toplevel always builds this; targets without virtio will put it in
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index a2c61f6b09..10942fe0b4 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
-> +devices-dirs-$(call land, $(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW))) += 9pfs/
->  devices-dirs-$(CONFIG_SOFTMMU) += acpi/
->  devices-dirs-$(CONFIG_SOFTMMU) += adc/
->  devices-dirs-$(CONFIG_SOFTMMU) += audio/
-> 
+>> +gboolean multifd_new_channel(QIOChannel *ioc)
+>> +{
+>> +    int thread_count = migrate_multifd_threads();
+>> +    MultiFDRecvParams *p = g_new0(MultiFDRecvParams, 1);
+>> +    MigrationState *s = migrate_get_current();
+>> +    char string[MULTIFD_UUID_MSG];
+>> +    char string_uuid[UUID_FMT_LEN];
+>> +    char *uuid;
+>> +    int id;
+>> +
+>> +    qio_channel_read(ioc, string, sizeof(string), &error_abort);
+>> +    sscanf(string, "%s multifd %03d", string_uuid, &id);
+>> +
+>> +    if (qemu_uuid_set) {
+>> +        uuid = qemu_uuid_unparse_strdup(&qemu_uuid);
+>> +    } else {
+>> +        uuid = g_strdup(multifd_uuid);
+>> +    }
+>> +    if (strcmp(string_uuid, uuid)) {
+>> +        error_report("multifd: received uuid '%s' and expected uuid '%s'",
+>> +                     string_uuid, uuid);
+>
+> probably worth adding the channel id as well so we can see
+> when it fails.
+
+Done.
+
+>> +        migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+>> +                          MIGRATION_STATUS_FAILED);
+>> +        terminate_multifd_recv_threads();
+>> +        return FALSE;
+>> +    }
+>> +    g_free(uuid);
+>> +
+>> +    if (multifd_recv_state->params[id] != NULL) {
+>> +        error_report("multifd: received id '%d' is already setup'", id);
+>> +        migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+>> +                          MIGRATION_STATUS_FAILED);
+>> +        terminate_multifd_recv_threads();
+>> +        return FALSE;
+>> +    }
+>> +    qemu_mutex_init(&p->mutex);
+>> +    qemu_sem_init(&p->sem, 0);
+>> +    p->quit = false;
+>> +    p->id = id;
+>> +    p->c = ioc;
+>> +    atomic_set(&multifd_recv_state->params[id], p);
+>
+> Can you explain why this is quite so careful about ordering ? Is there
+> something that could look at params or try and take the mutex before
+> the count is incremented?
+
+what happened to me in the middle stages of the patches (yes, doing
+asynchronously was painful) was that:
+
+I created the threads (at the beggining I did the
+multifd_recv_state->params[id] == p inside the thread, that makes things
+really, really racy.  I *think* that now we could probably do this
+as you state.
+
+
+
+> I think it's safe to do:
+>  p->quit = false;
+>  p->id = id;
+>  p->c = ioc;
+>  &multifd_recv_state->params[id] = p;
+>  qemu_sem_init(&p->sem, 0);
+>  qemu_mutex_init(&p->mutex);
+>  qemu_thread_create(...)
+>  atomic_inc(&multifd_recv_state->count);    <-- I'm not sure if this
+>  needs to be atomic
+
+We only change it on the main thread, so it should be enough.  The split
+that I want to do is:
+
+we do the listen asynchronously
+when something arrives, we just read it (main thread)
+we then read <uuid> <string> <arguments>
+and then after checking that uuid is right, we call whatever function we
+have for "string", in our case "multifd", with <arguments> as one string
+parameters.
+
+This should make it easier to create new "channels" for other purposes.
+So far so good.
+
+But then it appears what are the responsabilities, At the beggining, I
+read the string on the reception thread for that channel, that created a
+race because I received the 1st message for that channel before the
+channel was fully created (yes, it only happened sometimes, easy to
+understand after debugging).  This is the main reason that I changed to
+an array of pointers to structs instead of one array of structs.
+
+Then, I had to ve very careful to know when I had created all the
+channels threads, because otherwise I ended having races left and right.
+
+I will try to test the ordering that you suggested.
+
+>> +    qemu_thread_create(&p->thread, "multifd_recv", multifd_recv_thread, p,
+>> +                       QEMU_THREAD_JOINABLE);
+>
+> You've lost the nice numbered thread names you had created in the
+> previous version of this that you're removing.
+
+I could get them back, but they really were not showing at gdb, where do
+they show? ps?
+
+>> +    multifd_recv_state->count++;
+>> +
+>> +    /* We need to return FALSE for the last channel */
+>> +    if (multifd_recv_state->count == thread_count) {
+>> +        return FALSE;
+>> +    } else {
+>> +        return TRUE;
+>> +    }
+>
+> return multifd_recv_state->count != thread_count;   ?
+
+For other reasons I change this functions and now they use a different
+way of setting/checking if we have finished.  Look at the new series.
+
+I didn't do as you said because I feel it weird that we return a bool
+when we expert a gboolean, but .....
+
+Thanks, Juan.
