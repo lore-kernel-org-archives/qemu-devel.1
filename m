@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1df8lf-0001Ez-Ry
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:58:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1df8lh-0001GX-El
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1df8le-0002dq-Lw
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:58:11 -0400
+	(envelope-from <jsnow@redhat.com>) id 1df8lg-0002eQ-3f
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:58:13 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  8 Aug 2017 13:57:10 -0400
-Message-Id: <20170808175711.12203-4-jsnow@redhat.com>
+Date: Tue,  8 Aug 2017 13:57:11 -0400
+Message-Id: <20170808175711.12203-5-jsnow@redhat.com>
 In-Reply-To: <20170808175711.12203-1-jsnow@redhat.com>
 References: <20170808175711.12203-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] block-backend: shift in-flight counter to
- BB from BDS
+Subject: [Qemu-devel] [PATCH 4/4] block-backend: test flush op on empty
+ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +25,101 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redha
 
 From: Kevin Wolf <kwolf@redhat.com>
 
-This allows us to detect errors in cache flushing (ENOMEDIUM)
-without choking on a null dereference because we assume that
-blk_bs(bb) is always defined.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block.c               |  2 +-
- block/block-backend.c | 40 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 35 insertions(+), 7 deletions(-)
+ tests/Makefile.include     |  2 ++
+ tests/test-block-backend.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+)
+ create mode 100644 tests/test-block-backend.c
 
-diff --git a/block.c b/block.c
-index ce9cce7..834b836 100644
---- a/block.c
-+++ b/block.c
-@@ -4476,7 +4476,7 @@ out:
- 
- AioContext *bdrv_get_aio_context(BlockDriverState *bs)
- {
--    return bs->aio_context;
-+    return bs ? bs->aio_context : qemu_get_aio_context();
- }
- 
- void bdrv_coroutine_enter(BlockDriverState *bs, Coroutine *co)
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 968438c..efd7e92 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -68,6 +68,9 @@ struct BlockBackend {
-     NotifierList remove_bs_notifiers, insert_bs_notifiers;
- 
-     int quiesce_counter;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index eb4895f..153494b 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -56,6 +56,7 @@ check-unit-y += tests/test-hbitmap$(EXESUF)
+ gcov-files-test-hbitmap-y = blockjob.c
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
++check-unit-y += tests/test-block-backend$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ gcov-files-test-x86-cpuid-y =
+@@ -556,6 +557,7 @@ tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-o
+ tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
++tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
+new file mode 100644
+index 0000000..5348781
+--- /dev/null
++++ b/tests/test-block-backend.c
+@@ -0,0 +1,62 @@
++/*
++ * BlockBackend tests
++ *
++ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+    /* Number of in-flight requests. Accessed with atomic ops. */
-+    unsigned int in_flight;
- };
- 
- typedef struct BlockBackendAIOCB {
-@@ -1109,6 +1112,16 @@ int blk_make_zero(BlockBackend *blk, BdrvRequestFlags flags)
-     return bdrv_make_zero(blk->root, flags);
- }
- 
-+static void blk_inc_in_flight(BlockBackend *blk)
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++
++static void test_drain_aio_error_flush_cb(void *opaque, int ret)
 +{
-+    atomic_inc(&blk->in_flight);
++    bool *completed = opaque;
++
++    g_assert(ret == -ENOMEDIUM);
++    *completed = true;
 +}
 +
-+static void blk_dec_in_flight(BlockBackend *blk)
++static void test_drain_aio_error(void)
 +{
-+    atomic_dec(&blk->in_flight);
++    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    BlockAIOCB *acb;
++    bool completed = false;
++
++    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
++    g_assert(acb != NULL);
++    g_assert(completed == false);
++
++    blk_drain(blk);
++    g_assert(completed == true);
 +}
 +
- static void error_callback_bh(void *opaque)
- {
-     struct BlockBackendAIOCB *acb = opaque;
-@@ -1147,7 +1160,7 @@ static const AIOCBInfo blk_aio_em_aiocb_info = {
- static void blk_aio_complete(BlkAioEmAIOCB *acb)
- {
-     if (acb->has_returned) {
--        bdrv_dec_in_flight(acb->common.bs);
-+        blk_dec_in_flight(acb->rwco.blk);
-         acb->common.cb(acb->common.opaque, acb->rwco.ret);
-         qemu_aio_unref(acb);
-     }
-@@ -1168,7 +1181,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
-     BlkAioEmAIOCB *acb;
-     Coroutine *co;
- 
--    bdrv_inc_in_flight(blk_bs(blk));
-+    blk_inc_in_flight(blk);
-     acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
-     acb->rwco = (BlkRwCo) {
-         .blk    = blk,
-@@ -1405,14 +1418,28 @@ int blk_flush(BlockBackend *blk)
- 
- void blk_drain(BlockBackend *blk)
- {
--    if (blk_bs(blk)) {
--        bdrv_drain(blk_bs(blk));
-+    AioContext *ctx = blk_get_aio_context(blk);
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
 +
-+    while (atomic_read(&blk->in_flight)) {
-+        aio_context_acquire(ctx);
-+        aio_poll(ctx, false);
-+        aio_context_release(ctx);
++    g_test_init(&argc, &argv, NULL);
 +
-+        if (blk_bs(blk)) {
-+            bdrv_drain(blk_bs(blk));
-+        }
-     }
- }
- 
- void blk_drain_all(void)
- {
--    bdrv_drain_all();
-+    BlockBackend *blk = NULL;
++    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
 +
-+    bdrv_drain_all_begin();
-+    while ((blk = blk_all_next(blk)) != NULL) {
-+        blk_drain(blk);
-+    }
-+    bdrv_drain_all_end();
- }
- 
- void blk_set_on_error(BlockBackend *blk, BlockdevOnError on_read_error,
-@@ -1453,10 +1480,11 @@ static void send_qmp_error_event(BlockBackend *blk,
-                                  bool is_read, int error)
- {
-     IoOperationType optype;
-+    BlockDriverState *bs = blk_bs(blk);
- 
-     optype = is_read ? IO_OPERATION_TYPE_READ : IO_OPERATION_TYPE_WRITE;
-     qapi_event_send_block_io_error(blk_name(blk),
--                                   bdrv_get_node_name(blk_bs(blk)), optype,
-+                                   bs ? bdrv_get_node_name(bs) : "", optype,
-                                    action, blk_iostatus_is_enabled(blk),
-                                    error == ENOSPC, strerror(error),
-                                    &error_abort);
++    return g_test_run();
++}
 -- 
 2.9.4
