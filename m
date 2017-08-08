@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfBhj-0007zA-Bh
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 17:06:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfBpC-00022i-R5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 17:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfBhf-0001oG-AG
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 17:06:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43126)
+	(envelope-from <eblake@redhat.com>) id 1dfBp9-0006Tj-H4
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 17:14:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfBhf-0001nK-1W
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 17:06:15 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfBp9-0006So-6o
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 17:13:59 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B6BF26148E
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 21:06:13 +0000 (UTC)
-References: <20170808203900.7661-1-jfreimann@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id EF3DA4A71C
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 21:13:57 +0000 (UTC)
+References: <20170808205327.8768-1-crosa@redhat.com>
+	<20170808205327.8768-2-crosa@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f10f4722-1d0b-0793-c837-5915ed70d65a@redhat.com>
-Date: Tue, 8 Aug 2017 16:05:56 -0500
+Message-ID: <2e9697af-a48f-9fb6-696f-c2a8d3aebb06@redhat.com>
+Date: Tue, 8 Aug 2017 16:13:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170808203900.7661-1-jfreimann@redhat.com>
+In-Reply-To: <20170808205327.8768-2-crosa@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="1FMlLd0NO2Sc42Jf4dWsixLbX1XTpfiDx"
-Subject: Re: [Qemu-devel] [PATCH for-2.10? v2 0/5] tests/pxe-test: add
- testcase using vhost-user-bridge
+	boundary="caNiwIv5cRodHv7ngpv0Ckee2Ibsvh5J1"
+Subject: Re: [Qemu-devel] [PATCH 1/1] QAPI schema: turn example
+ commands/returns into proper JSON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
-Cc: victork@redhat.com, mst@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
+To: Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1FMlLd0NO2Sc42Jf4dWsixLbX1XTpfiDx
+--caNiwIv5cRodHv7ngpv0Ckee2Ibsvh5J1
 From: Eric Blake <eblake@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
-Cc: victork@redhat.com, mst@redhat.com, jasowang@redhat.com,
- maxime.coquelin@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
-Message-ID: <f10f4722-1d0b-0793-c837-5915ed70d65a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10? v2 0/5] tests/pxe-test: add
- testcase using vhost-user-bridge
-References: <20170808203900.7661-1-jfreimann@redhat.com>
-In-Reply-To: <20170808203900.7661-1-jfreimann@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <2e9697af-a48f-9fb6-696f-c2a8d3aebb06@redhat.com>
+Subject: Re: [PATCH 1/1] QAPI schema: turn example commands/returns into
+ proper JSON
+References: <20170808205327.8768-1-crosa@redhat.com>
+ <20170808205327.8768-2-crosa@redhat.com>
+In-Reply-To: <20170808205327.8768-2-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/08/2017 03:38 PM, Jens Freimann wrote:
-> This implements a testcase for pxe-test using the vhost-user interface.=
- Spawn a
-> vhost-user-bridge process and connect it to the qemu process.
+On 08/08/2017 03:53 PM, Cleber Rosa wrote:
+> Most QMP commands and returns in the QAPI schema documentation
+> are valid "JSON-based wire format".  A few examples are either
+> malformed, or contain comments.
 >=20
-> To make the testcase work we need to apply a few patches before the act=
-ual testcase:
-> - Patch 1 disables debug output of vhost-user-bridge
-> - Patch 2 fixes passing a file descriptor to -netdev.  This was broken =
-since the
->   mcast option was introduced.=20
+> This fixes all the examples command and return data, making them
+> proper JSON, as they would be received and generated by QEMU's
+> QMP monitor.
+>=20
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  qapi-schema.json     |  9 ++++-----
+>  qapi/block-core.json | 32 ++++++++++++++++----------------
+>  qapi/rocker.json     |  5 +----
+>  3 files changed, 21 insertions(+), 25 deletions(-)
 
-Is this a regression worthy of fixing in rc3?  Or are we okay with this
-entire series waiting for 2.11.
+
+> +++ b/qapi-schema.json
+> @@ -2000,8 +2000,7 @@
+>  #                "host": "127.0.0.1",
+>  #                "channel-id": 0,
+>  #                "tls": false
+> -#             },
+> -#             [ ... more channels follow ... ]
+> +#             }
+
+I still wonder if we want SOME sort of markup to make it obvious where
+we are compressing the example for the sake of brevity, where whatever
+we use to automate tests based on the docs would know how to recognize
+that the actual values given in reply to the test can be longer than the
+documented example.  But I guess we can cross that when we have an
+automated test where it matters.
+
+> @@ -2039,7 +2038,7 @@
+>  #
+>  # -> { "execute": "query-balloon" }
+>  # <- { "return": {
+> -#          "actual": 1073741824,
+> +#          "actual": 1073741824
+>  #       }
+
+I also suspect that test automation will have to do a lot of filtering,
+even for commands that don't need to be abbreviated, since some of the
+examples have pretty arbitrary numbers that will be difficult to
+reliably reproduce any particular number.
+
+This is a documentation fix, so it could still go in 2.10 - but since we
+are past -rc2, it's probably just as easy to save it for 2.11.  Either wa=
+y,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -72,7 +110,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---1FMlLd0NO2Sc42Jf4dWsixLbX1XTpfiDx
+--caNiwIv5cRodHv7ngpv0Ckee2Ibsvh5J1
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -81,14 +119,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmKJ7QACgkQp6FrSiUn
-Q2qj5wf/Zd7W4+vWmOfWxi1pEtwkpbQZi43NkUENY6pmAM5sGUMilCmzt++oe4Jp
-1VQ4yNIIgLptKlNNVHKvvx0ZLND0vQUwYOqLxconqHzqxw+CSt9eDMnJvfZAt7sA
-Ng5oAGrjrREm+LpE7eM4nU64tOZIEjuWnKI5bMZ4c4xGIyVloXn+tXnI2YkY91Mt
-9dY1+WIz38tEU7Fj87iJO+0r3mcA/LlsxZ/Tyk/QsIweBXAOH1mRm55YCfXRH9+E
-wX/tr1OWMkvklynsSI5hO7XWhWBgdg+/cK4MsoCgWzmTUVwsULWgG1xshrFE8dxT
-2YS2wgl2kNFI0yjBDjvfuSu1r6EPaQ==
-=1aAJ
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmKKZQACgkQp6FrSiUn
+Q2piuwgAl/b3G7P6KGe3QweTvHSAdxWqNbg757JNfXZ1J5e3DXJ7tnxiAwRPgsT/
+CaRHUZ+EcgZmQGUYtUtKo5jWdejtlYZKvX2eQEL+/dy3G8+VqGRw17I1uKouHr1F
+ysRGB/AF51vj4sbQjrLRvF7O8fsa/5ZDxyWZJMdPMjQgNXdsC9eSbHTqY8eTZl4p
+XCmTxIx5HtfUOOhKHGNurQD59ikOW3oUUvaGeC6WmYFJwSxbQ9/L2qky/V8/DMKQ
+1kmL050mp/aGLIchMVLwMAhWgCssnj7A4+36lzs97hyi45s432wtBlGtady/LzX5
+OrGarGfRFpxgX6XsRF+Y+xrPuy65sQ==
+=i44/
 -----END PGP SIGNATURE-----
 
---1FMlLd0NO2Sc42Jf4dWsixLbX1XTpfiDx--
+--caNiwIv5cRodHv7ngpv0Ckee2Ibsvh5J1--
