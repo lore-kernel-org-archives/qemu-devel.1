@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1df6B9-0006BU-78
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:12:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1df6Ew-0000XR-Gb
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1df6B7-0006Ak-1n
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:12:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1df6B6-0006A4-Rd
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:12:16 -0400
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-6-git-send-email-zuban32s@gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <87e569e6-e1ec-4238-e073-38c0e136af0d@redhat.com>
-Date: Tue, 8 Aug 2017 17:11:46 +0200
+	(envelope-from <kwolf@redhat.com>) id 1df6Ev-00080L-2B
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:16:14 -0400
+Date: Tue, 8 Aug 2017 17:16:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
+References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+	<20170807155717.GI6578@localhost.localdomain>
+	<692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
+	<20170808085352.GF4850@dhcp-200-186.str.redhat.com>
+	<896f8482-6e3a-13e9-4cce-ca115a6c8881@virtuozzo.com>
+	<645f5e9d-6a4b-1d7b-6907-6ab27e1ffa7e@virtuozzo.com>
+	<51899b88-6b4b-88ce-f820-f62bc944c034@redhat.com>
+	<2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1501964858-5159-6-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com, seabios@seabios.org, kevin@koconnor.net, kraxel@redhat.com, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, rth@twiddle.net
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>, jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-one comment below
+Am 08.08.2017 um 17:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 08.08.2017 18:07, Eric Blake wrote:
+> > On 08/08/2017 04:04 AM, Vladimir Sementsov-Ogievskiy wrote:
+> > 
+> > > > > > Throttling "guaranties" that there will not be more than one
+> > > > > > request. But
+> > > > > > what prevent less than one, i.e. zero, like in my reproduction?
+> > > > > Yes, I understand. Can we somehow make sure that at least one iteration
+> > > > > is made? I'd really like to keep the functional test for block job
+> > > > > throttling. I suppose a simple 'sleep 0.1' would do the trick, though
+> > > > > it's not very clean.
+> > > > > 
+> > > > > Kevin
+> > > > 
+> > > > I've started with 'sleep 0.5', now there are >100 successful
+> > > > iterations... The other way is to check in test that there was 0 or 1
+> > > > requests, but for this it looks better to rewrite it in python.
+> > > > 
+> > > > 
+> > > is sleep for ms portable?
+> > Sadly, sub-second sleep is a GNU coreutils feature; I suspect the BSD
+> > machines may fail to parse it.  (Of course, we could do some sort of
+> > 'sleep $SMALL', where $SMALL is 0.5 if sleep supports it, and 1 otherwise).
+> > 
+> sleep for 1 second may lead to more then one request done before qemu quite.
 
-On 08/05/17 22:27, Aleksandr Bezzubikov wrote:
+_supported_os Linux
 
-> +Capability layout (defined in include/hw/pci/pci_bridge.h):
-> +
-> +    uint8_t id;     Standard PCI capability header field
-> +    uint8_t next;   Standard PCI capability header field
-> +    uint8_t len;    Standard PCI vendor-specific capability header field
-> +
-> +    uint8_t type;   Red Hat vendor-specific capability type
-> +                    List of currently existing types:
-> +                        QEMU_RESERVE = 1
-> +
-> +
-> +    uint32_t bus_res;   Minimum number of buses to reserve
-> +
-> +    uint64_t io;        IO space to reserve
-> +    uint64_t mem        Non-prefetchable memory to reserve
-> +    uint64_t mem_pref;  Prefetchable memory to reserve
+So do we really care about portability? And are all the other test cases
+working on the BSDs?
 
-(I apologize if I missed any concrete points from the past messages
-regarding this structure.)
-
-How is the firmware supposed to know whether the prefetchable MMIO
-reservation should be made in 32-bit or 64-bit address space? If we
-reserve prefetchable MMIO outside of the 32-bit address space, then
-hot-plugging a device without 64-bit MMIO support could fail.
-
-My earlier request, to distinguish "prefetchable_32" from
-"prefetchable_64" (mutually exclusively), was so that firmware would
-know whether to restrict the MMIO reservation to 32-bit address space.
-
-This is based on an earlier email from Alex to me:
-
-On 10/03/16 18:01, Alex Williamson wrote:
-> I don't think there's such a thing as a 64-bit non-prefetchable
-> aperture.  In fact, there are not separate 32 and 64 bit prefetchable
-> apertures.  The apertures are:
->
-> I/O base/limit - (default 16bit, may be 32bit)
-> Memory base/limit - (32bit only, non-prefetchable)
-> Prefetchable Memory base/limit - (default 32bit, may be 64bit)
->
-> This is according to Table 3-2 in the PCI-to-PCI bridge spec rev 1.2.
-
-I don't care much about the 16-bit vs. 32-bit IO difference (that's
-entirely academic and the Platform Spec init doesn't even provide a way
-for OVMF to express such a difference). However, the optional
-restriction to 32-bit matters for the prefetchable MMIO aperture.
-
-Other than this, the patch looks good to me, and I'm ready to R-b.
-
-Thanks!
-Laszlo
+Kevin
