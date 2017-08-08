@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1df0Ej-00039M-Pj
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:51:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1df0H6-0004QB-Fu
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1df0Eg-0006aE-M4
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:51:37 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35626)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1df0Eg-0006Zi-Ee
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:51:34 -0400
-Received: by mail-wm0-x229.google.com with SMTP id m85so1528546wma.0
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 01:51:34 -0700 (PDT)
-References: <20170807153934.29477-1-alex.bennee@linaro.org>
-	<20170807153934.29477-5-alex.bennee@linaro.org>
-	<20170808014310.GP14780@lemon>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170808014310.GP14780@lemon>
-Date: Tue, 08 Aug 2017 09:51:31 +0100
-Message-ID: <87shh2v3vw.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1df0H5-0007f9-5W
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:54:04 -0400
+Date: Tue, 8 Aug 2017 10:53:52 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170808085352.GF4850@dhcp-200-186.str.redhat.com>
+References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+	<20170807155717.GI6578@localhost.localdomain>
+	<692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 v3 4/6] docker: docker.py make
- --no-cache skip checksum test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
+Am 08.08.2017 um 10:42 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 07.08.2017 18:57, Kevin Wolf wrote:
+> > Am 07.08.2017 um 16:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > 185 iotest is broken.
+> > > 
+> > > How to test:
+> > > > i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
+> > >    done; echo N = $i
+> > > 
+> > > finished for me like this:
+> > > 
+> > > 185 2s ... - output mismatch (see 185.out.bad)
+> > > --- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
+> > >      15:14:29.520343805 +0300
+> > > +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
+> > > @@ -37,7 +37,7 @@
+> > >   {"return": {}}
+> > >   {"return": {}}
+> > >   {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+> > >       "event": "SHUTDOWN", "data": {"guest": false}}
+> > > -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+> > >      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+> > >          "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
+> > >              "mirror"}}
+> > > +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+> > >      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+> > >          "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
+> > > 
+> > >   === Start backup job and exit qemu ===
+> > > 
+> > > Failures: 185
+> > > Failed 1 of 1 tests
+> > > N = 8
+> > > 
+> > > It doesn't seems logical to expect the constant offset on cancel,
+> > > so let filter it out.
+> > > 
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > I'm quoting 185:
+> > 
+> > # Note that the reference output intentionally includes the 'offset' field in
+> > # BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
+> > # predictable and any change in the offsets would hint at a bug in the job
+> > # throttling code.
+> > #
+> > # In order to achieve these predictable offsets, all of the following tests
+> > # use speed=65536. Each job will perform exactly one iteration before it has
+> > # to sleep at least for a second, which is plenty of time for the 'quit' QMP
+> > # command to be received (after receiving the command, the rest runs
+> > # synchronously, so jobs can arbitrarily continue or complete).
+> > #
+> > # The buffer size for commit and streaming is 512k (waiting for 8 seconds after
+> > # the first request), for active commit and mirror it's large enough to cover
+> > # the full 4M, and for backup it's the qcow2 cluster size, which we know is
+> > # 64k. As all of these are at least as large as the speed, we are sure that the
+> > # offset doesn't advance after the first iteration before qemu exits.
+> > 
+> > So before we change the expected output, can we explain why the offsets
+> > aren't predictable, even if throttling is used and contrary to what the
+> > comment says? Should we sleep a little before issuing 'quit'?
+> 
+> Throttling "guaranties" that there will not be more than one request. But
+> what prevent less than one, i.e. zero, like in my reproduction?
 
-Fam Zheng <famz@redhat.com> writes:
+Yes, I understand. Can we somehow make sure that at least one iteration
+is made? I'd really like to keep the functional test for block job
+throttling. I suppose a simple 'sleep 0.1' would do the trick, though
+it's not very clean.
 
-> On Mon, 08/07 16:39, Alex Bennée wrote:
->> If you invoke with NOCACHE=1 we pass --no-cache in the argv to
->> docker.py but may still not force a rebuild if the dockerfile checksum
->> hasn't changed. By testing for its presence we can force builds
->> without having to manually remove the docker image.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  tests/docker/docker.py | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->> index ee40ca04d9..aab1648cc5 100755
->> --- a/tests/docker/docker.py
->> +++ b/tests/docker/docker.py
->> @@ -261,7 +261,8 @@ class BuildCommand(SubCommand):
->>          tag = args.tag
->>
->>          dkr = Docker()
->> -        if dkr.image_matches_dockerfile(tag, dockerfile):
->> +        if "--no-cache" not in argv and \
->> +           dkr.image_matches_dockerfile(tag, dockerfile):
->>              if not args.quiet:
->>                  print "Image is up to date."
->>          else:
->> --
->> 2.13.0
->>
->>
->
-> NACK.
->
-> Please add "--no-cache" to BuildCommand.args, and use args.no_cache.
->
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index ee40ca04d9..530bc62d40 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -251,6 +251,8 @@ class BuildCommand(SubCommand):
->          parser.add_argument("--add-current-user", "-u", dest="user",
->                              action="store_true",
->                              help="Add the current user to image's passwd")
-> +        parser.add_argument("--no-cache", action="store_true",
-> +                            help="Disable docker cache and checksum")
->          parser.add_argument("tag",
->                              help="Image Tag")
->          parser.add_argument("dockerfile",
-
-Fair enough, I just didn't want to clash with what usually gets passed
-directly to the docker command.
-
-
---
-Alex Bennée
+Kevin
