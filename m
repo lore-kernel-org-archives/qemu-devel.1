@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df640-00009p-Ta
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:04:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1df645-0000E8-Ul
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df63z-0001PU-Es
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:04:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53090)
+	(envelope-from <kwolf@redhat.com>) id 1df642-0001Sc-Q7
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:05:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1df63z-0001OU-6G
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:04:55 -0400
-References: <150107094952.114.932926322923994155@5d477a5b5989>
-	<e982b2c6-dab4-24a0-7db4-2e76c370d227@redhat.com>
-	<87fud24drm.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b289a6e6-9773-c490-6c12-d43a6920d1c3@redhat.com>
-Date: Tue, 8 Aug 2017 10:04:48 -0500
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1df642-0001Rk-K7
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:04:58 -0400
+Date: Tue, 8 Aug 2017 17:04:54 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170808150454.GM4850@dhcp-200-186.str.redhat.com>
+References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
+	<20170730214231.GC16400@localhost.localdomain>
+	<CAOMFOmUwi+jF4w7ve4iV_rrPt2uAqZDe6PMZ0r0W047yjFi-gw@mail.gmail.com>
+	<f6024bcb-3dcb-609f-c2a7-3d425e738e33@twiddle.net>
+	<CAOMFOmVN74ghnqWGyfxHB_LqcSLC8XzRkrk88VXaPh4JRvYRNQ@mail.gmail.com>
+	<20170803083956.GD4456@dhcp-200-186.str.redhat.com>
+	<CAOMFOmWaFAbkSYj3m1AWMN6sjdpGMzugOFtfArPjzDLx495N3Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87fud24drm.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ucdk8jJ6cH10As8jdUjlrwohEVFHXngCT"
-Subject: Re: [Qemu-devel] [PATCH 0/5] ui: keymap fixes for 2.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOMFOmWaFAbkSYj3m1AWMN6sjdpGMzugOFtfArPjzDLx495N3Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
+ for multiboot?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, no-reply@patchew.org, kraxel@redhat.com, famz@redhat.com
+To: Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ucdk8jJ6cH10As8jdUjlrwohEVFHXngCT
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, no-reply@patchew.org, kraxel@redhat.com,
- famz@redhat.com
-Message-ID: <b289a6e6-9773-c490-6c12-d43a6920d1c3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] ui: keymap fixes for 2.10
-References: <150107094952.114.932926322923994155@5d477a5b5989>
- <e982b2c6-dab4-24a0-7db4-2e76c370d227@redhat.com>
- <87fud24drm.fsf@dusky.pond.sub.org>
-In-Reply-To: <87fud24drm.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 04.08.2017 um 06:53 hat Anatol Pomozov geschrieben:
+> Hi Kevin
+> 
+> Thanks for the information.
+> 
+> So I sounds like we do want multiboot to load all sections regardless
+> of its segments info. To achieve it we need to read sections headers
+> and load all section that were not loaded yet.
+> 
+> I have a working implementation here
+> https://github.com/anatol/qemu/commit/26773cf4f1f30b2d0d3fd89cce024f8e9c5603c5
+> Tested it with my multiboot OS image. The target iterates over all
+> sections and prints their names/address. The output result is the same
+> for QEMU and for VmWare+GRUB.
+> 
+> Let me know if this idea looks good so I can send this patch to qemu maillist.
 
-On 08/08/2017 04:20 AM, Markus Armbruster wrote:
-> Just back from the signed-vs-unsigned swamp, still catching up, sorry
-> for the delay...
->=20
+I'm not sure if I'll find the time to review this in detail, but I'll
+just give it a quick look.
 
->>>   File "/var/tmp/patchew-tester-tmp-xs4657r8/src/scripts/qapi2texi.py=
-", line 160, in texi_members
->>>     items +=3D member_func(section.member) + desc + '\n'
->>>   File "/var/tmp/patchew-tester-tmp-xs4657r8/src/scripts/qapi2texi.py=
-", line 133, in texi_enum_value
->>>     return '@item @code{%s}\n' % value.name
->>> AttributeError: 'NoneType' object has no attribute 'name'
->>
->> Eww, we have a bug in our qapi generator (a stack dump instead of a ni=
-ce
->> error message).  I suspect this is caused by your use of '@ac_*' inste=
-ad
->> of spelling out all the ac_ members added in qapi-schema.json in 4/5 -=
+You seem to attempt to add support for 64 bit ELF binaries. The
+Multiboot standard doesn't explicitly say that this is forbidden, but
+everything in it expects 32 bit binaries and I don't think GRUB (as the
+reference implementation for Multiboot) accepts 64 bit ELFs either. The
+boot state is 32 bit protected mode in any case. So unless I'm mistaken
+on GRUB's behaviour, I'd rather not support 64 bit ELFs.
 
->=20
-> Yes, we require doc comments to match the schema.  Wildcards aren't
-> supported.  They could be, if we want them badly enough.
->=20
->> but it IS something that needs to be fixed on your end to quit trippin=
-g
->> up the doc generator.
->=20
-> Has anyone worked on a fix for qapi2texi.py?
+You shouldn't look at ELF headers at all if MULTIBOOT_AOUT_KLUDGE is
+given. In this case, the kernel image is to be treated as a flat binary
+and section headers can't be expected. I think your code breaks non-ELF
+kernels.
 
-We worked around the generator bug in the meantime, so the qapi2texi.py
-bug is still latent (sadly, it's not my highest priority)
+As for loading the section headers, duplicating ELF parser code may be
+functionally correct, but probably not the best way to implement things.
+As I wrote in an earlier email, load_elf() already parses all the
+information that you need. You really just need to store it somewhere,
+which would probably just mean adding a new parameter to load_elf() and
+the parser could then store a copy of the data there if it's non-NULL.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+If you have any other specific aspects that you want me to have a closer
+look at, just let me know.
 
-
---Ucdk8jJ6cH10As8jdUjlrwohEVFHXngCT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmJ0xAACgkQp6FrSiUn
-Q2qd2wgAlm2hiImUbGzEEp7SWrrZ0YGEoVKldcyEGdZZtOmj9YXs9AZnG3t7xLlF
-rG4jwLZa5nUCZxouK3L5pMr9D0CQAcwGfSpfThAFRK2mwLeGRL7+nCi4M2YD8PUa
-nKiNwp9xNbJcGXhMG4q04yt/T4lzYoMtLL9FqXV1dBPz5AkDrOzD9rbo5OaKRYz5
-M5nC92pi6RC1bELfF0k370WGtzLVV7YLXZxRIK35Z9zdKnEbiQZYSiPgyJvs0K5B
-SQ73u8xnS+L44eGpUyf9Tz8wm0eRumdy6HVQduyvh/CXKdQSe8gOHzyVchpjWIiw
-NjCuONQURnbx9z6mU+WIKAQrYgrlug==
-=XC/J
------END PGP SIGNATURE-----
-
---Ucdk8jJ6cH10As8jdUjlrwohEVFHXngCT--
+Kevin
