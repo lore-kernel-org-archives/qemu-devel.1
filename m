@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1df3xf-0005uP-Nv
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:50:20 -0400
+	(envelope-from <stefanha@gmail.com>) id 1df416-0006gg-OY
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1df3xb-0004y2-R5
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:50:15 -0400
-Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:35881)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1df3xb-0004wA-JK
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:50:11 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 1239E8BB44
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 14:50:08 +0200 (CEST)
-Date: Tue, 8 Aug 2017 14:50:00 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170808145000.3259f597@bahia.lan>
-In-Reply-To: <20170808121701.18353-2-cohuck@redhat.com>
-References: <20170808121701.18353-1-cohuck@redhat.com>
-	<20170808121701.18353-2-cohuck@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1df411-0007xU-NB
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:53:48 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1df411-0007wq-Go
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:53:43 -0400
+Received: by mail-wm0-x232.google.com with SMTP id m85so6474999wma.0
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 05:53:43 -0700 (PDT)
+Date: Tue, 8 Aug 2017 13:53:37 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170808125337.GO16801@stefanha-x1.localdomain>
+References: <20170713190116.21608-1-dgilbert@redhat.com>
+	<20170717101703.GH7163@stefanha-x1.localdomain>
+	<20170717102642.GG2106@work-vm>
+	<c6161e7a-9b03-16bf-fb20-86df6f3fd9bc@redhat.com>
+	<CAJSP0QWd7gtV21Hpr3noA0odAMhdriNkaqJtLJvbSNzoErvFdQ@mail.gmail.com>
+	<9e79cd50-c23a-2b96-4206-f505993179f5@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/3VqvDDZ6BK5CPcDvqVFkoZB";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/1] 9pfs: fix and simplify dependencies
+	protocol="application/pgp-signature"; boundary="Qa0ccP92Gc0Ko3P8"
+Content-Disposition: inline
+In-Reply-To: <9e79cd50-c23a-2b96-4206-f505993179f5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vl.c/exit: pause cpus before closing block
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Prasad Pandit <ppandit@redhat.com>
 
---Sig_/3VqvDDZ6BK5CPcDvqVFkoZB
-Content-Type: text/plain; charset=US-ASCII
+
+--Qa0ccP92Gc0Ko3P8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue,  8 Aug 2017 14:17:01 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> We want to compile the 9pfs code iff virtfs is enabled and a virtio
-> transport is available (not only pci!).
+On Fri, Aug 04, 2017 at 01:46:17PM +0200, Paolo Bonzini wrote:
+> On 04/08/2017 11:58, Stefan Hajnoczi wrote:
+> >> the root cause of this bug is related to this as well:
+> >> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg02945.html
+> >>
+> >> From commit 99723548 we started assuming (incorrectly?) that blk_
+> >> functions always WILL have an attached BDS, but this is not always tru=
+e,
+> >> for instance, flushing the cache from an empty CDROM.
+> >>
+> >> Paolo, can we move the flight counter increment outside of the
+> >> block-backend layer, is that safe?
+> > I think the bdrv_inc_in_flight(blk_bs(blk)) needs to be fixed
+> > regardless of the throttling timer issue discussed below.  BB cannot
+> > assume that the BDS graph is non-empty.
 >=20
-> Let's make the generated CONFIG_VIRTFS statement depend on either
-> CONFIG_VIRTIO_PCI or (new) CONFIG_VIRTIO_CCW. The Makefiles for fsdev/
-> and hw/9pfs/ can then depend on CONFIG_VIRTFS directly.
->=20
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
+> Can we make bdrv_aio_* return NULL (even temporarily) if there is no
+> attached BDS?  That would make it much easier to fix.
 
-It looks good to me.
+There are many blk_aio_*() callers.  Returning NULL forces them to
+perform extra error handling.
 
-Acked-by: Greg Kurz <groug@kaod.org>
+When you say "temporarily" do you mean it returns NULL but schedules a
+one-shot BH to invoke the callback?  I wonder if we can use a singleton
+aiocb instead of NULL for -ENOMEDIUM errors.
 
->  configure                         | 2 +-
->  default-configs/s390x-softmmu.mak | 1 +
->  fsdev/Makefile.objs               | 2 +-
->  hw/Makefile.objs                  | 2 +-
->  4 files changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index dd73cce62f..709884dff1 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5771,7 +5771,7 @@ if test "$libattr" =3D "yes" ; then
->    echo "CONFIG_LIBATTR=3Dy" >> $config_host_mak
->  fi
->  if test "$virtfs" =3D "yes" ; then
-> -  echo "CONFIG_VIRTFS=3Dy" >> $config_host_mak
-> +  echo 'CONFIG_VIRTFS=3D$(call lor, $(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO=
-_CCW))' >> $config_host_mak
->  fi
->  if test "$vhost_scsi" =3D "yes" ; then
->    echo "CONFIG_VHOST_SCSI=3Dy" >> $config_host_mak
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-so=
-ftmmu.mak
-> index 51191b77df..e4c5236ceb 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=3Dy
->  CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
->  CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
->  CONFIG_WDT_DIAG288=3Dy
-> +CONFIG_VIRTIO_CCW=3Dy
-> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-> index 659df6e187..604cc8b6c4 100644
-> --- a/fsdev/Makefile.objs
-> +++ b/fsdev/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
-> +ifeq ($(CONFIG_VIRTFS),y)
->  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
->  # only pull in the actual virtio-9p device if we also enabled virtio.
->  common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index a2c61f6b09..147d1dc9fb 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),=
-$(CONFIG_PCI))) +=3D 9pfs/
-> +devices-dirs-$(CONFIG_VIRTFS) +=3D 9pfs/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D acpi/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D adc/
->  devices-dirs-$(CONFIG_SOFTMMU) +=3D audio/
+Stefan
 
-
---Sig_/3VqvDDZ6BK5CPcDvqVFkoZB
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--Qa0ccP92Gc0Ko3P8
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iEYEARECAAYFAlmJs3gACgkQAvw66wEB28LX4ACgoP60zeH4fgN2AYApKmt8Semo
-ruEAn0BO6SyKTYpsOGp2DQT7DdwaGnKD
-=7Hg0
+iQEcBAEBAgAGBQJZibRRAAoJEJykq7OBq3PIvGcH/1a45MioeYWuEYpoKz2s0zLd
+FPqb4TxNNKS1H21SP33tYmfAaBnCkZpYDkdlAI2hnd8DevgY8uXosS9AXKDCjeiM
+yrmpHOe+EjTtJdCax2dmIOjiTMa+nR8MczpF0BOhKGKm6UVw3+wLi14zwF2tzn35
+zCopLJE/bkFsqyNwwdKyAuUaJh1eeEU5+DRjJk3iM4ZqkMaEZb8JyaidYyfQU8Ay
+AVC6LUEmb90uSFtvA6t7j9LLawZZ7/1rHrRgjZ6/MkoSr5qxW44w6qmZFXhEAxU0
+xJkT06237ycxD94CrNH0/KoKssgi+MueFsDIf1Af4jBXtOKrgV+VZfT1C99Pf3M=
+=dyuG
 -----END PGP SIGNATURE-----
 
---Sig_/3VqvDDZ6BK5CPcDvqVFkoZB--
+--Qa0ccP92Gc0Ko3P8--
