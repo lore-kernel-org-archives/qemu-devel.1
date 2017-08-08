@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df7N3-0003LP-9i
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:28:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1df7N6-0003OR-Fg
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df7N1-0008Sv-Mh
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:28:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63524)
+	(envelope-from <quintela@redhat.com>) id 1df7N3-0008UF-2Q
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:28:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7N1-0008SL-DU
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:28:39 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7N2-0008Tf-Sn
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:28:40 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6355D6E805
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:28:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E421F796E9
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:28:39 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue,  8 Aug 2017 18:26:19 +0200
-Message-Id: <20170808162629.32493-10-quintela@redhat.com>
+Date: Tue,  8 Aug 2017 18:26:20 +0200
+Message-Id: <20170808162629.32493-11-quintela@redhat.com>
 In-Reply-To: <20170808162629.32493-1-quintela@redhat.com>
 References: <20170808162629.32493-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 09/19] migration: Create multifd migration
- threads
+Subject: [Qemu-devel] [PATCH v6 10/19] migration: Split
+ migration_fd_process_incoming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,306 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Creation of the threads, nothing inside yet.
+We need that on later patches.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
---
-
-Use pointers instead of long array names
-Move to use semaphores instead of conditions as paolo suggestion
-
-Put all the state inside one struct.
-Use a counter for the number of threads created.  Needed during cancellation.
-
-Add error return to thread creation
-
-Add id field
-
-Rename functions to multifd_save/load_setup/cleanup
-Change recv parameters to a pointer to struct
 ---
- migration/migration.c |  16 ++++-
- migration/ram.c       | 194 ++++++++++++++++++++++++++++++++++++++++++++++++++
- migration/ram.h       |   5 ++
- 3 files changed, 214 insertions(+), 1 deletion(-)
+ migration/migration.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 6c4eb4b..d031c93 100644
+index d031c93..e36e880 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -296,6 +296,7 @@ static void process_incoming_migration_bh(void *opaque)
-     } else {
-         runstate_set(global_state_get_runstate());
-     }
-+    multifd_load_cleanup();
-     /*
-      * This must happen after any state changes since as soon as an external
-      * observer sees this event they might start to prod at the VM assuming
-@@ -358,6 +359,7 @@ static void process_incoming_migration_co(void *opaque)
-                           MIGRATION_STATUS_FAILED);
-         error_report("load of migration failed: %s", strerror(-ret));
-         qemu_fclose(mis->from_src_file);
-+        multifd_load_cleanup();
-         exit(EXIT_FAILURE);
-     }
-     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
-@@ -368,7 +370,12 @@ void migration_fd_process_incoming(QEMUFile *f)
- {
-     Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
-     MigrationIncomingState *mis = migration_incoming_get_current();
--    
-+
-+    if (multifd_load_setup() != 0) {
-+        /* We haven't been able to create multifd threads
-+           nothing better to do */
-+        exit(EXIT_FAILURE);
-+    }
-     if (!mis->from_src_file) {
-         mis->from_src_file = f;
-     }
-@@ -1028,6 +1035,7 @@ static void migrate_fd_cleanup(void *opaque)
-         }
-         qemu_mutex_lock_iothread();
- 
-+        multifd_save_cleanup();
-         qemu_fclose(s->to_dst_file);
-         s->to_dst_file = NULL;
-     }
-@@ -2217,6 +2225,12 @@ void migrate_fd_connect(MigrationState *s)
-         }
-     }
- 
-+    if (multifd_save_setup() != 0) {
-+        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-+                          MIGRATION_STATUS_FAILED);
-+        migrate_fd_cleanup(s);
-+        return;
-+    }
-     qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
-                        QEMU_THREAD_JOINABLE);
-     s->migration_thread_running = true;
-diff --git a/migration/ram.c b/migration/ram.c
-index e18b3e2..9fb3496 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -356,6 +356,200 @@ static void compress_threads_save_setup(void)
-     }
+@@ -366,9 +366,8 @@ static void process_incoming_migration_co(void *opaque)
+     qemu_bh_schedule(mis->bh);
  }
  
-+/* Multiple fd's */
-+
-+struct MultiFDSendParams {
-+    uint8_t id;
-+    QemuThread thread;
-+    QemuSemaphore sem;
-+    QemuMutex mutex;
-+    bool quit;
-+};
-+typedef struct MultiFDSendParams MultiFDSendParams;
-+
-+struct {
-+    MultiFDSendParams *params;
-+    /* number of created threads */
-+    int count;
-+} *multifd_send_state;
-+
-+static void terminate_multifd_send_threads(void)
-+{
-+    int i;
-+
-+    for (i = 0; i < multifd_send_state->count; i++) {
-+        MultiFDSendParams *p = &multifd_send_state->params[i];
-+
-+        qemu_mutex_lock(&p->mutex);
-+        p->quit = true;
-+        qemu_sem_post(&p->sem);
-+        qemu_mutex_unlock(&p->mutex);
-+    }
-+}
-+
-+void multifd_save_cleanup(void)
-+{
-+    int i;
-+
-+    if (!migrate_use_multifd()) {
-+        return;
-+    }
-+    terminate_multifd_send_threads();
-+    for (i = 0; i < multifd_send_state->count; i++) {
-+        MultiFDSendParams *p = &multifd_send_state->params[i];
-+
-+        qemu_thread_join(&p->thread);
-+        qemu_mutex_destroy(&p->mutex);
-+        qemu_sem_destroy(&p->sem);
-+    }
-+    g_free(multifd_send_state->params);
-+    multifd_send_state->params = NULL;
-+    g_free(multifd_send_state);
-+    multifd_send_state = NULL;
-+}
-+
-+static void *multifd_send_thread(void *opaque)
-+{
-+    MultiFDSendParams *p = opaque;
-+
-+    while (true) {
-+        qemu_mutex_lock(&p->mutex);
-+        if (p->quit) {
-+            qemu_mutex_unlock(&p->mutex);
-+            break;
-+        }
-+        qemu_mutex_unlock(&p->mutex);
-+        qemu_sem_wait(&p->sem);
-+    }
-+
-+    return NULL;
-+}
-+
-+int multifd_save_setup(void)
-+{
-+    int thread_count;
-+    uint8_t i;
-+
-+    if (!migrate_use_multifd()) {
-+        return 0;
-+    }
-+    thread_count = migrate_multifd_threads();
-+    multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
-+    multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
-+    multifd_send_state->count = 0;
-+    for (i = 0; i < thread_count; i++) {
-+        char thread_name[16];
-+        MultiFDSendParams *p = &multifd_send_state->params[i];
-+
-+        qemu_mutex_init(&p->mutex);
-+        qemu_sem_init(&p->sem, 0);
-+        p->quit = false;
-+        p->id = i;
-+        snprintf(thread_name, sizeof(thread_name), "multifdsend_%d", i);
-+        qemu_thread_create(&p->thread, thread_name, multifd_send_thread, p,
-+                           QEMU_THREAD_JOINABLE);
-+        multifd_send_state->count++;
-+    }
-+    return 0;
-+}
-+
-+struct MultiFDRecvParams {
-+    uint8_t id;
-+    QemuThread thread;
-+    QemuSemaphore sem;
-+    QemuMutex mutex;
-+    bool quit;
-+};
-+typedef struct MultiFDRecvParams MultiFDRecvParams;
-+
-+struct {
-+    MultiFDRecvParams **params;
-+    /* number of created threads */
-+    int count;
-+} *multifd_recv_state;
-+
-+static void terminate_multifd_recv_threads(void)
-+{
-+    int i;
-+
-+    for (i = 0; i < multifd_recv_state->count; i++) {
-+        MultiFDRecvParams *p = multifd_recv_state->params[i];
-+
-+        qemu_mutex_lock(&p->mutex);
-+        p->quit = true;
-+        qemu_sem_post(&p->sem);
-+        qemu_mutex_unlock(&p->mutex);
-+    }
-+}
-+
-+void multifd_load_cleanup(void)
-+{
-+    int i;
-+
-+    if (!migrate_use_multifd()) {
-+        return;
-+    }
-+    terminate_multifd_recv_threads();
-+    for (i = 0; i < multifd_recv_state->count; i++) {
-+        MultiFDRecvParams *p = multifd_recv_state->params[i];
-+
-+        qemu_thread_join(&p->thread);
-+        qemu_mutex_destroy(&p->mutex);
-+        qemu_sem_destroy(&p->sem);
-+        g_free(p);
-+        multifd_recv_state->params[i] = NULL;
-+    }
-+    g_free(multifd_recv_state->params);
-+    multifd_recv_state->params = NULL;
-+    g_free(multifd_recv_state);
-+    multifd_recv_state = NULL;
-+}
-+
-+static void *multifd_recv_thread(void *opaque)
-+{
-+    MultiFDRecvParams *p = opaque;
-+
-+    while (true) {
-+        qemu_mutex_lock(&p->mutex);
-+        if (p->quit) {
-+            qemu_mutex_unlock(&p->mutex);
-+            break;
-+        }
-+        qemu_mutex_unlock(&p->mutex);
-+        qemu_sem_wait(&p->sem);
-+    }
-+
-+    return NULL;
-+}
-+
-+int multifd_load_setup(void)
-+{
-+    int thread_count;
-+    uint8_t i;
-+
-+    if (!migrate_use_multifd()) {
-+        return 0;
-+    }
-+    thread_count = migrate_multifd_threads();
-+    multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
-+    multifd_recv_state->params = g_new0(MultiFDRecvParams *, thread_count);
-+    multifd_recv_state->count = 0;
-+    for (i = 0; i < thread_count; i++) {
-+        char thread_name[16];
-+        MultiFDRecvParams *p = multifd_recv_state->params[i];
-+
-+        qemu_mutex_init(&p->mutex);
-+        qemu_sem_init(&p->sem, 0);
-+        p->quit = false;
-+        p->id = i;
-+        snprintf(thread_name, sizeof(thread_name), "multifdrecv_%d", i);
-+        qemu_thread_create(&p->thread, thread_name, multifd_recv_thread, p,
-+                           QEMU_THREAD_JOINABLE);
-+        multifd_recv_state->count++;
-+    }
-+    return 0;
-+}
-+
- /**
-  * save_page_header: write page header to wire
-  *
-diff --git a/migration/ram.h b/migration/ram.h
-index c081fde..93c2bb4 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -39,6 +39,11 @@ int64_t xbzrle_cache_resize(int64_t new_size);
- uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
+-void migration_fd_process_incoming(QEMUFile *f)
++static void migration_incoming_setup(QEMUFile *f)
+ {
+-    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
+     MigrationIncomingState *mis = migration_incoming_get_current();
  
-+int multifd_save_setup(void);
-+void multifd_save_cleanup(void);
-+int multifd_load_setup(void);
-+void multifd_load_cleanup(void);
+     if (multifd_load_setup() != 0) {
+@@ -380,9 +379,20 @@ void migration_fd_process_incoming(QEMUFile *f)
+         mis->from_src_file = f;
+     }
+     qemu_file_set_blocking(f, false);
++}
 +
- uint64_t ram_pagesize_summary(void);
- int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
- void acct_update_position(QEMUFile *f, size_t size, bool zero);
++static void migration_incoming_process(void)
++{
++    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
+     qemu_coroutine_enter(co);
+ }
+ 
++void migration_fd_process_incoming(QEMUFile *f)
++{
++    migration_incoming_setup(f);
++    migration_incoming_process();
++}
++
+ void migration_ioc_process_incoming(QIOChannel *ioc)
+ {
+     MigrationIncomingState *mis = migration_incoming_get_current();
 -- 
 2.9.4
