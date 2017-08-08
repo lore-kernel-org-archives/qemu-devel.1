@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df05w-0007rI-Id
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:42:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1df06U-00089w-Bs
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df05u-0001HZ-KG
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:42:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df05u-0001H9-E7
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:42:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B9977F40F
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 08:42:29 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170719154434.GE3500@work-vm> (David Alan Gilbert's message of
-	"Wed, 19 Jul 2017 16:44:34 +0100")
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-5-quintela@redhat.com>
-	<20170719154434.GE3500@work-vm>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 Aug 2017 10:42:25 +0200
-Message-ID: <87k22ebgcu.fsf@secure.mitica>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1df06R-0001Xv-7M
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:43:06 -0400
+References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+	<20170807155717.GI6578@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
+Date: Tue, 8 Aug 2017 11:42:57 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 04/17] migration: Add multifd capability
+In-Reply-To: <20170807155717.GI6578@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,15 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+07.08.2017 18:57, Kevin Wolf wrote:
+> Am 07.08.2017 um 16:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 185 iotest is broken.
+>>
+>> How to test:
+>>> i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
+>>    done; echo N = $i
+>>
+>> finished for me like this:
+>>
+>> 185 2s ... - output mismatch (see 185.out.bad)
+>> --- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
+>>      15:14:29.520343805 +0300
+>> +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
+>> @@ -37,7 +37,7 @@
+>>   {"return": {}}
+>>   {"return": {}}
+>>   {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+>>       "event": "SHUTDOWN", "data": {"guest": false}}
+>> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+>>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+>>          "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
+>>              "mirror"}}
+>> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
+>>      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
+>>          "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
+>>
+>>   === Start backup job and exit qemu ===
+>>
+>> Failures: 185
+>> Failed 1 of 1 tests
+>> N = 8
+>>
+>> It doesn't seems logical to expect the constant offset on cancel,
+>> so let filter it out.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> I'm quoting 185:
 >
-> Note you need to update this;  you need to add the
-> DEFINE_PROP_MIG_CAP in migration_properties[]
+> # Note that the reference output intentionally includes the 'offset' field in
+> # BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
+> # predictable and any change in the offsets would hint at a bug in the job
+> # throttling code.
+> #
+> # In order to achieve these predictable offsets, all of the following tests
+> # use speed=65536. Each job will perform exactly one iteration before it has
+> # to sleep at least for a second, which is plenty of time for the 'quit' QMP
+> # command to be received (after receiving the command, the rest runs
+> # synchronously, so jobs can arbitrarily continue or complete).
+> #
+> # The buffer size for commit and streaming is 512k (waiting for 8 seconds after
+> # the first request), for active commit and mirror it's large enough to cover
+> # the full 4M, and for backup it's the qcow2 cluster size, which we know is
+> # 64k. As all of these are at least as large as the speed, we are sure that the
+> # offset doesn't advance after the first iteration before qemu exits.
+>
+> So before we change the expected output, can we explain why the offsets
+> aren't predictable, even if throttling is used and contrary to what the
+> comment says? Should we sleep a little before issuing 'quit'?
 
-Done, it was sent before I integrated the other patches into upstream.
+Throttling "guaranties" that there will not be more than one request. 
+But what prevent less than one, i.e. zero, like in my reproduction?
+
+>
+> (By the way, I couldn't reproduce in N = 128 attempts, so it doesn't
+> look like I can look into what's happening in detail, except with code
+> review.)
+>
+> Kevin
+
+
+-- 
+Best regards,
+Vladimir
