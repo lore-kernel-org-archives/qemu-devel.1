@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df0H6-0004QB-Fu
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:54:06 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1df0IQ-0005gb-KN
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:55:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df0H5-0007f9-5W
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:54:04 -0400
-Date: Tue, 8 Aug 2017 10:53:52 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170808085352.GF4850@dhcp-200-186.str.redhat.com>
-References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-	<20170807155717.GI6578@localhost.localdomain>
-	<692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1df0IN-0008PB-Gy
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:55:26 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35789)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1df0IN-0008Ow-A1
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:55:23 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id m85so1604897wma.0
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 01:55:23 -0700 (PDT)
+References: <20170807153934.29477-1-alex.bennee@linaro.org>
+	<20170807153934.29477-2-alex.bennee@linaro.org>
+	<20170808013846.GO14780@lemon>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170808013846.GO14780@lemon>
+Date: Tue, 08 Aug 2017 09:55:20 +0100
+Message-ID: <87r2wmv3pj.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 v3 1/6] docker: ensure NOUSER for
+ travis images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Am 08.08.2017 um 10:42 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 07.08.2017 18:57, Kevin Wolf wrote:
-> > Am 07.08.2017 um 16:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > > 185 iotest is broken.
-> > > 
-> > > How to test:
-> > > > i=0; while ./check -qcow2 -nocache 185; do ((i+=1)); echo N = $i; \
-> > >    done; echo N = $i
-> > > 
-> > > finished for me like this:
-> > > 
-> > > 185 2s ... - output mismatch (see 185.out.bad)
-> > > --- /work/src/qemu/master/tests/qemu-iotests/185.out    2017-07-14 \
-> > >      15:14:29.520343805 +0300
-> > > +++ 185.out.bad 2017-08-07 16:51:02.231922900 +0300
-> > > @@ -37,7 +37,7 @@
-> > >   {"return": {}}
-> > >   {"return": {}}
-> > >   {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
-> > >       "event": "SHUTDOWN", "data": {"guest": false}}
-> > > -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
-> > >      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
-> > >          "len": 4194304, "offset": 4194304, "speed": 65536, "type": \
-> > >              "mirror"}}
-> > > +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, \
-> > >      "event": "BLOCK_JOB_CANCELLED", "data": {"device": "disk", \
-> > >          "len": 0, "offset": 0, "speed": 65536, "type": "mirror"}}
-> > > 
-> > >   === Start backup job and exit qemu ===
-> > > 
-> > > Failures: 185
-> > > Failed 1 of 1 tests
-> > > N = 8
-> > > 
-> > > It doesn't seems logical to expect the constant offset on cancel,
-> > > so let filter it out.
-> > > 
-> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > I'm quoting 185:
-> > 
-> > # Note that the reference output intentionally includes the 'offset' field in
-> > # BLOCK_JOB_CANCELLED events for all of the following block jobs. They are
-> > # predictable and any change in the offsets would hint at a bug in the job
-> > # throttling code.
-> > #
-> > # In order to achieve these predictable offsets, all of the following tests
-> > # use speed=65536. Each job will perform exactly one iteration before it has
-> > # to sleep at least for a second, which is plenty of time for the 'quit' QMP
-> > # command to be received (after receiving the command, the rest runs
-> > # synchronously, so jobs can arbitrarily continue or complete).
-> > #
-> > # The buffer size for commit and streaming is 512k (waiting for 8 seconds after
-> > # the first request), for active commit and mirror it's large enough to cover
-> > # the full 4M, and for backup it's the qcow2 cluster size, which we know is
-> > # 64k. As all of these are at least as large as the speed, we are sure that the
-> > # offset doesn't advance after the first iteration before qemu exits.
-> > 
-> > So before we change the expected output, can we explain why the offsets
-> > aren't predictable, even if throttling is used and contrary to what the
-> > comment says? Should we sleep a little before issuing 'quit'?
-> 
-> Throttling "guaranties" that there will not be more than one request. But
-> what prevent less than one, i.e. zero, like in my reproduction?
 
-Yes, I understand. Can we somehow make sure that at least one iteration
-is made? I'd really like to keep the functional test for block job
-throttling. I suppose a simple 'sleep 0.1' would do the trick, though
-it's not very clean.
+Fam Zheng <famz@redhat.com> writes:
 
-Kevin
+> On Mon, 08/07 16:39, Alex Bennée wrote:
+>> While adding the current user is a useful default behaviour for
+>> creating new images it is not appropriate for Travis which already has
+>> a default user.
+>
+> Target docker-travis@travis will not have NOUSER=1 automatically, right? Is that
+> a problem?
+
+It doesn't until this patch. In fact it would be better if we ran travis
+tests with the travis user rather than the mapped local user.
+
+>
+> Fam
+>
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  tests/docker/Makefile.include | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>> index aaab1a4208..d7dafdbd27 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -71,6 +71,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
+>>  docker-image-debian-s390x-cross: docker-image-debian9
+>>  docker-image-debian-win32-cross: docker-image-debian8-mxe
+>>  docker-image-debian-win64-cross: docker-image-debian8-mxe
+>> +docker-image-travis: NOUSER=1
+>>
+>>  # Expand all the pre-requistes for each docker image and test combination
+>>  $(foreach i,$(DOCKER_IMAGES), \
+>> --
+>> 2.13.0
+>>
+>>
+
+
+--
+Alex Bennée
