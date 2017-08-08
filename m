@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1df44S-0007bU-O2
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:57:21 -0400
+	(envelope-from <cohuck@redhat.com>) id 1df47x-0001HH-4J
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1df44N-0001lh-Rc
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:57:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54124)
+	(envelope-from <cohuck@redhat.com>) id 1df47s-0004jP-CA
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:00:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38416)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1df44N-0001kV-Lq
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 08:57:11 -0400
-Date: Tue, 8 Aug 2017 09:57:06 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170808125706.GQ3108@localhost.localdomain>
-References: <20170804213625.3756-1-ehabkost@redhat.com>
-	<20170804213625.3756-2-ehabkost@redhat.com>
-	<20170808100721.GC16801@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1df47s-0004iH-5b
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:00:48 -0400
+Date: Tue, 8 Aug 2017 15:00:42 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170808150042.5bf155ae@gondolin>
+In-Reply-To: <20170808145000.3259f597@bahia.lan>
+References: <20170808121701.18353-1-cohuck@redhat.com>
+	<20170808121701.18353-2-cohuck@redhat.com>
+	<20170808145000.3259f597@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170808100721.GC16801@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/5] qmp-shell: Use argparse module
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] 9pfs: fix and simplify dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Aug 08, 2017 at 11:07:21AM +0100, Stefan Hajnoczi wrote:
-> On Fri, Aug 04, 2017 at 06:36:21PM -0300, Eduardo Habkost wrote:
-> > It makes command-line parsing and generation of help text much
-> > simpler.
+On Tue, 8 Aug 2017 14:50:00 +0200
+Greg Kurz <groug@kaod.org> wrote:
+
+> On Tue,  8 Aug 2017 14:17:01 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > We want to compile the 9pfs code iff virtfs is enabled and a virtio
+> > transport is available (not only pci!).
 > > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  scripts/qmp/qmp-shell | 61 +++++++++++++++++----------------------------------
-> >  1 file changed, 20 insertions(+), 41 deletions(-)
+> > Let's make the generated CONFIG_VIRTFS statement depend on either
+> > CONFIG_VIRTIO_PCI or (new) CONFIG_VIRTIO_CCW. The Makefiles for fsdev/
+> > and hw/9pfs/ can then depend on CONFIG_VIRTFS directly.
+> > 
+> > Suggested-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---  
 > 
-> The minimum Python version is 2.6.  The argparse module was introduced
-> in Python 2.7 so we cannot use it without increasing the minimum Python
-> version:
+> It looks good to me.
 > 
-> https://docs.python.org/2.6/modindex.html
+> Acked-by: Greg Kurz <groug@kaod.org>
 > 
-> I suggest holding off on this for now.
+> >  configure                         | 2 +-
+> >  default-configs/s390x-softmmu.mak | 1 +
+> >  fsdev/Makefile.objs               | 2 +-
+> >  hw/Makefile.objs                  | 2 +-
+> >  4 files changed, 4 insertions(+), 3 deletions(-)
 
-2.6 is the minimum Python version for what, exactly?  Is it for
-building QEMU?
+Thanks!
 
-Note that qmp-shell is a tool for developers, not required for
-building or running QEMU.  People who really want to run
-qmp-shell on a python-2.6 system can still install argparse if
-they want to use qmp-shell.
-
-I could backport the code to optparse.  But should we add code
-that relies on a deprecated module, if developers running Python
-2.6 can install argparse?
-
--- 
-Eduardo
+Will you queue this yourself, or should I send it together with the
+zpci cleanup patches?
