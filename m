@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df7xl-0001ea-4v
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:06:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1df8I6-0001Oy-Uk
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df7xh-0003SQ-0g
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:06:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1df7xg-0003S7-Ob
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:06:32 -0400
-Date: Tue, 8 Aug 2017 18:06:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170808170610.GQ2081@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<CGME20170628190250epcas2p1f018e6169b78276f65cf4cc9fbeb14a3@epcas2p1.samsung.com>
-	<20170628190047.26159-24-dgilbert@redhat.com>
-	<1e52da76-269f-020e-c9cf-adaaef30b59c@samsung.com>
+	(envelope-from <eblake@redhat.com>) id 1df8I5-0006GK-No
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:27:38 -0400
+References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+	<20170807155717.GI6578@localhost.localdomain>
+	<692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
+	<20170808085352.GF4850@dhcp-200-186.str.redhat.com>
+	<896f8482-6e3a-13e9-4cce-ca115a6c8881@virtuozzo.com>
+	<645f5e9d-6a4b-1d7b-6907-6ab27e1ffa7e@virtuozzo.com>
+	<51899b88-6b4b-88ce-f820-f62bc944c034@redhat.com>
+	<2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
+	<20170808151600.GN4850@dhcp-200-186.str.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1d6823a2-a459-6dc8-428b-b5d0fee3db39@redhat.com>
+Date: Tue, 8 Aug 2017 12:27:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e52da76-269f-020e-c9cf-adaaef30b59c@samsung.com>
-Subject: Re: [Qemu-devel] [RFC 23/29] vub+postcopy: madvises
+In-Reply-To: <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QFgKBc8KasD3LbbuAnodtEoE1o4a2D836"
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> On 06/28/2017 10:00 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Clear the area and turn off THP.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >   contrib/libvhost-user/libvhost-user.c | 32 ++++++++++++++++++++++++++++++--
-> >   1 file changed, 30 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> > index 0658b6e847..ceddeac74f 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -451,11 +451,39 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >           }
-> >           if (dev->postcopy_listening) {
-> > +            int ret;
-> >               /* We should already have an open ufd need to mark each memory
-> >                * range as ufd.
-> > -             * Note: Do we need any madvises? Well it's not been accessed
-> > -             * yet, still probably need no THP to be safe, discard to be safe?
-> >                */
-> > +
-> > +            /* Discard any mapping we have here; note I can't use MADV_REMOVE
-> > +             * or fallocate to make the hole since I don't want to lose
-> > +             * data that's already arrived in the shared process.
-> > +             * TODO: How to do hugepage
-> > +             */
-> Hi, David, frankly saying, I stuck with my solution, and I have also another
-> issues,
-> but here I could suggest solution for hugepages. I think we could transmit a
-> received pages
-> bitmap in VHOST_USER_SET_MEM_TABLE (VhostUserMemoryRegion), but it will
-> raise a compatibility issue,
-> or introduce special message type for that and send it before
-> VHOST_USER_SET_MEM_TABLE.
-> So it will be  possible to do fallocate on received bitmap basis, just skip
-> already copied pages.
-> If you wish, I could send patches, rebased on yours, for doing it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QFgKBc8KasD3LbbuAnodtEoE1o4a2D836
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <1d6823a2-a459-6dc8-428b-b5d0fee3db39@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
+References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
+ <20170807155717.GI6578@localhost.localdomain>
+ <692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
+ <20170808085352.GF4850@dhcp-200-186.str.redhat.com>
+ <896f8482-6e3a-13e9-4cce-ca115a6c8881@virtuozzo.com>
+ <645f5e9d-6a4b-1d7b-6907-6ab27e1ffa7e@virtuozzo.com>
+ <51899b88-6b4b-88ce-f820-f62bc944c034@redhat.com>
+ <2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
+ <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-What we found works is that actually we don't need to do a discard -
-since we've only just done the mmap of the arena, nothing will be
-occupying it on the shared client, so we don't need to discard.
+On 08/08/2017 10:16 AM, Kevin Wolf wrote:
 
-We've had a postcopy migrate work now, with a few hacks we're still
-cleaning up, both on vhost-user-bridge and dpdk; so I'll get this
-updated and reposted.
+>>>> is sleep for ms portable?
+>>> Sadly, sub-second sleep is a GNU coreutils feature; I suspect the BSD=
 
-Dave
+>>> machines may fail to parse it.  (Of course, we could do some sort of
+>>> 'sleep $SMALL', where $SMALL is 0.5 if sleep supports it, and 1 other=
+wise).
+>>>
+>> sleep for 1 second may lead to more then one request done before qemu =
+quite.
+>=20
+> _supported_os Linux
+>=20
+> So do we really care about portability? And are all the other test case=
+s
+> working on the BSDs?
 
-> > +            ret = madvise((void *)dev_region->mmap_addr,
-> > +                          dev_region->size + dev_region->mmap_offset,
-> > +                          MADV_DONTNEED);
-> > +            if (ret) {
-> > +                fprintf(stderr,
-> > +                        "%s: Failed to madvise(DONTNEED) region %d: %s\n",
-> > +                        __func__, i, strerror(errno));
-> > +            }
-> > +            /* Turn off transparent hugepages so we dont get lose wakeups
-> > +             * in neighbouring pages.
-> > +             * TODO: Turn this backon later.
-> > +             */
-> > +            ret = madvise((void *)dev_region->mmap_addr,
-> > +                          dev_region->size + dev_region->mmap_offset,
-> > +                          MADV_NOHUGEPAGE);
-> > +            if (ret) {
-> > +                /* Note: This can happen legally on kernels that are configured
-> > +                 * without madvise'able hugepages
-> > +                 */
-> > +                fprintf(stderr,
-> > +                        "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
-> > +                        __func__, i, strerror(errno));
-> > +            }
-> >               struct uffdio_register reg_struct;
-> >               /* Note: We might need to go back to using mmap_addr and
-> >                * len + mmap_offset for * huge pages, but then we do hope not to
-> 
-> 
-> -- 
-> Best regards,
-> Alexey Perevalov
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You've got valid points there - I suspect that a run of qemu-iotests on
+BSD would turn up quite a few failures, some of which would be easy to
+address; but it's not on my personal priority list.  I'm fine with an
+approach of committing something that works where it was first tested,
+then adding followup patches to improve portability, especially as long
+as we are not currently getting anyone complaining about qemu-iotests
+failures on BSD.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--QFgKBc8KasD3LbbuAnodtEoE1o4a2D836
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmJ9H0ACgkQp6FrSiUn
+Q2pmbwf/RWG/oGNL0XXs3lkMI2zdJUt4pTXoOnX3M3iVEoPOVpo/w6M54CfOf+OC
+UPpKfp65r+T0cbwZCn6gRZlzp1VajnJjYnT+1XA/6aai8ESGl3oxm7OAz468HRK3
+KqN9HbIz29novdqhNY4IsNh2KvAz/2mO6oMPiTmj2mOWDd4DaB0SvbEMBkPpoZyj
+niM8iC2eFdOYlIHrZwKGF1XB4kj++tigOIuaBRkVdo0UVQPpoXY1hsRHcgPVb9K1
+Da/q2bkpZbLRxo3SUP1kQNPdYBJ9wS2+Z86B+5MdiXjJ2Fnkgxj0x4IiVB/Nvj4W
+N6VBvo7SLVw0aDG623b0Ildt3+OxCQ==
+=rU3t
+-----END PGP SIGNATURE-----
+
+--QFgKBc8KasD3LbbuAnodtEoE1o4a2D836--
