@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1deyV7-0001ho-Qv
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:00:30 -0400
+	(envelope-from <quintela@redhat.com>) id 1deyXd-0002bK-GV
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1deyV2-0005gS-Or
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:00:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58416)
+	(envelope-from <quintela@redhat.com>) id 1deyXY-00088Y-Q4
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:03:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1deyV2-0005YC-HV
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:00:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1deyXY-00087w-Jn
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:02:56 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D897356ED
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:00:16 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue,  8 Aug 2017 15:00:07 +0800
-Message-Id: <1502175607-9531-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11] rcu: init globals only once
+	by mx1.redhat.com (Postfix) with ESMTPS id 8651980E6A
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:02:55 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170804175011.21944-1-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Fri, 4 Aug 2017 18:50:11 +0100")
+References: <20170804175011.21944-1-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 Aug 2017 09:02:54 +0200
+Message-ID: <874ltiee3l.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH f0r 2.11] runstate/migrate: Two more
+ transitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +34,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
 
-We were calling rcu_init_complete() twice in the child processes when
-fork happened. However the pthread library does not really suggest to do
-it that way:
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> There's a race if someone does a 'stop' near the end of migrate;
+> the migration process goes through two runstates:
+>     'finish migrate'
+>     'postmigrate'
+>
+> If the user issues a 'stop' between the two we end up with invalid
+> state transitions.
+> Add the transitions as valid.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-http://pubs.opengroup.org/onlinepubs/7908799/xsh/pthread_mutex_init.html
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-"Attempting to initialise an already initialised mutex results in
- undefined behaviour."
+To answer Peter question:
 
-Actually, IMHO we can do it in a more natural way: Firstly, we only init
-the RCU globals once in rcu_init(). Then, in rcu_init_child(), we unlock
-all the locks held in rcu_init_lock() just like what we do in the parent
-process, then do the rest of RCU re-init (e.g., create the RCU thread).
+int vm_stop(RunState state)
+{
+    .... we don't care about this case ....
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
-this is based on Paolo's series:
-"[PATCH for-2.10 0/2] RCU: forking fix and cleanups"
----
- util/rcu.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+    return do_vm_stop(state);
+}
 
-diff --git a/util/rcu.c b/util/rcu.c
-index ca5a63e..6fbbe4c 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -299,15 +299,17 @@ void rcu_unregister_thread(void)
-     qemu_mutex_unlock(&rcu_registry_lock);
- }
- 
--static void rcu_init_complete(void)
-+static void rcu_init_globals(void)
- {
--    QemuThread thread;
--
-     qemu_mutex_init(&rcu_registry_lock);
-     qemu_mutex_init(&rcu_sync_lock);
-     qemu_event_init(&rcu_gp_event, true);
--
-     qemu_event_init(&rcu_call_ready_event, false);
-+}
-+
-+static void rcu_init_complete(void)
-+{
-+    QemuThread thread;
- 
-     /* The caller is assumed to have iothread lock, so the call_rcu thread
-      * must have been quiescent even after forking, just recreate it.
-@@ -357,6 +359,13 @@ static void rcu_init_child(void)
-         return;
-     }
- 
-+    rcu_init_unlock();
-+
-+    /*
-+     * For the newly forked child, we need something extra: since
-+     * after fork the threads are all gone, we need to re-init the RCU
-+     * thread, along with the globals.
-+     */
-     memset(&registry, 0, sizeof(registry));
-     rcu_init_complete();
- }
-@@ -367,5 +376,6 @@ static void __attribute__((__constructor__)) rcu_init(void)
- #ifdef CONFIG_POSIX
-     pthread_atfork(rcu_init_lock, rcu_init_unlock, rcu_init_child);
- #endif
-+    rcu_init_globals();
-     rcu_init_complete();
- }
--- 
-2.7.4
+static int do_vm_stop(RunState state)
+{
+    int ret = 0;
+
+    if (runstate_is_running()) {
+        cpu_disable_ticks();
+        pause_all_vcpus();
+        runstate_set(state);
+        vm_state_notify(0, state);
+        qapi_event_send_stop(&error_abort);
+    }
+
+    bdrv_drain_all();
+    replay_disable_events();
+    ret = bdrv_flush_all();
+
+    return ret;
+}
+
+
+int runstate_is_running(void)
+{
+    return runstate_check(RUN_STATE_RUNNING);
+}
+
+
+So, "stop" only changes states when we are in RUNNING state.
+The idea was that after migration, the only valid command (as in the
+film "it should do something")is "run".
+
+Later, Juan.
