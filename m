@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df5oH-0007oP-7D
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:48:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1df5sH-0001zy-O3
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1df5oG-0001Dk-38
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:48:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40027)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1df5oF-0001D7-TN
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:48:40 -0400
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-2-git-send-email-zuban32s@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8893f281-e30d-d1c6-3da0-14a644da5a03@redhat.com>
-Date: Tue, 8 Aug 2017 16:48:26 +0200
+	(envelope-from <armbru@redhat.com>) id 1df5sG-0003te-Gy
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:52:49 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170721034730.25612-1-crosa@redhat.com>
+	<20170721123325.GC18014@stefanha-x1.localdomain>
+	<20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+	<20170726175808.GD3600@stefanha-x1.localdomain>
+	<ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
+	<20170727134101.GG10129@stefanha-x1.localdomain>
+	<87mv7a4h77.fsf@dusky.pond.sub.org>
+	<20170808124410.GN16801@stefanha-x1.localdomain>
+Date: Tue, 08 Aug 2017 16:52:25 +0200
+In-Reply-To: <20170808124410.GN16801@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Tue, 8 Aug 2017 13:44:10 +0100")
+Message-ID: <877eye9knq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1501964858-5159-2-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] acpi-test: Warning! DSDT mismatch (was: [PATCH v4 1/5]
- hw/i386: allow SHPC for Q35 machine)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com
-Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>, ehabkost@redhat.com, kevin@koconnor.net, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, lersek@redhat.com, Peter Maydell <peter.maydell@linaro.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 05.08.2017 22:27, Aleksandr Bezzubikov wrote:
-> Unmask previously masked SHPC feature in _OSC method.
->=20
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
->  hw/i386/acpi-build.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index b9c245c..98dd424 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1862,9 +1862,9 @@ static Aml *build_q35_osc_method(void)
-> =20
->      /*
->       * Always allow native PME, AER (no dependencies)
-> -     * Never allow SHPC (no SHPC controller in this system)
-> +     * Allow SHPC (PCI bridges can have SHPC controller)
->       */
-> -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1D), a_ctrl));
-> +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
-> =20
->      if_ctx2 =3D aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
->      /* Unknown revision */
->=20
+Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-Since this patch has been merged, I now get a bunch of ugly warnings
-during "make check":
+> On Tue, Aug 08, 2017 at 10:06:04AM +0200, Markus Armbruster wrote:
+>> Stefan Hajnoczi <stefanha@gmail.com> writes:
+>> 
+>> > On Wed, Jul 26, 2017 at 02:24:02PM -0400, Cleber Rosa wrote:
+>> >> 
+>> >> 
+>> >> On 07/26/2017 01:58 PM, Stefan Hajnoczi wrote:
+>> >> > On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
+>> >> >> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
+>> >> >>> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
+>> >> >>>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
+>> >> >>>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
+>> >> >>>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+>> >> >>>> Without the static capabilities defined, the dynamic check would be
+>> >> >>>> influenced by the run time environment.  It would really mean "qemu-io
+>> >> >>>> running on this environment (filesystem?) can do native aio".  Again,
+>> >> >>>> that's not the best type of information to depend on when writing tests.
+>> >> >>>
+>> >> >>> Can you explain this more?
+>> >> >>>
+>> >> >>> It seems logical to me that if qemu-io in this environment cannot do
+>> >> >>> aio=native then we must skip those tests.
+>> >> >>>
+>> >> >>> Stefan
+>> >> >>>
+>> >> >>
+>> >> >> OK, let's abstract a bit more.  Let's take this part of your statement:
+>> >> >>
+>> >> >>  "if qemu-io in this environment cannot do aio=native"
+>> >> >>
+>> >> >> Let's call that a feature check.  Depending on how the *feature check*
+>> >> >> is written, a negative result may hide a test failure, because it would
+>> >> >> now be skipped.
+>> >> > 
+>> >> > You are saying a pass->skip transition can hide a failure but ./check
+>> >> > tracks skipped tests.  See tests/qemu-iotests/check.log for a
+>> >> > pass/fail/skip history.
+>> >> > 
+>> >> 
+>> >> You're not focusing on the problem here.  The problem is that a test
+>> >> that *was not* supposed to be skipped, would be skipped.
+>> >
+>> > As Daniel Berrange mentioned, ./configure has the same problem.  You
+>> > cannot just run it blindly because it silently disables features.
+>> >
+>> > What I'm saying is that in addition to watching ./configure closely, you
+>> > also need to look at the skipped tests that ./check reports.  If you do
+>> > that then you can be sure the expected set of tests is passing.
+>> >
+>> >> > It is the job of the CI system to flag up pass/fail/skip transitions.
+>> >> > You're no worse off using feature tests.
+>> >> > 
+>> >> > Stefan
+>> >> > 
+>> >> 
+>> >> What I'm trying to help us achieve here is a reliable and predictable
+>> >> way for the same test job execution to be comparable across
+>> >> environments.  From the individual developer workstation, CI, QA etc.
+>> >
+>> > 1. Use ./configure --enable-foo options for all desired features.
+>> > 2. Run the ./check command-line and there should be no unexpected skips
+>> >    like this:
+>> >
+>> > 087         [not run] missing aio=native support
+>> >
+>> > To me this seems to address the problem.
+>> >
+>> > I have mentioned the issues with the build flags solution: it creates a
+>> > dependency on the build environment and forces test feature checks to
+>> > duplicate build dependency logic.  This is why I think feature tests are
+>> > a cleaner solution.
+>> 
+>> I suspect the actual problem here is that the qemu-iotests harness is
+>> not integrated in the build process.  For other tests, we specify the
+>> tests to run in a Makefile, and use the same configuration mechanism as
+>> for building stuff conditionally.
+>
+> The ability to run tests against QEMU binaries without a build
+> environment is useful though.  It would still be possible to symlink to
+> external binaries but then the build feature information could be
+> incorrect.
 
-acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-T2ST4Y.dsl,
-aml:/tmp/aml-HVUT4Y], Expected [asl:/tmp/asl-00VT4Y.dsl,
-aml:tests/acpi-test-data/q35/DSDT].
-acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-3BKN4Y.dsl,
-aml:/tmp/aml-CDKN4Y], Expected [asl:/tmp/asl-2CZM4Y.dsl,
-aml:tests/acpi-test-data/q35/DSDT.bridge].
-acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-ZVPA4Y.dsl,
-aml:/tmp/aml-A3PA4Y], Expected [asl:/tmp/asl-F0QA4Y.dsl,
-aml:tests/acpi-test-data/q35/DSDT.ipmibt].
-acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-TX7P4Y.dsl,
-aml:/tmp/aml-S97P4Y], Expected [asl:/tmp/asl-AIJP4Y.dsl,
-aml:tests/acpi-test-data/q35/DSDT.cphp].
-acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6J0C4Y.dsl,
-aml:/tmp/aml-DCZC4Y], Expected [asl:/tmp/asl-9I1C4Y.dsl,
-aml:tests/acpi-test-data/q35/DSDT.memhp].
+I don't dispute it's useful.  "make check" doesn't do it, though.
 
-Did you maybe forget to update the ACPI test table according to the
-changes? (and why was this merged during hard-freeze at all? The
-ChangeLog text does not sound like a bug fix?)
-
- Thomas
+I think we can either have a standalone test suite (introspects the
+binaries under test to figure out what to test), or an integrated test
+suite (tests exactly what is configured).  "make check" is the latter.
+qemu-iotests is kind-of-sort-of the former.
