@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df4xq-0006sQ-G8
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:54:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1df52B-00005Q-Sc
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df4xl-0007mj-HN
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:54:30 -0400
-Date: Tue, 8 Aug 2017 15:54:07 +0200
+	(envelope-from <kwolf@redhat.com>) id 1df527-0001yP-3R
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:58:59 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170808135407.GK4850@dhcp-200-186.str.redhat.com>
-References: <20170703180950.9895-1-eblake@redhat.com>
+Date: Tue,  8 Aug 2017 15:58:20 +0200
+Message-Id: <20170808135838.11525-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170703180950.9895-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] tests: Avoid non-portable 'echo -ARG'
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/18] Block layer patches for 2.10.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,59 +20,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, stefanha@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Jiri Pirko <jiri@resnulli.us>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Am 03.07.2017 um 20:09 hat Eric Blake geschrieben:
-> POSIX says that backslashes in the arguments to 'echo', as well as
-> any use of 'echo -n' and 'echo -e', are non-portable; it recommends
-> people should favor 'printf' instead.  This is definitely true where
-> we do not control which shell is running (such as in makefile snippets
-> or in documentation examples).  But even for scripts where we
-> require bash (and therefore, where echo does what we want by default),
-> it is still possible to use 'shopt -s xpg_echo' to change bash's
-> behavior of echo.  And setting a good example never hurts when we are
-> not sure if a snippet will be copied from a bash-only script to a
-> general shell script (although I don't change the use of non-portable
-> \e for ESC when we know the running shell is bash).
-> 
-> Replace 'echo -n "..."' with 'printf %s "..."', and 'echo -e "..."'
-> with 'printf %b "...\n"', with the optimization that the %s/%b
-> argument can be omitted if the string being printed is a strict
-> literal with no '%', '$', or '`' (we could technically also make
-> this optimization when there are $ or `` substitutions but where
-> we can prove their results will not be problematic, but proving
-> that such substitutions are safe makes the patch less trivial
-> compared to just being consistent).
-> 
-> In the qemu-iotests check script, fix unusual shell quoting
-> that would result in word-splitting if 'date' outputs a space.
-> 
-> In test 051, take an opportunity to shorten the line.
-> 
-> In test 068, get rid of a pointless second invocation of bash.
-> 
-> CC: qemu-trivial@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+The following changes since commit b4174c4b08a719e7df7e4f35c29f44b7c25172=
+37:
 
-> diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
-> index 78d7edf..c8f3da8 100755
-> --- a/tests/multiboot/run_test.sh
-> +++ b/tests/multiboot/run_test.sh
-> @@ -26,7 +26,7 @@ run_qemu() {
->      local kernel=$1
->      shift
-> 
-> -    echo -e "\n\n=== Running test case: $kernel $@ ===\n" >> test.log
-> +    printf %b "\n\n=== Running test case: $kernel $@ ===\n\n" >> test.log
-> 
->      $QEMU \
->          -kernel $kernel \
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2017-08-08 10:01:49 +0100)
 
-Not completely sure why, but this broke the test with whitespace changes
-like this:
+are available in the git repository at:
 
--=== Running test case: mmap.elf -m 1.1M ===
-+=== Running test case: mmap.elf -m1.1M ===
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-Kevin
+for you to fetch changes up to 113fe792fd4931dd0538f03859278b8719ee4fa2:
+
+  block/nfs: fix mutex assertion in nfs_file_close() (2017-08-08 15:19:16=
+ +0200)
+
+----------------------------------------------------------------
+Block layer patches for 2.10.0-rc2
+
+----------------------------------------------------------------
+Alberto Garcia (1):
+      quorum: Set sectors-count to 0 when reporting a flush error
+
+Cleber Rosa (1):
+      qemu-iotests/109: Fix lock race condition
+
+Denis V. Lunev (3):
+      block: respect error code from bdrv_getlength in handle_aiocb_write=
+_zeroes
+      parallels: respect error code of bdrv_getlength() in allocate_clust=
+ers()
+      parallels: drop check that bdrv_truncate() is working
+
+Fam Zheng (1):
+      vmdk: Fix error handling/reporting of vmdk_check
+
+Jeff Cody (5):
+      block/vhdx: check error return of bdrv_getlength()
+      block/vhdx: check for offset overflow to bdrv_truncate()
+      block/vhdx: check error return of bdrv_flush()
+      block/vhdx: check error return of bdrv_truncate()
+      block/nfs: fix mutex assertion in nfs_file_close()
+
+Kevin Wolf (6):
+      block/null: Remove 'filename' option
+      block: Fix order in bdrv_replace_child()
+      block: Allow reopen rw without BDRV_O_ALLOW_RDWR
+      block: Set BDRV_O_ALLOW_RDWR during rw reopen
+      qemu-io: Allow reopen read-write
+      qemu-iotests: Test reopen between read-only and read-write
+
+Paolo Bonzini (1):
+      block: drop bdrv_set_key from BlockDriver
+
+ include/block/block.h      |  3 +-
+ include/block/block_int.h  |  1 -
+ block.c                    | 20 +++++++++-----
+ block/file-posix.c         |  8 +++++-
+ block/nfs.c                | 11 ++++++--
+ block/null.c               | 31 +++++++++++++++++----
+ block/parallels.c          | 12 ++++----
+ block/quorum.c             |  3 +-
+ block/vhdx-log.c           | 52 +++++++++++++++++++++++++++-------
+ block/vhdx.c               | 12 +++++++-
+ block/vmdk.c               | 26 +++++++++++------
+ qemu-io-cmds.c             | 19 +++++++++++--
+ tests/qemu-iotests/109     |  3 +-
+ tests/qemu-iotests/109.out | 56 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/136     |  2 +-
+ tests/qemu-iotests/187     | 69 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/187.out | 18 ++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 18 files changed, 299 insertions(+), 48 deletions(-)
+ create mode 100755 tests/qemu-iotests/187
+ create mode 100644 tests/qemu-iotests/187.out
