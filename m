@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1df9z9-0000UX-Ux
+	(envelope-from <bounces@canonical.com>) id 1df9z9-0000UZ-VJ
 	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1df9z5-0006Kf-0q
+	(envelope-from <bounces@canonical.com>) id 1df9z5-0006Ka-1B
 	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:16:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33881)
+Received: from indium.canonical.com ([91.189.90.7]:33883)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1df9z4-0006Jq-R7
+	id 1df9z4-0006Jr-RB
 	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 15:16:06 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1df9z1-0001JD-V2
+	id 1df9z2-0001IG-7a
 	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 19:16:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EC1DA2E81AC
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 19:15:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 47BF12E81C7
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 19:16:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 19:04:49 -0000
+Date: Tue, 08 Aug 2017 19:04:59 -0000
 From: Justin Hibbits <chmeeedalf+lp@gmail.com>
 Reply-To: Bug 1357175 <1357175@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140815031311.28738.47111.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150221908979.17444.8470073628369203851.malone@gac.canonical.com>
+Message-Id: <150221909962.17173.7289337918868161397.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1357175] Re: qemu fails to build on powerpc64
 List-Id: <qemu-devel.nongnu.org>
