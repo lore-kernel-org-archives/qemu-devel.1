@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df1ED-0002D1-9s
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:55:10 -0400
+	(envelope-from <stefanha@gmail.com>) id 1df1JW-0004Ay-Eg
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df1EA-0005ld-NI
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:55:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1df1EA-0005l3-DC
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 05:55:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F0ECC0587C8
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 09:55:05 +0000 (UTC)
-Date: Tue, 8 Aug 2017 10:54:57 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170808095457.GC2081@work-vm>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-10-quintela@redhat.com>
-	<20170719173513.GJ3500@work-vm> <87ziba9zbj.fsf@secure.mitica>
+	(envelope-from <stefanha@gmail.com>) id 1df1JS-0000cd-D5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:00:38 -0400
+Date: Tue, 8 Aug 2017 11:00:30 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170808100030.GB16801@stefanha-x1.localdomain>
+References: <20170807161529.3779-1-berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
 Content-Disposition: inline
-In-Reply-To: <87ziba9zbj.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v5 09/17] migration: Start of multiple fd
- work
+In-Reply-To: <20170807161529.3779-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] throttle: Make LeakyBucket.avg
+ and LeakyBucket.max integer types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,153 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> We create new channels for each new thread created. We only send through
-> >> them a character to be sure that we are creating the channels in the
-> >> right order.
-> >
-> > That text is out of date isn't it?
-> 
-> oops, fixed.
-> 
-> 
-> >> +gboolean multifd_new_channel(QIOChannel *ioc)
-> >> +{
-> >> +    int thread_count = migrate_multifd_threads();
-> >> +    MultiFDRecvParams *p = g_new0(MultiFDRecvParams, 1);
-> >> +    MigrationState *s = migrate_get_current();
-> >> +    char string[MULTIFD_UUID_MSG];
-> >> +    char string_uuid[UUID_FMT_LEN];
-> >> +    char *uuid;
-> >> +    int id;
-> >> +
-> >> +    qio_channel_read(ioc, string, sizeof(string), &error_abort);
-> >> +    sscanf(string, "%s multifd %03d", string_uuid, &id);
-> >> +
-> >> +    if (qemu_uuid_set) {
-> >> +        uuid = qemu_uuid_unparse_strdup(&qemu_uuid);
-> >> +    } else {
-> >> +        uuid = g_strdup(multifd_uuid);
-> >> +    }
-> >> +    if (strcmp(string_uuid, uuid)) {
-> >> +        error_report("multifd: received uuid '%s' and expected uuid '%s'",
-> >> +                     string_uuid, uuid);
-> >
-> > probably worth adding the channel id as well so we can see
-> > when it fails.
-> 
-> Done.
-> 
-> >> +        migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> >> +                          MIGRATION_STATUS_FAILED);
-> >> +        terminate_multifd_recv_threads();
-> >> +        return FALSE;
-> >> +    }
-> >> +    g_free(uuid);
-> >> +
-> >> +    if (multifd_recv_state->params[id] != NULL) {
-> >> +        error_report("multifd: received id '%d' is already setup'", id);
-> >> +        migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> >> +                          MIGRATION_STATUS_FAILED);
-> >> +        terminate_multifd_recv_threads();
-> >> +        return FALSE;
-> >> +    }
-> >> +    qemu_mutex_init(&p->mutex);
-> >> +    qemu_sem_init(&p->sem, 0);
-> >> +    p->quit = false;
-> >> +    p->id = id;
-> >> +    p->c = ioc;
-> >> +    atomic_set(&multifd_recv_state->params[id], p);
-> >
-> > Can you explain why this is quite so careful about ordering ? Is there
-> > something that could look at params or try and take the mutex before
-> > the count is incremented?
-> 
-> what happened to me in the middle stages of the patches (yes, doing
-> asynchronously was painful) was that:
-> 
-> I created the threads (at the beggining I did the
-> multifd_recv_state->params[id] == p inside the thread, that makes things
-> really, really racy.  I *think* that now we could probably do this
-> as you state.
-> 
-> 
-> 
-> > I think it's safe to do:
-> >  p->quit = false;
-> >  p->id = id;
-> >  p->c = ioc;
-> >  &multifd_recv_state->params[id] = p;
-> >  qemu_sem_init(&p->sem, 0);
-> >  qemu_mutex_init(&p->mutex);
-> >  qemu_thread_create(...)
-> >  atomic_inc(&multifd_recv_state->count);    <-- I'm not sure if this
-> >  needs to be atomic
-> 
-> We only change it on the main thread, so it should be enough.  The split
-> that I want to do is:
-> 
-> we do the listen asynchronously
-> when something arrives, we just read it (main thread)
-> we then read <uuid> <string> <arguments>
-> and then after checking that uuid is right, we call whatever function we
-> have for "string", in our case "multifd", with <arguments> as one string
-> parameters.
-> 
-> This should make it easier to create new "channels" for other purposes.
-> So far so good.
-> 
-> But then it appears what are the responsabilities, At the beggining, I
-> read the string on the reception thread for that channel, that created a
-> race because I received the 1st message for that channel before the
-> channel was fully created (yes, it only happened sometimes, easy to
-> understand after debugging).  This is the main reason that I changed to
-> an array of pointers to structs instead of one array of structs.
-> 
-> Then, I had to ve very careful to know when I had created all the
-> channels threads, because otherwise I ended having races left and right.
-> 
-> I will try to test the ordering that you suggested.
-> 
-> >> +    qemu_thread_create(&p->thread, "multifd_recv", multifd_recv_thread, p,
-> >> +                       QEMU_THREAD_JOINABLE);
-> >
-> > You've lost the nice numbered thread names you had created in the
-> > previous version of this that you're removing.
-> 
-> I could get them back, but they really were not showing at gdb, where do
-> they show? ps?
 
-If you start qemu with -name debug-threads=on they show up in gdb's
-info threads
-also in top (hit H) and ps if you turn on the right optioa (H as well?)n.
+--0ntfKIWw70PvrIHh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> >> +    multifd_recv_state->count++;
-> >> +
-> >> +    /* We need to return FALSE for the last channel */
-> >> +    if (multifd_recv_state->count == thread_count) {
-> >> +        return FALSE;
-> >> +    } else {
-> >> +        return TRUE;
-> >> +    }
-> >
-> > return multifd_recv_state->count != thread_count;   ?
-> 
-> For other reasons I change this functions and now they use a different
-> way of setting/checking if we have finished.  Look at the new series.
-> 
-> I didn't do as you said because I feel it weird that we return a bool
-> when we expert a gboolean, but .....
+On Mon, Aug 07, 2017 at 07:15:29PM +0300, Alberto Garcia wrote:
+> Both the throttling limits set with the throttling.iops-* and
+> throttling.bps-* options and their QMP equivalents defined in the
+> BlockIOThrottle struct are integer values.
+>=20
+> Those limits are also reported in the BlockDeviceInfo struct and they
+> are integers there as well.
+>=20
+> Therefore there's no reason to store them internally as double and do
+> the conversion everytime we're setting or querying them, so this patch
+> uses int64_t for those types.
+>=20
+> LeakyBucket.level and LeakyBucket.burst_level do however remain double
+> because their value changes depending on the fraction of time elapsed
+> since the previous I/O operation.
+>=20
+> There's one particular instance of the previous code where bkt->max
+> could have a non-integer value: that's in throttle_fix_bucket() when
+> bkt->max is initialized to bkt->avg / 10. This is now an integer
+> division and the result is rounded. We don't need to worry about this
+> because:
+>=20
+>    a) with the magnitudes we're dealing with (bytes per second, I/O
+>       operations per second) the limits are likely to be always
+>       multiples of 10.
+>=20
+>    b) even if they weren't this doesn't affect the actual limits, only
+>       the algorithm that makes the throttling smoother.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  include/qemu/throttle.h | 4 ++--
+>  util/throttle.c         | 7 ++-----
+>  2 files changed, 4 insertions(+), 7 deletions(-)
 
-I hope & believe they're defined as compatible:
-  https://people.gnome.org/~desrt/glib-docs/glib-Standard-Macros.html#TRUE:CAPS
+Why is this marked for-2.10?  Does it fix a bug?
 
-Dave
-> Thanks, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--0ntfKIWw70PvrIHh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZiYu+AAoJEJykq7OBq3PIl1YIALUkeb2aa9pZyD+x0/gIFj7t
+0xKl/vmc8Asd+QyG//2Lkxvmw4FhLUoGdWxn2n2gSZ0RYKrw2+vjAHC7M029Ecvw
+XUs19n2k6N3SWBXMSOBzkAnZy8smI46HdrmL1cyUylFpeec5ktBNpwPYhOtaI41E
+hg1ckBVH9sSorS+8Mr6qI5Liqe+ici+RyJeV4YcHSFpbXbxfq5/lrMmzxMN6Jtc3
+hKoIaqXD+K/I+LBfHaHsQ+kpFfzs0ZcLh/f7CIa5QDtmnVEDiXyj914Rnyuv2RNS
+heyFL/z9uqg0vNrZ7XIa/dBUdAzhLDL2f8FjIfcMGbxSCxwZHk8BB1VIer7EfL8=
+=XwHQ
+-----END PGP SIGNATURE-----
+
+--0ntfKIWw70PvrIHh--
