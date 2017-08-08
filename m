@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1deyRH-0000Vu-8Q
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 02:56:32 -0400
+	(envelope-from <peterx@redhat.com>) id 1deyV7-0001ho-Qv
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1deyRC-0002B6-FP
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 02:56:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1deyRC-0002AC-96
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 02:56:22 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1deyRA-0002kK-4v
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 06:56:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1BB3F2E80CB
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 06:56:20 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 06:47:26 -0000
-From: Riku Voipio <riku.voipio@linaro.org>
-Reply-To: Bug 1709170 <1709170@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150213708469.19430.16716526584783151905.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150217484663.17099.6130255789712318706.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1709170] Re: QEMU fails to honor O_TMPFILE
+	(envelope-from <peterx@redhat.com>) id 1deyV2-0005gS-Or
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:00:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1deyV2-0005YC-HV
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:00:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D897356ED
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:00:16 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue,  8 Aug 2017 15:00:07 +0800
+Message-Id: <1502175607-9531-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] rcu: init globals only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +28,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Thiago,
+We were calling rcu_init_complete() twice in the child processes when
+fork happened. However the pthread library does not really suggest to do
+it that way:
 
-What is the version of glibc on the targets you are building to? There
-was an O_TMPFILE bug in older glibc's:
+http://pubs.opengroup.org/onlinepubs/7908799/xsh/pthread_mutex_init.html
 
-https://sourceware.org/bugzilla/show_bug.cgi?id=3D17912
+"Attempting to initialise an already initialised mutex results in
+ undefined behaviour."
 
-** Bug watch added: Sourceware.org Bugzilla #17912
-   https://sourceware.org/bugzilla/show_bug.cgi?id=3D17912
+Actually, IMHO we can do it in a more natural way: Firstly, we only init
+the RCU globals once in rcu_init(). Then, in rcu_init_child(), we unlock
+all the locks held in rcu_init_lock() just like what we do in the parent
+process, then do the rest of RCU re-init (e.g., create the RCU thread).
 
--- =
+CC: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+this is based on Paolo's series:
+"[PATCH for-2.10 0/2] RCU: forking fix and cleanups"
+---
+ util/rcu.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1709170
-
-Title:
-  QEMU fails to honor O_TMPFILE
-
-Status in QEMU:
-  New
-
-Bug description:
-  When making a call like
-
-    open("/tmp", O_TMPFILE | O_RDWR);
-
-  under QEMU, we ged -EISDIR.
-
-  Under any kernel 3.11 or later, we are supposed to get an unnamed file
-  in /tmp. In case the filesystem for /tmp does not support unnamed
-  files, we are supposed to get EOPNOTSUPP.
-
-  [I don't know the QEMU version, since this happened in a system I
-  don't have access to]
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1709170/+subscriptions
+diff --git a/util/rcu.c b/util/rcu.c
+index ca5a63e..6fbbe4c 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -299,15 +299,17 @@ void rcu_unregister_thread(void)
+     qemu_mutex_unlock(&rcu_registry_lock);
+ }
+ 
+-static void rcu_init_complete(void)
++static void rcu_init_globals(void)
+ {
+-    QemuThread thread;
+-
+     qemu_mutex_init(&rcu_registry_lock);
+     qemu_mutex_init(&rcu_sync_lock);
+     qemu_event_init(&rcu_gp_event, true);
+-
+     qemu_event_init(&rcu_call_ready_event, false);
++}
++
++static void rcu_init_complete(void)
++{
++    QemuThread thread;
+ 
+     /* The caller is assumed to have iothread lock, so the call_rcu thread
+      * must have been quiescent even after forking, just recreate it.
+@@ -357,6 +359,13 @@ static void rcu_init_child(void)
+         return;
+     }
+ 
++    rcu_init_unlock();
++
++    /*
++     * For the newly forked child, we need something extra: since
++     * after fork the threads are all gone, we need to re-init the RCU
++     * thread, along with the globals.
++     */
+     memset(&registry, 0, sizeof(registry));
+     rcu_init_complete();
+ }
+@@ -367,5 +376,6 @@ static void __attribute__((__constructor__)) rcu_init(void)
+ #ifdef CONFIG_POSIX
+     pthread_atfork(rcu_init_lock, rcu_init_unlock, rcu_init_child);
+ #endif
++    rcu_init_globals();
+     rcu_init_complete();
+ }
+-- 
+2.7.4
