@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1df6b2-0001eP-PX
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:39:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1df6fh-0005Em-IM
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1df6b1-0003Zp-LF
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:39:04 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-8-git-send-email-armbru@redhat.com>
-	<20170808143101.GJ2081@work-vm>
-Date: Tue, 08 Aug 2017 17:37:37 +0200
-In-Reply-To: <20170808143101.GJ2081@work-vm> (David Alan Gilbert's message of
-	"Tue, 8 Aug 2017 15:31:02 +0100")
-Message-ID: <87fud26pfi.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1df6fe-0006nU-GD
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:43:53 -0400
+Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:33653)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1df6fe-0006my-Bb
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:43:50 -0400
+Received: by mail-ua0-x22e.google.com with SMTP id 80so16831743uas.0
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 08:43:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170808121544.12850-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <09444f8c-4613-908f-2777-382bd0815534@amsat.org>
+Date: Tue, 8 Aug 2017 12:43:45 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 07/56] cpus: Make memsave,
- pmemsave sizes, addresses unsigned in QAPI/QMP
+In-Reply-To: <20170808121544.12850-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10] target/mips: remove MIPS16 ASE
+ from 4Km
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +35,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On 08/08/2017 09:15 AM, Philippe Mathieu-Daudé wrote:
+> probably incorrect copy/paste from 8d162c2b68db72623a507069fda0e35ccd1c6b85
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Sizes, virtual and physical addresses should use QAPI type 'size'
->> (uint64_t).  memsave, pmemsave parameters @val, @size are 'int'
->> (int64_t).  qmp_memsave() and qmp_pmemsave() implicitly convert to
->> target_ulong or hwaddr.
->> 
->> Change the parameters to 'size'.
->> 
->> Both commands now accept size and address values between 2^63 and
->> 2^64-1.  They accept negative values as before, because that's how the
->> QObject input visitor works for backward compatibility.
->> 
->> The HMP commands' size parameters remain uint32_t, as HMP args_type
->> strings can't do uint64_t byte counts: 'l' is signed, and 'o'
->> multiplies by 2^20.  Their address parameters remain int64_t for the
->> same reason.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  cpus.c           | 6 +++---
->>  qapi-schema.json | 5 +++--
->>  2 files changed, 6 insertions(+), 5 deletions(-)
->> 
->> diff --git a/cpus.c b/cpus.c
->> index 9bed61e..8c5ee05 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -1947,14 +1947,14 @@ CpuInfoList *qmp_query_cpus(Error **errp)
->>      return head;
->>  }
->>  
->> -void qmp_memsave(int64_t addr, int64_t size, const char *filename,
->> +void qmp_memsave(uint64_t addr, uint64_t size, const char *filename,
->>                   bool has_cpu, int64_t cpu_index, Error **errp)
->>  {
->>      FILE *f;
->>      uint32_t l;
->>      CPUState *cpu;
->>      uint8_t buf[1024];
->> -    int64_t orig_addr = addr, orig_size = size;
->> +    uint64_t orig_addr = addr, orig_size = size;
->>  
->>      if (!has_cpu) {
->>          cpu_index = 0;
->
-> a little bit further down is a:
->             error_setg(errp, "Invalid addr 0x%016" PRIx64 "/size %" PRId64
->                              " specified", orig_addr, orig_size);
->
-> that PRId64 should be a PRIu64 now
-
-Will fix.
-
-> However, other than that;
->
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
+incorrect since 10 years, so can wait 2.11 :P
