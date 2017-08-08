@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df5CO-0001Az-Ju
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:09:35 -0400
+	(envelope-from <famz@redhat.com>) id 1df5FR-0004Eq-J0
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:12:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df5CN-0008HM-6o
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:09:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34396)
+	(envelope-from <famz@redhat.com>) id 1df5FM-0001f7-FC
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:12:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51978)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1df5CM-0008Gc-T5
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:09:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1df5FM-0001ed-8b
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:12:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BBD1B806C1
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 14:09:29 +0000 (UTC)
-References: <1502175607-9531-1-git-send-email-peterx@redhat.com>
-	<3f0e8fe6-babd-df82-c690-de0f1ffdd460@redhat.com>
-	<20170808074915.GB13486@pxdev.xzpeter.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6a4a3fd1-51d2-3bcb-a343-9acb87a19d99@redhat.com>
-Date: Tue, 8 Aug 2017 09:09:23 -0500
+	by mx1.redhat.com (Postfix) with ESMTPS id 3BA22883D2
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 14:12:35 +0000 (UTC)
+Date: Tue, 8 Aug 2017 22:12:32 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170808141232.GC2454@lemon>
+References: <20170808020249.GQ14780@lemon>
+	<45317b91-2a3e-3f6e-a0df-1678ee93c97a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170808074915.GB13486@pxdev.xzpeter.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WcaQbU9AWKQ7wf6a29fmwjQmKSsh54kwp"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] rcu: init globals only once
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45317b91-2a3e-3f6e-a0df-1678ee93c97a@redhat.com>
+Subject: Re: [Qemu-devel] Howto: instructing patchew about patch dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WcaQbU9AWKQ7wf6a29fmwjQmKSsh54kwp
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <6a4a3fd1-51d2-3bcb-a343-9acb87a19d99@redhat.com>
-Subject: Re: [PATCH for-2.11] rcu: init globals only once
-References: <1502175607-9531-1-git-send-email-peterx@redhat.com>
- <3f0e8fe6-babd-df82-c690-de0f1ffdd460@redhat.com>
- <20170808074915.GB13486@pxdev.xzpeter.org>
-In-Reply-To: <20170808074915.GB13486@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 08/08 16:00, Laszlo Ersek wrote:
+> On 08/08/17 04:02, Fam Zheng wrote:
+> > Hi, QEMU patch submitters,
+> > 
+> > I've patched patchew so that if you add a line:
+> > 
+> > Based-on: $MESSAGE_ID
+> > 
+> > in your cover letter body, or in a reply to it (or reply to reply), patchew will
+> > try to apply your series on top of the one $MESSAGE_ID refers to, assuming the
+> > base series _was_ successfully applied by patchew earlier.
+> > 
+> > In the single patch case, you can put the line under the "---" mark in the
+> > commit message (no need to let it enter git history).
+> > 
+> > For human readability, around the "Based-on:" line it may be better if the
+> > subject is noted. E.g.:
+> > 
+> > Based-on: 20170804140942.19342-1-famz@redhat.com
+> > ([PATCH for-2.10] vmdk: Fix error handling/reporting of vmdk_check)
+> > 
+> > Please don't join them in one line because it will confuse the parser, after all
+> > following the message id text, there aren't many spaces left.
+> 
+> If the basis is a multi-patch series, should Based-on refer to the msgid
+> of the last patch in that series, or its blurb? (I guess "refer to
+> blurb" is more logical, but asking shouldn't hurt.)
 
-On 08/08/2017 02:49 AM, Peter Xu wrote:
->> This doesn't work for error-checking mutexes: rcu_init_child has a
->> different PID than the parent, so the mutexes aren't unlocked.  It's
->> also true that right now we don't use error-checking mutexes (commit
->> 24fa90499f, "qemu-thread: do not use PTHREAD_MUTEX_ERRORCHECK",
->> 2015-03-10); however, that's also a bit sad.
->>
->> The reason for the undefined behavior is probably that some operating
->> systems allocate memory in pthread_mutex_init, and initializing twice
->> causes a memory leak.  One such operating system is OpenBSD. :(
->=20
-> Good to know. :)
->=20
-> I thought pthread_atfork() was designed to solve such a locking
-> problem (in child hanlder, we unlock all the held locks).
+My bad for not making it clear: patchew identifies patch series by cover letter
+message id, so yes, "blurb" is right.
 
-What's also sad is that POSIX says that pthread_atfork() is rather
-useless - there's no way it can be reliably used to do everything that
-everyone wants (and I think this case of error-checking mutexes is just
-ONE of those reasons).
-
-> If
-> PTHREAD_MUTEX_ERRORCHECK cannot coop well with it, not sure whether
-> that means we should just avoid using PTHREAD_MUTEX_ERRORCHECK in such
-> a use case (but we should be able to use the error checks in other
-> mutexes that do not need extra fork handling)?
->=20
-> Another idea is: can we just destroy the mutex first then re-init it
-> in subprocess? A quick glance in libpthread code shows that at least
-> pthread_mutex_destroy() won't check PTHREAD_MUTEX_ERRORCHECK.
->=20
-> Thanks,
->=20
->>
->> Eric, you chimed in on the patch that became commit 24fa90499f, what d=
-o
->> you suggest?
-
-If, after forking, you can successfully destroy the mutex to then
-reinitialize it (even though you can't unlock it), then that sounds as
-good as anything I can come up with.
-
-An alternative approach might be to add a new mutex that anyone obtains
-just before forking; as long as you hold that mutex, you can then
-release any other mutex, fork, and then reobtain in the parent - but it
-still becomes tricky bookkeeping to know which locks need to be dropped
-and reobtained, and I worry that gating fork performance with such a
-heavy lock will have noticeable slowdowns.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WcaQbU9AWKQ7wf6a29fmwjQmKSsh54kwp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmJxhMACgkQp6FrSiUn
-Q2rgWggAn7wygBQt1sXOv46ErmwlMI4EVjYeZnF3Qyd4XnVciDPmklJz9e3LF6wz
-9jVmm6wKmFTjMPfJvlCdULifiAPUUychXvhmw9PzUP5XXuTDKTON20ce0/bTOQ2A
-lCS4ezXRAbJ+r1Pqus4PH8ZHPIJBUjw3gjz2RcJp3UEEL3BfSxQZYuRKAjTOc7EU
-nFmsaB03xNC5dFN3+UgV/p9fKmMIPo1FvhVlwU1t/HU0125kSbH7ywa1AVQ2lJlj
-WCsUE/pce4BuNEqPa7rDd3ozok213nyinhkplM6J/htYCHBNs1H24/iTiGnnnqgX
-oZbwnISZMv2CNj7nOAUBm77Psngtyw==
-=Ifr1
------END PGP SIGNATURE-----
-
---WcaQbU9AWKQ7wf6a29fmwjQmKSsh54kwp--
+Fam
