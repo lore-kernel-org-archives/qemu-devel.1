@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dfDIV-0003JB-Rp
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 18:48:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dfDMj-0005Jo-L9
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 18:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dfDIQ-0001no-Ts
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 18:48:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dfDIQ-0001mA-NN
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 18:48:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F2E620272
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 22:48:15 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  9 Aug 2017 00:47:50 +0200
-Message-Id: <20170808224750.23904-1-marcandre.lureau@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dfDMe-0004QU-EV
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 18:52:45 -0400
+Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:34413)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dfDMe-0004Pk-9a
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 18:52:40 -0400
+Received: by mail-vk0-x241.google.com with SMTP id d124so2958184vkf.1
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 15:52:40 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1502196172-13818-1-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a57e650e-d37e-e1fa-d257-c715931d8a74@twiddle.net>
+Date: Tue, 8 Aug 2017 15:52:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] virtio-input: send rel-wheel events for wheel
- buttons
+In-Reply-To: <1502196172-13818-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/alpha: Switch to
+ do_transaction_failed() hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-qemu uses wheel-up/down button events for mouse wheel input, however
-linux applications typically want REL_WHEEL events.
+On 08/08/2017 05:42 AM, Peter Maydell wrote:
+> Switch the alpha target from the old unassigned_access hook
+> to the new do_transaction_failed hook. This allows us to
+> resolve a ??? in the old hook implementation.
+> 
+> The only part of the alpha target that does physical
+> memory accesses is reading the page table -- add a
+> TODO comment there to the effect that we should handle
+> bus faults on page table walks. (Since the palcode
+> doesn't actually do anything useful on a bus fault anyway
+> it's a bit moot for now.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Based-on: 1501867249-1924-1-git-send-email-peter.maydell@linaro.org
+> This patch sits on top of the series adding the new hook.
+> 
+> The comment in the page walk code could probably be
+> rephrased by somebody who knows what the palcode
+> behaviour in the busfault-on-table-walk case is.
+> 
+> This patch isn't really tested (just 'make check' and
+> checking that qemu-system-alpha can start up).
+> ---
+>  target/alpha/cpu.h        |  8 +++++---
+>  target/alpha/cpu.c        |  2 +-
+>  target/alpha/helper.c     |  8 ++++++++
+>  target/alpha/mem_helper.c | 19 ++++++++++---------
+>  4 files changed, 24 insertions(+), 13 deletions(-)
+> 
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index e95be2b..389e1a4 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -488,9 +488,11 @@ void cpu_alpha_store_fpcr (CPUAlphaState *env, uint64_t val);
+>  uint64_t cpu_alpha_load_gr(CPUAlphaState *env, unsigned reg);
+>  void cpu_alpha_store_gr(CPUAlphaState *env, unsigned reg, uint64_t val);
+>  #ifndef CONFIG_USER_ONLY
+> -QEMU_NORETURN void alpha_cpu_unassigned_access(CPUState *cpu, hwaddr addr,
+> -                                               bool is_write, bool is_exec,
+> -                                               int unused, unsigned size);
+> +void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+> +                                     vaddr addr, unsigned size,
+> +                                     MMUAccessType access_type,
+> +                                     int mmu_idx, MemTxAttrs attrs,
+> +                                     MemTxResult response, uintptr_t retaddr);
+>  #endif
+>  
+>  static inline void cpu_get_tb_cpu_state(CPUAlphaState *env, target_ulong *pc,
+> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+> index 76150f4..4d49fd0 100644
+> --- a/target/alpha/cpu.c
+> +++ b/target/alpha/cpu.c
+> @@ -307,7 +307,7 @@ static void alpha_cpu_class_init(ObjectClass *oc, void *data)
+>  #ifdef CONFIG_USER_ONLY
+>      cc->handle_mmu_fault = alpha_cpu_handle_mmu_fault;
+>  #else
+> -    cc->do_unassigned_access = alpha_cpu_unassigned_access;
+> +    cc->do_transaction_failed = alpha_cpu_do_transaction_failed;
+>      cc->do_unaligned_access = alpha_cpu_do_unaligned_access;
+>      cc->get_phys_page_debug = alpha_cpu_get_phys_page_debug;
+>      dc->vmsd = &vmstate_alpha_cpu;
+> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+> index 34121f4..36407f7 100644
+> --- a/target/alpha/helper.c
+> +++ b/target/alpha/helper.c
+> @@ -163,6 +163,14 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
+>  
+>      pt = env->ptbr;
+>  
+> +    /* TODO: rather than using ldq_phys() to read the page table we should
+> +     * use address_space_ldq() so that we can handle the case when
+> +     * the page table read gives a bus fault, rather than ignoring it.
+> +     * For the existing code the zero data that ldq_phys will return for
+> +     * an access to invalid memory will result in our treating the page
+> +     * table as invalid, which may even be the right behaviour.
+> +     */
 
-This fixes wheel with linux guests. Tested with X11/wayland, and
-windows virtio-input driver.
+FWIW, I believe the proper behaviour is to signal a machine check.
+I'd have to re-read the MILO source to be sure.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/input/virtio-input-hid.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+That said, this looks good.  If I have a chance, I'll throw together a small
+test case for this.
 
-diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
-index 46c038110c..f46857f0e4 100644
---- a/hw/input/virtio-input-hid.c
-+++ b/hw/input/virtio-input-hid.c
-@@ -196,6 +196,7 @@ static void virtio_input_handle_event(DeviceState *de=
-v, QemuConsole *src,
-     InputKeyEvent *key;
-     InputMoveEvent *move;
-     InputBtnEvent *btn;
-+    unsigned int map;
-=20
-     switch (evt->type) {
-     case INPUT_EVENT_KIND_KEY:
-@@ -215,9 +216,15 @@ static void virtio_input_handle_event(DeviceState *d=
-ev, QemuConsole *src,
-         break;
-     case INPUT_EVENT_KIND_BTN:
-         btn =3D evt->u.btn.data;
--        if (keymap_button[btn->button]) {
-+        map =3D keymap_button[btn->button];
-+        if (map =3D=3D BTN_GEAR_DOWN || map =3D=3D BTN_GEAR_UP) {
-+            event.type  =3D cpu_to_le16(EV_REL);
-+            event.code  =3D cpu_to_le16(REL_WHEEL);
-+            event.value =3D cpu_to_le32(map =3D=3D BTN_GEAR_DOWN ? -1 : =
-1);
-+            virtio_input_send(vinput, &event);
-+        } else if (map) {
-             event.type  =3D cpu_to_le16(EV_KEY);
--            event.code  =3D cpu_to_le16(keymap_button[btn->button]);
-+            event.code  =3D cpu_to_le16(map);
-             event.value =3D cpu_to_le32(btn->down ? 1 : 0);
-             virtio_input_send(vinput, &event);
-         } else {
-@@ -424,9 +431,9 @@ static struct virtio_input_config virtio_mouse_config=
-[] =3D {
-     },{
-         .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
-         .subsel    =3D EV_REL,
--        .size      =3D 1,
-+        .size      =3D 2,
-         .u.bitmap  =3D {
--            (1 << REL_X) | (1 << REL_Y),
-+            (1 << REL_X) | (1 << REL_Y),  (1 << (REL_WHEEL - 8))
-         },
-     },
-     { /* end of list */ },
---=20
-2.14.0.1.geff633fa0
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+
+
+r~
