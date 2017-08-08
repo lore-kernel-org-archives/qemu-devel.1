@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1df1zd-0006jw-WB
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:44:12 -0400
+	(envelope-from <groug@kaod.org>) id 1df2AE-000296-HV
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:55:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1df1zc-0004AG-3f
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:44:10 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1df1zb-00049o-NE
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:44:08 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  8 Aug 2017 11:44:02 +0100
-Message-Id: <1502189042-9676-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [RFC] docs/devel/loads-stores.rst: Document our
- various load and store APIs
+	(envelope-from <groug@kaod.org>) id 1df2AB-00018K-Fq
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:55:06 -0400
+Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:36580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1df2AB-00017Y-8I
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:55:03 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3765B8BABA
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 12:55:01 +0200 (CEST)
+Date: Tue, 8 Aug 2017 12:54:51 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170808125451.3281c2ce@bahia.lan>
+In-Reply-To: <96975486-48cd-1ccc-209c-3f06f73f5d0e@kaod.org>
+References: <20170808060817.2832-1-david@gibson.dropbear.id.au>
+	<20170808060817.2832-3-david@gibson.dropbear.id.au>
+	<96975486-48cd-1ccc-209c-3f06f73f5d0e@kaod.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/wU+pmlzWZsbB/+ystS+EE6g";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] target/ppc: Add stub
+ implementation of the PSSCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,396 +33,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, agraf@suse.de
 
-QEMU has a wide selection of different functions for doing
-loads and stores; provide some overview documentation of
-what they do and how to pick which one to use.
+--Sig_/wU+pmlzWZsbB/+ystS+EE6g
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This is currently a work in progress, with many TODO points.
-Some of the formatting is a bit inconsistent from section to
-section. I post it to see if people think it's a useful
-document to have and to try to get some answers to the TODO
-points which are "I don't know why this function exists" and
-"when should we use this function rather than that other one"...
+On Tue, 8 Aug 2017 11:19:58 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
- docs/devel/loads-stores.rst | 365 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 365 insertions(+)
- create mode 100644 docs/devel/loads-stores.rst
+> On 08/08/2017 08:08 AM, David Gibson wrote:
+> > The PSSCR register added in POWER9 controls certain power saving mode
+> > behaviours.  Mostly, it's not relevant to TCG, however because qemu
+> > doesn't know about it yet, it doesn't synchronize the state with KVM,
+> > and thus it doesn't get migrated.
+> >=20
+> > To fix that, this adds a minimal stub implementation of the register.
+> > This isn't complete, even to the extent that an implementation is
+> > possible in TCG, just enough to get migration working.  We need to
+> > come back later and at least properly filter the various fields in the
+> > register based on privilege level. =20
+>=20
+> yes a lot of the fields are only accessible to the hypervisor, and the=20
+> hypervisor also uses a different SPR number to access the PSSCR bits.
+>=20
 
-diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
-new file mode 100644
-index 0000000..73ae4c8
---- /dev/null
-+++ b/docs/devel/loads-stores.rst
-@@ -0,0 +1,365 @@
-+..
-+   Copyright (c) 2017 Linaro Limited
-+   Written by Peter Maydell
-+   TODO: do we have a standard doc license? bitmaps.rst
-+   uses the FreeBSD documentation license, I notice.
-+
-+===================
-+Load and Store APIs
-+===================
-+
-+QEMU internally has multiple families of functions for performing
-+loads and stores. This document attempts to enumerate them all
-+and indicate when to use them. It does not provide detailed
-+documentation of each API -- for that you should look at the
-+documentation comments in the relevant header files.
-+
-+
-+``ld*_p and st_*p``
-+~~~~~~~~~~~~~~~~~~~
-+
-+These functions operate on a host pointer, and should be used
-+when you already have a pointer into host memory (corresponding
-+to guest ram or a local buffer). They deal with doing accesses
-+with the desired endianness and with correctly handling
-+potentially unaligned pointer values.
-+
-+Function names follow the pattern:
-+
-+load: ``ld{type}{sign}{size}_{endian}_p(ptr)``
-+
-+store: ``st{type}{size}_{endian}_p(ptr, val)``
-+
-+``type``
-+ - (empty) : integer access
-+ - ``f`` : float access
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes (including floats and doubles)
-+ - ``u`` : unsigned
-+ - ``s`` : signed
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``he`` : host endian
-+ - ``be`` : big endian
-+ - ``le`` : little endian
-+
-+(except for byte accesses, which have no endian infix).
-+
-+The ``_{endian}`` infix is omitted for target-endian accesses.
-+
-+The target endian accessors are only available to source
-+files which are built per-target.
-+
-+Regexes for git grep
-+ - ``\<ldf\?[us]\?[bwlq]\(_[hbl]e\)\?_p\>``
-+ - ``\<stf\?[bwlq]\(_[hbl]e\)\?_p\>``
-+
-+``cpu_{ld,st}_*``
-+~~~~~~~~~~~~~~~~~
-+
-+These functions operate on a guest virtual address. Be aware
-+that these functions may cause a guest CPU exception to be
-+taken (eg for an alignment fault or MMU fault) which will
-+result in guest CPU state being updated and control longjumping
-+out of the function call. They should therefore only be used
-+in code that is implementing emulation of the target CPU.
-+
-+Function names follow the pattern:
-+
-+load: ``cpu_ld{sign}{size}_{mmusuffix}(env, ptr)``
-+
-+store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+ - ``s`` : signed
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``mmusuffix`` is one of the generic suffixes ``data`` or ``code``, or
-+(for softmmu configs) a target-specific MMU mode suffix as defined
-+in the target's ``cpu.h``.
-+
-+Regexes for git grep
-+ - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+\>``
-+ - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+\>``
-+
-+``cpu_{ld,st}_*_ra``
-+~~~~~~~~~~~~~~~~~~~~
-+
-+Thes functions work like the ``cpu_{ld,st}_*`` functions except
-+that they also take a ``retaddr`` argument.
-+
-+**TODO**: when should these be used and what should ``retaddr`` be?
-+
-+Function names follow the pattern:
-+
-+load: ``cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)``
-+
-+store: ``cpu_st{sign}{size}_{mmusuffix}_ra(env, ptr, val, retaddr)``
-+
-+Regexes for git grep
-+ - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+_ra\>``
-+ - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+_ra\>``
-+
-+``helper_*_{ld,st}*mmu``
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+These functions are intended primarily to be called by the code
-+generated by the TCG backend. They may also be called by target
-+CPU helper function code. (XXX why, and when this vs cpu_{ld,st}_* ?)
-+
-+**TODO** tcg.h claims the target-endian helper_ret* are temporary and
-+will go away?
-+
-+**TODO** why is "target endian" "ret" anyway?
-+
-+load: ``helper_{endian}_ld{sign}{size}_mmu(env, addr, opindex, retaddr)``
-+
-+load (code): ``helper_{endian}_ld{sign}{size}_cmmu(env, addr, opindex, retaddr)``
-+
-+store: ``helper_{endian}_st{size}_mmu(env, addr, val, opindex, retaddr)``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+ - ``s`` : signed
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+ - ``ret`` : target endianness
-+
-+Regexes for git grep
-+ - ``\<helper_\(le\|be\|ret\)_ld[us]\?[bwlq]_c\?mmu\>``
-+ - ``\<helper_\(le\|be\|ret\)_st[bwlq]_mmu\>``
-+
-+``address_space_*``
-+~~~~~~~~~~~~~~~~~~~
-+
-+These functions are the primary ones to use when emulating CPU
-+or device memory accesses. They take an AddressSpace, which is the
-+way QEMU defines the view of memory that a device or CPU has.
-+(They generally correspond to being the "master" end of a hardware bus
-+or bus fabric.)
-+
-+Each CPU has an AddressSpace. Some kinds of CPU have more than
-+one AddressSpace (for instance ARM guest CPUs have an AddressSpace
-+for the Secure world and one for NonSecure if they implement TrustZone).
-+Devices which can do DMA-type operations should generally have an
-+AddressSpace. There is also a "system address space" which typically
-+has all the devices and memory that all CPUs can see. (Some older
-+device models use the "system address space" rather than properly
-+modelling that they have an AddressSpace of their own.)
-+
-+Functions are provided for doing byte-buffer reads and writes,
-+and also for doing one-data-item loads and stores.
-+
-+In all cases the caller provides a MemTxAttrs to specify bus
-+transaction attributes, and can check whether the memory transaction
-+succeeded using a MemTxResult return code.
-+
-+``address_space_read(address_space, addr, attrs, buf, len)``
-+
-+``address_space_write(address_space, addr, attrs, buf, len)``
-+
-+``address_space_rw(address_space, addr, attrs, buf, len, is_write)``
-+
-+``address_space_ld{sign}{size}_{endian}(address_space, addr, attrs, txresult)``
-+
-+``address_space_st{size}_{endian}(address_space, addr, val, attrs, txresult)``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+
-+(No signed load operations are provided.)
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+
-+The ``_{endian}`` suffix is omitted for byte accesses.
-+
-+Regexes for git grep
-+ - ``\<address_space_\(read\|write\|rw\)\>``
-+ - ``\<address_space_ldu\?[bwql]\(_[lb]e\)\?\>``
-+ - ``\<address_space_st[bwql]\(_[lb]e\)\?\>``
-+
-+``{ld,st}*_phys``
-+~~~~~~~~~~~~~~~~~
-+
-+These are functions which are identical to
-+``address_space_{ld,st}*``, except that they always pass
-+``MEMTXATTRS_UNSPECIFIED`` for the transaction attributes, and ignore
-+whether the transaction succeeded or failed.
-+
-+The fact that they ignore whether the transaction succeeded means
-+they should not be used in new code.
-+
-+``load: ld{sign}{size}_{endian}_phys``
-+
-+``store: st{size}_{endian}_phys``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+
-+(No signed load operations are provided.)
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+
-+The ``_{endian}_`` infix is omitted for byte accesses.
-+
-+Regexes for git grep
-+ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_phys\>``
-+ - ``\<st[bwlq]\(_[bl]e\)\?_phys\>``
-+
-+``cpu_physical_memory_*``
-+~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+These are convenience functions which are identical to
-+``address_space_*`` but operate specifically on the system address space,
-+always pass a ``MEMTXATTRS_UNSPECIFIED`` set of memory attributes and
-+ignore whether the memory transaction succeeded or failed.
-+For new code they are better avoided:
-+
-+* there is likely to be behaviour you need to model correctly for a
-+  failed read or write operation
-+* a device should usually perform operations on its own AddressSpace
-+  rather than using the system address space
-+
-+``cpu_physical_memory_read``
-+
-+``cpu_physical_memory_write``
-+
-+``cpu_physical_memory_rw``
-+
-+Regexes for git grep
-+ - ``\<cpu_physical_memory_\(read\|write\|rw\)\>``
-+
-+``cpu_physical_memory_write_rom``
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+This function performs a write by physical address like
-+``address_space_write``, except that if the write is to a ROM then
-+the ROM contents will be modified, even though a write by the guest
-+CPU to the ROM would be ignored.
-+
-+Note that unlike ``cpu_physical_memory_write()`` this function takes
-+an AddressSpace argument, but unlike ``address_space_write()`` this
-+function does not take a ``MemTxAttrs`` or return a ``MemTxResult``.
-+
-+**TODO**: we should probably clean up this inconsistency and
-+turn the function into ``address_space_write_rom`` with an API
-+matching ``address_space_write``.
-+
-+``cpu_physical_memory_write_rom``
-+
-+
-+``cpu_memory_rw_debug``
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Access CPU memory by virtual address for debug purposes.
-+
-+This function is intended for use by the GDB stub and similar code.
-+It takes a virtual address, converts it to a physical address via
-+an MMU lookup using the current settings of the specified CPU,
-+and then performs the access (using ``address_space_rw`` for
-+reads or ``cpu_physical_memory_write_rom`` for writes).
-+This means that if the access is a write to a ROM then this
-+function will modify the contents (whereas a normal guest CPU access
-+would ignore the write attempt).
-+
-+``cpu_memory_rw_debug``
-+
-+``dma_memory_*``
-+~~~~~~~~~~~~~~~~
-+
-+These behave like ``address_space_*``, except that they perform a DMA
-+barrier operation first.
-+
-+**TODO**: I don't understand when you need to use these, and when
-+you can just use the address_space functions.
-+
-+``dma_memory_read``
-+
-+``dma_memory_write``
-+
-+``dma_memory_rw``
-+
-+Regexes for git grep
-+ - ``\<dma_memory_\(read\|write\|rw\)\>``
-+
-+``pci_dma_*`` and ``{ld,st}*_pci_dma``
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+These functions are specifically for PCI device models which need to
-+perform accesses where the PCI device is a bus master. You pass them a
-+``PCIDevice *`` and they will do ``dma_memory_*`` operations on the
-+correct address space for that device.
-+
-+``pci_dma_read``
-+
-+``pci_dma_write``
-+
-+``pci_dma_rw``
-+
-+``load: ld{sign}{size}_{endian}_pci_dma``
-+
-+``store: st{size}_{endian}_pci_dma``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+
-+(No signed load operations are provided.)
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+
-+The ``_{endian}_`` infix is omitted for byte accesses.
-+
-+Regexes for git grep
-+ - ``\<pci_dma_\(read\|write\|rw\)\>``
-+ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_pci_dma\>``
-+ - ``\<st[bwlq]\(_[bl]e\)\?_pci_dma\>``
--- 
-2.7.4
+This patch uses 0x357 (855) which is the SPR number for hypervisor state
+access. But, yes, part of the register is also accessible in privileged
+non-hypervisor state with SPR number 0x337 (823). This will have to be
+covered later, but for now:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
+> C.
+>  =20
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  target/ppc/cpu.h            | 1 +
+> >  target/ppc/translate_init.c | 5 +++++
+> >  2 files changed, 6 insertions(+)
+> >=20
+> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > index f6e5413fad..46d3dd88f6 100644
+> > --- a/target/ppc/cpu.h
+> > +++ b/target/ppc/cpu.h
+> > @@ -1771,6 +1771,7 @@ void ppc_compat_add_property(Object *obj, const c=
+har *name,
+> >  #define SPR_IC                (0x350)
+> >  #define SPR_VTB               (0x351)
+> >  #define SPR_MMCRC             (0x353)
+> > +#define SPR_PSSCR             (0x357)
+> >  #define SPR_440_INV0          (0x370)
+> >  #define SPR_440_INV1          (0x371)
+> >  #define SPR_440_INV2          (0x372)
+> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > index 94800cd29d..8fb407ed73 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -8846,6 +8846,11 @@ static void init_proc_POWER9(CPUPPCState *env)
+> >                       spr_read_generic, spr_write_generic,
+> >                       KVM_REG_PPC_TIDR, 0);
+> > =20
+> > +    /* FIXME: Filter fields properly based on privilege level */
+> > +    spr_register_kvm_hv(env, SPR_PSSCR, "PSSCR", NULL, NULL, NULL, NUL=
+L,
+> > +                        spr_read_generic, spr_write_generic,
+> > +                        KVM_REG_PPC_PSSCR, 0);
+> > +
+> >      /* env variables */
+> >  #if !defined(CONFIG_USER_ONLY)
+> >      env->slb_nr =3D 32;
+> >  =20
+>=20
+
+
+--Sig_/wU+pmlzWZsbB/+ystS+EE6g
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlmJmHsACgkQAvw66wEB28JGUwCfZBa1QxbMDXu2XHZSj095X8M6
+CjQAoJKDgDMy1zpyKGcE7t0KsDOu8zrf
+=Haj5
+-----END PGP SIGNATURE-----
+
+--Sig_/wU+pmlzWZsbB/+ystS+EE6g--
