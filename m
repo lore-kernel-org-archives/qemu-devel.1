@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df7In-0007tO-PK
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:19 -0400
+	(envelope-from <quintela@redhat.com>) id 1df7Is-0007xb-U9
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df7Ij-0006EA-OJ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40582)
+	(envelope-from <quintela@redhat.com>) id 1df7Ir-0006If-TO
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7Ij-0006De-Hf
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:13 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df7Ir-0006II-Nl
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:24:21 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 80518806C6
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:24:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9157C047B7A
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 16:24:20 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue,  8 Aug 2017 18:22:07 +0200
-Message-Id: <20170808162224.32419-3-quintela@redhat.com>
+Date: Tue,  8 Aug 2017 18:22:08 +0200
+Message-Id: <20170808162224.32419-4-quintela@redhat.com>
 In-Reply-To: <20170808162224.32419-1-quintela@redhat.com>
 References: <20170808162224.32419-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 02/19] migration: Teach it about
- G_SOURCE_REMOVE
+Subject: [Qemu-devel] [PATCH v6 03/19] migration: Add comments to channel
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +33,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-As this is defined on glib 2.32, add compatibility macros for older glibs.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/glib-compat.h | 2 ++
- migration/exec.c      | 2 +-
- migration/fd.c        | 2 +-
- migration/socket.c    | 2 +-
- 4 files changed, 5 insertions(+), 3 deletions(-)
+ migration/channel.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index fcffcd3..e15aca2 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -223,6 +223,8 @@ static inline gboolean g_hash_table_contains(GHashTable *hash_table,
+diff --git a/migration/channel.c b/migration/channel.c
+index edceebd..79b0f8b 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -19,6 +19,14 @@
+ #include "qapi/error.h"
+ #include "io/channel-tls.h"
+ 
++/**
++ * @migration_channel_process_incoming - Create new incoming migration channel
++ *
++ * Notice that TLS is special.  For it we listen in a listener socket,
++ * and then create a new client socket from the TLS library.
++ *
++ * @ioc: Channel to wich we are connecting
++ */
+ void migration_channel_process_incoming(QIOChannel *ioc)
  {
-     return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
- }
-+#define G_SOURCE_CONTINUE TRUE
-+#define G_SOURCE_REMOVE FALSE
- #endif
- 
- #ifndef g_assert_true
-diff --git a/migration/exec.c b/migration/exec.c
-index 08b599e..f3be1ba 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    return FALSE; /* unregister */
-+    return G_SOURCE_REMOVE;
- }
- 
- void exec_start_incoming_migration(const char *command, Error **errp)
-diff --git a/migration/fd.c b/migration/fd.c
-index 30f5258..30de4b9 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    return FALSE; /* unregister */
-+    return G_SOURCE_REMOVE;
- }
- 
- void fd_start_incoming_migration(const char *infd, Error **errp)
-diff --git a/migration/socket.c b/migration/socket.c
-index 757d382..b02d37d 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
- out:
-     /* Close listening socket as its no longer needed */
-     qio_channel_close(ioc, NULL);
--    return FALSE; /* unregister */
-+    return G_SOURCE_REMOVE;
+     MigrationState *s = migrate_get_current();
+@@ -41,6 +49,13 @@ void migration_channel_process_incoming(QIOChannel *ioc)
  }
  
  
++/**
++ * @migration_channel_connect - Create new outgoing migration channel
++ *
++ * @s: Current migration state
++ * @ioc: Channel to wich we are connecting
++ * @hostname: Where we want to connect
++ */
+ void migration_channel_connect(MigrationState *s,
+                                QIOChannel *ioc,
+                                const char *hostname)
 -- 
 2.9.4
