@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df6Ew-0000XR-Gb
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:16:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1df6HJ-0002P9-1a
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1df6Ev-00080L-2B
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:16:14 -0400
-Date: Tue, 8 Aug 2017 17:16:00 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
-References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-	<20170807155717.GI6578@localhost.localdomain>
-	<692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
-	<20170808085352.GF4850@dhcp-200-186.str.redhat.com>
-	<896f8482-6e3a-13e9-4cce-ca115a6c8881@virtuozzo.com>
-	<645f5e9d-6a4b-1d7b-6907-6ab27e1ffa7e@virtuozzo.com>
-	<51899b88-6b4b-88ce-f820-f62bc944c034@redhat.com>
-	<2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
+	(envelope-from <armbru@redhat.com>) id 1df6HH-0000ty-SG
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:18:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43733)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1df6HH-0000tl-Lb
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:18:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87bmoxcuvn.fsf@dusky.pond.sub.org>
+	<61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
+	<87shh3fn7d.fsf@dusky.pond.sub.org>
+	<w511soml2kh.fsf@maestria.local.igalia.com>
+	<34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
+	<w51shh2jfi9.fsf@maestria.local.igalia.com>
+Date: Tue, 08 Aug 2017 17:18:36 +0200
+In-Reply-To: <w51shh2jfi9.fsf@maestria.local.igalia.com> (Alberto Garcia's
+	message of "Tue, 08 Aug 2017 16:33:34 +0200")
+Message-ID: <87wp6e6qb7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Kevin Wolf <kwolf@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, qemu-devel@nongnu.org
 
-Am 08.08.2017 um 17:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 08.08.2017 18:07, Eric Blake wrote:
-> > On 08/08/2017 04:04 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > 
-> > > > > > Throttling "guaranties" that there will not be more than one
-> > > > > > request. But
-> > > > > > what prevent less than one, i.e. zero, like in my reproduction?
-> > > > > Yes, I understand. Can we somehow make sure that at least one iteration
-> > > > > is made? I'd really like to keep the functional test for block job
-> > > > > throttling. I suppose a simple 'sleep 0.1' would do the trick, though
-> > > > > it's not very clean.
-> > > > > 
-> > > > > Kevin
-> > > > 
-> > > > I've started with 'sleep 0.5', now there are >100 successful
-> > > > iterations... The other way is to check in test that there was 0 or 1
-> > > > requests, but for this it looks better to rewrite it in python.
-> > > > 
-> > > > 
-> > > is sleep for ms portable?
-> > Sadly, sub-second sleep is a GNU coreutils feature; I suspect the BSD
-> > machines may fail to parse it.  (Of course, we could do some sort of
-> > 'sleep $SMALL', where $SMALL is 0.5 if sleep supports it, and 1 otherwise).
-> > 
-> sleep for 1 second may lead to more then one request done before qemu quite.
+Alberto Garcia <berto@igalia.com> writes:
 
-_supported_os Linux
+> On Tue 08 Aug 2017 02:30:43 PM CEST, Pradeep Jagadeesh wrote:
+>> On 8/8/2017 1:30 PM, Alberto Garcia wrote:
+>>> On Mon 07 Aug 2017 04:48:38 PM CEST, Markus Armbruster wrote:
+>>>>>> Awkward question for a v7, but here goes anyway: why is IOThrottle
+>>>>>> worth its very own .json file?
+>>>>> I feel this is a common throttle structure that is used by block
+>>>>> devices as well as fsdev, so moved to a separate file.
+>>>> I'm not sure that's a good idea.  Kevin, Berto, what do you think?
+>>>
+>>> Mmm... I don't have a very strong opinion, but if there's no actual need
+>>> to move it to a separate file I'd prefer to leave it where it is.
+>> The segregation is the solid reason. Because throttling is a feature 
+>> that is used by fsdev, block may many more in future. I do not see 
+>> moving it back to block does it make any sense?
+>
+> It's not "moving it back", it's keeping it where it is. But I see no big
+> problem with moving it to a common file either.
 
-So do we really care about portability? And are all the other test cases
-working on the BSDs?
+I'd rather not put every struct shared across subsystem boundaries in
+its own file.
 
-Kevin
+We can keep it right where it is for now.  Bonus: more readable diff.
+If we start sharing more throttle-related material than just a struct,
+we can reconsider.
+
+We could also move it to the existing file for common stuff:
+qapi/common.json.  Not a great fit, though.
