@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dfB2f-0002Qi-8M
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:23:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfB3l-00037J-Pi
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:25:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dfB2b-0007Fn-6O
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:23:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51644
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dfB2a-0007FM-W2
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:23:49 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v78KNjMK067989
-	for <qemu-devel@nongnu.org>; Tue, 8 Aug 2017 16:23:48 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c7hbshxnw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 16:23:47 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 8 Aug 2017 16:23:47 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <eblake@redhat.com>) id 1dfB3h-0007kp-SM
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:25:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38932)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfB3h-0007kg-I1
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 16:24:57 -0400
+References: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
+	<9e56de2e-2c20-6e28-efd0-1f78b21a7be5@amsat.org>
+	<9f3c0af6-1ff8-adca-9f69-2be8dd7d250f@redhat.com>
+	<db1e220e-f3bf-352d-57ac-6ad3b427e944@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c26818de-c402-2db2-25f7-0e568ab41ddf@redhat.com>
+Date: Tue, 8 Aug 2017 15:24:45 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 08 Aug 2017 15:23:37 -0500
-Message-Id: <150222381791.30596.10692796082101371085@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.10.0-rc2 is now available
+In-Reply-To: <db1e220e-f3bf-352d-57ac-6ad3b427e944@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BPSgwk9vuFiaCO2sdUGCvGWci8Hxwv3bF"
+Subject: Re: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix
+ fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,100 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>, zhiyong.wu@ucloud.cn, qemu-devel@nongnu.org
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BPSgwk9vuFiaCO2sdUGCvGWci8Hxwv3bF
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ zhiyong.wu@ucloud.cn, qemu-devel@nongnu.org
+Message-ID: <c26818de-c402-2db2-25f7-0e568ab41ddf@redhat.com>
+Subject: Re: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix
+ fchmodat_nofollow() limitations
+References: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
+ <9e56de2e-2c20-6e28-efd0-1f78b21a7be5@amsat.org>
+ <9f3c0af6-1ff8-adca-9f69-2be8dd7d250f@redhat.com>
+ <db1e220e-f3bf-352d-57ac-6ad3b427e944@amsat.org>
+In-Reply-To: <db1e220e-f3bf-352d-57ac-6ad3b427e944@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-third release candidate for the QEMU 2.10 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+On 08/08/2017 03:10 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Technically, POSIX says (and 'man 2 open' agrees, modulo the fact that=
 
-  http://download.qemu-project.org/qemu-2.10.0-rc2.tar.xz
-  http://download.qemu-project.org/qemu-2.10.0-rc2.tar.xz.sig
+>> Linux still lacks O_SEARCH) that you MUST provide one of the 5 access
+>> modes (they are O_RDONLY, O_RDWR, O_WRONLY, O_EXEC, and O_SEARCH;
+>> although POSIX allows O_EXEC and O_SEARCH to be the same bit pattern),=
 
-A note from the maintainer:
+>> and then bitwise-or any additional flags.  So the usage here is correc=
+t.
+>>
 
-  Known issue in this rc: "make check" may produce warnings about
-  "acpi-test: Warning! DSDT mismatch". These are harmless and will
-  be silenced in the next rc.
- =
+> Oh ok. I didn't think of that, just checked Linux manpage:
+>=20
+>    O_PATH (since Linux 2.6.39)
+>=20
+>           When O_PATH is specified in flags, flag bits other than
+>           O_CLOEXEC, O_DIRECTORY, and O_NOFOLLOW are ignored.
 
-You can help improve the quality of the QEMU 2.10 release by testing this
-release and reporting bugs on Launchpad:
+There are access modes (5 in POSIX), and then flag bits (O_NONBLOCK
+being one of the flag bits, and therefore ignored when O_PATH is true).
+Presumably, the author was being careful by mentioning "flag bits" (and
+thereby implicitly meaning that O_RDONLY is NOT ignored when using
+O_PATH).  But I'm not _quite_ sure whether O_PATH should be considered a
+sixth access mode, or a flag bit, and the Linux man page doesn't help on
+that front ;)  Hmm - if you treat O_PATH as an access mode rather than a
+flag bit, then O_RDONLY | O_PATH no longer makes sense at all (you can't
+mix two modes at once).  Maybe we should file a bug report against the
+man page to get clarification.
 
-  https://bugs.launchpad.net/qemu/
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-The release plan, as well a documented known issues for release
-candidates, are available at:
 
-  http://wiki.qemu.org/Planning/2.10
+--BPSgwk9vuFiaCO2sdUGCvGWci8Hxwv3bF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Please add entries to the ChangeLog for the 2.10 release below:
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  http://wiki.qemu.org/ChangeLog/2.10
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmKHg0ACgkQp6FrSiUn
+Q2qHNggAqBTifNxBc5o9k7eZQjl1kS6R5QDuFpEOLhQRihbE7qLSfLliyhUxppXB
+vr/6vkwCheyRFK2tiLzqTErW5TnAl31nIaNiaKIhMV9AHxxB1YOMebw8RupgKJho
+P2m5H3zNFoI1/NrXK+B1VtwJci5z0HOEhXh5FLkFr88TfH+JDw5UhIk6s2BeZ2ly
+C6dugp8uiGIK4HLrMF7EYarH2hoR/ZK9i6HIjuF649MPpNcKT0qdD+/t/CkwCvED
+Dug6Yecpp8fC5gf1b4jcsf0Pxvusob01m+eGoAAhjHuD4dagXKhO6/GWL1xMsY7M
+JbEaOmp2Absy7q8KExiBm300jS2YpQ==
+=tB+b
+-----END PGP SIGNATURE-----
 
-Changes since rc1:
-
-54affb3: Update version for v2.10.0-rc2 release (Peter Maydell)
-f5048cb: maint: Include bug-reporting info in --help output (Eric Blake)
-8f1c29a: qga: Give more --version information (Eric Blake)
-4face32: qemu-io: Give more --version information (Eric Blake)
-57b2d9d: qemu-img: Sort sub-command names in --help (Eric Blake)
-113fe79: block/nfs: fix mutex assertion in nfs_file_close() (Jeff Cody)
-ea22b7a: qemu-iotests: Test reopen between read-only and read-write (Kevin =
-Wolf)
-ea92203: qemu-io: Allow reopen read-write (Kevin Wolf)
-fd45202: block: Set BDRV_O_ALLOW_RDWR during rw reopen (Kevin Wolf)
-54a32bf: block: Allow reopen rw without BDRV_O_ALLOW_RDWR (Kevin Wolf)
-8aecf1d: block: Fix order in bdrv_replace_child() (Kevin Wolf)
-e5e6268: parallels: drop check that bdrv_truncate() is working (Denis V. Lu=
-nev)
-d8b83e3: parallels: respect error code of bdrv_getlength() in allocate_clus=
-ters() (Denis V. Lunev)
-70d9110: block: respect error code from bdrv_getlength in handle_aiocb_writ=
-e_zeroes (Denis V. Lunev)
-0e51b9b: vmdk: Fix error handling/reporting of vmdk_check (Fam Zheng)
-809eb70: block/null: Remove 'filename' option (Kevin Wolf)
-8234668: block: drop bdrv_set_key from BlockDriver (Paolo Bonzini)
-95d7298: block/vhdx: check error return of bdrv_truncate() (Jeff Cody)
-c6572fa: block/vhdx: check error return of bdrv_flush() (Jeff Cody)
-27539ac: block/vhdx: check for offset overflow to bdrv_truncate() (Jeff Cod=
-y)
-3f91069: block/vhdx: check error return of bdrv_getlength() (Jeff Cody)
-795be06: quorum: Set sectors-count to 0 when reporting a flush error (Alber=
-to Garcia)
-53dd401: qemu-iotests/109: Fix lock race condition (Cleber Rosa)
-ab6ab3e: target/i386: set rip_offset for some SSE4.1 instructions (Joseph M=
-yers)
-ded6ddc: scsi: clarify sense codes for LUN0 emulation (Hannes Reinecke)
-1b7ac7c: kvm: workaround build break on gcc-7.1.1 / fedora26 (Greg Kurz)
-2a96a55: Revert "rcu: do not create thread in pthread_atfork callback" (Pao=
-lo Bonzini)
-73c6e40: rcu: completely disable pthread_atfork callbacks as soon as possib=
-le (Paolo Bonzini)
-e2a7f28: cpu: add APIs to allocate/free CPU environment (Michael S. Tsirkin)
-a41c78c: hw/i386: allow SHPC for Q35 machine (Aleksandr Bezzubikov)
-f22ab6c: hw/arm/virt: Add 2.10 machine type (Eric Auger)
-f42cf44: block: move trace probes into bdrv_co_preadv|pwritev (Daniel P. Be=
-rrange)
-13aaef6: tcg: Increase minimum alignment from tcg_malloc to 8 (Richard Hend=
-erson)
-de4e05d: target/s390x: Fix CSST for 16-byte store (Richard Henderson)
-ca671de: tcg/arm: Fix runtime overalignment test (Richard Henderson)
-e6a7486: build-sys: add --disable-vhost-user (Marc-Andr=C3=A9 Lureau)
-413d463: slirp: check len against dhcp options array end (Prasad J Pandit)
-5c843af: slirp: fill error when failing to initialize user network (Herv=C3=
-=A9 Poussineau)
-be2960b: cpu: don't allow negative core id (Laurent Vivier)
-d673a68: target/mips: Fix RDHWR CC with icount (James Hogan)
-51ca717: target/mips: Drop redundant gen_io_start/stop() (James Hogan)
-b74cddc: target/mips: Use BS_EXCP where interrupts are expected (James Hoga=
-n)
-2d1847e: target-mips: apply CP0.PageMask before writing into TLB entry (Leo=
-n Alrae)
-d3d93c6: mips: Add KVM T&E segment support for TCG (James Hogan)
-6743334: mips: Improve segment defs for KVM T&E guests (James Hogan)
-9652ef2: mips/malta: leave space for the bootmap after the initrd (Aurelien=
- Jarno)
-cb539fd: target-mips: Don't stop on [d]mtc0 DESAVE/KScratch (James Hogan)
+--BPSgwk9vuFiaCO2sdUGCvGWci8Hxwv3bF--
