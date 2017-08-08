@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1df7la-000407-7t
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:54:03 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1df7xl-0001ea-4v
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1df7lX-0006Cz-Kq
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:54:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33336)
+	(envelope-from <dgilbert@redhat.com>) id 1df7xh-0003SQ-0g
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:06:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1df7lX-0006CX-Be
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 12:53:59 -0400
-Date: Tue, 8 Aug 2017 10:53:49 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170808105349.580a89a8@w520.home>
-In-Reply-To: <CAMxP3BS+088_zjKMJeC0_g=sXiGqGPdj3UFD74URGFgef29kXA@mail.gmail.com>
-References: <4E0AFA5F-44D6-4624-A99F-68A7FE52F397@meituan.com>
-	<4b31a711-a52e-25d3-4a7c-1be8521097d9@redhat.com>
-	<F99BFE80-FC15-40A0-BB3E-1B53B6CF9B05@meituan.com>
-	<859362e8-0d98-3865-8bad-a15bfa218167@redhat.com>
-	<20170726092931.0678689e@w520.home>
-	<20170726190348-mutt-send-email-mst@kernel.org>
-	<20170726113222.52aad9a6@w520.home>
-	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
-	<20170731234626.7664be18@w520.home>
-	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
-	<20170801090158.35d18f10@w520.home>
-	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
-	<20170807095224.5438ef8c@w520.home>
-	<CAMxP3BS+088_zjKMJeC0_g=sXiGqGPdj3UFD74URGFgef29kXA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1df7xg-0003S7-Ob
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:06:32 -0400
+Date: Tue, 8 Aug 2017 18:06:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170808170610.GQ2081@work-vm>
+References: <20170628190047.26159-1-dgilbert@redhat.com>
+	<CGME20170628190250epcas2p1f018e6169b78276f65cf4cc9fbeb14a3@epcas2p1.samsung.com>
+	<20170628190047.26159-24-dgilbert@redhat.com>
+	<1e52da76-269f-020e-c9cf-adaaef30b59c@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
- =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1e52da76-269f-020e-c9cf-adaaef30b59c@samsung.com>
+Subject: Re: [Qemu-devel] [RFC 23/29] vub+postcopy: madvises
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,55 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bob Chen <a175818323@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-On Tue, 8 Aug 2017 09:44:56 +0800
-Bob Chen <a175818323@gmail.com> wrote:
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> On 06/28/2017 10:00 PM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Clear the area and turn off THP.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >   contrib/libvhost-user/libvhost-user.c | 32 ++++++++++++++++++++++++++++++--
+> >   1 file changed, 30 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> > index 0658b6e847..ceddeac74f 100644
+> > --- a/contrib/libvhost-user/libvhost-user.c
+> > +++ b/contrib/libvhost-user/libvhost-user.c
+> > @@ -451,11 +451,39 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
+> >           }
+> >           if (dev->postcopy_listening) {
+> > +            int ret;
+> >               /* We should already have an open ufd need to mark each memory
+> >                * range as ufd.
+> > -             * Note: Do we need any madvises? Well it's not been accessed
+> > -             * yet, still probably need no THP to be safe, discard to be safe?
+> >                */
+> > +
+> > +            /* Discard any mapping we have here; note I can't use MADV_REMOVE
+> > +             * or fallocate to make the hole since I don't want to lose
+> > +             * data that's already arrived in the shared process.
+> > +             * TODO: How to do hugepage
+> > +             */
+> Hi, David, frankly saying, I stuck with my solution, and I have also another
+> issues,
+> but here I could suggest solution for hugepages. I think we could transmit a
+> received pages
+> bitmap in VHOST_USER_SET_MEM_TABLE (VhostUserMemoryRegion), but it will
+> raise a compatibility issue,
+> or introduce special message type for that and send it before
+> VHOST_USER_SET_MEM_TABLE.
+> So it will be  possible to do fallocate on received bitmap basis, just skip
+> already copied pages.
+> If you wish, I could send patches, rebased on yours, for doing it.
 
-> 1. How to test the KVM exit rate?
+What we found works is that actually we don't need to do a discard -
+since we've only just done the mmap of the arena, nothing will be
+occupying it on the shared client, so we don't need to discard.
 
-You can use tracing: http://www.linux-kvm.org/page/Tracing
- 
-> 2. The switches are separate devices of PLX Technology
-> 
-> # lspci -s 07:08.0 -nn
-> 07:08.0 PCI bridge [0604]: PLX Technology, Inc. PEX 8747 48-Lane, 5-Port
-> PCI Express Gen 3 (8.0 GT/s) Switch [10b5:8747] (rev ca)
-> 
-> # This is one of the Root Ports in the system.
-> [0000:00]-+-00.0  Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D
-> DMI2
->              +-01.0-[01]----00.0  LSI Logic / Symbios Logic MegaRAID SAS
-> 2208 [Thunderbolt]
->              +-02.0-[02-05]--
->              +-03.0-[06-09]----00.0-[07-09]--+-08.0-[08]--+-00.0  NVIDIA
-> Corporation GP102 [TITAN Xp]
->              |                               |            \-00.1  NVIDIA
-> Corporation GP102 HDMI Audio Controller
->              |                               \-10.0-[09]--+-00.0  NVIDIA
-> Corporation GP102 [TITAN Xp]
->              |                                            \-00.1  NVIDIA
-> Corporation GP102 HDMI Audio Controller
-> 
-> 
-> 
-> 
-> 3. ACS
-> 
-> It seemed that I had misunderstood your point? I finally found ACS
-> information on switches, not on GPUs.
-> 
-> Capabilities: [f24 v1] Access Control Services
-> ACSCap: SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl+
-> DirectTrans+
-> ACSCtl: SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl-
-> DirectTrans-
+We've had a postcopy migrate work now, with a few hacks we're still
+cleaning up, both on vhost-user-bridge and dpdk; so I'll get this
+updated and reposted.
 
-Yes, NVIDIA uses the same PLX PEX 8747 on the switches on the cards I
-have access to.  Unfortunately the endpoints in my case do not support
-ATS, so the endpoint cannot generate a pre-translated address that
-would take advantage of the DT capability on the switch port if we were
-to enable it.  Thanks,
+Dave
 
-Alex
+> > +            ret = madvise((void *)dev_region->mmap_addr,
+> > +                          dev_region->size + dev_region->mmap_offset,
+> > +                          MADV_DONTNEED);
+> > +            if (ret) {
+> > +                fprintf(stderr,
+> > +                        "%s: Failed to madvise(DONTNEED) region %d: %s\n",
+> > +                        __func__, i, strerror(errno));
+> > +            }
+> > +            /* Turn off transparent hugepages so we dont get lose wakeups
+> > +             * in neighbouring pages.
+> > +             * TODO: Turn this backon later.
+> > +             */
+> > +            ret = madvise((void *)dev_region->mmap_addr,
+> > +                          dev_region->size + dev_region->mmap_offset,
+> > +                          MADV_NOHUGEPAGE);
+> > +            if (ret) {
+> > +                /* Note: This can happen legally on kernels that are configured
+> > +                 * without madvise'able hugepages
+> > +                 */
+> > +                fprintf(stderr,
+> > +                        "%s: Failed to madvise(NOHUGEPAGE) region %d: %s\n",
+> > +                        __func__, i, strerror(errno));
+> > +            }
+> >               struct uffdio_register reg_struct;
+> >               /* Note: We might need to go back to using mmap_addr and
+> >                * len + mmap_offset for * huge pages, but then we do hope not to
+> 
+> 
+> -- 
+> Best regards,
+> Alexey Perevalov
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
