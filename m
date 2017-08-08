@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df1yc-000613-FU
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1df1zd-0006jw-WB
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1df1yb-0003se-Aq
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55334)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1df1yb-0003sO-1P
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:43:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0648F7C852
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 10:43:04 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170720114507.GG2101@work-vm> (David Alan Gilbert's message of
-	"Thu, 20 Jul 2017 12:45:08 +0100")
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-18-quintela@redhat.com>
-	<20170720114507.GG2101@work-vm>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 Aug 2017 12:43:00 +0200
-Message-ID: <87valy9w7f.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
+	(envelope-from <pm215@archaic.org.uk>) id 1df1zc-0004AG-3f
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:44:10 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:36804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1df1zb-00049o-NE
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:44:08 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  8 Aug 2017 11:44:02 +0100
+Message-Id: <1502189042-9676-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [RFC] docs/devel/loads-stores.rst: Document our
+ various load and store APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +23,396 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> Each time that we sync the bitmap, it is a possiblity that we receive
->> a page that is being processed by a different thread.  We fix this
->> problem just making sure that we wait for all receiving threads to
->> finish its work before we procedeed with the next stage.
->> 
->> We are low on page flags, so we use a combination that is not valid to
->> emit that message:  MULTIFD_PAGE and COMPRESSED.
->> 
->> I tried to make a migration command for it, but it don't work because
->> we sync the bitmap sometimes when we have already sent the beggining
->> of the section, so I just added a new page flag.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
+QEMU has a wide selection of different functions for doing
+loads and stores; provide some overview documentation of
+what they do and how to pick which one to use.
 
->> +static int multifd_flush(void)
->> +{
->> +    int i, thread_count;
->> +
->> +    if (!migrate_use_multifd()) {
->> +        return 0;
->> +    }
->> +    thread_count = migrate_multifd_threads();
->> +    for (i = 0; i < thread_count; i++) {
->> +        MultiFDRecvParams *p = multifd_recv_state->params[i];
->> +
->> +        qemu_mutex_lock(&p->mutex);
->> +        while (!p->done) {
->> +            p->sync = true;
->> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
->> +        }
->
-> I don't think I understand how that works in the case where the
-> recv_thread has already 'done' by the point you set sync=true; how does
-> it get back to the check and do the signal?
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is currently a work in progress, with many TODO points.
+Some of the formatting is a bit inconsistent from section to
+section. I post it to see if people think it's a useful
+document to have and to try to get some answers to the TODO
+points which are "I don't know why this function exists" and
+"when should we use this function rather than that other one"...
 
-We have two cases:
-* done = true
-* done = false
+ docs/devel/loads-stores.rst | 365 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 365 insertions(+)
+ create mode 100644 docs/devel/loads-stores.rst
 
-if done is false, we need to wait until it is done.  But if it is true,
-we don't have to wait.  By definition, there is nothing on that thread
-that we need to wait for.  It is not in the middle of receiving a page.
-
-
-
->
->> +        qemu_mutex_unlock(&p->mutex);
->> +    }
->> +    return 0;
->> +}
->> +
->>  /**
->>   * save_page_header: write page header to wire
->>   *
->> @@ -809,6 +847,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
->>  {
->>      size_t size, len;
->>  
->> +    if (rs->multifd_needs_flush &&
->> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
->> +        offset |= RAM_SAVE_FLAG_ZERO;
->
-> In the comment near the top you say RAM_SAVE_FLAG_COMPRESS_PAGE;  it's
-> probably best to add an alias at the top to make it clear, e.g.
->   #define RAM_SAVE_FLAG_MULTIFD_SYNC RAM_SAVE_FLAG_ZERO
->
->   or maybe (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)
-
-done.
-
-But I only use it when we use the "or".
-
-Thanks, Juan.
+diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+new file mode 100644
+index 0000000..73ae4c8
+--- /dev/null
++++ b/docs/devel/loads-stores.rst
+@@ -0,0 +1,365 @@
++..
++   Copyright (c) 2017 Linaro Limited
++   Written by Peter Maydell
++   TODO: do we have a standard doc license? bitmaps.rst
++   uses the FreeBSD documentation license, I notice.
++
++===================
++Load and Store APIs
++===================
++
++QEMU internally has multiple families of functions for performing
++loads and stores. This document attempts to enumerate them all
++and indicate when to use them. It does not provide detailed
++documentation of each API -- for that you should look at the
++documentation comments in the relevant header files.
++
++
++``ld*_p and st_*p``
++~~~~~~~~~~~~~~~~~~~
++
++These functions operate on a host pointer, and should be used
++when you already have a pointer into host memory (corresponding
++to guest ram or a local buffer). They deal with doing accesses
++with the desired endianness and with correctly handling
++potentially unaligned pointer values.
++
++Function names follow the pattern:
++
++load: ``ld{type}{sign}{size}_{endian}_p(ptr)``
++
++store: ``st{type}{size}_{endian}_p(ptr, val)``
++
++``type``
++ - (empty) : integer access
++ - ``f`` : float access
++
++``sign``
++ - (empty) : for 32 or 64 bit sizes (including floats and doubles)
++ - ``u`` : unsigned
++ - ``s`` : signed
++
++``size``
++ - ``b`` : 8 bits
++ - ``w`` : 16 bits
++ - ``l`` : 32 bits
++ - ``q`` : 64 bits
++
++``endian``
++ - ``he`` : host endian
++ - ``be`` : big endian
++ - ``le`` : little endian
++
++(except for byte accesses, which have no endian infix).
++
++The ``_{endian}`` infix is omitted for target-endian accesses.
++
++The target endian accessors are only available to source
++files which are built per-target.
++
++Regexes for git grep
++ - ``\<ldf\?[us]\?[bwlq]\(_[hbl]e\)\?_p\>``
++ - ``\<stf\?[bwlq]\(_[hbl]e\)\?_p\>``
++
++``cpu_{ld,st}_*``
++~~~~~~~~~~~~~~~~~
++
++These functions operate on a guest virtual address. Be aware
++that these functions may cause a guest CPU exception to be
++taken (eg for an alignment fault or MMU fault) which will
++result in guest CPU state being updated and control longjumping
++out of the function call. They should therefore only be used
++in code that is implementing emulation of the target CPU.
++
++Function names follow the pattern:
++
++load: ``cpu_ld{sign}{size}_{mmusuffix}(env, ptr)``
++
++store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
++
++``sign``
++ - (empty) : for 32 or 64 bit sizes
++ - ``u`` : unsigned
++ - ``s`` : signed
++
++``size``
++ - ``b`` : 8 bits
++ - ``w`` : 16 bits
++ - ``l`` : 32 bits
++ - ``q`` : 64 bits
++
++``mmusuffix`` is one of the generic suffixes ``data`` or ``code``, or
++(for softmmu configs) a target-specific MMU mode suffix as defined
++in the target's ``cpu.h``.
++
++Regexes for git grep
++ - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+\>``
++ - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+\>``
++
++``cpu_{ld,st}_*_ra``
++~~~~~~~~~~~~~~~~~~~~
++
++Thes functions work like the ``cpu_{ld,st}_*`` functions except
++that they also take a ``retaddr`` argument.
++
++**TODO**: when should these be used and what should ``retaddr`` be?
++
++Function names follow the pattern:
++
++load: ``cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)``
++
++store: ``cpu_st{sign}{size}_{mmusuffix}_ra(env, ptr, val, retaddr)``
++
++Regexes for git grep
++ - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+_ra\>``
++ - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+_ra\>``
++
++``helper_*_{ld,st}*mmu``
++~~~~~~~~~~~~~~~~~~~~~~~~
++
++These functions are intended primarily to be called by the code
++generated by the TCG backend. They may also be called by target
++CPU helper function code. (XXX why, and when this vs cpu_{ld,st}_* ?)
++
++**TODO** tcg.h claims the target-endian helper_ret* are temporary and
++will go away?
++
++**TODO** why is "target endian" "ret" anyway?
++
++load: ``helper_{endian}_ld{sign}{size}_mmu(env, addr, opindex, retaddr)``
++
++load (code): ``helper_{endian}_ld{sign}{size}_cmmu(env, addr, opindex, retaddr)``
++
++store: ``helper_{endian}_st{size}_mmu(env, addr, val, opindex, retaddr)``
++
++``sign``
++ - (empty) : for 32 or 64 bit sizes
++ - ``u`` : unsigned
++ - ``s`` : signed
++
++``size``
++ - ``b`` : 8 bits
++ - ``w`` : 16 bits
++ - ``l`` : 32 bits
++ - ``q`` : 64 bits
++
++``endian``
++ - ``le`` : little endian
++ - ``be`` : big endian
++ - ``ret`` : target endianness
++
++Regexes for git grep
++ - ``\<helper_\(le\|be\|ret\)_ld[us]\?[bwlq]_c\?mmu\>``
++ - ``\<helper_\(le\|be\|ret\)_st[bwlq]_mmu\>``
++
++``address_space_*``
++~~~~~~~~~~~~~~~~~~~
++
++These functions are the primary ones to use when emulating CPU
++or device memory accesses. They take an AddressSpace, which is the
++way QEMU defines the view of memory that a device or CPU has.
++(They generally correspond to being the "master" end of a hardware bus
++or bus fabric.)
++
++Each CPU has an AddressSpace. Some kinds of CPU have more than
++one AddressSpace (for instance ARM guest CPUs have an AddressSpace
++for the Secure world and one for NonSecure if they implement TrustZone).
++Devices which can do DMA-type operations should generally have an
++AddressSpace. There is also a "system address space" which typically
++has all the devices and memory that all CPUs can see. (Some older
++device models use the "system address space" rather than properly
++modelling that they have an AddressSpace of their own.)
++
++Functions are provided for doing byte-buffer reads and writes,
++and also for doing one-data-item loads and stores.
++
++In all cases the caller provides a MemTxAttrs to specify bus
++transaction attributes, and can check whether the memory transaction
++succeeded using a MemTxResult return code.
++
++``address_space_read(address_space, addr, attrs, buf, len)``
++
++``address_space_write(address_space, addr, attrs, buf, len)``
++
++``address_space_rw(address_space, addr, attrs, buf, len, is_write)``
++
++``address_space_ld{sign}{size}_{endian}(address_space, addr, attrs, txresult)``
++
++``address_space_st{size}_{endian}(address_space, addr, val, attrs, txresult)``
++
++``sign``
++ - (empty) : for 32 or 64 bit sizes
++ - ``u`` : unsigned
++
++(No signed load operations are provided.)
++
++``size``
++ - ``b`` : 8 bits
++ - ``w`` : 16 bits
++ - ``l`` : 32 bits
++ - ``q`` : 64 bits
++
++``endian``
++ - ``le`` : little endian
++ - ``be`` : big endian
++
++The ``_{endian}`` suffix is omitted for byte accesses.
++
++Regexes for git grep
++ - ``\<address_space_\(read\|write\|rw\)\>``
++ - ``\<address_space_ldu\?[bwql]\(_[lb]e\)\?\>``
++ - ``\<address_space_st[bwql]\(_[lb]e\)\?\>``
++
++``{ld,st}*_phys``
++~~~~~~~~~~~~~~~~~
++
++These are functions which are identical to
++``address_space_{ld,st}*``, except that they always pass
++``MEMTXATTRS_UNSPECIFIED`` for the transaction attributes, and ignore
++whether the transaction succeeded or failed.
++
++The fact that they ignore whether the transaction succeeded means
++they should not be used in new code.
++
++``load: ld{sign}{size}_{endian}_phys``
++
++``store: st{size}_{endian}_phys``
++
++``sign``
++ - (empty) : for 32 or 64 bit sizes
++ - ``u`` : unsigned
++
++(No signed load operations are provided.)
++
++``size``
++ - ``b`` : 8 bits
++ - ``w`` : 16 bits
++ - ``l`` : 32 bits
++ - ``q`` : 64 bits
++
++``endian``
++ - ``le`` : little endian
++ - ``be`` : big endian
++
++The ``_{endian}_`` infix is omitted for byte accesses.
++
++Regexes for git grep
++ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_phys\>``
++ - ``\<st[bwlq]\(_[bl]e\)\?_phys\>``
++
++``cpu_physical_memory_*``
++~~~~~~~~~~~~~~~~~~~~~~~~~
++
++These are convenience functions which are identical to
++``address_space_*`` but operate specifically on the system address space,
++always pass a ``MEMTXATTRS_UNSPECIFIED`` set of memory attributes and
++ignore whether the memory transaction succeeded or failed.
++For new code they are better avoided:
++
++* there is likely to be behaviour you need to model correctly for a
++  failed read or write operation
++* a device should usually perform operations on its own AddressSpace
++  rather than using the system address space
++
++``cpu_physical_memory_read``
++
++``cpu_physical_memory_write``
++
++``cpu_physical_memory_rw``
++
++Regexes for git grep
++ - ``\<cpu_physical_memory_\(read\|write\|rw\)\>``
++
++``cpu_physical_memory_write_rom``
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++This function performs a write by physical address like
++``address_space_write``, except that if the write is to a ROM then
++the ROM contents will be modified, even though a write by the guest
++CPU to the ROM would be ignored.
++
++Note that unlike ``cpu_physical_memory_write()`` this function takes
++an AddressSpace argument, but unlike ``address_space_write()`` this
++function does not take a ``MemTxAttrs`` or return a ``MemTxResult``.
++
++**TODO**: we should probably clean up this inconsistency and
++turn the function into ``address_space_write_rom`` with an API
++matching ``address_space_write``.
++
++``cpu_physical_memory_write_rom``
++
++
++``cpu_memory_rw_debug``
++~~~~~~~~~~~~~~~~~~~~~~~
++
++Access CPU memory by virtual address for debug purposes.
++
++This function is intended for use by the GDB stub and similar code.
++It takes a virtual address, converts it to a physical address via
++an MMU lookup using the current settings of the specified CPU,
++and then performs the access (using ``address_space_rw`` for
++reads or ``cpu_physical_memory_write_rom`` for writes).
++This means that if the access is a write to a ROM then this
++function will modify the contents (whereas a normal guest CPU access
++would ignore the write attempt).
++
++``cpu_memory_rw_debug``
++
++``dma_memory_*``
++~~~~~~~~~~~~~~~~
++
++These behave like ``address_space_*``, except that they perform a DMA
++barrier operation first.
++
++**TODO**: I don't understand when you need to use these, and when
++you can just use the address_space functions.
++
++``dma_memory_read``
++
++``dma_memory_write``
++
++``dma_memory_rw``
++
++Regexes for git grep
++ - ``\<dma_memory_\(read\|write\|rw\)\>``
++
++``pci_dma_*`` and ``{ld,st}*_pci_dma``
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++These functions are specifically for PCI device models which need to
++perform accesses where the PCI device is a bus master. You pass them a
++``PCIDevice *`` and they will do ``dma_memory_*`` operations on the
++correct address space for that device.
++
++``pci_dma_read``
++
++``pci_dma_write``
++
++``pci_dma_rw``
++
++``load: ld{sign}{size}_{endian}_pci_dma``
++
++``store: st{size}_{endian}_pci_dma``
++
++``sign``
++ - (empty) : for 32 or 64 bit sizes
++ - ``u`` : unsigned
++
++(No signed load operations are provided.)
++
++``size``
++ - ``b`` : 8 bits
++ - ``w`` : 16 bits
++ - ``l`` : 32 bits
++ - ``q`` : 64 bits
++
++``endian``
++ - ``le`` : little endian
++ - ``be`` : big endian
++
++The ``_{endian}_`` infix is omitted for byte accesses.
++
++Regexes for git grep
++ - ``\<pci_dma_\(read\|write\|rw\)\>``
++ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_pci_dma\>``
++ - ``\<st[bwlq]\(_[bl]e\)\?_pci_dma\>``
+-- 
+2.7.4
