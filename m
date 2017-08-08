@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df6X1-0006ZA-3f
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:34:56 -0400
+	(envelope-from <mst@redhat.com>) id 1df6Xf-0007OS-Mh
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1df6X0-00010l-1q
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:34:55 -0400
-Date: Tue, 8 Aug 2017 16:34:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170808153429.GN2081@work-vm>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-33-git-send-email-armbru@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1df6Xb-0001Tn-MI
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:35:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1df6Xb-0001TS-AD
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:35:31 -0400
+Date: Tue, 8 Aug 2017 18:35:24 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170808183516-mutt-send-email-mst@kernel.org>
+References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
+	<1501964858-5159-2-git-send-email-zuban32s@gmail.com>
+	<8893f281-e30d-d1c6-3da0-14a644da5a03@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1502117160-24655-33-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 32/56] hmp: Make
- block_set_io_throttle's arguments unsigned
+In-Reply-To: <8893f281-e30d-d1c6-3da0-14a644da5a03@redhat.com>
+Subject: Re: [Qemu-devel] acpi-test: Warning! DSDT mismatch (was: [PATCH v4
+ 1/5] hw/i386: allow SHPC for Q35 machine)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Aleksandr Bezzubikov <zuban32s@gmail.com>, ehabkost@redhat.com, kevin@koconnor.net, pbonzini@redhat.com, marcel@redhat.com, imammedo@redhat.com, lersek@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> The previous commit made them unsigned in QMP.  Switch HMP's args_type
-> from 'l' to 'o'.  Loses support for expressions (QEMU pocket
-> calculator), gains support for unit suffixes.  Negative values are no
-> longer accepted and interpreted modulo 2^64.  Instead, values between
-> 2^63 and 2^64-1 are now accepted.
-
-But that also means all these values are assumed to be in MB by default?
-
-Dave
-
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hmp-commands.hx | 2 +-
->  hmp.c           | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
+On Tue, Aug 08, 2017 at 04:48:26PM +0200, Thomas Huth wrote:
+> On 05.08.2017 22:27, Aleksandr Bezzubikov wrote:
+> > Unmask previously masked SHPC feature in _OSC method.
+> > 
+> > Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> > ---
+> >  hw/i386/acpi-build.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index b9c245c..98dd424 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -1862,9 +1862,9 @@ static Aml *build_q35_osc_method(void)
+> >  
+> >      /*
+> >       * Always allow native PME, AER (no dependencies)
+> > -     * Never allow SHPC (no SHPC controller in this system)
+> > +     * Allow SHPC (PCI bridges can have SHPC controller)
+> >       */
+> > -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1D), a_ctrl));
+> > +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
+> >  
+> >      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
+> >      /* Unknown revision */
+> > 
 > 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 46ce79c..bc3c066 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1668,7 +1668,7 @@ ETEXI
->  
->      {
->          .name       = "block_set_io_throttle",
-> -        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
-> +        .args_type  = "device:B,bps:o,bps_rd:o,bps_wr:o,iops:l,iops_rd:l,iops_wr:l",
->          .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
->          .help       = "change I/O throttle limits for a block drive",
->          .cmd        = hmp_block_set_io_throttle,
-> diff --git a/hmp.c b/hmp.c
-> index 3253674..599e816 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1764,9 +1764,9 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
->      BlockIOThrottle throttle = {
->          .has_device = true,
->          .device = (char *) qdict_get_str(qdict, "device"),
-> -        .bps = qdict_get_int(qdict, "bps"),
-> -        .bps_rd = qdict_get_int(qdict, "bps_rd"),
-> -        .bps_wr = qdict_get_int(qdict, "bps_wr"),
-> +        .bps = qdict_get_uint(qdict, "bps"),
-> +        .bps_rd = qdict_get_uint(qdict, "bps_rd"),
-> +        .bps_wr = qdict_get_uint(qdict, "bps_wr"),
->          .iops = qdict_get_int(qdict, "iops"),
->          .iops_rd = qdict_get_int(qdict, "iops_rd"),
->          .iops_wr = qdict_get_int(qdict, "iops_wr"),
-> -- 
-> 2.7.5
+> Since this patch has been merged, I now get a bunch of ugly warnings
+> during "make check":
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-T2ST4Y.dsl,
+> aml:/tmp/aml-HVUT4Y], Expected [asl:/tmp/asl-00VT4Y.dsl,
+> aml:tests/acpi-test-data/q35/DSDT].
+> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-3BKN4Y.dsl,
+> aml:/tmp/aml-CDKN4Y], Expected [asl:/tmp/asl-2CZM4Y.dsl,
+> aml:tests/acpi-test-data/q35/DSDT.bridge].
+> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-ZVPA4Y.dsl,
+> aml:/tmp/aml-A3PA4Y], Expected [asl:/tmp/asl-F0QA4Y.dsl,
+> aml:tests/acpi-test-data/q35/DSDT.ipmibt].
+> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-TX7P4Y.dsl,
+> aml:/tmp/aml-S97P4Y], Expected [asl:/tmp/asl-AIJP4Y.dsl,
+> aml:tests/acpi-test-data/q35/DSDT.cphp].
+> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6J0C4Y.dsl,
+> aml:/tmp/aml-DCZC4Y], Expected [asl:/tmp/asl-9I1C4Y.dsl,
+> aml:tests/acpi-test-data/q35/DSDT.memhp].
+> 
+> Did you maybe forget to update the ACPI test table according to the
+> changes? (and why was this merged during hard-freeze at all? The
+> ChangeLog text does not sound like a bug fix?)
+> 
+>  Thomas
+
+My bad will fix ASAP.
