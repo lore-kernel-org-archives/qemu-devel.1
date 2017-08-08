@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dezGX-0007FD-JP
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:49:26 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dezPV-0001NJ-Ri
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dezGT-0007ZM-J9
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:49:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dezGT-0007Yk-DM
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:49:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 21F7B61463
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 07:49:20 +0000 (UTC)
-Date: Tue, 8 Aug 2017 15:49:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170808074915.GB13486@pxdev.xzpeter.org>
-References: <1502175607-9531-1-git-send-email-peterx@redhat.com>
-	<3f0e8fe6-babd-df82-c690-de0f1ffdd460@redhat.com>
+	(envelope-from <mjt@tls.msk.ru>) id 1dezPS-0003Mm-RY
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:58:41 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:34627)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mjt@tls.msk.ru>) id 1dezPS-0003Jz-Ig
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 03:58:38 -0400
+References: <149735886140.10189.12243168169281704231.reportbug@dawn124>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <fced5512-4fb1-00ba-0984-f011c0aebd09@msgid.tls.msk.ru>
+Date: Tue, 8 Aug 2017 10:58:29 +0300
 MIME-Version: 1.0
+In-Reply-To: <149735886140.10189.12243168169281704231.reportbug@dawn124>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3f0e8fe6-babd-df82-c690-de0f1ffdd460@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] rcu: init globals only once
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Bug#864718: fsdev emulation security_model=none
+ not handling mode 000
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Sjoerd Simons <sjoerd@debian.org>, 864718@bugs.debian.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On Tue, Aug 08, 2017 at 09:26:43AM +0200, Paolo Bonzini wrote:
-> On 08/08/2017 09:00, Peter Xu wrote:
-> > We were calling rcu_init_complete() twice in the child processes when
-> > fork happened. However the pthread library does not really suggest to do
-> > it that way:
-> > 
-> > http://pubs.opengroup.org/onlinepubs/7908799/xsh/pthread_mutex_init.html
-> > 
-> > "Attempting to initialise an already initialised mutex results in
-> >  undefined behaviour."
-> > 
-> > Actually, IMHO we can do it in a more natural way: Firstly, we only init
-> > the RCU globals once in rcu_init(). Then, in rcu_init_child(), we unlock
-> > all the locks held in rcu_init_lock() just like what we do in the parent
-> > process, then do the rest of RCU re-init (e.g., create the RCU thread).
+I'm forwarding this upstream.
+It looks like the same issue is present in 2.10-tobe.
+
+13.06.2017 16:01, Sjoerd Simons wrote:
+> Package: qemu-system
+> Version: 1:2.8+dfsg-6
+> Severity: normal
 > 
-> This doesn't work for error-checking mutexes: rcu_init_child has a
-> different PID than the parent, so the mutexes aren't unlocked.  It's
-> also true that right now we don't use error-checking mutexes (commit
-> 24fa90499f, "qemu-thread: do not use PTHREAD_MUTEX_ERRORCHECK",
-> 2015-03-10); however, that's also a bit sad.
+> Hey,
 > 
-> The reason for the undefined behavior is probably that some operating
-> systems allocate memory in pthread_mutex_init, and initializing twice
-> causes a memory leak.  One such operating system is OpenBSD. :(
-
-Good to know. :)
-
-I thought pthread_atfork() was designed to solve such a locking
-problem (in child hanlder, we unlock all the held locks). If
-PTHREAD_MUTEX_ERRORCHECK cannot coop well with it, not sure whether
-that means we should just avoid using PTHREAD_MUTEX_ERRORCHECK in such
-a use case (but we should be able to use the error checks in other
-mutexes that do not need extra fork handling)?
-
-Another idea is: can we just destroy the mutex first then re-init it
-in subprocess? A quick glance in libpthread code shows that at least
-pthread_mutex_destroy() won't check PTHREAD_MUTEX_ERRORCHECK.
-
-Thanks,
-
+> For $reasons i'm exposing /boot over a filesystem share with the host system,
+> fsdev is setup as followed on the qemu command line:
+>   -fsdev local,security_model=none,id=fsdev-fs0,path=/srv/mp30-ar1-cbg-0-armhf-0-boot
 > 
-> Eric, you chimed in on the patch that became commit 24fa90499f, what do
-> you suggest?
+> Unfortunately trying to install a kernel shows dpkg getting unhappy:
 > 
-> Paolo
-
--- 
-Peter Xu
+> [pid 26686] open("/boot/System.map-4.9.0-3-armmp-lpae.dpkg-new",
+>   O_WRONLY|O_CREAT|O_EXCL|O_LARGEFILE, 000) = -1 EACCES (Permission denied)
+> 
+> I suspect mode 000 is confusing everything here. A similarish issue can be seen
+> when changing a file to mode 000 by hand:
+> 
+> # touch badger
+> # ls -l badger
+> -rw-r--r-- 1 64055 64055 0 Jun 13 13:58 badger
+> # chmod 600 badger
+> # chmod 700 badger
+> # chmod 000 badger
+> # chmod 700 badger
+> chmod: changing permissions of 'badger': Permission denied
+> 
+> Iotw as soon as the mode is 000 any later permission changes fail.
+> 
+> -- System Information:
+> Debian Release: 9.0
+>   APT prefers unstable-debug
+>   APT policy: (500, 'unstable-debug'), (500, 'unstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
+> Architecture: amd64 (x86_64)
+> Foreign Architectures: i386, armhf, arm64
+> 
+> Kernel: Linux 4.9.0-3-amd64 (SMP w/4 CPU cores)
+> Locale: LANG=en_US.UTF-8, LC_CTYPE=en_US.UTF-8 (charmap=UTF-8), LANGUAGE=en_US:en (charmap=UTF-8)
+> Shell: /bin/sh linked to /usr/bin/dash
+> Init: systemd (via /run/systemd/system)
+> 
+> Versions of packages qemu-system depends on:
+> ii  qemu-system-arm    1:2.8+dfsg-6
+> ii  qemu-system-mips   1:2.8+dfsg-6
+> ii  qemu-system-misc   1:2.8+dfsg-6
+> ii  qemu-system-ppc    1:2.8+dfsg-6
+> ii  qemu-system-sparc  1:2.8+dfsg-6
+> ii  qemu-system-x86    1:2.8+dfsg-6
+> 
+> qemu-system recommends no packages.
+> 
+> qemu-system suggests no packages.
+> 
+> -- no debconf information
+> 
