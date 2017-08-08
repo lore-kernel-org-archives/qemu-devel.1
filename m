@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df8I6-0001Oy-Uk
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:27:40 -0400
+	(envelope-from <groug@kaod.org>) id 1df8JH-000220-Ep
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1df8I5-0006GK-No
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:27:38 -0400
-References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
-	<20170807155717.GI6578@localhost.localdomain>
-	<692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
-	<20170808085352.GF4850@dhcp-200-186.str.redhat.com>
-	<896f8482-6e3a-13e9-4cce-ca115a6c8881@virtuozzo.com>
-	<645f5e9d-6a4b-1d7b-6907-6ab27e1ffa7e@virtuozzo.com>
-	<51899b88-6b4b-88ce-f820-f62bc944c034@redhat.com>
-	<2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
-	<20170808151600.GN4850@dhcp-200-186.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1d6823a2-a459-6dc8-428b-b5d0fee3db39@redhat.com>
-Date: Tue, 8 Aug 2017 12:27:25 -0500
+	(envelope-from <groug@kaod.org>) id 1df8JE-0006oD-Ou
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:28:51 -0400
+Received: from 11.mo4.mail-out.ovh.net ([46.105.34.195]:60043)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1df8JE-0006o0-HV
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 13:28:48 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C9DA08AEEC
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 19:28:46 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 08 Aug 2017 19:28:36 +0200
+Message-ID: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QFgKBc8KasD3LbbuAnodtEoE1o4a2D836"
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix fchmodat_nofollow()
+ limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: zhiyong.wu@ucloud.cn, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QFgKBc8KasD3LbbuAnodtEoE1o4a2D836
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
-Message-ID: <1d6823a2-a459-6dc8-428b-b5d0fee3db39@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: fix 185
-References: <20170807141630.105066-1-vsementsov@virtuozzo.com>
- <20170807155717.GI6578@localhost.localdomain>
- <692a163e-acce-e594-896d-da96b7a099e9@virtuozzo.com>
- <20170808085352.GF4850@dhcp-200-186.str.redhat.com>
- <896f8482-6e3a-13e9-4cce-ca115a6c8881@virtuozzo.com>
- <645f5e9d-6a4b-1d7b-6907-6ab27e1ffa7e@virtuozzo.com>
- <51899b88-6b4b-88ce-f820-f62bc944c034@redhat.com>
- <2983bfe2-0646-2a50-0025-0211c4725f63@virtuozzo.com>
- <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20170808151600.GN4850@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This function has to ensure it doesn't follow a symlink that could be used
+to escape the virtfs directory. This could be easily achieved if fchmodat()
+on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
+it doesn't.
 
-On 08/08/2017 10:16 AM, Kevin Wolf wrote:
+The current implementation covers most use-cases, but it notably fails if:
+- the target path has access rights equal to 0000 (openat() returns EPERM),
+  => once you've done chmod(0000) on a file, you can never chmod() again
+- the target path is UNIX domain socket (openat() returns ENXIO)
+  => bind() of UNIX domain sockets fails if the file is on 9pfs
 
->>>> is sleep for ms portable?
->>> Sadly, sub-second sleep is a GNU coreutils feature; I suspect the BSD=
+The solution is to use O_PATH: openat() now succeeds in both cases, and we
+can ensure the path isn't a symlink with fstat(). The associated entry in
+"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
 
->>> machines may fail to parse it.  (Of course, we could do some sort of
->>> 'sleep $SMALL', where $SMALL is 0.5 if sleep supports it, and 1 other=
-wise).
->>>
->> sleep for 1 second may lead to more then one request done before qemu =
-quite.
->=20
-> _supported_os Linux
->=20
-> So do we really care about portability? And are all the other test case=
-s
-> working on the BSDs?
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p-local.c |   44 ++++++++++++++++++++++++++++----------------
+ hw/9pfs/9p-util.h  |   10 +++++++---
+ 2 files changed, 35 insertions(+), 19 deletions(-)
 
-You've got valid points there - I suspect that a run of qemu-iotests on
-BSD would turn up quite a few failures, some of which would be easy to
-address; but it's not on my personal priority list.  I'm fine with an
-approach of committing something that works where it was first tested,
-then adding followup patches to improve portability, especially as long
-as we are not currently getting anyone complaining about qemu-iotests
-failures on BSD.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---QFgKBc8KasD3LbbuAnodtEoE1o4a2D836
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmJ9H0ACgkQp6FrSiUn
-Q2pmbwf/RWG/oGNL0XXs3lkMI2zdJUt4pTXoOnX3M3iVEoPOVpo/w6M54CfOf+OC
-UPpKfp65r+T0cbwZCn6gRZlzp1VajnJjYnT+1XA/6aai8ESGl3oxm7OAz468HRK3
-KqN9HbIz29novdqhNY4IsNh2KvAz/2mO6oMPiTmj2mOWDd4DaB0SvbEMBkPpoZyj
-niM8iC2eFdOYlIHrZwKGF1XB4kj++tigOIuaBRkVdo0UVQPpoXY1hsRHcgPVb9K1
-Da/q2bkpZbLRxo3SUP1kQNPdYBJ9wS2+Z86B+5MdiXjJ2Fnkgxj0x4IiVB/Nvj4W
-N6VBvo7SLVw0aDG623b0Ildt3+OxCQ==
-=rU3t
------END PGP SIGNATURE-----
-
---QFgKBc8KasD3LbbuAnodtEoE1o4a2D836--
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 6e478f4765ef..b178d627c764 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -333,30 +333,42 @@ update_map_file:
+ 
+ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+ {
++    struct stat stbuf;
+     int fd, ret;
++    char *proc_path;
+ 
+     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
+-     * Unfortunately, the linux kernel doesn't implement it yet. As an
+-     * alternative, let's open the file and use fchmod() instead. This
+-     * may fail depending on the permissions of the file, but it is the
+-     * best we can do to avoid TOCTTOU. We first try to open read-only
+-     * in case name points to a directory. If that fails, we try write-only
+-     * in case name doesn't point to a directory.
++     * Unfortunately, the linux kernel doesn't implement it yet.
+      */
+-    fd = openat_file(dirfd, name, O_RDONLY, 0);
+-    if (fd == -1) {
+-        /* In case the file is writable-only and isn't a directory. */
+-        if (errno == EACCES) {
+-            fd = openat_file(dirfd, name, O_WRONLY, 0);
+-        }
+-        if (fd == -1 && errno == EISDIR) {
+-            errno = EACCES;
+-        }
++    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
++        return -1;
+     }
++
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno = ELOOP;
++        return -1;
++    }
++
++    fd = openat_file(dirfd, name, O_RDONLY | O_PATH, 0);
+     if (fd == -1) {
+         return -1;
+     }
+-    ret = fchmod(fd, mode);
++
++    ret = fstat(fd, &stbuf);
++    if (ret) {
++        goto out;
++    }
++
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno = ELOOP;
++        ret = -1;
++        goto out;
++    }
++
++    proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
++    ret = chmod(proc_path, mode);
++    g_free(proc_path);
++out:
+     close_preserve_errno(fd);
+     return ret;
+ }
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 91299a24b8af..7c1c8fb1e35c 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -43,9 +43,13 @@ static inline int openat_file(int dirfd, const char *name, int flags,
+     }
+ 
+     serrno = errno;
+-    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
+-    ret = fcntl(fd, F_SETFL, flags);
+-    assert(!ret);
++    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
++     * do that with O_PATH since it ignores O_NONBLOCK.
++     */
++    if (!(flags & O_PATH)) {
++        ret = fcntl(fd, F_SETFL, flags);
++        assert(!ret);
++    }
+     errno = serrno;
+     return fd;
+ }
