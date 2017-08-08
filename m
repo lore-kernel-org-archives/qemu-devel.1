@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dexKw-0005jy-W3
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:45:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1dexeh-0001Gd-VX
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 02:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dexKr-0008Fh-4G
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:45:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53744)
+	(envelope-from <bounces@canonical.com>) id 1dexec-0001OO-NJ
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 02:06:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54877)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dexKq-0008Eh-TV
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 01:45:45 -0400
+	id 1dexec-0001NT-Fw
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 02:06:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dexKo-0007V9-3t
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 05:45:42 +0000
+	id 1dexeb-0002s5-05
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 06:06:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DD6AD2E80CB
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 05:45:41 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F362D2E80CB
+	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 06:06:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 05:32:29 -0000
-From: Thomas Huth <1709025@bugs.launchpad.net>
+Date: Tue, 08 Aug 2017 05:59:21 -0000
+From: junchi <1709025@bugs.launchpad.net>
 Reply-To: Bug 1709025 <1709025@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150209306745.21201.16700911445033219702.malonedeb@wampee.canonical.com>
-Message-Id: <150217035003.8481.7420950170917159534.malone@soybean.canonical.com>
+Message-Id: <150217196184.11427.12970920894042607994.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1709025] Re: Disk corrupted after snapshot
  deletion
@@ -39,12 +39,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Please try again with the latest release of QEMU first (currently 2.9,
-or the latest RC of 2.10). QEMU 2.1.2 is very old, the bug might have
-been fixed in the latest release already.
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Thanks for your reply
+For some reason, I can't update my version. I believe the latest version ha=
+ve fixed the problem in commit 3432a1929ee18e08787ce35476abd74f2c93a17c or =
+27a7649a48f9019fa5bd2998d8e342791397bdda.  But I'm not sure the first patch=
+ have fixed the problem, as the second patch is too much change for me.
 
 -- =
 
