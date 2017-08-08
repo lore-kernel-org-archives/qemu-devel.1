@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1df5Vz-0005tV-4I
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:29:48 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1df5WA-00061e-R5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1df5Vv-0006Ri-5D
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:29:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46246)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1df5W5-0006Y1-4Z
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:29:58 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:43181 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1df5Vu-0006RJ-St
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:29:43 -0400
-References: <6b32aeb2-d488-eb3c-4147-a99fe4681a6f@redhat.com>
-	<5989A0D0.6010304@huawei.com>
-From: Eduardo Otubo <otubo@redhat.com>
-Message-ID: <72850633-e8e6-afe7-148f-695888c23438@redhat.com>
-Date: Tue, 8 Aug 2017 16:29:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <5989A0D0.6010304@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] colo-compare: segfault and assert on
- colo_compare_finalize
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1df5W4-0006WL-Eo
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 10:29:52 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue,  8 Aug 2017 17:29:44 +0300
+Message-Id: <20170808142944.145159-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH for 2.10] block/nbd-client: always return EIO
+ on and after the first io channel error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +23,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
-Cc: wency@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, wang.guang55@zte.com.cn, wang.yong155@zte.com.cn
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 08/08/2017 01:30 PM, Hailiang Zhang wrote:
-> Hi,
->=20
-> Did you test this branch=20
-> https://github.com/coloft/qemu/tree/colo-for-qemu-2.10-2017-4-22 ?
->=20
-> This seems to be an already known problem, I'm not quite sure, it may b=
-e=20
-> fixed by this patch
+Do not communicate after the first error to avoid communicating throught
+broken channel. The only exclusion is try to send NBD_CMD_DISC anyway on
+in nbd_client_close.
 
-It's not :( Using your branch I don't see the assert() error anymore,=20
-but the segfault remains and apparently in the same place:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-0x00007ffff30ec79e in pthread_join () from /lib64/libpthread.so.0
-(gdb) bt
-#0  0x00007ffff30ec79e in pthread_join () at /lib64/libpthread.so.0
-#1  0x0000555555c0b807 in qemu_thread_join (thread=3D0x7ffff7ff5130) at=20
-util/qemu-thread-posix.c:504
-#2  0x0000555555ac96c2 in colo_compare_finalize (obj=3D0x7ffff7fd3010) at=
-=20
-net/colo-compare.c:873
-#3  0x0000555555b12f90 in object_deinit (obj=3D0x7ffff7fd3010,=20
-type=3D0x5555566e4c70) at qom/object.c:454
-#4  0x0000555555b13002 in object_finalize (data=3D0x7ffff7fd3010) at=20
-qom/object.c:468
-#5  0x0000555555b13f92 in object_unref (obj=3D0x7ffff7fd3010) at=20
-qom/object.c:903
-#6  0x0000555555b17a3e in user_creatable_add_type (type=3D0x5555566eb270=20
-"colo-compare", id=3D0x5555566eb230 "test-object", qdict=3D0x555556781bc0=
-,=20
-v=3D0x5555567798f0, errp=3D0x7fffffffde58) at qom/object_interfaces.c:104
-#7  0x0000555555b17b9b in user_creatable_add_opts (opts=3D0x5555566eb1e0,=
-=20
-errp=3D0x7fffffffde58) at qom/object_interfaces.c:134
-#8  0x0000555555b17c96 in user_creatable_add_opts_foreach=20
-(opaque=3D0x5555558e3562 <object_create_delayed>, opts=3D0x5555566eb1e0,=20
-errp=3D0x0) at qom/object_interfaces.c:158
-#9  0x0000555555c1e634 in qemu_opts_foreach (list=3D0x5555561077a0=20
-<qemu_object_opts>, func=3D0x555555b17c08=20
-<user_creatable_add_opts_foreach>, opaque=3D0x5555558e3562=20
-<object_create_delayed>, errp=3D0x0) at util/qemu-option.c:1114
-#10 0x00005555558e7441 in main (argc=3D6, argv=3D0x7fffffffe2d8,=20
-envp=3D0x7fffffffe310) at vl.c:4455
+Hi all. Here is a patch, fixing a problem noted in
+[PATCH 06/17] block/nbd-client: fix nbd_read_reply_entry
+and
+[PATCH 17/17] block/nbd-client: always return EIO on and after the first io channel error
+and discussed on list.
 
-So, from what you're saying, this is *not* caused by the lack of=20
-parameter on the command line. Right?
+If it will be applied to 2.10, then I'll rebase my 'nbd client refactoring and fixing'
+on it (for 2.11). If not - I'll prefer not rebase the series, so, do not apply this
+patch for 2.11.
 
->=20
-> b19456dd0ea4eb418ad093f092adbb882be13054
-> char: Fix removing wrong GSource that be found by fd_in_tag
-> We use fd_in_tag to find a GSource, fd_in_tag is return value of=20
-> g_source_attach(GSource *source, GMainContext *context), the return=20
-> value is unique only in the same context, so we may get the same values=
-=20
-> with different 'context' parameters. It is no problem to find the right=
-=20
-> fd_in_tag by using g_main_context_find_source_by_id(GMainContext=20
-> *context, guint source_id) while there is only one default main context=
-.=20
-> But colo-compare tries to create/use its own context, and if we pass=20
-> wrong 'context' parameter with right fd_in_tag, we will find a wrong=20
-> GSource to handle. We tried to fix the related codes in commit=20
-> b43decb015a6efeb9e3cdbdb80f6547ad7248a4c, but it didn't fix the bug=20
-> completely, because we still have some codes didn't pass *right* contex=
-t=20
-> parameter for remove_fd_in_watch(). Let's fix it by record the GSource=20
-> directly instead of fd_in_tag. Signed-off-by: zhanghailiang=20
-> <zhang.zhanghailiang@huawei.com> Reviewed-by: Marc-Andr=C3=83=C2=A9 Lur=
-eau=20
-> <marcandre.lureau@redhat.com> Message-Id:=20
-> <1492564532-91680-1-git-send-email-zhang.zhanghailiang@huawei.com>=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com> Actually, we have=20
-> already re-writed this part, and please follow the later series. Thanks=
-,=20
-> Hailiang
->=20
-> On 2017/8/8 0:39, Eduardo Otubo wrote:
->> (please ignore my last email, looks like mutt wants play games lately)
->>
->> Hi all,
->>
->> I have found a problem on colo-compare that leads to segmentation faul=
-t
->> when calling qemu like this:
->>
->>    $ qemu-system-x86_64 -S -machine pc -object colo-compare,id=3Dtest-=
-object
->>
->> First I got an assert failed:
->>
->>    (qemu-system-x86_64:7887): GLib-CRITICAL **: g_main_loop_quit:
->> assertion 'loop !=3D NULL' failed
->>
->>   From this looks like s->compare_loop is NULL on the function
->> colo_compare_finalize(), then I just added a check there and the asser=
-t
->> went away. But then there's the segfault:
->>
->>    Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fa=
-ult.
->>    0x00007ffff333f79e in pthread_join () from /lib64/libpthread.so.0
->>    (gdb) bt
->>    #0  0x00007ffff333f79e in pthread_join () at /lib64/libpthread.so.0
->>    #1  0x0000555555c379d2 in qemu_thread_join (thread=3D0x7ffff7ff5160=
-) at
->> util/qemu-thread-posix.c:547
->>    #2  0x0000555555adfc1a in colo_compare_finalize (obj=3D0x7ffff7fd30=
-10)
->> at net/colo-compare.c:867
->>    #3  0x0000555555b2cd87 in object_deinit (obj=3D0x7ffff7fd3010,
->> type=3D0x5555567432e0) at qom/object.c:453
->>    #4  0x0000555555b2cdf9 in object_finalize (data=3D0x7ffff7fd3010) a=
-t
->> qom/object.c:467
->>    #5  0x0000555555b2dd80 in object_unref (obj=3D0x7ffff7fd3010) at
->> qom/object.c:902
->>    #6  0x0000555555b319a5 in user_creatable_add_type (type=3D0x5555567=
-499a0
->> "colo-compare", id=3D0x555556749960 "test-object", qdict=3D0x555556835=
-750,
->> v=3D0x55555681a3f0, errp=3D0x7fffffffde58) at qom/object_interfaces.c:=
-105
->>    #7  0x0000555555b31b02 in user_creatable_add_opts
->> (opts=3D0x555556749910, errp=3D0x7fffffffde58) at qom/object_interface=
-s.c:135
->>    #8  0x0000555555b31bfd in user_creatable_add_opts_foreach
->> (opaque=3D0x5555558e9c39 <object_create_delayed>, opts=3D0x55555674991=
-0,
->> errp=3D0x0) at qom/object_interfaces.c:159
->>    #9  0x0000555555c4aecf in qemu_opts_foreach (list=3D0x555556157ac0
->> <qemu_object_opts>, func=3D0x555555b31b6f
->> <user_creatable_add_opts_foreach>, opaque=3D0x5555558e9c39
->> <object_create_delayed>, errp=3D0x0) at util/qemu-option.c:1104
->>    #10 0x00005555558edb75 in main (argc=3D6, argv=3D0x7fffffffe2d8,
->> envp=3D0x7fffffffe310) at vl.c:4520
->>
->> At this point '&s->thread' is '0'. Is this segfault and the above
->> mentioned assert trigged because I'm creating a colo-compare object
->> without any other parameter? In a positive case, a simple workaround a=
-nd
->> error check should do it. Otherwise I'll debug a little more.
->>
->> Best regards,
->=20
+ block/nbd-client.h |  1 +
+ block/nbd-client.c | 58 +++++++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 41 insertions(+), 18 deletions(-)
+
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index df80771357..28db9922c8 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -29,6 +29,7 @@ typedef struct NBDClientSession {
+ 
+     Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
+     NBDReply reply;
++    bool eio_to_all;
+ } NBDClientSession;
+ 
+ NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 25dd28406b..1282b2484e 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -49,6 +49,8 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+ 
++    client->eio_to_all = true;
++
+     if (!client->ioc) { /* Already closed */
+         return;
+     }
+@@ -74,12 +76,16 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+     Error *local_err = NULL;
+ 
+     for (;;) {
++        if (s->eio_to_all) {
++            break;
++        }
++
+         assert(s->reply.handle == 0);
+         ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
+         if (ret < 0) {
+             error_report_err(local_err);
+         }
+-        if (ret <= 0) {
++        if (ret <= 0 || s->eio_to_all) {
+             break;
+         }
+ 
+@@ -107,6 +113,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+         qemu_coroutine_yield();
+     }
+ 
++    s->eio_to_all = true;
+     nbd_recv_coroutines_enter_all(s);
+     s->read_reply_co = NULL;
+ }
+@@ -118,6 +125,10 @@ static int nbd_co_send_request(BlockDriverState *bs,
+     NBDClientSession *s = nbd_get_client_session(bs);
+     int rc, ret, i;
+ 
++    if (s->eio_to_all) {
++        return -EIO;
++    }
++
+     qemu_co_mutex_lock(&s->send_mutex);
+     while (s->in_flight == MAX_NBD_REQUESTS) {
+         qemu_co_queue_wait(&s->free_sema, &s->send_mutex);
+@@ -135,15 +146,15 @@ static int nbd_co_send_request(BlockDriverState *bs,
+     assert(i < MAX_NBD_REQUESTS);
+     request->handle = INDEX_TO_HANDLE(s, i);
+ 
+-    if (!s->ioc) {
++    if (s->eio_to_all) {
+         qemu_co_mutex_unlock(&s->send_mutex);
+-        return -EPIPE;
++        return -EIO;
+     }
+ 
+     if (qiov) {
+         qio_channel_set_cork(s->ioc, true);
+         rc = nbd_send_request(s->ioc, request);
+-        if (rc >= 0) {
++        if (rc >= 0 && !s->eio_to_all) {
+             ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, false,
+                           NULL);
+             if (ret != request->len) {
+@@ -155,7 +166,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         rc = nbd_send_request(s->ioc, request);
+     }
+     qemu_co_mutex_unlock(&s->send_mutex);
+-    return rc;
++
++    return s->eio_to_all ? -EIO : rc;
+ }
+ 
+ static void nbd_co_receive_reply(NBDClientSession *s,
+@@ -169,13 +181,13 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+     qemu_coroutine_yield();
+     *reply = s->reply;
+     if (reply->handle != request->handle ||
+-        !s->ioc) {
++        !s->ioc || s->eio_to_all) {
+         reply->error = EIO;
+     } else {
+         if (qiov && reply->error == 0) {
+             ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, true,
+                           NULL);
+-            if (ret != request->len) {
++            if (ret != request->len || s->eio_to_all) {
+                 reply->error = EIO;
+             }
+         }
+@@ -225,8 +237,10 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, qiov);
+     }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    if (request.handle != 0) {
++        nbd_coroutine_end(bs, &request);
++    }
++    return client->eio_to_all ? -EIO : -reply.error;
+ }
+ 
+ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+@@ -254,8 +268,10 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    if (request.handle != 0) {
++        nbd_coroutine_end(bs, &request);
++    }
++    return client->eio_to_all ? -EIO : -reply.error;
+ }
+ 
+ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+@@ -288,8 +304,10 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    if (request.handle != 0) {
++        nbd_coroutine_end(bs, &request);
++    }
++    return client->eio_to_all ? -EIO : -reply.error;
+ }
+ 
+ int nbd_client_co_flush(BlockDriverState *bs)
+@@ -312,8 +330,10 @@ int nbd_client_co_flush(BlockDriverState *bs)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
++    if (request.handle != 0) {
++        nbd_coroutine_end(bs, &request);
++    }
++    return client->eio_to_all ? -EIO : -reply.error;
+ }
+ 
+ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+@@ -337,9 +357,10 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(bs, &request);
+-    return -reply.error;
+-
++    if (request.handle != 0) {
++        nbd_coroutine_end(bs, &request);
++    }
++    return client->eio_to_all ? -EIO : -reply.error;
+ }
+ 
+ void nbd_client_detach_aio_context(BlockDriverState *bs)
+@@ -384,6 +405,7 @@ int nbd_client_init(BlockDriverState *bs,
+     logout("session init %s\n", export);
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
+ 
++    client->eio_to_all = false;
+     client->info.request_sizes = true;
+     ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), export,
+                                 tlscreds, hostname,
+-- 
+2.11.1
