@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1df1Q9-000709-GS
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:07:30 -0400
+	(envelope-from <stefanha@gmail.com>) id 1df1Ry-0007h6-U8
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1df1Q5-0004J4-B9
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:07:29 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35238)
+	(envelope-from <stefanha@gmail.com>) id 1df1Ru-0005Ik-Qk
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:09:22 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35933)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1df1Q5-0004IZ-3b
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:07:25 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id m85so3068399wma.0
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 03:07:25 -0700 (PDT)
-Date: Tue, 8 Aug 2017 11:07:21 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1df1Ru-0005IK-K8
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 06:09:18 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id t201so3060080wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 03:09:18 -0700 (PDT)
+Date: Tue, 8 Aug 2017 11:09:15 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170808100721.GC16801@stefanha-x1.localdomain>
+Message-ID: <20170808100915.GD16801@stefanha-x1.localdomain>
 References: <20170804213625.3756-1-ehabkost@redhat.com>
-	<20170804213625.3756-2-ehabkost@redhat.com>
+	<20170804213625.3756-3-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MnLPg7ZWsaic7Fhd"
+	protocol="application/pgp-signature"; boundary="LKTjZJSUETSlgu2t"
 Content-Disposition: inline
-In-Reply-To: <20170804213625.3756-2-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/5] qmp-shell: Use argparse module
+In-Reply-To: <20170804213625.3756-3-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 2/5] qmp-shell: Pass split cmdargs
+ to __build_cmd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +35,34 @@ To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
 
---MnLPg7ZWsaic7Fhd
+--LKTjZJSUETSlgu2t
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 04, 2017 at 06:36:21PM -0300, Eduardo Habkost wrote:
-> It makes command-line parsing and generation of help text much
-> simpler.
+On Fri, Aug 04, 2017 at 06:36:22PM -0300, Eduardo Habkost wrote:
+> This will allow us to implement a method to run a command that is
+> already split in a list.
 >=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  scripts/qmp/qmp-shell | 61 +++++++++++++++++----------------------------=
-------
->  1 file changed, 20 insertions(+), 41 deletions(-)
+>  scripts/qmp/qmp-shell | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 
-The minimum Python version is 2.6.  The argparse module was introduced
-in Python 2.7 so we cannot use it without increasing the minimum Python
-version:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-https://docs.python.org/2.6/modindex.html
-
-I suggest holding off on this for now.
-
-Stefan
-
---MnLPg7ZWsaic7Fhd
+--LKTjZJSUETSlgu2t
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZiY1ZAAoJEJykq7OBq3PI2JwH/jrPACtR9aP3VFxgzhWoSix0
-4jaZcselaeTwU2zDGUoNfJ9zgqj1P6s2NDeHs+sjwHJ0zjlIk3Pd6qC1GX4LnXPa
-SUCIukuArJAZT4cPLuZeAidTt3Eta0GO/AvBfIvyF4Wq85TJVKQx2zY6KStl97rZ
-dxcAjV5Pli1GpfPdULxoLU60GukUSmP0tWqCpR3mFemLcz3iglxKxRTW9A4jvD44
-jZG5V7LfEUMXVJiLL0w9KhNUfL+gEppQW6xMfW10GIxlJZt9+rNzNQVR3b2tJqrA
-nopBMI7KEWe6coumHQeCijUXuTfds/IYZ2fCVYSKDIUm92drbOmrJ22B5PF32O0=
-=HHQv
+iQEcBAEBAgAGBQJZiY3LAAoJEJykq7OBq3PIBusH/i4kG+87dG8oR856nLBNHw5p
+skAGmpCrQtkgLDBqQ9MZDIp+IkyVXCoj/h6k/GeoPRIL1bslmb6xoRka40mgjHqq
+RcsVWDYKZCha1BeEk5iwuG5RkMFgJBYBLUckJduKWy90+xmla+2tyNTNbZ3f74Kj
+oSJjT7H5O5RmpsD1ueUzZcg0QIjfSc1kmvOMUWsMjdkSPvBSBM1W4EIstZAIxQNU
+sjlF/BDX81bF9l42rOf7hHonfni7sg6/wpjy4K6dFPrVNXK0UVVS0P2/2vIDdD4J
+b+offNw0AWp2/I/jlOm8Gio1pE8u2/OC4avQ9TbP2p6jAtRdhbux7DYU3KMJoPE=
+=OtzJ
 -----END PGP SIGNATURE-----
 
---MnLPg7ZWsaic7Fhd--
+--LKTjZJSUETSlgu2t--
