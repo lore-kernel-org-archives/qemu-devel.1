@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfE4g-00021x-DB
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:38:11 -0400
+	(envelope-from <joseph_myers@mentor.com>) id 1dfEHo-0006EP-D7
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfE4d-0002bO-7J
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:38:10 -0400
-Resent-Message-Id: <E1dfE4d-0002bO-7J@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21701)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dfE4d-0002b0-0G
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:38:07 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150223547221.30.18273470587667377200@dd743fd916bd>
-In-Reply-To: <20170808162629.32493-1-quintela@redhat.com>
+	(envelope-from <joseph_myers@mentor.com>) id 1dfEHj-00022n-Gf
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:51:44 -0400
+Received: from relay1.mentorg.com ([192.94.38.131]:33842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joseph_myers@mentor.com>)
+	id 1dfEHj-00022Y-Ae
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 19:51:39 -0400
+Date: Tue, 8 Aug 2017 23:51:29 +0000
+From: Joseph Myers <joseph@codesourcery.com>
+Message-ID: <alpine.DEB.2.20.1708082350340.23380@digraph.polyomino.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 8 Aug 2017 16:37:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v6 00/19] Multifd
+Content-Type: text/plain; charset="US-ASCII"
+Subject: [Qemu-devel] [PATCH] target/i386: set rip_offset for further SSE
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MDgxNjI2MjkuMzI0OTMtMS1xdWludGVsYUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggdjYgMDAvMTldIE11bHRpZmQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNv
-bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
-ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
-b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
-PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
-ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
-ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwowMGE5YjVlOGFlIG1pZ3JhdGlvbjogRmx1c2ggcmVjZWl2ZSBxdWV1ZQplOTE2ZWMwOTAxIG1p
-Z3JhdGlvbjogVHJhbnNmZXIgcGFnZXMgb3ZlciBuZXcgY2hhbm5lbHMKMzk5YWI1NjU4MiBtaWdy
-YXRpb246IFJlbmFtZSBpbml0aWFsX2J5dGVzCmY3ODczYjkwMWMgbWlncmF0aW9uOiBUZXN0IG5l
-dyBmZCBpbmZyYXN0cnVjdHVyZQo4ODFlNWUxOGE2IG1pZ3JhdGlvbjogQ3JlYXRlIHRocmVhZCBp
-bmZyYXN0cnVjdHVyZSBmb3IgbXVsdGlmZCByZWN2IHNpZGUKNmE2NWFjZDU1MyBtaWdyYXRpb246
-IFNlbmQgdGhlIGZkIG51bWJlciB3aGljaCB3ZSBhcmUgZ29pbmcgdG8gdXNlIGZvciB0aGlzIHBh
-Z2UKZGE2MTNlZjQyYyBtaWdyYXRpb246IFJlYWxseSB1c2UgbXVsdGlwbGUgcGFnZXMgYXQgYSB0
-aW1lCmY0YmVkZDZjYzQgbWlncmF0aW9uOiBDcmVhdGUgcmFtX211bHRpZmRfcGFnZQo3ZWVmYjI0
-NTUyIG1pZ3JhdGlvbjogU3RhcnQgb2YgbXVsdGlwbGUgZmQgd29yawpjMWNmZTVmNWNhIG1pZ3Jh
-dGlvbjogU3BsaXQgbWlncmF0aW9uX2ZkX3Byb2Nlc3NfaW5jb21pbmcKOGEzZTUwYzUxYyBtaWdy
-YXRpb246IENyZWF0ZSBtdWx0aWZkIG1pZ3JhdGlvbiB0aHJlYWRzCjU5Y2M2YmFkNjEgbWlncmF0
-aW9uOiBDcmVhdGUgeC1tdWx0aWZkLWdyb3VwIHBhcmFtZXRlcgo1M2Y4NDA0ZmE0IG1pZ3JhdGlv
-bjogQ3JlYXRlIHgtbXVsdGlmZC10aHJlYWRzIHBhcmFtZXRlcgphY2Y1MzhjYjhlIG1pZ3JhdGlv
-bjogQWRkIG11bHRpZmQgY2FwYWJpbGl0eQo0Y2JiN2M0Mzc0IHFpbzogQ3JlYXRlIG5ldyBxaW9f
-Y2hhbm5lbF97cmVhZHYsIHdyaXRldn1fYWxsCmVlYzM1MTQ4NzAgbWlncmF0aW9uOiBDcmVhdGUg
-bWlncmF0aW9uX2hhc19hbGxfY2hhbm5lbHMKMGNjZGVlM2JiYyBtaWdyYXRpb246IEFkZCBjb21t
-ZW50cyB0byBjaGFubmVsIGZ1bmN0aW9ucwplNTNkZGNlOTY2IG1pZ3JhdGlvbjogVGVhY2ggaXQg
-YWJvdXQgR19TT1VSQ0VfUkVNT1ZFCmU2NGQ1ZTNjOGEgbWlncmF0aW9uOiBDcmVhdGUgbWlncmF0
-aW9uX2lvY19wcm9jZXNzX2luY29taW5nKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvMTk6IG1pZ3JhdGlvbjogQ3JlYXRlIG1pZ3JhdGlvbl9pb2NfcHJvY2Vzc19pbmNv
-bWluZygpLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM1OTogRklMRTogbWlncmF0aW9u
-L21pZ3JhdGlvbi5jOjM2OToKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcy
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDIvMTk6IG1pZ3JhdGlvbjogVGVhY2ggaXQgYWJvdXQgR19TT1VSQ0VfUkVN
-T1ZFLi4uCkNoZWNraW5nIFBBVENIIDMvMTk6IG1pZ3JhdGlvbjogQWRkIGNvbW1lbnRzIHRvIGNo
-YW5uZWwgZnVuY3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDQvMTk6IG1pZ3JhdGlvbjogQ3JlYXRl
-IG1pZ3JhdGlvbl9oYXNfYWxsX2NoYW5uZWxzLi4uCkNoZWNraW5nIFBBVENIIDUvMTk6IHFpbzog
-Q3JlYXRlIG5ldyBxaW9fY2hhbm5lbF97cmVhZHYsIHdyaXRldn1fYWxsLi4uCkNoZWNraW5nIFBB
-VENIIDYvMTk6IG1pZ3JhdGlvbjogQWRkIG11bHRpZmQgY2FwYWJpbGl0eS4uLgpDaGVja2luZyBQ
-QVRDSCA3LzE5OiBtaWdyYXRpb246IENyZWF0ZSB4LW11bHRpZmQtdGhyZWFkcyBwYXJhbWV0ZXIu
-Li4KQ2hlY2tpbmcgUEFUQ0ggOC8xOTogbWlncmF0aW9uOiBDcmVhdGUgeC1tdWx0aWZkLWdyb3Vw
-IHBhcmFtZXRlci4uLgpDaGVja2luZyBQQVRDSCA5LzE5OiBtaWdyYXRpb246IENyZWF0ZSBtdWx0
-aWZkIG1pZ3JhdGlvbiB0aHJlYWRzLi4uCkNoZWNraW5nIFBBVENIIDEwLzE5OiBtaWdyYXRpb246
-IFNwbGl0IG1pZ3JhdGlvbl9mZF9wcm9jZXNzX2luY29taW5nLi4uCkNoZWNraW5nIFBBVENIIDEx
-LzE5OiBtaWdyYXRpb246IFN0YXJ0IG9mIG11bHRpcGxlIGZkIHdvcmsuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTIvMTk6IG1pZ3JhdGlvbjogQ3JlYXRlIHJhbV9tdWx0aWZkX3BhZ2UuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTMvMTk6IG1pZ3JhdGlvbjogUmVhbGx5IHVzZSBtdWx0aXBsZSBwYWdlcyBhdCBhIHRp
-bWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTk6IG1pZ3JhdGlvbjogU2VuZCB0aGUgZmQgbnVtYmVy
-IHdoaWNoIHdlIGFyZSBnb2luZyB0byB1c2UgZm9yIHRoaXMgcGFnZS4uLgpDaGVja2luZyBQQVRD
-SCAxNS8xOTogbWlncmF0aW9uOiBDcmVhdGUgdGhyZWFkIGluZnJhc3RydWN0dXJlIGZvciBtdWx0
-aWZkIHJlY3Ygc2lkZS4uLgpDaGVja2luZyBQQVRDSCAxNi8xOTogbWlncmF0aW9uOiBUZXN0IG5l
-dyBmZCBpbmZyYXN0cnVjdHVyZS4uLgpDaGVja2luZyBQQVRDSCAxNy8xOTogbWlncmF0aW9uOiBS
-ZW5hbWUgaW5pdGlhbF9ieXRlcy4uLgpDaGVja2luZyBQQVRDSCAxOC8xOTogbWlncmF0aW9uOiBU
-cmFuc2ZlciBwYWdlcyBvdmVyIG5ldyBjaGFubmVscy4uLgpDaGVja2luZyBQQVRDSCAxOS8xOTog
-bWlncmF0aW9uOiBGbHVzaCByZWNlaXZlIHF1ZXVlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMzODogRklMRTogbWlncmF0aW9uL3JhbS5jOjc5OgorI2RlZmluZSBSQU1fU0FW
-RV9GTEFHX01VTFRJRkRfU1lOQyAoUkFNX1NBVkVfRkxBR19NVUxUSUZEX1BBR0UgfCBSQU1fU0FW
-RV9GTEFHX1pFUk8pCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEyMCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+It turns out that my recent fix to set rip_offset when emulating some
+SSE4.1 instructions needs generalizing to cover a wider class of
+instructions.  Specifically, every instruction in the sse_op_table7
+table, coming from various instruction set extensions, has an 8-bit
+immediate operand that comes after any memory operand, and so needs
+rip_offset set for correctness if there is a memory operand that is
+rip-relative, and my patch only set it for a subset of those
+instructions.  This patch moves the rip_offset setting to cover the
+wider class of instructions, so fixing 9 further gcc testsuite
+failures in my GCC 6-based testing.  (I do not know whether there
+might be still further classes of instructions missing this setting.)
+
+Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+
+---
+
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 5fdadf9..95f7261 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -4077,10 +4077,11 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             if (!(s->cpuid_ext_features & sse_op_table7[b].ext_mask))
+                 goto illegal_op;
+ 
++            s->rip_offset = 1;
++
+             if (sse_fn_eppi == SSE_SPECIAL) {
+                 ot = mo_64_32(s->dflag);
+                 rm = (modrm & 7) | REX_B(s);
+-                s->rip_offset = 1;
+                 if (mod != 3)
+                     gen_lea_modrm(env, s, modrm);
+                 reg = ((modrm >> 3) & 7) | rex_r;
+
+-- 
+Joseph S. Myers
+joseph@codesourcery.com
