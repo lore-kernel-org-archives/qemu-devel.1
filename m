@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1df5zm-000741-Bv
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:00:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1df62k-0007uA-IV
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1df5zl-0007ZD-2N
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:00:34 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:14784 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1df5zk-0007Qk-GF
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:00:33 -0400
-References: <20170808142944.145159-1-vsementsov@virtuozzo.com>
-	<a8eaea35-6959-e3ff-db0f-f7bf4448b61c@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <61222882-0ed9-b591-f6cf-ba3dca69b25a@virtuozzo.com>
-Date: Tue, 8 Aug 2017 18:00:13 +0300
+	(envelope-from <eblake@redhat.com>) id 1df62j-0000cq-Dz
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:03:38 -0400
+References: <20170804105059.11941-1-berrange@redhat.com>
+	<20170804140210.GD4108@localhost.localdomain>
+	<20170804140630.GC14504@redhat.com>
+	<9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+	<20170804154919.GI14504@redhat.com> <20170808023929.GR14780@lemon>
+	<20170808091330.GB9393@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ef505f48-f876-743f-922c-1faddce3051d@redhat.com>
+Date: Tue, 8 Aug 2017 10:03:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <a8eaea35-6959-e3ff-db0f-f7bf4448b61c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for 2.10] block/nbd-client: always return
- EIO on and after the first io channel error
+In-Reply-To: <20170808091330.GB9393@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="C9VnX36x0O195aeiDjiBt5JFEmX94pKRj"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: document semanatics of
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-08.08.2017 17:44, Eric Blake wrote:
-> On 08/08/2017 09:29 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Do not communicate after the first error to avoid communicating throught
->> broken channel. The only exclusion is try to send NBD_CMD_DISC anyway on
->> in nbd_client_close.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C9VnX36x0O195aeiDjiBt5JFEmX94pKRj
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <ef505f48-f876-743f-922c-1faddce3051d@redhat.com>
+Subject: Re: [Qemu-block] [PATCH] block: document semanatics of
+ bdrv_co_preadv|pwritev
+References: <20170804105059.11941-1-berrange@redhat.com>
+ <20170804140210.GD4108@localhost.localdomain>
+ <20170804140630.GC14504@redhat.com>
+ <9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+ <20170804154919.GI14504@redhat.com> <20170808023929.GR14780@lemon>
+ <20170808091330.GB9393@redhat.com>
+In-Reply-To: <20170808091330.GB9393@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08/08/2017 04:13 AM, Daniel P. Berrange wrote:
+> On Tue, Aug 08, 2017 at 10:39:29AM +0800, Fam Zheng wrote:
+>> On Fri, 08/04 16:49, Daniel P. Berrange wrote:
+>>> This is odd.  In the bdrv_aligned_readv() it looks very much like
+>>> we'll reference qiov->niov, if bytes !=3D 0, so if qiov was NULL we
+>>> would crash.
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
+>> It doesn't make sense if read doesn't have an iov, where should the da=
+ta be
+>> placed? :)
 >>
->> Hi all. Here is a patch, fixing a problem noted in
->> [PATCH 06/17] block/nbd-client: fix nbd_read_reply_entry
->> and
->> [PATCH 17/17] block/nbd-client: always return EIO on and after the first io channel error
->> and discussed on list.
->>
->> If it will be applied to 2.10, then I'll rebase my 'nbd client refactoring and fixing'
->> on it (for 2.11). If not - I'll prefer not rebase the series, so, do not apply this
->> patch for 2.11.
-> It may be possible to do something even smaller:
->
->>   block/nbd-client.h |  1 +
->>   block/nbd-client.c | 58 +++++++++++++++++++++++++++++++++++++-----------------
->>   2 files changed, 41 insertions(+), 18 deletions(-)
->>
->> diff --git a/block/nbd-client.h b/block/nbd-client.h
->> index df80771357..28db9922c8 100644
->> --- a/block/nbd-client.h
->> +++ b/block/nbd-client.h
->> @@ -29,6 +29,7 @@ typedef struct NBDClientSession {
->>   
->>       Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
->>       NBDReply reply;
->> +    bool eio_to_all;
->>   } NBDClientSession;
->>   
->>   NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
->> diff --git a/block/nbd-client.c b/block/nbd-client.c
->> index 25dd28406b..1282b2484e 100644
->> --- a/block/nbd-client.c
->> +++ b/block/nbd-client.c
->> @@ -49,6 +49,8 @@ static void nbd_teardown_connection(BlockDriverState *bs)
->>   {
->>       NBDClientSession *client = nbd_get_client_session(bs);
->>   
->> +    client->eio_to_all = true;
->> +
->>       if (!client->ioc) { /* Already closed */
->>           return;
->>       }
->> @@ -74,12 +76,16 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
->>       Error *local_err = NULL;
->>   
->>       for (;;) {
->> +        if (s->eio_to_all) {
->> +            break;
->> +        }
->> +
-> How is this conditional ever reached? nbd_read_reply_entry() is our
-> workhorse, that is supposed to run until the client is ready to disconnect.
 
-I forget to set eio_to_all on error in sending request.
+> We can't remove it from the bdrv_co_pwritev() function, but we can remo=
+ve
+> it from bdrv_co_pwritev block driver callback AFAICT.
 
->
->>           assert(s->reply.handle == 0);
->>           ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
->>           if (ret < 0) {
->>               error_report_err(local_err);
->>           }
->> -        if (ret <= 0) {
->> +        if (ret <= 0 || s->eio_to_all) {
->>               break;
->>           }
-> This says we're now supposed to break out of the while loop.  So unless
-> something can set s->eio_to_all during
-> aio_co_wake(s->recv_coroutine[i]), the next iteration of the loop won't
-> hit the first conditional.
->
-> Meanwhile, even if we skip the first conditional, this second
-> conditional will still end the loop prior to acting on anything received
-> from the server (the difference being whether we called
-> nbd_receive_reply() one additional time, but I don't see that as getting
-> in the way of a clean exit).
->
-> But my question is whether we can just go with a simpler fix: if we ever
-> break out of the workhorse loop of nbd_read_reply_entry(), then (and
-> only then) is when we call nbd_recv_coroutines_enter_all() to mop up any
-> pending transactions before tearing down the coroutines.  Is there
-> something we can do in nbd_recv_coroutines_enter_all() that will
-> guarantee that our final entry into each coroutine will fail?
+Sounds like a separate cleanup series to remove the length parameter for
+both read and write (since we have write_zeroes), for the 2.11
+timeframe.  You're right that the block layer does not have to have
+quite the same interface as the driver callbacks.
 
-anyway, you should prevent the following new requests, using some 
-additional variable or disconnect..
-
-Also, I think, an error in sending requests should cause finishing of 
-this loop in nbd_read_reply_entry, so, an error condition should be 
-checked after each yield.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->
-> I'm still playing with the idea locally.
->
+--C9VnX36x0O195aeiDjiBt5JFEmX94pKRj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Best regards,
-Vladimir
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmJ0roACgkQp6FrSiUn
+Q2qf9gf/aNcJqZQ2DSCtaEP/4gMKNkCrwWc94mlOXe1iPT/zyFfAWBPe6sMjBJe3
+Frf4J4wyFSGa1MtSbxLix2ZcRnuNiYdBotW8gCc6gicXYs9nN+MMSr6a2yYgPzfV
+0F+1TC5wp36XMym7aMHcs9ytx5v+no4Xa9V2JSrH19hLD9/ejEtRQ9szFVJ81eTz
+NbfBU7GubWF0ZJ3JzAhJqeodPCsKIDnlshs8qHZHJP06nKFSagC3588n/NZ538UA
+6v1syH9QLS7Maa/InE8gARREaLF/l0YukcbtBanw2ZMP0uWGFzR0sXYaocPZXfmJ
+4vr+p5r2Z31drniRZ3wi1r22JjVztA==
+=kmKb
+-----END PGP SIGNATURE-----
+
+--C9VnX36x0O195aeiDjiBt5JFEmX94pKRj--
