@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1df4Mq-00069b-C8
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:16:21 -0400
+	(envelope-from <voipio@kos.to>) id 1df4Pi-0007bM-D5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1df4Ml-0004cf-5c
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:16:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1df4Mk-0004cQ-VZ
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:16:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1df4Mj-0005Zc-RZ
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 13:16:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CE7CE2E839C
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 13:16:09 +0000 (UTC)
+	(envelope-from <voipio@kos.to>) id 1df4Pd-0006B2-Jn
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:19:14 -0400
+Received: from jessie.kos.to ([212.47.231.226]:52156 helo=pilvi.kos.to)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1df4Pd-00069q-E3
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:19:09 -0400
+Date: Tue, 8 Aug 2017 13:19:04 +0000
+From: Riku Voipio <riku.voipio@iki.fi>
+Message-ID: <20170808131904.GA29288@kos.to>
+References: <150213708469.19430.16716526584783151905.malonedeb@chaenomeles.canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Aug 2017 13:02:02 -0000
-From: Thomas Huth <1223467@bugs.launchpad.net>
-Reply-To: Bug 1223467 <1223467@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130910170043.9057.99139.malonedeb@wampee.canonical.com>
-Message-Id: <150219732324.19011.17787758199788201473.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1223467] Re: Unable to use USB as hda in Windows
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <150213708469.19430.16716526584783151905.malonedeb@chaenomeles.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1709170] [NEW] QEMU fails to honor O_TMPFILE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Bug 1709170 <1709170@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, thiago@kde.org
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+On Mon, Aug 07, 2017 at 08:18:04PM -0000, Thiago Macieira wrote:
+> Public bug reported:
+> 
+> When making a call like
+> 
+>   open("/tmp", O_TMPFILE | O_RDWR);
+> 
+> under QEMU, we ged -EISDIR.
+> 
+> Under any kernel 3.11 or later, we are supposed to get an unnamed file
+> in /tmp. In case the filesystem for /tmp does not support unnamed files,
+> we are supposed to get EOPNOTSUPP.
 
--- =
+Actually, -EISDIR is valid error when underlying system doesn't support O_TMPFILE.
+See man openat or the kernel definition for O_TMPFILE.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1223467
+Regardless, I'm submitting a patch to properly translate the O_TMPFILE.
 
-Title:
-  Unable to use USB as hda in Windows
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  I built qemu 1.6.0 from source in MinGW (and all dependents not available=
- with mingw-get) =
-
-  The command line:
-  qemu-system-i386.exe -m 1024 -hda \\.\PhysicalDrive1 -L pc-bios
-  or
-  qemu-system-x86_64.exe -m 1024 -hda \\.\PhysicalDrive1 -L pc-bios
-  (or the *w.exe equivalents)
-  reports in stderr.txt:
-  qemu-system-i386.exe: -hda \\.\PhysicalDrive1: Block protocol 'host_devic=
-e' doesn't support the option 'filename'
-  qemu-system-i386.exe: -hda \\.\PhysicalDrive1: could not open disk image =
-\\.\PhysicalDrive1: Invalid argument
-
-  I have also found this bug in 1.5 but not in 1.4
-
-  Some Help:
-  The code in Qemu is a bit beyond me at 1am, but I was able to determine t=
-he root cause seems to be that block.c is becoming confused about referring=
- to a file but not having a file name. I have been able to work around this=
- by changing line 860 of block.c from:  "if (qdict_size(options) !=3D 0) {"=
- to "if (qdict_size(options) !=3D 0 && !is_windows_drive(filename)) {"
-
-  But I don't think this is a good solution (it is assuming that nothing
-  else could be wrong), and I can't be sure that I'm not masking some
-  real issue.
-
-  FWIW; Build is on XP, but execution is on Win7.
-
-  Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1223467/+subscriptions
+Riku
