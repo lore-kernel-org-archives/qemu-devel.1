@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1detrI-0000PZ-Kd
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 22:03:05 -0400
+	(envelope-from <famz@redhat.com>) id 1deuQy-0007cQ-AG
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 22:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1detrD-0005Gp-Rd
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 22:03:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1detrD-0005GJ-Kp
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 22:02:55 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46E83461C1
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 02:02:54 +0000 (UTC)
-Received: from localhost (ovpn-12-100.pek2.redhat.com [10.72.12.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5C2587012E
-	for <qemu-devel@nongnu.org>; Tue,  8 Aug 2017 02:02:50 +0000 (UTC)
-Date: Tue, 8 Aug 2017 10:02:49 +0800
+	(envelope-from <famz@redhat.com>) id 1deuQt-0004i4-Gz
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 22:39:52 -0400
+Date: Tue, 8 Aug 2017 10:39:29 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170808020249.GQ14780@lemon>
+Message-ID: <20170808023929.GR14780@lemon>
+References: <20170804105059.11941-1-berrange@redhat.com>
+	<20170804140210.GD4108@localhost.localdomain>
+	<20170804140630.GC14504@redhat.com>
+	<9c9832bf-1e0e-6b3a-d962-5672cb96d323@redhat.com>
+	<20170804154919.GI14504@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] Howto: instructing patchew about patch dependency
+In-Reply-To: <20170804154919.GI14504@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: document semanatics of
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hi, QEMU patch submitters,
+On Fri, 08/04 16:49, Daniel P. Berrange wrote:
+> This is odd.  In the bdrv_aligned_readv() it looks very much like
+> we'll reference qiov->niov, if bytes != 0, so if qiov was NULL we
+> would crash.
 
-I've patched patchew so that if you add a line:
+It doesn't make sense if read doesn't have an iov, where should the data be
+placed? :)
 
-Based-on: $MESSAGE_ID
+> 
+> In bdrv_aligned_writev(), qiov->niov is also refernced if bytes != 0,
+> *unless*  flags contains BDRV_REQ_ZERO_WRITE, in which case we'll
+> invoke bdrv_co_do_pwrite_zeroes() instead.
 
-in your cover letter body, or in a reply to it (or reply to reply), patchew will
-try to apply your series on top of the one $MESSAGE_ID refers to, assuming the
-base series _was_ successfully applied by patchew earlier.
+This is intended. Zero-write doesn't need qiov, hence the BDRV_REQ_ZERO_WRITE
+branch. Otherwise, we can assert qiov != NULL.
 
-In the single patch case, you can put the line under the "---" mark in the
-commit message (no need to let it enter git history).
+> 
+> So unless I'm missing something, bdrv_co_preadv|writev cannot be
+> called with a NULL  qiov, and bdrv_aligned_writev|readv might
+> need their assertions tightened up.
 
-For human readability, around the "Based-on:" line it may be better if the
-subject is noted. E.g.:
+bdrv_co_pwritev _is_ called with a NULL qiov from blk_aio_pwrite_zeroes. Your
+other reasonings are right.
 
-Based-on: 20170804140942.19342-1-famz@redhat.com
-([PATCH for-2.10] vmdk: Fix error handling/reporting of vmdk_check)
-
-Please don't join them in one line because it will confuse the parser, after all
-following the message id text, there aren't many spaces left.
+So for write we cannot remove the bytes parameter.
 
 Fam
