@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1df4jI-0005ns-5w
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:39:33 -0400
+	(envelope-from <jcody@redhat.com>) id 1df4jK-0005oT-Ij
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1df4jD-0008Ar-D9
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:39:28 -0400
+	(envelope-from <jcody@redhat.com>) id 1df4jE-0008Ch-Ki
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:39:29 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  8 Aug 2017 09:39:02 -0400
-Message-Id: <7f210a8d031e371be1e3bc578b8f641ce141f224.1502198932.git.jcody@redhat.com>
+Date: Tue,  8 Aug 2017 09:39:03 -0400
+Message-Id: <4d5999f33db7bd8433a80a9ea0f776fdef340ac1.1502198932.git.jcody@redhat.com>
 In-Reply-To: <cover.1502198932.git.jcody@redhat.com>
 References: <cover.1502198932.git.jcody@redhat.com>
 In-Reply-To: <cover.1502198932.git.jcody@redhat.com>
 References: <cover.1502198932.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 1/7] block/ssh: don't call
- libssh2_init() in block_init()
+Subject: [Qemu-devel] [PATCH for-2.11 2/7] block/ssh: make compliant with
+ coding guidelines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +25,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
 
-We don't need libssh2 failure to be fatal (we could just opt to not
-register the driver on failure). But, it is probably a good idea to
-avoid external library calls during the block_init(), and call the
-libssh2 global init function on the first usage, returning any errors.
-
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/ssh.c | 40 +++++++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ block/ssh.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/block/ssh.c b/block/ssh.c
-index e8f0404..cbb0e34 100644
+index cbb0e34..97f7673 100644
 --- a/block/ssh.c
 +++ b/block/ssh.c
-@@ -83,12 +83,28 @@ typedef struct BDRVSSHState {
-     bool unsafe_flush_warning;
- } BDRVSSHState;
+@@ -241,7 +241,7 @@ static int parse_uri(const char *filename, QDict *options, Error **errp)
+         goto err;
+     }
  
--static void ssh_state_init(BDRVSSHState *s)
-+static bool ssh_libinit_called;
-+
-+static int ssh_state_init(BDRVSSHState *s, Error **errp)
- {
-+    int ret;
-+
-+    if (!ssh_libinit_called) {
-+        ret = libssh2_init(0);
-+        if (ret) {
-+            error_setg(errp, "libssh2 initialization failed with %d", ret);
-+            return ret;
+-    if(uri->user && strcmp(uri->user, "") != 0) {
++    if (uri->user && strcmp(uri->user, "") != 0) {
+         qdict_put_str(options, "user", uri->user);
+     }
+ 
+@@ -268,7 +268,7 @@ static int parse_uri(const char *filename, QDict *options, Error **errp)
+ 
+  err:
+     if (uri) {
+-      uri_free(uri);
++        uri_free(uri);
+     }
+     return -EINVAL;
+ }
+@@ -342,7 +342,7 @@ static int check_host_key_knownhosts(BDRVSSHState *s,
+     libssh2_knownhost_readfile(knh, knh_file, LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+ 
+     r = libssh2_knownhost_checkp(knh, host, port, hostkey, len,
+-                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN|
++                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN |
+                                  LIBSSH2_KNOWNHOST_KEYENC_RAW,
+                                  &found);
+     switch (r) {
+@@ -405,15 +405,18 @@ static int compare_fingerprint(const unsigned char *fingerprint, size_t len,
+     unsigned c;
+ 
+     while (len > 0) {
+-        while (*host_key_check == ':')
++        while (*host_key_check == ':') {
+             host_key_check++;
 +        }
-+        ssh_libinit_called = true;
-+    }
-+
-+
-     memset(s, 0, sizeof *s);
-     s->sock = -1;
-     s->offset = -1;
-     qemu_co_mutex_init(&s->lock);
-+
-+    return 0;
- }
+         if (!qemu_isxdigit(host_key_check[0]) ||
+-            !qemu_isxdigit(host_key_check[1]))
++            !qemu_isxdigit(host_key_check[1])) {
+             return 1;
++        }
+         c = hex2decimal(host_key_check[0]) * 16 +
+             hex2decimal(host_key_check[1]);
+-        if (c - *fingerprint != 0)
++        if (c - *fingerprint != 0) {
+             return c - *fingerprint;
++        }
+         fingerprint++;
+         len--;
+         host_key_check += 2;
+@@ -433,8 +436,8 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
+         return -EINVAL;
+     }
  
- static void ssh_state_free(BDRVSSHState *s)
-@@ -772,8 +788,13 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-     BDRVSSHState *s = bs->opaque;
-     int ret;
-     int ssh_flags;
-+    Error *local_err = NULL;
+-    if(compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
+-                           hash) != 0) {
++    if (compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
++                            hash) != 0) {
+         error_setg(errp, "remote host key does not match host_key_check '%s'",
+                    hash);
+         return -EPERM;
+@@ -507,7 +510,7 @@ static int authenticate(BDRVSSHState *s, const char *user, Error **errp)
+         goto out;
+     }
  
--    ssh_state_init(s);
-+    ret = ssh_state_init(s, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return ret;
-+    }
+-    for(;;) {
++    for (;;) {
+         r = libssh2_agent_get_identity(agent, &identity, prev_identity);
+         if (r == 1) {           /* end of list */
+             break;
+@@ -863,8 +866,8 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
  
-     ssh_flags = LIBSSH2_FXF_READ;
-     if (bdrv_flags & BDRV_O_RDWR) {
-@@ -821,8 +842,13 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-     BDRVSSHState s;
-     ssize_t r2;
-     char c[1] = { '\0' };
-+    Error *local_err = NULL;
+     r = connect_to_ssh(&s, uri_options,
+-                       LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
+-                       LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
++                       LIBSSH2_FXF_READ  | LIBSSH2_FXF_WRITE |
++                       LIBSSH2_FXF_CREAT | LIBSSH2_FXF_TRUNC,
+                        0644, errp);
+     if (r < 0) {
+         ret = r;
+@@ -872,7 +875,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
  
--    ssh_state_init(&s);
-+    ret = ssh_state_init(&s, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return ret;
-+    }
+     if (total_size > 0) {
+-        libssh2_sftp_seek64(s.sftp_handle, total_size-1);
++        libssh2_sftp_seek64(s.sftp_handle, total_size - 1);
+         r2 = libssh2_sftp_write(s.sftp_handle, c, 1);
+         if (r2 < 0) {
+             sftp_error_setg(errp, &s, "truncate failed");
+@@ -1111,7 +1114,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+          * works for me.
+          */
+         if (r == 0) {
+-            ssh_seek(s, offset + written, SSH_SEEK_WRITE|SSH_SEEK_FORCE);
++            ssh_seek(s, offset + written, SSH_SEEK_WRITE | SSH_SEEK_FORCE);
+             co_yield(s, bs);
+             goto again;
+         }
+@@ -1125,8 +1128,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+             end_of_vec = i->iov_base + i->iov_len;
+         }
  
-     /* Get desired file size. */
-     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-@@ -1213,14 +1239,6 @@ static BlockDriver bdrv_ssh = {
+-        if (offset + written > s->attrs.filesize)
++        if (offset + written > s->attrs.filesize) {
+             s->attrs.filesize = offset + written;
++        }
+     }
  
- static void bdrv_ssh_init(void)
- {
--    int r;
--
--    r = libssh2_init(0);
--    if (r != 0) {
--        fprintf(stderr, "libssh2 initialization failed, %d\n", r);
--        exit(EXIT_FAILURE);
--    }
--
-     bdrv_register(&bdrv_ssh);
- }
- 
+     return 0;
 -- 
 2.9.4
