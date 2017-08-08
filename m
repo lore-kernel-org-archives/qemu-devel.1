@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1df6n7-0008Qe-Lz
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:51:35 -0400
+	(envelope-from <mst@redhat.com>) id 1df6pC-0000iX-CJ
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1df6n5-0003Xj-9h
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:51:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36406)
+	(envelope-from <mst@redhat.com>) id 1df6p9-0004mM-7c
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:53:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1df6n4-0003Wq-Vj
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:51:31 -0400
-References: <743158bc-15e4-46fe-38cb-161397b5b240@linaro.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3685aed3-735f-ae62-73a9-8f4a5c7cd459@redhat.com>
-Date: Tue, 8 Aug 2017 17:51:23 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1df6p8-0004lv-UX
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 11:53:39 -0400
+Date: Tue, 8 Aug 2017 18:53:14 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170808184619-mutt-send-email-mst@kernel.org>
+References: <1501964994-5257-1-git-send-email-zuban32s@gmail.com>
+	<1501964994-5257-4-git-send-email-zuban32s@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <743158bc-15e4-46fe-38cb-161397b5b240@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Qemu and 32 PCIe devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1501964994-5257-4-git-send-email-zuban32s@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] pci: enable RedHat PCI bridges to
+ reserve additional buses on PCI init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,156 +28,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Drew Jones <drjones@redhat.com>, Christoffer Dall <cdall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gema Gomez-Solano <gema.gomez-solano@linaro.org>, Marc Zygnier <marc.zyngier@arm.com>
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: seabios@seabios.org, marcel@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org
 
-On 08/08/17 12:39, Marcin Juszkiewicz wrote:
->
-> Few days ago I had an issue with getting PCIe hotplug working on
-> AArch64 machine. Enabled PCI hotplug in kernel and then got hit by
-> some issues.
->
-> Out setup is a bunch of aarch64 servers and we use OpenStack to
-> provide access to arm64 systems. OpenStack uses libvirt to control VMs
-> and allows to add network interfaces and disk volumes to running
-> systems.
->
-> By libvirt AArch64 is treated as PCIe machine without legacy PCI
-> slots. So to hotplug anything you first need to have enough
-> pcie-root-port entries as it is described in Qemu docs/pcie.txt and by
-> patch to libvirt documentation [1][2].
->
-> 1. https://bugs.linaro.org/attachment.cgi?id=782
-> 2. https://www.redhat.com/archives/libvir-list/2017-July/msg01033.html
->
->
-> But things get complicated once you are going to 32 PCIe devices limit
-> (which in our setup will rather not happen). UEFI first takes ages to
-> boot just to land in UEFI shell as it forgot all PCIe devices. With 31
-> devices it boots (also after long time).
+On Sat, Aug 05, 2017 at 11:29:54PM +0300, Aleksandr Bezzubikov wrote:
+> In case of Red Hat Generic PCIE Root Port reserve additional buses,
+> which number is provided in a vendor-specific capability.
+> 
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>  src/fw/pciinit.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  src/hw/pci_ids.h |  3 +++
+>  2 files changed, 68 insertions(+), 4 deletions(-)
+> 
+> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
+> index 864954f..d241d66 100644
+> --- a/src/fw/pciinit.c
+> +++ b/src/fw/pciinit.c
+> @@ -15,6 +15,7 @@
+>  #include "hw/pcidevice.h" // pci_probe_devices
+>  #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
+>  #include "hw/pci_regs.h" // PCI_COMMAND
+> +#include "fw/dev-pci.h" // qemu_pci_cap
+>  #include "list.h" // struct hlist_node
+>  #include "malloc.h" // free
+>  #include "output.h" // dprintf
+> @@ -578,9 +579,42 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
+>          pci_bios_init_bus_rec(secbus, pci_bus);
+>  
+>          if (subbus != *pci_bus) {
+> +            u8 res_bus = 0;
+> +            if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
+> +                    pci_config_readw(bdf, PCI_DEVICE_ID) ==
+> +                            PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
+> +                u8 cap;
+> +                do {
+> +                    cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
+> +                } while (cap &&
+> +                         pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE) !=
+> +                                REDHAT_CAP_TYPE_QEMU);
+> +                if (cap) {
+> +                    u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
+> +                    if (cap_len != QEMU_PCI_CAP_SIZE) {
+> +                        dprintf(1, "PCI: QEMU cap length %d is invalid\n",
+> +                                cap_len);
 
-OK, let me quote my earlier off-list followup (so that the discussion
-proceed publicly -- hopefully other thread participants will also repeat
-their off-list messages, and/or clarify my conveying them):
+I would do cap_len < QEMU_PCI_CAP_SIZE here - this way you can extend
+the capability without breaking things.
 
-On 08/07/17 19:32, Laszlo Ersek wrote:
->
-> (1) Everything that's being worked out right now for PCI Express
-> hotplug on Q35 (x86) applies equally to aarch64. Meaning, hotplug
-> oriented aperture reservations for bus numbers, "IO ports", and
-> various types of MMIO.
->
-> This is to say that resource reservation is not a done deal (it's
-> being designed) for x86 even, and it will take changes for both QEMU
-> and OVMF. In OVMF, the relevant driver is "OvmfPkg/PciHotPlugInitDxe".
-> Once we implement the necessary logic there (using a new
-> "communication channel" with QEMU), then the driver should be possible
-> to include in the ArmVirtQemu builds as well.
->
-> Marcel, can you please provide pointers to the qemu-devel and seabios
-> mailing list discussions?
+> +                    } else {
+> +                        u32 tmp_res_bus = pci_config_readl(bdf,
+> +                                                   cap + QEMU_PCI_CAP_BUS_RES);
+> +                        if (tmp_res_bus != (u32)-1) {
+> +                            res_bus = tmp_res_bus & 0xFF;
+> +                            if ((u8)(res_bus + secbus) < secbus ||
+> +                                (u8)(res_bus + secbus) < res_bus) {
+> +                                dprintf(1, "PCI: bus_reserve value %d is invalid\n",
+> +                                        res_bus);
+> +                                res_bus = 0;
+> +                            }
+> +                        }
+> +                    }
+> +                }
+> +                res_bus = (*pci_bus > secbus + res_bus) ? *pci_bus
+> +                                                      : secbus + res_bus;
+> +            }
+>              dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
+> -                    subbus, *pci_bus);
+> -            subbus = *pci_bus;
+> +                    subbus, res_bus);
+> +            subbus = res_bus;
+> +            *pci_bus = res_bus;
+>          } else {
+>              dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
+>          }
+> @@ -951,11 +985,38 @@ pci_region_map_one_entry(struct pci_region_entry *entry, u64 addr)
+>  
+>      u16 bdf = entry->dev->bdf;
+>      u64 limit = addr + entry->size - 1;
+> +
+> +    if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
+> +            pci_config_readw(bdf, PCI_DEVICE_ID) ==
+> +                    PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
+> +        u8 cap;
+> +        do {
+> +            cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, 0);
+> +        } while (cap &&
+> +                 pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE) !=
+> +                        REDHAT_CAP_TYPE_QEMU);
+> +        if (cap) {
+> +            u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
+> +            if (cap_len != QEMU_PCI_CAP_SIZE) {
+> +                dprintf(1, "PCI: QEMU cap length %d is invalid\n",
+> +                        cap_len);
 
-(Marcel provided the following links, "IO/MEM/Bus reservation hints":
+Same here.
 
- SeaBIOS:
-   - https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06289.html
-   - https://www.mail-archive.com/qemu-devel@nongnu.org/msg468550.html
-   - https://www.mail-archive.com/qemu-devel@nongnu.org/msg470584.html
- QEMU:
-   - https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07110.html
-   - https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg09157.html
-)
+> +            } else {
+> +                u32 offset = cap + QEMU_PCI_CAP_LIMITS_OFFSET + entry->type * 8;
 
->
-> The OVMF (and AAVMF) RHBZs for adhering to QEMU's IO and MMIO aperture
-> hints are:
->
-> - https://bugzilla.redhat.com/show_bug.cgi?id=1434740
-> - https://bugzilla.redhat.com/show_bug.cgi?id=1434747
->
-> The prerequisite QEMU RHBZs are:
-> - https://bugzilla.redhat.com/show_bug.cgi?id=1344299
-> - https://bugzilla.redhat.com/show_bug.cgi?id=1437113
->
-> In addition, there are some issues with edk2's generic PciBusDxe as
-> well; for example ATM it ignores bus number reservations for the kinds
-> of hotplug controllers that we care about:
->
-> https://bugzilla.tianocore.org/show_bug.cgi?id=656
->
-> I got a promise on edk2-devel from Ruiyu Ni (PciBusDxe maintainer from
-> Intel) that he'd fix the issue at some point, but it's "not high
-> priority".
->
->
-> (2) As discussed earlier, the aarch64 "virt" machine type has a
-> serious limitation relative to Q35: the former's MMCONFIG space is so
-> small that it allows for only 16 buses. Each PCI Express root port and
-> downstream port uses up a separate bus number. Please re-check
-> "docs/pcie.txt" in the QEMU source tree with particular attention to
-> section "4. Bus numbers issues" and "5. Hot-plug".
->
-> When the edk2 PciBusDxe driver runs out of any kind of aperture (such
-> as bus numbers, for example), it starts dropping devices. In general
-> it prefers to drop devices with the largest resource consumptions (so
-> that it has to drop the fewest devices for enabling the rest to work).
-> In case many "uniform" devices are used, it is unspecified which ones
-> get dropped. This can easily lead to boot failures (if the dropped
-> devices inlcude the one(s) you wanted to boot off of).
->
-> (3) The edk2 boot performance when using a large number of PCI
-> (Express) devices is indeed really bad. I've looked into it earlier
-> (on Q35), briefly, see for example:
->
-> https://bugzilla.redhat.com/show_bug.cgi?id=1441550#c11
+what is this doing exactly? type is an enum so it's a trick. I'd rather
+have an inline with a switch. Use it for bus as well.
 
-(Here Marcel referenced the following message, also reporting about slow
-PCI enumeration:
-<https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07182.html>.
-In this case the issue hit the guest kernel; OVMF was not used (and
-SeaBIOS was unaffected).)
-
-> As you can see, platform-independent, NIC enumeration-related code in
-> edk2 is *really heavy* on UEFI variables. If you had a physical
-> machine with lots of pflash, and tens (or hundreds) of NICs, the perf
-> would suffer mostly the same.
->
-> Anyway, beyond the things written in that comment, there is one very
-> interesting symptom that makes me think another (milder?) bottleneck
-> could be in QEMU:
->
-> When having a large number of PCI(e) devices (to the tune of 100+),
-> even the printing of DEBUG messages slows down extremely, to the point
-> where I can basically follow, with the naked eye, the printing of
-> *individual* characters, on the QEMU debug port. (Obviously such
-> printing is unrelated to PCI devices; the QEMU debug port is a simple
-> platform device on Q35 and i440fx). This suggests to me that the high
-> number of MemoryRegion objects in QEMU, used for the BARs of PCI(e)
-> devices and bridges, could slow down the dispatching of the individual
-> IO or MMIO accesses. I don't know what data structure QEMU uses for
-> representing the "flat view" of the address sapce, but I think it
-> *could* be a bottleneck. At least I tried to profile a few bits in the
-> firmware, and found nothing related specifically to the slowdown of
-> DEBUG prints.
-
-(Paolo says the data structure is a radix tree, so the bottleneck being
-there would be surprising. Also Paolo has given me tips for profiling,
-so I'm looking into it.)
-
-(Another remark from Paolo, paraphrased: programming the BARs relies on
-an O(n^3) algorithm, fixing which is on the todo list.)
-
->
-> In summary:
-> - all of the hotplug stuff is still under design / in flux even for
->   x86
-> - MMCONFIG of "virt" is too small (too few bus numbers available)
-> - the boot perf issue might need even KVM tracing (this is not to say
->   that the UEFI variable massaging during edk2 NIC binding isn't
->   resource hungry! See again RHBZ#1441550 comment 11.)
-
-(Drew added a few more points about mach-virt here; I'll let him repeat
-himself.)
-
-Thanks,
-Laszlo
+> +                u64 tmp_limit = (pci_config_readl(bdf, offset) |
+> +                            (u64)pci_config_readl(bdf, offset + 4) << 32);
+> +                if (tmp_limit != (u64)-1) {
+> +                    tmp_limit += addr - 1;
+> +                    limit = (limit > tmp_limit) ? limit : tmp_limit;
+> +                }
+> +            }
+> +        }
+> +    }
+> +
+>      if (entry->type == PCI_REGION_TYPE_IO) {
+>          pci_config_writeb(bdf, PCI_IO_BASE, addr >> PCI_IO_SHIFT);
+> -        pci_config_writew(bdf, PCI_IO_BASE_UPPER16, 0);
+> +        pci_config_writew(bdf, PCI_IO_BASE_UPPER16, limit >> 16);
+>          pci_config_writeb(bdf, PCI_IO_LIMIT, limit >> PCI_IO_SHIFT);
+> -        pci_config_writew(bdf, PCI_IO_LIMIT_UPPER16, 0);
+> +        pci_config_writew(bdf, PCI_IO_LIMIT_UPPER16, limit >> 16);
+>      }
+>      if (entry->type == PCI_REGION_TYPE_MEM) {
+>          pci_config_writew(bdf, PCI_MEMORY_BASE, addr >> PCI_MEMORY_SHIFT);
+> diff --git a/src/hw/pci_ids.h b/src/hw/pci_ids.h
+> index 4ac73b4..38fa2ca 100644
+> --- a/src/hw/pci_ids.h
+> +++ b/src/hw/pci_ids.h
+> @@ -2263,6 +2263,9 @@
+>  #define PCI_DEVICE_ID_KORENIX_JETCARDF0	0x1600
+>  #define PCI_DEVICE_ID_KORENIX_JETCARDF1	0x16ff
+>  
+> +#define PCI_VENDOR_ID_REDHAT		0x1b36
+> +#define PCI_DEVICE_ID_REDHAT_ROOT_PORT	0x000C
+> +
+>  #define PCI_VENDOR_ID_TEKRAM		0x1de1
+>  #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
+>  
+> -- 
+> 2.7.4
