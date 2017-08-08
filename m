@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1df4Rw-0000K3-St
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:21:37 -0400
+	(envelope-from <drjones@redhat.com>) id 1df4Ti-00012m-Jf
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1df4Rs-0007dr-0z
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:21:32 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170731095443.28211-6-el13635@mail.ntua.gr>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-6-el13635@mail.ntua.gr>
-Date: Tue, 08 Aug 2017 15:13:36 +0200
-Message-ID: <w51valyjj7j.fsf@maestria.local.igalia.com>
+	(envelope-from <drjones@redhat.com>) id 1df4Td-0000Jj-TK
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 09:23:22 -0400
+Date: Tue, 8 Aug 2017 15:23:00 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170808132300.uyrrmgoij4qlwy52@kamzik.brq.redhat.com>
+References: <1500471597-2517-1-git-send-email-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
- driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1500471597-2517-1-git-send-email-drjones@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] ARM: KVM: Enable in-kernel PMU with
+ user space gic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, agraf@suse.de, cdall@linaro.org
 
-On Mon 31 Jul 2017 11:54:41 AM CEST, Manos Pitsidianakis wrote:
-> block/throttle.c uses existing I/O throttle infrastructure inside a
-> block filter driver. I/O operations are intercepted in the filter's
-> read/write coroutines, and referred to block/throttle-groups.c
->
-> The driver can be used with the syntax
-> -drive driver=throttle,file.filename=foo.qcow2, \
->         limits.iops-total=...,throttle-group=bar
 
-Sorry for not having noticed this earlier, but can't you define the
-throttling group (and its limits) using -object throttle-group ... as
-shown in the previous patch, and simply reference it here? Or would we
-have two alternative ways of setting the throttling limits?
+Peter,
 
-What happens if you have many -drive lines each one with a different set
-of limits but with the same throttling group?
+ping?
 
-Berto
+Thanks,
+drew
+
+
+On Wed, Jul 19, 2017 at 09:39:53AM -0400, Andrew Jones wrote:
+> v2:
+>  - renamed the kvm pmu 'create' function to 'set_irq' after doing the
+>    create/set-irq split
+>  - added another patch that improves the error handling of the kvm pmu
+>    init and set-irq calls
+> 
+> Andrew Jones (4):
+>   hw/arm/virt: add pmu interrupt state
+>   target/arm/kvm: pmu: split init and set-irq stages
+>   hw/arm/virt: allow pmu instantiation with userspace irqchip
+>   target/arm/kvm: pmu: improve error handling
+> 
+>  hw/arm/virt.c        | 12 ++++++++--
+>  target/arm/cpu.c     |  2 ++
+>  target/arm/cpu.h     |  2 ++
+>  target/arm/kvm.c     |  6 ++++-
+>  target/arm/kvm32.c   |  7 +++++-
+>  target/arm/kvm64.c   | 63 ++++++++++++++++++++++++++++++----------------------
+>  target/arm/kvm_arm.h |  9 ++++----
+>  7 files changed, 65 insertions(+), 36 deletions(-)
+> 
+> -- 
+> 1.8.3.1
+> 
+> 
