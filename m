@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dezSo-0002u2-Er
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:02:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dezWq-0004QS-9E
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:06:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dezSn-0004SW-7y
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:02:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1dezWo-00062T-Vy
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 04:06:16 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170721034730.25612-1-crosa@redhat.com>
 	<20170721123325.GC18014@stefanha-x1.localdomain>
-	<f263a454-9dca-ecba-89b8-d09bee6b79ec@redhat.com>
-Date: Tue, 08 Aug 2017 10:01:55 +0200
-In-Reply-To: <f263a454-9dca-ecba-89b8-d09bee6b79ec@redhat.com> (Cleber Rosa's
-	message of "Fri, 21 Jul 2017 09:49:11 -0400")
-Message-ID: <87r2wm4he4.fsf@dusky.pond.sub.org>
+	<20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+	<20170726175808.GD3600@stefanha-x1.localdomain>
+	<ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
+	<20170727134101.GG10129@stefanha-x1.localdomain>
+Date: Tue, 08 Aug 2017 10:06:04 +0200
+In-Reply-To: <20170727134101.GG10129@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Thu, 27 Jul 2017 14:41:01 +0100")
+Message-ID: <87mv7a4h77.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
@@ -25,66 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Cleber Rosa <crosa@redhat.com> writes:
+Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-> On 07/21/2017 08:33 AM, Stefan Hajnoczi wrote:
->> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
->>> This is a follow up to a previous discussion about reported failures when
->>> running some qemu-iotests.  Turns out the failures were due to missing
->>> libraries, which in turn, reflected on the host build configuration.
->>>
->>> This series introduces a tool that can check both host and target level
->>> build configurations.  On top of that, it adds a function to to be used
->>> on qemu-iotests.  Finally, as an example, it sets a test to be skipped
->>> if the required feature is not enable on the host build configuration.
->>>
->>> Cleber Rosa (3):
->>>   scripts: introduce buildconf.py
->>>   qemu-iotests: add _require_feature() function
->>>   qemu-iotests: require CONFIG_LINUX_AIO for test 087
->>>
->>>  scripts/buildconf.py         | 278 +++++++++++++++++++++++++++++++++++++++++++
->>>  tests/qemu-iotests/087       |   1 +
->>>  tests/qemu-iotests/check     |   2 +
->>>  tests/qemu-iotests/common.rc |   7 ++
->>>  4 files changed, 288 insertions(+)
->>>
+> On Wed, Jul 26, 2017 at 02:24:02PM -0400, Cleber Rosa wrote:
 >> 
->> It should be possible to run iotests against any
->> qemu/qemu-img/qemu-io/qemu-nbd binaries - even if no build root is
->> available.
 >> 
->
-> Yes, I actually overlooked that point.
->
->> How about invoking qemu-img and tools to determine their capabilities?
+>> On 07/26/2017 01:58 PM, Stefan Hajnoczi wrote:
+>> > On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
+>> >> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
+>> >>> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
+>> >>>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
+>> >>>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wrote:
+>> >>>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+>> >>>> Without the static capabilities defined, the dynamic check would be
+>> >>>> influenced by the run time environment.  It would really mean "qemu-io
+>> >>>> running on this environment (filesystem?) can do native aio".  Again,
+>> >>>> that's not the best type of information to depend on when writing tests.
+>> >>>
+>> >>> Can you explain this more?
+>> >>>
+>> >>> It seems logical to me that if qemu-io in this environment cannot do
+>> >>> aio=native then we must skip those tests.
+>> >>>
+>> >>> Stefan
+>> >>>
+>> >>
+>> >> OK, let's abstract a bit more.  Let's take this part of your statement:
+>> >>
+>> >>  "if qemu-io in this environment cannot do aio=native"
+>> >>
+>> >> Let's call that a feature check.  Depending on how the *feature check*
+>> >> is written, a negative result may hide a test failure, because it would
+>> >> now be skipped.
+>> > 
+>> > You are saying a pass->skip transition can hide a failure but ./check
+>> > tracks skipped tests.  See tests/qemu-iotests/check.log for a
+>> > pass/fail/skip history.
+>> > 
 >> 
+>> You're not focusing on the problem here.  The problem is that a test
+>> that *was not* supposed to be skipped, would be skipped.
 >
-> Can capabilities be consistently queried?  I would love to not count on
-> a build root if the same information can be consistently queried from
-> the binaries themselves.
+> As Daniel Berrange mentioned, ./configure has the same problem.  You
+> cannot just run it blindly because it silently disables features.
 >
->> At the beginning of ./check, query the qemu/qemu-img/qemu-io/qemu-nbd
->> binaries for specific features.  This produces a set of available
->> features and tests can say:
+> What I'm saying is that in addition to watching ./configure closely, you
+> also need to look at the skipped tests that ./check reports.  If you do
+> that then you can be sure the expected set of tests is passing.
+>
+>> > It is the job of the CI system to flag up pass/fail/skip transitions.
+>> > You're no worse off using feature tests.
+>> > 
+>> > Stefan
+>> > 
 >> 
+>> What I'm trying to help us achieve here is a reliable and predictable
+>> way for the same test job execution to be comparable across
+>> environments.  From the individual developer workstation, CI, QA etc.
 >
-> Which would be another ad-hoc thing, limited to qemu-iotests.  From a
-> test writer perspective, QEMU lacks is a uniform way to introspect its
-> capabilities.
+> 1. Use ./configure --enable-foo options for all desired features.
+> 2. Run the ./check command-line and there should be no unexpected skips
+>    like this:
+>
+> 087         [not run] missing aio=native support
+>
+> To me this seems to address the problem.
+>
+> I have mentioned the issues with the build flags solution: it creates a
+> dependency on the build environment and forces test feature checks to
+> duplicate build dependency logic.  This is why I think feature tests are
+> a cleaner solution.
 
-The closest we have is query-qmp-schema.  It's uniform, but limited to
-the qapified part of QMP (see my KVM Forum 2015 talk[*] for details).
-Something similar for the command line would be nice, and I hope to get
-there some day.  Until then, you can often reason like "if QMP supports
-X, then surely the command line supports X'".
-
-We commonly reason "if INTERFACE supports FEATURE-API, then QEMU surely
-supports FEATURE".
-
-[...]
-
-[*] https://events.linuxfoundation.org/sites/events/files/slides/armbru-qemu-introspection.pdf
+I suspect the actual problem here is that the qemu-iotests harness is
+not integrated in the build process.  For other tests, we specify the
+tests to run in a Makefile, and use the same configuration mechanism as
+for building stuff conditionally.
