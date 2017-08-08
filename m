@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dersg-0000ki-57
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:56:22 -0400
+	(envelope-from <cota@braap.org>) id 1des0T-0007rx-Pv
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dersb-0007vW-Ga
-	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 19:56:18 -0400
-References: <ebdf772d1a48ccec999866f9c5cb209b2fcedf48.1502144886.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8c9d0a1a-e877-cdbe-d45f-c0ba68f055c0@redhat.com>
-Date: Mon, 7 Aug 2017 19:55:58 -0400
+	(envelope-from <cota@braap.org>) id 1des0O-0002qx-Pq
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:04:21 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:38075)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1des0O-0002qU-La
+	for qemu-devel@nongnu.org; Mon, 07 Aug 2017 20:04:16 -0400
+Date: Mon, 7 Aug 2017 20:04:14 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170808000414.GA20585@flamenco>
+References: <20170729003327.GA16954@flamenco>
+	<CAFEAcA9M88wdV+pR5pSCRbt=NT=OKL+Z88hOjsb_v3q-AcL4fA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <ebdf772d1a48ccec999866f9c5cb209b2fcedf48.1502144886.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10] block/nfs: fix mutex
- assertion in nfs_file_close()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9M88wdV+pR5pSCRbt=NT=OKL+Z88hOjsb_v3q-AcL4fA@mail.gmail.com>
+Subject: Re: [Qemu-devel] tb_invalidate_phys_range and
+ tb_invalidate_phys_page_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pl@kamp.de, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
-
-
-On 08/07/2017 06:29 PM, Jeff Cody wrote:
-> Commit c096358e747e88fc7364e40e3c354ee0bb683960 introduced assertion
-> checks for when qemu_mutex() functions are called without the
-> corresponding qemu_mutex_init() having initialized the mutex.
+On Sat, Jul 29, 2017 at 10:23:42 +0100, Peter Maydell wrote:
+> On 29 July 2017 at 01:33, Emilio G. Cota <cota@braap.org> wrote:
+(snip)
+> > +void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end,
+> > +                              int is_cpu_write_access)
+> > +{
+> > +    while (start < end) {
+> > +        tb_invalidate_phys_page_range(start, end, is_cpu_write_access);
+> > +        start &= TARGET_PAGE_MASK;
+> > +        start += TARGET_PAGE_SIZE;
+> > +    }
+> > +}
+> >
+> > What I find puzzling is that here we pass 'end' unmodified, instead of
+> > making sure the range passed is within a page.
+> >
+> > Is this a bug, or am I missing something?
 > 
-> This uncovered a latent bug in qemu's nfs driver - in
-> nfs_client_close(), the NFSClient structure is overwritten with zeros,
-> prior to the mutex being destroyed.
+> It's a bit odd, but looking at the code I think it doesn't matter.
+> The only thing that tb_invalidate_phys_page_range() uses 'end'
+> for is when it does the "does this TB I've found overlap the
+> range we're flushing" check with
+>  if (!(tb_end <= start || tb_start >= end))
 > 
-> Go ahead and destroy the mutex in nfs_client_close(), and change where
-> we call qemu_mutex_init() so that it is correctly balanced.
+> If we pass an 'end' value that's larger than it would be if
+> we confined it to the page, this is safe because at worst
+> we'll invalidate more TBs than we needed to (and in practice
+> if the TB we've found is within the full range that
+> tb_invalidate_phys_range() is checking we need to invalidate
+> it anyway). I haven't quite worked it through but I rather
+> suspect that you can't have a TB that's in the list for
+> the PageDesc for 'start' and which overlaps in the
+> "full" [start-end) range but which wouldn't overlap
+> in a truncated [start-(end rounded down to end of page))
+> range.
 > 
-> There are also a couple of memory leaks obscured by the memset, so this
-> fixes those as well.
-> 
-> Finally, we should be able to get rid of the memset(), as it isn't
-> necessary.
-> 
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> Basically the reason for the "same page" restriction
+> is that tb_invalidate_phys_page_range() only does
+> a single page_find() for the 'start' address. So
+> as long as we call it once per page in the range
+> it doesn't matter that we pass an overly pessimistic
+> end. This is kind of bordering on "happens to work"
+> territory though, so maybe we could improve it...
 
+Thanks Peter.
 
-Looks sane to me.
+I just sent a patch to improve this as part of the "tb lock removal"
+series. The patch is here:
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01270.html
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Cheers,
+
+		Emilio
