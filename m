@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dfJEj-00048J-Ig
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:08:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1dfJIp-0006FP-K2
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dfJEf-0002EC-A0
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:08:53 -0400
-Received: from ozlabs.org ([103.22.144.67]:46789)
+	(envelope-from <thuth@redhat.com>) id 1dfJIk-0003sc-Kh
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:13:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dfJEe-0002DC-UK
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:08:49 -0400
-Date: Wed, 9 Aug 2017 15:08:42 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170809050842.GI13670@umbus.fritz.box>
-References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-	<CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
-	<20170727105348.GG7970@umbus.fritz.box>
-	<20170727115042.GL2555@redhat.com>
-	<20170808134008.0648ab2e@w520.home>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dfJIk-0003sJ-Ah
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:13:02 -0400
+References: <20170808153827.427-1-cohuck@redhat.com>
+	<20170808182623.45e88fd6@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3988876c-6699-3da9-cdd4-bd3729a693ff@redhat.com>
+Date: Wed, 9 Aug 2017 07:12:51 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dCSxeJc5W8HZXZrD"
-Content-Disposition: inline
-In-Reply-To: <20170808134008.0648ab2e@w520.home>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
- to avoid races with libvirt
+In-Reply-To: <20170808182623.45e88fd6@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="hrqLBXBR36sn9PNOOKKfqqIPt5T4dfcvJ"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
 
-
---dCSxeJc5W8HZXZrD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hrqLBXBR36sn9PNOOKKfqqIPt5T4dfcvJ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 08, 2017 at 01:40:08PM -0600, Alex Williamson wrote:
-> On Thu, 27 Jul 2017 12:50:42 +0100
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+On 08.08.2017 18:26, Greg Kurz wrote:
+> On Tue,  8 Aug 2017 17:38:27 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 >=20
-> > On Thu, Jul 27, 2017 at 08:53:48PM +1000, David Gibson wrote:
-> > > On Thu, Jul 27, 2017 at 10:11:48AM +0100, Peter Maydell wrote: =20
-> > > > On 27 July 2017 at 02:30, Michael Roth <mdroth@linux.vnet.ibm.com> =
-wrote: =20
-> > > > > In particular, Mellanox CX4 adapters on PowerNV hosts might not b=
-e fully
-> > > > > quiesced by vfio-pci's finalize() routine until up to 6s after the
-> > > > > DEVICE_DELETED was emitted, leading to detach-device on the libvi=
-rt side pretty
-> > > > > much always crashing the host. =20
-> > > >=20
-> > > > My initial naive thought is that if the host kernel can crash then
-> > > > this is a host kernel bug... shouldn't the host kernel refuse
-> > > > the subsequent libvirt rebind if it would cause a crash ? =20
-> > >=20
-> > > I think so too, but I haven't been able to convince Alex.  Nor
-> > > find time to fix it in the kernel myself. =20
-> >=20
-> > I think we need to fix both the QEMU premature sending of DEVICE_DELETED
-> > and the kernel bug that allowed the crash.
+>> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+>> on CONFIG_VIRTFS and on the presence of an appropriate virtio transpor=
+t
+>> device.
+>>
+>> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+>> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+>>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>
+>> This is the alternative approach to "9pfs: fix and simplify dependenci=
+es".
+>> Uglier; but probably not broken...
+>>
 >=20
+> Yikes. I don't know why yet but this doesn't work for PCI-less targets
+> like cris-softmmu...
 >=20
-> Where do we stand on this for v2.10?  I'd like to see it get in.  There
-> may be things to fix in the kernel, some of them may already be fixed
-> in the latest development kernel, but ultimately the kernel considers
-> driver binding to be a trusted operation and if userspace doesn't
-> understand all the dependencies, they shouldn't be doing it.  In this
-> case libvirt is using the DEVICE_DELETED signal with the assumption
-> that the device has been fully released by QEMU, which is of course not
-> accurate (libvirt could test this, but chooses not to).  libvirt
-> therefore begins trying to unbind a device that is still in use, we try
-> to handle it, but see official kernel stance that userspace is
-> responsible for understanding device dependencies, so we can only do so
-> much.
+>   LINK    cris-softmmu/qemu-system-cris
+> vl.o: In function `fsdev_init_func':
+> vl.c:2360: undefined reference to `qemu_fsdev_add'
 >=20
-> IMO, the next step along those lines would be that libvirt needs to
-> understand that even once a device is fully released from QEMU, it's
-> not necessarily safe to re-bind the device to a host driver.  If the
-> device is a member of a group where other devices are still in use by
-> userspace, this will violate user/host device isolation and the kernel
-> will crash to protect itself.  At best I may be able to improve this to
-> killing the userspace process making use of the conflicting device, but
-> the kernel view is that userspace (libvirt) has mandated to bind the
-> device to the host driver and we must make it so, the user is
-> responsible for the consequences.  Thanks,
+>> ---
+>>  default-configs/s390x-softmmu.mak | 1 +
+>>  fsdev/Makefile.objs               | 9 +++------
+>>  hw/Makefile.objs                  | 2 +-
+>>  3 files changed, 5 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x=
+-softmmu.mak
+>> index 51191b77df..e4c5236ceb 100644
+>> --- a/default-configs/s390x-softmmu.mak
+>> +++ b/default-configs/s390x-softmmu.mak
+>> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=3Dy
+>>  CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
+>>  CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
+>>  CONFIG_WDT_DIAG288=3Dy
+>> +CONFIG_VIRTIO_CCW=3Dy
+>> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+>> index 659df6e187..10d8caa291 100644
+>> --- a/fsdev/Makefile.objs
+>> +++ b/fsdev/Makefile.objs
+>> @@ -1,10 +1,7 @@
+>> -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+>>  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+>> -# only pull in the actual virtio-9p device if we also enabled virtio.=
 
-Merging it for 2.10 seems like a good idea to me to, but it's not
-really my area of expertise, and therefore not my call.
+>> -common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+>> -else
+>> -common-obj-y =3D qemu-fsdev-dummy.o
+>> -endif
+>> +# only pull in the actual virtio-9p device if we also enabled a virti=
+o backend.
+>> +common-obj-$(call land, $(CONFIG_VIRTFS),$(call lor, $(CONFIG_VIRTIO_=
+PCI),$(CONFIG_VIRTIO_CCW)))=3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o=
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+>> +common-obj-$(call lnot, $(call land, $(CONFIG_VIRTFS),$(call lor, $(C=
+ONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) =3D qemu-fsdev-dummy.o
+>>  common-obj-y +=3D qemu-fsdev-opts.o qemu-fsdev-throttle.o
+>> =20
+>>  # Toplevel always builds this; targets without virtio will put it in
+>> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+>> index a2c61f6b09..10942fe0b4 100644
+>> --- a/hw/Makefile.objs
+>> +++ b/hw/Makefile.objs
+>> @@ -1,4 +1,4 @@
+>> -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTF=
+S),$(CONFIG_PCI))) +=3D 9pfs/
+>> +devices-dirs-$(call land, $(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO=
+_PCI),$(CONFIG_VIRTIO_CCW))) +=3D 9pfs/
+>>  devices-dirs-$(CONFIG_SOFTMMU) +=3D acpi/
+>>  devices-dirs-$(CONFIG_SOFTMMU) +=3D adc/
+>>  devices-dirs-$(CONFIG_SOFTMMU) +=3D audio/
 
---dCSxeJc5W8HZXZrD
+I think the problem are the white spaces after a ",". For example for
+the following test code in a makefile:
+
+	@echo test1: $(call lnot, n)
+	@echo test2: $(call lnot,n)
+
+I get the following output:
+
+ test1: n
+ test2: y
+
+Hope that helps,
+ Thomas
+
+
+--hrqLBXBR36sn9PNOOKKfqqIPt5T4dfcvJ
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmKmNoACgkQbDjKyiDZ
-s5Ls+w//YmCyDX3Y9EfH9pfkczr1bNpvQv3v/BSkL+jaGXO09SYRA8Cuz/Im0T0T
-1Lwe/8GviIqdcvg1NZUTui+o7mJaILgLRnYisnJUpxD4R8K35i93vuF70PVqZ13K
-YoVLPWUDGRe7aYnfluzGHnITy/vHEdHwCb9ECBmENaPbBPEkjjdxoswo4iYmTcg6
-+/iFz+/U2pQ4kj016wiWXJ0K2ijPRE/X+nZHVdOe/Ao7D+upM0jB7AQACPu6/xji
-fMHyD6jRsdYMqmt0u5O2+u6V8Y5jJoS3t6fN5xAYbaKk6sCEpcusAuZscEeDEhxt
-MKWUDyxI8Axu33rkC82laDEmd09aeRXBOaWmCFXQs9hzSDKD8VQk2F+gHE3aqns0
-MWqLb38iVnVn2HVHCU9TzYn03v7NO2LX4l9t34tDDxk6/N+l/XvAQNS1KB9BOg5w
-g9+/TZOAWJeHywh13yk4heS0outAF7yMDA72i73/o59urPsfd4Sv6hudGtvGkm50
-6Mopce6ZSTCm7mn77AU5NcajuYNBDvcr7YXIA5ckEq6saOASnqvfhdAy3i1h5N6y
-CCHYsAA31Pr7wyAI6CLlPVpOR/PDm/qnvHbgv4Jr7s5lT9B29GiCDgMhtHI+KDXh
-AuUYs8JAg2lm+wzFDi9HL0kM/zFsswBok+6CxrwAVpM0hjkI3/U=
-=mZbV
+iQIcBAEBAgAGBQJZipnYAAoJEC7Z13T+cC21LAwP/1dbnttb10E4S1NE2xwMN4wn
+htwvDAFPVmyMgAbGGqHGASyW3SHfMZs9MH+4YQdqK00aIVrEkYyb9jv2fPbYCueV
+66uX4CsOPOGhrDtRWE5v05Fo1JCnYQwm7tQiR7tqDWNeEM+0THl/qkcOpr1GBKzC
+bZpFq02KkCT2ge0725NPWFVXNwAhtH25y1cUSouc09SqTqk346RM1OSbr9WPumkK
+M06KpLpd0aaHB6K8KLe/njPMjEKt4K214VtJ+OcWFPYe/0IzeM+3hgvHDEj8cL7M
+8f9EhQG3LVWeL+aIdwAqonAcr7SrNsLkP6CQuALrefz3/2LUzW3kP6B7aCT5t6kf
+6+jY10sHQuowCOE8U/zohyXjxm69+CRLGRz01VpAWhIlD6qlVtwew9AScs5lXRs6
++vo+2jCPIsf49O2eFpzz0DiKnnPi1r290cpK9Q0N+BiixwK1U6wMN6esJ/QJTYsB
+eILrW8kttyN1TIAWUzGEqKtZpyEYSrZbWGXOPgpDgdRJ3v7zDO+fXT+BcZfViZSj
+9KIsm2Zl/Vi3gSwyrxiTevGAtGkt0Oog6E5GZd08ToCNUFickj0oZVWDUiMnlyj9
+rODPDKR+4SK2TJdjhfBf1jlpJWjG7JmHRxdKKcHNDkWpkJqzu4nDA903T4y0+mQe
++y3GOkEAGwlZwLQEy/sZ
+=kO3j
 -----END PGP SIGNATURE-----
 
---dCSxeJc5W8HZXZrD--
+--hrqLBXBR36sn9PNOOKKfqqIPt5T4dfcvJ--
