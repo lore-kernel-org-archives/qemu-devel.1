@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfSuD-0000N4-GL
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:28:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfSyq-0001oa-1h
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfSuA-0004Qv-A2
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:28:21 -0400
-Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:43594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfSuA-0004Qe-4J
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:28:18 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id AC0F18B963
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 17:28:16 +0200 (CEST)
-Date: Wed, 9 Aug 2017 17:28:11 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170809172811.0b7fa4cd@bahia.lan>
-In-Reply-To: <2a4a537f-0f26-3f5a-eaae-2e73bcef4a99@msgid.tls.msk.ru>
-References: <150228860899.28168.1415083032613087245.stgit@bahia>
-	<2a4a537f-0f26-3f5a-eaae-2e73bcef4a99@msgid.tls.msk.ru>
+	(envelope-from <eblake@redhat.com>) id 1dfSyo-00077h-MR
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:33:08 -0400
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-15-eblake@redhat.com>
+	<87d184ojqp.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ecd3699b-1a73-a8e2-5dac-b4f227f106b9@redhat.com>
+Date: Wed, 9 Aug 2017 10:32:50 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/1rqR=iPQVD.n=O/agxaQyTq";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
- fchmodat_nofollow() limitations
+In-Reply-To: <87d184ojqp.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OR7xngO92GJGMpwA2u4lvKjoLPH1grhxu"
+Subject: Re: [Qemu-devel] [PATCH v4 14/22] libqtest: Separate
+ qmp_discard_response() from command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +26,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, zhiyong.wu@ucloud.cn, Eric Blake <eblake@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
---Sig_/1rqR=iPQVD.n=O/agxaQyTq
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OR7xngO92GJGMpwA2u4lvKjoLPH1grhxu
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>,
+ John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <ecd3699b-1a73-a8e2-5dac-b4f227f106b9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 14/22] libqtest: Separate
+ qmp_discard_response() from command
+References: <20170804012551.2714-1-eblake@redhat.com>
+ <20170804012551.2714-15-eblake@redhat.com>
+ <87d184ojqp.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d184ojqp.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 9 Aug 2017 18:11:51 +0300
-Michael Tokarev <mjt@tls.msk.ru> wrote:
-
-> 09.08.2017 17:23, Greg Kurz wrote:
-> > This function has to ensure it doesn't follow a symlink that could be u=
-sed
-> > to escape the virtfs directory. This could be easily achieved if fchmod=
-at()
-> > on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-> > it doesn't.
-> >=20
-> > The current implementation covers most use-cases, but it notably fails =
-if:
-> > - the target path has access rights equal to 0000 (openat() returns EPE=
-RM), =20
-> >   =3D> once you've done chmod(0000) on a file, you can never chmod() ag=
-ain =20
-> > - the target path is UNIX domain socket (openat() returns ENXIO) =20
-> >   =3D> bind() of UNIX domain sockets fails if the file is on 9pfs =20
-> >=20
-> > The solution is to use O_PATH: openat() now succeeds in both cases, and=
- we
-> > can ensure the path isn't a symlink with fstat(). The associated entry =
-in
-> > "/proc/self/fd" can hence be safely passed to the regular chmod() sysca=
-ll. =20
+On 08/09/2017 10:15 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 >=20
-> How we can ensure the path isn't a symlink using fstat() ?
+>> Upcoming patches will be adding new convenience methods for
+>> constructing QMP commands.  But making every variation of sending
+>> support every variation of response handling becomes unwieldy;
+>> it's easier to specify that discarding a JSON response is
+>> unassociated with sending the command, where qmp_async() already
+>> fits the bill for sending a command without tying up a reference
+>> to the response.
+>>
+>> Doing this renders qtest_qmp[v]_discard_response() unused.
+>>
+>> Bonus: gets rid of a non-literal format string, which is a step
+>> towards compile-time format string checking without triggering
+>> -Wformat-nonliteral.
 >=20
-> As far as I understand, fstat NEVER, EVER will return S_ISLINK, because
-> we can't actually "open" a symlink itsef, only the target of the symlink.
+> Where?  (I'm feeling lazy today)
 >=20
 
-Except when O_PATH is passed, as stated in open(2):
+Sure:
 
-If  pathname  is a symbolic link and the O_NOFOLLOW flag is also
-specified, then the call returns a file descriptor referring  to
-the  symbolic  link.
+>=20
+> +++ b/tests/ide-test.c
+> @@ -624,7 +624,6 @@ static void test_retry_flush(const char *machine)
+>      QPCIDevice *dev;
+>      QPCIBar bmdma_bar, ide_bar;
+>      uint8_t data;
+> -    const char *s;
+>=20
+>      prepare_blkdebug_script(debug_path, "flush_to_disk");
+>=20
+> @@ -652,8 +651,8 @@ static void test_retry_flush(const char *machine)
+>      qmp_eventwait("STOP");
+>=20
+>      /* Complete the command */
+> -    s =3D "{'execute':'cont' }";
+> -    qmp_discard_response(s);
+> +    qmp_async("{'execute':'cont' }");
+> +    qmp_discard_response();
 
-See Eric's program that proves it at:
+Yes, I can update the commit message to focus in on it more precisely.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01600.html
+>> +++ b/tests/libqtest.c
+>> @@ -235,7 +235,8 @@ QTestState *qtest_init(const char *extra_args)
+>>      /* Read the QMP greeting and then do the handshake */
+>>      greeting =3D qtest_qmp_receive(s);
+>>      QDECREF(greeting);
+>> -    qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }"=
+);
+>> +    greeting =3D qtest_qmp(s, "{ 'execute': 'qmp_capabilities' }");
+>> +    QDECREF(greeting);
+>=20
+> Here, you replace
+>=20
+>        qtest_qmp_discard_response(ARGS...);
+>=20
+> effectively by
+>=20
+>        QDECREF(qtest_qmp(ARGS...));
+>=20
+> which is how qtest_qmp_discard_response() does its job before this
+> patch.  Okay.
+
+I deleted qtest_qmp_discard_response().  If I had kept it around (but
+made it static instead), I could have written this one as:
+
+/* Read the QMP greeting and then do the handshake */
+qtest_qmp_discard_response(s);
+qtest_qmp_async(s, "{'execute': 'qmp_capabilities'}");
+qtest_qmp_discard_response(s);
+
+But as the only place that needed to pass 's' on through, I was just as
+comfortable open-coding the QDECREF after the fact.
+
+>> +++ b/tests/ahci-test.c
+>> @@ -1596,8 +1596,9 @@ static void test_atapi_tray(void)
+>>      rsp =3D qmp_receive();
+>>      QDECREF(rsp);
+
+Hmm - this code already was manually using QDECREF()...
+
+>>
+>> -    qmp_discard_response("{'execute': 'x-blockdev-remove-medium', "
+>> -                         "'arguments': {'device': 'drive0'}}");
+>> +    qmp_async("{'execute': 'x-blockdev-remove-medium', "
+>> +              "'arguments': {'device': 'drive0'}}");
+>> +    qmp_discard_response();
+
+which means this could have reused rsp =3D qmp(...); QDECREF(rsp); as wel=
+l.
+
+>=20
+> Here, you replace the same pattern (less the QTestState argument) by
+>=20
+>        qmp_async(F, ...);
+>        qmp_discard_response();
+>=20
+> Also okay.  But why two ways to do the same things?
+>=20
+> Apropos QTestState argument: do we have a test with more than one state=
+,
+> or is having two versions of every function just "avoiding global state=
+
+> is virtuous" self-flagellation?
+
+We DO have tests that use more than one state - AND those tests prefer
+calling the qmp() version (rather than the qtest_qmp() version) with
+manipulation of the global_qtest as needed.  See my cleanup in 15/22.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> /mjt
-
-
---Sig_/1rqR=iPQVD.n=O/agxaQyTq
-Content-Type: application/pgp-signature
+--OR7xngO92GJGMpwA2u4lvKjoLPH1grhxu
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAlmLKgsACgkQAvw66wEB28JPxwCcDkMiqul9VHVmccCLqLKHchNg
-SkIAoIwIZmJrwuWywhRBUxvZjAiUj0Fz
-=+5yy
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLKyIACgkQp6FrSiUn
+Q2rosQgAgn+2v9cWO1iECnBeZQHTofm8bERSBK7MRY/bh/J+xsVQGlL9bbWAYk5l
+4TG+xSzWdZBO7nBLmXBEx5zTSW+JL89Uynqqwbyj2mowYIeLc9dNsutGsCjtOTWI
+UrDAk8/9UrIEw7cWogI72dlqlNsZr6nefibdQb2g4tIY2VtxqUni0+ReJRymOers
+ZO2H8bvhUruBTUJrg+QpvMMwHm+zeYHBO93i/eRD6g1jIrkN5VtVT/JQkDazgnu/
+dkqE8l+T/KFnDAW53bWLJRlx1CR0KYc6eq4EReEl0xvHrZ4JyoJcDqCs5qJc4AJy
+FaFfbfiO0zcdp4PLxf+DtH5hw+57aA==
+=WxDt
 -----END PGP SIGNATURE-----
 
---Sig_/1rqR=iPQVD.n=O/agxaQyTq--
+--OR7xngO92GJGMpwA2u4lvKjoLPH1grhxu--
