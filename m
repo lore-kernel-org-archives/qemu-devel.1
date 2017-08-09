@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dfTQE-0001jm-PC
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfTQS-0001vq-GY
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dfTQ8-0006dd-M9
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:26 -0400
-Date: Wed, 9 Aug 2017 18:01:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170809160105.GJ4213@localhost.localdomain>
-References: <20170808175711.12203-1-jsnow@redhat.com>
-	<20170808175711.12203-4-jsnow@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1dfTQO-0006ns-Bp
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfTQO-0006nW-2y
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D8B08357E54
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 16:01:34 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-22-eblake@redhat.com>
+Date: Wed, 09 Aug 2017 18:01:32 +0200
+In-Reply-To: <20170804012551.2714-22-eblake@redhat.com> (Eric Blake's message
+	of "Thu, 3 Aug 2017 20:25:50 -0500")
+Message-ID: <87k22cn31f.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170808175711.12203-4-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] block-backend: shift in-flight counter
- to BB from BDS
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 21/22] libqtest: Drop now-unused qmp()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,138 +33,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, pjp@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 08.08.2017 um 19:57 hat John Snow geschrieben:
-> From: Kevin Wolf <kwolf@redhat.com>
-> 
-> This allows us to detect errors in cache flushing (ENOMEDIUM)
-> without choking on a null dereference because we assume that
-> blk_bs(bb) is always defined.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
+Eric Blake <eblake@redhat.com> writes:
+
+> All callers have been converted to a form of qmp_cmd() or
+> qmp_args() that takes the command name with less boilerplate.
+> Therefore, we also know that all commands are using
+> interpolation, and can remove an assertion.
+>
+> This also means that we have fixed the testsuite to comply with
+> -Wformat checking on the strings being interpolated for qmp()
+> (similar to what we previously did for strings used in hmp(), and
+> matching the checking present on qobject_from_jsonf()).
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  block.c               |  2 +-
->  block/block-backend.c | 40 ++++++++++++++++++++++++++++++++++------
->  2 files changed, 35 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block.c b/block.c
-> index ce9cce7..834b836 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4476,7 +4476,7 @@ out:
->  
->  AioContext *bdrv_get_aio_context(BlockDriverState *bs)
->  {
-> -    return bs->aio_context;
-> +    return bs ? bs->aio_context : qemu_get_aio_context();
+>  tests/libqtest.h | 20 +-------------------
+>  tests/libqtest.c | 32 ++++----------------------------
+>  2 files changed, 5 insertions(+), 47 deletions(-)
+>
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 193adf1eb9..04b36a7b11 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -457,15 +457,6 @@ static inline void qtest_end(void)
 >  }
+>
+>  /**
+> - * qmp:
+> - * @fmt...: QMP message to send to qemu; formats arguments through
+> - * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+> - *
+> - * Sends a QMP message to QEMU and returns the response.
+> - */
+> -QDict *qmp(const char *fmt, ...);
+> -
+> -/**
+>   * qmp_raw:
+>   * @msg: Raw QMP message to send to qemu.
+>   *
+> @@ -474,15 +465,6 @@ QDict *qmp(const char *fmt, ...);
+>  QDict *qmp_raw(const char *msg);
+>
+>  /**
+> - * qmp_async:
+> - * @fmt...: QMP message to send to qemu; formats arguments through
+> - * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+> - *
+> - * Sends a QMP message to QEMU and leaves the response in the stream.
+> - */
+> -void qmp_async(const char *fmt, ...);
+> -
+> -/**
+>   * qmp_cmd:
+>   * @cmd: QMP command, with no arguments.
+>   *
+> @@ -530,7 +512,7 @@ void qmp_args_async(const char *cmd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+>  /**
+>   * qmp_discard_response:
+>   *
+> - * Read and discard a QMP response, typically after qmp_async().
+> + * Read and discard a QMP response, typically after qmp_cmd_async().
+>   */
+>  void qmp_discard_response(void);
+>
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 5012ecf929..4597d4ac66 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -453,17 +453,12 @@ static void qtest_qmp_sendv(QTestState *s, const char *fmt, va_list ap)
+>      QString *qstr;
+>      const char *str;
+>
+> -    assert(strstr(fmt, "execute"));
+> -
+>      /*
+> -     * A round trip through QObject is only needed if % interpolation
+> -     * is used.  We interpolate through QObject rather than sprintf in
+> -     * order to escape strings properly.
+> +     * A round trip through QObject (and not sprintf) is needed
+> +     * because % interpolation is used, and we must escape strings
+> +     * properly.
+>       */
+> -    if (!strchr(fmt, '%')) {
+> -        qmp_fd_send(s->qmp_fd, fmt);
+> -        return;
+> -    }
+> +    assert(strchr(fmt, '%'));
 
-This should probably be a separate patch; it's not really related to
-moving the in-flight counter, but fixes another NULL dereference in
-blk_aio_prwv().
+What exactly is wrong with a @fmt that doesn't contain '%'?
 
->  void bdrv_coroutine_enter(BlockDriverState *bs, Coroutine *co)
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 968438c..efd7e92 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -68,6 +68,9 @@ struct BlockBackend {
->      NotifierList remove_bs_notifiers, insert_bs_notifiers;
->  
->      int quiesce_counter;
-> +
-> +    /* Number of in-flight requests. Accessed with atomic ops. */
-> +    unsigned int in_flight;
->  };
->  
->  typedef struct BlockBackendAIOCB {
-> @@ -1109,6 +1112,16 @@ int blk_make_zero(BlockBackend *blk, BdrvRequestFlags flags)
->      return bdrv_make_zero(blk->root, flags);
+>
+>      qobj = qobject_from_jsonv(fmt, ap);
+>      qstr = qobject_to_json(qobj);
+> @@ -833,31 +828,12 @@ void qtest_memset(QTestState *s, uint64_t addr, uint8_t pattern, size_t size)
+>      qtest_rsp(s, 0);
 >  }
->  
-> +static void blk_inc_in_flight(BlockBackend *blk)
-> +{
-> +    atomic_inc(&blk->in_flight);
-> +}
-> +
-> +static void blk_dec_in_flight(BlockBackend *blk)
-> +{
-> +    atomic_dec(&blk->in_flight);
-> +}
-> +
->  static void error_callback_bh(void *opaque)
+>
+> -QDict *qmp(const char *fmt, ...)
+> -{
+> -    va_list ap;
+> -
+> -    va_start(ap, fmt);
+> -    qtest_qmp_sendv(global_qtest, fmt, ap);
+> -    va_end(ap);
+> -    return qtest_qmp_receive(global_qtest);
+> -}
+> -
+>  QDict *qmp_raw(const char *msg)
 >  {
->      struct BlockBackendAIOCB *acb = opaque;
-> @@ -1147,7 +1160,7 @@ static const AIOCBInfo blk_aio_em_aiocb_info = {
->  static void blk_aio_complete(BlkAioEmAIOCB *acb)
->  {
->      if (acb->has_returned) {
-> -        bdrv_dec_in_flight(acb->common.bs);
-> +        blk_dec_in_flight(acb->rwco.blk);
->          acb->common.cb(acb->common.opaque, acb->rwco.ret);
->          qemu_aio_unref(acb);
->      }
-> @@ -1168,7 +1181,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
->      BlkAioEmAIOCB *acb;
->      Coroutine *co;
->  
-> -    bdrv_inc_in_flight(blk_bs(blk));
-> +    blk_inc_in_flight(blk);
->      acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
->      acb->rwco = (BlkRwCo) {
->          .blk    = blk,
-> @@ -1405,14 +1418,28 @@ int blk_flush(BlockBackend *blk)
->  
->  void blk_drain(BlockBackend *blk)
->  {
-> -    if (blk_bs(blk)) {
-> -        bdrv_drain(blk_bs(blk));
-> +    AioContext *ctx = blk_get_aio_context(blk);
-> +
-> +    while (atomic_read(&blk->in_flight)) {
-> +        aio_context_acquire(ctx);
-> +        aio_poll(ctx, false);
-> +        aio_context_release(ctx);
-> +
-> +        if (blk_bs(blk)) {
-> +            bdrv_drain(blk_bs(blk));
-> +        }
->      }
+>      qmp_fd_send(global_qtest->qmp_fd, msg);
+>      return qtest_qmp_receive(global_qtest);
 >  }
->  
->  void blk_drain_all(void)
+>
+> -void qmp_async(const char *fmt, ...)
+> -{
+> -    va_list ap;
+> -
+> -    va_start(ap, fmt);
+> -    qtest_qmp_sendv(global_qtest, fmt, ap);
+> -    va_end(ap);
+> -}
+> -
+>  QDict *qmp_cmd(const char *cmd)
 >  {
-> -    bdrv_drain_all();
-> +    BlockBackend *blk = NULL;
-> +
-> +    bdrv_drain_all_begin();
-> +    while ((blk = blk_all_next(blk)) != NULL) {
-> +        blk_drain(blk);
-> +    }
-> +    bdrv_drain_all_end();
->  }
-
-We still need to check that everyone who should call blk_drain_all()
-rather than bdrv_drain_all() actually does so.
-
->  void blk_set_on_error(BlockBackend *blk, BlockdevOnError on_read_error,
-> @@ -1453,10 +1480,11 @@ static void send_qmp_error_event(BlockBackend *blk,
->                                   bool is_read, int error)
->  {
->      IoOperationType optype;
-> +    BlockDriverState *bs = blk_bs(blk);
->  
->      optype = is_read ? IO_OPERATION_TYPE_READ : IO_OPERATION_TYPE_WRITE;
->      qapi_event_send_block_io_error(blk_name(blk),
-> -                                   bdrv_get_node_name(blk_bs(blk)), optype,
-> +                                   bs ? bdrv_get_node_name(bs) : "", optype,
->                                     action, blk_iostatus_is_enabled(blk),
->                                     error == ENOSPC, strerror(error),
->                                     &error_abort);
-
-And this is another independent NULL dereference fix.
-
-Kevin
+>      qmp_cmd_async(cmd);
