@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfFcm-0003by-AG
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:29 -0400
+	(envelope-from <mtosatti@redhat.com>) id 1dfG5r-0001vg-5K
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfFcj-0005rj-IW
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:28 -0400
-Resent-Message-Id: <E1dfFcj-0005rj-IW@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150224143496.33.14217849227927698738@dd743fd916bd>
-In-Reply-To: <20170808183306.27474-1-jsnow@redhat.com>
+	(envelope-from <mtosatti@redhat.com>) id 1dfG5n-00048a-QM
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:47:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47860)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1dfG5n-00046E-J5
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:47:27 -0400
+Date: Tue, 8 Aug 2017 21:50:53 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+Message-ID: <20170809005053.GA26386@amt.cnet>
+References: <20170807085703.32267-1-lprosek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 8 Aug 2017 18:17:15 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/9] IDE: replace printfs with tracing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170807085703.32267-1-lprosek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] i386/kvm: advertise Hyper-V
+ frequency MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com, david@redhat.com, rkrcmar@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MDgxODMzMDYuMjc0NzQtMS1qc25vd0ByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVs
-XSBbUEFUQ0ggMC85XSBJREU6IHJlcGxhY2UgcHJpbnRmcyB3aXRoIHRyYWNpbmcKVHlwZTogc2Vy
-aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo1NjQzOTM0NGVmIEFIQ0k6IHJlbW92ZSBEUFJJTlRGIG1hY3Jv
-CjZhZDg1YWZiYTkgQUhDSTogcHJldHR5LXByaW50IEZJUyB0byBidWZmZXIgaW5zdGVhZCBvZiBz
-dGRlcnIKZGZjZDU4YmU2ZCBBSENJOiBSZXdvcmsgSVJRIGNvbnN0YW50cwo3N2ZlYjA4ZDFkIEFI
-Q0k6IFJlcGxhY2UgRFBSSU5URiB3aXRoIHRyYWNlLWV2ZW50cwo1NjU3YTQ5MTRlIElERTogcmVw
-bGFjZSBERUJVR19BSU8gd2l0aCB0cmFjZSBldmVudHMKNzcwOGJhMDE1OCBBVEFQSTogUmVwbGFj
-ZSBERUJVR19JREVfQVRBUEkgd2l0aCB0cmFjaW5nIGV2ZW50cwpjMDA3ZGE4MWIyIElERTogYWRk
-IHRyYWNpbmcgZm9yIGRhdGEgcG9ydHMKMDdjYzQzYTVmZiBJREU6IEFkZCByZWdpc3RlciBoaW50
-cyB0byB0cmFjaW5nCmE1YTdiNTA3YmUgSURFOiByZXBsYWNlIERFQlVHX0lERSB3aXRoIHRyYWNp
-bmcgc3lzdGVtCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IElERTog
-cmVwbGFjZSBERUJVR19JREUgd2l0aCB0cmFjaW5nIHN5c3RlbS4uLgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzEzOTogRklMRTogaHcvaWRlL2NvcmUu
-YzoxMTg5OgorICAgIGlmIChyZWdfbnVtICE9IDcgJiYgKHMtPnN0YXR1cyAmIChCVVNZX1NUQVR8
-RFJRX1NUQVQpKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lz
-ICcoJwojMTQ0OiBGSUxFOiBody9pZGUvY29yZS5jOjExOTM6CisgICAgc3dpdGNoKHJlZ19udW0p
-IHsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygn
-CiMxOTE6IEZJTEU6IGh3L2lkZS9jb3JlLmM6MjA1ODoKKyAgICBzd2l0Y2gocmVnX251bSkgewoK
-dG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi85OiBJREU6IEFk
-ZCByZWdpc3RlciBoaW50cyB0byB0cmFjaW5nLi4uCkNoZWNraW5nIFBBVENIIDMvOTogSURFOiBh
-ZGQgdHJhY2luZyBmb3IgZGF0YSBwb3J0cy4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IEFUQVBJOiBS
-ZXBsYWNlIERFQlVHX0lERV9BVEFQSSB3aXRoIHRyYWNpbmcgZXZlbnRzLi4uCkNoZWNraW5nIFBB
-VENIIDUvOTogSURFOiByZXBsYWNlIERFQlVHX0FJTyB3aXRoIHRyYWNlIGV2ZW50cy4uLgpDaGVj
-a2luZyBQQVRDSCA2Lzk6IEFIQ0k6IFJlcGxhY2UgRFBSSU5URiB3aXRoIHRyYWNlLWV2ZW50cy4u
-LgpFUlJPUjogSGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCcKIzU0MzogRklM
-RTogaHcvaWRlL3RyYWNlLWV2ZW50czo4ODoKK2hhbmRsZV9yZWdfaDJkX2Zpc19wbXAodm9pZCAq
-cywgaW50IHBvcnQsIGNoYXIgYjAsIGNoYXIgYjEsIGNoYXIgYjIpICJhaGNpKCVwKVslZF06IFBv
-cnQgTXVsdGlwbGllciBub3Qgc3VwcG9ydGVkLCBGSVM6IDB4JTAyeC0lMDJ4LSUwMngiCgpFUlJP
-UjogSGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCcKIzU0NDogRklMRTogaHcv
-aWRlL3RyYWNlLWV2ZW50czo4OToKK2hhbmRsZV9yZWdfaDJkX2Zpc19yZXModm9pZCAqcywgaW50
-IHBvcnQsIGNoYXIgYjAsIGNoYXIgYjEsIGNoYXIgYjIpICJhaGNpKCVwKVslZF06IFJlc2VydmVk
-IGZsYWdzIHNldCBpbiBIMkQgUmVnaXN0ZXIgRklTLCBGSVM6IDB4JTAyeC0lMDJ4LSUwMngiCgpF
-UlJPUjogSGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCcKIzU1MDogRklMRTog
-aHcvaWRlL3RyYWNlLWV2ZW50czo5NToKK2hhbmRsZV9jbWRfdW5oYW5kbGVkX2Zpcyh2b2lkICpz
-LCBpbnQgcG9ydCwgdWludDhfdCBiMCwgdWludDhfdCBiMSwgdWludDhfdCBiMikgImFoY2koJXAp
-WyVkXTogdW5oYW5kbGVkIEZJUyB0eXBlLiBjbWRfZmlzOiAweCUwMngtJTAyeC0lMDJ4IgoKdG90
-YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MDAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy85OiBBSENJOiBSZXdv
-cmsgSVJRIGNvbnN0YW50cy4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IEFIQ0k6IHByZXR0eS1wcmlu
-dCBGSVMgdG8gYnVmZmVyIGluc3RlYWQgb2Ygc3RkZXJyLi4uCkVSUk9SOiBVc2UgZ19hc3NlcnQg
-b3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzM1OiBGSUxFOiBody9pZGUvYWhjaS5jOjY1ODoKKyAg
-ICBnX2Fzc2VydF9jbXBpbnQoY21kX2xlbiwgPD0sIDB4MTAwKTsKCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgODUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS85OiBBSENJOiByZW1vdmUgRFBSSU5URiBtYWNy
-by4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-ZnJlZWxpc3RzLm9yZw==
+On Mon, Aug 07, 2017 at 10:56:59AM +0200, Ladi Prosek wrote:
+> This is the QEMU part of the changes required for nested Hyper-V to read
+> timestamps with RDTSC + TSC page. Without exposing the frequency MSRs,
+> Windows with the Hyper-V role enabled use the much slower
+> HV_X64_MSR_TIME_REF_COUNT (0x40000020) RDMSR to read timestamps.
+> 
+> The new registers are exposed only if the TSC frequency is stable across
+> migration and known, as suggested by Paolo.
+> 
+> v1->v2:
+> * deleted an extra empty line in patch 1
+> * added patch 3 introducing a helper function for the "TSC is stable and
+>   known" check (David)
+> 
+> Ladi Prosek (4):
+>   i386/kvm: use a switch statement for MSR detection
+>   i386/kvm: set tsc_khz before configuring Hyper-V CPUID
+>   i386/kvm: introduce tsc_is_stable_and_known()
+>   i386/kvm: advertise Hyper-V frequency MSRs
+> 
+>  target/i386/kvm.c | 138 ++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 71 insertions(+), 67 deletions(-)
+> 
+> -- 
+> 2.9.3
+
+
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
