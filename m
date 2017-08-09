@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dfZEu-00040k-3c
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:14:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfZJe-00060f-KS
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:19:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dfZEq-0000To-MF
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:14:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57265)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dfZEq-0000Ta-Fl
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:14:04 -0400
-References: <34458438-9913-6bab-0ddb-e2908ddd006a@bluestop.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <faffe6ab-b094-5f9a-0834-12d5c380edd4@redhat.com>
-Date: Thu, 10 Aug 2017 00:13:57 +0200
+	(envelope-from <eblake@redhat.com>) id 1dfZJd-00035h-Ah
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:19:02 -0400
+References: <20170809215510.22802-1-pbonzini@redhat.com>
+	<20170809215510.22802-2-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
+Date: Wed, 9 Aug 2017 17:18:54 -0500
 MIME-Version: 1.0
-In-Reply-To: <34458438-9913-6bab-0ddb-e2908ddd006a@bluestop.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] OvmfPkg (PlatformPei?): supporting Qemu's nvdimm
- device
+In-Reply-To: <20170809215510.22802-2-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us"
+Subject: Re: [Qemu-devel] [PATCH 01/12] qemu-iotests: remove dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rebecca Cran <rebecca@bluestop.org>
-Cc: edk2-devel@lists.01.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-On 08/09/17 22:47, Rebecca Cran wrote:
-> I've been investigating adding support for Qemu's nvdimm devices to
-> OVMF.  I was thinking such support would go into PlatformPei, but it
-> looks like I can only read the ACPI NFIT in the DXE phase. So, should
-> Qemu be changed to add non-volatile memory to the e820 table, or
-> should such memory be added during the DXE phase instead?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/12] qemu-iotests: remove dead code
+References: <20170809215510.22802-1-pbonzini@redhat.com>
+ <20170809215510.22802-2-pbonzini@redhat.com>
+In-Reply-To: <20170809215510.22802-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I don't have the slightest idea, sorry.
+On 08/09/2017 04:54 PM, Paolo Bonzini wrote:
+> This includes shell function, shell variables, command line options
+> (randomize.awk does not exist) and conditions that can never be true
+> (./qemu does not exist anymore).
 
-One thing that does look bad is that both edk2's
+Can we point to a commit id where we stopped making ./qemu?  Is it still
+worth supporting a local symlink?
 
-  MdeModulePkg/Universal/Disk/RamDiskDxe
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/qemu-iotests/check         | 36 +--------------------
+>  tests/qemu-iotests/common        | 23 --------------
+>  tests/qemu-iotests/common.config | 26 ---------------
+>  tests/qemu-iotests/common.rc     | 68 --------------------------------=
+--------
+>  4 files changed, 1 insertion(+), 152 deletions(-)
+>=20
+> -#
+> -# - These can be added to $HOST_CONFIG_DIR (witch default to ./config)=
 
-and QEMU's
 
-  hw/acpi/nvdimm.c
+Good riddance to the wrong word ('which' was intended)
 
-think they own the NVDIMM root device with, with _HID=ACPI0012.
+Other than possibly still wanting ./qemu convenience, this looks like a
+reasonable cleanup.
 
-I don't recall being consulted when QEMU's NVDIMM stuff was designed and
-implemented, despite the fact that it uses the ACPI linker/loader
-(apparently).
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-In general, using the ACPI linker/loader is a good recipe for making an
-ACPI-defined feature "just work" under both SeaBIOS and OVMF, without
-having to resort to specialized information channels such as new fw_cfg
-files, or additional paravirt hardware. However, there are enough quirks
-in edk2 / UEFI with regard to ACPI that, without special attention to
-OVMF / edk2 at design time, things will likely break due to infighting
-over ACPI ownership.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-In RamDiskPublishNfit(), there is
 
-    //
-    // Assumption is made that if no NFIT is in the ACPI table, there is no
-    // NVDIMM root device in the \SB scope.
-    // Therefore, a NVDIMM root device will be reported via Secondary System
-    // Description Table (SSDT).
-    //
-    Status = RamDiskPublishSsdt ();
+--8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-That assumption might or might not be good enough, when QEMU pushes down
-its NVDIMM / NFIT stuff. I suggest reading "docs/specs/acpi_nvdimm.txt"
-in the QEMU tree, and figuring out if that can work with OVMF's ACPI
-linker/loader client, and the rest of the edk2 modules. The assumption
-could also be affected by whether OvmfPkg/AcpiTableDxe installs QEMU's
-NVDIM stuff before or after RamDiskDxe does its thing. I have no clue.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I apologize but I don't think I can help (or even find the bandwidth to
-research or discuss this -- it's 00:13 local time and I'm reviewing
-patches...)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLik4ACgkQp6FrSiUn
+Q2qQIQf+OnxtJM65NgyAW6CnJsbWT4jJErp4cdJyTdnwdjrBmLr/rmgcp+MNbik5
+13fNFmS2LpJob7+wQb1zXHOwX4fD6TNmjJWIlHTK34a/8N79fNkcqPxc5dnwNscU
+VSgTPfzxiIkd5tofh6tVi2uIfg8cO7kc1CU69YIDeU+7E0R/fL4FhBFyZZNFtlj6
+ajDYJ7W7oIPqahKkc6GBiQ6OxHmhqSfm22CD6bKTS9200QYL1f9QwQCji7XW4uxD
+z9Hp11htAv66Um3fFiNckmUMyoOvgFcAF+VVWiqO8yQDkkZAdGRwIGsSbUg5VFNL
+/Rx94Hq0gF2/3PH1gQhMG25qjRyw0g==
+=hEZi
+-----END PGP SIGNATURE-----
 
-I'm CC'ing Michael and Igor, maybe they can provide you with pointers.
-(Also adding qemu-devel.)
-
-Thanks
-Laszlo
+--8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us--
