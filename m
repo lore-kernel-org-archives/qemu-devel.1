@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dfR7e-00007U-02
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:10 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfRGH-0005JP-8T
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dfR7Z-0003Xc-Nu
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dfR7Z-0003Wi-F2
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:01 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed,  9 Aug 2017 15:33:46 +0200
-Message-Id: <20170809133346.30271-7-david@redhat.com>
-In-Reply-To: <20170809133346.30271-1-david@redhat.com>
-References: <20170809133346.30271-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 6/6] kvm: kvm_log_sync() is only called
- with known memory sections
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfRGG-0002Bw-4h
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:43:01 -0400
+Date: Wed, 9 Aug 2017 16:42:07 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170809134205.dbkx5cuvjpbaxftv@postretch>
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+	<20170731095443.28211-6-el13635@mail.ntua.gr>
+	<w51valyjj7j.fsf@maestria.local.igalia.com>
+	<20170808134544.paekftiounmirhbo@postretch>
+	<w51poc6jeln.fsf@maestria.local.igalia.com>
+	<20170808145620.wlb5rdutuseutclx@postretch>
+	<w51mv7aje27.fsf@maestria.local.igalia.com>
+	<20170809093612.oee2u5kdgyojheqm@postretch>
+	<w51y3qslxyz.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nlkvm72nbewpz4m4"
+Content-Disposition: inline
+In-Reply-To: <w51y3qslxyz.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,151 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-Flatview will make sure that we can only end up in this function with
-memory sections that correspond to exactly one slot. So we don't
-have to iterate multiple times. There won't be overlapping slots but
-only matching slots.
 
-Properly align the section and look up the corresponding slot. This
-heavily simplifies this function.
+--nlkvm72nbewpz4m4
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We can now get rid of kvm_lookup_overlapping_slot().
+On Wed, Aug 09, 2017 at 02:36:20PM +0200, Alberto Garcia wrote:
+>On Wed 09 Aug 2017 11:36:12 AM CEST, Manos Pitsidianakis wrote:
+>> On Tue, Aug 08, 2017 at 05:04:48PM +0200, Alberto Garcia wrote:
+>>>On Tue 08 Aug 2017 04:56:20 PM CEST, Manos Pitsidianakis wrote:
+>>>>>> So basically if we have anonymous groups, we accept limits in the
+>>>>>> driver options but only without a group-name.
+>>>>>
+>>>>>In the commit message you do however have limits and a group name, is
+>>>>>that a mistake?
+>>>>>
+>>>>>    -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
+>>>>>           limits.iops-total=3D...,throttle-group=3Dbar
+>>>>
+>>>> Sorry this wasn't clear, I'm actually proposing to remove limits from
+>>>> the throttle driver options and only create/config throttle groups via
+>>>> -object/object-add.
+>>>
+>>>Sorry I think it was me who misunderstood :-) Anyway in the new
+>>>command-line API I would be more inclined to have limits defined using
+>>>"-object throttle-group" and -drive would only reference the group id.
+>>>
+>>>I understand that this implies that it wouldn't be possible to create
+>>>anonymous groups (at least not from the command line), is that a
+>>>problem?
+>>
+>> We can accept anonymous groups if a user specifies limits but not a
+>> group name in the throttle driver. (The only case where limits would
+>> be acccepted)
+>
+>Yeah but that's only if we have the limits.iops-total=3D... options in the
+>throttle driver. If we "remove limits from the throttle driver options
+>and only create/config throttle groups via -object/object-add" we=20
+>cannot
+>do that.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- accel/kvm/kvm-all.c | 101 +++++++++++++++++-----------------------------------
- 1 file changed, 33 insertions(+), 68 deletions(-)
+We can check that groups is not defined at the same time as limits,
+>
+>> Not creating eponymous throttle groups via the throttle driver means
+>> we don't need throttle_groups anymore, since even anonymous ones don't
+>> need to be accounted for in a list.
+>
+>I don't follow you here, how else do you get a group by its name?
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 78a7f01..5f1463d 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -218,34 +218,6 @@ static hwaddr kvm_align_section(MemoryRegionSection *section,
-     return size;
- }
- 
--/*
-- * Find overlapping slot with lowest start address
-- */
--static KVMSlot *kvm_lookup_overlapping_slot(KVMMemoryListener *kml,
--                                            hwaddr start_addr,
--                                            hwaddr end_addr)
--{
--    KVMState *s = kvm_state;
--    KVMSlot *found = NULL;
--    int i;
--
--    for (i = 0; i < s->nr_slots; i++) {
--        KVMSlot *mem = &kml->slots[i];
--
--        if (mem->memory_size == 0 ||
--            (found && found->start_addr < mem->start_addr)) {
--            continue;
--        }
--
--        if (end_addr > mem->start_addr &&
--            start_addr < mem->start_addr + mem->memory_size) {
--            found = mem;
--        }
--    }
--
--    return found;
--}
--
- int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
-                                        hwaddr *phys_addr)
- {
-@@ -489,55 +461,48 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
-                                           MemoryRegionSection *section)
- {
-     KVMState *s = kvm_state;
--    unsigned long size, allocated_size = 0;
-     struct kvm_dirty_log d = {};
-     KVMSlot *mem;
--    int ret = 0;
--    hwaddr start_addr = section->offset_within_address_space;
--    hwaddr end_addr = start_addr + int128_get64(section->size);
-+    hwaddr start_addr, size;
- 
--    d.dirty_bitmap = NULL;
--    while (start_addr < end_addr) {
--        mem = kvm_lookup_overlapping_slot(kml, start_addr, end_addr);
--        if (mem == NULL) {
--            break;
--        }
-+    size = kvm_align_section(section, &start_addr);
-+    if (!size) {
-+        return 0;
-+    }
- 
--        /* XXX bad kernel interface alert
--         * For dirty bitmap, kernel allocates array of size aligned to
--         * bits-per-long.  But for case when the kernel is 64bits and
--         * the userspace is 32bits, userspace can't align to the same
--         * bits-per-long, since sizeof(long) is different between kernel
--         * and user space.  This way, userspace will provide buffer which
--         * may be 4 bytes less than the kernel will use, resulting in
--         * userspace memory corruption (which is not detectable by valgrind
--         * too, in most cases).
--         * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
--         * a hope that sizeof(long) won't become >8 any time soon.
--         */
--        size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
--                     /*HOST_LONG_BITS*/ 64) / 8;
--        if (!d.dirty_bitmap) {
--            d.dirty_bitmap = g_malloc(size);
--        } else if (size > allocated_size) {
--            d.dirty_bitmap = g_realloc(d.dirty_bitmap, size);
--        }
--        allocated_size = size;
--        memset(d.dirty_bitmap, 0, allocated_size);
-+    mem = kvm_lookup_matching_slot(kml, start_addr, size);
-+    if (!mem) {
-+        fprintf(stderr, "%s: error finding slot\n", __func__);
-+        abort();
-+    }
- 
--        d.slot = mem->slot | (kml->as_id << 16);
--        if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
--            DPRINTF("ioctl failed %d\n", errno);
--            ret = -1;
--            break;
--        }
-+    /* XXX bad kernel interface alert
-+     * For dirty bitmap, kernel allocates array of size aligned to
-+     * bits-per-long.  But for case when the kernel is 64bits and
-+     * the userspace is 32bits, userspace can't align to the same
-+     * bits-per-long, since sizeof(long) is different between kernel
-+     * and user space.  This way, userspace will provide buffer which
-+     * may be 4 bytes less than the kernel will use, resulting in
-+     * userspace memory corruption (which is not detectable by valgrind
-+     * too, in most cases).
-+     * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
-+     * a hope that sizeof(long) won't become >8 any time soon.
-+     */
-+    size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
-+                 /*HOST_LONG_BITS*/ 64) / 8;
-+    d.dirty_bitmap = g_malloc0(size);
- 
--        kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
--        start_addr = mem->start_addr + mem->memory_size;
-+    d.slot = mem->slot | (kml->as_id << 16);
-+    if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
-+        DPRINTF("ioctl failed %d\n", errno);
-+        g_free(d.dirty_bitmap);
-+        return -1;
-     }
-+
-+    kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
-     g_free(d.dirty_bitmap);
- 
--    return ret;
-+    return 0;
- }
- 
- static void kvm_coalesce_mmio_region(MemoryListener *listener,
--- 
-2.9.4
+If all eponymous groups are managed by the QOM tree, we should be able=20
+to iterate over the object root container for all ThrottleGroups just=20
+like qmp_query_iothreads() in iothread.c
+
+--nlkvm72nbewpz4m4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmLES0ACgkQc2J8L2kN
+9xBnrxAA1Kg7M7de56Mx370fhsR5JXih2x4J7fntbzFsnadQ0P+emHJ73+CNnco9
+p9aISGHrVYWb/sNBjZ8OdLSz/NGlb7J1EBDxt3/SquD0Ig+30EqSowelKfZ0Rogp
+eKKRDlpryH11CqQyN/0YzWFfqtHmtK1Ox4VGsnOyk2kRiwnXi8GW74nH8XpepNV7
+5AyYX4E71LVeJusU/GED/9ZgXYNHA7YmVxYqA8evxNYpnuc3NILhqa836iJg61xS
+E7qMIx+++0gD4LzbucbHFwfoTkXyJHzuc62feU96KrhEHSQWvF4C2O6YQl4L+R84
+xzNFO97sKqeajDy70FRuCD2J5WMhkykYtcqOWw9ugtcjtIAPOfbosB5BgtNtYC6o
+do/KS6n6lTP7X2wejHWUBFQ/UcH3QGZvma483PnGjCJIc4GrDeFZ0ebQw6pZUd0M
+yn/lRVJD62jYcJcFHBZ+JLOWALkIzI1yJsR0GmwlTqHxZr/gu0lAz2MYvuW2FysN
+WNamC6Yw3WaZGJgR8Beu07Uwyd505nn+Qw1SuQmnmwNf2G+hjnsajZGL991OreWl
+jKeeWCUoL+tiQaFv7D2cgslBqkXuz5B63sscpy+GtsxEgLelLJm2nDtJatJCXaoV
+qkEMWBkhpDEGi75y2NsEzHkE+T1TADFv+I5+PjsaVen6stbTs8k=
+=geRZ
+-----END PGP SIGNATURE-----
+
+--nlkvm72nbewpz4m4--
