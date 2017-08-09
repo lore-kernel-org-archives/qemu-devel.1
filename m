@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfSO7-00014s-2j
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:55:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfSOb-0001Lb-SW
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfSO1-0000o0-1P
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:55:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42616)
+	(envelope-from <eblake@redhat.com>) id 1dfSOW-0001Bh-P3
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:55:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39784)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfSO0-0000mL-OF
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:55:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F96F31E433
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 14:55:00 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<20170804012551.2714-14-eblake@redhat.com>
-Date: Wed, 09 Aug 2017 16:54:58 +0200
-In-Reply-To: <20170804012551.2714-14-eblake@redhat.com> (Eric Blake's message
-	of "Thu, 3 Aug 2017 20:25:42 -0500")
-Message-ID: <87inhwokot.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfSOW-0001Ab-55
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:55:36 -0400
+References: <150228860899.28168.1415083032613087245.stgit@bahia>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d1343f6c-d524-0174-d1b7-fda2d83a3a44@redhat.com>
+Date: Wed, 9 Aug 2017 09:55:32 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 13/22] libqtest: Add qmp_raw()
+In-Reply-To: <150228860899.28168.1415083032613087245.stgit@bahia>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JmHjilLhNlox918jmI56eWA7KurjdpAvM"
+Subject: Re: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
+ fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,163 +28,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Eric Blake <eblake@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JmHjilLhNlox918jmI56eWA7KurjdpAvM
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d1343f6c-d524-0174-d1b7-fda2d83a3a44@redhat.com>
+Subject: Re: [for-2.10 PATCH v2] 9pfs: local: fix fchmodat_nofollow()
+ limitations
+References: <150228860899.28168.1415083032613087245.stgit@bahia>
+In-Reply-To: <150228860899.28168.1415083032613087245.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> The majority of calls into libqtest's qmp() and friends are passing
-> a JSON object that includes a command name; we can prove this by
-> adding an assertion.  The only outlier is qmp-test, which is testing
-> appropriate error responses to protocol violations and id support,
-> by sending raw strings, where those raw strings don't need
-> interpolation anyways.
->
-> Adding a new entry-point makes a clean separation of which input
-> needs interpolation, so that upcoming patches can refactor qmp()
-> to be more like the recent additions to test-qga in taking the
-> command name separately from the arguments for an overall
-> reduction in testsuite boilerplate.
->
-> This change also lets us move the workaround for the QMP parser
-> limitation of not ending a parse until } or newline: all calls
-> through qmp() are passing an object ending in }, so only the
-> few callers of qmp_raw() have to worry about a trailing newline.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 08/09/2017 09:23 AM, Greg Kurz wrote:
+> This function has to ensure it doesn't follow a symlink that could be u=
+sed
+> to escape the virtfs directory. This could be easily achieved if fchmod=
+at()
+> on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, bu=
+t
+> it doesn't.
+
+Might be worth including a URL of the LKML discussion on the last
+version of that patch attempt.
+
+>=20
+> The current implementation covers most use-cases, but it notably fails =
+if:
+> - the target path has access rights equal to 0000 (openat() returns EPE=
+RM),
+>   =3D> once you've done chmod(0000) on a file, you can never chmod() ag=
+ain
+> - the target path is UNIX domain socket (openat() returns ENXIO)
+>   =3D> bind() of UNIX domain sockets fails if the file is on 9pfs
+>=20
+> The solution is to use O_PATH: openat() now succeeds in both cases, and=
+ we
+> can ensure the path isn't a symlink with fstat(). The associated entry =
+in
+> "/proc/self/fd" can hence be safely passed to the regular chmod() sysca=
+ll.
+
+Hey - should we point this out as a viable solution to the glibc folks,
+since their current user-space emulation of AT_SYMLINK_NOFOLLOW is broken=
+?
+
+>=20
+> The previous behavior is kept for older systems that don't have O_PATH.=
+
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  tests/libqtest.h |  8 ++++++++
->  tests/libqtest.c | 13 +++++++------
->  tests/qmp-test.c | 19 ++++++++++++-------
->  3 files changed, 27 insertions(+), 13 deletions(-)
->
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 33af3ae8ff..917ec5cf92 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -550,6 +550,14 @@ static inline void qtest_end(void)
->  QDict *qmp(const char *fmt, ...);
->
->  /**
-> + * qmp_raw:
-> + * @msg: Raw QMP message to send to qemu.
-> + *
-> + * Sends a QMP message to QEMU and returns the response.
-> + */
-> +QDict *qmp_raw(const char *msg);
+> v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a repla=
+cement
+>       for O_PATH to avoid build breaks on O_PATH-less systems
+>     - keep current behavior for O_PATH-less systems
+>     - added comments
+>     - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_fil=
+e()
+> ---
+>  hw/9pfs/9p-local.c |   41 +++++++++++++++++++++++++++++++++--------
+>  hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
+>  2 files changed, 48 insertions(+), 17 deletions(-)
+>=20
+> +     /* First, we clear non-racing symlinks out of the way. */
+> +    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
+> +        return -1;
+> +    }
+> +    if (S_ISLNK(stbuf.st_mode)) {
+> +        errno =3D ELOOP;
+
+I don't know if ELOOP is the best errno value to use here, but I don't
+have any better suggestions so I'm okay with it.
+
+> +        return -1;
+> +    }
 > +
-> +/**
->   * qmp_async:
->   * @fmt...: QMP message to send to qemu; formats arguments through
->   * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 0fa32928c8..3071be2efb 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -451,7 +451,7 @@ static void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
->      QString *qstr;
->      const char *str;
->
-> -    assert(*fmt);
-> +    assert(strstr(fmt, "execute"));
+> +    /* Access modes are ignored when O_PATH is supported. We try O_RDO=
+NLY and
+> +     * O_WRONLY for old-systems that don't support O_PATH.
+>       */
+> -    fd =3D openat_file(dirfd, name, O_RDONLY, 0);
+> +    fd =3D openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
+>      if (fd =3D=3D -1) {
+>          /* In case the file is writable-only and isn't a directory. */=
 
-I doubt this assertion is worthwhile.
-
-One , qmp_fd_sendv() works just fine whether you include an 'execute' or
-not.  Two, there are zillions of other ways to send nonsense with
-qmp_fd_sendv().  If you do, your test doesn't work, so you fix it.
-
-Rejecting nonsensical QMP input is QEMU's job, not libqtest's.
-
->
->      /*
->       * A round trip through QObject is only needed if % interpolation
-> @@ -496,11 +496,6 @@ void qmp_fd_send(int fd, const char *msg)
+>          if (errno =3D=3D EACCES) {
+> @@ -356,7 +366,22 @@ static int fchmodat_nofollow(int dirfd, const char=
+ *name, mode_t mode)
+>      if (fd =3D=3D -1) {
+>          return -1;
 >      }
->      /* Send QMP request */
->      socket_send(fd, msg, strlen(msg));
-> -    /*
-> -     * BUG: QMP doesn't react to input until it sees a newline, an
-> -     * object, or an array.  Work-around: give it a newline.
-> -     */
-> -    socket_send(fd, "\n", 1);
->  }
->
->  QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
-> @@ -899,6 +894,12 @@ QDict *qmp(const char *fmt, ...)
->      return response;
->  }
->
-> +QDict *qmp_raw(const char *msg)
-> +{
-> +    qmp_fd_send(global_qtest->qmp_fd, msg);
-> +    return qtest_qmp_receive(global_qtest);
-> +}
+> -    ret =3D fchmod(fd, mode);
 > +
->  void qmp_async(const char *fmt, ...)
->  {
->      va_list ap;
-> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-> index 5d0260b2be..905fb4b3e5 100644
-> --- a/tests/qmp-test.c
-> +++ b/tests/qmp-test.c
-> @@ -44,28 +44,33 @@ static void test_malformed(void)
->  {
->      QDict *resp;
->
-> +    /*
-> +     * BUG: QMP doesn't react to input until it sees a newline, an
-> +     * object, or an array.  Work-around: give it a newline.
-> +     */
+> +    /* Now we handle racing symlinks. */
+> +    ret =3D fstat(fd, &stbuf);
+> +    if (ret) {
+> +        goto out;
+> +    }
+> +    if (S_ISLNK(stbuf.st_mode)) {
+> +        errno =3D ELOOP;
+> +        ret =3D -1;
+> +        goto out;
+> +    }
 > +
->      /* Not even a dictionary */
-> -    resp = qmp("null");
-> +    resp = qmp_raw("null\n");
->      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->      QDECREF(resp);
->
->      /* No "execute" key */
-> -    resp = qmp("{}");
-> +    resp = qmp_raw("{}");
->      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->      QDECREF(resp);
->
->      /* "execute" isn't a string */
-> -    resp = qmp("{ 'execute': true }");
-> +    resp = qmp_raw("{ 'execute': true }");
->      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->      QDECREF(resp);
->
->      /* "arguments" isn't a dictionary */
-> -    resp = qmp("{ 'execute': 'no-such-cmd', 'arguments': [] }");
-> +    resp = qmp_raw("{ 'execute': 'no-such-cmd', 'arguments': [] }");
->      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->      QDECREF(resp);
->
->      /* extra key */
-> -    resp = qmp("{ 'execute': 'no-such-cmd', 'extra': true }");
-> +    resp = qmp_raw("{ 'execute': 'no-such-cmd', 'extra': true }");
->      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->      QDECREF(resp);
->  }
-> @@ -114,14 +119,14 @@ static void test_qmp_protocol(void)
->      test_malformed();
->
->      /* Test 'id' */
-> -    resp = qmp("{ 'execute': 'query-name', 'id': 'cookie#1' }");
-> +    resp = qmp_raw("{ 'execute': 'query-name', 'id': 'cookie#1' }");
->      ret = qdict_get_qdict(resp, "return");
->      g_assert(ret);
->      g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, "cookie#1");
->      QDECREF(resp);
->
->      /* Test command failure with 'id' */
-> -    resp = qmp("{ 'execute': 'human-monitor-command', 'id': 2 }");
-> +    resp = qmp_raw("{ 'execute': 'human-monitor-command', 'id': 2 }");
->      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->      g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
->      QDECREF(resp);
+> +    proc_path =3D g_strdup_printf("/proc/self/fd/%d", fd);
+> +    ret =3D chmod(proc_path, mode);
 
-I'm afraid I don't like this patch.  All the extra function buys us is
-an assertion that isn't even tight, and the lifting of a newline out of
-a place where it shouldn't be.
+Nope, unsafe when O_PATH_9P_UTIL is 0.  This needs to be more like:
+
+/* Now we handle racing symlinks.  On kernels without O_PATH, we will
+ * fail on some corner cases, but that's better than dereferencing a
+ * symlink that was injected during the TOCTTOU between our initial
+ * fstatat() and openat_file().
+ */
+if (O_PATH_9P_UTIL) {
+    fstat, S_ISLINK, proc_path, chmod()
+} else {
+    fchmod()
+}
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--JmHjilLhNlox918jmI56eWA7KurjdpAvM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLImQACgkQp6FrSiUn
+Q2qr2Af/W+kE7Ysk6KmczhxLyUJC9KlU6dHc+BQcoQ92bqJmCP6J4eOkU3KEl2xe
+bNQNymv3EkG0Pld6ti22N/g7Cs9S7arvNoxdO30uFGClndGyOM9Q/qxwDMUkkzNj
+FoJqz3FjI8Cj89oWKRgZenlXek7IWp+Y/r1NOEFBPKuQWgSKYelrcIFK7OZARFkl
+z2ptsGxGJcm5FG8T7uftyewbMscfN7wHWP6oWZvN7yGnChGsNcDyBK37ZJrn4HUP
+/OLT3Ep3W3PaF3gOCVEGVsxTXYyRj2JJTj/b9JagvIhtytBfuq4DCMMy1SeYTKhS
+Qu/ZATz+0BpZ3rrPfy3NjY8EBXL/kA==
+=Zx2f
+-----END PGP SIGNATURE-----
+
+--JmHjilLhNlox918jmI56eWA7KurjdpAvM--
