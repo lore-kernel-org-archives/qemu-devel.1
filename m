@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfRtd-0007I5-Ml
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:23:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dfS0s-0000e7-Mc
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfRtZ-0002d6-G9
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:23:41 -0400
-Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:47249)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfRtZ-0002as-6s
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:23:37 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id CE8BC8A5E1
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 16:23:35 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 09 Aug 2017 16:23:29 +0200
-Message-ID: <150228860899.28168.1415083032613087245.stgit@bahia>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dfS0p-0002Xu-DL
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:31:10 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-47-f4bug@amsat.org>
+	<20170728062426.GQ5117@lemon.lan>
+	<c3c6b7df-6629-982a-3135-a739979c36e7@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <68e8b9be-17e0-479f-3ec1-84fad488dbc0@amsat.org>
+Date: Wed, 9 Aug 2017 11:31:01 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
- fchmodat_nofollow() limitations
+In-Reply-To: <c3c6b7df-6629-982a-3135-a739979c36e7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 46/47] MAINTAINERS: add missing entries
+ for Coccinelle scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-This function has to ensure it doesn't follow a symlink that could be used
-to escape the virtfs directory. This could be easily achieved if fchmodat()
-on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-it doesn't.
+Hi Paolo,
 
-The current implementation covers most use-cases, but it notably fails if:
-- the target path has access rights equal to 0000 (openat() returns EPERM),
-  => once you've done chmod(0000) on a file, you can never chmod() again
-- the target path is UNIX domain socket (openat() returns ENXIO)
-  => bind() of UNIX domain sockets fails if the file is on 9pfs
+On 07/28/2017 08:50 AM, Paolo Bonzini wrote:
+> On 28/07/2017 08:24, Fam Zheng wrote:
+>> On Fri, 07/28 02:36, Philippe Mathieu-Daudé wrote:
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 224890643d..7854792765 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -1537,6 +1537,12 @@ Checkpatch
+>>>   S: Odd Fixes
+>>>   F: scripts/checkpatch.pl
+>>>   
+>>> +Coccinelle scripts
+>>> +R: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> +S: Orphan
+>>
+>> "Orphan" sounds like we don't care much anymore but I suppose this is not the
+>> case. But I don't have any better idea either.
+> 
+> Just don't add it to the file.  It doesn't have a specific owner
+I thought an entry with F: but no M: was incorrect but apparently 
+get_maintainer.pl works and report it as "unknown" status, as for the 
+"Coroutines" section:
 
-The solution is to use O_PATH: openat() now succeeds in both cases, and we
-can ensure the path isn't a symlink with fstat(). The associated entry in
-"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
+$ ./scripts/get_maintainer.pl -f util/coroutine-ucontext.c
+Stefan Hajnoczi <stefanha@redhat.com> (unknown:Coroutines)
+Kevin Wolf <kwolf@redhat.com> (unknown:Coroutines)
+qemu-devel@nongnu.org (open list:All patches CC here)
 
-The previous behavior is kept for older systems that don't have O_PATH.
+So to enjoy the R-tag I'll remove the S-tag in v2 and see if Eric is ok 
+with it :)
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
-      for O_PATH to avoid build breaks on O_PATH-less systems
-    - keep current behavior for O_PATH-less systems
-    - added comments
-    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
----
- hw/9pfs/9p-local.c |   41 +++++++++++++++++++++++++++++++++--------
- hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
- 2 files changed, 48 insertions(+), 17 deletions(-)
+Regards,
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 6e478f4765ef..da7cbadbb848 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -333,17 +333,27 @@ update_map_file:
- 
- static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
- {
-+    struct stat stbuf;
-     int fd, ret;
-+    char *proc_path;
- 
-     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
--     * Unfortunately, the linux kernel doesn't implement it yet. As an
--     * alternative, let's open the file and use fchmod() instead. This
--     * may fail depending on the permissions of the file, but it is the
--     * best we can do to avoid TOCTTOU. We first try to open read-only
--     * in case name points to a directory. If that fails, we try write-only
--     * in case name doesn't point to a directory.
-+     * Unfortunately, the linux kernel doesn't implement it yet.
-+     */
-+
-+     /* First, we clear non-racing symlinks out of the way. */
-+    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-+        return -1;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        return -1;
-+    }
-+
-+    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
-+     * O_WRONLY for old-systems that don't support O_PATH.
-      */
--    fd = openat_file(dirfd, name, O_RDONLY, 0);
-+    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
-     if (fd == -1) {
-         /* In case the file is writable-only and isn't a directory. */
-         if (errno == EACCES) {
-@@ -356,7 +366,22 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
-     if (fd == -1) {
-         return -1;
-     }
--    ret = fchmod(fd, mode);
-+
-+    /* Now we handle racing symlinks. */
-+    ret = fstat(fd, &stbuf);
-+    if (ret) {
-+        goto out;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
-+    ret = chmod(proc_path, mode);
-+    g_free(proc_path);
-+out:
-     close_preserve_errno(fd);
-     return ret;
- }
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 91299a24b8af..dc0d2e29aa3b 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -13,6 +13,12 @@
- #ifndef QEMU_9P_UTIL_H
- #define QEMU_9P_UTIL_H
- 
-+#ifdef O_PATH
-+#define O_PATH_9P_UTIL O_PATH
-+#else
-+#define O_PATH_9P_UTIL 0
-+#endif
-+
- static inline void close_preserve_errno(int fd)
- {
-     int serrno = errno;
-@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
- 
- static inline int openat_dir(int dirfd, const char *name)
- {
--#ifdef O_PATH
--#define OPENAT_DIR_O_PATH O_PATH
--#else
--#define OPENAT_DIR_O_PATH 0
--#endif
-     return openat(dirfd, name,
--                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
-+                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
- }
- 
- static inline int openat_file(int dirfd, const char *name, int flags,
-@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
-     }
- 
-     serrno = errno;
--    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
--    ret = fcntl(fd, F_SETFL, flags);
--    assert(!ret);
-+    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
-+     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
-+     * ignored it anyway.
-+     */
-+    if (!(flags & O_PATH_9P_UTIL)) {
-+        ret = fcntl(fd, F_SETFL, flags);
-+        assert(!ret);
-+    }
-     errno = serrno;
-     return fd;
- }
+Phil.
+
+> 
+> Paolo
+> 
+>>
+>> Fam
+>>
+>>> +F: scripts/cocci-macro-file.h
+>>> +F: scripts/coccinelle/
+>>> +
+>>>   Migration
+>>>   M: Juan Quintela <quintela@redhat.com>
+>>>   M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> @@ -1970,4 +1976,3 @@ Build system architecture
+>>>   M: Daniel P. Berrange <berrange@redhat.com>
+>>>   S: Odd Fixes
+>>>   F: docs/devel/build-system.txt
+> 
