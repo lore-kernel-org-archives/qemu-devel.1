@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dfO4R-0001dV-K5
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:18:37 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dfOCE-00049q-SO
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:26:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dfO4O-0002iw-SI
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:18:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dfO4O-0002iW-IF
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:18:32 -0400
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-6-git-send-email-zuban32s@gmail.com>
-	<87e569e6-e1ec-4238-e073-38c0e136af0d@redhat.com>
-	<CAKSfGUD3cy7hMxT6PQULk21PO16e=s3A5jq_fZfR_J6rk325eg@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <888c4489-5603-0361-2a42-a4fbc3c70779@redhat.com>
-Date: Wed, 9 Aug 2017 12:18:22 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dfOCC-0007B4-5f
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:26:38 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dfOCB-0007AP-Ul
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:26:36 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id m85so28070984wma.0
+	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 03:26:35 -0700 (PDT)
+Date: Wed, 9 Aug 2017 11:26:27 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170809102627.GH18003@stefanha-x1.localdomain>
+References: <20170726144226.6913-1-ldoktor@redhat.com>
+	<20170726144226.6913-2-ldoktor@redhat.com>
+	<20170808123829.GM16801@stefanha-x1.localdomain>
+	<110c04e3-e676-c705-a6f9-de040208538e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUD3cy7hMxT6PQULk21PO16e=s3A5jq_fZfR_J6rk325eg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Enx9fNJ0XV5HaWRu"
+Content-Disposition: inline
+In-Reply-To: <110c04e3-e676-c705-a6f9-de040208538e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 01/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,153 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-On 08/08/17 21:21, Aleksandr Bezzubikov wrote:
-> 2017-08-08 18:11 GMT+03:00 Laszlo Ersek <lersek@redhat.com>:
->> one comment below
->>
->> On 08/05/17 22:27, Aleksandr Bezzubikov wrote:
->>
->>> +Capability layout (defined in include/hw/pci/pci_bridge.h):
->>> +
->>> +    uint8_t id;     Standard PCI capability header field
->>> +    uint8_t next;   Standard PCI capability header field
->>> +    uint8_t len;    Standard PCI vendor-specific capability header field
->>> +
->>> +    uint8_t type;   Red Hat vendor-specific capability type
->>> +                    List of currently existing types:
->>> +                        QEMU_RESERVE = 1
->>> +
->>> +
->>> +    uint32_t bus_res;   Minimum number of buses to reserve
->>> +
->>> +    uint64_t io;        IO space to reserve
->>> +    uint64_t mem        Non-prefetchable memory to reserve
->>> +    uint64_t mem_pref;  Prefetchable memory to reserve
->>
->> (I apologize if I missed any concrete points from the past messages
->> regarding this structure.)
->>
->> How is the firmware supposed to know whether the prefetchable MMIO
->> reservation should be made in 32-bit or 64-bit address space? If we
->> reserve prefetchable MMIO outside of the 32-bit address space, then
->> hot-plugging a device without 64-bit MMIO support could fail.
->>
->> My earlier request, to distinguish "prefetchable_32" from
->> "prefetchable_64" (mutually exclusively), was so that firmware would
->> know whether to restrict the MMIO reservation to 32-bit address
->> space.
->
-> IIUC now (in SeaBIOS at least) we just assign this PREF registers
-> unconditionally,
-> so the decision about the mode can be made basing on !=0
-> UPPER_PREF_LIMIT register.
-> My idea was the same - we can just check if the value doesn't fit into
-> 16-bit (PREF_LIMIT reg size, 32-bit MMIO). Do we really need separate
-> fields for that?
 
-The PciBusDxe driver in edk2 tracks 32-bit and 64-bit MMIO resources
-separately from each other, and other (independent) logic exists in it
-that, on some conditions, allocates 64-bit MMIO BARs from 32-bit address
-space. This is just to say that the distinction is intentional in
-PciBusDxe.
+--Enx9fNJ0XV5HaWRu
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Furthermore, the Platform Init spec v1.6 says the following (this is
-what OVMF will have to comply with, in the "platform hook" called by
-PciBusDxe):
+On Tue, Aug 08, 2017 at 02:56:47PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> Dne 8.8.2017 v 14:38 Stefan Hajnoczi napsal(a):
+> > On Wed, Jul 26, 2017 at 04:42:17PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> >>      def command(self, cmd, conv_keys=3DTrue, **args):
+> >> +        '''
+> >> +        Invoke a QMP command and on success report result dict or on =
+failure
+> >=20
+> > s/report/return/ ?
+> >=20
+> Don't see much difference, but I'll use the "return" in the next version.
 
-> 12.6 PCI Hot Plug PCI Initialization Protocol
-> EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetResourcePadding()
-> ...
-> Padding  The amount of resource padding that is required by the PCI
->          bus under the control of the specified HPC. Because the
->          caller does not know the size of this buffer, this buffer is
->          allocated by the callee and freed by the caller.
-> ...
-> The padding is returned in the form of ACPI (2.0 & 3.0) resource
-> descriptors. The exact definition of each of the fields is the same as
-> in the
-> EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.SubmitResources()
-> function. See the section 10.8 for the definition of this function.
+"report" could mean the function logs or prints a message.  I have not
+heard it used to mean "return".
 
-Following that pointer:
+Stefan
 
-> 10.8 PCI HostBridge Code Definitions
-> 10.8.2 PCI Host Bridge Resource Allocation Protocol
->
-> Table 8. ACPI 2.0 & 3.0 QWORD Address Space Descriptor Usage
->
-> Byte    Byte    Data  Description
-> Offset  Length
-> ...
-> 0x03    0x01          Resource type:
->                         0: Memory range
->                         1: I/O range
->                         2: Bus number range
-> ...
-> 0x05    0x01          Type-specific flags. Ignored except as defined
->                       in Table 3-3 and Table 3-4 below.
->
-> 0x06    0x08          Address Space Granularity. Used to differentiate
->                       between a 32-bit memory request and a 64-bit
->                       memory request. For a 32-bit memory request,
->                       this field should be set to 32. For a 64-bit
->                       memory request, this field should be set to 64.
->                       Ignored for I/O and bus resource requests.
->                       Ignored during GetProposedResources().
+--Enx9fNJ0XV5HaWRu
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The "Table 3-3" and "Table 3-4" references under "Type-specific flags"
-are out of date (spec bug); in reality those are:
-- Table 10. I/O Resource Flag (Resource Type = 1) Usage,
-- Table 11. Memory Resource Flag (Resource Type = 0) Usage.
+-----BEGIN PGP SIGNATURE-----
 
-The latter is relevant here:
+iQEcBAEBAgAGBQJZiuNTAAoJEJykq7OBq3PIhUwH/0BBB+CtTbtBay0/Q6vFxJxv
+aRf7w3S76wBlVrSYVzRl6BVmYepUbt1YTyBHGJfOo3k2guN6D24D23Htj3BQjZHM
+nJpF8CyE2MLjXVUo1WJS0QlSztgbiJ5DKNkMa2C5rXWzIBzSAD8nnAYmDJ/TpiK+
+MTSfP/Y3sQsaEkJ3c3FMcHWRJbc0wNWGlpzgsotmghpR402FnSTsr2ELG5SzlaoT
+oX3BL6sgGl+iFikchJKQjZ8y/s6tk5O8DKMna6N88jId7Wxk5NDufIrGxf5uyxka
+rQfXg2zYHYI09aiN/592maq4raetHnJGbyFLlZXOs9pS5tZCJZRa+iybOTmo/Sg=
+=o/pT
+-----END PGP SIGNATURE-----
 
-> Table 11. Memory Resource Flag (Resource Type = 0) Usage
->
-> Bits      Meaning
-> ...
-> Bit[2:1]  _MEM. Memory attributes.
->           Value and Meaning:
->             0 The memory is nonprefetchable.
->             1 Invalid.
->             2 Invalid.
->             3 The memory is prefetchable.
->           Note: The interpretation of these bits is somewhat different
->           from the ACPI Specification. According to the ACPI
->           Specification, a value of 0 implies noncacheable memory and
->           the value of 3 indicates prefetchable and cacheable memory.
-
-So whatever OVMF sees in the capability, it must be able to translate to
-the above representation.
-
-Thanks
-Laszlo
-
->
->>
->> This is based on an earlier email from Alex to me:
->>
->> On 10/03/16 18:01, Alex Williamson wrote:
->>> I don't think there's such a thing as a 64-bit non-prefetchable
->>> aperture.  In fact, there are not separate 32 and 64 bit
->>> prefetchable apertures.  The apertures are:
->>>
->>> I/O base/limit - (default 16bit, may be 32bit)
->>> Memory base/limit - (32bit only, non-prefetchable)
->>> Prefetchable Memory base/limit - (default 32bit, may be 64bit)
->>>
->>> This is according to Table 3-2 in the PCI-to-PCI bridge spec rev
->>> 1.2.
->>
->> I don't care much about the 16-bit vs. 32-bit IO difference (that's
->> entirely academic and the Platform Spec init doesn't even provide a
->> way for OVMF to express such a difference). However, the optional
->> restriction to 32-bit matters for the prefetchable MMIO aperture.
->>
->> Other than this, the patch looks good to me, and I'm ready to R-b.
->>
->> Thanks!
->> Laszlo
+--Enx9fNJ0XV5HaWRu--
