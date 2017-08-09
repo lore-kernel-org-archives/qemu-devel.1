@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfZJe-00060f-KS
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:19:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfZM5-00076Z-QH
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfZJd-00035h-Ah
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:19:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfZM4-0004YV-Hg
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 18:21:33 -0400
 References: <20170809215510.22802-1-pbonzini@redhat.com>
-	<20170809215510.22802-2-pbonzini@redhat.com>
+	<20170809215510.22802-3-pbonzini@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
-Date: Wed, 9 Aug 2017 17:18:54 -0500
+Message-ID: <a52e488a-184b-731b-cac0-3a5be2320e22@redhat.com>
+Date: Wed, 9 Aug 2017 17:21:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170809215510.22802-2-pbonzini@redhat.com>
+In-Reply-To: <20170809215510.22802-3-pbonzini@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us"
-Subject: Re: [Qemu-devel] [PATCH 01/12] qemu-iotests: remove dead code
+	boundary="p5EA44U8fRQ7Sme3NK32ADWi9LIk6bHGO"
+Subject: Re: [Qemu-devel] [PATCH 02/12] qemu-iotests: get rid of AWK_PROG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +28,26 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us
+--p5EA44U8fRQ7Sme3NK32ADWi9LIk6bHGO
 From: Eric Blake <eblake@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/12] qemu-iotests: remove dead code
+Message-ID: <a52e488a-184b-731b-cac0-3a5be2320e22@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/12] qemu-iotests: get rid of AWK_PROG
 References: <20170809215510.22802-1-pbonzini@redhat.com>
- <20170809215510.22802-2-pbonzini@redhat.com>
-In-Reply-To: <20170809215510.22802-2-pbonzini@redhat.com>
+ <20170809215510.22802-3-pbonzini@redhat.com>
+In-Reply-To: <20170809215510.22802-3-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/09/2017 04:54 PM, Paolo Bonzini wrote:
-> This includes shell function, shell variables, command line options
-> (randomize.awk does not exist) and conditions that can never be true
-> (./qemu does not exist anymore).
-
-Can we point to a commit id where we stopped making ./qemu?  Is it still
-worth supporting a local symlink?
-
->=20
+On 08/09/2017 04:55 PM, Paolo Bonzini wrote:
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  tests/qemu-iotests/check         | 36 +--------------------
->  tests/qemu-iotests/common        | 23 --------------
->  tests/qemu-iotests/common.config | 26 ---------------
->  tests/qemu-iotests/common.rc     | 68 --------------------------------=
---------
->  4 files changed, 1 insertion(+), 152 deletions(-)
+>  tests/qemu-iotests/check         | 4 ++--
+>  tests/qemu-iotests/common        | 2 +-
+>  tests/qemu-iotests/common.config | 3 ---
+>  3 files changed, 3 insertions(+), 6 deletions(-)
 >=20
-> -#
-> -# - These can be added to $HOST_CONFIG_DIR (witch default to ./config)=
-
-
-Good riddance to the wrong word ('which' was intended)
-
-Other than possibly still wanting ./qemu convenience, this looks like a
-reasonable cleanup.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -75,7 +57,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us
+--p5EA44U8fRQ7Sme3NK32ADWi9LIk6bHGO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -84,14 +66,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLik4ACgkQp6FrSiUn
-Q2qQIQf+OnxtJM65NgyAW6CnJsbWT4jJErp4cdJyTdnwdjrBmLr/rmgcp+MNbik5
-13fNFmS2LpJob7+wQb1zXHOwX4fD6TNmjJWIlHTK34a/8N79fNkcqPxc5dnwNscU
-VSgTPfzxiIkd5tofh6tVi2uIfg8cO7kc1CU69YIDeU+7E0R/fL4FhBFyZZNFtlj6
-ajDYJ7W7oIPqahKkc6GBiQ6OxHmhqSfm22CD6bKTS9200QYL1f9QwQCji7XW4uxD
-z9Hp11htAv66Um3fFiNckmUMyoOvgFcAF+VVWiqO8yQDkkZAdGRwIGsSbUg5VFNL
-/Rx94Hq0gF2/3PH1gQhMG25qjRyw0g==
-=hEZi
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLiuEACgkQp6FrSiUn
+Q2qMhwgAl+aWKhwwUjFArHNP7V+cajUoN4F71l0QjFciZBiYbne+8l2OPNFmWDGj
+HdKDQGqjjpHaxYN0vSZF+DE2WIujPOkH2utOmkhx9gy6G/mscBXOJno2L3TXYfl+
+RDZh/9J/uSR64m3DDCIyxMYbdpFLhNACaV74s6yLV/qjgJnG5GERgFj86TSev1ZS
+LPZCI5vuirs8lbrO9zjn6qIzWwL3KDYy54RsS3PZgcIi4vpbgEXKum8lwcblCsKV
+3MGuq0ROs94LkxN52eGfDYTVcUnW5p1SoCcdbzeGBmeLsMnnr2cxJ/I4w1tpCJ9i
+PV/0HgEr9XdvESy1MlgfbAWc6M8mYw==
+=eYhG
 -----END PGP SIGNATURE-----
 
---8Nh1FmRPxoeUxaIKUCkCW5kllMiXiW0us--
+--p5EA44U8fRQ7Sme3NK32ADWi9LIk6bHGO--
