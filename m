@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfLUA-0000Kj-9h
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:32:59 -0400
+	(envelope-from <groug@kaod.org>) id 1dfLXI-0001O9-L2
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfLU6-0001g0-B8
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:32:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41734)
+	(envelope-from <groug@kaod.org>) id 1dfLXE-00040M-II
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:36:12 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:58380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfLU6-0001dx-5L
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:32:54 -0400
-References: <743158bc-15e4-46fe-38cb-161397b5b240@linaro.org>
-	<3685aed3-735f-ae62-73a9-8f4a5c7cd459@redhat.com>
-	<9be585e2-4641-329e-f442-69ae05faadba@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea6acc7c-09a6-70ed-9ff0-865bd45a47f3@redhat.com>
-Date: Wed, 9 Aug 2017 09:26:11 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfLXE-0003yc-7d
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:36:08 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id F13DB86342
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 09:36:05 +0200 (CEST)
+Date: Wed, 9 Aug 2017 09:35:59 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170809093559.46396525@bahia.lan>
+In-Reply-To: <d9f906a7-eef1-e89c-36db-8e142a1272da@redhat.com>
+References: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
+	<d9f906a7-eef1-e89c-36db-8e142a1272da@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9be585e2-4641-329e-f442-69ae05faadba@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Qemu and 32 PCIe devices
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/7D.d.jHO=WD6xx3ZSWB8AKb";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix
+ fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +32,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Drew Jones <drjones@redhat.com>, Christoffer Dall <cdall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gema Gomez-Solano <gema.gomez-solano@linaro.org>, Marc Zygnier <marc.zyngier@arm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, zhiyong.wu@ucloud.cn
 
-On 09/08/2017 03:06, Laszlo Ersek wrote:
->>   20.14%  qemu-system-x86_64                  [.] render_memory_region
->>   17.14%  qemu-system-x86_64                  [.] subpage_register
->>   10.31%  qemu-system-x86_64                  [.] int128_add
->>    7.86%  qemu-system-x86_64                  [.] addrrange_end
->>    7.30%  qemu-system-x86_64                  [.] int128_ge
->>    4.89%  qemu-system-x86_64                  [.] int128_nz
->>    3.94%  qemu-system-x86_64                  [.] phys_page_compact
->>    2.73%  qemu-system-x86_64                  [.] phys_map_node_alloc
+--Sig_/7D.d.jHO=WD6xx3ZSWB8AKb
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Yes, this is the O(n^3) thing.  An optimized build should be faster
-because int128 operations will be inlined and become much more efficient.
+On Tue, 8 Aug 2017 14:14:18 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-> With this patch, I only tested the "93 devices" case, as the slowdown
-> became visible to the naked eye from the trace messages, as the firmwar=
-e
-> enabled more and more BARs / command registers (and inversely, the
-> speedup was perceivable when the firmware disabled more and more BARs /
-> command registers).
+> On 08/08/2017 12:28 PM, Greg Kurz wrote:
+> > This function has to ensure it doesn't follow a symlink that could be u=
+sed
+> > to escape the virtfs directory. This could be easily achieved if fchmod=
+at()
+> > on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
+> > it doesn't.
+> >=20
+> > The current implementation covers most use-cases, but it notably fails =
+if:
+> > - the target path has access rights equal to 0000 (openat() returns EPE=
+RM), =20
+> >   =3D> once you've done chmod(0000) on a file, you can never chmod() ag=
+ain =20
+> > - the target path is UNIX domain socket (openat() returns ENXIO) =20
+> >   =3D> bind() of UNIX domain sockets fails if the file is on 9pfs =20
+>=20
+> Did your attempt at a kernel patch for AT_SYMLINK_NOFOLLOW ever get
+> anywhere?
+>=20
 
-This is an interesting observation, and it's expected.  Looking at the
-O(n^3) complexity more in detail you have N operations, where the "i"th
-operates on "i" DMA address spaces, all of which have at least "i"
-memory regions (at least 1 BAR per device).
+No.
 
-So the total cost is sum i=3D1..N i^2 =3D N(N+1)(2N+1)/6 =3D O(n^3).
-Expressing it as a sum shows why it gets slower as time progresses.
+> >=20
+> > The solution is to use O_PATH: openat() now succeeds in both cases, and=
+ we
+> > can ensure the path isn't a symlink with fstat(). The associated entry =
+in
+> > "/proc/self/fd" can hence be safely passed to the regular chmod() sysca=
+ll.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p-local.c |   44 ++++++++++++++++++++++++++++----------------
+> >  hw/9pfs/9p-util.h  |   10 +++++++---
+> >  2 files changed, 35 insertions(+), 19 deletions(-)
+> >=20
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index 6e478f4765ef..b178d627c764 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -333,30 +333,42 @@ update_map_file:
+> > =20
+> >  static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+> >  {
+> > +    struct stat stbuf;
+> >      int fd, ret;
+> > +    char *proc_path;
+> > =20
+> >      /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW=
+).
+> > -     * Unfortunately, the linux kernel doesn't implement it yet. As an
+> > -     * alternative, let's open the file and use fchmod() instead. This
+> > -     * may fail depending on the permissions of the file, but it is the
+> > -     * best we can do to avoid TOCTTOU. We first try to open read-only
+> > -     * in case name points to a directory. If that fails, we try write=
+-only
+> > -     * in case name doesn't point to a directory.
+> > +     * Unfortunately, the linux kernel doesn't implement it yet.
+> >       */
+> > -    fd =3D openat_file(dirfd, name, O_RDONLY, 0);
+> > -    if (fd =3D=3D -1) {
+> > -        /* In case the file is writable-only and isn't a directory. */
+> > -        if (errno =3D=3D EACCES) {
+> > -            fd =3D openat_file(dirfd, name, O_WRONLY, 0);
+> > -        }
+> > -        if (fd =3D=3D -1 && errno =3D=3D EISDIR) {
+> > -            errno =3D EACCES;
+> > -        }
+> > +    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
+> > +        return -1;
+> >      } =20
+>=20
+> Checking the file...
+>=20
+> > +
+> > +    if (S_ISLNK(stbuf.st_mode)) {
+> > +        errno =3D ELOOP;
+> > +        return -1;
+> > +    }
+> > +
+> > +    fd =3D openat_file(dirfd, name, O_RDONLY | O_PATH, 0); =20
+>=20
+> ...and then opening the file is a TOCTTOU race (although it works most
+> of the time and avoids the open where it is easy)...
+>=20
 
-The solution is to note that those "i" address spaces are actually all
-the same, so we can get it down to sum i=3D1..N i =3D N(N+1)/2 =3D O(n^2)=
-.
+Exactly. It is globally assumed in the 9p code that symbolic links are
+resolved by the client. The earlier we detect the file is a symbolic
+link, the earlier we can error out. The fstat()+S_ISLNK() is a deliberate
+fast error path actually :)
 
-Thanks,
+> >      if (fd =3D=3D -1) {
+> >          return -1;
+> >      }
+> > -    ret =3D fchmod(fd, mode);
+> > +
+> > +    ret =3D fstat(fd, &stbuf);
+> > +    if (ret) {
+> > +        goto out;
+> > +    } =20
+>=20
+> ...so you are double-checking that you got a non-symlink after all (your
+> insurance against the race having done the wrong thing [but see below])...
+>=20
 
-Paolo
+Yes, this is the *real* check.
+
+> > +
+> > +    if (S_ISLNK(stbuf.st_mode)) {
+> > +        errno =3D ELOOP;
+> > +        ret =3D -1;
+> > +        goto out;
+> > +    }
+> > +
+> > +    proc_path =3D g_strdup_printf("/proc/self/fd/%d", fd);
+> > +    ret =3D chmod(proc_path, mode); =20
+>=20
+> ...at which point you now have a valid file name that represents the
+> file you wanted to chmod() in the first place (even if another rename
+> occurs in the meantime, you are changing the mode tied to the
+> non-symlink fd that you double-checked, which ends up behaving as if you
+> had won the race and made the chmod() call before the rename).
+>=20
+
+Yes.
+
+> > +    g_free(proc_path);
+> > +out:
+> >      close_preserve_errno(fd);
+> >      return ret; =20
+>=20
+> Might be worth littering some comments in the code explaining why you
+> have to call both fstatat() and stat(), or perhaps you could drop the
+> first fstatat() and just always do the open().
+>=20
+
+I like the idea of erroring out right away when a symbolic link is
+detected. I'll add comments.
+
+> Reading 'man open', it looks like O_PATH will chase symlinks UNLESS you
+> also use O_NOFOLLOW.  So I had to code up a simple test program to
+> verify if things work...
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> #define _GNU_SOURCE 1
+> #include <sys/stat.h>
+> #include <stdio.h>
+> #include <errno.h>
+> #include <unistd.h>
+> #include <fcntl.h>
+>=20
+> int main(void) {
+>     struct stat st;
+>     int fd;
+>=20
+>     remove("f");
+>     remove("l");
+>     if (creat("f", 0) < 0)
+>         return 1;
+>     if (symlink("f", "l") < 0)
+>         return 2;
+>=20
+>     fd =3D open("l", O_RDONLY | O_PATH);
+>     if (fd < 0)
+>         return 3;
+>     if (fstat(fd, &st) < 0)
+>         return 4;
+>     if (S_ISLNK(st.st_mode)) {
+>         printf("got a link\n");
+>     } else {
+>         printf("dereferenced\n");
+>     }
+>     close(fd);
+>=20
+>     fd =3D open("l", O_RDONLY | O_PATH | O_NOFOLLOW);
+>     if (fd < 0)
+>         return 5;
+>     if (fstat(fd, &st) < 0)
+>         return 6;
+>     if (S_ISLNK(st.st_mode)) {
+>         printf("got a link\n");
+>     } else {
+>         printf("dereferenced\n");
+>     }
+>     close(fd);
+>=20
+>     remove("f");
+>     remove("l");
+>     return 0;
+> }
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> $ ./foo
+> dereferenced
+> got a link
+>=20
+> Ouch - you need to fix your patch to use open(O_NOFOLLOW | O_PATH).
+>=20
+
+openat_file() adds O_NOFOLLOW... I'll rename it to openat_file_nofollow()
+in a separate patch for clarity.
+
+> Furthermore, I'm worried that your patch is regressing commit 918112c0,
+> when compiling for older platforms where either O_PATH does not exist,
+> or where libc exposes the constant but the kernel is too old to
+> understand it.  (I guess the latter problem is already existing in our
+> code base, so we really only need to worry about the former of compiling
+> when the constant does not exist).  So if supporting old platforms is
+> desired, you MUST keep BOTH approaches intact, gated by whether O_PATH
+> is defined to a non-zero value, rather than just assuming O_PATH works.
+>=20
+
+I don't necessarily want this to work for old platforms, but I'll fix the
+potential build break like in commit 918112c0.
+
+--Sig_/7D.d.jHO=WD6xx3ZSWB8AKb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlmKu18ACgkQAvw66wEB28I3VwCfWC8n3iU1QkG7RGLcN7PR4vHU
+XxgAn2qGEMRNH8+SqYlAYnWW9sbFSBIp
+=IqLP
+-----END PGP SIGNATURE-----
+
+--Sig_/7D.d.jHO=WD6xx3ZSWB8AKb--
