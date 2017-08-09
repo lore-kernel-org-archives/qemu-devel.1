@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dfNQE-0007zK-0d
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:37:03 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dfNX5-00015g-Vi
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dfNQD-0006e3-0s
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:37:02 -0400
-Date: Wed, 9 Aug 2017 12:36:12 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170809093612.oee2u5kdgyojheqm@postretch>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-6-el13635@mail.ntua.gr>
-	<w51valyjj7j.fsf@maestria.local.igalia.com>
-	<20170808134544.paekftiounmirhbo@postretch>
-	<w51poc6jeln.fsf@maestria.local.igalia.com>
-	<20170808145620.wlb5rdutuseutclx@postretch>
-	<w51mv7aje27.fsf@maestria.local.igalia.com>
+	(envelope-from <cohuck@redhat.com>) id 1dfNX1-0000yV-Sq
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:44:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dfNX1-0000xo-JF
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:44:03 -0400
+Date: Wed, 9 Aug 2017 11:43:48 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170809114348.37c4dafd.cohuck@redhat.com>
+In-Reply-To: <20170809092413.GB24723@redhat.com>
+References: <20170809071718.17924-1-cohuck@redhat.com>
+	<f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
+	<20170809102737.18436fb4.cohuck@redhat.com>
+	<5e015c3e-7973-f397-cc1e-fee190292616@redhat.com>
+	<20170809092413.GB24723@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ncf2wtrp2delb3w4"
-Content-Disposition: inline
-In-Reply-To: <w51mv7aje27.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
- driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
 
+On Wed, 9 Aug 2017 10:24:13 +0100
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
 
---ncf2wtrp2delb3w4
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Wed, Aug 09, 2017 at 11:07:38AM +0200, Thomas Huth wrote:
+> > On 09.08.2017 10:27, Cornelia Huck wrote:  
+> > > On Wed, 9 Aug 2017 10:23:04 +0200
+> > > Thomas Huth <thuth@redhat.com> wrote:
+> > >   
+> > >> On 09.08.2017 09:17, Cornelia Huck wrote:  
+> > >>> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+> > >>> on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
+> > >>> device.
+> > >>>
+> > >>> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+> > >>> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+> > >>>
+> > >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > >>> ---
+> > >>>
+> > >>> Changes v1->v2: drop extraneous spaces, fix build on cris
+> > >>>
+> > >>> ---
+> > >>>  default-configs/s390x-softmmu.mak | 1 +
+> > >>>  fsdev/Makefile.objs               | 9 +++------
+> > >>>  hw/Makefile.objs                  | 2 +-
+> > >>>  3 files changed, 5 insertions(+), 7 deletions(-)  
+> > [...]  
+> > >>
+> > >> Patch should be fine now, I think...
+> > >>
+> > >> But thinking about this again, I wonder whether it would be enough to
+> > >> simply check for CONFIG_VIRTIO=y here instead. CONFIG_VIRTIO=y should be
+> > >> sufficient to assert that there is also at least one kind of virtio
+> > >> transport available, right?
+> > >> Otherwise this will look really horrible as soon as somebody also tries
+> > >> to add support for virtio-mmio here later ;-)  
+> > > 
+> > > Do all virtio transports have support for 9p, though? I thought it was
+> > > only virtio-pci and virtio-ccw...  
+> > 
+> > While virtio-pci and virtio-ccw seem to require separate dedicated
+> > devices (e.g. virtio-9p-pci and virtio-9p-ccw) for everything,
+> > virtio-mmio seems to work different. As far as I can see, there are no
+> > dedicated virtio-xxx-mmio devices in the code at all. According to
+> > https://www.redhat.com/archives/libvir-list/2013-August/msg00009.html
+> > you simply have to use virtio-xxx-device here instead. And a
+> > virtio-9p-device is available. So theoretically, the 9p code should work
+> > with virtio-mmio, too, or is there a problem that I did not see yet?
+> > 
+> > Anyway, we likely should not blindly enable this, so unless somebody has
+> > a setup to test it, we should go with your current patch instead, I think.  
+> 
+> qemu-system-arm supports virtio-mmio so you can use that to test it
 
-On Tue, Aug 08, 2017 at 05:04:48PM +0200, Alberto Garcia wrote:
->On Tue 08 Aug 2017 04:56:20 PM CEST, Manos Pitsidianakis wrote:
->>>> So basically if we have anonymous groups, we accept limits in the
->>>> driver options but only without a group-name.
->>>
->>>In the commit message you do however have limits and a group name, is
->>>that a mistake?
->>>
->>>    -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
->>>           limits.iops-total=3D...,throttle-group=3Dbar
->>
->> Sorry this wasn't clear, I'm actually proposing to remove limits from
->> the throttle driver options and only create/config throttle groups via
->> -object/object-add.
->
->Sorry I think it was me who misunderstood :-) Anyway in the new
->command-line API I would be more inclined to have limits defined using
->"-object throttle-group" and -drive would only reference the group id.
->
->I understand that this implies that it wouldn't be possible to create
->anonymous groups (at least not from the command line), is that a
->problem?
->
+Hm, the default config for arm enables CONFIG_PCI, so machines using
+virtio-mmio and 9p would be broken with that patch... should we rather
+depend on PCI || VIRTIO_CCW?
 
-We can accept anonymous groups if a user specifies limits but not a=20
-group name in the throttle driver. (The only case where limits would be=20
-acccepted)
-
-Not creating eponymous throttle groups via the throttle driver means we=20
-don't need throttle_groups anymore, since even anonymous ones don't need=20
-to be accounted for in a list. I will send a new revision for this=20
-series but I can make this change in a later patch if everyone agrees.
-
---ncf2wtrp2delb3w4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmK14wACgkQc2J8L2kN
-9xBNpA/8C/uZio9/G46nZf338fykaIXUP7XYJoCe16PRM/EWVK/Nrnc2BdDvRquF
-bX4RCznAXbg21bQFJ6HYqZNLrBuUlEQ8bgUKfe49C7ZJ8YWc7VTmRkX3FN9Aht7E
-kkHbSEapLB7/4R6YooaxvkC0/r2I4e2PrM59diw/U1Ki0ke+Y1IpAqRkJnKBXoK0
-GtsWxIwg+YXCHkYqDHESuBio42g5OpKLDtDvzMMqlfg3bPwiT3daJzqLmgatuEx4
-jwhnjdKJfcAVpahoLjnsmU5PjH0/mA/PAXqcbYsy480YQaRNpQfG33+yYDDcTgeR
-KxYJqxNexnw0sDJa1mAr8CcHL4oyBOdVShvU+5o3CewjL7FE8CTtzWmsZJdJekUd
-EeITvLkNgNegMdtFLJyHr4rRqZxUgdSHNFHOmsh66Jj7vQFD3eH7rS3nsQf6XP/G
-TDuOPZLNeYOs1BdTHcnjv6HmWoNwRFoYNxSAwMONrLvd9yTzuxENqr8S+wRK1eVC
-AuDb9u8RZprIuDIwh/MdlojF7Z567WRBQ7SOs7ICukU9Yfeo2LG+yE4DK9RKFH1K
-oB6SaKBUddRnVer8Xt5Cvp/89sMOOLe0luESxB/XbC9ClBXDa0tSbPeTOHY7ma5K
-1/eqOf2swUGVcmQlxfOkhEIXimzl6LZZH5TuPpWEFFsng6cun0s=
-=5Hmy
------END PGP SIGNATURE-----
-
---ncf2wtrp2delb3w4--
+(Any arches not enabling PCI that use virtio-mmio? Or is arm the only
+user of virtio-mmio?)
