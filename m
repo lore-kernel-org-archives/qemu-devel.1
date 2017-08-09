@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dfTRf-00030k-Jg
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:02:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfTTC-00046x-UV
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dfTRb-0007Uq-9s
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:02:55 -0400
-Date: Wed, 9 Aug 2017 18:02:36 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170809160236.GK4213@localhost.localdomain>
-References: <20170808175711.12203-1-jsnow@redhat.com>
-	<20170808175711.12203-5-jsnow@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dfTT9-0008KT-Mo
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:04:30 -0400
+References: <20170809151757.15743-1-vsementsov@virtuozzo.com>
+	<565de2a2-316a-1b2e-95e3-6b2b2086484f@virtuozzo.com>
+	<93a7eaf1-3387-0772-b779-b1ff3d3b9443@redhat.com>
+	<bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6ecba212-dbd0-e81c-c7ad-50d09d1626e6@redhat.com>
+Date: Wed, 9 Aug 2017 11:04:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170808175711.12203-5-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] block-backend: test flush op on empty
- backend
+In-Reply-To: <bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa"
+Subject: Re: [Qemu-devel] [PATCH v2 for 2.10] iotests: fix 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,125 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, pjp@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com
 
-Am 08.08.2017 um 19:57 hat John Snow geschrieben:
-> From: Kevin Wolf <kwolf@redhat.com>
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/Makefile.include     |  2 ++
->  tests/test-block-backend.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 64 insertions(+)
->  create mode 100644 tests/test-block-backend.c
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index eb4895f..153494b 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -56,6 +56,7 @@ check-unit-y += tests/test-hbitmap$(EXESUF)
->  gcov-files-test-hbitmap-y = blockjob.c
->  check-unit-y += tests/test-blockjob$(EXESUF)
->  check-unit-y += tests/test-blockjob-txn$(EXESUF)
-> +check-unit-y += tests/test-block-backend$(EXESUF)
->  check-unit-y += tests/test-x86-cpuid$(EXESUF)
->  # all code tested by test-x86-cpuid is inside topology.h
->  gcov-files-test-x86-cpuid-y =
-> @@ -556,6 +557,7 @@ tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-o
->  tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
->  tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
->  tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
-> +tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
->  tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
->  tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
->  tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
-> diff --git a/tests/test-block-backend.c b/tests/test-block-backend.c
-> new file mode 100644
-> index 0000000..5348781
-> --- /dev/null
-> +++ b/tests/test-block-backend.c
-> @@ -0,0 +1,62 @@
-> +/*
-> + * BlockBackend tests
-> + *
-> + * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "block/block.h"
-> +#include "sysemu/block-backend.h"
-> +#include "qapi/error.h"
-> +
-> +static void test_drain_aio_error_flush_cb(void *opaque, int ret)
-> +{
-> +    bool *completed = opaque;
-> +
-> +    g_assert(ret == -ENOMEDIUM);
-> +    *completed = true;
-> +}
-> +
-> +static void test_drain_aio_error(void)
-> +{
-> +    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-> +    BlockAIOCB *acb;
-> +    bool completed = false;
-> +
-> +    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
-> +    g_assert(acb != NULL);
-> +    g_assert(completed == false);
-> +
-> +    blk_drain(blk);
-> +    g_assert(completed == true);
-> +}
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+Message-ID: <6ecba212-dbd0-e81c-c7ad-50d09d1626e6@redhat.com>
+Subject: Re: [PATCH v2 for 2.10] iotests: fix 185
+References: <20170809151757.15743-1-vsementsov@virtuozzo.com>
+ <565de2a2-316a-1b2e-95e3-6b2b2086484f@virtuozzo.com>
+ <93a7eaf1-3387-0772-b779-b1ff3d3b9443@redhat.com>
+ <bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
+In-Reply-To: <bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Locally, I added a second test for blk_drain_all():
+On 08/09/2017 10:57 AM, Vladimir Sementsov-Ogievskiy wrote:
 
-static void test_drain_all_aio_error(void)
-{
-    BlockBackend *blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-    BlockAIOCB *acb;
-    bool completed = false;
+>>>> This is because quite happens before first mirror request is done
+>>> s/quite/quit/
+>>>
+>>>> (and, in specified case, even before block-job len field is set).
+>>>> To prevent it let's just add a sleep for 0.3 seconds before quite.
+>> Here, as well.
+>>
+>> Maybe:
+>>
+>> This is because, under heavy load, the quit can happen before the firs=
+t
+>> iteration of the mirror request has occurred.  To make sure we've had
+>> time to iterate, let's just add a sleep for 0.3 seconds before quittin=
+g.
+>>
+>>
+>>>>        "return"
+>>>>    +# If we don't sleep here 'quit' command may be handled before
+>>>> +# the first mirror iteration is done
+>>>> +sleep 0.5
+>> The commit message disagrees with the code (.3 vs. .5) - which one is
+>> correct?
+>>
+> Let it be .5, as I've tested it.
 
-    acb = blk_aio_flush(blk, test_drain_aio_error_flush_cb, &completed);
-    g_assert(acb != NULL);
-    g_assert(completed == false);
+With a correct commit message (maintainer can touch it up),
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-    blk_drain_all();
-    g_assert(completed == true);
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-    blk_unref(blk);
-}
 
-> +int main(int argc, char **argv)
-> +{
-> +    bdrv_init();
-> +    qemu_init_main_loop(&error_abort);
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    g_test_add_func("/block-backend/drain_aio_error", test_drain_aio_error);
-> +
-> +    return g_test_run();
-> +}
+--pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Kevin
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLMn0ACgkQp6FrSiUn
+Q2oyJQf5Af+Ja5lGDLGwDgPaVCOm0GFawyQKNjV6Q74p3B4rkkruEt3po2xFEKYr
+yuaFuicD3KzRYvWqRjvnHMjG2aBONtqpgIFu5tyR2JR5hng5JVWFwTY2CLrJBRSC
+8vkxs9Hqwh+cvtlzzyuL6mW0IZBPHArcMp3M4we/34HOAhTgHimBwlbdE2D+2cCH
+e33btaA4kqhW7pbDW77iRD0Px6fg54FPYon9gTg/xxbQ/4Fl41Sddb3fHpY2sMKO
+D78Y/hzS5GTjSlpn2w+2Teq5Jp7LueR2skeWWNdqZlln4N7ZftQlLLoWVC7TSl4A
+NkcP48OcNsMV97DTud5JSRLZoo54Eg==
+=HXiZ
+-----END PGP SIGNATURE-----
+
+--pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa--
