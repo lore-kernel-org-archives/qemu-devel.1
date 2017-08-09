@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfNZM-0002ZY-Cb
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:46:29 -0400
+	(envelope-from <groug@kaod.org>) id 1dfNaJ-000328-Sv
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfNZI-0002YA-A4
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:46:28 -0400
-Date: Wed, 9 Aug 2017 10:46:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170809094620.GG18003@stefanha-x1.localdomain>
-References: <20170807161529.3779-1-berto@igalia.com>
+	(envelope-from <groug@kaod.org>) id 1dfNaF-0003G6-Od
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:47:27 -0400
+Received: from 11.mo4.mail-out.ovh.net ([46.105.34.195]:55911)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfNaF-0003D1-HQ
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:47:23 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id F1C568BCC9
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 11:47:15 +0200 (CEST)
+Date: Wed, 9 Aug 2017 11:47:05 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170809114705.39dc0455@bahia.lan>
+In-Reply-To: <20170809102737.18436fb4.cohuck@redhat.com>
+References: <20170809071718.17924-1-cohuck@redhat.com>
+	<f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
+	<20170809102737.18436fb4.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="iJXiJc/TAIT2rh2r"
-Content-Disposition: inline
-In-Reply-To: <20170807161529.3779-1-berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] throttle: Make LeakyBucket.avg
- and LeakyBucket.max integer types
+	boundary="Sig_/_15auDsKsnWdJ9/xAVH8J8k";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +32,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-
---iJXiJc/TAIT2rh2r
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/_15auDsKsnWdJ9/xAVH8J8k
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 07, 2017 at 07:15:29PM +0300, Alberto Garcia wrote:
-> Both the throttling limits set with the throttling.iops-* and
-> throttling.bps-* options and their QMP equivalents defined in the
-> BlockIOThrottle struct are integer values.
->=20
-> Those limits are also reported in the BlockDeviceInfo struct and they
-> are integers there as well.
->=20
-> Therefore there's no reason to store them internally as double and do
-> the conversion everytime we're setting or querying them, so this patch
-> uses int64_t for those types.
->=20
-> LeakyBucket.level and LeakyBucket.burst_level do however remain double
-> because their value changes depending on the fraction of time elapsed
-> since the previous I/O operation.
->=20
-> There's one particular instance of the previous code where bkt->max
-> could have a non-integer value: that's in throttle_fix_bucket() when
-> bkt->max is initialized to bkt->avg / 10. This is now an integer
-> division and the result is rounded. We don't need to worry about this
-> because:
->=20
->    a) with the magnitudes we're dealing with (bytes per second, I/O
->       operations per second) the limits are likely to be always
->       multiples of 10.
->=20
->    b) even if they weren't this doesn't affect the actual limits, only
->       the algorithm that makes the throttling smoother.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  include/qemu/throttle.h | 4 ++--
->  util/throttle.c         | 7 ++-----
->  2 files changed, 4 insertions(+), 7 deletions(-)
+On Wed, 9 Aug 2017 10:27:37 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Thanks, applied to my block-next tree:
-https://github.com/stefanha/qemu/commits/block-next
+> On Wed, 9 Aug 2017 10:23:04 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+> > On 09.08.2017 09:17, Cornelia Huck wrote: =20
+> > > Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+> > > on CONFIG_VIRTFS and on the presence of an appropriate virtio transpo=
+rt
+> > > device.
+> > >=20
+> > > Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+> > > CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+> > >=20
+> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > > ---
+> > >=20
+> > > Changes v1->v2: drop extraneous spaces, fix build on cris
+> > >=20
+> > > ---
+> > >  default-configs/s390x-softmmu.mak | 1 +
+> > >  fsdev/Makefile.objs               | 9 +++------
+> > >  hw/Makefile.objs                  | 2 +-
+> > >  3 files changed, 5 insertions(+), 7 deletions(-)
+> > >=20
+> > > diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390=
+x-softmmu.mak
+> > > index 51191b77df..e4c5236ceb 100644
+> > > --- a/default-configs/s390x-softmmu.mak
+> > > +++ b/default-configs/s390x-softmmu.mak
+> > > @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=3Dy
+> > >  CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
+> > >  CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
+> > >  CONFIG_WDT_DIAG288=3Dy
+> > > +CONFIG_VIRTIO_CCW=3Dy
+> > > diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+> > > index 659df6e187..3d157add31 100644
+> > > --- a/fsdev/Makefile.objs
+> > > +++ b/fsdev/Makefile.objs
+> > > @@ -1,10 +1,7 @@
+> > > -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+> > >  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+> > > -# only pull in the actual virtio-9p device if we also enabled virtio.
+> > > -common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> > > -else
+> > > -common-obj-y =3D qemu-fsdev-dummy.o
+> > > -endif
+> > > +# only pull in the actual virtio-9p device if we also enabled a virt=
+io backend.
+> > > +common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_P=
+CI),$(CONFIG_VIRTIO_CCW)))=3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> > > +common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CON=
+FIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) =3D qemu-fsdev-dummy.o
+> > >  common-obj-y +=3D qemu-fsdev-opts.o qemu-fsdev-throttle.o
+> > > =20
+> > >  # Toplevel always builds this; targets without virtio will put it in
+> > > diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> > > index a2c61f6b09..335f26b65e 100644
+> > > --- a/hw/Makefile.objs
+> > > +++ b/hw/Makefile.objs
+> > > @@ -1,4 +1,4 @@
+> > > -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRT=
+FS),$(CONFIG_PCI))) +=3D 9pfs/
+> > > +devices-dirs-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO=
+_PCI),$(CONFIG_VIRTIO_CCW))) +=3D 9pfs/
+> > >  devices-dirs-$(CONFIG_SOFTMMU) +=3D acpi/
+> > >  devices-dirs-$(CONFIG_SOFTMMU) +=3D adc/
+> > >  devices-dirs-$(CONFIG_SOFTMMU) +=3D audio/   =20
+> >=20
+> > Patch should be fine now, I think...
+> >=20
+> > But thinking about this again, I wonder whether it would be enough to
+> > simply check for CONFIG_VIRTIO=3Dy here instead. CONFIG_VIRTIO=3Dy shou=
+ld be
+> > sufficient to assert that there is also at least one kind of virtio
+> > transport available, right?
+> > Otherwise this will look really horrible as soon as somebody also tries
+> > to add support for virtio-mmio here later ;-) =20
+>=20
 
-Stefan
+And virtio isn't the only transport for 9p: we also have a Xen backend,
+which happen to be built because targets that support Xen also have
+CONFIG_PCI I guess.
 
---iJXiJc/TAIT2rh2r
-Content-Type: application/pgp-signature; name="signature.asc"
+Cc'ing Stefano and Paolo who had a discussion during the review of
+9p Xen backend patches:
+
+https://patchwork.kernel.org/patch/9622325/
+
+> Do all virtio transports have support for 9p, though? I thought it was
+> only virtio-pci and virtio-ccw...
+
+Hmm... I don't see any device-specific code in virtio-mmio.. why would it
+be different for 9p than for block or net ?
+
+--Sig_/_15auDsKsnWdJ9/xAVH8J8k
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJZitnsAAoJEJykq7OBq3PIF2QH/2oBYA2Sj5yI2jXK3p854eBn
-3nZeKIl7E8j/3bXdNQWUcJMHDlhPme5FBxx+/rcxFzbY1RK1AJlr4WdrRPBPRR2a
-TvAwLdH1INvVq387wTDAyMdHL6KgqDqH6IM4rRqX8K6Fch2Lc3begTepTD9ffTOz
-/HMMGvGQH01ZoETvpi6AtzkdeXe7DXsjGlVOjSHLHunVnDAfBKNAWBflqxPWy2V0
-gFxN2d7xdQYLaPMW223V96FAgtf6/xlEyLcFc+GdePK9G+jjjJV1KQ3B5HJ//oIB
-Hq9ryLMyfwkshbBR1YrTqQOPDzNhoHE/Z6XlRopqZSstIaL+6wj+Iq0Vyly92Yk=
-=FxHS
+iEYEARECAAYFAlmK2hkACgkQAvw66wEB28KvSwCgkoAFfhFfJ9W6bRtDrJ+mgbTt
+ED4AnR3DYoCvZ6mDjVxe8ajwzcBoxv7j
+=3Q29
 -----END PGP SIGNATURE-----
 
---iJXiJc/TAIT2rh2r--
+--Sig_/_15auDsKsnWdJ9/xAVH8J8k--
