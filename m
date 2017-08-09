@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfTQS-0001vq-GY
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:41 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dfTQw-0002O2-CL
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfTQO-0006ns-Bp
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52356)
+	(envelope-from <cohuck@redhat.com>) id 1dfTQt-0006zi-62
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:02:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfTQO-0006nW-2y
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8B08357E54
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 16:01:34 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<20170804012551.2714-22-eblake@redhat.com>
-Date: Wed, 09 Aug 2017 18:01:32 +0200
-In-Reply-To: <20170804012551.2714-22-eblake@redhat.com> (Eric Blake's message
-	of "Thu, 3 Aug 2017 20:25:50 -0500")
-Message-ID: <87k22cn31f.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dfTQs-0006zW-W9
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:02:07 -0400
+Date: Wed, 9 Aug 2017 18:02:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170809180200.39546490.cohuck@redhat.com>
+In-Reply-To: <20170809141001.3b65e53f@bahia.lan>
+References: <20170809071718.17924-1-cohuck@redhat.com>
+	<f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
+	<20170809102737.18436fb4.cohuck@redhat.com>
+	<20170809114705.39dc0455@bahia.lan>
+	<20170809130608.3ce61bd3.cohuck@redhat.com>
+	<20170809141001.3b65e53f@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 21/22] libqtest: Drop now-unused qmp()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+On Wed, 9 Aug 2017 14:10:01 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-> All callers have been converted to a form of qmp_cmd() or
-> qmp_args() that takes the command name with less boilerplate.
-> Therefore, we also know that all commands are using
-> interpolation, and can remove an assertion.
->
-> This also means that we have fixed the testsuite to comply with
-> -Wformat checking on the strings being interpolated for qmp()
-> (similar to what we previously did for strings used in hmp(), and
-> matching the checking present on qobject_from_jsonf()).
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/libqtest.h | 20 +-------------------
->  tests/libqtest.c | 32 ++++----------------------------
->  2 files changed, 5 insertions(+), 47 deletions(-)
->
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 193adf1eb9..04b36a7b11 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -457,15 +457,6 @@ static inline void qtest_end(void)
->  }
->
->  /**
-> - * qmp:
-> - * @fmt...: QMP message to send to qemu; formats arguments through
-> - * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
-> - *
-> - * Sends a QMP message to QEMU and returns the response.
-> - */
-> -QDict *qmp(const char *fmt, ...);
-> -
-> -/**
->   * qmp_raw:
->   * @msg: Raw QMP message to send to qemu.
->   *
-> @@ -474,15 +465,6 @@ QDict *qmp(const char *fmt, ...);
->  QDict *qmp_raw(const char *msg);
->
->  /**
-> - * qmp_async:
-> - * @fmt...: QMP message to send to qemu; formats arguments through
-> - * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
-> - *
-> - * Sends a QMP message to QEMU and leaves the response in the stream.
-> - */
-> -void qmp_async(const char *fmt, ...);
-> -
-> -/**
->   * qmp_cmd:
->   * @cmd: QMP command, with no arguments.
->   *
-> @@ -530,7 +512,7 @@ void qmp_args_async(const char *cmd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
->  /**
->   * qmp_discard_response:
->   *
-> - * Read and discard a QMP response, typically after qmp_async().
-> + * Read and discard a QMP response, typically after qmp_cmd_async().
->   */
->  void qmp_discard_response(void);
->
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 5012ecf929..4597d4ac66 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -453,17 +453,12 @@ static void qtest_qmp_sendv(QTestState *s, const char *fmt, va_list ap)
->      QString *qstr;
->      const char *str;
->
-> -    assert(strstr(fmt, "execute"));
-> -
->      /*
-> -     * A round trip through QObject is only needed if % interpolation
-> -     * is used.  We interpolate through QObject rather than sprintf in
-> -     * order to escape strings properly.
-> +     * A round trip through QObject (and not sprintf) is needed
-> +     * because % interpolation is used, and we must escape strings
-> +     * properly.
->       */
-> -    if (!strchr(fmt, '%')) {
-> -        qmp_fd_send(s->qmp_fd, fmt);
-> -        return;
-> -    }
-> +    assert(strchr(fmt, '%'));
+> On Wed, 9 Aug 2017 13:06:14 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 
-What exactly is wrong with a @fmt that doesn't contain '%'?
+> > Should the condition be VIRTFS && (VIRTIO || XEN), then?  
+> 
+> That's what I was beginning to think as well :)
 
->
->      qobj = qobject_from_jsonv(fmt, ap);
->      qstr = qobject_to_json(qobj);
-> @@ -833,31 +828,12 @@ void qtest_memset(QTestState *s, uint64_t addr, uint8_t pattern, size_t size)
->      qtest_rsp(s, 0);
->  }
->
-> -QDict *qmp(const char *fmt, ...)
-> -{
-> -    va_list ap;
-> -
-> -    va_start(ap, fmt);
-> -    qtest_qmp_sendv(global_qtest, fmt, ap);
-> -    va_end(ap);
-> -    return qtest_qmp_receive(global_qtest);
-> -}
-> -
->  QDict *qmp_raw(const char *msg)
->  {
->      qmp_fd_send(global_qtest->qmp_fd, msg);
->      return qtest_qmp_receive(global_qtest);
->  }
->
-> -void qmp_async(const char *fmt, ...)
-> -{
-> -    va_list ap;
-> -
-> -    va_start(ap, fmt);
-> -    qtest_qmp_sendv(global_qtest, fmt, ap);
-> -    va_end(ap);
-> -}
-> -
->  QDict *qmp_cmd(const char *cmd)
->  {
->      qmp_cmd_async(cmd);
+OK, here's what should work:
+
+- fsdev/Makefile.objs needs to check for VIRTFS && (VIRTIO || XEN)
+- hw/Makefile.objs needs to check for VIRTFS && (VIRTIO || XEN) before
+  building hw/9pfs/
+- hw/9pfs/Makefile.objs needs a new VIRTIO check for the virtio device
+
+I'm preparing a patch.
