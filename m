@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dfRat-0003US-CC
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:26 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfRaw-0003Xe-I8
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dfRar-0003dR-5C
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:19 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfRau-0003gf-RW
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:22 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Wed,  9 Aug 2017 17:02:54 +0300
-Message-Id: <20170809140256.25584-5-el13635@mail.ntua.gr>
+Date: Wed,  9 Aug 2017 17:02:53 +0300
+Message-Id: <20170809140256.25584-4-el13635@mail.ntua.gr>
 In-Reply-To: <20170809140256.25584-1-el13635@mail.ntua.gr>
 References: <20170809140256.25584-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 4/6] block: remove legacy I/O throttling
+Subject: [Qemu-devel] [PATCH v2 3/6] block: require job-id when device is a
+ node name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,465 +23,254 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This commit removes all I/O throttling from block/block-backend.c. In
-order to support the existing interface, it is changed to use the
-block/throttle.c filter driver.
+With implicit filter nodes on the top of the graph it is not possible to
+generate job-ids with the name of the device in block_job_create()
+anymore, since the job's bs will not be a child_root.
 
-The throttle filter node that is created by the legacy interface is
-stored in a 'throttle_node' field in the BlockBackendPublic of the
-device. The legacy throttle node is managed by the legacy interface
-completely. More advanced configurations with the filter drive are
-possible using the QMP API, but these will be ignored by the legacy
-interface.
+Instead we can require that job-id is not NULL in block_job_create(),
+and check that a job-id has been set in the callers of
+block_job_create() in blockdev.c. It is more consistent to require an
+explicit job-id when the device parameter in the job creation command,
+eg
+
+ { "execute": "drive-backup",
+   "arguments": { "device": "drive0",
+                  "sync": "full",
+                  "target": "backup.img" } }
+
+is not a BlockBackend name, instead of automatically getting it from the
+root BS if device is a node name. That information is lost after calling
+block_job_create(), so we can do it in its caller instead.
 
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- block/block-backend.c           | 133 ++++++++++++++++++++++++----------------
- block/qapi.c                    |  10 +--
- block/throttle.c                |   8 +++
- blockdev.c                      |  49 +++++++++++----
- include/block/throttle-groups.h |   1 +
- include/sysemu/block-backend.h  |   6 +-
- tests/test-throttle.c           |  19 +++---
- 7 files changed, 146 insertions(+), 80 deletions(-)
+ blockdev.c                   | 65 +++++++++++++++++++++++++++++++++++++++-----
+ blockjob.c                   | 16 ++++-------
+ include/block/blockjob_int.h |  3 +-
+ tests/test-blockjob.c        | 10 ++-----
+ 4 files changed, 67 insertions(+), 27 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index df0200fc49..61983b7393 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -15,6 +15,7 @@
- #include "block/block_int.h"
- #include "block/blockjob.h"
- #include "block/throttle-groups.h"
-+#include "qemu/throttle-options.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
- #include "qapi-event.h"
-@@ -282,7 +283,7 @@ static void blk_delete(BlockBackend *blk)
-     assert(!blk->refcnt);
-     assert(!blk->name);
-     assert(!blk->dev);
--    if (blk->public.throttle_group_member.throttle_state) {
-+    if (blk->public.throttle_node) {
-         blk_io_limits_disable(blk);
-     }
-     if (blk->root) {
-@@ -593,13 +594,7 @@ BlockBackend *blk_by_public(BlockBackendPublic *public)
-  */
- void blk_remove_bs(BlockBackend *blk)
- {
--    ThrottleTimers *tt;
--
-     notifier_list_notify(&blk->remove_bs_notifiers, blk);
--    if (blk->public.throttle_group_member.throttle_state) {
--        tt = &blk->public.throttle_group_member.throttle_timers;
--        throttle_timers_detach_aio_context(tt);
--    }
- 
-     blk_update_root_state(blk);
- 
-@@ -620,12 +615,6 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
-     bdrv_ref(bs);
- 
-     notifier_list_notify(&blk->insert_bs_notifiers, blk);
--    if (blk->public.throttle_group_member.throttle_state) {
--        throttle_timers_attach_aio_context(
--            &blk->public.throttle_group_member.throttle_timers,
--            bdrv_get_aio_context(bs));
--    }
--
-     return 0;
- }
- 
-@@ -983,13 +972,6 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-     }
- 
-     bdrv_inc_in_flight(bs);
--
--    /* throttling disk I/O */
--    if (blk->public.throttle_group_member.throttle_state) {
--        throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
--                bytes, false);
--    }
--
-     ret = bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
-     bdrv_dec_in_flight(bs);
-     return ret;
-@@ -1010,11 +992,6 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-     }
- 
-     bdrv_inc_in_flight(bs);
--    /* throttling disk I/O */
--    if (blk->public.throttle_group_member.throttle_state) {
--        throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
--                bytes, true);
--    }
- 
-     if (!blk->enable_write_cache) {
-         flags |= BDRV_REQ_FUA;
-@@ -1682,16 +1659,9 @@ static AioContext *blk_aiocb_get_aio_context(BlockAIOCB *acb)
- void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
- {
-     BlockDriverState *bs = blk_bs(blk);
--    ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
- 
-     if (bs) {
--        if (tgm->throttle_state) {
--            throttle_group_detach_aio_context(tgm);
--        }
-         bdrv_set_aio_context(bs, new_context);
--        if (tgm->throttle_state) {
--            throttle_group_attach_aio_context(tgm, new_context);
--        }
-     }
- }
- 
-@@ -1909,45 +1879,98 @@ int blk_commit_all(void)
- /* throttling disk I/O limits */
- void blk_set_io_limits(BlockBackend *blk, ThrottleConfig *cfg)
- {
--    throttle_group_config(&blk->public.throttle_group_member, cfg);
-+    assert(blk->public.throttle_node);
-+    throttle_group_config(throttle_get_tgm(blk->public.throttle_node), cfg);
- }
- 
- void blk_io_limits_disable(BlockBackend *blk)
- {
--    assert(blk->public.throttle_group_member.throttle_state);
--    bdrv_drained_begin(blk_bs(blk));
--    throttle_group_unregister_tgm(&blk->public.throttle_group_member);
--    bdrv_drained_end(blk_bs(blk));
-+    BlockDriverState *bs, *throttle_node;
-+
-+    throttle_node = blk_get_public(blk)->throttle_node;
-+
-+    assert(throttle_node);
-+
-+    bs = throttle_node->file->bs;
-+    bdrv_drained_begin(bs);
-+
-+    /* Ref throttle_node's child bs to ensure it won't go away */
-+    bdrv_ref(bs);
-+
-+    bdrv_child_try_set_perm(throttle_node->file, 0, BLK_PERM_ALL,
-+                            &error_abort);
-+    /* Replace throttle_node with bs. While throttle_node was inserted under
-+     * blk, at this point it might have more than one parent, so use
-+     * bdrv_replace_node(). This destroys throttle_node */
-+    bdrv_replace_node(throttle_node, bs, &error_abort);
-+    blk_get_public(blk)->throttle_node = NULL;
-+
-+    bdrv_unref(bs);
-+    bdrv_drained_end(bs);
-+
- }
- 
- /* should be called before blk_set_io_limits if a limit is set */
--void blk_io_limits_enable(BlockBackend *blk, const char *group)
-+void blk_io_limits_enable(BlockBackend *blk, const char *group,  Error **errp)
- {
--    assert(!blk->public.throttle_group_member.throttle_state);
--    throttle_group_register_tgm(&blk->public.throttle_group_member,
--                                group, blk_get_aio_context(blk));
-+    BlockDriverState *bs = blk_bs(blk), *throttle_node;
-+    QDict *options = qdict_new();
-+    Error *local_err = NULL;
-+
-+    bdrv_drained_begin(bs);
-+
-+    qdict_set_default_str(options, "file", bs->node_name);
-+    qdict_set_default_str(options, QEMU_OPT_THROTTLE_GROUP_NAME, group);
-+    throttle_node = bdrv_new_open_driver(bdrv_find_format("throttle"), NULL,
-+                                         bdrv_get_flags(bs), options, errp);
-+    if (!throttle_node) {
-+        goto end;
-+    }
-+    throttle_node->implicit = true;
-+
-+    blk_remove_bs(blk);
-+    blk_insert_bs(blk, throttle_node, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        blk_insert_bs(blk, bs, &error_abort);
-+        bdrv_unref(throttle_node);
-+        throttle_node = NULL;
-+        goto end;
-+    }
-+    bdrv_unref(throttle_node);
-+
-+    assert(throttle_node->file->bs == bs);
-+    assert(throttle_node->refcnt == 1);
-+
-+end:
-+    bdrv_drained_end(bs);
-+    blk_get_public(blk)->throttle_node = throttle_node;
- }
- 
--void blk_io_limits_update_group(BlockBackend *blk, const char *group)
-+void blk_io_limits_update_group(BlockBackend *blk, const char *group, Error **errp)
- {
-+    ThrottleGroupMember *tgm;
-+
-     /* this BB is not part of any group */
--    if (!blk->public.throttle_group_member.throttle_state) {
-+    if (!blk->public.throttle_node) {
-         return;
-     }
- 
-+    tgm = throttle_get_tgm(blk->public.throttle_node);
-     /* this BB is a part of the same group than the one we want */
--    if (!g_strcmp0(throttle_group_get_name(&blk->public.throttle_group_member),
--                group)) {
-+    if (!g_strcmp0(throttle_group_get_name(tgm),
-+                   group)) {
-         return;
-     }
- 
--    /* need to change the group this bs belong to */
-+    /* need to change the group this bs belongs to */
-     blk_io_limits_disable(blk);
--    blk_io_limits_enable(blk, group);
-+    blk_io_limits_enable(blk, group, errp);
- }
- 
- static void blk_root_drained_begin(BdrvChild *child)
- {
-+    ThrottleGroupMember *tgm;
-     BlockBackend *blk = child->opaque;
- 
-     if (++blk->quiesce_counter == 1) {
-@@ -1958,19 +1981,25 @@ static void blk_root_drained_begin(BdrvChild *child)
- 
-     /* Note that blk->root may not be accessible here yet if we are just
-      * attaching to a BlockDriverState that is drained. Use child instead. */
--
--    if (atomic_fetch_inc(&blk->public.throttle_group_member.io_limits_disabled) == 0) {
--        throttle_group_restart_tgm(&blk->public.throttle_group_member);
-+    if (blk->public.throttle_node) {
-+        tgm = throttle_get_tgm(blk->public.throttle_node);
-+        if (atomic_fetch_inc(&tgm->io_limits_disabled) == 0) {
-+            throttle_group_restart_tgm(tgm);
-+        }
-     }
- }
- 
- static void blk_root_drained_end(BdrvChild *child)
- {
-+    ThrottleGroupMember *tgm;
-     BlockBackend *blk = child->opaque;
-     assert(blk->quiesce_counter);
- 
--    assert(blk->public.throttle_group_member.io_limits_disabled);
--    atomic_dec(&blk->public.throttle_group_member.io_limits_disabled);
-+    if (blk->public.throttle_node) {
-+        tgm = throttle_get_tgm(blk->public.throttle_node);
-+        assert(tgm->io_limits_disabled);
-+        atomic_dec(&tgm->io_limits_disabled);
-+    }
- 
-     if (--blk->quiesce_counter == 0) {
-         if (blk->dev_ops && blk->dev_ops->drained_end) {
-diff --git a/block/qapi.c b/block/qapi.c
-index 847b044d13..ab55db7134 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -66,11 +66,12 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
- 
-     info->detect_zeroes = bs->detect_zeroes;
- 
--    if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
-+    if (blk && blk_get_public(blk)->throttle_node) {
-         ThrottleConfig cfg;
--        BlockBackendPublic *blkp = blk_get_public(blk);
-+        BlockDriverState *throttle_node = blk_get_public(blk)->throttle_node;
-+        ThrottleGroupMember *tgm = throttle_get_tgm(throttle_node);
- 
--        throttle_group_get_config(&blkp->throttle_group_member, &cfg);
-+        throttle_group_get_config(tgm, &cfg);
- 
-         info->bps     = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
-         info->bps_rd  = cfg.buckets[THROTTLE_BPS_READ].avg;
-@@ -118,8 +119,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
-         info->iops_size = cfg.op_size;
- 
-         info->has_group = true;
--        info->group =
--            g_strdup(throttle_group_get_name(&blkp->throttle_group_member));
-+        info->group = g_strdup(throttle_group_get_name(tgm));
-     }
- 
-     info->write_threshold = bdrv_write_threshold_get(bs);
-diff --git a/block/throttle.c b/block/throttle.c
-index 3e6cb1de7b..16861b57ff 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -38,6 +38,14 @@ static QemuOptsList throttle_opts = {
-     },
- };
- 
-+static BlockDriver bdrv_throttle;
-+
-+ThrottleGroupMember *throttle_get_tgm(BlockDriverState *bs)
-+{
-+    assert(bs->drv == &bdrv_throttle);
-+    return (ThrottleGroupMember *)bs->opaque;
-+}
-+
- /* Extract ThrottleConfig options. Assumes cfg is initialized and will be
-  * checked for validity.
-  *
 diff --git a/blockdev.c b/blockdev.c
-index 6ffa5b0b04..20e5513f87 100644
+index fc7b65c3f0..6ffa5b0b04 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -607,7 +607,14 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
-         if (!throttling_group) {
-             throttling_group = id;
-         }
--        blk_io_limits_enable(blk, throttling_group);
-+        blk_io_limits_enable(blk, throttling_group, &error);
-+        if (error) {
-+            error_propagate(errp, error);
-+            blk_unref(blk);
-+            blk = NULL;
-+            goto err_no_bs_opts;
-+
-+        }
-         blk_set_io_limits(blk, &cfg);
+@@ -3004,6 +3004,16 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+         return;
      }
  
-@@ -2629,6 +2636,9 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
-     BlockDriverState *bs;
-     BlockBackend *blk;
-     AioContext *aio_context;
-+    BlockDriverState *throttle_node = NULL;
-+    ThrottleGroupMember *tgm;
-+    Error *local_err = NULL;
- 
-     blk = qmp_get_blk(arg->has_device ? arg->device : NULL,
-                       arg->has_id ? arg->id : NULL,
-@@ -2704,18 +2714,33 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
-     if (throttle_enabled(&cfg)) {
-         /* Enable I/O limits if they're not enabled yet, otherwise
-          * just update the throttling group. */
--        if (!blk_get_public(blk)->throttle_group_member.throttle_state) {
--            blk_io_limits_enable(blk,
--                                 arg->has_group ? arg->group :
--                                 arg->has_device ? arg->device :
--                                 arg->id);
--        } else if (arg->has_group) {
--            blk_io_limits_update_group(blk, arg->group);
-+        if (!blk_get_public(blk)->throttle_node) {
-+            blk_io_limits_enable(blk, arg->has_group ? arg->group :
-+                                 arg->has_device ? arg->device : arg->id,
-+                                 &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                goto out;
-+            }
-         }
--        /* Set the new throttling configuration */
--        blk_set_io_limits(blk, &cfg);
--    } else if (blk_get_public(blk)->throttle_group_member.throttle_state) {
--        /* If all throttling settings are set to 0, disable I/O limits */
-+
-+        if (arg->has_group) {
-+            /* move throttle node membership to arg->group */
-+            blk_io_limits_update_group(blk, arg->group, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                goto out;
-+            }
++    /* Always require a job-id when device is a node name */
++    if (!has_job_id) {
++        if (blk_by_name(device)) {
++            job_id = device;
++        } else {
++            error_setg(errp, "An explicit job ID is required for this node");
++            return;
 +        }
++    }
 +
-+        throttle_node = blk_get_public(blk)->throttle_node;
-+        tgm = throttle_get_tgm(throttle_node);
-+        throttle_group_config(tgm, &cfg);
-+    } else if (blk_get_public(blk)->throttle_node) {
-+        /*
-+         * If all throttling settings are set to 0, disable I/O limits
-+         * by deleting the legacy throttle node
-+         * */
-         blk_io_limits_disable(blk);
+     /* Skip implicit filter nodes */
+     bs = bdrv_get_first_explicit(bs);
+ 
+@@ -3058,7 +3068,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+     /* backing_file string overrides base bs filename */
+     base_name = has_backing_file ? backing_file : base_name;
+ 
+-    stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
++    stream_start(job_id, bs, base_bs, base_name,
+                  has_speed ? speed : 0, on_error, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+@@ -3117,6 +3127,16 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+     /* Skip implicit filter nodes */
+     bs = bdrv_get_first_explicit(bs);
+ 
++    /* Always require a job-id when device is a node name */
++    if (!has_job_id) {
++        if (blk_by_name(device)) {
++            job_id = device;
++        } else {
++            error_setg(errp, "An explicit job ID is required for this node");
++            return;
++        }
++    }
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -3171,7 +3191,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+                              " but 'top' is the active layer");
+             goto out;
+         }
+-        commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
++        commit_active_start(job_id, bs, base_bs,
+                             BLOCK_JOB_DEFAULT, speed, on_error,
+                             filter_node_name, NULL, NULL, false, &local_err);
+     } else {
+@@ -3179,7 +3199,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
+             goto out;
+         }
+-        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
++        commit_start(job_id, bs, base_bs, top_bs, speed,
+                      on_error, has_backing_file ? backing_file : NULL,
+                      filter_node_name, &local_err);
+     }
+@@ -3220,7 +3240,13 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+         backup->mode = NEW_IMAGE_MODE_ABSOLUTE_PATHS;
+     }
+     if (!backup->has_job_id) {
+-        backup->job_id = NULL;
++        /* Always require a job-id when device is a node name */
++        if (blk_by_name(backup->device)) {
++            backup->job_id = backup->device;
++        } else {
++            error_setg(errp, "An explicit job ID is required for this node");
++            return NULL;
++        }
+     }
+     if (!backup->has_compress) {
+         backup->compress = false;
+@@ -3366,7 +3392,13 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+         backup->on_target_error = BLOCKDEV_ON_ERROR_REPORT;
+     }
+     if (!backup->has_job_id) {
+-        backup->job_id = NULL;
++        /* Always require a job-id when device is a node name */
++        if (blk_by_name(backup->device)) {
++            backup->job_id = backup->device;
++        } else {
++            error_setg(errp, "An explicit job ID is required for this node");
++            return NULL;
++        }
+     }
+     if (!backup->has_compress) {
+         backup->compress = false;
+@@ -3509,6 +3541,16 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         return;
      }
  
-diff --git a/include/block/throttle-groups.h b/include/block/throttle-groups.h
-index 82f030523f..26a8e44b43 100644
---- a/include/block/throttle-groups.h
-+++ b/include/block/throttle-groups.h
-@@ -76,5 +76,6 @@ void coroutine_fn throttle_group_co_io_limits_intercept(ThrottleGroupMember *tgm
- void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
-                                        AioContext *new_context);
- void throttle_group_detach_aio_context(ThrottleGroupMember *tgm);
-+ThrottleGroupMember *throttle_get_tgm(BlockDriverState *bs);
++    /* Always require a job-id when device is a node name */
++    if (!arg->has_job_id) {
++        if (blk_by_name(arg->device)) {
++            arg->job_id = arg->device;
++        } else {
++            error_setg(errp, "An explicit job ID is required for this node");
++            return;
++        }
++    }
++
+     /* Skip implicit filter nodes */
+     bs = bdrv_get_first_explicit(bs);
  
- #endif
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 0e0cda7521..4a7ca53685 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -73,7 +73,7 @@ typedef struct BlockDevOps {
-  * friends so that BlockBackends can be kept in lists outside block-backend.c
-  * */
- typedef struct BlockBackendPublic {
--    ThrottleGroupMember throttle_group_member;
-+    BlockDriverState *throttle_node;
- } BlockBackendPublic;
+@@ -3624,7 +3666,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
  
- BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm);
-@@ -225,7 +225,7 @@ BlockAIOCB *blk_abort_aio_request(BlockBackend *blk,
+     bdrv_set_aio_context(target_bs, aio_context);
  
- void blk_set_io_limits(BlockBackend *blk, ThrottleConfig *cfg);
- void blk_io_limits_disable(BlockBackend *blk);
--void blk_io_limits_enable(BlockBackend *blk, const char *group);
--void blk_io_limits_update_group(BlockBackend *blk, const char *group);
-+void blk_io_limits_enable(BlockBackend *blk, const char *group, Error **errp);
-+void blk_io_limits_update_group(BlockBackend *blk, const char *group, Error **errp);
+-    blockdev_mirror_common(arg->has_job_id ? arg->job_id : NULL, bs, target_bs,
++    blockdev_mirror_common(arg->job_id, bs, target_bs,
+                            arg->has_replaces, arg->replaces, arg->sync,
+                            backing_mode, arg->has_speed, arg->speed,
+                            arg->has_granularity, arg->granularity,
+@@ -3674,12 +3716,21 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+         return;
+     }
  
- #endif
-diff --git a/tests/test-throttle.c b/tests/test-throttle.c
-index 0ea9093eee..eef2b1c707 100644
---- a/tests/test-throttle.c
-+++ b/tests/test-throttle.c
-@@ -594,7 +594,6 @@ static void test_groups(void)
- {
-     ThrottleConfig cfg1, cfg2;
-     BlockBackend *blk1, *blk2, *blk3;
--    BlockBackendPublic *blkp1, *blkp2, *blkp3;
-     ThrottleGroupMember *tgm1, *tgm2, *tgm3;
++    /* Always require a job-id when device is a node name */
++    if (!has_job_id) {
++        if (blk_by_name(device)) {
++            job_id = device;
++        } else {
++            error_setg(errp, "An explicit job ID is required for this node");
++            return;
++        }
++    }
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
  
-     /* No actual I/O is performed on these devices */
-@@ -602,13 +601,9 @@ static void test_groups(void)
-     blk2 = blk_new(0, BLK_PERM_ALL);
-     blk3 = blk_new(0, BLK_PERM_ALL);
+     bdrv_set_aio_context(target_bs, aio_context);
  
--    blkp1 = blk_get_public(blk1);
--    blkp2 = blk_get_public(blk2);
--    blkp3 = blk_get_public(blk3);
+-    blockdev_mirror_common(has_job_id ? job_id : NULL, bs, target_bs,
++    blockdev_mirror_common(job_id, bs, target_bs,
+                            has_replaces, replaces, sync, backing_mode,
+                            has_speed, speed,
+                            has_granularity, granularity,
+diff --git a/blockjob.c b/blockjob.c
+index 70a78188b7..ba26890ae9 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -622,20 +622,14 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+         return NULL;
+     }
+ 
+-    if (job_id == NULL && !(flags & BLOCK_JOB_INTERNAL)) {
+-        job_id = bdrv_get_device_name(bs);
+-        if (!*job_id) {
+-            error_setg(errp, "An explicit job ID is required for this node");
+-            return NULL;
+-        }
+-    }
 -
--    tgm1 = &blkp1->throttle_group_member;
--    tgm2 = &blkp2->throttle_group_member;
--    tgm3 = &blkp3->throttle_group_member;
-+    tgm1 = g_new0(ThrottleGroupMember, 1);
-+    tgm2 = g_new0(ThrottleGroupMember, 1);
-+    tgm3 = g_new0(ThrottleGroupMember, 1);
+-    if (job_id) {
+-        if (flags & BLOCK_JOB_INTERNAL) {
++    if (flags & BLOCK_JOB_INTERNAL) {
++        if (job_id) {
+             error_setg(errp, "Cannot specify job ID for internal block job");
+             return NULL;
+         }
+-
++    } else {
++        /* Require job-id. */
++        assert(job_id);
+         if (!id_wellformed(job_id)) {
+             error_setg(errp, "Invalid job ID '%s'", job_id);
+             return NULL;
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index f13ad05c0d..ff906808a6 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -112,8 +112,7 @@ struct BlockJobDriver {
  
-     g_assert(tgm1->throttle_state == NULL);
-     g_assert(tgm2->throttle_state == NULL);
-@@ -655,6 +650,14 @@ static void test_groups(void)
-     g_assert(tgm1->throttle_state == NULL);
-     g_assert(tgm2->throttle_state == NULL);
-     g_assert(tgm3->throttle_state == NULL);
-+
-+    g_free(tgm1);
-+    g_free(tgm2);
-+    g_free(tgm3);
-+
-+    blk_unref(blk1);
-+    blk_unref(blk2);
-+    blk_unref(blk3);
- }
+ /**
+  * block_job_create:
+- * @job_id: The id of the newly-created job, or %NULL to have one
+- * generated automatically.
++ * @job_id: The id of the newly-created job, must be non %NULL.
+  * @job_type: The class object for the newly-created job.
+  * @bs: The block
+  * @perm, @shared_perm: Permissions to request for @bs
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 23bdf1a932..83ce5f63c7 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -93,9 +93,6 @@ static void test_job_ids(void)
+     blk[1] = create_blk("drive1");
+     blk[2] = create_blk("drive2");
  
- int main(int argc, char **argv)
+-    /* No job ID provided and the block backend has no name */
+-    job[0] = do_test_id(blk[0], NULL, false);
+-
+     /* These are all invalid job IDs */
+     job[0] = do_test_id(blk[0], "0id", false);
+     job[0] = do_test_id(blk[0], "",    false);
+@@ -119,16 +116,15 @@ static void test_job_ids(void)
+     block_job_early_fail(job[0]);
+     job[1] = do_test_id(blk[1], "id0", true);
+ 
+-    /* No job ID specified, defaults to the backend name ('drive1') */
+     block_job_early_fail(job[1]);
+-    job[1] = do_test_id(blk[1], NULL, true);
++    job[1] = do_test_id(blk[1], "drive1", true);
+ 
+     /* Duplicate job ID */
+     job[2] = do_test_id(blk[2], "drive1", false);
+ 
+-    /* The ID of job[2] would default to 'drive2' but it is already in use */
++    /* The ID of job[2] is already in use */
+     job[0] = do_test_id(blk[0], "drive2", true);
+-    job[2] = do_test_id(blk[2], NULL, false);
++    job[2] = do_test_id(blk[2], "drive2", false);
+ 
+     /* This one is valid */
+     job[2] = do_test_id(blk[2], "id_2", true);
 -- 
 2.11.0
