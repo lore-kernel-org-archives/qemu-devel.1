@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfLXI-0001O9-L2
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:36:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1dfLdY-0002mP-H4
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:42:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfLXE-00040M-II
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:36:12 -0400
-Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:58380)
+	(envelope-from <peterx@redhat.com>) id 1dfLdU-0006n3-HY
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:42:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54098)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfLXE-0003yc-7d
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:36:08 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id F13DB86342
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 09:36:05 +0200 (CEST)
-Date: Wed, 9 Aug 2017 09:35:59 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170809093559.46396525@bahia.lan>
-In-Reply-To: <d9f906a7-eef1-e89c-36db-8e142a1272da@redhat.com>
-References: <150221331695.15915.4904484630739512874.stgit@bahia.lan>
-	<d9f906a7-eef1-e89c-36db-8e142a1272da@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dfLdU-0006m3-8a
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:42:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 994CE46269
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 07:42:32 +0000 (UTC)
+Date: Wed, 9 Aug 2017 15:42:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170809074226.GI13486@pxdev.xzpeter.org>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-11-quintela@redhat.com>
+	<20170719190238.GK3500@work-vm>
+	<20170720081005.GB23385@pxdev.xzpeter.org>
+	<87d18682qh.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/7D.d.jHO=WD6xx3ZSWB8AKb";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [for-2.10 PATCH] 9pfs: local: fix
- fchmodat_nofollow() limitations
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87d18682qh.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v5 10/17] migration: Create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,241 +36,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, zhiyong.wu@ucloud.cn
+To: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, berrange@redhat.com
 
---Sig_/7D.d.jHO=WD6xx3ZSWB8AKb
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Aug 08, 2017 at 06:04:54PM +0200, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > On Wed, Jul 19, 2017 at 08:02:39PM +0100, Dr. David Alan Gilbert wrote:
+> >> * Juan Quintela (quintela@redhat.com) wrote:
+> 
+> >> >  struct MultiFDSendParams {
+> >> > +    /* not changed */
+> >> >      uint8_t id;
+> >> >      QemuThread thread;
+> >> >      QIOChannel *c;
+> >> >      QemuSemaphore sem;
+> >> >      QemuMutex mutex;
+> >> > +    /* protected by param mutex */
+> >> >      bool quit;
+> >> 
+> >> Should probably comment to say what address space address is in - this
+> >> is really a qemu pointer - and that's why we can treat 0 as special?
+> >
+> > I believe this comment is for "address" below.
+> >
+> > Yes, it would be nice to comment it. IIUC it belongs to virtual
+> > address space of QEMU, so it should be okay to use zero as a "special"
+> > value.
+> 
+> See new comments.
+> 
+> >> 
+> >> > +    uint8_t *address;
+> >> > +    /* protected by multifd mutex */
+> >> > +    bool done;
+> >> 
+> >> done needs a comment to explain what it is because
+> >> it sounds similar to quit;  I think 'done' is saying that
+> >> the thread is idle having done what was asked?
+> >
+> > Since we know that valid address won't be zero, not sure whether we
+> > can just avoid introducing the "done" field (even, not sure whether we
+> > will need lock when modifying "address", I think not as well? Please
+> > see below). For what I see this, it works like a state machine, and
+> > "address" can be the state:
+> >
+> >             +--------  send thread ---------+
+> >             |                               |
+> >            \|/                              |
+> >         address==0 (IDLE)               address!=0 (ACTIVE)
+> >             |                              /|\
+> >             |                               |
+> >             +--------  main thread ---------+
+> >
+> > Then...
+> 
+> It is needed, we change things later in the series.  We could treat as
+> an special case page.num == 0. But then we can differentiate the case
+> where we have finished the last round and that we are in the beggining
+> of the new one.
 
-On Tue, 8 Aug 2017 14:14:18 -0500
-Eric Blake <eblake@redhat.com> wrote:
+(Will comment below)
 
-> On 08/08/2017 12:28 PM, Greg Kurz wrote:
-> > This function has to ensure it doesn't follow a symlink that could be u=
-sed
-> > to escape the virtfs directory. This could be easily achieved if fchmod=
-at()
-> > on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-> > it doesn't.
-> >=20
-> > The current implementation covers most use-cases, but it notably fails =
-if:
-> > - the target path has access rights equal to 0000 (openat() returns EPE=
-RM), =20
-> >   =3D> once you've done chmod(0000) on a file, you can never chmod() ag=
-ain =20
-> > - the target path is UNIX domain socket (openat() returns ENXIO) =20
-> >   =3D> bind() of UNIX domain sockets fails if the file is on 9pfs =20
->=20
-> Did your attempt at a kernel patch for AT_SYMLINK_NOFOLLOW ever get
-> anywhere?
->=20
-
-No.
-
-> >=20
-> > The solution is to use O_PATH: openat() now succeeds in both cases, and=
- we
-> > can ensure the path isn't a symlink with fstat(). The associated entry =
-in
-> > "/proc/self/fd" can hence be safely passed to the regular chmod() sysca=
-ll.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/9p-local.c |   44 ++++++++++++++++++++++++++++----------------
-> >  hw/9pfs/9p-util.h  |   10 +++++++---
-> >  2 files changed, 35 insertions(+), 19 deletions(-)
-> >=20
-> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> > index 6e478f4765ef..b178d627c764 100644
-> > --- a/hw/9pfs/9p-local.c
-> > +++ b/hw/9pfs/9p-local.c
-> > @@ -333,30 +333,42 @@ update_map_file:
-> > =20
-> >  static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
-> >  {
-> > +    struct stat stbuf;
-> >      int fd, ret;
-> > +    char *proc_path;
-> > =20
-> >      /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW=
-).
-> > -     * Unfortunately, the linux kernel doesn't implement it yet. As an
-> > -     * alternative, let's open the file and use fchmod() instead. This
-> > -     * may fail depending on the permissions of the file, but it is the
-> > -     * best we can do to avoid TOCTTOU. We first try to open read-only
-> > -     * in case name points to a directory. If that fails, we try write=
--only
-> > -     * in case name doesn't point to a directory.
-> > +     * Unfortunately, the linux kernel doesn't implement it yet.
-> >       */
-> > -    fd =3D openat_file(dirfd, name, O_RDONLY, 0);
-> > -    if (fd =3D=3D -1) {
-> > -        /* In case the file is writable-only and isn't a directory. */
-> > -        if (errno =3D=3D EACCES) {
-> > -            fd =3D openat_file(dirfd, name, O_WRONLY, 0);
-> > -        }
-> > -        if (fd =3D=3D -1 && errno =3D=3D EISDIR) {
-> > -            errno =3D EACCES;
-> > -        }
-> > +    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-> > +        return -1;
-> >      } =20
->=20
-> Checking the file...
->=20
-> > +
-> > +    if (S_ISLNK(stbuf.st_mode)) {
-> > +        errno =3D ELOOP;
-> > +        return -1;
-> > +    }
-> > +
-> > +    fd =3D openat_file(dirfd, name, O_RDONLY | O_PATH, 0); =20
->=20
-> ...and then opening the file is a TOCTTOU race (although it works most
-> of the time and avoids the open where it is easy)...
->=20
-
-Exactly. It is globally assumed in the 9p code that symbolic links are
-resolved by the client. The earlier we detect the file is a symbolic
-link, the earlier we can error out. The fstat()+S_ISLNK() is a deliberate
-fast error path actually :)
-
-> >      if (fd =3D=3D -1) {
-> >          return -1;
-> >      }
-> > -    ret =3D fchmod(fd, mode);
-> > +
-> > +    ret =3D fstat(fd, &stbuf);
-> > +    if (ret) {
-> > +        goto out;
-> > +    } =20
->=20
-> ...so you are double-checking that you got a non-symlink after all (your
-> insurance against the race having done the wrong thing [but see below])...
->=20
-
-Yes, this is the *real* check.
-
-> > +
-> > +    if (S_ISLNK(stbuf.st_mode)) {
-> > +        errno =3D ELOOP;
-> > +        ret =3D -1;
-> > +        goto out;
-> > +    }
-> > +
-> > +    proc_path =3D g_strdup_printf("/proc/self/fd/%d", fd);
-> > +    ret =3D chmod(proc_path, mode); =20
->=20
-> ...at which point you now have a valid file name that represents the
-> file you wanted to chmod() in the first place (even if another rename
-> occurs in the meantime, you are changing the mode tied to the
-> non-symlink fd that you double-checked, which ends up behaving as if you
-> had won the race and made the chmod() call before the rename).
->=20
-
-Yes.
-
-> > +    g_free(proc_path);
-> > +out:
-> >      close_preserve_errno(fd);
-> >      return ret; =20
->=20
-> Might be worth littering some comments in the code explaining why you
-> have to call both fstatat() and stat(), or perhaps you could drop the
-> first fstatat() and just always do the open().
->=20
-
-I like the idea of erroring out right away when a symbolic link is
-detected. I'll add comments.
-
-> Reading 'man open', it looks like O_PATH will chase symlinks UNLESS you
-> also use O_NOFOLLOW.  So I had to code up a simple test program to
-> verify if things work...
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> #define _GNU_SOURCE 1
-> #include <sys/stat.h>
-> #include <stdio.h>
-> #include <errno.h>
-> #include <unistd.h>
-> #include <fcntl.h>
->=20
-> int main(void) {
->     struct stat st;
->     int fd;
->=20
->     remove("f");
->     remove("l");
->     if (creat("f", 0) < 0)
->         return 1;
->     if (symlink("f", "l") < 0)
->         return 2;
->=20
->     fd =3D open("l", O_RDONLY | O_PATH);
->     if (fd < 0)
->         return 3;
->     if (fstat(fd, &st) < 0)
->         return 4;
->     if (S_ISLNK(st.st_mode)) {
->         printf("got a link\n");
->     } else {
->         printf("dereferenced\n");
+> 
+> >> 
+> >> >  };
+> >> >  typedef struct MultiFDSendParams MultiFDSendParams;
+> >> >  
+> >> > @@ -375,6 +381,8 @@ struct {
+> >> >      MultiFDSendParams *params;
+> >> >      /* number of created threads */
+> >> >      int count;
+> >> > +    QemuMutex mutex;
+> >> > +    QemuSemaphore sem;
+> >> >  } *multifd_send_state;
+> >> >  
+> >> >  static void terminate_multifd_send_threads(void)
+> >> > @@ -443,6 +451,7 @@ static void *multifd_send_thread(void *opaque)
+> >> >      } else {
+> >> >          qio_channel_write(p->c, string, MULTIFD_UUID_MSG, &error_abort);
+> >> >      }
+> >> > +    qemu_sem_post(&multifd_send_state->sem);
+> >> >  
+> >> >      while (!exit) {
+> >> >          qemu_mutex_lock(&p->mutex);
+> >> > @@ -450,6 +459,15 @@ static void *multifd_send_thread(void *opaque)
+> >> >              qemu_mutex_unlock(&p->mutex);
+> >> >              break;
+> >> >          }
+> >> > +        if (p->address) {
+> >> > +            p->address = 0;
+> >> > +            qemu_mutex_unlock(&p->mutex);
+> >> > +            qemu_mutex_lock(&multifd_send_state->mutex);
+> >> > +            p->done = true;
+> >> > +            qemu_mutex_unlock(&multifd_send_state->mutex);
+> >> > +            qemu_sem_post(&multifd_send_state->sem);
+> >> > +            continue;
+> >
+> > Here instead of setting up address=0 at the entry, can we do this (no
+> > "done" for this time)?
+> >
+> >                  // send the page before clearing p->address
+> >                  send_page(p->address);
+> >                  // clear p->address to switch to "IDLE" state
+> >                  atomic_set(&p->address, 0);
+> >                  // tell main thread, in case it's waiting
+> >                  qemu_sem_post(&multifd_send_state->sem);
+> >
+> > And on the main thread...
+> >
+> >> > +        }
+> >> >          qemu_mutex_unlock(&p->mutex);
+> >> >          qemu_sem_wait(&p->sem);
+> >> >      }
+> >> > @@ -469,6 +487,8 @@ int multifd_save_setup(void)
+> >> >      multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
+> >> >      multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
+> >> >      multifd_send_state->count = 0;
+> >> > +    qemu_mutex_init(&multifd_send_state->mutex);
+> >> > +    qemu_sem_init(&multifd_send_state->sem, 0);
+> >> >      for (i = 0; i < thread_count; i++) {
+> >> >          char thread_name[16];
+> >> >          MultiFDSendParams *p = &multifd_send_state->params[i];
+> >> > @@ -477,6 +497,8 @@ int multifd_save_setup(void)
+> >> >          qemu_sem_init(&p->sem, 0);
+> >> >          p->quit = false;
+> >> >          p->id = i;
+> >> > +        p->done = true;
+> >> > +        p->address = 0;
+> >> >          p->c = socket_send_channel_create();
+> >> >          if (!p->c) {
+> >> >              error_report("Error creating a send channel");
+> >> > @@ -491,6 +513,30 @@ int multifd_save_setup(void)
+> >> >      return 0;
+> >> >  }
+> >> >  
+> >> > +static int multifd_send_page(uint8_t *address)
+> >> > +{
+> >> > +    int i;
+> >> > +    MultiFDSendParams *p = NULL; /* make happy gcc */
+> >> > +
+> >
+> >
+> >> > +    qemu_sem_wait(&multifd_send_state->sem);
+> >> > +    qemu_mutex_lock(&multifd_send_state->mutex);
+> >> > +    for (i = 0; i < multifd_send_state->count; i++) {
+> >> > +        p = &multifd_send_state->params[i];
+> >> > +
+> >> > +        if (p->done) {
+> >> > +            p->done = false;
+> >> > +            break;
+> >> > +        }
+> >> > +    }
+> >> > +    qemu_mutex_unlock(&multifd_send_state->mutex);
+> >> > +    qemu_mutex_lock(&p->mutex);
+> >> > +    p->address = address;
+> >> > +    qemu_mutex_unlock(&p->mutex);
+> >> > +    qemu_sem_post(&p->sem);
+> >
+> > ... here can we just do this?
+> >
+> > retry:
+> >     // don't take any lock, only read each p->address
+> >     for (i = 0; i < multifd_send_state->count; i++) {
+> >         p = &multifd_send_state->params[i];
+> >         if (!p->address) {
+> >             // we found one IDLE send thread
+> >             break;
+> >         }
+> >     }
+> >     if (!p) {
+> >         qemu_sem_wait(&multifd_send_state->sem);
+> >         goto retry;
+> >     }
+> >     // we switch its state, IDLE -> ACTIVE
+> >     atomic_set(&p->address, address);
+> >     // tell the thread to start work
+> >     qemu_sem_post(&p->sem);
+> >
+> > Above didn't really use any lock at all (either the per thread lock,
+> > or the global lock). Would it work?
+> 
+> Probably (surely on x86).
+> 
+> But on the "final code", it becomes:
+> 
+>     qemu_mutex_lock(&multifd_send_state->mutex);
+>     for (i = 0; i < multifd_send_state->count; i++) {
+>         p = &multifd_send_state->params[i];
+> 
+>         if (p->done) {
+>             p->done = false;
+>             break;
+>         }
 >     }
->     close(fd);
->=20
->     fd =3D open("l", O_RDONLY | O_PATH | O_NOFOLLOW);
->     if (fd < 0)
->         return 5;
->     if (fstat(fd, &st) < 0)
->         return 6;
->     if (S_ISLNK(st.st_mode)) {
->         printf("got a link\n");
->     } else {
->         printf("dereferenced\n");
->     }
->     close(fd);
->=20
->     remove("f");
->     remove("l");
->     return 0;
-> }
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> $ ./foo
-> dereferenced
-> got a link
->=20
-> Ouch - you need to fix your patch to use open(O_NOFOLLOW | O_PATH).
->=20
+>     qemu_mutex_unlock(&multifd_send_state->mutex);
+>     qemu_mutex_lock(&p->mutex);
+>     p->pages.num = pages->num;
+>     iov_copy(p->pages.iov, pages->num, pages->iov, pages->num, 0,
+>              iov_size(pages->iov, pages->num));
+>     pages->num = 0;
+>     qemu_mutex_unlock(&p->mutex);
+>     qemu_sem_post(&p->sem);
+> 
+> So, we set done to false, without the global mutex (yes, we can change
+> that for one atomic).
 
-openat_file() adds O_NOFOLLOW... I'll rename it to openat_file_nofollow()
-in a separate patch for clarity.
+Yep. Then IMHO we should be able to avoid the global lock
+(multifd_send_state->mutex).
 
-> Furthermore, I'm worried that your patch is regressing commit 918112c0,
-> when compiling for older platforms where either O_PATH does not exist,
-> or where libc exposes the constant but the kernel is too old to
-> understand it.  (I guess the latter problem is already existing in our
-> code base, so we really only need to worry about the former of compiling
-> when the constant does not exist).  So if supporting old platforms is
-> desired, you MUST keep BOTH approaches intact, gated by whether O_PATH
-> is defined to a non-zero value, rather than just assuming O_PATH works.
->=20
+Though I still think that p->done is not really necessary, since there
+are only two valid states for each MultiFDSendParams, either:
 
-I don't necessarily want this to work for old platforms, but I'll fix the
-potential build break like in commit 918112c0.
+  p->done == true, p->pages.num == 0
 
---Sig_/7D.d.jHO=WD6xx3ZSWB8AKb
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Which means the send thread is idle, or:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  p->done == true, p->pages.num > 0
 
-iEYEARECAAYFAlmKu18ACgkQAvw66wEB28I3VwCfWC8n3iU1QkG7RGLcN7PR4vHU
-XxgAn2qGEMRNH8+SqYlAYnWW9sbFSBIp
-=IqLP
------END PGP SIGNATURE-----
+Which means the send thread is busy. So logically p->pages.num
+contains all the information already.
 
---Sig_/7D.d.jHO=WD6xx3ZSWB8AKb--
+But I'm fine with either way.
+
+> 
+> But then we copy an iov without a lock?  With the other thread checking
+> for pages->num == 0?  It sounds a bit fragile to me, no?
+
+Yeah, for this one, not sure this can be achieved by careful ordering.
+When we publish the send request, we may need to:
+
+    for (i = 0; i < pages->num; i++) {
+        p->pages.iov[j].iov_base = pages.iov[j].iov_base;
+        p->pages.iov[j].iov_len = pages.iov[j].iov_len;
+    }
+    atomic_set(&p->pages.num, pages->num);
+    qemu_sem_post(&p->sem);
+
+The point is (just like when we were using address in current patch),
+we use p->pages.num as a state, though for this time num==0 means
+IDLE, but num>0 means busy. As long as we setup the IOVs before the
+final state change, IMHO we should be fine.
+
+Again, I'm also fine if we want to keep the locks at least in the
+first version. I just think it may be faster if we can avoid using
+those locks.
+
+Thanks,
+
+-- 
+Peter Xu
