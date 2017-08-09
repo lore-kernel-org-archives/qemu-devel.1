@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfXa7-0006Kn-A9
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 16:27:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfXkA-0006lk-8N
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 16:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfXa6-0002W3-6x
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 16:27:55 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32897)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfXa6-0002Vp-2Y
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 16:27:54 -0400
-Received: by mail-qt0-x244.google.com with SMTP id u19so6908057qtc.0
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 13:27:54 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  9 Aug 2017 17:27:12 -0300
-Message-Id: <20170809202712.6951-17-f4bug@amsat.org>
-In-Reply-To: <20170809202712.6951-1-f4bug@amsat.org>
-References: <20170809202712.6951-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1dfXk9-0008Jm-0U
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 16:38:18 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed,  9 Aug 2017 15:38:04 -0500
+Message-Id: <20170809203808.31725-2-eblake@redhat.com>
+In-Reply-To: <20170809203808.31725-1-eblake@redhat.com>
+References: <20170809203808.31725-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [NOTFORMERGE PATCH for-2.11 v3 16/16] travis/osx:
- build using bleeding Xcode
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 1/5] vpc: Check failure of bdrv_getlength()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +22,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, Max Reitz <mreitz@redhat.com>
 
-test 'unstable' Xcode (9beta4) ...
-    OS X 10.13 (darwin16.7.0)
-    Apple LLVM version 9.0.0 (clang-900.0.31)
+vpc_open() was checking for bdrv_getlength() failure in one, but
+not the other, location.
 
-see https://docs.travis-ci.com/user/reference/osx/#OS-X-Version
+Reported-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- .travis.yml | 5 +++++
- 1 file changed, 5 insertions(+)
+v2: error message tweak [Kevin]
+---
+ block/vpc.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index cd59570062..16c1dee150 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -130,6 +130,11 @@ matrix:
-       # newer stable available, OS X 10.12
-       osx_image: xcode8.3
-       compiler: clang
-+    - env: CONFIG=""
-+      os: osx
-+      # unstable
-+      osx_image: xcode9
-+      compiler: clang
-     # Plain Trusty System Build
-     - env: CONFIG="--disable-linux-user"
-       sudo: required
--- 
-2.13.3
+diff --git a/block/vpc.c b/block/vpc.c
+index 574879ba7c..82911ebead 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -219,6 +219,7 @@ static int vpc_open(BlockDriverState *bs, QDict *opti=
+ons, int flags,
+     uint64_t pagetable_size;
+     int disk_type =3D VHD_DYNAMIC;
+     int ret;
++    int64_t bs_size;
+
+     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+@@ -411,7 +412,13 @@ static int vpc_open(BlockDriverState *bs, QDict *opt=
+ions, int flags,
+             }
+         }
+
+-        if (s->free_data_block_offset > bdrv_getlength(bs->file->bs)) {
++        bs_size =3D bdrv_getlength(bs->file->bs);
++        if (bs_size < 0) {
++            error_setg_errno(errp, -bs_size, "Unable to learn image size=
+");
++            ret =3D bs_size;
++            goto fail;
++        }
++        if (s->free_data_block_offset > bs_size) {
+             error_setg(errp, "block-vpc: free_data_block_offset points a=
+fter "
+                              "the end of file. The image has been trunca=
+ted.");
+             ret =3D -EINVAL;
+--=20
+2.13.4
