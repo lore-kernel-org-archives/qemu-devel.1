@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dfFcg-0003Zv-Jw
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:23 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dfFcm-0003by-AG
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dfFcd-0005pD-TP
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dfFcd-0005om-K3
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E89CC0587C9
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 01:17:18 +0000 (UTC)
-Date: Wed, 9 Aug 2017 04:17:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170809041535-mutt-send-email-mst@kernel.org>
-References: <20170808203900.7661-1-jfreimann@redhat.com>
-	<150223674179.30.1367378707991546414@dd743fd916bd>
+	(envelope-from <no-reply@patchew.org>) id 1dfFcj-0005rj-IW
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:17:28 -0400
+Resent-Message-Id: <E1dfFcj-0005rj-IW@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150224143496.33.14217849227927698738@dd743fd916bd>
+In-Reply-To: <20170808183306.27474-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <150223674179.30.1367378707991546414@dd743fd916bd>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] tests/pxe-test: add testcase using
- vhost-user-bridge
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 8 Aug 2017 18:17:15 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/9] IDE: replace printfs with tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jfreimann@redhat.com, famz@redhat.com, victork@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
+To: jsnow@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, Aug 08, 2017 at 04:59:02PM -0700, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
->=20
-> Message-id: 20170808203900.7661-1-jfreimann@redhat.com
-> Subject: [Qemu-devel] [PATCH v2 0/5] tests/pxe-test: add testcase using=
- vhost-user-bridge
-> Type: series
-> /tmp/qemu-test/src/tests/pxe-test.c: In function =E2=80=98test_pxe_vhos=
-t_user=E2=80=99:
-> /tmp/qemu-test/src/tests/pxe-test.c:106: error: =E2=80=98G_SPAWN_SEARCH=
-_PATH_FROM_ENVP=E2=80=99 undeclared (first use in this function)
-> /tmp/qemu-test/src/tests/pxe-test.c:106: error: (Each undeclared identi=
-fier is reported only once
-> /tmp/qemu-test/src/tests/pxe-test.c:106: error: for each function it ap=
-pears in.)
-> make: *** [tests/pxe-test.o] Error 1
-> make: *** Waiting for unfinished jobs....
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 382, in <module>
->     sys.exit(main())
->   File "./tests/docker/docker.py", line 379, in main
->     return args.cmdobj.run(args, argv)
->   File "./tests/docker/docker.py", line 237, in run
->     return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
->   File "./tests/docker/docker.py", line 205, in run
->     quiet=3Dquiet)
->   File "./tests/docker/docker.py", line 123, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'c=
-om.qemu.instance.uuid=3D534034f67c9511e78af152540069c830', '-u', '0', '-t=
-', '--rm', '--net=3Dnone', '-e', 'TARGET_LIST=3D', '-e', 'EXTRA_CONFIGURE=
-_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D8', '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=
-=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache', '-v', '/var/tmp/patchew-test=
-er-tmp-ku3bj8a1/src/docker-src.2017-08-08-19.57.20.28326:/var/tmp/qemu:z,=
-ro', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:cen=
-tos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status =
-2
-> make[1]: *** [tests/docker/Makefile.include:139: docker-run] Error 1
-> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-ku3bj8a1/src'
-> make: *** [tests/docker/Makefile.include:168: docker-run-test-quick@cen=
-tos6] Error 2
->=20
-> real	1m41.298s
-> user	0m5.189s
-> sys	0m1.753s
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->=20
-> Test command exited with code: 2
-
-
-OK given this - it seems clear the right thing to do is to merge 2-4
-and leave 1 and 5 for 2.11.
-
---=20
-MST
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MDgxODMzMDYuMjc0NzQtMS1qc25vd0ByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVs
+XSBbUEFUQ0ggMC85XSBJREU6IHJlcGxhY2UgcHJpbnRmcyB3aXRoIHRyYWNpbmcKVHlwZTogc2Vy
+aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0Jwo1NjQzOTM0NGVmIEFIQ0k6IHJlbW92ZSBEUFJJTlRGIG1hY3Jv
+CjZhZDg1YWZiYTkgQUhDSTogcHJldHR5LXByaW50IEZJUyB0byBidWZmZXIgaW5zdGVhZCBvZiBz
+dGRlcnIKZGZjZDU4YmU2ZCBBSENJOiBSZXdvcmsgSVJRIGNvbnN0YW50cwo3N2ZlYjA4ZDFkIEFI
+Q0k6IFJlcGxhY2UgRFBSSU5URiB3aXRoIHRyYWNlLWV2ZW50cwo1NjU3YTQ5MTRlIElERTogcmVw
+bGFjZSBERUJVR19BSU8gd2l0aCB0cmFjZSBldmVudHMKNzcwOGJhMDE1OCBBVEFQSTogUmVwbGFj
+ZSBERUJVR19JREVfQVRBUEkgd2l0aCB0cmFjaW5nIGV2ZW50cwpjMDA3ZGE4MWIyIElERTogYWRk
+IHRyYWNpbmcgZm9yIGRhdGEgcG9ydHMKMDdjYzQzYTVmZiBJREU6IEFkZCByZWdpc3RlciBoaW50
+cyB0byB0cmFjaW5nCmE1YTdiNTA3YmUgSURFOiByZXBsYWNlIERFQlVHX0lERSB3aXRoIHRyYWNp
+bmcgc3lzdGVtCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IElERTog
+cmVwbGFjZSBERUJVR19JREUgd2l0aCB0cmFjaW5nIHN5c3RlbS4uLgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzEzOTogRklMRTogaHcvaWRlL2NvcmUu
+YzoxMTg5OgorICAgIGlmIChyZWdfbnVtICE9IDcgJiYgKHMtPnN0YXR1cyAmIChCVVNZX1NUQVR8
+RFJRX1NUQVQpKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lz
+ICcoJwojMTQ0OiBGSUxFOiBody9pZGUvY29yZS5jOjExOTM6CisgICAgc3dpdGNoKHJlZ19udW0p
+IHsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygn
+CiMxOTE6IEZJTEU6IGh3L2lkZS9jb3JlLmM6MjA1ODoKKyAgICBzd2l0Y2gocmVnX251bSkgewoK
+dG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi85OiBJREU6IEFk
+ZCByZWdpc3RlciBoaW50cyB0byB0cmFjaW5nLi4uCkNoZWNraW5nIFBBVENIIDMvOTogSURFOiBh
+ZGQgdHJhY2luZyBmb3IgZGF0YSBwb3J0cy4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IEFUQVBJOiBS
+ZXBsYWNlIERFQlVHX0lERV9BVEFQSSB3aXRoIHRyYWNpbmcgZXZlbnRzLi4uCkNoZWNraW5nIFBB
+VENIIDUvOTogSURFOiByZXBsYWNlIERFQlVHX0FJTyB3aXRoIHRyYWNlIGV2ZW50cy4uLgpDaGVj
+a2luZyBQQVRDSCA2Lzk6IEFIQ0k6IFJlcGxhY2UgRFBSSU5URiB3aXRoIHRyYWNlLWV2ZW50cy4u
+LgpFUlJPUjogSGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCcKIzU0MzogRklM
+RTogaHcvaWRlL3RyYWNlLWV2ZW50czo4ODoKK2hhbmRsZV9yZWdfaDJkX2Zpc19wbXAodm9pZCAq
+cywgaW50IHBvcnQsIGNoYXIgYjAsIGNoYXIgYjEsIGNoYXIgYjIpICJhaGNpKCVwKVslZF06IFBv
+cnQgTXVsdGlwbGllciBub3Qgc3VwcG9ydGVkLCBGSVM6IDB4JTAyeC0lMDJ4LSUwMngiCgpFUlJP
+UjogSGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCcKIzU0NDogRklMRTogaHcv
+aWRlL3RyYWNlLWV2ZW50czo4OToKK2hhbmRsZV9yZWdfaDJkX2Zpc19yZXModm9pZCAqcywgaW50
+IHBvcnQsIGNoYXIgYjAsIGNoYXIgYjEsIGNoYXIgYjIpICJhaGNpKCVwKVslZF06IFJlc2VydmVk
+IGZsYWdzIHNldCBpbiBIMkQgUmVnaXN0ZXIgRklTLCBGSVM6IDB4JTAyeC0lMDJ4LSUwMngiCgpF
+UlJPUjogSGV4IG51bWJlcnMgbXVzdCBiZSBwcmVmaXhlZCB3aXRoICcweCcKIzU1MDogRklMRTog
+aHcvaWRlL3RyYWNlLWV2ZW50czo5NToKK2hhbmRsZV9jbWRfdW5oYW5kbGVkX2Zpcyh2b2lkICpz
+LCBpbnQgcG9ydCwgdWludDhfdCBiMCwgdWludDhfdCBiMSwgdWludDhfdCBiMikgImFoY2koJXAp
+WyVkXTogdW5oYW5kbGVkIEZJUyB0eXBlLiBjbWRfZmlzOiAweCUwMngtJTAyeC0lMDJ4IgoKdG90
+YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MDAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy85OiBBSENJOiBSZXdv
+cmsgSVJRIGNvbnN0YW50cy4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IEFIQ0k6IHByZXR0eS1wcmlu
+dCBGSVMgdG8gYnVmZmVyIGluc3RlYWQgb2Ygc3RkZXJyLi4uCkVSUk9SOiBVc2UgZ19hc3NlcnQg
+b3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzM1OiBGSUxFOiBody9pZGUvYWhjaS5jOjY1ODoKKyAg
+ICBnX2Fzc2VydF9jbXBpbnQoY21kX2xlbiwgPD0sIDB4MTAwKTsKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgODUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS85OiBBSENJOiByZW1vdmUgRFBSSU5URiBtYWNy
+by4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+ZnJlZWxpc3RzLm9yZw==
