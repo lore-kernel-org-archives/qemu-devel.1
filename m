@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfNE1-0003h7-DL
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:24:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dfNHJ-0004Uz-4T
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfNDy-0000TX-41
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:24:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52481)
+	(envelope-from <cohuck@redhat.com>) id 1dfNHF-00025u-T4
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:27:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45417)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfNDx-0000Sh-Qd
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:24:22 -0400
-Date: Wed, 9 Aug 2017 10:24:13 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170809092413.GB24723@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170809071718.17924-1-cohuck@redhat.com>
-	<f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
-	<20170809102737.18436fb4.cohuck@redhat.com>
-	<5e015c3e-7973-f397-cc1e-fee190292616@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dfNHF-00024t-Ng
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:27:45 -0400
+Date: Wed, 9 Aug 2017 11:27:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170809112731.11659720.cohuck@redhat.com>
+In-Reply-To: <ec749714-0cb8-4e75-c056-760bfb12ae7c@redhat.com>
+References: <1502254778-14637-1-git-send-email-thuth@redhat.com>
+	<1502254778-14637-2-git-send-email-thuth@redhat.com>
+	<20170809110520.1fd23ddc.cohuck@redhat.com>
+	<ec749714-0cb8-4e75-c056-760bfb12ae7c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5e015c3e-7973-f397-cc1e-fee190292616@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: fix dependencies
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/boot-sector: Do not overwrite
+ the x86 buffer on other architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +31,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-On Wed, Aug 09, 2017 at 11:07:38AM +0200, Thomas Huth wrote:
-> On 09.08.2017 10:27, Cornelia Huck wrote:
-> > On Wed, 9 Aug 2017 10:23:04 +0200
+On Wed, 9 Aug 2017 11:18:33 +0200
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 09.08.2017 11:05, Cornelia Huck wrote:
+> > On Wed,  9 Aug 2017 06:59:37 +0200
 > > Thomas Huth <thuth@redhat.com> wrote:
+
+> >> @@ -80,16 +81,26 @@ int boot_sector_init(char *fname)
+> >>          return 1;
+> >>      }
+> >>  
+> >> -    /* For Open Firmware based system, we can use a Forth script instead */
+> >> -    if (strcmp(qtest_get_arch(), "ppc64") == 0) {
+> >> -        len = sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c! %x %x c!\n",
+> >> -                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET,
+> >> -                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET + 1);
+> >> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
+> >> +        /* Q35 requires a minimum 0x7e000 bytes disk (bug or feature?) */
+> >> +        len = 0x7e000;  
 > > 
-> >> On 09.08.2017 09:17, Cornelia Huck wrote:
-> >>> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
-> >>> on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
-> >>> device.
-> >>>
-> >>> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
-> >>> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
-> >>>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>
-> >>> Changes v1->v2: drop extraneous spaces, fix build on cris
-> >>>
-> >>> ---
-> >>>  default-configs/s390x-softmmu.mak | 1 +
-> >>>  fsdev/Makefile.objs               | 9 +++------
-> >>>  hw/Makefile.objs                  | 2 +-
-> >>>  3 files changed, 5 insertions(+), 7 deletions(-)
-> [...]
-> >>
-> >> Patch should be fine now, I think...
-> >>
-> >> But thinking about this again, I wonder whether it would be enough to
-> >> simply check for CONFIG_VIRTIO=y here instead. CONFIG_VIRTIO=y should be
-> >> sufficient to assert that there is also at least one kind of virtio
-> >> transport available, right?
-> >> Otherwise this will look really horrible as soon as somebody also tries
-> >> to add support for virtio-mmio here later ;-)
+> > Use the maximum of (0x7e000, sizeof(x86_boot_sector))? (Not that it is
+> > likely that the boot sector will ever grow, but I think it is cleaner.)  
+> 
+> Sounds like a little bit of too much sanity checking for me, but ok, I
+> can add it.
+
+It's probably a bit paranoid, but I don't think it hurts. 
+
+> 
+> >> +        boot_code = g_malloc(len);  
 > > 
-> > Do all virtio transports have support for 9p, though? I thought it was
-> > only virtio-pci and virtio-ccw...
+> > Would g_malloc_0() be better?  
 > 
-> While virtio-pci and virtio-ccw seem to require separate dedicated
-> devices (e.g. virtio-9p-pci and virtio-9p-ccw) for everything,
-> virtio-mmio seems to work different. As far as I can see, there are no
-> dedicated virtio-xxx-mmio devices in the code at all. According to
-> https://www.redhat.com/archives/libvir-list/2013-August/msg00009.html
-> you simply have to use virtio-xxx-device here instead. And a
-> virtio-9p-device is available. So theoretically, the 9p code should work
-> with virtio-mmio, too, or is there a problem that I did not see yet?
+> Good idea, the test is likely more predictable if we don't have random
+> data in the file here (it should not really matter, but let's better be
+> safe than sorry).
 > 
-> Anyway, we likely should not blindly enable this, so unless somebody has
-> a setup to test it, we should go with your current patch instead, I think.
+> >> +        memcpy(boot_code, x86_boot_sector, sizeof x86_boot_sector);  
+> > 
+> > sizeof(x86_boot_sector)?  
+> 
+> The original code uses sizeof without parenthesis, so I think we should
+> stay with that coding style.
 
-qemu-system-arm supports virtio-mmio so you can use that to test it
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+After your patch, the original sizeof callers are gone, no? (I really
+prefer the sizeof() variant...)
