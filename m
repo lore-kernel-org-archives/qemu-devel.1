@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dfSF6-0006Et-EY
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:53 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dfSML-0000L4-P7
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:53:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dfSF1-0005jw-Hg
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:52 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170809134205.dbkx5cuvjpbaxftv@postretch>
-References: <20170731095443.28211-1-el13635@mail.ntua.gr>
-	<20170731095443.28211-6-el13635@mail.ntua.gr>
-	<w51valyjj7j.fsf@maestria.local.igalia.com>
-	<20170808134544.paekftiounmirhbo@postretch>
-	<w51poc6jeln.fsf@maestria.local.igalia.com>
-	<20170808145620.wlb5rdutuseutclx@postretch>
-	<w51mv7aje27.fsf@maestria.local.igalia.com>
-	<20170809093612.oee2u5kdgyojheqm@postretch>
-	<w51y3qslxyz.fsf@maestria.local.igalia.com>
-	<20170809134205.dbkx5cuvjpbaxftv@postretch>
-Date: Wed, 09 Aug 2017 16:45:43 +0200
-Message-ID: <w51valwlrzc.fsf@maestria.local.igalia.com>
+	(envelope-from <eric.auger@redhat.com>) id 1dfSME-0008T0-PS
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:53:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1dfSME-0008Sd-G6
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:53:14 -0400
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d358266e-f14f-90eb-a74c-689c2ef0332e@redhat.com>
+Date: Wed, 9 Aug 2017 16:53:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
- driver
+In-Reply-To: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Wed 09 Aug 2017 03:42:07 PM CEST, Manos Pitsidianakis wrote:
-> On Wed, Aug 09, 2017 at 02:36:20PM +0200, Alberto Garcia wrote:
->>On Wed 09 Aug 2017 11:36:12 AM CEST, Manos Pitsidianakis wrote:
->>> On Tue, Aug 08, 2017 at 05:04:48PM +0200, Alberto Garcia wrote:
->>>>On Tue 08 Aug 2017 04:56:20 PM CEST, Manos Pitsidianakis wrote:
->>>>>>> So basically if we have anonymous groups, we accept limits in the
->>>>>>> driver options but only without a group-name.
->>>>>>
->>>>>>In the commit message you do however have limits and a group name, is
->>>>>>that a mistake?
->>>>>>
->>>>>>    -drive driver=throttle,file.filename=foo.qcow2, \
->>>>>>           limits.iops-total=...,throttle-group=bar
->>>>>
->>>>> Sorry this wasn't clear, I'm actually proposing to remove limits from
->>>>> the throttle driver options and only create/config throttle groups via
->>>>> -object/object-add.
->>>>
->>>>Sorry I think it was me who misunderstood :-) Anyway in the new
->>>>command-line API I would be more inclined to have limits defined using
->>>>"-object throttle-group" and -drive would only reference the group id.
->>>>
->>>>I understand that this implies that it wouldn't be possible to create
->>>>anonymous groups (at least not from the command line), is that a
->>>>problem?
->>>
->>> We can accept anonymous groups if a user specifies limits but not a
->>> group name in the throttle driver. (The only case where limits would
->>> be acccepted)
->>
->>Yeah but that's only if we have the limits.iops-total=... options in the
->>throttle driver. If we "remove limits from the throttle driver options
->>and only create/config throttle groups via -object/object-add" we 
->>cannot
->>do that.
->
-> We can check that groups is not defined at the same time as limits,
+Hi Michael,
 
-I'm not sure if I'm following the conversation anymore :-) let's try to
-recap:
+On 27/07/2017 03:30, Michael Roth wrote:
+> This series was motivated by the discussion in this thread:
+> 
+>   https://www.redhat.com/archives/libvir-list/2017-June/msg01370.html
+> 
+> The issue this series addresses is that when libvirt unplugs a VFIO PCI device,
+> it may attempt to bind the host device back to the host driver when QEMU emits
+> the DEVICE_DELETED event for the corresponding vfio-pci device. However, the
+> VFIO group FD is not actually cleaned up until vfio-pci device is *finalized*
+> by QEMU, whereas the event is emitted earlier during device_unparent.
+> Depending on the host device and how long certain operations like resetting the
+> device might take, this can in result in libvirt trying to rebind the device
+> back to the host while it is still in use by VFIO, leading to host crashes or
+> other unexpected behavior.
+> 
+> In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
+> quiesced by vfio-pci's finalize() routine until up to 6s after the
+> DEVICE_DELETED was emitted, leading to detach-device on the libvirt side pretty
+> much always crashing the host.
+> 
+> Implementing this change requires 2 prereqs to ensure the same information is
+> available when the DEVICE_DELETED is finally emitted:
+> 
+> 1) Storing the path in the composition patch, which is addressed by PATCH 1,
+>    which was plucked from another pending series from Greg Kurz:
+> 
+>    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07922.html
+> 
+>    since we are now "disconnected" at the time the event is emitted, and
+> 
+> 2) Deferring qemu_opts_del of the DeviceState->QemuOpts till finalize, since
+>    that is where DeviceState->id is stored. This was actually how it was
+>    done in the past, so PATCH 2 simply reverts the change which moved it to
+>    device_unparent.
+> 
+> From there it's just a mechanical move of the event from device_unparent to
+> device_finalize.
+> 
+>  hw/core/qdev.c         | 30 +++++++++++++++++++-----------
+>  include/hw/qdev-core.h |  1 +
+>  2 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> 
 
-  a) Groups are defined like this (with the current patches):
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-     -object throttle-group,id=foo,x-iops-total=100,x-..
 
-  b) Throttle nodes are defined like this:
+Without the series I get the following warning when detaching a pci host
+dev from virt-manager:
+2017-08-09T14:28:44.825925Z qemu-system-aarch64: Failed to remove group
+53 from KVM VFIO device: No such file or directory
 
-     -drive driver=throttle,file.filename=foo.qcow2, \
-            limits.iops-total=...,throttle-group=bar
+as KVM_DEV_VFIO_GROUP_DEL returns -ENOENT due to the fact the fd for the
+VFIO group does not exist anymore as libvirt already started to unbind
+the device from vfio-pci at vfio_instance_finalize() time.
 
-  c) Therefore limits can be defined either in (a) or (b)
+With the series I don't see the message anymore.
 
-  d) If we omit throttle-group=... in (b), we would create an anonymous
-     group.
+Thanks
 
-  e) The -drive syntax from (b) has the "problem" that it's possible to
-     define several nodes with the same throttling group but different
-     limits. The last one would win (as the legacy syntax does), but
-     that's not something completely straightforward for the end user.
-
-  f) The syntax from (b) also has the problem that there's one more
-     place that needs code to parse throttling limits.
-
-  g) We can solve (e) and (f) if we remove the limits.* options
-     altogether from the throttling filter. In that case you would need
-     to define a throttle-group object and use the throttle-group option
-     of the filter node in all cases.
-
-  h) If we remove the limits.* options we cannot have anonymous groups
-     anymore (at least not using this API). My question is: is it a
-     problem? What would we lose? What benefits do anonymous groups
-     bring us?
-     
-  i) We can of course maintain the limits.* options, but disallow
-     throttle-group when they are present. That way we would allow
-     anonymous groups and we would solve the ambiguity problem described
-     in (e). My question is: is it worth it?
-
->>> Not creating eponymous throttle groups via the throttle driver means
->>> we don't need throttle_groups anymore, since even anonymous ones
->>> don't need to be accounted for in a list.
->>
->>I don't follow you here, how else do you get a group by its name?
->
-> If all eponymous groups are managed by the QOM tree, we should be able
-> to iterate over the object root container for all ThrottleGroups just
-> like qmp_query_iothreads() in iothread.c
-
-Mmm... can't we actually use the root container now already? (even with
-anonymous groups I mean). Why do we need throttle_groups?
-
-Berto
+Eric
