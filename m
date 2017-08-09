@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dfKUW-00065I-9W
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 02:29:17 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dfKUb-0006AU-Vx
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 02:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dfKUV-00077C-6T
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 02:29:16 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dfKUb-0007C2-1E
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 02:29:22 -0400
 From: Andrew Jeffery <andrew@aj.id.au>
-Date: Wed,  9 Aug 2017 15:58:27 +0930
-Message-Id: <20170809062828.3673-3-andrew@aj.id.au>
+Date: Wed,  9 Aug 2017 15:58:28 +0930
+Message-Id: <20170809062828.3673-4-andrew@aj.id.au>
 In-Reply-To: <20170809062828.3673-1-andrew@aj.id.au>
 References: <20170809062828.3673-1-andrew@aj.id.au>
-Subject: [Qemu-devel] [PATCH for 2.11 v2 2/2] ARM: aspeed_soc: Propagate
+Subject: [Qemu-devel] [PATCH for 2.11 v2 2/2] aspeed_soc: Propagate
  silicon-rev to watchdog
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,7 +21,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org, clg@kaod.org, peter.maydell@linaro.org, joel@jms.id.au, ryan_chen@aspeedtech.com, f4bug@amsat.org, openbmc@lists.ozlabs.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org, clg@kaod.org, peter.maydell@linaro.org, joel@jms.id.au, f4bug@amsat.org, ryan_chen@aspeedtech.com, openbmc@lists.ozlabs.org
 
 This is required to configure differences in behaviour between the
 AST2400 and AST2500 watchdog IPs.
