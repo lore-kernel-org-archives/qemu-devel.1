@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1dfJDd-0003Qe-MK
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:07:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dfJEj-00048J-Ig
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:08:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <npiggin@gmail.com>) id 1dfJDY-0001eV-Mk
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:07:45 -0400
-Date: Wed, 9 Aug 2017 15:07:19 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Message-ID: <20170809150719.3d0a9cae@roar.ozlabs.ibm.com>
-In-Reply-To: <20170809040546.GF13670@umbus.fritz.box>
-References: <20170808175936.28793-1-npiggin@gmail.com>
-	<20170809040546.GF13670@umbus.fritz.box>
+	(envelope-from <dgibson@ozlabs.org>) id 1dfJEf-0002EC-A0
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:08:53 -0400
+Received: from ozlabs.org ([103.22.144.67]:46789)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dfJEe-0002DC-UK
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:08:49 -0400
+Date: Wed, 9 Aug 2017 15:08:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170809050842.GI13670@umbus.fritz.box>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<CAFEAcA_t8EDNnWTeRzuHEcdfq3DJFTN3ug=DHnGvWef3=wyFzA@mail.gmail.com>
+	<20170727105348.GG7970@umbus.fritz.box>
+	<20170727115042.GL2555@redhat.com>
+	<20170808134008.0648ab2e@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ppc/spapr: fix unicast H_SIGNAL_SYS_RESET
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dCSxeJc5W8HZXZrD"
+Content-Disposition: inline
+In-Reply-To: <20170808134008.0648ab2e@w520.home>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 9 Aug 2017 14:05:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Wed, Aug 09, 2017 at 03:59:36AM +1000, Nicholas Piggin wrote:
-> > Unicast H_SIGNAL_SYS_RESET does not find the target CPU if it
-> > is not the current CPU.
-> > 
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> > 
-> > Unfortunately this slipped through without my noticing because the
-> > Linux driver for NMI IPIs has a fallback to using regular IPIs, and
-> > because Linux did not make much use of unicasts. A new watchdog
-> > has started using them. After this patch, this function works
-> > properly:  
-> 
-> In fact this bug was already fixed in the for-2.11 branch.  If you've
-> hit this for real, I guess it's more important than I realized, so
-> I'll pull it into 2.10 instead.
+--dCSxeJc5W8HZXZrD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Oh sorry I didn't notice the 2.11 branch fix. Yes please pull it
-into 2.10 if possible.
+On Tue, Aug 08, 2017 at 01:40:08PM -0600, Alex Williamson wrote:
+> On Thu, 27 Jul 2017 12:50:42 +0100
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>=20
+> > On Thu, Jul 27, 2017 at 08:53:48PM +1000, David Gibson wrote:
+> > > On Thu, Jul 27, 2017 at 10:11:48AM +0100, Peter Maydell wrote: =20
+> > > > On 27 July 2017 at 02:30, Michael Roth <mdroth@linux.vnet.ibm.com> =
+wrote: =20
+> > > > > In particular, Mellanox CX4 adapters on PowerNV hosts might not b=
+e fully
+> > > > > quiesced by vfio-pci's finalize() routine until up to 6s after the
+> > > > > DEVICE_DELETED was emitted, leading to detach-device on the libvi=
+rt side pretty
+> > > > > much always crashing the host. =20
+> > > >=20
+> > > > My initial naive thought is that if the host kernel can crash then
+> > > > this is a host kernel bug... shouldn't the host kernel refuse
+> > > > the subsequent libvirt rebind if it would cause a crash ? =20
+> > >=20
+> > > I think so too, but I haven't been able to convince Alex.  Nor
+> > > find time to fix it in the kernel myself. =20
+> >=20
+> > I think we need to fix both the QEMU premature sending of DEVICE_DELETED
+> > and the kernel bug that allowed the crash.
+>=20
+>=20
+> Where do we stand on this for v2.10?  I'd like to see it get in.  There
+> may be things to fix in the kernel, some of them may already be fixed
+> in the latest development kernel, but ultimately the kernel considers
+> driver binding to be a trusted operation and if userspace doesn't
+> understand all the dependencies, they shouldn't be doing it.  In this
+> case libvirt is using the DEVICE_DELETED signal with the assumption
+> that the device has been fully released by QEMU, which is of course not
+> accurate (libvirt could test this, but chooses not to).  libvirt
+> therefore begins trying to unbind a device that is still in use, we try
+> to handle it, but see official kernel stance that userspace is
+> responsible for understanding device dependencies, so we can only do so
+> much.
+>=20
+> IMO, the next step along those lines would be that libvirt needs to
+> understand that even once a device is fully released from QEMU, it's
+> not necessarily safe to re-bind the device to a host driver.  If the
+> device is a member of a group where other devices are still in use by
+> userspace, this will violate user/host device isolation and the kernel
+> will crash to protect itself.  At best I may be able to improve this to
+> killing the userspace process making use of the conflicting device, but
+> the kernel view is that userspace (libvirt) has mandated to bind the
+> device to the host driver and we must make it so, the user is
+> responsible for the consequences.  Thanks,
 
-Thanks,
-Nick
+Merging it for 2.10 seems like a good idea to me to, but it's not
+really my area of expertise, and therefore not my call.
 
-> 
-> > 
-> > Watchdog CPU:0 detected Hard LOCKUP other CPUS:3
-> > *** Unicast NMI IPI is sent here ***
-> > Watchdog CPU:3 Hard LOCKUP
-> > Modules linked in:
-> > CPU: 3 PID: 1 Comm: swapper/0 Not tainted 4.13.0-rc3-00305-ge84cf82ae73a-dirty #1191
-> > task: c00000001e440000 task.stack: c00000001e480000
-> > NIP: c000000000023800 LR: c00000000000da28 CTR: c000000000626db0
-> > REGS: c00000001ff97d80 TRAP: 0100   Not tainted  (4.13.0-rc3-00305-ge84cf82ae73a-dirty)
-> > MSR: 8000000002001033 <SF,VEC,ME,IR,DR,RI,LE>
-> >   CR: 48000224  XER: 20000000
-> > CFAR: c00000000002380c SOFTE: 0 
-> > GPR00: c00000000000d9cc c00000001e483dc0 c000000000ebd900 000000000007d000 
-> > GPR04: f000000000078680 c00000001e1a0048 c00000001e1a0048 0000000000000001 
-> > GPR08: 0000000000000000 0000000000075036 00000003d5f633c2 0000000000000020 
-> > GPR12: 0000000000000000 c00000000fd80f00 c00000000000d988 0000000000000000 
-> > GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
-> > GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
-> > GPR24: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
-> > GPR28: 0000000000000000 0000000000000000 0000000000000000 0000000000000b60 
-> > NIP [c000000000023800] udelay+0x40/0x60
-> > LR [c00000000000da28] kernel_init+0xa8/0x1b0
-> > Call Trace:
-> > [c00000001e483dc0] [c00000000000d9cc] kernel_init+0x4c/0x1b0 (unreliable)
-> > [c00000001e483e30] [c00000000000bb1c] ret_from_kernel_thread+0x5c/0xc0
-> > Instruction dump:
-> > 7c6349d2 7c210b78 7d4c42a6 7d2c42a6 7d2a4850 7fa34840 409d0028 48000014 
-> > 60000000 60000000 60000000 60420000 <7d2c42a6> 7d2a4850 7fa34840 419dfff4 
-> > 
-> >  hw/ppc/spapr_hcall.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 72ea5a8247..f50e979b43 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -1432,7 +1432,9 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
-> >      } else {
-> >          /* Unicast */
-> >          CPU_FOREACH(cs) {
-> > -            if (cpu->cpu_dt_id == target) {
-> > +            PowerPCCPU *c = POWERPC_CPU(cs);
-> > +
-> > +            if (c->cpu_dt_id == target) {
-> >                  run_on_cpu(cs, spapr_do_system_reset_on_cpu, RUN_ON_CPU_NULL);
-> >                  return H_SUCCESS;
-> >              }  
-> 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--dCSxeJc5W8HZXZrD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmKmNoACgkQbDjKyiDZ
+s5Ls+w//YmCyDX3Y9EfH9pfkczr1bNpvQv3v/BSkL+jaGXO09SYRA8Cuz/Im0T0T
+1Lwe/8GviIqdcvg1NZUTui+o7mJaILgLRnYisnJUpxD4R8K35i93vuF70PVqZ13K
+YoVLPWUDGRe7aYnfluzGHnITy/vHEdHwCb9ECBmENaPbBPEkjjdxoswo4iYmTcg6
++/iFz+/U2pQ4kj016wiWXJ0K2ijPRE/X+nZHVdOe/Ao7D+upM0jB7AQACPu6/xji
+fMHyD6jRsdYMqmt0u5O2+u6V8Y5jJoS3t6fN5xAYbaKk6sCEpcusAuZscEeDEhxt
+MKWUDyxI8Axu33rkC82laDEmd09aeRXBOaWmCFXQs9hzSDKD8VQk2F+gHE3aqns0
+MWqLb38iVnVn2HVHCU9TzYn03v7NO2LX4l9t34tDDxk6/N+l/XvAQNS1KB9BOg5w
+g9+/TZOAWJeHywh13yk4heS0outAF7yMDA72i73/o59urPsfd4Sv6hudGtvGkm50
+6Mopce6ZSTCm7mn77AU5NcajuYNBDvcr7YXIA5ckEq6saOASnqvfhdAy3i1h5N6y
+CCHYsAA31Pr7wyAI6CLlPVpOR/PDm/qnvHbgv4Jr7s5lT9B29GiCDgMhtHI+KDXh
+AuUYs8JAg2lm+wzFDi9HL0kM/zFsswBok+6CxrwAVpM0hjkI3/U=
+=mZbV
+-----END PGP SIGNATURE-----
+
+--dCSxeJc5W8HZXZrD--
