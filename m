@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1dfG5r-0001vg-5K
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:47:32 -0400
+	(envelope-from <mst@redhat.com>) id 1dfG95-00037Y-Ss
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1dfG5n-00048a-QM
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:47:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47860)
+	(envelope-from <mst@redhat.com>) id 1dfG92-000648-Ju
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:50:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1dfG5n-00046E-J5
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:47:27 -0400
-Date: Tue, 8 Aug 2017 21:50:53 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-Message-ID: <20170809005053.GA26386@amt.cnet>
-References: <20170807085703.32267-1-lprosek@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dfG92-00063v-DL
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 21:50:48 -0400
+Date: Wed, 9 Aug 2017 04:50:46 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1502241852-6302-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170807085703.32267-1-lprosek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] i386/kvm: advertise Hyper-V
- frequency MSRs
+Subject: [Qemu-devel] [PULL 0/5] pc, vhost: fixes for rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com, david@redhat.com, rkrcmar@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Aug 07, 2017 at 10:56:59AM +0200, Ladi Prosek wrote:
-> This is the QEMU part of the changes required for nested Hyper-V to read
-> timestamps with RDTSC + TSC page. Without exposing the frequency MSRs,
-> Windows with the Hyper-V role enabled use the much slower
-> HV_X64_MSR_TIME_REF_COUNT (0x40000020) RDMSR to read timestamps.
-> 
-> The new registers are exposed only if the TSC frequency is stable across
-> migration and known, as suggested by Paolo.
-> 
-> v1->v2:
-> * deleted an extra empty line in patch 1
-> * added patch 3 introducing a helper function for the "TSC is stable and
->   known" check (David)
-> 
-> Ladi Prosek (4):
->   i386/kvm: use a switch statement for MSR detection
->   i386/kvm: set tsc_khz before configuring Hyper-V CPUID
->   i386/kvm: introduce tsc_is_stable_and_known()
->   i386/kvm: advertise Hyper-V frequency MSRs
-> 
->  target/i386/kvm.c | 138 ++++++++++++++++++++++++++++--------------------------
->  1 file changed, 71 insertions(+), 67 deletions(-)
-> 
-> -- 
-> 2.9.3
+The following changes since commit 54affb3a3623b1d36c95e34faa722a5831323a74:
 
+  Update version for v2.10.0-rc2 release (2017-08-08 19:07:46 +0100)
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+
+for you to fetch changes up to 24dd1e17696fbd11b3df50718dddcbdfe2c45f24:
+
+  libqtest: always set up signal handler for SIGABRT (2017-08-09 04:22:14 +0300)
+
+----------------------------------------------------------------
+pc, vhost: fixes for rc3
+
+Fix up bugs and warnings in tests. Revert an experimental commit that I
+put in by mistake: harmless but useless.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Jens Freimann (3):
+      net: fix -netdev socket,fd= for UDP sockets
+      libvhost-user: quit when no more data received
+      libqtest: always set up signal handler for SIGABRT
+
+Michael S. Tsirkin (2):
+      acpi-test: update expected DSDT files
+      Revert "cpu: add APIs to allocate/free CPU environment"
+
+ include/qom/cpu.h                     |  31 ----------------------------
+ contrib/libvhost-user/libvhost-user.c |   4 +++-
+ net/socket.c                          |  37 +++++++++++++++++-----------------
+ qom/cpu.c                             |  34 -------------------------------
+ tests/libqtest.c                      |   2 +-
+ tests/acpi-test-data/q35/DSDT         | Bin 7782 -> 7782 bytes
+ tests/acpi-test-data/q35/DSDT.bridge  | Bin 7799 -> 7799 bytes
+ tests/acpi-test-data/q35/DSDT.cphp    | Bin 8245 -> 8245 bytes
+ tests/acpi-test-data/q35/DSDT.ipmibt  | Bin 7857 -> 7857 bytes
+ tests/acpi-test-data/q35/DSDT.memhp   | Bin 9147 -> 9147 bytes
+ 10 files changed, 22 insertions(+), 86 deletions(-)
