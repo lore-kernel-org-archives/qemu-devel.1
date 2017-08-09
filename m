@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfN7O-0001jB-VW
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:17:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1dfN9j-0002Oy-0G
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfN7L-00060I-NP
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:17:34 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:33107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dfN7L-000608-Gz
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:17:31 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id k20so12414101wmg.0
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 02:17:31 -0700 (PDT)
-Date: Wed, 9 Aug 2017 10:17:28 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170809091728.GD18003@stefanha-x1.localdomain>
-References: <20170808203935.30021-1-ehabkost@redhat.com>
-	<20170808203935.30021-2-ehabkost@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dfN9f-0006qC-MC
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:19:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dfN9f-0006pq-DZ
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:19:55 -0400
+References: <1502254778-14637-1-git-send-email-thuth@redhat.com>
+	<1502254778-14637-2-git-send-email-thuth@redhat.com>
+	<20170809110520.1fd23ddc.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ec749714-0cb8-4e75-c056-760bfb12ae7c@redhat.com>
+Date: Wed, 9 Aug 2017 11:18:33 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="P+33d92oIH25kiaB"
-Content-Disposition: inline
-In-Reply-To: <20170808203935.30021-2-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 1/5] qmp-shell: Use optparse
- module
+In-Reply-To: <20170809110520.1fd23ddc.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/boot-sector: Do not overwrite
+ the x86 buffer on other architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +30,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-
---P+33d92oIH25kiaB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Aug 08, 2017 at 05:39:31PM -0300, Eduardo Habkost wrote:
-> It makes command-line parsing and generation of help text much
-> simpler.
+On 09.08.2017 11:05, Cornelia Huck wrote:
+> On Wed,  9 Aug 2017 06:59:37 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 >=20
-> The optparse module is deprecated since Python 2.7, but argparse
-> is not available in Python 2.6 (the minimum Python version
-> required for building QEMU).
+>> Re-using the boot_sector code buffer from x86 for other architectures
+>> is not very nice, especially if we add more architectures later. It's
+>> also ugly that the test uses a huge pre-initialized array - the size
+>> of the executable is very huge due to this array. So let's use a
+>> separate buffer for each architecture instead, allocated from the heap=
+,
+>> so that we really just use the memory that we need.
+>>
+>> Suggested-by: Michael Tsirkin <mst@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/boot-sector.c | 37 ++++++++++++++++++++++++-------------
+>>  1 file changed, 24 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+>> index e3880f4..4ea1373 100644
+>> --- a/tests/boot-sector.c
+>> +++ b/tests/boot-sector.c
+>> @@ -21,13 +21,12 @@
+>>  #define SIGNATURE 0xdead
+>>  #define SIGNATURE_OFFSET 0x10
+>>  #define BOOT_SECTOR_ADDRESS 0x7c00
+>> +#define SIGNATURE_ADDR (BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET)
 >=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * Use optparse module, as the minimum Python version for building
->   QEMU is 2.6
->   * Reported-by: Stefan Hajnoczi <stefanha@gmail.com>
->   * Suggested-by: "Daniel P. Berrange" <berrange@redhat.com>
-> ---
->  scripts/qmp/qmp-shell | 63 +++++++++++++++++++--------------------------=
-------
->  1 file changed, 23 insertions(+), 40 deletions(-)
+> Do you want to use this new #define in boot_sector_test() as well?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Yes, sounds like a good idea.
 
---P+33d92oIH25kiaB
-Content-Type: application/pgp-signature; name="signature.asc"
+>> =20
+>> -/* Boot sector code: write SIGNATURE into memory,
+>> +/* x86 boot sector code: write SIGNATURE into memory,
+>>   * then halt.
+>> - * Q35 machine requires a minimum 0x7e000 bytes disk.
+>> - * (bug or feature?)
+>>   */
+>> -static uint8_t boot_sector[0x7e000] =3D {
+>> +static uint8_t x86_boot_sector[512] =3D {
+>>      /* The first sector will be placed at RAM address 00007C00, and
+>>       * the BIOS transfers control to 00007C00
+>>       */
+>> @@ -50,8 +49,8 @@ static uint8_t boot_sector[0x7e000] =3D {
+>>      [0x07] =3D HIGH(SIGNATURE),
+>>      /* 7c08:  mov %ax,0x7c10 */
+>>      [0x08] =3D 0xa3,
+>> -    [0x09] =3D LOW(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
+>> -    [0x0a] =3D HIGH(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
+>> +    [0x09] =3D LOW(SIGNATURE_ADDR),
+>> +    [0x0a] =3D HIGH(SIGNATURE_ADDR),
+>> =20
+>>      /* 7c0b cli */
+>>      [0x0b] =3D 0xfa,
+>> @@ -72,7 +71,9 @@ static uint8_t boot_sector[0x7e000] =3D {
+>>  int boot_sector_init(char *fname)
+>>  {
+>>      int fd, ret;
+>> -    size_t len =3D sizeof boot_sector;
+>> +    size_t len;
+>> +    char *boot_code;
+>> +    const char *arch =3D qtest_get_arch();
+>> =20
+>>      fd =3D mkstemp(fname);
+>>      if (fd < 0) {
+>> @@ -80,16 +81,26 @@ int boot_sector_init(char *fname)
+>>          return 1;
+>>      }
+>> =20
+>> -    /* For Open Firmware based system, we can use a Forth script inst=
+ead */
+>> -    if (strcmp(qtest_get_arch(), "ppc64") =3D=3D 0) {
+>> -        len =3D sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c!=
+ %x %x c!\n",
+>> -                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSE=
+T,
+>> -                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFS=
+ET + 1);
+>> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
+>> +        /* Q35 requires a minimum 0x7e000 bytes disk (bug or feature?=
+) */
+>> +        len =3D 0x7e000;
+>=20
+> Use the maximum of (0x7e000, sizeof(x86_boot_sector))? (Not that it is
+> likely that the boot sector will ever grow, but I think it is cleaner.)
 
------BEGIN PGP SIGNATURE-----
+Sounds like a little bit of too much sanity checking for me, but ok, I
+can add it.
 
-iQEcBAEBAgAGBQJZitMoAAoJEJykq7OBq3PIb98H/2XWkPux7tIa/REXxyqOIs+X
-QE8B1fwmwCv/o4q12V/ZduQ0FGyWzd2WFvr6BtSmIaILYyK6UkrqY7oBT9qU11QO
-TKiz5OIb8rkcydacXkWfTAfzxStdmMiEkjlR7EAYYXFhtTyhOycGLdBuZ4bTGDAP
-W5dlqsCZgOldKZlLB8btymHV0VUc9JizKZ1nY922wSrkzTB4dVS3xNHpM5FgaHS0
-iQkgyq6HzCQeVJItiKIJIXMqBDQiVKd9bY1e25SFioUAxl7IdUVJJbb9DNIXqqA8
-hjJqXcIz2ECD82sD9DwSY1ZlMHSHdYlgB+x3dWPF+uKnX/yfSUj9EjhUaVh6LaA=
-=OLpI
------END PGP SIGNATURE-----
+>> +        boot_code =3D g_malloc(len);
+>=20
+> Would g_malloc_0() be better?
 
---P+33d92oIH25kiaB--
+Good idea, the test is likely more predictable if we don't have random
+data in the file here (it should not really matter, but let's better be
+safe than sorry).
+
+>> +        memcpy(boot_code, x86_boot_sector, sizeof x86_boot_sector);
+>=20
+> sizeof(x86_boot_sector)?
+
+The original code uses sizeof without parenthesis, so I think we should
+stay with that coding style.
+
+>> +    } else if (g_str_equal(arch, "ppc64")) {
+>> +        /* For Open Firmware based system, use a Forth script */
+>> +        boot_code =3D g_strdup_printf("\\ Bootscript\n%x %x c! %x %x =
+c!\n",
+>> +                                    LOW(SIGNATURE), SIGNATURE_ADDR,
+>> +                                    HIGH(SIGNATURE), SIGNATURE_ADDR +=
+ 1);
+>> +        len =3D strlen(boot_code);
+>> +    } else {
+>> +        g_assert_not_reached();
+>>      }
+>> =20
+>> -    ret =3D write(fd, boot_sector, len);
+>> +    ret =3D write(fd, boot_code, len);
+>>      close(fd);
+>> =20
+>> +    g_free(boot_code);
+>> +
+>>      if (ret !=3D len) {
+>>          fprintf(stderr, "Could not write \"%s\"", fname);
+>>          return 1;
+>=20
+> This makes the code much nicer :)
+
+Thanks for the review!
+
+I'll wait for some more feedback, then send a v2...
+
+ Thomas
