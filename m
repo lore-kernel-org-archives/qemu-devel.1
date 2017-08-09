@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfROy-0007vu-Km
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:52:01 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dfRQw-0008V2-6Q
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:54:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfROx-0002V7-De
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:52:00 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33779)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dfRQt-0004Xq-3Y
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:54:02 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dfROx-0002UP-59
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:51:59 -0400
-Received: by mail-wm0-x244.google.com with SMTP id q189so6909777wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 06:51:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dfRQs-0004XG-WE
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:53:59 -0400
+Received: by mail-qk0-x244.google.com with SMTP id d145so5700570qkc.0
+	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 06:53:58 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170807153934.29477-1-alex.bennee@linaro.org>
+	<20170807153934.29477-6-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fcc7fc91-36e2-9fc3-6a5a-ec0b853b7097@amsat.org>
+Date: Wed, 9 Aug 2017 10:53:55 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170809131032.GH24723@redhat.com>
-References: <CAJSP0QVrCm6TfgU0dsXbudaW3gmGo0YQTTWbNypx6st6mKcSKA@mail.gmail.com>
-	<20170809131032.GH24723@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 9 Aug 2017 14:51:57 +0100
-Message-ID: <CAJSP0QUMo4FocU0iRV2ti3eWDJLYXGcyur0-Nd4uG+-qnad96A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Making QEMU build with Python 3
+In-Reply-To: <20170807153934.29477-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 v3 5/6] docker: don't install
+ device-tree-compiler build-deps in travis.docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Ross Burton <ross@burtonini.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, famz@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Aug 9, 2017 at 2:10 PM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Wed, Aug 09, 2017 at 11:16:58AM +0100, Stefan Hajnoczi wrote:
->> Ross created a bug to track Python 3 support:
->>
->>   https://bugs.launchpad.net/qemu/+bug/1708462
->>
->> Currently most Python code in QEMU is for Python 2.6+ only.  There
->> have only been a few patches adding Python 3 support to certain
->> scripts so far.
->>
->> In this email I want to highlight the most important scripts that need
->> Python 3 support.  Volunteers are welcome!
->>
->> Python scripts needed to build QEMU are the highest priority.  They
->> are invoked by ./configure or make.  I've identified the following:
->>
->> scripts/signrom.py
->> scripts/qapi*.py
->> scripts/modules/module_block.py
->> scripts/tracetool*
->
->> I have tracetool on my todo list and hope to add Python 3 support in QEMU 2.11.
->
-> AFAICT tracetool seems to already work - i hacked rules.mak to
-> run tracetool via python3 and nothing obvious broke
+On 08/07/2017 12:39 PM, Alex Bennée wrote:
+> Installing the device-tree-compiler build-deps is a little extreme. We
+> only actually need the binary so include it with the other packages.
+> 
+> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Nice, thanks for checking!  I'll test all the tracetool backends and
-audit the code for 2.11.
+FWIW:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Stefan
+> ---
+>   tests/docker/dockerfiles/travis.docker | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
+> index 636fa590a5..57ac8e1419 100644
+> --- a/tests/docker/dockerfiles/travis.docker
+> +++ b/tests/docker/dockerfiles/travis.docker
+> @@ -1,6 +1,5 @@
+>   FROM quay.io/travisci/travis-ruby
+>   RUN apt-get update
+>   RUN apt-get -y build-dep qemu
+> -RUN apt-get -y build-dep device-tree-compiler
+> -RUN apt-get -y install python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
+> +RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
+>   ENV FEATURES pyyaml
+> 
