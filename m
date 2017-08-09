@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dfR7Y-0008UX-3m
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:01 -0400
+	(envelope-from <david@redhat.com>) id 1dfR7Z-0008VN-4p
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dfR7W-0003V2-O8
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55888)
+	(envelope-from <david@redhat.com>) id 1dfR7Y-0003WB-4Y
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dfR7W-0003U7-F8
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:33:58 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dfR7X-0003Va-Us
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 09:34:00 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed,  9 Aug 2017 15:33:44 +0200
-Message-Id: <20170809133346.30271-5-david@redhat.com>
+Date: Wed,  9 Aug 2017 15:33:45 +0200
+Message-Id: <20170809133346.30271-6-david@redhat.com>
 In-Reply-To: <20170809133346.30271-1-david@redhat.com>
 References: <20170809133346.30271-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 4/6] kvm: we never have overlapping slots
- in kvm_set_phys_mem()
+Subject: [Qemu-devel] [PATCH RFC 5/6] kvm: kvm_log_start/stop are only
+ called with known sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,137 +27,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, david@redhat.com
 
-Due to how flatviews are handled, we will never have overlapping memory
-sections in kvm.
-
-address_space_update_topology_pass() will make sure that we will only
-get called for
-
-a) an existing memory section for which we only update parameters
-(log_start, log_stop).
-b) an existing memory section we want to delete (region_del)
-c) a brand new memory section we want to add (region_add)
-
-We cannot have overlapping memory sections in kvm as we will first remove
-the overlapping sections and then add the ones without conflicts.
-
-Therefore we can remove the complexity for handling prefix and suffix
-slots.
+Let's properly align the sections first and bail out if we would ever
+be called with a memory region we don't know yet.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/kvm/kvm-all.c | 69 +++++++++--------------------------------------------
- 1 file changed, 11 insertions(+), 58 deletions(-)
+ accel/kvm/kvm-all.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index bec157e..7b45506 100644
+index 7b45506..78a7f01 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -725,7 +725,7 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
+@@ -411,15 +411,21 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
+ static int kvm_section_update_flags(KVMMemoryListener *kml,
+                                     MemoryRegionSection *section)
  {
--    KVMSlot *mem, old;
+-    hwaddr phys_addr = section->offset_within_address_space;
+-    ram_addr_t size = int128_get64(section->size);
+-    KVMSlot *mem = kvm_lookup_matching_slot(kml, phys_addr, size);
++    hwaddr start_addr, size;
 +    KVMSlot *mem;
-     int err;
-     MemoryRegion *mr = section->mr;
-     bool writeable = !mr->readonly && !mr->rom_device;
-@@ -750,28 +750,17 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     ram = memory_region_get_ram_ptr(mr) + section->offset_within_region +
-           (section->offset_within_address_space - start_addr);
  
--    while (1) {
--        mem = kvm_lookup_overlapping_slot(kml, start_addr, start_addr + size);
-+    mem = kvm_lookup_matching_slot(kml, start_addr, size);
-+    if (!add) {
-         if (!mem) {
--            break;
--        }
--
--        if (add && start_addr >= mem->start_addr &&
--            (start_addr + size <= mem->start_addr + mem->memory_size) &&
--            (ram - start_addr == mem->ram - mem->start_addr)) {
--            /* The new slot fits into the existing one and comes with
--             * identical parameters - update flags and done. */
--            kvm_slot_update_flags(kml, mem, mr);
-+            g_assert(!memory_region_is_ram(mr) && !writeable && !mr->romd_mode);
-             return;
-         }
--
--        old = *mem;
--
-         if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-             kvm_physical_sync_dirty_bitmap(kml, section);
-         }
- 
--        /* unregister the overlapping slot */
-+        /* unregister the slot */
-         mem->memory_size = 0;
-         err = kvm_set_user_memory_region(kml, mem);
-         if (err) {
-@@ -779,57 +768,21 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                     __func__, strerror(-err));
-             abort();
-         }
--
--        /* register prefix slot */
--        if (old.start_addr < start_addr) {
--            mem = kvm_alloc_slot(kml);
--            mem->memory_size = start_addr - old.start_addr;
--            mem->start_addr = old.start_addr;
--            mem->ram = old.ram;
--            mem->flags =  kvm_mem_flags(mr);
--
--            err = kvm_set_user_memory_region(kml, mem);
--            if (err) {
--                fprintf(stderr, "%s: error registering prefix slot: %s\n",
--                        __func__, strerror(-err));
--#ifdef TARGET_PPC
--                fprintf(stderr, "%s: This is probably because your kernel's " \
--                                "PAGE_SIZE is too big. Please try to use 4k " \
--                                "PAGE_SIZE!\n", __func__);
--#endif
--                abort();
--            }
--        }
--
--        /* register suffix slot */
--        if (old.start_addr + old.memory_size > start_addr + size) {
--            ram_addr_t size_delta;
--
--            mem = kvm_alloc_slot(kml);
--            mem->start_addr = start_addr + size;
--            size_delta = mem->start_addr - old.start_addr;
--            mem->memory_size = old.memory_size - size_delta;
--            mem->ram = old.ram + size_delta;
--            mem->flags = kvm_mem_flags(mr);
--
--            err = kvm_set_user_memory_region(kml, mem);
--            if (err) {
--                fprintf(stderr, "%s: error registering suffix slot: %s\n",
--                        __func__, strerror(-err));
--                abort();
--            }
--        }
-+        return;
-     }
- 
--    if (!add) {
-+    if (mem) {
-+        /* update the slot */
-+        kvm_slot_update_flags(kml, mem, mr);
-         return;
+-    if (mem == NULL)  {
++    size = kvm_align_section(section, &start_addr);
++    if (!size) {
+         return 0;
+-    } else {
+-        return kvm_slot_update_flags(kml, mem, section->mr);
      }
 +
-+    /* register the new slot */
-     mem = kvm_alloc_slot(kml);
-     mem->memory_size = size;
-     mem->start_addr = start_addr;
-     mem->ram = ram;
-     mem->flags = kvm_mem_flags(mr);
--
-     err = kvm_set_user_memory_region(kml, mem);
-     if (err) {
-         fprintf(stderr, "%s: error registering slot: %s\n", __func__,
++    mem = kvm_lookup_matching_slot(kml, start_addr, size);
++    if (!mem) {
++        fprintf(stderr, "%s: error finding slot\n", __func__);
++        abort();
++    }
++
++    return kvm_slot_update_flags(kml, mem, section->mr);
+ }
+ 
+ static void kvm_log_start(MemoryListener *listener,
 -- 
 2.9.4
