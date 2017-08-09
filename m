@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfU2f-0006x3-Hr
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:41:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfU3V-0007QN-Sn
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfU2a-0003Hf-V5
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:41:09 -0400
-Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:41927)
+	(envelope-from <eblake@redhat.com>) id 1dfU3S-0003bR-Q2
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:42:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfU2a-0003HK-Kv
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:41:04 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BDBF8885D2
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 18:41:02 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 09 Aug 2017 18:40:57 +0200
-Message-ID: <150229685736.21846.2809147507731700887.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfU3S-0003bD-Gl
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:41:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C1FA381BC9
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 16:41:57 +0000 (UTC)
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-20-eblake@redhat.com>
+	<87o9ron34y.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77053a1d-b68e-0f7c-16dd-0be36f629728@redhat.com>
+Date: Wed, 9 Aug 2017 11:41:56 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.10 PATCH v4] 9pfs: local: fix
- fchmodat_nofollow() limitations
+In-Reply-To: <87o9ron34y.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GsDeBmAW7MBAmpxMT5XDxrjuBMMmWVsx3"
+Subject: Re: [Qemu-devel] [PATCH v4 19/22] libqtest: Add qmp_args_dict()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,165 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This function has to ensure it doesn't follow a symlink that could be used
-to escape the virtfs directory. This could be easily achieved if fchmodat()
-on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-it doesn't. There was a tentative to implement a new fchmodat2() syscall
-with the correct semantics:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GsDeBmAW7MBAmpxMT5XDxrjuBMMmWVsx3
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <77053a1d-b68e-0f7c-16dd-0be36f629728@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 19/22] libqtest: Add qmp_args_dict()
+ helper
+References: <20170804012551.2714-1-eblake@redhat.com>
+ <20170804012551.2714-20-eblake@redhat.com>
+ <87o9ron34y.fsf@dusky.pond.sub.org>
+In-Reply-To: <87o9ron34y.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-https://patchwork.kernel.org/patch/9596301/
+On 08/09/2017 10:59 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> Leaving interpolation into JSON to qobject_from_jsonf() is more
+>> robust than building QMP input manually; however, we have a few
+>> places where code is already creating a QDict to interpolate
+>> individual arguments, which cannot be reproduced with the
+>> qobject_from_jsonf() parser.  Expose a public wrapper
+>> qmp_args_dict() for the internal helper qmp_args_dict_async()
+>> that we needed earlier for qmp_args(), and fix a test to use
+>> the new helper.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
 
-but it didn't gain much momentum. Also it was suggested to look at an O_PATH
-based solution in the first place.
+>> +++ b/tests/device-introspect-test.c
+>> @@ -36,8 +36,7 @@ static QList *qom_list_types(const char *implements,=
+ bool abstract)
+>>      if (implements) {
+>>          qdict_put_str(args, "implements", implements);
+>>      }
+>> -    resp =3D qmp("{'execute': 'qom-list-types',"
+>> -               " 'arguments': %p }", args);
+>> +    resp =3D qmp_args_dict("qom-list-types", args);
+>>      g_assert(qdict_haskey(resp, "return"));
+>>      ret =3D qdict_get_qlist(resp, "return");
+>>      QINCREF(ret);
+>=20
+> If we had five of these, the helper would be worth its keep.
 
-The current implementation covers most use-cases, but it notably fails if:
-- the target path has access rights equal to 0000 (openat() returns EPERM),
-  => once you've done chmod(0000) on a file, you can never chmod() again
-- the target path is UNIX domain socket (openat() returns ENXIO)
-  => bind() of UNIX domain sockets fails if the file is on 9pfs
+This patch only  has one client, but 20/22 adds another.  Is having 2
+clients sufficient to keep it (not quite the 5 that makes it obvious,
+but still a good reuse of code)?
 
-The solution is to use O_PATH: openat() now succeeds in both cases, and we
-can ensure the path isn't a symlink with fstat(). The associated entry in
-"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-The previous behavior is kept for older systems that don't have O_PATH.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
-v4: - fixed #if condition
-    - moved out: label above #endif
-    - fixed typo in changelog
-    - added Eric's r-b
+--GsDeBmAW7MBAmpxMT5XDxrjuBMMmWVsx3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-v3: - O_PATH in a separate block of code
-    - added a reference to the fchmodat2() tentative in the changelog
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
-      for O_PATH to avoid build breaks on O_PATH-less systems
-    - keep current behavior for O_PATH-less systems
-    - added comments
-    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
----
- hw/9pfs/9p-local.c |   43 ++++++++++++++++++++++++++++++++++++-------
- hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
- 2 files changed, 51 insertions(+), 16 deletions(-)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLO1QACgkQp6FrSiUn
+Q2rgCwf9HQbNiJ9kW8wsBn4UBdSHpzEpfMc11JmD1630/D6fxRiiCQkxVElUqQAG
+Km5i5LlZcyE1AyFEjSu04DlqMW82a5K/T55EWlW8yp2dprb+0mKwUvookf2d2B3k
+TwBJ16dU6Cafsk0+gAD/ajXTkIGs9R/7I4E0BRH4RRY6N7PiQ4QoPKZqEzud/MVj
+gPvJoHh9f95jdgZ3wg0hL/ebEKb9KJCJ/19rmPt+CAXzRjnjYdxZgLZbpwOhP6Ph
+iDU0o0vgaTnaW1JjBu2gFJ14UJyIp6uhlRkrKt1XGG8X2cerankNS9fVCAylZTzm
+SQIf3A8huzInKraINYov7FR6Y3BZ2A==
+=03aF
+-----END PGP SIGNATURE-----
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 6e478f4765ef..d9ef57d343c9 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -333,17 +333,27 @@ update_map_file:
- 
- static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
- {
-+    struct stat stbuf;
-     int fd, ret;
- 
-     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
--     * Unfortunately, the linux kernel doesn't implement it yet. As an
--     * alternative, let's open the file and use fchmod() instead. This
--     * may fail depending on the permissions of the file, but it is the
--     * best we can do to avoid TOCTTOU. We first try to open read-only
--     * in case name points to a directory. If that fails, we try write-only
--     * in case name doesn't point to a directory.
-+     * Unfortunately, the linux kernel doesn't implement it yet.
-      */
--    fd = openat_file(dirfd, name, O_RDONLY, 0);
-+
-+     /* First, we clear non-racing symlinks out of the way. */
-+    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-+        return -1;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        return -1;
-+    }
-+
-+    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
-+     * O_WRONLY for old-systems that don't support O_PATH.
-+     */
-+    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
-+#if O_PATH_9P_UTIL == 0
-     if (fd == -1) {
-         /* In case the file is writable-only and isn't a directory. */
-         if (errno == EACCES) {
-@@ -357,6 +367,25 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
-         return -1;
-     }
-     ret = fchmod(fd, mode);
-+#else
-+    /* Now we handle racing symlinks. */
-+    ret = fstat(fd, &stbuf);
-+    if (ret) {
-+        goto out;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    {
-+        char *proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
-+        ret = chmod(proc_path, mode);
-+        g_free(proc_path);
-+    }
-+out:
-+#endif
-     close_preserve_errno(fd);
-     return ret;
- }
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 91299a24b8af..dc0d2e29aa3b 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -13,6 +13,12 @@
- #ifndef QEMU_9P_UTIL_H
- #define QEMU_9P_UTIL_H
- 
-+#ifdef O_PATH
-+#define O_PATH_9P_UTIL O_PATH
-+#else
-+#define O_PATH_9P_UTIL 0
-+#endif
-+
- static inline void close_preserve_errno(int fd)
- {
-     int serrno = errno;
-@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
- 
- static inline int openat_dir(int dirfd, const char *name)
- {
--#ifdef O_PATH
--#define OPENAT_DIR_O_PATH O_PATH
--#else
--#define OPENAT_DIR_O_PATH 0
--#endif
-     return openat(dirfd, name,
--                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
-+                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
- }
- 
- static inline int openat_file(int dirfd, const char *name, int flags,
-@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
-     }
- 
-     serrno = errno;
--    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
--    ret = fcntl(fd, F_SETFL, flags);
--    assert(!ret);
-+    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
-+     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
-+     * ignored it anyway.
-+     */
-+    if (!(flags & O_PATH_9P_UTIL)) {
-+        ret = fcntl(fd, F_SETFL, flags);
-+        assert(!ret);
-+    }
-     errno = serrno;
-     return fd;
- }
+--GsDeBmAW7MBAmpxMT5XDxrjuBMMmWVsx3--
