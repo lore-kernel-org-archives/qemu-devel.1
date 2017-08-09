@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfRhv-0001Hs-RF
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:11:36 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dfRih-0001rK-CU
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:12:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfRhq-0001Fw-7g
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:11:35 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34529)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dfRhq-0001FC-1t
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:11:30 -0400
-Received: by mail-wm0-x232.google.com with SMTP id t138so14169809wmt.1
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 07:11:30 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1dfRic-0001s2-AW
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:12:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1dfRic-0001pW-1f
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:12:18 -0400
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<1501119055-4060-4-git-send-email-mdroth@linux.vnet.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e916c286-8e4b-32b7-41f2-8114db651a82@redhat.com>
+Date: Wed, 9 Aug 2017 16:04:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <d9c93599-1d2c-333e-dae0-7da8cc87b133@amsat.org>
-References: <CAJSP0QVrCm6TfgU0dsXbudaW3gmGo0YQTTWbNypx6st6mKcSKA@mail.gmail.com>
-	<d9c93599-1d2c-333e-dae0-7da8cc87b133@amsat.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 9 Aug 2017 15:11:28 +0100
-Message-ID: <CAJSP0QVFHN3U7xxUS1iUY6Ap80tHs2t_wgT26+V86vA8=4BCWg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Making QEMU build with Python 3
+In-Reply-To: <1501119055-4060-4-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 3/3] qdev: defer DEVICE_DEL event
+ until instance_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Ross Burton <ross@burtonini.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Wed, Aug 9, 2017 at 1:53 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> On 08/09/2017 07:16 AM, Stefan Hajnoczi wrote:
-> [...]> Python scripts needed to build QEMU are the highest priority.  The=
-y
->>
->> are invoked by ./configure or make.  I've identified the following:
->>
->> scripts/signrom.py
->> scripts/qapi*.py
->> scripts/modules/module_block.py
->> scripts/tracetool*
->>
-> [...]
->>
->> The fundamentals of adding Python 3 support are:
->>
->> 1. The script must work correctly under both Python 2.6+ and Python 3.
->
-> [...]
->>
->> 3. Avoid third-party package dependencies - QEMU currently has none!
->
->
-> This seems true for the "invoked by ./configure or make" set. However:
->
-> scripts/qemu-gdb.py:20:import gdb
-> scripts/qemugdb/aio.py:13:import gdb
-> scripts/qemugdb/coroutine.py:16:import gdb
-> scripts/qemugdb/mtree.py:18:import gdb
->
-> I just checked gdb8 and can't confirm python3 build works.
+Hi Michael,
 
-Yes, this is a GDB extension written in Python.  The gdb module is
-available in the interpreter environment that GDB sets up.
+On 27/07/2017 03:30, Michael Roth wrote:
+> DEVICE_DEL is currently emitted when a Device is unparented, as
+> opposed to when it is finalized. The main design motivation for this
+> seems to be that after unparent()/unrealize(), the Device is no
+> longer visible to the guest, and thus the operation is complete
+> from the perspective of management.
+> 
+> However, there are cases where remaining host-side cleanup is also
+> pertinent to management. The is generally handled by treating these
+> resources as aspects of the "backend", which can be managed via
+> separate interfaces/events, such as blockdev_add/del, netdev_add/del,
+> object_add/del, etc, but some devices do not have this level of
+> compartmentalization, namely vfio-pci, and possibly to lend themselves
+> well to it.
+> 
+> In the case of vfio-pci, the "backend" cleanup happens as part of
+> the finalization of the vfio-pci device itself, in particular the
+> cleanup of the VFIO group FD. Failing to wait for this cleanup can
+> result in tools like libvirt attempting to rebind the device to
+> the host while it's still being used by VFIO, which can result in
+> host crashes or other misbehavior depending on the host driver.
+> 
+> Deferring DEVICE_DEL still affords us the ability to manage backends
+> explicitly, while also addressing cases like vfio-pci's, so we
+> implement that approach here.
+> 
+> An alternative proposal involving having VFIO emit a separate event
+> to denote completion of host-side cleanup was discussed, but the
+> prevailing opinion seems to be that it is not worth the added
+> complexity, and leaves the issue open for other Device implementations
+> solve in the future.
+> 
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> ---
+>  hw/core/qdev.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 08c4061..d14acba 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -1067,7 +1067,6 @@ static void device_finalize(Object *obj)
+>      NamedGPIOList *ngl, *next;
+>  
+>      DeviceState *dev = DEVICE(obj);
+> -    qemu_opts_del(dev->opts);
+>  
+>      QLIST_FOREACH_SAFE(ngl, &dev->gpios, node, next) {
+>          QLIST_REMOVE(ngl, node);
+> @@ -1078,6 +1077,18 @@ static void device_finalize(Object *obj)
+>           * here
+>           */
+>      }
+> +
+> +    /* Only send event if the device had been completely realized */
+> +    if (dev->pending_deleted_event) {
+> +        g_assert(dev->canonical_path);
+> +
+> +        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canonical_path,
+> +                                       &error_abort);
+> +        g_free(dev->canonical_path);
+> +        dev->canonical_path = NULL;
+> +    }
+> +
+> +    qemu_opts_del(dev->opts);
+>  }
+>  
+>  static void device_class_base_init(ObjectClass *class, void *data)
+> @@ -1107,16 +1118,6 @@ static void device_unparent(Object *obj)
+>          object_unref(OBJECT(dev->parent_bus));
+>          dev->parent_bus = NULL;
+>      }
+> -
+> -    /* Only send event if the device had been completely realized */
+> -    if (dev->pending_deleted_event) {
+> -        g_assert(dev->canonical_path);
+> -
+> -        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canonical_path,
+> -                                       &error_abort);
+> -        g_free(dev->canonical_path);
+> -        dev->canonical_path = NULL;
+> -    }
+is the code below, introduced in patch 1/device_set_realized() still
+relevant?
+        /* always re-initialize since we clean up in device_unparent()
+instead
+         * of unrealize()
+         */
+        g_free(dev->canonical_path);
 
-Even if GDB doesn't support Python 3 yet, they will eventually.  It's
-okay if we cannot add Python 3 support to these scripts yet.
+Thanks
 
-> Also another 3rd party (python3 compliant):
->
-> scripts/analyze-migration.py:20:import numpy as np
-
-Weird, this script seems to use numpy APIs for unpacking binary data
-instead of the standard library struct module.  As far as I can tell
-the usual numpy functionality isn't actually used.  It should be easy
-to drop the numpy dependency.
-
-> Off-topic but we might document how to install dependencies for those
-> scripts?
-
-The analyze-migration.py script doesn't have any documentation, AFAIK.
-
-Stefan
+Eric
+>  }
+>  
+>  static void device_class_init(ObjectClass *class, void *data)
+> 
