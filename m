@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dfNhi-0006d3-W4
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:55:08 -0400
+	(envelope-from <groug@kaod.org>) id 1dfRtd-0007I5-Ml
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:23:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dfNhe-0007SV-Sg
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:55:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35675)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dfNhe-0007S4-Mg
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:55:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dfNhd-0000MD-J2
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 09:55:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 82F292E80CD
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 09:55:01 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1dfRtZ-0002d6-G9
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:23:41 -0400
+Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:47249)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfRtZ-0002as-6s
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:23:37 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id CE8BC8A5E1
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 16:23:35 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 09 Aug 2017 16:23:29 +0200
+Message-ID: <150228860899.28168.1415083032613087245.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 09 Aug 2017 09:42:29 -0000
-From: Sledge Sulaweyo <sledge.sulaweyo@gmail.com>
-Reply-To: Bug 823733 <823733@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110810053253.11269.76752.malonedeb@gac.canonical.com>
-Message-Id: <150227174914.10750.18260288162840326447.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 823733] Re: Soloaris can't be poweroff
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
+ fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,152 +29,147 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-I just ran into the same issue on Arch with qemu 2.9.0 and as well Ubuntu q=
-emu 2.8.something. Solaris 11 on powerdown shuts down to the point where it=
- prompts you that it's now safe to power off the VM, works fine in vmware o=
-r virtualbox.
-In a packer build at this point you just fail as the VM did not power down =
-in time.
+This function has to ensure it doesn't follow a symlink that could be used
+to escape the virtfs directory. This could be easily achieved if fchmodat()
+on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
+it doesn't.
 
--- =
+The current implementation covers most use-cases, but it notably fails if:
+- the target path has access rights equal to 0000 (openat() returns EPERM),
+  => once you've done chmod(0000) on a file, you can never chmod() again
+- the target path is UNIX domain socket (openat() returns ENXIO)
+  => bind() of UNIX domain sockets fails if the file is on 9pfs
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/823733
+The solution is to use O_PATH: openat() now succeeds in both cases, and we
+can ensure the path isn't a symlink with fstat(). The associated entry in
+"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
 
-Title:
-  Soloaris can't be poweroff
+The previous behavior is kept for older systems that don't have O_PATH.
 
-Status in QEMU:
-  Incomplete
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
+      for O_PATH to avoid build breaks on O_PATH-less systems
+    - keep current behavior for O_PATH-less systems
+    - added comments
+    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
+---
+ hw/9pfs/9p-local.c |   41 +++++++++++++++++++++++++++++++++--------
+ hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
+ 2 files changed, 48 insertions(+), 17 deletions(-)
 
-Bug description:
-  Thank you forgive my poor English.
-
-  It seems KVM can=E2=80=99t poweroff solairs 10 or sloalrs 11 VM.
-  I have created solaris 10 and 11 as usual. Everything in VM is running OK=
-, but finally I use shell command =E2=80=98poweroff=E2=80=99 or =E2=80=98in=
-it 5=E2=80=99, the solaris VM (both 10 & 11) system could=E2=80=99t be powe=
-roff but with promoting me the message: perss any key to reboot =E2=80=A6..=
-  ,I pressed any key in vnc client, solaris VM reboot immediately. Endless =
-reboot loop above.
-
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
-
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
-
-  1. On my real physical machine,the solaris can be poweroff
-  2. On vmware ,the solaris can be poweroff
-  3. On my real physical machine,I have try to disbale the ACPI opiton in B=
-OIS, then the solaris can't be poweroff,Like the problem I have described a=
-bove
-  so ,I doubt the KVM has a little problem in ACPI =
-
-
-  I have try the suggestion as follows, but I can=E2=80=99t solve the probl=
-em.
-  7.2 Solaris reboot all the time on grub menu
-  =E2=80=A2	Run through the installer as usual =
-
-  =E2=80=A2	On completion and reboot, the VM will perpetually reboot. "Stop=
-" the VM. =
-
-  =E2=80=A2	Start it up again, and immediately open a vnc console and selec=
-t the Safe Boot from the options screen =
-
-  =E2=80=A2	When prompted if you want to try and recover the boot block, sa=
-y yes =
-
-  =E2=80=A2	You should now have a Bourne terminal with your existing filesy=
-stem mounted on /a =
-
-  =E2=80=A2	Run /a/usr/bin/bash (my preferred shell) =
-
-  =E2=80=A2	export TERM=3Dxterm =
-
-  =E2=80=A2	vi /a/boot/grub/menu.1st (editing the bootloader on your mounte=
-d filesystem), to add "kernel/unix" to the kernel options for the non-safe-=
-mode boot. Ex : =
-
-  Config File : /a/boot/grub/menu.lst =
-
-  kernel$ /platform/i86pc/multiboot -B $ZFS-BOOTFS kernel/unix
-
-  According to KVM requirements, I collected the following information:
-  CPU model name
-  model name      : Intel(R) Xeon(R) CPU           X3450  @ 2.67GHz
-
-  kvm -version
-  QEMU PC emulator version 0.12.3 (qemu-kvm-0.12.3), Copyright (c) 2003-200=
-8 Fabrice Bellard
-
-  Host kernel version
-  Ubuntu 10.04.1 LTS   2.6.32-25-server =
-
-
-  What host kernel arch you are using (i386 or x86_64)
-  X86_64
-
-  Guest OS
-  Solaris 10 and Solaris 11=EF=BC=8Cboth can not shutdown
-
-  The qemu command line you are using to start the guest
-
-  First, I used the command line as follows:
-  kvm -m 1024 -drive file=3Dsolaris10.img,cache=3Dwriteback -net nic -net u=
-ser -nographic -vnc :1
-  then I try to use -no-kvm-irqchip or -no-kvm ,but the problem also appear=
-s!
-
-  Secondly, have created and run solaris 10&11 by using Virsh, still solari=
-s can't be poweroff, the XML file content is :
-  <domain type=3D'kvm'>
-      <name>solairs</name>
-      <uuid>85badf15-244d-4719-a2da-8c3de064137d</uuid>
-      <memory>1677721</memory>
-      <currentMemory>1677721</currentMemory>
-      <vcpu>1</vcpu>
-      <os>
-      <type arch=3D'i686' machine=3D'pc-0.12'>hvm</type>
-        <boot dev=3D'hd'/>
-     </os>
-     <features>
-      <acpi/>
-      <apic/>
-     </features>
-    <clock offset=3D'utc'/>
-     <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-     <on_crash>destroy</on_crash>
-     <devices>
-       <emulator>/usr/bin/kvm</emulator>
-       <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'qcow2' cache=3D'writeback'/>
-         <source file=3D'/opt/GuestOS/solaris10.img'/>
-         <target dev=3D'hda' bus=3D'ide'/>
-       </disk>
-      <interface type=3D'bridge'>
-        <mac address=3D'00:0c:29:d0:36:c3'/>
-        <source bridge=3D'br1'/>
-        <target dev=3D'vnet0'/>
-       </interface>
-       <input type=3D'mouse' bus=3D'ps2'/>
-       <graphics type=3D'vnc' port=3D'5901' autoport=3D'no' keymap=3D'en-us=
-'/>
-      <video>
-        <model type=3D'vga' vram=3D'65536' heads=3D'1'/>
-      </video>
-    </devices>
-    <seclabel type=3D'dynamic' model=3D'apparmor'>
-      <label>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</label>
-      <imagelabel>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</imagelabel>
-    </seclabel>
-   </domain>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/823733/+subscriptions
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 6e478f4765ef..da7cbadbb848 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -333,17 +333,27 @@ update_map_file:
+ 
+ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+ {
++    struct stat stbuf;
+     int fd, ret;
++    char *proc_path;
+ 
+     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
+-     * Unfortunately, the linux kernel doesn't implement it yet. As an
+-     * alternative, let's open the file and use fchmod() instead. This
+-     * may fail depending on the permissions of the file, but it is the
+-     * best we can do to avoid TOCTTOU. We first try to open read-only
+-     * in case name points to a directory. If that fails, we try write-only
+-     * in case name doesn't point to a directory.
++     * Unfortunately, the linux kernel doesn't implement it yet.
++     */
++
++     /* First, we clear non-racing symlinks out of the way. */
++    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
++        return -1;
++    }
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno = ELOOP;
++        return -1;
++    }
++
++    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
++     * O_WRONLY for old-systems that don't support O_PATH.
+      */
+-    fd = openat_file(dirfd, name, O_RDONLY, 0);
++    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
+     if (fd == -1) {
+         /* In case the file is writable-only and isn't a directory. */
+         if (errno == EACCES) {
+@@ -356,7 +366,22 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+     if (fd == -1) {
+         return -1;
+     }
+-    ret = fchmod(fd, mode);
++
++    /* Now we handle racing symlinks. */
++    ret = fstat(fd, &stbuf);
++    if (ret) {
++        goto out;
++    }
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno = ELOOP;
++        ret = -1;
++        goto out;
++    }
++
++    proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
++    ret = chmod(proc_path, mode);
++    g_free(proc_path);
++out:
+     close_preserve_errno(fd);
+     return ret;
+ }
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 91299a24b8af..dc0d2e29aa3b 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -13,6 +13,12 @@
+ #ifndef QEMU_9P_UTIL_H
+ #define QEMU_9P_UTIL_H
+ 
++#ifdef O_PATH
++#define O_PATH_9P_UTIL O_PATH
++#else
++#define O_PATH_9P_UTIL 0
++#endif
++
+ static inline void close_preserve_errno(int fd)
+ {
+     int serrno = errno;
+@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
+ 
+ static inline int openat_dir(int dirfd, const char *name)
+ {
+-#ifdef O_PATH
+-#define OPENAT_DIR_O_PATH O_PATH
+-#else
+-#define OPENAT_DIR_O_PATH 0
+-#endif
+     return openat(dirfd, name,
+-                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
++                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
+ }
+ 
+ static inline int openat_file(int dirfd, const char *name, int flags,
+@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
+     }
+ 
+     serrno = errno;
+-    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
+-    ret = fcntl(fd, F_SETFL, flags);
+-    assert(!ret);
++    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
++     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
++     * ignored it anyway.
++     */
++    if (!(flags & O_PATH_9P_UTIL)) {
++        ret = fcntl(fd, F_SETFL, flags);
++        assert(!ret);
++    }
+     errno = serrno;
+     return fd;
+ }
