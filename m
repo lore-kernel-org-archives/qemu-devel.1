@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfOtk-0000F0-VB
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 07:11:38 -0400
+	(envelope-from <quintela@redhat.com>) id 1dfOuq-0000to-Tj
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 07:12:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfOtj-00021o-Mk
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 07:11:36 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38083)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dfOtj-000219-De
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 07:11:35 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id m85so28248546wma.1
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 04:11:33 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dfOun-0002S6-Tp
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 07:12:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dfOun-0002RY-LL
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 07:12:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAB702F86D6
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 11:12:40 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170809080838.GK13486@pxdev.xzpeter.org> (Peter Xu's message of
+	"Wed, 9 Aug 2017 16:08:38 +0800")
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-10-quintela@redhat.com>
+	<20170720093455.GC23385@pxdev.xzpeter.org>
+	<874ltibemw.fsf@secure.mitica>
+	<20170809080838.GK13486@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Wed, 09 Aug 2017 13:12:36 +0200
+Message-ID: <87k22d6lln.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <c03faf70-9bad-aea7-00ed-8825e8770d03@redhat.com>
-References: <743158bc-15e4-46fe-38cb-161397b5b240@linaro.org>
-	<3685aed3-735f-ae62-73a9-8f4a5c7cd459@redhat.com>
-	<9be585e2-4641-329e-f442-69ae05faadba@redhat.com>
-	<ea6acc7c-09a6-70ed-9ff0-865bd45a47f3@redhat.com>
-	<24fa9f25-912e-8903-920e-b28feba492d2@redhat.com>
-	<0f748b72-69de-1122-767d-b36dadad46fc@redhat.com>
-	<c03faf70-9bad-aea7-00ed-8825e8770d03@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 9 Aug 2017 12:11:11 +0100
-Message-ID: <CAFEAcA_7hhP-w3HzFSwdABgK00sgJfbC0nSJQfU9m3BjRKcc1Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu and 32 PCIe devices
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 09/17] migration: Start of multiple fd
+ work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +38,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Drew Jones <drjones@redhat.com>, Christoffer Dall <cdall@linaro.org>, Gema Gomez-Solano <gema.gomez-solano@linaro.org>, Marc Zygnier <marc.zyngier@arm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
 
-On 9 August 2017 at 11:56, Laszlo Ersek <lersek@redhat.com> wrote:
-> Now that I look at the "info mtree" monitor output of a random VM, I see
-> the following "address-space"s:
-> - memory
-> - I/O
-> - cpu-memory
-> - bunch of nameless ones, with top level regions called
->   "bus master container"
-> - several named "virtio-pci-cfg-as"
-> - KVM-SMRAM
+Peter Xu <peterx@redhat.com> wrote:
+> On Tue, Aug 08, 2017 at 11:19:35AM +0200, Juan Quintela wrote:
+>> Peter Xu <peterx@redhat.com> wrote:
+>> > On Mon, Jul 17, 2017 at 03:42:30PM +0200, Juan Quintela wrote:
+>> >
+>> > [...]
+>> >
+>> >>  int multifd_load_setup(void)
+>> >>  {
+>> >>      int thread_count;
+>> >> -    uint8_t i;
+>> >>  
+>> >>      if (!migrate_use_multifd()) {
+>> >>          return 0;
+>> >>      }
+>> >>      thread_count = migrate_multifd_threads();
+>> >>      multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
+>> >> -    multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
+>> >> +    multifd_recv_state->params = g_new0(MultiFDRecvParams *, thread_count);
+>> >>      multifd_recv_state->count = 0;
+>> >> -    for (i = 0; i < thread_count; i++) {
+>> >> -        char thread_name[16];
+>> >> -        MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>> >> -
+>> >> -        qemu_mutex_init(&p->mutex);
+>> >> -        qemu_sem_init(&p->sem, 0);
+>> >> -        p->quit = false;
+>> >> -        p->id = i;
+>> >> -        snprintf(thread_name, sizeof(thread_name), "multifdrecv_%d", i);
+>> >> -        qemu_thread_create(&p->thread, thread_name, multifd_recv_thread, p,
+>> >> -                           QEMU_THREAD_JOINABLE);
+>> >> -        multifd_recv_state->count++;
+>> >> -    }
+>> >
+>> > Could I ask why we explicitly switched from MultiFDRecvParams[] array
+>> > into a pointer array? Can we still use the old array?  Thanks,
+>> 
+>> Now, we could receive the channels out of order (the wonders of
+>> networking).  So, we have two options that I can see:
+>> 
+>> * Add interesting global locking to be able to modify inplace (I know
+>>   that it should be safe, but yet).
+>> * Create a new struct in the new connection, and then atomically switch
+>>   the pointer to the right instruction.
+>> 
+>> I can assure you that the second one makes it much more easier to detect
+>> when you use the "channel" before you have fully created it O:-)
 >
-> I (sort of) understand MemoryRegions and aliases, but:
-> - I don't know why "memory" and "cpu-memory" exist separately, for example,
+> Oh, so it's possible that we start to recv pages even if the recv
+> channel has not yet been established...
+>
+> Then would current code be problematic? Like in multifd_recv_page() we
+> have:
+>
+> static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+> {
+>     ...
+>     p = multifd_recv_state->params[fd_num];
+>     qemu_sem_wait(&p->ready);
+>     ...
+> }
+>
+> Here can p==NULL if channel is not ready yet?
+>
+> (If so, I think a static array makes more sense...)
 
-"memory" is the "system address space", ie the default overall
-view of memory where most devices appear and which gets
-used by DMA'ing devices that don't have a proper model of
-what their view of the world should be.
-"cpu-memory" is specifically the view of the world that
-the CPU has. Per-CPU memory mapped devices and devices
-that are visible to the CPU but not to random DMA'ing
-things can appear here (and not in the 'memory' address space).
+Yeap.  If we make an error (and believe me that I did), we  get a "nice"
+segmentation fault, where we can see what fd_num is.  Otherwise we
+receive a hang qemu.  I know what I preffer O:-)
 
-Generally "cpu-memory" will be created effectively as
-"memory" plus some other stuff.
-
-Some CPU architectures have more than one address space
-per CPU -- notably ARM TrustZone-supporting  CPUs
-have "cpu-memory" for the NonSecure view and "cpu-secure-memory"
-for the Secure view.
-
-The overall aim here is to better model the real world,
-where different memory transaction masters can sit on
-different buses or in different places in the bus fabric,
-and thus have access to different things. Anything that
-is a bus master should ideally have its own AddressSpace,
-because for QEMU an AddressSpace is the endpoint that
-you use to initiate memory transactions. MemoryRegions
-on the other hand are what you use for building up the
-hierarchy of devices sitting on buses and so on, so
-when you're setting up the simulation you pass a device
-which is a bus master a MemoryRegion defining "this is
-the world you can see", and the device creates an
-AddressSpace from it in order to be able to interact
-with it.
-
-(We have address_space_init_shareable() to reduce the
-proliferation of theoretically distinct but in
-practice identical AddressSpaces.)
-
-Similarly, I'm not familiar with the PCI code, but
-conceptually each PCI device is a bus master and wants
-an AddressSpace to do transactions into.
-
-thanks
--- PMM
+Later, Juan.
