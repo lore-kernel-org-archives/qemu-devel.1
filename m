@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dfJwU-0005v0-Nl
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:54:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfK2y-0007sW-Qx
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 02:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dfJwR-00052K-L6
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:54:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dfJwR-00051w-EN
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 01:54:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2398FC047B61
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 05:54:02 +0000 (UTC)
-Date: Wed, 9 Aug 2017 13:53:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170809055358.GH13486@pxdev.xzpeter.org>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-14-quintela@redhat.com>
-	<20170720102244.GF23385@pxdev.xzpeter.org>
-	<8760dy9tie.fsf@secure.mitica>
+	(envelope-from <armbru@redhat.com>) id 1dfK2x-0007YI-6o
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 02:00:48 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-4-git-send-email-armbru@redhat.com>
+	<20170808112016.GD2081@work-vm> <87k22e6phm.fsf@dusky.pond.sub.org>
+	<20170808161022.GO2081@work-vm>
+Date: Wed, 09 Aug 2017 08:00:26 +0200
+In-Reply-To: <20170808161022.GO2081@work-vm> (David Alan Gilbert's message of
+	"Tue, 8 Aug 2017 17:10:22 +0100")
+Message-ID: <871sol1ds5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8760dy9tie.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v5 13/17] migration: Create thread
- infrastructure for multifd recv side
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 03/56] monitor: Rewrite comment
+ describing HMP .args_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +26,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, jsnow@redhat.com
 
-On Tue, Aug 08, 2017 at 01:41:13PM +0200, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > On Mon, Jul 17, 2017 at 03:42:34PM +0200, Juan Quintela wrote:
-> 
-> >> +static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
-> >> +{
-> >> +    int thread_count;
-> >> +    MultiFDRecvParams *p;
-> >> +    static multifd_pages_t pages;
-> >> +    static bool once;
-> >> +
-> >> +    if (!once) {
-> >> +        multifd_init_group(&pages);
-> >> +        once = true;
-> >> +    }
-> >> +
-> >> +    pages.iov[pages.num].iov_base = address;
-> >> +    pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
-> >> +    pages.num++;
-> >> +
-> >> +    if (fd_num == UINT16_MAX) {
-> >
-> > (so this check is slightly mistery as well if we don't define
-> >  something... O:-)
-> 
-> It means that we continue sending pages on the same "group".  Will add a
-> comment.
-> 
-> >
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    thread_count = migrate_multifd_threads();
-> >> +    assert(fd_num < thread_count);
-> >> +    p = multifd_recv_state->params[fd_num];
-> >> +
-> >> +    qemu_sem_wait(&p->ready);
-> >
-> > Shall we check for p->pages.num == 0 before wait? What if the
-> > corresponding thread is already finished its old work and ready?
-> 
-> this is a semaphore, not a condition variable.  We only use it with
-> values 0 and 1.  We only wait if the other thread hasn't done the post,
-> if it has done the post, the wait don't have to wait. (no, I didn't
-> invented the semaphore names).
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-Yeah I think you are right. :)  Thanks,
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+>> 
+>> > * Markus Armbruster (armbru@redhat.com) wrote:
+>> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> >> ---
+>> >>  monitor.c | 75 +++++++++++++++++++++++++++++++++++++++------------------------
+>> >>  1 file changed, 47 insertions(+), 28 deletions(-)
+>> >> 
+>> >> diff --git a/monitor.c b/monitor.c
+>> >> index e0f8801..8b54ba1 100644
+>> >> --- a/monitor.c
+>> >> +++ b/monitor.c
+>> >> @@ -85,37 +85,56 @@
+>> >>  #endif
+>> >>  
+>> >>  /*
+>> >> - * Supported types:
+>> >> + * Command handlers (mon_cmd_t member @cmd) receive actual arguments
+>> >> + * in a QDict, which is built by the HMP core according to mon_cmd_t
+>> >> + * member @args_type.  It's a list of NAME:TYPE separated by comma.
+>> >>   *
+>> >> - * 'F'          filename
+>> >> - * 'B'          block device name
+>> >> - * 's'          string (accept optional quote)
+>> >> - * 'S'          it just appends the rest of the string (accept optional quote)
+>> >> - * 'O'          option string of the form NAME=VALUE,...
+>> >> - *              parsed according to QemuOptsList given by its name
+>> >> - *              Example: 'device:O' uses qemu_device_opts.
+>> >> - *              Restriction: only lists with empty desc are supported
+>> >> - *              TODO lift the restriction
+>> >> - * 'i'          32 bit integer
+>> >> - * 'l'          target long (32 or 64 bit)
+>> >> - * 'M'          Non-negative target long (32 or 64 bit), in user mode the
+>> >> - *              value is multiplied by 2^20 (think Mebibyte)
+>> >> - * 'o'          octets (aka bytes)
+>> >> - *              user mode accepts an optional E, e, P, p, T, t, G, g, M, m,
+>> >> - *              K, k suffix, which multiplies the value by 2^60 for suffixes E
+>> >> - *              and e, 2^50 for suffixes P and p, 2^40 for suffixes T and t,
+>> >> - *              2^30 for suffixes G and g, 2^20 for M and m, 2^10 for K and k
+>> >> - * 'T'          double
+>> >> - *              user mode accepts an optional ms, us, ns suffix,
+>> >> - *              which divides the value by 1e3, 1e6, 1e9, respectively
+>> >> - * '/'          optional gdb-like print format (like "/10x")
+>> >> + * TYPEs that put a string value with key NAME into the QDict:
+>> >> + * 's'    Argument is enclosed in '"' or delimited by whitespace.  In
+>> >> + *        the former case, escapes \n \r \\ \' and \" are recognized.
+>> >> + * 'F'    File name, like 's' except for completion.
+>> >> + * 'B'    BlockBackend name, like 's' except for completion.
+>> >> + * 'S'    Argument is the remainder of the line, less leading
+>> >> + *        whitespace.
+>> >> +
+>> >>   *
+>> >> - * '?'          optional type (for all types, except '/')
+>> >> - * '.'          other form of optional type (for 'i' and 'l')
+>> >> - * 'b'          boolean
+>> >> - *              user mode accepts "on" or "off"
+>> >> - * '-'          optional parameter (eg. '-f')
+>> >> + * TYPEs that put an int64_t value with key NAME:
+>> >> + * 'l'    Argument is an expression (QEMU pocket calculator).
+>> >> + * 'i'    Like 'l' except value must fit into 32 bit unsigned.
+>> >> + * 'M'    Like 'l' except value must not be negative and is multiplied
+>> >> + *        by 2^20 (think "mebibyte").
+>> >>   *
+>> >> + * TYPEs that put an uint64_t value with key NAME:
+>> >> + * 'o'    Argument is a size (think "octets").  Without suffix the
+>> >> + *        value is multiplied by 2^20 (mebibytes), with suffix E or e
+>> >> + *        by 2^60 (exbibytes), with P or p by 2^50 (pebibytes), with T
+>> >> + *        or t by 2^40 (tebibytes), with G or g by 2^30 (gibibytes),
+>> >> + *        with M or m by 2^10 (mebibytes), with K or k by 2^10
+>> >> + *        (kibibytes).
+>> >
+>> > 'o' is messy.  It using qemu_strtosz_MiB which uses a 'double' intermediate
+>> > so I fear it can round.
+>> 
+>> It does, but only when you have more than 53 significant bits.
+>> 
+>> >                          It also has a note it can't take all f's due to
+>> > an overflow from the conversion.
+>> 
+>> Correct, because values between 0xfffffffffffffc00 and 2^64-1 round up
+>> to 2^64.
+>
+> Right, so these bother me not for normal sizes, but if we were to start
+> to use them for hex values with meanings, like addresses for example.
+> (Although I guess that's unlikely with the default assumption of MB)
 
--- 
-Peter Xu
+Yes, 'o' is convenient in some cases, inconvenient in others, and
+incapable when you need more than 53 significant bits.
+
+>> If it bothers you, feel free to explore the following: feed the string
+>> both to strtod() and to strtoll().  Whichever eats more characters wins.
+>
+> Is the reason we're using strtod because we actively want users to be
+> able to say 3.5G ?  I guess that's a reason to keep it.
+
+Early (and flawed) version(s) of the patch introducing strtosz() used
+strtoll().  Jes decided to switch to strtod() precisely to support
+things like 3.5G.
+
+>> This patch is of course just about better documenting what we have.  I
+>> was starting to type something like "repeating the (complex) contract of
+>> qemu_strtosz_MiB() here isn't so hot, let's include it by reference
+>> instead", but then I looked it up.  Pffft.
+>> 
+>> >                                    Two things not mentioned are that
+>> > it also takes hex (as explicit 0x) and that it also does 'b' as a suffix
+>> > to multiply by 1.  Those two combine in bad ways - i.e. 0x1b is 27MB,
+>> > 1b is 1 byte (same for 'e').  These are probably OK except if you were
+>> > to start replacing 'l' by 'o' because you really wanted 64bit addresses
+>> > say.
+>> 
+>> I guess the sanest solution is not to recognize suffixes when the number
+>> is hexadecimal.
+>> 
+>> > (I also wouldn't bother expanding the size names and powers).
+>> 
+>> I erred on the side of tedious clarity.  Feel free to suggest something
+>> you like better.
+>
+> I think something like:
+>   The optional suffix's b/k/m/g/t/p/e are accepted (upper or lower case)
+>   to denote bytes, kibibytes, mebibytes etc.  With no suffix, values
+>   are interpreted as MiB.
+
+I like it.  I'll fix "suffix's" to "suffixes", and list the suffixes in
+their "officially correct" case "b/k/M/G/T/P/E".
+
+>> >> + *
+>> >> + * TYPEs that put a double value with key NAME:
+>> >> + * 'T'    Argument is a time in seconds.  With optional ms, us, ns
+>> >> + *        suffix, the value divided by 1e3, 1e6, 1e9 respectively.
+>> >> + *
+>> >> + * TYPEs that put a bool value with key NAME:
+>> >> + * 'b'    Argument is either "on" (true) or "off" (false).
+>> >> + * '-' CHAR
+>> >> + *        Argument is either "-CHAR" (true) or absent (false).
+>> >
+>> > I found the previous description clearer.
+>> 
+>> What I don't like about the previous description: it defines by example.
+>> Examples are great, but they are for illustrating a definition, they
+>> can't really replace one.
+>
+> I'm less fussy if it's clear; how about
+>    '-' CHAR
+>        True if optional single character argument (e.g. -f) is present
+>        else absent.
+>
+>   since you've got the '-' CHAR   you have the definition.
+
+Sold.
+
+>> >> + * TYPEs that put multiple values:
+>> >> + * 'O'    Option string of the form NAME=VALUE,... parsed according to
+>> >> + *        the QemuOptsList given by its name.
+>> >> + *        Example: 'device:O' uses qemu_device_opts.
+>> >> + *        Restriction: only lists with empty desc are supported.
+>> >> + *        Puts all the NAME=VALUE.
+>> >> + * '/'    Gdb-like print format (like "/10x"), always optional.
+>> >> + *        Puts keys "count", "format", "size", all int.
+>> >> + *
+>> >> + * Modifier character following the type string:
+>> >> + * '?'    Argument is optional, nothing is put when it is absent
+>> >> + *        (all types except 'O', '/', 'b').
+>> >> + * '.'    Argument is optional, must be preceded by '.' if present
+>> >> + *        (only types 'i', 'l', 'M')
+>> >
+>> > That's obscure; I can only see one use of it in ioport_read and that's
+>> > extra-special!
+>> 
+>> Extra-special baroque!  Took me a while to figure out WTF it does :)
+>
+> Should we avoid a lot of the 'o' pain by adding a new type; something
+> like:
+>   '6'
+>       A 64bit unsigned value.  Decimal or hex integers are accepted;
+>    optional suffixes of k/m/g/t/p/e are accepted to denote kibibytes
+>    etc.  With no suffix values are interpreted as bytes.
+>
+>   then that would be suffix_mul() * qemu_strtou64()
+
+Feels like a good idea.  Of course you need to find a few uses for it.
+
+Might even want to discourage new uses of 'o' then.
+
+>
+> Dave
+>
+>> >>   */
+>> >>  
+>> >>  typedef struct mon_cmd_t {
+>> >> -- 
+>> >> 2.7.5
+>> 
+>> Thanks!
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
