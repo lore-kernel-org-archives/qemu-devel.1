@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dfYwu-0002bU-P8
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:55:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfYyx-0004R9-8J
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dfYwr-0006cK-QB
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:55:32 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  9 Aug 2017 23:55:10 +0200
-Message-Id: <20170809215510.22802-13-pbonzini@redhat.com>
-In-Reply-To: <20170809215510.22802-1-pbonzini@redhat.com>
-References: <20170809215510.22802-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/12] qemu-iotests: merge "check" and "common"
+	(envelope-from <eblake@redhat.com>) id 1dfYyu-0007uS-Sm
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:57:38 -0400
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-18-eblake@redhat.com>
+	<87shh0n38c.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fb135fb9-8c99-912e-ffe7-9d06800e8f5e@redhat.com>
+Date: Wed, 9 Aug 2017 16:57:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <87shh0n38c.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pwhScptiVMmrIPSDTVVUtG9P6IKioQLiR"
+Subject: Re: [Qemu-devel] [PATCH v4 17/22] libqtest: Add qmp_args() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,1018 +25,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>, Amit Shah <amit@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-"check" is full of qemu-iotests--specific details.  Separating it
-from "common" does not make much sense anymore.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pwhScptiVMmrIPSDTVVUtG9P6IKioQLiR
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>,
+ Amit Shah <amit@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?=
+ <afaerber@suse.de>
+Message-ID: <fb135fb9-8c99-912e-ffe7-9d06800e8f5e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 17/22] libqtest: Add qmp_args() helper
+References: <20170804012551.2714-1-eblake@redhat.com>
+ <20170804012551.2714-18-eblake@redhat.com>
+ <87shh0n38c.fsf@dusky.pond.sub.org>
+In-Reply-To: <87shh0n38c.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/qemu-iotests/check  | 482 +++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/common | 501 ----------------------------------------------
- 2 files changed, 480 insertions(+), 503 deletions(-)
- delete mode 100644 tests/qemu-iotests/common
+On 08/09/2017 10:57 AM, Markus Armbruster wrote:
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 28b3444963..6d4d01e432 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -110,8 +110,486 @@ then
-     export QEMU_NBD_PROG="$build_root/qemu-nbd"
- fi
- 
--# we need common
--. "$source_iotests/common"
-+_full_imgfmt_details()
-+{
-+    if [ -n "$IMGOPTS" ]; then
-+        echo "$IMGFMT ($IMGOPTS)"
-+    else
-+        echo "$IMGFMT"
-+    fi
-+}
-+
-+_full_imgproto_details()
-+{
-+    echo "$IMGPROTO"
-+}
-+
-+_full_platform_details()
-+{
-+    os=`uname -s`
-+    host=`hostname -s`
-+    kernel=`uname -r`
-+    platform=`uname -m`
-+    echo "$os/$platform $host $kernel"
-+}
-+
-+# $1 = prog to look for
-+set_prog_path()
-+{
-+    p=`command -v $1 2> /dev/null`
-+    if [ -n "$p" -a -x "$p" ]; then
-+        realpath -- "$(type -p "$p")"
-+    else
-+        return 1
-+    fi
-+}
-+
-+export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
-+export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
-+export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
-+export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
-+if [ -z "$QEMU_VXHS_PROG" ]; then
-+  export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
-+fi
-+
-+if [ -z "$TEST_DIR" ]; then
-+        TEST_DIR=`pwd`/scratch
-+fi
-+
-+if [ ! -e "$TEST_DIR" ]; then
-+        mkdir "$TEST_DIR"
-+fi
-+
-+diff="diff -u"
-+verbose=false
-+debug=false
-+group=false
-+xgroup=false
-+imgopts=false
-+showme=false
-+sortme=false
-+expunge=true
-+have_test_arg=false
-+cachemode=false
-+
-+tmp="${TEST_DIR}"/$$
-+rm -f $tmp.list $tmp.tmp $tmp.sed
-+
-+export IMGFMT=raw
-+export IMGFMT_GENERIC=true
-+export IMGPROTO=file
-+export IMGOPTS=""
-+export CACHEMODE="writeback"
-+export QEMU_IO_OPTIONS=""
-+export QEMU_IO_OPTIONS_NO_FMT=""
-+export CACHEMODE_IS_DEFAULT=true
-+export QEMU_OPTIONS="-nodefaults -machine accel=qtest"
-+export VALGRIND_QEMU=
-+export IMGKEYSECRET=
-+export IMGOPTSSYNTAX=false
-+
-+default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
-+default_alias_machine=$($QEMU_PROG -machine help | \
-+   sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
-+if [[ "$default_alias_machine" ]]; then
-+    default_machine="$default_alias_machine"
-+fi
-+
-+export QEMU_DEFAULT_MACHINE="$default_machine"
-+
-+for r
-+do
-+
-+    if $group
-+    then
-+        # arg after -g
-+        group_list=`sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
-+s/ .*//p
-+}'`
-+        if [ -z "$group_list" ]
-+        then
-+            echo "Group \"$r\" is empty or not defined?"
-+            exit 1
-+        fi
-+        [ ! -s $tmp.list ] && touch $tmp.list
-+        for t in $group_list
-+        do
-+            if grep -s "^$t\$" $tmp.list >/dev/null
-+            then
-+                :
-+            else
-+                echo "$t" >>$tmp.list
-+            fi
-+        done
-+        group=false
-+        continue
-+
-+    elif $xgroup
-+    then
-+        # arg after -x
-+        # Populate $tmp.list with all tests
-+        awk '/^[0-9]{3,}/ {print $1}' "${source_iotests}/group" > $tmp.list 2>/dev/null
-+        group_list=`sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
-+s/ .*//p
-+}'`
-+        if [ -z "$group_list" ]
-+        then
-+            echo "Group \"$r\" is empty or not defined?"
-+            exit 1
-+        fi
-+        numsed=0
-+        rm -f $tmp.sed
-+        for t in $group_list
-+        do
-+            if [ $numsed -gt 100 ]
-+            then
-+                sed -f $tmp.sed <$tmp.list >$tmp.tmp
-+                mv $tmp.tmp $tmp.list
-+                numsed=0
-+                rm -f $tmp.sed
-+            fi
-+            echo "/^$t\$/d" >>$tmp.sed
-+            numsed=`expr $numsed + 1`
-+        done
-+        sed -f $tmp.sed <$tmp.list >$tmp.tmp
-+        mv $tmp.tmp $tmp.list
-+        xgroup=false
-+        continue
-+
-+    elif $imgopts
-+    then
-+        IMGOPTS="$r"
-+        imgopts=false
-+        continue
-+    elif $cachemode
-+    then
-+        CACHEMODE="$r"
-+        CACHEMODE_IS_DEFAULT=false
-+        cachemode=false
-+        continue
-+    fi
-+
-+    xpand=true
-+    case "$r"
-+    in
-+
-+        -\? | -h | --help)        # usage
-+            echo "Usage: $0 [options] [testlist]"'
-+
-+common options
-+    -v                  verbose
-+    -d                  debug
-+
-+image format options
-+    -raw                test raw (default)
-+    -bochs              test bochs
-+    -cloop              test cloop
-+    -parallels          test parallels
-+    -qcow               test qcow
-+    -qcow2              test qcow2
-+    -qed                test qed
-+    -vdi                test vdi
-+    -vpc                test vpc
-+    -vhdx               test vhdx
-+    -vmdk               test vmdk
-+    -luks               test luks
-+
-+image protocol options
-+    -file               test file (default)
-+    -rbd                test rbd
-+    -sheepdog           test sheepdog
-+    -nbd                test nbd
-+    -ssh                test ssh
-+    -nfs                test nfs
-+    -vxhs               test vxhs
-+
-+other options
-+    -xdiff              graphical mode diff
-+    -nocache            use O_DIRECT on backing file
-+    -misalign           misalign memory allocations
-+    -n                  show me, do not run tests
-+    -o options          -o options to pass to qemu-img create/convert
-+    -T                  output timestamps
-+    -c mode             cache mode
-+
-+testlist options
-+    -g group[,group...]        include tests from these groups
-+    -x group[,group...]        exclude tests from these groups
-+    NNN                        include test NNN
-+    NNN-NNN                    include test range (eg. 012-021)
-+'
-+            exit 0
-+            ;;
-+
-+        -raw)
-+            IMGFMT=raw
-+            xpand=false
-+            ;;
-+
-+        -bochs)
-+            IMGFMT=bochs
-+            IMGFMT_GENERIC=false
-+            xpand=false
-+            ;;
-+
-+        -cloop)
-+            IMGFMT=cloop
-+            IMGFMT_GENERIC=false
-+            xpand=false
-+            ;;
-+
-+        -parallels)
-+            IMGFMT=parallels
-+            IMGFMT_GENERIC=false
-+            xpand=false
-+            ;;
-+
-+        -qcow)
-+            IMGFMT=qcow
-+            xpand=false
-+            ;;
-+
-+        -qcow2)
-+            IMGFMT=qcow2
-+            xpand=false
-+            ;;
-+
-+        -luks)
-+            IMGOPTSSYNTAX=true
-+            IMGFMT=luks
-+            IMGKEYSECRET=123456
-+            xpand=false
-+            ;;
-+
-+        -qed)
-+            IMGFMT=qed
-+            xpand=false
-+            ;;
-+
-+        -vdi)
-+            IMGFMT=vdi
-+            xpand=false
-+            ;;
-+
-+        -vmdk)
-+            IMGFMT=vmdk
-+            xpand=false
-+            ;;
-+
-+        -vpc)
-+            IMGFMT=vpc
-+            xpand=false
-+            ;;
-+
-+        -vhdx)
-+            IMGFMT=vhdx
-+            xpand=false
-+            ;;
-+
-+        -file)
-+            IMGPROTO=file
-+            xpand=false
-+            ;;
-+
-+        -rbd)
-+            IMGPROTO=rbd
-+            xpand=false
-+            ;;
-+
-+        -sheepdog)
-+            IMGPROTO=sheepdog
-+            xpand=false
-+            ;;
-+
-+        -nbd)
-+            IMGPROTO=nbd
-+            xpand=false
-+            ;;
-+
-+        -vxhs)
-+            IMGPROTO=vxhs
-+            xpand=false
-+            ;;
-+
-+        -ssh)
-+            IMGPROTO=ssh
-+            xpand=false
-+            ;;
-+
-+        -nfs)
-+            IMGPROTO=nfs
-+            xpand=false
-+            ;;
-+
-+        -nocache)
-+            CACHEMODE="none"
-+            CACHEMODE_IS_DEFAULT=false
-+            xpand=false
-+            ;;
-+
-+        -misalign)
-+            QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --misalign"
-+            xpand=false
-+            ;;
-+
-+        -valgrind)
-+            VALGRIND_QEMU='y'
-+            xpand=false
-+            ;;
-+
-+        -g)        # -g group ... pick from group file
-+            group=true
-+            xpand=false
-+            ;;
-+
-+        -xdiff)        # graphical diff mode
-+            xpand=false
-+
-+            if [ ! -z "$DISPLAY" ]
-+            then
-+                command -v xdiff >/dev/null 2>&1 && diff=xdiff
-+                command -v gdiff >/dev/null 2>&1 && diff=gdiff
-+                command -v tkdiff >/dev/null 2>&1 && diff=tkdiff
-+                command -v xxdiff >/dev/null 2>&1 && diff=xxdiff
-+            fi
-+            ;;
-+
-+        -n)        # show me, don't do it
-+            showme=true
-+            xpand=false
-+            ;;
-+        -o)
-+            imgopts=true
-+            xpand=false
-+            ;;
-+        -c)
-+            cachemode=true
-+            xpand=false
-+            ;;
-+        -T)        # turn on timestamp output
-+            timestamp=true
-+            xpand=false
-+            ;;
-+
-+        -v)
-+            verbose=true
-+            xpand=false
-+            ;;
-+        -d)
-+            debug=true
-+            xpand=false
-+            ;;
-+        -x)        # -x group ... exclude from group file
-+            xgroup=true
-+            xpand=false
-+            ;;
-+        '[0-9][0-9][0-9] [0-9][0-9][0-9][0-9]')
-+            echo "No tests?"
-+            status=1
-+            exit $status
-+            ;;
-+
-+        [0-9]*-[0-9]*)
-+            eval `echo $r | sed -e 's/^/start=/' -e 's/-/ end=/'`
-+            ;;
-+
-+        [0-9]*-)
-+            eval `echo $r | sed -e 's/^/start=/' -e 's/-//'`
-+            end=`echo [0-9][0-9][0-9] [0-9][0-9][0-9][0-9] | sed -e 's/\[0-9]//g' -e 's/  *$//' -e 's/.* //'`
-+            if [ -z "$end" ]
-+            then
-+                echo "No tests in range \"$r\"?"
-+                status=1
-+                exit $status
-+            fi
-+            ;;
-+
-+        *)
-+            start=$r
-+            end=$r
-+            ;;
-+
-+    esac
-+
-+    # get rid of leading 0s as can be interpreted as octal
-+    start=`echo $start | sed 's/^0*//'`
-+    end=`echo $end | sed 's/^0*//'`
-+
-+    if $xpand
-+    then
-+        have_test_arg=true
-+        awk </dev/null '
-+BEGIN        { for (t='$start'; t<='$end'; t++) printf "%03d\n",t }' \
-+        | while read id
-+        do
-+            if grep -s "^$id " "$source_iotests/group" >/dev/null
-+            then
-+                # in group file ... OK
-+                echo $id >>$tmp.list
-+            else
-+                if [ -f expunged ] && $expunge && egrep "^$id([         ]|\$)" expunged >/dev/null
-+                then
-+                    # expunged ... will be reported, but not run, later
-+                    echo $id >>$tmp.list
-+                else
-+                    # oops
-+                    if [ "$start" == "$end" -a "$id" == "$end" ]
-+                    then
-+                        echo "$id - unknown test"
-+                        exit 1
-+                    else
-+                        echo "$id - unknown test, ignored"
-+                    fi
-+                fi
-+            fi
-+        done || exit 1
-+    fi
-+
-+done
-+
-+# Set qemu-io cache mode with $CACHEMODE we have
-+QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+
-+QEMU_IO_OPTIONS_NO_FMT="$QEMU_IO_OPTIONS"
-+if [ "$IMGOPTSSYNTAX" != "true" ]; then
-+    QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS -f $IMGFMT"
-+fi
-+
-+# Set default options for qemu-img create -o if they were not specified
-+if [ "$IMGFMT" == "qcow2" ] && ! (echo "$IMGOPTS" | grep "compat=" > /dev/null); then
-+    IMGOPTS=$(_optstr_add "$IMGOPTS" "compat=1.1")
-+fi
-+if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null); then
-+    IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
-+fi
-+
-+if [ -z "$SAMPLE_IMG_DIR" ]; then
-+        SAMPLE_IMG_DIR="$source_iotests/sample_images"
-+fi
-+
-+export TEST_DIR
-+export SAMPLE_IMG_DIR
-+
-+if [ -s $tmp.list ]
-+then
-+    # found some valid test numbers ... this is good
-+    :
-+else
-+    if $have_test_arg
-+    then
-+        # had test numbers, but none in group file ... do nothing
-+        touch $tmp.list
-+    else
-+        # no test numbers, do everything from group file
-+        sed -n -e '/^[0-9][0-9][0-9]*/s/[         ].*//p' <"$source_iotests/group" >$tmp.list
-+    fi
-+fi
-+
-+# should be sort -n, but this did not work for Linux when this
-+# was ported from IRIX
-+#
-+list=`sort $tmp.list`
-+rm -f $tmp.list $tmp.tmp $tmp.sed
- 
- TIMESTAMP_FILE=check.time-$IMGPROTO-$IMGFMT
- 
-diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-deleted file mode 100644
-index 35e4d0f87b..0000000000
---- a/tests/qemu-iotests/common
-+++ /dev/null
-@@ -1,501 +0,0 @@
--#!/bin/bash
--#
--# Copyright (C) 2009 Red Hat, Inc.
--# Copyright (c) 2000-2005 Silicon Graphics, Inc.  All Rights Reserved.
--#
--# This program is free software; you can redistribute it and/or
--# modify it under the terms of the GNU General Public License as
--# published by the Free Software Foundation.
--#
--# This program is distributed in the hope that it would be useful,
--# but WITHOUT ANY WARRANTY; without even the implied warranty of
--# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--# GNU General Public License for more details.
--#
--# You should have received a copy of the GNU General Public License
--# along with this program.  If not, see <http://www.gnu.org/licenses/>.
--#
--#
--# common procedures for QA scripts
--#
--
--_full_imgfmt_details()
--{
--    if [ -n "$IMGOPTS" ]; then
--        echo "$IMGFMT ($IMGOPTS)"
--    else
--        echo "$IMGFMT"
--    fi
--}
--
--_full_imgproto_details()
--{
--    echo "$IMGPROTO"
--}
--
--_full_platform_details()
--{
--    os=`uname -s`
--    host=`hostname -s`
--    kernel=`uname -r`
--    platform=`uname -m`
--    echo "$os/$platform $host $kernel"
--}
--
--# $1 = prog to look for
--set_prog_path()
--{
--    p=`command -v $1 2> /dev/null`
--    if [ -n "$p" -a -x "$p" ]; then
--        realpath -- "$(type -p "$p")"
--    else
--        return 1
--    fi
--}
--
--export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
--export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
--export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
--export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
--if [ -z "$QEMU_VXHS_PROG" ]; then
--  export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
--fi
--
--if [ -z "$TEST_DIR" ]; then
--        TEST_DIR=`pwd`/scratch
--fi
--
--if [ ! -e "$TEST_DIR" ]; then
--        mkdir "$TEST_DIR"
--fi
--
--diff="diff -u"
--verbose=false
--debug=false
--group=false
--xgroup=false
--imgopts=false
--showme=false
--sortme=false
--expunge=true
--have_test_arg=false
--cachemode=false
--
--tmp="${TEST_DIR}"/$$
--rm -f $tmp.list $tmp.tmp $tmp.sed
--
--export IMGFMT=raw
--export IMGFMT_GENERIC=true
--export IMGPROTO=file
--export IMGOPTS=""
--export CACHEMODE="writeback"
--export QEMU_IO_OPTIONS=""
--export QEMU_IO_OPTIONS_NO_FMT=""
--export CACHEMODE_IS_DEFAULT=true
--export QEMU_OPTIONS="-nodefaults -machine accel=qtest"
--export VALGRIND_QEMU=
--export IMGKEYSECRET=
--export IMGOPTSSYNTAX=false
--
--default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
--default_alias_machine=$($QEMU_PROG -machine help | \
--   sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
--if [[ "$default_alias_machine" ]]; then
--    default_machine="$default_alias_machine"
--fi
--
--export QEMU_DEFAULT_MACHINE="$default_machine"
--
--for r
--do
--
--    if $group
--    then
--        # arg after -g
--        group_list=`sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
--s/ .*//p
--}'`
--        if [ -z "$group_list" ]
--        then
--            echo "Group \"$r\" is empty or not defined?"
--            exit 1
--        fi
--        [ ! -s $tmp.list ] && touch $tmp.list
--        for t in $group_list
--        do
--            if grep -s "^$t\$" $tmp.list >/dev/null
--            then
--                :
--            else
--                echo "$t" >>$tmp.list
--            fi
--        done
--        group=false
--        continue
--
--    elif $xgroup
--    then
--        # arg after -x
--        # Populate $tmp.list with all tests
--        awk '/^[0-9]{3,}/ {print $1}' "${source_iotests}/group" > $tmp.list 2>/dev/null
--        group_list=`sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
--s/ .*//p
--}'`
--        if [ -z "$group_list" ]
--        then
--            echo "Group \"$r\" is empty or not defined?"
--            exit 1
--        fi
--        numsed=0
--        rm -f $tmp.sed
--        for t in $group_list
--        do
--            if [ $numsed -gt 100 ]
--            then
--                sed -f $tmp.sed <$tmp.list >$tmp.tmp
--                mv $tmp.tmp $tmp.list
--                numsed=0
--                rm -f $tmp.sed
--            fi
--            echo "/^$t\$/d" >>$tmp.sed
--            numsed=`expr $numsed + 1`
--        done
--        sed -f $tmp.sed <$tmp.list >$tmp.tmp
--        mv $tmp.tmp $tmp.list
--        xgroup=false
--        continue
--
--    elif $imgopts
--    then
--        IMGOPTS="$r"
--        imgopts=false
--        continue
--    elif $cachemode
--    then
--        CACHEMODE="$r"
--        CACHEMODE_IS_DEFAULT=false
--        cachemode=false
--        continue
--    fi
--
--    xpand=true
--    case "$r"
--    in
--
--        -\? | -h | --help)        # usage
--            echo "Usage: $0 [options] [testlist]"'
--
--common options
--    -v                  verbose
--    -d                  debug
--
--image format options
--    -raw                test raw (default)
--    -bochs              test bochs
--    -cloop              test cloop
--    -parallels          test parallels
--    -qcow               test qcow
--    -qcow2              test qcow2
--    -qed                test qed
--    -vdi                test vdi
--    -vpc                test vpc
--    -vhdx               test vhdx
--    -vmdk               test vmdk
--    -luks               test luks
--
--image protocol options
--    -file               test file (default)
--    -rbd                test rbd
--    -sheepdog           test sheepdog
--    -nbd                test nbd
--    -ssh                test ssh
--    -nfs                test nfs
--    -vxhs               test vxhs
--
--other options
--    -xdiff              graphical mode diff
--    -nocache            use O_DIRECT on backing file
--    -misalign           misalign memory allocations
--    -n                  show me, do not run tests
--    -o options          -o options to pass to qemu-img create/convert
--    -T                  output timestamps
--    -c mode             cache mode
--
--testlist options
--    -g group[,group...]        include tests from these groups
--    -x group[,group...]        exclude tests from these groups
--    NNN                        include test NNN
--    NNN-NNN                    include test range (eg. 012-021)
--'
--            exit 0
--            ;;
--
--        -raw)
--            IMGFMT=raw
--            xpand=false
--            ;;
--
--        -bochs)
--            IMGFMT=bochs
--            IMGFMT_GENERIC=false
--            xpand=false
--            ;;
--
--        -cloop)
--            IMGFMT=cloop
--            IMGFMT_GENERIC=false
--            xpand=false
--            ;;
--
--        -parallels)
--            IMGFMT=parallels
--            IMGFMT_GENERIC=false
--            xpand=false
--            ;;
--
--        -qcow)
--            IMGFMT=qcow
--            xpand=false
--            ;;
--
--        -qcow2)
--            IMGFMT=qcow2
--            xpand=false
--            ;;
--
--        -luks)
--            IMGOPTSSYNTAX=true
--            IMGFMT=luks
--            IMGKEYSECRET=123456
--            xpand=false
--            ;;
--
--        -qed)
--            IMGFMT=qed
--            xpand=false
--            ;;
--
--        -vdi)
--            IMGFMT=vdi
--            xpand=false
--            ;;
--
--        -vmdk)
--            IMGFMT=vmdk
--            xpand=false
--            ;;
--
--        -vpc)
--            IMGFMT=vpc
--            xpand=false
--            ;;
--
--        -vhdx)
--            IMGFMT=vhdx
--            xpand=false
--            ;;
--
--        -file)
--            IMGPROTO=file
--            xpand=false
--            ;;
--
--        -rbd)
--            IMGPROTO=rbd
--            xpand=false
--            ;;
--
--        -sheepdog)
--            IMGPROTO=sheepdog
--            xpand=false
--            ;;
--
--        -nbd)
--            IMGPROTO=nbd
--            xpand=false
--            ;;
--
--        -vxhs)
--            IMGPROTO=vxhs
--            xpand=false
--            ;;
--
--        -ssh)
--            IMGPROTO=ssh
--            xpand=false
--            ;;
--
--        -nfs)
--            IMGPROTO=nfs
--            xpand=false
--            ;;
--
--        -nocache)
--            CACHEMODE="none"
--            CACHEMODE_IS_DEFAULT=false
--            xpand=false
--            ;;
--
--        -misalign)
--            QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --misalign"
--            xpand=false
--            ;;
--
--        -valgrind)
--            VALGRIND_QEMU='y'
--            xpand=false
--            ;;
--
--        -g)        # -g group ... pick from group file
--            group=true
--            xpand=false
--            ;;
--
--        -xdiff)        # graphical diff mode
--            xpand=false
--
--            if [ ! -z "$DISPLAY" ]
--            then
--                command -v xdiff >/dev/null 2>&1 && diff=xdiff
--                command -v gdiff >/dev/null 2>&1 && diff=gdiff
--                command -v tkdiff >/dev/null 2>&1 && diff=tkdiff
--                command -v xxdiff >/dev/null 2>&1 && diff=xxdiff
--            fi
--            ;;
--
--        -n)        # show me, don't do it
--            showme=true
--            xpand=false
--            ;;
--        -o)
--            imgopts=true
--            xpand=false
--            ;;
--        -c)
--            cachemode=true
--            xpand=false
--            ;;
--        -T)        # turn on timestamp output
--            timestamp=true
--            xpand=false
--            ;;
--
--        -v)
--            verbose=true
--            xpand=false
--            ;;
--        -d)
--            debug=true
--            xpand=false
--            ;;
--        -x)        # -x group ... exclude from group file
--            xgroup=true
--            xpand=false
--            ;;
--        '[0-9][0-9][0-9] [0-9][0-9][0-9][0-9]')
--            echo "No tests?"
--            status=1
--            exit $status
--            ;;
--
--        [0-9]*-[0-9]*)
--            eval `echo $r | sed -e 's/^/start=/' -e 's/-/ end=/'`
--            ;;
--
--        [0-9]*-)
--            eval `echo $r | sed -e 's/^/start=/' -e 's/-//'`
--            end=`echo [0-9][0-9][0-9] [0-9][0-9][0-9][0-9] | sed -e 's/\[0-9]//g' -e 's/  *$//' -e 's/.* //'`
--            if [ -z "$end" ]
--            then
--                echo "No tests in range \"$r\"?"
--                status=1
--                exit $status
--            fi
--            ;;
--
--        *)
--            start=$r
--            end=$r
--            ;;
--
--    esac
--
--    # get rid of leading 0s as can be interpreted as octal
--    start=`echo $start | sed 's/^0*//'`
--    end=`echo $end | sed 's/^0*//'`
--
--    if $xpand
--    then
--        have_test_arg=true
--        awk </dev/null '
--BEGIN        { for (t='$start'; t<='$end'; t++) printf "%03d\n",t }' \
--        | while read id
--        do
--            if grep -s "^$id " "$source_iotests/group" >/dev/null
--            then
--                # in group file ... OK
--                echo $id >>$tmp.list
--            else
--                if [ -f expunged ] && $expunge && egrep "^$id([         ]|\$)" expunged >/dev/null
--                then
--                    # expunged ... will be reported, but not run, later
--                    echo $id >>$tmp.list
--                else
--                    # oops
--                    if [ "$start" == "$end" -a "$id" == "$end" ]
--                    then
--                        echo "$id - unknown test"
--                        exit 1
--                    else
--                        echo "$id - unknown test, ignored"
--                    fi
--                fi
--            fi
--        done || exit 1
--    fi
--
--done
--
--# Set qemu-io cache mode with $CACHEMODE we have
--QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
--
--QEMU_IO_OPTIONS_NO_FMT="$QEMU_IO_OPTIONS"
--if [ "$IMGOPTSSYNTAX" != "true" ]; then
--    QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS -f $IMGFMT"
--fi
--
--# Set default options for qemu-img create -o if they were not specified
--if [ "$IMGFMT" == "qcow2" ] && ! (echo "$IMGOPTS" | grep "compat=" > /dev/null); then
--    IMGOPTS=$(_optstr_add "$IMGOPTS" "compat=1.1")
--fi
--if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null); then
--    IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
--fi
--
--if [ -z "$SAMPLE_IMG_DIR" ]; then
--        SAMPLE_IMG_DIR="$source_iotests/sample_images"
--fi
--
--export TEST_DIR
--export SAMPLE_IMG_DIR
--
--if [ -s $tmp.list ]
--then
--    # found some valid test numbers ... this is good
--    :
--else
--    if $have_test_arg
--    then
--        # had test numbers, but none in group file ... do nothing
--        touch $tmp.list
--    else
--        # no test numbers, do everything from group file
--        sed -n -e '/^[0-9][0-9][0-9]*/s/[         ].*//p' <"$source_iotests/group" >$tmp.list
--    fi
--fi
--
--# should be sort -n, but this did not work for Linux when this
--# was ported from IRIX
--#
--list=`sort $tmp.list`
--rm -f $tmp.list $tmp.tmp $tmp.sed
--- 
-2.13.3
+> I don't like the qmp_args name.  It's not about arguments, it's about
+> sending a command with arguments.
+>=20
+> I'm afraid I'm getting pretty thorougly confused by the evolving
+> interface.  So I stop and think how it should look like when done.
+
+At a bare minimum, I like your idea that we want:
+
+FOO_send()     # sends a message, does not wait for a reply
+FOO_receive()  # reads one JSON object, returns QObject counterpart
+FOO() # combo of FOO_send() and FOO_receive()
+
+Then FOO_discard() is a convenient shorthand for QDECREF(FOO_receive()).
+
+Which FOO do we need? Right now, we have 'qmp' for anything using the
+global_qtest, 'qtest_qmp' for anything using an explicit QTestState (but
+we're arguing that is overkill), and 'qmp_fd' for anything using a raw
+fd (test-qga.c - and where I added 'qga' in 11/22, although that
+addition was local rather than in libqtest.h).
+
+I also just had an insight: it is possible to write a macro
+qmp_send(...) that will expand to qmp_send_cmd(name) if there is only
+one argument, but to qmp_send_cmdf(name, fmt, ...) if there is more than
+one argument (and later expose a public qmp_send_cmdv(name, fmt,
+va_list) as pair if it is needed, although right now it is not).
+Perhaps we can even make the one-arg form expand to qmp_send_cmdf(name,
+" "), if that's enough to silence gcc's -Wformat-zero-length, and if our
+underlying routines are smart enough to recognize a single-space
+argument as not being worthy of calling qobject_from_jsonf() (since
+qobject_from_jsonf() aborts rather than returning NULL when presented
+just whitespace).
+
+In fact, having a macro qmp_send(cmd, ...) expand to
+qmp_send_internal(cmd, " " __VA_ARGS__) might even do the trick without
+preprocessor magic of checking whether __VA_ARGS__ contains a comma
+(although it has the subtle limitation that if present, a format
+argument MUST be a string literal because we now rely on string
+concatenation with " " - although given gcc's -Wformat-nonliteral, we
+are probably okay with that limitation).
+
+So, with a nice macro, the bulk of the testsuite would just write in
+this style:
+
+qmp_send("foo");
+qmp_send("foo", "{literal_args...}");
+qmp_send("foo", "{'name':%s}", value);
+
+for send without waiting, or:
+
+obj =3D qmp("foo");
+obj =3D qmp(foo", "{literal_args...}");
+obj =3D qmp("foo", "{'name':%s}", value);
+
+where the result matters.  And the names we choose for internal
+implementation are no longer quite as important (although still helpful
+to get right).
+
+>=20
+> We need send and receive.  Convenience functions to do both, and to
+> receive and throw away are nice to have.
+
+Do we want both a convenience function to throw away a single read, AND
+a function to send a command + throw away a read? Prior to this series,
+we have qmp_discard_response() which is send + discard, but nothing that
+does plain discard; although plain discard is a better building block
+(precisely because then we don't have to duplicate all the different
+send forms) - the convenience of send+receive in one call should be
+limited to the most common case.
+
+Also, the qmp_eventwait() is a nice convenience function for wait in a
+loop until the received object matches a given name; whether we also
+need the convenience of qmp_eventwait_ref() is a bit more debatable
+(perhaps we could just as easily have qmp_event_wait() always return an
+object, and require the caller to QDECREF() it, for one less function to
+maintain).
+
+>=20
+> We need qmp_raw().  We haven't found a need for a raw receive function.=
+
+
+Yes, qmp_raw() (or maybe it should be named qmp_send_raw(), depending on
+whether the receive is coupled with it?) is our backdoor for sending
+JSON that does not match the normal {'execute':'name','arguments':{}}
+paradigm (and pretty much qmp-test.c, or maybe also test-qga.c, would be
+the only clients).
+
+[Side node - why can't we pick a consistent naming of our tests?  The
+name 'FOO-test' is a bit nicer than 'test-FOO' when it comes to writing
+=2Egitignore entries. Should we do a bulk cleanup rename to get all the
+tests into one consistent naming style?]
+
+>=20
+> Convenience functions to build commands and send are nice to have.  The=
+y
+> come in pairs, without arguments, to avoid -Wno-format-zero-length
+> (aside: that's one of the sillier warnings).
+
+It's possible to alter CFLAGS to shut gcc up on that one while still
+getting the rest of -Wformat, if we don't think it adds value to qemu.
+My idea above is that you can use a macro to hide the worst of the
+paired nature, so that the bulk of the testsuite can supply or omit an
+arguments format string as desired.
+
+>=20
+> We used to have almost everything with and without QTestState, but we'r=
+e
+> refusing to continue that self-flagellation.
+
+And for v5, I think I'll reorder my series to get rid of QTestState
+sooner, rather than later.
+
+>=20
+> For every function taking ..., we want one taking va_list.
+
+Under the hood, probably.  Whether the va_list form has to be exported
+is a different question (we might be able to get by with just the ... for=
+m).
+
+>=20
+> Makes sense?
+>=20
+> Can we derive a sensible set of function names from this?
+>=20
+
+I gave it a shot.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--pwhScptiVMmrIPSDTVVUtG9P6IKioQLiR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLhT8ACgkQp6FrSiUn
+Q2o8hQgAqC7TMN0PLZfyKJpRCsrNhJIuny71LKm7i0q0QwgzwDm9kTPn8gKidYxX
+o4gnEV2/0a3HY5/10+1fcsFjsab367GTlrIZQ7X66XNkMQ88h1dWyVFj35Bo+nSe
+O+6cbYdWkvmnS4HCt+RZD9LaggB32P5rMe9t9rpDt58iQqqE9pG0HBSFVXzs6AON
+LPyKARVlfwA0wpK9nqZZ1s6bsz4ZSSgyLAdFZXurcdAB2M6Db9eifctJJ7krOSVD
+WNp5iqG7tr9e4VqweK47LJ0OOpIyL7+fP5KzHK0BhTt0KZi3aJvf5Kp5K6gCeXaZ
+6eJ+oQow4ISlcuP2T0eWnJhvaQUTaA==
+=RJUq
+-----END PGP SIGNATURE-----
+
+--pwhScptiVMmrIPSDTVVUtG9P6IKioQLiR--
