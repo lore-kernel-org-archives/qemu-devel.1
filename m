@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dfUDI-0003m6-Ns
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:52:10 -0400
+	(envelope-from <groug@kaod.org>) id 1dfUEX-0004Sx-42
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dfUDH-0000D8-6Y
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:52:08 -0400
-Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:35124)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dfUDG-0000Cu-US
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:52:07 -0400
-Received: by mail-pg0-x230.google.com with SMTP id v189so30303063pgd.2
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 09:52:06 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dfUES-0000aS-6q
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:53:25 -0400
+Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:58919)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfUES-0000a0-17
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:53:20 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 78CA48BDC3
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 18:53:18 +0200 (CEST)
+Date: Wed, 9 Aug 2017 18:53:11 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170809185248.230b6166@bahia.lan>
+In-Reply-To: <20170809163019.21593-1-cohuck@redhat.com>
+References: <20170809163019.21593-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <888c4489-5603-0361-2a42-a4fbc3c70779@redhat.com>
-References: <1501964858-5159-1-git-send-email-zuban32s@gmail.com>
-	<1501964858-5159-6-git-send-email-zuban32s@gmail.com>
-	<87e569e6-e1ec-4238-e073-38c0e136af0d@redhat.com>
-	<CAKSfGUD3cy7hMxT6PQULk21PO16e=s3A5jq_fZfR_J6rk325eg@mail.gmail.com>
-	<888c4489-5603-0361-2a42-a4fbc3c70779@redhat.com>
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Wed, 9 Aug 2017 19:52:05 +0300
-Message-ID: <CAKSfGUC2Tu=xswSK_nUSt1F7Qs0rCw0a1TW3Wn0mg56kSWTerA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] docs: update documentation
- considering PCIE-PCI bridge
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/tewdyiphgT6ddQBxikjGh21";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,171 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: aneesh.kumar@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, qemu-devel@nongnu.org
 
-2017-08-09 13:18 GMT+03:00 Laszlo Ersek <lersek@redhat.com>:
-> On 08/08/17 21:21, Aleksandr Bezzubikov wrote:
->> 2017-08-08 18:11 GMT+03:00 Laszlo Ersek <lersek@redhat.com>:
->>> one comment below
->>>
->>> On 08/05/17 22:27, Aleksandr Bezzubikov wrote:
->>>
->>>> +Capability layout (defined in include/hw/pci/pci_bridge.h):
->>>> +
->>>> +    uint8_t id;     Standard PCI capability header field
->>>> +    uint8_t next;   Standard PCI capability header field
->>>> +    uint8_t len;    Standard PCI vendor-specific capability header field
->>>> +
->>>> +    uint8_t type;   Red Hat vendor-specific capability type
->>>> +                    List of currently existing types:
->>>> +                        QEMU_RESERVE = 1
->>>> +
->>>> +
->>>> +    uint32_t bus_res;   Minimum number of buses to reserve
->>>> +
->>>> +    uint64_t io;        IO space to reserve
->>>> +    uint64_t mem        Non-prefetchable memory to reserve
->>>> +    uint64_t mem_pref;  Prefetchable memory to reserve
->>>
->>> (I apologize if I missed any concrete points from the past messages
->>> regarding this structure.)
->>>
->>> How is the firmware supposed to know whether the prefetchable MMIO
->>> reservation should be made in 32-bit or 64-bit address space? If we
->>> reserve prefetchable MMIO outside of the 32-bit address space, then
->>> hot-plugging a device without 64-bit MMIO support could fail.
->>>
->>> My earlier request, to distinguish "prefetchable_32" from
->>> "prefetchable_64" (mutually exclusively), was so that firmware would
->>> know whether to restrict the MMIO reservation to 32-bit address
->>> space.
->>
->> IIUC now (in SeaBIOS at least) we just assign this PREF registers
->> unconditionally,
->> so the decision about the mode can be made basing on !=0
->> UPPER_PREF_LIMIT register.
->> My idea was the same - we can just check if the value doesn't fit into
->> 16-bit (PREF_LIMIT reg size, 32-bit MMIO). Do we really need separate
->> fields for that?
->
-> The PciBusDxe driver in edk2 tracks 32-bit and 64-bit MMIO resources
-> separately from each other, and other (independent) logic exists in it
-> that, on some conditions, allocates 64-bit MMIO BARs from 32-bit address
-> space. This is just to say that the distinction is intentional in
-> PciBusDxe.
->
-> Furthermore, the Platform Init spec v1.6 says the following (this is
-> what OVMF will have to comply with, in the "platform hook" called by
-> PciBusDxe):
->
->> 12.6 PCI Hot Plug PCI Initialization Protocol
->> EFI_PCI_HOT_PLUG_INIT_PROTOCOL.GetResourcePadding()
->> ...
->> Padding  The amount of resource padding that is required by the PCI
->>          bus under the control of the specified HPC. Because the
->>          caller does not know the size of this buffer, this buffer is
->>          allocated by the callee and freed by the caller.
->> ...
->> The padding is returned in the form of ACPI (2.0 & 3.0) resource
->> descriptors. The exact definition of each of the fields is the same as
->> in the
->> EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.SubmitResources()
->> function. See the section 10.8 for the definition of this function.
->
-> Following that pointer:
->
->> 10.8 PCI HostBridge Code Definitions
->> 10.8.2 PCI Host Bridge Resource Allocation Protocol
->>
->> Table 8. ACPI 2.0 & 3.0 QWORD Address Space Descriptor Usage
->>
->> Byte    Byte    Data  Description
->> Offset  Length
->> ...
->> 0x03    0x01          Resource type:
->>                         0: Memory range
->>                         1: I/O range
->>                         2: Bus number range
->> ...
->> 0x05    0x01          Type-specific flags. Ignored except as defined
->>                       in Table 3-3 and Table 3-4 below.
->>
->> 0x06    0x08          Address Space Granularity. Used to differentiate
->>                       between a 32-bit memory request and a 64-bit
->>                       memory request. For a 32-bit memory request,
->>                       this field should be set to 32. For a 64-bit
->>                       memory request, this field should be set to 64.
->>                       Ignored for I/O and bus resource requests.
->>                       Ignored during GetProposedResources().
->
-> The "Table 3-3" and "Table 3-4" references under "Type-specific flags"
-> are out of date (spec bug); in reality those are:
-> - Table 10. I/O Resource Flag (Resource Type = 1) Usage,
-> - Table 11. Memory Resource Flag (Resource Type = 0) Usage.
->
-> The latter is relevant here:
->
->> Table 11. Memory Resource Flag (Resource Type = 0) Usage
->>
->> Bits      Meaning
->> ...
->> Bit[2:1]  _MEM. Memory attributes.
->>           Value and Meaning:
->>             0 The memory is nonprefetchable.
->>             1 Invalid.
->>             2 Invalid.
->>             3 The memory is prefetchable.
->>           Note: The interpretation of these bits is somewhat different
->>           from the ACPI Specification. According to the ACPI
->>           Specification, a value of 0 implies noncacheable memory and
->>           the value of 3 indicates prefetchable and cacheable memory.
->
-> So whatever OVMF sees in the capability, it must be able to translate to
-> the above representation.
+--Sig_/tewdyiphgT6ddQBxikjGh21
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-OK, I got it.
-Then I suggest this part of the cap look like
+On Wed,  9 Aug 2017 18:30:19 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-uint64_t mem_pref_32;
-uint64_t mem_pref_64;
+> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+> on CONFIG_VIRTFS and CONFIG_VIRTIO/CONFIG_XEN only.
+>=20
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>=20
 
-'mem_pref_32' field can be uint32_t, but this will require 4-byte padding,
-so what looks more preferable here - uint64_t for 32-bit value or
-4-byte padding in the middle
-of the capapbility?
+I think we're ok now. Thanks for fixing that!
 
->
-> Thanks
-> Laszlo
->
->>
->>>
->>> This is based on an earlier email from Alex to me:
->>>
->>> On 10/03/16 18:01, Alex Williamson wrote:
->>>> I don't think there's such a thing as a 64-bit non-prefetchable
->>>> aperture.  In fact, there are not separate 32 and 64 bit
->>>> prefetchable apertures.  The apertures are:
->>>>
->>>> I/O base/limit - (default 16bit, may be 32bit)
->>>> Memory base/limit - (32bit only, non-prefetchable)
->>>> Prefetchable Memory base/limit - (default 32bit, may be 64bit)
->>>>
->>>> This is according to Table 3-2 in the PCI-to-PCI bridge spec rev
->>>> 1.2.
->>>
->>> I don't care much about the 16-bit vs. 32-bit IO difference (that's
->>> entirely academic and the Platform Spec init doesn't even provide a
->>> way for OVMF to express such a difference). However, the optional
->>> restriction to 32-bit matters for the prefetchable MMIO aperture.
->>>
->>> Other than this, the patch looks good to me, and I'm ready to R-b.
->>>
->>> Thanks!
->>> Laszlo
+IIUC, this patch will be needed when your zpci cleanup patches get merged.
+I suggest you add it to your series with my:
+
+Acked-by: Greg Kurz <groug@kaod.org>
+
+Cheers,
+
+--
+Greg
+
+> v2->v3: switch dependencies to VIRTFS && (VIRTIO || XEN)
+>         add explict VIRTIO dependency for virtio-9p-device.o
+>=20
+> ---
+>  fsdev/Makefile.objs   | 9 +++------
+>  hw/9pfs/Makefile.objs | 2 +-
+>  hw/Makefile.objs      | 2 +-
+>  3 files changed, 5 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+> index 659df6e187..fb38017c0b 100644
+> --- a/fsdev/Makefile.objs
+> +++ b/fsdev/Makefile.objs
+> @@ -1,10 +1,7 @@
+> -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+>  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+> -# only pull in the actual virtio-9p device if we also enabled virtio.
+> -common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> -else
+> -common-obj-y =3D qemu-fsdev-dummy.o
+> -endif
+> +# only pull in the actual 9p backend if we also enabled virtio or xen.
+> +common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CO=
+NFIG_XEN))) =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> +common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_=
+VIRTIO),$(CONFIG_XEN)))) =3D qemu-fsdev-dummy.o
+>  common-obj-y +=3D qemu-fsdev-opts.o qemu-fsdev-throttle.o
+> =20
+>  # Toplevel always builds this; targets without virtio will put it in
+> diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+> index cab5e942ed..fd90b62900 100644
+> --- a/hw/9pfs/Makefile.objs
+> +++ b/hw/9pfs/Makefile.objs
+> @@ -7,4 +7,4 @@ common-obj-$(CONFIG_OPEN_BY_HANDLE) +=3D  9p-handle.o
+>  common-obj-y +=3D 9p-proxy.o
+>  common-obj-$(CONFIG_XEN) +=3D xen-9p-backend.o
+> =20
+> -obj-y +=3D virtio-9p-device.o
+> +obj-$(CONFIG_VIRTIO) +=3D virtio-9p-device.o
+> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> index a2c61f6b09..cf4cb2010b 100644
+> --- a/hw/Makefile.objs
+> +++ b/hw/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),=
+$(CONFIG_PCI))) +=3D 9pfs/
+> +devices-dirs-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(=
+CONFIG_XEN))) +=3D 9pfs/
+>  devices-dirs-$(CONFIG_SOFTMMU) +=3D acpi/
+>  devices-dirs-$(CONFIG_SOFTMMU) +=3D adc/
+>  devices-dirs-$(CONFIG_SOFTMMU) +=3D audio/
 
 
+--Sig_/tewdyiphgT6ddQBxikjGh21
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
--- 
-Aleksandr Bezzubikov
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlmLPfcACgkQAvw66wEB28I4NQCfTE+LVep3XzMvvHItIhFcO54J
+35kAn0m53zK2Q3858ViHsst2GhWuB7fB
+=/vVO
+-----END PGP SIGNATURE-----
+
+--Sig_/tewdyiphgT6ddQBxikjGh21--
