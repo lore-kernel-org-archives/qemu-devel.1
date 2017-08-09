@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dfNnM-0001KM-DE
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:00:57 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfNun-0003OF-Fd
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:08:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dfNnJ-00026D-54
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:00:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dfNnI-00024D-SB
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:00:53 -0400
-References: <743158bc-15e4-46fe-38cb-161397b5b240@linaro.org>
-	<3685aed3-735f-ae62-73a9-8f4a5c7cd459@redhat.com>
-	<9be585e2-4641-329e-f442-69ae05faadba@redhat.com>
-	<ea6acc7c-09a6-70ed-9ff0-865bd45a47f3@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <24fa9f25-912e-8903-920e-b28feba492d2@redhat.com>
-Date: Wed, 9 Aug 2017 12:00:44 +0200
-MIME-Version: 1.0
-In-Reply-To: <ea6acc7c-09a6-70ed-9ff0-865bd45a47f3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Qemu and 32 PCIe devices
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfNum-0005Zl-97
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:08:37 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Wed,  9 Aug 2017 13:07:27 +0300
+Message-Id: <20170809100734.17540-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v4 0/7] add throttle block driver filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +17,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Drew Jones <drjones@redhat.com>, Christoffer Dall <cdall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Gema Gomez-Solano <gema.gomez-solano@linaro.org>, Marc Zygnier <marc.zyngier@arm.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 08/09/17 09:26, Paolo Bonzini wrote:
-> On 09/08/2017 03:06, Laszlo Ersek wrote:
->>>   20.14%  qemu-system-x86_64                  [.] render_memory_region
->>>   17.14%  qemu-system-x86_64                  [.] subpage_register
->>>   10.31%  qemu-system-x86_64                  [.] int128_add
->>>    7.86%  qemu-system-x86_64                  [.] addrrange_end
->>>    7.30%  qemu-system-x86_64                  [.] int128_ge
->>>    4.89%  qemu-system-x86_64                  [.] int128_nz
->>>    3.94%  qemu-system-x86_64                  [.] phys_page_compact
->>>    2.73%  qemu-system-x86_64                  [.] phys_map_node_alloc
-> 
-> Yes, this is the O(n^3) thing.  An optimized build should be faster
-> because int128 operations will be inlined and become much more efficient.
-> 
->> With this patch, I only tested the "93 devices" case, as the slowdown
->> became visible to the naked eye from the trace messages, as the firmware
->> enabled more and more BARs / command registers (and inversely, the
->> speedup was perceivable when the firmware disabled more and more BARs /
->> command registers).
-> 
-> This is an interesting observation, and it's expected.  Looking at the
-> O(n^3) complexity more in detail you have N operations, where the "i"th
-> operates on "i" DMA address spaces, all of which have at least "i"
-> memory regions (at least 1 BAR per device).
+This series adds a throttle block driver filter. Currently throttling is done
+at the BlockBackend level. Using block driver interfaces we can move the
+throttling to any point in the BDS graph using a throttle node which uses the
+existing throttling code. This allows for potentially more complex
+configurations (throttling at any point in the graph, chained filters)
 
-- Can you please give me a pointer to the code where the "i"th operation
-works on "i" DMA address spaces? (Not that I dream about patching *that*
-code, wherever it may live :) )
+v4:
+  fix suggestions in block/throttle.c
+  fix suggestions in block/throttle_groups.c
+  add doc note in BlockDevOptionsThrottle
+  
+v3:
+  fix style error in 'add aio_context field in ThrottleGroupMember'
 
-- You mentioned that changing this is on the ToDo list. I couldn't find
-it under <https://wiki.qemu.org/index.php/ToDo>. Is it tracked somewhere
-else?
+v2:
+  change QOM throttle group object name
+  print valid ranges for uint on error
+  move frees in throttle_group_obj_finalize()
+  split throttle_group_{set,get}()
+  add throttle_recurse_is_first_non_filter()
 
-(I'm not trying to urge any changes in the area, I'd just like to learn
-about the code & the tracker item, if there's one.)
+Manos Pitsidianakis (7):
+  block: move ThrottleGroup membership to ThrottleGroupMember
+  block: add aio_context field in ThrottleGroupMember
+  block: tidy ThrottleGroupMember initializations
+  block: convert ThrottleGroup to object with QOM
+  block: add throttle block filter driver
+  block: add BlockDevOptionsThrottle to QAPI
+  block: add throttle block filter driver interface tests
 
-Thanks!
-Laszlo
+ block/Makefile.objs             |   1 +
+ block/block-backend.c           |  62 ++--
+ block/qapi.c                    |   8 +-
+ block/throttle-groups.c         | 730 +++++++++++++++++++++++++++++-----------
+ block/throttle.c                | 315 +++++++++++++++++
+ blockdev.c                      |   4 +-
+ include/block/throttle-groups.h |  47 ++-
+ include/qemu/throttle-options.h |  60 ++--
+ include/qemu/throttle.h         |   3 +
+ include/sysemu/block-backend.h  |  20 +-
+ qapi/block-core.json            |  70 +++-
+ tests/qemu-iotests/184          | 310 +++++++++++++++++
+ tests/qemu-iotests/184.out      | 422 +++++++++++++++++++++++
+ tests/qemu-iotests/group        |   1 +
+ tests/test-throttle.c           | 111 +++---
+ util/throttle.c                 | 151 +++++++++
+ 16 files changed, 1995 insertions(+), 320 deletions(-)
+ create mode 100644 block/throttle.c
+ create mode 100755 tests/qemu-iotests/184
+ create mode 100644 tests/qemu-iotests/184.out
 
-> 
-> So the total cost is sum i=1..N i^2 = N(N+1)(2N+1)/6 = O(n^3).
-> Expressing it as a sum shows why it gets slower as time progresses.
-> 
-> The solution is to note that those "i" address spaces are actually all
-> the same, so we can get it down to sum i=1..N i = N(N+1)/2 = O(n^2).
-> 
-> Thanks,
-> 
-> Paolo
-> 
+-- 
+2.11.0
