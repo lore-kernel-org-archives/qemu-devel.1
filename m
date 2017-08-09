@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfTP7-0000MN-Up
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:00:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dfTQE-0001jm-PC
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfTP4-0005uk-O2
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:00:18 -0400
-Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:33559)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfTP4-0005qw-El
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:00:14 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C98C98BE92
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 18:00:12 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 09 Aug 2017 18:00:07 +0200
-Message-ID: <150229440762.12920.17394043752149329973.stgit@bahia.lan>
+	(envelope-from <kwolf@redhat.com>) id 1dfTQ8-0006dd-M9
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:01:26 -0400
+Date: Wed, 9 Aug 2017 18:01:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170809160105.GJ4213@localhost.localdomain>
+References: <20170808175711.12203-1-jsnow@redhat.com>
+	<20170808175711.12203-4-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.10 PATCH v3] 9pfs: local: fix
- fchmodat_nofollow() limitations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170808175711.12203-4-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] block-backend: shift in-flight counter
+ to BB from BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,159 +24,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, pjp@redhat.com
 
-This function has to ensure it doesn't follow a symlink that could be used
-to escape the virtfs directory. This could be easily achieved if fchmodat()
-on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-it doesn't. There was a tentative to implement a new fchmodat2() syscall
-with the correct semantics:
+Am 08.08.2017 um 19:57 hat John Snow geschrieben:
+> From: Kevin Wolf <kwolf@redhat.com>
+> 
+> This allows us to detect errors in cache flushing (ENOMEDIUM)
+> without choking on a null dereference because we assume that
+> blk_bs(bb) is always defined.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block.c               |  2 +-
+>  block/block-backend.c | 40 ++++++++++++++++++++++++++++++++++------
+>  2 files changed, 35 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block.c b/block.c
+> index ce9cce7..834b836 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -4476,7 +4476,7 @@ out:
+>  
+>  AioContext *bdrv_get_aio_context(BlockDriverState *bs)
+>  {
+> -    return bs->aio_context;
+> +    return bs ? bs->aio_context : qemu_get_aio_context();
+>  }
 
-https://patchwork.kernel.org/patch/9596301/
+This should probably be a separate patch; it's not really related to
+moving the in-flight counter, but fixes another NULL dereference in
+blk_aio_prwv().
 
-but it didn't gain much momentum. Also it was suggested to look at a O_PATH
-based solution in the first place.
+>  void bdrv_coroutine_enter(BlockDriverState *bs, Coroutine *co)
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 968438c..efd7e92 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -68,6 +68,9 @@ struct BlockBackend {
+>      NotifierList remove_bs_notifiers, insert_bs_notifiers;
+>  
+>      int quiesce_counter;
+> +
+> +    /* Number of in-flight requests. Accessed with atomic ops. */
+> +    unsigned int in_flight;
+>  };
+>  
+>  typedef struct BlockBackendAIOCB {
+> @@ -1109,6 +1112,16 @@ int blk_make_zero(BlockBackend *blk, BdrvRequestFlags flags)
+>      return bdrv_make_zero(blk->root, flags);
+>  }
+>  
+> +static void blk_inc_in_flight(BlockBackend *blk)
+> +{
+> +    atomic_inc(&blk->in_flight);
+> +}
+> +
+> +static void blk_dec_in_flight(BlockBackend *blk)
+> +{
+> +    atomic_dec(&blk->in_flight);
+> +}
+> +
+>  static void error_callback_bh(void *opaque)
+>  {
+>      struct BlockBackendAIOCB *acb = opaque;
+> @@ -1147,7 +1160,7 @@ static const AIOCBInfo blk_aio_em_aiocb_info = {
+>  static void blk_aio_complete(BlkAioEmAIOCB *acb)
+>  {
+>      if (acb->has_returned) {
+> -        bdrv_dec_in_flight(acb->common.bs);
+> +        blk_dec_in_flight(acb->rwco.blk);
+>          acb->common.cb(acb->common.opaque, acb->rwco.ret);
+>          qemu_aio_unref(acb);
+>      }
+> @@ -1168,7 +1181,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
+>      BlkAioEmAIOCB *acb;
+>      Coroutine *co;
+>  
+> -    bdrv_inc_in_flight(blk_bs(blk));
+> +    blk_inc_in_flight(blk);
+>      acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
+>      acb->rwco = (BlkRwCo) {
+>          .blk    = blk,
+> @@ -1405,14 +1418,28 @@ int blk_flush(BlockBackend *blk)
+>  
+>  void blk_drain(BlockBackend *blk)
+>  {
+> -    if (blk_bs(blk)) {
+> -        bdrv_drain(blk_bs(blk));
+> +    AioContext *ctx = blk_get_aio_context(blk);
+> +
+> +    while (atomic_read(&blk->in_flight)) {
+> +        aio_context_acquire(ctx);
+> +        aio_poll(ctx, false);
+> +        aio_context_release(ctx);
+> +
+> +        if (blk_bs(blk)) {
+> +            bdrv_drain(blk_bs(blk));
+> +        }
+>      }
+>  }
+>  
+>  void blk_drain_all(void)
+>  {
+> -    bdrv_drain_all();
+> +    BlockBackend *blk = NULL;
+> +
+> +    bdrv_drain_all_begin();
+> +    while ((blk = blk_all_next(blk)) != NULL) {
+> +        blk_drain(blk);
+> +    }
+> +    bdrv_drain_all_end();
+>  }
 
-The current implementation covers most use-cases, but it notably fails if:
-- the target path has access rights equal to 0000 (openat() returns EPERM),
-  => once you've done chmod(0000) on a file, you can never chmod() again
-- the target path is UNIX domain socket (openat() returns ENXIO)
-  => bind() of UNIX domain sockets fails if the file is on 9pfs
+We still need to check that everyone who should call blk_drain_all()
+rather than bdrv_drain_all() actually does so.
 
-The solution is to use O_PATH: openat() now succeeds in both cases, and we
-can ensure the path isn't a symlink with fstat(). The associated entry in
-"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
+>  void blk_set_on_error(BlockBackend *blk, BlockdevOnError on_read_error,
+> @@ -1453,10 +1480,11 @@ static void send_qmp_error_event(BlockBackend *blk,
+>                                   bool is_read, int error)
+>  {
+>      IoOperationType optype;
+> +    BlockDriverState *bs = blk_bs(blk);
+>  
+>      optype = is_read ? IO_OPERATION_TYPE_READ : IO_OPERATION_TYPE_WRITE;
+>      qapi_event_send_block_io_error(blk_name(blk),
+> -                                   bdrv_get_node_name(blk_bs(blk)), optype,
+> +                                   bs ? bdrv_get_node_name(bs) : "", optype,
+>                                     action, blk_iostatus_is_enabled(blk),
+>                                     error == ENOSPC, strerror(error),
+>                                     &error_abort);
 
-The previous behavior is kept for older systems that don't have O_PATH.
+And this is another independent NULL dereference fix.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v3: - O_PATH in a separate block of code
-    - added a reference to the fchmodat2() tentative in the changelog
-
-v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
-      for O_PATH to avoid build breaks on O_PATH-less systems
-    - keep current behavior for O_PATH-less systems
-    - added comments
-    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
----
- hw/9pfs/9p-local.c |   43 ++++++++++++++++++++++++++++++++++++-------
- hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
- 2 files changed, 51 insertions(+), 16 deletions(-)
-
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 6e478f4765ef..1e20d4881089 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -333,17 +333,27 @@ update_map_file:
- 
- static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
- {
-+    struct stat stbuf;
-     int fd, ret;
- 
-     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
--     * Unfortunately, the linux kernel doesn't implement it yet. As an
--     * alternative, let's open the file and use fchmod() instead. This
--     * may fail depending on the permissions of the file, but it is the
--     * best we can do to avoid TOCTTOU. We first try to open read-only
--     * in case name points to a directory. If that fails, we try write-only
--     * in case name doesn't point to a directory.
-+     * Unfortunately, the linux kernel doesn't implement it yet.
-      */
--    fd = openat_file(dirfd, name, O_RDONLY, 0);
-+
-+     /* First, we clear non-racing symlinks out of the way. */
-+    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-+        return -1;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        return -1;
-+    }
-+
-+    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
-+     * O_WRONLY for old-systems that don't support O_PATH.
-+     */
-+    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
-+#ifndef O_PATH
-     if (fd == -1) {
-         /* In case the file is writable-only and isn't a directory. */
-         if (errno == EACCES) {
-@@ -357,6 +367,25 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
-         return -1;
-     }
-     ret = fchmod(fd, mode);
-+#else
-+    /* Now we handle racing symlinks. */
-+    ret = fstat(fd, &stbuf);
-+    if (ret) {
-+        goto out;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    {
-+        char *proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
-+        ret = chmod(proc_path, mode);
-+        g_free(proc_path);
-+    }
-+#endif
-+out:
-     close_preserve_errno(fd);
-     return ret;
- }
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 91299a24b8af..dc0d2e29aa3b 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -13,6 +13,12 @@
- #ifndef QEMU_9P_UTIL_H
- #define QEMU_9P_UTIL_H
- 
-+#ifdef O_PATH
-+#define O_PATH_9P_UTIL O_PATH
-+#else
-+#define O_PATH_9P_UTIL 0
-+#endif
-+
- static inline void close_preserve_errno(int fd)
- {
-     int serrno = errno;
-@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
- 
- static inline int openat_dir(int dirfd, const char *name)
- {
--#ifdef O_PATH
--#define OPENAT_DIR_O_PATH O_PATH
--#else
--#define OPENAT_DIR_O_PATH 0
--#endif
-     return openat(dirfd, name,
--                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
-+                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
- }
- 
- static inline int openat_file(int dirfd, const char *name, int flags,
-@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
-     }
- 
-     serrno = errno;
--    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
--    ret = fcntl(fd, F_SETFL, flags);
--    assert(!ret);
-+    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
-+     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
-+     * ignored it anyway.
-+     */
-+    if (!(flags & O_PATH_9P_UTIL)) {
-+        ret = fcntl(fd, F_SETFL, flags);
-+        assert(!ret);
-+    }
-     errno = serrno;
-     return fd;
- }
+Kevin
