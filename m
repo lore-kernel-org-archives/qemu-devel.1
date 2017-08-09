@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dfN9j-0002Oy-0G
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:20:00 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfNE1-0003h7-DL
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dfN9f-0006qC-MC
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:19:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39898)
+	(envelope-from <berrange@redhat.com>) id 1dfNDy-0000TX-41
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:24:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52481)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dfN9f-0006pq-DZ
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:19:55 -0400
-References: <1502254778-14637-1-git-send-email-thuth@redhat.com>
-	<1502254778-14637-2-git-send-email-thuth@redhat.com>
-	<20170809110520.1fd23ddc.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ec749714-0cb8-4e75-c056-760bfb12ae7c@redhat.com>
-Date: Wed, 9 Aug 2017 11:18:33 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfNDx-0000Sh-Qd
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:24:22 -0400
+Date: Wed, 9 Aug 2017 10:24:13 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170809092413.GB24723@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170809071718.17924-1-cohuck@redhat.com>
+	<f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
+	<20170809102737.18436fb4.cohuck@redhat.com>
+	<5e015c3e-7973-f397-cc1e-fee190292616@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170809110520.1fd23ddc.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests/boot-sector: Do not overwrite
- the x86 buffer on other architectures
+Content-Disposition: inline
+In-Reply-To: <5e015c3e-7973-f397-cc1e-fee190292616@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
 
-On 09.08.2017 11:05, Cornelia Huck wrote:
-> On Wed,  9 Aug 2017 06:59:37 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
->=20
->> Re-using the boot_sector code buffer from x86 for other architectures
->> is not very nice, especially if we add more architectures later. It's
->> also ugly that the test uses a huge pre-initialized array - the size
->> of the executable is very huge due to this array. So let's use a
->> separate buffer for each architecture instead, allocated from the heap=
-,
->> so that we really just use the memory that we need.
->>
->> Suggested-by: Michael Tsirkin <mst@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/boot-sector.c | 37 ++++++++++++++++++++++++-------------
->>  1 file changed, 24 insertions(+), 13 deletions(-)
->>
->> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
->> index e3880f4..4ea1373 100644
->> --- a/tests/boot-sector.c
->> +++ b/tests/boot-sector.c
->> @@ -21,13 +21,12 @@
->>  #define SIGNATURE 0xdead
->>  #define SIGNATURE_OFFSET 0x10
->>  #define BOOT_SECTOR_ADDRESS 0x7c00
->> +#define SIGNATURE_ADDR (BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET)
->=20
-> Do you want to use this new #define in boot_sector_test() as well?
+On Wed, Aug 09, 2017 at 11:07:38AM +0200, Thomas Huth wrote:
+> On 09.08.2017 10:27, Cornelia Huck wrote:
+> > On Wed, 9 Aug 2017 10:23:04 +0200
+> > Thomas Huth <thuth@redhat.com> wrote:
+> > 
+> >> On 09.08.2017 09:17, Cornelia Huck wrote:
+> >>> Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+> >>> on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
+> >>> device.
+> >>>
+> >>> Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+> >>> CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+> >>>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>> ---
+> >>>
+> >>> Changes v1->v2: drop extraneous spaces, fix build on cris
+> >>>
+> >>> ---
+> >>>  default-configs/s390x-softmmu.mak | 1 +
+> >>>  fsdev/Makefile.objs               | 9 +++------
+> >>>  hw/Makefile.objs                  | 2 +-
+> >>>  3 files changed, 5 insertions(+), 7 deletions(-)
+> [...]
+> >>
+> >> Patch should be fine now, I think...
+> >>
+> >> But thinking about this again, I wonder whether it would be enough to
+> >> simply check for CONFIG_VIRTIO=y here instead. CONFIG_VIRTIO=y should be
+> >> sufficient to assert that there is also at least one kind of virtio
+> >> transport available, right?
+> >> Otherwise this will look really horrible as soon as somebody also tries
+> >> to add support for virtio-mmio here later ;-)
+> > 
+> > Do all virtio transports have support for 9p, though? I thought it was
+> > only virtio-pci and virtio-ccw...
+> 
+> While virtio-pci and virtio-ccw seem to require separate dedicated
+> devices (e.g. virtio-9p-pci and virtio-9p-ccw) for everything,
+> virtio-mmio seems to work different. As far as I can see, there are no
+> dedicated virtio-xxx-mmio devices in the code at all. According to
+> https://www.redhat.com/archives/libvir-list/2013-August/msg00009.html
+> you simply have to use virtio-xxx-device here instead. And a
+> virtio-9p-device is available. So theoretically, the 9p code should work
+> with virtio-mmio, too, or is there a problem that I did not see yet?
+> 
+> Anyway, we likely should not blindly enable this, so unless somebody has
+> a setup to test it, we should go with your current patch instead, I think.
 
-Yes, sounds like a good idea.
+qemu-system-arm supports virtio-mmio so you can use that to test it
 
->> =20
->> -/* Boot sector code: write SIGNATURE into memory,
->> +/* x86 boot sector code: write SIGNATURE into memory,
->>   * then halt.
->> - * Q35 machine requires a minimum 0x7e000 bytes disk.
->> - * (bug or feature?)
->>   */
->> -static uint8_t boot_sector[0x7e000] =3D {
->> +static uint8_t x86_boot_sector[512] =3D {
->>      /* The first sector will be placed at RAM address 00007C00, and
->>       * the BIOS transfers control to 00007C00
->>       */
->> @@ -50,8 +49,8 @@ static uint8_t boot_sector[0x7e000] =3D {
->>      [0x07] =3D HIGH(SIGNATURE),
->>      /* 7c08:  mov %ax,0x7c10 */
->>      [0x08] =3D 0xa3,
->> -    [0x09] =3D LOW(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
->> -    [0x0a] =3D HIGH(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
->> +    [0x09] =3D LOW(SIGNATURE_ADDR),
->> +    [0x0a] =3D HIGH(SIGNATURE_ADDR),
->> =20
->>      /* 7c0b cli */
->>      [0x0b] =3D 0xfa,
->> @@ -72,7 +71,9 @@ static uint8_t boot_sector[0x7e000] =3D {
->>  int boot_sector_init(char *fname)
->>  {
->>      int fd, ret;
->> -    size_t len =3D sizeof boot_sector;
->> +    size_t len;
->> +    char *boot_code;
->> +    const char *arch =3D qtest_get_arch();
->> =20
->>      fd =3D mkstemp(fname);
->>      if (fd < 0) {
->> @@ -80,16 +81,26 @@ int boot_sector_init(char *fname)
->>          return 1;
->>      }
->> =20
->> -    /* For Open Firmware based system, we can use a Forth script inst=
-ead */
->> -    if (strcmp(qtest_get_arch(), "ppc64") =3D=3D 0) {
->> -        len =3D sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c!=
- %x %x c!\n",
->> -                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSE=
-T,
->> -                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFS=
-ET + 1);
->> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
->> +        /* Q35 requires a minimum 0x7e000 bytes disk (bug or feature?=
-) */
->> +        len =3D 0x7e000;
->=20
-> Use the maximum of (0x7e000, sizeof(x86_boot_sector))? (Not that it is
-> likely that the boot sector will ever grow, but I think it is cleaner.)
 
-Sounds like a little bit of too much sanity checking for me, but ok, I
-can add it.
-
->> +        boot_code =3D g_malloc(len);
->=20
-> Would g_malloc_0() be better?
-
-Good idea, the test is likely more predictable if we don't have random
-data in the file here (it should not really matter, but let's better be
-safe than sorry).
-
->> +        memcpy(boot_code, x86_boot_sector, sizeof x86_boot_sector);
->=20
-> sizeof(x86_boot_sector)?
-
-The original code uses sizeof without parenthesis, so I think we should
-stay with that coding style.
-
->> +    } else if (g_str_equal(arch, "ppc64")) {
->> +        /* For Open Firmware based system, use a Forth script */
->> +        boot_code =3D g_strdup_printf("\\ Bootscript\n%x %x c! %x %x =
-c!\n",
->> +                                    LOW(SIGNATURE), SIGNATURE_ADDR,
->> +                                    HIGH(SIGNATURE), SIGNATURE_ADDR +=
- 1);
->> +        len =3D strlen(boot_code);
->> +    } else {
->> +        g_assert_not_reached();
->>      }
->> =20
->> -    ret =3D write(fd, boot_sector, len);
->> +    ret =3D write(fd, boot_code, len);
->>      close(fd);
->> =20
->> +    g_free(boot_code);
->> +
->>      if (ret !=3D len) {
->>          fprintf(stderr, "Could not write \"%s\"", fname);
->>          return 1;
->=20
-> This makes the code much nicer :)
-
-Thanks for the review!
-
-I'll wait for some more feedback, then send a v2...
-
- Thomas
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
