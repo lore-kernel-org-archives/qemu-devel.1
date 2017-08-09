@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dfSEr-00062X-3R
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:38 -0400
+	(envelope-from <berto@igalia.com>) id 1dfSF6-0006Et-EY
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dfSEm-0005Ov-73
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51871)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dfSEl-0005NV-W3
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dfSEk-0006lJ-Om
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 14:45:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA6402E80CB
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 14:45:30 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1dfSF1-0005jw-Hg
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:45:52 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170809134205.dbkx5cuvjpbaxftv@postretch>
+References: <20170731095443.28211-1-el13635@mail.ntua.gr>
+	<20170731095443.28211-6-el13635@mail.ntua.gr>
+	<w51valyjj7j.fsf@maestria.local.igalia.com>
+	<20170808134544.paekftiounmirhbo@postretch>
+	<w51poc6jeln.fsf@maestria.local.igalia.com>
+	<20170808145620.wlb5rdutuseutclx@postretch>
+	<w51mv7aje27.fsf@maestria.local.igalia.com>
+	<20170809093612.oee2u5kdgyojheqm@postretch>
+	<w51y3qslxyz.fsf@maestria.local.igalia.com>
+	<20170809134205.dbkx5cuvjpbaxftv@postretch>
+Date: Wed, 09 Aug 2017 16:45:43 +0200
+Message-ID: <w51valwlrzc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 09 Aug 2017 14:29:14 -0000
-From: Thomas Huth <823733@bugs.launchpad.net>
-Reply-To: Bug 823733 <823733@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110810053253.11269.76752.malonedeb@gac.canonical.com>
-Message-Id: <150228895564.16960.11799740450337793670.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 823733] Re: Soloaris can't be poweroff
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: add throttle block filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,149 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Triaged
+On Wed 09 Aug 2017 03:42:07 PM CEST, Manos Pitsidianakis wrote:
+> On Wed, Aug 09, 2017 at 02:36:20PM +0200, Alberto Garcia wrote:
+>>On Wed 09 Aug 2017 11:36:12 AM CEST, Manos Pitsidianakis wrote:
+>>> On Tue, Aug 08, 2017 at 05:04:48PM +0200, Alberto Garcia wrote:
+>>>>On Tue 08 Aug 2017 04:56:20 PM CEST, Manos Pitsidianakis wrote:
+>>>>>>> So basically if we have anonymous groups, we accept limits in the
+>>>>>>> driver options but only without a group-name.
+>>>>>>
+>>>>>>In the commit message you do however have limits and a group name, is
+>>>>>>that a mistake?
+>>>>>>
+>>>>>>    -drive driver=throttle,file.filename=foo.qcow2, \
+>>>>>>           limits.iops-total=...,throttle-group=bar
+>>>>>
+>>>>> Sorry this wasn't clear, I'm actually proposing to remove limits from
+>>>>> the throttle driver options and only create/config throttle groups via
+>>>>> -object/object-add.
+>>>>
+>>>>Sorry I think it was me who misunderstood :-) Anyway in the new
+>>>>command-line API I would be more inclined to have limits defined using
+>>>>"-object throttle-group" and -drive would only reference the group id.
+>>>>
+>>>>I understand that this implies that it wouldn't be possible to create
+>>>>anonymous groups (at least not from the command line), is that a
+>>>>problem?
+>>>
+>>> We can accept anonymous groups if a user specifies limits but not a
+>>> group name in the throttle driver. (The only case where limits would
+>>> be acccepted)
+>>
+>>Yeah but that's only if we have the limits.iops-total=... options in the
+>>throttle driver. If we "remove limits from the throttle driver options
+>>and only create/config throttle groups via -object/object-add" we 
+>>cannot
+>>do that.
+>
+> We can check that groups is not defined at the same time as limits,
 
--- =
+I'm not sure if I'm following the conversation anymore :-) let's try to
+recap:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/823733
+  a) Groups are defined like this (with the current patches):
 
-Title:
-  Soloaris can't be poweroff
+     -object throttle-group,id=foo,x-iops-total=100,x-..
 
-Status in QEMU:
-  Triaged
+  b) Throttle nodes are defined like this:
 
-Bug description:
-  Thank you forgive my poor English.
+     -drive driver=throttle,file.filename=foo.qcow2, \
+            limits.iops-total=...,throttle-group=bar
 
-  It seems KVM can=E2=80=99t poweroff solairs 10 or sloalrs 11 VM.
-  I have created solaris 10 and 11 as usual. Everything in VM is running OK=
-, but finally I use shell command =E2=80=98poweroff=E2=80=99 or =E2=80=98in=
-it 5=E2=80=99, the solaris VM (both 10 & 11) system could=E2=80=99t be powe=
-roff but with promoting me the message: perss any key to reboot =E2=80=A6..=
-  ,I pressed any key in vnc client, solaris VM reboot immediately. Endless =
-reboot loop above.
+  c) Therefore limits can be defined either in (a) or (b)
 
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
+  d) If we omit throttle-group=... in (b), we would create an anonymous
+     group.
 
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
+  e) The -drive syntax from (b) has the "problem" that it's possible to
+     define several nodes with the same throttling group but different
+     limits. The last one would win (as the legacy syntax does), but
+     that's not something completely straightforward for the end user.
 
-  1. On my real physical machine,the solaris can be poweroff
-  2. On vmware ,the solaris can be poweroff
-  3. On my real physical machine,I have try to disbale the ACPI opiton in B=
-OIS, then the solaris can't be poweroff,Like the problem I have described a=
-bove
-  so ,I doubt the KVM has a little problem in ACPI =
+  f) The syntax from (b) also has the problem that there's one more
+     place that needs code to parse throttling limits.
 
+  g) We can solve (e) and (f) if we remove the limits.* options
+     altogether from the throttling filter. In that case you would need
+     to define a throttle-group object and use the throttle-group option
+     of the filter node in all cases.
 
-  I have try the suggestion as follows, but I can=E2=80=99t solve the probl=
-em.
-  7.2 Solaris reboot all the time on grub menu
-  =E2=80=A2	Run through the installer as usual =
+  h) If we remove the limits.* options we cannot have anonymous groups
+     anymore (at least not using this API). My question is: is it a
+     problem? What would we lose? What benefits do anonymous groups
+     bring us?
+     
+  i) We can of course maintain the limits.* options, but disallow
+     throttle-group when they are present. That way we would allow
+     anonymous groups and we would solve the ambiguity problem described
+     in (e). My question is: is it worth it?
 
-  =E2=80=A2	On completion and reboot, the VM will perpetually reboot. "Stop=
-" the VM. =
+>>> Not creating eponymous throttle groups via the throttle driver means
+>>> we don't need throttle_groups anymore, since even anonymous ones
+>>> don't need to be accounted for in a list.
+>>
+>>I don't follow you here, how else do you get a group by its name?
+>
+> If all eponymous groups are managed by the QOM tree, we should be able
+> to iterate over the object root container for all ThrottleGroups just
+> like qmp_query_iothreads() in iothread.c
 
-  =E2=80=A2	Start it up again, and immediately open a vnc console and selec=
-t the Safe Boot from the options screen =
+Mmm... can't we actually use the root container now already? (even with
+anonymous groups I mean). Why do we need throttle_groups?
 
-  =E2=80=A2	When prompted if you want to try and recover the boot block, sa=
-y yes =
-
-  =E2=80=A2	You should now have a Bourne terminal with your existing filesy=
-stem mounted on /a =
-
-  =E2=80=A2	Run /a/usr/bin/bash (my preferred shell) =
-
-  =E2=80=A2	export TERM=3Dxterm =
-
-  =E2=80=A2	vi /a/boot/grub/menu.1st (editing the bootloader on your mounte=
-d filesystem), to add "kernel/unix" to the kernel options for the non-safe-=
-mode boot. Ex : =
-
-  Config File : /a/boot/grub/menu.lst =
-
-  kernel$ /platform/i86pc/multiboot -B $ZFS-BOOTFS kernel/unix
-
-  According to KVM requirements, I collected the following information:
-  CPU model name
-  model name      : Intel(R) Xeon(R) CPU           X3450  @ 2.67GHz
-
-  kvm -version
-  QEMU PC emulator version 0.12.3 (qemu-kvm-0.12.3), Copyright (c) 2003-200=
-8 Fabrice Bellard
-
-  Host kernel version
-  Ubuntu 10.04.1 LTS   2.6.32-25-server =
-
-
-  What host kernel arch you are using (i386 or x86_64)
-  X86_64
-
-  Guest OS
-  Solaris 10 and Solaris 11=EF=BC=8Cboth can not shutdown
-
-  The qemu command line you are using to start the guest
-
-  First, I used the command line as follows:
-  kvm -m 1024 -drive file=3Dsolaris10.img,cache=3Dwriteback -net nic -net u=
-ser -nographic -vnc :1
-  then I try to use -no-kvm-irqchip or -no-kvm ,but the problem also appear=
-s!
-
-  Secondly, have created and run solaris 10&11 by using Virsh, still solari=
-s can't be poweroff, the XML file content is :
-  <domain type=3D'kvm'>
-      <name>solairs</name>
-      <uuid>85badf15-244d-4719-a2da-8c3de064137d</uuid>
-      <memory>1677721</memory>
-      <currentMemory>1677721</currentMemory>
-      <vcpu>1</vcpu>
-      <os>
-      <type arch=3D'i686' machine=3D'pc-0.12'>hvm</type>
-        <boot dev=3D'hd'/>
-     </os>
-     <features>
-      <acpi/>
-      <apic/>
-     </features>
-    <clock offset=3D'utc'/>
-     <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-     <on_crash>destroy</on_crash>
-     <devices>
-       <emulator>/usr/bin/kvm</emulator>
-       <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'qcow2' cache=3D'writeback'/>
-         <source file=3D'/opt/GuestOS/solaris10.img'/>
-         <target dev=3D'hda' bus=3D'ide'/>
-       </disk>
-      <interface type=3D'bridge'>
-        <mac address=3D'00:0c:29:d0:36:c3'/>
-        <source bridge=3D'br1'/>
-        <target dev=3D'vnet0'/>
-       </interface>
-       <input type=3D'mouse' bus=3D'ps2'/>
-       <graphics type=3D'vnc' port=3D'5901' autoport=3D'no' keymap=3D'en-us=
-'/>
-      <video>
-        <model type=3D'vga' vram=3D'65536' heads=3D'1'/>
-      </video>
-    </devices>
-    <seclabel type=3D'dynamic' model=3D'apparmor'>
-      <label>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</label>
-      <imagelabel>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</imagelabel>
-    </seclabel>
-   </domain>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/823733/+subscriptions
+Berto
