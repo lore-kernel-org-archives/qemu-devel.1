@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dfMFc-00041B-72
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:22:01 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dfMLM-0004pS-Ss
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dfMFY-0007Me-7N
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:22:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21549)
+	(envelope-from <cohuck@redhat.com>) id 1dfMLI-0002A3-TW
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:27:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1dfMFX-0007Ly-Tu
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:21:56 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAC868553E
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 08:21:54 +0000 (UTC)
-Date: Wed, 9 Aug 2017 10:21:41 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20170809082141.4dlhvvlintzpaata@dhcp-192-218.str.redhat.com>
-References: <20170808203900.7661-1-jfreimann@redhat.com>
-	<150223674179.30.1367378707991546414@dd743fd916bd>
-	<20170809041535-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dfMLI-00029A-IK
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:27:52 -0400
+Date: Wed, 9 Aug 2017 10:27:37 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170809102737.18436fb4.cohuck@redhat.com>
+In-Reply-To: <f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
+References: <20170809071718.17924-1-cohuck@redhat.com>
+	<f384f920-9d51-4663-f7e7-95c8b13044f4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20170809041535-mutt-send-email-mst@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] tests/pxe-test: add testcase using
- vhost-user-bridge
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, victork@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
 
-On Wed, Aug 09, 2017 at 04:17:05AM +0300, Michael S. Tsirkin wrote:
->On Tue, Aug 08, 2017 at 04:59:02PM -0700, no-reply@patchew.org wrote:
->> Hi,
->>
->> This series failed automatic build test. Please find the testing comma=
-nds and
->> their output below. If you have docker installed, you can probably rep=
-roduce it
->> locally.
->>
->> Message-id: 20170808203900.7661-1-jfreimann@redhat.com
->> Subject: [Qemu-devel] [PATCH v2 0/5] tests/pxe-test: add testcase usin=
-g vhost-user-bridge
->> Type: series
->> /tmp/qemu-test/src/tests/pxe-test.c: In function =E2=80=98test_pxe_vho=
-st_user=E2=80=99:
->> /tmp/qemu-test/src/tests/pxe-test.c:106: error: =E2=80=98G_SPAWN_SEARC=
-H_PATH_FROM_ENVP=E2=80=99 undeclared (first use in this function)
->> /tmp/qemu-test/src/tests/pxe-test.c:106: error: (Each undeclared ident=
-ifier is reported only once
->> /tmp/qemu-test/src/tests/pxe-test.c:106: error: for each function it a=
-ppears in.)
->> make: *** [tests/pxe-test.o] Error 1
->> make: *** Waiting for unfinished jobs....
->> Traceback (most recent call last):
->>   File "./tests/docker/docker.py", line 382, in <module>
->>     sys.exit(main())
->>   File "./tests/docker/docker.py", line 379, in main
->>     return args.cmdobj.run(args, argv)
->>   File "./tests/docker/docker.py", line 237, in run
->>     return Docker().run(argv, args.keep, quiet=3Dargs.quiet)
->>   File "./tests/docker/docker.py", line 205, in run
->>     quiet=3Dquiet)
->>   File "./tests/docker/docker.py", line 123, in _do_check
->>     return subprocess.check_call(self._command + cmd, **kwargs)
->>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
->>     raise CalledProcessError(retcode, cmd)
->> subprocess.CalledProcessError: Command '['docker', 'run', '--label', '=
-com.qemu.instance.uuid=3D534034f67c9511e78af152540069c830', '-u', '0', '-=
-t', '--rm', '--net=3Dnone', '-e', 'TARGET_LIST=3D', '-e', 'EXTRA_CONFIGUR=
-E_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D8', '-e', 'DEBUG=3D', '-e', 'SHOW_EN=
-V=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache', '-v', '/var/tmp/patchew-tes=
-ter-tmp-ku3bj8a1/src/docker-src.2017-08-08-19.57.20.28326:/var/tmp/qemu:z=
-,ro', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:ce=
-ntos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status=
- 2
->> make[1]: *** [tests/docker/Makefile.include:139: docker-run] Error 1
->> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-ku3bj8a1/src'
->> make: *** [tests/docker/Makefile.include:168: docker-run-test-quick@ce=
-ntos6] Error 2
->>
->> real	1m41.298s
->> user	0m5.189s
->> sys	0m1.753s
->> =3D=3D=3D OUTPUT END =3D=3D=3D
->>
->> Test command exited with code: 2
->
->
->OK given this - it seems clear the right thing to do is to merge 2-4
->and leave 1 and 5 for 2.11.
+On Wed, 9 Aug 2017 10:23:04 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Agreed. I'll fix this and send a new version.=20
+> On 09.08.2017 09:17, Cornelia Huck wrote:
+> > Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+> > on CONFIG_VIRTFS and on the presence of an appropriate virtio transport
+> > device.
+> > 
+> > Let's introduce CONFIG_VIRTIO_CCW to cover s390x and check for
+> > CONFIG_VIRTFS && (CONFIG_VIRTIO_PCI || CONFIG_VIRTIO_CCW).
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> > 
+> > Changes v1->v2: drop extraneous spaces, fix build on cris
+> > 
+> > ---
+> >  default-configs/s390x-softmmu.mak | 1 +
+> >  fsdev/Makefile.objs               | 9 +++------
+> >  hw/Makefile.objs                  | 2 +-
+> >  3 files changed, 5 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> > index 51191b77df..e4c5236ceb 100644
+> > --- a/default-configs/s390x-softmmu.mak
+> > +++ b/default-configs/s390x-softmmu.mak
+> > @@ -8,3 +8,4 @@ CONFIG_S390_FLIC=y
+> >  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+> >  CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+> >  CONFIG_WDT_DIAG288=y
+> > +CONFIG_VIRTIO_CCW=y
+> > diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+> > index 659df6e187..3d157add31 100644
+> > --- a/fsdev/Makefile.objs
+> > +++ b/fsdev/Makefile.objs
+> > @@ -1,10 +1,7 @@
+> > -ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+> >  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+> > -# only pull in the actual virtio-9p device if we also enabled virtio.
+> > -common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> > -else
+> > -common-obj-y = qemu-fsdev-dummy.o
+> > -endif
+> > +# only pull in the actual virtio-9p device if we also enabled a virtio backend.
+> > +common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))= qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+> > +common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW)))) = qemu-fsdev-dummy.o
+> >  common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+> >  
+> >  # Toplevel always builds this; targets without virtio will put it in
+> > diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> > index a2c61f6b09..335f26b65e 100644
+> > --- a/hw/Makefile.objs
+> > +++ b/hw/Makefile.objs
+> > @@ -1,4 +1,4 @@
+> > -devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
+> > +devices-dirs-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_PCI),$(CONFIG_VIRTIO_CCW))) += 9pfs/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += acpi/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += adc/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += audio/  
+> 
+> Patch should be fine now, I think...
+> 
+> But thinking about this again, I wonder whether it would be enough to
+> simply check for CONFIG_VIRTIO=y here instead. CONFIG_VIRTIO=y should be
+> sufficient to assert that there is also at least one kind of virtio
+> transport available, right?
+> Otherwise this will look really horrible as soon as somebody also tries
+> to add support for virtio-mmio here later ;-)
 
-Thanks!
-
-regards,
-Jens=20
+Do all virtio transports have support for 9p, though? I thought it was
+only virtio-pci and virtio-ccw...
