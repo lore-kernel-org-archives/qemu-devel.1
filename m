@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfTTC-00046x-UV
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:04:35 -0400
+	(envelope-from <groug@kaod.org>) id 1dfTV6-000651-GJ
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfTT9-0008KT-Mo
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:04:30 -0400
-References: <20170809151757.15743-1-vsementsov@virtuozzo.com>
-	<565de2a2-316a-1b2e-95e3-6b2b2086484f@virtuozzo.com>
-	<93a7eaf1-3387-0772-b779-b1ff3d3b9443@redhat.com>
-	<bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6ecba212-dbd0-e81c-c7ad-50d09d1626e6@redhat.com>
-Date: Wed, 9 Aug 2017 11:04:13 -0500
+	(envelope-from <groug@kaod.org>) id 1dfTV3-0001Jt-7c
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:06:28 -0400
+Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:51297)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfTV3-0001J2-0w
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:06:25 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 5CD3889F54
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 18:06:23 +0200 (CEST)
+Date: Wed, 9 Aug 2017 18:06:17 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170809180617.1ea5c101@bahia.lan>
+In-Reply-To: <c1ae9a24-632b-1dde-631a-b11a3e968ab7@redhat.com>
+References: <150228860899.28168.1415083032613087245.stgit@bahia>
+	<d1343f6c-d524-0174-d1b7-fda2d83a3a44@redhat.com>
+	<20170809172233.36e17285@bahia.lan>
+	<c1ae9a24-632b-1dde-631a-b11a3e968ab7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa"
-Subject: Re: [Qemu-devel] [PATCH v2 for 2.10] iotests: fix 185
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/QK/HgDxrE=SaShYx+C+e/3r";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
+ fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com
-Message-ID: <6ecba212-dbd0-e81c-c7ad-50d09d1626e6@redhat.com>
-Subject: Re: [PATCH v2 for 2.10] iotests: fix 185
-References: <20170809151757.15743-1-vsementsov@virtuozzo.com>
- <565de2a2-316a-1b2e-95e3-6b2b2086484f@virtuozzo.com>
- <93a7eaf1-3387-0772-b779-b1ff3d3b9443@redhat.com>
- <bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
-In-Reply-To: <bbc4083d-7a4c-2d93-d630-831fc0693161@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+--Sig_/QK/HgDxrE=SaShYx+C+e/3r
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On 08/09/2017 10:57 AM, Vladimir Sementsov-Ogievskiy wrote:
+On Wed, 9 Aug 2017 10:59:46 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
->>>> This is because quite happens before first mirror request is done
->>> s/quite/quit/
->>>
->>>> (and, in specified case, even before block-job len field is set).
->>>> To prevent it let's just add a sleep for 0.3 seconds before quite.
->> Here, as well.
->>
->> Maybe:
->>
->> This is because, under heavy load, the quit can happen before the firs=
-t
->> iteration of the mirror request has occurred.  To make sure we've had
->> time to iterate, let's just add a sleep for 0.3 seconds before quittin=
-g.
->>
->>
->>>>        "return"
->>>>    +# If we don't sleep here 'quit' command may be handled before
->>>> +# the first mirror iteration is done
->>>> +sleep 0.5
->> The commit message disagrees with the code (.3 vs. .5) - which one is
->> correct?
->>
-> Let it be .5, as I've tested it.
+> On 08/09/2017 10:22 AM, Greg Kurz wrote:
+>=20
+> >>>
+> >>> The solution is to use O_PATH: openat() now succeeds in both cases, a=
+nd we
+> >>> can ensure the path isn't a symlink with fstat(). The associated entr=
+y in
+> >>> "/proc/self/fd" can hence be safely passed to the regular chmod() sys=
+call.   =20
+> >>
+> >> Hey - should we point this out as a viable solution to the glibc folks,
+> >> since their current user-space emulation of AT_SYMLINK_NOFOLLOW is bro=
+ken?
+> >> =20
+> >=20
+> > Probably. What's the best way to do that ? =20
+>=20
+> I've added a comment to
+> https://sourceware.org/bugzilla/show_bug.cgi?id=3D14578; you'll also want
+> to point to the lkml discussion in that bug.  And reading that bug, it
+> also looks like your hack with /proc/self/fd has been proposed by Rich
+> Felker since 2013! (although fstat() didn't work until Linux 3.6, even
+> though O_PATH predates that time) - so there is that one additional
+> concern of whether we need to cater to the window of kernels where
+> O_PATH exists but fstat() on that fd can't learn whether we opened a
+> symlink.
+>=20
 
-With a correct commit message (maintainer can touch it up),
-Reviewed-by: Eric Blake <eblake@redhat.com>
+BTW, what happens with fstat() and O_PATH before Linux 3.6 ? Does it
+fail or does it return something wrong in th stat buf ?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/QK/HgDxrE=SaShYx+C+e/3r
+Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Version: GnuPG v2
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLMn0ACgkQp6FrSiUn
-Q2oyJQf5Af+Ja5lGDLGwDgPaVCOm0GFawyQKNjV6Q74p3B4rkkruEt3po2xFEKYr
-yuaFuicD3KzRYvWqRjvnHMjG2aBONtqpgIFu5tyR2JR5hng5JVWFwTY2CLrJBRSC
-8vkxs9Hqwh+cvtlzzyuL6mW0IZBPHArcMp3M4we/34HOAhTgHimBwlbdE2D+2cCH
-e33btaA4kqhW7pbDW77iRD0Px6fg54FPYon9gTg/xxbQ/4Fl41Sddb3fHpY2sMKO
-D78Y/hzS5GTjSlpn2w+2Teq5Jp7LueR2skeWWNdqZlln4N7ZftQlLLoWVC7TSl4A
-NkcP48OcNsMV97DTud5JSRLZoo54Eg==
-=HXiZ
+iEYEARECAAYFAlmLMvkACgkQAvw66wEB28LGaQCfXBxVSnrlJeICr2IR/JS9XEzg
+OygAn0tcLOUhw0L28l2BeBu3XajRdmY4
+=n3GQ
 -----END PGP SIGNATURE-----
 
---pprrAhUnnNSFG8NBxESaxAuH3sw3ftkHa--
+--Sig_/QK/HgDxrE=SaShYx+C+e/3r--
