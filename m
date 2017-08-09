@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dfRar-0003SY-Ee
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:19 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfRau-0003VQ-7L
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dfRap-0003cY-Qg
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:17 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dfRas-0003ed-Lp
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 10:04:20 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Wed,  9 Aug 2017 17:02:55 +0300
-Message-Id: <20170809140256.25584-6-el13635@mail.ntua.gr>
+Date: Wed,  9 Aug 2017 17:02:56 +0300
+Message-Id: <20170809140256.25584-7-el13635@mail.ntua.gr>
 In-Reply-To: <20170809140256.25584-1-el13635@mail.ntua.gr>
 References: <20170809140256.25584-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 5/6] block: add iotest 191 for legacy
- throttling interface
+Subject: [Qemu-devel] [PATCH v2 6/6] block: remove BlockBackendPublic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,182 +22,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Check that the implicit throttle filter driver node, used for
-compatibility with the legacy throttling interface on the BlockBackend
-level, works.
+All BlockBackend level throttling (via the implicit throttle filter node) is
+done in block/block-backend.c and block/throttle-groups.c doesn't know
+about BlockBackends anymore. Since BlockBackendPublic is not needed anymore, remove it.
 
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- tests/qemu-iotests/191     | 138 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/191.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 144 insertions(+)
- create mode 100644 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
+ block/block-backend.c          | 43 +++++++++++++++++++-----------------------
+ block/qapi.c                   |  4 ++--
+ blockdev.c                     |  6 +++---
+ include/sysemu/block-backend.h | 12 +-----------
+ 4 files changed, 25 insertions(+), 40 deletions(-)
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-new file mode 100644
-index 0000000000..82fd0b2fe5
---- /dev/null
-+++ b/tests/qemu-iotests/191
-@@ -0,0 +1,138 @@
-+#!/usr/bin/env python
-+#
-+# Tests that the legacy throttling interface using an implicit throttle filter
-+# driver node works
-+#
-+# Copyright (C) 2017 Manos Pitsidianakis
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 61983b7393..05f6e67222 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -36,7 +36,10 @@ struct BlockBackend {
+     DriveInfo *legacy_dinfo;    /* null unless created by drive_new() */
+     QTAILQ_ENTRY(BlockBackend) link;         /* for block_backends */
+     QTAILQ_ENTRY(BlockBackend) monitor_link; /* for monitor_block_backends */
+-    BlockBackendPublic public;
 +
-+import os
-+import iotests
-+
-+class TestLegacyThrottling(iotests.QMPTestCase):
-+    test_img = os.path.join(iotests.test_dir, "test.img")
-+    target_img = os.path.join(iotests.test_dir, "target.img")
-+    base_img = os.path.join(iotests.test_dir, "base.img")
-+
-+    def setUp(self):
-+        iotests.qemu_img("create", "-f", iotests.imgfmt, self.base_img, "1G")
-+        iotests.qemu_img("create", "-f", iotests.imgfmt, self.test_img, "-b", self.base_img)
-+        iotests.qemu_io("-f", iotests.imgfmt, "-c", "write -P0x5d 1M 128M", self.test_img)
-+        self.vm = iotests.VM().add_drive(self.test_img)
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.do_check_throttle_node(expect=True)
-+        params = {"device": "drive0",
-+                  "bps": 0,
-+                  "bps_rd": 0,
-+                  "bps_wr": 0,
-+                  "iops": 0,
-+                  "iops_rd": 0,
-+                  "iops_wr": 0,
-+                 }
-+        """
-+        This must remove the implicit throttle_node
-+        """
-+        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
-+                             **params)
-+        self.do_check_throttle_node(expect=False)
-+        self.vm.shutdown()
-+
-+    def do_test_job(self, cmd, **args):
-+        params = {"device": "drive0",
-+                  "bps": 1024,
-+                  "bps_rd": 0,
-+                  "bps_wr": 0,
-+                  "iops": 0,
-+                  "iops_rd": 0,
-+                  "iops_wr": 0,
-+                 }
-+        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
-+                             **params)
-+        self.assert_qmp(result, "return", {})
-+        result = self.vm.qmp(cmd, **args)
-+        self.assert_qmp(result, "return", {})
-+        result = self.vm.qmp("query-block-jobs")
-+        self.assert_qmp(result, "return[0]/device", "drive0")
-+
-+    def do_check_throttle_node(self, expect):
-+        result = self.vm.qmp("query-named-block-nodes")
-+        for r in result["return"]:
-+            if r["drv"] == "throttle":
-+                    self.assertTrue(expect)
-+                    return
-+        if expect:
-+            """ throttle_node missing! """
-+            self.assertTrue(False)
-+
-+    def do_check_params(self, file):
-+        result = self.vm.qmp("query-block")
-+        self.assert_qmp(result, "return[0]/inserted/bps", 1024)
-+        self.assert_qmp(result, "return[0]/inserted/drv", iotests.imgfmt)
-+        self.assert_qmp(result, "return[0]/inserted/file", file)
-+
-+    """
-+    Check that query-block reports the correct throttling parameters while
-+    ignoring the implicit throttle node.
-+    """
-+    def test_query_block(self):
-+        params = {"device": "drive0",
-+                  "bps": 1024,
-+                  "bps_rd": 0,
-+                  "bps_wr": 0,
-+                  "iops": 0,
-+                  "iops_rd": 0,
-+                  "iops_wr": 0,
-+                 }
-+        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
-+                             **params)
-+        self.assert_qmp(result, "return", {})
-+        self.do_check_params(file=self.test_img)
-+
-+    """
-+    Check that the throttle node doesn't get removed by block jobs, and that
-+    query-block reports the correct throttling parameters
-+    """
-+    def test_drive_mirror(self):
-+        self.do_test_job("drive-mirror", device="drive0",
-+                          target=self.target_img,
-+                          sync="full")
-+        self.vm.event_wait("BLOCK_JOB_READY")
-+        self.vm.qmp("block-job-complete", device="drive0")
-+        """
-+        query-block should report `target_img` now
-+        """
-+        self.do_check_params(file=self.target_img)
-+
-+    def test_drive_backup(self):
-+        self.do_test_job("drive-backup", device="drive0",
-+                          target=self.target_img,
-+                          sync="full")
-+        self.vm.event_wait("BLOCK_JOB_COMPLETED")
-+        self.do_check_params(file=self.test_img)
-+
-+    def test_block_commit(self):
-+        self.do_test_job("block-commit", device="drive0")
-+        self.vm.event_wait("BLOCK_JOB_READY")
-+        self.vm.qmp("block-job-complete", device="drive0")
-+        """
-+        query-block should report the backing file `base_img` now
-+        """
-+        self.do_check_params(file=self.base_img)
-+
-+if __name__ == "__main__":
-+    iotests.main(supported_fmts=["qcow2"])
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-new file mode 100644
-index 0000000000..89968f35d7
---- /dev/null
-+++ b/tests/qemu-iotests/191.out
-@@ -0,0 +1,5 @@
-+....
-+----------------------------------------------------------------------
-+Ran 4 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 6e6afb8ba9..1b4221f26d 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -187,3 +187,4 @@
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
-+191 rw auto quick
++    /* implicit throttle filter node for backwards compatibility with legacy
++     * throttling commands */
++    BlockDriverState *throttle_node;
+ 
+     void *dev;                  /* attached device model, if any */
+     bool legacy_dev;            /* true if dev is not a DeviceState */
+@@ -283,7 +286,7 @@ static void blk_delete(BlockBackend *blk)
+     assert(!blk->refcnt);
+     assert(!blk->name);
+     assert(!blk->dev);
+-    if (blk->public.throttle_node) {
++    if (blk->throttle_node) {
+         blk_io_limits_disable(blk);
+     }
+     if (blk->root) {
+@@ -574,19 +577,11 @@ BlockBackend *blk_by_legacy_dinfo(DriveInfo *dinfo)
+ }
+ 
+ /*
+- * Returns a pointer to the publicly accessible fields of @blk.
++ * Returns the throttle_node field of @blk.
+  */
+-BlockBackendPublic *blk_get_public(BlockBackend *blk)
++BlockDriverState *blk_get_throttle_node(BlockBackend *blk)
+ {
+-    return &blk->public;
+-}
+-
+-/*
+- * Returns a BlockBackend given the associated @public fields.
+- */
+-BlockBackend *blk_by_public(BlockBackendPublic *public)
+-{
+-    return container_of(public, BlockBackend, public);
++    return blk->throttle_node;
+ }
+ 
+ /*
+@@ -1879,15 +1874,15 @@ int blk_commit_all(void)
+ /* throttling disk I/O limits */
+ void blk_set_io_limits(BlockBackend *blk, ThrottleConfig *cfg)
+ {
+-    assert(blk->public.throttle_node);
+-    throttle_group_config(throttle_get_tgm(blk->public.throttle_node), cfg);
++    assert(blk->throttle_node);
++    throttle_group_config(throttle_get_tgm(blk->throttle_node), cfg);
+ }
+ 
+ void blk_io_limits_disable(BlockBackend *blk)
+ {
+     BlockDriverState *bs, *throttle_node;
+ 
+-    throttle_node = blk_get_public(blk)->throttle_node;
++    throttle_node = blk->throttle_node;
+ 
+     assert(throttle_node);
+ 
+@@ -1903,7 +1898,7 @@ void blk_io_limits_disable(BlockBackend *blk)
+      * blk, at this point it might have more than one parent, so use
+      * bdrv_replace_node(). This destroys throttle_node */
+     bdrv_replace_node(throttle_node, bs, &error_abort);
+-    blk_get_public(blk)->throttle_node = NULL;
++    blk->throttle_node = NULL;
+ 
+     bdrv_unref(bs);
+     bdrv_drained_end(bs);
+@@ -1944,7 +1939,7 @@ void blk_io_limits_enable(BlockBackend *blk, const char *group,  Error **errp)
+ 
+ end:
+     bdrv_drained_end(bs);
+-    blk_get_public(blk)->throttle_node = throttle_node;
++    blk->throttle_node = throttle_node;
+ }
+ 
+ void blk_io_limits_update_group(BlockBackend *blk, const char *group, Error **errp)
+@@ -1952,11 +1947,11 @@ void blk_io_limits_update_group(BlockBackend *blk, const char *group, Error **er
+     ThrottleGroupMember *tgm;
+ 
+     /* this BB is not part of any group */
+-    if (!blk->public.throttle_node) {
++    if (!blk->throttle_node) {
+         return;
+     }
+ 
+-    tgm = throttle_get_tgm(blk->public.throttle_node);
++    tgm = throttle_get_tgm(blk->throttle_node);
+     /* this BB is a part of the same group than the one we want */
+     if (!g_strcmp0(throttle_group_get_name(tgm),
+                    group)) {
+@@ -1981,8 +1976,8 @@ static void blk_root_drained_begin(BdrvChild *child)
+ 
+     /* Note that blk->root may not be accessible here yet if we are just
+      * attaching to a BlockDriverState that is drained. Use child instead. */
+-    if (blk->public.throttle_node) {
+-        tgm = throttle_get_tgm(blk->public.throttle_node);
++    if (blk->throttle_node) {
++        tgm = throttle_get_tgm(blk->throttle_node);
+         if (atomic_fetch_inc(&tgm->io_limits_disabled) == 0) {
+             throttle_group_restart_tgm(tgm);
+         }
+@@ -1995,8 +1990,8 @@ static void blk_root_drained_end(BdrvChild *child)
+     BlockBackend *blk = child->opaque;
+     assert(blk->quiesce_counter);
+ 
+-    if (blk->public.throttle_node) {
+-        tgm = throttle_get_tgm(blk->public.throttle_node);
++    if (blk->throttle_node) {
++        tgm = throttle_get_tgm(blk->throttle_node);
+         assert(tgm->io_limits_disabled);
+         atomic_dec(&tgm->io_limits_disabled);
+     }
+diff --git a/block/qapi.c b/block/qapi.c
+index ab55db7134..2be44a6758 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -66,9 +66,9 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+ 
+     info->detect_zeroes = bs->detect_zeroes;
+ 
+-    if (blk && blk_get_public(blk)->throttle_node) {
++    if (blk && blk_get_throttle_node(blk)) {
+         ThrottleConfig cfg;
+-        BlockDriverState *throttle_node = blk_get_public(blk)->throttle_node;
++        BlockDriverState *throttle_node = blk_get_throttle_node(blk);
+         ThrottleGroupMember *tgm = throttle_get_tgm(throttle_node);
+ 
+         throttle_group_get_config(tgm, &cfg);
+diff --git a/blockdev.c b/blockdev.c
+index 20e5513f87..5c11c245b0 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2714,7 +2714,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
+     if (throttle_enabled(&cfg)) {
+         /* Enable I/O limits if they're not enabled yet, otherwise
+          * just update the throttling group. */
+-        if (!blk_get_public(blk)->throttle_node) {
++        if (!blk_get_throttle_node(blk)) {
+             blk_io_limits_enable(blk, arg->has_group ? arg->group :
+                                  arg->has_device ? arg->device : arg->id,
+                                  &local_err);
+@@ -2733,10 +2733,10 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
+             }
+         }
+ 
+-        throttle_node = blk_get_public(blk)->throttle_node;
++        throttle_node = blk_get_throttle_node(blk);
+         tgm = throttle_get_tgm(throttle_node);
+         throttle_group_config(tgm, &cfg);
+-    } else if (blk_get_public(blk)->throttle_node) {
++    } else if (blk_get_throttle_node(blk)) {
+         /*
+          * If all throttling settings are set to 0, disable I/O limits
+          * by deleting the legacy throttle node
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 4a7ca53685..a05d75fa5f 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -68,14 +68,6 @@ typedef struct BlockDevOps {
+     void (*drained_end)(void *opaque);
+ } BlockDevOps;
+ 
+-/* This struct is embedded in (the private) BlockBackend struct and contains
+- * fields that must be public. This is in particular for QLIST_ENTRY() and
+- * friends so that BlockBackends can be kept in lists outside block-backend.c
+- * */
+-typedef struct BlockBackendPublic {
+-    BlockDriverState *throttle_node;
+-} BlockBackendPublic;
+-
+ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm);
+ BlockBackend *blk_new_open(const char *filename, const char *reference,
+                            QDict *options, int flags, Error **errp);
+@@ -90,9 +82,7 @@ BlockBackend *blk_all_next(BlockBackend *blk);
+ bool monitor_add_blk(BlockBackend *blk, const char *name, Error **errp);
+ void monitor_remove_blk(BlockBackend *blk);
+ 
+-BlockBackendPublic *blk_get_public(BlockBackend *blk);
+-BlockBackend *blk_by_public(BlockBackendPublic *public);
+-
++BlockDriverState *blk_get_throttle_node(BlockBackend *blk);
+ BlockDriverState *blk_bs(BlockBackend *blk);
+ void blk_remove_bs(BlockBackend *blk);
+ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp);
 -- 
 2.11.0
