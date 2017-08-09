@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfYYm-0005S2-K6
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:30:37 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dfYc1-00069f-Hu
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfYYi-0007WW-TK
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:30:36 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170728053610.15770-1-f4bug@amsat.org>
-	<20170728053610.15770-19-f4bug@amsat.org> <87mv7aumav.fsf@linaro.org>
-	<8e2e3aa5-4459-76ba-3309-af6b30220346@amsat.org>
-	<87fud0vmak.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3e66742f-04c5-51b7-de3a-f692c0637bc5@amsat.org>
-Date: Wed, 9 Aug 2017 18:30:25 -0300
-MIME-Version: 1.0
-In-Reply-To: <87fud0vmak.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 18/47] MAINTAINERS: add missing TCG entry
+	(envelope-from <jfreimann@redhat.com>) id 1dfYbw-0000iZ-Ij
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:33:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1dfYbw-0000ht-CU
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 17:33:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C1CEE9510
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 21:33:49 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
+Date: Wed,  9 Aug 2017 23:33:35 +0200
+Message-Id: <20170809213337.3013-1-jfreimann@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] tests/pxe-test: add testcase using
+ vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com, jasowang@redhat.com, stefanha@redhat.com
 
-[I added mails of other person who reply to this series, this mail is 
-not directly addressed to Alex]
+This implements a testcase for pxe-test using the vhost-user interface. Spawn a
+vhost-user-bridge process and connect it to the qemu process.
 
-On 08/09/2017 11:38 AM, Alex Bennée wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-[...]
->> Do you think there should be another entry in "Block QAPI, monitor,
->> command line"?
->> or this file (and related include) rather deserves an own section
->> (possibly tagged Odd Fixes) to unburden Richard?
-> 
-> Well the default for un-matched files is qemu-devel right? It would be
-> nice for it to be properly maintained but that requires someone to
-> step-up to the plate.
+changes v2->v3:
+- fixed build on aarch64 by removing a flag for g_spawn_async() that is
+  not even needed. Patch builds on my system for target aarch64 now
 
-I wonder if I'm understanding correctly what the MAINTAINERS file is for 
-and how to use it.
+changes v1->v2:
 
- From an submitter view I feel a bit confused. I thought 
-./get_maintainer.pl would give me the list of person to email the 
-changes I did on some file from the repository. This script seems 
-correctly named, I'm looking for some ./get_reviewers.pl instead, to 
-know who I'v to keep updated, apart from the ./get_maintainer.pl.
+- new patch 4/5. Necessary to make qtest_add_abrt_handler work. 
+- get rid of hugepagefs specific code (mst)
+- use htonl and INADDR_LOOPBACK to set remote address (Stefan Hajnoczi)
+- add qtest abort handler (Stefan Hajnoczi)
+- spawn vhost-user-bridge process with flag DO_NOT_REAP_CHILD and add a child
+  watch function (Stefan Hajnoczi)
+  Killing the vubr process manually at the end of the test and watching
+  its termination with the child watch function. 
+- clean up pxe-test-disk images 
+- add Jason Wang to Cc
 
-currently we have:
-"M: Mail patches to: FullName <address@domain>"
-Does this imply FullName is a maintainer?
-If so is it ok I do this change:
-
--    M: Mail patches to: FullName <address@domain>
-+    M: Maintainer: FullName <address@domain>
-+       These maintainers must be mailed on patches.
-      R: Designated reviewer: FullName <address@domain>
-         These reviewers should be CCed on patches.
+regards,
+Jens
 
 
-actual default for un-matched: "recent contributors" + qemu-devel@
+Jens Freimann (2):
+  tests/vhost-user-bridge: disable debug output by default
+  tests/pxe-test: add testcase using vhost-user-bridge
 
-   $ ./scripts/get_maintainer.pl -f disas.c
-   get_maintainer.pl: No maintainers found, printing recent contributors.
-   get_maintainer.pl: Do not blindly cc: them on patches!  Use common sense.
-   Peter Maydell <peter.maydell@linaro.org> (commit_signer:2/3=67%)
-   Richard Henderson <rth@twiddle.net> (commit_signer:1/3=33%)
-   Thomas Huth <thuth@redhat.com> (commit_signer:1/3=33%)
-   Michael Tokarev <mjt@tls.msk.ru> (commit_signer:1/3=33%)
-   Julian Brown <julian@codesourcery.com> (commit_signer:1/3=33%)
-   qemu-devel@nongnu.org (open list:All patches CC here)
+ tests/Makefile.include    |   4 +-
+ tests/pxe-test.c          | 114 +++++++++++++++++++++++++++++++++++++++++++++-
+ tests/vhost-user-bridge.c |   2 +-
+ 3 files changed, 117 insertions(+), 3 deletions(-)
 
-I find the un-matched "recent contributors" list often confuse, due to 
-files being moved, header updated, checkpatch indented.
-Most of the time you get the list of queue maintainers since they accept 
-patches and sign-of the pull request.
-
-Having to use 'git log --follow' and 'git blame' to figure out is not 
-bad, to be aware of who modified this file before you, but there are 
-some files I already hit 3 times in different series, and wondered about 
-how avoid those manual steps.
-
-Anyway I now understand these recent contributors are not maintainers 
-but no-designated reviewers, unwilling to be maintainers (else they'd 
-have added a section/entry by themselves).
-
-I also understand why Fam said it sounds weird to add an new section as 
-"Orphan".
-
-For the linux-headers case, if people want to be notified of changes the 
-easiest seems to modify the update-linux-headers.sh script.
-
-I'll review the whole series thinking differently and resend when 2.11 
-opens.
-
-Regards,
-
-Phil.
+-- 
+2.13.3
