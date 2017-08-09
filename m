@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfOCE-00049q-SO
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:26:40 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dfOFv-0005WB-BU
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfOCC-0007B4-5f
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:26:38 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dfOCB-0007AP-Ul
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:26:36 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id m85so28070984wma.0
-	for <qemu-devel@nongnu.org>; Wed, 09 Aug 2017 03:26:35 -0700 (PDT)
-Date: Wed, 9 Aug 2017 11:26:27 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170809102627.GH18003@stefanha-x1.localdomain>
-References: <20170726144226.6913-1-ldoktor@redhat.com>
-	<20170726144226.6913-2-ldoktor@redhat.com>
-	<20170808123829.GM16801@stefanha-x1.localdomain>
-	<110c04e3-e676-c705-a6f9-de040208538e@redhat.com>
+	(envelope-from <andrew@aj.id.au>) id 1dfOFt-0001Kb-Db
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:30:27 -0400
+Message-Id: <1502274617.2058464.1067857056.3F238295@webmail.messagingengine.com>
+From: Andrew Jeffery <andrew@aj.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Enx9fNJ0XV5HaWRu"
-Content-Disposition: inline
-In-Reply-To: <110c04e3-e676-c705-a6f9-de040208538e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 01/10] qemu.py: Pylint/style fixes
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Date: Wed, 09 Aug 2017 20:00:17 +0930
+References: <20170809062828.3673-1-andrew@aj.id.au>
+	<20170809062828.3673-2-andrew@aj.id.au>
+	<8d122179-665f-2cbe-939e-2e466b98b28d@kaod.org>
+In-Reply-To: <8d122179-665f-2cbe-939e-2e466b98b28d@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH for 2.11 v2 1/2] watchdog: wdt_aspeed: Add
+ support for the reset width register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +25,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+To: =?utf-8?Q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joel@jms.id.au, f4bug@amsat.org, ryan_chen@aspeedtech.com, openbmc@lists.ozlabs.org
 
 
---Enx9fNJ0XV5HaWRu
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 08, 2017 at 02:56:47PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> Dne 8.8.2017 v 14:38 Stefan Hajnoczi napsal(a):
-> > On Wed, Jul 26, 2017 at 04:42:17PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> >>      def command(self, cmd, conv_keys=3DTrue, **args):
-> >> +        '''
-> >> +        Invoke a QMP command and on success report result dict or on =
-failure
+On Wed, Aug 9, 2017, at 18:28, C=C3=A9dric Le Goater wrote:
+> On 08/09/2017 08:28 AM, Andrew Jeffery wrote:
+> > The reset width register controls how the pulse on the SoC's WDTRST{1,2}
+> > pins behaves. A pulse is emitted if the external reset bit is set in
+> > WDT_CTRL. On the AST2500 WDT_RESET_WIDTH can consume magic bit patterns
+> > to configure push-pull/open-drain and active-high/active-low
+> > behaviours and thus needs some special handling in the write path.
 > >=20
-> > s/report/return/ ?
+> > As some of the capabilities depend on the SoC version a silicon-rev
+> > property is introduced, which is used to guard version-specific
+> > behaviour.
 > >=20
-> Don't see much difference, but I'll use the "return" in the next version.
+> > Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+>=20
+> One minor comment below. Nevertheless :
+>=20
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
+> > ---
+> >  hw/watchdog/wdt_aspeed.c         | 93 ++++++++++++++++++++++++++++++++=
++++-----
+> >  include/hw/watchdog/wdt_aspeed.h |  2 +
+> >  2 files changed, 84 insertions(+), 11 deletions(-)
+> >=20
+> > diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+> > index 8bbe579b6b66..22bce364d7b5 100644
+> > --- a/hw/watchdog/wdt_aspeed.c
+> > +++ b/hw/watchdog/wdt_aspeed.c
+> > @@ -8,16 +8,19 @@
+> >   */
+> >=20=20
+> >  #include "qemu/osdep.h"
+> > +
+> > +#include "qapi/error.h"
+> >  #include "qemu/log.h"
+> > +#include "qemu/timer.h"
+> >  #include "sysemu/watchdog.h"
+> > +#include "hw/misc/aspeed_scu.h"
+> >  #include "hw/sysbus.h"
+> > -#include "qemu/timer.h"
+> >  #include "hw/watchdog/wdt_aspeed.h"
+> >=20=20
+> > -#define WDT_STATUS              (0x00 / 4)
+> > -#define WDT_RELOAD_VALUE        (0x04 / 4)
+> > -#define WDT_RESTART             (0x08 / 4)
+> > -#define WDT_CTRL                (0x0C / 4)
+> > +#define WDT_STATUS                      (0x00 / 4)
+> > +#define WDT_RELOAD_VALUE                (0x04 / 4)
+> > +#define WDT_RESTART                     (0x08 / 4)
+> > +#define WDT_CTRL                        (0x0C / 4)
+> >  #define   WDT_CTRL_RESET_MODE_SOC       (0x00 << 5)
+> >  #define   WDT_CTRL_RESET_MODE_FULL_CHIP (0x01 << 5)
+> >  #define   WDT_CTRL_1MHZ_CLK             BIT(4)
+> > @@ -25,18 +28,41 @@
+> >  #define   WDT_CTRL_WDT_INTR             BIT(2)
+> >  #define   WDT_CTRL_RESET_SYSTEM         BIT(1)
+> >  #define   WDT_CTRL_ENABLE               BIT(0)
+> > +#define WDT_RESET_WIDTH                 (0x18 / 4)
+> > +#define   WDT_RESET_WIDTH_ACTIVE_HIGH   BIT(31)
+> > +#define     WDT_POLARITY_MASK           (0xFF << 24)
+> > +#define     WDT_ACTIVE_HIGH_MAGIC       (0xA5 << 24)
+> > +#define     WDT_ACTIVE_LOW_MAGIC        (0x5A << 24)
+> > +#define   WDT_RESET_WIDTH_PUSH_PULL     BIT(30)
+> > +#define     WDT_DRIVE_TYPE_MASK         (0xFF << 24)
+> > +#define     WDT_PUSH_PULL_MAGIC         (0xA8 << 24)
+> > +#define     WDT_OPEN_DRAIN_MAGIC        (0x8A << 24)
+> >=20=20
+> > -#define WDT_TIMEOUT_STATUS      (0x10 / 4)
+> > -#define WDT_TIMEOUT_CLEAR       (0x14 / 4)
+> > -#define WDT_RESET_WDITH         (0x18 / 4)
+> > +#define WDT_TIMEOUT_STATUS              (0x10 / 4)
+> > +#define WDT_TIMEOUT_CLEAR               (0x14 / 4)
+> >=20=20
+> > -#define WDT_RESTART_MAGIC       0x4755
+> > +#define WDT_RESTART_MAGIC               0x4755
+> >=20=20
+> >  static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
+> >  {
+> >      return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
+> >  }
+> >=20=20
+> > +static bool is_ast2500(const AspeedWDTState *s)
+>=20
+> I think we could use this routine in other controllers (scu, sdmc).=20
+> So may be, in a follow-up patch, we could move it in aspeed_scu.h
 
-"report" could mean the function logs or prints a message.  I have not
-heard it used to mean "return".
+Right, I figured we would move it when we came to need it elsewhere.
 
-Stefan
+Thanks for the review.
 
---Enx9fNJ0XV5HaWRu
-Content-Type: application/pgp-signature; name="signature.asc"
+Cheers,
 
------BEGIN PGP SIGNATURE-----
+Andrew
 
-iQEcBAEBAgAGBQJZiuNTAAoJEJykq7OBq3PIhUwH/0BBB+CtTbtBay0/Q6vFxJxv
-aRf7w3S76wBlVrSYVzRl6BVmYepUbt1YTyBHGJfOo3k2guN6D24D23Htj3BQjZHM
-nJpF8CyE2MLjXVUo1WJS0QlSztgbiJ5DKNkMa2C5rXWzIBzSAD8nnAYmDJ/TpiK+
-MTSfP/Y3sQsaEkJ3c3FMcHWRJbc0wNWGlpzgsotmghpR402FnSTsr2ELG5SzlaoT
-oX3BL6sgGl+iFikchJKQjZ8y/s6tk5O8DKMna6N88jId7Wxk5NDufIrGxf5uyxka
-rQfXg2zYHYI09aiN/592maq4raetHnJGbyFLlZXOs9pS5tZCJZRa+iybOTmo/Sg=
-=o/pT
------END PGP SIGNATURE-----
-
---Enx9fNJ0XV5HaWRu--
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20=20
+> > +{
+> > +    switch (s->silicon_rev) {
+> > +    case AST2500_A0_SILICON_REV:
+> > +    case AST2500_A1_SILICON_REV:
+> > +        return true;
+> > +    case AST2400_A0_SILICON_REV:
+> > +    case AST2400_A1_SILICON_REV:
+> > +    default:
+> > +        break;
+> > +    }
+> > +
+> > +    return false;
+> > +}
+> > +
+> >  static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned =
+size)
+> >  {
+> >      AspeedWDTState *s =3D ASPEED_WDT(opaque);
+> > @@ -55,9 +81,10 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr=
+ offset, unsigned size)
+> >          return 0;
+> >      case WDT_CTRL:
+> >          return s->regs[WDT_CTRL];
+> > +    case WDT_RESET_WIDTH:
+> > +        return s->regs[WDT_RESET_WIDTH];
+> >      case WDT_TIMEOUT_STATUS:
+> >      case WDT_TIMEOUT_CLEAR:
+> > -    case WDT_RESET_WDITH:
+> >          qemu_log_mask(LOG_UNIMP,
+> >                        "%s: uninmplemented read at offset 0x%" HWADDR_P=
+RIx "\n",
+> >                        __func__, offset);
+> > @@ -119,9 +146,27 @@ static void aspeed_wdt_write(void *opaque, hwaddr =
+offset, uint64_t data,
+> >              timer_del(s->timer);
+> >          }
+> >          break;
+> > +    case WDT_RESET_WIDTH:
+> > +    {
+> > +        uint32_t property =3D data & WDT_POLARITY_MASK;
+> > +
+> > +        if (property && is_ast2500(s)) {
+> > +            if (property =3D=3D WDT_ACTIVE_HIGH_MAGIC) {
+> > +                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_H=
+IGH;
+> > +            } else if (property =3D=3D WDT_ACTIVE_LOW_MAGIC) {
+> > +                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_=
+HIGH;
+> > +            } else if (property =3D=3D WDT_PUSH_PULL_MAGIC) {
+> > +                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PUL=
+L;
+> > +            } else if (property =3D=3D WDT_OPEN_DRAIN_MAGIC) {
+> > +                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PU=
+LL;
+> > +            }
+> > +        }
+> > +        s->regs[WDT_RESET_WIDTH] &=3D ~s->ext_pulse_width_mask;
+> > +        s->regs[WDT_RESET_WIDTH] |=3D data & s->ext_pulse_width_mask;
+> > +        break;
+> > +    }
+> >      case WDT_TIMEOUT_STATUS:
+> >      case WDT_TIMEOUT_CLEAR:
+> > -    case WDT_RESET_WDITH:
+> >          qemu_log_mask(LOG_UNIMP,
+> >                        "%s: uninmplemented write at offset 0x%" HWADDR_=
+PRIx "\n",
+> >                        __func__, offset);
+> > @@ -167,6 +212,7 @@ static void aspeed_wdt_reset(DeviceState *dev)
+> >      s->regs[WDT_RELOAD_VALUE] =3D 0x03EF1480;
+> >      s->regs[WDT_RESTART] =3D 0;
+> >      s->regs[WDT_CTRL] =3D 0;
+> > +    s->regs[WDT_RESET_WIDTH] =3D 0xFF;
+> >=20=20
+> >      timer_del(s->timer);
+> >  }
+> > @@ -187,6 +233,25 @@ static void aspeed_wdt_realize(DeviceState *dev, E=
+rror **errp)
+> >      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+> >      AspeedWDTState *s =3D ASPEED_WDT(dev);
+> >=20=20
+> > +    if (!is_supported_silicon_rev(s->silicon_rev)) {
+> > +        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
+> > +                s->silicon_rev);
+> > +        return;
+> > +    }
+> > +
+> > +    switch (s->silicon_rev) {
+> > +    case AST2400_A0_SILICON_REV:
+> > +    case AST2400_A1_SILICON_REV:
+> > +        s->ext_pulse_width_mask =3D 0xff;
+> > +        break;
+> > +    case AST2500_A0_SILICON_REV:
+> > +    case AST2500_A1_SILICON_REV:
+> > +        s->ext_pulse_width_mask =3D 0xfffff;
+> > +        break;
+> > +    default:
+> > +        g_assert_not_reached();
+> > +    }
+> > +
+> >      s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_exp=
+ired, dev);
+> >=20=20
+> >      /* FIXME: This setting should be derived from the SCU hw strapping
+> > @@ -199,6 +264,11 @@ static void aspeed_wdt_realize(DeviceState *dev, E=
+rror **errp)
+> >      sysbus_init_mmio(sbd, &s->iomem);
+> >  }
+> >=20=20
+> > +static Property aspeed_wdt_properties[] =3D {
+> > +    DEFINE_PROP_UINT32("silicon-rev", AspeedWDTState, silicon_rev, 0),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> >  static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > @@ -207,6 +277,7 @@ static void aspeed_wdt_class_init(ObjectClass *klas=
+s, void *data)
+> >      dc->reset =3D aspeed_wdt_reset;
+> >      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> >      dc->vmsd =3D &vmstate_aspeed_wdt;
+> > +    dc->props =3D aspeed_wdt_properties;
+> >  }
+> >=20=20
+> >  static const TypeInfo aspeed_wdt_info =3D {
+> > diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt=
+_aspeed.h
+> > index 080c2231222e..7de3e5c224fb 100644
+> > --- a/include/hw/watchdog/wdt_aspeed.h
+> > +++ b/include/hw/watchdog/wdt_aspeed.h
+> > @@ -27,6 +27,8 @@ typedef struct AspeedWDTState {
+> >      uint32_t regs[ASPEED_WDT_REGS_MAX];
+> >=20=20
+> >      uint32_t pclk_freq;
+> > +    uint32_t silicon_rev;
+> > +    uint32_t ext_pulse_width_mask;
+> >  } AspeedWDTState;
+> >=20=20
+> >  #endif  /* ASPEED_WDT_H */
+> >=20
+>=20
