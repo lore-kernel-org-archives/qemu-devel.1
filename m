@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dfSeU-0007Kt-8f
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:12:07 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dfShD-0008KA-5U
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dfSeQ-0003Kj-9a
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:12:06 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:51067)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dfSeQ-0003I3-0i
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:12:02 -0400
-References: <150228860899.28168.1415083032613087245.stgit@bahia>
+	(envelope-from <mjt@tls.msk.ru>) id 1dfSh7-0004UQ-76
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:14:55 -0400
+References: <20170728115131.31725-1-otubo@redhat.com>
+	<a6feb869-e73e-ffd3-278e-23fef4ae6a0c@msgid.tls.msk.ru>
+	<20170807141604.GA14212@bluepex.com>
 From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <2a4a537f-0f26-3f5a-eaae-2e73bcef4a99@msgid.tls.msk.ru>
-Date: Wed, 9 Aug 2017 18:11:51 +0300
+Message-ID: <cdf1189d-f52c-6a2c-eabb-6923c383ca0e@msgid.tls.msk.ru>
+Date: Wed, 9 Aug 2017 18:14:48 +0300
 MIME-Version: 1.0
-In-Reply-To: <150228860899.28168.1415083032613087245.stgit@bahia>
+In-Reply-To: <20170807141604.GA14212@bluepex.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
- fchmodat_nofollow() limitations
+Subject: Re: [Qemu-devel] [PATCH] unicore32: abort when entering "x 0" on
+ the monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: zhiyong.wu@ucloud.cn, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Eduardo Otubo <otubo@redhat.com>, qemu-trivial@nongnu.org, thuth@redhat.com, gxt@mprc.pku.edu.cn, qemu-devel@nongnu.org
 
-09.08.2017 17:23, Greg Kurz wrote:
-> This function has to ensure it doesn't follow a symlink that could be used
-> to escape the virtfs directory. This could be easily achieved if fchmodat()
-> on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-> it doesn't.
+07.08.2017 17:16, Eduardo Otubo wrote:
+> On Mon, Jul 31, 2017 at 01:17:03PM +0300, Michael Tokarev wrote:
+>> 28.07.2017 14:51, Eduardo Otubo wrote:
+>>> Starting Qemu with "qemu-system-unicore32 -M puv3,accel=qtest -S -nographic"
+>>> and entering "x 0 " at the monitor prompt leads to abort():
+>>
+>> Applied to -trivial, thanks!
 > 
-> The current implementation covers most use-cases, but it notably fails if:
-> - the target path has access rights equal to 0000 (openat() returns EPERM),
->   => once you've done chmod(0000) on a file, you can never chmod() again
-> - the target path is UNIX domain socket (openat() returns ENXIO)
->   => bind() of UNIX domain sockets fails if the file is on 9pfs
-> 
-> The solution is to use O_PATH: openat() now succeeds in both cases, and we
-> can ensure the path isn't a symlink with fstat(). The associated entry in
-> "/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
+> Hi Michael, you missed this patch in the latest pull request. Care to
+> take it on the next one? I'm planning to send some other small fixes
+> until this Friday.
 
-How we can ensure the path isn't a symlink using fstat() ?
-
-As far as I understand, fstat NEVER, EVER will return S_ISLINK, because
-we can't actually "open" a symlink itsef, only the target of the symlink.
+Yeah, for some reason it slipped out. I'm picking it up again.
+Thanks,
 
 /mjt
