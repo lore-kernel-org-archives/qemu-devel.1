@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfTJA-0005MS-D4
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:54:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfTMa-00071c-JT
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dfTJ9-0002Vt-CE
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:54:08 -0400
-Date: Wed, 9 Aug 2017 16:53:55 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170809155355.GA8330@stefanha-x1.localdomain>
-References: <20170808175711.12203-1-jsnow@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1dfTMZ-0004Yw-8Y
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:57:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-18-eblake@redhat.com>
+Date: Wed, 09 Aug 2017 17:57:23 +0200
+In-Reply-To: <20170804012551.2714-18-eblake@redhat.com> (Eric Blake's message
+	of "Thu, 3 Aug 2017 20:25:46 -0500")
+Message-ID: <87shh0n38c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
-Content-Disposition: inline
-In-Reply-To: <20170808175711.12203-1-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/4] IDE: Do not flush empty
- drives
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 17/22] libqtest: Add qmp_args() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +23,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, pjp@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>, Amit Shah <amit@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
+Eric Blake <eblake@redhat.com> writes:
 
---liOOAslEiF7prFVr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Similar to the previous helper, we can reduce the boilerplate
+> of most callers by passing the command name separately from
+> the interpolated arguments.  Adjust the majority of the callers
+> that can use the new helpers; in the process, fixing a few
+> places where we would have failed -Wformat-nonliteral.  The
+> new helper function already uses GCC_FMT_ATTR to match the
+> underlying use of qobject_from_jsonv().
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqtest.h               |  20 ++++++
+>  tests/libqtest.c               |  29 +++++++++
+>  tests/ahci-test.c              |  19 +++---
+>  tests/device-introspect-test.c |   4 +-
+>  tests/drive_del-test.c         |  10 +--
+>  tests/fdc-test.c               |   8 +--
+>  tests/libqos/libqos.c          |   7 +--
+>  tests/libqos/pci-pc.c          |   8 +--
+>  tests/pc-cpu-test.c            |   8 +--
+>  tests/postcopy-test.c          |  30 +++------
+>  tests/qom-test.c               |   9 +--
+>  tests/test-netfilter.c         | 139 ++++++++++++++++-------------------------
+>  tests/test-x86-cpuid-compat.c  |   6 +-
+>  tests/tmp105-test.c            |   9 +--
+>  tests/usb-hcd-uhci-test.c      |  14 ++---
+>  tests/usb-hcd-xhci-test.c      |  25 ++------
+>  tests/vhost-user-test.c        |  12 +---
+>  tests/virtio-blk-test.c        |  12 +---
+>  tests/virtio-scsi-test.c       |  13 +---
+>  tests/virtio-serial-test.c     |  12 +---
+>  20 files changed, 167 insertions(+), 227 deletions(-)
+>
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index e0d87d035a..86ca7fa581 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -499,6 +499,26 @@ QDict *qmp_cmd(const char *cmd);
+>  void qmp_cmd_async(const char *cmd);
+>
+>  /**
+> + * qmp_args:
+> + * @cmd: QMP command to send to QEMU.
+> + * @fmt...: Arguments for the command; formats arguments through
+> + * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+> + *
+> + * Sends a QMP message to QEMU and returns the response.
+> + */
+> +QDict *qmp_args(const char *cmd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+> +
+> +/**
+> + * qmp_args_async:
+> + * @cmd: QMP command to send to QEMU.
+> + * @fmt...: Arguments for the command; formats arguments through
+> + * json-lexer.c (only understands '%(PRI[ud]64|(l|ll)?[du]|[ipsf%])').
+> + *
+> + * Sends a QMP message to QEMU and leaves the response in the stream.
+> + */
+> +void qmp_args_async(const char *cmd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+> +
+> +/**
+>   * qmp_discard_response:
+>   *
+>   * Read and discard a QMP response, typically after qmp_async().
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 3926a4d481..49786cf2d7 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -869,6 +869,35 @@ void qmp_cmd_async(const char *cmd)
+>      qtest_qmp_send(global_qtest, "{'execute':%s}", cmd);
+>  }
+>
+> +static void qmp_args_dict_async(const char *cmd, QDict *args)
+> +{
+> +    assert(args);
+> +    qtest_qmp_send(global_qtest, "{'execute':%s, 'arguments':%p}", cmd, args);
+> +}
+> +
+> +QDict *qmp_args(const char *cmd, const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    QObject *obj;
+> +
+> +    va_start(ap, fmt);
+> +    obj = qobject_from_jsonv(fmt, ap);
+> +    va_end(ap);
+> +    qmp_args_dict_async(cmd, qobject_to_qdict(obj));
+> +    return qtest_qmp_receive(global_qtest);
+> +}
+> +
+> +void qmp_args_async(const char *cmd, const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    QObject *obj;
+> +
+> +    va_start(ap, fmt);
+> +    obj = qobject_from_jsonv(fmt, ap);
+> +    va_end(ap);
+> +    qmp_args_dict_async(cmd, qobject_to_qdict(obj));
+> +}
+> +
 
-On Tue, Aug 08, 2017 at 01:57:07PM -0400, John Snow wrote:
-> Patches one and two here are a 2.10 bandaid that avoids a crash.
-> Patches three and four are a more comprehensive fix as written by
-> Kevin in another discussion and are being posted here for the sake
-> of a discussion.
->=20
-> Patch three as written causes hangs in iotests 20, 39, 97, 98, 129,
-> 153, 176, and 185. 124 actually segfaults.
->=20
-> For the purposes of 2.10, we'll likely just want patches 1 and 2
-> for now.
->=20
-> The problem in a nutshell: incrementing the in-flight counter of the
-> BDS from the BB layer assumes that every BB always has a BDS. That's
-> not true; and some devices like IDE have not in the past checked to
-> see if a given blk_ operation WOULD fail.
->=20
-> This culminates in a new regression where issuing a cache flush to a
-> CDROM (which is, for some reason, specification valid) will crash QEMU
-> due to a null dereference when attempting to atomically increment that
-> backend's in-flight counter.
->=20
-> John Snow (1):
->   IDE: Do not flush empty CDROM drives
->=20
-> Kevin Wolf (3):
->   IDE: test flush on empty CDROM
->   block-backend: shift in-flight counter to BB from BDS
->   block-backend: test flush op on empty backend
->=20
->  block.c                    |  2 +-
->  block/block-backend.c      | 40 +++++++++++++++++++++++++-----
->  hw/ide/core.c              | 11 +++++---
->  tests/Makefile.include     |  2 ++
->  tests/ide-test.c           | 19 ++++++++++++++
->  tests/test-block-backend.c | 62 ++++++++++++++++++++++++++++++++++++++++=
-++++++
->  6 files changed, 125 insertions(+), 11 deletions(-)
->  create mode 100644 tests/test-block-backend.c
+I don't like the qmp_args name.  It's not about arguments, it's about
+sending a command with arguments.
 
-John will be offline until Monday.  I'm sending a new patch series for
-2.10 with updated versions of Patch 1 & 2.
+I'm afraid I'm getting pretty thorougly confused by the evolving
+interface.  So I stop and think how it should look like when done.
 
-Stefan
+We need send and receive.  Convenience functions to do both, and to
+receive and throw away are nice to have.
 
---liOOAslEiF7prFVr
-Content-Type: application/pgp-signature; name="signature.asc"
+We need qmp_raw().  We haven't found a need for a raw receive function.
 
------BEGIN PGP SIGNATURE-----
+Convenience functions to build commands and send are nice to have.  They
+come in pairs, without arguments, to avoid -Wno-format-zero-length
+(aside: that's one of the sillier warnings).
 
-iQEcBAEBAgAGBQJZizATAAoJEJykq7OBq3PIWv0H/2rHVq57GPu/6eIjksKRIwtc
-mpPDkRay8EdZ38tikhzlcu3FHE9efbRGW6XA0lFTorubnn1WhQEH5dvKYL6s3NhD
-CHxGUZ+aXmMRNKOjghze5gmo08z5qno1VXVmnMlKpLNav1pKEnn4s0xR/homnwkL
-PkgbYDV/PyA95WH2QNUq/DBfKSIPtRCBEJVTExSPhlFk//h/6UAehEUd1LOZgaY4
-tip1jun/mszT8l+QR9azOPQ4ypCDC84Sro/4oXP8s1Q3JPJu4AeTSFcO8kJ9W+Y0
-NIbZryOVFCSvUd4hL35nTnC1X+mguKrCIwW0/yl/DIH82QxddrNexqT8UpNvue8=
-=/mad
------END PGP SIGNATURE-----
+We used to have almost everything with and without QTestState, but we're
+refusing to continue that self-flagellation.
 
---liOOAslEiF7prFVr--
+For every function taking ..., we want one taking va_list.
+
+Makes sense?
+
+Can we derive a sensible set of function names from this?
+
+[...]
