@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dfOFv-0005WB-BU
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:30:29 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dfOGc-00060z-2h
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1dfOFt-0001Kb-Db
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:30:27 -0400
-Message-Id: <1502274617.2058464.1067857056.3F238295@webmail.messagingengine.com>
-From: Andrew Jeffery <andrew@aj.id.au>
+	(envelope-from <stefanha@gmail.com>) id 1dfOGa-0002Dv-FX
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:31:10 -0400
+Date: Wed, 9 Aug 2017 11:30:58 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170809103058.GI18003@stefanha-x1.localdomain>
+References: <20170721140155.GQ17693@redhat.com>
+	<bcf52c05-1d73-a56f-98ae-7029a924786b@redhat.com>
+	<20170725154921.GS23343@stefanha-x1.localdomain>
+	<547d0cd0-052c-a1e5-e116-483d2a176ab8@redhat.com>
+	<20170726175808.GD3600@stefanha-x1.localdomain>
+	<ecbf4c6b-64e0-7878-380a-262753068cb0@redhat.com>
+	<20170727134101.GG10129@stefanha-x1.localdomain>
+	<87mv7a4h77.fsf@dusky.pond.sub.org>
+	<20170808124410.GN16801@stefanha-x1.localdomain>
+	<877eye9knq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-Date: Wed, 09 Aug 2017 20:00:17 +0930
-References: <20170809062828.3673-1-andrew@aj.id.au>
-	<20170809062828.3673-2-andrew@aj.id.au>
-	<8d122179-665f-2cbe-939e-2e466b98b28d@kaod.org>
-In-Reply-To: <8d122179-665f-2cbe-939e-2e466b98b28d@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH for 2.11 v2 1/2] watchdog: wdt_aspeed: Add
- support for the reset width register
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="OfrWf2Fun5Ae4m0Y"
+Content-Disposition: inline
+In-Reply-To: <877eye9knq.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 0/3] build configuration query tool and
+ conditional (qemu-io)test skip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,248 +33,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joel@jms.id.au, f4bug@amsat.org, ryan_chen@aspeedtech.com, openbmc@lists.ozlabs.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 
 
+--OfrWf2Fun5Ae4m0Y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 9, 2017, at 18:28, C=C3=A9dric Le Goater wrote:
-> On 08/09/2017 08:28 AM, Andrew Jeffery wrote:
-> > The reset width register controls how the pulse on the SoC's WDTRST{1,2}
-> > pins behaves. A pulse is emitted if the external reset bit is set in
-> > WDT_CTRL. On the AST2500 WDT_RESET_WIDTH can consume magic bit patterns
-> > to configure push-pull/open-drain and active-high/active-low
-> > behaviours and thus needs some special handling in the write path.
-> >=20
-> > As some of the capabilities depend on the SoC version a silicon-rev
-> > property is introduced, which is used to guard version-specific
-> > behaviour.
-> >=20
-> > Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+On Tue, Aug 08, 2017 at 04:52:25PM +0200, Markus Armbruster wrote:
+> Stefan Hajnoczi <stefanha@gmail.com> writes:
 >=20
-> One minor comment below. Nevertheless :
+> > On Tue, Aug 08, 2017 at 10:06:04AM +0200, Markus Armbruster wrote:
+> >> Stefan Hajnoczi <stefanha@gmail.com> writes:
+> >>=20
+> >> > On Wed, Jul 26, 2017 at 02:24:02PM -0400, Cleber Rosa wrote:
+> >> >>=20
+> >> >>=20
+> >> >> On 07/26/2017 01:58 PM, Stefan Hajnoczi wrote:
+> >> >> > On Tue, Jul 25, 2017 at 12:16:13PM -0400, Cleber Rosa wrote:
+> >> >> >> On 07/25/2017 11:49 AM, Stefan Hajnoczi wrote:
+> >> >> >>> On Fri, Jul 21, 2017 at 10:21:24AM -0400, Cleber Rosa wrote:
+> >> >> >>>> On 07/21/2017 10:01 AM, Daniel P. Berrange wrote:
+> >> >> >>>>> On Fri, Jul 21, 2017 at 01:33:25PM +0100, Stefan Hajnoczi wro=
+te:
+> >> >> >>>>>> On Thu, Jul 20, 2017 at 11:47:27PM -0400, Cleber Rosa wrote:
+> >> >> >>>> Without the static capabilities defined, the dynamic check wou=
+ld be
+> >> >> >>>> influenced by the run time environment.  It would really mean =
+"qemu-io
+> >> >> >>>> running on this environment (filesystem?) can do native aio". =
+ Again,
+> >> >> >>>> that's not the best type of information to depend on when writ=
+ing tests.
+> >> >> >>>
+> >> >> >>> Can you explain this more?
+> >> >> >>>
+> >> >> >>> It seems logical to me that if qemu-io in this environment cann=
+ot do
+> >> >> >>> aio=3Dnative then we must skip those tests.
+> >> >> >>>
+> >> >> >>> Stefan
+> >> >> >>>
+> >> >> >>
+> >> >> >> OK, let's abstract a bit more.  Let's take this part of your sta=
+tement:
+> >> >> >>
+> >> >> >>  "if qemu-io in this environment cannot do aio=3Dnative"
+> >> >> >>
+> >> >> >> Let's call that a feature check.  Depending on how the *feature =
+check*
+> >> >> >> is written, a negative result may hide a test failure, because i=
+t would
+> >> >> >> now be skipped.
+> >> >> >=20
+> >> >> > You are saying a pass->skip transition can hide a failure but ./c=
+heck
+> >> >> > tracks skipped tests.  See tests/qemu-iotests/check.log for a
+> >> >> > pass/fail/skip history.
+> >> >> >=20
+> >> >>=20
+> >> >> You're not focusing on the problem here.  The problem is that a test
+> >> >> that *was not* supposed to be skipped, would be skipped.
+> >> >
+> >> > As Daniel Berrange mentioned, ./configure has the same problem.  You
+> >> > cannot just run it blindly because it silently disables features.
+> >> >
+> >> > What I'm saying is that in addition to watching ./configure closely,=
+ you
+> >> > also need to look at the skipped tests that ./check reports.  If you=
+ do
+> >> > that then you can be sure the expected set of tests is passing.
+> >> >
+> >> >> > It is the job of the CI system to flag up pass/fail/skip transiti=
+ons.
+> >> >> > You're no worse off using feature tests.
+> >> >> >=20
+> >> >> > Stefan
+> >> >> >=20
+> >> >>=20
+> >> >> What I'm trying to help us achieve here is a reliable and predictab=
+le
+> >> >> way for the same test job execution to be comparable across
+> >> >> environments.  From the individual developer workstation, CI, QA et=
+c.
+> >> >
+> >> > 1. Use ./configure --enable-foo options for all desired features.
+> >> > 2. Run the ./check command-line and there should be no unexpected sk=
+ips
+> >> >    like this:
+> >> >
+> >> > 087         [not run] missing aio=3Dnative support
+> >> >
+> >> > To me this seems to address the problem.
+> >> >
+> >> > I have mentioned the issues with the build flags solution: it create=
+s a
+> >> > dependency on the build environment and forces test feature checks to
+> >> > duplicate build dependency logic.  This is why I think feature tests=
+ are
+> >> > a cleaner solution.
+> >>=20
+> >> I suspect the actual problem here is that the qemu-iotests harness is
+> >> not integrated in the build process.  For other tests, we specify the
+> >> tests to run in a Makefile, and use the same configuration mechanism as
+> >> for building stuff conditionally.
+> >
+> > The ability to run tests against QEMU binaries without a build
+> > environment is useful though.  It would still be possible to symlink to
+> > external binaries but then the build feature information could be
+> > incorrect.
 >=20
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> I don't dispute it's useful.  "make check" doesn't do it, though.
 >=20
-> > ---
-> >  hw/watchdog/wdt_aspeed.c         | 93 ++++++++++++++++++++++++++++++++=
-+++-----
-> >  include/hw/watchdog/wdt_aspeed.h |  2 +
-> >  2 files changed, 84 insertions(+), 11 deletions(-)
-> >=20
-> > diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-> > index 8bbe579b6b66..22bce364d7b5 100644
-> > --- a/hw/watchdog/wdt_aspeed.c
-> > +++ b/hw/watchdog/wdt_aspeed.c
-> > @@ -8,16 +8,19 @@
-> >   */
-> >=20=20
-> >  #include "qemu/osdep.h"
-> > +
-> > +#include "qapi/error.h"
-> >  #include "qemu/log.h"
-> > +#include "qemu/timer.h"
-> >  #include "sysemu/watchdog.h"
-> > +#include "hw/misc/aspeed_scu.h"
-> >  #include "hw/sysbus.h"
-> > -#include "qemu/timer.h"
-> >  #include "hw/watchdog/wdt_aspeed.h"
-> >=20=20
-> > -#define WDT_STATUS              (0x00 / 4)
-> > -#define WDT_RELOAD_VALUE        (0x04 / 4)
-> > -#define WDT_RESTART             (0x08 / 4)
-> > -#define WDT_CTRL                (0x0C / 4)
-> > +#define WDT_STATUS                      (0x00 / 4)
-> > +#define WDT_RELOAD_VALUE                (0x04 / 4)
-> > +#define WDT_RESTART                     (0x08 / 4)
-> > +#define WDT_CTRL                        (0x0C / 4)
-> >  #define   WDT_CTRL_RESET_MODE_SOC       (0x00 << 5)
-> >  #define   WDT_CTRL_RESET_MODE_FULL_CHIP (0x01 << 5)
-> >  #define   WDT_CTRL_1MHZ_CLK             BIT(4)
-> > @@ -25,18 +28,41 @@
-> >  #define   WDT_CTRL_WDT_INTR             BIT(2)
-> >  #define   WDT_CTRL_RESET_SYSTEM         BIT(1)
-> >  #define   WDT_CTRL_ENABLE               BIT(0)
-> > +#define WDT_RESET_WIDTH                 (0x18 / 4)
-> > +#define   WDT_RESET_WIDTH_ACTIVE_HIGH   BIT(31)
-> > +#define     WDT_POLARITY_MASK           (0xFF << 24)
-> > +#define     WDT_ACTIVE_HIGH_MAGIC       (0xA5 << 24)
-> > +#define     WDT_ACTIVE_LOW_MAGIC        (0x5A << 24)
-> > +#define   WDT_RESET_WIDTH_PUSH_PULL     BIT(30)
-> > +#define     WDT_DRIVE_TYPE_MASK         (0xFF << 24)
-> > +#define     WDT_PUSH_PULL_MAGIC         (0xA8 << 24)
-> > +#define     WDT_OPEN_DRAIN_MAGIC        (0x8A << 24)
-> >=20=20
-> > -#define WDT_TIMEOUT_STATUS      (0x10 / 4)
-> > -#define WDT_TIMEOUT_CLEAR       (0x14 / 4)
-> > -#define WDT_RESET_WDITH         (0x18 / 4)
-> > +#define WDT_TIMEOUT_STATUS              (0x10 / 4)
-> > +#define WDT_TIMEOUT_CLEAR               (0x14 / 4)
-> >=20=20
-> > -#define WDT_RESTART_MAGIC       0x4755
-> > +#define WDT_RESTART_MAGIC               0x4755
-> >=20=20
-> >  static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
-> >  {
-> >      return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
-> >  }
-> >=20=20
-> > +static bool is_ast2500(const AspeedWDTState *s)
->=20
-> I think we could use this routine in other controllers (scu, sdmc).=20
-> So may be, in a follow-up patch, we could move it in aspeed_scu.h
+> I think we can either have a standalone test suite (introspects the
+> binaries under test to figure out what to test), or an integrated test
+> suite (tests exactly what is configured).  "make check" is the latter.
+> qemu-iotests is kind-of-sort-of the former.
 
-Right, I figured we would move it when we came to need it elsewhere.
+Yes, originally qemu-iotests was a separate repo.  It was moved into
+qemu.git so that it's easier to include tests in a patch series.  But as
+a result of this history it has the ability to run against any QEMU.
 
-Thanks for the review.
+Actually I'm not sure how important that ability is anymore.  Some
+testing teams use qemu-iotests against QEMU binaries from elsewhere, so
+we'd inconvenience them by tying it to a build.  But they could update
+their process to get the QEMU tree that matches their binaries, if
+necessary.
 
-Cheers,
+Stefan
 
-Andrew
+--OfrWf2Fun5Ae4m0Y
+Content-Type: application/pgp-signature; name="signature.asc"
 
->=20
-> Thanks,
->=20
-> C.=20
->=20=20
-> > +{
-> > +    switch (s->silicon_rev) {
-> > +    case AST2500_A0_SILICON_REV:
-> > +    case AST2500_A1_SILICON_REV:
-> > +        return true;
-> > +    case AST2400_A0_SILICON_REV:
-> > +    case AST2400_A1_SILICON_REV:
-> > +    default:
-> > +        break;
-> > +    }
-> > +
-> > +    return false;
-> > +}
-> > +
-> >  static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned =
-size)
-> >  {
-> >      AspeedWDTState *s =3D ASPEED_WDT(opaque);
-> > @@ -55,9 +81,10 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr=
- offset, unsigned size)
-> >          return 0;
-> >      case WDT_CTRL:
-> >          return s->regs[WDT_CTRL];
-> > +    case WDT_RESET_WIDTH:
-> > +        return s->regs[WDT_RESET_WIDTH];
-> >      case WDT_TIMEOUT_STATUS:
-> >      case WDT_TIMEOUT_CLEAR:
-> > -    case WDT_RESET_WDITH:
-> >          qemu_log_mask(LOG_UNIMP,
-> >                        "%s: uninmplemented read at offset 0x%" HWADDR_P=
-RIx "\n",
-> >                        __func__, offset);
-> > @@ -119,9 +146,27 @@ static void aspeed_wdt_write(void *opaque, hwaddr =
-offset, uint64_t data,
-> >              timer_del(s->timer);
-> >          }
-> >          break;
-> > +    case WDT_RESET_WIDTH:
-> > +    {
-> > +        uint32_t property =3D data & WDT_POLARITY_MASK;
-> > +
-> > +        if (property && is_ast2500(s)) {
-> > +            if (property =3D=3D WDT_ACTIVE_HIGH_MAGIC) {
-> > +                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_H=
-IGH;
-> > +            } else if (property =3D=3D WDT_ACTIVE_LOW_MAGIC) {
-> > +                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_=
-HIGH;
-> > +            } else if (property =3D=3D WDT_PUSH_PULL_MAGIC) {
-> > +                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PUL=
-L;
-> > +            } else if (property =3D=3D WDT_OPEN_DRAIN_MAGIC) {
-> > +                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PU=
-LL;
-> > +            }
-> > +        }
-> > +        s->regs[WDT_RESET_WIDTH] &=3D ~s->ext_pulse_width_mask;
-> > +        s->regs[WDT_RESET_WIDTH] |=3D data & s->ext_pulse_width_mask;
-> > +        break;
-> > +    }
-> >      case WDT_TIMEOUT_STATUS:
-> >      case WDT_TIMEOUT_CLEAR:
-> > -    case WDT_RESET_WDITH:
-> >          qemu_log_mask(LOG_UNIMP,
-> >                        "%s: uninmplemented write at offset 0x%" HWADDR_=
-PRIx "\n",
-> >                        __func__, offset);
-> > @@ -167,6 +212,7 @@ static void aspeed_wdt_reset(DeviceState *dev)
-> >      s->regs[WDT_RELOAD_VALUE] =3D 0x03EF1480;
-> >      s->regs[WDT_RESTART] =3D 0;
-> >      s->regs[WDT_CTRL] =3D 0;
-> > +    s->regs[WDT_RESET_WIDTH] =3D 0xFF;
-> >=20=20
-> >      timer_del(s->timer);
-> >  }
-> > @@ -187,6 +233,25 @@ static void aspeed_wdt_realize(DeviceState *dev, E=
-rror **errp)
-> >      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> >      AspeedWDTState *s =3D ASPEED_WDT(dev);
-> >=20=20
-> > +    if (!is_supported_silicon_rev(s->silicon_rev)) {
-> > +        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
-> > +                s->silicon_rev);
-> > +        return;
-> > +    }
-> > +
-> > +    switch (s->silicon_rev) {
-> > +    case AST2400_A0_SILICON_REV:
-> > +    case AST2400_A1_SILICON_REV:
-> > +        s->ext_pulse_width_mask =3D 0xff;
-> > +        break;
-> > +    case AST2500_A0_SILICON_REV:
-> > +    case AST2500_A1_SILICON_REV:
-> > +        s->ext_pulse_width_mask =3D 0xfffff;
-> > +        break;
-> > +    default:
-> > +        g_assert_not_reached();
-> > +    }
-> > +
-> >      s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_exp=
-ired, dev);
-> >=20=20
-> >      /* FIXME: This setting should be derived from the SCU hw strapping
-> > @@ -199,6 +264,11 @@ static void aspeed_wdt_realize(DeviceState *dev, E=
-rror **errp)
-> >      sysbus_init_mmio(sbd, &s->iomem);
-> >  }
-> >=20=20
-> > +static Property aspeed_wdt_properties[] =3D {
-> > +    DEFINE_PROP_UINT32("silicon-rev", AspeedWDTState, silicon_rev, 0),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> > +
-> >  static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
-> >  {
-> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > @@ -207,6 +277,7 @@ static void aspeed_wdt_class_init(ObjectClass *klas=
-s, void *data)
-> >      dc->reset =3D aspeed_wdt_reset;
-> >      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> >      dc->vmsd =3D &vmstate_aspeed_wdt;
-> > +    dc->props =3D aspeed_wdt_properties;
-> >  }
-> >=20=20
-> >  static const TypeInfo aspeed_wdt_info =3D {
-> > diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt=
-_aspeed.h
-> > index 080c2231222e..7de3e5c224fb 100644
-> > --- a/include/hw/watchdog/wdt_aspeed.h
-> > +++ b/include/hw/watchdog/wdt_aspeed.h
-> > @@ -27,6 +27,8 @@ typedef struct AspeedWDTState {
-> >      uint32_t regs[ASPEED_WDT_REGS_MAX];
-> >=20=20
-> >      uint32_t pclk_freq;
-> > +    uint32_t silicon_rev;
-> > +    uint32_t ext_pulse_width_mask;
-> >  } AspeedWDTState;
-> >=20=20
-> >  #endif  /* ASPEED_WDT_H */
-> >=20
->=20
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZiuRiAAoJEJykq7OBq3PIY1gH/0GMKAilBpe4BAtbzfmUviGt
+m+Bd2lEjnX2IBzlBZPh4SrTBVM7S03y6aN5TZqLIBv9JkVBNIqlcpdepGP2RrbTR
+fr0H5d7bdZvN1T2EItBguxozYLAexvPLXXV6X5oyQTw+URnJ0UdIJR/OS6JnCIWq
+KzXuPlFX281Vo6B0IfHZxopn74BrMTuyMDkk7V1v0ja7h2FfN5XvxM5Jol81ZeFI
+o+XTrGbArH2+x425S5YTnEMQ3zOKwVGP9UJKALwq/EcnbugxzXnaVtKghwCqipeR
+E6UlnMcTqX47xVGCBXpdxTu03m/dg1gSLJoDufvu8GRam5EXFzg4T5xioIUkQO0=
+=YtL6
+-----END PGP SIGNATURE-----
+
+--OfrWf2Fun5Ae4m0Y--
