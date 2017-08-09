@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfTOj-0008No-C8
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:59:54 -0400
+	(envelope-from <groug@kaod.org>) id 1dfTP7-0000MN-Up
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfTOg-0005WG-7T
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:59:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33018)
+	(envelope-from <groug@kaod.org>) id 1dfTP4-0005uk-O2
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:00:18 -0400
+Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:33559)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfTOf-0005Vt-Ub
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 11:59:50 -0400
-References: <150228860899.28168.1415083032613087245.stgit@bahia>
-	<d1343f6c-d524-0174-d1b7-fda2d83a3a44@redhat.com>
-	<20170809172233.36e17285@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c1ae9a24-632b-1dde-631a-b11a3e968ab7@redhat.com>
-Date: Wed, 9 Aug 2017 10:59:46 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfTP4-0005qw-El
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 12:00:14 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C98C98BE92
+	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 18:00:12 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 09 Aug 2017 18:00:07 +0200
+Message-ID: <150229440762.12920.17394043752149329973.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170809172233.36e17285@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5IMP4jVWfwnuUP3p0dJsEIRQHWAttX1Mk"
-Subject: Re: [Qemu-devel] [for-2.10 PATCH v2] 9pfs: local: fix
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [for-2.10 PATCH v3] 9pfs: local: fix
  fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,78 +28,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5IMP4jVWfwnuUP3p0dJsEIRQHWAttX1Mk
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, zhiyong.wu@ucloud.cn,
- Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-Message-ID: <c1ae9a24-632b-1dde-631a-b11a3e968ab7@redhat.com>
-Subject: Re: [for-2.10 PATCH v2] 9pfs: local: fix fchmodat_nofollow()
- limitations
-References: <150228860899.28168.1415083032613087245.stgit@bahia>
- <d1343f6c-d524-0174-d1b7-fda2d83a3a44@redhat.com>
- <20170809172233.36e17285@bahia.lan>
-In-Reply-To: <20170809172233.36e17285@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This function has to ensure it doesn't follow a symlink that could be used
+to escape the virtfs directory. This could be easily achieved if fchmodat()
+on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
+it doesn't. There was a tentative to implement a new fchmodat2() syscall
+with the correct semantics:
 
-On 08/09/2017 10:22 AM, Greg Kurz wrote:
+https://patchwork.kernel.org/patch/9596301/
 
->>>
->>> The solution is to use O_PATH: openat() now succeeds in both cases, a=
-nd we
->>> can ensure the path isn't a symlink with fstat(). The associated entr=
-y in
->>> "/proc/self/fd" can hence be safely passed to the regular chmod() sys=
-call. =20
->>
->> Hey - should we point this out as a viable solution to the glibc folks=
-,
->> since their current user-space emulation of AT_SYMLINK_NOFOLLOW is bro=
-ken?
->>
->=20
-> Probably. What's the best way to do that ?
+but it didn't gain much momentum. Also it was suggested to look at a O_PATH
+based solution in the first place.
 
-I've added a comment to
-https://sourceware.org/bugzilla/show_bug.cgi?id=3D14578; you'll also want=
+The current implementation covers most use-cases, but it notably fails if:
+- the target path has access rights equal to 0000 (openat() returns EPERM),
+  => once you've done chmod(0000) on a file, you can never chmod() again
+- the target path is UNIX domain socket (openat() returns ENXIO)
+  => bind() of UNIX domain sockets fails if the file is on 9pfs
 
-to point to the lkml discussion in that bug.  And reading that bug, it
-also looks like your hack with /proc/self/fd has been proposed by Rich
-Felker since 2013! (although fstat() didn't work until Linux 3.6, even
-though O_PATH predates that time) - so there is that one additional
-concern of whether we need to cater to the window of kernels where
-O_PATH exists but fstat() on that fd can't learn whether we opened a
-symlink.
+The solution is to use O_PATH: openat() now succeeds in both cases, and we
+can ensure the path isn't a symlink with fstat(). The associated entry in
+"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+The previous behavior is kept for older systems that don't have O_PATH.
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+v3: - O_PATH in a separate block of code
+    - added a reference to the fchmodat2() tentative in the changelog
 
---5IMP4jVWfwnuUP3p0dJsEIRQHWAttX1Mk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
+      for O_PATH to avoid build breaks on O_PATH-less systems
+    - keep current behavior for O_PATH-less systems
+    - added comments
+    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
+---
+ hw/9pfs/9p-local.c |   43 ++++++++++++++++++++++++++++++++++++-------
+ hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
+ 2 files changed, 51 insertions(+), 16 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmLMXIACgkQp6FrSiUn
-Q2oa+Af/TNDYbCKNjByC06lI8iuxv8sQDNvgPL/dQObtgp9nrCIFK5HD+QNZ3ool
-b2c4stpIQ6MuGoo+ksweUC/EqYPR4LqzSfHjMP6A+CcZ3/1nMWLWokVnhkM3W1Zq
-raOzInjcs/opqssjmMV3afrwtOghJb9yWql+tU26rmro7MojXYLidbGgoEOM8vGA
-sEQCZKmLpjNQgpfPbSn0Ez59GlNkcDduwlY+hgKJsR6wEcHjprhYquvNTZLNICBY
-iNBw59bVXacLuboMeugmR4uxVgEBZFVf5P1OdDuqGxVkMIPHrR0Cr2pWW5u+3MeR
-wmSoqIWxjXqwbTSD4UUPCRIn0plB6Q==
-=1TjM
------END PGP SIGNATURE-----
-
---5IMP4jVWfwnuUP3p0dJsEIRQHWAttX1Mk--
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 6e478f4765ef..1e20d4881089 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -333,17 +333,27 @@ update_map_file:
+ 
+ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+ {
++    struct stat stbuf;
+     int fd, ret;
+ 
+     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
+-     * Unfortunately, the linux kernel doesn't implement it yet. As an
+-     * alternative, let's open the file and use fchmod() instead. This
+-     * may fail depending on the permissions of the file, but it is the
+-     * best we can do to avoid TOCTTOU. We first try to open read-only
+-     * in case name points to a directory. If that fails, we try write-only
+-     * in case name doesn't point to a directory.
++     * Unfortunately, the linux kernel doesn't implement it yet.
+      */
+-    fd = openat_file(dirfd, name, O_RDONLY, 0);
++
++     /* First, we clear non-racing symlinks out of the way. */
++    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
++        return -1;
++    }
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno = ELOOP;
++        return -1;
++    }
++
++    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
++     * O_WRONLY for old-systems that don't support O_PATH.
++     */
++    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
++#ifndef O_PATH
+     if (fd == -1) {
+         /* In case the file is writable-only and isn't a directory. */
+         if (errno == EACCES) {
+@@ -357,6 +367,25 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+         return -1;
+     }
+     ret = fchmod(fd, mode);
++#else
++    /* Now we handle racing symlinks. */
++    ret = fstat(fd, &stbuf);
++    if (ret) {
++        goto out;
++    }
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno = ELOOP;
++        ret = -1;
++        goto out;
++    }
++
++    {
++        char *proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
++        ret = chmod(proc_path, mode);
++        g_free(proc_path);
++    }
++#endif
++out:
+     close_preserve_errno(fd);
+     return ret;
+ }
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 91299a24b8af..dc0d2e29aa3b 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -13,6 +13,12 @@
+ #ifndef QEMU_9P_UTIL_H
+ #define QEMU_9P_UTIL_H
+ 
++#ifdef O_PATH
++#define O_PATH_9P_UTIL O_PATH
++#else
++#define O_PATH_9P_UTIL 0
++#endif
++
+ static inline void close_preserve_errno(int fd)
+ {
+     int serrno = errno;
+@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
+ 
+ static inline int openat_dir(int dirfd, const char *name)
+ {
+-#ifdef O_PATH
+-#define OPENAT_DIR_O_PATH O_PATH
+-#else
+-#define OPENAT_DIR_O_PATH 0
+-#endif
+     return openat(dirfd, name,
+-                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
++                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
+ }
+ 
+ static inline int openat_file(int dirfd, const char *name, int flags,
+@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
+     }
+ 
+     serrno = errno;
+-    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
+-    ret = fcntl(fd, F_SETFL, flags);
+-    assert(!ret);
++    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
++     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
++     * ignored it anyway.
++     */
++    if (!(flags & O_PATH_9P_UTIL)) {
++        ret = fcntl(fd, F_SETFL, flags);
++        assert(!ret);
++    }
+     errno = serrno;
+     return fd;
+ }
