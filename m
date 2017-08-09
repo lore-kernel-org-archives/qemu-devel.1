@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfOON-0007u8-3H
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:39:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dfOWo-0002Yc-9X
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfOOM-0006Ok-18
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:39:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfOOL-0006OO-Qq
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:39:09 -0400
-References: <alpine.DEB.2.20.1708082018390.23380@digraph.polyomino.org.uk>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bec4185e-fd7f-bc81-755f-0c2dd956db36@redhat.com>
-Date: Wed, 9 Aug 2017 12:39:06 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dfOWn-0003fM-1O
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 06:47:54 -0400
+Date: Wed, 9 Aug 2017 11:47:33 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170809104733.GC5796@work-vm>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-10-git-send-email-armbru@redhat.com>
+	<20170808145804.GK2081@work-vm> <87wp6dz37x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.20.1708082018390.23380@digraph.polyomino.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: fix pmovsx/pmovzx in-place
- operations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wp6dz37x.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 09/56] balloon: Make balloon size
+ unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +25,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-On 08/08/2017 22:21, Joseph Myers wrote:
-> The SSE4.1 pmovsx* and pmovzx* instructions take packed 1-byte, 2-byte
-> or 4-byte inputs and sign-extend or zero-extend them to a wider vector
-> output.  The associated helpers for these instructions do the
-> extension on each element in turn, starting with the lowest.  If the
-> input and output are the same register, this means that all the input
-> elements after the first have been overwritten before they are read.
-> This patch makes the helpers extend starting with the highest element,
-> not the lowest, to avoid such overwriting.  This fixes many GCC test
-> failures (161 in the gcc testsuite in my GCC 6-based testing) when
-> testing with a default CPU setting enabling those instructions.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 > 
-> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+> > * Markus Armbruster (armbru@redhat.com) wrote:
+> >> Sizes should use QAPI type 'size' (uint64_t).  balloon parameter
+> >> @value is 'int' (int64_t).  qmp_balloon() implicitly converts to
+> >> ram_addr_t, i.e. uint64_t.  BALLOON_CHANGE parameter @actual and
+> >> BalloonInfo member @actual are also 'int'.
+> >> virtio_balloon_set_config() and virtio_balloon_stat() implicitly
+> >> convert from ram_addr_t.
+> >> 
+> >> Change all three to 'size', and adjust the code using them.
+> >> 
+> >> balloon now accepts size values between 2^63 and 2^64-1.  It accepts
+> >> negative values as before, because that's how the QObject input
+> >> visitor works for backward compatibility.
+> >> 
+> >> Doing the same for HMP's balloon deserves its own commit (the next
+> >> one).
+> >> 
+> >> BALLOON_CHANGE and query-balloon now report sizes above 2^63-1
+> >> correctly instead of their (negative) two's complement.
+> >> 
+> >> So does HMP's "info balloon".
+> >> 
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>  balloon.c        | 2 +-
+> >>  hmp.c            | 2 +-
+> >>  qapi-schema.json | 4 ++--
+> >>  qapi/event.json  | 2 +-
+> >>  4 files changed, 5 insertions(+), 5 deletions(-)
+> >> 
+> >> diff --git a/balloon.c b/balloon.c
+> >> index 1d720ff..2ecca76 100644
+> >> --- a/balloon.c
+> >> +++ b/balloon.c
+> >> @@ -102,7 +102,7 @@ BalloonInfo *qmp_query_balloon(Error **errp)
+> >>      return info;
+> >>  }
+> >>  
+> >> -void qmp_balloon(int64_t target, Error **errp)
+> >> +void qmp_balloon(uint64_t target, Error **errp)
+> >>  {
+> >>      if (!have_balloon(errp)) {
+> >>          return;
+> >
+> > Can't you remove the:
+> >       if (target <= 0) {
+> >
+> > check?
 > 
-> ---
-> 
-> diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-> index 16509d0..d578216 100644
-> --- a/target/i386/ops_sse.h
-> +++ b/target/i386/ops_sse.h
-> @@ -1617,18 +1617,18 @@ void glue(helper_ptest, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
->  #define SSE_HELPER_F(name, elem, num, F)        \
->      void glue(name, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)     \
->      {                                           \
-> -        d->elem(0) = F(0);                      \
-> -        d->elem(1) = F(1);                      \
->          if (num > 2) {                          \
-> -            d->elem(2) = F(2);                  \
-> -            d->elem(3) = F(3);                  \
->              if (num > 4) {                      \
-> -                d->elem(4) = F(4);              \
-> -                d->elem(5) = F(5);              \
-> -                d->elem(6) = F(6);              \
->                  d->elem(7) = F(7);              \
-> +                d->elem(6) = F(6);              \
-> +                d->elem(5) = F(5);              \
-> +                d->elem(4) = F(4);              \
->              }                                   \
-> +            d->elem(3) = F(3);                  \
-> +            d->elem(2) = F(2);                  \
->          }                                       \
-> +        d->elem(1) = F(1);                      \
-> +        d->elem(0) = F(0);                      \
->      }
->  
->  SSE_HELPER_F(helper_pmovsxbw, W, 8, (int8_t) s->B)
-> 
+> Functional change when target == 0.  Impact is not clear to me.
 
-Queued, thanks.
+Hmm yes; I don't know whether 0 is legal.
 
-Paolo
+Dave
+
+> > (The type of the trace_balloon_event probably needs fixing
+> > to be uint64_t rather than the unsigned long)
+> 
+> You're right.  I'll fix it.
+> 
+> >> diff --git a/hmp.c b/hmp.c
+> >> index 8257dd0..4556045 100644
+> >> --- a/hmp.c
+> >> +++ b/hmp.c
+> >> @@ -781,7 +781,7 @@ void hmp_info_balloon(Monitor *mon, const QDict *qdict)
+> >>          return;
+> >>      }
+> >>  
+> >> -    monitor_printf(mon, "balloon: actual=%" PRId64 "\n", info->actual >> 20);
+> >> +    monitor_printf(mon, "balloon: actual=%" PRIu64 "\n", info->actual >> 20);
+> >>  
+> >>      qapi_free_BalloonInfo(info);
+> >>  }
+> >> diff --git a/qapi-schema.json b/qapi-schema.json
+> >> index 3ad2bc0..23eb60d 100644
+> >> --- a/qapi-schema.json
+> >> +++ b/qapi-schema.json
+> >> @@ -2003,7 +2003,7 @@
+> >>  # Since: 0.14.0
+> >>  #
+> >>  ##
+> >> -{ 'struct': 'BalloonInfo', 'data': {'actual': 'int' } }
+> >> +{ 'struct': 'BalloonInfo', 'data': {'actual': 'size' } }
+> >>  
+> >>  ##
+> >>  # @query-balloon:
+> >> @@ -2603,7 +2603,7 @@
+> >>  # <- { "return": {} }
+> >>  #
+> >>  ##
+> >> -{ 'command': 'balloon', 'data': {'value': 'int'} }
+> >> +{ 'command': 'balloon', 'data': {'value': 'size'} }
+> >>  
+> >>  ##
+> >>  # @Abort:
+> >> diff --git a/qapi/event.json b/qapi/event.json
+> >> index 6d22b02..9dfc70b 100644
+> >> --- a/qapi/event.json
+> >> +++ b/qapi/event.json
+> >> @@ -488,7 +488,7 @@
+> >>  #
+> >>  ##
+> >>  { 'event': 'BALLOON_CHANGE',
+> >> -  'data': { 'actual': 'int' } }
+> >> +  'data': { 'actual': 'size' } }
+> >
+> > I was going to ask whether that was a problem for any external users,
+> > but there again libvirt looks like it reads it into an unsigned long
+> > long.
+> 
+> Yes.  See also my reply to Juan's review of PATCH 15.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
