@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dfMpX-0002Rm-SV
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:59:09 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dfMvz-0004p3-7M
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:05:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dfMpT-0004Ny-UA
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:59:07 -0400
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:58759)
+	(envelope-from <cohuck@redhat.com>) id 1dfMvu-0008Rf-Tv
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:05:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38234)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dfMpT-0004NT-Nh
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 04:59:03 -0400
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 2A9BF743BA
-	for <qemu-devel@nongnu.org>; Wed,  9 Aug 2017 10:59:02 +0200 (CEST)
-References: <20170809062828.3673-1-andrew@aj.id.au>
-	<20170809062828.3673-3-andrew@aj.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <78e09d93-ba07-c882-8830-737691f83a3c@kaod.org>
-Date: Wed, 9 Aug 2017 10:58:54 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dfMvu-0008Qu-KF
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:05:42 -0400
+Date: Wed, 9 Aug 2017 11:05:20 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170809110520.1fd23ddc.cohuck@redhat.com>
+In-Reply-To: <1502254778-14637-2-git-send-email-thuth@redhat.com>
+References: <1502254778-14637-1-git-send-email-thuth@redhat.com>
+	<1502254778-14637-2-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170809062828.3673-3-andrew@aj.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.11 v2 2/2] ARM: aspeed_soc: Propagate
- silicon-rev to watchdog
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/boot-sector: Do not overwrite
+ the x86 buffer on other architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joel@jms.id.au, ryan_chen@aspeedtech.com, f4bug@amsat.org, openbmc@lists.ozlabs.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-On 08/09/2017 08:28 AM, Andrew Jeffery wrote:
-> This is required to configure differences in behaviour between the
-> AST2400 and AST2500 watchdog IPs.
->=20
-> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+On Wed,  9 Aug 2017 06:59:37 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
+> Re-using the boot_sector code buffer from x86 for other architectures
+> is not very nice, especially if we add more architectures later. It's
+> also ugly that the test uses a huge pre-initialized array - the size
+> of the executable is very huge due to this array. So let's use a
+> separate buffer for each architecture instead, allocated from the heap,
+> so that we really just use the memory that we need.
+> 
+> Suggested-by: Michael Tsirkin <mst@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/arm/aspeed_soc.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index 3034849c80bf..79804e1ee652 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -183,6 +183,8 @@ static void aspeed_soc_init(Object *obj)
->          object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_W=
-DT);
->          object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), N=
-ULL);
->          qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default());
-> +        qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
-> +                                    sc->info->silicon_rev);
+>  tests/boot-sector.c | 37 ++++++++++++++++++++++++-------------
+>  1 file changed, 24 insertions(+), 13 deletions(-)
+> 
+> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+> index e3880f4..4ea1373 100644
+> --- a/tests/boot-sector.c
+> +++ b/tests/boot-sector.c
+> @@ -21,13 +21,12 @@
+>  #define SIGNATURE 0xdead
+>  #define SIGNATURE_OFFSET 0x10
+>  #define BOOT_SECTOR_ADDRESS 0x7c00
+> +#define SIGNATURE_ADDR (BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET)
+
+Do you want to use this new #define in boot_sector_test() as well?
+
+>  
+> -/* Boot sector code: write SIGNATURE into memory,
+> +/* x86 boot sector code: write SIGNATURE into memory,
+>   * then halt.
+> - * Q35 machine requires a minimum 0x7e000 bytes disk.
+> - * (bug or feature?)
+>   */
+> -static uint8_t boot_sector[0x7e000] = {
+> +static uint8_t x86_boot_sector[512] = {
+>      /* The first sector will be placed at RAM address 00007C00, and
+>       * the BIOS transfers control to 00007C00
+>       */
+> @@ -50,8 +49,8 @@ static uint8_t boot_sector[0x7e000] = {
+>      [0x07] = HIGH(SIGNATURE),
+>      /* 7c08:  mov %ax,0x7c10 */
+>      [0x08] = 0xa3,
+> -    [0x09] = LOW(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
+> -    [0x0a] = HIGH(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
+> +    [0x09] = LOW(SIGNATURE_ADDR),
+> +    [0x0a] = HIGH(SIGNATURE_ADDR),
+>  
+>      /* 7c0b cli */
+>      [0x0b] = 0xfa,
+> @@ -72,7 +71,9 @@ static uint8_t boot_sector[0x7e000] = {
+>  int boot_sector_init(char *fname)
+>  {
+>      int fd, ret;
+> -    size_t len = sizeof boot_sector;
+> +    size_t len;
+> +    char *boot_code;
+> +    const char *arch = qtest_get_arch();
+>  
+>      fd = mkstemp(fname);
+>      if (fd < 0) {
+> @@ -80,16 +81,26 @@ int boot_sector_init(char *fname)
+>          return 1;
 >      }
-> =20
->      object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMAC=
-100);
->=20
+>  
+> -    /* For Open Firmware based system, we can use a Forth script instead */
+> -    if (strcmp(qtest_get_arch(), "ppc64") == 0) {
+> -        len = sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c! %x %x c!\n",
+> -                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET,
+> -                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET + 1);
+> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
+> +        /* Q35 requires a minimum 0x7e000 bytes disk (bug or feature?) */
+> +        len = 0x7e000;
+
+Use the maximum of (0x7e000, sizeof(x86_boot_sector))? (Not that it is
+likely that the boot sector will ever grow, but I think it is cleaner.)
+
+> +        boot_code = g_malloc(len);
+
+Would g_malloc_0() be better?
+
+> +        memcpy(boot_code, x86_boot_sector, sizeof x86_boot_sector);
+
+sizeof(x86_boot_sector)?
+
+> +    } else if (g_str_equal(arch, "ppc64")) {
+> +        /* For Open Firmware based system, use a Forth script */
+> +        boot_code = g_strdup_printf("\\ Bootscript\n%x %x c! %x %x c!\n",
+> +                                    LOW(SIGNATURE), SIGNATURE_ADDR,
+> +                                    HIGH(SIGNATURE), SIGNATURE_ADDR + 1);
+> +        len = strlen(boot_code);
+> +    } else {
+> +        g_assert_not_reached();
+>      }
+>  
+> -    ret = write(fd, boot_sector, len);
+> +    ret = write(fd, boot_code, len);
+>      close(fd);
+>  
+> +    g_free(boot_code);
+> +
+>      if (ret != len) {
+>          fprintf(stderr, "Could not write \"%s\"", fname);
+>          return 1;
+
+This makes the code much nicer :)
