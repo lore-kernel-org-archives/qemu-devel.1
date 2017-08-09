@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dfL2T-0006DU-Gm
+	(envelope-from <dgibson@ozlabs.org>) id 1dfL2T-0006DV-Go
 	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dfL2S-0003zJ-E1
+	(envelope-from <dgibson@ozlabs.org>) id 1dfL2S-0003z2-D6
 	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 03:04:21 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  9 Aug 2017 17:03:54 +1000
-Message-Id: <20170809070357.28723-4-david@gibson.dropbear.id.au>
+Date: Wed,  9 Aug 2017 17:03:53 +1000
+Message-Id: <20170809070357.28723-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170809070357.28723-1-david@gibson.dropbear.id.au>
 References: <20170809070357.28723-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/6] target/ppc: Implement TIDR
+Subject: [Qemu-devel] [PULL 2/6] ppc: fix double-free in cpu_post_load()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-This adds a trivial implementation of the TIDR register added in
-POWER9.  This isn't particularly important to qemu directly - it's
-used by accelerator modules that we don't emulate.
+From: Greg Kurz <groug@kaod.org>
 
-However, since qemu isn't aware of it, its state is not synchronized
-with KVM and therefore not migrated, which can be a problem.
+When running nested with KVM PR, ppc_set_compat() fails and QEMU crashes
+because of "double free or corruption (!prev)". The crash happens because
+error_report_err() has already called error_free().
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- target/ppc/cpu.h            | 1 +
- target/ppc/translate_init.c | 5 +++++
- 2 files changed, 6 insertions(+)
+ target/ppc/machine.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 6ee2a26a96..f6e5413fad 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1451,6 +1451,7 @@ void ppc_compat_add_property(Object *obj, const cha=
-r *name,
- #define SPR_TEXASR            (0x082)
- #define SPR_TEXASRU           (0x083)
- #define SPR_UCTRL             (0x088)
-+#define SPR_TIDR              (0x090)
- #define SPR_MPC_CMPA          (0x090)
- #define SPR_MPC_CMPB          (0x091)
- #define SPR_MPC_CMPC          (0x092)
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 01723bdfec..94800cd29d 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8841,6 +8841,11 @@ static void init_proc_POWER9(CPUPPCState *env)
-     gen_spr_power8_book4(env);
-     gen_spr_power8_rpr(env);
-=20
-+    /* POWER9 Specific registers */
-+    spr_register_kvm(env, SPR_TIDR, "TIDR", NULL, NULL,
-+                     spr_read_generic, spr_write_generic,
-+                     KVM_REG_PPC_TIDR, 0);
-+
-     /* env variables */
- #if !defined(CONFIG_USER_ONLY)
-     env->slb_nr =3D 32;
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index f578156dd4..abe0a1cdf0 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -239,7 +239,6 @@ static int cpu_post_load(void *opaque, int version_id=
+)
+         ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+-            error_free(local_err);
+             return -1;
+         }
+     } else
 --=20
 2.13.4
