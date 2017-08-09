@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dfESf-0002XD-Oi
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 20:02:59 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dfEnx-0000Fw-7w
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 20:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dfESc-0000W3-FF
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 20:02:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52825
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <no-reply@patchew.org>) id 1dfEnu-00030v-38
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 20:24:57 -0400
+Resent-Message-Id: <E1dfEnu-00030v-38@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1dfESc-0000V4-Ak
-	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 20:02:54 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v78Nx3Vb125973
-	for <qemu-devel@nongnu.org>; Tue, 8 Aug 2017 20:02:52 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2c7ng7vq3h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 Aug 2017 20:02:52 -0400
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Wed, 9 Aug 2017 10:02:49 +1000
-Date: Wed, 9 Aug 2017 10:02:44 +1000
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-References: <cover.1502087564.git.sam.bobroff@au1.ibm.com>
-	<2b5e13652c749b9ad2a519190396fe4160ac0dea.1502087564.git.sam.bobroff@au1.ibm.com>
-	<20170808062420.82867C6037@b03ledav006.gho.boulder.ibm.com>
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dfEnt-0002zm-Qy
+	for qemu-devel@nongnu.org; Tue, 08 Aug 2017 20:24:54 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150223828094.33.3394442530080950484@dd743fd916bd>
+In-Reply-To: <20170808162224.32419-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170808062420.82867C6037@b03ledav006.gho.boulder.ibm.com>
-Message-Id: <20170809000244.3eptjvatsxsdbx2d@tungsten.ozlabs.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] ppc: spapr: Make VCPU ID handling
- private to SPAPR
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 8 Aug 2017 17:24:41 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v6 00/19] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,74 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: quintela@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On Tue, Aug 08, 2017 at 04:24:01PM +1000, David Gibson wrote:
-> On Mon, Aug 07, 2017 at 04:33:29PM +1000, Sam Bobroff wrote:
-> > The concept of a VCPU ID that differs from the CPU's index
-> > (cpu->cpu_index) exists only within SPAPR machines so, move the
-> > functions ppc_get_vcpu_id() and ppc_get_cpu_by_vcpu_id() into spapr.c
-> > and rename them appropriately.
-> > 
-> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> > ---
-> > Changes in v2:
-> > 
-> > * Re-arranged so that spapr_vcpu_id() calls kvm_arch_vcpu_id() rather than the
-> > other way around.
-> 
-> Ah.. so close..
-> 
-> [snip]
-> > +int spapr_vcpu_id(PowerPCCPU *cpu)
-> > +{
-> > +    CPUState *cs = CPU(cpu);
-> > +
-> > +    if (kvm_enabled()) {
-> > +        return kvm_arch_vcpu_id(cs);
-> > +    } else {
-> > +        return cs->cpu_index;
-> > +    }
-> > +}
-> > +
-> > +PowerPCCPU *spapr_find_cpu(int vcpu_id)
-> > +{
-> > +    CPUState *cs;
-> > +
-> > +    CPU_FOREACH(cs) {
-> > +        PowerPCCPU *cpu = POWERPC_CPU(cs);
-> > +
-> > +        if (cpu->vcpu_id == vcpu_id) {
-> 
-> This is still reaching into vcpu_id which should really be cpu
-> private, not in spapr.  You can use spapr_vcpu_id() which you already
-> defined to avoid this.
-
-OK I'll post another version.
-
-> With that done, I believe it should be possible to put cpu->vcpu_id in
-> an ifdef CONFIG_KVM and have things work.
-
-That is indeed possible! ifdefs are needed around the initialization
-block in ppc_cpu_realizefn(), although here in spapr_vcpu_id() it doesn't seem
-necessary. (Presumably because kvm_enabled() becomes a constant 0 without
-CONFIG_KVM so the compiler can treat it like an ifdef.)
-
-We don't want to actually patch it to use CONFIG_KVM though, do we? I
-was intending (as part of the VSMT work) to make the vcpu_id a SPAPR
-concept, rather than a KVM one, so that machines could (in theory
-anyway) be migrated between KVM and non-KVM systems.
-
-> > +            return cpu;
-> > +        }
-> > +    }
-> > +
-> > +    return NULL;
-> > +}
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MDgxNjIyMjQuMzI0MTktMS1xdWludGVsYUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggdjYgMDAvMTldIE11bHRpZmQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
+LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNv
+bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
+ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
+b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
+PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
+ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
+ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+JwowMzRiMzg3NGMxIG1pZ3JhdGlvbjogRmx1c2ggcmVjZWl2ZSBxdWV1ZQozZmUwZmY5YjRjIG1p
+Z3JhdGlvbjogVHJhbnNmZXIgcGFnZXMgb3ZlciBuZXcgY2hhbm5lbHMKMGU2ZmVkMDdlMyBtaWdy
+YXRpb246IFJlbmFtZSBpbml0aWFsX2J5dGVzCjhlOTU1Y2IxZTkgbWlncmF0aW9uOiBUZXN0IG5l
+dyBmZCBpbmZyYXN0cnVjdHVyZQo1NDBhM2JlNzQxIG1pZ3JhdGlvbjogQ3JlYXRlIHRocmVhZCBp
+bmZyYXN0cnVjdHVyZSBmb3IgbXVsdGlmZCByZWN2IHNpZGUKYjljNDU0NWM0OCBtaWdyYXRpb246
+IFNlbmQgdGhlIGZkIG51bWJlciB3aGljaCB3ZSBhcmUgZ29pbmcgdG8gdXNlIGZvciB0aGlzIHBh
+Z2UKYTc5MmM1NmRhZiBtaWdyYXRpb246IFJlYWxseSB1c2UgbXVsdGlwbGUgcGFnZXMgYXQgYSB0
+aW1lCjA2YTI2NjY0MjcgbWlncmF0aW9uOiBDcmVhdGUgcmFtX211bHRpZmRfcGFnZQpiMWZkZTZk
+MDNjIG1pZ3JhdGlvbjogU3RhcnQgb2YgbXVsdGlwbGUgZmQgd29yawpiM2UyYjE5MDZhIG1pZ3Jh
+dGlvbjogU3BsaXQgbWlncmF0aW9uX2ZkX3Byb2Nlc3NfaW5jb21pbmcKY2UyZmU1ZDdkYiBtaWdy
+YXRpb246IENyZWF0ZSBtdWx0aWZkIG1pZ3JhdGlvbiB0aHJlYWRzCmYxZjhiZjc4ZmMgbWlncmF0
+aW9uOiBDcmVhdGUgeC1tdWx0aWZkLWdyb3VwIHBhcmFtZXRlcgpmNWEzZTQ0YzE4IG1pZ3JhdGlv
+bjogQ3JlYXRlIHgtbXVsdGlmZC10aHJlYWRzIHBhcmFtZXRlcgo3YjFkOTYyYWMwIG1pZ3JhdGlv
+bjogQWRkIG11bHRpZmQgY2FwYWJpbGl0eQoxNmIwMjYxZTE4IHFpbzogQ3JlYXRlIG5ldyBxaW9f
+Y2hhbm5lbF97cmVhZHYsIHdyaXRldn1fYWxsCjYyYWQ3Njg4MzcgbWlncmF0aW9uOiBDcmVhdGUg
+bWlncmF0aW9uX2hhc19hbGxfY2hhbm5lbHMKNTM3ZTEzZmQzNiBtaWdyYXRpb246IEFkZCBjb21t
+ZW50cyB0byBjaGFubmVsIGZ1bmN0aW9ucwo3NjM5YWVlYzEyIG1pZ3JhdGlvbjogVGVhY2ggaXQg
+YWJvdXQgR19TT1VSQ0VfUkVNT1ZFCjMxN2I4NGUwZjAgbWlncmF0aW9uOiBDcmVhdGUgbWlncmF0
+aW9uX2lvY19wcm9jZXNzX2luY29taW5nKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvMTk6IG1pZ3JhdGlvbjogQ3JlYXRlIG1pZ3JhdGlvbl9pb2NfcHJvY2Vzc19pbmNv
+bWluZygpLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM1OTogRklMRTogbWlncmF0aW9u
+L21pZ3JhdGlvbi5jOjM2OToKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcy
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDIvMTk6IG1pZ3JhdGlvbjogVGVhY2ggaXQgYWJvdXQgR19TT1VSQ0VfUkVN
+T1ZFLi4uCkNoZWNraW5nIFBBVENIIDMvMTk6IG1pZ3JhdGlvbjogQWRkIGNvbW1lbnRzIHRvIGNo
+YW5uZWwgZnVuY3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDQvMTk6IG1pZ3JhdGlvbjogQ3JlYXRl
+IG1pZ3JhdGlvbl9oYXNfYWxsX2NoYW5uZWxzLi4uCkNoZWNraW5nIFBBVENIIDUvMTk6IHFpbzog
+Q3JlYXRlIG5ldyBxaW9fY2hhbm5lbF97cmVhZHYsIHdyaXRldn1fYWxsLi4uCkNoZWNraW5nIFBB
+VENIIDYvMTk6IG1pZ3JhdGlvbjogQWRkIG11bHRpZmQgY2FwYWJpbGl0eS4uLgpDaGVja2luZyBQ
+QVRDSCA3LzE5OiBtaWdyYXRpb246IENyZWF0ZSB4LW11bHRpZmQtdGhyZWFkcyBwYXJhbWV0ZXIu
+Li4KQ2hlY2tpbmcgUEFUQ0ggOC8xOTogbWlncmF0aW9uOiBDcmVhdGUgeC1tdWx0aWZkLWdyb3Vw
+IHBhcmFtZXRlci4uLgpDaGVja2luZyBQQVRDSCA5LzE5OiBtaWdyYXRpb246IENyZWF0ZSBtdWx0
+aWZkIG1pZ3JhdGlvbiB0aHJlYWRzLi4uCkNoZWNraW5nIFBBVENIIDEwLzE5OiBtaWdyYXRpb246
+IFNwbGl0IG1pZ3JhdGlvbl9mZF9wcm9jZXNzX2luY29taW5nLi4uCkNoZWNraW5nIFBBVENIIDEx
+LzE5OiBtaWdyYXRpb246IFN0YXJ0IG9mIG11bHRpcGxlIGZkIHdvcmsuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTIvMTk6IG1pZ3JhdGlvbjogQ3JlYXRlIHJhbV9tdWx0aWZkX3BhZ2UuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTMvMTk6IG1pZ3JhdGlvbjogUmVhbGx5IHVzZSBtdWx0aXBsZSBwYWdlcyBhdCBhIHRp
+bWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTk6IG1pZ3JhdGlvbjogU2VuZCB0aGUgZmQgbnVtYmVy
+IHdoaWNoIHdlIGFyZSBnb2luZyB0byB1c2UgZm9yIHRoaXMgcGFnZS4uLgpDaGVja2luZyBQQVRD
+SCAxNS8xOTogbWlncmF0aW9uOiBDcmVhdGUgdGhyZWFkIGluZnJhc3RydWN0dXJlIGZvciBtdWx0
+aWZkIHJlY3Ygc2lkZS4uLgpDaGVja2luZyBQQVRDSCAxNi8xOTogbWlncmF0aW9uOiBUZXN0IG5l
+dyBmZCBpbmZyYXN0cnVjdHVyZS4uLgpDaGVja2luZyBQQVRDSCAxNy8xOTogbWlncmF0aW9uOiBS
+ZW5hbWUgaW5pdGlhbF9ieXRlcy4uLgpDaGVja2luZyBQQVRDSCAxOC8xOTogbWlncmF0aW9uOiBU
+cmFuc2ZlciBwYWdlcyBvdmVyIG5ldyBjaGFubmVscy4uLgpDaGVja2luZyBQQVRDSCAxOS8xOTog
+bWlncmF0aW9uOiBGbHVzaCByZWNlaXZlIHF1ZXVlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
+aGFyYWN0ZXJzCiMzODogRklMRTogbWlncmF0aW9uL3JhbS5jOjc5OgorI2RlZmluZSBSQU1fU0FW
+RV9GTEFHX01VTFRJRkRfU1lOQyAoUkFNX1NBVkVfRkxBR19NVUxUSUZEX1BBR0UgfCBSQU1fU0FW
+RV9GTEFHX1pFUk8pCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEyMCBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
