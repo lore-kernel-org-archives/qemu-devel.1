@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjnN-0000vq-SQ
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:30:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dfjsZ-0002Hi-Ha
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjnL-0000da-9n
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:30:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27637)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfjnL-0000Zz-3O
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:30:23 -0400
-References: <alpine.DEB.2.20.1708100023050.9262@digraph.polyomino.org.uk>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dd099cc0-1b3a-3371-e8f6-8500a2532490@redhat.com>
-Date: Thu, 10 Aug 2017 11:30:19 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dfjsY-0003dm-AF
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:35:47 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38446)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dfjsX-0003dA-TC
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:35:46 -0400
+Received: by mail-wm0-x233.google.com with SMTP id f15so17362314wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 02:35:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.20.1708100023050.9262@digraph.polyomino.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: fix packusdw in-place
- operation
+In-Reply-To: <3e66742f-04c5-51b7-de3a-f692c0637bc5@amsat.org>
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<20170728053610.15770-19-f4bug@amsat.org>
+	<87mv7aumav.fsf@linaro.org>
+	<8e2e3aa5-4459-76ba-3309-af6b30220346@amsat.org>
+	<87fud0vmak.fsf@linaro.org>
+	<3e66742f-04c5-51b7-de3a-f692c0637bc5@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Aug 2017 10:35:24 +0100
+Message-ID: <CAFEAcA80HQXTgLUUb4LjM+Vw=7ZTj09rbCsiyvC07GN+NywM_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 18/47] MAINTAINERS: add missing TCG entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 10/08/2017 02:24, Joseph Myers wrote:
-> The SSE4.1 packusdw instruction combines source and destination
-> vectors of signed 32-bit integers into a single vector of unsigned
-> 16-bit integers, with unsigned saturation.  When the source and
-> destination are the same register, this means each 32-bit element of
-> that register is used twice as an input, to produce two of the 16-bit
-> output elements, and so if the operation is carried out
-> element-by-element in-place, no matter what the order in which it is
-> applied to the elements, the first element's operation will overwrite
-> some future input.  The helper for packssdw avoids this issue by
-> computing the result in a local temporary and copying it to the
-> destination at the end; this patch fixes the packusdw helper to do
-> likewise.  This fixes three gcc test failures in my GCC 6-based
-> testing.
-> 
-> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-> 
-> ---
-> 
-> diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-> index 16509d0..05b1701 100644
-> --- a/target/i386/ops_sse.h
-> +++ b/target/i386/ops_sse.h
-> @@ -1655,14 +1655,17 @@ SSE_HELPER_Q(helper_pcmpeqq, FCMPEQQ)
->  
->  void glue(helper_packusdw, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
->  {
-> -    d->W(0) = satuw((int32_t) d->L(0));
-> -    d->W(1) = satuw((int32_t) d->L(1));
-> -    d->W(2) = satuw((int32_t) d->L(2));
-> -    d->W(3) = satuw((int32_t) d->L(3));
-> -    d->W(4) = satuw((int32_t) s->L(0));
-> -    d->W(5) = satuw((int32_t) s->L(1));
-> -    d->W(6) = satuw((int32_t) s->L(2));
-> -    d->W(7) = satuw((int32_t) s->L(3));
-> +    Reg r;
-> +
-> +    r.W(0) = satuw((int32_t) d->L(0));
-> +    r.W(1) = satuw((int32_t) d->L(1));
-> +    r.W(2) = satuw((int32_t) d->L(2));
-> +    r.W(3) = satuw((int32_t) d->L(3));
-> +    r.W(4) = satuw((int32_t) s->L(0));
-> +    r.W(5) = satuw((int32_t) s->L(1));
-> +    r.W(6) = satuw((int32_t) s->L(2));
-> +    r.W(7) = satuw((int32_t) s->L(3));
-> +    *d = r;
->  }
->  
->  #define FMINSB(d, s) MIN((int8_t)d, (int8_t)s)
-> 
+On 9 August 2017 at 22:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+ote:
+> I wonder if I'm understanding correctly what the MAINTAINERS file is for =
+and
+> how to use it.
+>
+> From an submitter view I feel a bit confused. I thought ./get_maintainer.=
+pl
+> would give me the list of person to email the changes I did on some file
+> from the repository. This script seems correctly named, I'm looking for s=
+ome
+> ./get_reviewers.pl instead, to know who I'v to keep updated, apart from t=
+he
+> ./get_maintainer.pl.
+>
+> currently we have:
+> "M: Mail patches to: FullName <address@domain>"
+> Does this imply FullName is a maintainer?
 
-Queued, thanks.
+Does it matter? As a contributor, what you want to know is
+"who cares enough about this file to be worth cc'ing, if anybody",
+and get_maintainer.pl does that for you.
+Hopefully at least one of those people is also in a position
+to shepherd the patch through into git master, but that doesn't
+affect what you need to do as a patch submitter.
+If anybody cares enough about a particular area of the codebase
+to want to be cc'd on all patches so they can review them, then
+to my mind that makes them effectively a co-maintainer on those
+files, and they can be listed in MAINTAINERS.
 
-Paolo
+> If so is it ok I do this change:
+>
+> -    M: Mail patches to: FullName <address@domain>
+> +    M: Maintainer: FullName <address@domain>
+> +       These maintainers must be mailed on patches.
+>      R: Designated reviewer: FullName <address@domain>
+>         These reviewers should be CCed on patches.
+>
+>
+> actual default for un-matched: "recent contributors" + qemu-devel@
+>
+>   $ ./scripts/get_maintainer.pl -f disas.c
+>   get_maintainer.pl: No maintainers found, printing recent contributors.
+>   get_maintainer.pl: Do not blindly cc: them on patches!  Use common sens=
+e.
+>   Peter Maydell <peter.maydell@linaro.org> (commit_signer:2/3=3D67%)
+>   Richard Henderson <rth@twiddle.net> (commit_signer:1/3=3D33%)
+>   Thomas Huth <thuth@redhat.com> (commit_signer:1/3=3D33%)
+>   Michael Tokarev <mjt@tls.msk.ru> (commit_signer:1/3=3D33%)
+>   Julian Brown <julian@codesourcery.com> (commit_signer:1/3=3D33%)
+>   qemu-devel@nongnu.org (open list:All patches CC here)
+>
+> I find the un-matched "recent contributors" list often confuse, due to fi=
+les
+> being moved, header updated, checkpatch indented.
+
+Yes, the recent-contributors list is often unhelpful, which
+is partly why the script warns about them. We might perhaps
+switch the default to --no-git-fallback".
+
+> Anyway I now understand these recent contributors are not maintainers but
+> no-designated reviewers, unwilling to be maintainers (else they'd have ad=
+ded
+> a section/entry by themselves).
+
+They're just people who touched a file more often, that's all;
+the script does a little of the git log mining for you in
+case it's useful (often it isn't).
+
+The underlying problem, as Cornelia points out, is that some
+parts of QEMU have no maintainer at all, or have a theoretical
+maintainer who in practice doesn't these days have enough time
+to do code reviews very promptly, or have a email listed that
+actually bounces because they changed employer 3 years ago and
+stopped working on QEMU, etc. Changing wording in the
+MAINTAINERS file is not going to help with this :-(
+
+thanks
+-- PMM
