@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfmFB-0003fo-18
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:07:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dfmLN-0004tY-QE
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:13:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfmF6-0005d2-Ti
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:07:17 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dfmF6-0005cp-O7
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:07:12 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c15so463175qta.3
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 05:07:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <150236199819.23199.3109419868654891687.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <90839c6e-7f12-a3bd-bd83-f2ca62a595c9@amsat.org>
-Date: Thu, 10 Aug 2017 09:07:08 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1dfmLJ-0000VS-Q3
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:13:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfmLJ-0000V6-Jc
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:13:37 -0400
+References: <1502359687-25370-1-git-send-email-tianyu.lan@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a9f3a782-d73c-a5b5-c6f2-7b6d832452b7@redhat.com>
+Date: Thu, 10 Aug 2017 14:13:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <150236199819.23199.3109419868654891687.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1502359687-25370-1-git-send-email-tianyu.lan@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [for-2.10 PATCH v5] 9pfs: local: fix
- fchmodat_nofollow() limitations
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] x86: Increase max vcpu number to 352
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,197 +27,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>
+To: Lan Tianyu <tianyu.lan@intel.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-On 08/10/2017 07:46 AM, Greg Kurz wrote:
-> This function has to ensure it doesn't follow a symlink that could be used
-> to escape the virtfs directory. This could be easily achieved if fchmodat()
-> on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-> it doesn't. There was a tentative to implement a new fchmodat2() syscall
-> with the correct semantics:
-> 
-> https://patchwork.kernel.org/patch/9596301/
-> 
-> but it didn't gain much momentum. Also it was suggested to look at an O_PATH
-> based solution in the first place.
-> 
-> The current implementation covers most use-cases, but it notably fails if:
-> - the target path has access rights equal to 0000 (openat() returns EPERM),
->    => once you've done chmod(0000) on a file, you can never chmod() again
-> - the target path is UNIX domain socket (openat() returns ENXIO)
->    => bind() of UNIX domain sockets fails if the file is on 9pfs
-> 
-> The solution is to use O_PATH: openat() now succeeds in both cases, and we
-> can ensure the path isn't a symlink with fstat(). The associated entry in
-> "/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
-> 
-> The previous behavior is kept for older systems that don't have O_PATH.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Tested-by: Zhi Yong Wu <zhiyong.wu@ucloud.cn>
-> ---
-> v5: - added missing fd == -1 check
-> 
-> v4: - fixed #if condition
->      - moved out: label above #endif
->      - fixed typo in changelog
->      - added Eric's r-b
-> 
-> v3: - O_PATH in a separate block of code
->      - added a reference to the fchmodat2() tentative in the changelog
-> 
-> v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
->        for O_PATH to avoid build breaks on O_PATH-less systems
->      - keep current behavior for O_PATH-less systems
->      - added comments
->      - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
-> ---
->   hw/9pfs/9p-local.c |   47 ++++++++++++++++++++++++++++++++++++++++-------
->   hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
->   2 files changed, 55 insertions(+), 16 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index 6e478f4765ef..cb0b5f1fc41c 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -333,17 +333,27 @@ update_map_file:
->   
->   static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
->   {
-> +    struct stat stbuf;
->       int fd, ret;
->   
->       /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
-> -     * Unfortunately, the linux kernel doesn't implement it yet. As an
-> -     * alternative, let's open the file and use fchmod() instead. This
-> -     * may fail depending on the permissions of the file, but it is the
-> -     * best we can do to avoid TOCTTOU. We first try to open read-only
-> -     * in case name points to a directory. If that fails, we try write-only
-> -     * in case name doesn't point to a directory.
-> +     * Unfortunately, the linux kernel doesn't implement it yet.
->        */
-> -    fd = openat_file(dirfd, name, O_RDONLY, 0);
-> +
-> +     /* First, we clear non-racing symlinks out of the way. */
-> +    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-> +        return -1;
-> +    }
-> +    if (S_ISLNK(stbuf.st_mode)) {
-> +        errno = ELOOP;
-> +        return -1;
-> +    }
-> +
-> +    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
-> +     * O_WRONLY for old-systems that don't support O_PATH.
-> +     */
-> +    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
-> +#if O_PATH_9P_UTIL == 0
->       if (fd == -1) {
->           /* In case the file is writable-only and isn't a directory. */
->           if (errno == EACCES) {
-> @@ -357,6 +367,29 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
->           return -1;
->       }
->       ret = fchmod(fd, mode);
-> +#else
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +
-> +    /* Now we handle racing symlinks. */
-> +    ret = fstat(fd, &stbuf);
+On 10/08/2017 12:08, Lan Tianyu wrote:
+> Intel Xeon phi chip will support 352 logical threads. For HPC
+> usage case, it will create a huge VM with vcpus number as same as host
+> cpus. This patch is to increase max vcpu number to 352.
 
-the following ...
+Even without Xeon Phi, a 24-core, 8-socket system (E7-8890 v4 for
+example) will have 384 physical CPUs.  288 was the biggest we could test
+at the time, but now that the 256 vCPU barrier has been broken I agree
+with going straight to 512.
 
-> +    if (ret) {
-> +        goto out;
-> +    }
-> +    if (S_ISLNK(stbuf.st_mode)) {
-> +        errno = ELOOP;
-> +        ret = -1;
-> +        goto out;
-> +    }
-> +
-> +    {
-> +        char *proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
-> +        ret = chmod(proc_path, mode);
-> +        g_free(proc_path);
-> +    }
-> +out:
-
-can be refactored as:
-
-     if (!ret) {
-         if (S_ISLNK(stbuf.st_mode)) {
-             errno = ELOOP;
-             ret = -1;
-         } else {
-             char *proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
-             ret = chmod(proc_path, mode);
-             g_free(proc_path);
-         }
-     }
-
-which look (at least to me) easier to follow, and remove the 'out' label
-
-this way:
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> +#endif
->       close_preserve_errno(fd);
->       return ret;
->   }
-> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-> index 91299a24b8af..dc0d2e29aa3b 100644
-> --- a/hw/9pfs/9p-util.h
-> +++ b/hw/9pfs/9p-util.h
-> @@ -13,6 +13,12 @@
->   #ifndef QEMU_9P_UTIL_H
->   #define QEMU_9P_UTIL_H
->   
-> +#ifdef O_PATH
-> +#define O_PATH_9P_UTIL O_PATH
-> +#else
-> +#define O_PATH_9P_UTIL 0
-> +#endif
-> +
->   static inline void close_preserve_errno(int fd)
->   {
->       int serrno = errno;
-> @@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
->   
->   static inline int openat_dir(int dirfd, const char *name)
->   {
-> -#ifdef O_PATH
-> -#define OPENAT_DIR_O_PATH O_PATH
-> -#else
-> -#define OPENAT_DIR_O_PATH 0
-> -#endif
->       return openat(dirfd, name,
-> -                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
-> +                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
->   }
->   
->   static inline int openat_file(int dirfd, const char *name, int flags,
-> @@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
->       }
->   
->       serrno = errno;
-> -    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
-> -    ret = fcntl(fd, F_SETFL, flags);
-> -    assert(!ret);
-> +    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
-> +     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
-> +     * ignored it anyway.
-> +     */
-> +    if (!(flags & O_PATH_9P_UTIL)) {
-> +        ret = fcntl(fd, F_SETFL, flags);
-> +        assert(!ret);
-> +    }
->       errno = serrno;
->       return fd;
->   }
-> 
-> 
+Paolo
