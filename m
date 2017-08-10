@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfqoV-0000ZJ-Sd
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:00:05 -0400
+	(envelope-from <rjones@redhat.com>) id 1dfqrJ-0001vw-5w
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:03:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfqoS-0002WV-7e
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:00:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36188)
+	(envelope-from <rjones@redhat.com>) id 1dfqrG-0004Xc-16
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:02:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfqoS-0002W5-1A
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:00:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C977211520
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 16:59:58 +0000 (UTC)
-Date: Thu, 10 Aug 2017 17:59:50 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170810165950.GA29997@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170810155522.31099-1-berrange@redhat.com>
-	<150238145088.69.341704419311348024@dd743fd916bd>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <150238145088.69.341704419311348024@dd743fd916bd>
-Subject: Re: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1dfqrF-0004T3-O0
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:02:53 -0400
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Thu, 10 Aug 2017 17:52:55 +0100
+Message-Id: <20170810165255.20865-1-rjones@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio-scsi: Add virtqueue_size parameter
+ allowing virtqueue size to be set.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +22,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, kraxel@redhat.com
+To: pbonzini@redhat.com
+Cc: mst@redhat.com, qemu-devel@nongnu.org, hch@lst.de, martin.petersen@oracle.com
 
-On Thu, Aug 10, 2017 at 09:10:51AM -0700, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
-> 
-> Subject: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
-> Type: series
-> Message-id: 20170810155522.31099-1-berrange@redhat.com
-> 
->   GEN     trace/generated-helpers.h
->   GEN     trace/generated-helpers-wrappers.h
->   GEN     trace/generated-tcg-tracers.h
->   GEN     trace/generated-helpers.c
-> make: *** No rule to make target 'ui/input-keymap-atset12qcode.c', needed by 'Makefile'.  Stop.
-> make: *** Waiting for unfinished jobs....
+Since Linux switched to blk-mq as the default in Linux commit
+5c279bd9e406 ("scsi: default to scsi-mq"), virtio-scsi LUNs consume
+about 10x as much guest kernel memory.
 
-Opps, failure due to me not testing non-srcdir builds.
+This commit allows you to choose the virtqueue size for each
+virtio-scsi-pci controller like this:
 
-Regards,
-Daniel
+  -device virtio-scsi-pci,id=scsi,virtqueue_size=16
+
+The default is still 128 as before.  Using smaller virtqueue_size
+allows many more disks to be added to small memory virtual machines.
+For a 1 vCPU, 500 MB, no swap VM I observed:
+
+  With scsi-mq enabled (upstream kernel):              175 disks
+    -"- ditto -"-   virtqueue_size=64:                 318 disks
+    -"- ditto -"-   virtqueue_size=16:                 775 disks
+  With scsi-mq disabled (kernel before 5c279bd9e406): 1755 disks
+
+Note that to have any effect, this requires a kernel patch:
+
+  https://lkml.org/lkml/2017/8/10/689
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ hw/scsi/virtio-scsi.c           | 8 +++++---
+ include/hw/virtio/virtio-scsi.h | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index eb639442d1..aca1909a59 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -867,10 +867,10 @@ void virtio_scsi_common_realize(DeviceState *dev,
+     s->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
+     s->cdb_size = VIRTIO_SCSI_CDB_DEFAULT_SIZE;
+ 
+-    s->ctrl_vq = virtio_add_queue(vdev, VIRTIO_SCSI_VQ_SIZE, ctrl);
+-    s->event_vq = virtio_add_queue(vdev, VIRTIO_SCSI_VQ_SIZE, evt);
++    s->ctrl_vq = virtio_add_queue(vdev, s->conf.virtqueue_size, ctrl);
++    s->event_vq = virtio_add_queue(vdev, s->conf.virtqueue_size, evt);
+     for (i = 0; i < s->conf.num_queues; i++) {
+-        s->cmd_vqs[i] = virtio_add_queue(vdev, VIRTIO_SCSI_VQ_SIZE, cmd);
++        s->cmd_vqs[i] = virtio_add_queue(vdev, s->conf.virtqueue_size, cmd);
+     }
+ }
+ 
+@@ -917,6 +917,8 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
+ 
+ static Property virtio_scsi_properties[] = {
+     DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
++    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
++                                         parent_obj.conf.virtqueue_size, 128),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
+                                                   0xFFFF),
+     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSI, parent_obj.conf.cmd_per_lun,
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index de6ae5a9f6..4c0bcdb788 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -32,7 +32,6 @@
+ #define VIRTIO_SCSI(obj) \
+         OBJECT_CHECK(VirtIOSCSI, (obj), TYPE_VIRTIO_SCSI)
+ 
+-#define VIRTIO_SCSI_VQ_SIZE     128
+ #define VIRTIO_SCSI_MAX_CHANNEL 0
+ #define VIRTIO_SCSI_MAX_TARGET  255
+ #define VIRTIO_SCSI_MAX_LUN     16383
+@@ -48,6 +47,7 @@ typedef struct virtio_scsi_config VirtIOSCSIConfig;
+ 
+ struct VirtIOSCSIConf {
+     uint32_t num_queues;
++    uint32_t virtqueue_size;
+     uint32_t max_sectors;
+     uint32_t cmd_per_lun;
+ #ifdef CONFIG_VHOST_SCSI
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.1
