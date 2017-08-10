@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfmow-0006eA-CZ
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:44:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dfms2-0007oN-66
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfmou-0000jK-Up
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:44:14 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34510)
+	(envelope-from <peter.maydell@linaro.org>) id 1dfms1-0003Eb-6S
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:47:26 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dfmou-0000hj-JM
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:44:12 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id c24so2703892wra.1
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 05:44:10 -0700 (PDT)
+	id 1dfms1-0003E4-0Z
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:47:25 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id c24so2734714wra.1
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 05:47:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1502367698-4539-1-git-send-email-frederic.konrad@adacore.com>
-References: <1502367698-4539-1-git-send-email-frederic.konrad@adacore.com>
+In-Reply-To: <20170809070357.28723-1-david@gibson.dropbear.id.au>
+References: <20170809070357.28723-1-david@gibson.dropbear.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 Aug 2017 13:43:49 +0100
-Message-ID: <CAFEAcA8A+KC=8tR4i0UMgykdbKim-D0DFZ5FGyj1XDuyBBKTkw@mail.gmail.com>
+Date: Thu, 10 Aug 2017 13:47:03 +0100
+Message-ID: <CAFEAcA_n88x0w1cVirQ61h+NOrvX1V7bXD1LCASVGyUZU=qDgg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] xlnx-qspi: add a property for
- mmio-execution
+Subject: Re: [Qemu-devel] [PULL 0/6] ppc patch queue 2017-08-09
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On 10 August 2017 at 13:21, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
-> This adds mmio-exec property to workaround the migration bug.
-> When enabled the migration is blocked and will return an error.
+On 9 August 2017 at 08:03, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 54affb3a3623b1d36c95e34faa722a5831323a74:
 >
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> ---
->  hw/ssi/xilinx_spips.c | 41 +++++++++++++++++++++++++++++++++--------
->  1 file changed, 33 insertions(+), 8 deletions(-)
+>   Update version for v2.10.0-rc2 release (2017-08-08 19:07:46 +0100)
 >
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index e833028..f763bc3 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -31,6 +31,8 @@
->  #include "hw/ssi/ssi.h"
->  #include "qemu/bitops.h"
->  #include "hw/ssi/xilinx_spips.h"
-> +#include "qapi/error.h"
-> +#include "migration/blocker.h"
+> are available in the git repository at:
 >
->  #ifndef XILINX_SPIPS_ERR_DEBUG
->  #define XILINX_SPIPS_ERR_DEBUG 0
-> @@ -139,6 +141,8 @@ typedef struct {
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170809
 >
->      uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
->      hwaddr lqspi_cached_addr;
-> +    Error *migration_blocker;
-> +    bool mmio_execution_enabled;
->  } XilinxQSPIPS;
+> for you to fetch changes up to f57467e3b326c7736f8e481fd6b680f30e575c87:
 >
->  typedef struct XilinxSPIPSClass {
-> @@ -500,12 +504,13 @@ static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
->  {
->      XilinxSPIPS *s = &q->parent_obj;
+>   spapr: Fix bug in h_signal_sys_reset() (2017-08-09 14:04:28 +1000)
 >
-> -    if (q->lqspi_cached_addr != ~0ULL) {
-> +    if ((q->mmio_execution_enabled) && (q->lqspi_cached_addr != ~0ULL)) {
->          /* Invalidate the current mapped mmio */
->          memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
->                                            LQSPI_CACHE_SIZE);
-> -        q->lqspi_cached_addr = ~0ULL;
->      }
-> +
-> +    q->lqspi_cached_addr = ~0ULL;
->  }
+> ----------------------------------------------------------------
+> ppc patch queue 2017-08-09
+>
+> This series contains a number of bugfixes for ppc and related
+> machines, for the qemu-2.10.release.  Some are true regressions,
+> others are serious enough and non-invasive enough to fix that it's
+> worth putting in 2.10 this late.
+>
+> ----------------------------------------------------------------
 
-This is safe, so it's probably the right thing to do for 2.10, but it
-does indicate that there's something weird in the mmio-enabled
-code. I was expecting this hunk not to be needed at all (on
-the basis that the lqspi_cached_addr should always be ~0ULL
-if there's no mapped mmio region), but it looks like calls to
-lqspi_read() will call load_cache which will set the
-lqspi_cached_addr even though we haven't actually set that up
-as an mmio_ptr backed region. Then the next time we call
-lqspi_load_cache() we'll call memory_region_invalidate_mmio_ptr()
-on a pointer value that we never returned from the
-request_mmio_ptr callback. The doc comment on the
-memory_region_invalidate_mmio_ptr() function doesn't say that's
-permitted.
+Applied, thanks.
 
-Looking at the implementation it seems like this will work in
-practice (because the invalidate code in memory.c checks that
-the MR it's about to drop really is an MMIO_INTERFACE), but
-if so we should document this. However, I'm not totally convinced
-that it really will work in complicated cases like where you
-have device A part of whose memory range is a container which
-holds a device B which is also using the mmio_pointer API:
-in that case if device A calls invalidate_mmio_ptr with an
-address that's in the part of A's memory region that is the
-device B container it could end up invalidating an mmio-interface
-that's actually inside device B. So it would be safer to say
-"the caller may only invalidate pointers it's actually told
-the memory system about".
+> I haven't completed a Travis build for this, which is part of my usual
+> test regime, since the first dozen or so Travis builds are failing
+> more often than not on master as well.  I don't know why this is -
+> seems to be failing some of the x86 tests.
 
-(Conversely if we're convinced that passing bogus pointers
-to memory_region_invalidate_mmio_ptr() is fine then we
-don't need to add the q->mmio_execution_enabled flag check.)
-
->  static void xilinx_qspips_write(void *opaque, hwaddr addr,
-> @@ -601,12 +606,17 @@ static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
->                                      unsigned *offset)
->  {
->      XilinxQSPIPS *q = opaque;
-> -    hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
-> -
-> -    lqspi_load_cache(opaque, offset_within_the_region);
-> -    *size = LQSPI_CACHE_SIZE;
-> -    *offset = offset_within_the_region;
-> -    return q->lqspi_buf;
-> +    hwaddr offset_within_the_region;
-> +
-> +    if (q->mmio_execution_enabled) {
-> +        offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
-> +        lqspi_load_cache(opaque, offset_within_the_region);
-> +        *size = LQSPI_CACHE_SIZE;
-> +        *offset = offset_within_the_region;
-> +        return q->lqspi_buf;
-> +    } else {
-> +        return NULL;
-> +    }
-
-Rather than making the diffstat complicated like this, you can just say
-   if (!q->mmio_execution_enabled) {
-       return NULL;
-   }
-
->  }
->
->  static uint64_t
-> @@ -693,6 +703,15 @@ static void xilinx_qspips_realize(DeviceState *dev, Error **errp)
->      sysbus_init_mmio(sbd, &s->mmlqspi);
->
->      q->lqspi_cached_addr = ~0ULL;
-> +
-> +    /* mmio_execution breaks migration better aborting than having strange
-> +     * bugs.
-> +     */
-> +    if (q->mmio_execution_enabled) {
-> +        error_setg(&q->migration_blocker,
-> +                   "enabling mmio_execution breaks migration");
-> +        migrate_add_blocker(q->migration_blocker, &error_fatal);
-> +    }
->  }
->
->  static int xilinx_spips_post_load(void *opaque, int version_id)
-> @@ -716,6 +735,11 @@ static const VMStateDescription vmstate_xilinx_spips = {
->      }
->  };
->
-> +static Property xilinx_qspips_properties[] = {
-> +    DEFINE_PROP_BOOL("mmio-exec", XilinxQSPIPS, mmio_execution_enabled, false),
-
-This needs to be an x-property, ie to have a name beginning "x-",
-to indicate that it is experimental and will go away when we
-fix the underlying bug. It would also be helpful to comment
-here with the underlying reason why we've had to turn this off
-in 2.10, and what the property does (ie enable execution directly
-from the device, at the cost of preventing VM migration).
-
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static Property xilinx_spips_properties[] = {
->      DEFINE_PROP_UINT8("num-busses", XilinxSPIPS, num_busses, 1),
->      DEFINE_PROP_UINT8("num-ss-bits", XilinxSPIPS, num_cs, 4),
-> @@ -729,6 +753,7 @@ static void xilinx_qspips_class_init(ObjectClass *klass, void * data)
->      XilinxSPIPSClass *xsc = XILINX_SPIPS_CLASS(klass);
->
->      dc->realize = xilinx_qspips_realize;
-> +    dc->props = xilinx_qspips_properties;
->      xsc->reg_ops = &qspips_ops;
->      xsc->rx_fifo_size = RXFF_A_Q;
->      xsc->tx_fifo_size = TXFF_A_Q;
-> --
-> 1.8.3.1
+Doesn't look much worse than usual to me -- of the last 24 travis
+builds for master 4 failed and 20 passed.
 
 thanks
 -- PMM
