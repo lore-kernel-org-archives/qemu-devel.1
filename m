@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfn3v-0002cd-GQ
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:59:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dfn73-0003Uq-9P
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:03:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfn3r-0001dT-H4
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:59:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfn3r-0001ch-BB
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:59:39 -0400
-References: <1498577836-25883-1-git-send-email-edgar.iglesias@gmail.com>
-	<1498577836-25883-7-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA_7_EwgxfnEmr+moHc5u4uprKjyL+ZA1VzspYwqONjfCg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9fc966eb-ee33-d5b8-fef8-5472853ca4fc@redhat.com>
-Date: Thu, 10 Aug 2017 14:59:34 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dfn6x-0003d1-Np
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:02:57 -0400
+Date: Thu, 10 Aug 2017 15:02:40 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170810130240.GC3650@localhost.localdomain>
+References: <20170809203808.31725-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_7_EwgxfnEmr+moHc5u4uprKjyL+ZA1VzspYwqONjfCg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 6/7] exec: allow to get a pointer for
- some mmio memory region
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170809203808.31725-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 0/5] More bdrv_getlength() fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +22,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Richard Henderson <rth@twiddle.net>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com
 
-On 10/08/2017 14:56, Peter Maydell wrote:
->> +    qemu_mutex_lock_iothread();
->> +
->> +    /* Reset dirty so this doesn't happen later. */
->> +    cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
->> +
->> +    if (section.mr != mr) {
->> +        /* memory_region_find add a ref on section.mr */
->> +        memory_region_unref(section.mr);
->> +        if (MMIO_INTERFACE(section.mr->owner)) {
+Am 09.08.2017 um 22:38 hat Eric Blake geschrieben:
+> We already have a lot of bdrv_getlength() fixes in -rc2; so I think
+> this is still okay for -rc3.
 > 
-> Could somebody explain why it's OK to unref section.mr here before
-> we go on to do things with it, rather than only unrefing it after
-> we've finished using it?
-
-The memory region won't disappear until you release the BQL and/or
-RCU-read-lock, but yes it's cleaner to move it later, and yes there is a
-leak.
-
-Paolo
-
-> Also, by my reading memory_region_find() will always ref
-> ret.mr (if it's not NULL), whereas this code only unrefs it
-> if section.mr == mr. Does this leak a reference in the case
-> where section.mr != mr, or am I missing something ?
+> v1 was here (with a typo'd subject line):
+> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01226.html
 > 
+> Since v1:
+> - patch 1: fix error message capitalization (Kevin, R-b kept)
+> - fix locking bug in original patch 2 (Kevin)
+> - split original patch 2 into two parts: signature update, and
+> added error checking (Kevin)
+> - check for unlikely integer overflow before bdrv_truncate (Jeff)
+> 
+> 001/5:[0002] [FC] 'vpc: Check failure of bdrv_getlength()'
+> 002/5:[down] 'qcow: Change signature of get_cluster_offset()'
+> 003/5:[0048] [FC] 'qcow: Check failure of bdrv_getlength() and bdrv_truncate()'
+> 004/5:[----] [--] 'qcow2: Drop debugging dump_refcounts()'
+> 005/5:[----] [--] 'qcow2: Check failure of bdrv_getlength()'
+
+Looks good to me, but as the bug is far from being critical, I'd rather
+apply the more complex qcow1 patches only to block-next. The vpc and
+qcow2 parts seems a lot less risky, so 2.10 should be okay for them.
+
+What do you think?
+
+Kevin
