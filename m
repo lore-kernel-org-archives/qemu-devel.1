@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dfkAY-0005yl-Ex
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:54:23 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1dfkKm-0008MI-S2
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dfkAX-0005fo-8T
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:54:22 -0400
-Date: Thu, 10 Aug 2017 10:54:01 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170810095401.GA20945@stefanha-x1.localdomain>
-References: <20170809160212.29976-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="envbJBWh7q8WU6mo"
-Content-Disposition: inline
-In-Reply-To: <20170809160212.29976-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] IDE: Do not flush empty drives
+	(envelope-from <tianyu.lan@intel.com>) id 1dfkKi-00029R-4e
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:04:56 -0400
+Received: from mga06.intel.com ([134.134.136.31]:61999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1dfkKh-00029D-Sb
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:04:52 -0400
+From: Lan Tianyu <tianyu.lan@intel.com>
+Date: Wed,  9 Aug 2017 23:58:20 -0400
+Message-Id: <1502337500-5718-1-git-send-email-tianyu.lan@intel.com>
+Subject: [Qemu-devel] [PATCH] x86: Increase max vcpu number to 352
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +23,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: P J P <ppandit@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Lan Tianyu <tianyu.lan@intel.com>, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
+Intel Xeon phi chip will support 352 logical threads. For HPC
+usage case, it will create a huge VM with vcpus number as same as host
+cpus. This patch is to increase max vcpu number to 352.
 
---envbJBWh7q8WU6mo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+---
+ hw/i386/pc_q35.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Wed, Aug 09, 2017 at 05:02:10PM +0100, Stefan Hajnoczi wrote:
-> John Snow is offline until Monday, QEMU 2.10-rc3 is due to be tagged on
-> Tuesday, and so I've taken two patches John sent for 2.10 and addressed r=
-eview
-> comments.
->=20
-> Kevin Wolf (1):
->   IDE: test flush on empty CDROM
->=20
-> Stefan Hajnoczi (1):
->   IDE: Do not flush empty CDROM drives
->=20
->  hw/ide/core.c    | 10 +++++++++-
->  tests/ide-test.c | 19 +++++++++++++++++++
->  2 files changed, 28 insertions(+), 1 deletion(-)
-
-John: I am sending a pull request to get this fix into -rc3 (Aug 15th).
-Feel free to send a follow-up/revert if you want to make changes when
-you get back online.
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---envbJBWh7q8WU6mo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZjC05AAoJEJykq7OBq3PIjpMH/AvNIzykev+LKhFwTy0okGvr
-gpBEZt4Z67rm+PpdjOvfUmfzT4T4NxpzkB9ivko5TwRnI9jZo0ssyK3qLmtvZGGK
-HoI09+TKo+4AB1FG7r0eUgHJ/HCnSj/TwBvW/dBQGPqqPdW1CPU/KiS/k+PXq/ze
-abh13NSLnsy1xod8PMh8JqKwvL/gfmSoUw8mEj5i8LH95A00E5QotTeaidlyTTXD
-y1EPFTM89v2+KHiKTmcLgUWi4MxIU8LiF3f+WnhQl/ZybRQUXdTyzLIcgbPlp3dU
-Bu6HLAAj5YpIbdYtX5h4NTzgrqzfhoRcYJqN+4ONvrWtB/adyKL46ZrR14mPrcg=
-=kPm6
------END PGP SIGNATURE-----
-
---envbJBWh7q8WU6mo--
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 169a214..5e93749 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -299,7 +299,7 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->default_display = "std";
+     m->no_floppy = 1;
+     m->has_dynamic_sysbus = true;
+-    m->max_cpus = 288;
++    m->max_cpus = 352;
+ }
+ 
+ static void pc_q35_2_10_machine_options(MachineClass *m)
+-- 
+1.8.3.1
