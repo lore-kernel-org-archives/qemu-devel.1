@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfqTp-0001Pb-Ob
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:38:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfqoV-0000ZJ-Sd
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:00:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfqTk-0007Lf-Su
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:38:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35150)
+	(envelope-from <berrange@redhat.com>) id 1dfqoS-0002WV-7e
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:00:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfqTk-0007LT-Lj
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:38:36 -0400
-References: <1502367921-17730-1-git-send-email-armbru@redhat.com>
-	<1502367921-17730-3-git-send-email-armbru@redhat.com>
-	<b0769260-8342-8a90-8a1e-d6545e0c64a1@redhat.com>
-	<87efsj8jn5.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e373532b-3c09-f893-1e9a-e40e4e82866a@redhat.com>
-Date: Thu, 10 Aug 2017 18:38:32 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfqoS-0002W5-1A
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:00:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C977211520
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 16:59:58 +0000 (UTC)
+Date: Thu, 10 Aug 2017 17:59:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170810165950.GA29997@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170810155522.31099-1-berrange@redhat.com>
+	<150238145088.69.341704419311348024@dd743fd916bd>
 MIME-Version: 1.0
-In-Reply-To: <87efsj8jn5.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Partial support for non-scalar
- properties with -object
+Content-Disposition: inline
+In-Reply-To: <150238145088.69.341704419311348024@dd743fd916bd>
+Subject: Re: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, el13635@mail.ntua.gr
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, kraxel@redhat.com
 
-On 10/08/2017 18:36, Markus Armbruster wrote:
->>> +    while (!QSIMPLEQ_EMPTY(&oo_queue)) {
->>> +        ObjectOptionsQueueEntry *e = QSIMPLEQ_FIRST(&oo_queue);
->>> +
->>> +        QSIMPLEQ_REMOVE_HEAD(&oo_queue, entry);
->>> +        qapi_free_ObjectOptions(e->oo);
->>> +        g_free(e);
->>> +    }
->> Why not free the queue entry in object_create, and assert here that it's
->> empty?
+On Thu, Aug 10, 2017 at 09:10:51AM -0700, no-reply@patchew.org wrote:
+> Hi,
 > 
-> Assumes object_create_delayed(TYPE) == !object_create_initial(TYPE),
-> which is the case.  Fewer assumptions is good.  Less code is also good.
-> Pick your goodness, please :)
+> This series failed build test on s390x host. Please find the details below.
+> 
+> Subject: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
+> Type: series
+> Message-id: 20170810155522.31099-1-berrange@redhat.com
+> 
+>   GEN     trace/generated-helpers.h
+>   GEN     trace/generated-helpers-wrappers.h
+>   GEN     trace/generated-tcg-tracers.h
+>   GEN     trace/generated-helpers.c
+> make: *** No rule to make target 'ui/input-keymap-atset12qcode.c', needed by 'Makefile'.  Stop.
+> make: *** Waiting for unfinished jobs....
 
-I think the assumption is not that object_create_delayed(TYPE) ==
-!object_create_initial(TYPE), but rather that all -object options are
-dealt with (and they shouldn't be dealt more than once).  It's a
-reasonable assumption, methinks. :)
+Opps, failure due to me not testing non-srcdir builds.
 
-Paolo
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
