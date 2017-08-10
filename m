@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dfuBQ-00036A-1a
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 16:35:58 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dfuJe-0005Qo-FN
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 16:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dfuBO-0005Th-5W
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 16:35:56 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dfuJa-000072-2y
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 16:44:26 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:37016)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dfuJZ-00006o-TE
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 16:44:22 -0400
+Received: by mail-io0-x242.google.com with SMTP id c74so2284391iod.4
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 13:44:21 -0700 (PDT)
 From: Programmingkid <programmingkidx@gmail.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-Id: <D8BB14D4-9DEF-4FAA-9C48-91E01D7B2EF9@gmail.com>
-Date: Thu, 10 Aug 2017 16:35:44 -0400
-Subject: [Qemu-devel] Block warning messages displayed while compiling
+Message-Id: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
+Date: Thu, 10 Aug 2017 16:44:19 -0400
+Subject: [Qemu-devel] SLIRP warning messages displayed while compiling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,329 +27,520 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-Host info:
-Operating system: Mac OS 10.12.5
+Host: Mac OS 10.12.5
 Compiler: Apple LLVM version 8.1.0 (clang-802.0.42)
-Command to reproduce: ./configure --target-list=3Dppc-softmmu,i386-softmmu=
- && make -j 4
+Command used: ./configure --target-list=3Dppc-softmmu,i386-softmmu && =
+make -j 4
 
-When compiling QEMU I see these warning messages:
+While compiling I saw these error messages:
 
+slirp/ip6_icmp.c:79:32: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
+                               ^~~~~~~~~~
+/usr/include/netinet6/in6.h:299:36: note: expanded from macro =
+'IN6_IS_ADDR_MULTICAST'
+#define IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] =3D=3D 0xff)
+                                          ^
+slirp/ip6_icmp.c:80:38: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                     ^~~~~~~~~~
+/usr/include/netinet6/in6.h:238:42: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        ((*(const __uint32_t *)(const void *)(&(a)->s6_addr[0]) =3D=3D =
+0) && \
+                                                ^
+slirp/ip6_icmp.c:80:38: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                     ^~~~~~~~~~
+/usr/include/netinet6/in6.h:239:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[4]) =3D=3D 0) =
+&& \
+                                               ^
+slirp/ip6_icmp.c:80:38: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                     ^~~~~~~~~~
+/usr/include/netinet6/in6.h:240:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[8]) =3D=3D 0) =
+&& \
+                                               ^
+slirp/ip6_icmp.c:80:38: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                     ^~~~~~~~~~
+/usr/include/netinet6/in6.h:241:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[12]) =3D=3D =
+0))
+                                               ^
+slirp/ip6_icmp.c:275:34: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    if (IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                 ^~~~~~~~~~
+/usr/include/netinet6/in6.h:238:42: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        ((*(const __uint32_t *)(const void *)(&(a)->s6_addr[0]) =3D=3D =
+0) && \
+                                                ^
+slirp/ip6_icmp.c:275:34: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    if (IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                 ^~~~~~~~~~
+/usr/include/netinet6/in6.h:239:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[4]) =3D=3D 0) =
+&& \
+                                               ^
+slirp/ip6_icmp.c:275:34: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    if (IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                 ^~~~~~~~~~
+/usr/include/netinet6/in6.h:240:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[8]) =3D=3D 0) =
+&& \
+                                               ^
+slirp/ip6_icmp.c:275:34: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    if (IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)) {
+                                 ^~~~~~~~~~
+/usr/include/netinet6/in6.h:241:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[12]) =3D=3D =
+0))
+                                               ^
+slirp/ip6_icmp.c:294:50: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    ricmp->icmp6_nna.S =3D !IN6_IS_ADDR_MULTICAST(&rip->ip_dst);
+                                                 ^~~~~~~~~~~
+/usr/include/netinet6/in6.h:299:36: note: expanded from macro =
+'IN6_IS_ADDR_MULTICAST'
+#define IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] =3D=3D 0xff)
+                                          ^
+slirp/ip6_icmp.c:351:44: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && !IN6_IS_ADDR_MULTICAST(&icmp->icmp6_nns.target)
+                    ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/netinet6/in6.h:299:36: note: expanded from macro =
+'IN6_IS_ADDR_MULTICAST'
+#define IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] =3D=3D 0xff)
+                                          ^
+slirp/ip6_icmp.c:353:47: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && (!IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)
+                                              ^~~~~~~~~~
+/usr/include/netinet6/in6.h:238:42: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        ((*(const __uint32_t *)(const void *)(&(a)->s6_addr[0]) =3D=3D =
+0) && \
+                                                ^
+slirp/ip6_icmp.c:353:47: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && (!IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)
+                                              ^~~~~~~~~~
+/usr/include/netinet6/in6.h:239:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[4]) =3D=3D 0) =
+&& \
+                                               ^
+slirp/ip6_icmp.c:353:47: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && (!IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)
+                                              ^~~~~~~~~~
+/usr/include/netinet6/in6.h:240:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[8]) =3D=3D 0) =
+&& \
+                                               ^
+slirp/ip6_icmp.c:353:47: warning: taking address of packed member =
+'ip_src' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && (!IN6_IS_ADDR_UNSPECIFIED(&ip->ip_src)
+                                              ^~~~~~~~~~
+/usr/include/netinet6/in6.h:241:41: note: expanded from macro =
+'IN6_IS_ADDR_UNSPECIFIED'
+        (*(const __uint32_t *)(const void *)(&(a)->s6_addr[12]) =3D=3D =
+0))
+                                               ^
+slirp/ip6_icmp.c:354:53: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                    || in6_solicitednode_multicast(&ip->ip_dst))) {
+                                                    ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:91:20=
+: note:=20
+      expanded from macro 'in6_solicitednode_multicast'
+    (in6_equal_net(a, &(struct in6_addr)SOLICITED_NODE_PREFIX, 104))
+                   ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+     ~~~~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:76:21=
+: note:=20
+      expanded from macro 'in6_equal_router'
+    ((in6_equal_net(a, &slirp->vprefix_addr6, slirp->vprefix_len)\
+                    ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+     ~~~~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:77:25=
+: note:=20
+      expanded from macro 'in6_equal_router'
+      && in6_equal_mach(a, &slirp->vhost_addr6, slirp->vprefix_len))\
+                        ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+     ~~~~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:78:21=
+: note:=20
+      expanded from macro 'in6_equal_router'
+  || (in6_equal_net(a, &(struct in6_addr)LINKLOCAL_ADDR, 64)\
+                    ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+     ~~~~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:79:25=
+: note:=20
+      expanded from macro 'in6_equal_router'
+      && in6_equal_mach(a, &slirp->vhost_addr6, 64)))
+                        ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                            ~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:82:21=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+    ((in6_equal_net(a, &slirp->vprefix_addr6, slirp->vprefix_len)\
+                    ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                            ~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:83:25=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+      && in6_equal_mach(a, &slirp->vnameserver_addr6, =
+slirp->vprefix_len))\
+                        ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                            ~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:84:21=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+  || (in6_equal_net(a, &(struct in6_addr)LINKLOCAL_ADDR, 64)\
+                    ^
+slirp/ip6_icmp.c:355:33: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_ns' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+            if (in6_equal_host(&icmp->icmp6_nns.target)) {
+                ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                            ~~~~~~~~~~~~~~^~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:85:25=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+      && in6_equal_mach(a, &slirp->vnameserver_addr6, 64)))
+                        ^
+slirp/ip6_icmp.c:368:44: warning: taking address of packed member =
+'target' of class or
+      structure 'ndp_na' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && !IN6_IS_ADDR_MULTICAST(&icmp->icmp6_nna.target)
+                    ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/netinet6/in6.h:299:36: note: expanded from macro =
+'IN6_IS_ADDR_MULTICAST'
+#define IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] =3D=3D 0xff)
+                                          ^
+slirp/ip6_icmp.c:369:45: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+                && (!IN6_IS_ADDR_MULTICAST(&ip->ip_dst)
+                                            ^~~~~~~~~~
+/usr/include/netinet6/in6.h:299:36: note: expanded from macro =
+'IN6_IS_ADDR_MULTICAST'
+#define IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] =3D=3D 0xff)
+                                          ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                      ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:76:21=
+: note:=20
+      expanded from macro 'in6_equal_router'
+    ((in6_equal_net(a, &slirp->vprefix_addr6, slirp->vprefix_len)\
+                    ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                      ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:77:25=
+: note:=20
+      expanded from macro 'in6_equal_router'
+      && in6_equal_mach(a, &slirp->vhost_addr6, slirp->vprefix_len))\
+                        ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                      ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:78:21=
+: note:=20
+      expanded from macro 'in6_equal_router'
+  || (in6_equal_net(a, &(struct in6_addr)LINKLOCAL_ADDR, 64)\
+                    ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:23=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                      ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:79:25=
+: note:=20
+      expanded from macro 'in6_equal_router'
+      && in6_equal_mach(a, &slirp->vhost_addr6, 64)))
+                        ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                                          ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:82:21=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+    ((in6_equal_net(a, &slirp->vprefix_addr6, slirp->vprefix_len)\
+                    ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                                          ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:83:25=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+      && in6_equal_mach(a, &slirp->vnameserver_addr6, =
+slirp->vprefix_len))\
+                        ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                                          ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:84:21=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+  || (in6_equal_net(a, &(struct in6_addr)LINKLOCAL_ADDR, 64)\
+                    ^
+slirp/ip6_icmp.c:414:29: warning: taking address of packed member =
+'ip_dst' of class or
+      structure 'ip6' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+        if (in6_equal_host(&ip->ip_dst)) {
+                            ^~~~~~~~~~
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:88:43=
+: note:=20
+      expanded from macro 'in6_equal_host'
+    (in6_equal_router(a) || in6_equal_dns(a))
+                                          ^
+=
+/Users/john/Documents/Development/Projects/Qemu/qemu-git/slirp/ip6.h:85:25=
+: note:=20
+      expanded from macro 'in6_equal_dns'
+      && in6_equal_mach(a, &slirp->vnameserver_addr6, 64)))
+                        ^
 
-  CC      block/vdi.o
-block/qcow.c:138:19: warning: taking address of packed member 'magic' of =
-class or
-      structure 'QCowHeader' may result in an unaligned pointer value
+slirp/ip_input.c:159:43: warning: taking address of packed member =
+'ip_link' of class or
+      structure 'ipq' may result in an unaligned pointer value
       [-Waddress-of-packed-member]
-    be32_to_cpus(&header.magic);
-                  ^~~~~~~~~~~~
-block/qcow.c:139:19: warning: taking address of packed member 'version' =
+                for (l =3D slirp->ipq.ip_link.next; l !=3D =
+&slirp->ipq.ip_link;
+                                                        =
+^~~~~~~~~~~~~~~~~~
+slirp/ip_input.c:441:18: warning: taking address of packed member =
+'ip_link' of class or
+      structure 'ipq' may result in an unaligned pointer value
+      [-Waddress-of-packed-member]
+    while (l !=3D &slirp->ipq.ip_link) {
+                 ^~~~~~~~~~~~~~~~~~
+2 warnings generated.
+34 warnings generated.
+
+slirp/slirp.c:403:19: warning: taking address of packed member 'ip_link' =
 of class or
-      structure 'QCowHeader' may result in an unaligned pointer value
+      structure 'ipq' may result in an unaligned pointer value
       [-Waddress-of-packed-member]
-    be32_to_cpus(&header.version);
-                  ^~~~~~~~~~~~~~
-block/qcow.c:140:19: warning: taking address of packed member =
-'backing_file_offset' of
-      class or structure 'QCowHeader' may result in an unaligned pointer =
-value
-      [-Waddress-of-packed-member]
-    be64_to_cpus(&header.backing_file_offset);
-                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
-block/qcow.c:141:19: warning: taking address of packed member =
-'backing_file_size' of
-      class or structure 'QCowHeader' may result in an unaligned pointer =
-value
-      [-Waddress-of-packed-member]
-    be32_to_cpus(&header.backing_file_size);
-                  ^~~~~~~~~~~~~~~~~~~~~~~~
-block/qcow.c:142:19: warning: taking address of packed member 'mtime' of =
-class or
-      structure 'QCowHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    be32_to_cpus(&header.mtime);
-                  ^~~~~~~~~~~~
-block/qcow.c:143:19: warning: taking address of packed member 'size' of =
-class or
-      structure 'QCowHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    be64_to_cpus(&header.size);
-                  ^~~~~~~~~~~
-block/qcow.c:144:19: warning: taking address of packed member =
-'crypt_method' of class or
-      structure 'QCowHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    be32_to_cpus(&header.crypt_method);
-                  ^~~~~~~~~~~~~~~~~~~
-block/qcow.c:145:19: warning: taking address of packed member =
-'l1_table_offset' of class
-      or structure 'QCowHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    be64_to_cpus(&header.l1_table_offset);
-                  ^~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:182:19: warning: taking address of packed member 'signature' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->signature);
-                  ^~~~~~~~~~~~~~~~~
-block/vdi.c:183:19: warning: taking address of packed member 'version' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->version);
-                  ^~~~~~~~~~~~~~~
-block/vdi.c:184:19: warning: taking address of packed member =
-'header_size' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->header_size);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:185:19: warning: taking address of packed member =
-'image_type' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->image_type);
-                  ^~~~~~~~~~~~~~~~~~
-block/vdi.c:186:19: warning: taking address of packed member =
-'image_flags' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->image_flags);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:187:19: warning: taking address of packed member =
-'offset_bmap' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->offset_bmap);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:188:19: warning: taking address of packed member =
-'offset_data' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->offset_data);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:189:19: warning: taking address of packed member 'cylinders' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->cylinders);
-                  ^~~~~~~~~~~~~~~~~
-block/vdi.c:190:19: warning: taking address of packed member 'heads' of =
-class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->heads);
-                  ^~~~~~~~~~~~~
-block/vdi.c:191:19: warning: taking address of packed member 'sectors' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->sectors);
-                  ^~~~~~~~~~~~~~~
-block/vdi.c:192:19: warning: taking address of packed member =
-'sector_size' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->sector_size);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:193:19: warning: taking address of packed member 'disk_size' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le64_to_cpus(&header->disk_size);
-                  ^~~~~~~~~~~~~~~~~
-block/vdi.c:194:19: warning: taking address of packed member =
-'block_size' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->block_size);
-                  ^~~~~~~~~~~~~~~~~~
-block/vdi.c:195:19: warning: taking address of packed member =
-'block_extra' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->block_extra);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:196:19: warning: taking address of packed member =
-'blocks_in_image' of class
-      or structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->blocks_in_image);
-                  ^~~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:197:19: warning: taking address of packed member =
-'blocks_allocated' of class
-      or structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    le32_to_cpus(&header->blocks_allocated);
-                  ^~~~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:198:22: warning: taking address of packed member =
-'uuid_image' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_image);
-                     ^~~~~~~~~~~~~~~~~~
-block/vdi.c:199:22: warning: taking address of packed member =
-'uuid_last_snap' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_last_snap);
-                     ^~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:200:22: warning: taking address of packed member 'uuid_link' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_link);
-                     ^~~~~~~~~~~~~~~~~
-block/vdi.c:201:22: warning: taking address of packed member =
-'uuid_parent' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_parent);
-                     ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:206:19: warning: taking address of packed member 'signature' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->signature);
-                  ^~~~~~~~~~~~~~~~~
-block/vdi.c:207:19: warning: taking address of packed member 'version' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->version);
-                  ^~~~~~~~~~~~~~~
-block/vdi.c:208:19: warning: taking address of packed member =
-'header_size' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->header_size);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:209:19: warning: taking address of packed member =
-'image_type' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->image_type);
-                  ^~~~~~~~~~~~~~~~~~
-block/vdi.c:210:19: warning: taking address of packed member =
-'image_flags' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->image_flags);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:211:19: warning: taking address of packed member =
-'offset_bmap' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->offset_bmap);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:212:19: warning: taking address of packed member =
-'offset_data' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->offset_data);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:213:19: warning: taking address of packed member 'cylinders' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->cylinders);
-                  ^~~~~~~~~~~~~~~~~
-block/vdi.c:214:19: warning: taking address of packed member 'heads' of =
-class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->heads);
-                  ^~~~~~~~~~~~~
-block/vdi.c:215:19: warning: taking address of packed member 'sectors' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->sectors);
-                  ^~~~~~~~~~~~~~~
-block/vdi.c:216:19: warning: taking address of packed member =
-'sector_size' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->sector_size);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:217:19: warning: taking address of packed member 'disk_size' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le64s(&header->disk_size);
-                  ^~~~~~~~~~~~~~~~~
-block/vdi.c:218:19: warning: taking address of packed member =
-'block_size' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->block_size);
-                  ^~~~~~~~~~~~~~~~~~
-block/vdi.c:219:19: warning: taking address of packed member =
-'block_extra' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->block_extra);
-                  ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:220:19: warning: taking address of packed member =
-'blocks_in_image' of class
-      or structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->blocks_in_image);
-                  ^~~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:221:19: warning: taking address of packed member =
-'blocks_allocated' of class
-      or structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    cpu_to_le32s(&header->blocks_allocated);
-                  ^~~~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:222:22: warning: taking address of packed member =
-'uuid_image' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_image);
-                     ^~~~~~~~~~~~~~~~~~
-block/vdi.c:223:22: warning: taking address of packed member =
-'uuid_last_snap' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_last_snap);
-                     ^~~~~~~~~~~~~~~~~~~~~~
-block/vdi.c:224:22: warning: taking address of packed member 'uuid_link' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_link);
-                     ^~~~~~~~~~~~~~~~~
-block/vdi.c:225:22: warning: taking address of packed member =
-'uuid_parent' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_bswap(&header->uuid_parent);
-                     ^~~~~~~~~~~~~~~~~~~
-block/vdi.c:440:36: warning: taking address of packed member 'uuid_link' =
-of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    } else if (!qemu_uuid_is_null(&header.uuid_link)) {
-                                   ^~~~~~~~~~~~~~~~
-block/vdi.c:444:36: warning: taking address of packed member =
-'uuid_parent' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    } else if (!qemu_uuid_is_null(&header.uuid_parent)) {
-                                   ^~~~~~~~~~~~~~~~~~
-block/vdi.c:798:25: warning: taking address of packed member =
-'uuid_image' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_generate(&header.uuid_image);
-                        ^~~~~~~~~~~~~~~~~
-block/vdi.c:799:25: warning: taking address of packed member =
-'uuid_last_snap' of class or
-      structure 'VdiHeader' may result in an unaligned pointer value
-      [-Waddress-of-packed-member]
-    qemu_uuid_generate(&header.uuid_last_snap);
+                (&slirp->ipq.ip_link !=3D slirp->ipq.ip_link.next));=
