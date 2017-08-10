@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dfn73-0003Uq-9P
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:03:00 -0400
+	(envelope-from <david@redhat.com>) id 1dfnBh-0004oV-8t
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dfn6x-0003d1-Np
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:02:57 -0400
-Date: Thu, 10 Aug 2017 15:02:40 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170810130240.GC3650@localhost.localdomain>
-References: <20170809203808.31725-1-eblake@redhat.com>
+	(envelope-from <david@redhat.com>) id 1dfnBd-0006WW-SC
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:07:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dfnBd-0006W4-MF
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:07:41 -0400
+References: <20170810123741.30449-1-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <19dbd7b5-495b-4e8e-1af1-25501a342a63@redhat.com>
+Date: Thu, 10 Aug 2017 15:07:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170809203808.31725-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 0/5] More bdrv_getlength() fixes
+In-Reply-To: <20170810123741.30449-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] s390x: introduce 2.11 compat
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, thuth@redhat.com
 
-Am 09.08.2017 um 22:38 hat Eric Blake geschrieben:
-> We already have a lot of bdrv_getlength() fixes in -rc2; so I think
-> this is still okay for -rc3.
+On 10.08.2017 14:37, Cornelia Huck wrote:
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
 > 
-> v1 was here (with a typo'd subject line):
-> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01226.html
+> It's that time again. I plan to put this into my first 2.11 pullreq.
+> Yes, and I assume that the next version is indeed 2.11 :)
 > 
-> Since v1:
-> - patch 1: fix error message capitalization (Kevin, R-b kept)
-> - fix locking bug in original patch 2 (Kevin)
-> - split original patch 2 into two parts: signature update, and
-> added error checking (Kevin)
-> - check for unlikely integer overflow before bdrv_truncate (Jeff)
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 17 ++++++++++++++++-
+>  include/hw/compat.h        |  3 +++
+>  2 files changed, 19 insertions(+), 1 deletion(-)
 > 
-> 001/5:[0002] [FC] 'vpc: Check failure of bdrv_getlength()'
-> 002/5:[down] 'qcow: Change signature of get_cluster_offset()'
-> 003/5:[0048] [FC] 'qcow: Check failure of bdrv_getlength() and bdrv_truncate()'
-> 004/5:[----] [--] 'qcow2: Drop debugging dump_refcounts()'
-> 005/5:[----] [--] 'qcow2: Check failure of bdrv_getlength()'
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 1c7af39ce6..d3d67b8d77 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -432,6 +432,9 @@ bool css_migration_enabled(void)
+>      }                                                                         \
+>      type_init(ccw_machine_register_##suffix)
+>  
+> +#define CCW_COMPAT_2_10 \
+> +        HW_COMPAT_2_10
+> +
+>  #define CCW_COMPAT_2_9 \
+>          HW_COMPAT_2_9 \
+>          {\
+> @@ -506,8 +509,18 @@ bool css_migration_enabled(void)
+>              .value    = "0",\
+>          },
+>  
+> +static void ccw_machine_2_11_instance_options(MachineState *machine)
+> +{
+> +}
+> +
+> +static void ccw_machine_2_11_class_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_CCW_MACHINE(2_11, "2.11", true);
+> +
+>  static void ccw_machine_2_10_instance_options(MachineState *machine)
+>  {
+> +    ccw_machine_2_11_instance_options(machine);
+>      if (css_migration_enabled()) {
+>          css_register_vmstate();
+>      }
+> @@ -515,8 +528,10 @@ static void ccw_machine_2_10_instance_options(MachineState *machine)
+>  
+>  static void ccw_machine_2_10_class_options(MachineClass *mc)
+>  {
+> +    ccw_machine_2_11_class_options(mc);
+> +    SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_10);
+>  }
+> -DEFINE_CCW_MACHINE(2_10, "2.10", true);
+> +DEFINE_CCW_MACHINE(2_10, "2.10", false);
+>  
+>  static void ccw_machine_2_9_instance_options(MachineState *machine)
+>  {
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 08f36004da..3e101f8f67 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -1,6 +1,9 @@
+>  #ifndef HW_COMPAT_H
+>  #define HW_COMPAT_H
+>  
+> +#define HW_COMPAT_2_10 \
+> +    /* empty */
+> +
+>  #define HW_COMPAT_2_9 \
+>      {\
+>          .driver   = "pci-bridge",\
+> 
 
-Looks good to me, but as the bug is far from being critical, I'd rather
-apply the more complex qcow1 patches only to block-next. The vpc and
-qcow2 parts seems a lot less risky, so 2.10 should be okay for them.
+Looks just fine to me.
 
-What do you think?
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Kevin
+-- 
+
+Thanks,
+
+David
