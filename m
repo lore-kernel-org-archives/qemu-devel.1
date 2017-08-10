@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfms2-0007oN-66
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:47:27 -0400
+	(envelope-from <rkrcmar@redhat.com>) id 1dfmtK-0008Pv-Dh
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfms1-0003Eb-6S
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:47:26 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34030)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dfms1-0003E4-0Z
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:47:25 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id c24so2734714wra.1
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 05:47:24 -0700 (PDT)
+	(envelope-from <rkrcmar@redhat.com>) id 1dfmtG-0003i1-Dl
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:48:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1dfmtG-0003fk-7Y
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:48:42 -0400
+Date: Thu, 10 Aug 2017 14:41:03 +0200
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20170810124102.GA21850@flask>
+References: <1502359687-25370-1-git-send-email-tianyu.lan@intel.com>
+	<20170810102649.GF12980@redhat.com>
+	<00cb01a4-5c27-fc69-d3ae-0653aa54b121@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170809070357.28723-1-david@gibson.dropbear.id.au>
-References: <20170809070357.28723-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 Aug 2017 13:47:03 +0100
-Message-ID: <CAFEAcA_n88x0w1cVirQ61h+NOrvX1V7bXD1LCASVGyUZU=qDgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/6] ppc patch queue 2017-08-09
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <00cb01a4-5c27-fc69-d3ae-0653aa54b121@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] x86: Increase max vcpu number to 352
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, rth@twiddle.net
 
-On 9 August 2017 at 08:03, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 54affb3a3623b1d36c95e34faa722a5831323a74:
->
->   Update version for v2.10.0-rc2 release (2017-08-08 19:07:46 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170809
->
-> for you to fetch changes up to f57467e3b326c7736f8e481fd6b680f30e575c87:
->
->   spapr: Fix bug in h_signal_sys_reset() (2017-08-09 14:04:28 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-08-09
->
-> This series contains a number of bugfixes for ppc and related
-> machines, for the qemu-2.10.release.  Some are true regressions,
-> others are serious enough and non-invasive enough to fix that it's
-> worth putting in 2.10 this late.
->
-> ----------------------------------------------------------------
+2017-08-10 19:02+0800, Lan Tianyu:
+> On 2017=E5=B9=B408=E6=9C=8810=E6=97=A5 18:26, Daniel P. Berrange wrote:
+>> On Thu, Aug 10, 2017 at 06:08:07PM +0800, Lan Tianyu wrote:
+>>> Intel Xeon phi chip will support 352 logical threads. For HPC
+>>> usage case, it will create a huge VM with vcpus number as same as hos=
+t
+>>> cpus. This patch is to increase max vcpu number to 352.
+>>=20
+>> If we pick arbitray limits based on size of physical CPUs that happen
+>> to be shipping today, we'll continue the cat+mouse game forever traili=
+ng
+>> latest CPUs that vendors ship.
+>>=20
+>> IMHO we should pick a higher number influenced by technical constraint=
+s
+>> of the q35 impl instead. eg can we go straight to something like 512 o=
+r
+>> 1024  ?
+>=20
+> Sure. 512 should be enough and some arrays is defined according to max
+> vcpu number.
 
-Applied, thanks.
+Hm, which arrays are that?  I was thinking it is safe to bump it to
+INT_MAX as the number is only used when setting global max_cpus.
 
-> I haven't completed a Travis build for this, which is part of my usual
-> test regime, since the first dozen or so Travis builds are failing
-> more often than not on master as well.  I don't know why this is -
-> seems to be failing some of the x86 tests.
-
-Doesn't look much worse than usual to me -- of the last 24 travis
-builds for master 4 failed and 20 passed.
-
-thanks
--- PMM
+Thanks.
