@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfsUm-0004qV-Ra
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:47:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfsfu-0007CT-8d
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfsUk-0000G2-7u
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:47:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59870)
+	(envelope-from <eblake@redhat.com>) id 1dfsfr-0006gE-LW
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:59:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfsUj-0000Fn-Td
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:47:46 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfsfr-0006fr-BL
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:59:15 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BEECC05A1A8
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 18:47:44 +0000 (UTC)
-References: <1502389816-29772-1-git-send-email-armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 02D6C7ACB6
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 18:59:14 +0000 (UTC)
+References: <20170810155522.31099-1-berrange@redhat.com>
+	<20170810155522.31099-3-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <17b1385e-c14f-d933-661f-56217077ff79@redhat.com>
-Date: Thu, 10 Aug 2017 13:47:42 -0500
+Message-ID: <5e2768ee-17e6-b33d-2787-ab9fb940615f@redhat.com>
+Date: Thu, 10 Aug 2017 13:59:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <1502389816-29772-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <20170810155522.31099-3-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="E4pT72XpblXrOvmTR6BdkKt531go2LVBM"
-Subject: Re: [Qemu-devel] [PATCH] tests/qmp-test: Add generic,
- basic test of query commands
+	boundary="Fg4Bn60KilTWBvddOn3fAWIo9bMeb8v0d"
+Subject: Re: [Qemu-devel] [PATCH 02/15] ui: convert common input code to
+ keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,119 +35,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: crosa@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E4pT72XpblXrOvmTR6BdkKt531go2LVBM
+--Fg4Bn60KilTWBvddOn3fAWIo9bMeb8v0d
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: crosa@redhat.com
-Message-ID: <17b1385e-c14f-d933-661f-56217077ff79@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/qmp-test: Add generic, basic test of
- query commands
-References: <1502389816-29772-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1502389816-29772-1-git-send-email-armbru@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <5e2768ee-17e6-b33d-2787-ab9fb940615f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/15] ui: convert common input code to
+ keycodemapdb
+References: <20170810155522.31099-1-berrange@redhat.com>
+ <20170810155522.31099-3-berrange@redhat.com>
+In-Reply-To: <20170810155522.31099-3-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/10/2017 01:30 PM, Markus Armbruster wrote:
-> A command is a query if it has no side effect and yields a result.
-> Such commands are typically named query-FOO, but there are exceptions.
+On 08/10/2017 10:55 AM, Daniel P. Berrange wrote:
+> Replace the number_to_qcode, qcode_to_number and linux_to_qcode
+> tables with automatically generated tables.
 >=20
-> The basic idea is to find candidates with query-qmp-schema, filter out
-> the ones that aren't queries with an explicit blacklist, and test the
-> remaining ones against a QEMU with no special arguments.
->=20
-> The current blacklist is just add-fd.
+> Missing entries in linux_to_qcode now fixed:
 
-I guess this is because it has no mandatory parameters.  Hmm - I wonder
-if introspection should flag WHICH commands require an fd over SCM
-rights (I guess just add-fd) - as that is a USEFUL piece of information
-to know (I can't call command XYZ unlss I also pass an fd) - and then
-you could use that real bit of the introspection rather than your
-blacklist as the mechanism for filtering this command (since anything
-that requires an fd is obviously not a query).
+> In additionsome fixes:
+
+s/additionsome/addition, some/
 
 >=20
-> query-qmp-schema reports a few commands that aren't actually
-> available.  See qmp_unregister_commands_hack() for details.  Work
-> around this flaw by accepting CommandNotFound errors, but add a TODO
-> to drop this when the flaw is fixed.
+>  - KEY_PLAYPAUSE now maps to Q_KEY_CODE_AUDIOPLAY, instead of
+>    KEY_PLAYCD. KEY_PLAYPAUSE is defined across almost all scancodes
+>    sets, while KEY_PLAYCD only appears in AT set1, so the former is
+>    a more useful mapping.
 >=20
-> The test can't do queries with arguments, because it knows nothing
-> about the arguments.  No coverage for query-cpu-model-baseline,
-> query-cpu-model-comparison and query-cpu-model-expansion, because
-
-s/because//
-
-> query-rocker, query-rocker-ports, query-rocker-of-dpa-flows and
-> query-rocker-of-dpa-groups.
+> Missing entries in qcode_to_number now fixed:
 >=20
-> We get basic test coverage for the following commands:
+>   Q_KEY_CODE_AGAIN -> 0x85
 
-Cool!
+I didn't research that these mappings are correct in relation to an
+official documentation, but trust that you have done due diligence.
 
+> In addition some fixes:
 >=20
->     qom-list-types
->     query-acpi-ospm-status
->     query-balloon               (expected to fail)
+>  - Q_KEY_CODE_MENU was incorrectly mapped to the compose
+>    scancode (0xdd) and is now mapped to 0x9e
+>  - Q_KEY_CODE_FIND was mapped to 0xe065 (Search) instead
+>    of to 0xe041 (Find)
+>  - Q_KEY_CODE_HIRAGANA was mapped to 0x70 (Katakanahiragana)
+>    instead of of 0x77 (Hirigana)
+>  - Q_KEY_CODE_PRINT was mapped to 0xb7 which is not a defined
+>    scan code in AT set 1, it is now mapped to 0x54 (sysrq)
+>=20
 
->     query-vm-generation-id      (expected to fail)
+Are any of these fixes something we need in 2.10 (more likely, as manual
+fixes rather than via the git submodule)?  At this point, though, I'm
+inclined to say we're deep enough in freeze that if it is not a
+regression over 2.9 behavior, it's not worth rushing in the fix to 2.10.
 
-> Most tested commands are expected to succeed.  The test does not check
-> the return value then.  A few commands are expected to fail because
-> they need special arguments to succeed, and this test is too dumb to
-> supply them.
-
-Sounds like it would just be a matter of adding additional command line
-parameters to the qemu being invoked for testing those commands?
-
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  include/ui/input.h |  11 +-
+>  ui/Makefile.objs   |   3 +
+>  ui/input-keymap.c  | 326 +++------------------------------------------=
+--------
+>  3 files changed, 28 insertions(+), 312 deletions(-)
+>=20
+> +++ b/ui/Makefile.objs
+> @@ -54,6 +54,9 @@ KEYCODEMAP_GEN =3D ui/keycodemapdb/tools/keymap-gen
+>  KEYCODEMAP_CSV =3D ui/keycodemapdb/data/keymaps.csv
 > =20
-> +static int query_error_class(const char *cmd)
-> +{
-> +    static struct {
-> +        const char *cmd;
-> +        int err_class;
-> +    } fails[] =3D {
-> +        { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
-> +        { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
+>  KEYCODEMAP_FILES =3D \
+> +		 ui/input-keymap-linux2qcode.c \
+> +		 ui/input-keymap-qcode2qnum.c \
+> +		 ui/input-keymap-qnum2qcode.c \
 
-But even THIS level of testing of those commands is pretty good!
+My comment on patch 1 complained about regex of [a-zA-Z0-9] - do any of
+the keycode names have digits, or can you shorten the regex to [a-zA-Z]?
 
+> -
+> -static int number_to_qcode[0x100];
+> +#include "ui/input-keymap-linux2qcode.c"
+> +#include "ui/input-keymap-qcode2qnum.c"
+> +#include "ui/input-keymap-qnum2qcode.c"
+> =20
+>  int qemu_input_linux_to_qcode(unsigned int lnx)
+>  {
+> -    assert(lnx < KEY_CNT);
+> -    return linux_to_qcode[lnx];
 
-> +static void test_query(const void *data)
-> +{
-> +    const char *cmd =3D data;
-> +    int expected_error_class =3D query_error_class(cmd);
-> +    QDict *resp, *error;
-> +    const char *error_class;
-> +
-> +    qtest_start("-nodefaults");
-> +
-> +    resp =3D qmp("{ 'execute': %s }", cmd);
+The old code asserted on an out-of-range input,
 
-Oh fun - your patch and my libqtest cleanup series will collide :)
+> +    if (lnx >=3D qemu_input_map_linux2qcode_len) {
+> +        return 0;
+> +    }
+> +    return qemu_input_map_linux2qcode[lnx];
 
-> +static void qmp_schema_init(QmpSchema *schema)
-> +{
-> +    QDict *resp;
-> +    Visitor *qiv;
-> +    SchemaInfoList *tail;
-> +
-> +    qtest_start("-nodefaults");
-> +    resp =3D qmp("{ 'execute': 'query-qmp-schema' }");
-> +
-> +    qiv =3D qobject_input_visitor_new(qdict_get(resp, "return"));
-> +    visit_type_SchemaInfoList(qiv, NULL, &schema->list, &error_abort);=
-
-
-It's always fun to see this in action!  Our efforts to add automated
-introspection code generation have been WELL worth the cost in time.
-
-Overall, I like the patch.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+the new code returns 0.  I guess that's okay, though, since the
+generated table uses 0 for invalid entries, and there's no implicit
+reason why out-of-range input has to assert.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -154,7 +140,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---E4pT72XpblXrOvmTR6BdkKt531go2LVBM
+--Fg4Bn60KilTWBvddOn3fAWIo9bMeb8v0d
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -163,14 +149,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMqk4ACgkQp6FrSiUn
-Q2oISAf/S1DeLQtqSlPYSUzXqOswtmqXYgbcmPk3fQupqUnWNIdjMQx/hiKDARV4
-UyvqPI3mRIdfyOULcfm2vSJS09HcA31ynmhD/CP6cE38mralDd/cZBbGRvg1sclu
-xoReO8Wh2L8XYk/W2c2vx2zjxkziSdAbtgMmdEenNoBq5cAnZwZIQB/oh3NvOf6I
-7hoFZE1wwSqIpYfubhVR/dMJNeBBO6i4EoKECoQETqve/6zzMqsO+6iVG+HjTF0i
-qEhwhnLzFDl8bf6n0rW2pg3pHx/Q8TgrvSxwo1/2j8Io5i8LGe09P/s9KawcnXKa
-B4gBJ4mE6EMwJLADkCMBFlTM9orNHg==
-=YTO2
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMrP0ACgkQp6FrSiUn
+Q2o1uQgAp6GPKFlEK2D0pd7CTejV5KgxquHt1aYBITGWmViDwI3sn4OdPUH3GUX7
+2KtAiwMHl184DVxsVa67pO425Ffp8H+iSa0cTWRNC8omBa3akck+P61lp0vTKPyi
+3upJdkvRtHsKj90EsvzQ7k8QptAN0UIY5G+nyjGsyk8AtsvNoEEFAh28cS7rZdH4
+bg+0kCcgu1wvygXuduQYSxOrvhz2gwgdUt3UrKoAltVv3GReGVWXadVoHYHs9mdH
+lX9yrzkYZapXIvIy7dd92aVmLQ24Hvj6LVaVsYllhm+lrK1SJGMdXXXZ4XRDrMUX
+G8lk6SVQMtv4r10UKef43/2DxbqQdA==
+=5cuj
 -----END PGP SIGNATURE-----
 
---E4pT72XpblXrOvmTR6BdkKt531go2LVBM--
+--Fg4Bn60KilTWBvddOn3fAWIo9bMeb8v0d--
