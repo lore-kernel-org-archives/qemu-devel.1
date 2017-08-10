@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfpoZ-00045D-UJ
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:56:06 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfpoc-00048G-UD
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfpoX-0005rz-QY
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:56:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35366)
+	(envelope-from <berrange@redhat.com>) id 1dfpoZ-0005sY-8O
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:56:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfpoX-0005qd-HP
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:56:01 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfpoY-0005sI-SF
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:56:03 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FE581E5E6
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 15:56:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9F2276034
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 15:56:01 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 10 Aug 2017 16:55:18 +0100
-Message-Id: <20170810155522.31099-12-berrange@redhat.com>
+Date: Thu, 10 Aug 2017 16:55:19 +0100
+Message-Id: <20170810155522.31099-13-berrange@redhat.com>
 In-Reply-To: <20170810155522.31099-1-berrange@redhat.com>
 References: <20170810155522.31099-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/15] ui: convert the SDL2 frontend to
+Subject: [Qemu-devel] [PATCH 12/15] ui: convert GTK and SDL1 frontends to
  keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,404 +33,916 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The SDL2 scancodes are conveniently identical to the USB
-scancodes. Replace the sdl2_scancode_to_qcode table with
-an automatically generated table.
-
-Missing entries in sdl2_scancode_to_qcode now fixed:
-
-  - 0x32 -> Q_KEY_CODE_BACKSLASH
-  - 0x66 -> Q_KEY_CODE_POWER
-  - 0x67 -> Q_KEY_CODE_KP_EQUALS
-  - 0x74 -> Q_KEY_CODE_OPEN
-  - 0x77 -> Q_KEY_CODE_FRONT
-  - 0x7f -> Q_KEY_CODE_AUDIOMUTE
-  - 0x80 -> Q_KEY_CODE_VOLUMEUP
-  - 0x81 -> Q_KEY_CODE_VOLUMEDOWN
-  - 0x85 -> Q_KEY_CODE_KP_COMMA
-  - 0x87 -> Q_KEY_CODE_RO
-  - 0x89 -> Q_KEY_CODE_YEN
-  - 0x8a -> Q_KEY_CODE_HENKAN
-  - 0x93 -> Q_KEY_CODE_HIRAGANA
-  - 0xe8 -> Q_KEY_CODE_AUDIOPLAY
-  - 0xe9 -> Q_KEY_CODE_AUDIOSTOP
-  - 0xea -> Q_KEY_CODE_AUDIOPREV
-  - 0xeb -> Q_KEY_CODE_AUDIONEXT
-  - 0xed -> Q_KEY_CODE_VOLUMEUP
-  - 0xee -> Q_KEY_CODE_VOLUMEDOWN
-  - 0xef -> Q_KEY_CODE_AUDIOMUTE
-  - 0xf1 -> Q_KEY_CODE_AC_BACK
-  - 0xf2 -> Q_KEY_CODE_AC_FORWARD
-  - 0xf3 -> Q_KEY_CODE_STOP
-  - 0xf4 -> Q_KEY_CODE_FIND
-  - 0xf8 -> Q_KEY_CODE_SLEEP
-  - 0xfa -> Q_KEY_CODE_AC_REFRESH
-  - 0xfb -> Q_KEY_CODE_CALCULATOR
-
-And some mistakes corrected:
-
-  - 0x65 -> Q_KEY_CODE_COMPOSE, not duplicating Q_KEY_CODE_MENU
+The x_keycode_to_pc_keycode and evdev_keycode_to_pc_keycode
+tables are replaced with automatically generated tables.
+In addition the X11 heuristics are improved to detect running
+on XQuartz and XWin X11 servers, to activate the correct OS-X
+and Win32 keycode maps.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/ui/input.h |   3 +
- ui/Makefile.objs   |   1 +
- ui/input-keymap.c  |   1 +
- ui/sdl2-input.c    |  14 ++-
- ui/sdl2-keymap.h   | 267 -----------------------------------------------------
- 5 files changed, 14 insertions(+), 272 deletions(-)
- delete mode 100644 ui/sdl2-keymap.h
+ include/ui/input.h |  21 +++++
+ ui/Makefile.objs   |  12 ++-
+ ui/gtk.c           | 205 ++++++++++++++++++++++++++------------------
+ ui/input-keymap.c  |   7 ++
+ ui/sdl.c           | 103 +++++++---------------
+ ui/trace-events    |   9 +-
+ ui/x_keymap.c      | 247 ++++++++++++++++++++---------------------------------
+ ui/x_keymap.h      |   8 +-
+ 8 files changed, 294 insertions(+), 318 deletions(-)
 
 diff --git a/include/ui/input.h b/include/ui/input.h
-index 595e596ef3..11bf94aacf 100644
+index 11bf94aacf..7ac1d62747 100644
 --- a/include/ui/input.h
 +++ b/include/ui/input.h
-@@ -95,4 +95,7 @@ extern const guint16 qemu_input_map_qcode2sun[];
- extern const guint qemu_input_map_qnum2qcode_len;
- extern const guint16 qemu_input_map_qnum2qcode[];
+@@ -65,6 +65,9 @@ void qemu_input_check_mode_change(void);
+ void qemu_add_mouse_mode_change_notifier(Notifier *notify);
+ void qemu_remove_mouse_mode_change_notifier(Notifier *notify);
  
-+extern const guint qemu_input_map_usb2qcode_len;
-+extern const guint16 qemu_input_map_usb2qcode[];
++extern const guint qemu_input_map_atset12qcode_len;
++extern const guint16 qemu_input_map_atset12qcode[];
++
+ extern const guint qemu_input_map_linux2qcode_len;
+ extern const guint16 qemu_input_map_linux2qcode[];
+ 
+@@ -98,4 +101,22 @@ extern const guint16 qemu_input_map_qnum2qcode[];
+ extern const guint qemu_input_map_usb2qcode_len;
+ extern const guint16 qemu_input_map_usb2qcode[];
+ 
++extern const guint qemu_input_map_win322qcode_len;
++extern const guint16 qemu_input_map_win322qcode[];
++
++extern const guint qemu_input_map_x112qcode_len;
++extern const guint16 qemu_input_map_x112qcode[];
++
++extern const guint qemu_input_map_xorgevdev2qcode_len;
++extern const guint16 qemu_input_map_xorgevdev2qcode[];
++
++extern const guint qemu_input_map_xorgkbd2qcode_len;
++extern const guint16 qemu_input_map_xorgkbd2qcode[];
++
++extern const guint qemu_input_map_xorgxquartz2qcode_len;
++extern const guint16 qemu_input_map_xorgxquartz2qcode[];
++
++extern const guint qemu_input_map_xorgxwin2qcode_len;
++extern const guint16 qemu_input_map_xorgxwin2qcode[];
 +
  #endif /* INPUT_H */
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index ce9c4380ae..cd2bf1e790 100644
+index cd2bf1e790..f240c4aa87 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -64,6 +64,7 @@ KEYCODEMAP_FILES = \
- 		 ui/input-keymap-qcode2qnum.c \
+@@ -11,11 +11,12 @@ common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+ common-obj-y += input.o input-keymap.o input-legacy.o
+ common-obj-$(CONFIG_LINUX) += input-linux.o
+ common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
+-common-obj-$(CONFIG_SDL) += sdl.mo x_keymap.o
++common-obj-$(CONFIG_SDL) += sdl.mo
+ common-obj-$(CONFIG_COCOA) += cocoa.o
+ common-obj-$(CONFIG_CURSES) += curses.o
+ common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
+-common-obj-$(CONFIG_GTK) += gtk.o x_keymap.o
++common-obj-$(CONFIG_GTK) += gtk.o
++common-obj-$(if $(CONFIG_WIN32),n,$(if $(CONFIG_SDL),y,$(CONFIG_GTK))) += x_keymap.o
+ 
+ ifeq ($(CONFIG_SDLABI),1.2)
+ sdl.mo-objs := sdl.o sdl_zoom.o
+@@ -54,6 +55,7 @@ KEYCODEMAP_GEN = ui/keycodemapdb/tools/keymap-gen
+ KEYCODEMAP_CSV = ui/keycodemapdb/data/keymaps.csv
+ 
+ KEYCODEMAP_FILES = \
++		 ui/input-keymap-atset12qcode.c \
+ 		 ui/input-keymap-linux2qcode.c \
+ 		 ui/input-keymap-osx2qcode.c \
+ 		 ui/input-keymap-qcode2adb.c \
+@@ -65,6 +67,12 @@ KEYCODEMAP_FILES = \
  		 ui/input-keymap-qcode2sun.c \
  		 ui/input-keymap-qnum2qcode.c \
-+		 ui/input-keymap-usb2qcode.c \
+ 		 ui/input-keymap-usb2qcode.c \
++		 ui/input-keymap-win322qcode.c \
++		 ui/input-keymap-x112qcode.c \
++		 ui/input-keymap-xorgevdev2qcode.c \
++		 ui/input-keymap-xorgkbd2qcode.c \
++		 ui/input-keymap-xorgxquartz2qcode.c \
++		 ui/input-keymap-xorgxwin2qcode.c \
  		 $(NULL)
  
  GENERATED_FILES += $(KEYCODEMAP_FILES)
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 5bd87c265a..52519e9aeb 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -52,7 +52,6 @@
+ #include "ui/input.h"
+ #include "sysemu/sysemu.h"
+ #include "qmp-commands.h"
+-#include "x_keymap.h"
+ #include "keymaps.h"
+ #include "chardev/char.h"
+ #include "qom/object.h"
+@@ -65,6 +64,48 @@
+ #define VC_SCALE_MIN    0.25
+ #define VC_SCALE_STEP   0.25
+ 
++#ifdef GDK_WINDOWING_X11
++#include "ui/x_keymap.h"
++
++/* Gtk2 compat */
++#ifndef GDK_IS_X11_DISPLAY
++#define GDK_IS_X11_DISPLAY(dpy) (dpy != NULL)
++#endif
++#endif
++
++
++#ifdef GDK_WINDOWING_WAYLAND
++/* Gtk2 compat */
++#ifndef GDK_IS_WAYLAND_DISPLAY
++#define GDK_IS_WAYLAND_DISPLAY(dpy) (dpy != NULL)
++#endif
++#endif
++
++
++#ifdef GDK_WINDOWING_WIN32
++/* Gtk2 compat */
++#ifndef GDK_IS_WIN32_DISPLAY
++#define GDK_IS_WIN32_DISPLAY(dpy) (dpy != NULL)
++#endif
++#endif
++
++
++#ifdef GDK_WINDOWING_BROADWAY
++/* Gtk2 compat */
++#ifndef GDK_IS_BROADWAY_DISPLAY
++#define GDK_IS_BROADWAY_DISPLAY(dpy) (dpy != NULL)
++#endif
++#endif
++
++
++#ifdef GDK_WINDOWING_QUARTZ
++/* Gtk2 compat */
++#ifndef GDK_IS_QUARTZ_DISPLAY
++#define GDK_IS_QUARTZ_DISPLAY(dpy) (dpy != NULL)
++#endif
++#endif
++
++
+ #if !defined(CONFIG_VTE)
+ # define VTE_CHECK_VERSION(a, b, c) 0
+ #endif
+@@ -123,10 +164,19 @@
+ #define HOTKEY_MODIFIERS        (GDK_CONTROL_MASK | GDK_MOD1_MASK)
+ 
+ static const int modifier_keycode[] = {
+-    /* shift, control, alt keys, meta keys, both left & right */
+-    0x2a, 0x36, 0x1d, 0x9d, 0x38, 0xb8, 0xdb, 0xdd,
++    Q_KEY_CODE_SHIFT,
++    Q_KEY_CODE_SHIFT_R,
++    Q_KEY_CODE_CTRL,
++    Q_KEY_CODE_CTRL_R,
++    Q_KEY_CODE_ALT,
++    Q_KEY_CODE_ALT_R,
++    Q_KEY_CODE_META_L,
++    Q_KEY_CODE_META_R,
+ };
+ 
++static const guint16 *keycode_map;
++static size_t keycode_maplen;
++
+ struct GtkDisplayState {
+     GtkWidget *window;
+ 
+@@ -178,7 +228,6 @@ struct GtkDisplayState {
+     bool external_pause_update;
+ 
+     bool modifier_pressed[ARRAY_SIZE(modifier_keycode)];
+-    bool has_evdev;
+     bool ignore_keys;
+ };
+ 
+@@ -412,18 +461,18 @@ static void gd_update_full_redraw(VirtualConsole *vc)
+ static void gtk_release_modifiers(GtkDisplayState *s)
+ {
+     VirtualConsole *vc = gd_vc_find_current(s);
+-    int i, keycode;
++    int i, qcode;
+ 
+     if (vc->type != GD_VC_GFX ||
+         !qemu_console_is_graphic(vc->gfx.dcl.con)) {
+         return;
+     }
+     for (i = 0; i < ARRAY_SIZE(modifier_keycode); i++) {
+-        keycode = modifier_keycode[i];
++        qcode = modifier_keycode[i];
+         if (!s->modifier_pressed[i]) {
+             continue;
+         }
+-        qemu_input_event_send_key_number(vc->gfx.dcl.con, keycode, false);
++        qemu_input_event_send_key_qcode(vc->gfx.dcl.con, qcode, false);
+         s->modifier_pressed[i] = false;
+     }
+ }
+@@ -1057,47 +1106,73 @@ static gboolean gd_scroll_event(GtkWidget *widget, GdkEventScroll *scroll,
+     return TRUE;
+ }
+ 
+-static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_keycode)
++
++static const guint16 *gd_get_keymap(size_t *maplen)
+ {
+-    int qemu_keycode;
++    GdkDisplay *dpy = gdk_display_get_default();
++
++#ifdef GDK_WINDOWING_X11
++    if (GDK_IS_X11_DISPLAY(dpy)) {
++        trace_gd_keymap_windowing("x11");
++        return qemu_xkeymap_mapping_table(
++            gdk_x11_display_get_xdisplay(dpy), maplen);
++    }
++#endif
++
++#ifdef GDK_WINDOWING_WAYLAND
++    if (GDK_IS_WAYLAND_DISPLAY(dpy)) {
++        trace_gd_keymap_windowing("wayland");
++        *maplen = qemu_input_map_xorgevdev2qcode_len;
++        return qemu_input_map_xorgevdev2qcode;
++    }
++#endif
+ 
+ #ifdef GDK_WINDOWING_WIN32
+     if (GDK_IS_WIN32_DISPLAY(dpy)) {
+-        qemu_keycode = MapVirtualKey(gdk_keycode, MAPVK_VK_TO_VSC);
+-        switch (qemu_keycode) {
+-        case 103:   /* alt gr */
+-            qemu_keycode = 56 | SCANCODE_GREY;
+-            break;
+-        }
+-        return qemu_keycode;
++        trace_gd_keymap_windowing("win32");
++        *maplen = qemu_input_map_win322qcode_len;
++        return qemu_input_map_win322qcode;
+     }
+ #endif
+ 
+-    if (gdk_keycode < 9) {
+-        qemu_keycode = 0;
+-    } else if (gdk_keycode < 97) {
+-        qemu_keycode = gdk_keycode - 8;
+-#ifdef GDK_WINDOWING_X11
+-    } else if (GDK_IS_X11_DISPLAY(dpy) && gdk_keycode < 158) {
+-        if (s->has_evdev) {
+-            qemu_keycode = translate_evdev_keycode(gdk_keycode - 97);
+-        } else {
+-            qemu_keycode = translate_xfree86_keycode(gdk_keycode - 97);
+-        }
+-#endif
+-#ifdef GDK_WINDOWING_WAYLAND
+-    } else if (GDK_IS_WAYLAND_DISPLAY(dpy) && gdk_keycode < 158) {
+-        qemu_keycode = translate_evdev_keycode(gdk_keycode - 97);
++#ifdef GDK_WINDOWING_QUARTZ
++    if (GDK_IS_QUARTZ_DISPLAY(dpy)) {
++        trace_gd_keymap_windowing("quartz");
++        *maplen = qemu_input_map_osx2qcode_len;
++        return qemu_input_map_osx2qcode;
++    }
+ #endif
+-    } else if (gdk_keycode == 208) { /* Hiragana_Katakana */
+-        qemu_keycode = 0x70;
+-    } else if (gdk_keycode == 211) { /* backslash */
+-        qemu_keycode = 0x73;
+-    } else {
+-        qemu_keycode = 0;
++
++#ifdef GDK_WINDOWING_BROADWAY
++    if (GDK_IS_BROADWAY_DISPLAY(dpy)) {
++        trace_gd_keymap_windowing("broadway");
++        g_warning("experimental: using broadway, x11 virtual keysym \n"
++                  "mapping - with very limited support. See also \n"
++                  "https://bugzilla.gnome.org/show_bug.cgi?id=700105");
++        *maplen = qemu_input_map_x112qcode_len;
++        return qemu_input_map_x112qcode;
+     }
++#endif
+ 
+-    return qemu_keycode;
++    g_warning("Unsupported GDK Windowing platform.\n"
++              "Disabling extended keycode tables.\n"
++              "Please report to qemu-devel@nongnu.org\n"
++              "including the following information:\n"
++              "\n"
++              "  - Operating system\n"
++              "  - GDK Windowing system build\n");
++    return NULL;
++}
++
++
++static int gd_map_keycode(int scancode)
++{
++    if (!keycode_map)
++        return 0;
++    if (scancode > keycode_maplen)
++        return 0;
++
++    return keycode_map[scancode];
+ }
+ 
+ static gboolean gd_text_key_down(GtkWidget *widget,
+@@ -1111,9 +1186,7 @@ static gboolean gd_text_key_down(GtkWidget *widget,
+     } else if (key->length) {
+         kbd_put_string_console(con, key->string, key->length);
+     } else {
+-        int num = gd_map_keycode(vc->s, gtk_widget_get_display(widget),
+-                                 key->hardware_keycode);
+-        int qcode = qemu_input_key_number_to_qcode(num);
++        int qcode = gd_map_keycode(key->hardware_keycode);
+         kbd_put_qcode_console(con, qcode);
+     }
+     return TRUE;
+@@ -1123,8 +1196,7 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+ {
+     VirtualConsole *vc = opaque;
+     GtkDisplayState *s = vc->s;
+-    int gdk_keycode = key->hardware_keycode;
+-    int qemu_keycode;
++    int qcode;
+     int i;
+ 
+     if (s->ignore_keys) {
+@@ -1138,20 +1210,19 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+         return TRUE;
+     }
+ 
+-    qemu_keycode = gd_map_keycode(s, gtk_widget_get_display(widget),
+-                                  gdk_keycode);
++    qcode = gd_map_keycode(key->hardware_keycode);
+ 
+-    trace_gd_key_event(vc->label, gdk_keycode, qemu_keycode,
++    trace_gd_key_event(vc->label, key->hardware_keycode, qcode,
+                        (key->type == GDK_KEY_PRESS) ? "down" : "up");
+ 
+     for (i = 0; i < ARRAY_SIZE(modifier_keycode); i++) {
+-        if (qemu_keycode == modifier_keycode[i]) {
++        if (qcode == modifier_keycode[i]) {
+             s->modifier_pressed[i] = (key->type == GDK_KEY_PRESS);
+         }
+     }
+ 
+-    qemu_input_event_send_key_number(vc->gfx.dcl.con, qemu_keycode,
+-                                     key->type == GDK_KEY_PRESS);
++    qemu_input_event_send_key_qcode(vc->gfx.dcl.con, qcode,
++                                    key->type == GDK_KEY_PRESS);
+ 
+     return TRUE;
+ }
+@@ -2195,38 +2266,6 @@ static void gd_create_menus(GtkDisplayState *s)
+     gtk_window_add_accel_group(GTK_WINDOW(s->window), s->accel_group);
+ }
+ 
+-static void gd_set_keycode_type(GtkDisplayState *s)
+-{
+-#ifdef GDK_WINDOWING_X11
+-    GdkDisplay *display = gtk_widget_get_display(s->window);
+-    if (GDK_IS_X11_DISPLAY(display)) {
+-        Display *x11_display = gdk_x11_display_get_xdisplay(display);
+-        XkbDescPtr desc = XkbGetMap(x11_display, XkbGBN_AllComponentsMask,
+-                                    XkbUseCoreKbd);
+-        char *keycodes = NULL;
+-
+-        if (desc &&
+-            (XkbGetNames(x11_display, XkbKeycodesNameMask, desc) == Success)) {
+-            keycodes = XGetAtomName(x11_display, desc->names->keycodes);
+-        }
+-        if (keycodes == NULL) {
+-            fprintf(stderr, "could not lookup keycode name\n");
+-        } else if (strstart(keycodes, "evdev", NULL)) {
+-            s->has_evdev = true;
+-        } else if (!strstart(keycodes, "xfree86", NULL)) {
+-            fprintf(stderr, "unknown keycodes `%s', please report to "
+-                    "qemu-devel@nongnu.org\n", keycodes);
+-        }
+-
+-        if (desc) {
+-            XkbFreeKeyboard(desc, XkbGBN_AllComponentsMask, True);
+-        }
+-        if (keycodes) {
+-            XFree(keycodes);
+-        }
+-    }
+-#endif
+-}
+ 
+ static gboolean gtkinit;
+ 
+@@ -2329,8 +2368,6 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
+     if (grab_on_hover) {
+         gtk_menu_item_activate(GTK_MENU_ITEM(s->grab_on_hover_item));
+     }
+-
+-    gd_set_keycode_type(s);
+ }
+ 
+ void early_gtk_display_init(int opengl)
+@@ -2377,6 +2414,8 @@ void early_gtk_display_init(int opengl)
+         break;
+     }
+ 
++    keycode_map = gd_get_keymap(&keycode_maplen);
++
+ #if defined(CONFIG_VTE)
+     type_register(&char_gd_vc_type_info);
+ #endif
 diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index e575348cb2..c7a9c08bdb 100644
+index c7a9c08bdb..566b8f2000 100644
 --- a/ui/input-keymap.c
 +++ b/ui/input-keymap.c
-@@ -15,6 +15,7 @@
- #include "ui/input-keymap-qcode2qnum.c"
+@@ -5,6 +5,7 @@
+ 
+ #include "standard-headers/linux/input.h"
+ 
++#include "ui/input-keymap-atset12qcode.c"
+ #include "ui/input-keymap-linux2qcode.c"
+ #include "ui/input-keymap-osx2qcode.c"
+ #include "ui/input-keymap-qcode2adb.c"
+@@ -16,6 +17,12 @@
  #include "ui/input-keymap-qcode2sun.c"
  #include "ui/input-keymap-qnum2qcode.c"
-+#include "ui/input-keymap-usb2qcode.c"
+ #include "ui/input-keymap-usb2qcode.c"
++#include "ui/input-keymap-win322qcode.c"
++#include "ui/input-keymap-x112qcode.c"
++#include "ui/input-keymap-xorgevdev2qcode.c"
++#include "ui/input-keymap-xorgkbd2qcode.c"
++#include "ui/input-keymap-xorgxquartz2qcode.c"
++#include "ui/input-keymap-xorgxwin2qcode.c"
  
  int qemu_input_linux_to_qcode(unsigned int lnx)
  {
-diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index 6e315ae800..f0a99ffd73 100644
---- a/ui/sdl2-input.c
-+++ b/ui/sdl2-input.c
-@@ -30,8 +30,6 @@
- #include "ui/sdl2.h"
+diff --git a/ui/sdl.c b/ui/sdl.c
+index 7b71a9ac58..450f499c24 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -34,7 +34,9 @@
+ #include "ui/console.h"
+ #include "ui/input.h"
  #include "sysemu/sysemu.h"
++#ifndef WIN32
+ #include "x_keymap.h"
++#endif
+ #include "sdl_zoom.h"
  
--#include "sdl2-keymap.h"
+ static DisplayChangeListener *dcl;
+@@ -63,6 +65,8 @@ static SDL_PixelFormat host_format;
+ static int scaling_active = 0;
+ static Notifier mouse_mode_notifier;
+ static int idle_counter;
++static const guint16 *keycode_map;
++static size_t keycode_maplen;
+ 
+ #define SDL_REFRESH_INTERVAL_BUSY 10
+ #define SDL_MAX_IDLE_COUNT (2 * GUI_REFRESH_INTERVAL_DEFAULT \
+@@ -208,95 +212,44 @@ static uint8_t sdl_keyevent_to_keycode_generic(const SDL_KeyboardEvent *ev)
+     return keysym2scancode(kbd_layout, keysym) & SCANCODE_KEYMASK;
+ }
+ 
+-/* specific keyboard conversions from scan codes */
 -
- static uint8_t modifiers_state[SDL_NUM_SCANCODES];
+-#if defined(_WIN32)
  
- void sdl2_reset_keys(struct sdl2_console *scon)
-@@ -39,9 +37,9 @@ void sdl2_reset_keys(struct sdl2_console *scon)
-     QemuConsole *con = scon ? scon->dcl.con : NULL;
-     int i;
- 
--    for (i = 0; i < SDL_NUM_SCANCODES; i++) {
-+    for (i = 0; i < SDL_NUM_SCANCODES && i < qemu_input_map_usb2qcode_len ; i++) {
-         if (modifiers_state[i]) {
--            int qcode = sdl2_scancode_to_qcode[i];
-+            int qcode = qemu_input_map_usb2qcode[i];
-             qemu_input_event_send_key_qcode(con, qcode, false);
-             modifiers_state[i] = 0;
-         }
-@@ -51,9 +49,15 @@ void sdl2_reset_keys(struct sdl2_console *scon)
- void sdl2_process_key(struct sdl2_console *scon,
-                       SDL_KeyboardEvent *ev)
+-static uint8_t sdl_keyevent_to_keycode(const SDL_KeyboardEvent *ev)
++static const guint16 *sdl_get_keymap(size_t *maplen)
  {
--    int qcode = sdl2_scancode_to_qcode[ev->keysym.scancode];
-+    int qcode;
-     QemuConsole *con = scon ? scon->dcl.con : NULL;
+-    return ev->keysym.scancode;
+-}
+-
++#if defined(WIN32)
++    *maplen = qemu_input_map_atset12qcode_len;
++    return qemu_input_map_atset12qcode;
+ #else
+-
+ #if defined(SDL_VIDEO_DRIVER_X11)
+-#include <X11/XKBlib.h>
+-
+-static int check_for_evdev(void)
+-{
+     SDL_SysWMinfo info;
+-    XkbDescPtr desc = NULL;
+-    int has_evdev = 0;
+-    char *keycodes = NULL;
  
-+    if (ev->keysym.scancode >= qemu_input_map_usb2qcode_len) {
-+        return;
+     SDL_VERSION(&info.version);
+-    if (!SDL_GetWMInfo(&info)) {
+-        return 0;
+-    }
+-    desc = XkbGetMap(info.info.x11.display,
+-                     XkbGBN_AllComponentsMask,
+-                     XkbUseCoreKbd);
+-    if (desc &&
+-        (XkbGetNames(info.info.x11.display,
+-                     XkbKeycodesNameMask, desc) == Success)) {
+-        keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
+-        if (keycodes == NULL) {
+-            fprintf(stderr, "could not lookup keycode name\n");
+-        } else if (strstart(keycodes, "evdev", NULL)) {
+-            has_evdev = 1;
+-        } else if (!strstart(keycodes, "xfree86", NULL)) {
+-            fprintf(stderr, "unknown keycodes `%s', please report to "
+-                    "qemu-devel@nongnu.org\n", keycodes);
+-        }
+-    }
+-
+-    if (desc) {
+-        XkbFreeKeyboard(desc, XkbGBN_AllComponentsMask, True);
+-    }
+-    if (keycodes) {
+-        XFree(keycodes);
++    if (SDL_GetWMInfo(&info) > 0) {
++        return qemu_xkeymap_mapping_table(
++            info.info.x11.display, maplen);
+     }
+-    return has_evdev;
+-}
+-#else
+-static int check_for_evdev(void)
+-{
+-	return 0;
+-}
+ #endif
++    g_warning("Unsupported SDL video driver / platform.\n"
++              "Assuming Linux KBD scancodes, but probably wrong.\n"
++              "Please report to qemu-devel@nongnu.org\n"
++              "including the following information:\n"
++              "\n"
++              "  - Operating system\n"
++              "  - SDL video driver\n");
++    *maplen = qemu_input_map_xorgkbd2qcode_len;
++    return qemu_input_map_xorgkbd2qcode;
++#endif
++}
+ 
+ static uint8_t sdl_keyevent_to_keycode(const SDL_KeyboardEvent *ev)
+ {
+-    int keycode;
+-    static int has_evdev = -1;
+-
+-    if (has_evdev == -1)
+-        has_evdev = check_for_evdev();
+-
+-    keycode = ev->keysym.scancode;
++    if (!keycode_map)
++        return 0;
++    if (ev->keysym.scancode > keycode_maplen)
++        return 0;
+ 
+-    if (keycode < 9) {
+-        keycode = 0;
+-    } else if (keycode < 97) {
+-        keycode -= 8; /* just an offset */
+-    } else if (keycode < 158) {
+-        /* use conversion table */
+-        if (has_evdev)
+-            keycode = translate_evdev_keycode(keycode - 97);
+-        else
+-            keycode = translate_xfree86_keycode(keycode - 97);
+-    } else if (keycode == 208) { /* Hiragana_Katakana */
+-        keycode = 0x70;
+-    } else if (keycode == 211) { /* backslash */
+-        keycode = 0x73;
+-    } else {
+-        keycode = 0;
+-    }
+-    return keycode;
++    return keycode_map[ev->keysym.scancode];
+ }
+ 
+-#endif
+-
+ static void reset_keys(void)
+ {
+     int i;
+@@ -995,6 +948,8 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+     vi = SDL_GetVideoInfo();
+     host_format = *(vi->vfmt);
+ 
++    keycode_map = sdl_get_keymap(&keycode_maplen);
++
+     /* Load a 32x32x4 image. White pixels are transparent. */
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, "qemu-icon.bmp");
+     if (filename) {
+diff --git a/ui/trace-events b/ui/trace-events
+index 2a69660e5a..426d234f8f 100644
+--- a/ui/trace-events
++++ b/ui/trace-events
+@@ -18,9 +18,10 @@ ppm_save(const char *filename, void *display_surface) "%s surface=%p"
+ # ui/gtk.c
+ gd_switch(const char *tab, int width, int height) "tab=%s, width=%d, height=%d"
+ gd_update(const char *tab, int x, int y, int w, int h) "tab=%s, x=%d, y=%d, w=%d, h=%d"
+-gd_key_event(const char *tab, int gdk_keycode, int qemu_keycode, const char *action) "tab=%s, translated GDK keycode %d to QEMU keycode %d (%s)"
++gd_key_event(const char *tab, int gdk_keycode, int qkeycode, const char *action) "tab=%s, translated GDK keycode %d to QKeyCode %d (%s)"
+ gd_grab(const char *tab, const char *device, const char *reason) "tab=%s, dev=%s, reason=%s"
+ gd_ungrab(const char *tab, const char *device) "tab=%s, dev=%s"
++gd_keymap_windowing(const char *name) "backend=%s"
+ 
+ # ui/vnc.c
+ vnc_key_guest_leds(bool caps, bool num, bool scroll) "caps %d, num %d, scroll %d"
+@@ -50,3 +51,9 @@ qemu_spice_create_update(uint32_t left, uint32_t right, uint32_t top, uint32_t b
+ keymap_parse(const char *file) "file %s"
+ keymap_add(const char *type, int sym, int code, const char *line) "%-6s sym=0x%04x code=0x%04x (line: %s)"
+ keymap_unmapped(int sym) "sym=0x%04x"
++
++# ui/x_keymap.c
++xkeymap_extension(const char *name) "extension '%s'"
++xkeymap_vendor(const char *name) "vendor '%s'"
++xkeymap_keycodes(const char *name) "keycodes '%s'"
++xkeymap_keymap(const char *name) "keymap '%s'"
+diff --git a/ui/x_keymap.c b/ui/x_keymap.c
+index 27884851de..3e2a9c6b4f 100644
+--- a/ui/x_keymap.c
++++ b/ui/x_keymap.c
+@@ -1,169 +1,108 @@
+ /*
+- * QEMU SDL display driver
++ * QEMU X11 keymaps
+  *
+- * Copyright (c) 2003 Fabrice Bellard
++ * Copyright (C) 2009-2010 Daniel P. Berrange <dan@berrange.com>
++ * Copyright (C) 2017 Red Hat, Inc
+  *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License version 2 as
++ * published by the Free Software Foundation.
+  */
++
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++
+ #include "x_keymap.h"
++#include "trace.h"
++#include "qemu/notify.h"
++#include "ui/input.h"
+ 
+-static const uint8_t x_keycode_to_pc_keycode[115] = {
+-   0xc7,      /*  97  Home   */
+-   0xc8,      /*  98  Up     */
+-   0xc9,      /*  99  PgUp   */
+-   0xcb,      /* 100  Left   */
+-   0x4c,        /* 101  KP-5   */
+-   0xcd,      /* 102  Right  */
+-   0xcf,      /* 103  End    */
+-   0xd0,      /* 104  Down   */
+-   0xd1,      /* 105  PgDn   */
+-   0xd2,      /* 106  Ins    */
+-   0xd3,      /* 107  Del    */
+-   0x9c,      /* 108  Enter  */
+-   0x9d,      /* 109  Ctrl-R */
+-   0x0,       /* 110  Pause  */
+-   0xb7,      /* 111  Print  */
+-   0xb5,      /* 112  Divide */
+-   0xb8,      /* 113  Alt-R  */
+-   0xc6,      /* 114  Break  */
+-   0x0,         /* 115 */
+-   0x0,         /* 116 */
+-   0x0,         /* 117 */
+-   0x0,         /* 118 */
+-   0x0,         /* 119 */
+-   0x0,         /* 120 */
+-   0x0,         /* 121 */
+-   0x0,         /* 122 */
+-   0x0,         /* 123 */
+-   0x0,         /* 124 */
+-   0x0,         /* 125 */
+-   0x0,         /* 126 */
+-   0x0,         /* 127 */
+-   0x0,         /* 128 */
+-   0x79,         /* 129 Henkan */
+-   0x0,         /* 130 */
+-   0x7b,         /* 131 Muhenkan */
+-   0x0,         /* 132 */
+-   0x7d,         /* 133 Yen */
+-   0x0,         /* 134 */
+-   0x0,         /* 135 */
+-   0x47,         /* 136 KP_7 */
+-   0x48,         /* 137 KP_8 */
+-   0x49,         /* 138 KP_9 */
+-   0x4b,         /* 139 KP_4 */
+-   0x4c,         /* 140 KP_5 */
+-   0x4d,         /* 141 KP_6 */
+-   0x4f,         /* 142 KP_1 */
+-   0x50,         /* 143 KP_2 */
+-   0x51,         /* 144 KP_3 */
+-   0x52,         /* 145 KP_0 */
+-   0x53,         /* 146 KP_. */
+-   0x47,         /* 147 KP_HOME */
+-   0x48,         /* 148 KP_UP */
+-   0x49,         /* 149 KP_PgUp */
+-   0x4b,         /* 150 KP_Left */
+-   0x4c,         /* 151 KP_ */
+-   0x4d,         /* 152 KP_Right */
+-   0x4f,         /* 153 KP_End */
+-   0x50,         /* 154 KP_Down */
+-   0x51,         /* 155 KP_PgDn */
+-   0x52,         /* 156 KP_Ins */
+-   0x53,         /* 157 KP_Del */
+-};
++#include <X11/XKBlib.h>
+ 
+-/* This table is generated based off the xfree86 -> scancode mapping above
+- * and the keycode mappings in /usr/share/X11/xkb/keycodes/evdev
+- * and  /usr/share/X11/xkb/keycodes/xfree86
+- */
++static gboolean check_for_xwin(Display *dpy)
++{
++    const char *vendor = ServerVendor(dpy);
++
++    trace_xkeymap_vendor(vendor);
+ 
+-static const uint8_t evdev_keycode_to_pc_keycode[61] = {
+-    0x73,      /*  97 EVDEV - RO   ("Internet" Keyboards) */
+-    0,         /*  98 EVDEV - KATA (Katakana) */
+-    0,         /*  99 EVDEV - HIRA (Hiragana) */
+-    0x79,      /* 100 EVDEV - HENK (Henkan) */
+-    0x70,      /* 101 EVDEV - HKTG (Hiragana/Katakana toggle) */
+-    0x7b,      /* 102 EVDEV - MUHE (Muhenkan) */
+-    0,         /* 103 EVDEV - JPCM (KPJPComma) */
+-    0x9c,      /* 104 KPEN */
+-    0x9d,      /* 105 RCTL */
+-    0xb5,      /* 106 KPDV */
+-    0xb7,      /* 107 PRSC */
+-    0xb8,      /* 108 RALT */
+-    0,         /* 109 EVDEV - LNFD ("Internet" Keyboards) */
+-    0xc7,      /* 110 HOME */
+-    0xc8,      /* 111 UP */
+-    0xc9,      /* 112 PGUP */
+-    0xcb,      /* 113 LEFT */
+-    0xcd,      /* 114 RGHT */
+-    0xcf,      /* 115 END */
+-    0xd0,      /* 116 DOWN */
+-    0xd1,      /* 117 PGDN */
+-    0xd2,      /* 118 INS */
+-    0xd3,      /* 119 DELE */
+-    0,         /* 120 EVDEV - I120 ("Internet" Keyboards) */
+-    0,         /* 121 EVDEV - MUTE */
+-    0,         /* 122 EVDEV - VOL- */
+-    0,         /* 123 EVDEV - VOL+ */
+-    0,         /* 124 EVDEV - POWR */
+-    0,         /* 125 EVDEV - KPEQ */
+-    0,         /* 126 EVDEV - I126 ("Internet" Keyboards) */
+-    0,         /* 127 EVDEV - PAUS */
+-    0,         /* 128 EVDEV - ???? */
+-    0x7e,      /* 129 EVDEV - KP_COMMA (brazilian) */
+-    0xf1,      /* 130 EVDEV - HNGL (Korean Hangul Latin toggle) */
+-    0xf2,      /* 131 EVDEV - HJCV (Korean Hangul Hanja toggle) */
+-    0x7d,      /* 132 AE13 (Yen)*/
+-    0xdb,      /* 133 EVDEV - LWIN */
+-    0xdc,      /* 134 EVDEV - RWIN */
+-    0xdd,      /* 135 EVDEV - MENU */
+-    0,         /* 136 EVDEV - STOP */
+-    0,         /* 137 EVDEV - AGAI */
+-    0,         /* 138 EVDEV - PROP */
+-    0,         /* 139 EVDEV - UNDO */
+-    0,         /* 140 EVDEV - FRNT */
+-    0,         /* 141 EVDEV - COPY */
+-    0,         /* 142 EVDEV - OPEN */
+-    0,         /* 143 EVDEV - PAST */
+-    0,         /* 144 EVDEV - FIND */
+-    0,         /* 145 EVDEV - CUT  */
+-    0,         /* 146 EVDEV - HELP */
+-    0,         /* 147 EVDEV - I147 */
+-    0,         /* 148 EVDEV - I148 */
+-    0,         /* 149 EVDEV - I149 */
+-    0,         /* 150 EVDEV - I150 */
+-    0,         /* 151 EVDEV - I151 */
+-    0,         /* 152 EVDEV - I152 */
+-    0,         /* 153 EVDEV - I153 */
+-    0,         /* 154 EVDEV - I154 */
+-    0,         /* 155 EVDEV - I156 */
+-    0,         /* 156 EVDEV - I157 */
+-    0,         /* 157 EVDEV - I158 */
+-};
++    if (strstr(vendor, "Cygwin/X"))
++        return TRUE;
+ 
+-uint8_t translate_xfree86_keycode(const int key)
++    return FALSE;
++}
++
++static gboolean check_for_xquartz(Display *dpy)
+ {
+-    return x_keycode_to_pc_keycode[key];
++    int nextensions;
++    int i;
++    gboolean match = FALSE;
++    char **extensions = XListExtensions(dpy, &nextensions);
++    for (i = 0 ; extensions != NULL && i < nextensions ; i++) {
++        trace_xkeymap_extension(extensions[i]);
++        if (strcmp(extensions[i], "Apple-WM") == 0 ||
++            strcmp(extensions[i], "Apple-DRI") == 0)
++            match = TRUE;
++    }
++    if (extensions)
++        XFreeExtensionList(extensions);
++
++    return match;
+ }
+ 
+-uint8_t translate_evdev_keycode(const int key)
++const guint16 *qemu_xkeymap_mapping_table(Display *dpy, size_t *maplen)
+ {
+-    return evdev_keycode_to_pc_keycode[key];
++    XkbDescPtr desc;
++    const gchar *keycodes = NULL;
++
++    /* There is no easy way to determine what X11 server
++     * and platform & keyboard driver is in use. Thus we
++     * do best guess heuristics.
++     *
++     * This will need more work for people with other
++     * X servers..... patches welcomed.
++     */
++
++    desc = XkbGetMap(dpy,
++                     XkbGBN_AllComponentsMask,
++                     XkbUseCoreKbd);
++    if (desc) {
++        if (XkbGetNames(dpy, XkbKeycodesNameMask, desc) == Success) {
++            keycodes = XGetAtomName (dpy, desc->names->keycodes);
++            if (!keycodes) {
++                g_warning("could not lookup keycode name");
++            } else {
++                trace_xkeymap_keycodes(keycodes);
++            }
++        }
++        XkbFreeKeyboard(desc, XkbGBN_AllComponentsMask, True);
 +    }
 +
-+    qcode = qemu_input_map_usb2qcode[ev->keysym.scancode];
-+
-     if (!qemu_console_is_graphic(con)) {
-         if (ev->type == SDL_KEYDOWN) {
-             switch (ev->keysym.scancode) {
-diff --git a/ui/sdl2-keymap.h b/ui/sdl2-keymap.h
-deleted file mode 100644
-index cbedaa477d..0000000000
---- a/ui/sdl2-keymap.h
-+++ /dev/null
-@@ -1,267 +0,0 @@
--
--/* map SDL2 scancodes to QKeyCode */
--
--static const int sdl2_scancode_to_qcode[SDL_NUM_SCANCODES] = {
--    [SDL_SCANCODE_A]                 = Q_KEY_CODE_A,
--    [SDL_SCANCODE_B]                 = Q_KEY_CODE_B,
--    [SDL_SCANCODE_C]                 = Q_KEY_CODE_C,
--    [SDL_SCANCODE_D]                 = Q_KEY_CODE_D,
--    [SDL_SCANCODE_E]                 = Q_KEY_CODE_E,
--    [SDL_SCANCODE_F]                 = Q_KEY_CODE_F,
--    [SDL_SCANCODE_G]                 = Q_KEY_CODE_G,
--    [SDL_SCANCODE_H]                 = Q_KEY_CODE_H,
--    [SDL_SCANCODE_I]                 = Q_KEY_CODE_I,
--    [SDL_SCANCODE_J]                 = Q_KEY_CODE_J,
--    [SDL_SCANCODE_K]                 = Q_KEY_CODE_K,
--    [SDL_SCANCODE_L]                 = Q_KEY_CODE_L,
--    [SDL_SCANCODE_M]                 = Q_KEY_CODE_M,
--    [SDL_SCANCODE_N]                 = Q_KEY_CODE_N,
--    [SDL_SCANCODE_O]                 = Q_KEY_CODE_O,
--    [SDL_SCANCODE_P]                 = Q_KEY_CODE_P,
--    [SDL_SCANCODE_Q]                 = Q_KEY_CODE_Q,
--    [SDL_SCANCODE_R]                 = Q_KEY_CODE_R,
--    [SDL_SCANCODE_S]                 = Q_KEY_CODE_S,
--    [SDL_SCANCODE_T]                 = Q_KEY_CODE_T,
--    [SDL_SCANCODE_U]                 = Q_KEY_CODE_U,
--    [SDL_SCANCODE_V]                 = Q_KEY_CODE_V,
--    [SDL_SCANCODE_W]                 = Q_KEY_CODE_W,
--    [SDL_SCANCODE_X]                 = Q_KEY_CODE_X,
--    [SDL_SCANCODE_Y]                 = Q_KEY_CODE_Y,
--    [SDL_SCANCODE_Z]                 = Q_KEY_CODE_Z,
--
--    [SDL_SCANCODE_1]                 = Q_KEY_CODE_1,
--    [SDL_SCANCODE_2]                 = Q_KEY_CODE_2,
--    [SDL_SCANCODE_3]                 = Q_KEY_CODE_3,
--    [SDL_SCANCODE_4]                 = Q_KEY_CODE_4,
--    [SDL_SCANCODE_5]                 = Q_KEY_CODE_5,
--    [SDL_SCANCODE_6]                 = Q_KEY_CODE_6,
--    [SDL_SCANCODE_7]                 = Q_KEY_CODE_7,
--    [SDL_SCANCODE_8]                 = Q_KEY_CODE_8,
--    [SDL_SCANCODE_9]                 = Q_KEY_CODE_9,
--    [SDL_SCANCODE_0]                 = Q_KEY_CODE_0,
--
--    [SDL_SCANCODE_RETURN]            = Q_KEY_CODE_RET,
--    [SDL_SCANCODE_ESCAPE]            = Q_KEY_CODE_ESC,
--    [SDL_SCANCODE_BACKSPACE]         = Q_KEY_CODE_BACKSPACE,
--    [SDL_SCANCODE_TAB]               = Q_KEY_CODE_TAB,
--    [SDL_SCANCODE_SPACE]             = Q_KEY_CODE_SPC,
--    [SDL_SCANCODE_MINUS]             = Q_KEY_CODE_MINUS,
--    [SDL_SCANCODE_EQUALS]            = Q_KEY_CODE_EQUAL,
--    [SDL_SCANCODE_LEFTBRACKET]       = Q_KEY_CODE_BRACKET_LEFT,
--    [SDL_SCANCODE_RIGHTBRACKET]      = Q_KEY_CODE_BRACKET_RIGHT,
--    [SDL_SCANCODE_BACKSLASH]         = Q_KEY_CODE_BACKSLASH,
--#if 0
--    [SDL_SCANCODE_NONUSHASH]         = Q_KEY_CODE_NONUSHASH,
--#endif
--    [SDL_SCANCODE_SEMICOLON]         = Q_KEY_CODE_SEMICOLON,
--    [SDL_SCANCODE_APOSTROPHE]        = Q_KEY_CODE_APOSTROPHE,
--    [SDL_SCANCODE_GRAVE]             = Q_KEY_CODE_GRAVE_ACCENT,
--    [SDL_SCANCODE_COMMA]             = Q_KEY_CODE_COMMA,
--    [SDL_SCANCODE_PERIOD]            = Q_KEY_CODE_DOT,
--    [SDL_SCANCODE_SLASH]             = Q_KEY_CODE_SLASH,
--    [SDL_SCANCODE_CAPSLOCK]          = Q_KEY_CODE_CAPS_LOCK,
--
--    [SDL_SCANCODE_F1]                = Q_KEY_CODE_F1,
--    [SDL_SCANCODE_F2]                = Q_KEY_CODE_F2,
--    [SDL_SCANCODE_F3]                = Q_KEY_CODE_F3,
--    [SDL_SCANCODE_F4]                = Q_KEY_CODE_F4,
--    [SDL_SCANCODE_F5]                = Q_KEY_CODE_F5,
--    [SDL_SCANCODE_F6]                = Q_KEY_CODE_F6,
--    [SDL_SCANCODE_F7]                = Q_KEY_CODE_F7,
--    [SDL_SCANCODE_F8]                = Q_KEY_CODE_F8,
--    [SDL_SCANCODE_F9]                = Q_KEY_CODE_F9,
--    [SDL_SCANCODE_F10]               = Q_KEY_CODE_F10,
--    [SDL_SCANCODE_F11]               = Q_KEY_CODE_F11,
--    [SDL_SCANCODE_F12]               = Q_KEY_CODE_F12,
--
--    [SDL_SCANCODE_PRINTSCREEN]       = Q_KEY_CODE_PRINT,
--    [SDL_SCANCODE_SCROLLLOCK]        = Q_KEY_CODE_SCROLL_LOCK,
--    [SDL_SCANCODE_PAUSE]             = Q_KEY_CODE_PAUSE,
--    [SDL_SCANCODE_INSERT]            = Q_KEY_CODE_INSERT,
--    [SDL_SCANCODE_HOME]              = Q_KEY_CODE_HOME,
--    [SDL_SCANCODE_PAGEUP]            = Q_KEY_CODE_PGUP,
--    [SDL_SCANCODE_DELETE]            = Q_KEY_CODE_DELETE,
--    [SDL_SCANCODE_END]               = Q_KEY_CODE_END,
--    [SDL_SCANCODE_PAGEDOWN]          = Q_KEY_CODE_PGDN,
--    [SDL_SCANCODE_RIGHT]             = Q_KEY_CODE_RIGHT,
--    [SDL_SCANCODE_LEFT]              = Q_KEY_CODE_LEFT,
--    [SDL_SCANCODE_DOWN]              = Q_KEY_CODE_DOWN,
--    [SDL_SCANCODE_UP]                = Q_KEY_CODE_UP,
--    [SDL_SCANCODE_NUMLOCKCLEAR]      = Q_KEY_CODE_NUM_LOCK,
--
--    [SDL_SCANCODE_KP_DIVIDE]         = Q_KEY_CODE_KP_DIVIDE,
--    [SDL_SCANCODE_KP_MULTIPLY]       = Q_KEY_CODE_KP_MULTIPLY,
--    [SDL_SCANCODE_KP_MINUS]          = Q_KEY_CODE_KP_SUBTRACT,
--    [SDL_SCANCODE_KP_PLUS]           = Q_KEY_CODE_KP_ADD,
--    [SDL_SCANCODE_KP_ENTER]          = Q_KEY_CODE_KP_ENTER,
--    [SDL_SCANCODE_KP_1]              = Q_KEY_CODE_KP_1,
--    [SDL_SCANCODE_KP_2]              = Q_KEY_CODE_KP_2,
--    [SDL_SCANCODE_KP_3]              = Q_KEY_CODE_KP_3,
--    [SDL_SCANCODE_KP_4]              = Q_KEY_CODE_KP_4,
--    [SDL_SCANCODE_KP_5]              = Q_KEY_CODE_KP_5,
--    [SDL_SCANCODE_KP_6]              = Q_KEY_CODE_KP_6,
--    [SDL_SCANCODE_KP_7]              = Q_KEY_CODE_KP_7,
--    [SDL_SCANCODE_KP_8]              = Q_KEY_CODE_KP_8,
--    [SDL_SCANCODE_KP_9]              = Q_KEY_CODE_KP_9,
--    [SDL_SCANCODE_KP_0]              = Q_KEY_CODE_KP_0,
--    [SDL_SCANCODE_KP_PERIOD]         = Q_KEY_CODE_KP_DECIMAL,
--
--    [SDL_SCANCODE_NONUSBACKSLASH]    = Q_KEY_CODE_LESS,
--    [SDL_SCANCODE_APPLICATION]       = Q_KEY_CODE_MENU,
--#if 0
--    [SDL_SCANCODE_POWER]             = Q_KEY_CODE_POWER,
--    [SDL_SCANCODE_KP_EQUALS]         = Q_KEY_CODE_KP_EQUALS,
--
--    [SDL_SCANCODE_F13]               = Q_KEY_CODE_F13,
--    [SDL_SCANCODE_F14]               = Q_KEY_CODE_F14,
--    [SDL_SCANCODE_F15]               = Q_KEY_CODE_F15,
--    [SDL_SCANCODE_F16]               = Q_KEY_CODE_F16,
--    [SDL_SCANCODE_F17]               = Q_KEY_CODE_F17,
--    [SDL_SCANCODE_F18]               = Q_KEY_CODE_F18,
--    [SDL_SCANCODE_F19]               = Q_KEY_CODE_F19,
--    [SDL_SCANCODE_F20]               = Q_KEY_CODE_F20,
--    [SDL_SCANCODE_F21]               = Q_KEY_CODE_F21,
--    [SDL_SCANCODE_F22]               = Q_KEY_CODE_F22,
--    [SDL_SCANCODE_F23]               = Q_KEY_CODE_F23,
--    [SDL_SCANCODE_F24]               = Q_KEY_CODE_F24,
--
--    [SDL_SCANCODE_EXECUTE]           = Q_KEY_CODE_EXECUTE,
--#endif
--    [SDL_SCANCODE_HELP]              = Q_KEY_CODE_HELP,
--    [SDL_SCANCODE_MENU]              = Q_KEY_CODE_MENU,
--#if 0
--    [SDL_SCANCODE_SELECT]            = Q_KEY_CODE_SELECT,
--#endif
--    [SDL_SCANCODE_STOP]              = Q_KEY_CODE_STOP,
--    [SDL_SCANCODE_AGAIN]             = Q_KEY_CODE_AGAIN,
--    [SDL_SCANCODE_UNDO]              = Q_KEY_CODE_UNDO,
--    [SDL_SCANCODE_CUT]               = Q_KEY_CODE_CUT,
--    [SDL_SCANCODE_COPY]              = Q_KEY_CODE_COPY,
--    [SDL_SCANCODE_PASTE]             = Q_KEY_CODE_PASTE,
--    [SDL_SCANCODE_FIND]              = Q_KEY_CODE_FIND,
--#if 0
--    [SDL_SCANCODE_MUTE]              = Q_KEY_CODE_MUTE,
--    [SDL_SCANCODE_VOLUMEUP]          = Q_KEY_CODE_VOLUMEUP,
--    [SDL_SCANCODE_VOLUMEDOWN]        = Q_KEY_CODE_VOLUMEDOWN,
--
--    [SDL_SCANCODE_KP_COMMA]          = Q_KEY_CODE_KP_COMMA,
--    [SDL_SCANCODE_KP_EQUALSAS400]    = Q_KEY_CODE_KP_EQUALSAS400,
--
--    [SDL_SCANCODE_INTERNATIONAL1]    = Q_KEY_CODE_INTERNATIONAL1,
--    [SDL_SCANCODE_INTERNATIONAL2]    = Q_KEY_CODE_INTERNATIONAL2,
--    [SDL_SCANCODE_INTERNATIONAL3]    = Q_KEY_CODE_INTERNATIONAL3,
--    [SDL_SCANCODE_INTERNATIONAL4]    = Q_KEY_CODE_INTERNATIONAL4,
--    [SDL_SCANCODE_INTERNATIONAL5]    = Q_KEY_CODE_INTERNATIONAL5,
--    [SDL_SCANCODE_INTERNATIONAL6]    = Q_KEY_CODE_INTERNATIONAL6,
--    [SDL_SCANCODE_INTERNATIONAL7]    = Q_KEY_CODE_INTERNATIONAL7,
--    [SDL_SCANCODE_INTERNATIONAL8]    = Q_KEY_CODE_INTERNATIONAL8,
--    [SDL_SCANCODE_INTERNATIONAL9]    = Q_KEY_CODE_INTERNATIONAL9,
--    [SDL_SCANCODE_LANG1]             = Q_KEY_CODE_LANG1,
--    [SDL_SCANCODE_LANG2]             = Q_KEY_CODE_LANG2,
--    [SDL_SCANCODE_LANG3]             = Q_KEY_CODE_LANG3,
--    [SDL_SCANCODE_LANG4]             = Q_KEY_CODE_LANG4,
--    [SDL_SCANCODE_LANG5]             = Q_KEY_CODE_LANG5,
--    [SDL_SCANCODE_LANG6]             = Q_KEY_CODE_LANG6,
--    [SDL_SCANCODE_LANG7]             = Q_KEY_CODE_LANG7,
--    [SDL_SCANCODE_LANG8]             = Q_KEY_CODE_LANG8,
--    [SDL_SCANCODE_LANG9]             = Q_KEY_CODE_LANG9,
--    [SDL_SCANCODE_ALTERASE]          = Q_KEY_CODE_ALTERASE,
--#endif
--    [SDL_SCANCODE_SYSREQ]            = Q_KEY_CODE_SYSRQ,
--#if 0
--    [SDL_SCANCODE_CANCEL]            = Q_KEY_CODE_CANCEL,
--    [SDL_SCANCODE_CLEAR]             = Q_KEY_CODE_CLEAR,
--    [SDL_SCANCODE_PRIOR]             = Q_KEY_CODE_PRIOR,
--    [SDL_SCANCODE_RETURN2]           = Q_KEY_CODE_RETURN2,
--    [SDL_SCANCODE_SEPARATOR]         = Q_KEY_CODE_SEPARATOR,
--    [SDL_SCANCODE_OUT]               = Q_KEY_CODE_OUT,
--    [SDL_SCANCODE_OPER]              = Q_KEY_CODE_OPER,
--    [SDL_SCANCODE_CLEARAGAIN]        = Q_KEY_CODE_CLEARAGAIN,
--    [SDL_SCANCODE_CRSEL]             = Q_KEY_CODE_CRSEL,
--    [SDL_SCANCODE_EXSEL]             = Q_KEY_CODE_EXSEL,
--    [SDL_SCANCODE_KP_00]             = Q_KEY_CODE_KP_00,
--    [SDL_SCANCODE_KP_000]            = Q_KEY_CODE_KP_000,
--    [SDL_SCANCODE_THOUSANDSSEPARATOR] = Q_KEY_CODE_THOUSANDSSEPARATOR,
--    [SDL_SCANCODE_DECIMALSEPARATOR]  = Q_KEY_CODE_DECIMALSEPARATOR,
--    [SDL_SCANCODE_CURRENCYUNIT]      = Q_KEY_CODE_CURRENCYUNIT,
--    [SDL_SCANCODE_CURRENCYSUBUNIT]   = Q_KEY_CODE_CURRENCYSUBUNIT,
--    [SDL_SCANCODE_KP_LEFTPAREN]      = Q_KEY_CODE_KP_LEFTPAREN,
--    [SDL_SCANCODE_KP_RIGHTPAREN]     = Q_KEY_CODE_KP_RIGHTPAREN,
--    [SDL_SCANCODE_KP_LEFTBRACE]      = Q_KEY_CODE_KP_LEFTBRACE,
--    [SDL_SCANCODE_KP_RIGHTBRACE]     = Q_KEY_CODE_KP_RIGHTBRACE,
--    [SDL_SCANCODE_KP_TAB]            = Q_KEY_CODE_KP_TAB,
--    [SDL_SCANCODE_KP_BACKSPACE]      = Q_KEY_CODE_KP_BACKSPACE,
--    [SDL_SCANCODE_KP_A]              = Q_KEY_CODE_KP_A,
--    [SDL_SCANCODE_KP_B]              = Q_KEY_CODE_KP_B,
--    [SDL_SCANCODE_KP_C]              = Q_KEY_CODE_KP_C,
--    [SDL_SCANCODE_KP_D]              = Q_KEY_CODE_KP_D,
--    [SDL_SCANCODE_KP_E]              = Q_KEY_CODE_KP_E,
--    [SDL_SCANCODE_KP_F]              = Q_KEY_CODE_KP_F,
--    [SDL_SCANCODE_KP_XOR]            = Q_KEY_CODE_KP_XOR,
--    [SDL_SCANCODE_KP_POWER]          = Q_KEY_CODE_KP_POWER,
--    [SDL_SCANCODE_KP_PERCENT]        = Q_KEY_CODE_KP_PERCENT,
--    [SDL_SCANCODE_KP_LESS]           = Q_KEY_CODE_KP_LESS,
--    [SDL_SCANCODE_KP_GREATER]        = Q_KEY_CODE_KP_GREATER,
--    [SDL_SCANCODE_KP_AMPERSAND]      = Q_KEY_CODE_KP_AMPERSAND,
--    [SDL_SCANCODE_KP_DBLAMPERSAND]   = Q_KEY_CODE_KP_DBLAMPERSAND,
--    [SDL_SCANCODE_KP_VERTICALBAR]    = Q_KEY_CODE_KP_VERTICALBAR,
--    [SDL_SCANCODE_KP_DBLVERTICALBAR] = Q_KEY_CODE_KP_DBLVERTICALBAR,
--    [SDL_SCANCODE_KP_COLON]          = Q_KEY_CODE_KP_COLON,
--    [SDL_SCANCODE_KP_HASH]           = Q_KEY_CODE_KP_HASH,
--    [SDL_SCANCODE_KP_SPACE]          = Q_KEY_CODE_KP_SPACE,
--    [SDL_SCANCODE_KP_AT]             = Q_KEY_CODE_KP_AT,
--    [SDL_SCANCODE_KP_EXCLAM]         = Q_KEY_CODE_KP_EXCLAM,
--    [SDL_SCANCODE_KP_MEMSTORE]       = Q_KEY_CODE_KP_MEMSTORE,
--    [SDL_SCANCODE_KP_MEMRECALL]      = Q_KEY_CODE_KP_MEMRECALL,
--    [SDL_SCANCODE_KP_MEMCLEAR]       = Q_KEY_CODE_KP_MEMCLEAR,
--    [SDL_SCANCODE_KP_MEMADD]         = Q_KEY_CODE_KP_MEMADD,
--    [SDL_SCANCODE_KP_MEMSUBTRACT]    = Q_KEY_CODE_KP_MEMSUBTRACT,
--    [SDL_SCANCODE_KP_MEMMULTIPLY]    = Q_KEY_CODE_KP_MEMMULTIPLY,
--    [SDL_SCANCODE_KP_MEMDIVIDE]      = Q_KEY_CODE_KP_MEMDIVIDE,
--    [SDL_SCANCODE_KP_PLUSMINUS]      = Q_KEY_CODE_KP_PLUSMINUS,
--    [SDL_SCANCODE_KP_CLEAR]          = Q_KEY_CODE_KP_CLEAR,
--    [SDL_SCANCODE_KP_CLEARENTRY]     = Q_KEY_CODE_KP_CLEARENTRY,
--    [SDL_SCANCODE_KP_BINARY]         = Q_KEY_CODE_KP_BINARY,
--    [SDL_SCANCODE_KP_OCTAL]          = Q_KEY_CODE_KP_OCTAL,
--    [SDL_SCANCODE_KP_DECIMAL]        = Q_KEY_CODE_KP_DECIMAL,
--    [SDL_SCANCODE_KP_HEXADECIMAL]    = Q_KEY_CODE_KP_HEXADECIMAL,
--#endif
--    [SDL_SCANCODE_LCTRL]             = Q_KEY_CODE_CTRL,
--    [SDL_SCANCODE_LSHIFT]            = Q_KEY_CODE_SHIFT,
--    [SDL_SCANCODE_LALT]              = Q_KEY_CODE_ALT,
--    [SDL_SCANCODE_LGUI]              = Q_KEY_CODE_META_L,
--    [SDL_SCANCODE_RCTRL]             = Q_KEY_CODE_CTRL_R,
--    [SDL_SCANCODE_RSHIFT]            = Q_KEY_CODE_SHIFT_R,
--    [SDL_SCANCODE_RALT]              = Q_KEY_CODE_ALT_R,
--    [SDL_SCANCODE_RGUI]              = Q_KEY_CODE_META_R,
--#if 0
--    [SDL_SCANCODE_MODE]              = Q_KEY_CODE_MODE,
--    [SDL_SCANCODE_AUDIONEXT]         = Q_KEY_CODE_AUDIONEXT,
--    [SDL_SCANCODE_AUDIOPREV]         = Q_KEY_CODE_AUDIOPREV,
--    [SDL_SCANCODE_AUDIOSTOP]         = Q_KEY_CODE_AUDIOSTOP,
--    [SDL_SCANCODE_AUDIOPLAY]         = Q_KEY_CODE_AUDIOPLAY,
--    [SDL_SCANCODE_AUDIOMUTE]         = Q_KEY_CODE_AUDIOMUTE,
--    [SDL_SCANCODE_MEDIASELECT]       = Q_KEY_CODE_MEDIASELECT,
--    [SDL_SCANCODE_WWW]               = Q_KEY_CODE_WWW,
--    [SDL_SCANCODE_MAIL]              = Q_KEY_CODE_MAIL,
--    [SDL_SCANCODE_CALCULATOR]        = Q_KEY_CODE_CALCULATOR,
--    [SDL_SCANCODE_COMPUTER]          = Q_KEY_CODE_COMPUTER,
--    [SDL_SCANCODE_AC_SEARCH]         = Q_KEY_CODE_AC_SEARCH,
--    [SDL_SCANCODE_AC_HOME]           = Q_KEY_CODE_AC_HOME,
--    [SDL_SCANCODE_AC_BACK]           = Q_KEY_CODE_AC_BACK,
--    [SDL_SCANCODE_AC_FORWARD]        = Q_KEY_CODE_AC_FORWARD,
--    [SDL_SCANCODE_AC_STOP]           = Q_KEY_CODE_AC_STOP,
--    [SDL_SCANCODE_AC_REFRESH]        = Q_KEY_CODE_AC_REFRESH,
--    [SDL_SCANCODE_AC_BOOKMARKS]      = Q_KEY_CODE_AC_BOOKMARKS,
--    [SDL_SCANCODE_BRIGHTNESSDOWN]    = Q_KEY_CODE_BRIGHTNESSDOWN,
--    [SDL_SCANCODE_BRIGHTNESSUP]      = Q_KEY_CODE_BRIGHTNESSUP,
--    [SDL_SCANCODE_DISPLAYSWITCH]     = Q_KEY_CODE_DISPLAYSWITCH,
--    [SDL_SCANCODE_KBDILLUMTOGGLE]    = Q_KEY_CODE_KBDILLUMTOGGLE,
--    [SDL_SCANCODE_KBDILLUMDOWN]      = Q_KEY_CODE_KBDILLUMDOWN,
--    [SDL_SCANCODE_KBDILLUMUP]        = Q_KEY_CODE_KBDILLUMUP,
--    [SDL_SCANCODE_EJECT]             = Q_KEY_CODE_EJECT,
--    [SDL_SCANCODE_SLEEP]             = Q_KEY_CODE_SLEEP,
--    [SDL_SCANCODE_APP1]              = Q_KEY_CODE_APP1,
--    [SDL_SCANCODE_APP2]              = Q_KEY_CODE_APP2,
--#endif
--};
++    if (check_for_xwin(dpy)) {
++        trace_xkeymap_keymap("xwin");
++        *maplen = qemu_input_map_xorgxwin2qcode_len;
++        return qemu_input_map_xorgxwin2qcode;
++    } else if (check_for_xquartz(dpy)) {
++        trace_xkeymap_keymap("xquartz");
++        *maplen = qemu_input_map_xorgxquartz2qcode_len;
++        return qemu_input_map_xorgxquartz2qcode;
++    } else if (keycodes && g_str_has_prefix(keycodes, "evdev")) {
++        trace_xkeymap_keymap("evdev");
++        *maplen = qemu_input_map_xorgevdev2qcode_len;
++        return qemu_input_map_xorgevdev2qcode;
++    } else if (keycodes && g_str_has_prefix(keycodes, "xfree86")) {
++        trace_xkeymap_keymap("kbd");
++        *maplen = qemu_input_map_xorgkbd2qcode_len;
++        return qemu_input_map_xorgkbd2qcode;
++    } else {
++        trace_xkeymap_keymap("NULL");
++        g_warning("Unknown X11 keycode mapping '%s'.\n"
++                  "Please report to qemu-devel@nongnu.org\n"
++                  "including the following information:\n"
++                  "\n"
++                  "  - Operating system\n"
++                  "  - X11 Server\n"
++                  "  - xprop -root\n"
++                  "  - xdpyinfo\n",
++                  keycodes ? keycodes : "<null>");
++        return NULL;
++    }
+ }
+diff --git a/ui/x_keymap.h b/ui/x_keymap.h
+index afde2e94bf..0395e335ff 100644
+--- a/ui/x_keymap.h
++++ b/ui/x_keymap.h
+@@ -1,7 +1,7 @@
+ /*
+- * QEMU SDL display driver
++ * QEMU X11 keymaps
+  *
+- * Copyright (c) 2003 Fabrice Bellard
++ * Copyright (c) 2017 Red Hat, Inc.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -25,8 +25,8 @@
+ #ifndef QEMU_X_KEYMAP_H
+ #define QEMU_X_KEYMAP_H
+ 
+-uint8_t translate_xfree86_keycode(const int key);
++#include <X11/Xlib.h>
+ 
+-uint8_t translate_evdev_keycode(const int key);
++const guint16 *qemu_xkeymap_mapping_table(Display *dpy, size_t *maplen);
+ 
+ #endif
 -- 
 2.13.3
