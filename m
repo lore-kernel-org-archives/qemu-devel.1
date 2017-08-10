@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfhuC-0008TD-Iq
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:29:22 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dfi2S-0001WN-FD
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:37:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfhu9-0002OZ-8d
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:29:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfhu8-0002Nt-Vo
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:29:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 988706F1A6
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 07:29:15 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<20170804012551.2714-14-eblake@redhat.com>
-	<87inhwokot.fsf@dusky.pond.sub.org>
-	<08e17b38-5137-2986-b85f-7fc6f140f275@redhat.com>
-Date: Thu, 10 Aug 2017 09:29:13 +0200
-In-Reply-To: <08e17b38-5137-2986-b85f-7fc6f140f275@redhat.com> (Eric Blake's
-	message of "Wed, 9 Aug 2017 10:18:49 -0500")
-Message-ID: <87valvj2ye.fsf@dusky.pond.sub.org>
+	(envelope-from <mjt@tls.msk.ru>) id 1dfi2N-0000I1-JU
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:37:52 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:36899)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mjt@tls.msk.ru>) id 1dfi2N-0000H8-C4
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:37:47 -0400
+References: <1C4DF81E-D39F-42E2-9D0C-5D76819662A4@gmail.com>
+	<9a34ac74-d96f-bd9c-7666-b02e2f8accba@redhat.com>
+	<613DA9EA-28E9-426C-8A9A-5D4805A46E2C@gmail.com>
+	<b3f776c4-5ea9-5771-8863-6308d4b186bb@redhat.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <1a3c3e6d-bc75-5635-da19-db990e28351b@msgid.tls.msk.ru>
+Date: Thu, 10 Aug 2017 10:37:43 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 13/22] libqtest: Add qmp_raw()
+In-Reply-To: <b3f776c4-5ea9-5771-8863-6308d4b186bb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] No video for Windows 2000 guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, ehabkost@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+10.08.2017 06:51, Thomas Huth wrote:
+[]
 
-> On 08/09/2017 09:54 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->> 
->>> The majority of calls into libqtest's qmp() and friends are passing
->>> a JSON object that includes a command name; we can prove this by
->>> adding an assertion.  The only outlier is qmp-test, which is testing
->>> appropriate error responses to protocol violations and id support,
->>> by sending raw strings, where those raw strings don't need
->>> interpolation anyways.
->>>
->>> Adding a new entry-point makes a clean separation of which input
->>> needs interpolation, so that upcoming patches can refactor qmp()
->>> to be more like the recent additions to test-qga in taking the
->>> command name separately from the arguments for an overall
->>> reduction in testsuite boilerplate.
->>>
->>> This change also lets us move the workaround for the QMP parser
->>> limitation of not ending a parse until } or newline: all calls
->>> through qmp() are passing an object ending in }, so only the
->>> few callers of qmp_raw() have to worry about a trailing newline.
->>> +++ b/tests/libqtest.c
->>> @@ -451,7 +451,7 @@ static void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
->>>      QString *qstr;
->>>      const char *str;
->>>
->>> -    assert(*fmt);
->>> +    assert(strstr(fmt, "execute"));
->> 
->> I doubt this assertion is worthwhile.
->
-> Indeed, and it disappears later in the series.  But it was useful in the
-> interim, to prove that ALL callers through this function are passing a
-> command name (and therefore my later patches to rewrite qmp() to take a
-> command name aren't overlooking any callers).
->
->> 
->> One , qmp_fd_sendv() works just fine whether you include an 'execute' or
->> not.  Two, there are zillions of other ways to send nonsense with
->> qmp_fd_sendv().  If you do, your test doesn't work, so you fix it.
->> 
->> Rejecting nonsensical QMP input is QEMU's job, not libqtest's.
->
-> I'm fine omitting the assertions in the next spin, even if they proved
-> useful in this revision for making sure I converted everything.
+> I guess you'll end up with QEMU 2.1 as good version and 2.2 as the first
+> "bad" version. According the qemu-doc:
+> 
+> -vga type
+> 
+>     Select type of VGA card to emulate. Valid values for type are
+> 
+>     cirrus
+> 
+>         Cirrus Logic GD5446 Video card. All Windows versions starting
+>         from Windows 95 should recognize and use this graphic card. For
+>         optimal performances, use 16 bit color depth in the guest and
+>         the host OS. (This card was the default before QEMU 2.2)
+> 
+>     std
+> 
+>         Standard VGA card with Bochs VBE extensions. If your guest OS
+>         supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if
+>         you want to use high resolution modes (>= 1280x1024x16) then you
+>         should use this option. (This card is the default since QEMU
+>         2.2)
 
-Omitting them is fine.
+Both cirrus and stdvga worked in Win2k not-so-recently. Cirrus, IIRC,
+required a driver install, stdvga used "standard vga controller" which,
+in win2k, was always marked with yellow exclamation mark, just because
+the driver itself always sets that mark, "thinking" it is always wrong
+driver.
 
-Keeping them temporarily with a comment why would also be fine, but more
-work.
+So no, it's not the switch from cirrus to std, it's something else.
 
->>>
->>>      /* Test command failure with 'id' */
->>> -    resp = qmp("{ 'execute': 'human-monitor-command', 'id': 2 }");
->>> +    resp = qmp_raw("{ 'execute': 'human-monitor-command', 'id': 2 }");
->>>      g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
->>>      g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
->>>      QDECREF(resp);
->> 
->> I'm afraid I don't like this patch.  All the extra function buys us is
->> an assertion that isn't even tight, and the lifting of a newline out of
->> a place where it shouldn't be.
->
-> Maybe you'll change your mind by the end of the series, once you see the
-> changes to make qmp() shorter (and where those changes necessitate a
-> qmp_raw() as the backdoor for anything that is not a normal
-> command+arguments).
-
-It's a big series.  I may not see the forest for the trees right now.  A
-v2 taking care of the uncontroversial improvements should improve my
-view some.
+/mjt
