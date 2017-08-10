@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfkAE-0005kl-QY
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:54:03 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dfkAY-0005yl-Ex
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:54:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfkAB-0005Tn-Mt
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:54:02 -0400
-Received: from mail-wr0-f170.google.com ([209.85.128.170]:37923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfkAB-0005TR-G2
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:53:59 -0400
-Received: by mail-wr0-f170.google.com with SMTP id f21so980969wrf.5
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 02:53:59 -0700 (PDT)
-References: <20170809215510.22802-1-pbonzini@redhat.com>
-	<20170809215510.22802-2-pbonzini@redhat.com>
-	<eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f31c5090-e9df-ca82-301f-a0e21e168774@redhat.com>
-Date: Thu, 10 Aug 2017 11:53:56 +0200
+	(envelope-from <stefanha@redhat.com>) id 1dfkAX-0005fo-8T
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:54:22 -0400
+Date: Thu, 10 Aug 2017 10:54:01 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170810095401.GA20945@stefanha-x1.localdomain>
+References: <20170809160212.29976-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/12] qemu-iotests: remove
- dead code
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="envbJBWh7q8WU6mo"
+Content-Disposition: inline
+In-Reply-To: <20170809160212.29976-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] IDE: Do not flush empty drives
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: P J P <ppandit@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 10/08/2017 00:18, Eric Blake wrote:
-> On 08/09/2017 04:54 PM, Paolo Bonzini wrote:
->> This includes shell function, shell variables, command line options
->> (randomize.awk does not exist) and conditions that can never be true
->> (./qemu does not exist anymore).
-> 
-> Can we point to a commit id where we stopped making ./qemu?  Is it still
-> worth supporting a local symlink?
-> 
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  tests/qemu-iotests/check         | 36 +--------------------
->>  tests/qemu-iotests/common        | 23 --------------
->>  tests/qemu-iotests/common.config | 26 ---------------
->>  tests/qemu-iotests/common.rc     | 68 ----------------------------------------
->>  4 files changed, 1 insertion(+), 152 deletions(-)
->>
->> -#
->> -# - These can be added to $HOST_CONFIG_DIR (witch default to ./config)
-> 
-> Good riddance to the wrong word ('which' was intended)
-> 
-> Other than possibly still wanting ./qemu convenience, this looks like a
-> reasonable cleanup.
 
-In my reply yesterday, I forgot to note that the other current-directory
-searches go away in patch 9 anyway. :)
+--envbJBWh7q8WU6mo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Wed, Aug 09, 2017 at 05:02:10PM +0100, Stefan Hajnoczi wrote:
+> John Snow is offline until Monday, QEMU 2.10-rc3 is due to be tagged on
+> Tuesday, and so I've taken two patches John sent for 2.10 and addressed r=
+eview
+> comments.
+>=20
+> Kevin Wolf (1):
+>   IDE: test flush on empty CDROM
+>=20
+> Stefan Hajnoczi (1):
+>   IDE: Do not flush empty CDROM drives
+>=20
+>  hw/ide/core.c    | 10 +++++++++-
+>  tests/ide-test.c | 19 +++++++++++++++++++
+>  2 files changed, 28 insertions(+), 1 deletion(-)
+
+John: I am sending a pull request to get this fix into -rc3 (Aug 15th).
+Feel free to send a follow-up/revert if you want to make changes when
+you get back online.
+
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--envbJBWh7q8WU6mo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZjC05AAoJEJykq7OBq3PIjpMH/AvNIzykev+LKhFwTy0okGvr
+gpBEZt4Z67rm+PpdjOvfUmfzT4T4NxpzkB9ivko5TwRnI9jZo0ssyK3qLmtvZGGK
+HoI09+TKo+4AB1FG7r0eUgHJ/HCnSj/TwBvW/dBQGPqqPdW1CPU/KiS/k+PXq/ze
+abh13NSLnsy1xod8PMh8JqKwvL/gfmSoUw8mEj5i8LH95A00E5QotTeaidlyTTXD
+y1EPFTM89v2+KHiKTmcLgUWi4MxIU8LiF3f+WnhQl/ZybRQUXdTyzLIcgbPlp3dU
+Bu6HLAAj5YpIbdYtX5h4NTzgrqzfhoRcYJqN+4ONvrWtB/adyKL46ZrR14mPrcg=
+=kPm6
+-----END PGP SIGNATURE-----
+
+--envbJBWh7q8WU6mo--
