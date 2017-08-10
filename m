@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfrY5-00063c-9S
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:47:10 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dfrZf-00072u-RS
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dfrY4-0000Fo-2I
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:47:09 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:37022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dfrY3-0000DG-Qw
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:47:07 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id 33so5601158wrz.4
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 10:47:07 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1dfrZb-0002SY-PY
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 13:48:47 -0400
+References: <1502365466-19432-1-git-send-email-thuth@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <b93a10d5-0fbf-e18f-6a3a-c56063a00f56@redhat.com>
+Date: Thu, 10 Aug 2017 19:43:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <1502380961-16398-1-git-send-email-groug@kaod.org>
-References: <1502380961-16398-1-git-send-email-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 Aug 2017 18:46:46 +0100
-Message-ID: <CAFEAcA8WE21t_SW9JhS=niuMJsei+NENdyUq4MeYdcCMHY=MwA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] 9pfs fixes for 2.10 20170810
+In-Reply-To: <1502365466-19432-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] qemu-doc: Fix "-net van"
+ typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, Daniel Berrange <berrange@redhat.com>
 
-On 10 August 2017 at 17:02, Greg Kurz <groug@kaod.org> wrote:
-> The following changes since commit b38df311c174c98ef8cce7dec9f46603b083018e:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.10-20170809' into staging (2017-08-10 11:12:36 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/gkurz/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 4751fd5328dfcd4fe2f9055728a72a0e3ae56512:
->
->   9pfs: local: fix fchmodat_nofollow() limitations (2017-08-10 14:36:11 +0200)
->
-> ----------------------------------------------------------------
-> Just a single fix for an annoying regression introduced in 2.9 when fixing
-> CVE-2016-9602.
->
-> ----------------------------------------------------------------
-> Greg Kurz (1):
->       9pfs: local: fix fchmodat_nofollow() limitations
->
->  hw/9pfs/9p-local.c | 42 +++++++++++++++++++++++++++++++++++-------
->  hw/9pfs/9p-util.h  | 24 +++++++++++++++---------
->  2 files changed, 50 insertions(+), 16 deletions(-)
-> --
+On 10/08/2017 13:44, Thomas Huth wrote:
+> While Andrew S. Tanenbaum has a point by saying "Never underestimate the
+> bandwidth of a station wagon full of tapes hurtling down the highway",
+> we don't support that way of transportation in QEMU yet, so replace the
+> typo with the correct word "vlan".
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Applied, thanks.
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
--- PMM
+> ---
+>  qemu-doc.texi | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 92d50f1..9811476 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -3243,7 +3243,7 @@ the ``-netdev user,guestfwd=ARGS'' argument instead.
+>  
+>  @subsection -net vlan (since 2.9.0)
+>  
+> -The ``-net van=NN'' argument is partially replaced with the
+> +The ``-net vlan=NN'' argument is partially replaced with the
+>  new ``-netdev'' argument. The remaining use cases will no
+>  longer be directly supported in QEMU.
+>  
+> 
