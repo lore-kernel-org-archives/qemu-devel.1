@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfq4K-00047t-8D
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:12:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfqJb-00036k-HZ
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:28:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfq4H-0006IW-1M
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:12:20 -0400
-Resent-Message-Id: <E1dfq4H-0006IW-1M@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dfq4G-0006I3-QI
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:12:16 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150238152872.69.2229274610545858521@dd743fd916bd>
-In-Reply-To: <20170810155522.31099-1-berrange@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1dfqJY-0001f9-Eg
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:28:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfqJY-0001eN-8K
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:28:04 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502367921-17730-1-git-send-email-armbru@redhat.com>
+	<1502367921-17730-2-git-send-email-armbru@redhat.com>
+	<1837a5c7-92a2-a40a-5f96-21bd448790bd@redhat.com>
+Date: Thu, 10 Aug 2017 18:28:00 +0200
+In-Reply-To: <1837a5c7-92a2-a40a-5f96-21bd448790bd@redhat.com> (Eric Blake's
+	message of "Thu, 10 Aug 2017 09:43:46 -0500")
+Message-ID: <87o9rn8k1b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 10 Aug 2017 09:12:09 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Factor object_create() out of
+ main()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, el13635@mail.ntua.gr
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MTAxNTU1MjIuMzEwOTktMS1iZXJyYW5nZUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggMDAvMTVdIENvbnZlcnQgb3ZlciB0byB1c2Uga2V5Y29kZW1hcGRiClR5cGU6
-IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
-Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
-cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
-VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
-ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
-IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
-cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAg
-ICAgICAgIHBhdGNoZXcvMTUwMjM4MDk2MS0xNjM5OC0yLWdpdC1zZW5kLWVtYWlsLWdyb3VnQGth
-b2Qub3JnIC0+IHBhdGNoZXcvMTUwMjM4MDk2MS0xNjM5OC0yLWdpdC1zZW5kLWVtYWlsLWdyb3Vn
-QGthb2Qub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2MyNmRlMjllNiBkaXNw
-bGF5OiBjb252ZXJ0IFhlbklucHV0IGtleWJvYXJkIHRvIGtleWNvZGVtYXBkYgpiOWQ0ZjYzM2Ji
-IHVpOiByZW1vdmUgcWVtdV9pbnB1dF9saW51eF90b19xY29kZSBtZXRob2QKYjgyOTUyZTAyYSB1
-aTogcmVtb3ZlIHFlbXVfaW5wdXRfcWNvZGVfdG9fbnVtYmVyIG1ldGhvZAplNjFlNTFjNGM2IHVp
-OiBjb252ZXJ0IEdUSyBhbmQgU0RMMSBmcm9udGVuZHMgdG8ga2V5Y29kZW1hcGRiCjhkYTAwNzNm
-YTQgdWk6IGNvbnZlcnQgdGhlIFNETDIgZnJvbnRlbmQgdG8ga2V5Y29kZW1hcGRiCmY0MzQ3ZmFl
-OGEgdWk6IGNvbnZlcnQgY29jb2EgZnJvbnRlbmQgdG8ga2V5Y29kZW1hcGRiCjBiYjVlM2NhM2Eg
-Y2hhcjogY29udmVydCB0aGUgZXNjYyBkZXZpY2UgdG8ga2V5Y29kZW1hcGRiCjE1MjRjNjUxOGMg
-aW5wdXQ6IGNvbnZlcnQgdGhlIGFkYiBkZXZpY2UgdG8ga2V5Y29kZW1hcGRiCjkzMTk2NWRmMDEg
-aW5wdXQ6IGNvbnZlcnQgcHMyIGRldmljZSB0byBrZXljb2RlbWFwZGIKMGUwMTIzOGQ2NSBpbnB1
-dDogY29udmVydCB2aXJ0aW8taW5wdXQtaGlkIGRldmljZSB0byBrZXljb2RlbWFwZGIKZjZjYTQw
-ZGYzZCB1aTogdXNlIFFLZXlDb2RlIGV4Y2x1c2l2ZWx5IGluIElucHV0S2V5RXZlbnQKNTI1MmI1
-OTQ2YSB1aTogZG9uJ3QgZXhwb3J0IHFlbXVfaW5wdXRfZXZlbnRfbmV3X2tleQowNDdjM2EwYzM3
-IHVpOiBjb252ZXJ0IGtleSBldmVudHMgdG8gUUtleUNvZGVzIGltbWVkaWF0ZWx5CjllZTdkNTgy
-NGYgdWk6IGNvbnZlcnQgY29tbW9uIGlucHV0IGNvZGUgdG8ga2V5Y29kZW1hcGRiCmFlNWEyMTJj
-NDggdWk6IGFkZCBrZXljb2RlbWFwZGIgcmVwb3NpdG9yeSBhcyBhIEdJVCBzdWJtb2R1bGUKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTU6IHVpOiBhZGQga2V5Y29kZW1h
-cGRiIHJlcG9zaXRvcnkgYXMgYSBHSVQgc3VibW9kdWxlLi4uCkNoZWNraW5nIFBBVENIIDIvMTU6
-IHVpOiBjb252ZXJ0IGNvbW1vbiBpbnB1dCBjb2RlIHRvIGtleWNvZGVtYXBkYi4uLgpDaGVja2lu
-ZyBQQVRDSCAzLzE1OiB1aTogY29udmVydCBrZXkgZXZlbnRzIHRvIFFLZXlDb2RlcyBpbW1lZGlh
-dGVseS4uLgpDaGVja2luZyBQQVRDSCA0LzE1OiB1aTogZG9uJ3QgZXhwb3J0IHFlbXVfaW5wdXRf
-ZXZlbnRfbmV3X2tleS4uLgpDaGVja2luZyBQQVRDSCA1LzE1OiB1aTogdXNlIFFLZXlDb2RlIGV4
-Y2x1c2l2ZWx5IGluIElucHV0S2V5RXZlbnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzM2MTogRklMRTogdWkvaW5wdXQuYzozODA6Cit2b2lkIHFlbXVfaW5wdXRfZXZlbnRf
-c2VuZF9rZXlfcWNvZGUoUWVtdUNvbnNvbGUgKnNyYywgUUtleUNvZGUgcWNvZGUsIGJvb2wgZG93
-bikKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzIxIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNi8xNTogaW5w
-dXQ6IGNvbnZlcnQgdmlydGlvLWlucHV0LWhpZCBkZXZpY2UgdG8ga2V5Y29kZW1hcGRiLi4uCkNo
-ZWNraW5nIFBBVENIIDcvMTU6IGlucHV0OiBjb252ZXJ0IHBzMiBkZXZpY2UgdG8ga2V5Y29kZW1h
-cGRiLi4uCkNoZWNraW5nIFBBVENIIDgvMTU6IGlucHV0OiBjb252ZXJ0IHRoZSBhZGIgZGV2aWNl
-IHRvIGtleWNvZGVtYXBkYi4uLgpDaGVja2luZyBQQVRDSCA5LzE1OiBjaGFyOiBjb252ZXJ0IHRo
-ZSBlc2NjIGRldmljZSB0byBrZXljb2RlbWFwZGIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTU6IHVp
-OiBjb252ZXJ0IGNvY29hIGZyb250ZW5kIHRvIGtleWNvZGVtYXBkYi4uLgpDaGVja2luZyBQQVRD
-SCAxMS8xNTogdWk6IGNvbnZlcnQgdGhlIFNETDIgZnJvbnRlbmQgdG8ga2V5Y29kZW1hcGRiLi4u
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDE6IEZJTEU6IHVpL3NkbDItaW5w
-dXQuYzo0MDoKKyAgICBmb3IgKGkgPSAwOyBpIDwgU0RMX05VTV9TQ0FOQ09ERVMgJiYgaSA8IHFl
-bXVfaW5wdXRfbWFwX3VzYjJxY29kZV9sZW4gOyBpKyspIHsKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgpDaGVja2luZyBQQVRDSCAxMi8xNTogdWk6IGNvbnZlcnQgR1RLIGFuZCBTREwxIGZy
-b250ZW5kcyB0byBrZXljb2RlbWFwZGIuLi4KRVJST1I6IHVubmVjZXNzYXJ5IHdoaXRlc3BhY2Ug
-YmVmb3JlIGEgcXVvdGVkIG5ld2xpbmUKIzI3OTogRklMRTogdWkvZ3RrLmM6MTE0OToKKyAgICAg
-ICAgZ193YXJuaW5nKCJleHBlcmltZW50YWw6IHVzaW5nIGJyb2Fkd2F5LCB4MTEgdmlydHVhbCBr
-ZXlzeW0gXG4iCgpFUlJPUjogdW5uZWNlc3Nhcnkgd2hpdGVzcGFjZSBiZWZvcmUgYSBxdW90ZWQg
-bmV3bGluZQojMjgwOiBGSUxFOiB1aS9ndGsuYzoxMTUwOgorICAgICAgICAgICAgICAgICAgIm1h
-cHBpbmcgLSB3aXRoIHZlcnkgbGltaXRlZCBzdXBwb3J0LiBTZWUgYWxzbyBcbiIKCkVSUk9SOiBi
-cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzMw
-MTogRklMRTogdWkvZ3RrLmM6MTE3MDoKKyAgICBpZiAoIWtleWNvZGVfbWFwKQpbLi4uXQoKRVJS
-T1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVu
-dAojMzAzOiBGSUxFOiB1aS9ndGsuYzoxMTcyOgorICAgIGlmIChzY2FuY29kZSA+IGtleWNvZGVf
-bWFwbGVuKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
-cyBvZiB0aGlzIHN0YXRlbWVudAojNTUwOiBGSUxFOiB1aS9zZGwuYzoyNDU6CisgICAgaWYgKCFr
-ZXljb2RlX21hcCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
-IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzU1MjogRklMRTogdWkvc2RsLmM6MjQ3OgorICAgIGlm
-IChldi0+a2V5c3ltLnNjYW5jb2RlID4ga2V5Y29kZV9tYXBsZW4pClsuLi5dCgpFUlJPUjogYnJh
-Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM3OTc6
-IEZJTEU6IHVpL3hfa2V5bWFwLmM6Mjc6CisgICAgaWYgKHN0cnN0cih2ZW5kb3IsICJDeWd3aW4v
-WCIpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBv
-ZiB0aGlzIHN0YXRlbWVudAojODEzOiBGSUxFOiB1aS94X2tleW1hcC5jOjQxOgorICAgICAgICBp
-ZiAoc3RyY21wKGV4dGVuc2lvbnNbaV0sICJBcHBsZS1XTSIpID09IDAgfHwKWy4uLl0KCkVSUk9S
-OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
-IzgxNzogRklMRTogdWkveF9rZXltYXAuYzo0NToKKyAgICBpZiAoZXh0ZW5zaW9ucykKWy4uLl0K
-CnRvdGFsOiA5IGVycm9ycywgMCB3YXJuaW5ncywgODMzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEzLzE1OiB1aTog
-cmVtb3ZlIHFlbXVfaW5wdXRfcWNvZGVfdG9fbnVtYmVyIG1ldGhvZC4uLgpDaGVja2luZyBQQVRD
-SCAxNC8xNTogdWk6IHJlbW92ZSBxZW11X2lucHV0X2xpbnV4X3RvX3Fjb2RlIG1ldGhvZC4uLgpD
-aGVja2luZyBQQVRDSCAxNS8xNTogZGlzcGxheTogY29udmVydCBYZW5JbnB1dCBrZXlib2FyZCB0
-byBrZXljb2RlbWFwZGIuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Eric Blake <eblake@redhat.com> writes:
+
+> On 08/10/2017 07:25 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  vl.c | 21 ++++++++++-----------
+>>  1 file changed, 10 insertions(+), 11 deletions(-)
+>> 
+>
+>> +++ b/vl.c
+>> @@ -2845,7 +2845,6 @@ static bool object_create_initial(const char *type)
+>>      return true;
+>>  }
+>>  
+>> -
+>>  /*
+>
+> Spurious whitespace change? I can live with it because it adds
+> consistency, but it's not on a function directly touched by this patch.
+
+Not intentional (alternatively: I've since forgotten).  I'll drop it.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
