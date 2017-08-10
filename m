@@ -1,37 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfpvH-00024j-GC
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:03:01 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfpy7-00059e-7R
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfpvE-0000ZY-Bq
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:02:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35141
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfpvE-0000ZP-6a
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:02:56 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7AFxN2Z038620
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 12:02:55 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c8tbw8x2g-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 12:02:55 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 10 Aug 2017 17:02:53 +0100
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 10 Aug 2017 18:02:41 +0200
-In-Reply-To: <1502380961-16398-1-git-send-email-groug@kaod.org>
-References: <1502380961-16398-1-git-send-email-groug@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1502380961-16398-2-git-send-email-groug@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL] 9pfs: local: fix fchmodat_nofollow() limitations
+	(envelope-from <berrange@redhat.com>) id 1dfpy6-0003Fo-1l
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:05:55 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 10 Aug 2017 17:04:43 +0100
+Message-Id: <20170810160451.32723-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/8] Enable full IPv4/IPv6 dual stack support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,167 +18,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-This function has to ensure it doesn't follow a symlink that could be use=
-d
-to escape the virtfs directory. This could be easily achieved if fchmodat=
-()
-on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-it doesn't. There was a tentative to implement a new fchmodat2() syscall
-with the correct semantics:
+Currently all the network listeners in QEMU, except the VNC server,
+are restricted to listening on a single socket. This makes it
+impossible to fully support IPv4/IPv6 dual stack. We're restricted
+to using IPV6_V6ONLY=0 to listen on both protocols from a single
+socket, but this doesn't work at all on OpenBSD, and even where
+supported it is quite crude (only really works for localhost and
+wildcard addresses).
 
-https://patchwork.kernel.org/patch/9596301/
+This patch series introduces a new object QIONetListener, which
+encapsulates multiple QIOChannelSocket listeners. This makes it
+trivial to support multiple listening sockets in any part of
+QEMU.
 
-but it didn't gain much momentum. Also it was suggested to look at an O_P=
-ATH
-based solution in the first place.
+Daniel P. Berrange (8):
+  tests: add functional test validating ipv4/ipv6 address flag handling
+  io: introduce a network socket listener API
+  blockdev: convert internal NBD server to QIONetListener
+  blockdev: convert qemu-nbd server to QIONetListener
+  migration: convert socket server to QIONetListener
+  chardev: convert the socket server to QIONetListener
+  ui: convert VNC server to QIONetListener
+  sockets: fix parsing of ipv4/ipv6 opts in parse_socket_addr
 
-The current implementation covers most use-cases, but it notably fails if=
-:
-- the target path has access rights equal to 0000 (openat() returns EPERM=
-),
-  =3D> once you've done chmod(0000) on a file, you can never chmod() agai=
-n
-- the target path is UNIX domain socket (openat() returns ENXIO)
-  =3D> bind() of UNIX domain sockets fails if the file is on 9pfs
+ blockdev-nbd.c             |  50 +--
+ chardev/char-socket.c      |  70 ++--
+ include/io/net-listener.h  | 174 +++++++++
+ io/Makefile.objs           |   1 +
+ io/net-listener.c          | 315 ++++++++++++++++
+ migration/socket.c         |  44 +--
+ qemu-nbd.c                 |  50 +--
+ tests/.gitignore           |   1 +
+ tests/Makefile.include     |   3 +
+ tests/test-sockets-proto.c | 906 +++++++++++++++++++++++++++++++++++++++++++++
+ ui/vnc.c                   | 194 +++-------
+ ui/vnc.h                   |   9 +-
+ util/qemu-sockets.c        |  36 +-
+ 13 files changed, 1563 insertions(+), 290 deletions(-)
+ create mode 100644 include/io/net-listener.h
+ create mode 100644 io/net-listener.c
+ create mode 100644 tests/test-sockets-proto.c
 
-The solution is to use O_PATH: openat() now succeeds in both cases, and w=
-e
-can ensure the path isn't a symlink with fstat(). The associated entry in
-"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
-
-The previous behavior is kept for older systems that don't have O_PATH.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Zhi Yong Wu <zhiyong.wu@ucloud.cn>
-Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- hw/9pfs/9p-local.c | 42 +++++++++++++++++++++++++++++++++++-------
- hw/9pfs/9p-util.h  | 24 +++++++++++++++---------
- 2 files changed, 50 insertions(+), 16 deletions(-)
-
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 6e478f4765ef..efb0b79a74bf 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -333,17 +333,27 @@ update_map_file:
-=20
- static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
- {
-+    struct stat stbuf;
-     int fd, ret;
-=20
-     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
--     * Unfortunately, the linux kernel doesn't implement it yet. As an
--     * alternative, let's open the file and use fchmod() instead. This
--     * may fail depending on the permissions of the file, but it is the
--     * best we can do to avoid TOCTTOU. We first try to open read-only
--     * in case name points to a directory. If that fails, we try write-o=
-nly
--     * in case name doesn't point to a directory.
-+     * Unfortunately, the linux kernel doesn't implement it yet.
-      */
--    fd =3D openat_file(dirfd, name, O_RDONLY, 0);
-+
-+     /* First, we clear non-racing symlinks out of the way. */
-+    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-+        return -1;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno =3D ELOOP;
-+        return -1;
-+    }
-+
-+    /* Access modes are ignored when O_PATH is supported. We try O_RDONL=
-Y and
-+     * O_WRONLY for old-systems that don't support O_PATH.
-+     */
-+    fd =3D openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
-+#if O_PATH_9P_UTIL =3D=3D 0
-     if (fd =3D=3D -1) {
-         /* In case the file is writable-only and isn't a directory. */
-         if (errno =3D=3D EACCES) {
-@@ -357,6 +367,24 @@ static int fchmodat_nofollow(int dirfd, const char *=
-name, mode_t mode)
-         return -1;
-     }
-     ret =3D fchmod(fd, mode);
-+#else
-+    if (fd =3D=3D -1) {
-+        return -1;
-+    }
-+
-+    /* Now we handle racing symlinks. */
-+    ret =3D fstat(fd, &stbuf);
-+    if (!ret) {
-+        if (S_ISLNK(stbuf.st_mode)) {
-+            errno =3D ELOOP;
-+            ret =3D -1;
-+        } else {
-+            char *proc_path =3D g_strdup_printf("/proc/self/fd/%d", fd);
-+            ret =3D chmod(proc_path, mode);
-+            g_free(proc_path);
-+        }
-+    }
-+#endif
-     close_preserve_errno(fd);
-     return ret;
- }
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 91299a24b8af..dc0d2e29aa3b 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -13,6 +13,12 @@
- #ifndef QEMU_9P_UTIL_H
- #define QEMU_9P_UTIL_H
-=20
-+#ifdef O_PATH
-+#define O_PATH_9P_UTIL O_PATH
-+#else
-+#define O_PATH_9P_UTIL 0
-+#endif
-+
- static inline void close_preserve_errno(int fd)
- {
-     int serrno =3D errno;
-@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
-=20
- static inline int openat_dir(int dirfd, const char *name)
- {
--#ifdef O_PATH
--#define OPENAT_DIR_O_PATH O_PATH
--#else
--#define OPENAT_DIR_O_PATH 0
--#endif
-     return openat(dirfd, name,
--                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PAT=
-H);
-+                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
- }
-=20
- static inline int openat_file(int dirfd, const char *name, int flags,
-@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *n=
-ame, int flags,
-     }
-=20
-     serrno =3D errno;
--    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
--    ret =3D fcntl(fd, F_SETFL, flags);
--    assert(!ret);
-+    /* O_NONBLOCK was only needed to open the file. Let's drop it. We do=
-n't
-+     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and ope=
-nat()
-+     * ignored it anyway.
-+     */
-+    if (!(flags & O_PATH_9P_UTIL)) {
-+        ret =3D fcntl(fd, F_SETFL, flags);
-+        assert(!ret);
-+    }
-     errno =3D serrno;
-     return fd;
- }
---=20
-2.7.5
+-- 
+2.13.3
