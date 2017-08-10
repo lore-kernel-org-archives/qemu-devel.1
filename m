@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfqPV-0006da-7j
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:34:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfqRp-0008V1-Cm
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dfqPT-0004kv-T0
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:34:13 -0400
-Resent-Message-Id: <E1dfqPT-0004kv-T0@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150238283470.69.11208913153471678606@dd743fd916bd>
-In-Reply-To: <20170810160451.32723-1-berrange@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1dfqRo-0006Xp-0c
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:36:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfqRn-0006XK-NQ
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:36:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502367921-17730-1-git-send-email-armbru@redhat.com>
+	<1502367921-17730-3-git-send-email-armbru@redhat.com>
+	<b0769260-8342-8a90-8a1e-d6545e0c64a1@redhat.com>
+Date: Thu, 10 Aug 2017 18:36:30 +0200
+In-Reply-To: <b0769260-8342-8a90-8a1e-d6545e0c64a1@redhat.com> (Paolo
+	Bonzini's message of "Thu, 10 Aug 2017 17:02:49 +0200")
+Message-ID: <87efsj8jn5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 10 Aug 2017 09:33:55 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/8] Enable full IPv4/IPv6 dual stack
- support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Partial support for non-scalar
+ properties with -object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +29,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, el13635@mail.ntua.gr
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MTAxNjA0NTEuMzI3MjMtMS1iZXJyYW5nZUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggMC84XSBFbmFibGUgZnVsbCBJUHY0L0lQdjYgZHVhbCBzdGFjayBzdXBwb3J0
-ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzgwZDRiM2Q5OSBzb2NrZXRzOiBmaXggcGFy
-c2luZyBvZiBpcHY0L2lwdjYgb3B0cyBpbiBwYXJzZV9zb2NrZXRfYWRkcgo4NTE5M2EyOWMxIHVp
-OiBjb252ZXJ0IFZOQyBzZXJ2ZXIgdG8gUUlPTmV0TGlzdGVuZXIKNTlkZDE4MTNjOCBjaGFyZGV2
-OiBjb252ZXJ0IHRoZSBzb2NrZXQgc2VydmVyIHRvIFFJT05ldExpc3RlbmVyCjIzMDRlYzIwMGYg
-bWlncmF0aW9uOiBjb252ZXJ0IHNvY2tldCBzZXJ2ZXIgdG8gUUlPTmV0TGlzdGVuZXIKNGY0YzMz
-OWQyYyBibG9ja2RldjogY29udmVydCBxZW11LW5iZCBzZXJ2ZXIgdG8gUUlPTmV0TGlzdGVuZXIK
-OTgzN2NjMGNjZCBibG9ja2RldjogY29udmVydCBpbnRlcm5hbCBOQkQgc2VydmVyIHRvIFFJT05l
-dExpc3RlbmVyCmYzYWExZDgyYzUgaW86IGludHJvZHVjZSBhIG5ldHdvcmsgc29ja2V0IGxpc3Rl
-bmVyIEFQSQo4MTU4NGNkYzZmIHRlc3RzOiBhZGQgZnVuY3Rpb25hbCB0ZXN0IHZhbGlkYXRpbmcg
-aXB2NC9pcHY2IGFkZHJlc3MgZmxhZyBoYW5kbGluZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS84OiB0ZXN0czogYWRkIGZ1bmN0aW9uYWwgdGVzdCB2YWxpZGF0aW5nIGlw
-djQvaXB2NiBhZGRyZXNzIGZsYWcgaGFuZGxpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBpbzog
-aW50cm9kdWNlIGEgbmV0d29yayBzb2NrZXQgbGlzdGVuZXIgQVBJLi4uCkNoZWNraW5nIFBBVENI
-IDMvODogYmxvY2tkZXY6IGNvbnZlcnQgaW50ZXJuYWwgTkJEIHNlcnZlciB0byBRSU9OZXRMaXN0
-ZW5lci4uLgpDaGVja2luZyBQQVRDSCA0Lzg6IGJsb2NrZGV2OiBjb252ZXJ0IHFlbXUtbmJkIHNl
-cnZlciB0byBRSU9OZXRMaXN0ZW5lci4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojNDE6IEZJTEU6IHFlbXUtbmJkLmM6MzQ4Ogorc3RhdGljIHZvaWQgbmJkX2FjY2VwdChRSU9O
-ZXRMaXN0ZW5lciAqbGlzdGVuZXIsIFFJT0NoYW5uZWxTb2NrZXQgKmNpb2MsIGdwb2ludGVyIG9w
-YXF1ZSkKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgOTkgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1Lzg6IG1p
-Z3JhdGlvbjogY29udmVydCBzb2NrZXQgc2VydmVyIHRvIFFJT05ldExpc3RlbmVyLi4uCkVSUk9S
-OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODk6IEZJTEU6IG1pZ3JhdGlvbi9zb2NrZXQuYzox
-NjM6CisgICAgcWlvX25ldF9saXN0ZW5lcl9zZXRfY2xpZW50X2Z1bmMobGlzdGVuZXIsIHNvY2tl
-dF9hY2NlcHRfaW5jb21pbmdfbWlncmF0aW9uLCBOVUxMLCBOVUxMKTsKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgODIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi84OiBjaGFyZGV2OiBjb252ZXJ0IHRoZSBz
-b2NrZXQgc2VydmVyIHRvIFFJT05ldExpc3RlbmVyLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM1NzogRklMRTogY2hhcmRldi9jaGFyLXNvY2tldC5jOjQwODoKKyAgICAgICAg
-cWlvX25ldF9saXN0ZW5lcl9zZXRfY2xpZW50X2Z1bmMocy0+bGlzdGVuZXIsIHRjcF9jaHJfYWNj
-ZXB0LCBjaHIsIE5VTEwpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE2NTog
-RklMRTogY2hhcmRldi9jaGFyLXNvY2tldC5jOjk0NjoKKyAgICAgICAgICAgICAgICBxaW9fbmV0
-X2xpc3RlbmVyX3NldF9jbGllbnRfZnVuYyhzLT5saXN0ZW5lciwgdGNwX2Nocl9hY2NlcHQsIGNo
-ciwgTlVMTCk7Cgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDE2OCBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDcv
-ODogdWk6IGNvbnZlcnQgVk5DIHNlcnZlciB0byBRSU9OZXRMaXN0ZW5lci4uLgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTE6IEZJTEU6IHVpL3ZuYy5jOjM5MDoKKyAgICAgICAg
-YWRkciA9IHFpb19jaGFubmVsX3NvY2tldF9nZXRfbG9jYWxfYWRkcmVzcyh2ZC0+bGlzdGVuZXIt
-PnNpb2NbMF0sIGVycnApOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyOTIgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQ
-QVRDSCA4Lzg6IHNvY2tldHM6IGZpeCBwYXJzaW5nIG9mIGlwdjQvaXB2NiBvcHRzIGluIHBhcnNl
-X3NvY2tldF9hZGRyLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 10/08/2017 14:25, Markus Armbruster wrote:
+>> We've wanted -object to support non-scalar properties for a while.
+>> Dan Berrange tried in "[PATCH v4 00/10]Provide a QOM-based
+>> authorization API".  Review led to the conclusion that we need to
+>> replace rather than add to QemuOpts.  Initial work towards that goal
+>> has been merged to provide -blockdev (commit 8746709), but there's
+>> substantial work left, mostly due to an bewildering array of
+>> compatibility problems.
+>> 
+>> Even if a full solution is still out of reach, we can have a partial
+>> solution now: accept -object argument in JSON syntax.  This should
+>> unblock development work that needs non-scalar properties with -object
+>> 
+>> The implementation is similar to -blockdev, except we use the new
+>> infrastructure only for the new JSON case, and stick to QemuOpts for
+>> the existing KEY=VALUE,... case, to sidestep compatibility problems.
+>> 
+>> If we did this for more options, we'd have to factor out common code.
+>> But for one option, this will do.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  qapi-schema.json | 14 +++++++++++---
+>>  vl.c             | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 66 insertions(+), 3 deletions(-)
+>> 
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 802ea53..7ed1db1 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -3618,15 +3618,23 @@
+>>  { 'command': 'netdev_del', 'data': {'id': 'str'} }
+>>  
+>>  ##
+>> -# @object-add:
+>> +# @ObjectOptions:
+>>  #
+>> -# Create a QOM object.
+>> +# Options for creating an object.
+>>  #
+>>  # @qom-type: the class name for the object to be created
+>>  #
+>>  # @id: the name of the new object
+>>  #
+>>  # @props: a dictionary of properties to be passed to the backend
+>> +##
+>> +{ 'struct': 'ObjectOptions',
+>> +  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
+>> +
+>> +##
+>> +# @object-add:
+>> +#
+>> +# Create a QOM object.
+>>  #
+>>  # Returns: Nothing on success
+>>  #          Error if @qom-type is not a valid class name
+>> @@ -3642,7 +3650,7 @@
+>>  #
+>>  ##
+>>  { 'command': 'object-add',
+>> -  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
+>> +  'data': 'ObjectOptions' }
+>>  
+>>  ##
+>>  # @object-del:
+>> diff --git a/vl.c b/vl.c
+>> index fd98ed1..db4680b 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -2854,8 +2854,32 @@ static bool object_create_delayed(const char *type)
+>>      return !object_create_initial(type);
+>>  }
+>>  
+>> +typedef struct ObjectOptionsQueueEntry {
+>> +    ObjectOptions *oo;
+>> +    Location loc;
+>> +    QSIMPLEQ_ENTRY(ObjectOptionsQueueEntry) entry;
+>> +} ObjectOptionsQueueEntry;
+>> +
+>> +typedef QSIMPLEQ_HEAD(ObjectOptionsQueue, ObjectOptionsQueueEntry)
+>> +    ObjectOptionsQueue;
+>> +
+>> +ObjectOptionsQueue oo_queue = QSIMPLEQ_HEAD_INITIALIZER(oo_queue);
+>> +
+>> +
+>>  static void object_create(bool (*type_predicate)(const char *))
+>>  {
+>> +    ObjectOptionsQueueEntry *e;
+>> +
+>> +    QSIMPLEQ_FOREACH(e, &oo_queue, entry) {
+>> +        if (!type_predicate(e->oo->qom_type)) {
+>> +            continue;
+>> +        }
+>> +        loc_push_restore(&e->loc);
+>> +        qmp_object_add(e->oo->qom_type, e->oo->id,
+>> +                       e->oo->has_props, e->oo->props, &error_fatal);
+>> +        loc_pop(&e->loc);
+>> +    }
+>> +
+>>      if (qemu_opts_foreach(qemu_find_opts("object"),
+>>                            user_creatable_add_opts_foreach,
+>>                            type_predicate, NULL)) {
+>> @@ -4078,6 +4102,29 @@ int main(int argc, char **argv, char **envp)
+>>  #endif
+>>                  break;
+>>              case QEMU_OPTION_object:
+>> +                /*
+>> +                 * TODO Use qobject_input_visitor_new_str() instead of
+>> +                 * QemuOpts, not in addition to.  Not done now because
+>> +                 * keyval_parse() isn't wart-compatible with QemuOpts.
+>> +                 */
+>> +                if (optarg[0] == '{') {
+>> +                    Visitor *v;
+>> +                    ObjectOptionsQueueEntry *e;
+>> +
+>> +                    v = qobject_input_visitor_new_str(optarg, "qom-type",
+>> +                                                      &err);
+>> +                    if (!v) {
+>> +                        error_report_err(err);
+>> +                        exit(1);
+>> +                    }
+>> +
+>> +                    e = g_new(ObjectOptionsQueueEntry, 1);
+>> +                    visit_type_ObjectOptions(v, NULL, &e->oo, &error_fatal);
+>> +                    visit_free(v);
+>> +                    loc_save(&e->loc);
+>> +                    QSIMPLEQ_INSERT_TAIL(&oo_queue, e, entry);
+>> +                    break;
+>> +                }
+>>                  opts = qemu_opts_parse_noisily(qemu_find_opts("object"),
+>>                                                 optarg, true);
+>>                  if (!opts) {
+>> @@ -4525,6 +4572,14 @@ int main(int argc, char **argv, char **envp)
+>>  
+>>      object_create(object_create_delayed);
+>>  
+>> +    while (!QSIMPLEQ_EMPTY(&oo_queue)) {
+>> +        ObjectOptionsQueueEntry *e = QSIMPLEQ_FIRST(&oo_queue);
+>> +
+>> +        QSIMPLEQ_REMOVE_HEAD(&oo_queue, entry);
+>> +        qapi_free_ObjectOptions(e->oo);
+>> +        g_free(e);
+>> +    }
+>
+> Why not free the queue entry in object_create, and assert here that it's
+> empty?
+
+Assumes object_create_delayed(TYPE) == !object_create_initial(TYPE),
+which is the case.  Fewer assumptions is good.  Less code is also good.
+Pick your goodness, please :)
+
+>
+> Paolo
+>
+>> +
+>>  #ifdef CONFIG_TPM
+>>      if (tpm_init() < 0) {
+>>          exit(1);
+>> 
