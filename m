@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfkzO-0003bY-0c
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:46:55 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1dflHs-00077i-57
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 07:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dfkzK-0008N5-QQ
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:46:54 -0400
-Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:45742)
+	(envelope-from <tianyu.lan@intel.com>) id 1dflHn-0000yt-Cn
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 07:06:00 -0400
+Received: from mga02.intel.com ([134.134.136.20]:4085)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfkzK-0008Ma-Gy
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:46:50 -0400
-Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 030698BFD6
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 12:46:49 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 10 Aug 2017 12:46:38 +0200
-Message-ID: <150236199819.23199.3109419868654891687.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1dflHn-0000wr-1d
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 07:05:55 -0400
+References: <1502359687-25370-1-git-send-email-tianyu.lan@intel.com>
+	<20170810102649.GF12980@redhat.com>
+From: Lan Tianyu <tianyu.lan@intel.com>
+Message-ID: <00cb01a4-5c27-fc69-d3ae-0653aa54b121@intel.com>
+Date: Thu, 10 Aug 2017 19:02:57 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-2.10 PATCH v5] 9pfs: local: fix
- fchmodat_nofollow() limitations
+In-Reply-To: <20170810102649.GF12980@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] x86: Increase max vcpu number to 352
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,172 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 
-This function has to ensure it doesn't follow a symlink that could be used
-to escape the virtfs directory. This could be easily achieved if fchmodat()
-on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
-it doesn't. There was a tentative to implement a new fchmodat2() syscall
-with the correct semantics:
+On 2017年08月10日 18:26, Daniel P. Berrange wrote:
+> On Thu, Aug 10, 2017 at 06:08:07PM +0800, Lan Tianyu wrote:
+>> Intel Xeon phi chip will support 352 logical threads. For HPC
+>> usage case, it will create a huge VM with vcpus number as same as host
+>> cpus. This patch is to increase max vcpu number to 352.
+> 
+> If we pick arbitray limits based on size of physical CPUs that happen
+> to be shipping today, we'll continue the cat+mouse game forever trailing
+> latest CPUs that vendors ship.
+> 
+> IMHO we should pick a higher number influenced by technical constraints
+> of the q35 impl instead. eg can we go straight to something like 512 or
+> 1024  ?
 
-https://patchwork.kernel.org/patch/9596301/
+Sure. 512 should be enough and some arrays is defined according to max
+vcpu number.
 
-but it didn't gain much momentum. Also it was suggested to look at an O_PATH
-based solution in the first place.
+> 
+>> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+>> ---
+>>  hw/i386/pc_q35.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>> index 169a214..5e93749 100644
+>> --- a/hw/i386/pc_q35.c
+>> +++ b/hw/i386/pc_q35.c
+>> @@ -299,7 +299,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>>      m->default_display = "std";
+>>      m->no_floppy = 1;
+>>      m->has_dynamic_sysbus = true;
+>> -    m->max_cpus = 288;
+>> +    m->max_cpus = 352;
+>>  }
+> 
+> You'll need to introduce machine type back compat support so that we
+> avoid changing the 2.10 q35 machine type - only the 2.11 machine
+> type should have the new limit.
 
-The current implementation covers most use-cases, but it notably fails if:
-- the target path has access rights equal to 0000 (openat() returns EPERM),
-  => once you've done chmod(0000) on a file, you can never chmod() again
-- the target path is UNIX domain socket (openat() returns ENXIO)
-  => bind() of UNIX domain sockets fails if the file is on 9pfs
+How about the following change?
 
-The solution is to use O_PATH: openat() now succeeds in both cases, and we
-can ensure the path isn't a symlink with fstat(). The associated entry in
-"/proc/self/fd" can hence be safely passed to the regular chmod() syscall.
-
-The previous behavior is kept for older systems that don't have O_PATH.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Zhi Yong Wu <zhiyong.wu@ucloud.cn>
----
-v5: - added missing fd == -1 check
-
-v4: - fixed #if condition
-    - moved out: label above #endif
-    - fixed typo in changelog
-    - added Eric's r-b
-
-v3: - O_PATH in a separate block of code
-    - added a reference to the fchmodat2() tentative in the changelog
-
-v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replacement
-      for O_PATH to avoid build breaks on O_PATH-less systems
-    - keep current behavior for O_PATH-less systems
-    - added comments
-    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file()
----
- hw/9pfs/9p-local.c |   47 ++++++++++++++++++++++++++++++++++++++++-------
- hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
- 2 files changed, 55 insertions(+), 16 deletions(-)
-
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 6e478f4765ef..cb0b5f1fc41c 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -333,17 +333,27 @@ update_map_file:
- 
- static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+-static void pc_q35_2_10_machine_options(MachineClass *m)
++static void pc_q35_2_11_machine_options(MachineClass *m)
  {
-+    struct stat stbuf;
-     int fd, ret;
- 
-     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
--     * Unfortunately, the linux kernel doesn't implement it yet. As an
--     * alternative, let's open the file and use fchmod() instead. This
--     * may fail depending on the permissions of the file, but it is the
--     * best we can do to avoid TOCTTOU. We first try to open read-only
--     * in case name points to a directory. If that fails, we try write-only
--     * in case name doesn't point to a directory.
-+     * Unfortunately, the linux kernel doesn't implement it yet.
-      */
--    fd = openat_file(dirfd, name, O_RDONLY, 0);
+      pc_q35_machine_options(m);
+      m->alias = "q35";
++}
 +
-+     /* First, we clear non-racing symlinks out of the way. */
-+    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
-+        return -1;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        return -1;
-+    }
-+
-+    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
-+     * O_WRONLY for old-systems that don't support O_PATH.
-+     */
-+    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
-+#if O_PATH_9P_UTIL == 0
-     if (fd == -1) {
-         /* In case the file is writable-only and isn't a directory. */
-         if (errno == EACCES) {
-@@ -357,6 +367,29 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
-         return -1;
-     }
-     ret = fchmod(fd, mode);
-+#else
-+    if (fd == -1) {
-+        return -1;
-+    }
-+
-+    /* Now we handle racing symlinks. */
-+    ret = fstat(fd, &stbuf);
-+    if (ret) {
-+        goto out;
-+    }
-+    if (S_ISLNK(stbuf.st_mode)) {
-+        errno = ELOOP;
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    {
-+        char *proc_path = g_strdup_printf("/proc/self/fd/%d", fd);
-+        ret = chmod(proc_path, mode);
-+        g_free(proc_path);
-+    }
-+out:
-+#endif
-     close_preserve_errno(fd);
-     return ret;
++static void pc_q35_2_10_machine_options(MachineClass *m)
++{
++    pc_q35_2_11_options(m);
++    m->alias = "q35";
++    m->max_cpus = 288;
+     m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
  }
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 91299a24b8af..dc0d2e29aa3b 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -13,6 +13,12 @@
- #ifndef QEMU_9P_UTIL_H
- #define QEMU_9P_UTIL_H
- 
-+#ifdef O_PATH
-+#define O_PATH_9P_UTIL O_PATH
-+#else
-+#define O_PATH_9P_UTIL 0
-+#endif
-+
- static inline void close_preserve_errno(int fd)
- {
-     int serrno = errno;
-@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
- 
- static inline int openat_dir(int dirfd, const char *name)
- {
--#ifdef O_PATH
--#define OPENAT_DIR_O_PATH O_PATH
--#else
--#define OPENAT_DIR_O_PATH 0
--#endif
-     return openat(dirfd, name,
--                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PATH);
-+                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
- }
- 
- static inline int openat_file(int dirfd, const char *name, int flags,
-@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *name, int flags,
-     }
- 
-     serrno = errno;
--    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
--    ret = fcntl(fd, F_SETFL, flags);
--    assert(!ret);
-+    /* O_NONBLOCK was only needed to open the file. Let's drop it. We don't
-+     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and openat()
-+     * ignored it anyway.
-+     */
-+    if (!(flags & O_PATH_9P_UTIL)) {
-+        ret = fcntl(fd, F_SETFL, flags);
-+        assert(!ret);
-+    }
-     errno = serrno;
-     return fd;
- }
+
+
+
+> 
+> Regards,
+> Daniel
+> 
+
+
+-- 
+Best regards
+Tianyu Lan
