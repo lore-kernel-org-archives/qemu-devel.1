@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfp0n-0006Tq-6V
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:04:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfp4c-0007UJ-5g
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:08:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfp0j-0001o4-3z
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:04:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39878)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfp0i-0001ns-R2
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:04:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDD6881DE5
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 15:04:31 +0000 (UTC)
-Date: Thu, 10 Aug 2017 16:04:25 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170810150425.GO12980@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170808162629.32493-1-quintela@redhat.com>
-	<20170808162629.32493-6-quintela@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dfp4a-00046M-Nw
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:08:34 -0400
+References: <20170809203808.31725-1-eblake@redhat.com>
+	<20170810130240.GC3650@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <daa65e6b-77d5-7779-faf4-8e76a811ba86@redhat.com>
+Date: Thu, 10 Aug 2017 10:08:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170808162629.32493-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 05/19] qio: Create new
- qio_channel_{readv, writev}_all
+In-Reply-To: <20170810130240.GC3650@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="udwPOXLG0Cf1UXcO47wecoQemcUREgo47"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 0/5] More bdrv_getlength() fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,423 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com
 
-On Tue, Aug 08, 2017 at 06:26:15PM +0200, Juan Quintela wrote:
-> The functions waits until it is able to write the full iov.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
-> Add tests.
-> 
-> fix reader to check for len == 0.
-> ---
->  include/io/channel.h           | 46 +++++++++++++++++++++++++
->  io/channel.c                   | 77 ++++++++++++++++++++++++++++++++++++++++++
->  migration/qemu-file-channel.c  | 29 +---------------
->  tests/io-channel-helpers.c     | 55 ++++++++++++++++++++++++++++++
->  tests/io-channel-helpers.h     |  4 +++
->  tests/test-io-channel-buffer.c | 55 ++++++++++++++++++++++++++++--
->  6 files changed, 235 insertions(+), 31 deletions(-)
-> 
-> diff --git a/include/io/channel.h b/include/io/channel.h
-> index db9bb02..bfc97e2 100644
-> --- a/include/io/channel.h
-> +++ b/include/io/channel.h
-> @@ -269,6 +269,52 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
->                                  Error **errp);
->  
->  /**
-> + * qio_channel_readv_all:
-> + * @ioc: the channel object
-> + * @iov: the array of memory regions to read data into
-> + * @niov: the length of the @iov array
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Read data from the IO channel, storing it in the
-> + * memory regions referenced by @iov. Each element
-> + * in the @iov will be fully populated with data
-> + * before the next one is used. The @niov parameter
-> + * specifies the total number of elements in @iov.
-> + *
-> + * Returns: the number of bytes read, or -1 on error,
-> + * or QIO_CHANNEL_ERR_BLOCK if no data is available
-> + * and the channel is non-blocking
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--udwPOXLG0Cf1UXcO47wecoQemcUREgo47
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com
+Message-ID: <daa65e6b-77d5-7779-faf4-8e76a811ba86@redhat.com>
+Subject: Re: [PATCH for-2.10 v2 0/5] More bdrv_getlength() fixes
+References: <20170809203808.31725-1-eblake@redhat.com>
+ <20170810130240.GC3650@localhost.localdomain>
+In-Reply-To: <20170810130240.GC3650@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is incorrect - it'll never return QIO_CHANNEL_ERR_BLOCK.
-If it seems that, it'll go into a wait until data arrives.
+On 08/10/2017 08:02 AM, Kevin Wolf wrote:
+> Am 09.08.2017 um 22:38 hat Eric Blake geschrieben:
+>> We already have a lot of bdrv_getlength() fixes in -rc2; so I think
+>> this is still okay for -rc3.
+>>
+>> v1 was here (with a typo'd subject line):
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01226.html
+>>
+>> Since v1:
+>> - patch 1: fix error message capitalization (Kevin, R-b kept)
+>> - fix locking bug in original patch 2 (Kevin)
+>> - split original patch 2 into two parts: signature update, and
+>> added error checking (Kevin)
+>> - check for unlikely integer overflow before bdrv_truncate (Jeff)
+>>
+>> 001/5:[0002] [FC] 'vpc: Check failure of bdrv_getlength()'
+>> 002/5:[down] 'qcow: Change signature of get_cluster_offset()'
+>> 003/5:[0048] [FC] 'qcow: Check failure of bdrv_getlength() and bdrv_tr=
+uncate()'
+>> 004/5:[----] [--] 'qcow2: Drop debugging dump_refcounts()'
+>> 005/5:[----] [--] 'qcow2: Check failure of bdrv_getlength()'
+>=20
+> Looks good to me, but as the bug is far from being critical, I'd rather=
 
-> + */
-> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
-> +                              const struct iovec *iov,
-> +                              size_t niov,
-> +                              Error **errp);
-> +
-> +
-> +/**
-> + * qio_channel_writev_all:
-> + * @ioc: the channel object
-> + * @iov: the array of memory regions to write data from
-> + * @niov: the length of the @iov array
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Write data to the IO channel, reading it from the
-> + * memory regions referenced by @iov. Each element
-> + * in the @iov will be fully sent, before the next
-> + * one is used. The @niov parameter specifies the
-> + * total number of elements in @iov.
-> + *
-> + * It is required for all @iov data to be fully
-> + * sent.
-> + *
-> + * Returns: the number of bytes sent, or -1 on error,
-> + */
-> +ssize_t qio_channel_writev_all(QIOChannel *ioc,
-> +                               const struct iovec *iov,
-> +                               size_t niov,
-> +                               Error **erp);
-> +
-> +/**
->   * qio_channel_readv:
->   * @ioc: the channel object
->   * @iov: the array of memory regions to read data into
-> diff --git a/io/channel.c b/io/channel.c
-> index 1cfb8b3..0b521f9 100644
-> --- a/io/channel.c
-> +++ b/io/channel.c
-> @@ -22,6 +22,7 @@
->  #include "io/channel.h"
->  #include "qapi/error.h"
->  #include "qemu/main-loop.h"
-> +#include "qemu/iov.h"
->  
->  bool qio_channel_has_feature(QIOChannel *ioc,
->                               QIOChannelFeature feature)
-> @@ -85,6 +86,82 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
->  }
->  
->  
-> +
-> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
-> +                              const struct iovec *iov,
-> +                              size_t niov,
-> +                              Error **errp)
-> +{
-> +    ssize_t done = 0;
-> +    struct iovec *local_iov = g_new(struct iovec, niov);
-> +    struct iovec *local_iov_head = local_iov;
-> +    unsigned int nlocal_iov = niov;
+> apply the more complex qcow1 patches only to block-next. The vpc and
+> qcow2 parts seems a lot less risky, so 2.10 should be okay for them.
+>=20
+> What do you think?
 
-Should be  size_t
+The argument for NOT doing the qcow changes (patches 2 and 3): the only
+place where we are not checking for failures is part of
+get_cluster_offset() - but in all likelihood, if we were unable to
+determine or change the length of the backing file, we will have nearby
+problems that will ultimately cause failure soon enough.  Furthermore,
+it's not a regression (we've had several releases with the problem), and
+qcow is not a good format (it's painfully slow, and we strongly
+recommend qcow2 instead) - so no one will be hitting any actual bugs in
+practice.
 
-> +
-> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
-> +                          iov, niov,
-> +                          0, iov_size(iov, niov));
-> +
-> +    while (nlocal_iov > 0) {
-> +        ssize_t len;
-> +        len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
-> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> +            qio_channel_wait(ioc, G_IO_OUT);
+I'll trust your judgment as maintainer, so taking just 1, 4, and 5 in
+2.10 is fine.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-This should be waiting for G_IO_IN
+--udwPOXLG0Cf1UXcO47wecoQemcUREgo47
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-> +            continue;
-> +        } else if (len < 0) {
-> +            error_setg_errno(errp, EIO,
-> +                             "Channel was not able to read full iov");
-> +            done = -1;
-> +            goto cleanup;
-> +        } else if (len == 0) {
-> +            goto cleanup;
-> +        }
-> +
-> +        iov_discard_front(&local_iov, &nlocal_iov, len);
-> +        done += len;
-> +    }
-> +
-> + cleanup:
-> +    g_free(local_iov_head);
-> +    return done;
-> +}
-> +
-> +ssize_t qio_channel_writev_all(QIOChannel *ioc,
-> +                               const struct iovec *iov,
-> +                               size_t niov,
-> +                               Error **errp)
-> +{
-> +    ssize_t done = 0;
-> +    struct iovec *local_iov = g_new(struct iovec, niov);
-> +    struct iovec *local_iov_head = local_iov;
-> +    unsigned int nlocal_iov = niov;
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMducACgkQp6FrSiUn
+Q2qWlQf9EVVmEz4Xd6tj/uBKfr5O4rQuzhae257TbHaMrNiZ+DzjKSJp/cyTj0zS
+FfSbMMcYGb/OwFN21K9F88gNdy19L9YmyOjeRBPjXtDGdhwi1qWwi4rrEkio17D2
+rArRch0JjAa2RBFEE+5SPvpqrd+VTsTkLFDJ0joauwz4zwiLPLgR5S/x4lgUdo0s
+JaEiYtROxMwfsTKUY+uLzAVMtzHMQ0K1xwfL7+oAKUdSg4vahE5MZZ6zwYk4JETc
+lBwjo40edzzD29/BG1nAMZxez/K4uAs+Bz2hGS+R88GkTNiPCivUEaACkfr5A/lP
+CNWodtTMBLz/T/ObNaggQEs7+/cOZg==
+=WgFp
+-----END PGP SIGNATURE-----
 
-Should be size_t 
-
-> +
-> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
-> +                          iov, niov,
-> +                          0, iov_size(iov, niov));
-> +
-> +    while (nlocal_iov > 0) {
-> +        ssize_t len;
-> +        len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
-> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> +            qio_channel_wait(ioc, G_IO_OUT);
-> +            continue;
-> +        }
-> +        if (len < 0) {
-> +            error_setg_errno(errp, EIO,
-> +                             "Channel was not able to write full iov");
-> +            done = -1;
-> +            goto cleanup;
-> +        }
-> +
-> +        iov_discard_front(&local_iov, &nlocal_iov, len);
-> +        done += len;
-> +    }
-> +
-> + cleanup:
-> +    g_free(local_iov_head);
-> +    return done;
-> +}
-> +
->  ssize_t qio_channel_readv(QIOChannel *ioc,
->                            const struct iovec *iov,
->                            size_t niov,
-> diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
-> index e202d73..457ea6c 100644
-> --- a/migration/qemu-file-channel.c
-> +++ b/migration/qemu-file-channel.c
-> @@ -36,35 +36,8 @@ static ssize_t channel_writev_buffer(void *opaque,
->                                       int64_t pos)
->  {
->      QIOChannel *ioc = QIO_CHANNEL(opaque);
-> -    ssize_t done = 0;
-> -    struct iovec *local_iov = g_new(struct iovec, iovcnt);
-> -    struct iovec *local_iov_head = local_iov;
-> -    unsigned int nlocal_iov = iovcnt;
->  
-> -    nlocal_iov = iov_copy(local_iov, nlocal_iov,
-> -                          iov, iovcnt,
-> -                          0, iov_size(iov, iovcnt));
-> -
-> -    while (nlocal_iov > 0) {
-> -        ssize_t len;
-> -        len = qio_channel_writev(ioc, local_iov, nlocal_iov, NULL);
-> -        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> -            qio_channel_wait(ioc, G_IO_OUT);
-> -            continue;
-> -        }
-> -        if (len < 0) {
-> -            /* XXX handle Error objects */
-> -            done = -EIO;
-> -            goto cleanup;
-> -        }
-> -
-> -        iov_discard_front(&local_iov, &nlocal_iov, len);
-> -        done += len;
-> -    }
-> -
-> - cleanup:
-> -    g_free(local_iov_head);
-> -    return done;
-> +    return qio_channel_writev_all(ioc, iov, iovcnt, NULL);
->  }
->  
->  
-> diff --git a/tests/io-channel-helpers.c b/tests/io-channel-helpers.c
-> index 05e5579..3d76d95 100644
-> --- a/tests/io-channel-helpers.c
-> +++ b/tests/io-channel-helpers.c
-> @@ -21,6 +21,7 @@
->  #include "qemu/osdep.h"
->  #include "io-channel-helpers.h"
->  #include "qapi/error.h"
-> +#include "qemu/iov.h"
->  
->  struct QIOChannelTest {
->      QIOChannel *src;
-> @@ -153,6 +154,45 @@ static gpointer test_io_thread_reader(gpointer opaque)
->      return NULL;
->  }
->  
-> +static gpointer test_io_thread_writer_all(gpointer opaque)
-> +{
-> +    QIOChannelTest *data = opaque;
-> +    size_t niov = data->niov;
-> +    ssize_t ret;
-> +
-> +    qio_channel_set_blocking(data->src, data->blocking, NULL);
-> +
-> +    ret = qio_channel_writev_all(data->src,
-> +                                 data->inputv,
-> +                                 niov,
-> +                                 &data->writeerr);
-> +    if (ret != iov_size(data->inputv, data->niov)) {
-> +        error_setg(&data->writeerr, "Unexpected I/O error");
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +/* This thread receives all data using iovecs */
-> +static gpointer test_io_thread_reader_all(gpointer opaque)
-> +{
-> +    QIOChannelTest *data = opaque;
-> +    size_t niov = data->niov;
-> +    ssize_t ret;
-> +
-> +    qio_channel_set_blocking(data->dst, data->blocking, NULL);
-> +
-> +    ret = qio_channel_readv_all(data->dst,
-> +                                data->outputv,
-> +                                niov,
-> +                                &data->readerr);
-> +
-> +    if (ret != iov_size(data->inputv, data->niov)) {
-> +        error_setg(&data->readerr, "Unexpected I/O error");
-> +    }
-> +
-> +    return NULL;
-> +}
->  
->  QIOChannelTest *qio_channel_test_new(void)
->  {
-> @@ -231,6 +271,21 @@ void qio_channel_test_run_reader(QIOChannelTest *test,
->      test->dst = NULL;
->  }
->  
-> +void qio_channel_test_run_writer_all(QIOChannelTest *test,
-> +                                     QIOChannel *src)
-> +{
-> +    test->src = src;
-> +    test_io_thread_writer_all(test);
-> +    test->src = NULL;
-> +}
-> +
-> +void qio_channel_test_run_reader_all(QIOChannelTest *test,
-> +                                     QIOChannel *dst)
-> +{
-> +    test->dst = dst;
-> +    test_io_thread_reader_all(test);
-> +    test->dst = NULL;
-> +}
->  
->  void qio_channel_test_validate(QIOChannelTest *test)
->  {
-> diff --git a/tests/io-channel-helpers.h b/tests/io-channel-helpers.h
-> index fedc64f..17b9647 100644
-> --- a/tests/io-channel-helpers.h
-> +++ b/tests/io-channel-helpers.h
-> @@ -36,6 +36,10 @@ void qio_channel_test_run_writer(QIOChannelTest *test,
->                                   QIOChannel *src);
->  void qio_channel_test_run_reader(QIOChannelTest *test,
->                                   QIOChannel *dst);
-> +void qio_channel_test_run_writer_all(QIOChannelTest *test,
-> +                                     QIOChannel *src);
-> +void qio_channel_test_run_reader_all(QIOChannelTest *test,
-> +                                     QIOChannel *dst);
->  
->  void qio_channel_test_validate(QIOChannelTest *test);
->  
-> diff --git a/tests/test-io-channel-buffer.c b/tests/test-io-channel-buffer.c
-> index 64722a2..4bf64ae 100644
-> --- a/tests/test-io-channel-buffer.c
-> +++ b/tests/test-io-channel-buffer.c
-> @@ -22,8 +22,7 @@
->  #include "io/channel-buffer.h"
->  #include "io-channel-helpers.h"
->  
-> -
-> -static void test_io_channel_buf(void)
-> +static void test_io_channel_buf1(void)
->  {
->      QIOChannelBuffer *buf;
->      QIOChannelTest *test;
-> @@ -39,6 +38,53 @@ static void test_io_channel_buf(void)
->      object_unref(OBJECT(buf));
->  }
->  
-> +static void test_io_channel_buf2(void)
-> +{
-> +    QIOChannelBuffer *buf;
-> +    QIOChannelTest *test;
-> +
-> +    buf = qio_channel_buffer_new(0);
-> +
-> +    test = qio_channel_test_new();
-> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
-> +    buf->offset = 0;
-> +    qio_channel_test_run_reader(test, QIO_CHANNEL(buf));
-> +    qio_channel_test_validate(test);
-> +
-> +    object_unref(OBJECT(buf));
-> +}
-> +
-> +static void test_io_channel_buf3(void)
-> +{
-> +    QIOChannelBuffer *buf;
-> +    QIOChannelTest *test;
-> +
-> +    buf = qio_channel_buffer_new(0);
-> +
-> +    test = qio_channel_test_new();
-> +    qio_channel_test_run_writer(test, QIO_CHANNEL(buf));
-> +    buf->offset = 0;
-> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
-> +    qio_channel_test_validate(test);
-> +
-> +    object_unref(OBJECT(buf));
-> +}
-> +
-> +static void test_io_channel_buf4(void)
-> +{
-> +    QIOChannelBuffer *buf;
-> +    QIOChannelTest *test;
-> +
-> +    buf = qio_channel_buffer_new(0);
-> +
-> +    test = qio_channel_test_new();
-> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
-> +    buf->offset = 0;
-> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
-> +    qio_channel_test_validate(test);
-> +
-> +    object_unref(OBJECT(buf));
-> +}
-xs>  
->  int main(int argc, char **argv)
->  {
-> @@ -46,6 +92,9 @@ int main(int argc, char **argv)
->  
->      g_test_init(&argc, &argv, NULL);
->  
-> -    g_test_add_func("/io/channel/buf", test_io_channel_buf);
-> +    g_test_add_func("/io/channel/buf1", test_io_channel_buf1);
-> +    g_test_add_func("/io/channel/buf2", test_io_channel_buf2);
-> +    g_test_add_func("/io/channel/buf3", test_io_channel_buf3);
-> +    g_test_add_func("/io/channel/buf4", test_io_channel_buf4);
->      return g_test_run();
->  }
-
-These test changes are all still wrong. The only test changes
-needed should be changing 'test_io_thread_writer' and
-'test_io_thread_reader' to call qio_channel_writev_all and
-qio_channel_readv_all, respectively. This will acheive test
-coverage across all the existnig I/O channel test cases,
-which is preferrable to special casing the buffer test case
-only.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--udwPOXLG0Cf1UXcO47wecoQemcUREgo47--
