@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dfi2S-0001WN-FD
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:37:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfi5G-0002Wi-HU
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dfi2N-0000I1-JU
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:37:52 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:36899)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dfi2N-0000H8-C4
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:37:47 -0400
-References: <1C4DF81E-D39F-42E2-9D0C-5D76819662A4@gmail.com>
-	<9a34ac74-d96f-bd9c-7666-b02e2f8accba@redhat.com>
-	<613DA9EA-28E9-426C-8A9A-5D4805A46E2C@gmail.com>
-	<b3f776c4-5ea9-5771-8863-6308d4b186bb@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <1a3c3e6d-bc75-5635-da19-db990e28351b@msgid.tls.msk.ru>
-Date: Thu, 10 Aug 2017 10:37:43 +0300
+	(envelope-from <armbru@redhat.com>) id 1dfi5F-0002kY-Fe
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 03:40:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-15-eblake@redhat.com>
+	<87d184ojqp.fsf@dusky.pond.sub.org>
+	<ecd3699b-1a73-a8e2-5dac-b4f227f106b9@redhat.com>
+Date: Thu, 10 Aug 2017 09:40:32 +0200
+In-Reply-To: <ecd3699b-1a73-a8e2-5dac-b4f227f106b9@redhat.com> (Eric Blake's
+	message of "Wed, 9 Aug 2017 10:32:50 -0500")
+Message-ID: <87poc3j2fj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <b3f776c4-5ea9-5771-8863-6308d4b186bb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] No video for Windows 2000 guest
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 14/22] libqtest: Separate
+ qmp_discard_response() from command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, ehabkost@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
 
-10.08.2017 06:51, Thomas Huth wrote:
-[]
+Eric Blake <eblake@redhat.com> writes:
 
-> I guess you'll end up with QEMU 2.1 as good version and 2.2 as the first
-> "bad" version. According the qemu-doc:
-> 
-> -vga type
-> 
->     Select type of VGA card to emulate. Valid values for type are
-> 
->     cirrus
-> 
->         Cirrus Logic GD5446 Video card. All Windows versions starting
->         from Windows 95 should recognize and use this graphic card. For
->         optimal performances, use 16 bit color depth in the guest and
->         the host OS. (This card was the default before QEMU 2.2)
-> 
->     std
-> 
->         Standard VGA card with Bochs VBE extensions. If your guest OS
->         supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if
->         you want to use high resolution modes (>= 1280x1024x16) then you
->         should use this option. (This card is the default since QEMU
->         2.2)
+> On 08/09/2017 10:15 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> Upcoming patches will be adding new convenience methods for
+>>> constructing QMP commands.  But making every variation of sending
+>>> support every variation of response handling becomes unwieldy;
+>>> it's easier to specify that discarding a JSON response is
+>>> unassociated with sending the command, where qmp_async() already
+>>> fits the bill for sending a command without tying up a reference
+>>> to the response.
+>>>
+>>> Doing this renders qtest_qmp[v]_discard_response() unused.
+>>>
+>>> Bonus: gets rid of a non-literal format string, which is a step
+>>> towards compile-time format string checking without triggering
+>>> -Wformat-nonliteral.
+>> 
+>> Where?  (I'm feeling lazy today)
+>> 
+>
+> Sure:
+>
+>> 
+>> +++ b/tests/ide-test.c
+>> @@ -624,7 +624,6 @@ static void test_retry_flush(const char *machine)
+>>      QPCIDevice *dev;
+>>      QPCIBar bmdma_bar, ide_bar;
+>>      uint8_t data;
+>> -    const char *s;
+>> 
+>>      prepare_blkdebug_script(debug_path, "flush_to_disk");
+>> 
+>> @@ -652,8 +651,8 @@ static void test_retry_flush(const char *machine)
+>>      qmp_eventwait("STOP");
+>> 
+>>      /* Complete the command */
+>> -    s = "{'execute':'cont' }";
+>> -    qmp_discard_response(s);
+>> +    qmp_async("{'execute':'cont' }");
+>> +    qmp_discard_response();
+>
+> Yes, I can update the commit message to focus in on it more precisely.
 
-Both cirrus and stdvga worked in Win2k not-so-recently. Cirrus, IIRC,
-required a driver install, stdvga used "standard vga controller" which,
-in win2k, was always marked with yellow exclamation mark, just because
-the driver itself always sets that mark, "thinking" it is always wrong
-driver.
+Not enabled by this patch, just cleanup while there.  Recommend to make
+that clearer in the commit message.
 
-So no, it's not the switch from cirrus to std, it's something else.
+Aside: I wonder what goes through a developer's head when he writes such
+code.  "Too terse, let me splice in a variable" seems unlikely.
 
-/mjt
+[...]
