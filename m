@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfjc2-0003GC-TP
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:18:43 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dfjg2-0005B5-JG
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfjc1-0002Re-UD
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:18:42 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170809215510.22802-1-pbonzini@redhat.com>
-	<20170809215510.22802-10-pbonzini@redhat.com>
-Date: Thu, 10 Aug 2017 11:18:29 +0200
-In-Reply-To: <20170809215510.22802-10-pbonzini@redhat.com> (Paolo Bonzini's
-	message of "Wed, 9 Aug 2017 23:55:07 +0200")
-Message-ID: <87zib7g4re.fsf@dusky.pond.sub.org>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dfjfy-00051M-9k
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:22:50 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36377)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1dfjfy-00050N-20
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:22:46 -0400
+Received: by mail-lf0-x242.google.com with SMTP id t128so126259lff.3
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 02:22:44 -0700 (PDT)
+Date: Thu, 10 Aug 2017 11:22:41 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170810092241.GK4859@toto>
+References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
+	<1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
+	<086e70d6-d5c1-2879-874f-ea1804c6ab38@adacore.com>
+	<20170801093015.GA4859@toto>
+	<48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
+	<CAFEAcA_eWCEmXBGNJXAfUjgXwYX10FwxRwd_YNcdtMYXNLAROg@mail.gmail.com>
+	<CAFEAcA-uR+KK9RfTQm8=E6SCeWh-CkY+fua-ByPUHoYQVw=TGQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 09/12] qemu-iotests: do not search for
- binaries in the current directory
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-uR+KK9RfTQm8=E6SCeWh-CkY+fua-ByPUHoYQVw=TGQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
+ blocker when using mmio_execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,14 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Thu, Aug 10, 2017 at 10:11:13AM +0100, Peter Maydell wrote:
+> On 1 August 2017 at 10:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 1 August 2017 at 10:35, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+> >>
+> >>
+> >> On 08/01/2017 11:30 AM, Edgar E. Iglesias wrote:
+> >>> At this stage, perhaps we should just register the blocker when this dev
+> >>> realizes.
+> >>>
+> >>> If a request_ptr comes in during migration, the VM will fail either way...
+> >
+> >> Yes but this will breaks migration for the spips device everytime
+> >> and not only when mmio-execution is used?
+> >
+> > This line of thought is why I ended up suggesting just disabling
+> > the exec-in-place feature -- that way we just don't introduce
+> > what would be a new-in-2.10 feature, rather than breaking something
+> > that used to work in 2.9.
+> 
+> OK, so what's the plan here? We have several options:
+>  * just disable exec-from-spips for 2.10 (I sent a patch for that)
+>  * disable exec-from-spips for 2.10 but with a device x-property
+>    to allow the user to turn it on again if they really want it
+>  * this patch or variants on it which try to only disable
+>    migration if exec-from-spips is actually used by the guest
+>    (I don't like these because of the awkward corner cases if
+>    migration and the guest using exec-from-spips happen at the
+>    same time)
+> 
+> So my current view remains "we should just disable this feature
+> for 2.10 and we can implement it properly with handling of
+> migration for 2.11", unless somebody cares enough to implement
+> the x-property thing within the next day or so.
 
-> Looking in the build root is enough.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Hi Peter,
 
-It's actually *better*.  I hate it when tests pick up random garbage I
-have lying around.
+I think the x-property sounds good.
+Fred, would you like to send a patch for that?
+Otherwise, I can do it later today.
+
+Cheers,
+Edgar
