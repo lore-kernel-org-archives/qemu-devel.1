@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dfkQj-0001Xu-R1
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:11:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dfkSo-0002YG-VV
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dfkQe-0000Lz-A1
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:11:05 -0400
-Received: from mga06.intel.com ([134.134.136.31]:65320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1dfkQe-0000Lk-1I
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:11:00 -0400
-From: Lan Tianyu <tianyu.lan@intel.com>
-Date: Thu, 10 Aug 2017 18:08:07 +0800
-Message-Id: <1502359687-25370-1-git-send-email-tianyu.lan@intel.com>
-Subject: [Qemu-devel] [PATCH] x86: Increase max vcpu number to 352
+	(envelope-from <peter.maydell@linaro.org>) id 1dfkSn-0001P2-RX
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:13:14 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dfkSn-0001OJ-LP
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 06:13:13 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id c24so1329893wra.1
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 03:13:13 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1502241852-6302-1-git-send-email-mst@redhat.com>
+References: <1502241852-6302-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Aug 2017 11:12:51 +0100
+Message-ID: <CAFEAcA9Wwnc3nK3TjwCyi71QKmhyY_5256nD1XfAJP2onok78g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] pc, vhost: fixes for rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Lan Tianyu <tianyu.lan@intel.com>, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Intel Xeon phi chip will support 352 logical threads. For HPC
-usage case, it will create a huge VM with vcpus number as same as host
-cpus. This patch is to increase max vcpu number to 352.
+On 9 August 2017 at 02:50, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 54affb3a3623b1d36c95e34faa722a5831323a74:
+>
+>   Update version for v2.10.0-rc2 release (2017-08-08 19:07:46 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 24dd1e17696fbd11b3df50718dddcbdfe2c45f24:
+>
+>   libqtest: always set up signal handler for SIGABRT (2017-08-09 04:22:14 +0300)
+>
+> ----------------------------------------------------------------
+> pc, vhost: fixes for rc3
+>
+> Fix up bugs and warnings in tests. Revert an experimental commit that I
+> put in by mistake: harmless but useless.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
+> Jens Freimann (3):
+>       net: fix -netdev socket,fd= for UDP sockets
+>       libvhost-user: quit when no more data received
+>       libqtest: always set up signal handler for SIGABRT
+>
+> Michael S. Tsirkin (2):
+>       acpi-test: update expected DSDT files
+>       Revert "cpu: add APIs to allocate/free CPU environment"
+>
 
-Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
----
- hw/i386/pc_q35.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 169a214..5e93749 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -299,7 +299,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->default_display = "std";
-     m->no_floppy = 1;
-     m->has_dynamic_sysbus = true;
--    m->max_cpus = 288;
-+    m->max_cpus = 352;
- }
- 
- static void pc_q35_2_10_machine_options(MachineClass *m)
--- 
-1.8.3.1
+-- PMM
