@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfsIs-0000Pd-NC
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:35:31 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dfsJ8-0000c2-Kj
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfsIr-0002Qp-GP
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:35:30 -0400
-References: <20170810160451.32723-1-berrange@redhat.com>
-	<20170810160451.32723-9-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a9553758-f0b3-f8c8-2457-41c389203602@redhat.com>
-Date: Thu, 10 Aug 2017 13:35:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170810160451.32723-9-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1lOF6gkovOxguoSTIFs1Wbq8th1axjEOX"
-Subject: Re: [Qemu-devel] [PATCH 8/8] sockets: fix parsing of ipv4/ipv6 opts
- in parse_socket_addr
+	(envelope-from <programmingkidx@gmail.com>) id 1dfsJ5-0002Vi-D0
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:35:46 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:33602)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dfsJ5-0002Tg-7t
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 14:35:43 -0400
+Received: by mail-io0-x243.google.com with SMTP id q64so2110475ioi.0
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 11:35:41 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <1a3c3e6d-bc75-5635-da19-db990e28351b@msgid.tls.msk.ru>
+Date: Thu, 10 Aug 2017 14:35:39 -0400
+Content-Transfer-Encoding: 7bit
+Message-Id: <012D4B91-CB4D-439B-BBA4-BBD1A2DE119F@gmail.com>
+References: <1C4DF81E-D39F-42E2-9D0C-5D76819662A4@gmail.com>
+	<9a34ac74-d96f-bd9c-7666-b02e2f8accba@redhat.com>
+	<613DA9EA-28E9-426C-8A9A-5D4805A46E2C@gmail.com>
+	<b3f776c4-5ea9-5771-8863-6308d4b186bb@redhat.com>
+	<1a3c3e6d-bc75-5635-da19-db990e28351b@msgid.tls.msk.ru>
+Subject: Re: [Qemu-devel] No video for Windows 2000 guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1lOF6gkovOxguoSTIFs1Wbq8th1axjEOX
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
-Message-ID: <a9553758-f0b3-f8c8-2457-41c389203602@redhat.com>
-Subject: Re: [PATCH 8/8] sockets: fix parsing of ipv4/ipv6 opts in
- parse_socket_addr
-References: <20170810160451.32723-1-berrange@redhat.com>
- <20170810160451.32723-9-berrange@redhat.com>
-In-Reply-To: <20170810160451.32723-9-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/10/2017 11:04 AM, Daniel P. Berrange wrote:
-> The inet_parse() function looks for 'ipv4' and 'ipv6'
-> flags, but only treats them as bare bool flags. The normal
-> QemuOpts parsing would allow on/off values to be set too.
->=20
-> This updated inet_parse() so that its handling of the
-
-s/updated/updates/ ?
-
-> 'ipv4' and 'ipv6' flags matches that done by QemuOpts.
-
-Do we have a regression compared to any previous version, such that this
-patch might be considered 2.10 material?  Offhand, though, I think it's
-fine as the end of your series, waiting for 2.11.
-
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  tests/test-sockets-proto.c | 13 -------------
->  util/qemu-sockets.c        | 36 ++++++++++++++++++++++++++++++++----
->  2 files changed, 32 insertions(+), 17 deletions(-)
->=20
-
-> +++ b/util/qemu-sockets.c
-> @@ -616,6 +616,25 @@ err:
->  }
-> =20
->  /* compatibility wrapper */
-> +static int inet_parse_flag(const char *flagname, const char *optstr, b=
-ool *val,
-> +                           Error **errp)
-> +{
-> +    char *end;
-> +    size_t len;
-> +
-> +    end =3D strstr(optstr, ",");
-
-Do we need to check that we are not landing on a ',,' escape that would
-make QemuOpts behave differently?  [That is, ipv4=3Don,,garbage should be=
-
-parsed as setting ipv4 to 'on,garbage' (which is not valid), and NOT
-setting 'ipv4=3Don' followed by the 'garbage' or ',garbage' key - while
-the key named 'garbage' would fail, there might be other key names where
-the distinction matters for catching command line typos]
-
-But if this is unrelated to QemuOpts escape parsing, it seems okay.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, ehabkost@redhat.com
 
 
---1lOF6gkovOxguoSTIFs1Wbq8th1axjEOX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> On Aug 10, 2017, at 3:37 AM, Michael Tokarev <mjt@tls.msk.ru> wrote:
+> 
+> 10.08.2017 06:51, Thomas Huth wrote:
+> []
+> 
+>> I guess you'll end up with QEMU 2.1 as good version and 2.2 as the first
+>> "bad" version. According the qemu-doc:
+>> 
+>> -vga type
+>> 
+>>    Select type of VGA card to emulate. Valid values for type are
+>> 
+>>    cirrus
+>> 
+>>        Cirrus Logic GD5446 Video card. All Windows versions starting
+>>        from Windows 95 should recognize and use this graphic card. For
+>>        optimal performances, use 16 bit color depth in the guest and
+>>        the host OS. (This card was the default before QEMU 2.2)
+>> 
+>>    std
+>> 
+>>        Standard VGA card with Bochs VBE extensions. If your guest OS
+>>        supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if
+>>        you want to use high resolution modes (>= 1280x1024x16) then you
+>>        should use this option. (This card is the default since QEMU
+>>        2.2)
+> 
+> Both cirrus and stdvga worked in Win2k not-so-recently. Cirrus, IIRC,
+> required a driver install, stdvga used "standard vga controller" which,
+> in win2k, was always marked with yellow exclamation mark, just because
+> the driver itself always sets that mark, "thinking" it is always wrong
+> driver.
+> 
+> So no, it's not the switch from cirrus to std, it's something else.
+> 
+> /mjt
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Here is the commit that causes Windows 2000 video problems: 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMp2QACgkQp6FrSiUn
-Q2rTNQf/YGVJsMWSQZBFY26WU+lJKLsttFFuF58uO5GiAkjAP33G/5pTd4QRh+za
-Pg6ZHdSC59MTMcN2YYdQmYFDMv3/SQWqhtNucQDZHJGuV4BqnAMYrQ0ydxj2ZARp
-IXYrLpql9KSghsOyx9SmKdkGiz249u4vCjcPHYhjbBm1aQzbodjkB4GWr4rlonVR
-PW+Q8h5TEbg3AX4WVctWamQ6j9BiSFvscZzbkeOStfFpQp27gYcb+wwi95cC9a36
-WnWq8IMXjgFlfTIyOHUZUpGR+5h5bzyQ0e4FdmfG8qH2sWN4BsE9HKG9vpw8fJlz
-ct5cAHSb9LiXT4L2le7DB+9WKI6Z9Q==
-=n1ni
------END PGP SIGNATURE-----
+commit 94ef4f337fb614f18b765a8e0e878a4c23cdedcd
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Tue May 17 10:54:54 2016 +0200
 
---1lOF6gkovOxguoSTIFs1Wbq8th1axjEOX--
+    vga: add sr_vbe register set
+    
+    Commit "fd3c136 vga: make sure vga register setup for vbe stays intact
+    (CVE-2016-3712)." causes a regression.  The win7 installer is unhappy
+    because it can't freely modify vga registers any more while in vbe mode.
