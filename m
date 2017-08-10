@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfozF-0005m3-Lr
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:03:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfp0n-0006Tq-6V
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfozB-0001Cj-KS
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:03:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52426)
+	(envelope-from <berrange@redhat.com>) id 1dfp0j-0001o4-3z
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:04:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfozB-0001CE-AG
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:02:57 -0400
-References: <1502367921-17730-1-git-send-email-armbru@redhat.com>
-	<1502367921-17730-3-git-send-email-armbru@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b0769260-8342-8a90-8a1e-d6545e0c64a1@redhat.com>
-Date: Thu, 10 Aug 2017 17:02:49 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dfp0i-0001ns-R2
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:04:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CDD6881DE5
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 15:04:31 +0000 (UTC)
+Date: Thu, 10 Aug 2017 16:04:25 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170810150425.GO12980@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170808162629.32493-1-quintela@redhat.com>
+	<20170808162629.32493-6-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1502367921-17730-3-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Partial support for non-scalar
- properties with -object
+Content-Disposition: inline
+In-Reply-To: <20170808162629.32493-6-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 05/19] qio: Create new
+ qio_channel_{readv, writev}_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,160 +35,423 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: el13635@mail.ntua.gr, kwolf@redhat.com, berrange@redhat.com, eblake@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 10/08/2017 14:25, Markus Armbruster wrote:
-> We've wanted -object to support non-scalar properties for a while.
-> Dan Berrange tried in "[PATCH v4 00/10]Provide a QOM-based
-> authorization API".  Review led to the conclusion that we need to
-> replace rather than add to QemuOpts.  Initial work towards that goal
-> has been merged to provide -blockdev (commit 8746709), but there's
-> substantial work left, mostly due to an bewildering array of
-> compatibility problems.
+On Tue, Aug 08, 2017 at 06:26:15PM +0200, Juan Quintela wrote:
+> The functions waits until it is able to write the full iov.
 > 
-> Even if a full solution is still out of reach, we can have a partial
-> solution now: accept -object argument in JSON syntax.  This should
-> unblock development work that needs non-scalar properties with -object
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > 
-> The implementation is similar to -blockdev, except we use the new
-> infrastructure only for the new JSON case, and stick to QemuOpts for
-> the existing KEY=VALUE,... case, to sidestep compatibility problems.
+> --
 > 
-> If we did this for more options, we'd have to factor out common code.
-> But for one option, this will do.
+> Add tests.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> fix reader to check for len == 0.
 > ---
->  qapi-schema.json | 14 +++++++++++---
->  vl.c             | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 66 insertions(+), 3 deletions(-)
+>  include/io/channel.h           | 46 +++++++++++++++++++++++++
+>  io/channel.c                   | 77 ++++++++++++++++++++++++++++++++++++++++++
+>  migration/qemu-file-channel.c  | 29 +---------------
+>  tests/io-channel-helpers.c     | 55 ++++++++++++++++++++++++++++++
+>  tests/io-channel-helpers.h     |  4 +++
+>  tests/test-io-channel-buffer.c | 55 ++++++++++++++++++++++++++++--
+>  6 files changed, 235 insertions(+), 31 deletions(-)
 > 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 802ea53..7ed1db1 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3618,15 +3618,23 @@
->  { 'command': 'netdev_del', 'data': {'id': 'str'} }
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index db9bb02..bfc97e2 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
+> @@ -269,6 +269,52 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
+>                                  Error **errp);
 >  
->  ##
-> -# @object-add:
-> +# @ObjectOptions:
->  #
-> -# Create a QOM object.
-> +# Options for creating an object.
->  #
->  # @qom-type: the class name for the object to be created
->  #
->  # @id: the name of the new object
->  #
->  # @props: a dictionary of properties to be passed to the backend
-> +##
-> +{ 'struct': 'ObjectOptions',
-> +  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
+>  /**
+> + * qio_channel_readv_all:
+> + * @ioc: the channel object
+> + * @iov: the array of memory regions to read data into
+> + * @niov: the length of the @iov array
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Read data from the IO channel, storing it in the
+> + * memory regions referenced by @iov. Each element
+> + * in the @iov will be fully populated with data
+> + * before the next one is used. The @niov parameter
+> + * specifies the total number of elements in @iov.
+> + *
+> + * Returns: the number of bytes read, or -1 on error,
+> + * or QIO_CHANNEL_ERR_BLOCK if no data is available
+> + * and the channel is non-blocking
+
+This is incorrect - it'll never return QIO_CHANNEL_ERR_BLOCK.
+If it seems that, it'll go into a wait until data arrives.
+
+> + */
+> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
+> +                              const struct iovec *iov,
+> +                              size_t niov,
+> +                              Error **errp);
 > +
-> +##
-> +# @object-add:
-> +#
-> +# Create a QOM object.
->  #
->  # Returns: Nothing on success
->  #          Error if @qom-type is not a valid class name
-> @@ -3642,7 +3650,7 @@
->  #
->  ##
->  { 'command': 'object-add',
-> -  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
-> +  'data': 'ObjectOptions' }
+> +
+> +/**
+> + * qio_channel_writev_all:
+> + * @ioc: the channel object
+> + * @iov: the array of memory regions to write data from
+> + * @niov: the length of the @iov array
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Write data to the IO channel, reading it from the
+> + * memory regions referenced by @iov. Each element
+> + * in the @iov will be fully sent, before the next
+> + * one is used. The @niov parameter specifies the
+> + * total number of elements in @iov.
+> + *
+> + * It is required for all @iov data to be fully
+> + * sent.
+> + *
+> + * Returns: the number of bytes sent, or -1 on error,
+> + */
+> +ssize_t qio_channel_writev_all(QIOChannel *ioc,
+> +                               const struct iovec *iov,
+> +                               size_t niov,
+> +                               Error **erp);
+> +
+> +/**
+>   * qio_channel_readv:
+>   * @ioc: the channel object
+>   * @iov: the array of memory regions to read data into
+> diff --git a/io/channel.c b/io/channel.c
+> index 1cfb8b3..0b521f9 100644
+> --- a/io/channel.c
+> +++ b/io/channel.c
+> @@ -22,6 +22,7 @@
+>  #include "io/channel.h"
+>  #include "qapi/error.h"
+>  #include "qemu/main-loop.h"
+> +#include "qemu/iov.h"
 >  
->  ##
->  # @object-del:
-> diff --git a/vl.c b/vl.c
-> index fd98ed1..db4680b 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2854,8 +2854,32 @@ static bool object_create_delayed(const char *type)
->      return !object_create_initial(type);
+>  bool qio_channel_has_feature(QIOChannel *ioc,
+>                               QIOChannelFeature feature)
+> @@ -85,6 +86,82 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
 >  }
 >  
-> +typedef struct ObjectOptionsQueueEntry {
-> +    ObjectOptions *oo;
-> +    Location loc;
-> +    QSIMPLEQ_ENTRY(ObjectOptionsQueueEntry) entry;
-> +} ObjectOptionsQueueEntry;
+>  
 > +
-> +typedef QSIMPLEQ_HEAD(ObjectOptionsQueue, ObjectOptionsQueueEntry)
-> +    ObjectOptionsQueue;
+> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
+> +                              const struct iovec *iov,
+> +                              size_t niov,
+> +                              Error **errp)
+> +{
+> +    ssize_t done = 0;
+> +    struct iovec *local_iov = g_new(struct iovec, niov);
+> +    struct iovec *local_iov_head = local_iov;
+> +    unsigned int nlocal_iov = niov;
+
+Should be  size_t
+
 > +
-> +ObjectOptionsQueue oo_queue = QSIMPLEQ_HEAD_INITIALIZER(oo_queue);
+> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
+> +                          iov, niov,
+> +                          0, iov_size(iov, niov));
 > +
+> +    while (nlocal_iov > 0) {
+> +        ssize_t len;
+> +        len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
+> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> +            qio_channel_wait(ioc, G_IO_OUT);
+
+
+This should be waiting for G_IO_IN
+
+
+> +            continue;
+> +        } else if (len < 0) {
+> +            error_setg_errno(errp, EIO,
+> +                             "Channel was not able to read full iov");
+> +            done = -1;
+> +            goto cleanup;
+> +        } else if (len == 0) {
+> +            goto cleanup;
+> +        }
 > +
->  static void object_create(bool (*type_predicate)(const char *))
->  {
-> +    ObjectOptionsQueueEntry *e;
+> +        iov_discard_front(&local_iov, &nlocal_iov, len);
+> +        done += len;
+> +    }
 > +
-> +    QSIMPLEQ_FOREACH(e, &oo_queue, entry) {
-> +        if (!type_predicate(e->oo->qom_type)) {
+> + cleanup:
+> +    g_free(local_iov_head);
+> +    return done;
+> +}
+> +
+> +ssize_t qio_channel_writev_all(QIOChannel *ioc,
+> +                               const struct iovec *iov,
+> +                               size_t niov,
+> +                               Error **errp)
+> +{
+> +    ssize_t done = 0;
+> +    struct iovec *local_iov = g_new(struct iovec, niov);
+> +    struct iovec *local_iov_head = local_iov;
+> +    unsigned int nlocal_iov = niov;
+
+Should be size_t 
+
+> +
+> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
+> +                          iov, niov,
+> +                          0, iov_size(iov, niov));
+> +
+> +    while (nlocal_iov > 0) {
+> +        ssize_t len;
+> +        len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
+> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> +            qio_channel_wait(ioc, G_IO_OUT);
 > +            continue;
 > +        }
-> +        loc_push_restore(&e->loc);
-> +        qmp_object_add(e->oo->qom_type, e->oo->id,
-> +                       e->oo->has_props, e->oo->props, &error_fatal);
-> +        loc_pop(&e->loc);
+> +        if (len < 0) {
+> +            error_setg_errno(errp, EIO,
+> +                             "Channel was not able to write full iov");
+> +            done = -1;
+> +            goto cleanup;
+> +        }
+> +
+> +        iov_discard_front(&local_iov, &nlocal_iov, len);
+> +        done += len;
 > +    }
 > +
->      if (qemu_opts_foreach(qemu_find_opts("object"),
->                            user_creatable_add_opts_foreach,
->                            type_predicate, NULL)) {
-> @@ -4078,6 +4102,29 @@ int main(int argc, char **argv, char **envp)
->  #endif
->                  break;
->              case QEMU_OPTION_object:
-> +                /*
-> +                 * TODO Use qobject_input_visitor_new_str() instead of
-> +                 * QemuOpts, not in addition to.  Not done now because
-> +                 * keyval_parse() isn't wart-compatible with QemuOpts.
-> +                 */
-> +                if (optarg[0] == '{') {
-> +                    Visitor *v;
-> +                    ObjectOptionsQueueEntry *e;
+> + cleanup:
+> +    g_free(local_iov_head);
+> +    return done;
+> +}
 > +
-> +                    v = qobject_input_visitor_new_str(optarg, "qom-type",
-> +                                                      &err);
-> +                    if (!v) {
-> +                        error_report_err(err);
-> +                        exit(1);
-> +                    }
-> +
-> +                    e = g_new(ObjectOptionsQueueEntry, 1);
-> +                    visit_type_ObjectOptions(v, NULL, &e->oo, &error_fatal);
-> +                    visit_free(v);
-> +                    loc_save(&e->loc);
-> +                    QSIMPLEQ_INSERT_TAIL(&oo_queue, e, entry);
-> +                    break;
-> +                }
->                  opts = qemu_opts_parse_noisily(qemu_find_opts("object"),
->                                                 optarg, true);
->                  if (!opts) {
-> @@ -4525,6 +4572,14 @@ int main(int argc, char **argv, char **envp)
+>  ssize_t qio_channel_readv(QIOChannel *ioc,
+>                            const struct iovec *iov,
+>                            size_t niov,
+> diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
+> index e202d73..457ea6c 100644
+> --- a/migration/qemu-file-channel.c
+> +++ b/migration/qemu-file-channel.c
+> @@ -36,35 +36,8 @@ static ssize_t channel_writev_buffer(void *opaque,
+>                                       int64_t pos)
+>  {
+>      QIOChannel *ioc = QIO_CHANNEL(opaque);
+> -    ssize_t done = 0;
+> -    struct iovec *local_iov = g_new(struct iovec, iovcnt);
+> -    struct iovec *local_iov_head = local_iov;
+> -    unsigned int nlocal_iov = iovcnt;
 >  
->      object_create(object_create_delayed);
+> -    nlocal_iov = iov_copy(local_iov, nlocal_iov,
+> -                          iov, iovcnt,
+> -                          0, iov_size(iov, iovcnt));
+> -
+> -    while (nlocal_iov > 0) {
+> -        ssize_t len;
+> -        len = qio_channel_writev(ioc, local_iov, nlocal_iov, NULL);
+> -        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> -            qio_channel_wait(ioc, G_IO_OUT);
+> -            continue;
+> -        }
+> -        if (len < 0) {
+> -            /* XXX handle Error objects */
+> -            done = -EIO;
+> -            goto cleanup;
+> -        }
+> -
+> -        iov_discard_front(&local_iov, &nlocal_iov, len);
+> -        done += len;
+> -    }
+> -
+> - cleanup:
+> -    g_free(local_iov_head);
+> -    return done;
+> +    return qio_channel_writev_all(ioc, iov, iovcnt, NULL);
+>  }
 >  
-> +    while (!QSIMPLEQ_EMPTY(&oo_queue)) {
-> +        ObjectOptionsQueueEntry *e = QSIMPLEQ_FIRST(&oo_queue);
+>  
+> diff --git a/tests/io-channel-helpers.c b/tests/io-channel-helpers.c
+> index 05e5579..3d76d95 100644
+> --- a/tests/io-channel-helpers.c
+> +++ b/tests/io-channel-helpers.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu/osdep.h"
+>  #include "io-channel-helpers.h"
+>  #include "qapi/error.h"
+> +#include "qemu/iov.h"
+>  
+>  struct QIOChannelTest {
+>      QIOChannel *src;
+> @@ -153,6 +154,45 @@ static gpointer test_io_thread_reader(gpointer opaque)
+>      return NULL;
+>  }
+>  
+> +static gpointer test_io_thread_writer_all(gpointer opaque)
+> +{
+> +    QIOChannelTest *data = opaque;
+> +    size_t niov = data->niov;
+> +    ssize_t ret;
 > +
-> +        QSIMPLEQ_REMOVE_HEAD(&oo_queue, entry);
-> +        qapi_free_ObjectOptions(e->oo);
-> +        g_free(e);
+> +    qio_channel_set_blocking(data->src, data->blocking, NULL);
+> +
+> +    ret = qio_channel_writev_all(data->src,
+> +                                 data->inputv,
+> +                                 niov,
+> +                                 &data->writeerr);
+> +    if (ret != iov_size(data->inputv, data->niov)) {
+> +        error_setg(&data->writeerr, "Unexpected I/O error");
 > +    }
-
-Why not free the queue entry in object_create, and assert here that it's
-empty?
-
-Paolo
-
 > +
->  #ifdef CONFIG_TPM
->      if (tpm_init() < 0) {
->          exit(1);
-> 
+> +    return NULL;
+> +}
+> +
+> +/* This thread receives all data using iovecs */
+> +static gpointer test_io_thread_reader_all(gpointer opaque)
+> +{
+> +    QIOChannelTest *data = opaque;
+> +    size_t niov = data->niov;
+> +    ssize_t ret;
+> +
+> +    qio_channel_set_blocking(data->dst, data->blocking, NULL);
+> +
+> +    ret = qio_channel_readv_all(data->dst,
+> +                                data->outputv,
+> +                                niov,
+> +                                &data->readerr);
+> +
+> +    if (ret != iov_size(data->inputv, data->niov)) {
+> +        error_setg(&data->readerr, "Unexpected I/O error");
+> +    }
+> +
+> +    return NULL;
+> +}
+>  
+>  QIOChannelTest *qio_channel_test_new(void)
+>  {
+> @@ -231,6 +271,21 @@ void qio_channel_test_run_reader(QIOChannelTest *test,
+>      test->dst = NULL;
+>  }
+>  
+> +void qio_channel_test_run_writer_all(QIOChannelTest *test,
+> +                                     QIOChannel *src)
+> +{
+> +    test->src = src;
+> +    test_io_thread_writer_all(test);
+> +    test->src = NULL;
+> +}
+> +
+> +void qio_channel_test_run_reader_all(QIOChannelTest *test,
+> +                                     QIOChannel *dst)
+> +{
+> +    test->dst = dst;
+> +    test_io_thread_reader_all(test);
+> +    test->dst = NULL;
+> +}
+>  
+>  void qio_channel_test_validate(QIOChannelTest *test)
+>  {
+> diff --git a/tests/io-channel-helpers.h b/tests/io-channel-helpers.h
+> index fedc64f..17b9647 100644
+> --- a/tests/io-channel-helpers.h
+> +++ b/tests/io-channel-helpers.h
+> @@ -36,6 +36,10 @@ void qio_channel_test_run_writer(QIOChannelTest *test,
+>                                   QIOChannel *src);
+>  void qio_channel_test_run_reader(QIOChannelTest *test,
+>                                   QIOChannel *dst);
+> +void qio_channel_test_run_writer_all(QIOChannelTest *test,
+> +                                     QIOChannel *src);
+> +void qio_channel_test_run_reader_all(QIOChannelTest *test,
+> +                                     QIOChannel *dst);
+>  
+>  void qio_channel_test_validate(QIOChannelTest *test);
+>  
+> diff --git a/tests/test-io-channel-buffer.c b/tests/test-io-channel-buffer.c
+> index 64722a2..4bf64ae 100644
+> --- a/tests/test-io-channel-buffer.c
+> +++ b/tests/test-io-channel-buffer.c
+> @@ -22,8 +22,7 @@
+>  #include "io/channel-buffer.h"
+>  #include "io-channel-helpers.h"
+>  
+> -
+> -static void test_io_channel_buf(void)
+> +static void test_io_channel_buf1(void)
+>  {
+>      QIOChannelBuffer *buf;
+>      QIOChannelTest *test;
+> @@ -39,6 +38,53 @@ static void test_io_channel_buf(void)
+>      object_unref(OBJECT(buf));
+>  }
+>  
+> +static void test_io_channel_buf2(void)
+> +{
+> +    QIOChannelBuffer *buf;
+> +    QIOChannelTest *test;
+> +
+> +    buf = qio_channel_buffer_new(0);
+> +
+> +    test = qio_channel_test_new();
+> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
+> +    buf->offset = 0;
+> +    qio_channel_test_run_reader(test, QIO_CHANNEL(buf));
+> +    qio_channel_test_validate(test);
+> +
+> +    object_unref(OBJECT(buf));
+> +}
+> +
+> +static void test_io_channel_buf3(void)
+> +{
+> +    QIOChannelBuffer *buf;
+> +    QIOChannelTest *test;
+> +
+> +    buf = qio_channel_buffer_new(0);
+> +
+> +    test = qio_channel_test_new();
+> +    qio_channel_test_run_writer(test, QIO_CHANNEL(buf));
+> +    buf->offset = 0;
+> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
+> +    qio_channel_test_validate(test);
+> +
+> +    object_unref(OBJECT(buf));
+> +}
+> +
+> +static void test_io_channel_buf4(void)
+> +{
+> +    QIOChannelBuffer *buf;
+> +    QIOChannelTest *test;
+> +
+> +    buf = qio_channel_buffer_new(0);
+> +
+> +    test = qio_channel_test_new();
+> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
+> +    buf->offset = 0;
+> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
+> +    qio_channel_test_validate(test);
+> +
+> +    object_unref(OBJECT(buf));
+> +}
+xs>  
+>  int main(int argc, char **argv)
+>  {
+> @@ -46,6 +92,9 @@ int main(int argc, char **argv)
+>  
+>      g_test_init(&argc, &argv, NULL);
+>  
+> -    g_test_add_func("/io/channel/buf", test_io_channel_buf);
+> +    g_test_add_func("/io/channel/buf1", test_io_channel_buf1);
+> +    g_test_add_func("/io/channel/buf2", test_io_channel_buf2);
+> +    g_test_add_func("/io/channel/buf3", test_io_channel_buf3);
+> +    g_test_add_func("/io/channel/buf4", test_io_channel_buf4);
+>      return g_test_run();
+>  }
+
+These test changes are all still wrong. The only test changes
+needed should be changing 'test_io_thread_writer' and
+'test_io_thread_reader' to call qio_channel_writev_all and
+qio_channel_readv_all, respectively. This will acheive test
+coverage across all the existnig I/O channel test cases,
+which is preferrable to special casing the buffer test case
+only.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
