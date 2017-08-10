@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dfifi-0002km-Ag
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:18:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfige-0003Rt-Fc
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dfifg-0002LS-QE
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:18:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1dfigd-0002qO-9Q
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:19:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dfigd-0002pt-32
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:19:23 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 28B04C00F7E9
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 08:19:22 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-20-eblake@redhat.com>
+	<87o9ron34y.fsf@dusky.pond.sub.org>
+	<77053a1d-b68e-0f7c-16dd-0be36f629728@redhat.com>
+Date: Thu, 10 Aug 2017 10:19:19 +0200
+In-Reply-To: <77053a1d-b68e-0f7c-16dd-0be36f629728@redhat.com> (Eric Blake's
+	message of "Wed, 9 Aug 2017 11:41:56 -0500")
+Message-ID: <87zib7hm2g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QXXM1_dQSS=34wV+JMnSaqYpyxtptPW+2VrYy1OV109Tg@mail.gmail.com>
-References: <1501165990-28033-1-git-send-email-ashijeetacharya@gmail.com>
-	<CAJSP0QXXM1_dQSS=34wV+JMnSaqYpyxtptPW+2VrYy1OV109Tg@mail.gmail.com>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Thu, 10 Aug 2017 13:48:22 +0530
-Message-ID: <CAC2QTZY0P=TCkDuOByDuGwhqSYHC_LA=dZM1Odb9t628g-M8tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 0/8] Optimize VMDK I/O by allocating
- multiple clusters
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 19/22] libqtest: Add qmp_args_dict()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +36,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Aug 10, 2017 at 1:41 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> On Thu, Jul 27, 2017 at 3:33 PM, Ashijeet Acharya
-> <ashijeetacharya@gmail.com> wrote:
-> > Previously posted series patches:
-> > v1 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 03/msg02044.html
-> > v2 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 03/msg05080.html
-> > v3 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 04/msg00074.html
-> > v4 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 04/msg03851.html
-> > v5 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 06/msg00929.html
-> > v6 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 06/msg00947.html
-> > v7 - http://lists.nongnu.org/archive/html/qemu-devel/2017-
-> 06/msg06600.html
-> >
-> > This series helps to optimize the I/O performance of VMDK driver.
-> >
-> > Patch 1 helps us to move vmdk_find_offset_in_cluster.
-> >
-> > Patch 2 & 3 perform a simple function re-naming tasks.
-> >
-> > Patch 4 is used to factor out metadata loading code and implement it in
-> separate
-> > functions. This will help us to avoid code duplication in future patches
-> of this
-> > series.
-> >
-> > Patch 5 helps to set the upper limit of the bytes handled in one cycle.
-> >
-> > Patch 6 adds new functions to help us allocate multiple clusters
-> according to
-> > the size requested, perform COW if required and return the offset of the
-> first
-> > newly allocated cluster.
-> >
-> > Patch 7 changes the metadata update code to update the L2 tables for
-> multiple
-> > clusters at once.
-> >
-> > Patch 8 helps us to finally change vmdk_get_cluster_offset() to find
-> cluster
-> > offset only as cluster allocation task is now handled by
-> vmdk_alloc_clusters()
-> >
-> > Optimization test results:
-> >
-> > This patch series improves 128 KB sequential write performance to an
-> > empty VMDK file by 54%
-> >
-> > Benchmark command: ./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f
-> > vmdk test.vmdk
-> >
-> > Changes in v8:
-> > - fix minor variable naming issue in patch 6
+> On 08/09/2017 10:59 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> Leaving interpolation into JSON to qobject_from_jsonf() is more
+>>> robust than building QMP input manually; however, we have a few
+>>> places where code is already creating a QDict to interpolate
+>>> individual arguments, which cannot be reproduced with the
+>>> qobject_from_jsonf() parser.  Expose a public wrapper
+>>> qmp_args_dict() for the internal helper qmp_args_dict_async()
+>>> that we needed earlier for qmp_args(), and fix a test to use
+>>> the new helper.
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> ---
 >
-> Fam: Ping?
+>>> +++ b/tests/device-introspect-test.c
+>>> @@ -36,8 +36,7 @@ static QList *qom_list_types(const char *implements, bool abstract)
+>>>      if (implements) {
+>>>          qdict_put_str(args, "implements", implements);
+>>>      }
+>>> -    resp = qmp("{'execute': 'qom-list-types',"
+>>> -               " 'arguments': %p }", args);
+>>> +    resp = qmp_args_dict("qom-list-types", args);
+>>>      g_assert(qdict_haskey(resp, "return"));
+>>>      ret = qdict_get_qlist(resp, "return");
+>>>      QINCREF(ret);
+>> 
+>> If we had five of these, the helper would be worth its keep.
 >
-> Ashijeet: Feel free to send a ping reply if no one reviews your
-> patches within a few days.
->
+> This patch only  has one client, but 20/22 adds another.  Is having 2
+> clients sufficient to keep it (not quite the 5 that makes it obvious,
+> but still a good reuse of code)?
 
-Hi Stefan,
-
-I had a chat with Fam on #qemu-block before submitting this series and he
-said he will be merging it soon when the freeze is over (I am not sure if
-it is yet) since all the patches are already reviewed :-)
-
-Ashijeet
+Your idea to use macros might make this a moot question.  Let's revisit
+it in v2.
