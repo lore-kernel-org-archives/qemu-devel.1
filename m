@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dfmY2-0001Ut-0x
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:26:47 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dfmil-0005Jp-3e
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:37:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dfmXy-0006y4-PW
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:26:46 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <e8abd17c-6003-6bf4-11da-309457467965@virtuozzo.com>
-Message-ID: <0731e80d-6a92-b1e8-d6b4-31cdb19f7cb3@virtuozzo.com>
-Date: Thu, 10 Aug 2017 15:26:33 +0300
-MIME-Version: 1.0
-In-Reply-To: <e8abd17c-6003-6bf4-11da-309457467965@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] block replication
+	(envelope-from <cohuck@redhat.com>) id 1dfmii-0006BH-Gh
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:37:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dfmii-0006Aw-92
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:37:48 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu, 10 Aug 2017 14:37:41 +0200
+Message-Id: <20170810123741.30449-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] s390x: introduce 2.11 compat machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +21,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wency@cn.fujitsu.com
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-09.08.2017 17:11, Vladimir Sementsov-Ogievskiy wrote:
-> Hi Wen!
->
-> I'm trying to understand block/replication code and have a question.
->
-> Why should we block the region from intersecting cow requests when 
-> read? If I understand correctly
->
-> regardless of writes to the secondary-disk we have consistent view of 
-> it through hidden-disk:
->
-> Even if we are intersecting with some writes to secondary-disk (and 
-> corresponding cow-requests), the
->
-> data in secondary disk will not be updated until backed up to 
-> hidden-disk, therefore, for read we have two
->
-> options:
->
-> 1. read old data from secondary-disk (unallocated region in 
-> hidden-disk means data in secondary-disk is not updated yet)
->
-> 2. read backed-up data from hidden-disk (data in secondary-disk may be 
-> already updated but we don't care)
->
-> (the whole region to read may consists of parts, corresponding to 1 or 
-> 2, but this should be ok too)
->
-> Where am I wrong?
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
 
-Ok, now I think this is needed to prevent intersecting of writes and 
-reads on hidden-disk. If it so, I think it is better to use serializing 
-requests
-mechanism (just serialize all requests on hidden-disk, and on write wait 
-for all intersecting serializing requests, on read wait for intersecting 
-serializing writes) - it may require additional
-option for BlockDriverState, but it is more generic and more clear than 
-export internal backup things to lock disk region. This also can be 
-reused for image-fleecing scheme
-(which is based on same pattern  [active-disk is backing for temp-disk, 
-backup sync=none from active to temp, read from temp])
+It's that time again. I plan to put this into my first 2.11 pullreq.
+Yes, and I assume that the next version is indeed 2.11 :)
 
->
->
-> ======
->
-> static coroutine_fn int replication_co_readv(BlockDriverState *bs,
->                                              int64_t sector_num,
->                                              int remaining_sectors,
->                                              QEMUIOVector *qiov)
-> {
->     BDRVReplicationState *s = bs->opaque;
->     BdrvChild *child = s->secondary_disk;
->     BlockJob *job = NULL;
->     CowRequest req;
->     int ret;
->
->     if (s->mode == REPLICATION_MODE_PRIMARY) {
->         /* We only use it to forward primary write requests */
->         return -EIO;
-> }
->
->     ret = replication_get_io_status(s);
->     if (ret < 0) {
->         return ret;
-> }
->
->     if (child && child->bs) {
->         job = child->bs->job;
-> }
->
->     if (job) {
->         uint64_t remaining_bytes = remaining_sectors * BDRV_SECTOR_SIZE;
->
-> backup_wait_for_overlapping_requests(child->bs->job,
->                                              sector_num * 
-> BDRV_SECTOR_SIZE,
-> remaining_bytes);
->         backup_cow_request_begin(&req, child->bs->job,
->                                  sector_num * BDRV_SECTOR_SIZE,
-> remaining_bytes);
->         ret = bdrv_co_readv(bs->file, sector_num, remaining_sectors,
-> qiov);
-> backup_cow_request_end(&req);
->         goto out;
-> }
->
->     ret = bdrv_co_readv(bs->file, sector_num, remaining_sectors, qiov);
-> out:
->     return replication_return_value(s, ret);
-> }
->
+---
+ hw/s390x/s390-virtio-ccw.c | 17 ++++++++++++++++-
+ include/hw/compat.h        |  3 +++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1c7af39ce6..d3d67b8d77 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -432,6 +432,9 @@ bool css_migration_enabled(void)
+     }                                                                         \
+     type_init(ccw_machine_register_##suffix)
+ 
++#define CCW_COMPAT_2_10 \
++        HW_COMPAT_2_10
++
+ #define CCW_COMPAT_2_9 \
+         HW_COMPAT_2_9 \
+         {\
+@@ -506,8 +509,18 @@ bool css_migration_enabled(void)
+             .value    = "0",\
+         },
+ 
++static void ccw_machine_2_11_instance_options(MachineState *machine)
++{
++}
++
++static void ccw_machine_2_11_class_options(MachineClass *mc)
++{
++}
++DEFINE_CCW_MACHINE(2_11, "2.11", true);
++
+ static void ccw_machine_2_10_instance_options(MachineState *machine)
+ {
++    ccw_machine_2_11_instance_options(machine);
+     if (css_migration_enabled()) {
+         css_register_vmstate();
+     }
+@@ -515,8 +528,10 @@ static void ccw_machine_2_10_instance_options(MachineState *machine)
+ 
+ static void ccw_machine_2_10_class_options(MachineClass *mc)
+ {
++    ccw_machine_2_11_class_options(mc);
++    SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_10);
+ }
+-DEFINE_CCW_MACHINE(2_10, "2.10", true);
++DEFINE_CCW_MACHINE(2_10, "2.10", false);
+ 
+ static void ccw_machine_2_9_instance_options(MachineState *machine)
+ {
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 08f36004da..3e101f8f67 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -1,6 +1,9 @@
+ #ifndef HW_COMPAT_H
+ #define HW_COMPAT_H
+ 
++#define HW_COMPAT_2_10 \
++    /* empty */
++
+ #define HW_COMPAT_2_9 \
+     {\
+         .driver   = "pci-bridge",\
 -- 
-Best regards,
-Vladimir
+2.13.4
