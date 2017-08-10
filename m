@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfpyY-0005kG-Ut
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:06:26 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfpyk-0005uT-Ur
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfpyU-0003SB-RA
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:06:22 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfpyi-0003ce-Eg
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:06:34 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 10 Aug 2017 17:04:44 +0100
-Message-Id: <20170810160451.32723-2-berrange@redhat.com>
+Date: Thu, 10 Aug 2017 17:04:45 +0100
+Message-Id: <20170810160451.32723-3-berrange@redhat.com>
 In-Reply-To: <20170810160451.32723-1-berrange@redhat.com>
 References: <20170810160451.32723-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/8] tests: add functional test validating
- ipv4/ipv6 address flag handling
+Subject: [Qemu-devel] [PATCH 2/8] io: introduce a network socket listener API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,991 +22,531 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-The semantics around handling ipv4=on|off & ipv6=on|off are quite
-subtle to understand in combination with the various hostname addresses
-and backend types. Introduce a massive test matrix that launches QEMU
-and validates the ability to connect a client on each protocol as
-appropriate.
+The existing QIOChannelSocket class provides the ability to
+listen on a single socket at a time. This patch introduces
+a QIONetListener class that provides a higher level API
+concept around listening for network services, allowing
+for listening on multiple sockets.
 
-The test requires that the host has ability to bind to both :: and
-0.0.0.0, on port 9000. If either protocol is not available, or if
-something is already listening on that port the test will skip.
-
-Although it isn't using the QTest APIs, it expects the
-QTEST_QEMU_BINARY env variable to be set.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/.gitignore           |   1 +
- tests/Makefile.include     |   3 +
- tests/test-sockets-proto.c | 924 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 928 insertions(+)
- create mode 100644 tests/test-sockets-proto.c
+ include/io/net-listener.h | 174 +++++++++++++++++++++++++
+ io/Makefile.objs          |   1 +
+ io/net-listener.c         | 315 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 490 insertions(+)
+ create mode 100644 include/io/net-listener.h
+ create mode 100644 io/net-listener.c
 
-diff --git a/tests/.gitignore b/tests/.gitignore
-index fed0189a5a..044183f4a0 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -78,6 +78,7 @@ test-qobject-output-visitor
- test-rcu-list
- test-replication
- test-shift128
-+test-sockets-proto
- test-string-input-visitor
- test-string-output-visitor
- test-thread-pool
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 59e536bf0b..8caa5a7ae8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -340,6 +340,7 @@ check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
- 
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-+check-qtest-generic-y += tests/test-sockets-proto$(EXESUF)
- 
- qapi-schema += alternate-any.json
- qapi-schema += alternate-array.json
-@@ -750,6 +751,8 @@ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
- tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
- tests/postcopy-test$(EXESUF): tests/postcopy-test.o
-+tests/test-sockets-proto$(EXESUF): tests/test-sockets-proto.o \
-+	$(test-io-obj-y)
- tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
- 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
- 	$(chardev-obj-y)
-diff --git a/tests/test-sockets-proto.c b/tests/test-sockets-proto.c
+diff --git a/include/io/net-listener.h b/include/io/net-listener.h
 new file mode 100644
-index 0000000000..1d6beda59f
+index 0000000000..0ac5c9cc72
 --- /dev/null
-+++ b/tests/test-sockets-proto.c
-@@ -0,0 +1,924 @@
++++ b/include/io/net-listener.h
+@@ -0,0 +1,174 @@
 +/*
-+ * QTest for IPv4/IPv6 protocol setup
++ * QEMU I/O network listener
 + *
-+ * Copyright (c) 2017 Red Hat, Inc.
++ * Copyright (c) 2016 Red Hat, Inc.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef QIO_NET_LISTENER_H
++#define QIO_NET_LISTENER_H
++
++#include "io/channel-socket.h"
++
++#define TYPE_QIO_NET_LISTENER "qio-net-listener"
++#define QIO_NET_LISTENER(obj)                                    \
++    OBJECT_CHECK(QIONetListener, (obj), TYPE_QIO_NET_LISTENER)
++#define QIO_NET_LISTENER_CLASS(klass)                                    \
++    OBJECT_CLASS_CHECK(QIONetListenerClass, klass, TYPE_QIO_NET_LISTENER)
++#define QIO_NET_LISTENER_GET_CLASS(obj)                                  \
++    OBJECT_GET_CLASS(QIONetListenerClass, obj, TYPE_QIO_NET_LISTENER)
++
++typedef struct QIONetListener QIONetListener;
++typedef struct QIONetListenerClass QIONetListenerClass;
++
++typedef void (*QIONetListenerClientFunc)(QIONetListener *listener,
++                                         QIOChannelSocket *sioc,
++                                         gpointer data);
++
++/**
++ * QIONetListener:
++ *
++ * The QIONetListener object encapsulates the management of a
++ * listening socket. It is able to listen on multiple sockets
++ * concurrently, to deal with the scenario where IPv4 / IPv6
++ * needs separate sockets, or there is a need to listen on a
++ * subset of interface IP addresses, instead of the wildcard
++ * address.
++ */
++struct QIONetListener {
++    Object parent;
++
++    char *name;
++    QIOChannelSocket **sioc;
++    gulong *io_tag;
++    size_t nsioc;
++
++    gboolean disconnected;
++
++    QIONetListenerClientFunc io_func;
++    gpointer io_data;
++    GDestroyNotify io_notify;
++};
++
++struct QIONetListenerClass {
++    ObjectClass parent;
++};
++
++
++/**
++ * qio_net_listener_new:
++ *
++ * Create a new network listener service, which is not
++ * listening on any sockets initially.
++ *
++ * Returns: the new listener
++ */
++QIONetListener *qio_net_listener_new(void);
++
++
++/**
++ * qio_net_listener_set_name:
++ * @listener: the network listener object
++ * @name: the listener name
++ *
++ * Set the name of the listener. This is used as a debugging
++ * aid, to set names on any GSource instances associated
++ * with the listener
++ */
++void qio_net_listener_set_name(QIONetListener *listener,
++                               const char *name);
++
++/**
++ * qio_net_listener_open_sync:
++ * @listener: the network listener object
++ * @addr: the address to listen on
++ * @errp: pointer to a NULL initialized error object
++ *
++ * Synchronously open a listening connection on all
++ * addresses associated with @addr. This method may
++ * also be invoked multiple times, in order to have a
++ * single listener on multiple distinct addresses.
++ */
++int qio_net_listener_open_sync(QIONetListener *listener,
++                               SocketAddress *addr,
++                               Error **errp);
++
++/**
++ * qio_net_listener_add:
++ * @listener: the network listener object
++ * @sioc: the socket I/O channel
++ *
++ * Associate a listening socket I/O channel with the
++ * listener. The listener will acquire an new reference
++ * on @sioc, so the caller should release its own reference
++ * if it no longer requires the object.
++ */
++void qio_net_listener_add(QIONetListener *listener,
++                          QIOChannelSocket *sioc);
++
++/**
++ * qio_net_listener_set_client_func:
++ * @listener: the network listener object
++ * @func: the callback function
++ * @data: opaque data to pass to @func
++ * @notify: callback to free @data
++ *
++ * Register @func to be invoked whenever a new client
++ * connects to the listener. @func will be invoked
++ * passing in the QIOChannelSocket instance for the
++ * client.
++ */
++void qio_net_listener_set_client_func(QIONetListener *listener,
++                                      QIONetListenerClientFunc func,
++                                      gpointer data,
++                                      GDestroyNotify notify);
++
++/**
++ * qio_net_listener_wait_client:
++ * @listener: the network listener object
++ *
++ * Block execution of the caller until a new client arrives
++ * on one of the listening sockets. If there was previously
++ * a callback registered with qio_net_listener_set_client_func
++ * it will be temporarily disabled, and re-enabled afterwards.
++ *
++ * Returns: the new client socket
++ */
++QIOChannelSocket *qio_net_listener_wait_client(QIONetListener *listener);
++
++
++/**
++ * qio_net_listener_disconnect:
++ * @listener: the network listener object
++ *
++ * Disconnect the listener, removing all I/O callback
++ * watches and closing the socket channels.
++ */
++void qio_net_listener_disconnect(QIONetListener *listener);
++
++
++/**
++ * qio_net_listener_is_disconnected:
++ * @listener: the network listener object
++ *
++ * Determine if the listener is connected to any socket
++ * channels
++ *
++ * Returns: TRUE if connected, FALSE otherwise
++ */
++gboolean qio_net_listener_is_disconnected(QIONetListener *listener);
++
++#endif /* QIO_NET_LISTENER_H */
+diff --git a/io/Makefile.objs b/io/Makefile.objs
+index 12983cca79..9a20fce4ed 100644
+--- a/io/Makefile.objs
++++ b/io/Makefile.objs
+@@ -8,4 +8,5 @@ io-obj-y += channel-watch.o
+ io-obj-y += channel-websock.o
+ io-obj-y += channel-util.o
+ io-obj-y += dns-resolver.o
++io-obj-y += net-listener.o
+ io-obj-y += task.o
+diff --git a/io/net-listener.c b/io/net-listener.c
+new file mode 100644
+index 0000000000..065429f6fb
+--- /dev/null
++++ b/io/net-listener.c
+@@ -0,0 +1,315 @@
++/*
++ * QEMU network listener
++ *
++ * Copyright (c) 2016 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + *
 + */
 +
 +#include "qemu/osdep.h"
-+
-+#include "io/channel-socket.h"
++#include "io/net-listener.h"
++#include "io/dns-resolver.h"
 +#include "qapi/error.h"
-+#include "qemu/cutils.h"
 +
-+typedef struct {
-+    const char *name;
-+    const char *args;
-+    int ipv4; /* 0 -> disabled, 1 -> enabled */
-+    int ipv6; /* 0 -> disabled, 1 -> enabled, -1 -> check getaddrinfo() order */
-+    bool error;
-+} QSocketsData;
++QIONetListener *qio_net_listener_new(void)
++{
++    QIONetListener *ret;
 +
-+/*
-+ * This is the giant matrix of combinations we need to consider.
-+ * There are 3 axes we deal with
-+ *
-+ * Axis 1: Protocol flags:
-+ *
-+ *  ipv4=unset, ipv6=unset  -> v4 & v6 clients ([1]
-+ *  ipv4=unset, ipv6=off    -> v4 clients only
-+ *  ipv4=unset, ipv6=on     -> v6 clients only
-+ *  ipv4=off, ipv6=unset    -> v6 clients only
-+ *  ipv4=off, ipv6=off      -> error - can't disable both [2]
-+ *  ipv4=off, ipv6=on       -> v6 clients only
-+ *  ipv4=on, ipv6=unset     -> v4 clients only
-+ *  ipv4=on, ipv6=off       -> v4 clients only
-+ *  ipv4=on, ipv6=on        -> v4 & v6 clients [3]
-+ *
-+ * Depending on the listening address, some of those combinations
-+ * may result in errors. eg ipv4=off,ipv6=on combined with 0.0.0.0
-+ * is nonsensical.
-+ *
-+ * [1] Some backends only support a single socket listener, so
-+ *     will actually only allow v4 clients
-+ * [2] QEMU should fail to startup in this case
-+ * [3] If hostname is "" or "::", then we get a single listener
-+ *     on IPv6 and thus can also accept v4 clients. For all other
-+ *     hostnames, have same problem as [1].
-+ *
-+ * Axis 2: Listening address:
-+ *
-+ *  ""        - resolves to 0.0.0.0 and ::, in that order
-+ *  "0.0.0.0" - v4 clients only
-+ *  "::"      - Mostly v6 clients only. Some scenarios should
-+ *              permit v4 clients too.
-+ *
-+ * Axis 3: Backend type:
-+ *
-+ *  Migration - restricted to a single listener. Also relies
-+ *              on buggy inet_parse() which can't accept
-+ *              =off/=on parameters to ipv4/ipv6 flags
-+ *  Chardevs  - restricted to a single listener.
-+ *  VNC       - supports multiple listeners. Also supports
-+ *              socket ranges, so has extra set of tests
-+ *              in the matrix
-+ *
-+ */
-+static QSocketsData test_data[] = {
-+    /* Migrate with "" address */
-+    /* XXX all settings with =off are disabled due to inet_parse() bug */
-+    /* XXX multilistener bug - should be .ipv6 = 1 */
-+    { .ipv4 = 1, .ipv6 = -1, .error = false,
-+      .name = "/sockets/migrate/wildcard/all",
-+      .args = "-incoming tcp::9000" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv4",
-+      .args = "-incoming tcp::9000,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv6",
-+      .args = "-incoming tcp::9000,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv4on",
-+      .args = "-incoming tcp::9000,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv6on",
-+      .args = "-incoming tcp::9000,ipv6=on" },
-+    /*
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv4off",
-+      .args = "-incoming tcp::9000,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv6off",
-+      .args = "-incoming tcp::9000,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv4onipv6off",
-+      .args = "-incoming tcp::9000,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv4offipv6on",
-+      .args = "-incoming tcp::9000,ipv4=off,ipv6=on" },
-+    */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/wildcard/ipv4onipv6on",
-+      .args = "-incoming tcp::9000,ipv4=on,ipv6=on" },
-+    /*
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/wildcard/ipv4offipv6off",
-+      .args = "-incoming tcp::9000,ipv4=off,ipv6=off" },
-+    */
++    ret = QIO_NET_LISTENER(object_new(TYPE_QIO_NET_LISTENER));
 +
-+    /* Migrate with 0.0.0.0 address */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/0.0.0.0/all",
-+      .args = "-incoming tcp:0.0.0.0:9000" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/0.0.0.0/ipv6",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4on",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/0.0.0.0/ipv6on",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv6=on" },
-+    /*
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4off",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/0.0.0.0/ipv6off",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4onipv6off",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4offipv6on",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4=off,ipv6=on" },
-+    */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4onipv6on",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4=on,ipv6=on" },
-+    /*
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/0.0.0.0/ipv4offipv6off",
-+      .args = "-incoming tcp:0.0.0.0:9000,ipv4=off,ipv6=off" },
-+    */
++    return ret;
++}
 +
-+    /* Migrate with :: address */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/::/all",
-+      .args = "-incoming tcp:[::]:9000" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/::/ipv4",
-+      .args = "-incoming tcp:[::]:9000,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/::/ipv6",
-+      .args = "-incoming tcp:[::]:9000,ipv6" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/::/ipv4on",
-+      .args = "-incoming tcp:[::]:9000,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/::/ipv6on",
-+      .args = "-incoming tcp:[::]:9000,ipv6=on" },
-+    /*
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/::/ipv4off",
-+      .args = "-incoming tcp:[::]:9000,ipv4=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/::/ipv6off",
-+      .args = "-incoming tcp:[::]:9000,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/::/ipv4onipv6off",
-+      .args = "-incoming tcp:[::]:9000,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/::/ipv4offipv6on",
-+      .args = "-incoming tcp:[::]:9000,ipv4=off,ipv6=on" },
-+    */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/migrate/::/ipv4onipv6on",
-+      .args = "-incoming tcp:[::]:9000,ipv4=on,ipv6=on" },
-+    /*
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/migrate/::/ipv4offipv6off",
-+      .args = "-incoming tcp:[::]:9000,ipv4=off,ipv6=off" },
-+    */
++void qio_net_listener_set_name(QIONetListener *listener,
++                               const char *name)
++{
++    g_free(listener->name);
++    listener->name = g_strdup(name);
++}
 +
 +
++static gboolean qio_net_listener_channel_func(QIOChannel *ioc,
++                                              GIOCondition condition,
++                                              gpointer opaque)
++{
++    QIONetListener *listener = QIO_NET_LISTENER(opaque);
++    QIOChannelSocket *sioc;
 +
-+    /* Chardev with "" address */
-+    /* XXX multilistener bug - should be .ipv6 = 1 */
-+    { .ipv4 = 1, .ipv6 = -1, .error = false,
-+      .name = "/sockets/chardev/wildcard/all",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv4",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv6",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv4on",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv6on",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv4off",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv6off",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv4onipv6off",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv4offipv6on",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/wildcard/ipv4onipv6on",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/wildcard/ipv4offipv6off",
-+      .args = "-chardev socket,id=cdev0,host=,port=9000,server,nowait,"
-+              "ipv4=off,ipv6=off" },
++    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
++                                     NULL);
++    if (!sioc) {
++        return TRUE;
++    }
 +
-+    /* Chardev with 0.0.0.0 address */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/0.0.0.0/all",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/0.0.0.0/ipv6",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4on",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/0.0.0.0/ipv6on",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4off",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/0.0.0.0/ipv6off",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4onipv6off",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4offipv6on",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4onipv6on",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/0.0.0.0/ipv4offipv6off",
-+      .args = "-chardev socket,id=cdev0,host=0.0.0.0,port=9000,server,nowait,"
-+              "ipv4=off,ipv6=off" },
++    if (listener->io_func) {
++        listener->io_func(listener, sioc, listener->io_data);
++    }
 +
-+    /* Chardev with :: address */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/::/all",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/::/ipv4",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/::/ipv6",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv6" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/::/ipv4on",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/::/ipv6on",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/::/ipv4off",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/::/ipv6off",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/::/ipv4onipv6off",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/::/ipv4offipv6on",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/chardev/::/ipv4onipv6on",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/chardev/::/ipv4offipv6off",
-+      .args = "-chardev socket,id=cdev0,host=::,port=9000,server,nowait,"
-+              "ipv4=off,ipv6=off" },
++    object_unref(OBJECT(sioc));
++
++    return TRUE;
++}
 +
 +
++int qio_net_listener_open_sync(QIONetListener *listener,
++                               SocketAddress *addr,
++                               Error **errp)
++{
++    QIODNSResolver *resolver = qio_dns_resolver_get_instance();
++    SocketAddress **resaddrs;
++    size_t nresaddrs;
++    size_t i;
++    Error *err = NULL;
++    bool success = false;
 +
-+    /* Net with "" address */
-+    /* XXX does not yet support ipv4/ipv6 flags at all */
-+    /* XXX multilistener bug - should be .ipv6 = 1 */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/wildcard/all",
-+      .args = "-netdev socket,id=net0,listen=:9000" },
-+    /*
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/wildcard/ipv4",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/wildcard/ipv6",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/wildcard/ipv4on",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/wildcard/ipv6on",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/wildcard/ipv4off",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/wildcard/ipv6off",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/wildcard/ipv4onipv6off",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/wildcard/ipv4offipv6on",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/wildcard/ipv4onipv6on",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/wildcard/ipv4offipv6off",
-+      .args = "-netdev socket,id=net0,listen=:9000,ipv4=off,ipv6=off" },
-+    */
++    if (qio_dns_resolver_lookup_sync(resolver,
++                                     addr,
++                                     &nresaddrs,
++                                     &resaddrs,
++                                     errp) < 0) {
++        return -1;
++    }
 +
-+    /* Net with 0.0.0.0 address */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/0.0.0.0/all",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000" },
-+    /*
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/0.0.0.0/ipv4",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/0.0.0.0/ipv6",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/0.0.0.0/ipv4on",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/0.0.0.0/ipv6on",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/0.0.0.0/ipv4off",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/0.0.0.0/ipv6off",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/0.0.0.0/ipv4onipv6off",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/0.0.0.0/ipv4offipv6on",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/net/0.0.0.0/ipv4onipv6on",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/0.0.0.0/ipv4offipv6off",
-+      .args = "-netdev socket,id=net0,listen=0.0.0.0:9000,ipv4=off,ipv6=off" },
-+    */
++    for (i = 0; i < nresaddrs; i++) {
++        QIOChannelSocket *sioc = qio_channel_socket_new();
 +
-+    /* Net with :: address */
-+    /* parse_host_port() doesn't cope with [] for IPv6 addrs
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/::/all",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000" },
-+    */
-+    /*
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/::/ipv4",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/::/ipv6",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv6" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/::/ipv4on",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/::/ipv6on",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/::/ipv4off",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/::/ipv6off",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/::/ipv4onipv6off",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/::/ipv4offipv6on",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/net/::/ipv4onipv6on",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/net/::/ipv4offipv6off",
-+      .args = "-netdev socket,id=net0,listen=[::]:9000,ipv4=off,ipv6=off" },
-+    */
++        if (qio_channel_socket_listen_sync(sioc, resaddrs[i],
++                                           err ? NULL : &err) == 0) {
++            success = true;
++        }
++
++        qio_net_listener_add(listener, sioc);
++
++        qapi_free_SocketAddress(resaddrs[i]);
++        object_unref(OBJECT(sioc));
++    }
++    g_free(resaddrs);
++
++    if (success) {
++        error_free(err);
++        return 0;
++    } else {
++        error_propagate(errp, err);
++        return -1;
++    }
++}
 +
 +
-+    /* VNC with "" address */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/wildcard/all",
-+      .args = "-vnc :3100" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv4",
-+      .args = "-vnc :3100,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv6",
-+      .args = "-vnc :3100,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv4on",
-+      .args = "-vnc :3100,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv6on",
-+      .args = "-vnc :3100,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv4off",
-+      .args = "-vnc :3100,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv6off",
-+      .args = "-vnc :3100,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv4onipv6off",
-+      .args = "-vnc :3100,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv4offipv6on",
-+      .args = "-vnc :3100,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/wildcard/ipv4onipv6on",
-+      .args = "-vnc :3100,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/wildcard/ipv4offipv6off",
-+      .args = "-vnc :3100,ipv4=off,ipv6=off" },
++void qio_net_listener_add(QIONetListener *listener,
++                          QIOChannelSocket *sioc)
++{
++    if (listener->name) {
++        char *name = g_strdup_printf("%s-listen", listener->name);
++        qio_channel_set_name(QIO_CHANNEL(sioc), name);
++        g_free(name);
++    }
 +
-+    /* VNC with 0.0.0.0 address */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/0.0.0.0/all",
-+      .args = "-vnc 0.0.0.0:3100" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4",
-+      .args = "-vnc 0.0.0.0:3100,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/0.0.0.0/ipv6",
-+      .args = "-vnc 0.0.0.0:3100,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4on",
-+      .args = "-vnc 0.0.0.0:3100,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/0.0.0.0/ipv6on",
-+      .args = "-vnc 0.0.0.0:3100,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4off",
-+      .args = "-vnc 0.0.0.0:3100,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/0.0.0.0/ipv6off",
-+      .args = "-vnc 0.0.0.0:3100,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4onipv6off",
-+      .args = "-vnc 0.0.0.0:3100,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4offipv6on",
-+      .args = "-vnc 0.0.0.0:3100,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4onipv6on",
-+      .args = "-vnc 0.0.0.0:3100,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/0.0.0.0/ipv4offipv6off",
-+      .args = "-vnc 0.0.0.0:3100,ipv4=off,ipv6=off" },
++    listener->sioc = g_renew(QIOChannelSocket *, listener->sioc,
++                             listener->nsioc + 1);
++    listener->io_tag = g_renew(gulong, listener->io_tag, listener->nsioc + 1);
++    listener->sioc[listener->nsioc] = sioc;
++    listener->io_tag[listener->nsioc] = 0;
 +
-+    /* VNC with :: address */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/::/all",
-+      .args = "-vnc :::3100" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/::/ipv4",
-+      .args = "-vnc :::3100,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/::/ipv6",
-+      .args = "-vnc :::3100,ipv6" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/::/ipv4on",
-+      .args = "-vnc :::3100,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/::/ipv6on",
-+      .args = "-vnc :::3100,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/::/ipv4off",
-+      .args = "-vnc :::3100,ipv4=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/::/ipv6off",
-+      .args = "-vnc :::3100,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/::/ipv4onipv6off",
-+      .args = "-vnc :::3100,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/::/ipv4offipv6on",
-+      .args = "-vnc :::3100,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc/::/ipv4onipv6on",
-+      .args = "-vnc :::3100,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc/::/ipv4offipv6off",
-+      .args = "-vnc :::3100,ipv4=off,ipv6=off" },
++    object_ref(OBJECT(sioc));
++    listener->disconnected = FALSE;
++
++    if (listener->io_func != NULL) {
++        object_ref(OBJECT(listener));
++        listener->io_tag[listener->nsioc] = qio_channel_add_watch(
++            QIO_CHANNEL(listener->sioc[listener->nsioc]), G_IO_IN,
++            qio_net_listener_channel_func,
++            listener, (GDestroyNotify)object_unref);
++    }
++
++    listener->nsioc++;
++}
 +
 +
++void qio_net_listener_set_client_func(QIONetListener *listener,
++                                      QIONetListenerClientFunc func,
++                                      gpointer data,
++                                      GDestroyNotify notify)
++{
++    size_t i;
 +
-+    /* VNC with "" address and range */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/all",
-+      .args = "-vnc :3100,to=9005" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv4",
-+      .args = "-vnc :3100,to=9005,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv6",
-+      .args = "-vnc :3100,to=9005,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv4on",
-+      .args = "-vnc :3100,to=9005,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv6on",
-+      .args = "-vnc :3100,to=9005,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv4off",
-+      .args = "-vnc :3100,to=9005,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv6off",
-+      .args = "-vnc :3100,to=9005,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv4onipv6off",
-+      .args = "-vnc :3100,to=9005,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv4offipv6on",
-+      .args = "-vnc :3100,to=9005,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/wildcard/ipv4onipv6on",
-+      .args = "-vnc :3100,to=9005,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/wildcard/ipv4offipv6off",
-+      .args = "-vnc :3100,to=9005,ipv4=off,ipv6=off" },
++    if (listener->io_notify) {
++        listener->io_notify(listener->io_data);
++    }
++    listener->io_func = func;
++    listener->io_data = data;
++    listener->io_notify = notify;
 +
-+    /* VNC with 0.0.0.0 address and range */
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/0.0.0.0/all",
-+      .args = "-vnc 0.0.0.0:3100,to=9005" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv6",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv6" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4on",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv6on",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4off",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv6off",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv6=off" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4onipv6off",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4offipv6on",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 0, .error = false,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4onipv6on",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/0.0.0.0/ipv4offipv6off",
-+      .args = "-vnc 0.0.0.0:3100,to=9005,ipv4=off,ipv6=off" },
++    for (i = 0; i < listener->nsioc; i++) {
++        if (listener->io_tag[i]) {
++            g_source_remove(listener->io_tag[i]);
++            listener->io_tag[i] = 0;
++        }
++    }
 +
-+    /* VNC with :: address and range */
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/::/all",
-+      .args = "-vnc :::3100,to=9005" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/::/ipv4",
-+      .args = "-vnc :::3100,to=9005,ipv4" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/::/ipv6",
-+      .args = "-vnc :::3100,to=9005,ipv6" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/::/ipv4on",
-+      .args = "-vnc :::3100,to=9005,ipv4=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/::/ipv6on",
-+      .args = "-vnc :::3100,to=9005,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/::/ipv4off",
-+      .args = "-vnc :::3100,to=9005,ipv4=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/::/ipv6off",
-+      .args = "-vnc :::3100,to=9005,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/::/ipv4onipv6off",
-+      .args = "-vnc :::3100,to=9005,ipv4=on,ipv6=off" },
-+    { .ipv4 = 0, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/::/ipv4offipv6on",
-+      .args = "-vnc :::3100,to=9005,ipv4=off,ipv6=on" },
-+    { .ipv4 = 1, .ipv6 = 1, .error = false,
-+      .name = "/sockets/vnc-to/::/ipv4onipv6on",
-+      .args = "-vnc :::3100,to=9005,ipv4=on,ipv6=on" },
-+    { .ipv4 = 0, .ipv6 = 0, .error = true,
-+      .name = "/sockets/vnc-to/::/ipv4offipv6off",
-+      .args = "-vnc :::3100,to=9005,ipv4=off,ipv6=off" },
++    if (listener->io_func != NULL) {
++        for (i = 0; i < listener->nsioc; i++) {
++            object_ref(OBJECT(listener));
++            listener->io_tag[i] = qio_channel_add_watch(
++                QIO_CHANNEL(listener->sioc[i]), G_IO_IN,
++                qio_net_listener_channel_func,
++                listener, (GDestroyNotify)object_unref);
++        }
++    }
++}
++
++
++struct QIONetListenerClientWaitData {
++    QIOChannelSocket *sioc;
++    GMainLoop *loop;
 +};
 +
-+static int check_bind(const char *hostname)
++
++static gboolean qio_net_listener_wait_client_func(QIOChannel *ioc,
++                                                  GIOCondition condition,
++                                                  gpointer opaque)
 +{
-+    int fd = -1;
-+    struct addrinfo ai, *res = NULL;
-+    int rc;
-+    int ret = -1;
-+
-+    memset(&ai, 0, sizeof(ai));
-+    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
-+    ai.ai_family = AF_UNSPEC;
-+    ai.ai_socktype = SOCK_STREAM;
-+
-+    /* lookup */
-+    rc = getaddrinfo(hostname, "9000", &ai, &res);
-+    if (rc != 0) {
-+        goto cleanup;
-+    }
-+
-+    fd = qemu_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-+    if (fd < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-+        goto cleanup;
-+    }
-+
-+    ret = 0;
-+
-+ cleanup:
-+    if (fd != -1) {
-+        close(fd);
-+    }
-+    if (res) {
-+        freeaddrinfo(res);
-+    }
-+    return ret;
-+}
-+
-+
-+/*
-+ * Validates that getaddrinfo() with a hostname of "",
-+ * returns both an IPv4 and IPv6 address, and reports
-+ * their order
-+ *
-+ * Returns:
-+ *  -1: if resolving "" didn't return IPv4+IPv6 addrs
-+ *   0: if IPv4 addr is first
-+ *   1: if IPv6 addr is first
-+ */
-+static int check_resolve_order(void)
-+{
-+    struct addrinfo ai, *res = NULL, *e;
-+    int rc;
-+    int ret = -1;
-+    int ipv4_idx = -1, ipv6_idx = -1;
-+    int idx;
-+
-+    memset(&ai, 0, sizeof(ai));
-+    ai.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
-+    ai.ai_family = AF_UNSPEC;
-+    ai.ai_socktype = SOCK_STREAM;
-+
-+    /* lookup */
-+    rc = getaddrinfo(NULL, "9000", &ai, &res);
-+    if (rc != 0) {
-+        goto cleanup;
-+    }
-+
-+    for (e = res, idx = 0; e != NULL; e = e->ai_next, idx++) {
-+        if (e->ai_family == AF_INET) {
-+            ipv4_idx = idx;
-+        } else if (e->ai_family == AF_INET6) {
-+            ipv6_idx = idx;
-+        } else {
-+            goto cleanup;
-+        }
-+    }
-+
-+    if (ipv4_idx == -1 || ipv6_idx == -1) {
-+        goto cleanup;
-+    }
-+
-+    if (ipv4_idx < ipv6_idx) {
-+        ret = 0;
-+    } else {
-+        ret = 1;
-+    }
-+
-+ cleanup:
-+    if (res) {
-+        freeaddrinfo(res);
-+    }
-+    return ret;
-+}
-+
-+static int check_protocol_support(void)
-+{
-+    if (check_bind("0.0.0.0") < 0) {
-+        return -1;
-+    }
-+    if (check_bind("::") < 0) {
-+        return -1;
-+    }
-+
-+    return check_resolve_order();
-+}
-+
-+static pid_t run_qemu(const char *args)
-+{
-+    const char *pidfile = "test-sockets-proto.pid";
-+    char *pidstr;
-+    pid_t child;
-+    int status;
-+    pid_t ret;
-+    const char *binary = getenv("QTEST_QEMU_BINARY");
-+    long pid = 0;
-+    if (binary == NULL) {
-+        g_printerr("Missing QTEST_QEMU_BINARY env variable\n");
-+        exit(1);
-+    }
-+
-+    unlink(pidfile);
-+    child = fork();
-+    if (child == 0) {
-+        setenv("QEMU_AUDIO_DRV", "none", true);
-+        char *cmd = g_strdup_printf(
-+            "exec %s -pidfile %s -daemonize -nodefconfig -nodefaults "
-+            "-machine none -display none %s 1>/dev/null 2>&1",
-+            binary, pidfile, args);
-+        execlp("/bin/sh", "sh", "-c", cmd, NULL);
-+        _exit(1);
-+    }
-+
-+    do {
-+        ret = waitpid(child, &status, 0);
-+    } while (ret == -1 && errno == EINTR);
-+
-+    if (WEXITSTATUS(status) != 0) {
-+        goto cleanup;
-+    }
-+
-+    if (!g_file_get_contents(pidfile, &pidstr, NULL, NULL)) {
-+        goto cleanup;
-+    }
-+
-+    qemu_strtol(pidstr, NULL, 0, &pid);
-+
-+ cleanup:
-+    unlink(pidfile);
-+    return (pid_t)pid;
-+}
-+
-+static void test_listen(const void *opaque)
-+{
-+    const QSocketsData *data = opaque;
++    struct QIONetListenerClientWaitData *data = opaque;
 +    QIOChannelSocket *sioc;
-+    SocketAddress *saddr;
-+    Error *err = NULL;
-+    pid_t child;
 +
-+    /* First test IPv4 */
-+    saddr = g_new0(SocketAddress, 1);
-+    saddr->type = SOCKET_ADDRESS_TYPE_INET;
-+    saddr->u.inet.host = g_strdup("127.0.0.1");
-+    saddr->u.inet.port = g_strdup("9000");
-+    saddr->u.inet.has_ipv4 = true;
-+    saddr->u.inet.ipv4 = true;
-+    saddr->u.inet.has_ipv6 = true;
-+    saddr->u.inet.ipv6 = false;
-+
-+    child = run_qemu(data->args);
-+
-+    if (!child) {
-+        /* QEMU failed to start, so make sure we are expecting
-+         * this scenario to fail
-+         */
-+        g_assert(data->error);
-+        goto cleanup;
-+    } else {
-+        g_assert(!data->error);
++    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
++                                     NULL);
++    if (!sioc) {
++        return TRUE;
 +    }
 +
-+    sioc = qio_channel_socket_new();
-+    qio_channel_socket_connect_sync(sioc, saddr, &err);
-+
-+    if (err != NULL) {
-+        /* We failed to connect to IPv4, make sure that
-+         * matches the scenario expectation
-+         */
-+        g_assert(data->ipv4 == 0);
-+        error_free(err);
-+        err = NULL;
-+    } else {
-+        g_assert(data->ipv4 != 0);
++    if (data->sioc) {
 +        object_unref(OBJECT(sioc));
-+    }
-+
-+    kill(child, SIGKILL);
-+
-+
-+    /* Now test IPv6 */
-+    child = run_qemu(data->args);
-+
-+    /*
-+     * The child should always succeed, because its the
-+     * same config as the successful run we just did above
-+     */
-+    g_assert(child != 0);
-+
-+    g_free(saddr->u.inet.host);
-+    saddr->u.inet.host = g_strdup("::1");
-+    saddr->u.inet.ipv4 = false;
-+    saddr->u.inet.ipv6 = true;
-+
-+    sioc = qio_channel_socket_new();
-+    qio_channel_socket_connect_sync(sioc, saddr, &err);
-+
-+    if (err != NULL) {
-+        /* We failed to connect to IPv6, make sure that
-+         * matches the scenario expectation
-+         */
-+        g_assert(data->ipv6 == 0);
-+        error_free(err);
-+        err = NULL;
 +    } else {
-+        g_assert(data->ipv6 != 0);
-+        object_unref(OBJECT(sioc));
++        data->sioc = sioc;
++        g_main_loop_quit(data->loop);
 +    }
-+    kill(child, SIGKILL);
 +
-+ cleanup:
-+    qapi_free_SocketAddress(saddr);
++    return TRUE;
 +}
 +
-+
-+int main(int argc, char **argv)
++QIOChannelSocket *qio_net_listener_wait_client(QIONetListener *listener)
 +{
-+    int ret;
-+    gsize i;
-+    int ipv6_first;
++    GMainContext *ctxt = g_main_context_new();
++    GMainLoop *loop = g_main_loop_new(ctxt, TRUE);
++    GSource **sources;
++    struct QIONetListenerClientWaitData data = {
++        .sioc = NULL,
++        .loop = loop
++    };
++    size_t i;
 +
-+    ipv6_first = check_protocol_support();
-+    if (ipv6_first < 0) {
-+        /* Skip test if we can't bind, or have unexpected
-+         * results from getaddrinfo */
-+         return 0;
-+     }
-+
-+    signal(SIGPIPE, SIG_IGN);
-+
-+    module_call_init(MODULE_INIT_QOM);
-+    g_test_init(&argc, &argv, NULL);
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QSocketsData *data = &test_data[i];
-+        if (data->ipv6 == -1) {
-+            data->ipv6 = ipv6_first ? 1 : 0;
++    for (i = 0; i < listener->nsioc; i++) {
++        if (listener->io_tag[i]) {
++            g_source_remove(listener->io_tag[i]);
++            listener->io_tag[i] = 0;
 +        }
-+        g_test_add_data_func(data->name, data, test_listen);
 +    }
 +
-+    ret = g_test_run();
++    sources = g_new0(GSource *, listener->nsioc);
++    for (i = 0; i < listener->nsioc; i++) {
++        sources[i] = qio_channel_create_watch(QIO_CHANNEL(listener->sioc[i]),
++                                              G_IO_IN);
 +
-+    return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
++        g_source_set_callback(sources[i],
++                              (GSourceFunc)qio_net_listener_wait_client_func,
++                              &data,
++                              NULL);
++        g_source_attach(sources[i], ctxt);
++    }
++
++    g_main_loop_run(loop);
++
++    for (i = 0; i < listener->nsioc; i++) {
++        g_source_unref(sources[i]);
++    }
++    g_main_loop_unref(loop);
++    g_main_context_unref(ctxt);
++
++    if (listener->io_func != NULL) {
++        for (i = 0; i < listener->nsioc; i++) {
++            object_ref(OBJECT(listener));
++            listener->io_tag[i] = qio_channel_add_watch(
++                QIO_CHANNEL(listener->sioc[i]), G_IO_IN,
++                qio_net_listener_channel_func,
++                listener, (GDestroyNotify)object_unref);
++        }
++    }
++
++    return data.sioc;
 +}
++
++void qio_net_listener_disconnect(QIONetListener *listener)
++{
++    size_t i;
++
++    if (listener->disconnected) {
++        return;
++    }
++
++    for (i = 0; i < listener->nsioc; i++) {
++        if (listener->io_tag[i]) {
++            g_source_remove(listener->io_tag[i]);
++            listener->io_tag[i] = 0;
++        }
++        qio_channel_close(QIO_CHANNEL(listener->sioc[i]), NULL);
++    }
++    listener->disconnected = TRUE;
++}
++
++
++gboolean qio_net_listener_is_disconnected(QIONetListener *listener)
++{
++    return listener->disconnected;
++}
++
++static void qio_net_listener_init(Object *obj)
++{
++    QIONetListener *listener = QIO_NET_LISTENER(obj);
++
++    listener->disconnected = TRUE;
++}
++
++static void qio_net_listener_finalize(Object *obj)
++{
++    QIONetListener *listener = QIO_NET_LISTENER(obj);
++    size_t i;
++
++    qio_net_listener_disconnect(listener);
++
++    for (i = 0; i < listener->nsioc; i++) {
++        object_unref(OBJECT(listener->sioc[i]));
++    }
++    g_free(listener->io_tag);
++    g_free(listener->sioc);
++    g_free(listener->name);
++}
++
++static const TypeInfo qio_net_listener_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_QIO_NET_LISTENER,
++    .instance_size = sizeof(QIONetListener),
++    .instance_finalize = qio_net_listener_finalize,
++    .instance_init = qio_net_listener_init,
++    .class_size = sizeof(QIONetListenerClass),
++};
++
++
++static void qio_net_listener_register_types(void)
++{
++    type_register_static(&qio_net_listener_info);
++}
++
++
++type_init(qio_net_listener_register_types);
 -- 
 2.13.3
