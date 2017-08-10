@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfnz6-0006Dc-JL
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:58:49 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dfo7W-0000DT-Ed
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 10:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfnz5-0000Go-Cp
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:58:48 -0400
-References: <20170810080108.31047-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f587d8ac-476d-e285-6579-3a8188de1790@redhat.com>
-Date: Thu, 10 Aug 2017 08:58:36 -0500
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dfo7Q-0004kd-SI
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 10:07:30 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:20935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dfo7Q-0004ip-J2
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 10:07:24 -0400
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87bmoxcuvn.fsf@dusky.pond.sub.org>
+	<61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
+	<87shh3fn7d.fsf@dusky.pond.sub.org>
+	<w511soml2kh.fsf@maestria.local.igalia.com>
+	<34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
+	<w51shh2jfi9.fsf@maestria.local.igalia.com>
+	<87wp6e6qb7.fsf@dusky.pond.sub.org>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <dc14df7c-2f7c-300b-5f60-44411f3d6604@huawei.com>
+Date: Thu, 10 Aug 2017 16:06:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170810080108.31047-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10?] file-posix: Clear out first
- sector in hdev_create
+In-Reply-To: <87wp6e6qb7.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <f587d8ac-476d-e285-6579-3a8188de1790@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10?] file-posix: Clear out first sector
- in hdev_create
-References: <20170810080108.31047-1-famz@redhat.com>
-In-Reply-To: <20170810080108.31047-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 8/8/2017 5:18 PM, Markus Armbruster wrote:
+> Alberto Garcia <berto@igalia.com> writes:
+>
+>> On Tue 08 Aug 2017 02:30:43 PM CEST, Pradeep Jagadeesh wrote:
+>>> On 8/8/2017 1:30 PM, Alberto Garcia wrote:
+>>>> On Mon 07 Aug 2017 04:48:38 PM CEST, Markus Armbruster wrote:
+>>>>>>> Awkward question for a v7, but here goes anyway: why is IOThrottle
+>>>>>>> worth its very own .json file?
+>>>>>> I feel this is a common throttle structure that is used by block
+>>>>>> devices as well as fsdev, so moved to a separate file.
+>>>>> I'm not sure that's a good idea.  Kevin, Berto, what do you think?
+>>>>
+>>>> Mmm... I don't have a very strong opinion, but if there's no actual need
+>>>> to move it to a separate file I'd prefer to leave it where it is.
+>>> The segregation is the solid reason. Because throttling is a feature
+>>> that is used by fsdev, block may many more in future. I do not see
+>>> moving it back to block does it make any sense?
+>>
+>> It's not "moving it back", it's keeping it where it is. But I see no big
+>> problem with moving it to a common file either.
+>
+> I'd rather not put every struct shared across subsystem boundaries in
+> its own file.
+>
+> We can keep it right where it is for now.  Bonus: more readable diff.
+> If we start sharing more throttle-related material than just a struct,
+> we can reconsider.
+>
+> We could also move it to the existing file for common stuff:
+> qapi/common.json.  Not a great fit, though.
+So, the final conclusion is to move to common.json?
 
-On 08/10/2017 03:01 AM, Fam Zheng wrote:
-> People get surprised when, after "qemu-imc create -f raw /dev/sdX", the=
-y
-> still see qcow2 with "qemu-img info", if previously the bdev had a qcow=
-2
-> header. While this is natural because raw doesn't need to write any
-> magic bytes during creation, hdev_create is free to clear out the first=
-
-> sector to make sure the stale qcow2 header doesn't cause such a
-> confusion.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/file-posix.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index f4de022ae0..1d8ef6f873 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -2703,6 +2703,17 @@ static int hdev_create(const char *filename, Qem=
-uOpts *opts,
->          ret =3D -ENOSPC;
->      }
-> =20
-> +    if (total_size) {
-> +        int64_t zero_size =3D MIN(BDRV_SECTOR_SIZE, total_size);
-> +        uint8_t *buf;
-
-Since BDRV_SECTOR_SIZE is small enough to stack-allocate, you could skip
-the malloc by doing:
-
-uint8_t buf[BDRV_SECTOR_SIZE] =3D "";
-
-> +        if (lseek(fd, 0, SEEK_SET) =3D=3D -1) {
-> +            ret =3D -errno;
-> +        } else {
-> +            buf =3D g_malloc0(zero_size);
-> +            ret =3D qemu_write_full(fd, buf, zero_size);
-
-Instead of doing lseek + qemu_write_full, can we just use
-qemu_pwritev(fd, &iov, 1, 0) with an iov set up to point to the
-appropriate amount of buf?
-
-At any rate, my ideas are micro-optimizations, so I can also live with
-how you wrote it.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Are you arguing that this is a bug-fix worthy of inclusion in 2.10,
-because it helps avoid user confusion? Or are you delaying it to 2.11,
-because we've had the existing behavior for longer than one release, so
-one release more won't hurt?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMZowACgkQp6FrSiUn
-Q2q8Ygf/Z1hyMZJrB8GICObTislpznQyrqqanu4AMPTwr+8k56SEy7184+4omdKk
-BD3kMw3nMcALd2jK2RekZOIdJ3DH3MoolykoXN6sx02aADOU02AzgqiqwZZOFThg
-gs9HNZRan4MZ+YIBx847iAc78u6l9Nca4C7JDvIoYTc+RLNW4bjQ43Hi908/aM5K
-s42bnbVnMt+2lZYOzey4lcMwkdcY8Ec0vWbqwHfeiRpGp/SY6XGhViqTq433ny3F
-7hOiVi801we0yTxmAdlsKE4hZvmslGy4BbMUbsZmM/Bmfe0aq+2DJt/HwxV0aQ1+
-W4iFH6CmQmISRG2Lpkur7GpzCB2y3A==
-=wagM
------END PGP SIGNATURE-----
-
---celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8--
+Regards,
+Pradeep
+>
