@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfihl-0004JA-5E
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:20:34 -0400
+	(envelope-from <famz@redhat.com>) id 1dfj3U-00006K-G9
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dfihf-0003Q7-UX
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:20:33 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-2-git-send-email-armbru@redhat.com>
-	<546a1140-e5e1-b6b9-2671-0dba6a274227@redhat.com>
-Date: Thu, 10 Aug 2017 10:20:06 +0200
-In-Reply-To: <546a1140-e5e1-b6b9-2671-0dba6a274227@redhat.com> (Eric Blake's
-	message of "Wed, 9 Aug 2017 09:39:42 -0500")
-Message-ID: <87valvhm15.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1dfj3T-0007iD-8H
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:43:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58641)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dfj3T-0007hf-2G
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:42:59 -0400
+Date: Thu, 10 Aug 2017 16:42:55 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170810084255.GA7003@lemon.lan>
+References: <16148252-7ec9-bc6f-023f-d0c12efc2444@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 01/56] qobject: Touch up comments to
- say @param instead of 'param'
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <16148252-7ec9-bc6f-023f-d0c12efc2444@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] make check-help not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+On Fri, 07/28 20:56, Philippe Mathieu-Daud=E9 wrote:
+> I'm a bit lost with this error:
+>=20
+> (master)$ make check-help V=3D1
+> cc -nostdlib  -o check-help.mo
+> cc: fatal error: no input files
+> compilation terminated.
+> rules.mak:115: recipe for target 'check-help.mo' failed
+> make: *** [check-help.mo] Error 1
 
-> On 08/07/2017 09:45 AM, Markus Armbruster wrote:
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  qobject/qdict.c | 68 ++++++++++++++++++++++++++++-----------------------------
->>  qobject/qlist.c |  2 +-
->>  2 files changed, 35 insertions(+), 35 deletions(-)
->> 
->> diff --git a/qobject/qdict.c b/qobject/qdict.c
->> index 576018e..d795079 100644
->> --- a/qobject/qdict.c
->> +++ b/qobject/qdict.c
->> @@ -116,13 +116,13 @@ static QDictEntry *qdict_find(const QDict *qdict,
->>  /**
->>   * qdict_put_obj(): Put a new QObject into the dictionary
->>   *
->> - * Insert the pair 'key:value' into 'qdict', if 'key' already exists
->> - * its 'value' will be replaced.
->> + * Insert the pair @key:@value into @qdict, if @key already exists
->> + * its value will be replaced.
->
-> Maybe s/,/;/ while at it.
+I think this is because in Makefile:
 
-Or even *gasp* a period.
+ifneq ($(wildcard config-host.mak),)
+include $(SRC_PATH)/tests/Makefile.include
+endif
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+which basically means only include that file, which contains the "check-h=
+elp"
+rule, after configure.
 
-Thanks!
+We can move that ifned/endif pair down to tests/Makefile.include and move
+check-help out of it.
+
+I'll send a patch for it.
+
+Fam
