@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1dfNgI-0005TM-Lm
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:53:40 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1dfNgM-0005VH-Ur
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:53:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1dfNgF-0006nH-Vm
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:53:38 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1dfNgK-0006pM-4n
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:53:43 -0400
 Received: from mga02.intel.com ([134.134.136.20]:64292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1dfNgF-0006li-J5
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:53:35 -0400
+	id 1dfNgJ-0006li-NC
+	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 05:53:40 -0400
 From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Thu, 10 Aug 2017 18:12:28 +0800
-Message-Id: <1502359951-29160-2-git-send-email-changpeng.liu@intel.com>
+Date: Thu, 10 Aug 2017 18:12:29 +0800
+Message-Id: <1502359951-29160-3-git-send-email-changpeng.liu@intel.com>
 In-Reply-To: <1502359951-29160-1-git-send-email-changpeng.liu@intel.com>
 References: <1502359951-29160-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] vhost-user: add new vhost user messages
- to support virtio config space
+Subject: [Qemu-devel] [PATCH v2 2/4] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,346 +28,629 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: changpeng.liu@intel.com, qemu-devel@nongnu.org
 Cc: stefanha@gmail.com, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
-used for live migration for vhost user devices, also vhost user devices
-can benifit from the messages to get/set virtio config space from/to the
-I/O target besides Qemu. For the purpose to support virtio config space
-change, VHOST_USER_SET_CONFIG_FD message is added as the event notifier
-in case virtio config space change.
+This commit introduces a new vhost-user device for block, it uses a
+chardev to connect with the backend, same with Qemu virito-blk device,
+Guest OS still uses the virtio-blk frontend driver.
+
+To use it, start Qemu with command line like this:
+
+qemu-system-x86_64 \
+    -chardev socket,id=char0,path=/path/vhost.socket \
+    -device vhost-user-blk-pci,chardev=char0,num_queues=...
+
+Different with exist Qemu virtio-blk host device, it makes more easy
+for users to implement their own I/O processing logic, such as all
+user space I/O stack against hardware block device. It uses the new
+vhost messages(VHOST_USER_GET_CONFIG) to get block virtio config
+information from backend process.
 
 Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 ---
- docs/interop/vhost-user.txt       | 31 ++++++++++++++
- hw/virtio/vhost-user.c            | 86 +++++++++++++++++++++++++++++++++++++++
- hw/virtio/vhost.c                 | 63 ++++++++++++++++++++++++++++
- include/hw/virtio/vhost-backend.h |  8 ++++
- include/hw/virtio/vhost.h         | 16 ++++++++
- 5 files changed, 204 insertions(+)
+ configure                          |  11 ++
+ hw/block/Makefile.objs             |   3 +
+ hw/block/vhost-user-blk.c          | 360 +++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c             |  55 ++++++
+ hw/virtio/virtio-pci.h             |  18 ++
+ include/hw/virtio/vhost-user-blk.h |  40 +++++
+ 6 files changed, 487 insertions(+)
+ create mode 100644 hw/block/vhost-user-blk.c
+ create mode 100644 include/hw/virtio/vhost-user-blk.h
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index 954771d..19dfc61 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -116,6 +116,10 @@ Depending on the request type, payload can be:
-     - 3: IOTLB invalidate
-     - 4: IOTLB access fail
+diff --git a/configure b/configure
+index dd73cce..1452c66 100755
+--- a/configure
++++ b/configure
+@@ -305,6 +305,7 @@ tcg="yes"
  
-+ * Virtio device config space
-+
-+   256 Bytes static virito config space  
-+
- In QEMU the vhost-user message is implemented with the following struct:
+ vhost_net="no"
+ vhost_scsi="no"
++vhost_user_blk="no"
+ vhost_vsock="no"
+ vhost_user=""
+ kvm="no"
+@@ -779,6 +780,7 @@ Linux)
+   kvm="yes"
+   vhost_net="yes"
+   vhost_scsi="yes"
++  vhost_user_blk="yes"
+   vhost_vsock="yes"
+   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+   supported_os="yes"
+@@ -1136,6 +1138,10 @@ for opt do
+   ;;
+   --enable-vhost-scsi) vhost_scsi="yes"
+   ;;
++  --disable-vhost-user-blk) vhost_user_blk="no"
++  ;;
++  --enable-vhost-user-blk) vhost_user_blk="yes"
++  ;;
+   --disable-vhost-vsock) vhost_vsock="no"
+   ;;
+   --enable-vhost-vsock) vhost_vsock="yes"
+@@ -1506,6 +1512,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   cap-ng          libcap-ng support
+   attr            attr and xattr support
+   vhost-net       vhost-net acceleration support
++  vhost-user-blk  VM virtio-blk acceleration in user space
+   spice           spice
+   rbd             rados block device (rbd)
+   libiscsi        iscsi support
+@@ -5365,6 +5372,7 @@ echo "posix_madvise     $posix_madvise"
+ echo "libcap-ng support $cap_ng"
+ echo "vhost-net support $vhost_net"
+ echo "vhost-scsi support $vhost_scsi"
++echo "vhost-user-blk support $vhost_user_blk"
+ echo "vhost-vsock support $vhost_vsock"
+ echo "vhost-user support $vhost_user"
+ echo "Trace backends    $trace_backends"
+@@ -5776,6 +5784,9 @@ fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
++if test "$vhost_user_blk" = "yes" ; then
++  echo "CONFIG_VHOST_USER_BLK=y" >> $config_host_mak
++fi
+ if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
+   echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
+ fi
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index e0ed980..4c19a58 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -13,3 +13,6 @@ obj-$(CONFIG_SH4) += tc58128.o
  
- typedef struct VhostUserMsg {
-@@ -129,6 +133,7 @@ typedef struct VhostUserMsg {
-         VhostUserMemory memory;
-         VhostUserLog log;
-         struct vhost_iotlb_msg iotlb;
-+        uint8_t config[256];
-     };
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -596,6 +601,32 @@ Master message types
-       and expect this message once (per VQ) during device configuration
-       (ie. before the master starts the VQ).
- 
-+ * VHOST_USER_GET_CONFIG
-+      Id: 24
-+      Equivalent ioctl: N/A
-+      Master payload: virtio device config space
-+
-+      Submitted by the vhost-user master to fetch the contents of the virtio
-+      config space. The vhost-user master may cache the contents to avoid
-+      repeated VHOST_USER_GET_CONFIG calls.
-+
-+* VHOST_USER_SET_CONFIG
-+      Id: 25
-+      Equivalent ioctl: N/A
-+      Master payload: virtio device config space
-+
-+      Submitted by the vhost-user master when the guest writes to virtio
-+      config space and also after live migration on the destination host.
-+
-+* VHOST_USER_SET_CONFIG_FD
-+      Id: 26
-+      Equivalent ioctl: N/A
-+      Master payload: N/A
-+
-+      Sets the notifier file descriptor, which is passed as ancillary data.
-+      Vhost-user master uses the file descriptor as event callback when the
-+      virtio config space changed.
-+
- Slave message types
- -------------------
- 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 093675e..4b402c5 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -26,6 +26,11 @@
- #define VHOST_MEMORY_MAX_NREGIONS    8
- #define VHOST_USER_F_PROTOCOL_FEATURES 30
- 
+ obj-$(CONFIG_VIRTIO) += virtio-blk.o
+ obj-$(CONFIG_VIRTIO) += dataplane/
++ifeq ($(CONFIG_VIRTIO),y)
++obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
++endif
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+new file mode 100644
+index 0000000..8aa9fa9
+--- /dev/null
++++ b/hw/block/vhost-user-blk.c
+@@ -0,0 +1,360 @@
 +/*
-+ * Maximum size of virtio device config space
++ * vhost-user-blk host device
++ *
++ * Copyright IBM, Corp. 2011
++ * Copyright(C) 2017 Intel Corporation.
++ *
++ * Authors:
++ *  Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
++ *  Changpeng Liu <changpeng.liu@intel.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
 + */
-+#define VHOST_USER_MAX_CONFIG_SIZE 256
 +
- enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_MQ = 0,
-     VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
-@@ -65,6 +70,9 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_SLAVE_REQ_FD = 21,
-     VHOST_USER_IOTLB_MSG = 22,
-     VHOST_USER_SET_VRING_ENDIAN = 23,
-+    VHOST_USER_GET_CONFIG = 24,
-+    VHOST_USER_SET_CONFIG = 25,
-+    VHOST_USER_SET_CONFIG_FD = 26,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -109,6 +117,7 @@ typedef struct VhostUserMsg {
-         VhostUserMemory memory;
-         VhostUserLog log;
-         struct vhost_iotlb_msg iotlb;
-+        uint8_t config[VHOST_USER_MAX_CONFIG_SIZE];
-     } payload;
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -922,6 +931,80 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
-     /* No-op as the receive channel is not dedicated to IOTLB messages. */
- }
- 
-+static int vhost_user_get_config(struct vhost_dev *dev, uint8_t *config,
-+                                 size_t config_len)
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "qemu/typedefs.h"
++#include "qemu/cutils.h"
++#include "qom/object.h"
++#include "hw/qdev-core.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-user-blk.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-bus.h"
++#include "hw/virtio/virtio-access.h"
++
++static const int user_feature_bits[] = {
++    VIRTIO_BLK_F_SIZE_MAX,
++    VIRTIO_BLK_F_SEG_MAX,
++    VIRTIO_BLK_F_GEOMETRY,
++    VIRTIO_BLK_F_BLK_SIZE,
++    VIRTIO_BLK_F_TOPOLOGY,
++    VIRTIO_BLK_F_SCSI,
++    VIRTIO_BLK_F_MQ,
++    VIRTIO_BLK_F_RO,
++    VIRTIO_BLK_F_FLUSH,
++    VIRTIO_BLK_F_BARRIER,
++    VIRTIO_BLK_F_WCE,
++    VIRTIO_F_VERSION_1,
++    VIRTIO_RING_F_INDIRECT_DESC,
++    VIRTIO_RING_F_EVENT_IDX,
++    VIRTIO_F_NOTIFY_ON_EMPTY,
++    VHOST_INVALID_FEATURE_BIT
++};
++
++static void vhost_user_blk_update_config(VirtIODevice *vdev, uint8_t *config)
 +{
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_GET_CONFIG,
-+        .flags = VHOST_USER_VERSION,
-+        .size = config_len,
-+    };
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
 +
-+    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
-+        error_report("bad config length");
-+        return -1;
-+    }
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
-+    }
-+
-+    if (vhost_user_read(dev, &msg) < 0) {
-+        return -1;
-+    }
-+
-+    if (msg.request != VHOST_USER_GET_CONFIG) {
-+        error_report("Received unexpected msg type. Expected %d received %d",
-+                     VHOST_USER_GET_CONFIG, msg.request);
-+        return -1;
-+    }
-+
-+    if (msg.size != config_len) {
-+        error_report("Received bad msg size.");
-+        return -1;
-+    }
-+
-+    memcpy(config, &msg.payload.config, config_len);
-+
-+    return 0;
++    memcpy(config, &s->blkcfg, sizeof(struct virtio_blk_config));
 +}
 +
-+static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *config,
-+                                 size_t config_len)
++static void vhost_user_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
 +{
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_SET_CONFIG,
-+        .flags = VHOST_USER_VERSION,
-+        .size = config_len,
-+    };
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    struct virtio_blk_config *blkcfg = (struct virtio_blk_config *)config;
++    int ret;
 +
-+    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
-+        error_report("bad config length");
-+        return -1;
++    if (blkcfg->wce == s->blkcfg.wce) {
++        return;
 +    }
 +
-+    memcpy(&msg.payload.config, config, config_len);
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
++    ret = vhost_dev_set_config(&s->dev, config,
++                              sizeof(struct virtio_blk_config));
++    if (ret) {
++        error_report("set device config space failed");
++        return;
 +    }
 +
-+    return 0;
++    s->blkcfg.wce = blkcfg->wce;
 +}
 +
-+static int vhost_user_set_config_fd(struct vhost_dev *dev, int fd)
++static void vhost_user_blk_handle_config_change(struct vhost_dev *dev)
 +{
-+    VhostUserMsg msg = {
-+       .request = VHOST_USER_SET_CONFIG_FD,
-+       .flags = VHOST_USER_VERSION,
-+    };
++    int ret;
++    struct virtio_blk_config blkcfg;
++    VHostUserBlk *s = VHOST_USER_BLK(dev->vdev);
 +
-+    if (vhost_user_write(dev, &msg, &fd, 1) < 0) {
-+        return -1;
++    ret = vhost_dev_get_config(dev, (uint8_t *)&blkcfg,
++                               sizeof(struct virtio_blk_config));
++    if (ret < 0) {
++        error_report("get config space failed");
++        return;
 +    }
 +
-+    return 0;
++    memcpy(&s->blkcfg, &blkcfg, sizeof(struct virtio_blk_config));
++    memcpy(dev->vdev->config, &blkcfg, sizeof(struct virtio_blk_config));
++
++    virtio_notify_config(dev->vdev);
 +}
 +
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-@@ -948,4 +1031,7 @@ const VhostOps user_ops = {
-         .vhost_net_set_mtu = vhost_user_net_set_mtu,
-         .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
-+        .vhost_get_config = vhost_user_get_config,
-+        .vhost_set_config = vhost_user_set_config,
-+        .vhost_set_config_fd = vhost_user_set_config_fd,
- };
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 6eddb09..0d39a55 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1353,6 +1353,9 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
-     for (i = 0; i < hdev->nvqs; ++i) {
-         vhost_virtqueue_cleanup(hdev->vqs + i);
-     }
-+    if (hdev->config_ops) {
-+        event_notifier_cleanup(&hdev->config_notifier);
-+    }
-     if (hdev->mem) {
-         /* those are only safe after successful init */
-         memory_listener_unregister(&hdev->memory_listener);
-@@ -1496,6 +1499,66 @@ void vhost_ack_features(struct vhost_dev *hdev, const int *feature_bits,
-     }
- }
- 
-+int vhost_dev_get_config(struct vhost_dev *hdev, uint8_t *config,
-+                         size_t config_len)
++const VhostDevConfigOps blk_ops = {
++    .vhost_dev_config_notifier = vhost_user_blk_handle_config_change,
++};
++
++static void vhost_user_blk_start(VirtIODevice *vdev)
 +{
-+    assert(hdev->vhost_ops);
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
++    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
++    int i, ret;
 +
-+    if (hdev->vhost_ops->vhost_get_config) {
-+        return hdev->vhost_ops->vhost_get_config(hdev, config, config_len);
++    if (!k->set_guest_notifiers) {
++        error_report("binding does not support guest notifiers");
++        return;
 +    }
 +
-+    return 0;
-+}
-+
-+int vhost_dev_set_config(struct vhost_dev *hdev, const uint8_t *config,
-+                         size_t config_len)
-+{
-+    assert(hdev->vhost_ops);
-+
-+    if (hdev->vhost_ops->vhost_set_config) {
-+        return hdev->vhost_ops->vhost_set_config(hdev, config, config_len);
++    ret = vhost_dev_enable_notifiers(&s->dev, vdev);
++    if (ret < 0) {
++        error_report("Error enabling host notifiers: %d", -ret);
++        return;
 +    }
 +
-+    return 0;
-+}
-+
-+static void vhost_dev_config_notifier_read(EventNotifier *n)
-+{
-+    struct vhost_dev *hdev = container_of(n, struct vhost_dev,
-+                                         config_notifier);
-+
-+    if (event_notifier_test_and_clear(n)) {
-+        if (hdev->config_ops) {
-+            hdev->config_ops->vhost_dev_config_notifier(hdev);
-+        }
-+    }
-+}
-+
-+int vhost_dev_set_config_notifier(struct vhost_dev *hdev,
-+                                  const VhostDevConfigOps *ops)
-+{
-+    int r, fd;
-+
-+    assert(hdev->vhost_ops);
-+
-+    r = event_notifier_init(&hdev->config_notifier, 0);
-+    if (r < 0) {
-+        return r;
++    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
++    if (ret < 0) {
++        error_report("Error binding guest notifier: %d", -ret);
++        goto err_host_notifiers;
 +    }
 +
-+    hdev->config_ops = ops;
-+    event_notifier_set_handler(&hdev->config_notifier,
-+                               vhost_dev_config_notifier_read);
-+
-+    if (hdev->vhost_ops->vhost_set_config_fd) {
-+        fd  = event_notifier_get_fd(&hdev->config_notifier);
-+        return hdev->vhost_ops->vhost_set_config_fd(hdev, fd);
++    s->dev.acked_features = vdev->guest_features;
++    ret = vhost_dev_start(&s->dev, vdev);
++    if (ret < 0) {
++        error_report("Error starting vhost: %d", -ret);
++        goto err_guest_notifiers;
 +    }
 +
-+    return 0;
-+}
-+
- /* Host notifiers must be enabled at this point. */
- int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
- {
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index a7a5f22..df6769e 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -84,6 +84,11 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
-                                            int enabled);
- typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *imsg);
-+typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t *config,
-+                                   size_t config_len);
-+typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
-+                                   size_t config_len);
-+typedef int (*vhost_set_config_fd_op)(struct vhost_dev *dev, int fd);
- 
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-@@ -118,6 +123,9 @@ typedef struct VhostOps {
-     vhost_vsock_set_running_op vhost_vsock_set_running;
-     vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
-     vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-+    vhost_get_config_op vhost_get_config;
-+    vhost_set_config_op vhost_set_config;
-+    vhost_set_config_fd_op vhost_set_config_fd;
- } VhostOps;
- 
- extern const VhostOps user_ops;
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 467dc77..ff172f2 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -46,6 +46,12 @@ struct vhost_iommu {
-     QLIST_ENTRY(vhost_iommu) iommu_next;
- };
- 
-+typedef struct VhostDevConfigOps {
-+    /* Vhost device config space changed callback
++    /* guest_notifier_mask/pending not used yet, so just unmask
++     * everything here. virtio-pci will do the right thing by
++     * enabling/disabling irqfd.
 +     */
-+    void (*vhost_dev_config_notifier)(struct vhost_dev *dev);
-+} VhostDevConfigOps;
++    for (i = 0; i < s->dev.nvqs; i++) {
++        vhost_virtqueue_mask(&s->dev, vdev, i, false);
++    }
 +
- struct vhost_memory;
- struct vhost_dev {
-     VirtIODevice *vdev;
-@@ -76,6 +82,8 @@ struct vhost_dev {
-     QLIST_ENTRY(vhost_dev) entry;
-     QLIST_HEAD(, vhost_iommu) iommu_list;
-     IOMMUNotifier n;
-+    EventNotifier config_notifier;
-+    const VhostDevConfigOps *config_ops;
++    return;
++
++err_guest_notifiers:
++    k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
++err_host_notifiers:
++    vhost_dev_disable_notifiers(&s->dev, vdev);
++}
++
++static void vhost_user_blk_stop(VirtIODevice *vdev)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
++    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
++    int ret;
++
++    if (!k->set_guest_notifiers) {
++        return;
++    }
++
++    vhost_dev_stop(&s->dev, vdev);
++
++    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
++    if (ret < 0) {
++        error_report("vhost guest notifier cleanup failed: %d", ret);
++        return;
++    }
++
++    vhost_dev_disable_notifiers(&s->dev, vdev);
++}
++
++static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
++
++    if (!vdev->vm_running) {
++        should_start = false;
++    }
++
++    if (s->dev.started == should_start) {
++        return;
++    }
++
++    if (should_start) {
++        vhost_user_blk_start(vdev);
++    } else {
++        vhost_user_blk_stop(vdev);
++    }
++
++}
++
++static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
++                                            uint64_t features,
++                                            Error **errp)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    uint64_t get_features;
++
++    /* Turn on pre-defined features */
++    features |= s->host_features;
++
++    get_features = vhost_get_features(&s->dev, user_feature_bits, features);
++
++    return get_features;
++}
++
++static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
++{
++
++}
++
++static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    int i, ret;
++
++    if (!s->chardev.chr) {
++        error_setg(errp, "vhost-user-blk: chardev is mandatory");
++        return;
++    }
++
++    if (!s->num_queues || s->num_queues > VIRTIO_QUEUE_MAX) {
++        error_setg(errp, "vhost-user-blk: invalid number of IO queues");
++        return;
++    }
++
++    if (!s->queue_size) {
++        error_setg(errp, "vhost-user-blk: queue size must be non-zero");
++        return;
++    }
++
++    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
++                sizeof(struct virtio_blk_config));
++
++    for (i = 0; i < s->num_queues; i++) {
++        virtio_add_queue(vdev, s->queue_size,
++                         vhost_user_blk_handle_output);
++    }
++
++    s->dev.nvqs = s->num_queues;
++    s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
++    s->dev.vq_index = 0;
++    s->dev.backend_features = 0;
++
++    ret = vhost_dev_init(&s->dev, &s->chardev, VHOST_BACKEND_TYPE_USER, 0);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
++                   strerror(-ret));
++        goto virtio_err;
++    }
++
++    ret = vhost_dev_get_config(&s->dev, (uint8_t *)&s->blkcfg,
++                              sizeof(struct virtio_blk_config));
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-blk: get block config failed");
++        goto vhost_err;
++    }
++
++    if (s->blkcfg.num_queues != s->num_queues) {
++        s->blkcfg.num_queues = s->num_queues;
++    }
++
++    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
++
++    return;
++
++vhost_err:
++    vhost_dev_cleanup(&s->dev);
++virtio_err:
++    g_free(s->dev.vqs);
++    virtio_cleanup(vdev);
++}
++
++static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserBlk *s = VHOST_USER_BLK(dev);
++
++    vhost_user_blk_set_status(vdev, 0);
++    vhost_dev_cleanup(&s->dev);
++    g_free(s->dev.vqs);
++    virtio_cleanup(vdev);
++}
++
++static void vhost_user_blk_instance_init(Object *obj)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(obj);
++
++    device_add_bootindex_property(obj, &s->bootindex, "bootindex",
++                                  "/disk@0,0", DEVICE(obj), NULL);
++}
++
++static const VMStateDescription vmstate_vhost_user_blk = {
++    .name = "vhost-user-blk",
++    .minimum_version_id = 1,
++    .version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_VIRTIO_DEVICE,
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static Property vhost_user_blk_properties[] = {
++    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
++    DEFINE_PROP_UINT16("num_queues", VHostUserBlk, num_queues, 1),
++    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue_size, 128),
++    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SIZE_MAX, true),
++    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SIZE_MAX, true),
++    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SEG_MAX, true),
++    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_GEOMETRY, true),
++    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_RO, false),
++    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_BLK_SIZE, true),
++    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_TOPOLOGY, true),
++    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_MQ, true),
++    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_FLUSH, true),
++    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_BARRIER, false),
++    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_SCSI, false),
++    DEFINE_PROP_BIT64("f_wce", VHostUserBlk, host_features,
++                      VIRTIO_BLK_F_WCE, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++
++    dc->props = vhost_user_blk_properties;
++    dc->vmsd = &vmstate_vhost_user_blk;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    vdc->realize = vhost_user_blk_device_realize;
++    vdc->unrealize = vhost_user_blk_device_unrealize;
++    vdc->get_config = vhost_user_blk_update_config;
++    vdc->set_config = vhost_user_blk_set_config;
++    vdc->get_features = vhost_user_blk_get_features;
++    vdc->set_status = vhost_user_blk_set_status;
++}
++
++static const TypeInfo vhost_user_blk_info = {
++    .name = TYPE_VHOST_USER_BLK,
++    .parent = TYPE_VIRTIO_DEVICE,
++    .instance_size = sizeof(VHostUserBlk),
++    .instance_init = vhost_user_blk_instance_init,
++    .class_init = vhost_user_blk_class_init,
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&vhost_user_blk_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 8b0d6b6..be9a992 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2012,6 +2012,58 @@ static const TypeInfo virtio_blk_pci_info = {
+     .class_init    = virtio_blk_pci_class_init,
  };
  
- int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-@@ -106,4 +114,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
-                           struct vhost_vring_file *file);
++#ifdef CONFIG_VHOST_USER_BLK
++/* vhost-user-blk */
++
++static Property vhost_user_blk_pci_properties[] = {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_user_blk_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_user_blk_pci_properties;
++    k->realize = vhost_user_blk_pci_realize;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_user_blk_pci_instance_init(Object *obj)
++{
++    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_BLK);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const TypeInfo vhost_user_blk_pci_info = {
++    .name           = TYPE_VHOST_USER_BLK_PCI,
++    .parent         = TYPE_VIRTIO_PCI,
++    .instance_size  = sizeof(VHostUserBlkPCI),
++    .instance_init  = vhost_user_blk_pci_instance_init,
++    .class_init     = vhost_user_blk_pci_class_init,
++};
++#endif
++
+ /* virtio-scsi-pci */
  
- int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
-+int vhost_dev_get_config(struct vhost_dev *dev, uint8_t *config,
-+                         size_t config_len);
-+int vhost_dev_set_config(struct vhost_dev *dev, const uint8_t *config,
-+                         size_t config_len);
-+/* notifier callback in case vhost device config space changed
-+ */
-+int vhost_dev_set_config_notifier(struct vhost_dev *dev,
-+                                  const VhostDevConfigOps *ops);
+ static Property virtio_scsi_pci_properties[] = {
+@@ -2658,6 +2710,9 @@ static void virtio_pci_register_types(void)
+     type_register_static(&virtio_9p_pci_info);
  #endif
+     type_register_static(&virtio_blk_pci_info);
++#ifdef CONFIG_VHOST_USER_BLK
++    type_register_static(&vhost_user_blk_pci_info);
++#endif
+     type_register_static(&virtio_scsi_pci_info);
+     type_register_static(&virtio_balloon_pci_info);
+     type_register_static(&virtio_serial_pci_info);
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 69f5959..19a0d01 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -27,6 +27,9 @@
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
+ #include "hw/virtio/vhost-user-scsi.h"
++#ifdef CONFIG_VHOST_USER_BLK
++#include "hw/virtio/vhost-user-blk.h"
++#endif
+ 
+ #ifdef CONFIG_VIRTFS
+ #include "hw/9pfs/virtio-9p.h"
+@@ -46,6 +49,7 @@ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
++typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+@@ -241,6 +245,20 @@ struct VHostUserSCSIPCI {
+     VHostUserSCSI vdev;
+ };
+ 
++#ifdef CONFIG_VHOST_USER_BLK
++/*
++ * vhost-user-blk-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci"
++#define VHOST_USER_BLK_PCI(obj) \
++        OBJECT_CHECK(VHostUserBlkPCI, (obj), TYPE_VHOST_USER_BLK_PCI)
++
++struct VHostUserBlkPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserBlk vdev;
++};
++#endif
++
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+new file mode 100644
+index 0000000..77d20f0
+--- /dev/null
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -0,0 +1,40 @@
++/*
++ * vhost-user-blk host device
++ * Copyright IBM, Corp. 2011
++ * Copyright(C) 2017 Intel Corporation.
++ *
++ * Authors:
++ *  Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
++ *  Changpeng Liu <changpeng.liu@intel.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#ifndef VHOST_USER_BLK_H
++#define VHOST_USER_BLK_H
++
++#include "standard-headers/linux/virtio_blk.h"
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/block/block.h"
++#include "chardev/char-fe.h"
++#include "hw/virtio/vhost.h"
++
++#define TYPE_VHOST_USER_BLK "vhost-user-blk"
++#define VHOST_USER_BLK(obj) \
++        OBJECT_CHECK(VHostUserBlk, (obj), TYPE_VHOST_USER_BLK)
++
++typedef struct VHostUserBlk {
++    VirtIODevice parent_obj;
++    CharBackend chardev;
++    int32_t bootindex;
++    uint64_t host_features;
++    struct virtio_blk_config blkcfg;
++    uint16_t num_queues;
++    uint32_t queue_size;
++    struct vhost_dev dev;
++} VHostUserBlk;
++
++#endif
 -- 
 1.9.3
