@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dfeVA-0004rn-GC
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 23:51:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1dff6q-0002Ne-IT
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 00:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dfeV6-0003bS-Ja
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 23:51:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dfeV6-0003ax-Cj
-	for qemu-devel@nongnu.org; Wed, 09 Aug 2017 23:51:12 -0400
-References: <1C4DF81E-D39F-42E2-9D0C-5D76819662A4@gmail.com>
-	<9a34ac74-d96f-bd9c-7666-b02e2f8accba@redhat.com>
-	<613DA9EA-28E9-426C-8A9A-5D4805A46E2C@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b3f776c4-5ea9-5771-8863-6308d4b186bb@redhat.com>
-Date: Thu, 10 Aug 2017 05:51:07 +0200
+	(envelope-from <bounces@canonical.com>) id 1dff6k-0004o0-Og
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 00:30:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37643)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dff6k-0004nU-IJ
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 00:30:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dff6i-0008HT-Nq
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 04:30:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B2CC72E80C7
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 04:30:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <613DA9EA-28E9-426C-8A9A-5D4805A46E2C@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] No video for Windows 2000 guest
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 10 Aug 2017 04:17:22 -0000
+From: Launchpad Bug Tracker <904308@bugs.launchpad.net>
+Reply-To: Bug 904308 <904308@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111214154735.7533.86725.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150233864450.628.12920079144031036890.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 904308] Re: x86: BT/BTS/BTR/BTC: ZF flag is
+ unaffected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +37,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, ehabkost@redhat.com, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 09.08.2017 20:12, Programmingkid wrote:
-> 
->> On Aug 9, 2017, at 12:37 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 09/08/2017 16:56, Programmingkid wrote:
->>> The default vga card not longer works with a Windows 2000 guest. All I see is a black screen after a the Windows splash screen.
->>>
->>> This is the command-line I used: 
->>>
->>> qemu-system-i386 -hda Windows2000HD.qcow2 -boot c -m 512
->>>
->>> When using the -vga cirrus option video works. Testing was done with QEMU v2.10.0 rc2. 
->>
->> Did it work in 2.9?
->>
->> Paolo
-> 
-> I haven't test version QEMU 2.9.0 but I did test version 2.8.0 and it has the same problem. Starting up Windows 2000 in VGA mode allowed me to access the operating system. Found out QEMU's default video controller is not recognized. In the Device Manager I can see a yellow question mark for Video Controller (VGA Compatible). I remember Windows 2000 being able to use the default video card in QEMU in the past. I may be able to bisect this issue after all.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-I guess you'll end up with QEMU 2.1 as good version and 2.2 as the first
-"bad" version. According the qemu-doc:
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
--vga type
+-- =
 
-    Select type of VGA card to emulate. Valid values for type are
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/904308
 
-    cirrus
+Title:
+  x86: BT/BTS/BTR/BTC: ZF flag is unaffected
 
-        Cirrus Logic GD5446 Video card. All Windows versions starting
-        from Windows 95 should recognize and use this graphic card. For
-        optimal performances, use 16 bit color depth in the guest and
-        the host OS. (This card was the default before QEMU 2.2)
+Status in QEMU:
+  Expired
 
-    std
+Bug description:
+  Hello!
 
-        Standard VGA card with Bochs VBE extensions. If your guest OS
-        supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if
-        you want to use high resolution modes (>= 1280x1024x16) then you
-        should use this option. (This card is the default since QEMU
-        2.2)
+  Bug was found in qemu.git.
+  See target-i386/translate.c:
 
-Everything is in the documentation ;-)
+      case 0x1ba: /* bt/bts/btr/btc Gv, im */
+          ot =3D dflag + OT_WORD;
+          modrm =3D ldub_code(s->pc++);
+          op =3D (modrm >> 3) & 7;
+          mod =3D (modrm >> 6) & 3;
+          rm =3D (modrm & 7) | REX_B(s);
+          if (mod !=3D 3) {
+              s->rip_offset =3D 1;
+              gen_lea_modrm(s, modrm, &reg_addr, &offset_addr);
+              gen_op_ld_T0_A0(ot + s->mem_index);
+          } else {
+              gen_op_mov_TN_reg(ot, 0, rm);
+          }
+          /* load shift */
+          val =3D ldub_code(s->pc++);
+          gen_op_movl_T1_im(val);
+          if (op < 4)
+              goto illegal_op;
+          op -=3D 4;
+          goto bt_op;
+      case 0x1a3: /* bt Gv, Ev */
+          op =3D 0;
+          goto do_btx;
+      case 0x1ab: /* bts */
+          op =3D 1;
+          goto do_btx;
+      case 0x1b3: /* btr */
+          op =3D 2;
+          goto do_btx;
+      case 0x1bb: /* btc */
+          op =3D 3;
+      do_btx:
+          ot =3D dflag + OT_WORD;
+          modrm =3D ldub_code(s->pc++);
+          reg =3D ((modrm >> 3) & 7) | rex_r;
+          mod =3D (modrm >> 6) & 3;
+          rm =3D (modrm & 7) | REX_B(s);
+          gen_op_mov_TN_reg(OT_LONG, 1, reg);
+          if (mod !=3D 3) {
+              gen_lea_modrm(s, modrm, &reg_addr, &offset_addr);
+              /* specific case: we need to add a displacement */
+              gen_exts(ot, cpu_T[1]);
+              tcg_gen_sari_tl(cpu_tmp0, cpu_T[1], 3 + ot);
+              tcg_gen_shli_tl(cpu_tmp0, cpu_tmp0, ot);
+              tcg_gen_add_tl(cpu_A0, cpu_A0, cpu_tmp0);
+              gen_op_ld_T0_A0(ot + s->mem_index);
+          } else {
+              gen_op_mov_TN_reg(ot, 0, rm);
+          }
+      bt_op:
+          tcg_gen_andi_tl(cpu_T[1], cpu_T[1], (1 << (3 + ot)) - 1);
+          switch(op) {
+          case 0:
+              tcg_gen_shr_tl(cpu_cc_src, cpu_T[0], cpu_T[1]);
+              tcg_gen_movi_tl(cpu_cc_dst, 0);                              =
+ <<<<<<<<<<<<<<<<<<<<<< always set zf
+              break;
+          case 1:
+              tcg_gen_shr_tl(cpu_tmp4, cpu_T[0], cpu_T[1]);
+              tcg_gen_movi_tl(cpu_tmp0, 1);
+              tcg_gen_shl_tl(cpu_tmp0, cpu_tmp0, cpu_T[1]);
+              tcg_gen_or_tl(cpu_T[0], cpu_T[0], cpu_tmp0);
+              break;
+          case 2:
+              tcg_gen_shr_tl(cpu_tmp4, cpu_T[0], cpu_T[1]);
+              tcg_gen_movi_tl(cpu_tmp0, 1);
+              tcg_gen_shl_tl(cpu_tmp0, cpu_tmp0, cpu_T[1]);
+              tcg_gen_not_tl(cpu_tmp0, cpu_tmp0);
+              tcg_gen_and_tl(cpu_T[0], cpu_T[0], cpu_tmp0);
+              break;
+          default:
+          case 3:
+              tcg_gen_shr_tl(cpu_tmp4, cpu_T[0], cpu_T[1]);
+              tcg_gen_movi_tl(cpu_tmp0, 1);
+              tcg_gen_shl_tl(cpu_tmp0, cpu_tmp0, cpu_T[1]);
+              tcg_gen_xor_tl(cpu_T[0], cpu_T[0], cpu_tmp0);
+              break;
+          }
+          s->cc_op =3D CC_OP_SARB + ot;
+          if (op !=3D 0) {
+              if (mod !=3D 3)
+                  gen_op_st_T0_A0(ot + s->mem_index);
+              else
+                  gen_op_mov_reg_T0(ot, rm);
+              tcg_gen_mov_tl(cpu_cc_src, cpu_tmp4);
+              tcg_gen_movi_tl(cpu_cc_dst, 0);                           <<<=
+<<<<<<<<<<<<<<<<<<< always set zf
+          }
+          break;
 
- Thomas
+  always set zf...
+
+  There is fixed patch.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/904308/+subscriptions
