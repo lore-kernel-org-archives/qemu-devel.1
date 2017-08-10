@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dfwv2-0000KS-5K
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 19:31:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1dfxEj-00041U-Qd
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 19:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dfwuy-0001S1-W6
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 19:31:12 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33703)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dfwuy-0001QN-O9
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 19:31:08 -0400
-Received: by mail-lf0-x242.google.com with SMTP id 65so1382587lfa.0
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 16:31:08 -0700 (PDT)
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Fri, 11 Aug 2017 02:30:59 +0300
-Message-Id: <1502407863-23182-1-git-send-email-zuban32s@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1dfxEf-0004uL-S2
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 19:51:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dfxEf-0004tk-Lz
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 19:51:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dfxEd-0007an-CS
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 23:51:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5010A2E80CB
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 23:51:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 0/4] Generic PCIE-PCI Bridge
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 10 Aug 2017 23:42:55 -0000
+From: John Arbuckle <programmingkidx@gmail.com>
+Reply-To: Bug 1706296 <1706296@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
+Message-Id: <150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
+ /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
+ (!qemu_mutex_iothread_locked())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +39,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com, seabios@seabios.org, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-This series introduces a new device - Generic PCI Express to PCI bridge,
-and also makes all necessary changes to enable hotplug of the bridge itself
-and any device into the bridge.
+Using '-cpu 486' gets past the assertion error. I guess Windows NT 4.0
+is not compatible with newer Intel processors.
 
-Changes v4->v5:
-1. Change PCIE-PCI Bridge license (addresses Marcel's comment)
-2. The capability layout changes (adress Laszlo' comments): 
-    - separate pref_mem into pref_mem_32 and pref_mem_64 fields (SeaBIOS side has the same changes)
-    - accordingly change the Generic Root Port's properties
-3. Do not add the capability to the root port if no valid values are provided (adresses Michael's comment)
-4. Rename the capability type to 'RESOURCE_RESERVE' (addresses Marcel's comment)
-5. Remove shpc_present check function (addresses Marcel's comment)
-6. Fix the 4th patch message (adresses Michael's comment)
-7. Patch for SHPC enabling in _OSC method has been already merged
+Currently I can install Windows NT 4.0, but booting from the
+installation has its problems. It won't boot unless you use the NTFS
+file system. Even with this file system I still see a BSOD that states
+INACCESSIBLE_BOOT_DEVICE. Not sure what is wrong. Switching to a SCSI
+controller didn't help.
 
-Changes v3->v4:
-1. PCIE-PCI Bridge device: "msi_enable"->"msi", "shpc"->"shpc_bar", remove local_err,
-   make "msi" property OnOffAuto, shpc_present() is still here 
-   to avoid SHPC_VMSTATE refactoring (address Marcel's comments). 
-2. Change QEMU PCI capability layout (SeaBIOS side has the same changes):
-  - change reservation fields types: bus_res - uint32_t, others - uint64_t
-  - rename 'non_pref' and 'pref' fields
-  - interpret -1 value as 'ignore'
-3. Use parent_realize in Generic PCI Express Root Port properly.
-4. Fix documentation: fully replace the DMI-PCI bridge references with the new PCIE-PCI bridge,
-"PCIE"->"PCI Express", small mistakes and typos - address Laszlo's and Marcel's comments.
-5. Rename QEMU PCI cap creation fucntion - addresses Marcel's comment.
+-- =
 
-Changes v2->v3:
-(0). 'do_not_use' capability field flag is still _not_ in here since we haven't come to consesus on it yet.
-1. Merge commits 5 (bus_reserve property creation) and 6 (property usage) together - addresses Michael's comment.
-2. Add 'bus_reserve' property and QEMU PCI capability only to Generic PCIE Root Port - addresses Michael's and Marcel's comments.
-3. Change 'bus_reserve' property's default value to 0 - addresses Michael's comment.
-4. Rename QEMU bridge-specific PCI capability creation function - addresses Michael's comment.
-5. Init the whole QEMU PCI capability with zeroes - addresses Michael's and Laszlo's comments.
-6. Change QEMU PCI capability layout (SeaBIOS side has the same changes)
-  - add 'type' field to distinguish multiple 
-    RedHat-specific capabilities - addresses Michael's comment
-  - do not mimiс PCI Config space register layout, but use mutually exclusive differently
-    sized fields for IO and prefetchable memory limits - addresses Laszlo's comment
-7. Correct error handling in PCIE-PCI bridge realize function.
-8. Replace a '2' constant with PCI_CAP_FLAGS in the capability creation function - addresses Michael's comment.
-9. Remove a comment on _OSC which isn't correct anymore - address Marcel's comment.
-10. Add documentation for the Generic PCIE-PCI Bridge and QEMU PCI capability - addresses Michael's comment.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706296
 
-Changes v1->v2:
-1. Enable SHPC for the bridge.
-2. Enable SHPC support for the Q35 machine (ACPI stuff).
-3. Introduce PCI capability to help firmware on the system init.
-   This allows the bridge to be hotpluggable. Now it's supported 
-   only for pcie-root-port. Now it's supposed to used with 
-   SeaBIOS only, look at the SeaBIOS corresponding series
-   "Allow RedHat PCI bridges reserve more buses than necessary during init".
+Title:
+  Booting NT 4 disk causes
+  /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion
+  failed: (!qemu_mutex_iothread_locked())
 
-Aleksandr Bezzubikov (4):
-  hw/pci: introduce pcie-pci-bridge device
-  hw/pci: introduce bridge-only vendor-specific capability to provide
-    some hints to firmware
-  hw/pci: add QEMU-specific PCI capability to the Generic PCI Express
-    Root Port
-  docs: update documentation considering PCIE-PCI bridge
+Status in QEMU:
+  New
 
- docs/pcie.txt                      |  49 +++++-----
- docs/pcie_pci_bridge.txt           | 115 ++++++++++++++++++++++
- hw/pci-bridge/Makefile.objs        |   2 +-
- hw/pci-bridge/gen_pcie_root_port.c |  36 +++++++
- hw/pci-bridge/pcie_pci_bridge.c    | 192 +++++++++++++++++++++++++++++++++++++
- hw/pci/pci_bridge.c                |  54 +++++++++++
- include/hw/pci/pci.h               |   1 +
- include/hw/pci/pci_bridge.h        |  24 +++++
- include/hw/pci/pcie_port.h         |   1 +
- 9 files changed, 450 insertions(+), 24 deletions(-)
- create mode 100644 docs/pcie_pci_bridge.txt
- create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
+Bug description:
+  Grab the NT 4 disk from
+  https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-0=
+75
+  -385_CD-KEY_419-1343253_1996
 
--- 
-2.7.4
+  Try to boot it as follows:
+
+  qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Versi=
+on_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,=
+accel=3Dtcg
+  WARNING: Image format was not specified for 'disk.img' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
+  **
+  ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion=
+ failed: (!qemu_mutex_iothread_locked())
+  Aborted (core dumped)
+
+  The stack trace in the failing thread is:
+
+  Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
+  #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
+  #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
+  #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so=
+.0
+  #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
+      at /lib64/libglib-2.0.so.0
+  #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
+      at /home/rjones/d/qemu/cpus.c:1580
+  #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, io=
+tlbentry=3D0x55555675b678, =
+
+      iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@=
+entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsiz=
+e@entry=3D4)
+      at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
+  #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D214=
+8532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
+      at /home/rjones/d/qemu/softmmu_template.h:265
+  #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x55555675=
+1400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized =
+out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/s=
+oftmmu_template.h:300
+  #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
+2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_lds=
+t_template.h:182
+  #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>=
+, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, int=
+no=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i=
+386/seg_helper.c:758
+  #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x555556749=
+170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, nex=
+t_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/ta=
+rget/i386/seg_helper.c:1252
+  #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
+      at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
+  #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>=
+, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
+  #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
+      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
+  #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
+      at /home/rjones/d/qemu/cpus.c:1270
+  #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
+>)
+      at /home/rjones/d/qemu/cpus.c:1365
+  #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
+  #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706296/+subscriptions
