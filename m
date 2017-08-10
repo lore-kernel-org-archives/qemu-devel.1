@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dfmNg-0005tn-6k
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:16:06 -0400
+	(envelope-from <groug@kaod.org>) id 1dfmSk-0007QP-2I
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dfmNc-0001ok-4A
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:16:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56715
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dfmNb-0001oL-UB
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:16:00 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7ACE0I8135084
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 08:15:59 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2c8m4a19fv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 08:15:58 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Thu, 10 Aug 2017 06:15:57 -0600
-References: <20170809204346.5220-1-danielhb@linux.vnet.ibm.com>
-	<20170810005256.GS13670@umbus.fritz.box>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Thu, 10 Aug 2017 09:15:47 -0300
+	(envelope-from <groug@kaod.org>) id 1dfmSg-000450-PV
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:21:18 -0400
+Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:40606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dfmSg-00044I-FR
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 08:21:14 -0400
+Received: from player694.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C4EE0863A5
+	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 14:21:10 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 10 Aug 2017 14:21:04 +0200
+Message-ID: <150236766413.25933.15038553262682443771.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <20170810005256.GS13670@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <2d973303-c75d-7ec8-51d7-2ffaae6d17dd@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: 'PVR != host PVR'
- in KVM_SET_SREGS workaround
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [for-2.10 PATCH v6] 9pfs: local: fix
+ fchmodat_nofollow() limitations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,164 +28,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: zhiyong.wu@ucloud.cn, Michael Tokarev <mjt@tls.msk.ru>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+This function has to ensure it doesn't follow a symlink that could be use=
+d
+to escape the virtfs directory. This could be easily achieved if fchmodat=
+()
+on linux honored the AT_SYMLINK_NOFOLLOW flag as described in POSIX, but
+it doesn't. There was a tentative to implement a new fchmodat2() syscall
+with the correct semantics:
 
+https://patchwork.kernel.org/patch/9596301/
 
-On 08/09/2017 09:52 PM, David Gibson wrote:
-> On Wed, Aug 09, 2017 at 05:43:46PM -0300, Daniel Henrique Barboza wrote:
->> Commit d5fc133eed ("ppc: Rework CPU compatibility testing
->> across migration") changed the way cpu_post_load behaves with
->> the PVR setting, causing an unexpected bug in KVM-HV migrations
->> between hosts that are compatible (POWER8 and POWER8E, for example).
->> Even with pvr_match() returning true, the guest freezes right after
->> cpu_post_load. The reason is that the guest kernel can't handle a
->> different PVR value other that the running host in KVM_SET_SREGS.
->>
->> In [1] it was discussed the possibility of a new KVM capability
->> that would indicate that the guest kernel can handle a different
->> PVR in KVM_SET_SREGS. Even if such feature is implemented, there is
->> still the problem with older kernels that will not have this capability
->> and will fail to migrate.
->>
->> This patch implements a workaround for that scenario. If running
->> with KVM, check if the guest kernel does not have the capability
->> (named here as 'cap_ppc_pvr_compat'). If it doesn't, calls
->> kvmppc_is_pr() to see if the guest is running in KVM-HV. If all this
->> happens, set env->spr[SPR_PVR] to the same value as the current
->> host PVR. This ensures that we allow migrations with 'close enough'
->> PVRs to still work in KVM-HV but also makes the code ready for
->> this new KVM capability when it is done.
->>
->> A new function called 'kvmppc_pvr_workaround_required' was created
->> to encapsulate the conditions said above and to avoid calling too
->> many kvm.c internals inside cpu_post_load.
->>
->> [1] https://lists.gnu.org/archive/html/qemu-ppc/2017-06/msg00503.html
->>
->> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> Ugly, but necessary.  Applied to ppc-for-2.10.
-Definitely not my finest hour either.
+but it didn't gain much momentum. Also it was suggested to look at an O_P=
+ATH
+based solution in the first place.
 
-Hopefully when we start looking at P8 -> P9 migrations we can clean this up
-or make it less ugly.
+The current implementation covers most use-cases, but it notably fails if=
+:
+- the target path has access rights equal to 0000 (openat() returns EPERM=
+),
+  =3D> once you've done chmod(0000) on a file, you can never chmod() agai=
+n
+- the target path is UNIX domain socket (openat() returns ENXIO)
+  =3D> bind() of UNIX domain sockets fails if the file is on 9pfs
 
+The solution is to use O_PATH: openat() now succeeds in both cases, and w=
+e
+can ensure the path isn't a symlink with fstat(). The associated entry in
+"/proc/self/fd" can hence be safely passed to the regular chmod() syscall=
+.
 
-Daniel
+The previous behavior is kept for older systems that don't have O_PATH.
 
->
->> ---
->>   target/ppc/kvm.c     | 34 ++++++++++++++++++++++++++++++++++
->>   target/ppc/kvm_ppc.h |  1 +
->>   target/ppc/machine.c | 22 ++++++++++++++++++++++
->>   3 files changed, 57 insertions(+)
->>
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index 8571379..fb3ee43 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -90,6 +90,7 @@ static int cap_htm;             /* Hardware transactional memory support */
->>   static int cap_mmu_radix;
->>   static int cap_mmu_hash_v3;
->>   static int cap_resize_hpt;
->> +static int cap_ppc_pvr_compat;
->>   
->>   static uint32_t debug_inst_opcode;
->>   
->> @@ -147,6 +148,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>       cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
->>       cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
->>       cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
->> +    /*
->> +     * Note: setting it to false because there is not such capability
->> +     * in KVM at this moment.
->> +     *
->> +     * TODO: call kvm_vm_check_extension() with the right capability
->> +     * after the kernel starts implementing it.*/
->> +    cap_ppc_pvr_compat = false;
->>   
->>       if (!cap_interrupt_level) {
->>           fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
->> @@ -2785,3 +2793,29 @@ void kvmppc_update_sdr1(target_ulong sdr1)
->>           run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
->>       }
->>   }
->> +
->> +/*
->> + * This is a helper function to detect a post migration scenario
->> + * in which a guest, running as KVM-HV, freezes in cpu_post_load because
->> + * the guest kernel can't handle a PVR value other than the actual host
->> + * PVR in KVM_SET_SREGS, even if pvr_match() returns true.
->> + *
->> + * If we don't have cap_ppc_pvr_compat and we're not running in PR
->> + * (so, we're HV), return true. The workaround itself is done in
->> + * cpu_post_load.
->> + *
->> + * The order here is important: we'll only check for KVM PR as a
->> + * fallback if the guest kernel can't handle the situation itself.
->> + * We need to avoid as much as possible querying the running KVM type
->> + * in QEMU level.
->> + */
->> +bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
->> +{
->> +    CPUState *cs = CPU(cpu);
->> +
->> +    if (cap_ppc_pvr_compat) {
->> +        return false;
->> +    }
->> +
->> +    return !kvmppc_is_pr(cs->kvm_state);
->> +}
->> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
->> index 6bc6fb3..381afe6 100644
->> --- a/target/ppc/kvm_ppc.h
->> +++ b/target/ppc/kvm_ppc.h
->> @@ -67,6 +67,7 @@ void kvmppc_check_papr_resize_hpt(Error **errp);
->>   int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
->>   int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
->>   void kvmppc_update_sdr1(target_ulong sdr1);
->> +bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
->>   
->>   bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
->>   
->> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
->> index f578156..e545885 100644
->> --- a/target/ppc/machine.c
->> +++ b/target/ppc/machine.c
->> @@ -9,6 +9,7 @@
->>   #include "mmu-hash64.h"
->>   #include "migration/cpu.h"
->>   #include "qapi/error.h"
->> +#include "kvm_ppc.h"
->>   
->>   static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
->>   {
->> @@ -250,6 +251,27 @@ static int cpu_post_load(void *opaque, int version_id)
->>           }
->>       }
->>   
->> +    /*
->> +     * If we're running with KVM HV, there is a chance that the guest
->> +     * is running with KVM HV and its kernel does not have the
->> +     * capability of dealing with a different PVR other than this
->> +     * exact host PVR in KVM_SET_SREGS. If that happens, the
->> +     * guest freezes after migration.
->> +     *
->> +     * The function kvmppc_pvr_workaround_required does this verification
->> +     * by first checking if the kernel has the cap, returning true immediately
->> +     * if that is the case. Otherwise, it checks if we're running in KVM PR.
->> +     * If the guest kernel does not have the cap and we're not running KVM-PR
->> +     * (so, it is running KVM-HV), we need to ensure that KVM_SET_SREGS will
->> +     * receive the PVR it expects as a workaround.
->> +     *
->> +     */
->> +#if defined(CONFIG_KVM)
->> +    if (kvmppc_pvr_workaround_required(cpu)) {
->> +        env->spr[SPR_PVR] = env->spr_cb[SPR_PVR].default_value;
->> +    }
->> +#endif
->> +
->>       env->lr = env->spr[SPR_LR];
->>       env->ctr = env->spr[SPR_CTR];
->>       cpu_write_xer(env, env->spr[SPR_XER]);
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Zhi Yong Wu <zhiyong.wu@ucloud.cn>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+v6: - refactored some code as suggested by Philippe
+
+v5: - added missing fd =3D=3D -1 check
+
+v4: - fixed #if condition
+    - moved out: label above #endif
+    - fixed typo in changelog
+    - added Eric's r-b
+
+v3: - O_PATH in a separate block of code
+    - added a reference to the fchmodat2() tentative in the changelog
+
+v2: - renamed OPENAT_DIR_O_PATH to O_PATH_9P_UTIL and use it as a replace=
+ment
+      for O_PATH to avoid build breaks on O_PATH-less systems
+    - keep current behavior for O_PATH-less systems
+    - added comments
+    - TODO in 2.11: add _nofollow suffix to openat_dir() and openat_file(=
+)
+---
+ hw/9pfs/9p-local.c |   42 +++++++++++++++++++++++++++++++++++-------
+ hw/9pfs/9p-util.h  |   24 +++++++++++++++---------
+ 2 files changed, 50 insertions(+), 16 deletions(-)
+
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 6e478f4765ef..efb0b79a74bf 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -333,17 +333,27 @@ update_map_file:
+=20
+ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+ {
++    struct stat stbuf;
+     int fd, ret;
+=20
+     /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
+-     * Unfortunately, the linux kernel doesn't implement it yet. As an
+-     * alternative, let's open the file and use fchmod() instead. This
+-     * may fail depending on the permissions of the file, but it is the
+-     * best we can do to avoid TOCTTOU. We first try to open read-only
+-     * in case name points to a directory. If that fails, we try write-o=
+nly
+-     * in case name doesn't point to a directory.
++     * Unfortunately, the linux kernel doesn't implement it yet.
+      */
+-    fd =3D openat_file(dirfd, name, O_RDONLY, 0);
++
++     /* First, we clear non-racing symlinks out of the way. */
++    if (fstatat(dirfd, name, &stbuf, AT_SYMLINK_NOFOLLOW)) {
++        return -1;
++    }
++    if (S_ISLNK(stbuf.st_mode)) {
++        errno =3D ELOOP;
++        return -1;
++    }
++
++    /* Access modes are ignored when O_PATH is supported. We try O_RDONL=
+Y and
++     * O_WRONLY for old-systems that don't support O_PATH.
++     */
++    fd =3D openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
++#if O_PATH_9P_UTIL =3D=3D 0
+     if (fd =3D=3D -1) {
+         /* In case the file is writable-only and isn't a directory. */
+         if (errno =3D=3D EACCES) {
+@@ -357,6 +367,24 @@ static int fchmodat_nofollow(int dirfd, const char *=
+name, mode_t mode)
+         return -1;
+     }
+     ret =3D fchmod(fd, mode);
++#else
++    if (fd =3D=3D -1) {
++        return -1;
++    }
++
++    /* Now we handle racing symlinks. */
++    ret =3D fstat(fd, &stbuf);
++    if (!ret) {
++        if (S_ISLNK(stbuf.st_mode)) {
++            errno =3D ELOOP;
++            ret =3D -1;
++        } else {
++            char *proc_path =3D g_strdup_printf("/proc/self/fd/%d", fd);
++            ret =3D chmod(proc_path, mode);
++            g_free(proc_path);
++        }
++    }
++#endif
+     close_preserve_errno(fd);
+     return ret;
+ }
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 91299a24b8af..dc0d2e29aa3b 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -13,6 +13,12 @@
+ #ifndef QEMU_9P_UTIL_H
+ #define QEMU_9P_UTIL_H
+=20
++#ifdef O_PATH
++#define O_PATH_9P_UTIL O_PATH
++#else
++#define O_PATH_9P_UTIL 0
++#endif
++
+ static inline void close_preserve_errno(int fd)
+ {
+     int serrno =3D errno;
+@@ -22,13 +28,8 @@ static inline void close_preserve_errno(int fd)
+=20
+ static inline int openat_dir(int dirfd, const char *name)
+ {
+-#ifdef O_PATH
+-#define OPENAT_DIR_O_PATH O_PATH
+-#else
+-#define OPENAT_DIR_O_PATH 0
+-#endif
+     return openat(dirfd, name,
+-                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | OPENAT_DIR_O_PAT=
+H);
++                  O_DIRECTORY | O_RDONLY | O_NOFOLLOW | O_PATH_9P_UTIL);
+ }
+=20
+ static inline int openat_file(int dirfd, const char *name, int flags,
+@@ -43,9 +44,14 @@ static inline int openat_file(int dirfd, const char *n=
+ame, int flags,
+     }
+=20
+     serrno =3D errno;
+-    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
+-    ret =3D fcntl(fd, F_SETFL, flags);
+-    assert(!ret);
++    /* O_NONBLOCK was only needed to open the file. Let's drop it. We do=
+n't
++     * do that with O_PATH since fcntl(F_SETFL) isn't supported, and ope=
+nat()
++     * ignored it anyway.
++     */
++    if (!(flags & O_PATH_9P_UTIL)) {
++        ret =3D fcntl(fd, F_SETFL, flags);
++        assert(!ret);
++    }
+     errno =3D serrno;
+     return fd;
+ }
