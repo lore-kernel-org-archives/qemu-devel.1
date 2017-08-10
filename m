@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjma-0000H9-9r
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:29:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dfjnN-0000vq-SQ
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:30:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjmU-0008ND-9G
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:29:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24434)
+	(envelope-from <pbonzini@redhat.com>) id 1dfjnL-0000da-9n
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:30:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27637)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfjmU-0008Mq-37
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:29:30 -0400
-References: <1502359951-29160-1-git-send-email-changpeng.liu@intel.com>
-	<1502359951-29160-3-git-send-email-changpeng.liu@intel.com>
-	<20170809194506-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfjnL-0000Zz-3O
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:30:23 -0400
+References: <alpine.DEB.2.20.1708100023050.9262@digraph.polyomino.org.uk>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c3de58a9-a701-958d-b3c1-a7bec93e8c5e@redhat.com>
-Date: Thu, 10 Aug 2017 11:29:22 +0200
+Message-ID: <dd099cc0-1b3a-3371-e8f6-8500a2532490@redhat.com>
+Date: Thu, 10 Aug 2017 11:30:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170809194506-mutt-send-email-mst@kernel.org>
+In-Reply-To: <alpine.DEB.2.20.1708100023050.9262@digraph.polyomino.org.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] vhost-user-blk: introduce a new
- vhost-user-blk host device
+Subject: Re: [Qemu-devel] [PATCH] target/i386: fix packusdw in-place
+ operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, stefanha@gmail.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
 
-On 09/08/2017 19:10, Michael S. Tsirkin wrote:
-> So user specifies properties and
-> they get sent to backend at init time. Only handle geometry changes
-> specially.
+On 10/08/2017 02:24, Joseph Myers wrote:
+> The SSE4.1 packusdw instruction combines source and destination
+> vectors of signed 32-bit integers into a single vector of unsigned
+> 16-bit integers, with unsigned saturation.  When the source and
+> destination are the same register, this means each 32-bit element of
+> that register is used twice as an input, to produce two of the 16-bit
+> output elements, and so if the operation is carried out
+> element-by-element in-place, no matter what the order in which it is
+> applied to the elements, the first element's operation will overwrite
+> some future input.  The helper for packssdw avoids this issue by
+> computing the result in a local temporary and copying it to the
+> destination at the end; this patch fixes the packusdw helper to do
+> likewise.  This fixes three gcc test failures in my GCC 6-based
+> testing.
+> 
+> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+> 
+> ---
+> 
+> diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
+> index 16509d0..05b1701 100644
+> --- a/target/i386/ops_sse.h
+> +++ b/target/i386/ops_sse.h
+> @@ -1655,14 +1655,17 @@ SSE_HELPER_Q(helper_pcmpeqq, FCMPEQQ)
+>  
+>  void glue(helper_packusdw, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
+>  {
+> -    d->W(0) = satuw((int32_t) d->L(0));
+> -    d->W(1) = satuw((int32_t) d->L(1));
+> -    d->W(2) = satuw((int32_t) d->L(2));
+> -    d->W(3) = satuw((int32_t) d->L(3));
+> -    d->W(4) = satuw((int32_t) s->L(0));
+> -    d->W(5) = satuw((int32_t) s->L(1));
+> -    d->W(6) = satuw((int32_t) s->L(2));
+> -    d->W(7) = satuw((int32_t) s->L(3));
+> +    Reg r;
+> +
+> +    r.W(0) = satuw((int32_t) d->L(0));
+> +    r.W(1) = satuw((int32_t) d->L(1));
+> +    r.W(2) = satuw((int32_t) d->L(2));
+> +    r.W(3) = satuw((int32_t) d->L(3));
+> +    r.W(4) = satuw((int32_t) s->L(0));
+> +    r.W(5) = satuw((int32_t) s->L(1));
+> +    r.W(6) = satuw((int32_t) s->L(2));
+> +    r.W(7) = satuw((int32_t) s->L(3));
+> +    *d = r;
+>  }
+>  
+>  #define FMINSB(d, s) MIN((int8_t)d, (int8_t)s)
+> 
 
-So QEMU would get the configuration, set these properties, and send the
-result to the backend via SET_CONFIG?
-
-vhost-user-blk-pci.cyls=uint32
-vhost-user-blk-pci.secs=uint32
-vhost-user-blk-pci.heads=uint32
-vhost-user-blk-pci.serial=str
-vhost-user-blk-pci.min_io_size=uint16
-vhost-user-blk-pci.opt_io_size=uint32
-vhost-user-blk-pci.logical_block_size=uint16
-vhost-user-blk-pci.physical_block_size=uint16
-
-If the properties are incompatible (e.g. too small logical block size)
-SET_CONFIG fails and QEMU would fail to realize the device.  This makes
-sense, I think.
-
-Thanks,
+Queued, thanks.
 
 Paolo
