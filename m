@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjZC-0001nN-AF
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:15:47 -0400
+	(envelope-from <famz@redhat.com>) id 1dfjav-0002ek-01
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjZ9-0000eM-3V
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:15:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33098)
+	(envelope-from <famz@redhat.com>) id 1dfjaq-0001s1-6f
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:17:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfjZ8-0000dm-KE
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:15:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8914F24FF4B
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 09:15:41 +0000 (UTC)
-References: <1502354790-16927-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <edcf593a-52c8-bd43-e25d-520e628cedf4@redhat.com>
-Date: Thu, 10 Aug 2017 11:15:37 +0200
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dfjap-0001rX-TB
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:17:28 -0400
+Date: Thu, 10 Aug 2017 17:17:23 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170810091723.GB7003@lemon.lan>
+References: <1502411355-3943-1-git-send-email-wang.yong155@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <1502354790-16927-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add a blog post about
- deprecation of old interfaces and features
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1502411355-3943-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iothread: IOThread supports the
+ GMainContext event loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Daniel Berrange <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Wang yong <wang.yong155@zte.com.cn>
+Cc: pbonzini@redhat.com, stefanha@redhat.com, jasowang@redhat.com, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, wang.guang55@zte.com.cn, qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com
 
-On 10/08/2017 10:46, Thomas Huth wrote:
-> Now that we've got a list of deprecated interfaces/features in the QEMU
-> documentation, it is time to draw some more public attention to our plans
-> of removing certain interfaces/features in future releases.
+On Fri, 08/11 08:29, Wang yong wrote:
+> From: Wang Yong<wang.yong155@zte.com.cn>
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> IOThread uses AioContext event loop and does not run a GMainContext.
+> Therefore,chardev cannot work in IOThread,such as the chardev is
+> used for colo-compare packets reception.
+> 
+> This patch makes the IOThread run the GMainContext event loop,
+> chardev and IOThread can work together.
+> 
+> Signed-off-by: Wang Yong<wang.yong155@zte.com.cn>
+> Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
 > ---
->  v2: Use a link to the qemu-doc instead of pointing to the Wiki
+>  include/sysemu/iothread.h |  1 +
+>  iothread.c                | 13 +++++++++++++
+>  2 files changed, 14 insertions(+)
 > 
->  _posts/2017-08-10-deprecation.md | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->  create mode 100644 _posts/2017-08-10-deprecation.md
-> 
-> diff --git a/_posts/2017-08-10-deprecation.md b/_posts/2017-08-10-deprecation.md
-> new file mode 100644
-> index 0000000..784fb79
-> --- /dev/null
-> +++ b/_posts/2017-08-10-deprecation.md
-> @@ -0,0 +1,26 @@
-> +---
-> +layout: post
-> +title:  "Deprecation of old parameters and features"
-> +date:   2017-08-10 10:45:00 +0200
-> +author: Thomas Huth
-> +categories: [features, 'web site']
-> +---
-> +QEMU has a lot of interfaces (like command line options or HMP commands) and
-> +old features (like certain devices) which are considered as deprecated
-> +since other more generic or better interfaces/features have been established
-> +instead. While the QEMU developers are generally trying to keep each QEMU
-> +release compatible with the previous ones, the old legacy sometimes gets into
-> +the way when developing new code and/or causes quite some burden of maintaining
-> +it.
+> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+> index e6da1a4..ffe4e8a 100644
+> --- a/include/sysemu/iothread.h
+> +++ b/include/sysemu/iothread.h
+> @@ -24,6 +24,7 @@ typedef struct {
+>  
+>      QemuThread thread;
+>      AioContext *ctx;
+> +    GMainLoop *loop;
+>      QemuMutex init_done_lock;
+>      QemuCond init_done_cond;    /* is thread initialization done? */
+>      bool stopping;
+> diff --git a/iothread.c b/iothread.c
+> index beeb870..b6f3c3c 100644
+> --- a/iothread.c
+> +++ b/iothread.c
+> @@ -46,6 +46,7 @@ AioContext *qemu_get_current_aio_context(void)
+>  static void *iothread_run(void *opaque)
+>  {
+>      IOThread *iothread = opaque;
+> +    GMainContext *context;
+>  
+>      rcu_register_thread();
+>  
+> @@ -57,6 +58,15 @@ static void *iothread_run(void *opaque)
+>  
+>      while (!atomic_read(&iothread->stopping)) {
+>          aio_poll(iothread->ctx, true);
 > +
-> +Thus we are currently considering to get rid of some of the old interfaces
-> +and features in a future release and have started to collect a list of such
-> +old items in our
-> +[QEMU documentation](https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features).
-> +If you are running QEMU directly, please have a look at this deprecation
-> +chapter of the QEMU documentation to see whether you are still using one of
-> +these old interfaces or features, so you can adapt your setup to use the new
-> +interfaces/features instead. Or if you rather think that one of the items
-> +should *not* be removed from QEMU at all, please speak up on the
-> +[qemu-devel mailing list](http://wiki.qemu.org/Contribute/MailingLists)
-> +to explain why the interface or feature is still required.
+> +        context = iothread->ctx->source.context;
+> +        if (context) {
+> +            iothread->loop = g_main_loop_new(context, TRUE);
+> +            g_main_loop_run(iothread->loop);
+> +
+> +            g_main_loop_unref(iothread->loop);
+
+Is it better to set iothread->loop to NULL after unref? If in the future a
+second place adds g_main_loop_quit(), it can coordinate with iothread_stop by
+checking iothread->loop == NULL.
+
+> +            g_main_context_unref(context);
+
+Where is the matching g_main_context_ref? I think the one reference in
+iothread->loop goes away with g_main_loop_unref. Is this line unnecessary?
+
+> +        }
+>      }
+>  
+>      rcu_unregister_thread();
+> @@ -72,6 +82,9 @@ static int iothread_stop(Object *object, void *opaque)
+>          return 0;
+>      }
+>      iothread->stopping = true;
+> +    if (iothread->loop) {
+> +        g_main_loop_quit(iothread->loop);
+> +    }
+>      aio_notify(iothread->ctx);
+>      qemu_thread_join(&iothread->thread);
+>      return 0;
+> -- 
+> 1.8.3.1
+> 
+> 
 > 
 
-Pushed, thanks.
+Though I haven't seen the chardev changes yet, the general idea looks good to
+me.
 
-Paolo
+Fam
