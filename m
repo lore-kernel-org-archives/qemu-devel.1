@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfji1-0006lI-4Z
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:24:54 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dfjld-0008FZ-2T
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dfjhw-0005zZ-GF
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:24:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50154)
+	(envelope-from <frederic.konrad@adacore.com>) id 1dfjlb-00081q-QQ
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:28:37 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:45588
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfjhw-0005z9-8w
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:24:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3555A7F7AB
-	for <qemu-devel@nongnu.org>; Thu, 10 Aug 2017 09:24:47 +0000 (UTC)
-References: <1502354790-16927-1-git-send-email-thuth@redhat.com>
-	<20170810092356.GD12980@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d9c9f00d-9da8-10c2-bc9c-4e0a2a0df5e2@redhat.com>
-Date: Thu, 10 Aug 2017 11:24:44 +0200
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dfjlb-00081D-Hw
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 05:28:35 -0400
+References: <1501575048-13485-1-git-send-email-frederic.konrad@adacore.com>
+	<1501575048-13485-3-git-send-email-frederic.konrad@adacore.com>
+	<CAFEAcA__hzcs_wvtYA35F4wAPhgHX0=-z8TJ8uwTSom6zxjN=A@mail.gmail.com>
+	<086e70d6-d5c1-2879-874f-ea1804c6ab38@adacore.com>
+	<20170801093015.GA4859@toto>
+	<48d4b55f-6463-48a8-8ed3-b72110005377@adacore.com>
+	<CAFEAcA_eWCEmXBGNJXAfUjgXwYX10FwxRwd_YNcdtMYXNLAROg@mail.gmail.com>
+	<CAFEAcA-uR+KK9RfTQm8=E6SCeWh-CkY+fua-ByPUHoYQVw=TGQ@mail.gmail.com>
+	<20170810092241.GK4859@toto>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <1e6243a1-90f9-786e-8095-b80294f00e22@adacore.com>
+Date: Thu, 10 Aug 2017 11:28:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170810092356.GD12980@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170810092241.GK4859@toto>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add a blog post about
- deprecation of old interfaces and features
+Subject: Re: [Qemu-devel] [PATCH for-2.10 2/2] xilinx-spips: add a migration
+ blocker when using mmio_execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +38,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 10/08/2017 11:23, Daniel P. Berrange wrote:
-> On Thu, Aug 10, 2017 at 10:46:30AM +0200, Thomas Huth wrote:
->> Now that we've got a list of deprecated interfaces/features in the QEMU
->> documentation, it is time to draw some more public attention to our plans
->> of removing certain interfaces/features in future releases.
+
+
+On 08/10/2017 11:22 AM, Edgar E. Iglesias wrote:
+> On Thu, Aug 10, 2017 at 10:11:13AM +0100, Peter Maydell wrote:
+>> On 1 August 2017 at 10:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> On 1 August 2017 at 10:35, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
+>>>>
+>>>>
+>>>> On 08/01/2017 11:30 AM, Edgar E. Iglesias wrote:
+>>>>> At this stage, perhaps we should just register the blocker when this dev
+>>>>> realizes.
+>>>>>
+>>>>> If a request_ptr comes in during migration, the VM will fail either way...
+>>>
+>>>> Yes but this will breaks migration for the spips device everytime
+>>>> and not only when mmio-execution is used?
+>>>
+>>> This line of thought is why I ended up suggesting just disabling
+>>> the exec-in-place feature -- that way we just don't introduce
+>>> what would be a new-in-2.10 feature, rather than breaking something
+>>> that used to work in 2.9.
 >>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  v2: Use a link to the qemu-doc instead of pointing to the Wiki
+>> OK, so what's the plan here? We have several options:
+>>   * just disable exec-from-spips for 2.10 (I sent a patch for that)
+>>   * disable exec-from-spips for 2.10 but with a device x-property
+>>     to allow the user to turn it on again if they really want it
+>>   * this patch or variants on it which try to only disable
+>>     migration if exec-from-spips is actually used by the guest
+>>     (I don't like these because of the awkward corner cases if
+>>     migration and the guest using exec-from-spips happen at the
+>>     same time)
 >>
->>  _posts/2017-08-10-deprecation.md | 26 ++++++++++++++++++++++++++
->>  1 file changed, 26 insertions(+)
->>  create mode 100644 _posts/2017-08-10-deprecation.md
->>
->> diff --git a/_posts/2017-08-10-deprecation.md b/_posts/2017-08-10-deprecation.md
->> new file mode 100644
->> index 0000000..784fb79
->> --- /dev/null
->> +++ b/_posts/2017-08-10-deprecation.md
->> @@ -0,0 +1,26 @@
->> +---
->> +layout: post
->> +title:  "Deprecation of old parameters and features"
->> +date:   2017-08-10 10:45:00 +0200
->> +author: Thomas Huth
->> +categories: [features, 'web site']
->> +---
->> +QEMU has a lot of interfaces (like command line options or HMP commands) and
->> +old features (like certain devices) which are considered as deprecated
->> +since other more generic or better interfaces/features have been established
->> +instead. While the QEMU developers are generally trying to keep each QEMU
->> +release compatible with the previous ones, the old legacy sometimes gets into
->> +the way when developing new code and/or causes quite some burden of maintaining
->> +it.
->> +
->> +Thus we are currently considering to get rid of some of the old interfaces
->> +and features in a future release and have started to collect a list of such
->> +old items in our
->> +[QEMU documentation](https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features).
+>> So my current view remains "we should just disable this feature
+>> for 2.10 and we can implement it properly with handling of
+>> migration for 2.11", unless somebody cares enough to implement
+>> the x-property thing within the next day or so.
 > 
-> Unrelated to your post - it would be nice to have the qemu docs hosted
-> on qemu.org, and even nicer if someone figures out how to theme them
-> to fit in with the website style instead of being bare black & white
-> pages with no navigation :-)
+> Hi Peter,
+> 
+> I think the x-property sounds good.
+> Fred, would you like to send a patch for that?
+> Otherwise, I can do it later today.
+> 
+> Cheers,
+> Edgar
+> 
 
-My hope is still to host them on readthedocs sooner or later (though
-then they'd have the readthedocs theme).
+Hi,
 
-Paolo
+Ok I will do.
+
+Thanks,
+Fred
