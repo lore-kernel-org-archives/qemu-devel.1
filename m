@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfovz-0004T4-QI
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 10:59:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dfozF-0005m3-Lr
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dfovv-00078t-MD
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 10:59:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11658)
+	(envelope-from <pbonzini@redhat.com>) id 1dfozB-0001Cj-KS
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:03:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dfovv-00077y-EB
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 10:59:35 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dfozB-0001CE-AG
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 11:02:57 -0400
 References: <1502367921-17730-1-git-send-email-armbru@redhat.com>
 	<1502367921-17730-3-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7ce274ba-e487-4f16-4620-8c68a3ace35d@redhat.com>
-Date: Thu, 10 Aug 2017 09:59:31 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b0769260-8342-8a90-8a1e-d6545e0c64a1@redhat.com>
+Date: Thu, 10 Aug 2017 17:02:49 +0200
 MIME-Version: 1.0
 In-Reply-To: <1502367921-17730-3-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4iW21LCQRGgEui893HcaB1BCxJUrJKHk4"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Partial support for non-scalar
  properties with -object
 List-Id: <qemu-devel.nongnu.org>
@@ -30,24 +30,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: el13635@mail.ntua.gr, kwolf@redhat.com, berrange@redhat.com, pbonzini@redhat.com
+Cc: el13635@mail.ntua.gr, kwolf@redhat.com, berrange@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4iW21LCQRGgEui893HcaB1BCxJUrJKHk4
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: el13635@mail.ntua.gr, kwolf@redhat.com, berrange@redhat.com,
- pbonzini@redhat.com
-Message-ID: <7ce274ba-e487-4f16-4620-8c68a3ace35d@redhat.com>
-Subject: Re: [PATCH 2/2] vl: Partial support for non-scalar properties with
- -object
-References: <1502367921-17730-1-git-send-email-armbru@redhat.com>
- <1502367921-17730-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1502367921-17730-3-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/10/2017 07:25 AM, Markus Armbruster wrote:
+On 10/08/2017 14:25, Markus Armbruster wrote:
 > We've wanted -object to support non-scalar properties for a while.
 > Dan Berrange tried in "[PATCH v4 00/10]Provide a QOM-based
 > authorization API".  Review led to the conclusion that we need to
@@ -55,76 +40,149 @@ On 08/10/2017 07:25 AM, Markus Armbruster wrote:
 > has been merged to provide -blockdev (commit 8746709), but there's
 > substantial work left, mostly due to an bewildering array of
 > compatibility problems.
->=20
+> 
 > Even if a full solution is still out of reach, we can have a partial
 > solution now: accept -object argument in JSON syntax.  This should
 > unblock development work that needs non-scalar properties with -object
->=20
-
-Trailing dot?
-
+> 
 > The implementation is similar to -blockdev, except we use the new
 > infrastructure only for the new JSON case, and stick to QemuOpts for
-> the existing KEY=3DVALUE,... case, to sidestep compatibility problems.
->=20
+> the existing KEY=VALUE,... case, to sidestep compatibility problems.
+> 
 > If we did this for more options, we'd have to factor out common code.
 > But for one option, this will do.
->=20
+> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
 >  qapi-schema.json | 14 +++++++++++---
->  vl.c             | 55 ++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++
+>  vl.c             | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 >  2 files changed, 66 insertions(+), 3 deletions(-)
->=20
-
-2.11 material.
-
+> 
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 802ea53..7ed1db1 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -3618,15 +3618,23 @@
+>  { 'command': 'netdev_del', 'data': {'id': 'str'} }
+>  
+>  ##
+> -# @object-add:
+> +# @ObjectOptions:
+>  #
+> -# Create a QOM object.
+> +# Options for creating an object.
+>  #
+>  # @qom-type: the class name for the object to be created
+>  #
+>  # @id: the name of the new object
+>  #
+>  # @props: a dictionary of properties to be passed to the backend
+> +##
+> +{ 'struct': 'ObjectOptions',
+> +  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
+> +
+> +##
+> +# @object-add:
+> +#
+> +# Create a QOM object.
+>  #
+>  # Returns: Nothing on success
+>  #          Error if @qom-type is not a valid class name
+> @@ -3642,7 +3650,7 @@
+>  #
+>  ##
+>  { 'command': 'object-add',
+> -  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
+> +  'data': 'ObjectOptions' }
+>  
+>  ##
+>  # @object-del:
+> diff --git a/vl.c b/vl.c
+> index fd98ed1..db4680b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2854,8 +2854,32 @@ static bool object_create_delayed(const char *type)
+>      return !object_create_initial(type);
+>  }
+>  
+> +typedef struct ObjectOptionsQueueEntry {
+> +    ObjectOptions *oo;
+> +    Location loc;
+> +    QSIMPLEQ_ENTRY(ObjectOptionsQueueEntry) entry;
+> +} ObjectOptionsQueueEntry;
+> +
+> +typedef QSIMPLEQ_HEAD(ObjectOptionsQueue, ObjectOptionsQueueEntry)
+> +    ObjectOptionsQueue;
+> +
+> +ObjectOptionsQueue oo_queue = QSIMPLEQ_HEAD_INITIALIZER(oo_queue);
+> +
+> +
+>  static void object_create(bool (*type_predicate)(const char *))
+>  {
+> +    ObjectOptionsQueueEntry *e;
+> +
+> +    QSIMPLEQ_FOREACH(e, &oo_queue, entry) {
+> +        if (!type_predicate(e->oo->qom_type)) {
+> +            continue;
+> +        }
+> +        loc_push_restore(&e->loc);
+> +        qmp_object_add(e->oo->qom_type, e->oo->id,
+> +                       e->oo->has_props, e->oo->props, &error_fatal);
+> +        loc_pop(&e->loc);
+> +    }
+> +
+>      if (qemu_opts_foreach(qemu_find_opts("object"),
+>                            user_creatable_add_opts_foreach,
+>                            type_predicate, NULL)) {
 > @@ -4078,6 +4102,29 @@ int main(int argc, char **argv, char **envp)
 >  #endif
 >                  break;
 >              case QEMU_OPTION_object:
 > +                /*
-> +                 * TODO Use qobject_input_visitor_new_str() instead of=
-
-> +                 * QemuOpts, not in addition to.  Not done now because=
-
-> +                 * keyval_parse() isn't wart-compatible with QemuOpts.=
-
+> +                 * TODO Use qobject_input_visitor_new_str() instead of
+> +                 * QemuOpts, not in addition to.  Not done now because
+> +                 * keyval_parse() isn't wart-compatible with QemuOpts.
 > +                 */
-> +                if (optarg[0] =3D=3D '{') {
+> +                if (optarg[0] == '{') {
+> +                    Visitor *v;
+> +                    ObjectOptionsQueueEntry *e;
+> +
+> +                    v = qobject_input_visitor_new_str(optarg, "qom-type",
+> +                                                      &err);
+> +                    if (!v) {
+> +                        error_report_err(err);
+> +                        exit(1);
+> +                    }
+> +
+> +                    e = g_new(ObjectOptionsQueueEntry, 1);
+> +                    visit_type_ObjectOptions(v, NULL, &e->oo, &error_fatal);
+> +                    visit_free(v);
+> +                    loc_save(&e->loc);
+> +                    QSIMPLEQ_INSERT_TAIL(&oo_queue, e, entry);
+> +                    break;
+> +                }
+>                  opts = qemu_opts_parse_noisily(qemu_find_opts("object"),
+>                                                 optarg, true);
+>                  if (!opts) {
+> @@ -4525,6 +4572,14 @@ int main(int argc, char **argv, char **envp)
+>  
+>      object_create(object_create_delayed);
+>  
+> +    while (!QSIMPLEQ_EMPTY(&oo_queue)) {
+> +        ObjectOptionsQueueEntry *e = QSIMPLEQ_FIRST(&oo_queue);
+> +
+> +        QSIMPLEQ_REMOVE_HEAD(&oo_queue, entry);
+> +        qapi_free_ObjectOptions(e->oo);
+> +        g_free(e);
+> +    }
 
-So we DON'T allow " {...}", even though that is valid JSON.  I'm okay
-with stating that { is magic only as the first byte.
+Why not free the queue entry in object_create, and assert here that it's
+empty?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Paolo
 
-Do we need any documentation additions (whether in --help output, or in
-the man page, or ?)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---4iW21LCQRGgEui893HcaB1BCxJUrJKHk4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMdNMACgkQp6FrSiUn
-Q2pAcgf/UFU4Cdllunb6I2M5hs2AWgiP5xodKn/hOL9nFKVzd82OsIXQRaR3pd5z
-o+sedI86tsIOIg9yh0hY4ATEIq3GSWCB/6c82KLWBiUQnauDxiE64/6pjMlFZ4ZG
-SjNkTH72a9Z32Ve8ou24uauxDSaG1Aa8wTf/nKewyaGEziTTRFwThKMtLY/NMd6I
-+xi3NWAOc6HmEJ+e6/0ghzGafrNzmj1aKQPCJUMyHMAm4uDzxrCIoKh8vANVgxJv
-P9z3D9Udk4yltKcX5SfM9TMUdLnkvNjqJR9jOZ1rLSfRbjnqd1zDEHeKHKm3T6yK
-HA1AH6fXkqAyUW8UT7Zk48riLD0C9w==
-=/vM+
------END PGP SIGNATURE-----
-
---4iW21LCQRGgEui893HcaB1BCxJUrJKHk4--
+> +
+>  #ifdef CONFIG_TPM
+>      if (tpm_init() < 0) {
+>          exit(1);
+> 
