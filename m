@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfpzP-0006Xg-MC
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:07:17 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfpzR-0006Z5-3S
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dfpzN-0003wM-Vq
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:07:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1dfpzP-0003xH-KW
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 12:07:17 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 10 Aug 2017 17:04:50 +0100
-Message-Id: <20170810160451.32723-8-berrange@redhat.com>
+Date: Thu, 10 Aug 2017 17:04:51 +0100
+Message-Id: <20170810160451.32723-9-berrange@redhat.com>
 In-Reply-To: <20170810160451.32723-1-berrange@redhat.com>
 References: <20170810160451.32723-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/8] ui: convert VNC server to QIONetListener
+Subject: [Qemu-devel] [PATCH 8/8] sockets: fix parsing of ipv4/ipv6 opts in
+ parse_socket_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,327 +23,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-The VNC server already has the ability to listen on multiple sockets.
-Converting it to use the QIONetListener APIs though, will reduce the
-amount of code in the VNC server and improve the clarity of what is
-left.
+The inet_parse() function looks for 'ipv4' and 'ipv6'
+flags, but only treats them as bare bool flags. The normal
+QemuOpts parsing would allow on/off values to be set too.
+
+This updated inet_parse() so that its handling of the
+'ipv4' and 'ipv6' flags matches that done by QemuOpts.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- ui/vnc.c | 194 ++++++++++++++++++---------------------------------------------
- ui/vnc.h |   9 +--
- 2 files changed, 57 insertions(+), 146 deletions(-)
+ tests/test-sockets-proto.c | 13 -------------
+ util/qemu-sockets.c        | 36 ++++++++++++++++++++++++++++++++----
+ 2 files changed, 32 insertions(+), 17 deletions(-)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 651cbb8606..5b78541575 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -227,12 +227,12 @@ static VncServerInfo *vnc_server_info_get(VncDisplay *vd)
-     VncServerInfo *info;
-     Error *err = NULL;
+diff --git a/tests/test-sockets-proto.c b/tests/test-sockets-proto.c
+index a92389bef6..5805d2be5f 100644
+--- a/tests/test-sockets-proto.c
++++ b/tests/test-sockets-proto.c
+@@ -69,7 +69,6 @@ typedef struct {
+  */
+ static QSocketsData test_data[] = {
+     /* Migrate with "" address */
+-    /* XXX all settings with =off are disabled due to inet_parse() bug */
+     { .ipv4 = 1, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/wildcard/all",
+       .args = "-incoming tcp::9000" },
+@@ -85,7 +84,6 @@ static QSocketsData test_data[] = {
+     { .ipv4 = 0, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/wildcard/ipv6on",
+       .args = "-incoming tcp::9000,ipv6=on" },
+-    /*
+     { .ipv4 = 0, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/wildcard/ipv4off",
+       .args = "-incoming tcp::9000,ipv4=off" },
+@@ -98,15 +96,12 @@ static QSocketsData test_data[] = {
+     { .ipv4 = 0, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/wildcard/ipv4offipv6on",
+       .args = "-incoming tcp::9000,ipv4=off,ipv6=on" },
+-    */
+     { .ipv4 = 1, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/wildcard/ipv4onipv6on",
+       .args = "-incoming tcp::9000,ipv4=on,ipv6=on" },
+-    /*
+     { .ipv4 = 0, .ipv6 = 0, .error = true,
+       .name = "/sockets/migrate/wildcard/ipv4offipv6off",
+       .args = "-incoming tcp::9000,ipv4=off,ipv6=off" },
+-    */
  
--    if (!vd->nlsock) {
-+    if (!vd->listener || !vd->listener->nsioc) {
-         return NULL;
-     }
+     /* Migrate with 0.0.0.0 address */
+     { .ipv4 = 1, .ipv6 = 0, .error = false,
+@@ -124,7 +119,6 @@ static QSocketsData test_data[] = {
+     { .ipv4 = 0, .ipv6 = 0, .error = true,
+       .name = "/sockets/migrate/0.0.0.0/ipv6on",
+       .args = "-incoming tcp:0.0.0.0:9000,ipv6=on" },
+-    /*
+     { .ipv4 = 0, .ipv6 = 0, .error = true,
+       .name = "/sockets/migrate/0.0.0.0/ipv4off",
+       .args = "-incoming tcp:0.0.0.0:9000,ipv4=off" },
+@@ -137,15 +131,12 @@ static QSocketsData test_data[] = {
+     { .ipv4 = 0, .ipv6 = 0, .error = true,
+       .name = "/sockets/migrate/0.0.0.0/ipv4offipv6on",
+       .args = "-incoming tcp:0.0.0.0:9000,ipv4=off,ipv6=on" },
+-    */
+     { .ipv4 = 1, .ipv6 = 0, .error = false,
+       .name = "/sockets/migrate/0.0.0.0/ipv4onipv6on",
+       .args = "-incoming tcp:0.0.0.0:9000,ipv4=on,ipv6=on" },
+-    /*
+     { .ipv4 = 0, .ipv6 = 0, .error = true,
+       .name = "/sockets/migrate/0.0.0.0/ipv4offipv6off",
+       .args = "-incoming tcp:0.0.0.0:9000,ipv4=off,ipv6=off" },
+-    */
  
-     info = g_malloc0(sizeof(*info));
--    vnc_init_basic_info_from_server_addr(vd->lsock[0],
-+    vnc_init_basic_info_from_server_addr(vd->listener->sioc[0],
-                                          qapi_VncServerInfo_base(info), &err);
-     info->has_auth = true;
-     info->auth = g_strdup(vnc_auth_name(vd));
-@@ -378,7 +378,7 @@ VncInfo *qmp_query_vnc(Error **errp)
-     VncDisplay *vd = vnc_display_find(NULL);
-     SocketAddress *addr = NULL;
+     /* Migrate with :: address */
+     { .ipv4 = 1, .ipv6 = 1, .error = false,
+@@ -163,7 +154,6 @@ static QSocketsData test_data[] = {
+     { .ipv4 = 0, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/::/ipv6on",
+       .args = "-incoming tcp:[::]:9000,ipv6=on" },
+-    /*
+     { .ipv4 = 0, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/::/ipv4off",
+       .args = "-incoming tcp:[::]:9000,ipv4=off" },
+@@ -176,15 +166,12 @@ static QSocketsData test_data[] = {
+     { .ipv4 = 0, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/::/ipv4offipv6on",
+       .args = "-incoming tcp:[::]:9000,ipv4=off,ipv6=on" },
+-    */
+     { .ipv4 = 1, .ipv6 = 1, .error = false,
+       .name = "/sockets/migrate/::/ipv4onipv6on",
+       .args = "-incoming tcp:[::]:9000,ipv4=on,ipv6=on" },
+-    /*
+     { .ipv4 = 0, .ipv6 = 0, .error = true,
+       .name = "/sockets/migrate/::/ipv4offipv6off",
+       .args = "-incoming tcp:[::]:9000,ipv4=off,ipv6=off" },
+-    */
  
--    if (vd == NULL || !vd->nlsock) {
-+    if (vd == NULL || !vd->listener || !vd->listener->nsioc) {
-         info->enabled = false;
-     } else {
-         info->enabled = true;
-@@ -387,11 +387,7 @@ VncInfo *qmp_query_vnc(Error **errp)
-         info->has_clients = true;
-         info->clients = qmp_query_client_list(vd);
  
--        if (vd->lsock == NULL) {
--            return info;
--        }
--
--        addr = qio_channel_socket_get_local_address(vd->lsock[0], errp);
-+        addr = qio_channel_socket_get_local_address(vd->listener->sioc[0], errp);
-         if (!addr) {
-             goto out_error;
-         }
-@@ -571,13 +567,14 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
-             info->has_display = true;
-             info->display = g_strdup(dev->id);
-         }
--        for (i = 0; i < vd->nlsock; i++) {
-+        for (i = 0; vd->listener != NULL && i < vd->listener->nsioc; i++) {
-             info->server = qmp_query_server_entry(
--                vd->lsock[i], false, vd->auth, vd->subauth, info->server);
-+                vd->listener->sioc[i], false, vd->auth, vd->subauth,
-+                info->server);
-         }
--        for (i = 0; i < vd->nlwebsock; i++) {
-+        for (i = 0; vd->wslistener != NULL && i < vd->wslistener->nsioc; i++) {
-             info->server = qmp_query_server_entry(
--                vd->lwebsock[i], true, vd->ws_auth,
-+                vd->wslistener->sioc[i], true, vd->ws_auth,
-                 vd->ws_subauth, info->server);
-         }
  
-@@ -2991,36 +2988,18 @@ void vnc_start_protocol(VncState *vs)
-     qemu_add_mouse_mode_change_notifier(&vs->mouse_mode_notifier);
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 1358c81bcc..76202949f5 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -616,6 +616,25 @@ err:
  }
  
--static gboolean vnc_listen_io(QIOChannel *ioc,
--                              GIOCondition condition,
--                              void *opaque)
-+static void vnc_listen_io(QIONetListener *listener,
-+                          QIOChannelSocket *cioc,
-+                          void *opaque)
+ /* compatibility wrapper */
++static int inet_parse_flag(const char *flagname, const char *optstr, bool *val,
++                           Error **errp)
++{
++    char *end;
++    size_t len;
++
++    end = strstr(optstr, ",");
++    len = end ? end - optstr : strlen(optstr);
++    if (len == 0 || (len == 3 && strncmp(optstr, "=on", len) == 0)) {
++        *val = true;
++    } else if ((len == 4) && strncmp(optstr, "=off", len) == 0) {
++        *val = false;
++    } else {
++        error_setg(errp, "error parsing '%s' flag '%s'", flagname, optstr);
++        return -1;
++    }
++    return 0;
++}
++
+ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
  {
-     VncDisplay *vd = opaque;
--    QIOChannelSocket *sioc = NULL;
--    Error *err = NULL;
--    bool isWebsock = false;
--    size_t i;
--
--    for (i = 0; i < vd->nlwebsock; i++) {
--        if (ioc == QIO_CHANNEL(vd->lwebsock[i])) {
--            isWebsock = true;
--            break;
--        }
--    }
--
--    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc), &err);
--    if (sioc != NULL) {
--        qio_channel_set_name(QIO_CHANNEL(sioc),
--                             isWebsock ? "vnc-ws-server" : "vnc-server");
--        qio_channel_set_delay(QIO_CHANNEL(sioc), false);
--        vnc_connect(vd, sioc, false, isWebsock);
--        object_unref(OBJECT(sioc));
--    } else {
--        /* client probably closed connection before we got there */
--        error_free(err);
--    }
-+    bool isWebsock = listener == vd->wslistener;
+     const char *optstr, *h;
+@@ -623,6 +642,7 @@ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
+     char port[33];
+     int to;
+     int pos;
++    char *begin;
  
--    return TRUE;
-+    qio_channel_set_name(QIO_CHANNEL(cioc),
-+                         isWebsock ? "vnc-ws-server" : "vnc-server");
-+    qio_channel_set_delay(QIO_CHANNEL(cioc), false);
-+    vnc_connect(vd, cioc, false, isWebsock);
-+    object_unref(OBJECT(cioc));
- }
+     memset(addr, 0, sizeof(*addr));
  
- static const DisplayChangeListenerOps dcl_ops = {
-@@ -3072,34 +3051,22 @@ void vnc_display_init(const char *id)
- 
- static void vnc_display_close(VncDisplay *vd)
- {
--    size_t i;
-     if (!vd) {
-         return;
+@@ -664,11 +684,19 @@ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
+         addr->has_to = true;
+         addr->to = to;
      }
-     vd->is_unix = false;
--    for (i = 0; i < vd->nlsock; i++) {
--        if (vd->lsock_tag[i]) {
--            g_source_remove(vd->lsock_tag[i]);
--        }
--        object_unref(OBJECT(vd->lsock[i]));
-+
-+    if (vd->listener) {
-+        qio_net_listener_disconnect(vd->listener);
-+        object_unref(OBJECT(vd->listener));
+-    if (strstr(optstr, ",ipv4")) {
+-        addr->ipv4 = addr->has_ipv4 = true;
++    begin = strstr(optstr, ",ipv4");
++    if (begin) {
++        if (inet_parse_flag("ipv4", begin + 5, &addr->ipv4, errp) < 0) {
++            return -1;
++        }
++        addr->has_ipv4 = true;
      }
--    g_free(vd->lsock);
--    g_free(vd->lsock_tag);
--    vd->lsock = NULL;
--    vd->lsock_tag = NULL;
--    vd->nlsock = 0;
-+    vd->listener = NULL;
- 
--    for (i = 0; i < vd->nlwebsock; i++) {
--        if (vd->lwebsock_tag[i]) {
--            g_source_remove(vd->lwebsock_tag[i]);
--        }
--        object_unref(OBJECT(vd->lwebsock[i]));
-+    if (vd->wslistener) {
-+        qio_net_listener_disconnect(vd->wslistener);
-+        object_unref(OBJECT(vd->wslistener));
+-    if (strstr(optstr, ",ipv6")) {
+-        addr->ipv6 = addr->has_ipv6 = true;
++    begin = strstr(optstr, ",ipv6");
++    if (begin) {
++        if (inet_parse_flag("ipv6", begin + 5, &addr->ipv6, errp) < 0) {
++            return -1;
++        }
++        addr->has_ipv6 = true;
      }
--    g_free(vd->lwebsock);
--    g_free(vd->lwebsock_tag);
--    vd->lwebsock = NULL;
--    vd->lwebsock_tag = NULL;
--    vd->nlwebsock = 0;
-+    vd->wslistener = NULL;
- 
-     vd->auth = VNC_AUTH_INVALID;
-     vd->subauth = VNC_AUTH_INVALID;
-@@ -3151,11 +3118,11 @@ static void vnc_display_print_local_addr(VncDisplay *vd)
-     SocketAddress *addr;
-     Error *err = NULL;
- 
--    if (!vd->nlsock) {
-+    if (!vd->listener || !vd->listener->nsioc) {
-         return;
-     }
- 
--    addr = qio_channel_socket_get_local_address(vd->lsock[0], &err);
-+    addr = qio_channel_socket_get_local_address(vd->listener->sioc[0], &err);
-     if (!addr) {
-         return;
-     }
-@@ -3663,68 +3630,6 @@ static int vnc_display_connect(VncDisplay *vd,
- }
- 
- 
--static int vnc_display_listen_addr(VncDisplay *vd,
--                                   SocketAddress *addr,
--                                   const char *name,
--                                   QIOChannelSocket ***lsock,
--                                   guint **lsock_tag,
--                                   size_t *nlsock,
--                                   Error **errp)
--{
--    QIODNSResolver *resolver = qio_dns_resolver_get_instance();
--    SocketAddress **rawaddrs = NULL;
--    size_t nrawaddrs = 0;
--    Error *listenerr = NULL;
--    bool listening = false;
--    size_t i;
--
--    if (qio_dns_resolver_lookup_sync(resolver, addr, &nrawaddrs,
--                                     &rawaddrs, errp) < 0) {
--        return -1;
--    }
--
--    for (i = 0; i < nrawaddrs; i++) {
--        QIOChannelSocket *sioc = qio_channel_socket_new();
--
--        qio_channel_set_name(QIO_CHANNEL(sioc), name);
--        if (qio_channel_socket_listen_sync(
--                sioc, rawaddrs[i], listenerr == NULL ? &listenerr : NULL) < 0) {
--            object_unref(OBJECT(sioc));
--            continue;
--        }
--        listening = true;
--        (*nlsock)++;
--        *lsock = g_renew(QIOChannelSocket *, *lsock, *nlsock);
--        *lsock_tag = g_renew(guint, *lsock_tag, *nlsock);
--
--        (*lsock)[*nlsock - 1] = sioc;
--        (*lsock_tag)[*nlsock - 1] = 0;
--    }
--
--    for (i = 0; i < nrawaddrs; i++) {
--        qapi_free_SocketAddress(rawaddrs[i]);
--    }
--    g_free(rawaddrs);
--
--    if (listenerr) {
--        if (!listening) {
--            error_propagate(errp, listenerr);
--            return -1;
--        } else {
--            error_free(listenerr);
--        }
--    }
--
--    for (i = 0; i < *nlsock; i++) {
--        (*lsock_tag)[i] = qio_channel_add_watch(
--            QIO_CHANNEL((*lsock)[i]),
--            G_IO_IN, vnc_listen_io, vd, NULL);
--    }
--
--    return 0;
--}
--
--
- static int vnc_display_listen(VncDisplay *vd,
-                               SocketAddress **saddr,
-                               size_t nsaddr,
-@@ -3734,25 +3639,34 @@ static int vnc_display_listen(VncDisplay *vd,
- {
-     size_t i;
- 
--    for (i = 0; i < nsaddr; i++) {
--        if (vnc_display_listen_addr(vd, saddr[i],
--                                    "vnc-listen",
--                                    &vd->lsock,
--                                    &vd->lsock_tag,
--                                    &vd->nlsock,
--                                    errp) < 0) {
--            return -1;
-+    if (nsaddr) {
-+        vd->listener = qio_net_listener_new();
-+        qio_net_listener_set_name(vd->listener, "vnc-listen");
-+        for (i = 0; i < nsaddr; i++) {
-+            if (qio_net_listener_open_sync(vd->listener,
-+                                           saddr[i],
-+                                           errp) < 0)  {
-+                return -1;
-+            }
-         }
-+
-+        qio_net_listener_set_client_func(vd->listener,
-+                                         vnc_listen_io, vd, NULL);
-     }
--    for (i = 0; i < nwsaddr; i++) {
--        if (vnc_display_listen_addr(vd, wsaddr[i],
--                                    "vnc-ws-listen",
--                                    &vd->lwebsock,
--                                    &vd->lwebsock_tag,
--                                    &vd->nlwebsock,
--                                    errp) < 0) {
--            return -1;
-+
-+    if (nwsaddr) {
-+        vd->wslistener = qio_net_listener_new();
-+        qio_net_listener_set_name(vd->wslistener, "vnc-ws-listen");
-+        for (i = 0; i < nwsaddr; i++) {
-+            if (qio_net_listener_open_sync(vd->wslistener,
-+                                           wsaddr[i],
-+                                           errp) < 0)  {
-+                return -1;
-+            }
-         }
-+
-+        qio_net_listener_set_client_func(vd->wslistener,
-+                                         vnc_listen_io, vd, NULL);
-     }
- 
      return 0;
-diff --git a/ui/vnc.h b/ui/vnc.h
-index 694cf32ca9..d6f685b473 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -37,6 +37,7 @@
- #include "qemu/buffer.h"
- #include "io/channel-socket.h"
- #include "io/channel-tls.h"
-+#include "io/net-listener.h"
- #include <zlib.h>
- 
- #include "keymaps.h"
-@@ -146,12 +147,8 @@ struct VncDisplay
-     int num_exclusive;
-     int connections_limit;
-     VncSharePolicy share_policy;
--    size_t nlsock;
--    QIOChannelSocket **lsock;
--    guint *lsock_tag;
--    size_t nlwebsock;
--    QIOChannelSocket **lwebsock;
--    guint *lwebsock_tag;
-+    QIONetListener *listener;
-+    QIONetListener *wslistener;
-     DisplaySurface *ds;
-     DisplayChangeListener dcl;
-     kbd_layout_t *kbd_layout;
+ }
 -- 
 2.13.3
