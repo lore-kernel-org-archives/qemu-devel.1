@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dfnvA-0004QI-Lo
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:54:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1dfnz6-0006Dc-JL
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dfnv7-0006Bj-Ib
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:54:44 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170809100734.17540-6-el13635@mail.ntua.gr>
-References: <20170809100734.17540-1-el13635@mail.ntua.gr>
-	<20170809100734.17540-6-el13635@mail.ntua.gr>
-Date: Thu, 10 Aug 2017 15:54:02 +0200
-Message-ID: <w511sojy1dx.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1dfnz5-0000Go-Cp
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 09:58:48 -0400
+References: <20170810080108.31047-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f587d8ac-476d-e285-6579-3a8188de1790@redhat.com>
+Date: Thu, 10 Aug 2017 08:58:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 5/7] block: add throttle block filter
- driver
+In-Reply-To: <20170810080108.31047-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10?] file-posix: Clear out first
+ sector in hdev_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,140 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed 09 Aug 2017 12:07:32 PM CEST, Manos Pitsidianakis wrote:
-> +/* Extract ThrottleConfig options. Assumes cfg is initialized and will be
-> + * checked for validity.
-> + *
-> + * Returns -1 and sets errp if a burst_length value is over UINT_MAX.
-> + */
-> +static int throttle_extract_options(QemuOpts *opts, ThrottleConfig *cfg,
-> +                                    Error **errp)
-> +{
-> +#define IF_OPT_SET(rvalue, opt_name) \
-> +    if (qemu_opt_get(opts, THROTTLE_OPT_PREFIX opt_name)) { \
-> +        rvalue = qemu_opt_get_number(opts, THROTTLE_OPT_PREFIX opt_name, 0); }
-> +
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_TOTAL].avg, QEMU_OPT_BPS_TOTAL);
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_READ].avg, QEMU_OPT_BPS_READ);
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_WRITE].avg, QEMU_OPT_BPS_WRITE);
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_TOTAL].avg, QEMU_OPT_IOPS_TOTAL);
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_READ].avg, QEMU_OPT_IOPS_READ);
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_WRITE].avg, QEMU_OPT_IOPS_WRITE);
-> +    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_TOTAL].max, QEMU_OPT_BPS_TOTAL_MAX);
-  [...]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <f587d8ac-476d-e285-6579-3a8188de1790@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10?] file-posix: Clear out first sector
+ in hdev_create
+References: <20170810080108.31047-1-famz@redhat.com>
+In-Reply-To: <20170810080108.31047-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is all the code that I was saying that we'd save if we don't allow
-setting limits here.
+On 08/10/2017 03:01 AM, Fam Zheng wrote:
+> People get surprised when, after "qemu-imc create -f raw /dev/sdX", the=
+y
+> still see qcow2 with "qemu-img info", if previously the bdev had a qcow=
+2
+> header. While this is natural because raw doesn't need to write any
+> magic bytes during creation, hdev_create is free to clear out the first=
 
-> +static int throttle_configure_tgm(BlockDriverState *bs,
-> +                                  ThrottleGroupMember *tgm,
-> +                                  QDict *options, Error **errp)
-> +{
-> +    int ret;
-> +    ThrottleConfig cfg;
-> +    const char *group_name = NULL;
+> sector to make sure the stale qcow2 header doesn't cause such a
+> confusion.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index f4de022ae0..1d8ef6f873 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2703,6 +2703,17 @@ static int hdev_create(const char *filename, Qem=
+uOpts *opts,
+>          ret =3D -ENOSPC;
+>      }
+> =20
+> +    if (total_size) {
+> +        int64_t zero_size =3D MIN(BDRV_SECTOR_SIZE, total_size);
+> +        uint8_t *buf;
 
-No need to set it to NULL here.
+Since BDRV_SECTOR_SIZE is small enough to stack-allocate, you could skip
+the malloc by doing:
 
-> +    Error *local_err = NULL;
-> +    QemuOpts *opts = qemu_opts_create(&throttle_opts, NULL, 0, &error_abort);
-> +
-> +    qemu_opts_absorb_qdict(opts, options, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        goto err;
-> +    }
-> +
-> +    /* If group_name is NULL, an anonymous group will be created */
-> +    group_name = qemu_opt_get(opts, QEMU_OPT_THROTTLE_GROUP_NAME);
-> +
-> +    /* Register membership to group with name group_name */
-> +    throttle_group_register_tgm(tgm, group_name, bdrv_get_aio_context(bs));
-> +
-> +    /* Copy previous configuration */
-> +    throttle_group_get_config(tgm, &cfg);
-> +
-> +    /* Change limits if user has specified them */
-> +    if (throttle_extract_options(opts, &cfg, errp) ||
-> +        !throttle_is_valid(&cfg, errp)) {
-> +        throttle_group_unregister_tgm(tgm);
-> +        goto err;
-> +    }
-> +    /* Update group configuration */
-> +    throttle_group_config(tgm, &cfg);
+uint8_t buf[BDRV_SECTOR_SIZE] =3D "";
 
-We'd also spare this, and this function would remain much simpler.
+> +        if (lseek(fd, 0, SEEK_SET) =3D=3D -1) {
+> +            ret =3D -errno;
+> +        } else {
+> +            buf =3D g_malloc0(zero_size);
+> +            ret =3D qemu_write_full(fd, buf, zero_size);
 
-> +
-> +    ret = 0;
-> +    goto fin;
-> +
-> +err:
-> +    ret = -EINVAL;
-> +fin:
-> +    qemu_opts_del(opts);
-> +    return ret;
-> +}
+Instead of doing lseek + qemu_write_full, can we just use
+qemu_pwritev(fd, &iov, 1, 0) with an iov set up to point to the
+appropriate amount of buf?
 
-If you set ret = -EINVAL before calling goto err you can simplify this
-part as well, but feel free to ignore this suggestion.
+At any rate, my ideas are micro-optimizations, so I can also live with
+how you wrote it.
 
-> +static int throttle_reopen_prepare(BDRVReopenState *reopen_state,
-> +                                   BlockReopenQueue *queue, Error **errp)
-> +{
-> +    ThrottleGroupMember *tgm = NULL;
-> +
-> +    assert(reopen_state != NULL);
-> +    assert(reopen_state->bs != NULL);
-> +
-> +    reopen_state->opaque = g_new0(ThrottleGroupMember, 1);
-> +    tgm = reopen_state->opaque;
-> +
-> +    return throttle_configure_tgm(reopen_state->bs, tgm, reopen_state->options,
-> +            errp);
-> +}
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I would rename 'reopen_state' as 'state' for consistency with the other
-two functions.
+Are you arguing that this is a bug-fix worthy of inclusion in 2.10,
+because it helps avoid user confusion? Or are you delaying it to 2.11,
+because we've had the existing behavior for longer than one release, so
+one release more won't hurt?
 
-> +static void throttle_reopen_commit(BDRVReopenState *state)
-> +{
-> +    ThrottleGroupMember *tgm = state->bs->opaque;
-> +
-> +    throttle_group_unregister_tgm(tgm);
-> +    g_free(state->bs->opaque);
-> +    state->bs->opaque = state->opaque;
-> +    state->opaque = NULL;
-> +}
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-I also find the mixing of state->bs->opaque and tgm a bit confusing.
-Here's a suggestion, but feel free to ignore it:
 
-    ThrottleGroupMember *old_tgm = state->bs->opaque;
-    ThrottleGroupMember *new_tgm = state->opaque;
+--celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-    throttle_group_unregister_tgm(old_tgm);
-    g_free(old_tgm);
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-    state->bs->opaque = new_tgm;
-    state->opaque = NULL;
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmMZowACgkQp6FrSiUn
+Q2q8Ygf/Z1hyMZJrB8GICObTislpznQyrqqanu4AMPTwr+8k56SEy7184+4omdKk
+BD3kMw3nMcALd2jK2RekZOIdJ3DH3MoolykoXN6sx02aADOU02AzgqiqwZZOFThg
+gs9HNZRan4MZ+YIBx847iAc78u6l9Nca4C7JDvIoYTc+RLNW4bjQ43Hi908/aM5K
+s42bnbVnMt+2lZYOzey4lcMwkdcY8Ec0vWbqwHfeiRpGp/SY6XGhViqTq433ny3F
+7hOiVi801we0yTxmAdlsKE4hZvmslGy4BbMUbsZmM/Bmfe0aq+2DJt/HwxV0aQ1+
+W4iFH6CmQmISRG2Lpkur7GpzCB2y3A==
+=wagM
+-----END PGP SIGNATURE-----
 
-> +static void throttle_reopen_abort(BDRVReopenState *state)
-> +{
-> +    ThrottleGroupMember *tgm = state->opaque;
-> +
-> +    throttle_group_unregister_tgm(tgm);
-> +    g_free(state->opaque);
-> +    state->opaque = NULL;
-> +}
-
-Similar problem here (this one is simpler though).
-
-Apart from the general question of whether we're parsing the limits in
-this driver, the rest are just comments about the style. Otherwise the
-code looks good, thanks!
-
-Berto
+--celb0QqH6v6JaWrGMxtrbTOuOgHsvJ6G8--
