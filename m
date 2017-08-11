@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dg4fA-0001lW-2f
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:21 -0400
+	(envelope-from <david@redhat.com>) id 1dg4fE-0001qi-A5
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dg4f6-0003FK-55
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49928)
+	(envelope-from <david@redhat.com>) id 1dg4fD-0003Gl-0s
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dg4f5-0003FD-VO
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:16 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dg4fC-0003Gb-NS
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:22 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 11 Aug 2017 09:46:50 +0200
-Message-Id: <20170811074652.31474-4-david@redhat.com>
+Date: Fri, 11 Aug 2017 09:46:51 +0200
+Message-Id: <20170811074652.31474-5-david@redhat.com>
 In-Reply-To: <20170811074652.31474-1-david@redhat.com>
 References: <20170811074652.31474-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 3/5] s390x: avoid calling kvm_ functions
- outside of target/s390x/
+Subject: [Qemu-devel] [PATCH RFC 4/5] target/s390x: remove all CONFIG_KVM
+ from cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com
 
-Let's just introduce an helper.
+Let's move everything into internal.h
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 4 +---
- target/s390x/cpu.c         | 6 ++++++
- target/s390x/cpu.h         | 1 +
- 3 files changed, 8 insertions(+), 3 deletions(-)
+ target/s390x/cpu.h      | 62 -------------------------------------------------
+ target/s390x/internal.h | 52 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+), 62 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 1c7af39..ac087ab 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -142,9 +142,7 @@ static void ccw_init(MachineState *machine)
-     /* register hypercalls */
-     virtio_ccw_register_hcalls();
- 
--    if (kvm_enabled()) {
--        kvm_s390_enable_css_support(s390_cpu_addr2state(0));
--    }
-+    s390_enable_css_support(s390_cpu_addr2state(0));
-     /*
-      * Non mcss-e enabled guests only see the devices from the default
-      * css, which is determined by the value of the squash_mcss property.
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 81165e8..c834bfb 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -472,6 +472,12 @@ bool s390_get_squash_mcss(void)
- 
-     return false;
- }
-+void s390_enable_css_support(S390CPU *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_s390_enable_css_support(cpu);
-+    }
-+}
- #endif
- 
- static gchar *s390_gdb_arch_name(CPUState *cs)
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index a9acef6..87dea80 100644
+index 87dea80..dc1eb77 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -404,6 +404,7 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo,
+@@ -406,22 +406,6 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo,
  
- #ifndef CONFIG_USER_ONLY
- 
-+void s390_enable_css_support(S390CPU *cpu);
+ void s390_enable_css_support(S390CPU *cpu);
  int s390_virtio_hypercall(CPUS390XState *env);
+-
+-#ifdef CONFIG_KVM
+-int kvm_s390_inject_flic(struct kvm_s390_irq *irq);
+-int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_clock);
+-int kvm_s390_set_clock(uint8_t *tod_high, uint64_t *tod_clock);
+-#else
+-static inline int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_low)
+-{
+-    return -ENOSYS;
+-}
+-static inline int kvm_s390_set_clock(uint8_t *tod_high, uint64_t *tod_low)
+-{
+-    return -ENOSYS;
+-}
+-#endif
+-
+ int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
+ int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low);
  
- #ifdef CONFIG_KVM
+@@ -688,52 +672,6 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+ #define ILEN_AUTO                   0xff
+ void program_interrupt(CPUS390XState *env, uint32_t code, int ilen);
+ 
+-#ifdef CONFIG_KVM
+-void kvm_s390_enable_css_support(S390CPU *cpu);
+-int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
+-                                    int vq, bool assign);
+-int kvm_s390_cpu_restart(S390CPU *cpu);
+-int kvm_s390_get_memslot_count(KVMState *s);
+-int kvm_s390_cmma_active(void);
+-void kvm_s390_cmma_reset(void);
+-void kvm_s390_reset_vcpu(S390CPU *cpu);
+-int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit);
+-void kvm_s390_crypto_reset(void);
+-#else
+-
+-static inline void kvm_s390_enable_css_support(S390CPU *cpu)
+-{
+-}
+-static inline int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier,
+-                                                  uint32_t sch, int vq,
+-                                                  bool assign)
+-{
+-    return -ENOSYS;
+-}
+-static inline int kvm_s390_cpu_restart(S390CPU *cpu)
+-{
+-    return -ENOSYS;
+-}
+-static inline void kvm_s390_cmma_reset(void)
+-{
+-}
+-static inline int kvm_s390_get_memslot_count(KVMState *s)
+-{
+-  return MAX_AVAIL_SLOTS;
+-}
+-static inline void kvm_s390_reset_vcpu(S390CPU *cpu)
+-{
+-}
+-static inline int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit,
+-                                         uint64_t *hw_limit)
+-{
+-    return 0;
+-}
+-static inline void kvm_s390_crypto_reset(void)
+-{
+-}
+-#endif
+-
+ int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
+ void s390_cmma_reset(void);
+ int s390_cpu_restart(S390CPU *cpu);
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 9a55271..c3e98b4 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -491,6 +491,19 @@ void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu);
+ int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu);
+ int kvm_s390_get_ri(void);
+ int kvm_s390_get_gs(void);
++int kvm_s390_inject_flic(struct kvm_s390_irq *irq);
++int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_clock);
++int kvm_s390_set_clock(uint8_t *tod_high, uint64_t *tod_clock);
++void kvm_s390_enable_css_support(S390CPU *cpu);
++int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
++                                    int vq, bool assign);
++int kvm_s390_cpu_restart(S390CPU *cpu);
++int kvm_s390_get_memslot_count(KVMState *s);
++int kvm_s390_cmma_active(void);
++void kvm_s390_cmma_reset(void);
++void kvm_s390_reset_vcpu(S390CPU *cpu);
++int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit);
++void kvm_s390_crypto_reset(void);
+ #else
+ static inline void kvm_s390_service_interrupt(uint32_t parm)
+ {
+@@ -535,6 +548,45 @@ static inline int kvm_s390_get_gs(void)
+ {
+     return 0;
+ }
++static inline int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_low)
++{
++    return -ENOSYS;
++}
++static inline int kvm_s390_set_clock(uint8_t *tod_high, uint64_t *tod_low)
++{
++    return -ENOSYS;
++}
++static inline void kvm_s390_enable_css_support(S390CPU *cpu)
++{
++}
++static inline int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier,
++                                                  uint32_t sch, int vq,
++                                                  bool assign)
++{
++    return -ENOSYS;
++}
++static inline int kvm_s390_cpu_restart(S390CPU *cpu)
++{
++    return -ENOSYS;
++}
++static inline void kvm_s390_cmma_reset(void)
++{
++}
++static inline int kvm_s390_get_memslot_count(KVMState *s)
++{
++  return MAX_AVAIL_SLOTS;
++}
++static inline void kvm_s390_reset_vcpu(S390CPU *cpu)
++{
++}
++static inline int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit,
++                                         uint64_t *hw_limit)
++{
++    return 0;
++}
++static inline void kvm_s390_crypto_reset(void)
++{
++}
+ #endif /* CONFIG_KVM */
+ 
+ 
 -- 
 2.9.4
