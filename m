@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg9Mq-0002Dh-Rm
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:48:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dg9YQ-0006xP-I7
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 09:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg9Mp-0004S4-I6
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:48:44 -0400
-Date: Fri, 11 Aug 2017 13:48:21 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170811124821.GL2554@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170810160451.32723-1-berrange@redhat.com>
-	<20170810160451.32723-3-berrange@redhat.com>
-	<20170811122559.GB2076@work-vm> <20170811122936.GK2554@redhat.com>
-	<20170811123942.GC2076@work-vm>
+	(envelope-from <ehabkost@redhat.com>) id 1dg9YM-0001zB-Hd
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 09:00:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39208)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dg9YM-0001yC-3S
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 09:00:38 -0400
+Date: Fri, 11 Aug 2017 10:00:26 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170811130026.GG3108@localhost.localdomain>
+References: <1502417472-15511-1-git-send-email-tianyu.lan@intel.com>
+	<1502418366-28289-1-git-send-email-tianyu.lan@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170811123942.GC2076@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 2/8] io: introduce a network socket
- listener API
+In-Reply-To: <1502418366-28289-1-git-send-email-tianyu.lan@intel.com>
+Subject: Re: [Qemu-devel] [Update PATCH V2] x86: Increase max vcpu number to
+ 8192
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, berrange@redhat.com, rkrcmar@redhat.com
 
-On Fri, Aug 11, 2017 at 01:39:43PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Fri, Aug 11, 2017 at 01:26:00PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > The existing QIOChannelSocket class provides the ability to
-> > > > listen on a single socket at a time. This patch introduces
-> > > > a QIONetListener class that provides a higher level API
-> > > > concept around listening for network services, allowing
-> > > > for listening on multiple sockets.
-> > > 
-> > > What protects against a connection on more than one of the sockets?
-> > 
-> > That's not the responsibility of this module. If a backend only
-> > wants to allow a single client at a time, it has to unregister
-> > the new client callback and re-register when it is ready to
-> > accept a new client. This aspect is no different to the existing
-> > case of multiple clients connecting to a single listener socket.
+On Thu, Aug 10, 2017 at 10:26:06PM -0400, Lan Tianyu wrote:
+> Intel Xeon phi chip will support 352 logical threads. For HPC
+> usage case, it will create a huge VM with vcpus number as same as host
+> cpus. This patch is to increase max vcpu number from 288 to 8192 which
+> is current default maximum cpu number for Linux kernel.
 > 
-> OK, and we guarantee that we never call accept() twice because we
-> make sure we do that unregister before we get back to the main loop?
+> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+> ---
+> Change since v1:
+> 	* Bump max vcpu number from 352 to 8192
+> 	* Add compat support for new max vcpu limitation
+> 
+>  hw/i386/pc_q35.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 169a214..e093601 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -299,13 +299,21 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->default_display = "std";
+>      m->no_floppy = 1;
+>      m->has_dynamic_sysbus = true;
+> -    m->max_cpus = 288;
+> +    m->max_cpus = 8192;
+>  }
+>  
+> +static void pc_q35_2_11_machine_options(MachineClass *m)
+> +{
+> +     pc_q35_machine_options(m);
+> +     m->alias = "q35";
+> +}
+> +DEFINE_Q35_MACHINE(v2_11, "pc-q35-2.11", NULL,
+> +                   pc_q35_2_11_machine_options);
+> +
+>  static void pc_q35_2_10_machine_options(MachineClass *m)
+>  {
+> -    pc_q35_machine_options(m);
+> -    m->alias = "q35";
+> +    pc_q35_2_11_machine_options(m);
 
-Yes, and even if 2 clients arrive at exactly the same time, and thus
-both sockets show G_IO_IN on the same iteration of the main loop,
-we check whether the new client callback is NULL, and so will just
-drop the 2nd client.
+You need m->alias=NULL here.
 
+> +    m->max_cpus = 288;
+>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+>  }
+>  
 
-Regards,
-Daniel
+Please add the pc-*-2.11 machine-types in a separate patch.  This
+way we can add the new machine-types in other series/trees and
+deal more easily with conflicts.
+
+You can use commit 465238d9f873a6251223db1669aa4766822a8783
+("pc: add 2.10 machine type") as reference.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eduardo
