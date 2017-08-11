@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dfiPF-0007TL-7Y
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:01:26 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dfiYU-0000mK-1O
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dfiPE-0001bb-8Y
-	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:01:25 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 10 Aug 2017 16:01:08 +0800
-Message-Id: <20170810080108.31047-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] file-posix: Clear out first sector in
- hdev_create
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dfiYP-0007hq-2G
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:10:58 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:53790 helo=zte.com.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dfiYO-0007eI-Nu
+	for qemu-devel@nongnu.org; Thu, 10 Aug 2017 04:10:53 -0400
+From: Wang yong <wang.yong155@zte.com.cn>
+Date: Fri, 11 Aug 2017 08:29:15 +0800
+Message-Id: <1502411355-3943-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] qemu-iothread: IOThread supports the
+ GMainContext event loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,42 +22,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com
+Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
 
-People get surprised when, after "qemu-imc create -f raw /dev/sdX", they
-still see qcow2 with "qemu-img info", if previously the bdev had a qcow2
-header. While this is natural because raw doesn't need to write any
-magic bytes during creation, hdev_create is free to clear out the first
-sector to make sure the stale qcow2 header doesn't cause such a
-confusion.
+From: Wang Yong<wang.yong155@zte.com.cn>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+IOThread uses AioContext event loop and does not run a GMainContext.
+Therefore,chardev cannot work in IOThread,such as the chardev is
+used for colo-compare packets reception.
+
+This patch makes the IOThread run the GMainContext event loop,
+chardev and IOThread can work together.
+
+Signed-off-by: Wang Yong<wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
 ---
- block/file-posix.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ include/sysemu/iothread.h |  1 +
+ iothread.c                | 13 +++++++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f4de022ae0..1d8ef6f873 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2703,6 +2703,17 @@ static int hdev_create(const char *filename, QemuOpts *opts,
-         ret = -ENOSPC;
+diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+index e6da1a4..ffe4e8a 100644
+--- a/include/sysemu/iothread.h
++++ b/include/sysemu/iothread.h
+@@ -24,6 +24,7 @@ typedef struct {
+ 
+     QemuThread thread;
+     AioContext *ctx;
++    GMainLoop *loop;
+     QemuMutex init_done_lock;
+     QemuCond init_done_cond;    /* is thread initialization done? */
+     bool stopping;
+diff --git a/iothread.c b/iothread.c
+index beeb870..b6f3c3c 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -46,6 +46,7 @@ AioContext *qemu_get_current_aio_context(void)
+ static void *iothread_run(void *opaque)
+ {
+     IOThread *iothread = opaque;
++    GMainContext *context;
+ 
+     rcu_register_thread();
+ 
+@@ -57,6 +58,15 @@ static void *iothread_run(void *opaque)
+ 
+     while (!atomic_read(&iothread->stopping)) {
+         aio_poll(iothread->ctx, true);
++
++        context = iothread->ctx->source.context;
++        if (context) {
++            iothread->loop = g_main_loop_new(context, TRUE);
++            g_main_loop_run(iothread->loop);
++
++            g_main_loop_unref(iothread->loop);
++            g_main_context_unref(context);
++        }
      }
  
-+    if (total_size) {
-+        int64_t zero_size = MIN(BDRV_SECTOR_SIZE, total_size);
-+        uint8_t *buf;
-+        if (lseek(fd, 0, SEEK_SET) == -1) {
-+            ret = -errno;
-+        } else {
-+            buf = g_malloc0(zero_size);
-+            ret = qemu_write_full(fd, buf, zero_size);
-+            g_free(buf);
-+        }
+     rcu_unregister_thread();
+@@ -72,6 +82,9 @@ static int iothread_stop(Object *object, void *opaque)
+         return 0;
+     }
+     iothread->stopping = true;
++    if (iothread->loop) {
++        g_main_loop_quit(iothread->loop);
 +    }
-     qemu_close(fd);
-     return ret;
- }
+     aio_notify(iothread->ctx);
+     qemu_thread_join(&iothread->thread);
+     return 0;
 -- 
-2.13.3
+1.8.3.1
