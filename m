@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dgAZk-0001BY-Ij
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:06:10 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dgAZe-0002ZX-Vd
+	(envelope-from <kwolf@redhat.com>) id 1dgAZe-00017t-SB
 	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:06:08 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1dgAZc-0002W2-6E
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:06:02 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 11 Aug 2017 16:05:33 +0200
-Message-Id: <20170811140536.2792-5-kwolf@redhat.com>
-In-Reply-To: <20170811140536.2792-1-kwolf@redhat.com>
-References: <20170811140536.2792-1-kwolf@redhat.com>
+Date: Fri, 11 Aug 2017 16:05:29 +0200
+Message-Id: <20170811140536.2792-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/7] qcow2: Check failure of bdrv_getlength()
+Subject: [Qemu-devel] [PULL 0/7] Block/Multiboot patches for 2.10.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+The following changes since commit 95766c2cd04395e5712b4d5967b3251f35d537=
+df:
 
-qcow2_co_pwritev_compressed() should not call bdrv_truncate()
-if determining the size failed.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2017-08-10 18:53:39 +0100)
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qcow2.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+are available in the git repository at:
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 99407403ea..40ba26c111 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3282,12 +3282,15 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs,=
- uint64_t offset,
-     z_stream strm;
-     int ret, out_len;
-     uint8_t *buf, *out_buf;
--    uint64_t cluster_offset;
-+    int64_t cluster_offset;
-=20
-     if (bytes =3D=3D 0) {
-         /* align end of file to a sector boundary to ease reading with
-            sector based I/Os */
-         cluster_offset =3D bdrv_getlength(bs->file->bs);
-+        if (cluster_offset < 0) {
-+            return cluster_offset;
-+        }
-         return bdrv_truncate(bs->file, cluster_offset, PREALLOC_MODE_OFF=
-, NULL);
-     }
-=20
---=20
-2.13.4
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to 8565c3ab537e78f3e69977ec2c609dc9417a806e:
+
+  qemu-iotests: fix 185 (2017-08-11 14:44:39 +0200)
+
+----------------------------------------------------------------
+Block layer patches for 2.10.0-rc3
+
+----------------------------------------------------------------
+Eric Blake (4):
+      tests/multiboot: Fix whitespace failure
+      vpc: Check failure of bdrv_getlength()
+      qcow2: Drop debugging dump_refcounts()
+      qcow2: Check failure of bdrv_getlength()
+
+Fam Zheng (2):
+      osdep: Add runtime OFD lock detection
+      file-posix: Do runtime check for ofd lock API
+
+Vladimir Sementsov-Ogievskiy (1):
+      qemu-iotests: fix 185
+
+ include/qemu/osdep.h        |  1 +
+ block/file-posix.c          | 19 ++++++-------
+ block/qcow2.c               | 26 +++---------------
+ block/vpc.c                 |  9 ++++++-
+ util/osdep.c                | 66 ++++++++++++++++++++++++++++++++++++++-=
+------
+ tests/multiboot/run_test.sh |  2 +-
+ tests/qemu-iotests/185      |  4 +++
+ 7 files changed, 82 insertions(+), 45 deletions(-)
