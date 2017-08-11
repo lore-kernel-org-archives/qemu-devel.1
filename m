@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dg2xT-0000J5-AV
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 01:58:08 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1dg39e-0005Dr-6p
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 02:10:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dg2xR-0003ff-SM
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 01:58:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33482)
+	(envelope-from <tianyu.lan@intel.com>) id 1dg39b-0001Kn-8N
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 02:10:42 -0400
+Received: from mga05.intel.com ([192.55.52.43]:48450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dg2xR-0003fW-Iv
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 01:58:05 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 11 Aug 2017 07:57:55 +0200
-Message-Id: <1502431076-22849-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1502431076-22849-1-git-send-email-thuth@redhat.com>
-References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.11 1/2] tests/boot-sector: Do not
- overwrite the x86 buffer on other architectures
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1dg39a-00015Q-V4
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 02:10:39 -0400
+References: <1502359687-25370-1-git-send-email-tianyu.lan@intel.com>
+	<20170810102649.GF12980@redhat.com>
+	<00cb01a4-5c27-fc69-d3ae-0653aa54b121@intel.com>
+	<20170810124102.GA21850@flask>
+	<20170810181648.GC3108@localhost.localdomain>
+	<20170810192207.GA22459@flask>
+From: Lan Tianyu <tianyu.lan@intel.com>
+Message-ID: <a4b72fef-3fc3-787f-fb7e-6e8d9ee96396@intel.com>
+Date: Fri, 11 Aug 2017 14:07:48 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170810192207.GA22459@flask>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] x86: Increase max vcpu number to 352
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net, Igor Mammedov <imammedo@redhat.com>
 
-Re-using the boot_sector code buffer from x86 for other architectures
-is not very nice, especially if we add more architectures later. It's
-also ugly that the test uses a huge pre-initialized array at all - the
-size of the executable is very huge due to this array. So let's use a
-separate buffer for each architecture instead, allocated from the heap,
-so that we really just use the memory that we need.
+On 2017年08月11日 03:22, Radim Krčmář wrote:
+> 2017-08-10 15:16-0300, Eduardo Habkost:
+>> On Thu, Aug 10, 2017 at 02:41:03PM +0200, Radim Krčmář wrote:
+>>> 2017-08-10 19:02+0800, Lan Tianyu:
+>>>> On 2017年08月10日 18:26, Daniel P. Berrange wrote:
+>>>>> On Thu, Aug 10, 2017 at 06:08:07PM +0800, Lan Tianyu wrote:
+>>>>>> Intel Xeon phi chip will support 352 logical threads. For HPC
+>>>>>> usage case, it will create a huge VM with vcpus number as same as host
+>>>>>> cpus. This patch is to increase max vcpu number to 352.
+>>>>>
+>>>>> If we pick arbitray limits based on size of physical CPUs that happen
+>>>>> to be shipping today, we'll continue the cat+mouse game forever trailing
+>>>>> latest CPUs that vendors ship.
+>>>>>
+>>>>> IMHO we should pick a higher number influenced by technical constraints
+>>>>> of the q35 impl instead. eg can we go straight to something like 512 or
+>>>>> 1024  ?
+>>>>
+>>>> Sure. 512 should be enough and some arrays is defined according to max
+>>>> vcpu number.
+>>>
+>>> Hm, which arrays are that?  I was thinking it is safe to bump it to
+>>> INT_MAX as the number is only used when setting global max_cpus.
+>>
+>> We had a MAX_CPUMASK_BITS macro, and bitmaps whose sizes were
+>> defined at compile time based on it.  But commit
+>> cdda2018e3b9ce0c18938767dfdb1e05a05b67ca removed it.  Probably
+>> those arrays all use max_cpus, by now (and the default for
+>> max_cpus is smp_cpus, not MachineClass::max_cpus).
+> 
+> Ah, thanks.
+> 
+>> Anyway, if we set it to INT_MAX, there are some cases where more
+>> appropriate error checking/reporting could be required because
+>> they won't handle overflow very well:
+>> * pcms->apic_id_limit initialization at pc_cpus_init()
+>> * ACPI code that assumes possible_cpus->cpus[i].arch_id fits
+>>   in a 32-bit integer
+>> * Other x86_cpu_apic_id_from_index() calls in PC code
+>>   (especially the initialization of possible_cpus->cpus[i].arch_id).
+>>   Note that x86_cpu_apic_id_from_index(cpu_index) might not fit
+>>   in 32 bits even if cpu_index <= UINT32_MAX.
+> 
+> Good point, looks like it all comes to x86_cpu_apic_id_from_index().
+> Each level of the topology has at most one underutilized bit, so
+> 2^(32 - 3) would be safe.
+> 
+> It is still needlessly large for the foreseeable future, but 512 is
+> going to be surpassed pretty soon, so I think that jumping at least to
+> 8k would be better.
+> (8k the current default maximum for Linux and the resulting overcommit
+>  of ~20 is bearable for smoke testing on current hardware.)
+> 
 
-Suggested-by: Michael Tsirkin <mst@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/boot-sector.c | 41 ++++++++++++++++++++++++++---------------
- 1 file changed, 26 insertions(+), 15 deletions(-)
+Hi All:
+	Thanks for your input. I tried Qemu with 8192 as max_vcpu and it works
+normally. I will update patches.
 
-diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-index e3880f4..8729562 100644
---- a/tests/boot-sector.c
-+++ b/tests/boot-sector.c
-@@ -21,13 +21,12 @@
- #define SIGNATURE 0xdead
- #define SIGNATURE_OFFSET 0x10
- #define BOOT_SECTOR_ADDRESS 0x7c00
-+#define SIGNATURE_ADDR (BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET)
- 
--/* Boot sector code: write SIGNATURE into memory,
-+/* x86 boot sector code: write SIGNATURE into memory,
-  * then halt.
-- * Q35 machine requires a minimum 0x7e000 bytes disk.
-- * (bug or feature?)
-  */
--static uint8_t boot_sector[0x7e000] = {
-+static uint8_t x86_boot_sector[512] = {
-     /* The first sector will be placed at RAM address 00007C00, and
-      * the BIOS transfers control to 00007C00
-      */
-@@ -50,8 +49,8 @@ static uint8_t boot_sector[0x7e000] = {
-     [0x07] = HIGH(SIGNATURE),
-     /* 7c08:  mov %ax,0x7c10 */
-     [0x08] = 0xa3,
--    [0x09] = LOW(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
--    [0x0a] = HIGH(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET),
-+    [0x09] = LOW(SIGNATURE_ADDR),
-+    [0x0a] = HIGH(SIGNATURE_ADDR),
- 
-     /* 7c0b cli */
-     [0x0b] = 0xfa,
-@@ -72,7 +71,9 @@ static uint8_t boot_sector[0x7e000] = {
- int boot_sector_init(char *fname)
- {
-     int fd, ret;
--    size_t len = sizeof boot_sector;
-+    size_t len;
-+    char *boot_code;
-+    const char *arch = qtest_get_arch();
- 
-     fd = mkstemp(fname);
-     if (fd < 0) {
-@@ -80,16 +81,26 @@ int boot_sector_init(char *fname)
-         return 1;
-     }
- 
--    /* For Open Firmware based system, we can use a Forth script instead */
--    if (strcmp(qtest_get_arch(), "ppc64") == 0) {
--        len = sprintf((char *)boot_sector, "\\ Bootscript\n%x %x c! %x %x c!\n",
--                LOW(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET,
--                HIGH(SIGNATURE), BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET + 1);
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
-+        /* Q35 requires a minimum 0x7e000 bytes disk (bug or feature?) */
-+        len = MAX(0x7e000, sizeof(x86_boot_sector));
-+        boot_code = g_malloc0(len);
-+        memcpy(boot_code, x86_boot_sector, sizeof(x86_boot_sector));
-+    } else if (g_str_equal(arch, "ppc64")) {
-+        /* For Open Firmware based system, use a Forth script */
-+        boot_code = g_strdup_printf("\\ Bootscript\n%x %x c! %x %x c!\n",
-+                                    LOW(SIGNATURE), SIGNATURE_ADDR,
-+                                    HIGH(SIGNATURE), SIGNATURE_ADDR + 1);
-+        len = strlen(boot_code);
-+    } else {
-+        g_assert_not_reached();
-     }
- 
--    ret = write(fd, boot_sector, len);
-+    ret = write(fd, boot_code, len);
-     close(fd);
- 
-+    g_free(boot_code);
-+
-     if (ret != len) {
-         fprintf(stderr, "Could not write \"%s\"", fname);
-         return 1;
-@@ -115,8 +126,8 @@ void boot_sector_test(void)
-      * instruction.
-      */
-     for (i = 0; i < TEST_CYCLES; ++i) {
--        signature_low = readb(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET);
--        signature_high = readb(BOOT_SECTOR_ADDRESS + SIGNATURE_OFFSET + 1);
-+        signature_low = readb(SIGNATURE_ADDR);
-+        signature_high = readb(SIGNATURE_ADDR + 1);
-         signature = (signature_high << 8) | signature_low;
-         if (signature == SIGNATURE) {
-             break;
 -- 
-1.8.3.1
+Best regards
+Tianyu Lan
