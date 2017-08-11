@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dgB6g-0006NI-Km
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:40:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1dgB9N-0000Vs-Cs
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:42:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dgB6d-0000lM-C7
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:40:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33314)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dgB6d-0000jX-3X
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:40:07 -0400
-References: <20170811074652.31474-1-david@redhat.com>
-	<20170811074652.31474-2-david@redhat.com>
-	<c9bb3167-3de8-42a3-2815-0851b56f49a5@redhat.com>
-	<79f9f850-f0dc-cea7-8a5c-85d23b07842b@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c5c6bbd0-e975-76f1-4d18-0618aeaffe60@redhat.com>
-Date: Fri, 11 Aug 2017 16:39:59 +0200
+	(envelope-from <eblake@redhat.com>) id 1dgB9M-0002V9-1v
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:42:57 -0400
+References: <20170811080939.22304-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f508bf20-c60d-6947-eb54-727d9fa8d686@redhat.com>
+Date: Fri, 11 Aug 2017 09:42:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <79f9f850-f0dc-cea7-8a5c-85d23b07842b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/5] target/s390x: introduce internal.h
+In-Reply-To: <20170811080939.22304-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8KRMusDbDRDUFQJIvBxvR360Ixkx7JXK9"
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v2] file-posix: Clear out first
+ sector in hdev_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On 11.08.2017 16:21, David Hildenbrand wrote:
-> On 11.08.2017 16:00, Thomas Huth wrote:
->> On 11.08.2017 09:46, David Hildenbrand wrote:
->>> cpu.h should only contain what really has to be accessed outside of
->>> target/s390x/. Add internal.h which can only be used inside target/s390x/.
->>>
->>> Move everything that isn't fast enough to run away and restructure it
->>> right away.
->>>
->>> Minor style fixes to avoid checkpatch warning to:
->>> - struct Lowcore: "{" goes into same line as typedef
->>> - struct LowCore: add spaces around "-" in array length calculations
->>> - time2tod() and tod2time(): move "{" to separate line
->>> - get_per_atmid(): add space between ")" and "?". Move cases by one char.
->>> - get_per_atmid(): drop extra paremthesis around (1 << 6)
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->> [...]
->>> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
->>> new file mode 100644
->>> index 0000000..9a55271
->>> --- /dev/null
->>> +++ b/target/s390x/internal.h
->>> @@ -0,0 +1,560 @@
->>> +/*
->>> + * s390x internal definitions and helpers
->>> + *
->>> + *  Copyright (c) 2009 Ulrich Hecht
->>> + *
->>> + * This library is free software; you can redistribute it and/or
->>> + * modify it under the terms of the GNU Lesser General Public
->>> + * License as published by the Free Software Foundation; either
->>> + * version 2 of the License, or (at your option) any later version.
->>> + *
->>> + * This library is distributed in the hope that it will be useful,
->>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>> + * Lesser General Public License for more details.
->>> + *
->>> + * Contributions after 2012-10-29 are licensed under the terms of the
->>> + * GNU GPL, version 2 or (at your option) any later version.
->>
->> Slightly off-topic to your patch, but since you're at it anyway: AFAIK
->> the above sentence effectively means that we should update the copyright
->> boiler plate to GPL2+ nowadays. See
->> https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html section 3.
-> 
-> (not a license expert)
-> 
-> Do you want me to replace it also in cpu.h?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8KRMusDbDRDUFQJIvBxvR360Ixkx7JXK9
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <f508bf20-c60d-6947-eb54-727d9fa8d686@redhat.com>
+Subject: Re: [PATCH for-2.11 v2] file-posix: Clear out first sector in
+ hdev_create
+References: <20170811080939.22304-1-famz@redhat.com>
+In-Reply-To: <20170811080939.22304-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No, at least not directly here in this patch series. I think that's
-something for a separate patch (we've got the same issue in cpu.c and
-kvm.c), so just use the correct boilerplate text in internal.h here.
+On 08/11/2017 03:09 AM, Fam Zheng wrote:
+> People get surprised when, after "qemu-img create -f raw /dev/sdX", the=
+y
+> still see qcow2 with "qemu-img info", if previously the bdev had a qcow=
+2
+> header. While this is natural because raw doesn't need to write any
+> magic bytes during creation, hdev_create is free to clear out the first=
 
-> Do we still need the remark about "contributions after 2012-10-29 are" ?
+> sector to make sure the stale qcow2 header doesn't cause such confusion=
+=2E
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+>=20
+> v2: Use stack allocated buffer. [Eric]
+>     Fix return value.
+>     (Keep qemu_write_full instead of switching to qemu_pwritev because
+>     the former handles short writes.)
+>     Fix typo "qemu-img". [Changlong]
+> ---
+>  block/file-posix.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 
-Once the license text has been updated, the remark can certainly go away.
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index f4de022ae0..a63bbf2b90 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2703,6 +2703,16 @@ static int hdev_create(const char *filename, Qem=
+uOpts *opts,
+>          ret =3D -ENOSPC;
+>      }
+> =20
+> +    if (total_size) {
+> +        uint8_t buf[BDRV_SECTOR_SIZE] =3D { 0 };
+> +        int64_t zero_size =3D MIN(BDRV_SECTOR_SIZE, total_size);
+> +        if (lseek(fd, 0, SEEK_SET) =3D=3D -1) {
+> +            ret =3D -errno;
+> +        } else {
+> +            ret =3D qemu_write_full(fd, buf, zero_size);
+> +            ret =3D ret =3D=3D zero_size ? 0 : -errno;
+> +        }
+> +    }
 
- Thomas
+Question: are we ever constrained by O_DIRECT where writing only 512
+bytes would be too small for a block device that mandates 4k alignment?
+If so, then we need MAX(minimum write size, MIN(BDRV_SECTOR_SIZE,
+total_size)) - it would also mean we can't stack-allocate any more, but
+that we have to do an aligned buffer allocation (where g_malloc is not
+necessarily suitably aligned).
+
+If O_DIRECT is not a problem, then this is okay:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--8KRMusDbDRDUFQJIvBxvR360Ixkx7JXK9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmNwlwACgkQp6FrSiUn
+Q2ojLggAokpxkA1crh93rAk58+oMz+BaKHkcvo57BckPKwKUvxQPSDib/LsDAaAY
+sDCeVdAzkc31OH+N5LKOmD3rSTFWuBpukmCsmQKj3YJjqLxRFQ1tUsZl3E8s9mVw
+631jnVJ3+aeamJsUvbNkm2bP+2LB+4OfIAM6mpNLnHypmnJThpvyN/xpnxGXQW0t
+sqqrA8Tw7siLXObJHVbrU8BhkEHbgPo8w7w/MfifzSavOvQmwL2b3Ieo2FzhInRr
+cG68xua8avhU7Bto0uQc8avbrb1dDvZuoJEBdjkDY+O1RKeVM7X4PX5xNFWf49x9
+JePDVjJU/QaOsM4m1oMVOhY+2hfT/g==
+=cwvl
+-----END PGP SIGNATURE-----
+
+--8KRMusDbDRDUFQJIvBxvR360Ixkx7JXK9--
