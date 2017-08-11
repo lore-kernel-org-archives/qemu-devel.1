@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dg6ZX-000493-7Y
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:49:40 -0400
+	(envelope-from <otubo@redhat.com>) id 1dg6bE-0005hb-J2
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:51:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dg6ZS-0007iv-DL
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:49:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43582)
+	(envelope-from <otubo@redhat.com>) id 1dg6b9-0001fq-Ob
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:51:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dg6ZS-0007eZ-47
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:49:34 -0400
-Date: Fri, 11 Aug 2017 11:49:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170811114922.2edda3a7.cohuck@redhat.com>
-In-Reply-To: <1502431076-22849-1-git-send-email-thuth@redhat.com>
-References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dg6b9-0001fJ-Hb
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:51:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D2D6AB474
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 09:51:18 +0000 (UTC)
+Date: Fri, 11 Aug 2017 11:51:12 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20170811095112.GB11001@vader>
+References: <20170728121040.631-1-otubo@redhat.com>
+	<20170728121040.631-2-otubo@redhat.com>
+	<787616d3-955a-42d9-6c8f-1236821751c3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 0/2] Improvements for the pxe
- tester
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <787616d3-955a-42d9-6c8f-1236821751c3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] seccomp: changing from whitelist to
+ blacklist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +36,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, pbonzini@redhat.com
 
-On Fri, 11 Aug 2017 07:57:54 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> The first patch improves the buffer handling in the pxe tester a
-> little bit by allocating a separate buffer on the heap for each
-> architecture. This also gets rid of the huge pre-initialized
-> array in the tester, shrinking the size of the executable by
-> half of a megabyte!
-> The second patch adds s390x support to the pxe tester. Starting
-> with QEMU 2.10, the guest firmware on s390x can now net-boot via
-> TFTP, too, so we can automatically test this code in the pxe tester.
+On Thu, Aug 03, 2017 at 06:54:15PM +0200, Thomas Huth wrote:
+> On 28.07.2017 14:10, Eduardo Otubo wrote:
+> > This patch changes the default behavior of the seccomp filter from
+> > whitelist to blacklist. By default now all system calls are allowed and
+> > a small black list of definitely forbidden ones was created.
+> > 
+> > Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> > ---
+> >  qemu-seccomp.c | 256 +++++++--------------------------------------------------
+> >  vl.c           |   5 +-
+> >  2 files changed, 32 insertions(+), 229 deletions(-)
+> > 
+> > diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> > index df75d9c471..f8877b07b5 100644
+> > --- a/qemu-seccomp.c
+> > +++ b/qemu-seccomp.c
+> > @@ -31,229 +31,29 @@ struct QemuSeccompSyscall {
+> >      uint8_t priority;
+> >  };
+> [...]
+> > +static const struct QemuSeccompSyscall blacklist[] = {
+> > +    { SCMP_SYS(reboot), 255 },
+> > +    { SCMP_SYS(swapon), 255 },
+> > +    { SCMP_SYS(swapoff), 255 },
+> > +    { SCMP_SYS(syslog), 255 },
+> > +    { SCMP_SYS(mount), 255 },
+> > +    { SCMP_SYS(umount), 255 },
+> > +    { SCMP_SYS(kexec_load), 255 },
+> > +    { SCMP_SYS(afs_syscall), 255 },
+> > +    { SCMP_SYS(break), 255 },
+> > +    { SCMP_SYS(ftime), 255 },
+> > +    { SCMP_SYS(getpmsg), 255 },
+> > +    { SCMP_SYS(gtty), 255 },
+> > +    { SCMP_SYS(lock), 255 },
+> > +    { SCMP_SYS(mpx), 255 },
+> > +    { SCMP_SYS(prof), 255 },
+> > +    { SCMP_SYS(profil), 255 },
+> > +    { SCMP_SYS(putpmsg), 255 },
+> > +    { SCMP_SYS(security), 255 },
+> > +    { SCMP_SYS(stty), 255 },
+> > +    { SCMP_SYS(tuxcall), 255 },
+> > +    { SCMP_SYS(ulimit), 255 },
+> > +    { SCMP_SYS(vserver), 255 },
+> >  };
 > 
-> v2: Adressed Cornelia's review feedback from the first version, e.g.:
->  - Use g_malloc0() instead of g_malloc()
->  - Use sizeof with parentheses
-> 
-> Thomas Huth (2):
->   tests/boot-sector: Do not overwrite the x86 buffer on other
->     architectures
->   tests/pxe: Check virtio-net-ccw on s390x
-> 
->  tests/Makefile.include |  1 +
->  tests/boot-sector.c    | 61 +++++++++++++++++++++++++++++++++++++-------------
->  tests/pxe-test.c       |  7 ++++++
->  3 files changed, 54 insertions(+), 15 deletions(-)
-> 
+> Does it makes sense to still keep the priority field? Everything is now
+> marked with the value 255 and I currently fail to see the point of
+> priorities when using blacklisting ... so maybe just get rid of it?
 
-Haven't reviewed the updates yet, but tried it out (on my laptop and on
-a z/VM guest). Laptop went fine; on the z/VM guest, I forgot to turn on
-vm.allocate_pgste at first:
+I think that's a fair point here. Don't see much of a point on such a
+small number of syscalls. I just need to double check the libseccomp
+docs if I can build the list without any priority information, but I'm
+pretty sure I've seen this before.
 
-TEST: tests/pxe-test... (pid=56084)
-  /s390x/pxe/virtio-ccw:                                               ioctl(KVM_CREATE_VM) failed: 22 Invalid argument
-Host kernel setup problem detected. Please verify:
-- for kernels supporting the switch_amode or user_mode parameters, whether
-  user space is running in primary address space
-- for kernels supporting the vm.allocate_pgste sysctl, whether it is enabled
-qemu-system-s390x: failed to initialize KVM: Invalid argument
-qemu-system-s390x: Back to tcg accelerator
-OK
-PASS: tests/pxe-test
-
-It does the correct fallback (the need for allocate_pgste will go away
-with future kernels), so this is fine. However, it prompted me to test
-with --disable-tcg:
-
-TEST: tests/boot-serial-test... (pid=60499)
-  /s390x/boot-serial/s390-ccw-virtio:                                  qemu-system-s390x: -machine accel=tcg: No accelerator found
-socket_accept failed: Resource temporarily unavailable
-**
-ERROR:/root/git/qemu/tests/libqtest.c:212:qtest_init_without_qmp_handshake: assertion failed: (s->fd >= 0 && s->qmp_fd >= 0)
-FAIL
-GTester: last random seed: R02S83c8a1860bbd8c2658647407c7070b7e
-(pid=60503)
-FAIL: tests/boot-serial-test
-
-There are probably more tests that rely on tcg always being available,
-which is no longer true. (Also, the boot-serial test should probably
-check if qemu even started rather than run into in a timeout.)
-
-[Your patches are fine, but I think we really need to consider tests
-and accelerators.]
+-- 
+Eduardo Otubo
+Senior Software Engineer @ RedHat
