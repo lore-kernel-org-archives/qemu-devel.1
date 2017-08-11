@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49700)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dgGwQ-0001GW-TF
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 16:54:00 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34886)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<SRS0=J12V=7N=ens-lyon.org=samuel.thibault@bounce.ens-lyon.org>)
+	id 1dgHxG-0007rY-RZ
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 17:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dgGwP-0005sx-QP
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 16:53:58 -0400
+	(envelope-from
+	<SRS0=J12V=7N=ens-lyon.org=samuel.thibault@bounce.ens-lyon.org>)
+	id 1dgHxC-0004Yt-0U
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 17:58:54 -0400
+Received: from domu-toccata.ens-lyon.fr ([140.77.166.138]:48264
+	helo=sonata.ens-lyon.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from
+	<SRS0=J12V=7N=ens-lyon.org=samuel.thibault@bounce.ens-lyon.org>)
+	id 1dgHxB-0004YB-Q1
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 17:58:49 -0400
+Date: Fri, 11 Aug 2017 23:58:45 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
+References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKM1p2-9roBs1Lh-7UUvQ+JGW4LWTPbLJ=VWzae2Q2s4uw@mail.gmail.com>
-References: <cover.1502474835.git.alistair.francis@xilinx.com>
-	<2fbcf76e4ff63d8527edd3662342948276e2cd37.1502474835.git.alistair.francis@xilinx.com>
-	<de3609ba-241a-6df8-b5c3-30eb4535735e@linaro.org>
-	<CAKmqyKPLJpv79Dv77t8m2q-pFOBg3u4hDmcz5Wk2t+tt+bT8UA@mail.gmail.com>
-	<fb2b501e-21b0-f711-19f5-a3087b6007f3@linaro.org>
-	<CAKmqyKOCAS1=WPFwBUXwTve1T_VZsQKJdT=15CPRoHSs-eEhDw@mail.gmail.com>
-	<abdfeb96-6c04-66cb-44fe-a964beb901c3@linaro.org>
-	<CAKmqyKM1p2-9roBs1Lh-7UUvQ+JGW4LWTPbLJ=VWzae2Q2s4uw@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 11 Aug 2017 13:53:23 -0700
-Message-ID: <CAKmqyKNoXxHLzemFXqjTYz9CK_TGPHyH=HexWWQbFHT8vpf5CQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 3/3] target/arm: Correct exclusive store
- return value
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Fri, Aug 11, 2017 at 1:39 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Fri, Aug 11, 2017 at 1:38 PM, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> On 08/11/2017 01:29 PM, Alistair Francis wrote:
->>> On Fri, Aug 11, 2017 at 1:24 PM, Richard Henderson
->>> <richard.henderson@linaro.org> wrote:
->>>> On 08/11/2017 01:13 PM, Alistair Francis wrote:
->>>>>>> +            tcg_gen_ext_i64(val, val, memop);
->>>>>>
->>>>>> What is this addition intended to accomplish?  Because of the position within
->>>>>> the code, you know that memop contains MO_64, so that this is a no-op.
->>>>>
->>>>> This is when size == 2 so it's a 32bit operation so memop contains MO_32.
->>>>
->>>> It's a paired 32-bit operation, so we're operating on a 64-bit quantity.  So
->>>> extending from 32-bits would be actively wrong.
->>>
->>> From what I can see though, the 32bit memop is carried into the
->>> tcg_gen_atomic_cmpxchg_i64() call so the value returned to tmp is
->>> masked by the 32bit operation.
->>>
->>> Is passing down MO_32 into tcg_gen_atomic_cmpxchg_i64() wrong then as
->>> it ends up as a 64-bit operation?
->>
->> If we're passing MO_32 down to cmpxchg_i64 for this case, you have indeed found
->> a bug.  I'll investigate this further on Monday.
->
-> Maybe that is why I'm seeing these failures. I'll have a look as well
-> to see if this fixes my problems.
+Hello,
 
-That's it. That wrong mask was causing all my breakages.
+Programmingkid, on jeu. 10 ao=C3=BBt 2017 16:44:19 -0400, wrote:
+> While compiling I saw these error messages:
+>=20
+> slirp/ip6_icmp.c:79:32: warning: taking address of packed member 'ip_sr=
+c' of class or
+>       structure 'ip6' may result in an unaligned pointer value
+>       [-Waddress-of-packed-member]
+>     if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
+>                                ^~~~~~~~~~
 
-I'll send out a new series, thanks for your help.
+> slirp/ip_input.c:159:43: warning: taking address of packed member 'ip_l=
+ink' of class or
+>       structure 'ipq' may result in an unaligned pointer value
+>       [-Waddress-of-packed-member]
+>                 for (l =3D slirp->ipq.ip_link.next; l !=3D &slirp->ipq.=
+ip_link;
+>                                                         ^~~~~~~~~~~~~~~=
+~~~
 
-Thanks,
-Alistair
+Well, if the compiler was counting well, it would notice that the
+structure are made so that even with packing, fields always get aligned
+on proper bounds.
 
->
-> Thanks,
-> Alistair
->
->>
->>
->> r~
->>
+(and no, we don't want to remove QEMU_PACKED from struct ip6, at least,
+since it *has* to be packed to match the ipv6 headers).
+
+Samuel
