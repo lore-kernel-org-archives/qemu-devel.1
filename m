@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dgBFL-0006Oj-Iw
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:49:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1dgBHI-0008Rd-K7
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dgBFI-00050q-Ht
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:49:07 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:38714)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dgBFI-00050k-Dd
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:49:04 -0400
-Received: by mail-qk0-x242.google.com with SMTP id m84so3686558qki.5
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 07:49:04 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170811140628.31935-1-f4bug@amsat.org>
-	<bd1e9b06-56fd-fed0-e19b-c8a0c036c58c@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3bca0f5d-1daf-fff3-4002-9671adf29d6a@amsat.org>
-Date: Fri, 11 Aug 2017 11:49:00 -0300
+	(envelope-from <berrange@redhat.com>) id 1dgBHF-0005oL-J1
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:51:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dgBHF-0005o6-CZ
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:51:05 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3729425B99
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 14:51:04 +0000 (UTC)
+Date: Fri, 11 Aug 2017 15:50:56 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170811145056.GN2554@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170808162629.32493-1-quintela@redhat.com>
+	<20170808162629.32493-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bd1e9b06-56fd-fed0-e19b-c8a0c036c58c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] memory: fix
- access_with_adjusted_size() on big-endian
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170808162629.32493-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 01/19] migration: Create
+ migration_ioc_process_incoming()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,99 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 08/11/2017 11:25 AM, Paolo Bonzini wrote:
-> On 11/08/2017 16:06, Philippe Mathieu-Daudé wrote:
->> remove unnecessary memory_region_big_endian()
+On Tue, Aug 08, 2017 at 06:26:11PM +0200, Juan Quintela wrote:
+> We pass the ioc instead of the fd.  This will allow us to have more
+> than one channel open.  We also make sure that we set the
+> from_src_file sooner, so we don't need to pass it as a parameter.
 > 
-> Can you explain why it's unnecessary?...
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/channel.c   |  3 +--
+>  migration/migration.c | 25 ++++++++++++++++++++-----
+>  migration/migration.h |  2 ++
+>  3 files changed, 23 insertions(+), 7 deletions(-)
 
-I might have missed a lot here, I'm focusing on something else and 
-thought this might help Frederic so I only cherry-picked this patch from 
-a bigger series, since I memory_region_big_endian() is static/unused I 
-just dropped it, which is surely wrong.
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-I see in this series I then call "adjust_endianness(mr, value, size)" 
-before returning. And then lot of unit-tests to understand failures I'm 
-having accessing PCI bus on armeb.
 
-This branch is few months old and I'm out of context, I shouldn't have 
-rushed to send this patch, I'll try to get some time during the week-end 
-to remember.
-
-Cheers,
-
-Phil.
-
-> 
-> Paolo
-> 
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> This is part of a branch with many cross-endianness tests for 2.11
->>
->> Frederic does it helps your issues on armeb?
->>
->>   memory.c | 28 ++++++++++------------------
->>   1 file changed, 10 insertions(+), 18 deletions(-)
->>
->> diff --git a/memory.c b/memory.c
->> index c0adc35410..600f5d5b1a 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -338,15 +338,6 @@ static void flatview_simplify(FlatView *view)
->>       }
->>   }
->>   
->> -static bool memory_region_big_endian(MemoryRegion *mr)
->> -{
->> -#ifdef TARGET_WORDS_BIGENDIAN
->> -    return mr->ops->endianness != DEVICE_LITTLE_ENDIAN;
->> -#else
->> -    return mr->ops->endianness == DEVICE_BIG_ENDIAN;
->> -#endif
->> -}
->> -
->>   static bool memory_region_wrong_endianness(MemoryRegion *mr)
->>   {
->>   #ifdef TARGET_WORDS_BIGENDIAN
->> @@ -572,7 +563,8 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
->>   {
->>       uint64_t access_mask;
->>       unsigned access_size;
->> -    unsigned i;
->> +    hwaddr access_addr;
->> +    unsigned offset;
->>       MemTxResult r = MEMTX_OK;
->>   
->>       if (!access_size_min) {
->> @@ -585,17 +577,17 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
->>       /* FIXME: support unaligned access? */
->>       access_size = MAX(MIN(size, access_size_max), access_size_min);
->>       access_mask = -1ULL >> (64 - access_size * 8);
->> -    if (memory_region_big_endian(mr)) {
->> -        for (i = 0; i < size; i += access_size) {
->> -            r |= access(mr, addr + i, value, access_size,
->> -                        (size - access_size - i) * 8, access_mask, attrs);
->> +    access_addr = addr & ~(access_size - 1);
->> +    if (access_size < size) {
->> +        for (offset = 0; offset < size; offset += access_size) {
->> +            r |= access(mr, access_addr + offset, value, access_size,
->> +                        offset * 8, access_mask, attrs);
->>           }
->>       } else {
->> -        for (i = 0; i < size; i += access_size) {
->> -            r |= access(mr, addr + i, value, access_size, i * 8,
->> -                        access_mask, attrs);
->> -        }
->> +        r = access(mr, access_addr, value, access_size,
->> +                    0, access_mask, attrs);
->>       }
->> +
->>       return r;
->>   }
->>   
->>
-> 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
