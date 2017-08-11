@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dgBEt-0005yw-9C
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:48:41 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dgBFL-0006Oj-Iw
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dgBEq-0004uC-7X
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:48:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dgBEp-0004tx-U3
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:48:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B2650C0CBC15
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 14:48:34 +0000 (UTC)
-References: <1502389816-29772-1-git-send-email-armbru@redhat.com>
-	<17b1385e-c14f-d933-661f-56217077ff79@redhat.com>
-	<87shgy4gl8.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d96352cf-3c43-b453-7f09-5576e8863205@redhat.com>
-Date: Fri, 11 Aug 2017 09:48:32 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dgBFI-00050q-Ht
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:49:07 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:38714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dgBFI-00050k-Dd
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:49:04 -0400
+Received: by mail-qk0-x242.google.com with SMTP id m84so3686558qki.5
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 07:49:04 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170811140628.31935-1-f4bug@amsat.org>
+	<bd1e9b06-56fd-fed0-e19b-c8a0c036c58c@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3bca0f5d-1daf-fff3-4002-9671adf29d6a@amsat.org>
+Date: Fri, 11 Aug 2017 11:49:00 -0300
 MIME-Version: 1.0
-In-Reply-To: <87shgy4gl8.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Iw25d5KIsTQJHqxFOihFiGX7RR3M1cQpe"
-Subject: [Qemu-devel] marking SCM_RIGHTS qapi commands [was: [PATCH]
- tests/qmp-test: Add generic, basic test of query commands]
+In-Reply-To: <bd1e9b06-56fd-fed0-e19b-c8a0c036c58c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] memory: fix
+ access_with_adjusted_size() on big-endian
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,93 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, crosa@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Iw25d5KIsTQJHqxFOihFiGX7RR3M1cQpe
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, crosa@redhat.com
-Message-ID: <d96352cf-3c43-b453-7f09-5576e8863205@redhat.com>
-Subject: marking SCM_RIGHTS qapi commands [was: [PATCH] tests/qmp-test: Add
- generic, basic test of query commands]
-References: <1502389816-29772-1-git-send-email-armbru@redhat.com>
- <17b1385e-c14f-d933-661f-56217077ff79@redhat.com>
- <87shgy4gl8.fsf@dusky.pond.sub.org>
-In-Reply-To: <87shgy4gl8.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 08/11/2017 11:25 AM, Paolo Bonzini wrote:
+> On 11/08/2017 16:06, Philippe Mathieu-Daudé wrote:
+>> remove unnecessary memory_region_big_endian()
+> 
+> Can you explain why it's unnecessary?...
 
-On 08/11/2017 04:08 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> On 08/10/2017 01:30 PM, Markus Armbruster wrote:
->>> A command is a query if it has no side effect and yields a result.
->>> Such commands are typically named query-FOO, but there are exceptions=
-=2E
->>>
->>> The basic idea is to find candidates with query-qmp-schema, filter ou=
-t
->>> the ones that aren't queries with an explicit blacklist, and test the=
+I might have missed a lot here, I'm focusing on something else and 
+thought this might help Frederic so I only cherry-picked this patch from 
+a bigger series, since I memory_region_big_endian() is static/unused I 
+just dropped it, which is surely wrong.
 
->>> remaining ones against a QEMU with no special arguments.
->>>
->>> The current blacklist is just add-fd.
+I see in this series I then call "adjust_endianness(mr, value, size)" 
+before returning. And then lot of unit-tests to understand failures I'm 
+having accessing PCI bus on armeb.
+
+This branch is few months old and I'm out of context, I shouldn't have 
+rushed to send this patch, I'll try to get some time during the week-end 
+to remember.
+
+Cheers,
+
+Phil.
+
+> 
+> Paolo
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> This is part of a branch with many cross-endianness tests for 2.11
 >>
->> I guess this is because it has no mandatory parameters.  Hmm - I wonde=
-r
->> if introspection should flag WHICH commands require an fd over SCM
->> rights (I guess just add-fd)
->=20
-> Actually, add-fd and getfd.
-
->=20
-> An obvious alternative is of course adding another optional member to
-> the command object, say a flag "takes file descriptors via SCM_RIGHTS".=
-
-> Do we need to express the number of file descriptors it takes?  The
-> underlying infrastructure supports several (TCP_MAX_FDS in
-> char-socket.c), but the existing commands take just one.
-
-Yeah, I was definitely leaning towards an additional annotation - maybe
-where the .json file has:
-
-{ 'command': 'add-fd', 'data': {'*fdset-id': 'int', '*opaque': 'str'},
-  'fds': 1, 'returns': 'AddfdInfo' }
-
-where the new 'fds' is what designates that the command expects to
-consume 1 fd by SCM_RIGHTS (defaults to 0 when not present, and could be
-larger than one if a command is ever designed to take multiple fds in
-one go - although I find SCM_RIGHTS tricky enough with 1 fd that passing
-multiple is probably not necessary, so maybe false/true is better than
-int).  The introspection output would similarly expose the same optional
-member for each command object, repeating what was present in the .json
-file.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Iw25d5KIsTQJHqxFOihFiGX7RR3M1cQpe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmNw8EACgkQp6FrSiUn
-Q2o8sAf+I6PrEyFxH/KS47EWfQ33Cmxbtg1VzIfRRjB2ixyBiG4beRbVTHOJINw4
-1LqVj5SLIcW8pucQNxi3XC0/rFfzct+stbrz1QKEaC6Nj9+r/qRtWsx0L76rJPJv
-abi1mw0hictOTbFLzl7zJC9BhqWJH7tC8zfw1/hx5kVykuCIi9bk+Ut7rfaJvR2H
-LO/g3Hl9/oc1DJ68M1U1AIRXkSLOw9qJFfebLHB4LBw03QiBaONz5nuLv+kKtFs8
-GIcniOwZjfEpd1WcBEOorcQhKVEsIPyw/idIONScPrasngpK82UssPvtEYbDRVGF
-vYdK79w0ltcnDOAd+jk4WeTX/6+kmA==
-=MPeR
------END PGP SIGNATURE-----
-
---Iw25d5KIsTQJHqxFOihFiGX7RR3M1cQpe--
+>> Frederic does it helps your issues on armeb?
+>>
+>>   memory.c | 28 ++++++++++------------------
+>>   1 file changed, 10 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/memory.c b/memory.c
+>> index c0adc35410..600f5d5b1a 100644
+>> --- a/memory.c
+>> +++ b/memory.c
+>> @@ -338,15 +338,6 @@ static void flatview_simplify(FlatView *view)
+>>       }
+>>   }
+>>   
+>> -static bool memory_region_big_endian(MemoryRegion *mr)
+>> -{
+>> -#ifdef TARGET_WORDS_BIGENDIAN
+>> -    return mr->ops->endianness != DEVICE_LITTLE_ENDIAN;
+>> -#else
+>> -    return mr->ops->endianness == DEVICE_BIG_ENDIAN;
+>> -#endif
+>> -}
+>> -
+>>   static bool memory_region_wrong_endianness(MemoryRegion *mr)
+>>   {
+>>   #ifdef TARGET_WORDS_BIGENDIAN
+>> @@ -572,7 +563,8 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+>>   {
+>>       uint64_t access_mask;
+>>       unsigned access_size;
+>> -    unsigned i;
+>> +    hwaddr access_addr;
+>> +    unsigned offset;
+>>       MemTxResult r = MEMTX_OK;
+>>   
+>>       if (!access_size_min) {
+>> @@ -585,17 +577,17 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+>>       /* FIXME: support unaligned access? */
+>>       access_size = MAX(MIN(size, access_size_max), access_size_min);
+>>       access_mask = -1ULL >> (64 - access_size * 8);
+>> -    if (memory_region_big_endian(mr)) {
+>> -        for (i = 0; i < size; i += access_size) {
+>> -            r |= access(mr, addr + i, value, access_size,
+>> -                        (size - access_size - i) * 8, access_mask, attrs);
+>> +    access_addr = addr & ~(access_size - 1);
+>> +    if (access_size < size) {
+>> +        for (offset = 0; offset < size; offset += access_size) {
+>> +            r |= access(mr, access_addr + offset, value, access_size,
+>> +                        offset * 8, access_mask, attrs);
+>>           }
+>>       } else {
+>> -        for (i = 0; i < size; i += access_size) {
+>> -            r |= access(mr, addr + i, value, access_size, i * 8,
+>> -                        access_mask, attrs);
+>> -        }
+>> +        r = access(mr, access_addr, value, access_size,
+>> +                    0, access_mask, attrs);
+>>       }
+>> +
+>>       return r;
+>>   }
+>>   
+>>
+> 
