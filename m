@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=3891006ae=anthony.perard@citrix.com>)
-	id 1dgBbK-0005Iz-Tr
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:11:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dgBeq-0008FS-NM
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=3891006ae=anthony.perard@citrix.com>)
-	id 1dgBbF-0000iC-US
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:11:50 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:58291)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=3891006ae=anthony.perard@citrix.com>)
-	id 1dgBbF-0000i5-Nt
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:11:45 -0400
-From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Fri, 11 Aug 2017 16:11:36 +0100
-Message-ID: <20170811151138.29405-1-anthony.perard@citrix.com>
+	(envelope-from <cohuck@redhat.com>) id 1dgBel-0002Kf-Ok
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:15:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dgBel-0002IV-J5
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:15:23 -0400
+Date: Fri, 11 Aug 2017 17:15:15 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170811171515.623cd5c6.cohuck@redhat.com>
+In-Reply-To: <20170811074652.31474-1-david@redhat.com>
+References: <20170811074652.31474-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.10 0/2] Fix hotplug of PCI passthrought
- device on Xen
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 0/5] target/s390x: introduce internal.h
+ and cleanup cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com
 
-Adding PCI passthrough before the guest start works fine (broken in 2.9 but now
-fixed), but hotplug does not work anymore.
+On Fri, 11 Aug 2017 09:46:47 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Anthony PERARD (2):
-  hw/acpi: Call acpi_set_pci_info when no ACPI tables needed
-  Revert "ACPI: don't call acpi_pcihp_device_plug_cb on xen"
+> cpu.h is accessed outside of target/s390x. It should only contain
+> what is expected to be accessed outside of this folder. Therefore, create
+> internal.h and move a lot to that file.
 
- hw/acpi/piix4.c      | 11 +++--------
- hw/i386/acpi-build.c |  4 ++--
- 2 files changed, 5 insertions(+), 10 deletions(-)
+Cool, I like that.
 
--- 
-Anthony PERARD
+> 
+> While doing that, I noticed that a lot of function prototypes not
+> available with CONFIG_USER_ONLY are not protected by CONFIG_USER_ONLY.
+> 
+> As these CONFIG_USER_ONLY are in general ugly, I decided to minimize
+> them to the bare minimum :]. Do we care? I dropped it wherever possible.
+> 
+> My compiler doesn't bail out, so let's see what the bot says.
+
+That should be easy to fix :)
+
+> 
+> There is still a lot to clean up (e.g. do we want kvm-stub.c ?). This is
+> the first step.
+
+Do you plan to send a v2 with kvm_s390x.h? If yes, I'll hold off
+looking at this series.
