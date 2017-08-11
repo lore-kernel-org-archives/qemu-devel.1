@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dgCoS-0004T5-5r
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:29:29 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dgCrz-0006pl-Lw
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dgCoP-0002v4-36
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:29:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58988)
+	(envelope-from <ehabkost@redhat.com>) id 1dgCrw-0005Gb-Js
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:33:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36630)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dgCoO-0002uT-Pv
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:29:25 -0400
-References: <20170811074652.31474-1-david@redhat.com>
-	<20170811074652.31474-2-david@redhat.com>
-	<c9bb3167-3de8-42a3-2815-0851b56f49a5@redhat.com>
-	<79f9f850-f0dc-cea7-8a5c-85d23b07842b@redhat.com>
-	<c5c6bbd0-e975-76f1-4d18-0618aeaffe60@redhat.com>
-	<125ba0f4-957a-ce49-8a53-bc4c277968dd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3760fe1a-1951-5a81-c479-71061c1ab47d@redhat.com>
-Date: Fri, 11 Aug 2017 18:29:17 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dgCrw-0005G5-EZ
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:33:04 -0400
+Date: Fri, 11 Aug 2017 13:33:00 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170811163300.GA29509@localhost.localdomain>
+References: <20170614203000.19984-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <125ba0f4-957a-ce49-8a53-bc4c277968dd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/5] target/s390x: introduce internal.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170614203000.19984-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] hostmem-file: Add "persistent" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>
 
-On 11.08.2017 18:11, David Hildenbrand wrote:
-> On 11.08.2017 16:39, Thomas Huth wrote:
->> On 11.08.2017 16:21, David Hildenbrand wrote:
->>> On 11.08.2017 16:00, Thomas Huth wrote:
->>>> On 11.08.2017 09:46, David Hildenbrand wrote:
->>>>> cpu.h should only contain what really has to be accessed outside of
->>>>> target/s390x/. Add internal.h which can only be used inside target/s390x/.
->>>>>
->>>>> Move everything that isn't fast enough to run away and restructure it
->>>>> right away.
->>>>>
->>>>> Minor style fixes to avoid checkpatch warning to:
->>>>> - struct Lowcore: "{" goes into same line as typedef
->>>>> - struct LowCore: add spaces around "-" in array length calculations
->>>>> - time2tod() and tod2time(): move "{" to separate line
->>>>> - get_per_atmid(): add space between ")" and "?". Move cases by one char.
->>>>> - get_per_atmid(): drop extra paremthesis around (1 << 6)
->>>>>
->>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>>> ---
->>>> [...]
->>>>> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
->>>>> new file mode 100644
->>>>> index 0000000..9a55271
->>>>> --- /dev/null
->>>>> +++ b/target/s390x/internal.h
->>>>> @@ -0,0 +1,560 @@
->>>>> +/*
->>>>> + * s390x internal definitions and helpers
->>>>> + *
->>>>> + *  Copyright (c) 2009 Ulrich Hecht
->>>>> + *
->>>>> + * This library is free software; you can redistribute it and/or
->>>>> + * modify it under the terms of the GNU Lesser General Public
->>>>> + * License as published by the Free Software Foundation; either
->>>>> + * version 2 of the License, or (at your option) any later version.
->>>>> + *
->>>>> + * This library is distributed in the hope that it will be useful,
->>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>>>> + * Lesser General Public License for more details.
->>>>> + *
->>>>> + * Contributions after 2012-10-29 are licensed under the terms of the
->>>>> + * GNU GPL, version 2 or (at your option) any later version.
->>>>
->>>> Slightly off-topic to your patch, but since you're at it anyway: AFAIK
->>>> the above sentence effectively means that we should update the copyright
->>>> boiler plate to GPL2+ nowadays. See
->>>> https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html section 3.
->>>
->>> (not a license expert)
->>>
->>> Do you want me to replace it also in cpu.h?
->>
->> No, at least not directly here in this patch series. I think that's
->> something for a separate patch (we've got the same issue in cpu.c and
->> kvm.c), so just use the correct boilerplate text in internal.h here.
->>
+CCing Zack Cornelius.
+
+On Wed, Jun 14, 2017 at 05:29:55PM -0300, Eduardo Habkost wrote:
+> This series adds a new "persistent" option to
+> memory-backend-file.  The new option it will be useful if
+> somebody is sharing RAM contents on a file using share=on, but
+> don't need it to be flushed to disk when QEMU exits.
 > 
-> I'll use the following:
+> Internally, it will trigger a madvise(MADV_REMOVE) or
+> fallocate(FALLOC_FL_PUNCH_HOLE) call when the memory backend is
+> destroyed.
 > 
-> /*
->  * s390x internal definitions and helpers
->  *
->  * Copyright (c) 2009 Ulrich Hecht
->  *
->  * This work is licensed under the terms of the GNU LGPL, version 2.1 or
-> later.
->  * See the COPYING.LIB file in the top-level directory.
->  */
+> To make we actually trigger the new code when QEMU exits, the
+> first patch in the series ensures we destroy all user-created
+> objects when exiting QEMU.
 
-That's the LGPL text ... I meant to change it to GPL2+ instead.
+So, before sending a new version of this, we need to clarify one
+thing: why exactly unlink()+close() wouldn't be enough to avoid
+having data unnecessarily flushed to the backing store and make
+the new option unnecessary?
 
- Thomas
+I would expect close() to not write any data unnecessarily if
+there are no remaining references to the file.  Why/when this is
+not the case?
+
+-- 
+Eduardo
